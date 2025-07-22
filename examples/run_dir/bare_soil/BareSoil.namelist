@@ -32,8 +32,14 @@ NPXS=30,30,30      !number of cycles per hour for water,heat,solute flux calcns
 NPYS=10,10,10      !number of cycles per NPX for gas flux calcns
 NCYC_LITR=20
 NCYC_SNOW=20
+
+hist_fincl1='O2w_conc_vr','N2w_conc_vr','Arw_conc_vr','H2w_conc_vr','NH3w_conc_vr',
+  'N2Ow_conc_vr','CH4w_conc_vr','CO2w_conc_vr','CO2_gas_ppmv_vr','O2_gas_ppmv_vr',
+  'N2O_gas_ppmv_vr','CH4_gas_ppmv_vr','N2_gas_ppmv_vr','H2_gas_ppmv_vr','NH3_gas_ppmv_vr',
+  'Ar_gas_ppmv_vr'
+
 !set up output frequency
-hist_mfilt=8760
+hist_mfilt=730
 hist_nhtfrq=-24
 /
 

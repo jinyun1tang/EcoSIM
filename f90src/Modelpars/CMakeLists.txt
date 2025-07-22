@@ -1,7 +1,7 @@
 file(GLOB MODELPARS_SOURCES "*.F90")
 #set(MODELPARS_SOURCES
 #  NitroPars.F90
-#  GrosubPars.F90
+#  PlantBGCPars.F90
 #  TracerPropMod.F90
 #  MicBGCPars.F90
 #  EcoSiMParDataMod.F90
@@ -14,6 +14,8 @@ add_ecosim_library(modelpars ${MODELPARS_SOURCES})
 
 target_include_directories(modelpars  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Mesh/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/  
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
 
 

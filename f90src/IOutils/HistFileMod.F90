@@ -7,6 +7,7 @@ module HistFileMod
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
+  use GridConsts        , only : NumCanopyLayers,JP,NumGrowthStages  
   use ElmIDMod          , only : NumPlantChemElms  
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
@@ -185,7 +186,6 @@ implicit none
   !create history file for output
 
   use EcoSIMConfig      , only : case_name
-  use GridConsts        , only : JZ,JS,MaxNumBranches,NumOfCanopyLayers,JP,NumGrowthStages
   use EcoSIMConfig      , only : jcplx=>jcplxc,jsken=>jskenc
   implicit none
   integer, intent(in) :: t        ! tape index
@@ -247,7 +247,7 @@ implicit none
   ! "level" dimensions
   call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
-  call ncd_defdim(lnfid, 'levcan',NumOfCanopyLayers,dimid)
+  call ncd_defdim(lnfid, 'levcan',NumCanopyLayers,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
@@ -564,6 +564,8 @@ implicit none
       num2d=NumOfPlantMorphUnits    
   case ('elements')    
       num2d=NumPlantChemElms
+  case ('levcan')
+      num2d=NumCanopyLayers
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &
@@ -1661,6 +1663,7 @@ implicit none
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
     integer :: hist_ntimes(ntapes)
     integer :: hist_mfilt(ntapes)
+    character(len=14) :: ymdhs    
     character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
@@ -1751,9 +1754,10 @@ implicit none
 !             do_3Dtconst = .false.
 !          end if
 !         if (masterproc) then
+             call etimer%get_ymdhs(ymdhs)
              write(iulog,*)
              write(iulog,*) trim(subname),' : Writing current time sample to local history file ', &
-                  trim(locfnh(t)),' at nstep = ',etimer%get_nstep(), &
+                  trim(locfnh(t)),' at = ',ymdhs, &
                   ' for history time interval beginning at ', tape(t)%begtime, &
                   ' and ending at ',time
              write(iulog,*)

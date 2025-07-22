@@ -56,7 +56,7 @@ module StarteMod
 !
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
-      solutevar%CCO2M = CCO2EI_col(NY,NX)/catomw
+      solutevar%CCO2M = CCO2EI_gperm3_col(NY,NX)/catomw
       solutevar%CCH4M = AtmGasCgperm3_col(idg_CH4,NY,NX)/catomw
       solutevar%COXYM = AtmGasCgperm3_col(idg_O2,NY,NX)/32.0_r8
       solutevar%CZ2GM = AtmGasCgperm3_col(idg_N2,NY,NX)/natomw
@@ -378,7 +378,7 @@ module StarteMod
     endif
 !
 !   INITIAL STATE VARIABLES FOR GAS IN SOIL
-!   CCO2EI is set to the first year, because AtmGasCgperm3_col(idg_CO2,x)
+!   CCO2EI_gperm3 is set to the first year, because AtmGasCgperm3_col(idg_CO2,x)
 !   varies year by year, while other tracer gases are fixed year by year,
 !   this is not quite right for CH4, and N2O. However, the current implementation
 !   make sure the inexact restart run works. When exact restart is used, trcg_gasml_vr
@@ -386,7 +386,7 @@ module StarteMod
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)
+    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI_gperm3_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)
     DO idg=idg_beg,idg_NH3
       trcg_gasml_vr(idg,L,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*VLsoiAirP_vr(L,NY,NX)
     ENDDO

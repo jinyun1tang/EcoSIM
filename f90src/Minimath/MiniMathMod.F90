@@ -26,8 +26,13 @@ module minimathmod
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
-  public :: AZERO,AZERO1
+  public :: AZERO,AZERO1  
   public :: SubstrateLimit
+  public :: SubstrateDribbling
+  interface SubstrateDribbling
+    module procedure SubstrateDribbling_vec
+    module procedure SubstrateDribbling_scal
+  end interface SubstrateDribbling
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -497,7 +502,7 @@ module minimathmod
   subroutine SubstrateLimit(n1,n2,demand_flux,y,scal)
   implicit none
   integer, intent(in) :: n1,n2
-  real(r8), intent(inout) :: demand_flux(n1:n2)
+  real(r8), intent(inout) :: demand_flux(n1:n2)  !consumption/demand flux
   real(r8), intent(inout) :: Y  
   real(r8), optional, intent(out)   :: scal
   real(r8) :: tDemand,scal1
@@ -505,16 +510,58 @@ module minimathmod
 
   tDemand = sum(demand_flux)
   scal1    = 1._r8
-  
-  if(y>=tDemand)then
-    y=y-tDemand
+  if(y-tDemand>=tiny_val .or. tDemand<=tiny_val)then
+    y=AZMAX1(y-tDemand)
   else
-    scal1=y/tDemand
+    scal1=safe_adb(y,tDemand)
     DO n=n1,n2
       demand_flux(n)=demand_flux(n)*scal1
     enddo
+    y=0._r8
   endif
   if(present(scal))scal=scal1
   end subroutine SubstrateLimit
+
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_scal(demand_flux,dribbling_flx,y)
+
+  implicit none
+  real(r8), intent(in) :: demand_flux        !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = demand_flux + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_scal
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_vec(n1,n2,demand_flux,dribbling_flx,y)
+
+  implicit none
+  integer, intent(in) :: n1,n2
+  real(r8), intent(in) :: demand_flux(n1:n2)  !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx    !>0
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = sum(demand_flux) + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_vec
 
 end module minimathmod

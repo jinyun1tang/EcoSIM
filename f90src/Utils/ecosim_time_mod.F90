@@ -47,7 +47,7 @@ module ecosim_Time_Mod
      integer  :: leap_yr
      integer  :: rest_n
      integer  :: rest_frq
-     integer  :: diag_n
+     integer  :: diag_n     
      character(len=optstrlen)  :: diag_opt
      integer  :: diag_frq
      character(len=optstrlen) :: rest_opt
@@ -63,10 +63,12 @@ module ecosim_Time_Mod
      procedure, public :: get_prev_date
      procedure, public :: get_curr_date
      procedure, public :: get_curr_doy
+     procedure, public :: get_curr_dom
      procedure, public :: get_days_per_year
      procedure, public :: get_step_size
      procedure, public :: get_prev_time
      procedure, public :: get_curr_time
+     procedure, public :: get_curr_mon_days
      procedure, public :: getdatetime
      procedure, public :: get_curr_timeful  !current time + offset
      procedure, public :: get_days_cur_year
@@ -656,6 +658,15 @@ contains
     if(isLeap(year))get_days_cur_year=366
   end function  get_days_cur_year
   !-------------------------------------------------------------------------------
+  integer function get_curr_mon_days(this)
+  implicit none
+  class(ecosim_time_type), intent(in) :: this
+
+  get_curr_mon_days=daz(this%moy)
+  if(this%moy==2)get_curr_mon_days=get_curr_mon_days+this%leap_yr
+      
+  end function get_curr_mon_days
+  !-------------------------------------------------------------------------------
 
   subroutine print_curr_time(this)
   implicit none
@@ -995,8 +1006,13 @@ contains
   get_curr_doy=this%doy
   end function get_curr_doy
 
+  !-----------------------------------------------------------------------
+  integer function get_curr_dom(this)
+  implicit none
+  class(ecosim_time_type), intent(in) :: this
 
-
+  get_curr_dom=this%dom
+  end function get_curr_dom
   !-----------------------------------------------------------------------
   function get_calendar(this,prev)
 

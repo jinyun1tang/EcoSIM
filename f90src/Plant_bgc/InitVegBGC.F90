@@ -2,13 +2,13 @@ module InitVegBGC
 
   use EcosimConst
   use GridConsts
-  use GrosubPars, only : ibackward,iforward
+  use PlantBGCPars, only : ibackward,iforward
   implicit none
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
   public :: InitIrradianceGeometry
   contains
-
+  ![header]
 !------------------------------------------------------------------------------------------
   subroutine InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   use CanopyRadDataType
@@ -47,7 +47,7 @@ module InitVegBGC
 
     D225: DO L=1,NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
-      DO  M=1,NumOfLeafZenithSectors
+      DO  M=1,NumLeafZenithSectors
         OMEGY        = CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
         OMEGA(N,M,L) = ABS(OMEGY)
         OMEGX(N,M,L) = OMEGA(N,M,L)/YSIN(N)
@@ -70,5 +70,5 @@ module InitVegBGC
     ENDDO D225
   ENDDO D230
   end subroutine InitIrradianceGeometry
-
+  ![tail]
 end module InitVegBGC

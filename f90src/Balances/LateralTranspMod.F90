@@ -188,7 +188,7 @@ implicit none
 
         DO  K=1,jcplx
           DO NO=1,NumMicbFunGrupsPerCmplx
-            DO NGL=JGnio(NO),JGnfo(NO)
+            DO NGL=JGniH(NO),JGnfH(NO)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
@@ -252,7 +252,7 @@ implicit none
 
           DO  K=1,jcplx
             DO  NO=1,NumMicbFunGrupsPerCmplx
-              DO NGL=JGnio(NO),JGnfo(NO)
+              DO NGL=JGniH(NO),JGnfH(NO)
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
                   DO NE=1,NumPlantChemElms
@@ -318,7 +318,7 @@ implicit none
 
           D8380: DO K=1,jcplx
             DO  NO=1,NumMicbFunGrupsPerCmplx
-              DO NGL=JGnio(NO),JGnfo(NO)
+              DO NGL=JGniH(NO),JGnfH(NO)
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)    
                   DO NE=1,NumPlantChemElms            

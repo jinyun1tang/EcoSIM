@@ -232,8 +232,10 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
-  if(use_fire .and. check_fire(yearc,fire_event_entry))then
-    call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+  if(use_fire)then
+    if(check_fire(yearc,fire_event_entry))then
+      call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+    endif
   endif
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)

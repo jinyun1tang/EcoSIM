@@ -41,12 +41,12 @@ module InitSOMBGCMOD
 
   call MicPar%Init(nmicbguilds)
 
-  JGnio  => micpar%JGnio
-  JGnfo  => micpar%JGnfo
+  JGniH  => micpar%JGniH
+  JGnfH  => micpar%JGnfH
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
   NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
-  NumHetetrMicCmplx     = micpar%NumHetetrMicCmplx
+  NumHetetr1MicCmplx     = micpar%NumHetetr1MicCmplx
   NumLiveHeterBioms     = micpar%NumLiveHeterBioms
   NumLiveAutoBioms      = micpar%NumLiveAutoBioms
   allocate(CORGCX(1:jcplx))
@@ -94,8 +94,8 @@ module InitSOMBGCMOD
   ! begin_execution
 
   associate(                                               &
-    rNCOMC_ave               => micpar%rNCOMC_ave,               &
-    rPCOMC_ave               => micpar%rPCOMC_ave,               &
+    rNCOMC_ave            => micpar%rNCOMC_ave,            &
+    rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
     OHCK                  => micpar%OHCK,                  &
@@ -250,18 +250,18 @@ module InitSOMBGCMOD
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !     rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!  The reason that initialization of complex 5 microbes is repated for each
-! complex is because complex 5 is shared by the other complexes
+!     The reason that initialization of complex-5 microbes is repated for each
+!     complex is because complex 5 is shared by all the other complexes
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGrupsPerCmplx
-      tglds=JGnfo(N)-JGnio(N)+1._r8
+      tglds=JGnfH(N)-JGniH(N)+1._r8
       D8991: DO M=1,nlbiomcp
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
         OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
         OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
 
-        do NGL=JGnio(N),JGnfo(N)
+        do NGL=JGniH(N),JGnfH(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
@@ -332,6 +332,7 @@ module InitSOMBGCMOD
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     D8980: DO M=1,jsken
+
       SolidOM_vr(ielmc,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
         SolidOM_vr(ielmn,M,K,L,NY,NX)=AZMAX1(CFOSC_vr(M,K,L,NY,NX)*CNOSC_vr(M,K,L,NY,NX) &
@@ -353,11 +354,12 @@ module InitSOMBGCMOD
       ENDIF
     ENDDO D8980
   ENDDO D8995
+
 !
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !
 
-  RO2DmndHetert(:,:,L,NY,NX)             = 0.0_r8
+  RO2DmndHetert_vr(:,:,L,NY,NX)             = 0.0_r8
   RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
   RNO2DmndReduxSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
   RN2ODmndReduxHeter_vr(:,:,L,NY,NX)     = 0.0_r8
@@ -734,6 +736,8 @@ module InitSOMBGCMOD
 !------------------------------------------------------------------------------------------
 
   subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+  !
+  !seeding microbes added through litterfall
   implicit none
   integer, intent(in) :: I,J,K
   integer, intent(in) :: NY,NX
@@ -742,26 +746,26 @@ module InitSOMBGCMOD
   integer :: M,N,NGL,MID,NE,NN
   real(r8) :: FOSCI,FOSNI,FOSPI,tglds
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8), parameter :: scal=0.5_r8  
-  associate(                                               &
-    rNCOMC_ave               => micpar%rNCOMC_ave,               &
-    rPCOMC_ave               => micpar%rPCOMC_ave,               &
-    nlbiomcp              => micpar%nlbiomcp,              &
-    OMCI                  => micpar%OMCI,                  &    
-    OMCF                  => micpar%OMCF,                  &
-    OMCA                  => micpar%OMCA                   &
+  real(r8), parameter :: scal=0.05_r8    !scalar for incoming microbial biomass associated with litterfall.
+  associate(                         &
+    rNCOMC_ave => micpar%rNCOMC_ave, &
+    rPCOMC_ave => micpar%rPCOMC_ave, &
+    nlbiomcp   => micpar%nlbiomcp,   &
+    OMCI       => micpar%OMCI,       &
+    OMCF       => micpar%OMCF,       &
+    OMCA       => micpar%OMCA        &
   )
 
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
 
   DO N=1,NumMicbFunGrupsPerCmplx
-    tglds=JGnfo(N)-JGnio(N)+1._r8
+    tglds=JGnfH(N)-JGniH(N)+1._r8
     DO M=1,nlbiomcp
       OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
       OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
       OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
 
-      do NGL=JGnio(N),JGnfo(N)
+      do NGL=JGniH(N),JGnfH(N)
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms
           mBiomeHeter_vr(NE,MID,K,0,NY,NX)=mBiomeHeter_vr(NE,MID,K,0,NY,NX)+OME1(NE)/tglds

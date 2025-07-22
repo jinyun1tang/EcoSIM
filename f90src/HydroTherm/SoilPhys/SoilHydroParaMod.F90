@@ -128,10 +128,10 @@ contains
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
 !
-!     HydroCondMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
+!     HYCDMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
 !
     K=MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX))/POROS_vr(L,NY,NX))+1))
-    HydroCondMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
+    HYCDMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
     
   END DO
   call PrintInfo('end '//subname)

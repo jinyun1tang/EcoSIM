@@ -116,7 +116,7 @@ module SoilDisturbMod
             !     REMOVE heterotrophic MICROBIAL BIOMASS
             !
             D2960: DO N=1,NumMicbFunGrupsPerCmplx
-              DO NGL=JGnio(N),JGnfo(N)
+              DO NGL=JGniH(N),JGnfH(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
                   DO NE=1,NumPlantChemElms 
@@ -355,10 +355,10 @@ module SoilDisturbMod
             TOMOU_lnds(NE)=TOMOU_lnds(NE)+OMelm(NE)
           ENDDO
 
-          HydroSufDOCFlx_col(NY,NX)       = HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
-          HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)+OMelm(ielmn)
-          HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)+OMelm(ielmp)
-          Eco_NBP_CumYr_col(NY,NX)        = Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
+          HydroSufDOCFlx_col(NY,NX) = HydroSufDOCFlx_col(NY,NX)+OMelm(ielmc)
+          HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)+OMelm(ielmn)
+          HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)+OMelm(ielmp)
+          Eco_NBP_CumYr_col(NY,NX)  = Eco_NBP_CumYr_col(NY,NX)-OMelm(ielmc)
 
         ELSEIF(iSoilDisturbType_col(I,NY,NX).EQ.itill_fire)THEN
           SurfGas_lnd(idg_CO2) = SurfGas_lnd(idg_CO2)-OMelm(ielmc)

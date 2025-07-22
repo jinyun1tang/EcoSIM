@@ -80,12 +80,16 @@ module SnowDataType
   real(r8),target,allocatable ::   trcn_SnowDrift_flx_col(:,:,:)           !nutrient loss from snow due to drifting [g/d2/h]
   real(r8),target,allocatable ::   trcg_SnowDrift_flx_col(:,:,:)           !volatile loss from snow due to drifting [g/d2/h]
   real(r8),target,allocatable ::   trcSalt_SnowDrift_flx_col(:,:,:)        !salt loss through snow drift [mol/d2/h]
+  real(r8),target,allocatable :: Gas_WetDepo2Snow_col(:,:,:)               !wet deposition to snow, [g d-2 h-1] 
+  real(r8),target,allocatable :: Gas_Snowloss_flx_col(:,:,:)               !tracer loss from snow [g d-2 h-1]  
+
 !----------------------------------------------------------------------
 
 contains
   subroutine InitSnowData
 
   implicit none
+  allocate(Gas_Snowloss_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_Snowloss_flx_col=0._r8  
   allocate(trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,JS,JY,JX)); trcg_AquaAdv_flx_snvr=0._r8
   allocate(trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_AquaAdv_flx_snvr=0._r8
   allocate(trcg_snowMassloss_col(idg_beg:idg_NH3,JY,JX)); trcg_snowMassloss_col=0._r8
@@ -93,7 +97,7 @@ contains
   allocate(IFLBSM_2DH(60,2,2,JY,JX));IFLBSM_2DH=-1
   allocate(trcn_SnowDrift_flx_col(ids_nut_beg:ids_nuts_end,JY,JX));trcn_SnowDrift_flx_col=0._r8
   allocate(trcg_SnowDrift_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_SnowDrift_flx_col=0._r8
-
+  allocate(Gas_WetDepo2Snow_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDepo2Snow_col=0._r8
   allocate(trcg_AquaADV_Snow2Litr_flx(idg_beg:idg_NH3,JY,JX)) ;trcg_AquaADV_Snow2Litr_flx=0._r8 
   allocate(trcn_AquaADV_Snow2Litr_flx(ids_nut_beg:ids_nuts_end,JY,JX));trcn_AquaADV_Snow2Litr_flx=0._r8
   allocate(trcn_AquaADV_Snow2Soil_flx(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_AquaADV_Snow2Soil_flx=0._r8
@@ -244,7 +248,8 @@ contains
   call destroy(trcg_snowMass_beg_col)
   call destroy(trcn_SnowDrift_flx_col)
   call destroy(trcg_SnowDrift_flx_col)
-
+  call destroy(Gas_WetDepo2Snow_col)
+  call destroy(Gas_Snowloss_flx_col)  
   end subroutine DestructSnowData
 
 end module SnowDataType

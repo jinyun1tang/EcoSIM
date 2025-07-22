@@ -13,7 +13,6 @@ module PlantDataRateType
   real(r8),target,allocatable ::  Eco_NEE_col(:,:)                               !total canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                          !canopy NH3 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)                   !pft nodule infection [g d-2 h-1]
-  real(r8),target,allocatable ::  NodulInfectElmsCum_pft(:,:,:,:)                !pft cumulative nodule infection,[g d-2]
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
   real(r8),target,allocatable ::  RootMycoExudEUptk_pvr(:,:,:,:,:,:,:)           !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
@@ -89,8 +88,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootCO2Emis2Root_vr(:,:,:)                     !total root CO2 flux into roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2Emis2Root_col(:,:)                     !total root CO2 flux into roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RUptkRootO2_vr(:,:,:)                          !total root internal O2 flux taken away from root O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootO2_Xink_vr(:,:,:)                          !root O2 consumption for autotrophic respiraiton, [gO d-2 h-1]
-  real(r8),target,allocatable ::  RootO2_Xink_col(:,:)                           !integrated root O2 consumption for autotrophic respiraiton, [gO d-2 h-1]  
+  real(r8),target,allocatable ::  RootO2_TotSink_vr(:,:,:)                          !root O2 consumption for autotrophic respiraiton, [gO d-2 h-1]
+  real(r8),target,allocatable ::  RootO2_TotSink_col(:,:)                        !integrated root O2 uptake from soil and atmosphere for autotrophic respiraiton, [gO d-2 h-1]  
   real(r8),target,allocatable ::  RUptkRootO2_col(:,:)                           !total root internal O2 flux take away from root O2, [g d-2 h-1]  
   real(r8),target,allocatable ::  totRootLenDens_vr(:,:,:)                       !total root length density, [m m-3]
   real(r8),target,allocatable ::  REcoO2DmndResp_vr(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
@@ -136,6 +135,7 @@ module PlantDataRateType
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
   integer, intent(in) :: jroots
+
   call InitAllocate(NumOfPlantLitrCmplxs,jroots)
 
   end subroutine InitPlantRates
@@ -155,7 +155,6 @@ module PlantDataRateType
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
   allocate(NH3Emis_CumYr_pft(JP,JY,JX));    NH3Emis_CumYr_pft=0._r8  
   allocate(NodulInfectElms_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElms_pft=0._r8
-  allocate(NodulInfectElmsCum_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElmsCum_pft=0._r8  
   allocate(SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElms_CumYr_pft=0._r8
   allocate(RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudEUptk_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
@@ -230,8 +229,8 @@ module PlantDataRateType
   allocate(RootCO2Emis2Root_vr(JZ,JY,JX));    RootCO2Emis2Root_vr=0._r8
   allocate(RootCO2Emis2Root_col(JY,JX));    RootCO2Emis2Root_col=0._r8  
   allocate(RUptkRootO2_vr(JZ,JY,JX));   RUptkRootO2_vr=0._r8
-  allocate(RootO2_Xink_vr(JZ,JY,JX));  RootO2_Xink_vr=0._r8
-  allocate(RootO2_Xink_col(JY,JX));  RootO2_Xink_col=0._r8  
+  allocate(RootO2_TotSink_vr(JZ,JY,JX));  RootO2_TotSink_vr=0._r8
+  allocate(RootO2_TotSink_col(JY,JX));  RootO2_TotSink_col=0._r8  
   allocate(RUptkRootO2_col(JY,JX));   RUptkRootO2_col=0._r8
   allocate(totRootLenDens_vr(JZ,JY,JX));    totRootLenDens_vr=0._r8
   allocate(REcoO2DmndResp_vr(0:JZ,JY,JX));  REcoO2DmndResp_vr=0._r8
@@ -313,7 +312,6 @@ module PlantDataRateType
   call destroy(EcoHavstElmnt_CumYr_pft)
   call destroy(EcoHavstElmntCum_pft)
   call destroy(NodulInfectElms_pft)
-  call destroy(NodulInfectElmsCum_pft)
   call destroy(CO2ByFire_CumYr_pft)
   call destroy(CH4ByFire_CumYr_pft)
   call destroy(O2ByFire_CumYr_pft)
@@ -353,8 +351,8 @@ module PlantDataRateType
   call destroy(RootCO2Emis2Root_vr)
   call destroy(RootCO2Emis2Root_col)
   call destroy(RUptkRootO2_vr)
-  call destroy(RootO2_Xink_vr)
-  call destroy(RootO2_Xink_col)
+  call destroy(RootO2_TotSink_vr)
+  call destroy(RootO2_TotSink_col)
   call destroy(RUptkRootO2_col)
   call destroy(totRootLenDens_vr)
   call destroy(REcoO2DmndResp_vr)

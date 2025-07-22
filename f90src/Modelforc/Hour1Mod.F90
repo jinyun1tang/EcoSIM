@@ -9,10 +9,12 @@ module Hour1Mod
   use EcoSIMConfig     , only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig     , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
   use EcoSIMConfig     , only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
-  use EcoSiMParDataMod,  only : micpar, pltpar
-  use SoilBGCNLayMod,    only : sumORGMLayL
-  use PlantMgmtDataType, only : NP_col
-  use BalancesMod,       only : SummarizeTracerMass,BegCheckBalances
+  use EcoSiMParDataMod,  only: micpar, pltpar
+  use SoilBGCNLayMod,    only: sumORGMLayL
+  use PlantMgmtDataType, only: NP_col
+  use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
+  use CanopyHydroMod
+  use NumericalAuxMod
   use DebugToolMod
   use ATSUtilsMod
   use TracerPropMod
@@ -61,7 +63,6 @@ module Hour1Mod
   public :: hour1
   public :: InitHour1
 
-  real(r8) :: FoliarWatRetcap(0:3)
   real(r8), pointer :: THETRX(:)
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 !
@@ -77,7 +78,6 @@ module Hour1Mod
 
   allocate(THETRX(1:NumOfLitrCmplxs))
 
-  FoliarWatRetcap=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
 
   end subroutine InitHour1
@@ -204,7 +204,7 @@ module Hour1Mod
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
       LWRadCanGPrev_col(NY,NX)         = LWRadCanG_col(NY,NX)
-      LWRadGrnd(NY,NX)                 = LWRadBySurf_col(NY,NX)
+      LWRadGrnd_col(NY,NX)                 = LWRadBySurf_col(NY,NX)
       NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       LWRadCanG_col(NY,NX)                 = 0._r8
       LWRadBySurf_col(NY,NX)           = 0._r8
@@ -230,7 +230,7 @@ module Hour1Mod
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
-        DO  NR=1,NumOfCanopyLayers
+        DO  NR=1,NumCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
@@ -249,41 +249,6 @@ module Hour1Mod
 
   call PrintInfo('end '//subname)
   END subroutine hour1
-!------------------------------------------------------------------------------------------
-
-  subroutine CanopyInterceptPrecp(NY,NX)
-  !
-  !DESCRIPTION
-  !precipitation intercepation by canopy
-  implicit none
-  integer, intent(in) :: NY,NX
-  integer :: NZ
-  real(r8) :: CanopyWatHeldCap  !maximum precipitation holding capacity by canopy (leaf+stem) [m3 H2O]
-  real(r8) :: prec2canopy_pft   !precipiation onto canopy [m H2O/h]
-!
-!     CANOPY RETENTION OF PRECIPITATION
-!
-!     FoliarWatRetcap=foliar surface water retention capacity
-!     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
-!     FLWC,TFLWC=water retention of PFT,combined canopy
-!     PRECA=precipitation+irrigation
-!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
-!     VOLWC=canopy surface water retention
-!
-!     Warning: No snofall intercepation is considered at the moment.
-
-  DO  NZ=1,NP_col(NY,NX)
-    CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
-      *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
-      
-    prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
-    PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,CanopyWatHeldCap-WatHeldOnCanopy_pft(NZ,NY,NX)))
-    Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+prec2canopy_pft
-    PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
-  ENDDO
-  RainPrecThrufall_col(NY,NX) = PrecRainAndIrrig_col(NY,NX)-PrecIntceptByCanopy_col(NY,NX)
-
-  end subroutine CanopyInterceptPrecp
 
 !------------------------------------------------------------------------------------------
   subroutine ResetLndscapeAccumlators()
@@ -326,7 +291,7 @@ module Hour1Mod
       !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
       
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
@@ -371,18 +336,20 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      QWatIntLaterFlow_col(NY,NX)            = 0._r8
-      QCanopyWat2Dist_col(NY,NX)             = 0._r8
-      HeatCanopy2Dist_col(NY,NX)             = 0._r8
-      HydroSufDOCFlx_col(NY,NX)              = 0._r8
-      HydroSubsDOCFlx_col(NY,NX)             = 0._r8
-      HydroSufDICFlx_col(NY,NX)              = 0._r8
-      HydroSubsDICFlx_col(NY,NX)             = 0._r8
-      HydroSubsDONFlx_col(NY,NX)             = 0._r8
-      HydroSubsDINFlx_col(NY,NX)             = 0._r8
-      HydroSubsDOPFlx_col(NY,NX)             = 0._r8
-      HydroSubsDIPFlx_col(NY,NX)             = 0._r8
-      SurfRunoffPotentM_col(:,NY,NX)        = 0._r8
+      QWatIntLaterFlow_col(NY,NX)    = 0._r8
+      QCanopyWat2Dist_col(NY,NX)     = 0._r8
+      HeatCanopy2Dist_col(NY,NX)     = 0._r8
+      HydroSufDOCFlx_col(NY,NX)      = 0._r8
+      HydroSufDONFlx_col(NY,NX)      = 0._r8
+      HydroSufDOPFlx_col(NY,NX)      = 0._r8      
+      HydroSubsDOCFlx_col(NY,NX)     = 0._r8
+      HydroSufDICFlx_col(NY,NX)      = 0._r8
+      HydroSubsDICFlx_col(NY,NX)     = 0._r8
+      HydroSubsDONFlx_col(NY,NX)     = 0._r8
+      HydroSubsDINFlx_col(NY,NX)     = 0._r8
+      HydroSubsDOPFlx_col(NY,NX)     = 0._r8
+      HydroSubsDIPFlx_col(NY,NX)     = 0._r8
+      SurfRunoffPotentM_col(:,NY,NX) = 0._r8
 
       DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
       trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8
@@ -751,6 +718,7 @@ module Hour1Mod
   ECO_HR_CO2_col(NY,NX)                      = 0._r8
   ECO_HR_CH4_col(NY,NX)                      = 0._r8
   Eco_RadSW_col(NY,NX)                       = 0._r8
+  RadSW_Canopy_col(NY,NX)                    = 0._R8
   RootCO2Autor_vr(:,NY,NX)                   = 0._r8
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)    = 0._r8
   QRunSurf_col(NY,NX)                        = 0._r8
@@ -769,9 +737,10 @@ module Hour1Mod
   tHxPO4_col(NY,NX)                          = 0._r8
   tXPO4_col(NY,NX)                           = 0._r8
   UION_col(NY,NX)                            = 0._r8
-  QDischar_col(NY,NX)                        = 0._r8
+  QDischarg2WTBL_col(NY,NX)                        = 0._r8
   PrecHeat_col(NY,NX)                        = 0._r8
   QDrain_col(NY,NX)                          = 0._r8
+  QDrainloss_vr(:,NY,NX)   =0._r8
   HeatDrain_col(NY,NX)                       = 0._r8
   trcg_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8
   trcn_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8
@@ -845,20 +814,21 @@ module Hour1Mod
 !     begin_execution
 
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL_col(NY,NX),NY,NX) = 0._r8
-  HeatSource_col(NY,NX)                                                       = 0._r8
-  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                 = 0._r8
-  RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                              = 0._r8
-  trcn_GeoChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)            = 0._r8
-  TRChem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                   = 0._r8
-  TRChem_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                = 0._r8
-  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                       = 0._r8
-  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)           = 0._r8
-  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX) =   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
-  TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                  = 0._r8
-  THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  HeatSource_col(NY,NX)                                                               = 0._r8
+  REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                     = 0._r8
+  RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                                  = 0._r8
+  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)                = 0._r8
+  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                       = 0._r8
+  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
+  trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
+  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
+  TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                      = 0._r8
+  THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                        = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
-  RO2UptkSoilM_vr(1:NPH,NU_col(NY,NX):NL_col(NY,NX),NY,NX)                            = 0._r8
-  RainLitr_col(NY,NX)                                                         = 0._r8
+  REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                                     = 0._r8
+  RainLitr_col(NY,NX)                                                                 = 0._r8
+  trcs_netpro_vr(:,:,NY,NX)                                                           = 0._r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
@@ -1090,7 +1060,9 @@ module Hour1Mod
   real(r8) :: TFACR
   real(r8) :: TFACA
   real(r8) :: TFACW
+  real(r8) :: tPBOT,tmp
   integer :: K,L,idg
+
 !     begin_execution
 !
 !     LITTER GAS CONCENTRATIOS
@@ -1101,20 +1073,23 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  trcg_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_O2,0,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_N2,0,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*TREF/TKS_vr(0,NY,NX)
-  trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05*TREF/TKS_vr(0,NY,NX)
+  tPBOT                          = PBOT_col(NY,NX)/1.01325E+02_r8
+  tmp = TREF/TKS_vr(0,NY,NX)*tPBOT
+  trcg_gascl_vr(idg_CO2,0,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp
+  trcg_gascl_vr(idg_CH4,0,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp
+  trcg_gascl_vr(idg_O2,0,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp
+  trcg_gascl_vr(idg_N2,0,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp
+  trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
+  trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
+  trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
+  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
 ! exclude NH3B,
     DO idg=idg_beg,idg_NH3
-      trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
+      trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)-trcs_solml_drib_vr(idg,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
     ENDDO
   ELSE
     trc_solcl_vr(idg_beg:idg_NH3,0,NY,NX)=0._r8
@@ -1207,26 +1182,25 @@ module Hour1Mod
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
       IF(trcs_VLN_vr(ids_NH4,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NH4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)))
-        trc_solcl_vr(idg_NH3,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3,L,NY,NX)))
+        trc_solcl_vr(ids_NH4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4,L,NY,NX)-trcs_solml_drib_vr(ids_NH4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX))
+        trc_solcl_vr(idg_NH3,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3,L,NY,NX)-trcs_solml_drib_vr(idg_NH3,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NH4,L,NY,NX)=0._r8
         trc_solcl_vr(idg_NH3,L,NY,NX)=0._r8
       ENDIF
       IF(trcs_VLN_vr(ids_NO3,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NO3,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)))
-        trc_solcl_vr(ids_NO2,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2,L,NY,NX)))
+        trc_solcl_vr(ids_NO3,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3,L,NY,NX)-trcs_solml_drib_vr(ids_NO3,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX))
+        trc_solcl_vr(ids_NO2,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2,L,NY,NX)-trcs_solml_drib_vr(ids_NO2,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NO3,L,NY,NX)=0._r8
         trc_solcl_vr(ids_NO2,L,NY,NX)=0._r8
       ENDIF
 
       IF(trcs_VLN_vr(ids_H1PO4,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_H1PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)))
-        trc_solcl_vr(ids_H2PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4,L,NY,NX)))
+        trc_solcl_vr(ids_H1PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX))
+        trc_solcl_vr(ids_H2PO4,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4,L,NY,NX))
 
         CPO4S_vr(L,NY,NX)=trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4,L,NY,NX)
-
         if(salt_model)then
           CPO4S_vr(L,NY,NX)=CPO4S_vr(L,NY,NX)+(trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX) &
             +trcSalt_solml_vr(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml_vr(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4,L,NY,NX) &
@@ -1247,23 +1221,23 @@ module Hour1Mod
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
       IF(trcs_VLN_vr(ids_NH4B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NH4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)))
-        trc_solcl_vr(idg_NH3B,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3B,L,NY,NX)))
+        trc_solcl_vr(ids_NH4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NH4B,L,NY,NX)-trcs_solml_drib_vr(ids_NH4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX))
+        trc_solcl_vr(idg_NH3B,L,NY,NX)=AZMAX1(trcs_solml_vr(idg_NH3B,L,NY,NX)-trcs_solml_drib_vr(idg_NH3B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(idg_NH3B,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NH4B,L,NY,NX)=0._r8
         trc_solcl_vr(idg_NH3B,L,NY,NX)=0._r8
       ENDIF
 
       IF(trcs_VLN_vr(ids_NO3B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_NO3B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)))
-        trc_solcl_vr(ids_NO2B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2B,L,NY,NX)))
+        trc_solcl_vr(ids_NO3B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO3B,L,NY,NX)-trcs_solml_drib_vr(ids_NO3B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX))
+        trc_solcl_vr(ids_NO2B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_NO2B,L,NY,NX)-trcs_solml_drib_vr(ids_NO2B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO2B,L,NY,NX))
       ELSE
         trc_solcl_vr(ids_NO3B,L,NY,NX)=0._r8
         trc_solcl_vr(ids_NO2B,L,NY,NX)=0._r8
       ENDIF
       IF(trcs_VLN_vr(ids_H1PO4B,L,NY,NX).GT.ZERO)THEN
-        trc_solcl_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)))
-        trc_solcl_vr(ids_H2PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4B,L,NY,NX)))
+        trc_solcl_vr(ids_H1PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H1PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H1PO4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX))
+        trc_solcl_vr(ids_H2PO4B,L,NY,NX)=AZMAX1(trcs_solml_vr(ids_H2PO4B,L,NY,NX)-trcs_solml_drib_vr(ids_H2PO4B,L,NY,NX))/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H2PO4B,L,NY,NX))
 
         CPO4B_vr(L,NY,NX)=trcs_solml_vr(ids_H1PO4B,L,NY,NX)+trcs_solml_vr(ids_H2PO4B,L,NY,NX)
         if(salt_model)then
@@ -1536,7 +1510,7 @@ module Hour1Mod
 !     C*=litter solute concentrations
 !
       DO NTN=ids_nut_beg,ids_nuts_end
-        trc_solcl_vr(NTN,0,NY,NX)=AZMAX1(trcs_solml_vr(NTN,0,NY,NX)/VLWatMicP_vr(0,NY,NX))
+        trc_solcl_vr(NTN,0,NY,NX)=AZMAX1(trcs_solml_vr(NTN,0,NY,NX)-trcs_solml_drib_vr(ntn,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
       ENDDO
 
     ELSE
@@ -1602,7 +1576,7 @@ module Hour1Mod
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_NH3
-        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)/VLWatMicP_vr(L,NY,NX))
+        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)
       ENDDO
     ELSE
       trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
@@ -1631,25 +1605,25 @@ module Hour1Mod
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
-  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)=0._r8
-  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX) = 0._r8  
-  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8  
-  RootO2_Xink_col(NY,NX)                          = 0._r8
+  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)          = 0._r8
+  trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX)  = 0._r8
+  trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8
+  RootO2_TotSink_col(NY,NX)                          = 0._r8
   DO L=NUI_col(NY,NX),NLI_col(NY,NX)
     RootN2Fix_vr(L,NY,NX)                         = 0._r8
     FWatExMacP2MicP_vr(L,NY,NX)                   = 0._r8
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) = 0._r8
     RootCO2Emis2Root_vr(L,NY,NX)                  = 0._r8
     RUptkRootO2_vr(L,NY,NX)                       = 0._r8
-    RootO2_Xink_vr(L,NY,NX)                       = 0._r8
+    RootO2_TotSink_vr(L,NY,NX)                       = 0._r8
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
 
-    trcn_RChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_NO3B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
-    trcn_RChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
-    trcn_RChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NH4B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NO3B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_NO2B,L,NY,NX)   = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_H1PO4B,L,NY,NX) = 0._r8
+    trcn_RProdChem_band_soil_vr(ids_H2PO4B,L,NY,NX) = 0._r8
     TProd_CO2_geochem_soil_vr(L,NY,NX)          = 0._r8
     Txchem_CO2_vr(L,NY,NX)                      = 0._r8
 

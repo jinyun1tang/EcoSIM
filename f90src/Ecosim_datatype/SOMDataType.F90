@@ -45,6 +45,7 @@ module SOMDataType
   real(r8),target,allocatable :: tNO3_col(:,:)                         !total soil NO3 + NO2 content, [g d-2]
   real(r8),target,allocatable :: tHxPO4_col(:,:)                         !total soil PO4 content, [g d-2]
   real(r8),target,allocatable :: FracLitrMix_vr(:,:,:)              !fraction of litter to be mixed downward,[-]
+  real(r8),target,allocatable :: RHydlySOCK_vr(:,:,:,:)             !hydrolysis of soil organic C in each complex, [gC d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -97,6 +98,7 @@ module SOMDataType
   allocate(tNO3_col(JY,JX));        tNO3_col=0._r8
   allocate(tHxPO4_col(JY,JX));        tHxPO4_col=0._r8
   allocate(FracLitrMix_vr(0:JZ,JY,JX)); FracLitrMix_vr=0._r8
+  allocate(RHydlySOCK_vr(1:jcplx,0:JZ,JY,JX)); RHydlySOCK_vr=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -134,7 +136,7 @@ module SOMDataType
   call destroy(tHumOM_col)
   call destroy(EPOC_vr)
   call destroy(EHUM_vr)
-
+  call destroy(RHydlySOCK_vr)
   call destroy(CDOM_vr)
   call destroy(FracBulkSOMC_vr)
   call destroy(DIC_mass_col)

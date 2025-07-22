@@ -69,7 +69,7 @@ implicit none
     !     FCI,WPI=ice field capacity,wilting point
     !     PSISoilMatric=matric water potential
     !
-  ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1).and.FracSoiPAsIce_vr(N3,N2,N1)>ZEROS2(N2,N1))THEN
+  ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     FCX  = FCI*FracSoiPAsIce_vr(N3,N2,N1)
     WPX  = WPI*FracSoiPAsIce_vr(N3,N2,N1)
     FCLX = LOG(FCX)

@@ -33,7 +33,6 @@ implicit none
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubsMod          , only : InitGrosub
   use InitSoluteMod       , only : InitSoluteProperty
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
@@ -54,9 +53,11 @@ implicit none
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
   use PerturbationMod     , only : InitSoilWarming
-  use GridConsts
+  use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
+  use PlantBGCPars          , only : InitPlantTraitTable
+  use GridConsts  
   implicit none
   integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 ! begin_execution
@@ -65,7 +66,10 @@ implicit none
 
   call InitPlantMorphSize()
 
-  if(plant_model)call InitGrosub(NumGrowthStages,MaxNumRootAxes)
+  if(plant_model)then    
+    !and obtain plant NumGrowthStages and MaxNumRootAxes for output set up
+    call InitPlantTraitTable(pltpar,NumGrowthStages,MaxNumRootAxes)
+  endif  
 
   call InitGridData
 
@@ -135,6 +139,8 @@ implicit none
 
   call InitSoilPhysData
 
+  call InitNumericAux()
+
   if(salt_model)call InitSoluteProperty
 
   call InitSoilWarming
@@ -149,11 +155,11 @@ implicit none
   implicit none
 
   pltpar%JZ1    = JZ
-  pltpar%NumOfCanopyLayers1    = NumOfCanopyLayers
+  pltpar%NumCanopyLayers1    = NumCanopyLayers
   pltpar%JP1    = JP
   pltpar%NumOfLeafAzimuthSectors   = NumOfLeafAzimuthSectors
   pltpar%NumOfSkyAzimuthSects1   = NumOfSkyAzimuthSects
-  pltpar%NumOfLeafZenithSectors1   = NumOfLeafZenithSectors
+  pltpar%NumLeafZenithSectors1   = NumLeafZenithSectors
   pltpar%MaxNodesPerBranch1 = MaxNodesPerBranch
   pltpar%iprotein =micpar%iprotein
   pltpar%icarbhyro=micpar%icarbhyro

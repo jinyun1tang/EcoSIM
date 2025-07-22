@@ -1,15 +1,15 @@
-module GrosubPars
+module PlantBGCPars
 
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use GridConsts, only : jroots
   implicit none
   public
   save
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 !
-!
-  
+! 
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]  
   real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
@@ -32,6 +32,12 @@ module GrosubPars
   real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
   real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
   real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
+
+  real(r8) :: CNKI_rubisco                        !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
+  real(r8) :: CPKI_rubisco                        !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
+  real(r8) :: RSMY_stomaCO2                       !minimum stomatal resistance for CO2 uptake (h m-1)
+  real(r8) :: C4KI_pepcarboxy                     !nonstructural C inhibition constant on PEP carboxylase (uM)
+  real(r8) :: Hours4ConiferSpringDeharden         !hours to full dehardening of conifers in spring (h)
 
   real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
   real(r8) :: ELEC4                               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
@@ -105,84 +111,80 @@ module GrosubPars
   real(r8) :: ZPLFD                               !1-ZPLFM, [-]
   real(r8) :: ZPGRD                               !1-ZPGRM, [-]
 
-  character(len=10), allocatable :: pftss(:)
-  character(len=40),allocatable :: pft_long(:)
-  character(len=4), allocatable :: pft_short(:)
-  character(len=2), allocatable :: koppen_clim_no(:)
-  character(len=3), allocatable :: koppen_clim_short(:)
-  character(len=64),allocatable :: koppen_clim_long(:)
-
   type, public :: plant_bgc_par_type
-   !nonstructural(0,*),
-   !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer :: inonstruct
-  integer :: ifoliar
-  integer :: inonfoliar
-  integer :: istalk
-  integer :: iroot
-  integer :: icwood
+  integer :: inonstruct                  !group id of plant nonstructural litter
+  integer :: ifoliar                     !group id of plant foliar litter
+  integer :: inonfoliar                  !group id of plant non-foliar litter group
+  integer :: istalk                      !group id of plant stalk litter group
+  integer :: iroot                       !group id of plant root litter
+  integer :: icwood                      !group id of coarse woody litter
   integer :: NumGrowthStages             !number of growth stages
   integer :: MaxNumRootAxes              !maximum number of root axes
-  integer  :: JP1                        !number of plants
-  integer  :: MaxNumBranches             !maximum number of branches
-  integer  :: NumOfSkyAzimuthSects1      !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx                      !number of organo-microbial complexes
-  integer  :: NumOfLeafAzimuthSectors    !number of sectors for the leaf azimuth, [0,pi]
-  integer  :: NumOfCanopyLayers1         !number of canopy layers
-  integer  :: JZ1                        !number of soil layers
-  integer  :: NumOfLeafZenithSectors1    !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: MaxNodesPerBranch1         !maximum number of canopy nodes, 25
-  integer  :: jsken                      !number of kinetic components in litter,PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-  integer  :: NumLitterGroups            !number of litter groups nonstructural(0,*),
-                                         !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer  :: NumOfPlantMorphUnits       !number of plant organs
-  integer  :: NumOfPlantLitrCmplxs       !number of plant litter microbial-om complexes
-  integer :: iprotein
-  integer :: icarbhyro
-  integer :: icellulos
-  integer :: ilignin
-  integer :: k_woody_litr
-  integer :: k_fine_litr
-  integer :: jroots
+  integer :: JP1                         !number of plants
+  integer :: MaxNumBranches              !maximum number of branches
+  integer :: NumOfSkyAzimuthSects1       !number of sectors for the sky azimuth  [0,2*pi]
+  integer :: jcplx                       !number of organo-microbial complexes
+  integer :: NumOfLeafAzimuthSectors     !number of sectors for the leaf azimuth, [0,pi]
+  integer :: NumCanopyLayers1          !number of canopy layers
+  integer :: JZ1                         !number of soil layers
+  integer :: NumLeafZenithSectors1     !number of sectors for the leaf zenith [0,pi/2]
+  integer :: MaxNodesPerBranch1          !maximum number of canopy nodes, 25
+  integer :: jsken                       !number of kinetic components in litter
+  integer :: NumLitterGroups             !number of litter groups nonstructural(0,*)                         
+  integer :: NumOfPlantMorphUnits        !number of plant organs
+  integer :: NumOfPlantLitrCmplxs        !number of plant litter microbial-om complexes
+  integer :: iprotein                    !kinetic id of litter component as protein
+  integer :: icarbhyro                   !kinetic id of litter component as carbonhydrate
+  integer :: icellulos                   !kinetic id of litter component as cellulose
+  integer :: ilignin                     !kinetic id of litter component as lignin
+  integer :: k_woody_litr                !woody litter complex id
+  integer :: k_fine_litr                 !fine litter complex id
+  integer :: jroots                      !number of root groups, plant root + myco types
   end type plant_bgc_par_type
 
   contains
 
-  subroutine InitVegPars(pltpar)
+!----------------------------------------------------------------------------------------------------
+  subroutine InitPlantTraitTable(pltpar,NumGrowthStages,MaxNumRootAxes)
+  use PlantTraitTableMod, only : AllocPlantTraitTable
+  implicit none
+  type(plant_bgc_par_type)  :: pltpar
+  integer, intent(out) :: NumGrowthStages
+  integer, intent(out) :: MaxNumRootAxes
+  integer :: npft,nkopenclms,npfts_tab
+
+  call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
+  
+  NumGrowthStages = pltpar%NumGrowthStages
+  MaxNumRootAxes  = pltpar%MaxNumRootAxes
+
+  call AllocPlantTraitTable(jroots,npft,nkopenclms,npfts_tab)
+
+  end subroutine InitPlantTraitTable
+
+!----------------------------------------------------------------------------------------------------
+  subroutine InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
   use EcoSIMCtrlMod, only : pft_file_in,pft_nfid
   use abortutils, only : endrun
   use fileUtil, only : file_exists
   use ncdio_pio
   implicit none
   type(plant_bgc_par_type)  :: pltpar
-  integer :: npfts
-  integer :: npft
-  integer :: nkopenclms
+  integer, intent(out) :: npft        !total pft types, exclude koppen climate code
+  integer, intent(out) :: nkopenclms  !
+  integer, intent(out) :: npfts_tab   !total pft records, pft_short name + numerical koppen climate code
 
   if (len_trim(pft_file_in) == 0)then
     write(*,*) "Setting PFTs to one"
-    npfts=1
+    npfts_tab=1
   else
     if(.not. file_exists(trim(pft_file_in)))then
       call endrun(msg='Fail to locate plant trait file '//trim(pft_file_in)//' in ' &
         //mod_filename,line=__LINE__)
     else
-      npfts      = get_dim_len(pft_file_in, 'npfts')
+      npfts_tab  = get_dim_len(pft_file_in, 'npfts');
       npft       = get_dim_len(pft_file_in, 'npft')
       nkopenclms = get_dim_len(pft_file_in,'nkopenclms')
-      allocate(pftss(npfts))
-      allocate(pft_long(npft))
-      allocate(pft_short(npft))
-      allocate(koppen_clim_no(nkopenclms))
-      allocate(koppen_clim_short(nkopenclms))
-      allocate(koppen_clim_long(nkopenclms))
-      call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
-      call ncd_getvar(pft_nfid, 'pfts', pftss)
-      call ncd_getvar(pft_nfid,'pfts_long',pft_long)
-      call ncd_getvar(pft_nfid,'pfts_short',pft_short)
-      call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_no)
-      call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short)
-      call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long)
     endif
   endif  
   pltpar%inonstruct = 0
@@ -192,7 +194,7 @@ module GrosubPars
   pltpar%iroot      = 4
   pltpar%icwood     = 5
 
-  pltpar%jroots=2
+  pltpar%jroots=jroots
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
   PART1X                      = 0.05_r8
   PART2X                      = 0.02_r8
@@ -230,6 +232,13 @@ module GrosubPars
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
+
+  CNKI_rubisco                = 1.0E-02_r8
+  CPKI_rubisco                = 1.0E-03_r8
+  RSMY_stomaCO2               = 2.78E-03_r8
+  C4KI_pepcarboxy             = 5.0E+06_r8
+  Hours4ConiferSpringDeharden = 276.9_r8
+
 
   FSTK                  = 0.05_r8
   ZSTX                  = 1.0E-03_r8
@@ -283,61 +292,5 @@ module GrosubPars
   HourReq2InitSStor4LeafOut=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
   
   end subroutine InitVegPars
-!------------------------------------------------------------------------------------------
 
-  function get_pft_loc(koppen_def,pft_name,pft_lname,koppen_climl,koppen_clims)result(loc)
-  !
-  !!DESCRIPTION
-  ! return the id of pft to be read
-  implicit none
-  integer, intent(in) :: koppen_def
-  character(len=*), intent(in) :: pft_name
-  character(len=40),intent(out):: pft_lname
-  character(len=64),intent(out):: koppen_climl
-  character(len=3), intent(out):: koppen_clims
-  integer :: loc,loc1,len,k
-
-  len=len_trim(pft_name)
-
-  do 
-    if(ichar(pft_name(len:len))==0 .or. pft_name(len:len)==' ')then
-      len=len-1
-    else
-      exit
-    endif
-  enddo
-
-  loc=1
-  DO
-    if(pftss(loc)(1:len)==pft_name(1:len))exit
-    loc=loc+1
-  enddo
-
-  loc1=1
-  do 
-    if(pft_name(1:4)==pft_short(loc1))exit
-    loc1=loc1+1
-    if(loc1 > size(pft_short))then
-      exit      
-    endif
-  enddo
-  if(loc1 <=  size(pft_short))then
-    pft_lname=pft_long(loc1)
-  else
-    pft_lname=pft_name
-  endif
-  
-  if(koppen_def==0)then
-    koppen_climl='None'  
-    koppen_clims='None'
-    return
-  endif
-  loc1=1  
-  do
-    if(koppen_clim_no(loc1)==pft_name(5:6))exit
-    loc1=loc1+1
-  enddo
-  koppen_climl=koppen_clim_long(loc1)
-  koppen_clims=koppen_clim_short(loc1)
-  end function get_pft_loc
-end module GrosubPars
+end module PlantBGCPars

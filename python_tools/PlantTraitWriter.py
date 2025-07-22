@@ -350,7 +350,7 @@ def write_plant_traits(pft_path,gfname,outdir):
 
     for j in range(npfts):
         pfile=pft_path+pft_names[j]
-#        print('read file %s'%pfile)
+        print('read file %s'%pfile)
         with open(pfile,"r") as pftfile:
             line=pftfile.readline()
 

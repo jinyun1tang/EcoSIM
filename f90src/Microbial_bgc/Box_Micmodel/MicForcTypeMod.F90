@@ -3,7 +3,6 @@ module MicForcTypeMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL   
   use EcoSiMParDataMod, only : micpar
-  use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
   implicit none
 
@@ -12,7 +11,7 @@ module MicForcTypeMod
   __FILE__
 
   type, public :: micforctype
-
+  integer  :: L                 !layer number
   real(r8) :: CCH4E
   real(r8) :: COXYE
   real(r8) :: O2_irrig_conc
@@ -94,8 +93,9 @@ module MicForcTypeMod
 
   implicit none
   class(micforctype) :: this
-  integer :: jcplx
+  integer :: jcplx,NPH
   jcplx=micpar%jcplx
+  NPH=60
   allocate(this%ElmAllocmatMicrblitr2POM(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POM=spval
   allocate(this%ElmAllocmatMicrblitr2POMU(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POMU=spval
   allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval

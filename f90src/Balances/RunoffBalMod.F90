@@ -183,9 +183,9 @@ implicit none
       TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)       = -OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)       = -CXR
-      HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
       HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXR                             = XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU                          = OXYGOU-OXR
@@ -302,7 +302,7 @@ implicit none
           D3580: DO K=1,jcplx
             DO NO=1,NumMicbFunGrupsPerCmplx
               DO M=1,nlbiomcp
-                DO NGL=JGnio(NO),JGnfo(NO)
+                DO NGL=JGniH(NO),JGnfH(NO)
                   MID=micpar%get_micb_id(M,NGL)                
                   DO NE=1,NumPlantChemElms
                     MOE(NE)=MOE(NE)+XN*OMEERhetr_2D(NE,MID,K,N,NN,N5,N4)
@@ -352,8 +352,8 @@ implicit none
           TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)-PPE
 
           HydroSufDOCFlx_col(NY,NX)       = HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
+          HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-MOE(ielmn)
+          HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
           HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-MXE(ielmc)
           HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE
           HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
@@ -420,7 +420,7 @@ implicit none
 !
 !     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
-!     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
+!     H2OLoss_CumYr_col,QDischarg2WTBL_col=cumulative,hourly water loss through lateral and lower boundaries
 !
 
   IF(FlowDirIndicator_col(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN

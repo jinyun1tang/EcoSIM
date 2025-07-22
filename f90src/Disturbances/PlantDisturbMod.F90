@@ -4,7 +4,7 @@ module PlantDisturbMod
 ! code to apply distance to plants
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SOMDataType
-  use GrosubPars
+  use PlantBGCPars
   use PlantTraitDataType
   use GridConsts
   use FlagDataType

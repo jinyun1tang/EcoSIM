@@ -15,8 +15,8 @@ module RootGasMod
   __FILE__
   public :: RootSoilGasExchange
   contains
-!------------------------------------------------------------------------
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   subroutine RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
     RootAreaDivRadius_vr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake)
   !
@@ -91,61 +91,60 @@ module RootGasMod
   integer  :: idg
   
 !     begin_execution
-  associate(                                                             &
-    RootStrutElms_pft         => plt_biom%RootStrutElms_pft,             &
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,                &
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft,           &
-    CumSoilThickMidL_vr       => plt_site%CumSoilThickMidL_vr,           &
-    AtmGasc                   => plt_site%AtmGasc,                       &  !in: atmospheric gaseous concentration
-    ZEROS                     => plt_site%ZEROS,                         &
-    ZERO                      => plt_site%ZERO,                          &
-    VLWatMicPM_vr             => plt_site%VLWatMicPM_vr,                 &
-    VLsoiAirPM_vr             => plt_site%VLsoiAirPM_vr,                 &
-    TortMicPM_vr              => plt_site%TortMicPM_vr,                  &
-    FILMM_vr                  => plt_site%FILMM_vr,                      &
-    RGasTranspFlxPrev_vr      => plt_bgcr%RGasTranspFlxPrev_vr,          &
-    RO2AquaSourcePrev_vr      => plt_bgcr%RO2AquaSourcePrev_vr,          &
-    RootO2_Xink_pvr           => plt_bgcr%RootO2_Xink_pvr     ,          & !out: O2 consumed for root respiration 
-    RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr,                & !out: O2 uptake from inside root O2
-    RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr,        &
-    ZERO4Uptk_pft             => plt_rbgc%ZERO4Uptk_pft,                 &
-    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr,            &
-    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr,           & !Input: whole population root O2 demand
-    RO2UptkSoilM_vr           => plt_rbgc%RO2UptkSoilM_vr,               &
-    RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr,               & !output: total CO2 emitted inside roots
-    trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr,         & !output: atmospheric gas flux to root gas concentration
-    trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr,      & !output: gaseous to aqueous dissolution inside root
-    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr,            & !out: aqueous tracer uptake from soil into roots
-    RootCO2AutorX_pvr         => plt_rbgc%RootCO2AutorX_pvr,             & !input: root respiration from previous time step [gC d-2 h-1]
-    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,               &
-    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,               &
-    RootGasConductance_pvr    => plt_rbgc%RootGasConductance_pvr,        &
-    TScal4Difsvity_vr         => plt_soilchem%TScal4Difsvity_vr,         &
-    trcs_VLN_vr               => plt_soilchem%trcs_VLN_vr,               &
-    GasDifc_vr                => plt_soilchem%GasDifc_vr,                &  !in: gaseous diffusivity of volatile tracers
-    SoluteDifusvty_vr         => plt_soilchem%SoluteDifusvty_vr,         &  !in: aqueous diffusivity of volatile tracers
-    GasSolbility_vr           => plt_soilchem%GasSolbility_vr,           &
-    trc_solcl_vr              => plt_soilchem%trc_solcl_vr,              &
-    SoilWatAirDry_vr          => plt_soilchem%SoilWatAirDry_vr,          &
-    VLSoilMicP_vr             => plt_soilchem%VLSoilMicP_vr,             &
-    FracAirFilledSoilPoreM_vr => plt_soilchem%FracAirFilledSoilPoreM_vr, &
-    DiffusivitySolutEffM_vr   => plt_soilchem%DiffusivitySolutEffM_vr,   &
-    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch,          &
-    RootPoreTortu4Gas_pft         => plt_morph%RootPoreTortu4Gas_pft,            &
-    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr,            &
-    Root2ndMeanLens_pvr         => plt_morph%Root2ndMeanLens_pvr,            &
-    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr,              &
-    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr,          &
-    Root2ndXNum_pvr           => plt_morph%Root2ndXNum_pvr,              &
-    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr,            &
-    RootRaidus_rpft           => plt_morph%RootRaidus_rpft,              &
-    RootVH2O_pvr              => plt_morph%RootVH2O_pvr,                 &
-    RootPorosity_pft          => plt_morph%RootPorosity_pft,             &
-    Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr,             &
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft,           &
-    RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr,            &
-    RootCO2Ar2RootX_pvr        => plt_rbgc%RootCO2Ar2RootX_pvr,            & !previous time step root respiration released into roots [gC d-2 h-1]
-    MainBranchNum_pft         => plt_morph%MainBranchNum_pft             &
+  associate(                                                              &
+    RootStrutElms_pft         => plt_biom%RootStrutElms_pft              ,& !input  :plant root structural element mass, [g d-2]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
+    CumSoilThickMidL_vr       => plt_site%CumSoilThickMidL_vr            ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
+    AtmGasc                   => plt_site%AtmGasc                        ,& !input  :atmospheric gas concentrations, [g m-3]
+    ZEROS                     => plt_site%ZEROS                          ,& !input  :threshold zero for numerical stability,[-]
+    ZERO                      => plt_site%ZERO                           ,& !input  :threshold zero for numerical stability, [-]
+    VLWatMicPM_vr             => plt_site%VLWatMicPM_vr                  ,& !input  :soil micropore water content, [m3 d-2]
+    VLsoiAirPM_vr             => plt_site%VLsoiAirPM_vr                  ,& !input  :soil air content, [m3 d-2]
+    TortMicPM_vr              => plt_site%TortMicPM_vr                   ,& !input  :micropore soil tortuosity, [m3 m-3]
+    FILMM_vr                  => plt_site%FILMM_vr                       ,& !input  :soil water film thickness, [m]
+    RGasTranspFlxPrev_vr      => plt_bgcr%RGasTranspFlxPrev_vr           ,& !input  :net gaseous flux, [g d-2 h-1]
+    RO2AquaSourcePrev_vr      => plt_bgcr%RO2AquaSourcePrev_vr           ,& !input  :net aqueous O2 flux, [g d-2 h-1]
+    ZERO4Uptk_pft             => plt_rbgc%ZERO4Uptk_pft                  ,& !input  :threshold zero for uptake calculation, [-]
+    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr             ,& !input  :root respiration unconstrained by O2, [g d-2 h-1]
+    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr            ,& !input  :root O2 demand from respiration, [g d-2 h-1]
+    RootCO2AutorX_pvr         => plt_rbgc%RootCO2AutorX_pvr              ,& !input  :root respiration from previous time step, [g d-2 h-1]
+    TScal4Difsvity_vr         => plt_soilchem%TScal4Difsvity_vr          ,& !input  :temperature effect on diffusivity,[-]
+    trcs_VLN_vr               => plt_soilchem%trcs_VLN_vr                ,& !input  :effective relative tracer volume, [-]
+    GasDifc_vr                => plt_soilchem%GasDifc_vr                 ,& !input  :gaseous diffusivity, [m2 h-1]
+    SoluteDifusvty_vr         => plt_soilchem%SoluteDifusvty_vr          ,& !input  :aqueous diffusivity, [m2 h-1]
+    GasSolbility_vr           => plt_soilchem%GasSolbility_vr            ,& !input  :gas solubility, [m3 m-3]
+    SoilWatAirDry_vr          => plt_soilchem%SoilWatAirDry_vr           ,& !input  :air-dry water content, [m3 m-3]
+    VLSoilMicP_vr             => plt_soilchem%VLSoilMicP_vr              ,& !input  :total micropore volume in layer, [m3 d-2]
+    FracAirFilledSoilPoreM_vr => plt_soilchem%FracAirFilledSoilPoreM_vr  ,& !input  :soil air-filled porosity, [m3 m-3]
+    DiffusivitySolutEffM_vr   => plt_soilchem%DiffusivitySolutEffM_vr    ,& !input  :coefficient for dissolution - volatilization, [-]
+    iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch           ,& !input  :plant growth stage, [-]
+    RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft         ,& !input  :power function of root porosity used to calculate root gaseous diffusivity, [-]
+    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !input  :root layer diameter primary axes, [m]
+    Root2ndMeanLens_pvr       => plt_morph%Root2ndMeanLens_pvr           ,& !input  :root layer average length, [m]
+    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr               ,& !input  :root layer volume air, [m2 d-2]
+    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
+    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr               ,& !input  :root layer number axes, [d-2]
+    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr             ,& !input  :root layer diameter secondary axes, [m]
+    RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
+    RootVH2O_pvr              => plt_morph%RootVH2O_pvr                  ,& !input  :root layer volume water, [m2 d-2]
+    RootPorosity_pft          => plt_morph%RootPorosity_pft              ,& !input  :root porosity, [m3 m-3]
+    Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr              ,& !input  :root layer number primary axes, [d-2]
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
+    RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr                 ,& !inoput :aqueous O2 flux from roots to root water, [g d-2 h-1]
+    RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr         ,& !inoput :O2 constraint to root respiration (0-1), [-]
+    REcoUptkSoilO2M_vr           => plt_rbgc%REcoUptkSoilO2M_vr                ,& !inoput :total O2 sink, [g d-2 t-1]
+    RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr              ,& !inoput :aqueous CO2 flux from roots to root water, [g d-2 h-1]
+    trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr          ,& !inoput :gaseous tracer flux through roots, [g d-2 h-1]
+    trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr       ,& !inoput :dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
+    RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr             ,& !inoput :aqueous CO2 flux from roots to soil water, [g d-2 h-1]
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr                ,& !inoput :root gas content, [g d-2]
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr                ,& !inoput :root aqueous content, [g d-2]
+    RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr             ,& !inoput :root respiration released to soil, [gC d-2 h-1]
+    RootCO2Ar2RootX_pvr       => plt_rbgc%RootCO2Ar2RootX_pvr            ,& !inoput :root respiration released to root, [gC d-2 h-1]
+    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr                ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootGasConductance_pvr    => plt_rbgc%RootGasConductance_pvr          & !output :Conductance for gas diffusion [m3 d-2 h-1]
   )
   
   call PrintInfo('beg '//subname)
@@ -202,7 +201,7 @@ module RootGasMod
       !primary roots conductance scalar
       RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar
-      RTCR2 = (Root2ndXNum_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
+      RTCR2 = (Root2ndXNumL_pvr(N,L,NZ)*PICON*Root2ndRadius_pvr(N,L,NZ)**2/Root2ndMeanLens_pvr(N,L,NZ))/FracSoiLayByPrimRoot(L,NZ)
       IF(RTCR2.GT.RTCR1)THEN
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE
@@ -567,11 +566,11 @@ module RootGasMod
           ! ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
           !
           ! RootO2Uptk_pvr=root O2 uptake from root
-          ! RO2UptkSoilM_vr=total O2 uptake from soil by all microbial,root popns
+          ! REcoUptkSoilO2M_vr=total O2 uptake from soil by all microbial,root popns
           ! Root CO2 emission includes actual CO2 production from respiration and flux exchange with soil
           RCO2Emis2Root_pvr(N,L,NZ) = RCO2Emis2Root_pvr(N,L,NZ)+RootCO2Prod_tscaled+RootUptkSoiSolute(idg_CO2)
           RootO2Uptk_pvr(N,L,NZ)    = RootO2Uptk_pvr(N,L,NZ)+ROxyRoot2Uptk    !uptake from O2 inside roots for root respiration
-          RO2UptkSoilM_vr(M,L)      = RO2UptkSoilM_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
+          REcoUptkSoilO2M_vr(M,L)      = REcoUptkSoilO2M_vr(M,L)+ROxySoil2Uptk      !uptake from soil O2 for root respiration
         ENDDO D90        
       ENDIF
 
@@ -598,13 +597,13 @@ module RootGasMod
     ! O2 is taken from inside the root and directly from the aqueous soil O2.
 
     PopPlantO2Uptake        = RootO2Uptk_pvr(N,L,NZ)+RootUptkSoiSol_pvr(idg_O2,N,L,NZ)
-    RootO2_Xink_pvr(N,L,NZ) = PopPlantO2Uptake
+    RootO2_TotSink_pvr(N,L,NZ) = PopPlantO2Uptake     !include O2 uptake from soil and from inside the roots
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake/RootO2Dmnd4Resp_pvr(N,L,NZ)))
   ELSE
     RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
     PopPlantO2Uptake         = 0.0_r8
-    RootO2_Xink_pvr(N,L,NZ)  = 0._r8
+    RootO2_TotSink_pvr(N,L,NZ)  = 0._r8
     IF(L.GT.NGTopRootLayer_pft(NZ))THEN
       RAutoRootO2Limter_rpvr(N,L,NZ)=RAutoRootO2Limter_rpvr(N,L-1,NZ)
     ELSE
@@ -615,5 +614,5 @@ module RootGasMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootSoilGasExchange
-
+  ![tail]
 end module RootGasMod

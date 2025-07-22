@@ -17,7 +17,7 @@ module CanopyRadDataType
   real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)   !leaf surface area, [m2 d-2]
   real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)     !stem surface area, [m2 d-2]
-
+  real(r8),target,allocatable :: RadSW_Canopy_col(:,:)              !canopy intercepted shortwave radiation, [MJ d-2]
   real(r8) :: TotSineSkyAngles_grd
   real(r8) :: dangle
   private :: InitAllocate
@@ -31,16 +31,16 @@ module CanopyRadDataType
   real(r8) :: da
   real(r8) :: aa
   integer :: N
-! NumOfLeafZenithSectors: number of leaf inclination groups, 90 deg into NumOfLeafZenithSectors groups
+! NumLeafZenithSectors: number of leaf inclination groups, 90 deg into NumLeafZenithSectors groups
 
   call InitAllocate
 
-  dangle=PICON2h/real(NumOfLeafZenithSectors,r8)         !the angle section width
+  dangle=PICON2h/real(NumLeafZenithSectors,r8)         !the angle section width
 
-  DO N = 1, NumOfLeafZenithSectors
-    aa=real(N-0.5,r8)*dangle
-    SineLeafAngle(N)=sin(aa)
-    CosineLeafAngle(N)=cos(aa)
+  DO N = 1, NumLeafZenithSectors
+    aa                 = real(N-0.5,r8)*dangle
+    SineLeafAngle(N)   = sin(aa)
+    CosineLeafAngle(N) = cos(aa)
   ENDDO
   TotSineSkyAngles_grd = 0._r8
   end subroutine InitCanopyRad
@@ -54,18 +54,18 @@ module CanopyRadDataType
   integer :: ncols
   ncols = bounds%ncols
 
-  allocate(SineLeafAngle(NumOfLeafZenithSectors))
-  allocate(CosineLeafAngle(NumOfLeafZenithSectors))
-  allocate(OMEGA(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGA=0._r8
-  allocate(OMEGX(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGX=0._r8
-  allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumOfLeafZenithSectors,NumOfLeafAzimuthSectors))
-  allocate(LeafAngleClass_pft(NumOfLeafZenithSectors,JP,JY,JX));LeafAngleClass_pft=0._r8
-  allocate(LeafAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaZsec_brch=0._r8
-  allocate(LeafAUnshaded_zsec(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAUnshaded_zsec=0._r8
-  allocate(RadPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX));RadPAR_zsec=0._r8
-  allocate(RadDifPAR_zsec(NumOfLeafZenithSectors,NumOfSkyAzimuthSects,NumOfCanopyLayers,JP,JY,JX));RadDifPAR_zsec=0._r8
-  allocate(StemAreaZsec_brch(NumOfLeafZenithSectors,NumOfCanopyLayers,MaxNumBranches,JP,JY,JX));StemAreaZsec_brch=0._r8
-
+  allocate(SineLeafAngle(NumLeafZenithSectors))
+  allocate(CosineLeafAngle(NumLeafZenithSectors))
+  allocate(OMEGA(NumOfSkyAzimuthSects,NumLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGA=0._r8
+  allocate(OMEGX(NumOfSkyAzimuthSects,NumLeafZenithSectors,NumOfLeafAzimuthSectors));OMEGX=0._r8
+  allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumLeafZenithSectors,NumOfLeafAzimuthSectors))
+  allocate(LeafAngleClass_pft(NumLeafZenithSectors,JP,JY,JX));LeafAngleClass_pft=0._r8
+  allocate(LeafAreaZsec_brch(NumLeafZenithSectors,NumCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaZsec_brch=0._r8
+  allocate(LeafAUnshaded_zsec(NumLeafZenithSectors,NumCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAUnshaded_zsec=0._r8
+  allocate(RadPAR_zsec(NumLeafZenithSectors,NumOfSkyAzimuthSects,NumCanopyLayers,JP,JY,JX));RadPAR_zsec=0._r8
+  allocate(RadDifPAR_zsec(NumLeafZenithSectors,NumOfSkyAzimuthSects,NumCanopyLayers,JP,JY,JX));RadDifPAR_zsec=0._r8
+  allocate(StemAreaZsec_brch(NumLeafZenithSectors,NumCanopyLayers,MaxNumBranches,JP,JY,JX));StemAreaZsec_brch=0._r8
+  allocate(RadSW_Canopy_col(JY,JX)); RadSW_Canopy_col=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -85,5 +85,6 @@ module CanopyRadDataType
   call destroy(RadPAR_zsec)
   call destroy(RadDifPAR_zsec)
   call destroy(StemAreaZsec_brch)
+  call destroy(RadSW_Canopy_col)
   end subroutine DestructCanopyRad
 end module CanopyRadDataType

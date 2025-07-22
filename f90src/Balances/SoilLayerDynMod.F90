@@ -7,7 +7,7 @@ module SoilLayerDynMod
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
   use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
-  use PlantTraitDataType, only : MY_pft
+  use PlantTraitDataType, only : Myco_pft
   use DebugToolMod
   USE RedistDataMod      
   use RootDataType
@@ -86,7 +86,7 @@ implicit none
   real(r8) :: SoilLayBotEdgeOld_vr(JZ)     !edge location before mass update
   integer  :: IFLGL(0:JZ,6)                !flag for soil thickness change by different processes
   real(r8) :: DDLYRX(3)
-  integer :: NN,K,M,N,NR,NZ,L
+  integer :: NN,K,M,N,NR,NZ,L,idg
   integer :: L0,L1,NUX,ICHKL,NGL
   real(r8) :: FX,FY
   real(r8) :: FBO
@@ -100,7 +100,13 @@ implicit none
   !     SOIL SUBSIDENCE
   !
   call PrintInfo('beg '//subname)
-
+!  if(I==167 .and. J==16)then
+!    write(193,*)'upggas',trcg_gasml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)
+!    write(193,*)'upgmic',trcs_solml_vr(idg_O2,0:NL_col(NY,NX),NY,NX)
+!    write(193,*)'upgmac',trcs_soHml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)  
+!    idg=idg_O2
+!    write(194,*)'afgmas',sum(trcg_gasml_vr(idg,1:NL_col(NY,NX),NY,NX))+sum(trcs_solml_vr(idg,0:NL_col(NY,NX),NY,NX))+sum(trcs_soHml_vr(idg,1:NL_col(NY,NX),NY,NX))        
+!  endif
   IF(.not. erosion_model)return
   !soil relayering can occur due to freeze-thaw, soc change, and erosion
 
@@ -996,7 +1002,7 @@ implicit none
     DO  K=1,jcplx
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
               mBiomeHeter_vr(NE,MID,K,L1,NY,NX)=mBiomeHeter_vr(NE,MID,K,L1,NY,NX)+FX*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
@@ -1043,7 +1049,7 @@ implicit none
     DO  NZ=1,NP_col(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO N=1,MY_pft(NZ,NY,NX)
+        DO N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1068,7 +1074,7 @@ implicit none
           PopuRootMycoC_pvr(N,L1,NZ,NY,NX)       = PopuRootMycoC_pvr(N,L1,NZ,NY,NX)+FX* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)        = RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_pvr(N,L1,NZ,NY,NX)        = Root1stXNumL_pvr(N,L1,NZ,NY,NX)+FX*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
-          Root2ndXNum_pvr(N,L1,NZ,NY,NX)         = Root2ndXNum_pvr(N,L1,NZ,NY,NX)+FX*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
+          Root2ndXNumL_pvr(N,L1,NZ,NY,NX)         = Root2ndXNumL_pvr(N,L1,NZ,NY,NX)+FX*Root2ndXNumL_pvr(N,L0,NZ,NY,NX)
           RootLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootPoreVol_pvr(N,L1,NZ,NY,NX)         = RootPoreVol_pvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_pvr(N,L0,NZ,NY,NX)
@@ -1174,7 +1180,7 @@ implicit none
     DO  K=1,jcplx
        DO N=1,NumMicbFunGrupsPerCmplx
         DO M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
             DO NE=1,NumPlantChemElms
               mBiomeHeter_vr(NE,MID,K,L0,NY,NX)=FY*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
@@ -1221,7 +1227,7 @@ implicit none
     DO  NZ=1,NP_col(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
-        DO  N=1,MY_pft(NZ,NY,NX)
+        DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1242,7 +1248,7 @@ implicit none
           PopuRootMycoC_pvr(N,L0,NZ,NY,NX)       = FY* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L0,NZ,NY,NX)        = FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_pvr(N,L0,NZ,NY,NX)        = FY*Root1stXNumL_pvr(N,L0,NZ,NY,NX)
-          Root2ndXNum_pvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
+          Root2ndXNumL_pvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNumL_pvr(N,L0,NZ,NY,NX)
           RootLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = FY*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootPoreVol_pvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_pvr(N,L0,NZ,NY,NX)
@@ -1306,7 +1312,7 @@ implicit none
     DO  K=1,jcplx
       DO  N=1,NumMicbFunGrupsPerCmplx
         DO  M=1,nlbiomcp
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)          
             DO NE=1,NumPlantChemElms
               FXOMC                             = FXO*mBiomeHeter_vr(NE,MID,K,L0,NY,NX)
@@ -1380,7 +1386,7 @@ implicit none
           FRO=AMIN1(0.5,FO*CumSoilThickMidL_vr(L0,NY,NX)/CumSoilThickMidL_vr(L1,NY,NX))
         ENDIF
 
-        DO  N=1,MY_pft(NZ,NY,NX)
+        DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             FXGA                               = FRO*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FXGA
@@ -1435,9 +1441,9 @@ implicit none
           Root1stXNumL_pvr(N,L1,NZ,NY,NX) = Root1stXNumL_pvr(N,L1,NZ,NY,NX)+FRootPrimeAxsNum
           Root1stXNumL_pvr(N,L0,NZ,NY,NX) = Root1stXNumL_pvr(N,L0,NZ,NY,NX)-FRootPrimeAxsNum
 
-          FXRTNL                         = FRO*Root2ndXNum_pvr(N,L0,NZ,NY,NX)
-          Root2ndXNum_pvr(N,L1,NZ,NY,NX) = Root2ndXNum_pvr(N,L1,NZ,NY,NX)+FXRTNL
-          Root2ndXNum_pvr(N,L0,NZ,NY,NX) = Root2ndXNum_pvr(N,L0,NZ,NY,NX)-FXRTNL
+          FXRTNL                         = FRO*Root2ndXNumL_pvr(N,L0,NZ,NY,NX)
+          Root2ndXNumL_pvr(N,L1,NZ,NY,NX) = Root2ndXNumL_pvr(N,L1,NZ,NY,NX)+FXRTNL
+          Root2ndXNumL_pvr(N,L0,NZ,NY,NX) = Root2ndXNumL_pvr(N,L0,NZ,NY,NX)-FXRTNL
 
           FXRTLGP                            = FRO*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTLGP

@@ -129,7 +129,7 @@ module StartsMod
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
@@ -198,10 +198,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   CanopyHeight_col(:,:)                        = 0.0_r8
-  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
-  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  CanopyHeightZ_col(0:NumCanopyLayers,:,:)   = 0.0_r8
+  CanopyLeafAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  CanopyStemAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
   
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
@@ -516,7 +516,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     
   ENDDO D1200
-  
+
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
   call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
@@ -612,9 +612,9 @@ module StartsMod
       ZEROS(NY,NX)  = ZERO*GridArea
       ZEROS2(NY,NX) = ZERO2*GridArea
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)      = ASP_col(NY,NX)*RadianPerDegree   !radian
-      SineGrndSurfAzimuth_col(NY,NX)    = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
-      CosineGrndSurfAzimuth_col(NY,NX)  = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
+      GroundSurfAzimuth_col(NY,NX)          = ASP_col(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
       SLOPE_col(iWestEastDirection,NY,NX)   = -SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
       SLOPE_col(iNorthSouthDirection,NY,NX) = SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
@@ -801,9 +801,9 @@ module StartsMod
   RootResp_CumYr_col(:,:)        = 0.0_r8
   HydroSufDOCFlx_col(:,:)        = 0.0_r8
   HydroSubsDOCFlx_col(:,:)       = 0.0_r8
-  HydroSufDONFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDONFlx_col(:,:)  = 0.0_r8
   HydroSubsDONFlx_col(:,:)       = 0.0_r8
-  HydroSufDOPFlx_CumYr_col(:,:)  = 0.0_r8
+  HydroSufDOPFlx_col(:,:)  = 0.0_r8
   HydroSubsDOPFlx_col(:,:)       = 0.0_r8
   HydroSufDICFlx_col(:,:)        = 0.0_r8
   HydroSubsDICFlx_col(:,:)       = 0.0_r8
@@ -1045,7 +1045,7 @@ module StartsMod
 !     TairKClimMean_col=mean annual air temperature (K)
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
-      CCO2EI_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
@@ -1111,10 +1111,10 @@ module StartsMod
 !     INITIALIZE COMMUNITY CANOPY
 !
   CanopyHeight_col(:,:)                        = 0.0_r8
-  CanopyHeightZ_col(0:NumOfCanopyLayers,:,:)   = 0.0_r8
-  CanopyLeafAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  CanopyStemAareZ_col(1:NumOfCanopyLayers,:,:) = 0.0_r8
-  tCanLeafC_cl(1:NumOfCanopyLayers,:,:)        = 0.0_r8
+  CanopyHeightZ_col(0:NumCanopyLayers,:,:)   = 0.0_r8
+  CanopyLeafAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  CanopyStemAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
+  tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
 
