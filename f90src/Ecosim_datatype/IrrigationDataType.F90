@@ -9,26 +9,25 @@ module IrrigationDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: DIRRI(12)                         !change factor for irrigation, [-]
-
-  real(r8) :: CCOU                              !subsurface irrigation  CO2 concentration	[g m-3]
-  real(r8) :: CCHU                              !subsurface irrigation  CH4 concentration	[g m-3]
-  real(r8) :: COXU                              !subsurface irrigation  O2 concentration	[g m-3]
-  real(r8) :: CNNU                              !subsurface irrigation  N2 concentration	[g m-3]
-  real(r8) :: CN2U                              !subsurface irrigation  N2O concentration	[g m-3]
+  real(r8) :: DIRRI(12)                                              !change factor for irrigation, [-]
+  real(r8) :: CCOU                                                   !subsurface irrigation  CO2 concentration,	[g m-3]
+  real(r8) :: CCHU                                                   !subsurface irrigation  CH4 concentration,	[g m-3]
+  real(r8) :: COXU                                                   !subsurface irrigation  O2 concentration,	[g m-3]
+  real(r8) :: CNNU                                                   !subsurface irrigation  N2 concentration,	[g m-3]
+  real(r8) :: CN2U                                                   !subsurface irrigation  N2O concentration	[g m-3]
   integer ,target,allocatable ::  IIRRA(:,:,:)                       !start and end dates of automated irrigation, [-]
   real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
   real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
-  real(r8),target,allocatable ::  IrrigSubsurf_col(:,:)                  !underground irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  IrrigSurface_col(:,:)                        !surface irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FIRRA(:,:)                        !fraction of FC - WP below which automatic irrigation applied, [-]
-  real(r8),target,allocatable ::  CIRRA(:,:)                        !fraction of FC - WP to which automatic irrigation applied, [-]
-  real(r8),target,allocatable ::  DIRRA(:,:,:)                      !depth to which automatic irrigation applied, [m]
-  real(r8),target,allocatable ::  TDIRI(:,:,:)                      !accumulated change  for irrigation, [-]
-  real(r8),target,allocatable ::  PHQ(:,:,:)                        !surface irrigation  pH, [-]
-  real(r8),target,allocatable ::  NH4_irrig_mole_conc(:,:,:)                       !surface irrigation  NH4 concentration, [g m-3]
-  real(r8),target,allocatable ::  NO3_irrig_mole_conc(:,:,:)                       !surface irrigation  NO3 concentration, [g m-3]
-  real(r8),target,allocatable ::  H2PO4_irrig_mole_conc(:,:,:)                       !surface irrigation  H2PO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  IrrigSubsurf_col(:,:)              !underground irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  IrrigSurface_col(:,:)              !surface irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  FIRRA_col(:,:)                     !fraction of FC-WP below which automatic irrigation applied, [-]
+  real(r8),target,allocatable ::  CIRRA_col(:,:)                     !fraction of FC-WP to which automatic irrigation applied, [-]
+  real(r8),target,allocatable ::  DIRRA(:,:,:)                       !depth to which automatic irrigation applied, [m]
+  real(r8),target,allocatable ::  TDIRI(:,:,:)                       !accumulated relative change  for irrigation, [-]
+  real(r8),target,allocatable ::  PHQ(:,:,:)                         !surface irrigation  pH, [-]
+  real(r8),target,allocatable ::  NH4_irrig_mole_conc(:,:,:)         !surface irrigation  NH4 concentration, [g m-3]
+  real(r8),target,allocatable ::  NO3_irrig_mole_conc(:,:,:)         !surface irrigation  NO3 concentration, [g m-3]
+  real(r8),target,allocatable ::  H2PO4_irrig_mole_conc(:,:,:)       !surface irrigation  H2PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CALQ(:,:,:)                       !surface irrigation  Al concentration, [g m-3]
   real(r8),target,allocatable ::  CFEQ(:,:,:)                       !surface irrigation  Fe concentration, [g m-3]
   real(r8),target,allocatable ::  CHYQ(:,:,:)                       !surface irrigation  H concentration, [g m-3]
@@ -63,7 +62,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CNASQ(:,:,:)                      !surface irrigation  NaSO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CKASQ(:,:,:)                      !surface irrigation  K concentration, [g m-3]
   real(r8),target,allocatable ::  CH0PQ(:,:,:)                      !surface irrigation  PO4 concentration, [g m-3]
-  real(r8),target,allocatable ::  HPO4_irrig_mole_conc(:,:,:)            !surface irrigation  HPO4 concentration, [g m-3]
+  real(r8),target,allocatable ::  HPO4_irrig_mole_conc(:,:,:)       !surface irrigation  HPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CH3PQ(:,:,:)                      !surface irrigation  H3PO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF1PQ(:,:,:)                      !surface irrigation  FeHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CF2PQ(:,:,:)                      !surface irrigation  FeH2PO4 concentration, [g m-3]
@@ -72,19 +71,15 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CC2PQ(:,:,:)                      !surface irrigation  CaH4P2O8 concentration, [g m-3]
   real(r8),target,allocatable ::  CM1PQ(:,:,:)                      !surface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  CSTRQ(:,:,:)                      !surface irrigation ion strength, [g m-3]
-  real(r8),target,allocatable ::  SurfIrrig_IonStrenth_col(:,:)                        !surface irrigation ion strength, [g m-3]
+  real(r8),target,allocatable ::  SurfIrrig_IonStrenth_col(:,:)     !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  trcg_irrig_mole_conc_col(:,:,:)   !surface irrigation  volatile concentration, [mol m-3]
-  real(r8),target,allocatable ::  COCU(:,:,:,:)                     !subsurface irrigation  DOC concentration, [g m-3]
-  real(r8),target,allocatable ::  CONU(:,:,:,:)                     !subsurface irrigation  DON concentration, [g m-3]
-  real(r8),target,allocatable ::  COAU(:,:,:,:)                     !subsurface irrigation  acetate concentration, [g m-3]
   real(r8),target,allocatable ::  trcn_irrig_vr(:,:,:,:)            !subsurface irrigation  nutrient concentration, [g m-3]
-  real(r8),target,allocatable ::  CNZU(:,:,:)                       !subsurface irrigation  Al concentration, [g m-3]
-  real(r8),target,allocatable ::  trcSalt_irrig_vr(:,:,:,:)         !subsurface irrigation  chemical concentration, [g m-3]
-  real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
-  real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)         !subsurface irrigation  chemical concentration, [g m-3]
+  real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)       !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  trcs_Irrig_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable :: trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation [g m-3]
+  real(r8),target,allocatable ::  trcs_Irrig_flx_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcsalt_irrig_mole_conc_col(:,:,:,:)        !salt tracer concentration in irrigation, [g m-3]
+  real(r8),target,allocatable ::  trcs_irrig_flx_col(:,:,:)         !tracer flux through irrigation, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -102,6 +97,7 @@ module IrrigationDataType
   implicit none
 
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
+  allocate(trcs_irrig_flx_col(ids_beg:ids_end,JY,JX)); trcs_irrig_flx_col=0._r8
   allocate(NH4_irrig_mole_conc(366,JY,JX));    NH4_irrig_mole_conc=0._r8
   allocate(trcg_irrig_mole_conc_col(idg_beg:idg_NH3,JY,JX));   trcg_irrig_mole_conc_col=0._r8
   allocate(NO3_irrig_mole_conc(366,JY,JX));    NO3_irrig_mole_conc=0._r8
@@ -155,22 +151,18 @@ module IrrigationDataType
   allocate(IIRRA(4,JY,JX));     IIRRA=0
   allocate(IrrigSubsurf_col(JY,JX));       IrrigSubsurf_col=0._r8
   allocate(IrrigSurface_col(JY,JX));       IrrigSurface_col=0._r8
-  allocate(FIRRA(JY,JX));       FIRRA=0._r8
-  allocate(CIRRA(JY,JX));       CIRRA=0._r8
+  allocate(FIRRA_col(JY,JX));       FIRRA_col=0._r8
+  allocate(CIRRA_col(JY,JX));       CIRRA_col=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
   allocate(TDIRI(12,JY,JX));    TDIRI=0._r8
   allocate(SurfIrrig_IonStrenth_col(JY,JX));       SurfIrrig_IonStrenth_col=0._r8
-  allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
-  allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
-  allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
+
   allocate(trcn_irrig_vr(ids_nuts_beg:ids_nuts_end,JZ,JY,JX)); trcn_irrig_vr=0._r8
-  allocate(CNZU(JZ,JY,JX));     CNZU=0._r8
-  allocate(trcSalt_irrig_vr(idsalt_beg:idsalt_end,JZ,JY,JX));     trcSalt_irrig_vr=0._r8
-  allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
+  allocate(trcSalt_Irrig_vr(idsalt_beg:idsalt_end,JZ,JY,JX));     trcSalt_irrig_vr=0._r8
   allocate(FWatIrrigate2MicP_vr(JZ,JY,JX));      FWatIrrigate2MicP_vr=0._r8
   allocate(HeatIrrigation_vr(JZ,JY,JX));    HeatIrrigation_vr=0._r8
-  allocate(trcs_Irrig_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_vr=0._r8
-  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX))
+  allocate(trcs_Irrig_flx_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_Irrig_flx_vr=0._r8
+  allocate(trcsalt_irrig_mole_conc_col(idsalt_beg:idsaltb_end,366,JY,JX));trcsalt_irrig_mole_conc_col=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -178,8 +170,10 @@ module IrrigationDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(trcsalt_irrig_mole_conc_col)
+  call destroy(trcs_irrig_flx_col)
   call destroy(trcn_irrig_vr)
-  call destroy(trcs_Irrig_vr)
+  call destroy(trcs_Irrig_flx_vr)
   call destroy(PHQ)
   call destroy(NH4_irrig_mole_conc)
   call destroy(NO3_irrig_mole_conc)
@@ -232,18 +226,14 @@ module IrrigationDataType
   call destroy(IIRRA)
   call destroy(IrrigSubsurf_col)
   call destroy(IrrigSurface_col)
-  call destroy(FIRRA)
-  call destroy(CIRRA)
+  call destroy(FIRRA_col)
+  call destroy(CIRRA_col)
   call destroy(DIRRA)
   call destroy(TDIRI)
   call destroy(SurfIrrig_IonStrenth_col)
   call destroy(trcg_irrig_mole_conc_col)
   call destroy(trcSalt_irrig_vr)
-  call destroy(COCU)
-  call destroy(CONU)
-  call destroy(COAU)
-  call destroy(CNZU)
-  call destroy(COPU)
+
   call destroy(FWatIrrigate2MicP_vr)
   call destroy(HeatIrrigation_vr)
 

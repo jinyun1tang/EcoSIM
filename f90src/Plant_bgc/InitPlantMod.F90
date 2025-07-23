@@ -8,7 +8,7 @@ module InitPlantMod
   use PlantAPIData
   use TracerIDMod
   use PlantMathFuncMod
-  use GrosubPars
+  use PlantBGCPars
 
   use PlantMathFuncMod
   implicit none
@@ -17,8 +17,10 @@ module InitPlantMod
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
   public :: StartPlants
+  public :: InitPlantPhenoMorphoBio
   contains
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   SUBROUTINE StartPlants(NZ1Q,NZ2Q)
 !
 !     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
@@ -29,17 +31,17 @@ module InitPlantMod
   integer :: K,L,M,NZ,NZ2X
 !     begin_execution
 
-  associate(                                             &
-    PlantPopulation_pft => plt_site%PlantPopulation_pft, &
-    NU                  => plt_site%NU,                  &
-    NP                  => plt_site%NP,                  &
-    NL                  => plt_site%NL,                  &
-    ZERO                => plt_site%ZERO,                &
-    AREA3               => plt_site%AREA3,               &
-    ZERO4Uptk_pft       => plt_rbgc%ZERO4Uptk_pft,       &
-    ZERO4Groth_pft      => plt_biom%ZERO4Groth_pft,      &
-    ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft,    &
-    IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   &
+  associate(                                              &
+    AREA3               => plt_site%AREA3                ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   ,& !input  :flag for living pft, [-]
+    NL                  => plt_site%NL                   ,& !input  :lowest soil layer number,[-]
+    NP                  => plt_site%NP                   ,& !input  :current number of plant species,[-]
+    NU                  => plt_site%NU                   ,& !input  :current soil surface layer number, [-]
+    PlantPopulation_pft => plt_site%PlantPopulation_pft  ,& !input  :plant population, [d-2]
+    ZERO                => plt_site%ZERO                 ,& !input  :threshold zero for numerical stability, [-]
+    ZERO4Groth_pft      => plt_biom%ZERO4Groth_pft       ,& !output :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft     ,& !output :threshold zero for leaf calculation, [-]
+    ZERO4Uptk_pft       => plt_rbgc%ZERO4Uptk_pft         & !output :threshold zero for uptake calculation, [-]
   )
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
@@ -50,8 +52,8 @@ module InitPlantMod
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
-!     CNWS,rCPNonstRemob_pft=protein:N,protein:P ratios
-!     RootFracRemobilizableBiom=maximum root protein concentration (g g-1)
+!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios
+!     RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
@@ -82,17 +84,17 @@ module InitPlantMod
       ENDDO D9985
 
       DO NZ=NZ1Q,NZ2X
-        ZERO4Groth_pft(NZ)=ZERO*PlantPopulation_pft(NZ)
-        ZERO4Uptk_pft(NZ)=ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-        ZERO4LeafVar_pft(NZ)=ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8  
+        ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
+        ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
+        ZERO4LeafVar_pft(NZ) = ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
       ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
-        plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)=0._r8
-        plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+        plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
+        plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)     = 0._r8
+        plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)         = 0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             plt_bgcr%LitrfalStrutElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
@@ -102,61 +104,59 @@ module InitPlantMod
   RETURN
   end associate
   END subroutine StartPlants
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitShootGrowth(NZ)
 
   implicit none
   integer, intent(in) :: NZ
-  associate(                                                          &
-    iPlantingDay_pft          => plt_distb%iPlantingDay_pft,          &
-    iHarvestYear_pft          => plt_distb%iHarvestYear_pft,          &
-    iPlantingYear_pft         => plt_distb%iPlantingYear_pft,         &
-    iYearPlanting_pft         => plt_distb%iYearPlanting_pft,         &
-    iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft,     &
-    iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft,      &
-    iDayPlanting_pft          => plt_distb%iDayPlanting_pft,          &
-    iHarvestDay_pft           => plt_distb%iHarvestDay_pft,           &
-    CuticleResist_pft         => plt_photo%CuticleResist_pft,         &
-    PPI_pft                   => plt_site%PPI_pft,                    &
-    PPX_pft                   => plt_site%PPX_pft,                    &
-    PPatSeeding_pft           => plt_site%PPatSeeding_pft,            &
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    rCNNonstRemob_pft         => plt_allom%rCNNonstRemob_pft,         &
-    rCPNonstRemob_pft         => plt_allom%rCPNonstRemob_pft,         &
-    RootrNC_pft               => plt_allom%RootrNC_pft,               &
-    RootrPC_pft               => plt_allom%RootrPC_pft,               &
-    O2I                       => plt_photo%O2I,                       &
-    CO2CuticleResist_pft      => plt_photo%CO2CuticleResist_pft,      &
-    iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType,  &
-    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft,      &
-    ClumpFactorInit_pft       => plt_morph%ClumpFactorInit_pft,       &
-    ClumpFactor_pft           => plt_morph%ClumpFactor_pft,           &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft            &
+  associate(                                                           &
+    ClumpFactorInit_pft       => plt_morph%ClumpFactorInit_pft        ,& !input  :initial clumping factor for self-shading in canopy layer, [-]
+    CuticleResist_pft         => plt_photo%CuticleResist_pft          ,& !input  :maximum stomatal resistance to vapor, [s m-1]
+    PPatSeeding_pft           => plt_site%PPatSeeding_pft             ,& !input  :plant population at seeding, [plants d-2]
+    rNCRoot_pft               => plt_allom%rNCRoot_pft                ,& !input  :root N:C ratio, [gN gC-1]
+    rPCRootr_pft               => plt_allom%rPCRootr_pft                ,& !input  :root P:C ratio, [gP gC-1]
+    iHarvestDay_pft           => plt_distb%iHarvestDay_pft            ,& !input  :day of harvest, [-]
+    iHarvestYear_pft          => plt_distb%iHarvestYear_pft           ,& !input  :year of harvest,[-]
+    iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantingDay_pft          => plt_distb%iPlantingDay_pft           ,& !input  :day of planting,[-]
+    iPlantingYear_pft         => plt_distb%iPlantingYear_pft          ,& !input  :year of planting,[-]
+    PPI_pft                   => plt_site%PPI_pft                     ,& !output :initial plant population, [plants d-2]
+    rProteinC2N_pft         => plt_allom%rProteinC2N_pft          ,& !output :C:N ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2P_pft         => plt_allom%rProteinC2P_pft          ,& !output :C:P ratio in remobilizable nonstructural biomass, [-]
+    CO2CuticleResist_pft      => plt_photo%CO2CuticleResist_pft       ,& !output :maximum stomatal resistance to CO2, [s h-1]
+    ClumpFactor_pft           => plt_morph%ClumpFactor_pft            ,& !output :clumping factor for self-shading in canopy layer, [-]
+    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !output :maximum stomatal resistance to vapor, [s h-1]
+    O2I_pft                   => plt_photo%O2I_pft                    ,& !output :leaf gaseous O2 concentration, [umol m-3]
+    PPX_pft                   => plt_site%PPX_pft                     ,& !output :plant population, [plants m-2]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !output :fraction of remobilizable nonstructural biomass in root, [-]
+    iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft       ,& !output :day of harvest,[-]
+    iDayPlanting_pft          => plt_distb%iDayPlanting_pft           ,& !output :day of planting,[-]
+    iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft      ,& !output :year of harvest,[-]
+    iYearPlanting_pft         => plt_distb%iYearPlanting_pft           & !output :year of planting,[-]
   )
-  iYearPlanting_pft(NZ)=iPlantingYear_pft(NZ)
-  iDayPlanting_pft(NZ)=iPlantingDay_pft(NZ)
-  iYearPlantHarvest_pft(NZ)=iHarvestYear_pft(NZ)
-  iDayPlantHarvest_pft(NZ)=iHarvestDay_pft(NZ)
-  PPI_pft(NZ)=PPatSeeding_pft(NZ)
-  PPX_pft(NZ)=PPI_pft(NZ)
-  ClumpFactor_pft(NZ)=ClumpFactorInit_pft(NZ)
+  iYearPlanting_pft(NZ)     = iPlantingYear_pft(NZ)
+  iDayPlanting_pft(NZ)      = iPlantingDay_pft(NZ)
+  iYearPlantHarvest_pft(NZ) = iHarvestYear_pft(NZ)
+  iDayPlantHarvest_pft(NZ)  = iHarvestDay_pft(NZ)
+  PPI_pft(NZ)               = PPatSeeding_pft(NZ)
+  PPX_pft(NZ)               = PPI_pft(NZ)
+  ClumpFactor_pft(NZ)       = ClumpFactorInit_pft(NZ)
 
-  H2OCuticleResist_pft(NZ)=CuticleResist_pft(NZ)/3600.0_r8        
-  CO2CuticleResist_pft(NZ)=CuticleResist_pft(NZ)*1.56_r8    !1.56=sqrt(44./18.)
-  rCNNonstRemob_pft(NZ)=2.5_r8
-  rCPNonstRemob_pft(NZ)=25.0_r8
-  RootFracRemobilizableBiom(NZ)=AMIN1(RootrNC_pft(NZ)*rCNNonstRemob_pft(NZ),&
-    RootrPC_pft(NZ)*rCPNonstRemob_pft(NZ))
+  H2OCuticleResist_pft(NZ)          = CuticleResist_pft(NZ)/3600.0_r8
+  CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
+  rProteinC2N_pft(NZ)             = 2.5_r8
+  rProteinC2P_pft(NZ)             = 25.0_r8
+  RootFracRemobilizableBiom_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rProteinC2N_pft(NZ),rPCRootr_pft(NZ)*rProteinC2P_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
-    O2I(NZ)=2.10E+05_r8
+    O2I_pft(NZ)=2.10E+05_r8
   ELSE
-    O2I(NZ)=3.96E+05_r8
+    O2I_pft(NZ)=3.96E+05_r8
   ENDIF
   end associate
   end subroutine InitShootGrowth
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine PlantLitterFraction(NZ)
   implicit none
   integer, intent(in) :: NZ
@@ -164,26 +164,26 @@ module InitPlantMod
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                                                          &
-    inonstruct                => pltpar%inonstruct,                   &
-    ifoliar                   => pltpar%ifoliar,                      &
-    inonfoliar                => pltpar%inonfoliar,                   &
-    istalk                    => pltpar%istalk,                       &
-    iroot                     => pltpar%iroot,                        &
-    icwood                    => pltpar%icwood,                       &
-    iprotein                  => pltpar%iprotein,                     &
-    icarbhyro                 => pltpar%icarbhyro,                    &
-    icellulos                 => pltpar%icellulos,                    &
-    ilignin                   => pltpar%ilignin,                      &
-    NumLitterGroups           => pltpar%NumLitterGroups,              &
-    RefLeafAppearRate_pft     => plt_pheno%RefLeafAppearRate_pft,     &
-    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft, &
-    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft,     &
-    MatureGroup_pft           => plt_pheno%MatureGroup_pft,           &
-    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr,       &
-    FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft,        &
-    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft,        &
-    NumCogrowthNode_pft        => plt_morph%NumCogrowthNode_pft         &
+  associate(                                                           &
+    MatureGroup_pft           => plt_pheno%MatureGroup_pft            ,& !input  :acclimated plant maturity group, [-]
+    NumLitterGroups           => pltpar%NumLitterGroups               ,& !input  :number of litter groups nonstructural(0,*)
+    RefLeafAppearRate_pft     => plt_pheno%RefLeafAppearRate_pft      ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft         ,& !input  :N2 fixation type,[-]
+    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
+    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    icarbhyro                 => pltpar%icarbhyro                     ,& !input  :kinetic id of litter component as carbonhydrate
+    icellulos                 => pltpar%icellulos                     ,& !input  :kinetic id of litter component as cellulose
+    icwood                    => pltpar%icwood                        ,& !input  :group id of coarse woody litter
+    ifoliar                   => pltpar%ifoliar                       ,& !input  :group id of plant foliar litter
+    ilignin                   => pltpar%ilignin                       ,& !input  :kinetic id of litter component as lignin
+    inonfoliar                => pltpar%inonfoliar                    ,& !input  :group id of plant non-foliar litter group
+    inonstruct                => pltpar%inonstruct                    ,& !input  :group id of plant nonstructural litter
+    iprotein                  => pltpar%iprotein                      ,& !input  :kinetic id of litter component as protein
+    iroot                     => pltpar%iroot                         ,& !input  :group id of plant root litter
+    istalk                    => pltpar%istalk                        ,& !input  :group id of plant stalk litter group
+    ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr        ,& !inoput :litter kinetic fraction, [-]
+    FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft         ,& !output :parameter for allocation of growth to nodes, [-]
+    NumCogrowthNode_pft       => plt_morph%NumCogrowthNode_pft         & !output :number of concurrently growing nodes,[-]
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -391,8 +391,8 @@ module InitPlantMod
   ENDIF
   end associate
   end subroutine PlantLitterFraction
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine PFTThermalAcclimation(NZ)
 
   implicit none
@@ -400,16 +400,16 @@ module InitPlantMod
   real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
   real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
 
-  associate(                                                        &
-    DATAP                    => plt_site%DATAP,                     &
-    iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType, &
-    HighTempLimitSeed_pft    => plt_pheno%HighTempLimitSeed_pft,    &
-    TC4LeafOff_pft           => plt_pheno%TC4LeafOff_pft,           &
-    TC4LeafOut_pft           => plt_pheno%TC4LeafOut_pft,           &
-    TempOffset_pft           => plt_pheno%TempOffset_pft,           &
-    PlantInitThermoAdaptZone => plt_pheno%PlantInitThermoAdaptZone, &
-    iPlantThermoAdaptZone_pft    => plt_pheno%iPlantThermoAdaptZone_pft,    &
-    SeedTempSens_pft         => plt_pheno%SeedTempSens_pft          &
+  associate(                                                           &
+    DATAP                     => plt_site%DATAP                       ,& !input  :parameter file name,[-]
+    PlantInitThermoAdaptZone  => plt_pheno%PlantInitThermoAdaptZone   ,& !input  :initial plant thermal adaptation zone, [-]
+    iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    TempOffset_pft            => plt_pheno%TempOffset_pft             ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+    iPlantThermoAdaptZone_pft => plt_pheno%iPlantThermoAdaptZone_pft  ,& !output :plant thermal adaptation zone, [-]
+    HighTempLimitSeed_pft     => plt_pheno%HighTempLimitSeed_pft      ,& !output :temperature above which seed set is adversely affected, [oC]
+    SeedTempSens_pft          => plt_pheno%SeedTempSens_pft           ,& !output :sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
+    TC4LeafOff_pft            => plt_pheno%TC4LeafOff_pft             ,& !output :threshold temperature for autumn leafoff/hardening, [oC]
+    TC4LeafOut_pft            => plt_pheno%TC4LeafOut_pft              & !output :threshold temperature for spring leafout/dehardening, [oC]
   )
 !
 !     PFT THERMAL ACCLIMATION
@@ -420,10 +420,10 @@ module InitPlantMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone_pft(NZ)=PlantInitThermoAdaptZone(NZ)
-  TempOffset_pft(NZ)=2.667_r8*(2.5_r8-iPlantThermoAdaptZone_pft(NZ))
-  TC4LeafOut_pft(NZ)=TCZD-TempOffset_pft(NZ)
-  TC4LeafOff_pft(NZ)=AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
+  iPlantThermoAdaptZone_pft(NZ) = PlantInitThermoAdaptZone(NZ)
+  TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-iPlantThermoAdaptZone_pft(NZ))
+  TC4LeafOut_pft(NZ)            = TCZD-TempOffset_pft(NZ)
+  TC4LeafOff_pft(NZ)            = AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
       HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
@@ -438,54 +438,54 @@ module InitPlantMod
   ENDIF
   end associate
   end subroutine PFTThermalAcclimation
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitDimensionsandUptake(NZ)
 
   implicit none
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
-  associate(                                                  &
-    CNRTS_pft             => plt_allom%CNRTS_pft,             &
-    CPRTS_pft             => plt_allom%CPRTS_pft,             &
-    RootBiomGrosYld_pft   => plt_allom%RootBiomGrosYld_pft,   &
-    RootrNC_pft           => plt_allom%RootrNC_pft,           &
-    RootrPC_pft           => plt_allom%RootrPC_pft,           &
-    CMinPO4Root_pft       => plt_rbgc%CMinPO4Root_pft,        &
-    KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft,          &
-    VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft,        &
-    CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft,        &
-    KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft,          &
-    VmaxNO3Root_pft       => plt_rbgc%VmaxNO3Root_pft,        &
-    CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft,        &
-    VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft,        &
-    KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft,          &
-    CumSoilThickness_vr   => plt_site%CumSoilThickness_vr,    &
-    NU                    => plt_site%NU,                     &
-    NL                    => plt_site%NL,                     &
-    NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft,    &
-    SeedDepth_pft         => plt_morph%SeedDepth_pft,         &
-    SeedAreaMean_pft      => plt_morph%SeedAreaMean_pft,      &
-    SeedCMass_pft         => plt_morph%SeedCMass_pft,         &
-    PlantinDepz_pft       => plt_morph%PlantinDepz_pft,       &
-    Root2ndMaxRadius1_pft => plt_morph%Root2ndMaxRadius1_pft, &
-    Root2ndXSecArea_pft   => plt_morph%Root2ndXSecArea_pft,   &
-    Root1stMaxRadius1_pft => plt_morph%Root1stMaxRadius1_pft, &
-    Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft,   &
-    Root2ndMaxRadius_pft  => plt_morph%Root2ndMaxRadius_pft,  &
-    Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft,  &
-    Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft,    &
-    NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft,   &
-    RootRadialResist_pft => plt_morph%RootRadialResist_pft, &
-    Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft,    &
-    RootPorosity_pft      => plt_morph%RootPorosity_pft,      &
-    RootPoreTortu4Gas     => plt_morph%RootPoreTortu4Gas,     &
-    RootRaidus_rpft       => plt_morph%RootRaidus_rpft,       &
-    RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft,   &
-    RootAxialResist_pft  => plt_morph%RootAxialResist_pft,  &
-    NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft,  &
-    SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft,    &
-    SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        &
+  associate(                                                   &
+    CumSoilThickness_vr   => plt_site%CumSoilThickness_vr     ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
+    NL                    => plt_site%NL                      ,& !input  :lowest soil layer number,[-]
+    NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
+    PlantinDepz_pft       => plt_morph%PlantinDepz_pft        ,& !input  :planting depth, [m]
+    RootBiomGrosYld_pft   => plt_allom%RootBiomGrosYld_pft    ,& !input  :root growth yield, [g g-1]
+    rNCRoot_pft           => plt_allom%rNCRoot_pft            ,& !input  :root N:C ratio, [gN gC-1]
+    rPCRootr_pft           => plt_allom%rPCRootr_pft            ,& !input  :root P:C ratio, [gP gC-1]
+    SeedAreaMean_pft      => plt_morph%SeedAreaMean_pft       ,& !input  :seed surface area, [m2]
+    SeedCMass_pft         => plt_morph%SeedCMass_pft          ,& !input  :grain size at seeding, [g]
+    SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        ,& !input  :seed length, [m]
+    SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft     ,& !input  :seed volume, [m3 ]
+    CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft         ,& !inoput :minimum NH4 concentration for root NH4 uptake, [g m-3]
+    CMinPO4Root_pft       => plt_rbgc%CMinPO4Root_pft         ,& !inoput :minimum PO4 concentration for root NH4 uptake, [g m-3]
+    CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft         ,& !inoput :minimum NO3 concentration for root NH4 uptake, [g m-3]
+    KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft           ,& !inoput :Km for root NH4 uptake, [g m-3]
+    KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft           ,& !inoput :Km for root NO3 uptake, [g m-3]
+    KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft           ,& !inoput :Km for root PO4 uptake, [g m-3]
+    RootPorosity_pft      => plt_morph%RootPorosity_pft       ,& !inoput :root porosity, [m3 m-3]
+    VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft         ,& !inoput :maximum root NH4 uptake rate, [g m-2 h-1]
+    VmaxNO3Root_pft       => plt_rbgc%VmaxNO3Root_pft         ,& !inoput :maximum root NO3 uptake rate, [g m-2 h-1]
+    VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft         ,& !inoput :maximum root PO4 uptake rate, [g m-2 h-1]
+    Root1stMaxRadius1_pft => plt_morph%Root1stMaxRadius1_pft  ,& !output :root diameter primary axes, [m]
+    Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft   ,& !output :maximum radius of primary roots, [m]
+    Root2ndMaxRadius1_pft => plt_morph%Root2ndMaxRadius1_pft  ,& !output :root diameter secondary axes, [m]
+    Root2ndMaxRadius_pft  => plt_morph%Root2ndMaxRadius_pft   ,& !output :maximum radius of secondary roots, [m]
+    RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft    ,& !output :root volume:mass ratio, [m3 g-1]
+    SeedDepth_pft         => plt_morph%SeedDepth_pft          ,& !output :seeding depth, [m]
+    CNRTS_pft             => plt_allom%CNRTS_pft              ,& !output :root N:C ratio x root growth yield, [-]
+    CPRTS_pft             => plt_allom%CPRTS_pft              ,& !output :root P:C ratio x root growth yield, [-]
+    NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft     ,& !output :soil layer at planting depth, [-]
+    NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft    ,& !output :maximum soil layer number for all root axes, [-]
+    NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft   ,& !output :maximum soil layer number for root axes, [-]
+    Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft     ,& !output :specific root length primary axes, [m g-1]
+    Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft    ,& !output :root cross-sectional area primary axes, [m2]
+    Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft     ,& !output :specific root length secondary axes, [m g-1]
+    Root2ndXSecArea_pft   => plt_morph%Root2ndXSecArea_pft    ,& !output :root cross-sectional area secondary axes, [m2]
+    RootAxialResist_pft   => plt_morph%RootAxialResist_pft    ,& !output :root axial resistivity, [MPa h m-4]
+    RootPoreTortu4Gas_pft => plt_morph%RootPoreTortu4Gas_pft  ,& !output :power function of root porosity used to calculate root gaseous diffusivity, [-]
+    RootRadialResist_pft  => plt_morph%RootRadialResist_pft   ,& !output :root radial resistivity, [MPa h m-2]
+    RootRaidus_rpft       => plt_morph%RootRaidus_rpft         & !output :root internal radius, [m]
   )
 !
 !     SEED CHARACTERISTICS
@@ -512,43 +512,43 @@ module InitPlantMod
   D9795: DO L=NU,NL
     IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
       .AND.SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
-      NGTopRootLayer_pft(NZ)=L
-      NIXBotRootLayer_pft(NZ)=L
+      NGTopRootLayer_pft(NZ)  = L
+      NIXBotRootLayer_pft(NZ) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
         NIXBotRootLayer_rpft(NR,NZ)=L
       ENDDO D9790
     ENDIF
   ENDDO D9795
-  CNRTS_pft(NZ)=RootrNC_pft(NZ)*RootBiomGrosYld_pft(NZ)
-  CPRTS_pft(NZ)=RootrPC_pft(NZ)*RootBiomGrosYld_pft(NZ)
-  Root1stMaxRadius_pft(2,NZ)=5.0E-06_r8
-  Root2ndMaxRadius_pft(2,NZ)=5.0E-06_r8
-  RootPorosity_pft(2,NZ)=RootPorosity_pft(1,NZ)
-  VmaxNH4Root_pft(2,NZ)=VmaxNH4Root_pft(1,NZ)
-  KmNH4Root_pft(2,NZ)=KmNH4Root_pft(1,NZ)
-  CMinNH4Root_pft(2,NZ)=CMinNH4Root_pft(1,NZ)
-  VmaxNO3Root_pft(2,NZ)=VmaxNO3Root_pft(1,NZ)
-  KmNO3Root_pft(2,NZ)=KmNO3Root_pft(1,NZ)
-  CminNO3Root_pft(2,NZ)=CminNO3Root_pft(1,NZ)
-  VmaxPO4Root_pft(2,NZ)=VmaxPO4Root_pft(1,NZ)
-  KmPO4Root_pft(2,NZ)=KmPO4Root_pft(1,NZ)
-  CMinPO4Root_pft(2,NZ)=CMinPO4Root_pft(1,NZ)
-  RootRadialResist_pft(2,NZ)=1.0E+04_r8
-  RootAxialResist_pft(2,NZ)=1.0E+12_r8
+  CNRTS_pft(NZ)              = rNCRoot_pft(NZ)*RootBiomGrosYld_pft(NZ)
+  CPRTS_pft(NZ)              = rPCRootr_pft(NZ)*RootBiomGrosYld_pft(NZ)
+  Root1stMaxRadius_pft(2,NZ) = 5.0E-06_r8
+  Root2ndMaxRadius_pft(2,NZ) = 5.0E-06_r8
+  RootPorosity_pft(2,NZ)     = RootPorosity_pft(1,NZ)
+  VmaxNH4Root_pft(2,NZ)      = VmaxNH4Root_pft(1,NZ)
+  KmNH4Root_pft(2,NZ)        = KmNH4Root_pft(1,NZ)
+  CMinNH4Root_pft(2,NZ)      = CMinNH4Root_pft(1,NZ)
+  VmaxNO3Root_pft(2,NZ)      = VmaxNO3Root_pft(1,NZ)
+  KmNO3Root_pft(2,NZ)        = KmNO3Root_pft(1,NZ)
+  CminNO3Root_pft(2,NZ)      = CminNO3Root_pft(1,NZ)
+  VmaxPO4Root_pft(2,NZ)      = VmaxPO4Root_pft(1,NZ)
+  KmPO4Root_pft(2,NZ)        = KmPO4Root_pft(1,NZ)
+  CMinPO4Root_pft(2,NZ)      = CMinPO4Root_pft(1,NZ)
+  RootRadialResist_pft(2,NZ) = 1.0E+04_r8
+  RootAxialResist_pft(2,NZ)  = 1.0E+12_r8
 !
-!     RootPoreTortu4Gas=tortuosity for gas transport
+!     RootPoreTortu4Gas_pft=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
 !     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
 !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
 !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
-    RootPoreTortu4Gas(N,NZ)=RootPorosity_pft(N,NZ)**1.33_r8
-    RootRaidus_rpft(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
-    RootVolPerMassC_pft(N,NZ)=ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
-    Root1stSpecLen_pft(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2._r8)
-    Root2ndSpecLen_pft(N,NZ)=RootVolPerMassC_pft(N,NZ)/(PICON*Root2ndMaxRadius_pft(N,NZ)**2._r8)
-    Root1stMaxRadius1_pft(N,NZ)=Root1stMaxRadius_pft(N,NZ)
+    RootPoreTortu4Gas_pft(N,NZ)     = RootPorosity_pft(N,NZ)**1.33_r8
+    RootRaidus_rpft(N,NZ)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
+    RootVolPerMassC_pft(N,NZ)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
+    Root1stSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2._r8)
+    Root2ndSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root2ndMaxRadius_pft(N,NZ)**2._r8)
+    Root1stMaxRadius1_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
     Root2ndMaxRadius1_pft(N,NZ)=Root2ndMaxRadius_pft(N,NZ)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
@@ -557,74 +557,72 @@ module InitPlantMod
   ENDDO D500
   end associate
   end subroutine InitDimensionsandUptake
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitPlantPhenoMorphoBio(NZ)
 
   implicit none
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
-  associate(                                                                          &
-    NU                                => plt_site%NU,                                 &
-    PPX_pft                           => plt_site%PPX_pft,                            &
-    PlantPopulation_pft               => plt_site%PlantPopulation_pft,                &
-    ALAT                              => plt_site%ALAT,                               &
-    AREA3                             => plt_site%AREA3,                              &
-    iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft,             &
-    LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch,       &
-    MatureGroup_brch                  => plt_pheno%MatureGroup_brch,                  &
-    KHiestGroLeafNode_brch            => plt_pheno%KHiestGroLeafNode_brch,            &
-    KLowestGroLeafNode_brch           => plt_pheno%KLowestGroLeafNode_brch,           &
-    NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch,          &
-    ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch,   &
-    HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch,            &
-    HoursDoingRemob_brch              => plt_pheno%HoursDoingRemob_brch,              &
-    Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch,     &
-    Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch,                &
-    iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch,            &
-    Hours4ShortenPhotoPeriod_brch     => plt_pheno%Hours4ShortenPhotoPeriod_brch,     &
-    iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch,               &
-    Hours4Leafout_brch                => plt_pheno%Hours4Leafout_brch,                &
-    Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch,                &
-    HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft,             &
-    MatureGroup_pft                   => plt_pheno%MatureGroup_pft,                   &
-    PetioleChemElmRemobFlx_brch       => plt_pheno%PetioleChemElmRemobFlx_brch,       &
-    TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch, &
-    TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch,     &
-    C4PhotosynDowreg_brch             => plt_photo%C4PhotosynDowreg_brch,             &
-    CPOOL3_node                       => plt_photo%CPOOL3_node,                       &
-    CPOOL4_node                       => plt_photo%CPOOL4_node,                       &
-    ChillHours_pft                    => plt_photo%ChillHours_pft,                    &
-    RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch,              &
-    CMassHCO3BundleSheath_node        => plt_photo%CMassHCO3BundleSheath_node,        &
-    CMassCO2BundleSheath_node         => plt_photo%CMassCO2BundleSheath_node,         &
-    NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch,                  &
-    CanopyHeight_pft                  => plt_morph%CanopyHeight_pft,                  &
-    KLeafNumber_brch                  => plt_morph%KLeafNumber_brch,                  &
-    ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft,        &
-    BranchNumber_pft                  => plt_morph%BranchNumber_pft,                  &
-    ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch,                 &
-    CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft,                &
-    CanopyStalkArea_lbrch             => plt_morph%CanopyStalkArea_lbrch,             &
-    StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch,                 &
-    CanopyStemArea_pft                => plt_morph%CanopyStemArea_pft,                &
-    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch,         &
-    PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch,           &
-    LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch,           &
-    SeedNumSet_brch                   => plt_morph%SeedNumSet_brch,                   &
-    LeafAreaLive_brch                 => plt_morph%LeafAreaLive_brch,                 &
-    LeafAreaDying_brch                => plt_morph%LeafAreaDying_brch,                &
-    CanopyLeafArea_lpft               => plt_morph%CanopyLeafArea_lpft,               &
-    CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft,               &
-    CanopyStemAreaZ_pft               => plt_morph%CanopyStemAreaZ_pft,               &
-    LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch,                 &
-    LeafNodeArea_brch                 => plt_morph%LeafNodeArea_brch,                 &
-    CanPBranchHeight                  => plt_morph%CanPBranchHeight,                  &
-    HypoctoHeight_pft                 => plt_morph%HypoctoHeight_pft,                 &
-    BranchNumber_brch                 => plt_morph%BranchNumber_brch,                 &
-    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch,           &
-    KMinNumLeaf4GroAlloc_brch         => plt_morph%KMinNumLeaf4GroAlloc_brch,         &
-    NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  &
+  associate(                                                                           &
+    AREA3                             => plt_site%AREA3                               ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]
+    NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]
+    PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
+    PetioleChemElmRemobFlx_brch       => plt_pheno%PetioleChemElmRemobFlx_brch        ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
+    ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
+    iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch             ,& !input  :flag to detect branch death, [-]
+    Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
+    Hours4ShortenPhotoPeriod_brch     => plt_pheno%Hours4ShortenPhotoPeriod_brch      ,& !output :initial cold requirement for autumn leafoff/hardening, [h]
+    ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
+    BranchNumber_brch                 => plt_morph%BranchNumber_brch                  ,& !output :branch meric id, [-]
+    BranchNumber_pft                  => plt_morph%BranchNumber_pft                   ,& !output :main branch numeric id,[-]
+    C4PhotosynDowreg_brch             => plt_photo%C4PhotosynDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
+    CMassCO2BundleSheath_node         => plt_photo%CMassCO2BundleSheath_node          ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
+    CMassHCO3BundleSheath_node        => plt_photo%CMassHCO3BundleSheath_node         ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
+    CPOOL3_node                       => plt_photo%CPOOL3_node                        ,& !output :minimum sink strength for nonstructural C transfer, [g d-2]
+    CPOOL4_node                       => plt_photo%CPOOL4_node                        ,& !output :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
+    CanPBranchHeight                  => plt_morph%CanPBranchHeight                   ,& !output :branch height, [m]
+    CanopyHeight_pft                  => plt_morph%CanopyHeight_pft                   ,& !output :canopy height, [m]
+    CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft                ,& !output :canopy layer leaf area, [m2 d-2]
+    CanopyLeafArea_lnode              => plt_morph%CanopyLeafArea_lnode               ,& !output :layer/node/branch leaf area, [m2 d-2]
+    CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft                 ,& !output :plant canopy leaf area, [m2 d-2]
+    CanopyStalkArea_lbrch             => plt_morph%CanopyStalkArea_lbrch              ,& !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStemAreaZ_pft               => plt_morph%CanopyStemAreaZ_pft                ,& !output :plant canopy layer stem area, [m2 d-2]
+    CanopyStemArea_pft                => plt_morph%CanopyStemArea_pft                 ,& !output :plant stem area, [m2 d-2]
+    ChillHours_pft                    => plt_photo%ChillHours_pft                     ,& !output :chilling effect on CO2 fixation, [-]
+    HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
+    Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch                 ,& !output :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+    Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch                 ,& !output :cold requirement for autumn leafoff/hardening, [h]
+    Hours4Leafout_brch                => plt_pheno%Hours4Leafout_brch                 ,& !output :heat requirement for spring leafout/dehardening, [h]
+    HoursDoingRemob_brch              => plt_pheno%HoursDoingRemob_brch               ,& !output :counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
+    HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft              ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
+    HypoctoHeight_pft                 => plt_morph%HypoctoHeight_pft                  ,& !output :cotyledon height, [m]
+    KHiestGroLeafNode_brch            => plt_pheno%KHiestGroLeafNode_brch             ,& !output :leaf growth stage counter, [-]
+    KLeafNumber_brch                  => plt_morph%KLeafNumber_brch                   ,& !output :leaf number, [-]
+    KLowestGroLeafNode_brch           => plt_pheno%KLowestGroLeafNode_brch            ,& !output :leaf growth stage counter, [-]
+    KMinNumLeaf4GroAlloc_brch         => plt_morph%KMinNumLeaf4GroAlloc_brch          ,& !output :NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
+    LeafAreaDying_brch                => plt_morph%LeafAreaDying_brch                 ,& !output :branch leaf area, [m2 d-2]
+    LeafAreaLive_brch                 => plt_morph%LeafAreaLive_brch                  ,& !output :branch leaf area, [m2 d-2]
+    LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch                  ,& !output :leaf surface area, [m2 d-2]
+    LeafNodeArea_brch                 => plt_morph%LeafNodeArea_brch                  ,& !output :leaf area, [m2 d-2]
+    LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
+    LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch            ,& !output :internode height, [m]
+    MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
+    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
+    NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
+    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !output :number of branches,[-]
+    NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
+    PlantPopulation_pft               => plt_site%PlantPopulation_pft                 ,& !output :plant population, [d-2]
+    PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
+    ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]
+    RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
+    SeedNumSet_brch                   => plt_morph%SeedNumSet_brch                    ,& !output :branch grain number, [d-2]
+    StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
+    TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
+    iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
   )
 !
 !     INITIALIZE PLANT PHENOLOGY
@@ -697,7 +695,7 @@ module InitPlantMod
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
 
   D25: DO NB=1,MaxNumBranches
-    plt_biom%StalkLiveBiomassC_brch(NB,NZ)       = 0._r8
+    plt_biom%SapwoodBiomassC_brch(NB,NZ)   = 0._r8
     plt_biom%LeafPetolBiomassC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
     SeedNumSet_brch(NB,NZ)                   = 0._r8
@@ -706,16 +704,17 @@ module InitPlantMod
     plt_rbgc%NH3Dep2Can_brch(NB,NZ)          = 0._r8
     LeafAreaDying_brch(NB,NZ)                = 0._r8
     CanPBranchHeight(NB,NZ)                  = 0._r8
-    D5: DO L=1,NumOfCanopyLayers1
+    D5: DO L=1,NumCanopyLayers1
       CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
-      DO N=1,NumOfLeafZenithSectors1
+      DO N=1,NumLeafZenithSectors1
         StemAreaZsec_brch(N,L,NB,NZ)=0._r8
       enddo
     ENDDO D5
+
     DO K=0,MaxNodesPerBranch1
       LeafNodeArea_brch(K,NB,NZ)                                   = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%InternodeHeightDead_brch(K,NB,NZ)                 = 0._r8
+      plt_morph%InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
       plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
@@ -723,24 +722,26 @@ module InitPlantMod
       plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
       plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
 
-      D55: DO L=1,NumOfCanopyLayers1
-        CanopyLeafArea_lpft(L,K,NB,NZ)=0._r8
+      D55: DO L=1,NumCanopyLayers1
+        CanopyLeafArea_lnode(L,K,NB,NZ)=0._r8
         plt_biom%LeafElmsByLayerNode_brch(1:NumPlantChemElms,L,K,NB,NZ)=0._r8
       ENDDO D55
+
       IF(K.NE.0)THEN
         CPOOL3_node(K,NB,NZ)                = 0._r8
         CMassCO2BundleSheath_node(K,NB,NZ)  = 0._r8
         CMassHCO3BundleSheath_node(K,NB,NZ) = 0._r8
         CPOOL4_node(K,NB,NZ)                = 0._r8
-        D45: DO L=1,NumOfCanopyLayers1
-          DO N=1,NumOfLeafZenithSectors1
+        D45: DO L=1,NumCanopyLayers1
+          DO N=1,NumLeafZenithSectors1
             LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
           enddo
         ENDDO D45
       ENDIF
     enddo
   ENDDO D25
-  D35: DO L=1,NumOfCanopyLayers1
+  
+  D35: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)         = 0._r8
     plt_biom%CanopyLeafCLyr_pft(L,NZ) = 0._r8
     CanopyStemAreaZ_pft(L,NZ)         = 0._r8
@@ -752,7 +753,7 @@ module InitPlantMod
   plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
   plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  plt_biom%CanopyStalkC_pft(NZ)                          = 0._r8
+  plt_biom%CanopySapwoodC_pft(NZ)                          = 0._r8
   plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%EarStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
@@ -765,8 +766,8 @@ module InitPlantMod
   CanopyStemArea_pft(NZ)                                 = 0._r8
   end associate
   end subroutine InitPlantPhenoMorphoBio
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitMassBalance(NZ)
 
   implicit none
@@ -774,31 +775,29 @@ module InitPlantMod
   integer :: M,NE
   real(r8) :: WTSTDX
 
-  associate(                                                                   &
-    NU                             => plt_site%NU,                             &
-    AREA3                          => plt_site%AREA3,                          &
-    ElmAllocmat4Litr               => plt_soilchem%ElmAllocmat4Litr,           &
-    ETCanopy_CumYr_pft             => plt_ew%ETCanopy_CumYr_pft,               &
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft,         &
-    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft,         &
-    StandingDeadInitC_pft          => plt_biom%StandingDeadInitC_pft,          &
-    RootBiomCPerPlant_pft          => plt_biom%RootBiomCPerPlant_pft,          &
-    rNCStalk_pft                   => plt_allom%rNCStalk_pft,                  &
-    rPCStalk_pft                   => plt_allom%rPCStalk_pft,                  &
-    PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft,         &
-    RootUptk_N_CumYr_pft           => plt_rbgc%RootUptk_N_CumYr_pft,           &
-    RootUptk_P_CumYr_pft           => plt_rbgc%RootUptk_P_CumYr_pft,           &
-    NH3Emis_CumYr_pft              => plt_bgcr%NH3Emis_CumYr_pft,              &
-    NH3Dep2Can_pft                 => plt_bgcr%NH3Dep2Can_pft,                 &
-    SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft, &
-    GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft,                &
-    CanopyRespC_CumYr_pft          => plt_bgcr%CanopyRespC_CumYr_pft,          &
-    GrossResp_pft                  => plt_bgcr%GrossResp_pft,                  &
-    PlantN2Fix_CumYr_pft           => plt_bgcr%PlantN2Fix_CumYr_pft,           &
-    LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft,     &
-    CanopyStemArea_pft             => plt_morph%CanopyStemArea_pft,            &
-    icwood                         => pltpar%icwood,                           &
-    NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft       &
+  associate(                                                                    &
+    AREA3                          => plt_site%AREA3                           ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    ElmAllocmat4Litr               => plt_soilchem%ElmAllocmat4Litr            ,& !input  :litter kinetic fraction, [-]
+    NU                             => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
+    StandingDeadInitC_pft          => plt_biom%StandingDeadInitC_pft           ,& !input  :initial standing dead C, [g C m-2]
+    icwood                         => pltpar%icwood                            ,& !input  :group id of coarse woody litter
+    rNCStalk_pft                   => plt_allom%rNCStalk_pft                   ,& !input  :stalk N:C ratio, [gN gC-1]
+    rPCStalk_pft                   => plt_allom%rPCStalk_pft                   ,& !input  :stalk P:C ratio, [g g-1]
+    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft          ,& !inoput :standing dead element, [g d-2]
+    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft          ,& !output :standing dead element fraction, [g d-2]
+    CanopyRespC_CumYr_pft          => plt_bgcr%CanopyRespC_CumYr_pft           ,& !output :total autotrophic respiration, [gC d-2 ]
+    ETCanopy_CumYr_pft             => plt_ew%ETCanopy_CumYr_pft                ,& !output :total transpiration, [m H2O d-2]
+    GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft                 ,& !output :total gross CO2 fixation, [gC d-2 ]
+    GrossResp_pft                  => plt_bgcr%GrossResp_pft                   ,& !output :total plant respiration, [gC d-2 ]
+    LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !output :total plant element LitrFall, [g d-2 ]
+    NH3Dep2Can_pft                 => plt_bgcr%NH3Dep2Can_pft                  ,& !output :canopy NH3 flux, [g d-2 h-1]
+    NH3Emis_CumYr_pft              => plt_bgcr%NH3Emis_CumYr_pft               ,& !output :total canopy NH3 flux, [gN d-2 ]
+    NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft       ,& !output :effect of canopy element status on seed set, [-]
+    PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft          ,& !output :total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
+    PlantN2Fix_CumYr_pft           => plt_bgcr%PlantN2Fix_CumYr_pft            ,& !output :total plant N2 fixation, [g d-2 ]
+    RootUptk_N_CumYr_pft           => plt_rbgc%RootUptk_N_CumYr_pft            ,& !output :cumulative plant N uptake, [gN d-2]
+    RootUptk_P_CumYr_pft           => plt_rbgc%RootUptk_P_CumYr_pft            ,& !output :cumulative plant P uptake, [gP d-2]
+    SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft   & !output :total surface LitrFall element, [g d-2]
   )
 !
 !     INITIALIZE MASS BALANCE CHECKS
@@ -840,35 +839,35 @@ module InitPlantMod
   ENDIF
   end associate
   end subroutine InitMassBalance
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitPlantHeatWater(NZ)
 
   implicit none
   integer, intent(in) :: NZ
   REAL(R8) :: FDM
 
-  associate(                                                &
-    ATCA                  => plt_site%ATCA,                 &
-    CanOsmoPsi0pt_pft     => plt_ew%CanOsmoPsi0pt_pft,      &
-    HeatCanopy2Dist_col   => plt_ew%HeatCanopy2Dist_col,    &
-    TKC_pft               => plt_ew%TKC_pft,                &
-    Transpiration_pft     => plt_ew%Transpiration_pft,      &
-    VHeatCapCanopy_pft    => plt_ew%VHeatCapCanopy_pft,     &
-    PSICanopy_pft         => plt_ew%PSICanopy_pft,          &
-    PSICanopyTurg_pft     => plt_ew%PSICanopyTurg_pft,      &
-    PSICanopyOsmo_pft     => plt_ew%PSICanopyOsmo_pft,      &
-    ENGYX_pft             => plt_ew%ENGYX_pft,              &
-    DeltaTKC_pft          => plt_ew%DeltaTKC_pft,           &
-    TdegCCanopy_pft    => plt_ew%TdegCCanopy_pft,     &
-    TKGroth_pft           => plt_pheno%TKGroth_pft,         &
-    TCGroth_pft           => plt_pheno%TCGroth_pft,         &
-    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft,        &
-    QCanopyWat2Dist_col   => plt_ew%QCanopyWat2Dist_col,    &
-    fTCanopyGroth_pft     => plt_pheno%fTCanopyGroth_pft,   &
-    CanopyLeafShethC_pft  => plt_biom%CanopyLeafShethC_pft, &
-    ShootStrutElms_pft    => plt_biom%ShootStrutElms_pft,   &
-    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft  &
+  associate(                                                 &
+    ATCA                  => plt_site%ATCA                  ,& !input  :mean annual air temperature, [oC]
+    CanOsmoPsi0pt_pft     => plt_ew%CanOsmoPsi0pt_pft       ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyLeafShethC_pft  => plt_biom%CanopyLeafShethC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
+    ShootStrutElms_pft    => plt_biom%ShootStrutElms_pft    ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    HeatCanopy2Dist_col   => plt_ew%HeatCanopy2Dist_col     ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
+    QCanopyWat2Dist_col   => plt_ew%QCanopyWat2Dist_col     ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
+    CanopyBiomWater_pft   => plt_ew%CanopyBiomWater_pft     ,& !output :canopy water content, [m3 d-2]
+    PSICanopyOsmo_pft     => plt_ew%PSICanopyOsmo_pft       ,& !output :canopy osmotic water potential, [Mpa]
+    PSICanopy_pft         => plt_ew%PSICanopy_pft           ,& !output :canopy total water potential, [Mpa]
+    TCGroth_pft           => plt_pheno%TCGroth_pft          ,& !output :canopy growth temperature, [oC]
+    TKC_pft               => plt_ew%TKC_pft                 ,& !output :canopy temperature, [K]
+    TdegCCanopy_pft       => plt_ew%TdegCCanopy_pft         ,& !output :canopy temperature, [oC]
+    VHeatCapCanopy_pft    => plt_ew%VHeatCapCanopy_pft      ,& !output :canopy heat capacity, [MJ d-2 K-1]
+    DeltaTKC_pft          => plt_ew%DeltaTKC_pft            ,& !output :change in canopy temperature, [K]
+    ENGYX_pft             => plt_ew%ENGYX_pft               ,& !output :canopy heat storage from previous time step, [MJ d-2]
+    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft  ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    PSICanopyTurg_pft     => plt_ew%PSICanopyTurg_pft       ,& !output :plant canopy turgor water potential, [MPa]
+    TKGroth_pft           => plt_pheno%TKGroth_pft          ,& !output :canopy growth temperature, [K]
+    Transpiration_pft     => plt_ew%Transpiration_pft       ,& !output :canopy transpiration, [m2 d-2 h-1]
+    fTCanopyGroth_pft     => plt_pheno%fTCanopyGroth_pft     & !output :canopy temperature growth function, [-]
   )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
@@ -881,7 +880,7 @@ module InitPlantMod
   VHeatCapCanopy_pft(NZ)    = cpw*ShootStrutElms_pft(ielmc,NZ)*10.0E-06
   ENGYX_pft(NZ)             = 0._r8
   DeltaTKC_pft(NZ)          = 0._r8
-  TdegCCanopy_pft(NZ)    = ATCA
+  TdegCCanopy_pft(NZ)       = ATCA
   TKC_pft(NZ)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ))
   TCGroth_pft(NZ)           = TdegCCanopy_pft(NZ)
   TKGroth_pft(NZ)           = units%Celcius2Kelvin(TCGroth_pft(NZ))
@@ -892,15 +891,15 @@ module InitPlantMod
   Transpiration_pft(NZ)     = 0._r8
   FracPARads2Canopy_pft(NZ) = 0._r8
   FDM                       = get_FDM(PSICanopy_pft(NZ))
-  CanopyBiomWater_pft(NZ)       = ppmc*CanopyLeafShethC_pft(NZ)/FDM
+  CanopyBiomWater_pft(NZ)   = ppmc*CanopyLeafShethC_pft(NZ)/FDM
   VHeatCapCanopy_pft(NZ)    = cpw*(ShootStrutElms_pft(ielmc,NZ)*SpecStalkVolume+CanopyBiomWater_pft(NZ))
   QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
   HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
 
   end associate
   end subroutine InitPlantHeatWater
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitRootMychorMorphoBio(NZ)
   implicit none
   integer, intent(in) :: NZ
@@ -909,32 +908,31 @@ module InitPlantMod
   REAL(R8) :: CCO2P
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
-  associate(                                                          &
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft,            &
-    PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
-    PSIRoot_pvr               => plt_ew%PSIRoot_pvr,                  &
-    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr,               &
-    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr,               &
-    RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr,              &
-    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr,            &
-    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr,            &
-    OXYE                      => plt_site%OXYE,                       &
-    COXYE                     => plt_site%COXYE,                      &
-    CO2EI                     => plt_site%CO2EI,                      &
-    NL                        => plt_site%NL,                         &
-    ATCA                      => plt_site%ATCA,                       &
-    CCO2EI                    => plt_site%CCO2EI,                     &
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    RootProteinConc_rpvr       => plt_biom%RootProteinConc_rpvr,        &
-    RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
-    SeedDepth_pft             => plt_morph%SeedDepth_pft,             &
-    RootVH2O_pvr              => plt_morph%RootVH2O_pvr,              &
-    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr,           &
-    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr,         &
-    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr,         &
-    Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft,      &
-    Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft,      &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft            &
+  associate(                                                           &
+    ATCA                      => plt_site%ATCA                        ,& !input  :mean annual air temperature, [oC]
+    CCO2EI_gperm3             => plt_site%CCO2EI_gperm3               ,& !input  :initial atmospheric CO2 concentration, [g m-3]
+    CO2EI                     => plt_site%CO2EI                       ,& !input  :initial atmospheric CO2 concentration, [umol mol-1]
+    COXYE                     => plt_site%COXYE                       ,& !input  :current atmospheric O2 concentration, [g m-3]
+    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    NL                        => plt_site%NL                          ,& !input  :lowest soil layer number,[-]
+    OXYE                      => plt_site%OXYE                        ,& !input  :atmospheric O2 concentration, [umol mol-1]
+    Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft       ,& !input  :maximum radius of primary roots, [m]
+    Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft       ,& !input  :maximum radius of secondary roots, [m]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
+    SeedDepth_pft             => plt_morph%SeedDepth_pft              ,& !input  :seeding depth, [m]
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr             ,& !inoput :root gas content, [g d-2]
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr             ,& !inoput :root aqueous content, [g d-2]
+    PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !output :root osmotic water potential, [Mpa]
+    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
+    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr            ,& !output :root layer volume air, [m2 d-2]
+    RootVH2O_pvr              => plt_morph%RootVH2O_pvr               ,& !output :root layer volume water, [m2 d-2]
+    NumRootAxes_pft           => plt_morph%NumRootAxes_pft            ,& !output :root primary axis number,[-]
+    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !output :root turgor water potential, [Mpa]
+    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr          ,& !output :root layer diameter primary axes, [m]
+    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr          ,& !output :root layer diameter secondary axes, [m]
+    RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr               ,& !output :root N2 fixation, [gN d-2 h-1]
+    RootProteinC_pvr          => plt_biom%RootProteinC_pvr            ,& !output :root layer protein C, [gC d-2]
+    RootProteinConc_rpvr      => plt_biom%RootProteinConc_rpvr         & !output :root layer protein C concentration, [g g-1]
   )
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
@@ -957,18 +955,19 @@ module InitPlantMod
   ENDDO      
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL
-      plt_ew%AllPlantRootH2OLoss_vr(N,L,NZ)                      = 0._r8
+      plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                        = 0._r8
+      plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                        = 0._r8
       PSIRoot_pvr(N,L,NZ)                                          = -0.01_r8
       PSIRootOSMO_vr(N,L,NZ)                                       = CanOsmoPsi0pt_pft(NZ)+PSIRoot_pvr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)                                       = AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)   = 0._r8
       plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = 0._r8
-      RootProteinConc_rpvr(N,L,NZ)                                  = RootFracRemobilizableBiom(NZ)
+      RootProteinConc_rpvr(N,L,NZ)                                  = RootFracRemobilizableBiom_pft(NZ)
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
       plt_morph%Root1stXNumL_pvr(N,L,NZ)                       = 0._r8
-      plt_morph%Root2ndXNum_pvr(N,L,NZ)                        = 0._r8
+      plt_morph%Root2ndXNumL_pvr(N,L,NZ)                        = 0._r8
       plt_morph%RootLenPerPlant_pvr(N,L,NZ)                    = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
       RootPoreVol_pvr(N,L,NZ)                                  = 0._r8
@@ -976,7 +975,7 @@ module InitPlantMod
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_pvr(N,L,NZ)                                = Root2ndMaxRadius_pft(N,NZ)
       plt_morph%RootAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
-      plt_morph%Root2ndAveLen_pvr(N,L,NZ)                      = 1.0E-03
+      plt_morph%Root2ndMeanLens_pvr(N,L,NZ)                    = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8
       plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)                     = 0._r8
@@ -987,18 +986,18 @@ module InitPlantMod
       plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
-      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)       = 0._r8
-      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)       = 0._r8
-      CCO2A                                                    = CCO2EI
+      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
+      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
+      CCO2A                                             = CCO2EI_gperm3
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
       trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2P*RootVH2O_pvr(N,L,NZ)
-      plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)   = 0._r8
+      plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
-      plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)             = 0._r8
-      plt_rbgc%RootCO2Emis_pvr(N,L,NZ)                  = 0._r8
+      plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)       = 0._r8
+      plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                = 0._r8
       COXYA                                             = COXYE
-      COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
+      COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
       plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
       plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
@@ -1023,36 +1022,34 @@ module InitPlantMod
   plt_morph%RootLenDensPerPlant_pvr(1:2,NL+1:JZ1,NZ)=0._r8
   end associate
   end subroutine InitRootMychorMorphoBio
-!------------------------------------------------------------------------------------------
 
+!----------------------------------------------------------------------------------------------------
   subroutine InitSeedMorphoBio(NZ)
 
   implicit none
   integer, intent(in) :: NZ
 
-  associate(                                                          &
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft,        &
-    PSICanopy_pft             => plt_ew%PSICanopy_pft,                &
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft,          &
-    RootFracRemobilizableBiom => plt_allom%RootFracRemobilizableBiom, &
-    CNGR                      => plt_allom%CNGR,                      &
-    CPGR                      => plt_allom%CPGR,                      &
-    RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs,        &
-    SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft,           &
-    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr,  &
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,     &
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,       &
-    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr,         &
-    PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch,       &
-    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr,    &
-    RootProteinC_pvr          => plt_biom%RootProteinC_pvr,           &
-    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr,     &
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,       &
-    LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch,         &
-    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft,      &
-    SeedCMass_pft             => plt_morph%SeedCMass_pft,             &
-    Root1stDepz_pft           => plt_morph%Root1stDepz_pft,           &
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         &
+  associate(                                                           &
+    rNCGrain_pft                  => plt_allom%rNCGrain_pft                   ,& !input  :grain N:C ratio, [g g-1]
+    rPCGrain_pft                  => plt_allom%rPCGrain_pft                   ,& !input  :grain P:C ratio, [gP gP-1]
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
+    PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
+    PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
+    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr          ,& !input  :root layer C, [gC d-2]
+    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr   ,& !input  :root layer element primary axes, [g d-2]
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr     ,& !input  :root layer structural C, [gC d-2]
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      ,& !input  :root layer nonstructural element, [g d-2]
+    RootProteinC_pvr          => plt_biom%RootProteinC_pvr            ,& !input  :root layer protein C, [gC d-2]
+    SeedCMass_pft             => plt_morph%SeedCMass_pft              ,& !input  :grain size at seeding, [g]
+    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft        ,& !inoput :canopy leaf + sheath C, [g d-2]
+    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch        ,& !inoput :branch nonstructural element, [g d-2]
+    LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !inoput :branch leaf structural element mass, [g d-2]
+    RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs         ,& !inoput :root C primary axes, [g d-2]
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
+    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch      ,& !output :plant branch leaf + sheath C, [g d-2]
+    SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft            ,& !output :plant stored nonstructural C at planting, [gC d-2]
+    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft            & !output :canopy surface water content, [m3 d-2]
   )
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
@@ -1071,34 +1068,34 @@ module InitPlantMod
 !
   SeedCPlanted_pft(NZ)            = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
   SeasonalNonstElms_pft(ielmc,NZ) = SeedCPlanted_pft(NZ)
-  SeasonalNonstElms_pft(ielmn,NZ) = CNGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  SeasonalNonstElms_pft(ielmp,NZ) = CPGR(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-  LeafStrutElms_brch(ielmn,1,NZ)  = CNGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
-  LeafStrutElms_brch(ielmp,1,NZ)  = CPGR(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  SeasonalNonstElms_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  SeasonalNonstElms_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+  LeafStrutElms_brch(ielmn,1,NZ)  = rNCGrain_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
+  LeafStrutElms_brch(ielmp,1,NZ)  = rPCGrain_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   LeafPetolBiomassC_brch(1,NZ)    = LeafStrutElms_brch(ielmc,1,NZ)+PetoleStrutElms_brch(ielmc,1,NZ)
   CanopyLeafShethC_pft(NZ)        = CanopyLeafShethC_pft(NZ)+LeafPetolBiomassC_brch(1,NZ)
 
   WatHeldOnCanopy_pft(NZ)         = 0._r8
-  CanopyNonstElms_brch(ielmn,1,NZ) = CNGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  CanopyNonstElms_brch(ielmp,1,NZ) = CPGR(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
-  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ) = CNGR(NZ) &
+  CanopyNonstElms_brch(ielmn,1,NZ) = rNCGrain_pft(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  CanopyNonstElms_brch(ielmp,1,NZ) = rPCGrain_pft(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
+  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ),1,NZ) = rNCGrain_pft(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=CPGR(NZ) &
+  RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)=rPCGrain_pft(NZ) &
     *RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
-  RootMyco1stElm_raxs(ielmn,1,1,NZ)=CNGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
-  RootMyco1stElm_raxs(ielmp,1,1,NZ)=CPGR(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmn,1,1,NZ)=rNCGrain_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
+  RootMyco1stElm_raxs(ielmp,1,1,NZ)=rPCGrain_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,1,NZ)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)=&
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ),1,NZ)
   RootProteinC_pvr(1,NGTopRootLayer_pft(NZ),NZ)=RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)&
-    *RootFracRemobilizableBiom(NZ)
-  RootMycoNonstElms_rpvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=CNGR(NZ)&
+    *RootFracRemobilizableBiom_pft(NZ)
+  RootMycoNonstElms_rpvr(ielmn,1,NGTopRootLayer_pft(NZ),NZ)=rNCGrain_pft(NZ)&
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
-  RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=CPGR(NZ) &
+  RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=rPCGrain_pft(NZ) &
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
 
   end associate
   end subroutine InitSeedMorphoBio
-
+  ![tail]
   end module InitPlantMod

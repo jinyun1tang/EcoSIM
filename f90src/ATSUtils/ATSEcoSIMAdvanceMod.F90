@@ -19,7 +19,7 @@ module ATSEcoSIMAdvanceMod
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, AirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
+      FracSoiPAsIce_vr, FracAirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -94,7 +94,7 @@ implicit none
     NL(NY,NX)               = a_NL(NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
-    !TairKClimMean(NY,NX) = a_ATKA(NY)
+    !TairKClimMean_col(NY,NX) = a_ATKA(NY)
     !CO2E_col(NY,NX)      = atm_co2
     !CH4E_col(NY,NX)      = atm_ch4
     !OXYE_col(NY,NX)      = atm_o2
@@ -106,7 +106,7 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
-    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
+    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
@@ -120,7 +120,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    DO L=NU(NY,NX),NL(NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
@@ -145,11 +145,11 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        FracAirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
+        FracAirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF    
     ENDDO
 

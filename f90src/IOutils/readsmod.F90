@@ -5,6 +5,7 @@ module readsmod
   use fileUtil,      only: open_safe
   use minimathmod,   only: isLeap, AZMAX1
   use EcoSIMCtrlMod, only: lverb,  salt_model, fixClime
+  use FireMod
   use DebugToolMod
   use GridConsts
   use FlagDataType
@@ -58,8 +59,8 @@ module readsmod
   WindMesureHeight_col(:,:) = 0.5_r8
   SolarNoonHour_col(:,:)    = 12._r8
   pH_rain_col(:,:)          = 7._r8
-  CN4RI(:,:)                = 0._r8
-  CNORI(:,:)                = 0._r8
+  CN4RI_col(:,:)                = 0._r8
+  CNORI_col(:,:)                = 0._r8
   NH4_rain_mole_conc(:,:)   = 0._r8
   NO3_rain_mole_conc(:,:)   = 0._r8
   H2PO4_rain_mole_conc(:,:) = 0._r8
@@ -83,7 +84,7 @@ module readsmod
 !
 ! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
-  use ReadManagementMod, only : ReadManagementFiles
+  use ReadManagementMod, only : ReadManagementFiles,ReadFire
   use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: yearc   !current model year
@@ -97,6 +98,7 @@ module readsmod
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
+  character(len=12) :: fire_event_entry
   integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
@@ -182,12 +184,12 @@ module readsmod
 !
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
-      ROWSpaceNH4_col(NY,NX)=0.0_r8
-      ROWSpaceNO3_col(NY,NX)=0.0_r8
-      ROWSpacePO4_col(NY,NX)=0.0_r8
+      ROWSpaceNH4_col(NY,NX) = 0.0_r8
+      ROWSpaceNO3_col(NY,NX) = 0.0_r8
+      ROWSpacePO4_col(NY,NX) = 0.0_r8
       D325: DO I=1,366
-        iSoilDisturbType_col(I,NY,NX)=0
-        DepzCorp_col(I,NY,NX)=0.0_r8
+        iSoilDisturbType_col(I,NY,NX) = 0
+        DepzCorp_col(I,NY,NX)         = 0.0_r8
       ENDDO D325
       D40: DO I=1,366
         D45: DO N=1,20
@@ -230,6 +232,11 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
+  if(use_fire)then
+    if(check_fire(yearc,fire_event_entry))then
+      call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+    endif
+  endif
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)
   ENDIF
@@ -342,8 +349,8 @@ module readsmod
       WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
       SolarNoonHour_col(NY,NX)    = ZNOONG
       pH_rain_col(NY,NX)           = PHRG
-      CN4RI(NY,NX)                = CN4RIG
-      CNORI(NY,NX)                = CNORIG
+      CN4RI_col(NY,NX)                = CN4RIG
+      CNORI_col(NY,NX)                = CNORIG
       NH4_rain_mole_conc(NY,NX)   = CN4RIG
       NO3_rain_mole_conc(NY,NX)   = CNORIG
       H2PO4_rain_mole_conc(NY,NX) = CPORG

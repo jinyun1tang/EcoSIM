@@ -41,14 +41,20 @@ module EcoSIMDesctruct
   use SedimentDataType    , only : DestructSedimentData
   use SoilWaterDataType   , only : DestructSoilWater
   use PlantAPIData        , only : DestructPlantAPIData
-  use PlantMgmtDataType  , only : DestructPlantMngmtData
+  use PlantMgmtDataType   , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
-  use TranspNoSaltMod           , only : DestructTranspNoSalt
+  use TranspNoSaltMod     , only : DestructTranspNoSalt
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
   use BalanceCheckDataType, only : DestructBalanceCheckData
   use PerturbationMod     , only : destructSoilWarming
+  use TracerIDMod         , only : CleanUpTracerIDs
+  use NumericalAuxMod     , only : DestructNumericAux
+  use PlantTraitTableMod  , only : DestructPlantTraitTable
+  use MicBGCAPI           , only : MicAPI_cleanup  
   implicit none
+
+  call MicAPI_cleanup
 
   call DestructMicrobialData
 
@@ -83,6 +89,9 @@ module EcoSIMDesctruct
   if(.not.salt_model)then
     call DestructTranspNoSalt
   endif
+
+  call DestructPlantTraitTable()
+
   call DestructEcoSIMCtrlData
 
   call DestructCanopyData
@@ -117,11 +126,13 @@ module EcoSIMDesctruct
 
   call DestructEcoSimSum
 
-  if(plant_model)call ncd_pio_closefile(pft_nfid)
- 
   call DestructBalanceCheckData
 
   call destructSoilWarming()
+
+  call DestructNumericAux()
+
+  call CleanUpTracerIDs
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

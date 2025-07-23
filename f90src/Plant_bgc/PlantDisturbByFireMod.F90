@@ -2,7 +2,7 @@ module PlantDisturbByFireMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ElmIDMod
   use PlantAPIData
-  use GrosubPars
+  use PlantBGCPars
   use EcoSimConst
   use PlantMathFuncMod
   implicit none
@@ -21,14 +21,15 @@ module PlantDisturbByFireMod
   real(r8) :: EFIRE(2,5:5)
 
 contains
-!--------------------------------------------------------------------------------
-
+  ![header]
+!----------------------------------------------------------------------------------------------------
   subroutine InitPlantFireMod
   implicit none
   EFIRE=reshape(real((/0.917,0.167/),r8),shape(EFIRE))
   end subroutine InitPlantFireMod
 
-!--------------------------------------------------------------------------------
+
+!----------------------------------------------------------------------------------------------------
   subroutine StageRootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
   implicit none
   integer, intent(in) :: I,J
@@ -38,12 +39,12 @@ contains
   real(r8),intent(out) :: FFIRE(NumPlantChemElms)
   real(r8), intent(out):: FracLeftThin
 
-  associate(                                                &
-    iSoilDisturbType_col => plt_distb%iSoilDisturbType_col, &
-    CSoilOrgM_vr         => plt_soilchem%CSoilOrgM_vr,      &
-    FracBiomHarvsted     => plt_distb%FracBiomHarvsted,     &
-    iHarvstType_pft      => plt_distb%iHarvstType_pft,      &
-    THETW_vr             => plt_soilchem%THETW_vr           &
+  associate(                                                 &
+    iSoilDisturbType_col => plt_distb%iSoilDisturbType_col  ,& !input  :soil disturbance type, [-]
+    CSoilOrgM_vr         => plt_soilchem%CSoilOrgM_vr       ,& !input  :soil organic C content, [gC kg soil-1]
+    FracBiomHarvsted     => plt_distb%FracBiomHarvsted      ,& !input  :harvest efficiency, [-]
+    iHarvstType_pft      => plt_distb%iHarvstType_pft       ,& !input  :type of harvest,[-]
+    THETW_vr             => plt_soilchem%THETW_vr            & !input  :volumetric water content, [m3 m-3]
   )
   IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.22)THEN
     FracLeftThin=1.0_r8
@@ -58,9 +59,7 @@ contains
   end associate
   end subroutine StageRootRemovalByFire
 
-
-!--------------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------------------------------
   subroutine RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
   !
   !upon combustion:
@@ -73,16 +72,15 @@ contains
   integer, intent(in) :: NZ
   real(r8), INTENT(IN) :: FrcMassNotHarvst(NumPlantChemElms)
   real(r8), intent(in) :: FFIRE(NumPlantChemElms)
-  associate(                                              &
-    iHarvstType_pft     => plt_distb%iHarvstType_pft,     &
-    CO2NetFix_pft       => plt_bgcr%CO2NetFix_pft,        &
-    PO4byFire_CumYr_pft => plt_distb%PO4byFire_CumYr_pft, &
-    N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft, &
-    NH3byFire_CumYr_pft => plt_distb%NH3byFire_CumYr_pft, &
-    O2ByFire_CumYr_pft  => plt_distb%O2ByFire_CumYr_pft,  &
-    CH4ByFire_CumYr_pft => plt_distb%CH4ByFire_CumYr_pft, &
-    CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft, &
-    Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col     &
+  associate(                                               &
+    CO2NetFix_pft       => plt_bgcr%CO2NetFix_pft         ,& !inoput :canopy net CO2 exchange, [gC d-2 h-1]
+    PO4byFire_CumYr_pft => plt_distb%PO4byFire_CumYr_pft  ,& !inoput :plant PO4 emission from fire, [g d-2 ]
+    N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft  ,& !inoput :plant N2O emission from fire, [g d-2 ]
+    NH3byFire_CumYr_pft => plt_distb%NH3byFire_CumYr_pft  ,& !inoput :plant NH3 emission from fire, [g d-2 ]
+    O2ByFire_CumYr_pft  => plt_distb%O2ByFire_CumYr_pft   ,& !inoput :plant O2 uptake from fire, [g d-2 ]
+    CH4ByFire_CumYr_pft => plt_distb%CH4ByFire_CumYr_pft  ,& !inoput :plant CH4 emission from fire, [g d-2 ]
+    CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft  ,& !inoput :plant CO2 emission from fire, [g d-2 ]
+    Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col      & !inoput :total NBP, [g d-2]
   )
 
   CO2ByFire_CumYr_pft(NZ) = CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*FFIRE(ielmc)*FrcMassNotHarvst(ielmc)
@@ -96,7 +94,7 @@ contains
   end associate
   end subroutine RemoveRootByFire
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine AbvGrndLiterFallByFire(I,J,NZ,NonstructElmnt2Litr,StandeadElmntOffEcosystem, &
     FineNonleafElmOffEcosystem,LeafElmnt2Litr,LeafElmntOffEcosystem,NonstructElmntOffEcosystem,&
     WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetioleElmntHarv2Litr,&
@@ -121,21 +119,20 @@ contains
   integer :: M,NE
 
   associate(                                                             &
-    LitrfalStrutElms_pvr        => plt_bgcr%LitrfalStrutElms_pvr,        &
-    ElmAllocmat4Litr            => plt_soilchem%ElmAllocmat4Litr,        &
-    StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft,      &
-    icwood                      => pltpar%icwood,                        &
-    istalk                      => pltpar%istalk,                        &
-    iroot                       => pltpar%iroot,                         &
-    ilignin                     => pltpar%ilignin,                       &
-    inonstruct                  => pltpar%inonstruct,                    &
-    k_fine_litr                 => pltpar%k_fine_litr,                   &
-    k_woody_litr                => pltpar%k_woody_litr,                  &
-    ifoliar                     => pltpar%ifoliar,                       &
-    inonfoliar                  => pltpar%inonfoliar,                    &
-    FracRootStalkElmAlloc2Litr  => plt_allom%FracRootStalkElmAlloc2Litr, &    
-    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft,  &    
-    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft       &    
+    ElmAllocmat4Litr           => plt_soilchem%ElmAllocmat4Litr         ,& !input  :litter kinetic fraction, [-]
+    icwood                     => pltpar%icwood                         ,& !input  :group id of coarse woody litter
+    istalk                     => pltpar%istalk                         ,& !input  :group id of plant stalk litter group
+    ilignin                    => pltpar%ilignin                        ,& !input  :kinetic id of litter component as lignin
+    inonstruct                 => pltpar%inonstruct                     ,& !input  :group id of plant nonstructural litter
+    k_fine_litr                => pltpar%k_fine_litr                    ,& !input  :fine litter complex id
+    k_woody_litr               => pltpar%k_woody_litr                   ,& !input  :woody litter complex id
+    ifoliar                    => pltpar%ifoliar                        ,& !input  :group id of plant foliar litter
+    inonfoliar                 => pltpar%inonfoliar                     ,& !input  :group id of plant non-foliar litter group
+    FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
+    iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft   ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft       ,& !input  :plant growth type (vascular, non-vascular),[-]
+    LitrfalStrutElms_pvr       => plt_bgcr%LitrfalStrutElms_pvr         ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    StandDeadKCompElms_pft     => plt_biom%StandDeadKCompElms_pft        & !inoput :standing dead element fraction, [g d-2]
   )
 
   D6485: DO M=1,jsken
@@ -183,30 +180,30 @@ contains
         
       LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_woody_litr,0,NZ) &
         *ElmAllocmat4Litr(ielmc,istalk,M,NZ)&
-        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracRootStalkElmAlloc2Litr(ielmc,k_woody_litr)
+        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)
 
       DO NE=2,NumPlantChemElms  
         LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ) &
-          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
 
         LitrfalStrutElms_pvr(NE,ilignin,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,ilignin,k_woody_litr,0,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)-WoodyElmntOffEcosystem(NE) &
           +StandeadElmnt2Litr(NE)+StandeadElmntHarv2Litr(NE)-StandeadElmntOffEcosystem(NE)) &
-          *FracRootStalkElmAlloc2Litr(NE,k_woody_litr)
+          *FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
       ENDDO    
 
       LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
         +ElmAllocmat4Litr(ielmc,istalk,M,NZ) &
-        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracRootStalkElmAlloc2Litr(ielmc,k_fine_litr)
+        *(StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))*FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr)
 
       DO NE=2,NumPlantChemElms    
         LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ) &
-          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+          +ElmAllocmat4Litr(NE,istalk,M,NZ)*StandeadElmntOffEcosystem(NE)*FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
         
         LitrfalStrutElms_pvr(NE,ilignin,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,ilignin,k_fine_litr,0,NZ) &
           +ElmAllocmat4Litr(NE,icwood,M,NZ)*(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)-WoodyElmntOffEcosystem(NE) &
           +StandeadElmnt2Litr(NE)+StandeadElmntHarv2Litr(NE)-StandeadElmntOffEcosystem(NE)) &
-          *FracRootStalkElmAlloc2Litr(NE,k_fine_litr)
+          *FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
 
       ENDDO  
     ENDIF
@@ -214,7 +211,7 @@ contains
   end associate
   end subroutine AbvGrndLiterFallByFire
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine AbvgBiomRemovalByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   implicit none
   integer, intent(in) :: I,J
@@ -222,15 +219,15 @@ contains
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)
 
-  associate(                                              &
-    Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col,    &
-    CO2NetFix_pft       => plt_bgcr%CO2NetFix_pft,        &
-    NH3byFire_CumYr_pft => plt_distb%NH3byFire_CumYr_pft, &
-    PO4byFire_CumYr_pft => plt_distb%PO4byFire_CumYr_pft, &
-    CH4ByFire_CumYr_pft => plt_distb%CH4ByFire_CumYr_pft, &
-    O2ByFire_CumYr_pft  => plt_distb%O2ByFire_CumYr_pft,  &
-    N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft, &
-    CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft  &
+  associate(                                               &
+    Eco_NBP_CumYr_col   => plt_bgcr%Eco_NBP_CumYr_col     ,& !inoput :total NBP, [g d-2]
+    CO2NetFix_pft       => plt_bgcr%CO2NetFix_pft         ,& !inoput :canopy net CO2 exchange, [gC d-2 h-1]
+    NH3byFire_CumYr_pft => plt_distb%NH3byFire_CumYr_pft  ,& !inoput :plant NH3 emission from fire, [g d-2 ]
+    PO4byFire_CumYr_pft => plt_distb%PO4byFire_CumYr_pft  ,& !inoput :plant PO4 emission from fire, [g d-2 ]
+    CH4ByFire_CumYr_pft => plt_distb%CH4ByFire_CumYr_pft  ,& !inoput :plant CH4 emission from fire, [g d-2 ]
+    O2ByFire_CumYr_pft  => plt_distb%O2ByFire_CumYr_pft   ,& !inoput :plant O2 uptake from fire, [g d-2 ]
+    N2ObyFire_CumYr_pft => plt_distb%N2ObyFire_CumYr_pft  ,& !inoput :plant N2O emission from fire, [g d-2 ]
+    CO2ByFire_CumYr_pft => plt_distb%CO2ByFire_CumYr_pft   & !inoput :plant CO2 emission from fire, [g d-2 ]
   )
   CO2ByFire_CumYr_pft(NZ) = CO2ByFire_CumYr_pft(NZ)-(1._r8-FrcAsCH4byFire)*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   CH4ByFire_CumYr_pft(NZ) = CH4ByFire_CumYr_pft(NZ)-FrcAsCH4byFire*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
@@ -243,7 +240,7 @@ contains
   end associate
   end subroutine AbvgBiomRemovalByFire
 
-!------------------------------------------------------------------------------------------
+!----------------------------------------------------------------------------------------------------
   subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
     StandeadElmntRemoval,NonstructElmntRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
     FineNonleafElmntRemoval,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
@@ -270,9 +267,9 @@ contains
   real(r8), intent(out) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: StandeadElmnt2Litr(NumPlantChemElms)
 
-  associate(                                       &
-    iHarvstType_pft  => plt_distb%iHarvstType_pft, &
-    FracBiomHarvsted => plt_distb%FracBiomHarvsted &
+  associate(                                         &
+    iHarvstType_pft  => plt_distb%iHarvstType_pft   ,& !input  :type of harvest,[-]
+    FracBiomHarvsted => plt_distb%FracBiomHarvsted   & !input  :harvest efficiency, [-]
   )
   NonstructElmnt2Litr(ielmc) = NonstructElmntRemoval(ielmc)*EHVST21
   NonstructElmnt2Litr(ielmn) = NonstructElmntRemoval(ielmn)*&
@@ -311,5 +308,5 @@ contains
   StandeadElmntOffEcosystem(ielmp) = StandeadElmntRemoval(ielmp)*EHVST24
   end associate
   end subroutine ApplyBiomRemovalByFire
-
+  ![tail]
   end module PlantDisturbByFireMod

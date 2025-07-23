@@ -201,6 +201,9 @@ def write_site_topo_data(config_dict):
 #write grid file
 
   current_dateTime = datetime.now()
+  odir=config_dict['outdir']
+  print('outputdir=%s'%odir)  
+  os.makedirs(odir, exist_ok=True)  
   nc_f=config_dict['outdir']+case+'_grid_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
   nc_fid = Dataset(nc_f, 'w')
     

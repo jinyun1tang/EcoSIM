@@ -8,11 +8,11 @@ module SurfLitterDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) ,target,allocatable ::   BulkDensLitR(:)                   !surface litter bulk density	[Mg m-3]
+  real(r8) ,target,allocatable ::   BulkDensLitR(:)                   !surface litter bulk density,	[Mg m-3]
   real(r8) ,target,allocatable ::   PARR_col(:,:)                     !surface litter boundary layer conductance, [m t-1]
-  integer  ,target,allocatable ::   iLitrType_col(:,:,:)              !surface litter type:1 = plant, 2 = manure
+  integer  ,target,allocatable ::   iLitrType_col(:,:,:)              !surface litter type:1 = plant, 2 = manure,[-]
   real(r8) ,target,allocatable ::   XTillCorp_col(:,:)                !factor for surface litter incorporation and soil mixing
-  real(r8) ,target,allocatable ::   WatFLo2LitrM(:,:,:)               !water transfer between soil surface and surface litter, [g d-2 t-1]
+  real(r8) ,target,allocatable ::   WatFLoLitr2SoilM_col(:,:,:)        !water transfer between soil surface and surface litter, [g d-2 t-1]
   real(r8) ,target,allocatable ::   WatFlowSno2LitRM_col(:,:,:)       !meltwater flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)           !fraction of soil surface covered by surface litter, [-]
   real(r8) ,target,allocatable ::   HeatFLoByWat2LitR_col(:,:)        !net heat transfer to surface litter, [MJ d-2 t-1]
@@ -25,11 +25,11 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)            !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   Irrig2LitRSurf_col(:,:)               !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0_col(:,:)                   !litter porosity, [m3 pore m-3 litr]
-  real(r8) ,target,allocatable ::   RC0(:,:,:)                        !surface litter in each complex,	[g d-2]
-  real(r8) ,target,allocatable ::   RC0ff(:,:)
+  real(r8) ,target,allocatable ::   RC0_col(:,:,:)                        !surface litter OM in each complex,	[g d-2]
+  real(r8) ,target,allocatable ::   RC0ff_col(:,:)                        !surface litter OM in the autotrophic complex,[g d-2]
   real(r8) ,target,allocatable ::   LitWatMassBeg_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
   real(r8) ,target,allocatable ::   LitWatMassEnd_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
-  real(r8) ,target,allocatable ::   Rain2LitR_col(:,:)                !total precipiation reaches the litter layer [m3 H3O d-2 h-1]
+  real(r8) ,target,allocatable ::   Rain2LitR_col(:,:)                !total precipiation reaches the litter layer, [m3 H3O d-2 h-1]
   private :: InitAllocate
   contains
 !----------------------------------------------------------------------
@@ -55,7 +55,7 @@ module SurfLitterDataType
   allocate(PARR_col(JY,JX));         PARR_col=0._r8
   allocate(iLitrType_col(2,JY,JX));      iLitrType_col=0
   allocate(XTillCorp_col(JY,JX));        XTillCorp_col=0._r8
-  allocate(WatFLo2LitrM(60,JY,JX));     WatFLo2LitrM=0._r8
+  allocate(WatFLoLitr2SoilM_col(60,JY,JX));     WatFLoLitr2SoilM_col=0._r8
   allocate(WatFlowSno2LitRM_col(60,JY,JX));     WatFlowSno2LitRM_col=0._r8
   allocate(FracSurfByLitR_col(JY,JX));         FracSurfByLitR_col=0._r8
   allocate(HeatFLoByWat2LitR_col(JY,JX));        HeatFLoByWat2LitR_col=0._r8
@@ -68,8 +68,8 @@ module SurfLitterDataType
   allocate(Rain2LitRSurf_col(JY,JX));        Rain2LitRSurf_col=0._r8
   allocate(Irrig2LitRSurf_col(JY,JX));        Irrig2LitRSurf_col=0._r8
   allocate(POROS0_col(JY,JX));       POROS0_col=0._r8
-  allocate(RC0(1:NumOfLitrCmplxs,JY,JX));      Rc0=0._r8
-  allocate(RC0ff(JY,JX)); RC0ff=0._r8
+  allocate(RC0_col(1:NumOfLitrCmplxs,JY,JX));      RC0_col=0._r8
+  allocate(RC0ff_col(JY,JX)); RC0ff_col=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -84,7 +84,7 @@ module SurfLitterDataType
   call destroy(PARR_col)
   call destroy(iLitrType_col)
   call destroy(XTillCorp_col)
-  call destroy(WatFLo2LitrM)
+  call destroy(WatFLoLitr2SoilM_col)
   call destroy(WatFlowSno2LitRM_col)
   call destroy(FracSurfByLitR_col)
   call destroy(HeatFLoByWat2LitR_col)
@@ -97,8 +97,8 @@ module SurfLitterDataType
   call destroy(Rain2LitRSurf_col)
   call destroy(Irrig2LitRSurf_col)
   call destroy(POROS0_col)
-  call destroy(RC0)
-  call destroy(RC0ff)
+  call destroy(RC0_col)
+  call destroy(RC0ff_col)
 
   end subroutine DestructSurfLitter
 

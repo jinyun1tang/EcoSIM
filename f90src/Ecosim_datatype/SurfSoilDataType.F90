@@ -7,8 +7,8 @@ module SurfSoilDataType
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  real(r8),target,allocatable ::  FracSurfAsSnow_col(:,:)                !fraction of snow cover
-  real(r8),target,allocatable ::  FracSurfSnoFree_col(:,:)               !fraction of snow-free cover
+  real(r8),target,allocatable ::  FracSurfAsSnow_col(:,:)                !fraction of snow cover,[-]
+  real(r8),target,allocatable ::  FracSurfSnoFree_col(:,:)               !fraction of snow-free cover,[-]
   real(r8),target,allocatable ::  FracSurfBareSoil_col(:,:)              !fraction of exposed soil surface, [-]
   real(r8),target,allocatable ::  LWRadBySurf_col(:,:)                   !longwave radiation emitted from ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HeatByRad2Surf_col(:,:)                !total net radiation at ground surface, [MJ d-2 t-1]
@@ -18,15 +18,15 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  HeatNet2Surf_col(:,:)                  !total ground heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  VapXAir2GSurf_col(:,:)                 !negative of total evaporation at ground surface, [m3 d-2 t-1]
   real(r8),target,allocatable ::  VWatStoreCapSurf_col(:,:)              !surface water storage capacity, [m3 d-2]
-  real(r8),target,allocatable ::  VLWatHeldCapSurf_col(:,:)              !soil surface water retention capacity
+  real(r8),target,allocatable ::  VLWatHeldCapSurf_col(:,:)              !soil surface water retention capacity,[m3 d-2]
   real(r8),target,allocatable ::  VHCPNX_col(:,:)                        !minimum heat capacities,[MJ k-1 d-2]
   real(r8),target,allocatable ::  CondGasXSnowM_col(:,:,:)               !area upscaled soil surface boundary layer conductance, [m d-2]
   real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)                 !precipitation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  Irrig2SoilSurf_col(:,:)                !irrifation flux into soil surface , [m3 d-2 h-1]
-  real(r8),target,allocatable ::  LakeSurfFlowMicP_col(:,:)              !lake surface water flux
-  real(r8),target,allocatable ::  LakeSurfFlowMicPX_col(:,:)             !lake surface water flux
-  real(r8),target,allocatable ::  LakeSurfFlowMacP_col(:,:)              !lake surface water flux
-  real(r8),target,allocatable ::  LakeSurfHeatFlux_col(:,:)              !lake surface heat flux, outgoing positive
+  real(r8),target,allocatable ::  LakeSurfFlowMicP_col(:,:)              !lake surface water flux,[m3 d-2 h-1]
+  real(r8),target,allocatable ::  LakeSurfFlowMicPX_col(:,:)             !lake surface water flux,[m3 d-2 h-1]
+  real(r8),target,allocatable ::  LakeSurfFlowMacP_col(:,:)              !lake surface water flux,[m3 d-2 h-1]
+  real(r8),target,allocatable ::  LakeSurfHeatFlux_col(:,:)              !lake surface heat flux, outgoing positive, [m3 d-2 h-1]
 !----------------------------------------------------------------------
 
 contains

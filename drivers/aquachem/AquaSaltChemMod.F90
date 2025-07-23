@@ -60,10 +60,10 @@ implicit none
   integer :: itemp
   itemp=0
   cid_CO2S     =addone(itemp)  !aqueous CO2  micropore	[g d-2]
-  cid_H1PO4_2e_aqua_mole_conc    =addone(itemp)  !soil aqueous HPO4 content micropore non-band, [mol m-3]
-  cid_H2PO4_1e_aqua_mole_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore non-band, [mol m-3]
-  cid_NH3_aqua_mole_conc     =addone(itemp)  !soil NH3 concentration in non-band soil, [mol m-3]
-  cid_NH4_1p_aqua_mole_conc     =addone(itemp)  !soil NH4 concentration in non-band soil, [mol m-3]
+  cid_H1PO4_2e_aque_mole_conc    =addone(itemp)  !soil aqueous HPO4 content micropore non-band, [mol m-3]
+  cid_H2PO4_1e_aque_mole_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore non-band, [mol m-3]
+  cid_NH3_aque_mole_conc     =addone(itemp)  !soil NH3 concentration in non-band soil, [mol m-3]
+  cid_NH4_1p_aque_mole_conc     =addone(itemp)  !soil NH4 concentration in non-band soil, [mol m-3]
   cid_ZNO3S    =addone(itemp)  !NO3 mass non-band micropore, [g d-2]
   cid_ZHY      =addone(itemp)  !soil aqueous H content micropore, [mol d-2]
   cid_ZOH      =addone(itemp)  !soil aqueous OH content micropore, [mol d-2]
@@ -106,11 +106,11 @@ implicit none
   cid_ZCA1P    =addone(itemp)  !soil aqueous CaHPO4 content micropore non-band, [mol d-2]
   cid_ZCA2P    =addone(itemp)  !soil aqueous CaH4P2O8 content micropore non-band, [mol d-2]
   cid_ZMG1P    =addone(itemp)  !soil aqueous MgHPO4 content micropore non-band, [mol d-2]
-  cid_Precp_AlPO4_conc   =addone(itemp)  !precipitated AlPO4 non-band, [mol m-3]
-  cid_Precp_CaHPO4_conc   =addone(itemp)  !precipitated CaHPO4 non-band soil, [mol m-3]
-  cid_Precp_Ca5P3O12O3H3_conc   =addone(itemp)  !precipitated Ca5(PO4)3OH hydroxyapatite non-band soil, [mol m-3]
-  cid_Precp_CaH4P2O8_conc   =addone(itemp)  !precipitated Ca(H2PO4)2 non-band soil, [mol m-3]
-  cid_Precp_FePO4_conc   =addone(itemp)  !precipitated FePO4 non-band soil, [mol m-3]
+  cid_Precp_AlPO4_mole_conc   =addone(itemp)  !precipitated AlPO4 non-band, [mol m-3]
+  cid_Precp_CaHPO4_mole_conc   =addone(itemp)  !precipitated CaHPO4 non-band soil, [mol m-3]
+  cid_Precp_Ca5P3O12O3H3_mole_conc   =addone(itemp)  !precipitated Ca5(PO4)3OH hydroxyapatite non-band soil, [mol m-3]
+  cid_Precp_CaH4P2O8_mole_conc   =addone(itemp)  !precipitated Ca(H2PO4)2 non-band soil, [mol m-3]
+  cid_Precp_FePO4_mole_conc   =addone(itemp)  !precipitated FePO4 non-band soil, [mol m-3]
   cid_PALOH    =addone(itemp)  !precipitated Al(OH)3, [mol d-2]
   cid_PFEOH    =addone(itemp)  !precipitated Fe(OH)3, [mol d-2]
   cid_PCACO    =addone(itemp)  !precipitated CaCO3, [mol d-2]
@@ -123,19 +123,19 @@ implicit none
   cid_XNA      =addone(itemp)  !exchangeable Na, [mol d-2]
   cid_XKA      =addone(itemp)  !exchangeable K, [mol d-2]
   cid_XHC      =addone(itemp)  !exchangeable COOH , [mol d-2]
-  cid_XROH1_conc    =addone(itemp)  !exchangeable OH  non-band, [mol d-2]
+  cid_XROH1_mole_conc    =addone(itemp)  !exchangeable OH  non-band, [mol d-2]
   cid_XALO2    =addone(itemp)  !exchangeable AlOH2 , [mol d-2]
   cid_XFEO2    =addone(itemp)  !exchangeable Fe(OH)2, [mol d-2]
   cid_XNH4_mole_conc     =addone(itemp)  !exchangeable NH4 non-band soil, [mol d-2]
-  cid_XOH_conc    =addone(itemp)  !exchangeable OH- non-band, [mol d-2]
-  cid_XHPO4_conc    =addone(itemp)  !exchangeable HPO4  non-band, [mol m-3]
-  cid_XROH2_conc    =addone(itemp)  !exchangeable OH2  non-band soil, [mol m-3]
-  cid_XH2PO4_conc    =addone(itemp)  !exchangeable H2PO4  non-band soil, [mol m-3]
+  cid_XOH_mole_conc    =addone(itemp)  !exchangeable OH- non-band, [mol d-2]
+  cid_XHPO4_mole_conc    =addone(itemp)  !exchangeable HPO4  non-band, [mol m-3]
+  cid_XROH2_mole_conc    =addone(itemp)  !exchangeable OH2  non-band soil, [mol m-3]
+  cid_XH2PO4_mole_conc    =addone(itemp)  !exchangeable H2PO4  non-band soil, [mol m-3]
 
-  cid_H1PO4_2e_band_conc    =addone(itemp)  !soil aqueous HPO4 content micropore band, [mol m-3]
-  cid_H2PO4_1e_band_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore  band, [mol m-3]
-  cid_NH3_aqu_band_conc     =addone(itemp)  !soil NH3 concentration in band soil, [mol m-3]
-  cid_NH4_1p_band_conc     =addone(itemp)  !soil NH4 concentration in band soil, [mol m-3]
+  cid_H1PO4_2e_band_mole_conc    =addone(itemp)  !soil aqueous HPO4 content micropore band, [mol m-3]
+  cid_H2PO4_1e_band_mole_conc    =addone(itemp)  !soil aqueous H2PO4 content micropore  band, [mol m-3]
+  cid_NH3_aqu_band_mole_conc     =addone(itemp)  !soil NH3 concentration in band soil, [mol m-3]
+  cid_NH4_1p_band_mole_conc     =addone(itemp)  !soil NH4 concentration in band soil, [mol m-3]
   cid_ZNO3B    =addone(itemp)  !NO3 mass band micropore, [g d-2]
   cid_H0POB    =addone(itemp)  !soil aqueous PO4 content micropore band, [mol d-2]
   cid_H3POB    =addone(itemp)  !soil aqueous H3PO4 content micropore band, [mol d-2]
@@ -145,17 +145,17 @@ implicit none
   cid_ZCA1PB   =addone(itemp)  !soil aqueous CaHPO4 content micropore band, [mol d-2]
   cid_ZCA2PB   =addone(itemp)  !soil aqueous CaH4P2O8 content micropore band, [mol d-2]
   cid_ZMG1PB   =addone(itemp)  !soil aqueous MgHPO4 content micropore band, [mol d-2]
-  cid_PrecpB_AlPO4_conc   =addone(itemp)  !precipitated AlPO4 band soil, [mol m-3]
-  cid_PrecpB_CaHPO4_conc   =addone(itemp)  !precipitated CaHPO4 band soil, [mol m-3]
-  cid_PrecpB_Ca5P3O12O3H3_conc   =addone(itemp)  !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
-  cid_PrecpB_CaH4P2O8_conc   =addone(itemp)  !precipitated CaH4P2O8 band soil, [mol m-3]
-  cid_PrecpB_FePO4_con   =addone(itemp)  !precipitated FePO4 band soil, [mol m-3]
-  cid_XNH4_band_conc     =addone(itemp)  !exchangeable NH4 band soil, [mol d-2]
-  cid_XROH1_band_conc    =addone(itemp)  !exchangeable OH- band, [mol d-2]
-  cid_XHPO4_band_conc    =addone(itemp)  !exchangeable HPO4 concentration band-soil, [mol m-3]
-  cid_XH2PO4_band_conc    =addone(itemp)  !exchangeable H2PO4 concentration band-soil, [mol m-3]
-  cid_XROH_band_conc    =addone(itemp)  !exchangeable OH band-soil, [mol m-3]
-  cid_XROH2_band_conc    =addone(itemp)  !exchangeable OH2 band-soil, [mol m-3]
+  cid_PrecpB_AlPO4_mole_conc   =addone(itemp)  !precipitated AlPO4 band soil, [mol m-3]
+  cid_PrecpB_CaHPO4_mole_conc   =addone(itemp)  !precipitated CaHPO4 band soil, [mol m-3]
+  cid_PrecpB_Ca5P3O12O3H3_mole_conc   =addone(itemp)  !precipitated Ca5(PO4)3OH hydroxyapatite band soil, [mol m-3]
+  cid_PrecpB_CaH4P2O8_mole_conc   =addone(itemp)  !precipitated CaH4P2O8 band soil, [mol m-3]
+  cid_PrecpB_FePO4_mole_conc   =addone(itemp)  !precipitated FePO4 band soil, [mol m-3]
+  cid_XNH4_band_mole_conc     =addone(itemp)  !exchangeable NH4 band soil, [mol d-2]
+  cid_XROH1_band_mole_conc    =addone(itemp)  !exchangeable OH- band, [mol d-2]
+  cid_XHPO4_band_mole_conc    =addone(itemp)  !exchangeable HPO4 concentration band-soil, [mol m-3]
+  cid_XH2PO4_band_mole_conc    =addone(itemp)  !exchangeable H2PO4 concentration band-soil, [mol m-3]
+  cid_XROH_band_mole_conc    =addone(itemp)  !exchangeable OH band-soil, [mol m-3]
+  cid_XROH2_band_mole_conc    =addone(itemp)  !exchangeable OH2 band-soil, [mol m-3]
 
   fid_TRChem_CaCO3_precip_soil   =addone(itemp)
   fid_TRChem_NaCO3_soil    =addone(itemp)
@@ -275,17 +275,17 @@ implicit none
   varl(cid_CO2S)='CO2S';varlnml(cid_CO2S)='aqueous CO2 concentration micropore';
   unitl(cid_CO2S)='gC d-2';vartypes(cid_CO2S)=var_state_type
 
-  varl(cid_H1PO4_2e_aqua_mole_conc)='H1PO4_2e_aqua_mole_conc';varlnml(cid_H1PO4_2e_aqua_mole_conc)='non-band soil aqueous HPO4 content micropore'
-  unitl(cid_H1PO4_2e_aqua_mole_conc)='mol m-3';vartypes(cid_H1PO4_2e_aqua_mole_conc)=var_state_type
+  varl(cid_H1PO4_2e_aque_mole_conc)='H1PO4_2e_aque_mole_conc';varlnml(cid_H1PO4_2e_aque_mole_conc)='non-band soil aqueous HPO4 content micropore'
+  unitl(cid_H1PO4_2e_aque_mole_conc)='mol m-3';vartypes(cid_H1PO4_2e_aque_mole_conc)=var_state_type
 
-  varl(cid_H2PO4_1e_aqua_mole_conc)='H2PO4_1e_aqua_mole_conc';varlnml(cid_H2PO4_1e_aqua_mole_conc)='non-band soil micropore aqueous H2PO4 content'
-  unitl(cid_H2PO4_1e_aqua_mole_conc)='mol m-3';vartypes(cid_H2PO4_1e_aqua_mole_conc)=var_state_type
+  varl(cid_H2PO4_1e_aque_mole_conc)='H2PO4_1e_aque_mole_conc';varlnml(cid_H2PO4_1e_aque_mole_conc)='non-band soil micropore aqueous H2PO4 content'
+  unitl(cid_H2PO4_1e_aque_mole_conc)='mol m-3';vartypes(cid_H2PO4_1e_aque_mole_conc)=var_state_type
 
-  varl(cid_NH3_aqua_mole_conc) ='NH3_aqua_mole_conc';varlnml(cid_NH3_aqua_mole_conc)='non-band soil NH3 concentration'
-  unitl(cid_NH3_aqua_mole_conc)='mol m-3';vartypes(cid_NH3_aqua_mole_conc)=var_state_type
+  varl(cid_NH3_aque_mole_conc) ='NH3_aque_mole_conc';varlnml(cid_NH3_aque_mole_conc)='non-band soil NH3 concentration'
+  unitl(cid_NH3_aque_mole_conc)='mol m-3';vartypes(cid_NH3_aque_mole_conc)=var_state_type
 
-  varl(cid_NH4_1p_aqua_mole_conc)  ='NH4_1p_aqua_mole_conc';varlnml(cid_NH4_1p_aqua_mole_conc)='non-band soil NH4 concentration'
-  unitl(cid_NH4_1p_aqua_mole_conc)='mol m-3';vartypes(cid_NH4_1p_aqua_mole_conc)=var_state_type
+  varl(cid_NH4_1p_aque_mole_conc)  ='NH4_1p_aque_mole_conc';varlnml(cid_NH4_1p_aque_mole_conc)='non-band soil NH4 concentration'
+  unitl(cid_NH4_1p_aque_mole_conc)='mol m-3';vartypes(cid_NH4_1p_aque_mole_conc)=var_state_type
 
   varl(cid_ZNO3S) = 'ZNO3S';varlnml(cid_ZNO3S)='non-band soil micropore NO3 mass'
   unitl(cid_ZNO3S)= 'g d-2';vartypes(cid_ZNO3S)=var_state_type
@@ -413,20 +413,20 @@ implicit none
   varl(cid_ZMG1P)='ZMG1P';varlnml(cid_ZMG1P)='soil aqueous MgHPO4 content micropore non-band'
   unitl(cid_ZMG1P)='mol d-2';vartypes(cid_ZMG1P)=var_state_type
 
-  varl(cid_Precp_AlPO4_conc)='Precp_AlPO4_conc';varlnml(cid_Precp_AlPO4_conc)='non-band soil precipitated AlPO4'
-  unitl(cid_Precp_AlPO4_conc)='mol m-3';vartypes(cid_Precp_AlPO4_conc)=var_state_type
+  varl(cid_Precp_AlPO4_mole_conc)='Precp_AlPO4_mole_conc';varlnml(cid_Precp_AlPO4_mole_conc)='non-band soil precipitated AlPO4'
+  unitl(cid_Precp_AlPO4_mole_conc)='mol m-3';vartypes(cid_Precp_AlPO4_mole_conc)=var_state_type
 
-  varl(cid_Precp_CaHPO4_conc) ='Precp_CaHPO4_conc';varlnml(cid_Precp_CaHPO4_conc)='non-band soil precipitated CaHPO4'
-  unitl(cid_Precp_CaHPO4_conc)='mol m-3';vartypes(cid_Precp_CaHPO4_conc)=var_state_type
+  varl(cid_Precp_CaHPO4_mole_conc) ='Precp_CaHPO4_mole_conc';varlnml(cid_Precp_CaHPO4_mole_conc)='non-band soil precipitated CaHPO4'
+  unitl(cid_Precp_CaHPO4_mole_conc)='mol m-3';vartypes(cid_Precp_CaHPO4_mole_conc)=var_state_type
 
-  varl(cid_Precp_Ca5P3O12O3H3_conc) ='Precp_Ca5P3O12O3H3_conc';varlnml(cid_Precp_Ca5P3O12O3H3_conc)='non-band soil precipitated Ca5(PO4)3OH hydroxyapatite'
-  unitl(cid_Precp_Ca5P3O12O3H3_conc)='mol m-3';vartypes(cid_Precp_Ca5P3O12O3H3_conc)=var_state_type
+  varl(cid_Precp_Ca5P3O12O3H3_mole_conc) ='Precp_Ca5P3O12O3H3_mole_conc';varlnml(cid_Precp_Ca5P3O12O3H3_mole_conc)='non-band soil precipitated Ca5(PO4)3OH hydroxyapatite'
+  unitl(cid_Precp_Ca5P3O12O3H3_mole_conc)='mol m-3';vartypes(cid_Precp_Ca5P3O12O3H3_mole_conc)=var_state_type
 
-  varl(cid_Precp_CaH4P2O8_conc) ='Precp_CaH4P2O8_conc';varlnml(cid_Precp_CaH4P2O8_conc)='non-band soil precipitated Ca(H2PO4)2'
-  unitl(cid_Precp_CaH4P2O8_conc)='mol m-3';vartypes(cid_Precp_CaH4P2O8_conc)=var_state_type
+  varl(cid_Precp_CaH4P2O8_mole_conc) ='Precp_CaH4P2O8_mole_conc';varlnml(cid_Precp_CaH4P2O8_mole_conc)='non-band soil precipitated Ca(H2PO4)2'
+  unitl(cid_Precp_CaH4P2O8_mole_conc)='mol m-3';vartypes(cid_Precp_CaH4P2O8_mole_conc)=var_state_type
 
-  varl(cid_Precp_FePO4_conc) ='Precp_FePO4_conc';varlnml(cid_Precp_FePO4_conc)='non-band soil precipitated FePO4'
-  unitl(cid_Precp_FePO4_conc)='mol m-3';vartypes(cid_Precp_FePO4_conc)=var_state_type
+  varl(cid_Precp_FePO4_mole_conc) ='Precp_FePO4_mole_conc';varlnml(cid_Precp_FePO4_mole_conc)='non-band soil precipitated FePO4'
+  unitl(cid_Precp_FePO4_mole_conc)='mol m-3';vartypes(cid_Precp_FePO4_mole_conc)=var_state_type
 
   varl(cid_PALOH)='PALOH';varlnml(cid_PALOH)='precipitated Al(OH)3'
   unitl(cid_PALOH)='mol d-2';vartypes(cid_PALOH)=var_state_type
@@ -464,8 +464,8 @@ implicit none
   varl(cid_XHC)='XHC';varlnml(cid_XHC)='exchangeable COOH'
   unitl(cid_XHC)='mol d-2';vartypes(cid_XHC)=var_state_type
 
-  varl(cid_XROH1_conc)='XROH1_conc';varlnml(cid_XROH1_conc)='exchangeable OH  non-band'
-  unitl(cid_XROH1_conc)='mol d-2';vartypes(cid_XROH1_conc)=var_state_type
+  varl(cid_XROH1_mole_conc)='XROH1_mole_conc';varlnml(cid_XROH1_mole_conc)='exchangeable OH  non-band'
+  unitl(cid_XROH1_mole_conc)='mol d-2';vartypes(cid_XROH1_mole_conc)=var_state_type
 
   varl(cid_XALO2)='XALO2';varlnml(cid_XALO2)='exchangeable Al(OH)2'
   unitl(cid_XALO2)='mol d-2';vartypes(cid_XALO2)=var_state_type
@@ -476,29 +476,29 @@ implicit none
   varl(cid_XNH4_mole_conc)  ='XNH4_mole_conc';varlnml(cid_XNH4_mole_conc)='non-band soil adsorbed NH4 concentration'
   unitl(cid_XNH4_mole_conc) ='mol m-3';vartypes(cid_XNH4_mole_conc)=var_state_type
 
-  varl(cid_XOH_conc)='XOH_conc';varlnml(cid_XOH_conc)='exchangeable OH- non-band'
-  unitl(cid_XOH_conc)='mol d-2';vartypes(cid_XOH_conc)=var_state_type
+  varl(cid_XOH_mole_conc)='XOH_mole_conc';varlnml(cid_XOH_mole_conc)='exchangeable OH- non-band'
+  unitl(cid_XOH_mole_conc)='mol d-2';vartypes(cid_XOH_mole_conc)=var_state_type
 
-  varl(cid_XHPO4_conc) ='XHPO4_conc';varlnml(cid_XHPO4_conc)='non-band soil concentration of adsorbed HPO4'
-  unitl(cid_XHPO4_conc)='mol m-3';vartypes(cid_XHPO4_conc)=var_state_type
+  varl(cid_XHPO4_mole_conc) ='XHPO4_mole_conc';varlnml(cid_XHPO4_mole_conc)='non-band soil concentration of adsorbed HPO4'
+  unitl(cid_XHPO4_mole_conc)='mol m-3';vartypes(cid_XHPO4_mole_conc)=var_state_type
 
-  varl(cid_XROH2_conc) ='XROH2_conc';varlnml(cid_XROH2_conc)='non-band soil exchangeable site R-OH2'
-  unitl(cid_XROH2_conc)='mol m-3';vartypes(cid_XROH2_conc)=var_state_type
+  varl(cid_XROH2_mole_conc) ='XROH2_mole_conc';varlnml(cid_XROH2_mole_conc)='non-band soil exchangeable site R-OH2'
+  unitl(cid_XROH2_mole_conc)='mol m-3';vartypes(cid_XROH2_mole_conc)=var_state_type
 
-  varl(cid_XH2PO4_conc) ='XH2PO4_conc';varlnml(cid_XH2PO4_conc)='non-band soil concentration of adsorbed H2PO4'
-  unitl(cid_XH2PO4_conc)='mol m-3';vartypes(cid_XH2PO4_conc)=var_state_type
+  varl(cid_XH2PO4_mole_conc) ='XH2PO4_mole_conc';varlnml(cid_XH2PO4_mole_conc)='non-band soil concentration of adsorbed H2PO4'
+  unitl(cid_XH2PO4_mole_conc)='mol m-3';vartypes(cid_XH2PO4_mole_conc)=var_state_type
 
-  varl(cid_H1PO4_2e_band_conc)='H1PO4_2e_band_conc';varlnml(cid_H1PO4_2e_band_conc)='band soil aqueous HPO4 content micropore'
-  unitl(cid_H1PO4_2e_band_conc)='mol m-3';vartypes(cid_H1PO4_2e_band_conc)=var_state_type
+  varl(cid_H1PO4_2e_band_mole_conc)='H1PO4_2e_band_mole_conc';varlnml(cid_H1PO4_2e_band_mole_conc)='band soil aqueous HPO4 content micropore'
+  unitl(cid_H1PO4_2e_band_mole_conc)='mol m-3';vartypes(cid_H1PO4_2e_band_mole_conc)=var_state_type
 
-  varl(cid_H2PO4_1e_band_conc)='H2PO4_1e_band_conc';varlnml(cid_H2PO4_1e_band_conc)='band soil micropore aqueous H2PO4 content'
-  unitl(cid_H2PO4_1e_band_conc)='mol m-3';vartypes(cid_H2PO4_1e_band_conc)=var_state_type
+  varl(cid_H2PO4_1e_band_mole_conc)='H2PO4_1e_band_mole_conc';varlnml(cid_H2PO4_1e_band_mole_conc)='band soil micropore aqueous H2PO4 content'
+  unitl(cid_H2PO4_1e_band_mole_conc)='mol m-3';vartypes(cid_H2PO4_1e_band_mole_conc)=var_state_type
 
-  varl(cid_NH3_aqu_band_conc) ='NH3_aqu_band_conc';varlnml(cid_NH3_aqu_band_conc)='band soil NH3 concentration'
-  unitl(cid_NH3_aqu_band_conc)='mol m-3';vartypes(cid_NH3_aqu_band_conc)=var_state_type
+  varl(cid_NH3_aqu_band_mole_conc) ='NH3_aqu_band_mole_conc';varlnml(cid_NH3_aqu_band_mole_conc)='band soil NH3 concentration'
+  unitl(cid_NH3_aqu_band_mole_conc)='mol m-3';vartypes(cid_NH3_aqu_band_mole_conc)=var_state_type
 
-  varl(cid_NH4_1p_band_conc)  ='NH4_1p_band_conc';varlnml(cid_NH4_1p_band_conc)='band soil NH4 concentration'
-  unitl(cid_NH4_1p_band_conc) ='mol m-3';vartypes(cid_NH4_1p_band_conc)=var_state_type
+  varl(cid_NH4_1p_band_mole_conc)  ='NH4_1p_band_mole_conc';varlnml(cid_NH4_1p_band_mole_conc)='band soil NH4 concentration'
+  unitl(cid_NH4_1p_band_mole_conc) ='mol m-3';vartypes(cid_NH4_1p_band_mole_conc)=var_state_type
 
   varl(cid_ZNO3B) ='ZNO3B';varlnml(cid_ZNO3B) ='NO3 mass band micropore'
   unitl(cid_ZNO3B)='g N d-2';vartypes(cid_ZNO3B)=var_state_type
@@ -527,38 +527,38 @@ implicit none
   varl(cid_ZMG1PB)='ZMG1PB';varlnml(cid_ZMG1PB)='band soil aqueous MgHPO4 content micropore'
   unitl(cid_ZMG1PB)='mol d-2';vartypes(cid_ZMG1PB)=var_state_type
 
-  varl(cid_PrecpB_AlPO4_conc) ='PrecpB_AlPO4_conc';varlnml(cid_PrecpB_AlPO4_conc)='band soil precipitated AlPO4'
-  unitl(cid_PrecpB_AlPO4_conc)='mol m-3';vartypes(cid_PrecpB_AlPO4_conc)=var_state_type
+  varl(cid_PrecpB_AlPO4_mole_conc) ='PrecpB_AlPO4_mole_conc';varlnml(cid_PrecpB_AlPO4_mole_conc)='band soil precipitated AlPO4'
+  unitl(cid_PrecpB_AlPO4_mole_conc)='mol m-3';vartypes(cid_PrecpB_AlPO4_mole_conc)=var_state_type
 
-  varl(cid_PrecpB_CaHPO4_conc) ='PrecpB_CaHPO4_conc';varlnml(cid_PrecpB_CaHPO4_conc)='band soil precipitated CaHPO4'
-  unitl(cid_PrecpB_CaHPO4_conc)='mol m-3';vartypes(cid_PrecpB_CaHPO4_conc)=var_state_type
+  varl(cid_PrecpB_CaHPO4_mole_conc) ='PrecpB_CaHPO4_mole_conc';varlnml(cid_PrecpB_CaHPO4_mole_conc)='band soil precipitated CaHPO4'
+  unitl(cid_PrecpB_CaHPO4_mole_conc)='mol m-3';vartypes(cid_PrecpB_CaHPO4_mole_conc)=var_state_type
 
-  varl(cid_PrecpB_Ca5P3O12O3H3_conc) ='PrecpB_Ca5P3O12O3H3_conc';varlnml(cid_PrecpB_Ca5P3O12O3H3_conc)='band soil precipitated Ca5(PO4)3OH hydroxyapatite'
-  unitl(cid_PrecpB_Ca5P3O12O3H3_conc)='mol m-3';vartypes(cid_PrecpB_Ca5P3O12O3H3_conc)=var_state_type
+  varl(cid_PrecpB_Ca5P3O12O3H3_mole_conc) ='PrecpB_Ca5P3O12O3H3_mole_conc';varlnml(cid_PrecpB_Ca5P3O12O3H3_mole_conc)='band soil precipitated Ca5(PO4)3OH hydroxyapatite'
+  unitl(cid_PrecpB_Ca5P3O12O3H3_mole_conc)='mol m-3';vartypes(cid_PrecpB_Ca5P3O12O3H3_mole_conc)=var_state_type
 
-  varl(cid_PrecpB_CaH4P2O8_conc) ='PrecpB_CaH4P2O8_conc';varlnml(cid_PrecpB_CaH4P2O8_conc)='band soil precipitated CaH4P2O8'
-  unitl(cid_PrecpB_CaH4P2O8_conc)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_conc)=var_state_type
+  varl(cid_PrecpB_CaH4P2O8_mole_conc) ='PrecpB_CaH4P2O8_mole_conc';varlnml(cid_PrecpB_CaH4P2O8_mole_conc)='band soil precipitated CaH4P2O8'
+  unitl(cid_PrecpB_CaH4P2O8_mole_conc)='mol m-3';vartypes(cid_PrecpB_CaH4P2O8_mole_conc)=var_state_type
 
-  varl(cid_PrecpB_FePO4_con) ='PrecpB_FePO4_con';varlnml(cid_PrecpB_FePO4_con)='band soil precipitated FePO4'
-  unitl(cid_PrecpB_FePO4_con)='mol m-3';vartypes(cid_PrecpB_FePO4_con)=var_state_type
+  varl(cid_PrecpB_FePO4_mole_conc) ='PrecpB_FePO4_mole_conc';varlnml(cid_PrecpB_FePO4_mole_conc)='band soil precipitated FePO4'
+  unitl(cid_PrecpB_FePO4_mole_conc)='mol m-3';vartypes(cid_PrecpB_FePO4_mole_conc)=var_state_type
 
-  varl(cid_XNH4_band_conc)  ='XNH4_band_conc';varlnml(cid_XNH4_band_conc)='band soil adsorbed NH4 concentration'
-  unitl(cid_XNH4_band_conc) ='mol m-3';vartypes(cid_XNH4_band_conc)=var_state_type
+  varl(cid_XNH4_band_mole_conc)  ='XNH4_band_mole_conc';varlnml(cid_XNH4_band_mole_conc)='band soil adsorbed NH4 concentration'
+  unitl(cid_XNH4_band_mole_conc) ='mol m-3';vartypes(cid_XNH4_band_mole_conc)=var_state_type
 
-  varl(cid_XROH1_band_conc) ='XROH1_band_conc';varlnml(cid_XROH1_band_conc)='band soil exchangeable R-OH'
-  unitl(cid_XROH1_band_conc)='mol d-2';vartypes(cid_XROH1_band_conc)=var_state_type
+  varl(cid_XROH1_band_mole_conc) ='XROH1_band_mole_conc';varlnml(cid_XROH1_band_mole_conc)='band soil exchangeable R-OH'
+  unitl(cid_XROH1_band_mole_conc)='mol d-2';vartypes(cid_XROH1_band_mole_conc)=var_state_type
 
-  varl(cid_XHPO4_band_conc) ='XHPO4_band_conc';varlnml(cid_XHPO4_band_conc)='band soil exchangeable HPO4 concentration'
-  unitl(cid_XHPO4_band_conc)='mol m-3';vartypes(cid_XHPO4_band_conc)=var_state_type
+  varl(cid_XHPO4_band_mole_conc) ='XHPO4_band_mole_conc';varlnml(cid_XHPO4_band_mole_conc)='band soil exchangeable HPO4 concentration'
+  unitl(cid_XHPO4_band_mole_conc)='mol m-3';vartypes(cid_XHPO4_band_mole_conc)=var_state_type
 
-  varl(cid_XH2PO4_band_conc) ='XH2PO4_band_conc';varlnml(cid_XH2PO4_band_conc)='band soil exchangeable H2PO4 concentration'
-  unitl(cid_XH2PO4_band_conc)='mol m-3';vartypes(cid_XH2PO4_band_conc)=var_state_type
+  varl(cid_XH2PO4_band_mole_conc) ='XH2PO4_band_mole_conc';varlnml(cid_XH2PO4_band_mole_conc)='band soil exchangeable H2PO4 concentration'
+  unitl(cid_XH2PO4_band_mole_conc)='mol m-3';vartypes(cid_XH2PO4_band_mole_conc)=var_state_type
 
-  varl(cid_XROH_band_conc) ='XROH_band_conc';varlnml(cid_XROH_band_conc)='band soil concentration of adsorbed HPO4'
-  unitl(cid_XROH_band_conc)='mol m-3';vartypes(cid_XROH_band_conc)=var_state_type
+  varl(cid_XROH_band_mole_conc) ='XROH_band_mole_conc';varlnml(cid_XROH_band_mole_conc)='band soil concentration of adsorbed HPO4'
+  unitl(cid_XROH_band_mole_conc)='mol m-3';vartypes(cid_XROH_band_mole_conc)=var_state_type
 
-  varl(cid_XROH2_band_conc) ='XROH2_band_conc';varlnml(cid_XROH2_band_conc)='band soil exchangeable site R-OH2'
-  unitl(cid_XROH2_band_conc)='mol m-3';vartypes(cid_XROH2_band_conc)=var_state_type
+  varl(cid_XROH2_band_mole_conc) ='XROH2_band_mole_conc';varlnml(cid_XROH2_band_mole_conc)='band soil exchangeable site R-OH2'
+  unitl(cid_XROH2_band_mole_conc)='mol m-3';vartypes(cid_XROH2_band_mole_conc)=var_state_type
 
   varl(fid_TRChem_CaCO3_precip_soil)='TRChem_CaCO3_precip_soil';varlnml(fid_TRChem_CaCO3_precip_soil)='total precipitated CaCO3 transformation'
   unitl(fid_TRChem_CaCO3_precip_soil)='mol d-2 h-1';vartypes(fid_TRChem_CaCO3_precip_soil)=var_flux_type
@@ -888,11 +888,11 @@ implicit none
   real(r8), intent(out) :: ystatesfl(nvars)
 
   !ZNH4S=ZNH4S+TRChem_NH4_soil*Natomw
-  ystatesfl(cid_NH4_1p_aqua_mole_conc)=ystates0l(cid_NH4_1p_aqua_mole_conc)+solflx%TRChem_NH4_soil_mole/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH4_1p_aque_mole_conc)=ystates0l(cid_NH4_1p_aque_mole_conc)+solflx%TRChem_NH4_soil_mole/chemvar%VLWatMicPNH
   ystatesfl(fid_TRChem_NH4_soil)=solflx%TRChem_NH4_soil_mole
 
   !ZNH3S=ZNH3S+TRChem_NH3_soil_vr*Natomw
-  ystatesfl(cid_NH3_aqua_mole_conc)=ystates0l(cid_NH3_aqua_mole_conc)+solflx%TRChem_NH3_soil_mole/chemvar%VLWatMicPNH
+  ystatesfl(cid_NH3_aque_mole_conc)=ystates0l(cid_NH3_aque_mole_conc)+solflx%TRChem_NH3_soil_mole/chemvar%VLWatMicPNH
   ystatesfl(fid_TRChem_NH3_soil_vr)=solflx%TRChem_NH3_soil_mole
 
   !XN4  =XN4+TRChem_NH4_sorbed_soil
@@ -900,103 +900,103 @@ implicit none
   ystatesfl(fid_TRChem_NH4_sorbed_soil)=solflx%TRChem_NH4_sorbed_soil
 
   !ZNH4B=ZNH4B+TRChem_NH4_band_soil*Natomw
-  ystatesfl(cid_NH4_1p_band_conc)=ystates0l(cid_NH4_1p_band_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_NH4_1p_band_mole_conc)=ystates0l(cid_NH4_1p_band_mole_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH3_band_soil)=solflx%TRChem_NH3_band_soil
 
   !ZNH3B=ZNH3B+TRChem_NH3_band_soil*Natomw
-  ystatesfl(cid_NH3_aqu_band_conc)=ystates0l(cid_NH3_aqu_band_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_NH3_aqu_band_mole_conc)=ystates0l(cid_NH3_aqu_band_mole_conc)+solflx%TRChem_NH3_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH3_band_soil)=solflx%TRChem_NH3_band_soil
 
   !XNB  = XNB+TRChem_NH4_sorbed_band_soil
-  ystatesfl(cid_XNH4_band_conc)=ystates0l(cid_XNH4_band_conc)+solflx%TRChem_NH4_sorbed_band_soil/chemvar%VLWatMicPNB
+  ystatesfl(cid_XNH4_band_mole_conc)=ystates0l(cid_XNH4_band_mole_conc)+solflx%TRChem_NH4_sorbed_band_soil/chemvar%VLWatMicPNB
   ystatesfl(fid_TRChem_NH4_sorbed_band_soil)=solflx%TRChem_NH4_sorbed_band_soil
 
   !H1PO4=H1PO4+TRChem_H1PO4_soil*Patomw
-  ystatesfl(cid_H1PO4_2e_aqua_mole_conc)=ystates0l(cid_H1PO4_2e_aqua_mole_conc)+solflx%TRChem_H1PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H1PO4_2e_aque_mole_conc)=ystates0l(cid_H1PO4_2e_aque_mole_conc)+solflx%TRChem_H1PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_H1PO4_soil)=solflx%TRChem_H1PO4_soil
 
   !H2PO4=H2PO4+TRChem_H2PO4_soil*Patomw
-  ystatesfl(cid_H2PO4_1e_aqua_mole_conc)=ystates0l(cid_H2PO4_1e_aqua_mole_conc)+solflx%TRChem_H2PO4_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_H2PO4_1e_aque_mole_conc)=ystates0l(cid_H2PO4_1e_aque_mole_conc)+solflx%TRChem_H2PO4_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_H2PO4_soil)=solflx%TRChem_H2PO4_soil
 
   !XOH1 =XOH1+TRChem_ROH_sorbed_soil
-  ystatesfl(cid_XROH1_conc)=ystates0l(cid_XROH1_conc)+solflx%TRChem_ROH_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XROH1_mole_conc)=ystates0l(cid_XROH1_mole_conc)+solflx%TRChem_ROH_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_ROH_sorbed_soil)=solflx%TRChem_ROH_sorbed_soil
 
   !XOH2 =XOH2+TRChem_ROH2_sorbed_soil
-  ystatesfl(cid_XROH2_conc)=ystates0l(cid_XROH2_conc)+solflx%TRChem_ROH2_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XROH2_mole_conc)=ystates0l(cid_XROH2_mole_conc)+solflx%TRChem_ROH2_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_ROH2_sorbed_soil)=solflx%TRChem_ROH2_sorbed_soil
 
   !XH1P =XH1P+TRChem_RHPO4_sorbed_soil
-  ystatesfl(cid_XHPO4_conc)=ystates0l(cid_XHPO4_conc)+solflx%TRChem_RHPO4_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XHPO4_mole_conc)=ystates0l(cid_XHPO4_mole_conc)+solflx%TRChem_RHPO4_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_RHPO4_sorbed_soil)=solflx%TRChem_RHPO4_sorbed_soil
 
   !XH2P =XH2P+TRChem_RH2PO4_sorbed_soil
-  ystatesfl(cid_XH2PO4_conc)=ystates0l(cid_XH2PO4_conc)+solflx%TRChem_RH2PO4_sorbed_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_XH2PO4_mole_conc)=ystates0l(cid_XH2PO4_mole_conc)+solflx%TRChem_RH2PO4_sorbed_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_RH2PO4_sorbed_soil)=solflx%TRChem_RH2PO4_sorbed_soil
 
   !PALPO=PALPO+TRChem_AlPO4_precip_soil
-  ystatesfl(cid_Precp_AlPO4_conc)=ystates0l(cid_Precp_AlPO4_conc)+solflx%TRChem_AlPO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_AlPO4_mole_conc)=ystates0l(cid_Precp_AlPO4_mole_conc)+solflx%TRChem_AlPO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_AlPO4_precip_soil)=solflx%TRChem_AlPO4_precip_soil
 
   !PFEPO=PFEPO+TRChem_FePO4_precip_soil
-  ystatesfl(cid_Precp_FePO4_conc)=ystates0l(cid_Precp_FePO4_conc)+solflx%TRChem_FePO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_FePO4_mole_conc)=ystates0l(cid_Precp_FePO4_mole_conc)+solflx%TRChem_FePO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_FePO4_precip_soil)=solflx%TRChem_FePO4_precip_soil
 
   !PCAPD=PCAPD+TRChem_CaHPO4_precip_soil
-  ystatesfl(cid_Precp_CaHPO4_conc)=ystates0l(cid_Precp_CaHPO4_conc)+solflx%TRChem_CaHPO4_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_CaHPO4_mole_conc)=ystates0l(cid_Precp_CaHPO4_mole_conc)+solflx%TRChem_CaHPO4_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_CaHPO4_precip_soil)=solflx%TRChem_CaHPO4_precip_soil
 
   !PCAPH=PCAPH+TRChem_apatite_precip_soil
-  ystatesfl(cid_Precp_Ca5P3O12O3H3_conc)=ystates0l(cid_Precp_Ca5P3O12O3H3_conc)+solflx%TRChem_apatite_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_Ca5P3O12O3H3_mole_conc)=ystates0l(cid_Precp_Ca5P3O12O3H3_mole_conc)+solflx%TRChem_apatite_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_apatite_precip_soil)=solflx%TRChem_apatite_precip_soil
 
   !PCAPM=PCAPM+TRChem_CaH4P2O8_precip_soil
-  ystatesfl(cid_Precp_CaH4P2O8_conc)=ystates0l(cid_Precp_CaH4P2O8_conc)+solflx%TRChem_CaH4P2O8_precip_soil/chemvar%VLWatMicPPO
+  ystatesfl(cid_Precp_CaH4P2O8_mole_conc)=ystates0l(cid_Precp_CaH4P2O8_mole_conc)+solflx%TRChem_CaH4P2O8_precip_soil/chemvar%VLWatMicPPO
   ystatesfl(fid_TRChem_CaH4P2O8_precip_soil)=solflx%TRChem_CaH4P2O8_precip_soil
 
   !H1POB=H1POB+TRChem_H1PO4_band_soil*Patomw
-  ystatesfl(cid_H1PO4_2e_band_conc)=ystates0l(cid_H1PO4_2e_band_conc)+solflx%TRChem_H1PO4_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_H1PO4_2e_band_mole_conc)=ystates0l(cid_H1PO4_2e_band_mole_conc)+solflx%TRChem_H1PO4_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_H1PO4_band_soil)=solflx%TRChem_H1PO4_band_soil
 
   !H2POB=H2POB+TRChem_H2PO4_band_soil*Patomw
-  ystatesfl(cid_H2PO4_1e_band_conc)=ystates0l(cid_H2PO4_1e_band_conc)+solflx%TRChem_H2PO4_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_H2PO4_1e_band_mole_conc)=ystates0l(cid_H2PO4_1e_band_mole_conc)+solflx%TRChem_H2PO4_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_H2PO4_band_soil)=solflx%TRChem_H2PO4_band_soil
 
   !XOH1B=XOH1B+TRChem_ROH_sorbed_band_soil
-  ystatesfl(cid_XROH_band_conc)=ystates0l(cid_XROH_band_conc)+solflx%TRChem_ROH_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XROH_band_mole_conc)=ystates0l(cid_XROH_band_mole_conc)+solflx%TRChem_ROH_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_ROH_sorbed_band_soil)=solflx%TRChem_ROH_sorbed_band_soil
 
   !XOH2B=XOH2B+TRChem_ROH2_sorbed_band_soil
-  ystatesfl(cid_XROH2_band_conc)=ystates0l(cid_XROH2_band_conc)+solflx%TRChem_ROH2_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XROH2_band_mole_conc)=ystates0l(cid_XROH2_band_mole_conc)+solflx%TRChem_ROH2_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_ROH2_sorbed_band_soil)=solflx%TRChem_ROH2_sorbed_band_soil
 
-  !XHPO4_band_conc=XHPO4_band_conc+TRChem_RHPO4_sorbed_band_soil
-  ystatesfl(cid_XHPO4_band_conc)=ystates0l(cid_XHPO4_band_conc)+solflx%TRChem_RHPO4_sorbed_band_soil/chemvar%VLWatMicPPB
+  !XHPO4_band_mole_conc=XHPO4_band_mole_conc+TRChem_RHPO4_sorbed_band_soil
+  ystatesfl(cid_XHPO4_band_mole_conc)=ystates0l(cid_XHPO4_band_mole_conc)+solflx%TRChem_RHPO4_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_RHPO4_sorbed_band_soil)=solflx%TRChem_RHPO4_sorbed_band_soil
 
   !XH2PB=XH2PB+TRChem_RH2PO4_sorbed_band_soil
-  ystatesfl(cid_XH2PO4_band_conc)=ystates0l(cid_XH2PO4_band_conc)+solflx%TRChem_RH2PO4_sorbed_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_XH2PO4_band_mole_conc)=ystates0l(cid_XH2PO4_band_mole_conc)+solflx%TRChem_RH2PO4_sorbed_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_RH2PO4_sorbed_band_soil)=solflx%TRChem_RH2PO4_sorbed_band_soil
 
   !PALPB=PALPB+TRChem_AlPO4_precip_band_soil
-  ystatesfl(cid_PrecpB_AlPO4_conc)=ystates0l(cid_PrecpB_AlPO4_conc)+solflx%TRChem_AlPO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_AlPO4_mole_conc)=ystates0l(cid_PrecpB_AlPO4_mole_conc)+solflx%TRChem_AlPO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_AlPO4_precip_band_soil)=solflx%TRChem_AlPO4_precip_band_soil
 
   !PFEPB=PFEPB+TRChem_FePO4_precip_band_soil
-  ystatesfl(cid_PrecpB_FePO4_con)=ystates0l(cid_PrecpB_FePO4_con)+solflx%TRChem_FePO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_FePO4_mole_conc)=ystates0l(cid_PrecpB_FePO4_mole_conc)+solflx%TRChem_FePO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_FePO4_precip_band_soil)=solflx%TRChem_FePO4_precip_band_soil
 
   !PCPDB=PCPDB+TRChem_CaHPO4_precip_band_soil
-  ystatesfl(cid_PrecpB_CaHPO4_conc)=ystates0l(cid_PrecpB_CaHPO4_conc)+solflx%TRChem_CaHPO4_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaHPO4_mole_conc)=ystates0l(cid_PrecpB_CaHPO4_mole_conc)+solflx%TRChem_CaHPO4_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_CaHPO4_precip_band_soil)=solflx%TRChem_CaHPO4_precip_band_soil
 
   !PCPHB=PCPHB+TRChem_apatite_precip_band_soil
-  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_conc)+solflx%TRChem_apatite_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_Ca5P3O12O3H3_mole_conc)=ystates0l(cid_PrecpB_Ca5P3O12O3H3_mole_conc)+solflx%TRChem_apatite_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_apatite_precip_band_soil)=solflx%TRChem_apatite_precip_band_soil
 
   !PCPMB=PCPMB+TRChem_CaH4P2O8_precip_band_soil
-  ystatesfl(cid_PrecpB_CaH4P2O8_conc)=ystates0l(cid_PrecpB_CaH4P2O8_conc)+solflx%TRChem_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
+  ystatesfl(cid_PrecpB_CaH4P2O8_mole_conc)=ystates0l(cid_PrecpB_CaH4P2O8_mole_conc)+solflx%TRChem_CaH4P2O8_precip_band_soil/chemvar%VLWatMicPPB
   ystatesfl(fid_TRChem_CaH4P2O8_precip_band_soil)=solflx%TRChem_CaH4P2O8_precip_band_soil
   end subroutine RetrieveYstatef
 

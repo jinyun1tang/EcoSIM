@@ -102,7 +102,7 @@ subroutine Init_ATSEcoSIM_driver()
   do NY=1,NYS
     do L=1,ncells_per_col_
       a_AREA3(L,NY) = 1.0
-      !DH(NY,NX) = 0.316229
+      !DH_col(NY,NX) = 0.316229
       !DV(NY,NX) = 0.316229
       a_CumDepz2LayBottom_vr(L,NY) = dist_tot
       dist_tot = dist_tot+dist_step

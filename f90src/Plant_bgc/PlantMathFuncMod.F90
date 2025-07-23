@@ -47,11 +47,11 @@ contains
   !update the osmotic and turgor pressure of a plant organ
   implicit none
   real(r8), intent(in) :: PSICanopy   !plant orgran pressure, MPa
-  real(r8), intent(in) :: CCPOLT !total organ dry mass, C+N+P
-  real(r8), intent(in) :: OSMO   !canopy osmotic potential when canopy water potential = 0 MPa
-  real(r8), intent(in) :: TKP    !organ temperature, Kelvin
-  real(r8), intent(out) :: PSIOsmo  !osmotic pressure of the organ, MPa
-  real(r8), intent(out) :: PSITurg  !turgor pressure of the organ, MPa
+  real(r8), intent(in) :: CCPOLT      !total organ dry mass, C+N+P, g
+  real(r8), intent(in) :: OSMO        !canopy osmotic potential when canopy water potential = 0 MPa
+  real(r8), intent(in) :: TKP         !organ temperature, Kelvin
+  real(r8), intent(out) :: PSIOsmo    !osmotic pressure of the organ, MPa
+  real(r8), intent(out) :: PSITurg    !turgor pressure of the organ, MPa
   real(r8), optional, intent(out) :: FDMP1
 
   real(r8) :: OSWT
@@ -70,7 +70,7 @@ contains
   !
   !DESCRIPTION
   !assuming the seed is spherical, compute its volume, diameter(=length), and surface area
-  !     SeedVolumeMean,SeedLengthMean,SeedAreaMean=seed volume(m3),length(m),area(m2)
+  !     SeedVolumeMean,SeedLengthMean,SeedAreaMean=seed volume(m3),length(m),AREA_3D(m2)
   !     SeedCMass=seed C mass (g) from PFT file
   !
 
@@ -193,7 +193,7 @@ contains
 
   !Oxygen limited but not solute or carbon limited uptake
   ! u^2+Bu+C=0., it requires when C=0, delta=1, u=0
-  B     = -(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
+  B     = -AZMAX1(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
   C     = AZMAX1(X-Y)*UptakeRateMax_Ol
   delta = B*B-4.0_r8*C
 
@@ -204,7 +204,7 @@ contains
   endif
 
   !Oxygen, and carbon unlimited solute uptake
-  BP    = -(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
+  BP    = -AZMAX1(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
   CP    = AZMAX1(X-Y)*UptakeRateMax
   delta = BP*BP-4.0_r8*CP
   if(delta<0._r8)then
@@ -252,7 +252,7 @@ contains
 ! iplt_bryophyte=0
 ! iplt_grasslike=1
 !  iplt_treelike=2
-
+! only bryophyte is considered as shallow roots
   implicit none
   integer, intent(in) :: iPlantRootProfile_pft
   logical :: ans

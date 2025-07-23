@@ -1,5 +1,5 @@
 module EcoSiMParDataMod
- use GrosubPars, only : plant_bgc_par_type
+ use PlantBGCPars, only : plant_bgc_par_type
  use MicBGCPars, only : MicParType
 implicit none
   character(len=*),private, parameter :: mod_filename =&

@@ -12,186 +12,100 @@ module NitroPars
 
   save
 ! SUBSTRATE DECOMPOSITION BY MICROBIAL POPULATIONS
-!
-! ORAD=microbial radius (m), BIOS=microbial density (n m-3)
-! BIOA=microbial surface area (m2 m-3), DCKI=inhibition of
-! decomposition by microbial concentration (g C m-3)
-! RCCX=maximum remobilization of microbial N (-)
-! RCCY=maximum remobilization of microbial P (-)
-!     RCCZ, RCCY = minimum, maximum remobilization of microbial C (-)
-!     FPRIM, FPRIMM=fraction of nonstructural, microbial C,N,P
-!     transferred with priming (-), OMGR=rate constant for
-!     transferring nonstructural to structural microbial C (h-1)
-!     OQKI=DOC product inhibition constant for decomposition (g C m-3)
-!     H2KI=H2 product inhibition for methanogenesis (g H m-3)
-!     COMKI, COMKM= Km to slow microbial decomposition, maintenance
-!     respiration with low microbial C (g micr C g-1 subs C)
-!     CKC=controls C remobilization of microbial C (g C g-1 C)
-!     FOSCZ0, FOSCZL=rate constants for mixing surface (0) and
-!     subsurface (L) litter (h-1),FMN=minimum ratio of total
-!     biological demand for any substrate by any microbial population
-!     DCKM0, DCKML=Km for SOC decomposition (g C g-1 soil)
-!
 
-
-!
-!     SPECIFIC RESPIRATION RATES, M-M UPTAKE CONSTANTS,
-!     STOICHIOMETRIC CONSTANTS FOR MICROBIAL REDOX REACTIONS
-!
-!     VMX*=specific oxidation rates (g C g-1C h-1_
-!        O=all bacteria, F=fungi, M=acetotrophic methanogens
-!        H=ammonia oxidizers, N=nitrite oxidizers, 4=methanotrophs
-!        C=hydrogenotrophic methanogens
-!     OQK*=Km for DOC uptake by heterotrophs (g C m-3)
-!        M=all bacteria and fungi, A=acetate by fermenters
-!        AM=acetate by acetotrophic methanogens
-!     CCKM=Km for CO2 uptake, CCK4=Km for CH4 uptake (g C m-3)
-!     Z*KM=Km for N uptake (g N m-3)
-!        H=NH4 by nitrifiers, N=NO2 by nitrifiers
-!        3=NO3 by denitrifiers, 2=NO2 by denitrifiers
-!        1=N2O uptake by denitrifiers
-!     Z4*=NH4 uptake kinetics by all MFTs(g N m-2 h-1, g N m-3)
-!       MX=maximum uptake rate, KU=Km, MN= minimum concentration
-!     ZO*=NO3 uptake kinetics by all MFTs(g N m-2 h-1, g N m-3)
-!       MX=maximum uptake rate, KU=Km, MN= minimum concentration
-!     HP*=H2PO4 uptake kinetics by all MFTs(g P m-2 h-1, g P m-3)
-!       MX=maximum uptake rate, KU=Km, MN= minimum concentration
-!     ZFKM=Km for N2 uptake by diazotrophs (g N m-3)
-!     H2KM=Km for H2 uptake by hydrogenotrophic methanogens (g H m-3)
-!     ECNH=efficiency CO2 conversion to biomass by ammonia oxidizers
-!     ECNO=efficiency CO2 conversion to biomass by nitrite oxidizers
-!     ECHO=efficiency CO2 conversion to biomass by methane oxidizers
-!     eQNO3toOxy,eQNO2toOxy,eQN2OtoOxy=N2:O2 ratios for e- transfers to NO3, NO2 and N2O
-!     by denitrifiers, RNFNI=parameter for nitrification inhibition
-!     ZHKI=inhibition of nitrification inhibition by NH3 (g N m-3)
-!     VMKI=product inhibn for NOx reduction by denitrifiers(g N m-3)
-!     VHKI=product inhibn for NH3 oxidation by nitrifiers (g N m-3)
-!     OXKA=Km for O2 uptake by nitrifiers(g O m-3)
-!
-!     ENERGY REQUIREMENTS FOR MICROBIAL GROWTH AND
-!     ENERGY YIELDS FROM REDUCTION OF O2, OC, CH4, NO3, N2
-!
-!     EOM*=energy requirements for microbial growth (kJ g-1 C)
-!        C=aerobic bacteria, D=denitrifiers, G=fungi, F=fermenters
-!        H=methanogens, N=diazotrophs
-!     G*=free energy yields of redox reactions (kJ g-1 C or N)
-!        O2X=DOC-CO2, H4X=CO2-CH4, CHX=DOC-acetate, O2A=acetate-CO2
-!        C4X=acetate-CH4, COX=CO2-CH4, NOX=NO3-NO2,NO2-N2O,N2O-N2
-!        N2X=N2-NH3
-!     E*=growth respiration efficiency (-)(growth yield=1.0-E*)
-!        N2X=aerobic N2 fixation, N2Y=anaerobic N2 fixation
-!        O2X=aerobic bacteria (DOC), H4X=fermenters, O2G=fungi
-!        O2D=denitrifiers (aerobic), NFX=diazotrophs
-!        NOX= denitrifiers (anaerobic),O2A=aerobic bacteria (acetate)
-!
-!
-!     SORPTION COEFFICIENTS
-!
-!
-!     SPECIFIC DECOMPOSITION RATES
-!
-!     DOSA=rate constant for litter colonization by heterotrophs (g C g-1 C)
-!     SP*= specific decomposition rate constant (g subs. C g-1 micr. C)
-!       OHC=adsorbed SOC, OHA=adsorbed acetate, OSC=SOC
-!       (K=0,M=1,4 woody litter, K=1,M=1,4 non-woody litter,
-!       K=2,M=1,4 manure, K=3,M=1,1 POC, K=4,M=1,2 humus)
-!       ORC (M=1,2) microbial residue, OMC (M=1,2) microbial biomass
-!     RMOM=specific maintenance respiration (g C g-1 N h-1)
-!
-
-  real(r8) :: ORAD
-  real(r8) :: BIOS
-  real(r8) :: BIOA
-  real(r8) :: DCKI
-  real(r8) :: RCCX
-  real(r8) :: RCCQ
-  real(r8) :: RCCZ
-  real(r8) :: RCCY
-  real(r8) :: FPRIM
-  real(r8) :: FPRIMM
-  real(r8) :: OMGR     !reserve turnover rate [1/h]
-  real(r8) :: OQKI
-  real(r8) :: H2KI
-  real(r8) :: OAKI
-  real(r8) :: COMKI
-  real(r8) :: COMKM
-  real(r8) :: CKC
-  real(r8) :: FOSCZ0   !rate for mixing surface litter  [1/h]
-  real(r8) :: FOSCZL   !rate for mixing subsurface litter [1/h]
-  real(r8) :: FMN
-  real(r8) :: DCKM0
-  real(r8) :: DCKML
-  real(r8) :: VMXO
-  real(r8) :: VMXF
-  real(r8) :: VMXM
-  real(r8) :: VMXH
-  real(r8) :: VMXN
-  real(r8) :: VMX4
-  real(r8) :: VMXC
-  real(r8) :: OQKM
-  real(r8) :: OQKA
-  real(r8) :: OQKAM
-  real(r8) :: CCKM
-  real(r8) :: CCK4
-  real(r8) :: ZHKM
-  real(r8) :: ZNKM
-  real(r8) :: Z3KM
-  real(r8) :: Z2KM
-  real(r8) :: Z1KM
-  real(r8) :: Z4MX
-  real(r8) :: Z4KU
-  real(r8) :: Z4MN
-  real(r8) :: ZOMX
-  real(r8) :: ZOKU
-  real(r8) :: ZOMN
-  real(r8) :: HPMX
-  real(r8) :: HPKU
-  real(r8) :: HPMN
-  real(r8) :: ZFKM
-  real(r8) :: H2KM
-  real(r8) :: ECNH
-  real(r8) :: ECNO
-  real(r8) :: ECHO
-  real(r8) :: eQNO3toOxy
-  real(r8) :: eQNO2toOxy
-  real(r8) :: eQN2OtoOxy
-  real(r8) :: RNFNI
-  real(r8) :: ZHKI
-  real(r8) :: VMKI
-  real(r8) :: VHKI
-  real(r8) :: OXKA
-  real(r8) :: EOMC
-  real(r8) :: EOMD
-  real(r8) :: EOMG
-  real(r8) :: EOMF
-  real(r8) :: EOMH
-  real(r8) :: EOMN
-  real(r8) :: GO2X
-  real(r8) :: GH4X
-  real(r8) :: GCHX
-  real(r8) :: GO2A
-  real(r8) :: GC4X
-  real(r8) :: GCOX
-  real(r8) :: GNOX
-  real(r8) :: GN2X
-  real(r8) :: EN2X
-  real(r8) :: EN2Y
-  real(r8) :: EO2X
-  real(r8) :: EH4X
-  real(r8) :: EO2G
-  real(r8) :: EO2D
-  real(r8) :: ENFX
-  real(r8) :: ENOX
-  real(r8) :: EO2A
-  real(r8) :: TSORP
-  real(r8) :: HSORP
-  real(r8) :: SPOHC
-  real(r8) :: SPOHA
-  real(r8) :: RMOM
-  real(r8) :: SPORC(2)
-  real(r8) :: SPOMC(2)
-  real(r8) :: EN2F(7)
-  real(r8) :: EFIRE(2,21:22)
+  real(r8) :: ORAD         !microbial radius, [m]
+  real(r8) :: BIOS         !microbial density, [n m-3]
+  real(r8) :: BIOA         !microbial surface area, [m2 m-3]
+  real(r8) :: DCKI         !inhibition of decomposition by microbial concentration, [g C m-3]
+  real(r8) :: RCCX         !maximum remobilization of microbial N, [-]
+  real(r8) :: RCCQ         !maximum P recycling fractions , [-]
+  real(r8) :: RCCZ         !minimum fractions for bacteria C recycling,[-]
+  real(r8) :: RCCY         !maximum remobilization of microbial P, [-]
+  real(r8) :: FPRIM        !fraction of nonstructural transferred with priming, [-] 
+  real(r8) :: FPRIMM       !fraction of microbial C,N,P transferred with priming, [-]
+  real(r8) :: OMGR         !rate constant for transferring nonstructural to structural microbial C,[h-1]
+  real(r8) :: OQKI         !DOC product inhibition constant for decomposition, [g C m-3]
+  real(r8) :: H2KI         !H2 product inhibition for methanogenesis, [g H m-3]
+  real(r8) :: OAKI         !acetate product inhibition constant for decomposition, [g C m-3]
+  real(r8) :: COMKI        !Km to slow microbial decomposition with low microbial C, [g micr C g-1 subs C]
+  real(r8) :: COMKM        !Km to slow microbial maintenance respiration with low microbial C, [g micr C g-1 subs C]
+  real(r8) :: CKC          !controls C remobilization of microbial C, [g C g-1 C]
+  real(r8) :: FOSCZ0       !rate for mixing surface litter,  [h-1]
+  real(r8) :: FOSCZL       !rate for mixing subsurface litter, [h-1]
+  real(r8) :: FMN          !minimum ratio of total biological demand for any substrate by any microbial population,[-]
+  real(r8) :: DCKM0        !Km for SOC decomposition, [g C g-1 soil]
+  real(r8) :: DCKML        !Km for SOC decomposition, [g C g-1 soil] 
+  real(r8) :: VMXO         !specific oxidation rates for all bacteria, [g C g-1C h-1]
+  real(r8) :: VMXF         !specific oxidation rates for all fungi, [g C g-1C h-1] 
+  real(r8) :: VMXM         !specific oxidation rates for acetotrophic methanogens,[g C g-1C h-1] 
+  real(r8) :: VMXH         !specific oxidation rates for ammonia oxidizers, [g  g-1C h-1] 
+  real(r8) :: VMXN         !specific oxidation rates for nitrite oxidizers, [g  g-1C h-1] 
+  real(r8) :: VMX4         !specific oxidation rates for methanotrophs, [g   g-1C h-1] 
+  real(r8) :: VMXC         !specific oxidation rates for hydrogenotrophic methanogens,[g   g-1C h-1] 
+  real(r8) :: OQKM         !Km for DOC uptake by heterotrophs bacteria and fungi, [g C m-3]
+  real(r8) :: OQKA         !Km for acetate uptake by heterotrophic fermenters, [g C m-3]
+  real(r8) :: OQKAM        !Km for acetate uptake  by acetotrophic methanogens,[g C m-3]
+  real(r8) :: CCKM         !Km for CO2 uptake,  [g C m-3]
+  real(r8) :: CCK4         !Km for CH4 uptake, [g C m-3]
+  real(r8) :: ZHKM         !Km for NH4 uptake by nitrifiers, [gN m-3]
+  real(r8) :: ZNKM         !Km for NO2 uptake by nitrifiers, [gN m-3]
+  real(r8) :: Z3KM         !Km for NO3 uptake by denitrifiers,[gN m-3]
+  real(r8) :: Z2KM         !Km for NO2 uptake by denitrifiers, [gN m-3]
+  real(r8) :: Z1KM         !Km for N2O uptake by denitrifiers, [gN m-3]
+  real(r8) :: Z4MX         !maximum uptake rate for NH4 uptake kinetics by all microbial functional groups,[g N m-2 h-1]
+  real(r8) :: Z4KU         !Km for NH4 uptake kinetics by all microbial functional groups,[g N m-3]
+  real(r8) :: Z4MN         !minimum concentration for NH4 uptake kinetics by all microbial functional groups,[g N m-3]
+  real(r8) :: ZOMX         !maximum uptake rate for NO3 uptake kinetics by all microbial functional groups, [g N m-2 h-1] 
+  real(r8) :: ZOKU         !Km for NO3 uptake kinetics by all microbial functional groups, [g N m-3]
+  real(r8) :: ZOMN         !minimum concentration for NO3 uptake kinetics by all microbial functional groups, [g N m-3]
+  real(r8) :: HPMX         !maximum rate for H2PO4 uptake kinetics by all microbial functional groups, [g P m-2 h-1]
+  real(r8) :: HPKU         !Km for H2PO4 uptake kinetics by all microbial functional groups,[g P m-3]
+  real(r8) :: HPMN         !Minimum concentration for H2PO4 uptake kinetics by all microbial functional groups,[g P m-3]
+  real(r8) :: ZFKM         !Km for N2 uptake by diazotrophs, [g N m-3]
+  real(r8) :: H2KM         !Km for H2 uptake by hydrogenotrophic methanogens, [g H m-3]
+  real(r8) :: ECNH         !efficiency of CO2 conversion to biomass by ammonia oxidizers,[-]
+  real(r8) :: ECNO         !efficiency of CO2 conversion to biomass by nitrite oxidizers,[-]
+  real(r8) :: ECHO         !efficiency of CO2 conversion to biomass by methane oxidizers,[-]
+  real(r8) :: eQNO3toOxy   !N2:O2 ratios for e- transfers to NO3 by denitrifiers,[-]
+  real(r8) :: eQNO2toOxy   !N2:O2 ratios for e- transfers to NO2 by denitrifiers,[-]
+  real(r8) :: eQN2OtoOxy   !N2:O2 ratios for e- transfers to N2O by denitrifiers,[-]
+  real(r8) :: RNFNI        !parameter for nitrification inhibition,[-]
+  real(r8) :: ZHKI         !inhibition of nitrification inhibition by NH3, [g N m-3]
+  real(r8) :: VMKI         !product inhibn for NOx reduction by denitrifiers, [g N m-3]
+  real(r8) :: VHKI         !product inhibn for NH3 oxidation by nitrifiers, [g N m-3]
+  real(r8) :: OXKA         !Km for O2 uptake by nitrifiers, [g O m-3]
+  real(r8) :: EOMC         !energy requirements for microbial growth of aerobic bacteria, [kJ g-1 C]
+  real(r8) :: EOMD         !energy requirements for microbial growth of denitrifiers, [kJ g-1 C]
+  real(r8) :: EOMG         !energy requirements for microbial growth of fungi, [kJ g-1 C]
+  real(r8) :: EOMF         !energy requirements for microbial growth of fermenters, [kJ g-1 C]
+  real(r8) :: EOMH         !energy requirements for microbial growth of methanogens, [kJ g-1 C]
+  real(r8) :: EOMN         !energy requirements for microbial growth of diazotrophs, [kJ g-1 C]
+  real(r8) :: GO2X           !free energy yields of redox reactions for DOC-CO2, [kJ g-1 C]
+  real(r8) :: GH4X           !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
+  real(r8) :: GCHX           !free energy yields of redox reactions for DOC-acetate, [kJ g-1 C]
+  real(r8) :: GO2A           !free energy yields of redox reactions for acetate-CO2, [kJ g-1 C]
+  real(r8) :: GC4X           !free energy yields of redox reactions for acetate-CH4, [kJ g-1 C]
+  real(r8) :: GCOX           !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
+  real(r8) :: GNOX           !free energy yields of redox reactions for NO3-NO2, NO2-N2O,N2O-N2, [kJ g-1 N]
+  real(r8) :: GN2X           !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
+  real(r8) :: EN2X           !growth respiration efficiency for aerobic N2 fixation, [-]
+  real(r8) :: EN2Y           !growth respiration efficiency for anaerobic N2 fixation, [-]
+  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-]
+  real(r8) :: EH4X           !growth respiration efficiency for fermenters, [-]
+  real(r8) :: EO2G           !growth respiration efficiency for fungi, [-]
+  real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-]
+  real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-]
+  real(r8) :: ENOX           !growth respiration efficiency for denitrifiers (anaerobic), [-]
+  real(r8) :: EO2A           !growth respiration efficiency for aerobic bacteria (acetate), [-]
+  real(r8) :: TSORP          !sorption rate constant for OHC, [h-1]
+  real(r8) :: HSORP          !sorption rate coefficient for OHC, [-]
+  real(r8) :: SPOHC          !specific decomposition rate constant for adsorbed SOC, [g subs. C g-1 micr. C]
+  real(r8) :: SPOHA          !specific decomposition rate constant for adsorbed acetate, [g subs. C g-1 micr. C]
+  real(r8) :: RMOM           !specific maintenance respiration, [g C g-1 N h-1]
+  real(r8) :: SPORC(2)       !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
+  real(r8) :: SPOMC(2)       !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
+  real(r8) :: EN2F(7)        !N fixation yield from C oxidation, [g N g-1 C]
+  real(r8) :: EFIRE(2,21:22) !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
   contains
 
   subroutine initNitroPars

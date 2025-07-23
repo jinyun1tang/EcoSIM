@@ -7,6 +7,7 @@ implicit none
   __FILE__
 
   real(r8), parameter, private :: ZERO=1.0E-15_r8
+
   contains
 !------------------------------------------------------------------------
 
@@ -60,6 +61,6 @@ implicit none
     uptake=0.0_r8
   ENDIF
   end function TranspBasedsubstrateUptake
-!------------------------------------------------------------------------
+
 
 end module MicrobMathFuncMod

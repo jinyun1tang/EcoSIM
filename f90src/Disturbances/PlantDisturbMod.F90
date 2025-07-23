@@ -4,7 +4,7 @@ module PlantDisturbMod
 ! code to apply distance to plants
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SOMDataType
-  use GrosubPars
+  use PlantBGCPars
   use PlantTraitDataType
   use GridConsts
   use FlagDataType
@@ -42,7 +42,7 @@ module PlantDisturbMod
 
   D2995: DO NX=NHW,NHE
     D2990: DO NY=NVN,NVS
-      D2985: DO NZ=1,NP(NY,NX)
+      D2985: DO NZ=1,NP_col(NY,NX)
 !
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -54,7 +54,7 @@ module PlantDisturbMod
           NN=0
           D1995: DO NX1=NHW,NHE
             D1990: DO NY1=NVN,NVS
-              IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
+              IF(LSG_pft(NZ,NY1,NX1).EQ.LSG_pft(NZ,NY,NX))THEN
                 IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iActive)THEN
                   WTSHTZ=WTSHTZ+ShootStrutElms_pft(ielmc,NZ,NY1,NX1)
                   NN=NN+1

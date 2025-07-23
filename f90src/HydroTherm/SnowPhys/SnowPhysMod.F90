@@ -7,8 +7,9 @@ module SnowPhysMod
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL  
-  use abortutils   , only : endrun   
-  use EcoSIMCtrlMod,  only: fixWaterLevel  
+  use abortutils,    only: endrun
+  use EcoSIMCtrlMod, only: fixWaterLevel
+  use DebugToolMod,  only: PrintInfo
   use SnowDataType
   use SurfLitterDataType
   use SOMDataType
@@ -59,6 +60,7 @@ contains
   real(r8), optional, intent(out) :: XSW  !total water equivalent snow 
   real(r8) :: DLYRSI
   real(r8) :: VOLSWI
+  real(r8) :: GridArea
   !reference snow thickness [m]
   real(r8), parameter :: cumSnowDepzRef_col(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
   !the maximum snow layer is 1.0 m.
@@ -78,10 +80,11 @@ contains
 ! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
 ! SnowDepth=total snow height in the column
 
+  GridArea=DH_col(NY,NX)*DV_col(NY,NX)
   if(present(XSW))XSW=0._r8
   cumSnowDepz_col(0,NY,NX) = 0.0_r8
   NewSnowDens_col(NY,NX)   = 0.10_r8   ![Mg m-3]
-  VcumDrySnoWE_col(NY,NX)  = SnowDepth_col(NY,NX)*NewSnowDens_col(NY,NX)*DH(NY,NX)*DV(NY,NX)
+  VcumDrySnoWE_col(NY,NX)  = SnowDepth_col(NY,NX)*NewSnowDens_col(NY,NX)*GridArea
   VcumWatSnow_col(NY,NX)   = 0.0_r8
   VcumIceSnow_col(NY,NX)   = 0.0_r8
   VcumSnoDWI_col(NY,NX)    = VcumDrySnoWE_col(NY,NX)/NewSnowDens_col(NY,NX)+VcumWatSnow_col(NY,NX)+VcumIceSnow_col(NY,NX)
@@ -97,11 +100,11 @@ contains
       DLYRSI                   = cumSnowDepzRef_col(L)-cumSnowDepzRef_col(L-1)
       SnowThickL_snvr(L,NY,NX) = AMIN1(DLYRSI,AZMAX1(SnowDepth_col(NY,NX)-cumSnowDepzRef_col(L-1)))
     ENDIF
-    VLSnoDWIMax_snvr(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !maximum snow volume alloed in layer L
+    VLSnoDWIMax_snvr(L,NY,NX)=DLYRSI*GridArea      !maximum snow volume alloed in layer L
 
     if(SnowThickL_snvr(L,NY,NX) .GT. ZEROS(NY,NX))then
       !there is meaningful snow
-      VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*DH(NY,NX)*DV(NY,NX)
+      VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*GridArea
       VLWatSnow_snvr(L,NY,NX)  = 0.0_r8
       VLIceSnow_snvr(L,NY,NX)  = 0.0_r8
 
@@ -116,7 +119,7 @@ contains
       SnoDens_snvr(L,NY,NX)      = NewSnowDens_col(NY,NX)
       VLSnoDWIprev_snvr(L,NY,NX) = VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)
       cumSnowDepz_col(L,NY,NX)    = cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
-      TKSnow_snvr(L,NY,NX)        = AMIN1(Tref,TairKClimMean(NY,NX))
+      TKSnow_snvr(L,NY,NX)        = AMIN1(Tref,TairKClimMean_col(NY,NX))
       TCSnow_snvr(L,NY,NX)        = TKSnow_snvr(L,NY,NX)-Tref
       VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
     ELSE
@@ -127,7 +130,7 @@ contains
       SnoDens_snvr(L,NY,NX)       = NewSnowDens_col(NY,NX)
       VLSnoDWIprev_snvr(L,NY,NX)  = 0._r8
       cumSnowDepz_col(L,NY,NX)    = cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
-      TKSnow_snvr(L,NY,NX)        = TKS_vr(NU(NY,NX),NY,NX)
+      TKSnow_snvr(L,NY,NX)        = TKS_vr(NU_col(NY,NX),NY,NX)
       TCSnow_snvr(L,NY,NX)        = TKSnow_snvr(L,NY,NX)-Tref
       VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
     ENDIF
@@ -139,7 +142,7 @@ contains
 !     VLHeatCapSnowMin_col,=minimum heat capacities for solving
 !      snowpack water and heat fluxes
 !
-  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*AREA(3,NU(NY,NX),NY,NX)
+  VLHeatCapSnowMin_col(NY,NX)=VLHeatCapSnoMin*AREA_3D(3,NU_col(NY,NX),NY,NX)
 
   end subroutine InitSnowLayers
 
@@ -263,10 +266,10 @@ contains
     IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
       ! active snow layer
       VLSnoDWI1_snvr(L,NY,NX)   = VLDrySnoWE0M_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow0M_snvr(L,NY,NX)+VLIceSnow0M_snvr(L,NY,NX)
-      SnowThickL0_snvr(L,NY,NX) = VLSnoDWI1_snvr(L,NY,NX)/AREA(3,NUM(NY,NX),NY,NX)
+      SnowThickL0_snvr(L,NY,NX) = VLSnoDWI1_snvr(L,NY,NX)/AREA_3D(3,NUM_col(NY,NX),NY,NX)
       VLairSno1                 = AZMAX1(VLSnoDWI1_snvr(L,NY,NX)-VLDrySnoWE0M_snvr(L,NY,NX)-VLIceSnow0M_snvr(L,NY,NX)-VLWatSnow0M_snvr(L,NY,NX))
       FracAsAirSno1             = AMAX1(THETPI,VLairSno1/VLSnoDWI1_snvr(L,NY,NX))
-      VapCond1                  = FracAsAirSno1**2.0_r8*H2OVapDifscSno(L,NY,NX)
+      VapCond1                  = FracAsAirSno1**2*H2OVapDifsc_snvr(L,NY,NX)
       VapSnoSrc                 = vapsat(TKSnow1_snvr(L,NY,NX))  !*dssign(VLWatSnow0M_snvr(L,NY,NX))
 
       IF(VLSnoDWI1_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -303,7 +306,7 @@ contains
         !if L==JS-1, L2==JS, so top layer is treated here.
 
         VLSnoDWI1_snvr(L2,NY,NX)   = VLDrySnoWE0M_snvr(L2,NY,NX)/SnoDens_snvr(L2,NY,NX)+VLWatSnow0M_snvr(L2,NY,NX)+VLIceSnow0M_snvr(L2,NY,NX)
-        SnowThickL0_snvr(L2,NY,NX) = VLSnoDWI1_snvr(L2,NY,NX)/AREA(3,NUM(NY,NX),NY,NX)
+        SnowThickL0_snvr(L2,NY,NX) = VLSnoDWI1_snvr(L2,NY,NX)/AREA_3D(3,NUM_col(NY,NX),NY,NX)
         VLairSno2                  = VLSnoDWI1_snvr(L2,NY,NX)-VLDrySnoWE0M_snvr(L2,NY,NX)-VLIceSnow0M_snvr(L2,NY,NX)-VLWatSnow0M_snvr(L2,NY,NX)
         FracAsAirInSno             = AMAX1(THETPI,VLairSno2/VLSnoDWI1_snvr(L2,NY,NX))
 
@@ -325,11 +328,11 @@ contains
         !
         IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. VLairSno2.GT.ZEROS2(NY,NX))THEN
           !both layer has air-filled pores
-          VapCond2         = FracAsAirInSno**2.0_r8*H2OVapDifscSno(L2,NY,NX)
+          VapCond2         = FracAsAirInSno**2*H2OVapDifsc_snvr(L2,NY,NX)
           VapSnoDest       = vapsat(TKSnow1_snvr(L2,NY,NX))  !*dssign(VLWatSnow0M_snvr(L2,NY,NX))
           VapCondSnoWeited = 2.0_r8*VapCond1*VapCond2/(VapCond1*SnowThickL0_snvr(L2,NY,NX) &
             +VapCond2*SnowThickL0_snvr(L,NY,NX))
-          H2OVapFlx = VapCondSnoWeited*(VapSnoSrc-VapSnoDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*dt_SnoHeat
+          H2OVapFlx = VapCondSnoWeited*(VapSnoSrc-VapSnoDest)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*dt_SnoHeat
           VPY       = (VapSnoSrc*VLairSno1+VapSnoDest*VLairSno2)/(VLairSno1+VLairSno2)
           !H2OVapFlxMax>0, moves out from layer L
           H2OVapFlxMax=(VapSnoSrc-VPY)*VLairSno1*dts_sno
@@ -374,7 +377,7 @@ contains
         TKY    = (TKSnow1_snvr(L,NY,NX)*VLHeatCapSnowM1_snvr(L,NY,NX)+TKSnow1_snvr(L2,NY,NX) &
           *VLHeatCapSnowM1_snvr(L2,NY,NX))/(VLHeatCapSnowM1_snvr(L,NY,NX)+VLHeatCapSnowM1_snvr(L2,NY,NX))
         HeatCnductMax = (TKSnow1_snvr(L,NY,NX)-TKY)*VLHeatCapSnowM1_snvr(L,NY,NX)*dts_sno
-        HeatCnduct    = ATCNDW*(TKSnow1_snvr(L,NY,NX)-TKSnow1_snvr(L2,NY,NX))*AREA(3,NUM(NY,NX),NY,NX) &
+        HeatCnduct    = ATCNDW*(TKSnow1_snvr(L,NY,NX)-TKSnow1_snvr(L2,NY,NX))*AREA_3D(3,NUM_col(NY,NX),NY,NX) &
           *FracSurfAsSnow_col(NY,NX)*dt_SnoHeat
 
         IF(HeatCnduct.GE.0.0_r8)THEN
@@ -405,16 +408,16 @@ contains
           !first  flow to micro- and macropores
           if(FracSurfByLitR_col(NY,NX)>ZEROL)then
             PtWatFlowSno2Soi      = WatFloInSnoMax*FracSurfBareSoil_col(NY,NX)
-            WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX))
-            WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX))
+            WatFlowSno2MicP       = AMIN1(VLairMicP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM_col(NY,NX),NY,NX))
+            WatFlowSno2MacP       = AMIN1(VLairMacP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM_col(NY,NX),NY,NX))
             WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
             HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
             WatFlowSno2LitR       = WatFloInSnoMax-WatFlowSno2Soil
             HeatFlowSno2LitrByWat = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2LitR
           else
             PtWatFlowSno2Soi      = WatFloInSnoMax
-            WatFlowSno2MicP       = PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM(NY,NX),NY,NX)
-            WatFlowSno2MacP       = PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM(NY,NX),NY,NX)
+            WatFlowSno2MicP       = PtWatFlowSno2Soi*SoilFracAsMicP_vr(NUM_col(NY,NX),NY,NX)
+            WatFlowSno2MacP       = PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM_col(NY,NX),NY,NX)
             WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
             HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
             WatFlowSno2LitR       = 0._r8
@@ -445,15 +448,6 @@ contains
           ! GATHER WATER, VAPOR AND HEAT FLUXES INTO FLUX ARRAYS
           ! FOR LATER UPDATES TO STATE VARIABLES
           !
-          ! TotWatXFlx2SoiMicP,CumWatFlx2SoiMicP=total,accumulated water flux to soil micropores
-          ! CumWatXFlx2SoiMicP,CumWatFlx2SoiMacP=total,accumd snow-soil micropore,macropore water
-          ! TotHeatFlow2Soi,cumNetHeatFlow2Soil=total,accumulated snow+litter heat flux to soil
-          ! TotSnoWatFlow2Litr,CumSnowWatFLow2LitR=total,accumulated snow+soil water flux to litter
-          ! TotSnoHeatFlow2Litr,CumNetHeatFlow2LitR=total,accumulated snow+soil heat flux to litter
-          ! WatFlowSno2LitRM_col,WatFlowSno2MicPM_col,WatFlowSno2MacPM_col=total water flux to litter,soil micropore,macropore
-          ! WatConvSno2MicP,WatConvSno2MacP,WatConvSno2LitR=water flux from lowest snow layer to soil macropore,micropore,litter
-          ! HeatConvSno2Soi,HeatConvSno2LitR=heat flux from lowest snow layer to soil,litter
-
           TotWatXFlx2SoiMicP = WatFlowSno2MicP+VapFlxSno2Soi1+CumVapFlxLitr2Soi
           CumWatFlx2SoiMicP  = CumWatFlx2SoiMicP+TotWatXFlx2SoiMicP
 
@@ -522,7 +516,7 @@ contains
   real(r8) :: tNetWat2LayL,vwat,vdry,vice
   real(r8) :: dt_SnoHeat   !time step size for snow model iteration
   real(r8) :: cphwat,vhcp0,dNetWat2LayL
-  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow,snowLMass
+  real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow,SnowVolume
   real(r8), parameter :: mscal=1._r8-1.e-8_r8,tinyw=1.e-14_r8,tinyw0=1.e-16_r8
   real(r8), parameter :: mscal1=1.0001_r8
   real(r8) :: tinyw1
@@ -562,11 +556,11 @@ contains
 
   D3000: DO MM = 1, NPS
 
-    snowLMass=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
+    SnowVolume=VLDrySnoWE0M_snvr(1,NY,NX)+VLIceSnow0M_snvr(1,NY,NX)+VLWatSnow0M_snvr(1,NY,NX)+IceFall+SnoFall+RainFall
 
-    if(snowLMass>0._r8)then
+    if(SnowVolume>0._r8)then
 
-      call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,LatentHeatAir2Sno,&
+      call SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,SnowVolume,HeatSnofall2Snow,LatentHeatAir2Sno,&
         HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
 
       call SnowPackIterationMM(dt_snoHeat,I,J,M,NY,NX,TotWatXFlx2SoiMicP,TotHeatFlow2Soi,WatFlowSno2MacP,&
@@ -747,7 +741,7 @@ contains
         (TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8 .or. TKSnow1_snvr(L,NY,NX)<200._r8))then
         write(*,*)'dh, TK1X, TKSnow1',I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX)
         write(*,*)'VH, VHMX, tair,TKSnow0',VLHeatCapSnowM1_snvr(L,NY,NX), VLHeatCapSnowMX,TairK_col(NY,NX),TKSnow_snvr(L,NY,NX)
-        write(*,*)'TKS_1, TKS_0',TKS_vr(NUM(NY,NX),NY,NX),TKS_vr(0,NY,NX),VLHeatCapSnowMin_col(NY,NX)
+        write(*,*)'TKS_1, TKS_0',TKS_vr(NUM_col(NY,NX),NY,NX),TKS_vr(0,NY,NX),VLHeatCapSnowMin_col(NY,NX)
         write(*,*)'energy(ENGY0, NetHeat2LayL, HeatByFT ', ENGY0, NetHeat2LayL, HeatByFrezThaw
         write(*,*)'mass0 (dry, wat, ice): ',vdry,vwat,vice
         write(*,*)'masst (dry, wat, ice): ',VLDrySnoWE0M_snvr(L,NY,NX),VLWatSnow0M_snvr(L,NY,NX),VLIceSnow0M_snvr(L,NY,NX)
@@ -769,14 +763,14 @@ contains
 
   end subroutine SolveSnowpackM
 !------------------------------------------------------------------------------------------
-  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,snowLMass,HeatSnofall2Snow,&
+  subroutine SnowAtmosExchangeMM(I,J,M,NY,NX,SnoFall,Rainfall,IceFall,SnowVolume,HeatSnofall2Snow,&
     LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatNetFlx2Snow,Radnet2Snow,HeatSensAir2Snow)
   implicit none  
   integer, intent(in) :: I,J
   integer, intent(in) :: M    !soil heat-flow iteration id
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: HeatSnofall2Snow,IceFall,SnoFall,Rainfall
-  real(r8),intent(in) :: snowLMass
+  real(r8),intent(in) :: SnowVolume
   real(r8), intent(inout) :: LatentHeatAir2Sno
   real(r8), intent(inout) :: HeatSensEvapAir2Snow    !cumulated heat by vapor advection from air to snow [MJ]
   real(r8), intent(inout) :: HeatNetFlx2Snow,Radnet2Snow
@@ -804,11 +798,11 @@ contains
   real(r8) :: RadSWbySnow                                !shortwave radiation absorbed by snow [MJ]
 
   SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
-    +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/snowLMass
+    +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/SnowVolume
 
   RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
   RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation, short + longwave
-  LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4._r8/real(NPS,kind=r8)         !emitting longwave radiation,
+  LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4/real(NPS,kind=r8)         !emitting longwave radiation,
   RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow
 
@@ -1033,10 +1027,10 @@ contains
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      CumSno2SnowL_snvr(1,NY,NX)  = CumSno2SnowL_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
-      CumWat2SnowL_snvr(1,NY,NX)  = CumWat2SnowL_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
-      CumIce2SnowL_snvr(1,NY,NX)  = CumIce2SnowL_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
-      CumHeat2SnowL_snvr(1,NY,NX) = CumHeat2SnowL_snvr(1,NY,NX)+cumHeatFlxBySnowRedistribut(NY,NX)
+      CumSno2SnowL_snvr(1,NY,NX)  = CumSno2SnowL_snvr(1,NY,NX)+cumDrySnoByRedistM_col(NY,NX)
+      CumWat2SnowL_snvr(1,NY,NX)  = CumWat2SnowL_snvr(1,NY,NX)+cumWatSnoByRedistM_col(NY,NX)
+      CumIce2SnowL_snvr(1,NY,NX)  = CumIce2SnowL_snvr(1,NY,NX)+cumIceSnoByRedistM_col(NY,NX)
+      CumHeat2SnowL_snvr(1,NY,NX) = CumHeat2SnowL_snvr(1,NY,NX)+cumHeatSnoByRedistM_col(NY,NX)
     ENDDO
   ENDDO
   end subroutine AccumulateSnowRedisFluxM
@@ -1067,34 +1061,34 @@ contains
 
     VLSnowHeatCapM_snvr(M+1,1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
 
-    if(any((/cumDrySnoFlxByRedistribut(NY,NX)/=0._r8,cumWatFlxBySnowRedistribut(NY,NX)/=0._r8,&
-      cumIceFlxBySnowRedistribut(NY,NX)/=0._r8/)))then
+    if(any((/cumDrySnoByRedistM_col(NY,NX)/=0._r8,cumWatSnoByRedistM_col(NY,NX)/=0._r8, &
+      cumIceSnoByRedistM_col(NY,NX)/=0._r8/)))then
       ENGY0   = VLSnowHeatCapM_snvr(M+1,1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
-      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
-      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
-      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
+      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoByRedistM_col(NY,NX)
+      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatSnoByRedistM_col(NY,NX)
+      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceSnoByRedistM_col(NY,NX)
 
       VLSnowHeatCapM_snvr(M+1,1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
       
       IF(VLSnowHeatCapM_snvr(M+1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLSnowHeatCapM_snvr(M+1,1,NY,NX)
+        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatSnoByRedistM_col(NY,NX))/VLSnowHeatCapM_snvr(M+1,1,NY,NX)
       ELSE
         TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
       ENDIF
     endif
   ELSE
     VLHeatCapSnow_snvr(1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
-    if(any((/cumDrySnoFlxByRedistribut(NY,NX)/=0._r8,cumWatFlxBySnowRedistribut(NY,NX)/=0._r8,&
-      cumIceFlxBySnowRedistribut(NY,NX)/=0._r8/)))then    
+    if(any((/cumDrySnoByRedistM_col(NY,NX)/=0._r8,cumWatSnoByRedistM_col(NY,NX)/=0._r8,&
+      cumIceSnoByRedistM_col(NY,NX)/=0._r8/)))then    
       ENGY0   = VLHeatCapSnow_snvr(1,NY,NX)*TKSnow0_snvr(1,NY,NX)  
-      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoFlxByRedistribut(NY,NX)
-      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatFlxBySnowRedistribut(NY,NX)
-      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceFlxBySnowRedistribut(NY,NX)
+      VLDrySnoWE0_snvr(1,NY,NX) = VLDrySnoWE0_snvr(1,NY,NX)+cumDrySnoByRedistM_col(NY,NX)
+      VLWatSnow0_snvr(1,NY,NX)  = VLWatSnow0_snvr(1,NY,NX)+cumWatSnoByRedistM_col(NY,NX)
+      VLIceSnow0_snvr(1,NY,NX)  = VLIceSnow0_snvr(1,NY,NX)+cumIceSnoByRedistM_col(NY,NX)
 
       VLHeatCapSnow_snvr(1,NY,NX) = cps*VLDrySnoWE0_snvr(1,NY,NX)+cpw*VLWatSnow0_snvr(1,NY,NX)+cpi*VLIceSnow0_snvr(1,NY,NX)
       
       IF(VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatFlxBySnowRedistribut(NY,NX))/VLHeatCapSnow_snvr(1,NY,NX)
+        TKSnow0_snvr(1,NY,NX)=(ENGY0+cumHeatSnoByRedistM_col(NY,NX))/VLHeatCapSnow_snvr(1,NY,NX)
         !the following line may introduce error in energy 
       ELSE
         TKSnow0_snvr(1,NY,NX)=TairK_col(NY,NX)
@@ -1103,7 +1097,7 @@ contains
   ENDIF
 
   if(VLWatSnow0_snvr(1,NY,NX)<0._r8)then    
-    write(*,*)'UpdateSnowAtM NY,NX ',NY,NX,M,VLWatSnow0_snvr(1,NY,NX),cumWatFlxBySnowRedistribut(NY,NX)
+    write(*,*)'UpdateSnowAtM NY,NX ',NY,NX,M,VLWatSnow0_snvr(1,NY,NX),cumWatSnoByRedistM_col(NY,NX)
     call endrun(trim(mod_filename)//' at line',__LINE__)
   endif
     !
@@ -1126,37 +1120,37 @@ contains
     ENGY1          = TKSoil1_vr(0,NY,NX)*VHeatCapacity1_vr(0,NY,NX)
 
     !it is not a pond
-    IF(SoilBulkDensity_vr(NUM(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
+    IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
       VLWatMicP1_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)+FLWW
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
       VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
-!      if(I==149 .and. J==10 .and. NX==1)then
-!        write(114,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),tk1pres
-!      endif
+      QSnowH2Oloss_col(NY,NX)    = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
+      QSnowHeatLoss_col(NY,NX)   = QSnowHeatLoss_col(NY,NX)+HFLWS
+
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else 
       if(.not. fixWaterLevel)then     
-        VLWatMicP1_vr(NUM(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM(NY,NX),NY,NX)+FLWW
-        VLiceMicP1_vr(NUM(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-        ENGY1                                = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)
-        VLHeatCapacityA_vr(NUM(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM(NY,NX),NY,NX) &
-          +cpw*VLWatMicP1_vr(NUM(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM(NY,NX),NY,NX)
-        VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM(NY,NX),NY,NX) &
-          +cpi*VLiceMacP1_vr(NUM(NY,NX),NY,NX)
-        VHeatCapacity1_vr(NUM(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM(NY,NX),NY,NX)
+        VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
+        VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+        ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+        VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
+          +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
+        VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
+          +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)
+        VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)
 
         QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
         QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
         QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
 
         ! topsoil layer is there        
-        IF(VHeatCapacity1_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-          tk1pres                      = TKSoil1_vr(NUM(NY,NX),NY,NX)
-          TKSoil1_vr(NUM(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
+        IF(VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+          tk1pres                      = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
         ELSE
-          TKSoil1_vr(NUM(NY,NX),NY,NX) = TairK_col(NY,NX)
+          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = TairK_col(NY,NX)
         ENDIF
 
         Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
@@ -1174,7 +1168,7 @@ contains
     VLWatSnow_snvr(L,NY,NX)     = VLWatSnow0_snvr(L,NY,NX)
     VLSnoDWIprev_snvr(L,NY,NX)  = VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX)+VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)
     VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
-    SnowThickL_snvr(L,NY,NX)    = VLSnoDWIprev_snvr(L,NY,NX)/AREA(3,NUM(NY,NX),NY,NX)
+    SnowThickL_snvr(L,NY,NX)    = VLSnoDWIprev_snvr(L,NY,NX)/AREA_3D(3,NUM_col(NY,NX),NY,NX)
     TKSnow_snvr(L,NY,NX)        = TKSnow0_snvr(L,NY,NX)
   ENDDO D60
 
@@ -1182,120 +1176,163 @@ contains
 
 !------------------------------------------------------------------------------------------
   subroutine SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
-!
-! SNOW redistribution
-! currently, it does consider wind effect
+
+  !
+  !Description:
+  ! SNOW redistribution between inside grids
+  ! currently, it does consider wind effect
+  ! Some update is needed to make sure it is correct
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
+  character(len=*), parameter :: subname='SnowRedistributionM'
   integer  :: N1,N2   !reference grid
 
   integer :: N,NN,N4,N5,N4B,N5B
-  real(r8) :: ALTS1,ALTS2
-  real(r8) :: QSX,SnowDepthLateralGradient
-  integer, parameter :: iDirectionEW=1   !east-west direction
-  integer, parameter :: iDirectionNS=2   !north-south direction
+  real(r8) :: ALTS1,ALTS2,ALTSB
+  real(r8) :: QSX              !later snow flux 
+  real(r8) :: SnowDepthGradH   !lateral snow depth gradient 
 !
 !     SNOW REDISTRIBUTION FROM SNOWPACK
 !
-!     N2,N1=NY,NX of source grid cell
-!     N5,N4=NY,NX of destination grid cell
-!     ALTS1,ALTS2=elevation of source,destination snowpack surfaces
-!     SnowDepthLateralGradient,DIST=slope,distance between source,destination
-!     QSX=transfer fraction
-!     DrySnoFlxBySnowRedistribut,WatFlxBySnowRedistribut,IceFlxBySnowRedistribut=snow,water,ice transfer
-!     HeatFlxBySnowRedistribut=convective heat transfer from snow,water,ice transfer
-!     VOLS0,VOLW0,VOLI0=snow,water,ice volume
-!     MinSnowDepth=minimum snowpack depth for full cover
-!     QS,WatBySnowRedistrib,IceBySnowRedistrib=hourly-accumulated snow,water,ice transfer
-!     HeatBySnowRedistrib_2DH=hourly-accumd convective heat from snow,water,ice transfer
-!     DrySnoFlxBySnoRedistM=snow transfer for solute flux calculation
+  call PrintInfo('beg '//subname)
   N1=NX;N2=NY
   DO  N=1,2
+    !iFront:=1,iBehind:=2
     DO  NN=1,2
-      IF(N.EQ.iDirectionEW)THEN
-        !east-west
-        IF(NX.EQ.NHE .AND. NN.EQ.iOutflow .OR. NX.EQ.NHW .AND. NN.EQ.iInflow)THEN
+      IF(N.EQ.iWestEastDirection)THEN
+        !skip the boundaries        
+        IF(NX.EQ.NHE .AND. NN.EQ.iFront .OR. (NX.EQ.NHW .AND. NN.EQ.iBehind))THEN
           !at the boundary
           cycle
         ELSE
-          N4=NX+1   !east
-          N5=NY
-          N4B=NX-1  !west grid
-          N5B=NY
+          N4=NX+1 ;N5=NY
+          N4B=NX-1;N5B=NY
         ENDIF
-      ELSEIF(N.EQ.iDirectionNS)THEN
-        !south-north
-        IF(NY.EQ.NVS .AND. NN.EQ.iOutflow .OR. NY.EQ.NVN .AND. NN.EQ.iInflow)THEN
-          !at the boundary
+      ELSEIF(N.EQ.iNorthSouthDirection)THEN
+        !skip the boundariers
+        IF(NY.EQ.NVS .AND. NN.EQ.iFront .OR. (NY.EQ.NVN .AND. NN.EQ.iBehind))THEN          
           cycle
         ELSE
-          N4=NX
-          N5=NY+1   !north grid
-          N4B=NX
-          N5B=NY-1  !south grid
+          N4=NX;N5=NY+1   !north grid
+          N4B=NX;N5B=NY-1  !south grid
         ENDIF
       ENDIF
       
-      ALTS1=Altitude_grid(N2,N1)+SnowDepth_col(N2,N1)
+      ALTS1=Altitude_col(N2,N1)+SnowDepth_col(N2,N1)
+      !
+      IF(NN.EQ.iFront)THEN               
 
-      IF(NN.EQ.iOutflow)THEN
-        !east or south        
-        ALTS2=Altitude_grid(N5,N4)+SnowDepth_col(N5,N4)
-        
-        SnowDepthLateralGradient=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
-        !QSX>0, grid (N2,N1) loses mass
-        QSX=SnowDepthLateralGradient/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*dts_HeatWatTP
+        ALTS2=Altitude_col(N5,N4)+SnowDepth_col(N5,N4)        
+        SnowDepthGradH=(ALTS1-ALTS2)/DIST_3D(N,NU_col(N5,N4),N5,N4)
 
-        IF(SnowDepthLateralGradient.GT.0.0_r8.AND.SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
-          DrySnoFlxBySnowRedistribut(N,N5,N4) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
-          WatFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
-          IceFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
-          HeatFlxBySnowRedistribut(N,N5,N4)   = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxBySnowRedistribut(N,N5,N4) &
-            +cpw*WatFlxBySnowRedistribut(N,N5,N4)+cpi*IceFlxBySnowRedistribut(N,N5,N4))
-        ELSEIF(SnowDepthLateralGradient.LT.0.0_r8.AND.SnowDepth_col(N5,N4).GT.MinSnowDepth)THEN
-          DrySnoFlxBySnowRedistribut(N,N5,N4) = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N5,N4))
-          WatFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLWatSnow0_snvr(1,N5,N4))
-          IceFlxBySnowRedistribut(N,N5,N4)    = QSX*AZMAX1(VLIceSnow0_snvr(1,N5,N4))
-          HeatFlxBySnowRedistribut(N,N5,N4)   = TKSnow0_snvr(1,N5,N4)*(cps*DrySnoFlxBySnowRedistribut(N,N5,N4) &
-            +cpw*WatFlxBySnowRedistribut(N,N5,N4)+cpi*IceFlxBySnowRedistribut(N,N5,N4))
+        !QSX>0, grid (N2,N1) loses mass, double check here
+        QSX=SnowDepthGradH/AMAX1(1.0_r8,DIST_3D(N,NU_col(N5,N4),N5,N4))*dts_HeatWatTP
+
+        !using the upstream approach
+        IF(SnowDepthGradH.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+          QSX=AMIN1(QSX,1._r8)
+          DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
+          WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
+          IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
+          HeatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4) = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4) &
+            +cpw*WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)+cpi*IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4))
+          IFLBSM_2DH(M,N,iBehind,N5,N4)           = 0
+          DrySnoByRedistrib_2DH(N,iBehind,N5,N4)  = DrySnoByRedistrib_2DH(N,iBehind,N5,N4)+DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
+          WatSnoByRedist_2DH(N,iBehind,N5,N4)     = WatSnoByRedist_2DH(N,iBehind,N5,N4)+WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
+          IceSnoBySnowRedist_2DH(N,iBehind,N5,N4) = IceSnoBySnowRedist_2DH(N,iBehind,N5,N4)+IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
+          HeatSnoByRedist_2DH(N,iBehind,N5,N4)    = HeatSnoByRedist_2DH(N,iBehind,N5,N4)+HeatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)
         ELSE
-          DrySnoFlxBySnowRedistribut(N,N5,N4) = 0.0_r8
-          WatFlxBySnowRedistribut(N,N5,N4)    = 0.0_r8
-          IceFlxBySnowRedistribut(N,N5,N4)    = 0.0_r8
-          HeatFlxBySnowRedistribut(N,N5,N4)   = 0.0_r8
+          DrySnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = 0._r8
+          WatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = 0._r8
+          IceSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4)  = 0._r8
+          HeatSnoFlxByRedistM_2DH(M,N,iBehind,N5,N4) = 0._r8
+          IFLBSM_2DH(M,N,iBehind,N5,N4)                 = -1
         ENDIF
-        DrySnoBySnoRedistrib_2DH(N,N5,N4)    = DrySnoBySnoRedistrib_2DH(N,N5,N4)+DrySnoFlxBySnowRedistribut(N,N5,N4)
-        WatBySnowRedistrib_2DH(N,N5,N4)      = WatBySnowRedistrib_2DH(N,N5,N4)+WatFlxBySnowRedistribut(N,N5,N4)
-        IceBySnowRedistrib_2DH(N,N5,N4)      = IceBySnowRedistrib_2DH(N,N5,N4)+IceFlxBySnowRedistribut(N,N5,N4)
-        HeatBySnowRedistrib_2DH(N,N5,N4)     = HeatBySnowRedistrib_2DH(N,N5,N4)+HeatFlxBySnowRedistribut(N,N5,N4)
-        DrySnoFlxBySnoRedistM_2DH(M,N,N5,N4) = DrySnoFlxBySnowRedistribut(N,N5,N4)
-      ENDIF
 
-      !add west and south
-      IF(NN.EQ.iInflow)THEN
+      ELSEIF(NN.EQ.iBehind)THEN
+
+        ALTSB=Altitude_col(N5,N4)+SnowDepth_col(N5B,N4B)        
+        return
+
+        SnowDepthGradH=(ALTS1-ALTSB)/DIST_3D(N,NU_col(N5B,N4B),N5B,N4B)
+        QSX=SnowDepthGradH/AMAX1(1.0_r8,DIST_3D(N,NU_col(N5B,N4B),N5B,N4B))*dts_HeatWatTP
+
+        !MOVE from (N2,N1) to (N5B,N4B), front (N2,N1) to back (N5B,N4B)
+        IF(SnowDepthGradH.GT.0.0_r8 .AND. SnowDepth_col(N2,N1).GT.MinSnowDepth)THEN
+          QSX=AMIN1(QSX,1._r8)
+          DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLDrySnoWE0_snvr(1,N2,N1))
+          WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLWatSnow0_snvr(1,N2,N1))
+          IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = QSX*AZMAX1(VLIceSnow0_snvr(1,N2,N1))
+          HeatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B) = TKSnow0_snvr(1,N2,N1)*(cps*DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B) &
+            +cpw*WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)+cpi*IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B))
+          IFLBSM_2DH(M,N,iFront,N5B,N4B)           = 1
+          DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)  = DrySnoByRedistrib_2DH(N,iFront,N5B,N4B)+DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
+          WatSnoByRedist_2DH(N,iFront,N5B,N4B)     = WatSnoByRedist_2DH(N,iFront,N5B,N4B)+WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
+          IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B) = IceSnoBySnowRedist_2DH(N,iFront,N5B,N4B)+IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
+          HeatSnoByRedist_2DH(N,iFront,N5B,N4B)    = HeatSnoByRedist_2DH(N,iFront,N5B,N4B)+HeatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)
+        ELSE
+          DrySnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = 0._r8
+          WatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = 0._r8
+          IceSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B)  = 0._r8
+          HeatSnoFlxByRedistM_2DH(M,N,iFront,N5B,N4B) = 0._r8
+          IFLBSM_2DH(M,N,iFront,N5B,N4B)              = -1
+        ENDIF
 
       ENDIF
     ENDDO
   ENDDO    
+  call PrintInfo('end '//subname)
   end subroutine SnowRedistributionM
 
 !------------------------------------------------------------------------------------------
   subroutine SumSnowDriftByRunoffM(M,N,N1,N2,N4,N5,N4B,N5B)
-  use SoilWaterDataType, only : IFLBM
+  use SoilWaterDataType, only : IFLBM_2DH
   implicit none 
   integer, intent(in) :: M,N
   integer, intent(in) :: N1,N2
   integer, intent(in) :: N4,N5    !forward dest grid
   integer, intent(in) :: N4B,N5B  !backward dest grid  
+  integer :: NN
 
-  cumDrySnoFlxByRedistribut(N2,N1)=cumDrySnoFlxByRedistribut(N2,N1)+DrySnoFlxBySnowRedistribut(N,N2,N1) &
-    -DrySnoFlxBySnowRedistribut(N,N5,N4)
-  cumWatFlxBySnowRedistribut(N2,N1)=cumWatFlxBySnowRedistribut(N2,N1)+WatFlxBySnowRedistribut(N,N2,N1) &
-    -WatFlxBySnowRedistribut(N,N5,N4)
-  cumIceFlxBySnowRedistribut(N2,N1)=cumIceFlxBySnowRedistribut(N2,N1)+IceFlxBySnowRedistribut(N,N2,N1) &
-    -IceFlxBySnowRedistribut(N,N5,N4)
-  cumHeatFlxBySnowRedistribut(N2,N1)=cumHeatFlxBySnowRedistribut(N2,N1)+HeatFlxBySnowRedistribut(N,N2,N1) &
-    -HeatFlxBySnowRedistribut(N,N5,N4)
+  DO NN=1,2
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)+DrySnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)+WatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)+IceSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)+HeatSnoFlxByRedistM_2DH(M,N,NN,N2,N1)
+
+  ENDDO  
+
+  if(IFLBSM_2DH(M,N,iBehind,N5,N4).EQ.0)then
+    NN                             = iBehind
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5,N4)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5,N4)    
+  ENDIF
+
+  if(N4B.GT.0 .and. N5B.GT.0)then
+    NN                             = iFront
+    cumDrySnoByRedistM_col(N2,N1)  = cumDrySnoByRedistM_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumWatSnoByRedistM_col(N2,N1)  = cumWatSnoByRedistM_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumIceSnoByRedistM_col(N2,N1)  = cumIceSnoByRedistM_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    cumHeatSnoByRedistM_col(N2,N1) = cumHeatSnoByRedistM_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+
+    TDrysnoByRedist_col(N2,N1)  = TDrysnoByRedist_col(N2,N1)-DrySnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    TWatSnoByRedist_col(N2,N1)  = TWatSnoByRedist_col(N2,N1)-WatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    TIceSnoByRedist_col(N2,N1)  = TIceSnoByRedist_col(N2,N1)-IceSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)
+    THeatSnoByRedist_col(N2,N1) = THeatSnoByRedist_col(N2,N1)-HeatSnoFlxByRedistM_2DH(M,N,NN,N5B,N4B)    
+  ENDIF
+
   END subroutine SumSnowDriftByRunoffM
 !------------------------------------------------------------------------------------------
   subroutine ZeroSnowFluxM(NY,NX)
@@ -1303,10 +1340,11 @@ contains
   implicit none
   integer, intent(in) :: NY,NX
 
-  cumDrySnoFlxByRedistribut(NY,NX)   = 0.0_r8
-  cumWatFlxBySnowRedistribut(NY,NX)  = 0.0_r8
-  cumIceFlxBySnowRedistribut(NY,NX)  = 0.0_r8
-  cumHeatFlxBySnowRedistribut(NY,NX) = 0.0_r8
+  cumDrySnoByRedistM_col(NY,NX)  = 0.0_r8
+  cumWatSnoByRedistM_col(NY,NX)  = 0.0_r8
+  cumIceSnoByRedistM_col(NY,NX)  = 0.0_r8
+  cumHeatSnoByRedistM_col(NY,NX) = 0.0_r8
+
   end subroutine ZeroSnowFluxM
 !------------------------------------------------------------------------------------------
   FUNCTION SnowBNDResistance(NY,NX)result(RAS)
@@ -1333,12 +1371,12 @@ contains
         if(ats_cpl_mode)then
           !In the coupler I need these defined which are typically done in hour1
           TFACW=TEFGASDIF(TKSnow_snvr(L,NY,NX))
-          H2OVapDifscSno(L,NY,NX)=WGSG*TFACW
+          H2OVapDifsc_snvr(L,NY,NX)=WGSG*TFACW
         endif
-        RASX         = SnowThickL_snvr(L,NY,NX)/H2OVapDifscSno(L,NY,NX)
+        RASX         = SnowThickL_snvr(L,NY,NX)/H2OVapDifsc_snvr(L,NY,NX)
         FracAsAirSno = AMAX1(THETPI,1.0_r8-(VLDrySnoWE0_snvr(L,NY,NX)+VLIceSnow0_snvr(L,NY,NX) &
             +VLWatSnow0_snvr(L,NY,NX))/VLSnoDWI1_snvr(L,NY,NX))
-        RASL = RASX/AMAX1(ZERO,FracAsAirSno)**2.0_r8
+        RASL = RASX/AMAX1(ZERO,FracAsAirSno)**2
         RAS  = RAS+RASL
       ENDIF
     ENDDO D9775
@@ -1384,17 +1422,17 @@ contains
   real(r8) :: dLWdTSoil,dLWSoil
 ! begin_execution
 
-  dLWdTLitR = -0._r8*LWEmscefLitR_col(NY,NX)*TKSoil1_vr(0,NY,NX)**3._r8/real(NPS*NPR,kind=r8)
-  dLWdTSoil = -0._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM(NY,NX),NY,NX)**3._r8/real(NPS*NPR,kind=r8)
+  dLWdTLitR = -0._r8*LWEmscefLitR_col(NY,NX)*TKSoil1_vr(0,NY,NX)**3/real(NPS*NPR,kind=r8)
+  dLWdTSoil = -0._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3/real(NPS*NPR,kind=r8)
 
   TK0X              = TKSnow1_snvr(L,NY,NX)
   TKXR              = TKSoil1_vr(0,NY,NX)
-  TK1X              = TKSoil1_vr(NUM(NY,NX),NY,NX)
+  TK1X              = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
 
   VHeatCapacityLitR = VHeatCapacity1_vr(0,NY,NX)
   VLWatLitR         = VLWatMicP1_vr(0,NY,NX)
-  VHeatCapacitySoil = VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
-  VLWatSoil         = VLWatMicP1_vr(NUM(NY,NX),NY,NX)
+  VHeatCapacitySoil = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
+  VLWatSoil         = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)
   dts_litrvapht     = dt_SnoHeat/(real(NPR,kind=r8))  
   D4000: DO NN = 1, NPR
     !
@@ -1414,17 +1452,17 @@ contains
     !residue vapor pressure
     VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKXR))
     if(abs(VPR)>1.e20_r8)then
-      write(*,*)'TKXR=',TKXR,TKSoil1_vr(0,NY,NX),TKSoil1_vr(NUM(NY,NX),NY,NX),NN
+      write(*,*)'TKXR=',TKXR,TKSoil1_vr(0,NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX),NN
       write(*,*)'PSISM1_vr(0,NY,NX)=',PSISM1_vr(0,NY,NX)
       call endrun(trim(mod_filename)//'at line',__LINE__)
     endif
 
     !AvgVaporCondctSnowLitR=snowpack-litter conductance
     !there is litter layer with sufficient moisture
-    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. AirFilledSoilPoreM_vr(M,0,NY,NX).GT.AirFillPore_Min)THEN      
+    IF(VLairSno1.GT.ZEROS2(NY,NX) .AND. FracAirFilledSoilPoreM_vr(M,0,NY,NX).GT.AirFillPore_Min)THEN      
       VapSnow0=vapsat(TK0X)  !*dssign(VLWatSnow0M_snvr(L,NY,NX)) !snow vapor pressure, saturated
       !snow -> residue vapor flux (>0)
-      H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
+      H2OVapFlx=AvgVaporCondctSnowLitR*(VapSnow0-VPR)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX) &
         *FracSurfByLitR_col(NY,NX)*dts_litrvapht 
       !equilibrium vapor pressure
       VPY          = (VapSnow0*VLairSno1+VPR*VLsoiAirPM_vr(M,0,NY,NX))/(VLairSno1+VLsoiAirPM_vr(M,0,NY,NX))
@@ -1452,7 +1490,7 @@ contains
     ! VLSnowHeatCapMM= volumetric heat capacity in snow layer
     TKY           = (TK0X*VLHeatCapSnowM1_snvr(L,NY,NX)+TKXR*VHeatCapacityLitR)/(VLHeatCapSnowM1_snvr(L,NY,NX)+VHeatCapacityLitR)
     HeatCnductMax = (TK0X-TKY)*VLHeatCapSnowM1_snvr(L,NY,NX)*dt_watvap
-    HeatCnduct    = AvgThermCondctSnoLitR*(TK0X-TKXR)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
+    HeatCnduct    = AvgThermCondctSnoLitR*(TK0X-TKXR)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
     IF(HeatCnduct.GE.0.0_r8)THEN
       !sensible heat flux from snow to litter
       HeatCndFlxSno2Litr=AZMAX1(AMIN1(HeatCnductMax,HeatCnduct))
@@ -1473,12 +1511,12 @@ contains
 !     TKXR,TK1X=interim calculation of litter,soil temperatures
 !
     !both litter layer and topsoil are not-saturated
-    IF(VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS(NY,NX) .AND. VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS(NY,NX) .AND. VLsoiAirPM_vr(M,NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       VP1       = vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGASC*TK1X))
-      H2OVapFlx = AvgVaporCondctSoilLitR*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
+      H2OVapFlx = AvgVaporCondctSoilLitR*(VPR-VP1)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
 
-      VPY=(VPR*VLsoiAirPM_vr(M,0,NY,NX)+VP1*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX)) &
-        /(VLsoiAirPM_vr(M,0,NY,NX)+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
+      VPY=(VPR*VLsoiAirPM_vr(M,0,NY,NX)+VP1*VLsoiAirPM_vr(M,NUM_col(NY,NX),NY,NX)) &
+        /(VLsoiAirPM_vr(M,0,NY,NX)+VLsoiAirPM_vr(M,NUM_col(NY,NX),NY,NX))
       H2OVapFlxMax=(VPR-VPY)*VLsoiAirPM_vr(M,0,NY,NX)*dt_watvap
 
       IF(H2OVapFlx.GE.0.0_r8)THEN
@@ -1515,7 +1553,7 @@ contains
 !
     TKY           = (TKXR*VHeatCapacityLitR+TK1X*VHeatCapacitySoil)/(VHeatCapacityLitR+VHeatCapacitySoil)
     HeatCnductMax = (TKXR-TKY)*VHeatCapacityLitR*dt_watvap
-    HeatCnduct    = AvgThermCondctSoilLitR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
+    HeatCnduct    = AvgThermCondctSoilLitR*(TKXR-TK1X)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_litrvapht
     
     IF(HeatCnduct.GE.0.0_r8)THEN
       !sensible heat flux from litter to soil
@@ -1537,7 +1575,7 @@ contains
     cumHeatCndFlxLitr2Soi   = cumHeatCndFlxLitr2Soi+HeatCndFlxLitr2Soi
 
     dLWLitR = dLWdTLitR*(TKXR-TKSoil1_vr(0,NY,NX))
-    dLWSoil = dLWdTSoil*(TK1X-TKSoil1_vr(NUM(NY,NX),NY,NX))
+    dLWSoil = dLWdTSoil*(TK1X-TKSoil1_vr(NUM_col(NY,NX),NY,NX))
 
     TK0X = TK0X-HeatConvFlxSno2Litr/VLHeatCapSnowM1_snvr(L,NY,NX)
     TKXR = TKXR+(dLWLitR-HeatCndFlxLitr2Soi)/VHeatCapacityLitR
@@ -1559,15 +1597,19 @@ contains
   integer, intent(in) :: NY,NX,I,J
 
   integer :: L
-! VOLS0,VOLSSL=snowpack snow content (water equivalent)
-! VOLI0,VOLISSL=snowpack ice content
-! VOLW0,VOLWSL=snowpack water content
-! VLSnoDWI1,VLSnoDWIprev_snvr=snowpack volume
-! SnowThickL0_snvr,DLYRS=snowpack depth
-! VLSnowHeatCapM,VHCPW=snowpack heat capacity
-! TK0,TKW=snowpack temperature
-!
-!  print*,'TKS_vr(0,NY,NX)=',TKS_vr(0,NY,NX)
+  ! VOLS0,VOLSSL=snowpack snow content (water equivalent)
+  ! VOLI0,VOLISSL=snowpack ice content
+  ! VOLW0,VOLWSL=snowpack water content
+  ! VLSnoDWI1,VLSnoDWIprev_snvr=snowpack volume
+  ! SnowThickL0_snvr,DLYRS=snowpack depth
+  ! VLSnowHeatCapM,VHCPW=snowpack heat capacity
+  ! TK0,TKW=snowpack temperature
+ 
+  TDrysnoByRedist_col(NY,NX)  = 0._r8
+  TWatSnoByRedist_col(NY,NX)  = 0._r8
+  TIceSnoByRedist_col(NY,NX)  = 0._r8
+  THeatSnoByRedist_col(NY,NX) = 0._r8
+
   D60: DO L=1,JS
     VLDrySnoWE0_snvr(L,NY,NX)      = VLDrySnoWE_snvr(L,NY,NX)
     VLIceSnow0_snvr(L,NY,NX)       = VLIceSnow_snvr(L,NY,NX)
@@ -1594,41 +1636,41 @@ contains
   real(r8) :: THETW1,VPY,FCX,WPX
   real(r8) :: LOGFCX,LOGWPX,PSDX,FCDX
 
-  THETW1=AMAX1(SoilWatAirDry_vr(NUM(NY,NX),NY,NX),AMIN1(POROS_vr(NUM(NY,NX),NY,NX) &
-    ,safe_adb(VLWatMicP1_vr(NUM(NY,NX),NY,NX),VLSoilMicP_vr(NUM(NY,NX),NY,NX))))
-  IF(VLSoilMicPMass_vr(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    IF(THETW1.LT.FieldCapacity_vr(NUM(NY,NX),NY,NX))THEN
-      PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-        +((LOGFldCapacity_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /FCD_vr(NUM(NY,NX),NY,NX)*LOGPSIMND(NY,NX))))
-    ELSEIF(THETW1.LT.POROS_vr(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1_vr(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
-        +(((LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /PSD_vr(NUM(NY,NX),NY,NX))**SRP_vr(NUM(NY,NX),NY,NX)*LOGPSIMXD(NY,NX)))
+  THETW1=AMAX1(SoilWatAirDry_vr(NUM_col(NY,NX),NY,NX),AMIN1(POROS_vr(NUM_col(NY,NX),NY,NX) &
+    ,safe_adb(VLWatMicP1_vr(NUM_col(NY,NX),NY,NX),VLSoilMicP_vr(NUM_col(NY,NX),NY,NX))))
+  IF(VLSoilMicPMass_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(THETW1.LT.FieldCapacity_vr(NUM_col(NY,NX),NY,NX))THEN
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
+        +((LOGFldCapacity_vr(NUM_col(NY,NX),NY,NX)-LOG(THETW1)) &
+        /FCD_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMND_col(NY,NX))))
+    ELSEIF(THETW1.LT.POROS_vr(NUM_col(NY,NX),NY,NX)-DTHETW)THEN
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
+        +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(THETW1)) &
+        /PSD_vr(NUM_col(NY,NX),NY,NX))**SRP_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMXD_col(NY,NX)))
     ELSE
-      THETW1=POROS_vr(NUM(NY,NX),NY,NX)
-      PSISM1_vr(NUM(NY,NX),NY,NX)=PSISE_vr(NUM(NY,NX),NY,NX)
+      THETW1=POROS_vr(NUM_col(NY,NX),NY,NX)
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=PSISE_vr(NUM_col(NY,NX),NY,NX)
     ENDIF
-  ELSEIF(VLSoilPoreMicP_vr(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    FCX    = FCI*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)
-    WPX    = WPI*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)
+  ELSEIF(VLSoilPoreMicP_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    FCX    = FCI*FracSoiPAsIce_vr(NUM_col(NY,NX),NY,NX)
+    WPX    = WPI*FracSoiPAsIce_vr(NUM_col(NY,NX),NY,NX)
     LOGFCX = LOG(FCX)
     LOGWPX = LOG(WPX)
-    PSDX   = LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOGFCX
+    PSDX   = LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOGFCX
     FCDX   = LOGFCX-LOGWPX
-    IF(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX).LT.FCX)THEN
-      PSISM1_vr(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
-        +((LOGFCX-LOG(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
-    ELSEIF(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX).LT.POROS_vr(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1_vr(NUM(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
-        +(((LOGPOROS_vr(NUM(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD(NY,NX)))
+    IF(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX).LT.FCX)THEN
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
+        +((LOGFCX-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/FCDX*LOGPSIMND_col(NY,NX))))
+    ELSEIF(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX).LT.POROS_vr(NUM_col(NY,NX),NY,NX)-DTHETW)THEN
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=-EXP(LOGPSIAtSat(NY,NX) &
+        +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD_col(NY,NX)))
     ELSE
-      THETW1                      = POROS_vr(NUM(NY,NX),NY,NX)
-      PSISM1_vr(NUM(NY,NX),NY,NX) = PSISE_vr(NUM(NY,NX),NY,NX)
+      THETW1                      = POROS_vr(NUM_col(NY,NX),NY,NX)
+      PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSISE_vr(NUM_col(NY,NX),NY,NX)
     ENDIF
   ELSE
-    THETW1                      = POROS_vr(NUM(NY,NX),NY,NX)
-    PSISM1_vr(NUM(NY,NX),NY,NX) = PSISE_vr(NUM(NY,NX),NY,NX)
+    THETW1                      = POROS_vr(NUM_col(NY,NX),NY,NX)
+    PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSISE_vr(NUM_col(NY,NX),NY,NX)
   ENDIF
   end subroutine UpdateSoilWaterPotential  
 !------------------------------------------------------------------------------------------
@@ -1664,11 +1706,11 @@ contains
   IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX).AND.VLWatMicP1_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VLWatMicP1_vr(0,NY,NX))/VLitR_col(NY,NX)
     IF(ThetaWLitR.LT.FieldCapacity_vr(0,NY,NX))THEN
-      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
-        *LOGPSIMND(NY,NX))))
+      PSISM1_vr(0,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+((LOGFldCapacity_vr(0,NY,NX)-LOG(ThetaWLitR))/FCD_vr(0,NY,NX) &
+        *LOGPSIMND_col(NY,NX))))
     ELSEIF(ThetaWLitR.LT.POROS0_col(NY,NX))THEN
       PSISM1_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR))/PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX) &
-        *LOGPSIMXD(NY,NX)))
+        *LOGPSIMXD_col(NY,NX)))
     ELSE
       ThetaWLitR=POROS0_col(NY,NX)
       PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
@@ -1678,7 +1720,7 @@ contains
     PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
   ENDIF
 
-  CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*AirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*AirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
+  CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*FracAirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*FracAirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
 
   IF(FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
     IF(VapCond1.GT.ZERO .AND. CNVR.GT.ZERO)THEN      
@@ -1688,16 +1730,16 @@ contains
     ENDIF
 
     IF(CNVR.GT.ZERO.AND.VapCond2.GT.ZERO)THEN
-      AvgVaporCondctSoilLitR=2.0_r8*CNVR*VapCond2/(CNVR*DLYR_3D(3,NUM(NY,NX),NY,NX)+VapCond2*DLYRR_COL(NY,NX))
+      AvgVaporCondctSoilLitR=2.0_r8*CNVR*VapCond2/(CNVR*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+VapCond2*DLYRR_COL(NY,NX))
     ELSE
-      AvgVaporCondctSoilLitR=2.0_r8*VapCond2/(DLYR_3D(3,NUM(NY,NX),NY,NX)+DLYRR_COL(NY,NX))
+      AvgVaporCondctSoilLitR=2.0_r8*VapCond2/(DLYR_3D(3,NUM_col(NY,NX),NY,NX)+DLYRR_COL(NY,NX))
     ENDIF
 
-    THETRR = AZMAX1(1.0_r8-AirFilledSoilPore_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
+    THETRR = AZMAX1(1.0_r8-FracAirFilledSoilPore_vr(0,NY,NX)-FracSoiPAsWat_vr(0,NY,NX)-FracSoiPAsIce_vr(0,NY,NX))
     TCNDR  = (0.779_r8*THETRR*9.050E-04_r8+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+AirFilledSoilPore_vr(0,NY,NX) &
+      *2.067E-03_r8+0.380_r8*FracSoiPAsIce_vr(0,NY,NX)*7.844E-03_r8+FracAirFilledSoilPore_vr(0,NY,NX) &
       *9.050E-05_r8)/(0.779_r8*THETRR+0.622_r8*FracSoiPAsWat_vr(0,NY,NX) &
-      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+AirFilledSoilPore_vr(0,NY,NX))
+      +0.380_r8*FracSoiPAsIce_vr(0,NY,NX)+FracAirFilledSoilPore_vr(0,NY,NX))
 
     IF(TCND1W.GT.ZERO.AND.TCNDR.GT.ZERO)THEN
       AvgThermCondctSnoLitR=2.0_r8*TCND1W*TCNDR/(TCND1W*DLYRR_COL(NY,NX)+TCNDR*SnowThickL0_snvr(L,NY,NX))
@@ -1706,7 +1748,7 @@ contains
     ENDIF
 
     IF(TCNDR.GT.ZERO.AND.TCNDS.GT.ZERO)THEN
-      AvgThermCondctSoilLitR=2.0_r8*TCNDR*TCNDS/(TCNDR*DLYR_3D(3,NUM(NY,NX),NY,NX)+TCNDS*DLYRR_COL(NY,NX))
+      AvgThermCondctSoilLitR=2.0_r8*TCNDR*TCNDS/(TCNDR*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+TCNDS*DLYRR_COL(NY,NX))
     ELSE
       AvgThermCondctSoilLitR=0.0_r8
     ENDIF
@@ -1744,7 +1786,7 @@ contains
 
   call UpdateSoilWaterPotential(NY,NX)
   !micropore pressure, excluding gravitational pressure
-  PSISV1=PSISM1_vr(NUM(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM(NY,NX),NY,NX)
+  PSISV1=PSISM1_vr(NUM_col(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM_col(NY,NX),NY,NX)
 !
   ! VAPOR FLUX BETWEEN SNOWPACK AND SOIL SURFACE
   !
@@ -1762,19 +1804,19 @@ contains
   ! dts_wat=time step for flux calculations
   ! VapFlxSno2Soi1,HeatConvFlxSno2Soi1=vapor flux and its convective heat flux
   !
-  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX).GT.AirFillPore_Min)THEN
-    VapSoiDest = vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoil1_vr(NUM(NY,NX),NY,NX)))
-    VapCond2   = WVapDifusvitySoil_vr(NUM(NY,NX),NY,NX)*AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)*POROQ &
-      *AirFilledSoilPoreM_vr(M,NUM(NY,NX),NY,NX)/POROS_vr(NUM(NY,NX),NY,NX)
+  IF(VLairSno1.GT.ZEROS2(NY,NX).AND.FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX).GT.AirFillPore_Min)THEN
+    VapSoiDest = vapsat(TKSoil1_vr(NUM_col(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGASC*TKSoil1_vr(NUM_col(NY,NX),NY,NX)))
+    VapCond2   = WVapDifusvitySoil_vr(NUM_col(NY,NX),NY,NX)*FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)*POROQ &
+      *FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)/POROS_vr(NUM_col(NY,NX),NY,NX)
 
-    AvgVaporCondctSoilLitR = 2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR_3D(3,NUM(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
-    H2OVapFlx              = AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA(3,NUM(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)&
+    AvgVaporCondctSoilLitR = 2.0_r8*VapCond1*VapCond2/(VapCond1*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+VapCond2*SnowThickL0_snvr(L,NY,NX))
+    H2OVapFlx              = AvgVaporCondctSoilLitR*(VapSnoSrc-VapSoiDest)*AREA_3D(3,NUM_col(NY,NX),NY,NX)*FracSurfAsSnow_col(NY,NX)&
       *FracSurfBareSoil_col(NY,NX)*dt_SnoHeat
-    VPY          = (VapSnoSrc*VLairSno1+VapSoiDest*VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))/(VLairSno1+VLsoiAirPM_vr(M,NUM(NY,NX),NY,NX))
+    VPY          = (VapSnoSrc*VLairSno1+VapSoiDest*VLsoiAirPM_vr(M,NUM_col(NY,NX),NY,NX))/(VLairSno1+VLsoiAirPM_vr(M,NUM_col(NY,NX),NY,NX))
     H2OVapFlxMax = (VapSnoSrc-VPY)*VLairSno1*dts_sno
 
     if(abs(H2OVapFlx)>1.e10)then
-      print*,'hev',vapsat(TKSoil1_vr(NUM(NY,NX),NY,NX)),PSISV1,RGASC,TKSoil1_vr(NUM(NY,NX),NY,NX)
+      print*,'hev',vapsat(TKSoil1_vr(NUM_col(NY,NX),NY,NX)),PSISV1,RGASC,TKSoil1_vr(NUM_col(NY,NX),NY,NX)
       print*,'h2ovapflx',AvgVaporCondctSoilLitR,VapSnoSrc,VapSoiDest,FracSurfAsSnow_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
     endif
     IF(H2OVapFlx.GE.0.0_r8)THEN
@@ -1784,7 +1826,7 @@ contains
     ELSE
       !water flux out of soil
       VapFlxSno2Soi1      = AZMIN1(AMAX1(H2OVapFlx,H2OVapFlxMax))
-      HeatConvFlxSno2Soi1 = (cpw*TKSoil1_vr(NUM(NY,NX),NY,NX)*HeatAdv_scal+EvapLHTC)*VapFlxSno2Soi1
+      HeatConvFlxSno2Soi1 = (cpw*TKSoil1_vr(NUM_col(NY,NX),NY,NX)*HeatAdv_scal+EvapLHTC)*VapFlxSno2Soi1
     ENDIF
   ELSE
     VapCond2            = 0.0_r8
@@ -1807,26 +1849,26 @@ contains
   ! dt_SnoHeat=time step for snowpack flux calculations
   ! HeatCndFlxSno2Soi=snowpack-soil heat flux
   ! FracSoilAsAirt=air-filled pores (including macropores and micropores)
-  WTHET2 = 1.467_r8-0.467_r8*FracSoilAsAirt(NUM(NY,NX),NY,NX)
-  TCNDS  = (NumerSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
-    *2.067E-03_r8+0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
-    +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX)*9.050E-05_r8) &
-    /(DenomSolidThermCond_vr(NUM(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM(NY,NX),NY,NX) &
-    +0.611_r8*FracSoiPAsIce_vr(NUM(NY,NX),NY,NX) &
-    +WTHET2*AirFilledSoilPore_vr(NUM(NY,NX),NY,NX))
+  WTHET2 = 1.467_r8-0.467_r8*FracSoilAsAirt(NUM_col(NY,NX),NY,NX)
+  TCNDS  = (NumerSolidThermCond_vr(NUM_col(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX) &
+    *2.067E-03_r8+0.611_r8*FracSoiPAsIce_vr(NUM_col(NY,NX),NY,NX)*7.844E-03_r8 &
+    +WTHET2*FracAirFilledSoilPore_vr(NUM_col(NY,NX),NY,NX)*9.050E-05_r8) &
+    /(DenomSolidThermCond_vr(NUM_col(NY,NX),NY,NX)+FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX) &
+    +0.611_r8*FracSoiPAsIce_vr(NUM_col(NY,NX),NY,NX) &
+    +WTHET2*FracAirFilledSoilPore_vr(NUM_col(NY,NX),NY,NX))
 
   !the mean thermal conductivity
   IF(FracSurfBareSoil_col(NY,NX).GT.ZERO)THEN
-    AvgThermCondctSoilLitR=2.0_r8*TCND1W*TCNDS/(TCND1W*DLYR_3D(3,NUM(NY,NX),NY,NX)+TCNDS*SnowThickL0_snvr(L,NY,NX))
+    AvgThermCondctSoilLitR=2.0_r8*TCND1W*TCNDS/(TCND1W*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+TCNDS*SnowThickL0_snvr(L,NY,NX))
   ELSE
     AvgThermCondctSoilLitR=0.0_r8
   ENDIF
 
-  TKWX1 = TKSoil1_vr(NUM(NY,NX),NY,NX)+HeatConvFlxSno2Soi1/VHeatCapacity1_vr(NUM(NY,NX),NY,NX)
-  TKY   = (TKSnow1_snvr(L,NY,NX)*VLHeatCapSnowM1_snvr(L,NY,NX)+TKWX1*VHeatCapacity1_vr(NUM(NY,NX),NY,NX)) &
-    /(VLHeatCapSnowM1_snvr(L,NY,NX)+VHeatCapacity1_vr(NUM(NY,NX),NY,NX))
+  TKWX1 = TKSoil1_vr(NUM_col(NY,NX),NY,NX)+HeatConvFlxSno2Soi1/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
+  TKY   = (TKSnow1_snvr(L,NY,NX)*VLHeatCapSnowM1_snvr(L,NY,NX)+TKWX1*VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)) &
+    /(VLHeatCapSnowM1_snvr(L,NY,NX)+VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX))
   HeatCnductMax = (TKSnow1_snvr(L,NY,NX)-TKY)*VLHeatCapSnowM1_snvr(L,NY,NX)*dts_sno
-  HeatCnduct    = AvgThermCondctSoilLitR*(TKSnow1_snvr(L,NY,NX)-TKWX1)*AREA(3,NUM(NY,NX),NY,NX) &
+  HeatCnduct    = AvgThermCondctSoilLitR*(TKSnow1_snvr(L,NY,NX)-TKWX1)*AREA_3D(3,NUM_col(NY,NX),NY,NX) &
     *FracSurfAsSnow_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dt_SnoHeat
   IF(HeatCnduct.GE.0.0_r8)THEN
     HeatCndFlxSno2Soi=AZMAX1(AMIN1(HeatCnductMax,HeatCnduct))

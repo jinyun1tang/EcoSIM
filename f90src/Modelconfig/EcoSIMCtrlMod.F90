@@ -8,7 +8,7 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
    __FILE__  
-  integer :: ldebug_day  = -1 
+  integer :: idebug_day  = -1         !specify the day being debugged
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: first_topou   = .false.  !only simulate first topo unit
@@ -21,6 +21,9 @@ implicit none
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.
+  logical :: ldo_sp_mode        =.false.   !do satellite phenology mode
+  logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy 
+  logical :: ldo_transpt_bubbling=.true.   !flag to turn on/off ebullition during transport
   integer :: yearf1       !first year of daily climate forcing
   integer :: yearf2       !first year of hourly climate forcing
   integer :: nyeardal1    !number of daily climate forcing
@@ -29,8 +32,9 @@ implicit none
   real(r8) :: an2o_ppm  = 0.270_r8
   real(r8) :: ao2_ppm   = 0.209e6_r8
   real(r8) :: arg_ppm   = 0.00934e6_r8
-  real(r8) :: an2_ppm   = 0.78e6_r8
+  real(r8) :: an2_ppm   = 0.78e6_r8  
   real(r8) :: anh3_ppm  = 5.e-3_r8
+  real(r8) :: ah2_ppm   = 0.55_r8
   real(r8) :: atm_co2_fix=-100._r8
   real(r8) :: atm_ch4_fix=-100._r8
   real(r8) :: atm_n2o_fix=-100._r8
@@ -43,6 +47,7 @@ implicit none
   character(len=300) :: soil_mgmt_in     !file for soil management information
   character(len=300) :: clm_factor_in    !file for climate change factors
   character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
+  integer :: iVerbLevel = 0        
   logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid 
   type(ecosim_time_type) :: etimer

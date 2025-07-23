@@ -1,8 +1,8 @@
 set(ECOSIM_MOD_SOURCES
     InitAllocMod.F90
-	ExecMod.F90
 	StarteMod.F90
 	StartsMod.F90
+	StartqMod.F90  
 	VisualMod.F90
 )
 include(add_ecosim_library)
