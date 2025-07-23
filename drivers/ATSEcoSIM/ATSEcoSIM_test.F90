@@ -88,6 +88,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(swrad(1:ncells_per_col_))
   allocate(sunrad(1:ncells_per_col_))
   allocate(p_rain(1:ncells_per_col_))
+  allocate(p_snow(1:ncells_per_col_))
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
@@ -98,6 +99,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_WC(ncells_per_col_, ncol))
   allocate(a_MATP(ncells_per_col_, ncol))
   allocate(a_PORO(ncells_per_col_, ncol))
+  allocate(a_LDENS(ncells_per_col_, ncol))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
@@ -114,6 +116,7 @@ subroutine Init_ATSEcoSIM_driver()
       a_TEMP(L,NY) = 242.00
       a_MATP(L,NY) = -6.9
       a_PORO(L,NY) = 0.5
+      a_LDENS(L,NY) = 1.0
     enddo
     a_ASP(NY) = 0.0
     tairc(NY) = 242.13003959655759
@@ -122,7 +125,8 @@ subroutine Init_ATSEcoSIM_driver()
     !uwind(NY) = 1.0*3600.0_r8
     !swrad(NY) = 400.0*0.0036_r8
     !sunrad(NY) =  219.78*0.0036_r8
-    !p_rain(NY) = 0.0
+    p_rain(NY) = 0.0
+    p_snow(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
     
     vpair(NY) = 3.9167352020740509E-002*1.0e3

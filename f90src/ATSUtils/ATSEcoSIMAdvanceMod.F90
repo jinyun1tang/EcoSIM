@@ -90,8 +90,8 @@ implicit none
   enddo
 
   do NY=1,NYS
-    NU(NY,NX)               = a_NU(NY)
-    NL(NY,NX)               = a_NL(NY)
+    NU_col(NY,NX)               = a_NU(NY)
+    NL_col(NY,NX)               = a_NL(NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
     !TairKClimMean_col(NY,NX) = a_ATKA(NY)
@@ -118,7 +118,7 @@ implicit none
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
-    LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
@@ -128,7 +128,7 @@ implicit none
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
       !Convert ATS units (mols) to EcoSIM units (mH2O)
-      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/(a_LDENS(L,NY)*AREA(3,NU(NY,NX),NY,NX))
+      VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/(a_LDENS(L,NY)*AREA_3D(3,NU_col(NY,NX),NY,NX))
       !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)/(a_LDENS(L,NY))
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
@@ -175,14 +175,14 @@ implicit none
     PrecRainAndIrrig_col = RainFalPrec_col
     RainPrecThrufall_col = RainFalPrec_col
 
-    !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
+    !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
   !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s" 
-  PSIAtFldCapacity = pressure_at_field_capacity
-  PSIAtWiltPoint = pressure_at_wilting_point
+  PSIAtFldCapacity_col = pressure_at_field_capacity
+  PSIAtWiltPoint_col = pressure_at_wilting_point
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
