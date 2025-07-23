@@ -176,8 +176,8 @@ implicit none
     PrecRainAndIrrig_col = RainFalPrec_col
     RainPrecThrufall_col = RainFalPrec_col
 
-    !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
+    !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
