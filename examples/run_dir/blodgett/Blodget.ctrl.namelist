@@ -22,7 +22,7 @@ soichem_model=.true.
 !set up the first year of simulation
 start_date  = '19800101000000'
 grid_mode=1    !enable lateral runoff
-continue_run=.true.
+continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2013,2013,1,2022,2012,1,2013,2022,2,2012,2022,1
 
