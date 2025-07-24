@@ -1073,13 +1073,13 @@ module MicBGCMod
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt, &
     nmicf,nmics,micflx)
 
-  call GatherHetertrophRespiration(I,J,NGL,N,K,RMOMK,RGrowthRespHeter,RMaintDefcitcitHeter,RMaintRespHeter, &
+  call GatherHetertrophRespiration(I,J,NGL,N,K,RMOMK,micflx%RGrowthRespHeter(NGL,K),RMaintDefcitcitHeter,RMaintRespHeter, &
     micfor,micstt,nmicf,nmics)
 
-  call GatherHetertrophAnabolicFlux(I,J,NGL,N,K,ECHZ,FGOCP,FGOAP,RGrowthRespHeter,&
+  call GatherHetertrophAnabolicFlux(I,J,NGL,N,K,ECHZ,FGOCP,FGOAP,micflx%RGrowthRespHeter(NGL,K),&
     RMaintDefcitcitHeter,RMaintRespHeter,spomk,micfor,micstt,nmicf, &
     nmics,ncplxf,ncplxs,micflx)
-
+  
   end associate
   end subroutine ActiveHeterotrophs
 
@@ -4094,7 +4094,7 @@ module MicBGCMod
 !     FracHeterBiomOfActK=faction of OMActHeterin total OMA
 !     rCNDOM,rCPDOM=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
-!
+! gross respiration equals to maintenance+respiraiton for N-fixation + growth respiraiton
   CGOMX     = AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZ
   CGOMD     = RNOxReduxRespDenitLim(NGL,K)/ENOX
   CDOMuptk1 = CDOMuptk1+CGOMX

@@ -8,6 +8,7 @@ module ExtractsMod
   use minimathmod,   only: AZMAX1
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
+  use EcoSIMCtrlMod, only: lverb, ldo_sp_mode
   use EcosimConst
   use PlantBGCPars
   use PlantAPIData
@@ -37,11 +38,11 @@ module ExtractsMod
 
     call PrintRootTracer(I,J,NZ,'extract')
     IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
+      if(.not.ldo_sp_mode)then
+        call CalcTotalLeafArea(NZ)
 
-      call CalcTotalLeafArea(NZ)
-
-      call TotalGasandSoluteUptake(I,J,NZ)
-
+        call TotalGasandSoluteUptake(I,J,NZ)
+      endif
       call ExtractCanopyFluxes(I,J,NZ)
 
     ENDIF
@@ -57,7 +58,7 @@ module ExtractsMod
   implicit none
   integer :: NZ,L,K,M
   integer :: NE
-  associate(                                                      &
+  associate(                                                          &
     LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
@@ -153,7 +154,7 @@ module ExtractsMod
  
   associate(                                                          &
     AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    RPlantRootH2OUptk_pvr   => plt_ew%RPlantRootH2OUptk_pvr      ,& !input  :root water uptake, [m2 d-2 h-1]
+    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr        ,& !input  :root water uptake, [m2 d-2 h-1]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
@@ -172,7 +173,7 @@ module ExtractsMod
     RootNutUptake_pvr         => plt_rbgc%RootNutUptake_pvr          ,& !input  :root uptake of Nutrient band, [g d-2 h-1]
     RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr        ,& !input  :root O2 demand from respiration, [g d-2 h-1]
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr             ,& !input  :aqueous O2 flux from roots to root water, [g d-2 h-1]
-    RootO2_TotSink_pvr           => plt_bgcr%RootO2_TotSink_pvr            ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
+    RootO2_TotSink_pvr        => plt_bgcr%RootO2_TotSink_pvr         ,& !input  :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr         ,& !input  :aqueous CO2 flux from roots to soil water, [g d-2 h-1]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                 ,& !input  :canopy temperature, [K]
     TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
@@ -291,7 +292,7 @@ module ExtractsMod
   integer :: L, NE,NB,idg
   real(r8) :: ENGYC
 
-  associate(                                                      &
+  associate(                                                          &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft              ,& !input  :canopy net CO2 exchange, [gC d-2 h-1]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !input  :canopy water content, [m3 d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
@@ -359,11 +360,11 @@ module ExtractsMod
 !     TRootGasLossDisturb_col=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLossDisturb_pft=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
+  
   Eco_NetRad_col         = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
   Eco_Heat_Latent_col    = Eco_Heat_Latent_col+EvapTransLHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
-  Canopy_NEE_col         = Canopy_NEE_col+CO2NetFix_pft(NZ)
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanopyWat_col          = CanopyWat_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
@@ -374,6 +375,9 @@ module ExtractsMod
   HeatFlx2Canopy_col     = HeatFlx2Canopy_col+ENGYC-ENGYX_pft(NZ)
   ENGYX_pft(NZ)          = ENGYC
   LWRadCanG              = LWRadCanG+LWRadCanopy_pft(NZ)
+
+  if(ldo_sp_mode)return
+  Canopy_NEE_col         = Canopy_NEE_col+CO2NetFix_pft(NZ)
   CanopyLeafArea_col     = CanopyLeafArea_col+CanopyLeafArea_pft(NZ)
   StemArea_col           = StemArea_col+CanopyStemArea_pft(NZ)
 

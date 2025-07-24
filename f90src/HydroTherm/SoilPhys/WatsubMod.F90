@@ -798,7 +798,7 @@ module WatsubMod
 
         !-----------------------------------
         ! configure water table info, should the exchange to water table be limited only to boundary grids?
-        call Config4WaterTableDrain(L,NY,NX,DPTHH,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL)
+        call Config4WaterTableDrain(I,J,L,NY,NX,DPTHH,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL)
 
         call Config4TileDrainage(L,NY,NX,DPTHH,DoMicPDischarg2Tile,DoMacPDischarg2Tile)
         !-----------------------------------
@@ -1517,10 +1517,10 @@ module WatsubMod
   end subroutine Config4TileDrainage
 !------------------------------------------------------------------
 
-  subroutine Config4WaterTableDrain(L,NY,NX,DPTHH,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL)
+  subroutine Config4WaterTableDrain(I,J,L,NY,NX,DPTHH,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL)
 
   implicit none
-  integer , intent(in) :: L,NY,NX
+  integer , intent(in) :: I,J,L,NY,NX
   real(r8), intent(in):: DPTHH  !depth to layer macropore water
   logical , intent(out):: DoMicPDischarg2ExtWTBL
   logical , intent(out):: DoMacPDischarg2ExtWTBL
@@ -1559,6 +1559,7 @@ module WatsubMod
   ELSE
     DoMicPDischarg2ExtWTBL=.false.
   ENDIF
+!  print*,I*100+J,'IDWaterTable_col(NY,NX)',IDWaterTable_col(NY,NX),ExtWaterTable_col(NY,NX),DoMicPDischarg2ExtWTBL,L  
 !
 !     IDENTIFY CONDITIONS FOR MACROPORE DISCHARGE TO WATER TABLE
 !
@@ -2236,7 +2237,7 @@ module WatsubMod
     .AND. (AirfMicP.GT.ZEROS2(N2,N1) .OR. SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)    & !able to accept water
     .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                         & !source grid is unsaturated
     .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN                                 !water exchange with watertable enabled
-
+    
     PSISWD = XN*0.005_r8*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+&
       mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
