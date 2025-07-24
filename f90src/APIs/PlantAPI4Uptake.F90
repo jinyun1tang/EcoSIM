@@ -53,34 +53,44 @@ implicit none
   NP0_col(NY,NX)=1
 
   !sent variables also modified
-  plt_site%NumActivePlants         = NumActivePlants_col(NY,NX)      !number of active plants in the column
-  plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)            !total plant population in the column
-  plt_site%ZERO                    = ZERO                            !numerical threshold
-  plt_site%ZERO2                   = ZERO2                           !numerical threshold
-  plt_morph%LeafStalkArea_col      = LeafStalkArea_col(NY,NX)        !leaf+stalk area, set as phenology input 
-  plt_morph%CanopyLeafArea_col     = CanopyLeafArea_col(NY,NX)       !canopy leaf area, set as phenolgoy input 
-  plt_site%NL                      = NL_col(NY,NX)                   !lower node number of the total vertical number of soil layers used for water uptake
-  plt_site%NP0                     = NP0_col(NY,NX)                  !total number of plants in the column
-  plt_site%MaxNumRootLays          = NL_col(NY,NX)                   !assume roots exist in all layers
-  plt_site%NP                      = NP_col(NY,NX)                   !total number of plants in the column, set to NP0_col for simplicity
-  plt_site%NU                      = NU_col(NY,NX)                   !top soil layer indices
-  plt_site%NK                      = NK_col(NY,NX)                   !total layers with roots, can be set to NL_col
-  plt_site%ALT                     = ALT_col(NY,NX)                  !column altitude [m]  
-  plt_ew%TKSnow                    = TKSnow_snvr(1,NY,NX)            !surface snow temperature 
-  plt_ew%SnowDepth                 = SnowDepth_col(NY,NX)            !total snow depth
-  plt_ew%AbvCanopyBndlResist_col   = AbvCanopyBndlResist_col(NY,NX)  !aboveground canopy resistance, computed in the radiation code
-  plt_ew%TairK                     = TairK_col(NY,NX)                !air temperature
-  plt_ew%RoughHeight               = RoughHeight_col(NY,NX)          !computed in the radiation coce
-  plt_morph%CanopyHeight_col       = CanopyHeight_col(NY,NX)         !canopy height as prescribed input
-  plt_rad%LWRadGrnd_col            = LWRadGrnd_col(NY,NX)            !computed in surface energy model
-  plt_rad%LWRadSky_col             = LWRadSky_col(NY,NX)             !computed in surface energy model
-  plt_ew%VPA                       = VPA_col(NY,NX)                  !vapor pressure as climate input
-  plt_ew%RIB                       = RIB_col(NY,NX)                  !richardson stability number, computed in surface radiation model
-  plt_site%ZEROS2                  = ZEROS2(NY,NX)                   !numerical threshold
-  plt_ew%Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col(NY,NX)    !initialized to zero, but is needed iterately to update heat source for surface energy balance calculation?
-  plt_ew%Air_Heat_Latent_store_col = Air_Heat_Latent_store_col(NY,NX)  !initialized to zero, but is needed iteratively for surface energy calculation  
-  plt_ew%ZERO4PlantDisplace_col    = ZERO4PlantDisplace_col(NY,NX)
-
+  plt_site%NumActivePlants         = NumActivePlants_col(NY,NX)        !number of active plants in the column
+  plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column
+  plt_site%ZERO                    = ZERO                              !numerical threshold
+  plt_site%ZERO2                   = ZERO2                             !numerical threshold
+  plt_morph%LeafStalkArea_col      = LeafStalkArea_col(NY,NX)          !leaf+stalk area,  set as phenology input
+  plt_morph%CanopyLeafArea_col     = CanopyLeafArea_col(NY,NX)         !canopy leaf area, set as phenolgoy input
+  plt_site%NL                      = NL_col(NY,NX)                     !lower node number of the total vertical number of soil layers used for water uptake
+  plt_site%NP0                     = NP0_col(NY,NX)                    !total number of plants in the column
+  plt_site%MaxNumRootLays          = NL_col(NY,NX)                     !assume roots exist in all layers
+  plt_site%NP                      = NP_col(NY,NX)                     !total number of plants in the column, set to NP0_col for simplicity
+  plt_site%NU                      = NU_col(NY,NX)                     !top soil layer indices
+  plt_site%NK                      = NK_col(NY,NX)                     !total layers with roots,  can be set to NL_col
+  plt_site%ALT                     = ALT_col(NY,NX)                    !column altitude [m]
+  plt_ew%TKSnow                    = TKSnow_snvr(1,NY,NX)              !surface snow temperature
+  plt_ew%SnowDepth                 = SnowDepth_col(NY,NX)              !total snow depth
+  plt_ew%AbvCanopyBndlResist_col   = AbvCanopyBndlResist_col(NY,NX)    !aboveground canopy resistance,  computed in the radiation code
+  plt_ew%TairK                     = TairK_col(NY,NX)                  !air temperature
+  plt_ew%RoughHeight               = RoughHeight_col(NY,NX)            !computed in the radiation coce
+  plt_morph%CanopyHeight_col       = CanopyHeight_col(NY,NX)           !canopy height as prescribed input
+  plt_rad%LWRadGrnd_col            = LWRadGrnd_col(NY,NX)              !computed in surface energy model
+  plt_rad%LWRadSky_col             = LWRadSky_col(NY,NX)               !computed in surface energy model
+  plt_ew%VPA                       = VPA_col(NY,NX)                    !vapor pressure as climate input
+  plt_ew%RIB                       = RIB_col(NY,NX)                    !richardson stability number,  computed in surface radiation model
+  plt_site%ZEROS2                  = ZEROS2(NY,NX)                     !numerical threshold
+  plt_ew%Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col(NY,NX)    !initialized to zero,  but is needed iterately to update heat source for surface energy balance calculation?
+  plt_ew%Air_Heat_Latent_store_col = Air_Heat_Latent_store_col(NY,NX)  !initialized to zero,  but is needed iteratively for surface energy calculation
+  plt_ew%ZERO4PlantDisplace_col    = ZERO4PlantDisplace_col(NY,NX)     !numerical threshold
+  plt_rad%Eco_NetRad_col           = Eco_NetRad_col(NY,NX)             !net ecosystem radiation, updated through model iterations, reset to zero in hour1.F90
+  plt_ew%Eco_Heat_Sens_col         = Eco_Heat_Sens_col(NY,NX)          !whole ecosystem sensible heat, updated iteratively, reset to zero in hour1.F90
+  plt_ew%Eco_Heat_Latent_col       = Eco_Heat_Latent_col(NY,NX)        !whole ecosystem latent heat, updated iterately, reset to zero in hour1.F90
+  plt_ew%Eco_Heat_GrndSurf_col     = Eco_Heat_GrndSurf_col(NY,NX)      !heat to ground surface, updated iterately, reset to zero in hour1.F90
+  plt_ew%CanopyWat_col             = CanopyWat_col(NY,NX)              !canopy water content, updated iterately
+  plt_ew%WatHeldOnCanopy_col       = WatHeldOnCanopy_col(NY,NX)        !water held on canopy, updated iterately
+  plt_ew%QVegET_col                = QVegET_col(NY,NX)                 !canopy evapotranspiration, reset to zero in hour1.F90
+  plt_ew%VapXAir2Canopy_col        = VapXAir2Canopy_col(NY,NX)         !canopy evaporation, reset to zero in hour1.F90
+  plt_ew%CanopyHeatStor_col        = CanopyHeatStor_col(NY,NX)         !canopy heat storage, reset to zero in hour1.F90
+  plt_ew%HeatFlx2Canopy_col        = HeatFlx2Canopy_col(NY,NX)         !heat flux to canopy, reset to zero in hour1.F90
+  plt_ew%LWRadCanG                 = LWRadCanG_col(NY,NX)              !longwave radiation onto groud, reset to zero in hour1.F90
   DO L=1,NK_col(NY,NX)
    plt_soilchem%VLSoilPoreMicP_vr(L)      = VLSoilPoreMicP_vr(L,NY,NX)             !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered 
    plt_ew%ElvAdjstedSoilH2OPSIMPa_vr(L)   = ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX)    !elevation adjusted soil matric water potential, MPa
@@ -105,13 +115,15 @@ implicit none
   ENDDO
 
   DO NZ=1,NP0_col(NY,NX)
+    Myco_pft(NZ,NY,NX)=1
     plt_ew%DeltaTKC_pft(NZ)                 = DeltaTKC_pft(NZ,NY,NX)
     if(LeafStalkArea_pft(NZ,NY,NX)>ZERO4LeafVar_pft(NZ,NY,NX))then
       IsPlantActive_pft(NZ,NY,NX)=iActive
     else
       IsPlantActive_pft(NZ,NY,NX)=iDormant
     endif
-    Myco_pft(NZ,NY,NX)=1
+    plt_ew%ETCanopy_CumYr_pft(NZ)      = ETCanopy_CumYr_pft(NZ,NY,NX)
+    plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)  = 1
     plt_morph%LeafStalkArea_pft(NZ)        = LeafStalkArea_pft(NZ,NY,NX)      !pft leaf+stalk area
     plt_morph%HypoctoHeight_pft(NZ)        = HypoctoHeight_pft(NZ,NY,NX)      !(approximately) plant height
@@ -129,7 +141,7 @@ implicit none
     plt_biom%ZERO4Groth_pft(NZ)             = ZERO4Groth_pft(NZ,NY,NX)
     plt_photo%RCS_pft(NZ)                   = RCS_pft(NZ,NY,NX)                    !read in pft parameter
     plt_photo%CuticleResist_pft(NZ)         = CuticleResist_pft(NZ,NY,NX)          !read in pft parameter
-    plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)       !set based on read in pft parameter
+    plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)       !set based on read in pft parameter    
     DO N=1,Myco_pft(NZ,NY,NX)
       plt_morph%Root1stMaxRadius_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%Root2ndMaxRadius_pft(N,NZ) = Root2ndMaxRadius_pft(N,NZ,NY,NX)
@@ -208,8 +220,20 @@ implicit none
 
   Air_Heat_Latent_store_col(NY,NX) = plt_ew%Air_Heat_Latent_store_col
   Air_Heat_Sens_store_col(NY,NX)   = plt_ew%Air_Heat_Sens_store_col
-
+  Eco_NetRad_col(NY,NX)            = plt_rad%Eco_NetRad_col
+  Eco_Heat_Latent_col(NY,NX)       = plt_ew%Eco_Heat_Latent_col
+  Eco_Heat_Sens_col(NY,NX)         = plt_ew%Eco_Heat_Sens_col
+  Eco_Heat_GrndSurf_col(NY,NX)     = plt_ew%Eco_Heat_GrndSurf_col
+  CanopyWat_col(NY,NX)             = plt_ew%CanopyWat_col
+  WatHeldOnCanopy_col(NY,NX)       = plt_ew%WatHeldOnCanopy_col
+  QVegET_col(NY,NX)                = plt_ew%QVegET_col
+  VapXAir2Canopy_col(NY,NX)        = plt_ew%VapXAir2Canopy_col
+  CanopyHeatStor_col(NY,NX)        = plt_ew%CanopyHeatStor_col
+  HeatFlx2Canopy_col(NY,NX)        = plt_ew%HeatFlx2Canopy_col
+  LWRadCanG_col(NY,NX)             = plt_ew%LWRadCanG
   DO NZ=1,NP0_col(NY,NX)
+    ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)  
+    ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)  
     DeltaTKC_pft(NZ,NY,NX)           = plt_ew%DeltaTKC_pft(NZ)
     EvapTransLHeat_pft(NZ,NY,NX)     = plt_ew%EvapTransLHeat_pft(NZ)
     HeatXAir2PCan_pft(NZ,NY,NX)      = plt_ew%HeatXAir2PCan_pft(NZ)
@@ -223,6 +247,7 @@ implicit none
     PSICanopyOsmo_pft(NZ,NY,NX)      = plt_ew%PSICanopyOsmo_pft(NZ)
     PSICanopyTurg_pft(NZ,NY,NX)      = plt_ew%PSICanopyTurg_pft(NZ)
     CanPStomaResistH2O_pft(NZ,NY,NX) = plt_photo%CanPStomaResistH2O_pft(NZ)
+    TdegCCanopy_pft(NZ,NY,NX)        = plt_ew%TdegCCanopy_pft(NZ)    
     DO L=1,NK_col(NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
         PSIRootOSMO_vr(N,L,NZ,NY,NX)        = plt_ew%PSIRootOSMO_vr(N,L,NZ)

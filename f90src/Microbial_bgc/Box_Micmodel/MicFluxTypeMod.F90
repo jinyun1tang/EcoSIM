@@ -43,13 +43,14 @@ implicit none
   real(r8) :: NetNH4Mineralize                !>0 uptake/ASSIMILATION
   real(r8) :: NetPO4Mineralize                !>0 uptake/ASSIMILATION
   real(r8) :: RNiDemand
-  real(r8) :: RPiDemand
+  real(r8) :: RPiDemand  
   real(r8) :: TRDOE2DIE(1:NumPlantChemElms)              !cumulative conversion of organic element to inorganic element  
   real(r8) :: tRHydlySOM(1:NumPlantChemElms)
   real(r8) :: tRHydlyBioReSOM(1:NumPlantChemElms)
   real(r8) :: tRHydlySoprtOM(1:NumPlantChemElms)
   real(r8) :: RNO2DmndSoilChemoPrev
-  real(r8) :: RNO2DmndBandChemoPrev
+  real(r8) :: RNO2DmndBandChemoPrev  
+  real(r8), allocatable :: RGrowthRespAutor(:)      !growth respiration of autotrophs
   real(r8), allocatable :: REcoDOMProd(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
   real(r8), allocatable :: RNH3OxidAutor(:)
@@ -113,7 +114,7 @@ implicit none
   real(r8), allocatable :: RAcetateUptkHeterPrev(:,:)  
   real(r8), allocatable :: RNH3OxidAutorPrev(:) 
   real(r8), allocatable :: RNH3OxidAutorBandPrev(:)
-
+  real(R8), allocatable :: RGrowthRespHeter(:,:)  !growth respiraiton of heterotrophs
   real(r8), allocatable :: RNH4DmndLitrHeterPrev(:,:);
   real(r8), allocatable :: RNO3DmndLitrHeterPrev(:,:)   
   real(r8), allocatable :: RH2PO4DmndLitrHeterPrev(:,:) 
@@ -150,6 +151,7 @@ implicit none
   NumHetetr1MicCmplx      = micpar%NumHetetr1MicCmplx
   NumMicrobAutrophCmplx   = micpar%NumMicrobAutrophCmplx
 
+  allocate(this%RGrowthRespHeter(1:NumHetetr1MicCmplx,1:jcplx));     this%RGrowthRespHeter=0._r8
   allocate(this%RNH4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx)) ;this%RNH4DmndSoilHeterPrev=0._r8
   allocate(this%RNH4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:jcplx)) ;this%RNH4DmndBandHeterPrev=0._r8
   allocate(this%RNO3DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx)) ;this%RNO3DmndSoilHeterPrev=0._r8
@@ -171,7 +173,7 @@ implicit none
   allocate(this%RH1PO4UptkSoilAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH1PO4UptkSoilAutorPrev=0._r8
   allocate(this%RH1PO4UptkBandAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH1PO4UptkBandAutorPrev=0._r8
   allocate(this%RO2DmndAutortPrev(1:NumMicrobAutrophCmplx))       ;this%RO2DmndAutortPrev=0._r8
-
+  allocate(this%RGrowthRespAutor(1:NumMicrobAutrophCmplx));this%RGrowthRespAutor=0._r8
   allocate(this%RHydlySOCK(1:jcplx)); this%RHydlySOCK=0._r8
   allocate(this%REcoUptkSoilO2M(NPH));this%REcoUptkSoilO2M = spval
   allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
@@ -239,8 +241,10 @@ implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
+  this%RGrowthRespAutor       = 0._r8
+  this%RGrowthRespHeter       = 0._r8
   this%TRDOE2DIE              = 0._r8
-  this%REcoUptkSoilO2M           = 0._r8
+  this%REcoUptkSoilO2M        = 0._r8
   this%REcoDOMProd            = 0._r8
   this%RO2DmndHetert          = 0._r8
   this%RDOCUptkHeter          = 0._r8
@@ -302,6 +306,9 @@ implicit none
   use abortutils, only : destroy
   implicit none
   class(micfluxtype) :: this
+
+  call destroy(this%RGrowthRespAutor)
+  call destroy(this%RGrowthRespHeter)
   call destroy(this%RHydlySOCK)
   call destroy(this%REcoDOMProd)
   call destroy(this%RNH3OxidAutor)

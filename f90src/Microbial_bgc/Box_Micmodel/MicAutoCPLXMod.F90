@@ -179,8 +179,7 @@ module MicAutoCPLXMod
 !     AUTOTROPHIC DENITRIFICATION
 !
   IF(N.EQ.mid_AmmoniaOxidBacter .AND. RO2Dmnd4RespAutor(NGL).GT.0.0_r8 .AND. (.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
-    call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,&
-      naqfdiag,nmicf,nmics,micflx)
+    call AutotrophDenitrificCatabolism(NGL,N,XCO2,VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
   ELSE
     RNO3UptkAutor(NGL)         = 0.0_r8
     RNO2ReduxAutorSoil(NGL)    = 0.0_r8
@@ -194,10 +193,10 @@ module MicAutoCPLXMod
     FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,nmicf,nmics)
 !
-  call GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,RGrowthRespAutor,&
+  call GatherAutotrophRespiration(NGL,N,RMOMK,micfor,micstt,micflx%RGrowthRespAutor(NGL),&
     RMaintDefcitcitAutor,RMaintRespAutor,nmicf,nmics)
 !
-  call GatherAutotrophAnabolicFlux(I,J,NGL,N,ECHZ,FGOCP,FGOAP,RGrowthRespAutor,&
+  call GatherAutotrophAnabolicFlux(I,J,NGL,N,ECHZ,FGOCP,FGOAP,micflx%RGrowthRespAutor(NGL),&
     RMaintDefcitcitAutor,RMaintRespAutor,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
 
   end associate

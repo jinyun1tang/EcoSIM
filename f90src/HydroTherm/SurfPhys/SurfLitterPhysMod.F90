@@ -45,7 +45,8 @@ implicit none
 
   !if there is heat-wise significant litter layer
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
-    if(SoilOrgM_vr(ielmc,0,NY,NX).GT.1.e-2_r8 .or. XVLMobileWaterLitR_col(NY,NX) > 0._r8)then
+
+    if(SoilOrgM_vr(ielmc,0,NY,NX).GT.1.e-2_r8 .or. XVLMobileWaterLitR_col(NY,NX) .GT. 0._r8)then
       FracSurfBareSoil_col(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA_3D(3,0,NY,NX))),&
         XVLMobileWaterLitR_col(NY,NX)/VLWatHeldCapSurf_col(NY,NX)))
     else
@@ -130,7 +131,6 @@ implicit none
   !
   ! THERMAL CONDUCTIVITY BETWEEN SURFACE RESIDUE AND SOIL SURFACE
   !
-  
   IF(FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
   ! litter layer
   ! albedo
@@ -296,6 +296,7 @@ implicit none
 
   D5000: DO NN=1,NPR
     !significant litter presence
+
     IF(VLHeatCapcityLitR2.GT.VHeatCapLitRMin_col(NY,NX))THEN
       !
       ! AERODYNAMIC RESISTANCE ABOVE RESIDUE INCLUDING
@@ -527,6 +528,7 @@ implicit none
   VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
 
   THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)
+  
   IF(VHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre          = TKS_vr(0,NY,NX)

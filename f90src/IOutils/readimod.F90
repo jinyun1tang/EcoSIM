@@ -312,7 +312,6 @@ module readiMod
       RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
-
       DH_col(NY,NX)                = DHI(NX)
       DV_col(NY,NX)                = DVI(NY)
       CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
@@ -494,18 +493,18 @@ module readiMod
     DO  NX=NH1,NH2
       DO  NY=NV1,NV2
         IF (NX/=NH1 .OR. NY/=NV1) THEN
-!
-!     SURFACE PROPERTIES
-!
-!     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
-!     SoilAlbedo=wet soil albedo
-!     PH=litter pH
-!     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
-!     IXTYP=surface litter type:1=plant,2=manure
-!     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
-!     NL1,NL2=number of additional layers below NJ with,without data in file
-!     ISOILR_col=natural(0),reconstructed(1) soil profile
-!
+          !
+          !     SURFACE PROPERTIES
+          !
+          !     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
+          !     SoilAlbedo=wet soil albedo
+          !     PH=litter pH
+          !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
+          !     IXTYP=surface litter type:1=plant,2=manure
+          !     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
+          !     NL1,NL2=number of additional layers below NJ with,without data in file
+          !     ISOILR_col=natural(0),reconstructed(1) soil profile
+          !
           PSIAtFldCapacity_col(NY,NX)   = PSIAtFldCapacity_col(NV1,NH1)
           PSIAtWiltPoint_col(NY,NX)     = PSIAtWiltPoint_col(NV1,NH1)
           SoilAlbedo_col(NY,NX)     = SoilAlbedo_col(NV1,NH1)
@@ -527,18 +526,18 @@ module readiMod
           NU_col(NY,NX)                 =NU_col(NV1,NH1)
           NK_col(NY,NX)                 = NK_col(NV1,NH1)
           NM(NY,NX)                 = NM(NV1,NH1)
-!  the extra soil layer below root zone cannot be greater than what is allowed
+          !  the extra soil layer below root zone cannot be greater than what is allowed
           NLI_col(NY,NX) = NLI_col(NV1,NH1)
           NL_col(NY,NX)  = NLI_col(NV1,NH1)
         ENDIF
 
-!
-!     PHYSICAL PROPERTIES
-!
-!     CDPTH=depth to bottom (m) > 0
-!     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
-!
-!
+        !
+        !     PHYSICAL PROPERTIES
+        !
+        !     CDPTH=depth to bottom (m) > 0
+        !     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
+        !
+        !
         iPondFlag_col(NY,NX)=.false.
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU_col(NY,NX),NM(NY,NX)
@@ -603,10 +602,11 @@ module readiMod
             RSC_vr(k_manure,L,NY,NX)     = RSC_vr(k_manure,L,NV1,NH1)
             RSN_vr(k_manure,L,NY,NX)     = RSN_vr(k_manure,L,NV1,NH1)
             RSP_vr(k_manure,L,NY,NX)     = RSP_vr(k_manure,L,NV1,NH1)
-
           ENDDO
         ENDIF
+        
         DO L=1,NL_col(NY,NX)
+
           if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
             if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
               write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
@@ -618,6 +618,7 @@ module readiMod
             endif
           endif  
         ENDDO
+
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
@@ -626,18 +627,18 @@ module readiMod
 !        RSP_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_litr,0,NY,NX))
 
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
-!
-!     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
-!
-!     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
-!
+        !
+        !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
+        !
+        !     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
+        !
         call ComputeSoilHydroPars(NY,NX,NU_col(NY,NX),NM(NY,NX))
 
-!
-!     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
-!     below is for soil repacking, whence NU>1
-!     root zone from NU to NM, why use 0.025?
-!
+        !
+        !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
+        !     below is for soil repacking, whence NU>1
+        !     root zone from NU to NM, why use 0.025?
+        !
         IF(NU_col(NY,NX).GT.1)THEN
           DO  L=NU_col(NY,NX)-1,0,-1
             IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
@@ -703,29 +704,29 @@ module readiMod
             ENDIF
           ENDDO
         ENDIF
-!
-!     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
-!     depth of layer (L-1) is at the middle between that of layer L-2 and L
+        !
+        !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
+        !     depth of layer (L-1) is at the middle between that of layer L-2 and L
         if(lverb)write(*,*)'SetDeepSoil'
         call SetDeepSoil(NY,NX,NM(NY,NX),JZ)
 
-!
-!   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
-!
-!   FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
-!   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
-!   CSAND_vr,CSILT,CCLAY_vr=sand,silt,clay content converted to g Mg-1
-!   CORGC,CORGR=SOC,POC converted to g Mg-1
-!   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
-!   CNH4...=solute concentrations converted to mol Mg-1
-!   SoiBulkDensityt0_vr: initial bulk density
-
+        !
+        !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
+        !
+        !   FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
+        !   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
+        !   CSAND_vr,CSILT,CCLAY_vr=sand,silt,clay content converted to g Mg-1
+        !   CORGC,CORGR=SOC,POC converted to g Mg-1
+        !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
+        !   CNH4...=solute concentrations converted to mol Mg-1
+        !   SoiBulkDensityt0_vr: initial bulk density
+        
         DO  L=1,NL_col(NY,NX)
-  !   SoilFracAsMacP: macropore fraction
+        !   SoilFracAsMacP: macropore fraction
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
           IF(isclose(SoilBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
-  !     fraction of soil as micropore
+        !     fraction of soil as micropore
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
   !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
   !  both macropores and micropores    
@@ -739,7 +740,7 @@ module readiMod
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI_vr(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)
-  ! soil texture is reported based on mass basis soley for mineral component of the soil
+        ! soil texture is reported based on mass basis soley for mineral component of the soil
           corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
           CSAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*corrector
           CSILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*corrector
@@ -765,12 +766,12 @@ module readiMod
           CFEOH_vr(L,NY,NX)=CFEOH_vr(L,NY,NX)/56.0_r8
           CCACO_vr(L,NY,NX)=CCACO_vr(L,NY,NX)/40.0_r8
           CCASO_vr(L,NY,NX)=CCASO_vr(L,NY,NX)/40.0_r8
-  !
-  !     ESTIMATE SON,SOP,CEC IF UNKNOWN
-  !     BIOCHEMISTRY 130:117-131
-  !
+        !
+        !     ESTIMATE SON,SOP,CEC IF UNKNOWN
+        !     BIOCHEMISTRY 130:117-131
+        !
           IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
-  !  default ORGN parameterization
+        !  default ORGN parameterization
             CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
               8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
@@ -790,6 +791,7 @@ module readiMod
       ENDDO
     ENDDO
   ENDDO
+
   write(*,*)'ieadTo',RSC_vr(1:micpar%NumOfLitrCmplxs,0,1,1)
 
   end associate

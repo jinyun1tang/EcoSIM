@@ -801,9 +801,9 @@ contains
     +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/SnowVolume
 
   RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
-  RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)    !incoming radiation, short + longwave
+  RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)                            !incoming radiation, short + longwave
   LWRadSno1            = LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(1,NY,NX)**4/real(NPS,kind=r8)         !emitting longwave radiation,
-  RadNet2Sno2          = RFLX0-LWRadSno1                            !net radiation
+  RadNet2Sno2          = RFLX0-LWRadSno1                                              !net radiation
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySnow
 
   !
@@ -864,10 +864,12 @@ contains
 !     HeatNetFlx2Sno1=storage heat flux
 !     SnoFall,Rainfall,IceFall=snow,water,ice input to snowpack
 !     HeatSnofall2Snow=convective heat from snow,water,ice input to snowpack
-!  
+! 
+
   HeatSensAir2Sno2 = CdSnoHSens*(TKQ_col(NY,NX)-TKSnow1_snvr(1,NY,NX))
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
   HeatNetFlx2Sno1      = RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2
+
   HeatNetFlx2Sno2      = HeatNetFlx2Sno1+HeatAdvAir2SnoByEvap2
   Radnet2Snow          = Radnet2Snow+RadNet2Sno2
   LatentHeatAir2Sno    = LatentHeatAir2Sno+LatentHeatAir2Sno2
@@ -882,6 +884,7 @@ contains
   SnofallRain                    = Rainfall+EVAPW2
   Snofallice                     = IceFall
   NetHeatAir2Snow                = HeatSnofall2Snow+HeatNetFlx2Sno2
+
   SnoX2SnoLay_snvr(1,NY,NX)      = SnofallDry
   WatX2SnoLay_snvr(1,NY,NX)      = SnofallRain
   IceX2SnoLay_snvr(1,NY,NX)      = Snofallice
