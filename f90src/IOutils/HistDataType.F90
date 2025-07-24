@@ -210,11 +210,7 @@ implicit none
   real(r8),pointer   :: h1D_CANDew_ptc(:)
   real(r8),pointer   :: h1D_VHeatCap_litr_col(:)
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)    
-  real(r8),pointer   :: h2D_SOC_Cp1_vr(:,:)  
-  real(r8),pointer   :: h2D_SOC_Cp2_vr(:,:)  
-  real(r8),pointer   :: h2D_SOC_Cp3_vr(:,:)  
-  real(r8),pointer   :: h2D_SOC_Cp4_vr(:,:)  
-  real(r8),pointer   :: h2D_SOC_Cp5_vr(:,:)          
+  real(r8),pointer   :: h3D_SOC_Cps_vr(:,:,:)  
   real(r8),pointer   :: h2D_tSOC_vr(:,:)      
   real(r8),pointer   :: h2D_microbC_vr(:,:)
   real(r8),pointer   :: h2D_microbN_vr(:,:)
@@ -446,21 +442,9 @@ implicit none
   real(r8),pointer   :: h2D_RDECOMPC_BReSOM_vr(:,:)
   real(r8),pointer   :: h2D_RDECOMPC_SorpSOM_vr(:,:)
   real(r8),pointer   :: h2D_MicrobAct_vr(:,:)
-  real(r8),pointer   :: h2D_SOMHydrylScalCp1_vr(:,:)
-  real(r8),pointer   :: h2D_SOMHydrylScalCp2_vr(:,:)
-  real(r8),pointer   :: h2D_SOMHydrylScalCp3_vr(:,:)
-  real(r8),pointer   :: h2D_SOMHydrylScalCp4_vr(:,:)
-  real(r8),pointer   :: h2D_SOMHydrylScalCp5_vr(:,:)        
-  real(r8),pointer   :: h2D_MicrobActCp1_vr(:,:)
-  real(r8),pointer   :: h2D_MicrobActCp2_vr(:,:)
-  real(r8),pointer   :: h2D_MicrobActCp3_vr(:,:)
-  real(r8),pointer   :: h2D_MicrobActCp4_vr(:,:)
-  real(r8),pointer   :: h2D_MicrobActCp5_vr(:,:)
-  real(r8),pointer   :: h2D_HydrolCSOMCp1_vr(:,:)
-  real(r8),pointer   :: h2D_HydrolCSOMCp2_vr(:,:)
-  real(r8),pointer   :: h2D_HydrolCSOMCp3_vr(:,:)
-  real(r8),pointer   :: h2D_HydrolCSOMCp4_vr(:,:)
-  real(r8),pointer   :: h2D_HydrolCSOMCp5_vr(:,:)      
+  real(r8),pointer   :: h3D_SOMHydrylScalCps_vr(:,:,:)
+  real(r8),pointer   :: h3D_MicrobActCps_vr(:,:,:)
+  real(r8),pointer   :: h3D_HydrolCSOMCps_vr(:,:,:)
   real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)   
   real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   
   real(r8),pointer   :: h2D_faculDenitP_vr(:,:)  
@@ -513,8 +497,8 @@ implicit none
   real(r8),pointer   :: h2D_HeatUptk_vr(:,:)   
   real(r8),pointer   :: h2D_HeatFlow_vr(:,:)   
   real(r8),pointer   :: h2D_VSPore_vr(:,:)
-  real(r8),pointer   :: h2D_VSM_vr    (:,:)    
-  real(r8),pointer   :: h2D_VSICE_vr    (:,:)   
+  real(r8),pointer   :: h2D_VSM_vr(:,:)    
+  real(r8),pointer   :: h2D_VSICE_vr(:,:)   
   real(r8),pointer   :: h2D_PSI_vr(:,:)        
   real(r8),pointer   :: h2D_PsiO_vr(:,:)
   real(r8),pointer   :: h2D_cNH4t_vr(:,:)                                                     
@@ -555,7 +539,7 @@ implicit none
   real(r8), pointer :: data1d_ptr(:)
   integer , pointer :: idata1d_ptr(:)
   real(r8), pointer :: data2d_ptr(:,:)
-  integer :: nbr
+  integer :: nbr,jj
   character(len=32) :: fieldname
 
   beg_col=1;end_col=bounds%ncols
@@ -974,29 +958,13 @@ implicit none
   allocate(this%h2D_RDECOMPC_SorpSOM_vr(beg_col:end_col,1:JZ));this%h2D_RDECOMPC_SorpSOM_vr(:,:)=spval
   allocate(this%h2D_MicrobAct_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobAct_vr(:,:)=spval
 
-  allocate(this%h2D_MicrobActCp1_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp1_vr(:,:)=spval
-  allocate(this%h2D_MicrobActCp2_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp2_vr(:,:)=spval
-  allocate(this%h2D_MicrobActCp3_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp3_vr(:,:)=spval
-  allocate(this%h2D_MicrobActCp4_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp4_vr(:,:)=spval
-  allocate(this%h2D_MicrobActCp5_vr(beg_col:end_col,1:JZ)); this%h2D_MicrobActCp5_vr(:,:)=spval
+  allocate(this%h3D_MicrobActCps_vr(beg_col:end_col,1:JZ,jcplx)); this%h3D_MicrobActCps_vr(:,:,:)=spval
 
-  allocate(this%h2D_SOMHydrylScalCp1_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp1_vr(:,:)=spval
-  allocate(this%h2D_SOMHydrylScalCp2_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp2_vr(:,:)=spval
-  allocate(this%h2D_SOMHydrylScalCp3_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp3_vr(:,:)=spval
-  allocate(this%h2D_SOMHydrylScalCp4_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp4_vr(:,:)=spval
-  allocate(this%h2D_SOMHydrylScalCp5_vr(beg_col:end_col,1:JZ));this%h2D_SOMHydrylScalCp5_vr(:,:)=spval
+  allocate(this%h3D_SOMHydrylScalCps_vr(beg_col:end_col,1:JZ,jcplx));this%h3D_SOMHydrylScalCps_vr(:,:,:)=spval
 
-  allocate(this%h2D_SOC_Cp1_vr(beg_col:end_col,1:JZ)); this%h2D_SOC_Cp1_vr(:,:)=spval
-  allocate(this%h2D_SOC_Cp2_vr(beg_col:end_col,1:JZ)); this%h2D_SOC_Cp2_vr(:,:)=spval
-  allocate(this%h2D_SOC_Cp3_vr(beg_col:end_col,1:JZ)); this%h2D_SOC_Cp3_vr(:,:)=spval
-  allocate(this%h2D_SOC_Cp4_vr(beg_col:end_col,1:JZ)); this%h2D_SOC_Cp4_vr(:,:)=spval
-  allocate(this%h2D_SOC_Cp5_vr(beg_col:end_col,1:JZ)); this%h2D_SOC_Cp5_vr(:,:)=spval
+  allocate(this%h3D_SOC_Cps_vr(beg_col:end_col,1:JZ,jcplx)); this%h3D_SOC_Cps_vr(:,:,:)=spval
 
-  allocate(this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp1_vr(:,:)=spval
-  allocate(this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp2_vr(:,:)=spval
-  allocate(this%h2D_HydrolCSOMCp3_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp3_vr(:,:)=spval
-  allocate(this%h2D_HydrolCSOMCp4_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp4_vr(:,:)=spval
-  allocate(this%h2D_HydrolCSOMCp5_vr(beg_col:end_col,1:JZ)); this%h2D_HydrolCSOMCp5_vr(:,:)=spval
+  allocate(this%h3D_HydrolCSOMCps_vr(beg_col:end_col,1:JZ,jcplx)); this%h3D_HydrolCSOMCps_vr(:,:,:)=spval
 
   allocate(this%h1D_RDECOMPC_SOM_litr_col(beg_col:end_col)); this%h1D_RDECOMPC_SOM_litr_col(:)=spval
   allocate(this%h1D_RDECOMPC_BReSOM_litr_col(beg_col:end_col));this%h1D_RDECOMPC_BReSOM_litr_col(:)=spval
@@ -1519,11 +1487,11 @@ implicit none
 
   data1d_ptr => this%h1D_SOIL_LE_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOIL_LE_col',units='W/m2',avgflag='A',&
-    long_name='Latent heat flux into ground surface',ptr_col=data1d_ptr)      
+    long_name='Latent heat flux into ground surface (exclude plant canopy)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_H_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOIL_H_col',units='W/m2',avgflag='A',&
-    long_name='Sensible heat flux into ground surface',ptr_col=data1d_ptr)      
+    long_name='Sensible heat flux into ground surface (exclude plant canopy)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_G_col(beg_col:end_col)  
   call hist_addfld1d(fname='SOIL_G_col',units='W/m2',avgflag='A',&
@@ -2780,105 +2748,27 @@ implicit none
     long_name='Layer resolved respiration-based microbial acitivity for hydrolysis',&
     ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_HydrolCSOMCp1_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='HydrolCSOMCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in woody cplx',&
-    ptr_col=data2d_ptr,default='inactive')       
+  DO jj=1,jcplx
+    data2d_ptr =>  this%h3D_HydrolCSOMCps_vr(beg_col:end_col,1:JZ,jj)
+    call hist_addfld2d(fname='HydrolCSOM_'//trim(micpar%cplxname(jj))//'_cplx_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+      long_name='Layer resolved carbon hydrolysis in '//trim(micpar%cplxname(jj))//' complex',&
+      ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_SOC_Cp1_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOC_Cp1_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon in woody complex',&
-    ptr_col=data2d_ptr,default='inactive')       
+    data2d_ptr =>  this%h3D_SOC_Cps_vr(beg_col:end_col,1:JZ,jj)
+    call hist_addfld2d(fname='SOC_'//trim(micpar%cplxname(jj))//'_cplx_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
+      long_name='Layer resolved carbon in '//trim(micpar%cplxname(jj))//' complex',&
+      ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_SOC_Cp2_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOC_Cp2_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon in fine litter complex',&
-    ptr_col=data2d_ptr,default='inactive')       
+    data2d_ptr =>  this%h3D_SOMHydrylScalCps_vr(beg_col:end_col,1:JZ,jj)
+    call hist_addfld2d(fname='SOMHydrlScal_'//trim(micpar%cplxname(jj))//'_cplx_vr',units='none',type2d='levsoi',avgflag='A',&
+      long_name='Layer resolved SOM hydrolysis scalar in '//trim(micpar%cplxname(jj))//' complex',&
+      ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_SOC_Cp3_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOC_Cp3_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon in manure complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOC_Cp4_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOC_Cp4_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon in POM complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOC_Cp5_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOC_Cp5_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon in humus complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_HydrolCSOMCp2_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='HydrolCSOMCp2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in fine litter cplx',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_HydrolCSOMCp3_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='HydrolCSOMCp3_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in manure complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_HydrolCSOMCp4_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='HydrolCSOMCp4_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in POM complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_HydrolCSOMCp5_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='HydrolCSOMCp5_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved carbon hydrolysis in humus complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOMHydrylScalCp1_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOMHydrlScalCp1_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved SOM hydrolysis scalar in woody complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOMHydrylScalCp2_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOMHydrlScalCp2_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved SOM hydrolysis scalar in fine litter complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOMHydrylScalCp3_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOMHydrlScalCp3_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved SOM hydrolysis scalar in mnaure complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOMHydrylScalCp4_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOMHydrlScalCp4_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved SOM hydrolysis scalar in POM complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_SOMHydrylScalCp5_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SOMHydrlScalCp5_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved SOM hydrolysis scalar in humus complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_MicrobActCp1_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='MicrobActCp1_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in woody complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_MicrobActCp2_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='MicrobActCp2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in fine litter complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_MicrobActCp3_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='MicrobActCp3_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in manure complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_MicrobActCp4_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='MicrobActCp4_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in POM complex',&
-    ptr_col=data2d_ptr,default='inactive')       
-
-  data2d_ptr =>  this%h2D_MicrobActCp5_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='MicrobActCp5_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in humus complex',&
-    ptr_col=data2d_ptr,default='inactive')       
+    data2d_ptr =>  this%h3D_MicrobActCps_vr(beg_col:end_col,1:JZ,jj)
+    call hist_addfld2d(fname='MicrobAct_'//trim(micpar%cplxname(jj))//'_cplx_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
+      long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in '//trim(micpar%cplxname(jj))//' complex',&
+      ptr_col=data2d_ptr,default='inactive')       
+  ENDDO
 
   data2d_ptr =>  this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_SOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
@@ -3042,10 +2932,6 @@ implicit none
   call hist_addfld2d(fname='TMIN_SOIL_vr',units='oC',type2d='levsoi',avgflag='M',&
     long_name='Soil minimum temperature profile',ptr_col=data2d_ptr,default='inactive')       
 
-  data1d_ptr => this%h1D_TEMP_LITR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMAX_LITR',units='oC',avgflag='X',&
-    long_name='Litter maximum temperature',ptr_col=data1d_ptr,default='inactive')       
-
   data1d_ptr => this%h1D_decomp_ostress_litr_col(beg_col:end_col)    
   call hist_addfld1d(fname='Decomp_OStress_LITR',units='none',avgflag='A',&
     long_name='Decomposition O2 stress in litter layer [0->1: weaker]',ptr_col=data1d_ptr,&
@@ -3069,10 +2955,6 @@ implicit none
   data1d_ptr => this%h1D_RO2Decomp_litr_col(beg_col:end_col)    
   call hist_addfld1d(fname='RO2Decomp_flx_LITR',units='gO2/m2/h',avgflag='A',&
     long_name='Decomposition O2 uptake in litter layer ',ptr_col=data1d_ptr,default='inactive')       
-
-  data1d_ptr => this%h1D_TEMP_LITR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMIN_LITR',units='oC',avgflag='M',&
-    long_name='Litter minimum temperature',ptr_col=data1d_ptr,default='inactive')       
 
   data1d_ptr => this%h1D_TSolidOMActC_litr_col(beg_col:end_col)    
   call hist_addfld1d(fname='SoildOM_Act_litr',units='gC/m2',avgflag='M',&
@@ -3221,6 +3103,7 @@ implicit none
                                             'Anthesis      ','Seed_fill     ','See_no_set    ', &
                                             'Seed_mass_set ','End_seed_fill '/)
   real(r8) :: DVOLL,SOMC(jcplx)                                            
+  integer :: jj
 
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
@@ -3471,11 +3354,9 @@ implicit none
       this%h1D_tAcetate_soil_col(ncol)=0._r8      
       DO L=1,JZ        
         call SumSolidOML(ielmc,L,NY,NX,SOMC)
-        this%h2D_SOC_Cp1_vr(ncol,L) = SOMC(1)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_SOC_Cp2_vr(ncol,L) = SOMC(2)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_SOC_Cp3_vr(ncol,L) = SOMC(3)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_SOC_Cp4_vr(ncol,L) = SOMC(4)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_SOC_Cp5_vr(ncol,L) = SOMC(5)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
+        DO jj=1,jcplx
+          this%h3D_SOC_Cps_vr(ncol,L,jj) = SOMC(jj)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        ENDDO
         this%h2D_Gas_Pressure_vr(ncol,L) = Soil_Gas_pressure_vr(L,NY,NX)
         this%h2D_CO2_Gas_ppmv_vr(ncol,L) = Soil_Gas_Frac_vr(idg_CO2,L,NY,NX)
         this%h2D_CH4_Gas_ppmv_vr(ncol,L) = Soil_Gas_Frac_vr(idg_CH4,L,NY,NX)
@@ -3609,24 +3490,13 @@ implicit none
         this%h2D_RDECOMPC_SorpSOM_vr(ncol,L) = tRHydlySoprtOM_vr(ielmc,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_MicrobAct_vr(ncol,L)        = TMicHeterActivity_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
-        this%h2D_MicrobActCp1_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_MicrobActCp2_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_MicrobActCp3_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_MicrobActCp4_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_MicrobActCp5_vr(ncol,L) = ROQC4HeterMicActCmpK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        DO jj=1,jcplx
+          this%h3D_MicrobActCps_vr(ncol,L,jj) = ROQC4HeterMicActCmpK_vr(jj,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
-        this%h2D_SOMHydrylScalCp1_vr(ncol,L) = AZMAX1(RHydrolysisScalCmpK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
-        this%h2D_SOMHydrylScalCp2_vr(ncol,L) = AZMAX1(RHydrolysisScalCmpK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
-        this%h2D_SOMHydrylScalCp3_vr(ncol,L) = AZMAX1(RHydrolysisScalCmpK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
-        this%h2D_SOMHydrylScalCp4_vr(ncol,L) = AZMAX1(RHydrolysisScalCmpK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
-        this%h2D_SOMHydrylScalCp5_vr(ncol,L) = AZMAX1(RHydrolysisScalCmpK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
-
-        this%h2D_HydrolCSOMCp1_vr(ncol,L) = RHydlySOCK_vr(1,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_HydrolCSOMCp2_vr(ncol,L) = RHydlySOCK_vr(2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_HydrolCSOMCp3_vr(ncol,L) = RHydlySOCK_vr(3,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_HydrolCSOMCp4_vr(ncol,L) = RHydlySOCK_vr(4,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_HydrolCSOMCp5_vr(ncol,L) = RHydlySOCK_vr(5,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+          this%h3D_SOMHydrylScalCps_vr(ncol,L,jj) = AZMAX1(RHydrolysisScalCmpK_vr(jj,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX))
+        
+          this%h3D_HydrolCSOMCps_vr(ncol,L,jj) = RHydlySOCK_vr(jj,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        ENDDO
         !anaerobic N2 fixer
         call SumMicbGroup(L,NY,NX,micpar%mid_Anaerob_N2Fixer,MicbE)
         this%h2D_anaeN2FixC_vr(ncol,L) = micBE(ielmc)/DVOLL

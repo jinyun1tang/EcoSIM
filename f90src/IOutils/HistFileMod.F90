@@ -370,6 +370,7 @@ implicit none
   integer :: hpindex                 ! history buffer pointer index
   character(len=16):: l_default      ! local version of 'default'
   character(len=max_namlen) :: lstandard_name  ! local standard name
+
   hpindex = pointer_index()
 
   if (present(ptr_gcell)) then
@@ -554,7 +555,7 @@ implicit none
   character(len=16):: l_default      ! local version of 'default'
 
   hpindex = pointer_index()
-
+  
   select case (type2d)
   case ('levsoi')
       num2d = JZ
@@ -588,6 +589,7 @@ implicit none
   else if (present(ptr_patch)) then
     l_type1d = namep
     l_type1d_out = namep
+    print*,'fname',fname,hpindex,size(ptr_patch,2),hpindex
     esmptr_ra1(hpindex)%ptr => ptr_patch
   else
     write(iulog,*) trim(subname),' ERROR: must specify a valid pointer index,', &
