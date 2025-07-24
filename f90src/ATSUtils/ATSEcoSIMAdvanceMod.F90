@@ -25,24 +25,14 @@ module ATSEcoSIMAdvanceMod
   use EcoSIMCtrlDataType
   use MiniMathMod
   use ClimForcDataType
+  use PrescribePhenolMod
+  use RootDataType
 
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
   public :: RunEcoSIMSurfaceBalance
   contains
-
-  ! Function to check for NaN in an array
-  function is_nan(x) result(mask)
-    real(r8), intent(in) :: x(:)
-    logical, dimension(size(x)) :: mask
-    integer :: i
-
-    !allocate(mask(size(x)))
-    do i = 1, size(x)
-      mask(i) = (x(i) /= x(i))  ! NaN is the only value that is not equal to itself
-    end do
-  end function is_nan
 
   subroutine RunEcoSIMSurfaceBalance(NYS)
   !
@@ -76,10 +66,17 @@ implicit none
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
 
+  !All the necessary sizes are taken from GridConsts
+  real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
+  real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP) 
+
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
   NPH_Test=1
   NX=1
+
+  LeafAreaZsec_lpft(:,:,:) = 0.2
+  StemAreaZsec_lpft(:,:,:) = 0.05
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
 
@@ -187,8 +184,9 @@ implicit none
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
-  !Actually I update this just in the loop above??
-  !call UpdateSoilMoistureFromATS(I,J,NHW,NHE,NVN,NVS)
+  call SetCanopyProfile(I,J,LeafAreaZsec_lpft, StemAreaZsec_lpft)
+
+  call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 
@@ -220,9 +218,6 @@ implicit none
 
   !write(*,*) "After SnowMassUpdate computation of Qinfl2MicP: "
   ! Check for NaN in surf_w_source
-  if (any(is_nan(Qinfl2MicP(:,1)))) then
-    write(*,*) "NaN found in Winfl2MicP at indices:", pack([(i, i=1,NYS)], is_nan(Qinfl2MicP(:,1)))
-  end if
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
