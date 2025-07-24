@@ -3,6 +3,9 @@ program EcoATSTest
   use BGCContainers_module
   use SharedDataMod
   use GridDataType
+  use RootDataType
+  use EcoSIMCtrlMod, only: etimer
+  !use ecosim_Time_Mod  , only : ecosim_time_type
   implicit none
   
   ! Declare variables
@@ -13,7 +16,7 @@ program EcoATSTest
   integer :: ncells_per_col_, ncol
   !real, dimension(6) :: rain_array
   real, dimension(6) :: rain_array = (/1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3/)
-
+ 
   !rain_array = 1.6e-5
 
   NX = 1
@@ -57,7 +60,9 @@ subroutine Init_ATSEcoSIM_driver()
   type (BGCSizes) :: sizes
   integer :: NY, NX, L
   integer :: ncells_per_col_, ncol
+  integer :: kmo,dofmon,ndaysmon
   real(r8) :: dist_step, dist_tot
+  !type(ecosim_time_type) :: etimer
 
   NX = 1
   NYS = 1
@@ -70,6 +75,19 @@ subroutine Init_ATSEcoSIM_driver()
   sizes%num_components = 1
   sizes%ncells_per_col_ = 100
   sizes%num_columns = 1
+  write(*,*) "setting time"
+  !
+  !call etimer%Init(year0=1804,nyears=12)
+  !call etimer%setClock(dtime=3600._r8,nelapstep=0)
+  !ndaysmon = etimer%get_curr_mon_days()  ! Would return 31 (days in March)
+  !dofmon = etimer%get_curr_dom()         ! Would return 15 (15th day of month)
+  !kmo = etimer%get_curr_mon()            ! Would return 3 (March)
+  !or set by hand
+  ndaysmon = 31
+  dofmon = 15
+  kmo = 3
+
+  write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon 
 
   ! needed in starts
   !pressure_at_field_capacity = 0.001
@@ -81,6 +99,7 @@ subroutine Init_ATSEcoSIM_driver()
   heat_capacity = 2.0e-2
 
   !need to allocate these because c_f_pointer sets them in the actual coupler
+  !surface vars
   allocate(a_ASP(ncells_per_col_))
   allocate(tairc(1:ncells_per_col_))
   allocate(vpair(1:ncells_per_col_))
@@ -92,6 +111,10 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
+  allocate(a_LAI(1:ncells_per_col_))
+  allocate(a_SAI(1:ncells_per_col_))
+
+  !subsurface vars
   allocate(a_TEMP(ncells_per_col_, ncol))
   allocate(a_CumDepz2LayBottom_vr(ncells_per_col_, ncol))
   allocate(a_AREA3(ncells_per_col_, ncol))
@@ -131,18 +154,9 @@ subroutine Init_ATSEcoSIM_driver()
     
     vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
-    
-    !swrad(NY) = 0.8
-    !sunrad(NY) =  4.63
-    
-    !swrad(NY) = 0.8
-    !sunrad(NY) =  1.63
 
-    !swrad(NY) = 400.0
-    !sunrad(NY) =  219.0
-
-    !swrad(NY) = 0.0
-    !sunrad(NY) =  0.0
+    a_LAI(NY) = 0.2
+    a_SAI(NY) = 0.05
 
   enddo
 

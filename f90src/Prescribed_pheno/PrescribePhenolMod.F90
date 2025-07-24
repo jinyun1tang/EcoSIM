@@ -202,6 +202,8 @@ implicit none
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
   !==========================================
 
+  write(*,*) "Starting phenology interp"
+
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       NP_col(NY,NX)=1    
@@ -215,9 +217,12 @@ implicit none
     ENDDO
   ENDDO    
 
-  ndaysmon = etimer%get_curr_mon_days()
-  dofmon   = etimer%get_curr_dom()
-  kmo      = etimer%get_curr_mon()
+  !ndaysmon = etimer%get_curr_mon_days()
+  !dofmon   = etimer%get_curr_dom()
+  !kmo      = etimer%get_curr_mon()
+  ndaysmon = 31
+  dofmon = 15
+  kmo = 3
   t = (dofmon-0.5_r8) / ndaysmon
   it(1) = t + 0.5_r8
   it(2) = it(1) + 1
@@ -229,6 +234,8 @@ implicit none
   timwt(1) = (it(1)+0.5_r8) - t
   timwt(2) = 1._r8-timwt(1)
   
+  write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon 
+
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !==========================================
@@ -288,6 +295,13 @@ implicit none
     ENDDO
   ENDDO  
 
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS 
+      DO NZ=1,NP_col(NY,NX)
+        write(*,*) "LAI: ", tlai_day_pft(NZ,NY,NX), "SAI: ",  tsai_day_pft(NZ,NY,NX) 
+      enddo
+    enddo
+  enddo
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------     
   subroutine SetRootProfileZ(irootType,NL,cdepthz,PerPlantRootC_vr,PerPlantRootLen_vr)
