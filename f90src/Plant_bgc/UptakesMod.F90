@@ -25,7 +25,6 @@ module UptakesMod
   public :: RootUptakes
   public :: InitUptake
 
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000, MPa/m.
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
