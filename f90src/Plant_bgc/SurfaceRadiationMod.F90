@@ -396,16 +396,14 @@ module SurfaceRadiationMod
     !when there is canopy
     IF(LeafStalkArea_col.GT.0.0_r8)THEN
 
-      call MultiCanLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
-        SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle)
-
-
       if(ldo_radiation_test)then
         RadSW_Grnd=ABS(GrndIncidSolarAngle)*RadSWDirect_col
         D121: DO N=1,NumOfSkyAzimuthSects1
           RadSW_Grnd=RadSW_Grnd+ABS(OMEGAG(N))*RadSWDiffus_col
         ENDDO D121
-        RadSWGrnd_col=RadSW_Grnd*AREA3(NU)      
+      else
+        call MultiCanLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
+          SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle,RadSW_Grnd)
       endif
       !     RADIATION AT GROUND SURFACE IF NO CANOPY      
     ELSE
@@ -414,12 +412,13 @@ module SurfaceRadiationMod
       D120: DO N=1,NumOfSkyAzimuthSects1
         RadSW_Grnd=RadSW_Grnd+ABS(OMEGAG(N))*RadSWDiffus_col
       ENDDO D120
-      RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
+
       D135: DO NZ=1,NP
         RadSWbyCanopy_pft(NZ)  = 0.0_r8
         RadPARbyCanopy_pft(NZ) = 0.0_r8
       ENDDO D135
     ENDIF
+    RadSWGrnd_col=RadSW_Grnd*AREA3(NU)    
     !
     !     IF NO RADIATION
     !
@@ -447,7 +446,7 @@ module SurfaceRadiationMod
     FRadPARbyLeafT=1.0_r8-EXP(-0.65_r8*LeafStalkArea_col/AREA3(NU))
     D145: DO NZ=1,NP
       FracPARads2Canopy_pft(NZ) = FRadPARbyLeafT*LeafStalkArea_pft(NZ)/LeafStalkArea_col
-      if(.not.ldo_radiation_test)FracSWRad2Grnd_col        = FracSWRad2Grnd_col-FracPARads2Canopy_pft(NZ)
+      if(.not.ldo_radiation_test)FracSWRad2Grnd_col = FracSWRad2Grnd_col-FracPARads2Canopy_pft(NZ)
     ENDDO D145
   ELSE
     FracSWRad2Grnd_col=1.0_r8
@@ -463,7 +462,7 @@ module SurfaceRadiationMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine MultiCanLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
-    SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle)
+    SolarAzimuthAngle,CosineSunInclAngle,GrndIncidSolarAngle,RadSW_Grnd)
   !
   !Description:
   ! Model multiple canopy layer radiation using bidirectional reflectance distribution function.
@@ -477,6 +476,7 @@ module SurfaceRadiationMod
   real(r8), intent(in) :: SolarAzimuthAngle
   real(r8), intent(in) :: CosineSunInclAngle  
   real(r8), intent(in) :: GrndIncidSolarAngle
+  real(r8), intent(out):: RadSW_Grnd
   integer :: NB,NZ,L,K,M,N,NN
   integer :: iScatteringDirect(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)
   real(r8) :: TAU_DifuseRTransmit(0:NumCanopyLayers1+1)
@@ -524,7 +524,7 @@ module SurfaceRadiationMod
   real(r8) :: FracDirRadAbsorbt, FracDifRadAbsorbt
   real(r8) :: bakScatRadSWbyLeafT,bakScatRadSWbyStalkT,bakScatRadPARbyLeafT,bakScatRadPARbyStalkT,fwdScatRadSWbyLeafT
   real(r8) :: fwdScatRadSWbyStalkT,fwdScatRadPARbyLeafT,fwdScatRadPARbyStalkT
-  REAL(R8) :: RadSW_Grnd,SolarAngle
+  REAL(R8) :: SolarAngle
   real(r8) :: THETW1
   real(r8) :: LeafIntceptArea,UnselfShadeLeafArea,UnselfShadeLeafAreaAzclass,TSurfLeaf
   real(r8) :: UnselfShadeStalkArea,UnselfShadeStalkAreaAzclass,TSurfStalk,StalkIntceptArea
@@ -575,7 +575,6 @@ module SurfaceRadiationMod
     RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft        ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit      ,& !inoput :fraction of radiation intercepted by canopy layer, [-]
     RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft       ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]
-    RadSWGrnd_col          => plt_rad%RadSWGrnd_col            ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
     TAU_RadThru            => plt_rad%TAU_RadThru               & !output :fraction of radiation transmitted by canopy layer, [-]
   )
   
@@ -594,7 +593,7 @@ module SurfaceRadiationMod
     RadPARbyLeafSurf_pft(NZ)  = RadPARDirect_col*LeafPARabsorpty_pft(NZ)
     RadPARbyStalkSurf_pft(NZ) = RadPARDirect_col*StalkPARAbsorpty
   ENDDO D1050
-
+!  write(3333,*)I*100+J,'LeafSWabsorpty_pft(NZ)',RadSWDirect_col,LeafSWabsorpty_pft(NZ),StalkSWAbsorpty
   !distribute radiation into different leaf/canopy sector
   !     ANGLES BETWEEN SUN OR SKY ZONES AND FOLIAR SURFACES
   !
@@ -676,7 +675,8 @@ module SurfaceRadiationMod
   !     DIFFUSE DOWNWARD TOTAL AND VISIBLE RADIATION BY EACH SPECIES
   !     NZ IN EACH LAYER L
   !
-
+!  write(3355,*)I*100+J,'leaf',((LeafAreaZsec_lpft(N,L,1),N=1,NumLeafZenithSectors1),L=NumCanopyLayers1,1,-1)
+!  write(3355,*)I*100+J,'stalk',((StemAreaZsec_lpft(N,L,1),N=1,NumLeafZenithSectors1),L=NumCanopyLayers1,1,-1)
   D1800: DO L=NumCanopyLayers1,1,-1
     !next layer is above snow, and above water
     IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
@@ -932,9 +932,9 @@ module SurfaceRadiationMod
     ELSE
       RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L+1)
       RadPARFwdScat2NextL(L) = RadPARFwdScat2NextL(L+1)
-      TAU_DirectRTransmit(L)    = TAU_DirectRTransmit(L+1)
+      TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L+1)
       TAU_RadThru(L)         = 1.0_r8-TAU_DirectRTransmit(L)
-      TAU_DifuseRTransmit(L)   = TAU_DifuseRTransmit(L+1)
+      TAU_DifuseRTransmit(L) = TAU_DifuseRTransmit(L+1)
     ENDIF
 
   ENDDO D1800
@@ -949,6 +949,7 @@ module SurfaceRadiationMod
   !     RadSW_Grnd,RadPAR_Grnd=total SW,PAR at ground surface
   !     GrndIncidSolarAngle,OMEGAG=incident solar,sky angle at ground surface
   !
+
   RADSG = RadSWDirect_col*TAU_DirectRTransmit(1)
   RADYG = RadSWDiffusL*TAU_DifuseRTransmit(1)+RadSWFwdScat2NextL(1)
   RAPSG = RadPARDirect_col*TAU_DirectRTransmit(1)
@@ -956,12 +957,14 @@ module SurfaceRadiationMod
 
   RadSW_Grnd  = ABS(GrndIncidSolarAngle)*RADSG
   RadPAR_Grnd = ABS(GrndIncidSolarAngle)*RAPSG
-  
+!  write(3333,*)I*100+J,RadSW_Grnd,RADSG,RadSWDirect_col,'0RadSWDirect_col',TAU_DirectRTransmit  
+
   D20: DO N=1,NumOfSkyAzimuthSects1
     RadSW_Grnd  = RadSW_Grnd+ABS(OMEGAG(N))*RADYG
     RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
   ENDDO D20 
-  RadSWGrnd_col=RadSW_Grnd*AREA3(NU)
+!  write(3333,*)I*100+J,RadSW_Grnd,RADYG,'1RadSWDirect_col',TAU_DifuseRTransmit(1),RadSWFwdScat2NextL(1)
+!  if(I>=16)stop
 
   !
   !     RADIATION REFLECTED FROM GROUND SURFACE

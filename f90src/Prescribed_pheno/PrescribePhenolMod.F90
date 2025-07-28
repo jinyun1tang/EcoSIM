@@ -162,14 +162,15 @@ implicit none
     NB=1    
     DO L=1,NumCanopyLayers1
       DO N=1,NumLeafZenithSectors1
-        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)        
+        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)        
       ENDDO      
-      StemAreaZsec_lpft(1:NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)      
+      StemAreaZsec_lpft(:,L,NZ)=0._r8
+      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)      
       LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)         
 
       !Assuming uniform azimuth desitribution for leaves  
       DO N=1,NumLeafZenithSectors1
-        LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
+        LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)
       ENDDO  
     ENDDO
 
@@ -265,13 +266,13 @@ implicit none
 
       !divide canopy height      
       CanopyHeightZ_col(NumCanopyLayers,NY,NX) = CanopyHeight_col(NY,NX)+0.01_r8
-      ZL1(NumCanopyLayers)               = CanopyHeightZ_col(NumCanopyLayers,NY,NX)
-      ZL1(0)                                = 0.0_r8
+      ZL1(NumCanopyLayers)                     = CanopyHeightZ_col(NumCanopyLayers,NY,NX)
+      ZL1(0)                                   = 0.0_r8
       
       !for simplicity, right now unifrom division is used
       !divide total are into NumCanopyLayers1, from top to bottom
-      AreaInterval=(CanopyLeafArea_col(NY,NX)+StemArea_col(NY,NX))/NumCanopyLayers  
-      DZL=CanopyHeightZ_col(NumCanopyLayers,NY,NX)/real(NumCanopyLayers,kind=r8)
+      AreaInterval = (CanopyLeafArea_col(NY,NX)+StemArea_col(NY,NX))/NumCanopyLayers
+      DZL          = CanopyHeightZ_col(NumCanopyLayers,NY,NX)/real(NumCanopyLayers,kind=r8)
 
       IF(AreaInterval.GT.ZEROS(NY,NX))THEN
          DO L=NumCanopyLayers,1,-1

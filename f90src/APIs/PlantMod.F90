@@ -53,6 +53,7 @@ implicit none
         !do prescribed phenolgoy
         call PlantUptakeAPISend(I,J,NY,NX)        
         CALL ROOTUPTAKES(I,J)
+        call extracts(I,J)
         call PlantUPtakeAPIRecv(I,J,NY,NX)
       else
         call  PlantAPISend(I,J,NY,NX)
