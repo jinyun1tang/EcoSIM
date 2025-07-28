@@ -99,7 +99,7 @@ implicit none
   plt_rad%RadSWDiffus_col          = RadSWDiffus_col(NY,NX)
   plt_rad%RadPARDiffus_col         = RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col          = RadSWDirect_col(NY,NX)
-  plt_rad%RadPARDirect_col         = RadPARDirect_col(NY,NX)
+  plt_rad%RadDirectPAR_col         = RadDirectPAR_col(NY,NX)
   plt_site%SoilSurfRoughnesst0_col = SoilSurfRoughnesst0_col(NY,NX)
   plt_ew%VcumWatSnow_col           = VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col           = VcumIceSnow_col(NY,NX)
@@ -186,7 +186,7 @@ implicit none
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col
   RadSWDirect_col(NY,NX)     = plt_rad%RadSWDirect_col
   RadSWDiffus_col(NY,NX)     = plt_rad%RadSWDiffus_col
-  RadPARDirect_col(NY,NX)    = plt_rad%RadPARDirect_col
+  RadDirectPAR_col(NY,NX)    = plt_rad%RadDirectPAR_col
   RadPARDiffus_col(NY,NX)    = plt_rad%RadPARDiffus_col
   RadSWGrnd_col(NY,NX)       = plt_rad%RadSWGrnd_col
   FracSWRad2Grnd_col(NY,NX)  = plt_rad%FracSWRad2Grnd_col
@@ -215,7 +215,7 @@ implicit none
       DO M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafZenithSectors
           RadDifPAR_zsec(N,M,L,NZ,NY,NX)=plt_rad%RadDifPAR_zsec(N,M,L,NZ)
-          RadPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadPAR_zsec(N,M,L,NZ)
+          RadTotPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadTotPAR_zsec(N,M,L,NZ)
         ENDDO
       ENDDO
     ENDDO

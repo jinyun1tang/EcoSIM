@@ -950,10 +950,9 @@ module WatsubMod
                 !including lateral connection or woking on vertical direction
 
                 ! IF NO WATER TABLE
-
                 IF((IDWaterTable_col(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection) .AND. .not.isclose(Recharg2WTBLScal,0.0_r8))THEN    
                   !vertical flow or lateral drainage
-                  call BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
+                  call VertBoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
                   !
                   !lateral flow
                 ELSE
@@ -1112,7 +1111,7 @@ module WatsubMod
   end subroutine XBoundaryFlowM
 !------------------------------------------------------------------------------------------
 
-  subroutine BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargDist2WTBL,Recharg2WTBLScal)    
+  subroutine VertBoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargDist2WTBL,Recharg2WTBLScal)    
   !
   !Drainage across the lateral or bottom boundaries.      
   implicit none
@@ -1122,10 +1121,10 @@ module WatsubMod
   integer,  intent(in) :: M4,M5,M6  !dest, when XN=1, N2=M5,N1=M4
   real(r8), intent(in) :: RainEkReducedKsat 
   real(r8), intent(in) :: XN        !direction
-  real(r8), intent(in) :: RechargDist2WTBL
+  real(r8), intent(in) :: RechargDist2WTBL    !lateral distance to external water table, [m]
   real(r8), intent(in) :: Recharg2WTBLScal
 
-  character(len=*), parameter :: subname='BoundaryDrainM'
+  character(len=*), parameter :: subname='VertBoundaryDrainM'
   real(r8) :: THETA1,HydcondSrc,RechargRate
   real(r8) :: watflx,heatflx,HydGrad
   integer :: K1
@@ -1167,7 +1166,7 @@ module WatsubMod
   HeatDrain_col(N2,N1) = HeatDrain_col(N2,N1)-XN*heatflx
 
   call PrintInfo('end '//subname)
-  end subroutine BoundaryDrainM
+  end subroutine VertBoundaryDrainM
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateSoilMoistTemp(I,J,M,NHW,NHE,NVN,NVS,twatmass0)

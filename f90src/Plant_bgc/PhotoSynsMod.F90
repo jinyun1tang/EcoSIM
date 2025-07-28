@@ -11,6 +11,7 @@ implicit none
   __FILE__
   public :: ComputeGPP
   real(r8), parameter :: VLScal=1._r8
+  real(r8), parameter :: umol2gC_hr=0.0432_r8 !=3600*12.e-6_r8
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -24,7 +25,7 @@ implicit none
   real(r8), intent(out) :: CO2FCL          !carbon-dependent photosynthesis rate
   real(r8), intent(out) :: CO2FLL          !light-dependent photosynthesis rate
   integer :: L,NN,M,N,LP
-  real(r8) :: WFNB
+  real(r8) :: WFNB,cfscal,clscal
   real(r8) :: CO2X,CO2C,CO2Y
   real(r8) :: CBXNX
   real(r8) :: DIFF
@@ -58,7 +59,7 @@ implicit none
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     CanopyLeafArea_lnode          => plt_morph%CanopyLeafArea_lnode           ,& !input  :layer/node/branch leaf area, [m2 d-2]
     RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                   ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
-    RadPAR_zsec                   => plt_rad%RadPAR_zsec                      ,& !input  :direct incoming PAR, [umol m-2 s-1]
+    RadTotPAR_zsec                => plt_rad%RadTotPAR_zsec                   ,& !input  :direct incoming PAR, [umol m-2 s-1]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
     TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit               & !input  :fraction of radiation intercepted by canopy layer, [-]
   )
@@ -81,9 +82,11 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN            
             DO LP=1,2
               if (LP==1)then
-                PAR_zsec = RadPAR_zsec(N,M,L,NZ)
+                !sun-lit leave
+                PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
                 Tau_rad  = TAU_DirectRTransmit(L+1)
               else
+                !sun-shaded leave
                 PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad  = TAU_RadThru(L+1)
               endif
@@ -161,7 +164,8 @@ implicit none
                     CBXNX = CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
                     VGROX = Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
                     EGROX = ETLF*CBXNX
-                    VL    = AMIN1(VGROX,EGROX)*WFNB*RubiscoActivity_brch(NB,NZ)*VLScal
+                    cfscal=WFNB*RubiscoActivity_brch(NB,NZ)*VLScal
+                    VL    = AMIN1(VGROX,EGROX)*cfscal
                     VG=(CanopyGasCO2_pft(NZ)-CO2X)*GSL
                   
                     IF(VL+VG.GT.ZERO)THEN
@@ -174,8 +178,9 @@ implicit none
                       exit
                     ENDIF
                   ENDDO D225
-                  CO2FCL = CO2FCL+VGROX
-                  CO2FLL = CO2FLL+EGROX
+                  clscal=LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
+                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
 !                  WRITE(123,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,VL,VGROX,EGROX,WFNB,EGROX/PAR_zsec
                   
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
@@ -184,25 +189,14 @@ implicit none
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
 !               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
-                  CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+                  CH2O3K=CH2O3K+VL*clscal
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
 
                 ENDIF
               ENDIF
-              if(I==6.and.J==22.and.LP==1.and..false.)then
-              write(456,*)'N,M',N,M,'pardir',PAR_zsec
-              write(456,*)'cangas',CanopyGasCO2_pft(NZ),plt_site%CO2E,LeafIntracellularCO2_pft(NZ)
-              write(456,*)VL,LeafAUnshaded_zsec(N,L,K,NB,NZ),TAU_Rad
-              write(456,*)'sco2',AirConc_pft(NZ),CO2Solubility_pft(NZ),Km4RubiscoCarboxy_pft(NZ)
-              stop
-              endif              
             ENDDO
-            if(I==6.and.J==22.and..false.)then
-            write(456,*)'N,M',N,M
-            stop
-            endif
           ENDIF
         ENDDO D220
       ENDDO D215
@@ -235,7 +229,7 @@ implicit none
   real(r8) :: GSL
   real(r8) :: PARX,PARJ
   real(r8) :: RS,RSL,VL
-  real(r8) :: VGROX
+  real(r8) :: VGROX,cfscal,clscal
   real(r8) :: VA,VG
   real(r8) :: PAR_zsec,Tau_rad
 ! begin_execution
@@ -262,7 +256,7 @@ implicit none
     CanopyLeafArea_lnode          => plt_morph%CanopyLeafArea_lnode           ,& !input  :layer/node/branch leaf area, [m2 d-2]
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]
     RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                   ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
-    RadPAR_zsec                   => plt_rad%RadPAR_zsec                      ,& !input  :direct incoming PAR, [umol m-2 s-1]
+    RadTotPAR_zsec                   => plt_rad%RadTotPAR_zsec                      ,& !input  :direct incoming PAR, [umol m-2 s-1]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
     TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit               & !input  :fraction of radiation intercepted by canopy layer, [-]
   )
@@ -287,7 +281,7 @@ implicit none
           IF(LeafAUnshaded_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
             DO LP=1,2
               if(LP==1)then
-                PAR_zsec = RadPAR_zsec(N,M,L,NZ)
+                PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
                 Tau_rad  = TAU_DirectRTransmit(L+1)
               else
                 PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
@@ -366,7 +360,8 @@ implicit none
                     CBXNX = CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
                     VGROX = Vmax4PEPCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4PEPCarboxy_pft(NZ))
                     EGROX = ETLF4*CBXNX
-                    VL    = AMIN1(VGROX,EGROX)*WFN4*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
+                    cfscal=WFN4*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
+                    VL    = AMIN1(VGROX,EGROX)*cfscal
                     VG    = (CanopyGasCO2_pft(NZ)-CO2X)*GSL
                     IF(VL+VG.GT.ZERO)THEN
                       DIFF=(VL-VG)/(VL+VG)
@@ -378,8 +373,9 @@ implicit none
                       exit
                     ENDIF
                   ENDDO D125
-                  CO2FCL = CO2FCL+VGROX
-                  CO2FLL = CO2FLL+EGROX
+                  clscal=LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
+                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -387,7 +383,7 @@ implicit none
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
 !               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
-                  CH2O4K=CH2O4K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+                  CH2O4K=CH2O4K+VL*clscal
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
@@ -414,7 +410,7 @@ implicit none
 !               LeafAUnshaded_zsec=unself-shaded leaf surface area
 !               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
 !
-                  CH2O3K=CH2O3K+VL*LeafAUnshaded_zsec(N,L,K,NB,NZ)*TAU_Rad
+                  CH2O3K=CH2O3K+VL*clscal
                 ENDIF  
               ENDIF
             ENDDO
@@ -435,8 +431,8 @@ implicit none
   real(r8), intent(out) :: CH2O3(MaxNodesPerBranch1),CH2O4(MaxNodesPerBranch1)
   real(r8), intent(out) :: CO2F   !CO2 fixation
   real(r8), intent(out) :: CH2O   !CO2 fixation
-  real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix
-  real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix
+  real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix, [gC h-1 d-2]
+  real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix,  [gC h-1 d-2]
   real(r8) :: ZADDB,PADDB
   real(r8) :: CO2FCL,CO2FLL
   integer  :: K
@@ -454,16 +450,13 @@ implicit none
     LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch         ,& !input  :leaf area, [m2 d-2]
     RubiscoActivity_brch     => plt_photo%RubiscoActivity_brch       & !input  :branch down-regulation of CO2 fixation, [-]
   )
-  if(I==6.and.J==22.and..false.)then
-  write(*,*)'computegpp',NB,NZ
-  write(456,*)'compgpp'
-  write(456,*)RubiscoActivity_brch(NB,NZ),SineSunInclAngle_col,RadPARbyCanopy_pft(NZ),CanopyGasCO2_pft(NZ)
-  endif
+
   CH2OClm=0._r8;CH2OLlm=0._r8
+  CO2F = 0._r8;CH2O = 0._r8  
   IF(abs(RubiscoActivity_brch(NB,NZ)).GT.0._r8)THEN    
     IF(SineSunInclAngle_col.GT.0.0_r8 .AND. RadPARbyCanopy_pft(NZ).GT.0.0_r8 &
       .AND. CanopyGasCO2_pft(NZ).GT.0.0_r8)THEN
-      CO2F=0._r8;CH2O=0._r8
+
       IF(.not.is_root_shallow(iPlantRootProfile_pft(NZ)).OR.Stomata_Stress.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
@@ -492,9 +485,7 @@ implicit none
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
-              if(I==6.and.J==22.and..false.)then
-              write(456,*)'c3',K,Vmax4RubiscoCarboxy_pft(K,NB,NZ)              
-              endif
+
               call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
               CO2F    = CO2F+CH2O3(K)
               CH2O    = CH2O+CH2O3(K)
@@ -507,20 +498,19 @@ implicit none
 !
 !         CO2F,CH2O=total CO2 fixation,CH2O production
 !
-        CO2F = CO2F*0.0432_r8
-        CH2O = CH2O*0.0432_r8
+        CO2F = CO2F*umol2gC_hr
+        CH2O = CH2O*umol2gC_hr
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
         D150: DO K=1,MaxNodesPerBranch1
-          CH2O3(K) = CH2O3(K)*0.0432_r8
-          CH2O4(K) = CH2O4(K)*0.0432_r8
+          CH2O3(K) = CH2O3(K)*umol2gC_hr
+          CH2O4(K) = CH2O4(K)*umol2gC_hr
         ENDDO D150
-        CH2OClm = CH2OClm*0.0432_r8
-        CH2OLlm = CH2OLlm*0.0432_r8
+        CH2OClm = CH2OClm*umol2gC_hr
+        CH2OLlm = CH2OLlm*umol2gC_hr
       ELSE
-        CO2F = 0._r8
-        CH2O = 0._r8
+
         IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
           D155: DO K=1,MaxNodesPerBranch1
             CH2O3(K) = 0._r8
@@ -529,8 +519,7 @@ implicit none
         ENDIF
       ENDIF
     ELSE
-      CO2F = 0._r8
-      CH2O = 0._r8
+
       !C4
       IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
         D160: DO K=1,MaxNodesPerBranch1
@@ -540,8 +529,6 @@ implicit none
       ENDIF
     ENDIF
   ELSE
-    CO2F = 0._r8
-    CH2O = 0._r8
     IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
       D165: DO K=1,MaxNodesPerBranch1
         CH2O3(K) = 0._r8

@@ -22,7 +22,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  H2OCuticleResist_pft(:,:,:)                !maximum stomatal resistance to vapor, [s h-1]
   real(r8),target,allocatable ::  RCS_pft(:,:,:)                             !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)              !canopy stomatal resistance, [h m-1]
-  real(r8),target,allocatable ::  MinCanPStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
+  real(r8),target,allocatable ::  CanopyMinStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
   real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                  !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I_pft(:,:,:)                             !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)            !leaf gaseous CO2 concentration, [umol m-3]
@@ -60,7 +60,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  Km4PEPCarboxy_pft(:,:,:)                   !Km for PEP carboxylase activity, [uM]
   real(r8),target,allocatable ::  LeafRuBPConc_pft(:,:,:)                    !leaf rubisco content, [g g-1]
   real(r8),target,allocatable ::  FracLeafProtAsPEPCarboxyl_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
-  real(r8),target,allocatable ::  SpecChloryfilAct_pft(:,:,:)                !cholorophyll activity , [umol g-1 h-1 at 25 oC]
+  real(r8),target,allocatable ::  SpecLeafChlAct_pft(:,:,:)                !cholorophyll activity , [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  LeafC3ChlorofilConc_pft(:,:,:)             !leaf C3 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  LeafC4ChlorofilConc_pft(:,:,:)             !leaf C4 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  CanPCi2CaRatio(:,:,:)                      !Ci:Ca ratio, [-]
@@ -159,6 +159,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  PetoleProteinCNode_brch(:,:,:,:,:)         !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)           !maximum grain C during grain fill, [g d-2]
+  real(r8),target,allocatable ::  CanopyNLimFactor_brch(:,:,:,:)             !Canopy N-limitation factor, [0->1] weaker limitation,[-]
+  real(r8),target,allocatable ::  CanopyPLimFactor_brch(:,:,:,:)             !Canopy P-limitation factor, [0->1] weaker limitation,[-]
   real(r8),target,allocatable ::  StandDeadKCompElms_pft(:,:,:,:,:)          !standing dead chemical element fraction, [g d-2]
   real(r8),target,allocatable ::  StandDeadStrutElms_pft(:,:,:,:)            !standing dead chemical element, [g d-2]
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
@@ -174,6 +176,8 @@ module CanopyDataType
 
   implicit none
 
+  allocate(CanopyNLimFactor_brch(MaxNumBranches,JP,JY,JX));CanopyNLimFactor_brch=1._r8
+  allocate(CanopyPLimFactor_brch(MaxNumBranches,JP,JY,JX));CanopyPLimFactor_brch=1._r8
   allocate(CanopyMassC_pft(JP,JY,jX)) ; CanopyMassC_pft=0._r8
   allocate(CanopyWaterMassBeg_col(JY,JX)); CanopyWaterMassBeg_col=0._r8
   allocate(CanopyWaterMassEnd_col(JY,JX)); CanopyWaterMassEnd_col=0._r8
@@ -192,7 +196,7 @@ module CanopyDataType
   allocate(H2OCuticleResist_pft(JP,JY,JX));     H2OCuticleResist_pft=0._r8
   allocate(RCS_pft(JP,JY,JX));      RCS_pft=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
-  allocate(MinCanPStomaResistH2O_pft(JP,JY,JX));     MinCanPStomaResistH2O_pft=0._r8
+  allocate(CanopyMinStomaResistH2O_pft(JP,JY,JX));     CanopyMinStomaResistH2O_pft=0._r8
   allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
   allocate(O2I_pft(JP,JY,JX));      O2I_pft=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
@@ -230,7 +234,7 @@ module CanopyDataType
   allocate(Km4PEPCarboxy_pft(JP,JY,JX));   Km4PEPCarboxy_pft=0._r8
   allocate(LeafRuBPConc_pft(JP,JY,JX));     LeafRuBPConc_pft=0._r8
   allocate(FracLeafProtAsPEPCarboxyl_pft(JP,JY,JX));     FracLeafProtAsPEPCarboxyl_pft=0._r8
-  allocate(SpecChloryfilAct_pft(JP,JY,JX));     SpecChloryfilAct_pft=0._r8
+  allocate(SpecLeafChlAct_pft(JP,JY,JX));     SpecLeafChlAct_pft=0._r8
   allocate(LeafC3ChlorofilConc_pft(JP,JY,JX));      LeafC3ChlorofilConc_pft=0._r8
   allocate(LeafC4ChlorofilConc_pft(JP,JY,JX));     LeafC4ChlorofilConc_pft=0._r8
   allocate(CanPCi2CaRatio(JP,JY,JX));     CanPCi2CaRatio=0._r8
@@ -338,6 +342,8 @@ module CanopyDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(CanopyNLimFactor_brch)
+  call destroy(CanopyPLimFactor_brch)
   call destroy(CanopyMassC_pft)
   call destroy(CanopyWaterMassBeg_col)
   call destroy(CanopyWaterMassEnd_col)
@@ -356,7 +362,7 @@ module CanopyDataType
   call destroy(H2OCuticleResist_pft)
   call destroy(RCS_pft)
   call destroy(CanPStomaResistH2O_pft)
-  call destroy(MinCanPStomaResistH2O_pft)
+  call destroy(CanopyMinStomaResistH2O_pft)
   call destroy(CanopyBndlResist_col)
   call destroy(O2I_pft)
   call destroy(LeafIntracellularCO2_pft)
@@ -394,7 +400,7 @@ module CanopyDataType
   call destroy(Km4PEPCarboxy_pft)
   call destroy(LeafRuBPConc_pft)
   call destroy(FracLeafProtAsPEPCarboxyl_pft)
-  call destroy(SpecChloryfilAct_pft)
+  call destroy(SpecLeafChlAct_pft)
   call destroy(LeafC3ChlorofilConc_pft)
   call destroy(LeafC4ChlorofilConc_pft)
   call destroy(CanPCi2CaRatio)

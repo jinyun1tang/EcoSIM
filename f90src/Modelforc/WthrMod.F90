@@ -316,7 +316,7 @@ module WthrMod
         RadSWDirect_col(NY,NX)  = safe_adb(RADN_col(NY,NX)-RADZ,SineSunInclAngle_col(NY,NX))
         RadSWDirect_col(NY,NX)  = AMIN1(4.167_r8,RadSWDirect_col(NY,NX))
         RadSWDiffus_col(NY,NX)  = RADZ/TotSineSkyAngles_grd
-        RadPARDirect_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
+        RadDirectPAR_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
         RadPARDiffus_col(NY,NX) = RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES 
@@ -364,7 +364,7 @@ module WthrMod
       !     ELSE
       !     RADS=DIRECT SW RADIATION (MJ M-2 H-1)
       !     RadSWDiffus_col=INDIRECT SW RADIATION (MJ M-2 H-1)
-      !     RadPARDirect_col=DIRECT PAR (UMOL M-2 S-1)
+      !     RadDirectPAR_col=DIRECT PAR (UMOL M-2 S-1)
       !     RadPARDiffus_col=INDIRECT PAR (UMOL M-2 S-1)
       !     THSX=LW RADIATION (MJ M-2 H-1)
       !     TCA=AIR TEMPERATURE (C)
@@ -494,7 +494,7 @@ module WthrMod
 !
       RadSWDirect_col(NY,NX)  = RadSWDirect_col(NY,NX)*TDRAD(N,NY,NX)
       RadSWDiffus_col(NY,NX)  = RadSWDiffus_col(NY,NX)*TDRAD(N,NY,NX)
-      RadPARDirect_col(NY,NX) = RadPARDirect_col(NY,NX)*TDRAD(N,NY,NX)
+      RadDirectPAR_col(NY,NX) = RadDirectPAR_col(NY,NX)*TDRAD(N,NY,NX)
       RadPARDiffus_col(NY,NX) = RadPARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       WindSpeedAtm_col(NY,NX) = WindSpeedAtm_col(NY,NX)*TDWND(N,NY,NX)
       VPK_col(NY,NX)          = AMIN1(VPS(NY,NX),VPK_col(NY,NX)*TDHUM(N,NY,NX))
@@ -525,8 +525,9 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD_col(NY,NX)= &
-        RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)then
+        TRAD_col(NY,NX)= RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+      endif  
       HUDX_col(NY,NX)  = AMAX1(HUDX_col(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN_col(NY,NX)  = AMIN1(HUDN_col(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
       TWIND_col(NY,NX) = TWIND_col(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]

@@ -95,6 +95,9 @@ module RootDataType
   real(r8),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
   real(r8),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
+  real(r8),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
+  real(r8),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
+
 !----------------------------------------------------------------------
 
 contains
@@ -103,6 +106,8 @@ contains
   implicit none
   integer, intent(in) :: jroots
 
+  allocate(ROOTNLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTNLim_rpvr=0._r8
+  allocate(ROOTPLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTPLim_rpvr=0._r8
   allocate(RootMaintDef_CO2_pvr(jroots,JZ,JP,JY,JX)); RootMaintDef_CO2_pvr=0._r8
   allocate(Nutruptk_fClim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fClim_rpvr=0._r8
   allocate(Nutruptk_fNlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fNlim_rpvr=0._r8
@@ -195,6 +200,8 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(ROOTNLim_rpvr)
+  call destroy(ROOTPLim_rpvr)  
   call destroy(RootMaintDef_CO2_pvr)
   call destroy(RootGasConductance_pvr)
   call destroy(RootMassElm_vr)

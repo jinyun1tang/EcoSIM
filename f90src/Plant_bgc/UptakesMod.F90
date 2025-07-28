@@ -565,7 +565,7 @@ module UptakesMod
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
     Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
     NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
@@ -620,8 +620,8 @@ module UptakesMod
       VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC_pft(NZ)           = 0.0_r8
       Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
-      CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ) &
-        +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
+      CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
+        +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
       
       D4290: DO N=1,Myco_pft(NZ)
         DO  L=NU,MaxSoiL4Root_pft(NZ)
@@ -705,7 +705,7 @@ module UptakesMod
     LWRadGrnd_col             => plt_rad%LWRadGrnd_col                    ,& !input  :longwave radiation emitted by ground surface, [MJ m-2 h-1]
     LWRadSky_col              => plt_rad%LWRadSky_col                 ,& !input  :sky longwave radiation , [MJ d-2 h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
     Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
     NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
     PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft             ,& !input  :canopy osmotic water potential, [Mpa]
@@ -810,12 +810,12 @@ module UptakesMod
 !
 !     RCS=shape parameter for CanPStomaResistH2O_pftvs PSICanopyTurg_pft from PFT file
 !     RC=canopy stomatal resistance
-!     MinCanPStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
+!     CanopyMinStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
 !     CuticleResist_pft=cuticular resistance from PFT file
 !
     Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
-    CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ)+Stomata_Stress &
-      *(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))
+    CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ)+Stomata_Stress &
+      *(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))
 
 !
 !     CANOPY VAPOR PRESSURE AND EVAPORATION OF INTERCEPTED WATER
@@ -1234,7 +1234,7 @@ module UptakesMod
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
-    MinCanPStomaResistH2O_pft => plt_photo%MinCanPStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
     Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
     NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
@@ -1295,8 +1295,8 @@ module UptakesMod
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
   Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
-  CanPStomaResistH2O_pft(NZ) = MinCanPStomaResistH2O_pft(NZ) &
-    +(H2OCuticleResist_pft(NZ)-MinCanPStomaResistH2O_pft(NZ))*Stomata_Stress
+  CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
+    +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ) = ReistanceCanopy_pft(NZ)
   VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
   DeltaTKC_pft(NZ)         = 0.0_r8

@@ -662,8 +662,8 @@ module InitPlantMod
     Hours4Leafout_brch(NB,NZ)                     = Hours4LenthenPhotoPeriod_brch(NB,NZ)
     Hours4LeafOff_brch(NB,NZ)                     = Hours4ShortenPhotoPeriod_brch(NB,NZ)
     Hours2LeafOut_brch(NB,NZ)                     = 0._r8
-    RubiscoActivity_brch(NB,NZ)                   = 1.0
-    C4PhotosynDowreg_brch(NB,NZ)                  = 1.0
+    RubiscoActivity_brch(NB,NZ)                   = 1.0_r8
+    C4PhotosynDowreg_brch(NB,NZ)                  = 1.0_r8
     HourFailGrainFill_brch(NB,NZ)                 = 0
     HoursDoingRemob_brch(NB,NZ)                   = 0
     BranchNumber_brch(NB,NZ)                      = 0

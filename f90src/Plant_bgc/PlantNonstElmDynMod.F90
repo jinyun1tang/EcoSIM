@@ -197,8 +197,7 @@ module PlantNonstElmDynMod
         .AND. PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         !root
         WTRTD1=PopuRootMycoC_pvr(ipltroot,L,NZ)
-        WTRTD2=AMIN1(PopuRootMycoC_pvr(ipltroot,L,NZ),AMAX1(FSNK &
-        *PopuRootMycoC_pvr(ipltroot,L,NZ), PopuRootMycoC_pvr(N,L,NZ)))
+        WTRTD2=AMIN1(PopuRootMycoC_pvr(ipltroot,L,NZ),AMAX1(FSNK*PopuRootMycoC_pvr(ipltroot,L,NZ), PopuRootMycoC_pvr(N,L,NZ)))
         TwoCompMassC=WTRTD1+WTRTD2
         IF(TwoCompMassC.GT.ZERO4Groth_pft(NZ))THEN
           NonstElmGradt=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*WTRTD2 &

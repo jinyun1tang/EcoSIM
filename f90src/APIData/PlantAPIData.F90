@@ -89,7 +89,7 @@ implicit none
 
   type, public :: plant_photosyns_type
   integer,  pointer :: iPlantPhotosynthesisType(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
-  real(r8), pointer :: SpecChloryfilAct_pft(:)              => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
+  real(r8), pointer :: SpecLeafChlAct_pft(:)              => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
   real(r8), pointer :: LeafC3ChlorofilConc_pft(:)           => null()  !leaf C3 chlorophyll content,                                               [gC gC-1]
   real(r8), pointer :: FracLeafProtAsPEPCarboxyl_pft(:)   => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
   real(r8), pointer :: LeafC4ChlorofilConc_pft(:)           => null()  !leaf C4 chlorophyll content,                                               [gC gC-1]
@@ -114,7 +114,7 @@ implicit none
   real(r8), pointer :: CanopyGasCO2_pft(:)                  => null()   !canopy gaesous CO2 concentration,                                         [umol mol-1]
   real(r8), pointer :: O2L_pft(:)                           => null()   !leaf aqueous O2 concentration,                                            [uM]
   real(r8), pointer :: Km4PEPCarboxy_pft(:)                 => null()   !Km for PEP carboxylase activity,                                          [uM]
-  real(r8), pointer :: MinCanPStomaResistH2O_pft(:)         => null()   !canopy minimum stomatal resistance,                          [s m-1]
+  real(r8), pointer :: CanopyMinStomaResistH2O_pft(:)         => null()   !canopy minimum stomatal resistance,                          [s m-1]
   real(r8), pointer :: CuticleResist_pft(:)                 => null()   !maximum stomatal resistance to vapor,                        [s m-1]
   real(r8), pointer :: CanPStomaResistH2O_pft(:)            => null()   !canopy stomatal resistance,                                  [h m-1]
   real(r8), pointer :: CanopyBndlResist_pft(:)              => null()   !canopy boundary layer resistance,                            [h m-1]
@@ -151,7 +151,7 @@ implicit none
   real(r8) :: RadSWDiffus_col                !diffuse shortwave radiation, [W m-2]
   real(r8) :: RadSWDirect_col                !direct shortwave radiation, [W m-2]
   real(r8) :: RadPARDiffus_col               !diffuse PAR, [umol m-2 s-1]
-  real(r8) :: RadPARDirect_col               !direct PAR, [umol m-2 s-1]
+  real(r8) :: RadDirectPAR_col               !direct PAR, [umol m-2 s-1]
   real(r8) :: Eco_NetRad_col                 !ecosystem net radiation, [MJ d-2 h-1]
   real(r8) :: RadSWSolarBeam_col             !shortwave radiation in solar beam, [MJ m-2 h-1]
   real(r8) :: FracSWRad2Grnd_col             !fraction of radiation intercepted by ground surface, [-]
@@ -183,7 +183,7 @@ implicit none
   real(r8), pointer :: RadPARLeafTransmis_pft(:) => null() !canopy PAR transmissivity,                         [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
   real(r8), pointer :: FracPARads2Canopy_pft(:)  => null() !fraction of incoming PAR absorbed by canopy,       [-]
-  real(r8), pointer :: RadPAR_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
+  real(r8), pointer :: RadTotPAR_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
   real(r8), pointer :: RadDifPAR_zsec(:,:,:,:)   => null()  !diffuse incoming PAR,                             [umol m-2 s-1]
   contains
     procedure, public :: Init    => plt_rad_init
@@ -527,6 +527,9 @@ implicit none
   real(r8), pointer :: GrainStrutElms_pft(:,:)              => null()   !canopy grain structural element,                     [g d-2]
   real(r8), pointer :: EarStrutElms_pft(:,:)                => null()   !canopy ear structural element,                       [g d-2]
   real(r8), pointer :: CanopyMassC_pft(:)                   => null()   !Canopy biomass C,                                    [g d-2]
+  real(r8), pointer :: ROOTNLim_rpvr(:,:,:)                 => null()   !root N-limitation, 0->1 weaker limitation, [-]     
+  real(r8), pointer :: ROOTPLim_rpvr(:,:,:)                 => null()   !root P-limitation, 0->1 weaker limitation, [-]         
+
   contains
     procedure, public :: Init => plt_biom_init
     procedure, public :: Destroy => plt_biom_destroy
@@ -657,6 +660,8 @@ implicit none
   real(r8), pointer :: RootO2_TotSink_vr(:)                => null()  !all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
   real(r8), pointer :: RCanMaintDef_CO2_pft(:)             => null()  !canopy maintenance respiraiton deficit as CO2, [gC d-2 h-1]  
   real(r8), pointer :: CanopyRespC_CumYr_pft(:)            => null()  !total autotrophic respiration,               [gC d-2 ]
+  real(r8), pointer :: CanopyNLimFactor_brch(:,:)          => null()  !Canopy N-limitation factor, [0->1] weaker limitation,[-]  
+  real(r8), pointer :: CanopyPLimFactor_brch(:,:)          => null()  !Canopy P-limitation factor, [0->1] weaker limitation,[-]    
   real(r8), pointer :: LitrfalStrutElms_pvr(:,:,:,:,:)     => null()  !plant LitrFall element,                      [g d-2 h-1]
   real(r8), pointer :: RootMaintDef_CO2_pvr(:,:,:)         => null()  !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
   real(r8), pointer :: REcoO2DmndResp_vr(:)                => null()  !total root + microbial O2 uptake,            [g d-2 h-1]
@@ -1043,6 +1048,8 @@ implicit none
   allocate(this%RootO2_TotSink_pvr(jroots,JZ1,JP1)); this%RootO2_TotSink_pvr=0._r8
   allocate(this%RootO2_TotSink_vr(JZ1)); this%RootO2_TotSink_vr=0._r8
   allocate(this%CanopyRespC_CumYr_pft(JP1));this%CanopyRespC_CumYr_pft=spval
+  allocate(this%CanopyNLimFactor_brch(MaxNumBranches,JP1));this%CanopyNLimFactor_brch=1._r8
+  allocate(this%CanopyPLimFactor_brch(MaxNumBranches,JP1));this%CanopyPLimFactor_brch=1._r8
   allocate(this%REcoH1PO4DmndBand_vr(0:JZ1));this%REcoH1PO4DmndBand_vr=spval
   allocate(this%REcoNO3DmndSoil_vr(0:JZ1));this%REcoNO3DmndSoil_vr=spval
   allocate(this%REcoH2PO4DmndSoil_vr(0:JZ1));this%REcoH2PO4DmndSoil_vr=spval
@@ -1305,6 +1312,8 @@ implicit none
   allocate(this%PopuRootMycoC_pvr(jroots,JZ1,JP1));this%PopuRootMycoC_pvr=spval
   allocate(this%RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootMycoNonstElms_rpvr=spval
   allocate(this%RootNonstructElmConc_rpvr(NumPlantChemElms,jroots,JZ1,JP1));this%RootNonstructElmConc_rpvr=spval
+  allocate(this%ROOTNLim_rpvr(jroots,JZ1,JP1)); this%ROOTNLim_rpvr=0._r8
+  allocate(this%ROOTPLim_rpvr(jroots,JZ1,JP1)); this%ROOTPLim_rpvr=0._r8
   allocate(this%CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNonstElms_brch=spval
   allocate(this%C4PhotoShootNonstC_brch(MaxNumBranches,JP1));this%C4PhotoShootNonstC_brch=spval
   allocate(this%CanopySapwoodC_pft(JP1));this%CanopySapwoodC_pft=spval
@@ -1625,7 +1634,7 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
-  allocate(this%RadPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadPAR_zsec=0._r8
+  allocate(this%RadTotPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadTotPAR_zsec=0._r8
   allocate(this%RadDifPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
   allocate(this%RadSWLeafAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
@@ -1663,7 +1672,7 @@ implicit none
   class(plant_photosyns_type) :: this
 
   allocate(this%CuticleResist_pft(JP1));this%CuticleResist_pft=spval
-  allocate(this%MinCanPStomaResistH2O_pft(JP1));this%MinCanPStomaResistH2O_pft=spval
+  allocate(this%CanopyMinStomaResistH2O_pft(JP1));this%CanopyMinStomaResistH2O_pft=spval
   allocate(this%LeafO2Solubility_pft(JP1));this%LeafO2Solubility_pft=spval
   allocate(this%CanopyBndlResist_pft(JP1));this%CanopyBndlResist_pft=spval
   allocate(this%CanPStomaResistH2O_pft(JP1));this%CanPStomaResistH2O_pft=spval
@@ -1693,7 +1702,7 @@ implicit none
   allocate(this%CO2Solubility_pft(JP1));this%CO2Solubility_pft=spval
   allocate(this%CanopyGasCO2_pft(JP1));this%CanopyGasCO2_pft=spval
   allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
-  allocate(this%SpecChloryfilAct_pft(JP1));this%SpecChloryfilAct_pft=spval
+  allocate(this%SpecLeafChlAct_pft(JP1));this%SpecLeafChlAct_pft=spval
   allocate(this%LeafC3ChlorofilConc_pft(JP1));this%LeafC3ChlorofilConc_pft=spval
   allocate(this%FracLeafProtAsPEPCarboxyl_pft(JP1));this%FracLeafProtAsPEPCarboxyl_pft=spval
   allocate(this%LeafC4ChlorofilConc_pft(JP1));this%LeafC4ChlorofilConc_pft=spval

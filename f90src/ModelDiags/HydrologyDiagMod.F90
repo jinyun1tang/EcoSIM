@@ -2,6 +2,7 @@ module HydrologyDiagMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: isclose, AZMAX1, AZMIN1
   use EcosimConst,   only: mGravAccelerat
+  use DebugToolMod  
   use SoilWaterDataType
   use GridDataType  
   use EcoSIMCtrlDataType
@@ -35,9 +36,10 @@ module HydrologyDiagMod
   real(r8) :: THETWP  
   integer :: LL,L
   logical :: FoundWaterTable
+  character(len=*), parameter :: subname='DiagWaterTBLDepz'
 
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   THETPW          = 0.01_r8
   THETWP          = 1.0_r8-THETPW
   FoundWaterTable = .false.
@@ -50,7 +52,7 @@ module HydrologyDiagMod
 !     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
 !     DepzIntWTBL_col=water table depth
 !
-    IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
+    IF(VLSoilMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
       THETI_vr(L,NY,NX)    = 0._r8
       ThetaAir_vr(L,NY,NX) = 0._r8
@@ -116,5 +118,6 @@ module HydrologyDiagMod
       ENDIF      
     ENDIF
   END DO
+  call PrintInfo('end '//subname)
   end subroutine DiagWaterTBLDepz
 end module HydrologyDiagMod  

@@ -167,7 +167,7 @@ implicit none
     DO L=1,NumCanopyLayers
       DO  M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafZenithSectors
-          plt_rad%RadPAR_zsec(N,M,L,NZ)    = RadPAR_zsec(N,M,L,NZ,NY,NX)
+          plt_rad%RadTotPAR_zsec(N,M,L,NZ)    = RadTotPAR_zsec(N,M,L,NZ,NY,NX)
           plt_rad%RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO

@@ -96,7 +96,6 @@ module Hour1Mod
 
   character(len=*), parameter :: subname='hour1'
   integer :: L,NX,NY
-  real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
   real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
@@ -162,7 +161,6 @@ module Hour1Mod
 !     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
 !
-      if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
       call SetHourlyDiagnostics(I,J,NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
@@ -684,10 +682,11 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NX,NY
-
   integer :: L
+  character(len=*), parameter :: subname='SetHourlyDiagnostics'
+  
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
   trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
@@ -739,7 +738,7 @@ module Hour1Mod
   tHxPO4_col(NY,NX)                          = 0._r8
   tXPO4_col(NY,NX)                           = 0._r8
   UION_col(NY,NX)                            = 0._r8
-  QDischarg2WTBL_col(NY,NX)                        = 0._r8
+  QDischarg2WTBL_col(NY,NX)                  = 0._r8
   PrecHeat_col(NY,NX)                        = 0._r8
   QDrain_col(NY,NX)                          = 0._r8
   QDrainloss_vr(:,NY,NX)   =0._r8
@@ -806,22 +805,23 @@ module Hour1Mod
     trcSalt_snowMassloss_col(:,NY,NX)      = 0._r8
     trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8    
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
 
   subroutine SetArrays4PlantSoilTransfer(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-
+  character(len=*), parameter :: subname='SetArrays4PlantSoilTransfer'
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL_col(NY,NX),NY,NX) = 0._r8
   HeatSource_col(NY,NX)                                                               = 0._r8
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                     = 0._r8
   RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                                  = 0._r8
-  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)                = 0._r8
-  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                       = 0._r8
-  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)              = 0._r8
+  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                  = 0._r8
+  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
   TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
@@ -831,6 +831,7 @@ module Hour1Mod
   REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   RainLitr_col(NY,NX)                                                                 = 0._r8
   trcs_netpro_vr(:,:,NY,NX)                                                           = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine SetArrays4PlantSoilTransfer
 
 !------------------------------------------------------------------------------------------
@@ -1458,6 +1459,9 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
 
   integer :: L,idg
+  character(len=*), parameter :: subname='GetChemicalConcsInSoil'
+
+  call PrintInfo('beg '//subname)
 !     begin_execution
 
 !     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
@@ -1470,7 +1474,7 @@ module Hour1Mod
     !
     !     GAS CONCENTRATIONS
     !
-    IF(ThetaAir_vr(L,NY,NX).GT.AirFillPore_Min)THEN
+    IF(VLsoiAirP_vr(L,NY,NX).GT.AirFillPore_Min)THEN
       DO idg=idg_beg,idg_NH3
         trcg_gascl_vr(idg,L,NY,NX)=AZMAX1(trcg_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
@@ -1494,6 +1498,7 @@ module Hour1Mod
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
   ENDDO
+  call PrintInfo('end '//subname)  
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------
 
@@ -1502,8 +1507,9 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
 
   integer :: K,L,NTSA
+  character(len=*), parameter :: subname='ZeroHourlyArrays'
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
@@ -1567,6 +1573,7 @@ module Hour1Mod
   ENDDO
   trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)      = 0._r8
   trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------

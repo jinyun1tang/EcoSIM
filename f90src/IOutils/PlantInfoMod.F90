@@ -427,7 +427,7 @@ implicit none
     VmaxRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
     VmaxRubOxyRef_pft(NZ,NY,NX)      = 2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecChloryfilAct_pft(NZ,NY,NX)   = 2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
+    SpecLeafChlAct_pft(NZ,NY,NX)     = 2.5_r8*SpecLeafChlAct_pft(NZ,NY,NX)
     LeafSWabsorpty_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
     LeafPARabsorpty_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
     RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
@@ -497,7 +497,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecChloryfilAct_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
@@ -640,7 +640,7 @@ implicit none
   Km4PEPCarboxy_pft(NZ,NY,NX)             = Km4PEPCarboxy_tab(loc)
   LeafRuBPConc_pft(NZ,NY,NX)              = LeafRuBPConc_tab(loc)
   FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX) = FracLeafProtAsPEPCarboxyl_tab(loc)
-  SpecChloryfilAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
+  SpecLeafChlAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
   LeafC3ChlorofilConc_pft(NZ,NY,NX)       = LeafC3ChlorofilConc_tab(loc)
   LeafC4ChlorofilConc_pft(NZ,NY,NX)       = LeafC4ChlorofilConc_tab(loc)
   CanPCi2CaRatio(NZ,NY,NX)                = CanPCi2CaRatio_tab(loc)
@@ -951,7 +951,7 @@ implicit none
   call writefixl(nu_plt,'Fraction of leaf protein in rubisco (g rub/(g protein)) RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)) PEPC',&
     FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecChloryfilAct_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein)) CHL',&
       LeafC3ChlorofilConc_pft(NZ,NY,NX),90)

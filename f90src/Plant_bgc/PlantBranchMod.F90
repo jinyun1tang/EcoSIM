@@ -45,7 +45,7 @@ module PlantBranchMod
   real(r8), intent(inout) :: CanopyN2Fix_pft(JP1)
   real(r8), intent(out) :: PTRT
   integer, intent(out) :: BegRemoblize
-  real(r8) :: DMSHD
+  real(r8) :: DMSHD                     !respiraiton ratio of canopy growth, 1./DMSHD, total biomass required to give 1 unit of CO2 respiration
   integer  :: MinNodeNum  
   REAL(R8) :: CH2O3(pltpar%MaxNodesPerBranch1),CH2O4(pltpar%MaxNodesPerBranch1)
   integer  :: LRemob_brch
@@ -129,7 +129,7 @@ module PlantBranchMod
 !
     call GrowStalkOnBranch(NZ,NB,Growth_brch(:,ibrch_stalk),EtoliationCoeff)
 
-!
+    !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
     !   ON SHOOT NON-STRUCTURAL C:N:P
     !
@@ -142,16 +142,12 @@ module PlantBranchMod
 !
     IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0.AND.LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
       CCC=AZMAX1(AMIN1(1.0_r8 &
-        ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
-        +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
-        ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ) &
-        +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)))
+        ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
+        ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)))
       CNC=AZMAX1(AMIN1(1.0_r8 &
-        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/CNKI)))
+        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)+LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/CNKI)))
       CPC=AZMAX1(AMIN1(1.0_r8 &
-        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
-        +LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/CPKI)))
+        ,LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)+LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/CPKI)))
     ELSE
       CCC=0._r8
       CNC=0._r8
@@ -394,11 +390,15 @@ module PlantBranchMod
   real(r8), intent(in) :: CNRTW,CPRTW   !root/stalk
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
   real(r8), intent(out) :: ShootStructE_brch(NumPlantChemElms)    
-  real(r8), intent(out) :: DMSHD,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(out) :: DMSHD                               !respiraiton ratio of canopy growth, 1./DMSHD, total biomass required to give 1 unit of CO2 respiration
+  real(r8), intent(out) :: CNLFM,CPLFM
+  real(r8), intent(out) :: CNSHX,CPSHX
+  real(r8), intent(out) :: CNLFX,CPLFX
   real(r8), intent(out) :: DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB
 
   character(len=*), parameter :: subname='UpdateBranchAllometry'
-  real(r8)   :: DMSHT  
+  real(r8)   :: DMSHT  !shoot C biomass yield, averaged across all canopy organs
+
   associate(                                                         &
     LeafBiomGrowthYld_pft    => plt_allom%LeafBiomGrowthYld_pft     ,& !input  :leaf growth yield, [g g-1]
     PetioleBiomGrowthYld_pft => plt_allom%PetioleBiomGrowthYld_pft  ,& !input  :sheath growth yield, [g g-1]
@@ -482,9 +482,6 @@ module PlantBranchMod
   ShootStructE_brch(ielmc) = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ)+SapwoodBiomassC_brch(NB,NZ))
   ShootStructE_brch(ielmn) = AZMAX1(LeafStrutElms_brch(ielmn,NB,NZ)+PetoleStrutElms_brch(ielmn,NB,NZ)+SapwoodBiomassC_brch(NB,NZ)*rNCStalk_pft(NZ))
   ShootStructE_brch(ielmp) = AZMAX1(LeafStrutElms_brch(ielmp,NB,NZ)+PetoleStrutElms_brch(ielmp,NB,NZ)+SapwoodBiomassC_brch(NB,NZ)*rPCStalk_pft(NZ))
-!  write(556,*)part,'part'
-!  write(556,*)DMSHT,DMSHD,'shoot-root'
-!  write(556,*)CNSHX,CPSHX,'shootx'
   
   IF(iPlantCalendar_brch(ipltcal_EndSeedFill,NB,NZ).EQ.0)THEN
     ShootStructE_brch(ielmn)=ShootStructE_brch(ielmn)+AZMAX1(HuskStrutElms_brch(ielmn,NB,NZ) &
@@ -757,7 +754,9 @@ module PlantBranchMod
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: DMSHD
-  real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(in) :: CNLFM,CPLFM
+  real(r8), intent(in) :: CNSHX,CPSHX
+  real(r8), intent(in) :: CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN,TFN5,WaterStress4Groth
   real(r8), intent(in) :: Stomata_Stress,CanTurgPSIFun4Expans
   real(r8), intent(out) :: RCO2NonstC_brch
@@ -2087,10 +2086,8 @@ module PlantBranchMod
 !     ChemElmRsrv2Grain(ielmn),ChemElmRsrv2Grain(ielmp)=N,P translocation rate from reserve to grain
 !
     IF(StalkRsrvElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      ZNPGN=StalkRsrvElms_brch(ielmn,NB,NZ)/(StalkRsrvElms_brch(ielmn,NB,NZ) &
-        +SETN*StalkRsrvElms_brch(ielmc,NB,NZ))
-      ZNPGP=StalkRsrvElms_brch(ielmp,NB,NZ)/(StalkRsrvElms_brch(ielmp,NB,NZ) &
-        +SETP*StalkRsrvElms_brch(ielmc,NB,NZ))
+      ZNPGN=StalkRsrvElms_brch(ielmn,NB,NZ)/(StalkRsrvElms_brch(ielmn,NB,NZ)+SETN*StalkRsrvElms_brch(ielmc,NB,NZ))
+      ZNPGP=StalkRsrvElms_brch(ielmp,NB,NZ)/(StalkRsrvElms_brch(ielmp,NB,NZ)+SETP*StalkRsrvElms_brch(ielmc,NB,NZ))
       ZPGRN                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
       ZPGRP                    = ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
       ChemElmRsrv2Grain(ielmn) = AMIN1(MaxChemElmRsrv2Grain*rNCGrain_pft(NZ) &
@@ -2936,9 +2933,10 @@ module PlantBranchMod
   real(r8), intent(in) :: CNLFM,CPLFM
   real(r8), intent(in) :: CNSHX,CPSHX
   real(r8), intent(in) :: CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN,CO2F
-  real(r8), intent(in) :: CH2O  !total CH2O production
-  real(r8), intent(in) :: TFN5  !temperature function for canopy maintenance respiration
+  real(r8), intent(in) :: ShootStructN
+  real(r8), intent(in) :: CO2F      !CO2 fixation rate, [gC h-1 d-2]
+  real(r8), intent(in) :: CH2O      !total CH2O production
+  real(r8), intent(in) :: TFN5      !temperature function for canopy maintenance respiration
   real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: CanTurgPSIFun4Expans
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
@@ -2970,7 +2968,9 @@ module PlantBranchMod
     ECO_ER_col                => plt_bgcr%ECO_ER_col                 ,& !inoput :ecosystem respiration, [g d-2 h-1]
     GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft            ,& !inoput :total gross CO2 fixation, [gC d-2 ]
     RCanMaintDef_CO2_pft      => plt_bgcr%RCanMaintDef_CO2_pft       ,& !inoput :canopy maintenance respiraiton deficit as CO2, [gC d-2 h-1]
-    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft       & !inoput :total autotrophic respiration, [gC d-2 ]
+    CanopyRespC_CumYr_pft     => plt_bgcr%CanopyRespC_CumYr_pft      ,& !inoput :total autotrophic respiration, [gC d-2 ]
+    CanopyNLimFactor_brch     => plt_bgcr%CanopyNLimFactor_brch      ,& !output :Canopy N-limitation factor, [0->1] stronger limitation
+    CanopyPLimFactor_brch     => plt_bgcr%CanopyPLimFactor_brch       & !output :Canopy P-limitation factor, [0->1] stronger limitation    
   )
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -2985,8 +2985,13 @@ module PlantBranchMod
       +LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI)
     CNPG=AMIN1(CNG,CPG)
   ELSE
+    CNG=1._r8
+    CPG=1._r8
     CNPG=1.0_r8
   ENDIF
+  CanopyNLimFactor_brch(NB,NZ)=CNG
+  CanopyPLimFactor_brch(NB,NZ)=CPG
+
 !
 ! RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
 ! NON-STRUCTURAL C:N:P
@@ -3046,8 +3051,8 @@ module PlantBranchMod
   IF(RCO2Y.GT.0.0_r8 .AND. (CNSHX.GT.0.0_r8 .OR. CNLFX.GT.0.0_r8))THEN
     ZPOOLB      = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
     PPOOLB      = AZMAX1(CanopyNonstElms_brch(ielmp,NB,NZ))
-    RFN1=ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG)
-    RFP1=PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG)
+    RFN1        = ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG)
+    RFP1        = PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG)
     RGFNP       = AMIN1(RFN1,RFP1)
     RgroCO2_ltd = AMIN1(RCO2Y,RGFNP)
   ELSE

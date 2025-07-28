@@ -95,7 +95,7 @@ implicit none
   real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
-  real(r8),target,allocatable ::  RadPARDirect_col(:,:)              !direct PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadDirectPAR_col(:,:)              !direct PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)              !sine of solar angle, [-]
   real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)        !sine of solar angle next hour, [-]
@@ -204,7 +204,7 @@ implicit none
   allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
-  allocate(RadPARDirect_col(JY,JX));        RadPARDirect_col=0._r8
+  allocate(RadDirectPAR_col(JY,JX));        RadDirectPAR_col=0._r8
   allocate(RadPARDiffus_col(JY,JX));        RadPARDiffus_col=0._r8
   allocate(SineSunInclAngle_col(JY,JX));        SineSunInclAngle_col=0._r8
   allocate(SineSunInclAnglNxtHour_col(JY,JX));       SineSunInclAnglNxtHour_col=0._r8
@@ -298,7 +298,7 @@ implicit none
   call destroy(CO2E_col)
   call destroy(RadSWDirect_col)
   call destroy(RadSWDiffus_col)
-  call destroy(RadPARDirect_col)
+  call destroy(RadDirectPAR_col)
   call destroy(RadPARDiffus_col)
   call destroy(SineSunInclAngle_col)
   call destroy(SineSunInclAnglNxtHour_col)

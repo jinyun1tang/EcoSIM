@@ -248,6 +248,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_TEMPFN_ptc(:)  
   real(r8),pointer   :: h1D_CAN_CO2_FLX_ptc(:) 
   real(r8),pointer   :: h1D_CAN_GPP_ptc(:)     
+  real(r8),pointer   :: h1D_dCAN_GPP_CLIM_ptc(:)
+  real(r8),pointer   :: h1D_dCAN_GPP_eLIM_ptc(:)  
   real(r8),pointer   :: h1D_CAN_RA_ptc(:)      
   real(r8),pointer   :: h1D_CAN_GROWTH_ptc(:)
   real(r8),pointer   :: h1D_cTNC_ptc(:)        
@@ -255,6 +257,7 @@ implicit none
   real(r8),pointer   :: h1D_cTNP_ptc(:)    
   real(r8),pointer   :: h1D_CanNonstBConc_ptc(:)      
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:)
+  real(r8),pointer   :: h1D_STOML_Min_RSC_CO2_ptc(:)
   real(r8),pointer   :: h1D_Km_CO2_carboxy_ptc(:)
   real(r8),pointer   :: h1D_Ci_mesophyll_ptc(:)
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:) 
@@ -358,6 +361,8 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)       
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:) 
   real(r8),pointer   :: h2D_RootMaintDef_CO2_pvr(:,:)
+  real(r8),pointer   :: h2D_ROOTNLim_rpvr(:,:)
+  real(r8),pointer   :: h2D_ROOTPLim_rpvr(:,:)  
   real(r8),pointer   :: h1D_RootMaintDef_CO2_pft(:)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)    
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
@@ -372,6 +377,8 @@ implicit none
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:) 
   real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:) 
   real(r8),pointer   :: h1D_RUB_ACTVN_ptc(:)    
+  real(r8),pointer   :: h1D_CanopyNLim_ptc(:)
+  real(r8),pointer   :: h1D_CanopyPLim_ptc(:)
   real(r8),pointer   :: h3D_PARTS_ptc(:,:,:)      
   real(r8),pointer   :: h2D_Gas_Pressure_vr(:,:)
   real(r8),pointer   :: h2D_N2O_Gas_ppmv_vr(:,:)  
@@ -712,6 +719,8 @@ implicit none
   allocate(this%h1D_CAN_TEMPFN_ptc(beg_ptc:end_ptc))      ;this%h1D_CAN_TEMPFN_ptc(:)=spval
   allocate(this%h1D_CAN_CO2_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_CAN_CO2_FLX_ptc(:)=spval
   allocate(this%h1D_CAN_GPP_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_GPP_ptc(:)=spval
+  allocate(this%h1D_dCAN_GPP_CLIM_ptc(beg_ptc:end_ptc))    ;this%h1D_dCAN_GPP_CLIM_ptc(:)=spval
+  allocate(this%h1D_dCAN_GPP_eLIM_ptc(beg_ptc:end_ptc))    ;this%h1D_dCAN_GPP_eLIM_ptc(:)=spval
   allocate(this%h1D_CAN_RA_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RA_ptc(:)=spval
   allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))         ;this%h1D_LEAF_PC_ptc(:)=spval
   allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RN_ptc(:)=spval
@@ -723,6 +732,7 @@ implicit none
   allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNP_ptc(:)=spval
   allocate(this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)) ;this%h1D_CanNonstBConc_ptc(:)=spval
   allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))   ;this%h1D_STOML_RSC_CO2_ptc(:)=spval
+  allocate(this%h1D_STOML_Min_RSC_CO2_ptc(beg_ptc:end_ptc));this%h1D_STOML_Min_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)); this%h1D_Km_CO2_carboxy_ptc(:)=spval
   allocate(this%h1D_Ci_mesophyll_ptc(beg_ptc:end_ptc)); this%h1D_Ci_mesophyll_ptc(:)=spval
   allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_CO2_ptc(:)=spval
@@ -847,6 +857,8 @@ implicit none
   allocate(this%h2D_VHeatCap_vr(beg_col:end_col,1:JZ));this%h2D_VHeatCap_vr(:,:)=spval
   allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
   allocate(this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc));  this%h1D_RUB_ACTVN_ptc(:)=spval
+  allocate(this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyNLim_ptc(:)=spval
+  allocate(this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyPLim_ptc(:)=spval  
   allocate(this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ))    ;this%h2D_RNITRIF_vr(:,:)=spval
   allocate(this%h2D_Aqua_N2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_N2_vr(:,:)=spval  
   allocate(this%h2D_Aqua_H2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_H2_vr(:,:)=spval  
@@ -1016,6 +1028,8 @@ implicit none
   allocate(this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
   allocate(this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMaintDef_CO2_pvr(:,:)=spval
+  allocate(this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTNLim_rpvr(:,:)=spval
+  allocate(this%h2D_ROOTPLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTPLim_rpvr(:,:)=spval
   allocate(this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_ROOT_OSTRESS_pvr(:,:)=spval
   allocate(this%h2D_prtUP_NH4_pvr(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NH4_pvr(:,:)=spval                                                              
   allocate(this%h2D_prtUP_NO3_pvr(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NO3_pvr(:,:)=spval                                                              
@@ -1773,6 +1787,16 @@ implicit none
   call hist_addfld1d(fname='CAN_GPP_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Plant canopy gross CO2 fixation',ptr_patch=data1d_ptr)      
   
+  data1d_ptr => this%h1D_dCAN_GPP_CLIM_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='dCAN_GPP_CLIM_pft',units='gC/m2/hr',avgflag='A',&
+    long_name='Plant canopy CO2-limited gross CO2 fixation minus acutal value',ptr_patch=data1d_ptr,&
+    default='inactive')      
+
+  data1d_ptr => this%h1D_dCAN_GPP_eLIM_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='dCAN_GPP_eLIM_pft',units='gC/m2/hr',avgflag='A',&
+    long_name='Plant canopy light-limited gross CO2 fixation minus actual value',ptr_patch=data1d_ptr,&
+    default='inactive')      
+
   data1d_ptr => this%h1D_CAN_RA_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_RA_pft',units='gC/m2/hr',avgflag='A',&
     long_name='total aboveground autotrophic respiration',ptr_patch=data1d_ptr,&
@@ -1806,6 +1830,11 @@ implicit none
   data1d_ptr => this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='STOML_RSC_CO2_pft',units='s/m',avgflag='A',&
     long_name='Canopy stomatal resistance for CO2',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_STOML_Min_RSC_CO2_ptc(beg_ptc:end_ptc) 
+  call hist_addfld1d(fname='STOML_MinRSC_CO2_pft',units='s/m',avgflag='A',&
+    long_name='Canopy minimal stomatal resistance for CO2',ptr_patch=data1d_ptr,&
+    default='inactive')      
 
   data1d_ptr => this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Km_CO2_carboxy_pft',units='uM',avgflag='A',&
@@ -2405,6 +2434,14 @@ implicit none
   call hist_addfld1d(fname='RUB_ACTVN_pft',units='none',avgflag='A',&
     long_name='mean rubisco activity for CO2 fixation across branches, 0-1',ptr_patch=data1d_ptr,default='inactive')       
 
+  data1d_ptr => this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='CanopyNLim_pft',units='none',avgflag='A',&
+    long_name='mean canopy nitrogen limitation across branches, 0->1 weaker limitation',ptr_patch=data1d_ptr,default='inactive')       
+
+  data1d_ptr => this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='CanopyPLim_pft',units='none',avgflag='A',&
+    long_name='mean canopy phosphorus limitation across branches, 0->1 weaker limitation',ptr_patch=data1d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RNITRIF_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
     long_name='Nitrification rate from NH3 oxidation in each soil layer',ptr_col=data2d_ptr,&
@@ -2989,6 +3026,14 @@ implicit none
   call hist_addfld2d(fname='RootMaintDef_CO2_pvr',units='g CO2 m-2 h-1',type2d='levsoi',avgflag='A',&
     long_name='Plant root maintenance deficit each pft (<0 deficit)',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='RootNlim_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Plant root nitrogen limitation for each pft',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_ROOTPLim_rpvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='RootPlim_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Plant root phosphorus limitation for each pft',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root_OXYSTRESS_pvr',units='None',type2d='levsoi',avgflag='A',&
     long_name='Root Oxygen stress profile [0->1 weaker stress]',ptr_patch=data2d_ptr,default='inactive')       
@@ -3554,9 +3599,13 @@ implicit none
         this%h1D_SHOOT_NONSTC_ptc(nptc) = CanopyNonstElms_pft(ielmc,NZ,NY,NX)
         this%h1D_SHOOT_NONSTN_ptc(nptc) = CanopyNonstElms_pft(ielmn,NZ,NY,NX)
         this%h1D_SHOOT_NONSTP_ptc(nptc) = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
+
         if(CO2FixLL_pft(NZ,NY,NX)/=spval .and. CO2FixCL_pft(NZ,NY,NX)/=spval)then
+          this%h1D_dCAN_GPP_CLIM_ptc(nptc) = (CO2FixCL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          this%h1D_dCAN_GPP_eLIM_ptc(nptc) = (CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
           if(CO2FixLL_pft(NZ,NY,NX)>1.e-8_r8)this%h1D_CFIX_lmtf_ptc(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
         endif
+
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin_pft(NZ,NY,NX)
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
@@ -3575,6 +3624,7 @@ implicit none
         this%h1D_cTNP_ptc(nptc)          = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
         this%h1D_CanNonstBconc_ptc(nptc) = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX))
         this%h1D_STOML_RSC_CO2_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
+        this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=CanopyMinStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_Km_CO2_carboxy_ptc(nptc)= Km4RubiscoCarboxy_pft(NZ,NY,NX)
         this%h1D_Ci_mesophyll_ptc(nptc)  = LeafIntracellularCO2_pft(NZ,NY,NX)
         this%h1D_BLYR_RSC_CO2_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
@@ -3696,15 +3746,23 @@ implicit none
             ENDIF  
           ENDDO
           this%h1D_RUB_ACTVN_ptc(nptc)=0._r8; NB1=0
+          this%h1D_CanopyNLim_ptc(nptc)=0._r8
+          this%h1D_CanopyPLim_ptc(nptc)=0._r8
           DO NB=1,NumOfBranches_pft(NZ,NY,NX)
             this%h2D_LEAF_NODE_NO_ptc(nptc,NB)              = NumOfLeaves_brch(NB,NZ,NY,NX)
             if(RubiscoActivity_brch(NB,NZ,NY,NX)>0._r8)then
               NB1=NB1+1
               this%h1D_RUB_ACTVN_ptc(nptc)   = this%h1D_RUB_ACTVN_ptc(nptc)+ RubiscoActivity_brch(NB,NZ,NY,NX)
+              this%h1D_CanopyNLim_ptc(nptc)  = this%h1D_CanopyNLim_ptc(nptc)+ CanopyNLimFactor_brch(NB,NZ,NY,NX)
+              this%h1D_CanopyPLim_ptc(nptc)  = this%h1D_CanopyPLim_ptc(nptc)+ CanopyPLimFactor_brch(NB,NZ,NY,NX)      
             endif
-            this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB) = PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)
+            this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,NB) = PARTS_brch(1:NumOfPlantMorphUnits,NB,NZ,NY,NX)            
           ENDDO
-          if(NB1>0)this%h1D_RUB_ACTVN_ptc(nptc)=this%h1D_RUB_ACTVN_ptc(nptc)/real(NB1,kind=r8)
+          if(NB1>0)then
+            this%h1D_RUB_ACTVN_ptc(nptc)=this%h1D_RUB_ACTVN_ptc(nptc)/real(NB1,kind=r8)
+            this%h1D_CanopyNLim_ptc(nptc)=this%h1D_CanopyNLim_ptc(nptc)/real(NB1,kind=r8)
+            this%h1D_CanopyPLim_ptc(nptc)=this%h1D_CanopyPLim_ptc(nptc)/real(NB1,kind=r8)            
+          endif
         endif
         DO L=1,NumCanopyLayers
           this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3733,7 +3791,8 @@ implicit none
             sum(RootNutUptake_pvr(ids_H2PO4B,:,L,NZ,NY,NX)))/AREA_3D(3,L,NY,NX)
           this%h2D_DNS_RT_pvr(nptc,L) = RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)* &
             PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+          this%h2D_ROOTNLim_rpvr(nptc,L) = ROOTNLim_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_ROOTPLim_rpvr(nptc,L) = ROOTPLim_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_Root1stStrutC_pvr(nptc,L) = 0._r8
           this%h2D_Root1stStrutN_pvr(nptc,L) = 0._r8
           this%h2D_Root1stStrutP_pvr(nptc,L) = 0._r8
