@@ -52,7 +52,7 @@ implicit none
     CO2lmtRubiscoCarboxyRate_node => plt_photo%CO2lmtRubiscoCarboxyRate_node  ,& !input  :carboxylation rate, [umol m-2 s-1]
     LeafIntracellularCO2_pft      => plt_photo%LeafIntracellularCO2_pft       ,& !input  :leaf gaseous CO2 concentration, [umol m-3]
     CO2CuticleResist_pft          => plt_photo%CO2CuticleResist_pft           ,& !input  :maximum stomatal resistance to CO2, [s h-1]
-    Vmax4RubiscoCarboxy_pft       => plt_photo%Vmax4RubiscoCarboxy_pft        ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
+    Vmax4RubiscoCarboxy_node       => plt_photo%Vmax4RubiscoCarboxy_node        ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node            ,& !input  :CO2 compensation point, [uM]
     AirConc_pft                   => plt_photo%AirConc_pft                    ,& !input  :total gas concentration, [mol m-3]
     DiffCO2Atmos2Intracel_pft     => plt_photo%DiffCO2Atmos2Intracel_pft      ,& !input  :gaesous CO2 concentration difference across stomates, [umol m-3]
@@ -148,7 +148,7 @@ implicit none
 !               CO2CompenPoint_node=C3 CO2 compensation point (uM)
 !               CBXNX=rubisco carboxylation efficiency
 !               ELEC3=e- requirement for CO2 fixn by rubisco
-!               Vmax4RubiscoCarboxy_pft,VGROX=rubisco carboxylation rate unlimited,limited by CO2
+!               Vmax4RubiscoCarboxy_node,VGROX=rubisco carboxylation rate unlimited,limited by CO2
 !               Km4RubiscoCarboxy_pft=Km for rubisco carboxylation
 !               EGROX=light-limited rubisco carboxylation rate
 !               ETLF=light-limited e- transport rate
@@ -162,7 +162,7 @@ implicit none
                     CO2C  = CO2X*CO2Solubility_pft(NZ)
                     CO2Y  = AZMAX1(CO2C-CO2CompenPoint_node(K,NB,NZ))
                     CBXNX = CO2Y/(ELEC3*CO2C+10.5_r8*CO2CompenPoint_node(K,NB,NZ))
-                    VGROX = Vmax4RubiscoCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
+                    VGROX = Vmax4RubiscoCarboxy_node(K,NB,NZ)*CO2Y/(CO2C+Km4RubiscoCarboxy_pft(NZ))
                     EGROX = ETLF*CBXNX
                     cfscal=WFNB*RubiscoActivity_brch(NB,NZ)*VLScal
                     VL    = AMIN1(VGROX,EGROX)*cfscal
@@ -252,7 +252,7 @@ implicit none
     RubiscoActivity_brch          => plt_photo%RubiscoActivity_brch           ,& !input  :branch down-regulation of CO2 fixation, [-]
     LeafIntracellularCO2_pft      => plt_photo%LeafIntracellularCO2_pft       ,& !input  :leaf gaseous CO2 concentration, [umol m-3]
     RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node         ,& !input  :carboxylation efficiency, [umol umol-1]
-    Vmax4PEPCarboxy_pft           => plt_photo%Vmax4PEPCarboxy_pft            ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
+    Vmax4PEPCarboxy_node           => plt_photo%Vmax4PEPCarboxy_node            ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     CanopyLeafArea_lnode          => plt_morph%CanopyLeafArea_lnode           ,& !input  :layer/node/branch leaf area, [m2 d-2]
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]
     RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                   ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
@@ -345,7 +345,7 @@ implicit none
 !               COMP4=C4 CO2 compensation point (uM)
 !               CBXNX=PEP carboxylation efficiency
 !               ELEC4=e- requirement for CO2 fixn by PEP carboxylase
-!               Vmax4PEPCarboxy_pft,VGROX=PEP carboxylation rate unlimited,limited by CO2
+!               Vmax4PEPCarboxy_node,VGROX=PEP carboxylation rate unlimited,limited by CO2
 !               Km4PEPCarboxy_pft=Km for VmaxPEPCarboxyRef_pft from PFT file (uM)
 !               EGROX=light-limited PEP carboxylation rate
 !               ETLF4=light-limited e- transport rate
@@ -358,7 +358,7 @@ implicit none
                     CO2C  = CO2X*CO2Solubility_pft(NZ)
                     CO2Y  = AZMAX1(CO2C-COMP4)
                     CBXNX = CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
-                    VGROX = Vmax4PEPCarboxy_pft(K,NB,NZ)*CO2Y/(CO2C+Km4PEPCarboxy_pft(NZ))
+                    VGROX = Vmax4PEPCarboxy_node(K,NB,NZ)*CO2Y/(CO2C+Km4PEPCarboxy_pft(NZ))
                     EGROX = ETLF4*CBXNX
                     cfscal=WFN4*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
                     VL    = AMIN1(VGROX,EGROX)*cfscal
@@ -441,13 +441,13 @@ implicit none
   associate(                                                         &
     CanopyGasCO2_pft         => plt_photo%CanopyGasCO2_pft          ,& !input  :canopy gaesous CO2 concentration, [umol mol-1]
     iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType  ,& !input  :plant photosynthetic type (C3 or C4),[-]
-    Vmax4PEPCarboxy_pft      => plt_photo%Vmax4PEPCarboxy_pft       ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
-    Vmax4RubiscoCarboxy_pft  => plt_photo%Vmax4RubiscoCarboxy_pft   ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
+    Vmax4PEPCarboxy_node      => plt_photo%Vmax4PEPCarboxy_node       ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
+    Vmax4RubiscoCarboxy_node  => plt_photo%Vmax4RubiscoCarboxy_node   ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     iPlantRootProfile_pft    => plt_pheno%iPlantRootProfile_pft     ,& !input  :plant growth type (vascular, non-vascular),[-]
     SineSunInclAngle_col     => plt_rad%SineSunInclAngle_col        ,& !input  :sine of solar angle, [-]
     RadPARbyCanopy_pft       => plt_rad%RadPARbyCanopy_pft          ,& !input  :canopy absorbed PAR, [umol m-2 s-1]
     ZERO4Groth_pft           => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
-    LeafNodeArea_brch        => plt_morph%LeafNodeArea_brch         ,& !input  :leaf area, [m2 d-2]
+    LeafArea_node        => plt_morph%LeafArea_node         ,& !input  :leaf area, [m2 d-2]
     RubiscoActivity_brch     => plt_photo%RubiscoActivity_brch       & !input  :branch down-regulation of CO2 fixation, [-]
   )
 
@@ -465,15 +465,15 @@ implicit none
           CH2O3(K) = 0._r8
           CH2O4(K) = 0._r8
 
-          IF(LeafNodeArea_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+          IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             LeafNodeArea_brch,CanopyLeafArea_lnode=leaf area
+!             LeafArea_node,CanopyLeafArea_lnode=leaf area
 !             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
-!             Vmax4PEPCarboxy_pft=PEP carboxylation rate unlimited by CO2
+!             Vmax4PEPCarboxy_node=PEP carboxylation rate unlimited by CO2
 !
-            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
+            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
               CO2F    = CO2F+CH2O4(K)
@@ -484,7 +484,7 @@ implicit none
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_pft(K,NB,NZ).GT.0.0_r8)THEN
+            ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 
               call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
               CO2F    = CO2F+CH2O3(K)

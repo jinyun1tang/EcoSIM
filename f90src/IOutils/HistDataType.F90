@@ -342,6 +342,9 @@ implicit none
   real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)  
   real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)  
   real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_VcMaxRubisco_pft(:)
+  real(r8),pointer   :: h1D_VoMaxRubisco_pft(:)  
+  real(r8),pointer   :: h1D_VcMaxPEP_pft(:)  
   real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_P_ptc(:)     
   real(r8),pointer   :: h1D_LEAF_P_ptc(:)      
@@ -786,6 +789,9 @@ implicit none
   allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))        ;this%h1D_tTRANSPN_ptc(:)=spval
   allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
   allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_OXY_STRESS_ptc(:)=spval
+  allocate(this%h1D_VcMaxRubisco_pft(beg_ptc:end_ptc))    ;this%h1D_VcMaxRubisco_pft(:)=spval
+  allocate(this%h1D_VoMaxRubisco_pft(beg_ptc:end_ptc))    ;this%h1D_VoMaxRubisco_pft(:)=spval
+  allocate(this%h1D_VcMaxPEP_pft(beg_ptc:end_ptc))        ;this%h1D_VcMaxPEP_pft(:)=spval
   allocate(this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_N_ptc(:)=spval
   allocate(this%h1D_Plant_N_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_N_ptc(:)=spval
   allocate(this%h1D_LEAF_N_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_N_ptc(:)=spval
@@ -2099,6 +2105,21 @@ implicit none
   data1d_ptr => this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc)    !OSTR(NZ,NY,NX)
   call hist_addfld1d(fname='OXY_STRESS_pft',units='none',avgflag='A',&
     long_name='Plant root O2 stress indicator [0->1 weaker stress]',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_VcMaxRubisco_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='VcMax_RUBISCO_pft',units='umol h-1 m-2',avgflag='A',&
+    long_name='Maximum reference rate of carboxylation by Rubisco at reference temperature 25oC',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_VoMaxRubisco_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='VoMax_RUBISCO_pft',units='umol h-1 m-2',avgflag='A',&
+    long_name='Maximum reference rate of oxygenation by Rubisco at reference temperature 25oC',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_VcMaxPEP_pft(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='VcMax_PEP_pft',units='umol h-1 m-2',avgflag='A',&
+    long_name='Maximum rate of carboxylation by PEP at reference temperature 25oC',&
+    ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='SHOOT_N_pft',units='gN/m2',avgflag='A',&
@@ -3681,7 +3702,11 @@ implicit none
         this%h1D_POPN_ptc(nptc)             = PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)         = -ETCanopy_CumYr_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_WTR_STRESS_ptc(nptc)       = HoursTooLowPsiCan_pft(NZ,NY,NX)
-                
+
+        this%h1D_VcMaxRubisco_pft(nptc)     = CanopyVcMaxRubisco_pft(NZ,NY,NX)
+        this%h1D_VoMaxRubisco_pft(nptc)     = CanopyVoMaxRubisco_pft(NZ,NY,NX)
+        this%h1D_VcMaxPEP_pft(nptc)         = CanopyVcMaxPEP_pft(NZ,NY,NX)
+
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress_pft(NZ,NY,NX)
         this%h1D_SHOOTST_N_ptc(nptc)    = ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
@@ -3773,8 +3798,8 @@ implicit none
           this%h2D_RootNutupk_fNlim_pvr(nptc,L) = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)                      
           this%h2D_RootNutupk_fPlim_pvr(nptc,L) = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)                      
           this%h2D_RootNutupk_fProtC_pvr(nptc,L)= Nutruptk_fProtC_rpvr(ipltroot,L,NZ,NY,NX)                     
-          this%h2D_O2_rootconduct_pvr(nptc,L)    = RootGasConductance_pvr(idg_O2,ipltroot,L,NZ,NY,NX)
-          this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_pvr(idg_CO2,ipltroot,L,NZ,NY,NX)
+          this%h2D_O2_rootconduct_pvr(nptc,L)    = RootGasConductance_rpvr(idg_O2,ipltroot,L,NZ,NY,NX)
+          this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_rpvr(idg_CO2,ipltroot,L,NZ,NY,NX)
           this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)
           this%h2D_fRootGrowPSISense_pvr(nptc,L) = fRootGrowPSISense_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3800,8 +3825,8 @@ implicit none
           this%h2D_Root2ndStrutN_pvr(nptc,L) = 0._r8
           this%h2D_Root2ndStrutP_pvr(nptc,L) = 0._r8
           this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
-          this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(ipltroot,L,NZ,NY,NX)
-          this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_pvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           DO NR=1,NumRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_pvr(nptc,L)= this%h2D_Root1stStrutC_pvr(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)

@@ -128,7 +128,7 @@ implicit none
     plt_morph%LeafStalkArea_pft(NZ)        = LeafStalkArea_pft(NZ,NY,NX)      !pft leaf+stalk area
     plt_morph%HypoctoHeight_pft(NZ)        = HypoctoHeight_pft(NZ,NY,NX)      !(approximately) plant height
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
-    plt_ew%ReistanceCanopy_pft(NZ)          = ReistanceCanopy_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
+    plt_ew%CanopyIsothBndlResist_pft(NZ)          = CanopyIsothBndlResist_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
     plt_morph%CanopyHeight_pft(NZ)          = CanopyHeight_pft(NZ,NY,NX)       !canopy height, set as prescribed input
     plt_morph%CanopyStemArea_pft(NZ)        = CanopyStemArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
@@ -154,11 +154,11 @@ implicit none
 
     DO L=1,NK_col(NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
-        plt_morph%Root2ndXNumL_pvr(N,L,NZ)   = Root2ndXNumL_pvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndRadius_pvr(N,L,NZ) = Root2ndRadius_pvr(N,L,NZ,NY,NX)
-        plt_morph%Root1stXNumL_pvr(N,L,NZ)  = Root1stXNumL_pvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndMeanLens_pvr(N,L,NZ) = Root2ndMeanLens_pvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndRadius_rpvr(N,L,NZ) = Root2ndRadius_rpvr(N,L,NZ,NY,NX)
+        plt_morph%Root1stXNumL_rpvr(N,L,NZ)  = Root1stXNumL_rpvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndMeanLens_rpvr(N,L,NZ) = Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)        
         plt_morph%RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO
@@ -187,7 +187,7 @@ implicit none
       ENDDO  
 
       DO K=0,MaxNodesPerBranch
-        plt_morph%LeafNodeArea_brch(K,NB,NZ)   = LeafNodeArea_brch(K,NB,NZ,NY,NX)
+        plt_morph%LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ,NY,NX)
       ENDDO          
     ENDDO  
     !variables updated iteratively

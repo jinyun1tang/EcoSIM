@@ -605,7 +605,7 @@ module InitPlantMod
     LeafAreaDying_brch                => plt_morph%LeafAreaDying_brch                 ,& !output :branch leaf area, [m2 d-2]
     LeafAreaLive_brch                 => plt_morph%LeafAreaLive_brch                  ,& !output :branch leaf area, [m2 d-2]
     LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch                  ,& !output :leaf surface area, [m2 d-2]
-    LeafNodeArea_brch                 => plt_morph%LeafNodeArea_brch                  ,& !output :leaf area, [m2 d-2]
+    LeafArea_node                 => plt_morph%LeafArea_node                  ,& !output :leaf area, [m2 d-2]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch            ,& !output :internode height, [m]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
@@ -712,7 +712,7 @@ module InitPlantMod
     ENDDO D5
 
     DO K=0,MaxNodesPerBranch1
-      LeafNodeArea_brch(K,NB,NZ)                                   = 0._r8
+      LeafArea_node(K,NB,NZ)                                   = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
       plt_morph%InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
@@ -924,12 +924,12 @@ module InitPlantMod
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr             ,& !inoput :root aqueous content, [g d-2]
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !output :root osmotic water potential, [Mpa]
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
-    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr            ,& !output :root layer volume air, [m2 d-2]
+    RootPoreVol_rpvr           => plt_morph%RootPoreVol_rpvr            ,& !output :root layer volume air, [m2 d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr               ,& !output :root layer volume water, [m2 d-2]
     NumRootAxes_pft           => plt_morph%NumRootAxes_pft            ,& !output :root primary axis number,[-]
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !output :root turgor water potential, [Mpa]
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr          ,& !output :root layer diameter primary axes, [m]
-    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr          ,& !output :root layer diameter secondary axes, [m]
+    Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr          ,& !output :root layer diameter secondary axes, [m]
     RootN2Fix_pvr             => plt_bgcr%RootN2Fix_pvr               ,& !output :root N2 fixation, [gN d-2 h-1]
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr            ,& !output :root layer protein C, [gC d-2]
     RootProteinConc_rpvr      => plt_biom%RootProteinConc_rpvr         & !output :root layer protein C concentration, [g g-1]
@@ -966,16 +966,16 @@ module InitPlantMod
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
-      plt_morph%Root1stXNumL_pvr(N,L,NZ)                       = 0._r8
-      plt_morph%Root2ndXNumL_pvr(N,L,NZ)                        = 0._r8
+      plt_morph%Root1stXNumL_rpvr(N,L,NZ)                       = 0._r8
+      plt_morph%Root2ndXNumL_rpvr(N,L,NZ)                        = 0._r8
       plt_morph%RootLenPerPlant_pvr(N,L,NZ)                    = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
-      RootPoreVol_pvr(N,L,NZ)                                  = 0._r8
+      RootPoreVol_rpvr(N,L,NZ)                                  = 0._r8
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
-      Root2ndRadius_pvr(N,L,NZ)                                = Root2ndMaxRadius_pft(N,NZ)
+      Root2ndRadius_rpvr(N,L,NZ)                                = Root2ndMaxRadius_pft(N,NZ)
       plt_morph%RootAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
-      plt_morph%Root2ndMeanLens_pvr(N,L,NZ)                    = 1.0E-03
+      plt_morph%Root2ndMeanLens_rpvr(N,L,NZ)                    = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8
       plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)                     = 0._r8
@@ -990,7 +990,7 @@ module InitPlantMod
       plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
       CCO2A                                             = CCO2EI_gperm3
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
-      trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_pvr(N,L,NZ)
+      trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_rpvr(N,L,NZ)
       trcs_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2P*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
@@ -998,7 +998,7 @@ module InitPlantMod
       plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                = 0._r8
       COXYA                                             = COXYE
       COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
-      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
+      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_rpvr(N,L,NZ)
       plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes

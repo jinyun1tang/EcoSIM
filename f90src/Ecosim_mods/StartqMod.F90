@@ -421,7 +421,7 @@ module StartqMod
 !
   SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
-    IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
+    IF(SeedDepth_pft(NZ,NY,NX)+1.e-6.GE.CumSoilThickness_vr(L-1,NY,NX) &
       .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
@@ -564,7 +564,7 @@ module StartqMod
     ENDDO D5
 
     DO K=0,MaxNodesPerBranch
-      LeafNodeArea_brch(K,NB,NZ,NY,NX)                          = 0._r8
+      LeafArea_node(K,NB,NZ,NY,NX)                          = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ,NY,NX)                    = 0._r8
       InternodeHeightDead_brch(K,NB,NZ,NY,NX)                  = 0._r8
       PetoleLensNode_brch(K,NB,NZ,NY,NX)                        = 0._r8
@@ -744,16 +744,16 @@ module StartqMod
       RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)                      = 0._r8
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = 0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)             = 0._r8
-      Root1stXNumL_pvr(N,L,NZ,NY,NX)             = 0._r8
-      Root2ndXNumL_pvr(N,L,NZ,NY,NX)              = 0._r8
+      Root1stXNumL_rpvr(N,L,NZ,NY,NX)             = 0._r8
+      Root2ndXNumL_rpvr(N,L,NZ,NY,NX)              = 0._r8
       RootLenPerPlant_pvr(N,L,NZ,NY,NX)          = 0._r8
       RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)      = 0._r8
-      RootPoreVol_pvr(N,L,NZ,NY,NX)              = 0._r8
+      RootPoreVol_rpvr(N,L,NZ,NY,NX)              = 0._r8
       RootVH2O_pvr(N,L,NZ,NY,NX)                 = 0._r8
       Root1stRadius_pvr(N,L,NZ,NY,NX)            = Root1stMaxRadius_pft(N,NZ,NY,NX)
-      Root2ndRadius_pvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
+      Root2ndRadius_rpvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
       RootAreaPerPlant_pvr(N,L,NZ,NY,NX)         = 0._r8
-      Root2ndMeanLens_pvr(N,L,NZ,NY,NX)            = 1.0E-03
+      Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)            = 1.0E-03
       RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_NO3,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_H2PO4,N,L,NZ,NY,NX)  = 0._r8
@@ -773,7 +773,7 @@ module StartqMod
       RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)        = 0._r8
       CCO2A                                           = CCO2EI_gperm3_col(NY,NX)
       CCO2P                                           = 0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA_col(NY,NX))*CO2EI_col(NY,NX)
-      trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2A*RootPoreVol_pvr(N,L,NZ,NY,NX)
+      trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2A*RootPoreVol_rpvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2P*RootVH2O_pvr(N,L,NZ,NY,NX)
       trcg_air2root_flx_pvr(idg_CO2,N,L,NZ,NY,NX)     = 0._r8
       trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ,NY,NX)  = 0._r8
@@ -783,7 +783,7 @@ module StartqMod
       COXYP                                           = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA_col(NY,NX))*OXYE_col(NY,NX)
       trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
       trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
-      trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
+      trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYA*RootPoreVol_rpvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
       RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)            = 1.0_r8
 

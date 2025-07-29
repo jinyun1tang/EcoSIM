@@ -413,8 +413,8 @@ module grosubsMod
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
-    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr             ,& !output :root layer number primary axes, [d-2]
-    Root2ndXNumL_pvr             => plt_morph%Root2ndXNumL_pvr              ,& !output :root layer number axes, [d-2]
+    Root1stXNumL_rpvr            => plt_morph%Root1stXNumL_rpvr             ,& !output :root layer number primary axes, [d-2]
+    Root2ndXNumL_rpvr             => plt_morph%Root2ndXNumL_rpvr              ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr                 ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -432,8 +432,8 @@ module grosubsMod
   D6: DO L=1,NK
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
-      Root1stXNumL_pvr(N,L,NZ)   = 0._r8
-      Root2ndXNumL_pvr(N,L,NZ)    = 0._r8
+      Root1stXNumL_rpvr(N,L,NZ)   = 0._r8
+      Root2ndXNumL_rpvr(N,L,NZ)    = 0._r8
       RootRespPotent_pvr(N,L,NZ) = 0._r8
       RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
       RootCO2Autor_pvr(N,L,NZ)   = 0._r8
@@ -598,7 +598,8 @@ module grosubsMod
   integer :: L,NR,N,NE,NB
 
 !     begin_execution
-  associate(                                                      &
+  associate(                                                          &
+    ZEROS                     => plt_site%ZEROS                      ,& !input  :threshold zero for numerical stability,[-]  
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
@@ -620,7 +621,7 @@ module grosubsMod
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
     SeedNumSet_brch           => plt_morph%SeedNumSet_brch           ,& !input  :branch grain number, [d-2]
     ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch        ,& !input  :branch shoot structural element mass, [g d-2]
-    SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch     ,& !input  :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch         ,& !input  :branch reserve element mass, [g d-2]
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch        ,& !input  :branch stalk structural element mass, [g d-2]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
@@ -631,6 +632,9 @@ module grosubsMod
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft   ,& !inoput :net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
     RootUptk_N_CumYr_pft      => plt_rbgc%RootUptk_N_CumYr_pft       ,& !inoput :cumulative plant N uptake, [gN d-2]
     RootUptk_P_CumYr_pft      => plt_rbgc%RootUptk_P_CumYr_pft       ,& !inoput :cumulative plant P uptake, [gP d-2]
+    VcMaxRubiscoRef_brch      => plt_photo%VcMaxRubiscoRef_brch      ,& !input  :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]    
+    VoMaxRubiscoRef_brch      => plt_photo%VoMaxRubiscoRef_brch      ,& !input  :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]    
+    VcMaxPEPCarboxyRef_brch   => plt_photo%VcMaxPEPCarboxyRef_brch   ,& !input  :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]        
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !output :branch leaf area, [m2 d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !output :branch leaf structural element mass, [g d-2]
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch       ,& !output :branch sheath structural element, [g d-2]
@@ -639,7 +643,7 @@ module grosubsMod
     CanopyNodulElms_pft       => plt_biom%CanopyNodulElms_pft        ,& !output :canopy nodule chemical element mass, [g d-2]
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft        ,& !output :canopy nonstructural element concentration, [g d-2]
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
-    CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft           ,& !output :canopy active stalk C, [g d-2]
+    CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !output :plant stem area, [m2 d-2]
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft           ,& !output :canopy ear structural element, [g d-2]
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft         ,& !output :canopy grain structural element, [g d-2]
@@ -649,7 +653,10 @@ module grosubsMod
     RootNodulElms_pft         => plt_biom%RootNodulElms_pft          ,& !output :root nodule chemical element mass, [g d-2]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         ,& !output :canopy shoot structural chemical element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
-    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft          & !output :canopy stalk structural element mass, [g d-2]
+    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
+    CanopyVcMaxRubisco_pft    => plt_photo%CanopyVcMaxRubisco_pft    ,& !output :Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
+    CanopyVoMaxRubisco_pft    => plt_photo%CanopyVoMaxRubisco_pft    ,& !output :Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
+    CanopyVcMaxPEP_pft        => plt_photo%CanopyVcMaxPEP_pft         & !output :Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
   )
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
@@ -678,18 +685,33 @@ module grosubsMod
     !sum structural biomass
   ENDDO
 
-  CanopySapwoodC_pft(NZ)   = AZMAX1(sum(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ)))
-  CanopyLeafShethC_pft(NZ) = AZMAX1(sum(LeafPetolBiomassC_brch(1:NumOfBranches_pft(NZ),NZ)))
-  CanopySeedNum_pft(NZ)    = AZMAX1(sum(SeedNumSet_brch(1:NumOfBranches_pft(NZ),NZ)))
-  CanopyLeafArea_pft(NZ)   = AZMAX1(sum(LeafAreaLive_brch(1:NumOfBranches_pft(NZ),NZ)))
-  CanopyStemArea_pft(NZ)   = AZMAX1(sum(CanopyStalkArea_lbrch(1:NumCanopyLayers1,1:NumOfBranches_pft(NZ),NZ)))
+  CanopySapwoodC_pft(NZ)   = 0._r8
+  CanopyLeafShethC_pft(NZ) = 0._r8
+  CanopySeedNum_pft(NZ)    = 0._r8
+  CanopyLeafArea_pft(NZ)   = 0._r8
+  CanopyStemArea_pft(NZ)   = 0._r8
+  CanopyVcMaxRubisco_pft(NZ)=0._r8
+  CanopyVoMaxRubisco_pft(NZ)=0._r8
+  CanopyVcMaxPEP_pft(NZ)    =0._r8
 
-  
   DO NB=1,NumOfBranches_pft(NZ)        
+    CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
+    CanopyLeafShethC_pft(NZ)   = CanopyLeafShethC_pft(NZ) +LeafPetolBiomassC_brch(NB,NZ)
+    CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedNumSet_brch(NB,NZ)
+    CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
+    CanopyVcMaxRubisco_pft(NZ) = CanopyVcMaxRubisco_pft(NZ)+VcMaxRubiscoRef_brch(NB,NZ)
+    CanopyVoMaxRubisco_pft(NZ) = CanopyVoMaxRubisco_pft(NZ)+VoMaxRubiscoRef_brch(NB,NZ)
+    CanopyVcMaxPEP_pft(NZ)     = CanopyVcMaxPEP_pft(NZ) +VcMaxPEPCarboxyRef_brch(NB,NZ)
+
     DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
+  if(CanopyLeafArea_pft(NZ)>ZEROS)then
+    CanopyVcMaxRubisco_pft(NZ)=CanopyVcMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
+    CanopyVoMaxRubisco_pft(NZ)=CanopyVoMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
+    CanopyVcMaxPEP_pft(NZ)    =CanopyVcMaxPEP_pft(NZ)/CanopyLeafArea_pft(NZ)
+  endif
 
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES

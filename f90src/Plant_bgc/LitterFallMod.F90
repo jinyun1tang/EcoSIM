@@ -403,18 +403,18 @@ implicit none
     Root1stDepz_pft           => plt_morph%Root1stDepz_pft           ,& !output :root layer depth, [m]
     Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr           ,& !output :root layer length primary axes, [m d-2]
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr         ,& !output :root layer diameter primary axes, [m]
-    Root1stXNumL_pvr          => plt_morph%Root1stXNumL_pvr          ,& !output :root layer number primary axes, [d-2]
+    Root1stXNumL_rpvr          => plt_morph%Root1stXNumL_rpvr          ,& !output :root layer number primary axes, [d-2]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !output :root layer length secondary axes, [m d-2]
-    Root2ndMeanLens_pvr       => plt_morph%Root2ndMeanLens_pvr       ,& !output :root layer average length, [m]
-    Root2ndRadius_pvr         => plt_morph%Root2ndRadius_pvr         ,& !output :root layer diameter secondary axes, [m]
-    Root2ndXNumL_pvr           => plt_morph%Root2ndXNumL_pvr           ,& !output :root layer number axes, [d-2]
+    Root2ndMeanLens_rpvr       => plt_morph%Root2ndMeanLens_rpvr       ,& !output :root layer average length, [m]
+    Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr         ,& !output :root layer diameter secondary axes, [m]
+    Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr           ,& !output :root layer number axes, [d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !output :root layer number secondary axes, [d-2]
     RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr      ,& !output :root layer area per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !output :root layer length density, [m m-3]
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr       ,& !output :root layer length per plant, [m p-1]
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs        ,& !output :root C primary axes, [g d-2]
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    ,& !output :root layer structural C, [gC d-2]
-    RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr           ,& !output :root layer volume air, [m2 d-2]
+    RootPoreVol_rpvr           => plt_morph%RootPoreVol_rpvr           ,& !output :root layer volume air, [m2 d-2]
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr           ,& !output :root layer protein C, [gC d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr               & !output :root layer volume water, [m2 d-2]
   )
@@ -503,16 +503,16 @@ implicit none
         RootMycoActiveBiomC_pvr(N,L,NZ)  = 0._r8
         PopuRootMycoC_pvr(N,L,NZ)        = 0._r8
         RootProteinC_pvr(N,L,NZ)         = 0._r8
-        Root1stXNumL_pvr(N,L,NZ)         = 0._r8
-        Root2ndXNumL_pvr(N,L,NZ)          = 0._r8
+        Root1stXNumL_rpvr(N,L,NZ)         = 0._r8
+        Root2ndXNumL_rpvr(N,L,NZ)          = 0._r8
         RootLenPerPlant_pvr(N,L,NZ)      = 0._r8
         RootLenDensPerPlant_pvr(N,L,NZ)  = 0._r8
-        RootPoreVol_pvr(N,L,NZ)          = 0._r8
+        RootPoreVol_rpvr(N,L,NZ)          = 0._r8
         RootVH2O_pvr(N,L,NZ)             = 0._r8
         Root1stRadius_pvr(N,L,NZ)        = Root1stMaxRadius_pft(N,NZ)
-        Root2ndRadius_pvr(N,L,NZ)        = Root2ndMaxRadius_pft(N,NZ)
+        Root2ndRadius_rpvr(N,L,NZ)        = Root2ndMaxRadius_pft(N,NZ)
         RootAreaPerPlant_pvr(N,L,NZ)     = 0._r8
-        Root2ndMeanLens_pvr(N,L,NZ)        = Root2ndMeanLensMin
+        Root2ndMeanLens_rpvr(N,L,NZ)        = Root2ndMeanLensMin
       ENDDO
     ENDDO    
 !
@@ -840,7 +840,7 @@ implicit none
     LeafAreaLive_brch          => plt_morph%LeafAreaLive_brch           ,& !output :branch leaf area, [m2 d-2]
     LeafAreaZsec_brch          => plt_morph%LeafAreaZsec_brch           ,& !output :leaf surface area, [m2 d-2]
     LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch           ,& !output :leaf element, [g d-2]
-    LeafNodeArea_brch          => plt_morph%LeafNodeArea_brch           ,& !output :leaf area, [m2 d-2]
+    LeafArea_node          => plt_morph%LeafArea_node           ,& !output :leaf area, [m2 d-2]
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch       ,& !output :plant branch leaf + sheath C, [g d-2]
     LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch        ,& !output :layer leaf protein C, [g d-2]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !output :branch leaf structural element mass, [g d-2]
@@ -910,7 +910,7 @@ implicit none
       CMassCO2BundleSheath_node(K,NB,NZ)  = 0._r8
       CMassHCO3BundleSheath_node(K,NB,NZ) = 0._r8
     ENDIF
-    LeafNodeArea_brch(K,NB,NZ)                          = 0._r8
+    LeafArea_node(K,NB,NZ)                          = 0._r8
     LiveInterNodeHight_brch(K,NB,NZ)                    = 0._r8
     InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
     PetoleLensNode_brch(K,NB,NZ)                        = 0._r8

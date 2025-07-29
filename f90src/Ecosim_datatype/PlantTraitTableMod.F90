@@ -27,7 +27,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
   real(r8), target, allocatable :: LeafC3ChlorofilConc_tab(:)
   real(r8), target, allocatable :: LeafC4ChlorofilConc_tab(:)
-  real(r8), target, allocatable :: CanPCi2CaRatio_tab(:)
+  real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
   real(r8), target, allocatable :: RadSWLeafTransmis_tab(:)
@@ -141,7 +141,7 @@ module PlantTraitTableMod
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
   allocate(LeafC3ChlorofilConc_tab(npfts));LeafC3ChlorofilConc_tab=0._r8
   allocate(LeafC4ChlorofilConc_tab(npfts));LeafC4ChlorofilConc_tab=0._r8
-  allocate(CanPCi2CaRatio_tab(npfts));CanPCi2CaRatio_tab=0._r8
+  allocate(CanopyCi2CaRatio_pft_tab(npfts));CanopyCi2CaRatio_pft_tab=0._r8
   allocate(RadSWLeafAlbedo_tab(npfts));RadSWLeafAlbedo_tab=0._r8
   allocate(CanopyPARalbedo_tab(npfts));CanopyPARalbedo_tab=0._r8
   allocate(RadSWLeafTransmis_tab(npfts));RadSWLeafTransmis_tab=0._r8
@@ -255,7 +255,7 @@ module PlantTraitTableMod
   call destroy(SpecChloryfilAct_tab)
   call destroy(LeafC3ChlorofilConc_tab)
   call destroy(LeafC4ChlorofilConc_tab)
-  call destroy(CanPCi2CaRatio_tab)
+  call destroy(CanopyCi2CaRatio_pft_tab)
   call destroy(RadSWLeafAlbedo_tab)
   call destroy(CanopyPARalbedo_tab)
   call destroy(RadSWLeafTransmis_tab)

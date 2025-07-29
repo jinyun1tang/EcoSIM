@@ -42,9 +42,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                    !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                 !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                !sheath angle, [degree from horizontal]
-  real(r8),target,allocatable ::  ReistanceCanopy_pft(:,:,:)                 !canopy roughness height, [m]
+  real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
-  real(r8),target,allocatable ::  LeafNodeArea_brch(:,:,:,:,:)               !leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)             !sheath height, [m]
   real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)         !Live internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
@@ -209,10 +209,10 @@ contains
   allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
   allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
-  allocate(ReistanceCanopy_pft(JP,JY,JX));      ReistanceCanopy_pft=0._r8
+  allocate(CanopyIsothBndlResist_pft(JP,JY,JX));      CanopyIsothBndlResist_pft=0._r8
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
-  allocate(LeafNodeArea_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafNodeArea_brch=0._r8
+  allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
   allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
   allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
@@ -375,9 +375,9 @@ contains
   call destroy(PetioleAngle_pft)
   call destroy(SineBranchAngle_pft)
   call destroy(SinePetioleAngle_pft)
-  call destroy(ReistanceCanopy_pft)
+  call destroy(CanopyIsothBndlResist_pft)
   call destroy(CanopyHeight4WatUptake_pft)
-  call destroy(LeafNodeArea_brch)
+  call destroy(LeafArea_node)
   call destroy(PetoleLensNode_brch)
   call destroy(LiveInterNodeHight_brch)
   call destroy(LeafAreaLive_brch)
