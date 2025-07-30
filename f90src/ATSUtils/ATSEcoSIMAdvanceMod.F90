@@ -86,6 +86,8 @@ implicit none
     call SetHourlyAccumulatorsATS(NY,NX)
   enddo
 
+  write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
+
   do NY=1,NYS
     NU_col(NY,NX)               = a_NU(NY)
     NL_col(NY,NX)               = a_NL(NY)
