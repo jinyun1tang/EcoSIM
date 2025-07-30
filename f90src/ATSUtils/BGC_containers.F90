@@ -158,6 +158,7 @@ module BGCContainers_module
      type (BGCVectorDouble) :: surface_energy_source
      type (BGCVectorDouble) :: surface_water_source
      type (BGCVectorDouble) :: snow_depth
+     type (BGCVectorDouble) :: canopy_height
      type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
@@ -196,6 +197,8 @@ module BGCContainers_module
      real (c_double) :: heat_capacity
      real (c_double) :: field_capacity
      real (c_double) :: wilting_point
+     integer (c_int) :: current_day
+     integer (c_int) :: current_year
      logical (c_bool) :: p_bool
   end type BGCProperties
 

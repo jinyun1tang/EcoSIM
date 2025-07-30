@@ -183,6 +183,8 @@ contains
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
   p_bool = props%p_bool
+  current_day = props%current_day
+  current_year = props%current_year
 
   if(p_bool)THEN
     call c_f_pointer(props%precipitation%data, data, (/num_cols/))
@@ -203,6 +205,9 @@ contains
 
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
+
+  !call c_f_pointer(state%canopy_height%data, data, (/num_cols/))
+  !surf_canopy_height = data(:)
 
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------

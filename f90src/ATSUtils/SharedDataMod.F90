@@ -66,7 +66,7 @@ Module SharedDataMod
   integer,  allocatable :: a_NL(:)        !lower soil layer index
   integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays_col(:)
-  integer :: NYS, I                       !total number of columns
+  integer :: NYS, I, current_day, current_year !total number of columns
   logical :: p_bool
   contains
 
