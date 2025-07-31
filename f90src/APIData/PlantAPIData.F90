@@ -121,7 +121,7 @@ implicit none
   real(r8), pointer :: LeafO2Solubility_pft(:)              => null()   !leaf O2 solubility,                                          [uM /umol mol-1]
   real(r8), pointer :: CO2CuticleResist_pft(:)              => null()   !maximum stomatal resistance to CO2,                          [s h-1]
   real(r8), pointer :: DiffCO2Atmos2Intracel_pft(:)         => null()   !gaesous CO2 concentration difference across stomates,        [umol m-3]
-  real(r8), pointer :: LeafAUnshaded_zsec(:,:,:,:,:)        => null()   !leaf irradiated surface area,                                [m2 d-2]
+  real(r8), pointer :: LeafAreaSunlit_zsec(:,:,:,:,:)        => null()  !leaf irradiated surface area in different leaf sector,       [m2 d-2]
   real(r8), pointer :: CPOOL3_node(:,:,:)                   => null()   !minimum sink strength for nonstructural C transfer,          [g d-2]
   real(r8), pointer :: CPOOL4_node(:,:,:)                   => null()   !leaf nonstructural C4 content in C4 photosynthesis,          [g d-2]
   real(r8), pointer :: CMassCO2BundleSheath_node(:,:,:)     => null()   !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
@@ -143,6 +143,14 @@ implicit none
   real(r8), pointer :: CanopyVcMaxRubisco_pft(:)            => null()   !Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
   real(r8), pointer :: CanopyVoMaxRubisco_pft(:)            => null()   !Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
   real(r8), pointer :: CanopyVcMaxPEP_pft(:)                => null()   !Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
+  real(r8), pointer :: TFN_Carboxy_pft(:)                   => null()   !temperature dependence of carboxylation, [-]
+  real(r8), pointer :: TFN_Oxygen_pft(:)                    => null()   !temperature dependence of oxygenation, [-]
+  real(r8), pointer :: TFN_eTranspt_pft(:)                  => null()   !temperature dependence of electron transport, [-]
+  real(r8), pointer :: LeafAreaSunlit_pft(:)                => null()   !leaf irradiated surface area, [m2 d-2]    
+  real(r8), pointer :: PARSunlit_pft(:)                     => null()   !PAR absorbed by sunlit leaf, [umol m-2 s-1]
+  real(r8), pointer :: PARSunsha_pft(:)                     => null()   !PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
+  real(r8), pointer :: CH2OSunlit_pft(:)                    => null()   !carbon fixation by sun-lit leaf, [gC d-2 h-1]
+  real(r8), pointer :: CH2OSunsha_pft(:)                    => null()   !carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
 
   contains
     procedure, public :: Init    =>  plt_photo_init
@@ -1687,9 +1695,17 @@ implicit none
   allocate(this%CanopyVcMaxRubisco_pft(JP1));this%CanopyVcMaxRubisco_pft=0._r8
   allocate(this%CanopyVoMaxRubisco_pft(JP1));this%CanopyVoMaxRubisco_pft=0._r8
   allocate(this%CanopyVcMaxPEP_pft(JP1)); this%CanopyVcMaxPEP_pft=0._r8
+  allocate(this%TFN_Carboxy_pft(JP1));this%TFN_Carboxy_pft=0._r8
+  allocate(this%TFN_Oxygen_pft(JP1));this%TFN_Oxygen_pft=0._r8
+  allocate(this%TFN_eTranspt_pft(JP1));this%TFN_eTranspt_pft=0._r8
+  allocate(this%LeafAreaSunlit_pft(JP1)); this%LeafAreaSunlit_pft=0._r8
+  allocate(this%PARSunlit_pft(JP1));this%PARSunlit_pft=0._r8
+  allocate(this%PARSunsha_pft(JP1));this%PARSunsha_pft=0._r8
+  allocate(this%CH2OSunlit_pft(JP1));this%CH2OSunlit_pft=0._r8
+  allocate(this%CH2OSunsha_pft(JP1));this%CH2OSunsha_pft=0._r8
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
-  allocate(this%LeafAUnshaded_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
-  this%LeafAUnshaded_zsec=spval
+  allocate(this%LeafAreaSunlit_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
+  this%LeafAreaSunlit_zsec=spval
   allocate(this%CPOOL3_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3_node=spval
   allocate(this%CPOOL4_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4_node=spval
   allocate(this%CMassCO2BundleSheath_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CMassCO2BundleSheath_node=spval

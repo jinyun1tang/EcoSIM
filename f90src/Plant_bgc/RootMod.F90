@@ -125,7 +125,7 @@ implicit none
   real(r8), INTENT(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
 
-  integer :: LL,LZ,L1,L,K,lx,M,NR,N,NTG
+  integer :: LL,LZ,L1,L,K,lx,M,NR,N,NTG,NE
   real(r8) :: CCC,CNC,CPC
   real(r8) :: NonstElmGradt
   real(r8) :: CPOOLX
@@ -140,8 +140,8 @@ implicit none
   real(r8) :: Root2ndC,Root1stC
   real(r8) :: WTRTLX
   real(r8) :: WTRTTT
-  real(r8) :: WTRTT
-  real(r8) :: XFRC
+  real(r8) :: TotRootC
+  real(r8) :: XFRC,CPOOLT
   integer :: iRootXsUpdateFlag(pltpar%jroots,JZ1)  
   INTEGER :: NRX(pltpar%jroots,JZ1)
   real(r8) :: mass_inital(NumPlantChemElms)
@@ -243,20 +243,21 @@ implicit none
 
 !====================================================================================
         masst_inital=masst_finale
-!     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
-!     SEASONAL STORAGE POOL IS DEPLETED
-!
-!     RootMycoActiveBiomC_pvr,WTRT=total root C mass
-!     WTRVC=storage C
-!     XFRX=maximum storage C content for remobiln from stalk,root reserves
-!     CPOOLR=non-structural C mass in root
-!     Note, 03/28/2024, Jinyun Tang: I need to take a careful look at the following code, particularly for WTRTLX and WTRTTX,
-!     which are essentially the same. However, assuming the flux is driven by C concentration of the seasonal storage
-!     and the nonstructural biomass in root, then WTRTTX should be defined with stalk volume.
-!     Question: where is seasonal storage located?
-        IF(L.LE.NIXBotRootLayer_pft(NZ))THEN
-          IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) &
-            .AND. SeasonalNonstElms_pft(ielmc,NZ).LT.XFRX*RootElms_pft(ielmc,NZ))THEN
+        !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
+        !     SEASONAL STORAGE POOL IS DEPLETED
+        !
+        !     RootMycoActiveBiomC_pvr,WTRT=total root C mass
+        !     WTRVC=storage C
+        !     XFRX=maximum storage C content for remobiln from stalk,root reserves
+        !     CPOOLR=non-structural C mass in root
+        !     Note, 03/28/2024, Jinyun Tang: I need to take a careful look at the following code, particularly for WTRTLX and WTRTTX,
+        !     which are essentially the same. However, assuming the flux is driven by C concentration of the seasonal storage
+        !     and the nonstructural biomass in root, then WTRTTX should be defined with stalk volume.
+        !     Question: where is seasonal storage located?
+        IF(L.LE.NIXBotRootLayer_pft(NZ))THEN   !within the root zone
+          IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &                      !has active root or mycorrhizae biomass
+            .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ)     &                      !root has sufficient biomass
+            .AND. SeasonalNonstElms_pft(ielmc,NZ).LT.XFRX*RootElms_pft(ielmc,NZ))THEN     !seasonal C storage is less than remobilizable root C
             FWTRT                                = RootMycoActiveBiomC_pvr(N,L,NZ)/RootElms_pft(ielmc,NZ)
             WTRTLX                               = RootMycoActiveBiomC_pvr(N,L,NZ)
             WTRTTX                               = RootElms_pft(ielmc,NZ)*FWTRT
@@ -267,6 +268,17 @@ implicit none
             XFRC                                 = XFRY*AZMIN1(NonstElmGradt)
             RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)+XFRC
             SeasonalNonstElms_pft(ielmc,NZ)      = SeasonalNonstElms_pft(ielmc,NZ)-XFRC
+
+            CPOOLT=WTRTLX+RootElms_pft(ielmc,NZ)
+
+            DO NE=2,NumPlantChemElms
+              CPOOLX                            = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
+              WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FWTRT)
+              NonstElmGradt                     = (WTRVCX*WTRTLX-CPOOLX*WTRTTX)/CPOOLT
+              XFRC                              = XFRY*AZMIN1(NonstElmGradt)
+              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRC
+              SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRC
+            ENDDO
           ENDIF
         ENDIF
 !
@@ -278,7 +290,7 @@ implicit none
 !     TotRoot2ndLen=total secondary root length
 !     Root2ndC=total secondary root C mass
 !     TotPopuRootLen=total root length
-!     WTRTT=total root C mass
+!     TotRootC=total root C mass
 !     FWOOD=C woody fraction in root:0=woody,1=non-woody
 !     PP=PFT population
 !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
@@ -297,9 +309,9 @@ implicit none
 
         TotPopuRoot1stLen_rpvr = TotRoot1stLen*PlantPopulation_pft(NZ)
         TotPopuRootLen         = TotRoot2ndLen+TotPopuRoot1stLen_rpvr
-        WTRTT                  = Root2ndC+Root1stC
+        TotRootC                  = Root2ndC+Root1stC
         
-        IF(TotPopuRootLen.GT.ZERO4Groth_pft(NZ) .AND. WTRTT.GT.ZERO4Groth_pft(NZ) &
+        IF(TotPopuRootLen.GT.ZERO4Groth_pft(NZ) .AND. TotRootC.GT.ZERO4Groth_pft(NZ) &
           .AND. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
           RootLenPerPlant_pvr(N,L,NZ)=TotPopuRootLen/PlantPopulation_pft(NZ)
           IF(DLYR3(L).GT.ZERO)THEN
@@ -309,7 +321,7 @@ implicit none
             RootLenDensPerPlant_pvr(N,L,NZ)=0._r8
           ENDIF
           TotRootVol=AMAX1(Root1stXSecArea_pft(N,NZ)*TotPopuRoot1stLen_rpvr+Root2ndXSecArea_pft(N,NZ)*TotRoot2ndLen &
-            ,WTRTT*RootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))
+            ,TotRootC*RootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))
           RootPoreVol_rpvr(N,L,NZ) = RootPorosity_pft(N,NZ)*TotRootVol
           RootVH2O_pvr(N,L,NZ)    = (1.0_r8-RootPorosity_pft(N,NZ))*TotRootVol
           !primary roots

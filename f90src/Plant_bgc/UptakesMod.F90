@@ -346,7 +346,7 @@ module UptakesMod
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     KoppenClimZone            => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
     LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
-    LeafArea_node         => plt_morph%LeafArea_node          ,& !input  :leaf area, [m2 d-2]
+    LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
     LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       ,& !input  :layer leaf protein C, [g d-2]
     LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     NP                        => plt_site%NP                          ,& !input  :current number of plant species,[-]
@@ -357,8 +357,9 @@ module UptakesMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col        ,& !input  :zero plane displacement height, [m]
     KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch  ,& !output :NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
-    LeafAUnshaded_zsec        => plt_photo%LeafAUnshaded_zsec         ,& !output :leaf irradiated surface area, [m2 d-2]
-    CanopyIsothBndlResist_pft       => plt_ew%CanopyIsothBndlResist_pft           ,& !output :canopy roughness height, [m]
+    LeafAreaSunlit_zsec       => plt_photo%LeafAreaSunlit_zsec        ,& !output :leaf irradiated surface area in different leaf sector, [m2 d-2]
+    LeafAreaSunlit_pft        => plt_photo%LeafAreaSunlit_pft         ,& !output :leaf irradiated surface area, [m2 d-2]    
+    CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !output :canopy roughness height, [m]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                   & !output :canopy temperature, [K]
   )
 !
@@ -367,6 +368,7 @@ module UptakesMod
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
   call PrintInfo('beg '//subname)
+  LeafAreaSunlit_pft(NZ)=0._r8
   D500: DO NB=1,NumOfBranches_pft(NZ)
     D550: DO K=1,MaxNodesPerBranch1
 !
@@ -374,7 +376,7 @@ module UptakesMod
 !
 !     LeafArea_node=leaf area
 !     LeafProteinCNode_brch=leaf protein content
-!     LeafAUnshaded_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
+!     LeafAreaSunlit_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
 !     ClumpFactorNow_pft=clumping factor from PFT file
 !
       IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -383,7 +385,8 @@ module UptakesMod
 
       D600: DO L=NumCanopyLayers1,1,-1
         D650: DO N=1,NumLeafZenithSectors1
-          LeafAUnshaded_zsec(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
+          LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
+          LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
         ENDDO D650
       ENDDO D600
     ENDDO D550

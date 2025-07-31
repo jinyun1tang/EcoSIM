@@ -303,7 +303,11 @@ implicit none
     CO2FixCL_pft          => plt_rbgc%CO2FixCL_pft           ,& !output :Rubisco-limited CO2 fixation, [gC d-2 h-1]
     CO2FixLL_pft          => plt_rbgc%CO2FixLL_pft           ,& !output :Light-limited CO2 fixation, [gC d-h2 h-1]
     CanopyGrosRCO2_pft    => plt_bgcr%CanopyGrosRCO2_pft     ,& !output :canopy plant+nodule autotrophic respiraiton, [gC d-2]
-    LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr    & !output :plant LitrFall element, [g d-2 h-1]
+    LitrfalStrutElms_pvr  => plt_bgcr%LitrfalStrutElms_pvr   ,& !output :plant LitrFall element, [g d-2 h-1]
+    PARSunlit_pft         => plt_photo%PARSunlit_pft         ,& !output :PAR absorbed by sunlit leaf, [umol m-2 s-1]
+    PARSunsha_pft         => plt_photo%PARSunsha_pft         ,& !output :PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
+    CH2OSunlit_pft        => plt_photo%CH2OSunlit_pft        ,& !output :carbon fixation by sun-lit leaf, [gC d-2 h-1]
+    CH2OSunsha_pft        => plt_photo%CH2OSunsha_pft         & !output :carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
   )
   
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
@@ -318,6 +322,10 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
+    PARSunsha_pft(NZ)                                           = 0._r8
+    PARSunlit_pft(NZ)                                           = 0._r8
+    CH2OSunlit_pft(NZ)                                          = 0._r8
+    CH2OSunsha_pft(NZ)                                          = 0._r8
     RootMaintDef_CO2_pvr(:,:,NZ)                                = 0._r8
     RootCO2Autor_pvr(1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ) = 0._r8
     NH3Dep2Can_pft(NZ)                                          = 0._r8

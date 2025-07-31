@@ -215,7 +215,7 @@ module PlantBGCPars
   RTDPX                       = 0.00_r8
   Root2ndMeanLensMin            = 1.0E-03_r8
   EMODR                       = 5.0_r8
-  QNTM                        = 0.45_r8+0.05_r8
+  QNTM                        = 0.45_r8
   CURV                        = 0.70_r8
   CURV2                       = 2.0_r8*CURV
   CURV4                       = 4.0_r8*CURV

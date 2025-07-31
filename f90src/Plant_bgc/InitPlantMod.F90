@@ -1029,27 +1029,27 @@ module InitPlantMod
   implicit none
   integer, intent(in) :: NZ
 
-  associate(                                                           &
+  associate(                                                                   &
     rNCGrain_pft                  => plt_allom%rNCGrain_pft                   ,& !input  :grain N:C ratio, [g g-1]
     rPCGrain_pft                  => plt_allom%rPCGrain_pft                   ,& !input  :grain P:C ratio, [gP gP-1]
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft         ,& !input  :soil layer at planting depth, [-]
-    PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
-    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr          ,& !input  :root layer C, [gC d-2]
+    NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft             ,& !input  :soil layer at planting depth, [-]
+    PetoleStrutElms_brch          => plt_biom%PetoleStrutElms_brch            ,& !input  :branch sheath structural element, [g d-2]
+    PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
+    PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !input  :root layer C, [gC d-2]
     RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
-    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr   ,& !input  :root layer element primary axes, [g d-2]
-    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr     ,& !input  :root layer structural C, [gC d-2]
-    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr      ,& !input  :root layer nonstructural element, [g d-2]
-    RootProteinC_pvr          => plt_biom%RootProteinC_pvr            ,& !input  :root layer protein C, [gC d-2]
-    SeedCMass_pft             => plt_morph%SeedCMass_pft              ,& !input  :grain size at seeding, [g]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft        ,& !inoput :canopy leaf + sheath C, [g d-2]
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch        ,& !inoput :branch nonstructural element, [g d-2]
-    LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !inoput :branch leaf structural element mass, [g d-2]
-    RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs         ,& !inoput :root C primary axes, [g d-2]
-    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch      ,& !output :plant branch leaf + sheath C, [g d-2]
-    SeedCPlanted_pft          => plt_biom%SeedCPlanted_pft            ,& !output :plant stored nonstructural C at planting, [gC d-2]
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft            & !output :canopy surface water content, [m3 d-2]
+    RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
+    RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !input  :root layer structural C, [gC d-2]
+    RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !input  :root layer nonstructural element, [g d-2]
+    RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !input  :root layer protein C, [gC d-2]
+    SeedCMass_pft                 => plt_morph%SeedCMass_pft                  ,& !input  :grain size at seeding, [g]
+    CanopyLeafShethC_pft          => plt_biom%CanopyLeafShethC_pft            ,& !inoput :canopy leaf + sheath C, [g d-2]
+    CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch            ,& !inoput :branch nonstructural element, [g d-2]
+    LeafStrutElms_brch            => plt_biom%LeafStrutElms_brch              ,& !inoput :branch leaf structural element mass, [g d-2]
+    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs             ,& !inoput :root C primary axes, [g d-2]
+    SeasonalNonstElms_pft         => plt_biom%SeasonalNonstElms_pft           ,& !inoput :plant stored nonstructural element at current step, [g d-2]
+    LeafPetolBiomassC_brch        => plt_biom%LeafPetolBiomassC_brch          ,& !output :plant branch leaf + sheath C, [g d-2]
+    SeedCPlanted_pft              => plt_biom%SeedCPlanted_pft                ,& !output :plant stored nonstructural C at planting, [gC d-2]
+    WatHeldOnCanopy_pft           => plt_ew%WatHeldOnCanopy_pft                & !output :canopy surface water content, [m3 d-2]
   )
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS

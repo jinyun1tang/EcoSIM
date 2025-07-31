@@ -186,6 +186,10 @@ implicit none
     NodulStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)             = plt_biom%NodulStrutElms_pft(1:NumPlantChemElms,NZ)
     PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ,NY,NX)       = plt_rbgc%PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)
     CanopyLeafArea_pft(NZ,NY,NX)                                = plt_morph%CanopyLeafArea_pft(NZ)
+    PARSunlit_pft(NZ,NY,NX)             = plt_photo%PARSunlit_pft(NZ)       
+    PARSunsha_pft(NZ,NY,NX)             = plt_photo%PARSunsha_pft(NZ)       
+    CH2OSunlit_pft(NZ,NY,NX)            = plt_photo%CH2OSunlit_pft(NZ)     
+    CH2OSunsha_pft(NZ,NY,NX)            = plt_photo%CH2OSunsha_pft(NZ)     
     CanopyMassC_pft(NZ,NY,NX)           = plt_biom%CanopyMassC_pft(NZ)
     CanopyStemArea_pft(NZ,NY,NX)        = plt_morph%CanopyStemArea_pft(NZ)
     NoduleNonstructCconc_pft(NZ,NY,NX)  = plt_biom%NoduleNonstructCconc_pft(NZ)
@@ -194,7 +198,10 @@ implicit none
     CanopyVcMaxRubisco_pft(NZ,NY,NX)    = plt_photo%CanopyVcMaxRubisco_pft(NZ)
     CanopyVoMaxRubisco_pft(NZ,NY,NX)    = plt_photo%CanopyVoMaxRubisco_pft(NZ)
     CanopyVcMaxPEP_pft(NZ,NY,NX)        = plt_photo%CanopyVcMaxPEP_pft(NZ)
-
+    LeafAreaSunlit_pft(NZ,NY,NX)        = plt_photo%LeafAreaSunlit_pft(NZ)    
+    TFN_Carboxy_pft(NZ,NY,NX)           = plt_photo%TFN_Carboxy_pft(NZ)    
+    TFN_Oxygen_pft(NZ,NY,NX)            = plt_photo%TFN_Oxygen_pft(NZ)    
+    TFN_eTranspt_pft(NZ,NY,NX)          = plt_photo%TFN_eTranspt_pft(NZ)  
     CanopyGasCO2_pft(NZ,NY,NX)          = plt_photo%CanopyGasCO2_pft(NZ)
     LeafIntracellularCO2_pft(NZ,NY,NX)  = plt_photo%LeafIntracellularCO2_pft(NZ)
     aquCO2Intraleaf_pft(NZ,NY,NX)       = plt_photo%aquCO2Intraleaf_pft(NZ)
@@ -450,7 +457,7 @@ implicit none
         DO  L=1,NumCanopyLayers
           DO N=1,NumLeafZenithSectors
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)  = plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
-            LeafAUnshaded_zsec(N,L,K,NB,NZ,NY,NX) = plt_photo%LeafAUnshaded_zsec(N,L,K,NB,NZ)
+            LeafAreaSunlit_zsec(N,L,K,NB,NZ,NY,NX) = plt_photo%LeafAreaSunlit_zsec(N,L,K,NB,NZ)
           ENDDO
         ENDDO
 

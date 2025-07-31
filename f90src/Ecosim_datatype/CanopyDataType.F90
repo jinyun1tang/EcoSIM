@@ -172,6 +172,14 @@ module CanopyDataType
   real(r8),target,allocatable :: CanopyVcMaxRubisco_pft(:,:,:)               !Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
   real(r8),target,allocatable :: CanopyVoMaxRubisco_pft(:,:,:)               !Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
   real(r8),target,allocatable :: CanopyVcMaxPEP_pft(:,:,:)                   !Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
+  real(r8),target,allocatable :: TFN_Carboxy_pft(:,:,:)                      ! temperature dependence of carboxylation, [-]
+  real(r8),target,allocatable :: TFN_Oxygen_pft(:,:,:)                       !temperature dependence of oxygenation, [-] 
+  real(r8),target,allocatable :: TFN_eTranspt_pft(:,:,:)                     !temperature dependence of electron transport, [-]
+  real(r8),target,allocatable :: LeafAreaSunlit_pft(:,:,:)                   !leaf irradiated surface area, [m2 d-2]    
+  real(r8),target,allocatable :: PARSunlit_pft(:,:,:)                        !PAR absorbed by sunlit leaf, [umol m-2 s-1]
+  real(r8),target,allocatable :: PARSunsha_pft(:,:,:)                        !PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
+  real(r8),target,allocatable :: CH2OSunlit_pft(:,:,:)                       !carbon fixation by sun-lit leaf, [gC d-2 h-1]
+  real(r8),target,allocatable :: CH2OSunsha_pft(:,:,:)                       !carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
 
   contains
 !----------------------------------------------------------------------
@@ -180,6 +188,15 @@ module CanopyDataType
 
   implicit none
 
+  allocate(PARSunlit_pft(JP,JY,JX));PARSunlit_pft=0._r8
+  allocate(PARSunsha_pft(JP,JY,JX));PARSunsha_pft=0._r8
+  allocate(CH2OSunlit_pft(JP,JY,JX));CH2OSunlit_pft=0._r8
+  allocate(CH2OSunsha_pft(JP,JY,JX));CH2OSunsha_pft=0._r8
+
+  allocate(LeafAreaSunlit_pft(JP,JY,JX)); LeafAreaSunlit_pft=0._r8
+  allocate(TFN_Carboxy_pft(JP,JY,JX));TFN_Carboxy_pft=0._r8
+  allocate(TFN_Oxygen_pft(JP,JY,JX)); TFN_Oxygen_pft=0._r8
+  allocate(TFN_eTranspt_pft(JP,JY,JX)); TFN_eTranspt_pft=0._r8
   allocate(CanopyVcMaxRubisco_pft(JP,JY,JX));CanopyVcMaxRubisco_pft=0._r8
   allocate(CanopyVoMaxRubisco_pft(JP,JY,JX));CanopyVoMaxRubisco_pft=0._r8  
   allocate(CanopyVcMaxPEP_pft(JP,JY,JX)); CanopyVcMaxPEP_pft=0._r8
@@ -349,6 +366,14 @@ module CanopyDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(PARSunlit_pft)
+  call destroy(PARSunsha_pft)
+  call destroy(CH2OSunlit_pft)
+  call destroy(CH2OSunsha_pft)
+  call destroy(TFN_Carboxy_pft)
+  call destroy(TFN_Oxygen_pft)
+  call destroy(TFN_eTranspt_pft)
+  call destroy(LeafAreaSunlit_pft)
   call destroy(CanopyVcMaxRubisco_pft)
   call destroy(CanopyVoMaxRubisco_pft)
   call destroy(CanopyVcMaxPEP_pft)

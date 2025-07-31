@@ -15,7 +15,7 @@ module CanopyRadDataType
   real(r8),target,allocatable :: RadTotPAR_zsec(:,:,:,:,:,:)           !direct incoming PAR, [umol m-2 s-1]
   real(r8),target,allocatable :: LeafAngleClass_pft(:,:,:,:)        !fractionction of leaves in different angle classes, [-]
   real(r8),target,allocatable :: LeafAreaZsec_brch(:,:,:,:,:,:,:)   !leaf surface area, [m2 d-2]
-  real(r8),target,allocatable :: LeafAUnshaded_zsec(:,:,:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
+  real(r8),target,allocatable :: LeafAreaSunlit_zsec(:,:,:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: StemAreaZsec_brch(:,:,:,:,:,:)     !stem surface area, [m2 d-2]
   real(r8),target,allocatable :: RadSW_Canopy_col(:,:)              !canopy intercepted shortwave radiation, [MJ d-2]
   real(r8) :: TotSineSkyAngles_grd
@@ -61,7 +61,7 @@ module CanopyRadDataType
   allocate(iScatteringDiffus(NumOfSkyAzimuthSects,NumLeafZenithSectors,NumOfLeafAzimuthSectors))
   allocate(LeafAngleClass_pft(NumLeafZenithSectors,JP,JY,JX));LeafAngleClass_pft=0._r8
   allocate(LeafAreaZsec_brch(NumLeafZenithSectors,NumCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaZsec_brch=0._r8
-  allocate(LeafAUnshaded_zsec(NumLeafZenithSectors,NumCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAUnshaded_zsec=0._r8
+  allocate(LeafAreaSunlit_zsec(NumLeafZenithSectors,NumCanopyLayers,MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafAreaSunlit_zsec=0._r8
   allocate(RadTotPAR_zsec(NumLeafZenithSectors,NumOfSkyAzimuthSects,NumCanopyLayers,JP,JY,JX));RadTotPAR_zsec=0._r8
   allocate(RadDifPAR_zsec(NumLeafZenithSectors,NumOfSkyAzimuthSects,NumCanopyLayers,JP,JY,JX));RadDifPAR_zsec=0._r8
   allocate(StemAreaZsec_brch(NumLeafZenithSectors,NumCanopyLayers,MaxNumBranches,JP,JY,JX));StemAreaZsec_brch=0._r8
@@ -81,7 +81,7 @@ module CanopyRadDataType
   call destroy(iScatteringDiffus)
   call destroy(LeafAngleClass_pft)
   call destroy(LeafAreaZsec_brch)
-  call destroy(LeafAUnshaded_zsec)
+  call destroy(LeafAreaSunlit_zsec)
   call destroy(RadTotPAR_zsec)
   call destroy(RadDifPAR_zsec)
   call destroy(StemAreaZsec_brch)

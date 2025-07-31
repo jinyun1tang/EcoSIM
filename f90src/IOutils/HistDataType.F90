@@ -342,9 +342,18 @@ implicit none
   real(r8),pointer   :: h1D_PLANT_BALANCE_N_ptc(:)  
   real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)  
   real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)      
-  real(r8),pointer   :: h1D_VcMaxRubisco_pft(:)
-  real(r8),pointer   :: h1D_VoMaxRubisco_pft(:)  
-  real(r8),pointer   :: h1D_VcMaxPEP_pft(:)  
+  real(r8),pointer   :: h1D_VcMaxRubisco_ptc(:)
+  real(r8),pointer   :: h1D_PARSunlit_ptc(:)
+  real(r8),pointer   :: h1D_PARSunsha_ptc(:)
+  real(r8),pointer   :: h1D_CH2OSunlit_ptc(:)
+  real(r8),pointer   :: h1D_CH2OSunsha_ptc(:)  
+  real(r8),pointer   :: h1D_VoMaxRubisco_ptc(:)  
+  real(r8),pointer   :: h1D_VcMaxPEP_ptc(:)  
+  real(r8),pointer   :: h1D_TFN_Carboxy_ptc(:)
+  real(r8),pointer   :: h1D_TFN_Oxygen_ptc(:)
+  real(r8),pointer   :: h1D_TFN_eTranspt_ptc(:)  
+  real(r8),pointer   :: h1D_LeafAreaSunlit_ptc(:)
+  real(r8),pointer   :: h1D_fClump_ptc(:)
   real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_P_ptc(:)     
   real(r8),pointer   :: h1D_LEAF_P_ptc(:)      
@@ -789,9 +798,19 @@ implicit none
   allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))        ;this%h1D_tTRANSPN_ptc(:)=spval
   allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
   allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_OXY_STRESS_ptc(:)=spval
-  allocate(this%h1D_VcMaxRubisco_pft(beg_ptc:end_ptc))    ;this%h1D_VcMaxRubisco_pft(:)=spval
-  allocate(this%h1D_VoMaxRubisco_pft(beg_ptc:end_ptc))    ;this%h1D_VoMaxRubisco_pft(:)=spval
-  allocate(this%h1D_VcMaxPEP_pft(beg_ptc:end_ptc))        ;this%h1D_VcMaxPEP_pft(:)=spval
+  allocate(this%h1D_VcMaxRubisco_ptc(beg_ptc:end_ptc))    ;this%h1D_VcMaxRubisco_ptc(:)=spval
+  allocate(this%h1D_VoMaxRubisco_ptc(beg_ptc:end_ptc))    ;this%h1D_VoMaxRubisco_ptc(:)=spval
+  allocate(this%h1D_VcMaxPEP_ptc(beg_ptc:end_ptc))        ;this%h1D_VcMaxPEP_ptc(:)=spval
+  allocate(this%h1D_TFN_Carboxy_ptc(beg_ptc:end_ptc))     ;this%h1D_TFN_Carboxy_ptc(:)=spval
+  allocate(this%h1D_TFN_Oxygen_ptc(beg_ptc:end_ptc))      ;this%h1D_TFN_Oxygen_ptc(:)=spval
+  allocate(this%h1D_TFN_eTranspt_ptc(beg_ptc:end_ptc))    ;this%h1D_TFN_eTranspt_ptc(:)=spval
+
+  allocate(this%h1D_PARSunlit_ptc(beg_ptc:end_ptc))  ;this%h1D_PARSunlit_ptc(:)=spval
+  allocate(this%h1D_PARSunsha_ptc(beg_ptc:end_ptc))  ;this%h1D_PARSunsha_ptc(:)=spval
+  allocate(this%h1D_CH2OSunlit_ptc(beg_ptc:end_ptc)) ;this%h1D_CH2OSunlit_ptc(:)=spval
+  allocate(this%h1D_CH2OSunsha_ptc(beg_ptc:end_ptc)); this%h1D_CH2OSunsha_ptc(:)=spval
+  allocate(this%h1D_fClump_ptc(beg_ptc:end_ptc)); this%h1D_fClump_ptc(:)=spval
+  allocate(this%h1D_LeafAreaSunlit_ptc(beg_ptc:end_ptc))  ;this%h1D_LeafAreaSunlit_ptc(:)=spval  
   allocate(this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_N_ptc(:)=spval
   allocate(this%h1D_Plant_N_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_N_ptc(:)=spval
   allocate(this%h1D_LEAF_N_ptc(beg_ptc:end_ptc))          ;this%h1D_LEAF_N_ptc(:)=spval
@@ -2106,20 +2125,63 @@ implicit none
   call hist_addfld1d(fname='OXY_STRESS_pft',units='none',avgflag='A',&
     long_name='Plant root O2 stress indicator [0->1 weaker stress]',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_VcMaxRubisco_pft(beg_ptc:end_ptc)
+  data1d_ptr => this%h1D_VcMaxRubisco_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VcMax_RUBISCO_pft',units='umol h-1 m-2',avgflag='A',&
     long_name='Maximum reference rate of carboxylation by Rubisco at reference temperature 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
-  data1d_ptr => this%h1D_VoMaxRubisco_pft(beg_ptc:end_ptc)
+  data1d_ptr => this%h1D_VoMaxRubisco_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VoMax_RUBISCO_pft',units='umol h-1 m-2',avgflag='A',&
     long_name='Maximum reference rate of oxygenation by Rubisco at reference temperature 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
-  data1d_ptr => this%h1D_VcMaxPEP_pft(beg_ptc:end_ptc)
+  data1d_ptr => this%h1D_VcMaxPEP_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VcMax_PEP_pft',units='umol h-1 m-2',avgflag='A',&
     long_name='Maximum rate of carboxylation by PEP at reference temperature 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_TFN_Carboxy_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TFN_Carboxy_pft',units='none',avgflag='A',&
+    long_name='Temperature response of carboyxlation in photosynthesis',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_TFN_Oxygen_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TFN_Oxygen_pft',units='none',avgflag='A',&
+    long_name='Temperature response of oxygenation in photosynthesis',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_TFN_eTranspt_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TFN_eTranspt_pft',units='none',avgflag='A',&
+    long_name='Temperature response of electron transport in photosynthesis',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_PARSunlit_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='PARSunlit_pft',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR absorbed by sunlit leaves',&
+    ptr_patch=data1d_ptr,default='inactive')      
+  
+  data1d_ptr => this%h1D_PARSunsha_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='PARSunsha_pft',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR absorbed by sun-shaded leaves',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_CH2OSunlit_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='CH2OSunlit_pft',units='gC m-2 h-1',avgflag='A',&
+    long_name='Photosynthesis by sunlit leaves',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_CH2OSunsha_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='CH2OSunsha_pft',units='gC m-2 h-1',avgflag='A',&
+    long_name='Photosynthesis by sun-shaded leaves',&
+    ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_LeafAreaSunlit_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafArea_sunlit_pft',units='m2 m-2',avgflag='A',&
+    long_name='Irridiance-lit leaf area',ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_fClump_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='fClump_pft',units='none',avgflag='A',&
+    long_name='Clumping factor of leaf area',ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_SHOOT_N_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='SHOOT_N_pft',units='gN/m2',avgflag='A',&
@@ -3703,10 +3765,19 @@ implicit none
         this%h1D_tTRANSPN_ptc(nptc)         = -ETCanopy_CumYr_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_WTR_STRESS_ptc(nptc)       = HoursTooLowPsiCan_pft(NZ,NY,NX)
 
-        this%h1D_VcMaxRubisco_pft(nptc)     = CanopyVcMaxRubisco_pft(NZ,NY,NX)
-        this%h1D_VoMaxRubisco_pft(nptc)     = CanopyVoMaxRubisco_pft(NZ,NY,NX)
-        this%h1D_VcMaxPEP_pft(nptc)         = CanopyVcMaxPEP_pft(NZ,NY,NX)
+        this%h1D_VcMaxRubisco_ptc(nptc) = CanopyVcMaxRubisco_pft(NZ,NY,NX)
+        this%h1D_VoMaxRubisco_ptc(nptc) = CanopyVoMaxRubisco_pft(NZ,NY,NX)
+        this%h1D_VcMaxPEP_ptc(nptc)     = CanopyVcMaxPEP_pft(NZ,NY,NX)
+        this%h1D_TFN_Carboxy_ptc(nptc)  = TFN_Carboxy_pft(NZ,NY,NX)
+        this%h1D_TFN_Oxygen_ptc(nptc)   = TFN_Oxygen_pft(NZ,NY,NX)
+        this%h1D_TFN_eTranspt_ptc(nptc) = TFN_eTranspt_pft(NZ,NY,NX)
+        this%h1D_PARSunlit_ptc(nptc)    = PARSunlit_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_PARSunsha_ptc(nptc)    = PARSunsha_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_CH2OSunlit_ptc(nptc)   = CH2OSunlit_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_CH2OSunsha_ptc(nptc)   = CH2OSunsha_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
+        this%h1D_fClump_ptc(nptc)  = ClumpFactorNow_pft(NZ,NY,NX)
+        this%h1D_LeafAreaSunlit_ptc(nptc)=LeafAreaSunlit_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress_pft(NZ,NY,NX)
         this%h1D_SHOOTST_N_ptc(nptc)    = ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
