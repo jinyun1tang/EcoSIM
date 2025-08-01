@@ -380,7 +380,7 @@ implicit none
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)  
   real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)  
-  real(r8),pointer   :: h1D_CFIX_lmtf_ptc(:)
+!  real(r8),pointer   :: h1D_CFIX_lmtf_ptc(:)
   real(r8),pointer   :: h1D_MainBranchNO_ptc(:)
   real(r8),pointer   :: h1D_Ar_mass_col(:)       
   real(r8),pointer   :: h1D_CO2_mass_col(:)
@@ -860,7 +860,7 @@ implicit none
   allocate(this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
-  allocate(this%h1D_CFIX_lmtf_ptc(beg_ptc:end_ptc))        ;this%h1D_CFIX_lmtf_ptc(:)=spval
+!  allocate(this%h1D_CFIX_lmtf_ptc(beg_ptc:end_ptc))        ;this%h1D_CFIX_lmtf_ptc(:)=spval
   allocate(this%h1D_MainBranchNO_ptc(beg_ptc:end_ptc))     ;this%h1D_MainBranchNO_ptc(:)=ispval
   allocate(this%h1D_RCanMaintDef_CO2_pft(beg_ptc:end_ptc)) ;this%h1D_RCanMaintDef_CO2_pft(:)=spval
   allocate(this%h1D_RootMaintDef_CO2_pft(beg_ptc:end_ptc)) ;this%h1D_RootMaintDef_CO2_pft(:)=spval
@@ -2050,10 +2050,10 @@ implicit none
   call hist_addfld1d(fname='SHOOT_NONSTP_pft',units='gP/m2',avgflag='A',&
     long_name='Plant leaf storage of nonstructural P',ptr_patch=data1d_ptr,default='inactive')                  
 
-  data1d_ptr => this%h1D_CFIX_lmtf_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='CFIX_rC2L_pft',units='none',avgflag='A',&
-    long_name='Plant rubisco to light limiting ratio (>1 light-limited)',ptr_patch=data1d_ptr,&
-    default='inactive')                  
+!  data1d_ptr => this%h1D_CFIX_lmtf_ptc(beg_ptc:end_ptc)
+!  call hist_addfld1d(fname='CFIX_rC2L_pft',units='none',avgflag='A',&
+!    long_name='Plant rubisco to light limiting ratio (>1 light-limited)',ptr_patch=data1d_ptr,&
+!    default='inactive')                  
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO_pft',units='1/m2',avgflag='A',&
@@ -3686,7 +3686,7 @@ implicit none
         if(CO2FixLL_pft(NZ,NY,NX)/=spval .and. CO2FixCL_pft(NZ,NY,NX)/=spval)then
           this%h1D_dCAN_GPP_CLIM_ptc(nptc) = (CO2FixCL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h1D_dCAN_GPP_eLIM_ptc(nptc) = (CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-          if(CO2FixLL_pft(NZ,NY,NX)>1.e-8_r8)this%h1D_CFIX_lmtf_ptc(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
+!          if(CO2FixLL_pft(NZ,NY,NX)>1.e-8_r8)this%h1D_CFIX_lmtf_ptc(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
         endif
 
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin_pft(NZ,NY,NX)

@@ -158,13 +158,6 @@ module SurfaceRadiationMod
   !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
   !     CanopyLeafAareZ_col,CanopyStemAareZ_col=leaf,stalk area of combined canopy layer
   !
-  if(I==6.and.J==22.and..false.)then
-    !set up input
-    CanopyHeight_pft(1)=0.2
-    plt_morph%CanopyLeafArea_pft(1)=0.1
-    CanopyLeafAareZ_col(1)=0.1
-    CanopyStemAareZ_col(1)=0.05
-  endif  
   CanopyHeight_col=0.0_r8
   D9685: DO NZ=1,NP
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
@@ -443,9 +436,6 @@ module SurfaceRadiationMod
     ENDDO D125
   ENDIF
   
-  if(I==6.and.J==22.and..false.)then
-  write(456,*)'csw,cpar=',RadSWbyCanopy_pft(1),RadPARbyCanopy_pft(1)
-  endif  
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
   !
@@ -467,9 +457,7 @@ module SurfaceRadiationMod
       FracPARads2Canopy_pft(NZ)=0.0_r8
     ENDDO D146
   ENDIF
-  if(I==6.and.J==22.and..false.)then
-  write(456,*)'fpar',FracPARads2Canopy_pft(1)
-  endif
+
   end associate
   end subroutine SurfaceRadiation
 
@@ -1089,7 +1077,7 @@ module SurfaceRadiationMod
       RadPARFwdScat2NextL(L) = 0.0_r8
       if(I==10.and.J==16.and..false.)then
       NZ=1
-      write(4444,*)'DIFL',L,RadPARDiffusL,LeafPARabsorpty_pft(NZ)
+      write(4444,*)'DIFL',L,RadPARDiffusL,LeafPARabsorpty_pft(NZ),TAU_DifuseRTransmit(L-1)
       endif
       D2500: DO NZ=1,NP
         RadDifSWbyLeaf_pft(NZ)   = 0.0_r8
@@ -1134,17 +1122,15 @@ module SurfaceRadiationMod
   if(I==10.and..false.)then
   write(4444,*)'par'  
   write(4444,*)(((RadTotPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1),L=1,NumCanopyLayers1)
-  write(4444,*)(((RadDifPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1),L=1,NumCanopyLayers1)  
+  write(4444,*)(((RadDifPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1),L=1,NumCanopyLayers1)    
   write(4444,*)'------------------------------------' 
+  if(J==16)then
+  write(4559,*)'IJ',I,J
+  write(4559,*)'TAUS',TAU_DirectRTransmit(1:NumCanopyLayers1+1)
+  write(4559,*)'TAU0',TAU_RadThru(1:NumCanopyLayers1+1)  
   endif
-  if(I==6.and.J==22.and..false.)then
-  write(456,*)'swfwd','pafwd','swbak','pabak'
-  write(456,*)(RadSWFwdScat2NextL(L),L=0,NumCanopyLayers1+1)
-  write(456,*)(RadPARFwdScat2NextL(L),L=0,NumCanopyLayers1+1)
-  write(456,*)(RadSWBakScat2NextL(L),L=0,NumCanopyLayers1+1)
-  write(456,*)(RadPARBakScat2NextL(L),L=0,NumCanopyLayers1+1)
-  write(456,*)'parz'
   endif
+
   end associate
   end subroutine MultiCanLayerRadiation
   ![tail]

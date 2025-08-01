@@ -124,7 +124,7 @@ module UptakesMod
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
       
-      call UpdateCanopyProperty(NZ)
+      call UpdateCanopyProperty(I,J,NZ)
 
 !     STOMATE=solve for minimum canopy stomatal resistance
       
@@ -324,12 +324,12 @@ module UptakesMod
   end subroutine PrepH2ONutrientUptake
 
 !----------------------------------------------------------------------------------------------------
-  subroutine UpdateCanopyProperty(NZ)
+  subroutine UpdateCanopyProperty(I,J,NZ)
   !
   !Description:
   ! Update canopy characterization
   implicit none
-  integer, intent(in) :: NZ
+  integer, intent(in) :: I,J,NZ
 
   character(len=*), parameter :: subname='UpdateCanopyProperty'
   real(r8) :: ALFZ       !shape parameter for windspeed attenuation in canopy
@@ -387,11 +387,16 @@ module UptakesMod
         D650: DO N=1,NumLeafZenithSectors1
           LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
           LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
+          IF(I==10.and.J==16.and..false. .and. LeafAreaZsec_brch(N,L,K,NB,NZ)>0._r8)then
+          write(4447,*)'SURF(',N,L,K,'NB,NZ)',LeafAreaZsec_brch(N,L,K,NB,NZ)
+          endif
         ENDDO D650
       ENDDO D600
     ENDDO D550
   ENDDO D500
-  !
+  IF(I==10.and.J==16.and..false.)THEN
+  WRITE(*,*)'LEAF',I,J,LeafAreaSunlit_pft(NZ),ClumpFactorNow_pft(NZ)
+  ENDIF
   if(lverb)write(*,*)'   CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER',LeafStalkArea_pft(NZ)
   !
   !     DIFFUSIVE RESISTANCE OF OTHER TALLER CANOPIES TO HEAT AND VAPOR

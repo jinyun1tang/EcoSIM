@@ -723,11 +723,11 @@ implicit none
   plt_morph%CanopyHeightZ_col(0)      = CanopyHeightZ_col(0,NY,NX)
   DO  L=1,NumCanopyLayers
     plt_morph%CanopyHeightZ_col(L) = CanopyHeightZ_col(L,NY,NX)
-    plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)
-    plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)
   ENDDO
-  plt_rad%TAU_DirectRTransmit(NumCanopyLayers+1) = TAU_DirectRTransmit(NumCanopyLayers+1,NY,NX)
-  plt_rad%TAU_RadThru(NumCanopyLayers+1)      = TAU_RadThru(NumCanopyLayers+1,NY,NX)
+  DO  L=1,NumCanopyLayers+1 
+    plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)  
+    plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)  
+  ENDDO  
 
   DO N=1,NumLeafZenithSectors
     plt_rad%SineLeafAngle(N)=SineLeafAngle(N)

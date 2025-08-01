@@ -82,7 +82,9 @@ implicit none
     plt_morph%CanopyHeightZ_col(L)   = CanopyHeightZ_col(L,NY,NX)
     plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)
   ENDDO
-  plt_rad%TAU_DirectRTransmit(NumCanopyLayers+1)=TAU_DirectRTransmit(NumCanopyLayers+1,NY,NX)
+  DO L=1,NumCanopyLayers+1
+    plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)  
+  ENDDO  
 
   DO L=0,NL_col(NY,NX)
     plt_site%AREA3(L)                 = AREA_3D(3,L,NY,NX)
@@ -196,9 +198,9 @@ implicit none
   DO L=0,NumCanopyLayers
     CanopyHeightZ_col(L,NY,NX)=plt_morph%CanopyHeightZ_col(L)
   ENDDO
-  DO L=1,NumCanopyLayers
+  DO L=1,NumCanopyLayers+1
     TAU_DirectRTransmit(L,NY,NX) = plt_rad%TAU_DirectRTransmit(L)
-    TAU_RadThru(L,NY,NX)      = plt_rad%TAU_RadThru(L)
+    TAU_RadThru(L,NY,NX)         = plt_rad%TAU_RadThru(L)
   ENDDO
   LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col
   

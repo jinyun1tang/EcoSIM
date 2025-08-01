@@ -201,10 +201,6 @@ implicit none
                     CH2OSunsha_pft(NZ)=CH2OSunsha_pft(NZ)+VL*clscal*umol2gC_hr
                     ParSunsha_pft(NZ)=ParSunsha_pft(NZ)+PAR_zsec*clscal
                   endif
-!               ICO2I=MAX(1,MIN(400,INT(CO2X)))
-!               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
-
                 ENDIF
               ENDIF
             ENDDO
