@@ -27,6 +27,7 @@ module ATSEcoSIMAdvanceMod
   use ClimForcDataType
   use PrescribePhenolMod
   use RootDataType
+  use ATSUtilsMod
 
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -68,7 +69,7 @@ implicit none
 
   !All the necessary sizes are taken from GridConsts
   real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
-  real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP) 
+  real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -77,6 +78,10 @@ implicit none
 
   LeafAreaZsec_lpft(:,:,:) = 0.2
   StemAreaZsec_lpft(:,:,:) = 0.05
+
+  !what Day/Month is it?
+  call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
+  write(*,*) "(ATSEcoSIMAdvance) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
 

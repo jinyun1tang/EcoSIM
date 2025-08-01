@@ -21,7 +21,7 @@ module EcoSIMCtrlDataType
   integer :: IDAYR           !day of recovery from earlier run
   integer :: IYRR            !year of recovery from earlier run
   integer :: ITERM           !end date for reading weather data
-  integer :: IFIN            !end date for reading weather data  
+  integer :: IFIN            !end date for reading weather data
   integer :: IOLD            !last day of previous scenario
   integer :: ILAST           !last day of previous scenario
   integer :: IRUN            !start date of current scenario
@@ -35,6 +35,7 @@ module EcoSIMCtrlDataType
   integer :: iYearCurrent     !current year
   integer :: iyear_pre        !previous year
   integer :: iyear_rest       !restart year
+  integer :: current_month, day_of_month, total_days_in_month
   contains
 
   subroutine InitEcoSIMCtrlData
