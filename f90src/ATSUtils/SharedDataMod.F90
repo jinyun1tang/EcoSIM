@@ -20,7 +20,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_LDENS(:,:)   !ATS liquid density (mols)
   real(r8), allocatable :: a_CumDepz2LayBottom_vr(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_Volume(:,:)   !volume
-  real(r8), allocatable :: a_dz(:,:)      !distance between layers  
+  real(r8), allocatable :: a_dz(:,:)      !distance between layers
   real(r8), allocatable :: a_AreaZ(:,:)   !Area normal to z axis
   real(r8), allocatable :: a_FC(:,:)      !field capacity
   real(r8), allocatable :: a_WP(:,:)      !wilting point
@@ -47,13 +47,13 @@ Module SharedDataMod
   real(r8), allocatable :: a_TEMP_pad(:,:)    !temperature
   real(r8), allocatable :: a_SSES(:,:)    !subsurface energy source
   real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
-  real(r8), allocatable :: a_AREA3(:,:) 
+  real(r8), allocatable :: a_AREA3(:,:)
   real(r8), allocatable :: a_AREA3_pad(:,:)
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
   real(r8), allocatable :: p_rain(:)      !precipitation, m H2O/s
-  real(r8), allocatable :: p_snow(:)      !precipitation snow, m (SWE) /s 
+  real(r8), allocatable :: p_snow(:)      !precipitation snow, m (SWE) /s
   real(r8), allocatable :: p_total(:)     !total precipitation m H20/s
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: swrad(:)       !shortwave radiation,
@@ -66,7 +66,8 @@ Module SharedDataMod
   integer,  allocatable :: a_NL(:)        !lower soil layer index
   integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays_col(:)
-  integer :: NYS, I, current_day, current_year !total number of columns
+  integer :: NYS, I !total number of columns
+  integer :: current_day, current_year
   logical :: p_bool
   contains
 
@@ -79,10 +80,10 @@ Module SharedDataMod
     !JZSOI=JZs
     write(*,*) "(InitSharedData) JX, JY, JZ, N_cells, N_cols: ", JX, JY, JZ, &
             ncells_per_col_, ncol
-    
+
     JX=1;JY=ncol
     JZ = ncells_per_col_
-   
+
     write(*,*) "In Shared data after setting: "
     write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
 
@@ -121,7 +122,7 @@ Module SharedDataMod
     !allocate(vpair(1:ncells_per_col_))
     write(*,*) "atka"
     allocate(a_ATKA(1:ncells_per_col_))
- 
+
     !allocate(a_BKDSI(ncells_per_col_, ncol))        ! bulk density
     !allocate(a_CumDepth2LayerBottom(ncells_per_col_, ncol))  ! depth (from surface to bottom)
     !allocate(a_Volume(ncells_per_col_, ncol))       ! volume
@@ -138,7 +139,7 @@ Module SharedDataMod
     !allocate(a_TEMP(ncells_per_col_, ncol))         ! temperature
     !allocate(a_SSES(ncells_per_col_, ncol))         ! subsurface energy source
     !allocate(a_SSWS(ncells_per_col_, ncol))         ! subsurface water source
-    !allocate(a_AREA3(ncells_per_col_, ncol)) 
+    !allocate(a_AREA3(ncells_per_col_, ncol))
     !allocate(a_AREA3_pad(ncells_per_col_, ncol))
     !allocate(a_TEMP_pad(ncells_per_col_, ncol))
 
