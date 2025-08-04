@@ -1055,7 +1055,7 @@ implicit none
             trcs_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
           ENDDO
 
-          DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
+          DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
               RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) &
                 +FX*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
@@ -1232,7 +1232,7 @@ implicit none
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
             trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)
           ENDDO
-          DO NR=1,NumRootAxes_pft(NZ,NY,NX)
+          DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
               RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = FY*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
               RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = FY*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
@@ -1397,7 +1397,7 @@ implicit none
             trcs_rootml_pvr(idg,N,L0,NZ,NY,NX) = trcs_rootml_pvr(idg,N,L0,NZ,NY,NX)-FXGP
           ENDDO
 
-          DO  NR=1,NumRootAxes_pft(NZ,NY,NX)
+          DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
               FXWTRT1E                                       = FRO*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
               RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E

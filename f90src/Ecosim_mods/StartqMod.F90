@@ -369,26 +369,26 @@ module StartqMod
 !
 !     PFT THERMAL ACCLIMATION
 !
-!     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
+!     ZTYP,PlantInitThermoAdaptZone_pft=dynamic,initial thermal adaptation zone from PFT file
 !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone_pft(NZ,NY,NX) = PlantInitThermoAdaptZone(NZ,NY,NX)
-  TempOffset_pft(NZ,NY,NX)            = 2.667*(2.5-iPlantThermoAdaptZone_pft(NZ,NY,NX))
+  rPlantThermoAdaptZone_pft(NZ,NY,NX) = PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  TempOffset_pft(NZ,NY,NX)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ,NY,NX))
   TC4LeafOut_pft(NZ,NY,NX)            = TCZD-TempOffset_pft(NZ,NY,NX)
   TC4LeafOff_pft(NZ,NY,NX)            = AMIN1(15.0,TCXD-TempOffset_pft(NZ,NY,NX))
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
-      HighTempLimitSeed_pft(NZ,NY,NX) = 30.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+      HighTempLimitSeed_pft(NZ,NY,NX) = 30.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ,NY,NX)
       SeedTempSens_pft(NZ,NY,NX)      = 0.002_r8
     ELSE
-      HighTempLimitSeed_pft(NZ,NY,NX) = 27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+      HighTempLimitSeed_pft(NZ,NY,NX) = 27.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ,NY,NX)
       SeedTempSens_pft(NZ,NY,NX)      = 0.002_r8
     ENDIF
   ELSE
-    HighTempLimitSeed_pft(NZ,NY,NX) = 27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+    HighTempLimitSeed_pft(NZ,NY,NX) = 27.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ,NY,NX)
     SeedTempSens_pft(NZ,NY,NX)      = 0.005_r8
   ENDIF
   end subroutine PFTThermalAcclimation
@@ -425,7 +425,7 @@ module StartqMod
       .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
-      NIXBotRootLayer_pft(NZ,NY,NX) = L
+      NMaxRootBotLayer_pft(NZ,NY,NX) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
         NIXBotRootLayer_rpft(NR,NZ,NY,NX)=L
       ENDDO D9790
@@ -719,7 +719,7 @@ module StartqMod
 !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
-  NumRootAxes_pft(NZ,NY,NX)=0
+  NumPrimeRootAxes_pft(NZ,NY,NX)=0
   RootNH4Uptake_pft(NZ,NY,NX)=0._r8
   RootNO3Uptake_pft(NZ,NY,NX)=0._r8
   RootH2PO4Uptake_pft(NZ,NY,NX)=0._r8

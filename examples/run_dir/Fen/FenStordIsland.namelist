@@ -35,10 +35,9 @@ NPYS=10,10,10      !number of cycles per NPX for gas flux calcns
 NCYC_LITR=20
 NCYC_SNOW=20
 !set up output frequency
-!hist_fincl2='Surf_LitrC','Aerobic_HetrBacterE_litr','Aerobic_HetrFungiE_litr','DOC_vr','TEMP_LITR',
-!  'DOC_litr','ECO_RH_CO2','Decomp_Moist_FN_LITR','Decomp_TEMP_FN_LITR','PSI_LITR'
+
 hist_fincl1='CH4_cumerr_col','Hygrogen_methanogenC_vr','Acetic_methanogenC_vr',
-  'CH4_gas_ppmv_vr','CH4Prod_aceto_vr','CH4Prod_hydro_vr','CH4Oxi_Aero_vr','acetate_vr',
+  'CH4Prod_aceto_vr','CH4Prod_hydro_vr','CH4Oxi_Aero_vr','acetate_vr',
   'FermentorC_vr','O2w_conc_vr','tSoilOrgC_col','tMICROB_C_col','Fermentation_vr',
   'AcetoMethgen_frac_vr','HydrogMethgen_frac_vr','Fermentor_frac_vr','MicrobAct_vr',
   'Decomp_OStress_vr','RDecompC_SOM_vr','Aerobic_HetrBacterC_vr','Aerobic_HetrFungiC_vr',
@@ -47,9 +46,18 @@ hist_fincl1='CH4_cumerr_col','Hygrogen_methanogenC_vr','Acetic_methanogenC_vr',
   'CH4_DIF_FLX_col','GasXSurfConduct_col','CH4w_conc_vr','WTR_TBL_col','FermOXYI_vr'
   'SOC_folialitr_cplx_vr','SOC_pom_cplx_vr','SOC_humus_cplx_vr','rIceFLP_vr',
   'dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft'
+
 !hist_fincl2='TEMP_vr','SOIL_RN_col','SOIL_LE_col','SOIL_H_col','SOIL_G_col','EVAPN_col'  
-hist_mfilt=3650 !,8760
-hist_nhtfrq=-24 !,-1
+!hist_fincl2='CAN_TEMPC_pft','PARSunlit_pft','PARSunsha_pft','CH2OSunlit_pft',
+!  'CH2OSunsha_pft','LeafArea_sunlit_pft','fClump_pft','BRANCH_NO_pft','SNOWPACK_col',
+!  'CAN_HT_pft'
+hist_fincl2='CAN_TEMPC_pft','STOMATAL_STRESS_pft','RUB_ACTVN_pft', 'TFN_Carboxy_pft',
+'TFN_Oxygen_pft','TFN_eTranspt_pft','VcMax_RUBISCO_pft','VoMax_RUBISCO_pft',
+  'Root_OXYSTRESS_pvr','LeafArea_sunlit_pft','STOML_RSC_CO2_pft'
+
+hist_mfilt=3650,4380
+hist_nhtfrq=-24,-2
+!oscal_test=0.0
 /
 
 &bbgcforc
@@ -60,7 +68,7 @@ hist_nhtfrq=-24 !,-1
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=90            !this shall overwrite what is set in forc_periods
+stop_n=60            !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

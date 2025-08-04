@@ -278,8 +278,8 @@ implicit none
   integer,  pointer :: Myco_pft(:)                    => null() !mycorrhizal type (no or yes),[-]
   integer,  pointer :: MainBranchNum_pft(:)           => null() !number of main branch,[-]
   integer,  pointer :: MaxSoiL4Root_pft(:)            => null() !maximum soil layer number for all root axes,[-]
-  integer,  pointer :: NIXBotRootLayer_pft(:)         => null() !maximum soil layer number for all root axes, [-]
-  integer,  pointer :: NumRootAxes_pft(:)             => null() !root primary axis number,[-]
+  integer,  pointer :: NMaxRootBotLayer_pft(:)         => null() !maximum soil layer number for all root axes, [-]
+  integer,  pointer :: NumPrimeRootAxes_pft(:)             => null() !root primary axis number,[-]
   integer,  pointer :: NumCogrowthNode_pft(:)         => null() !number of concurrently growing nodes,[-]
   integer,  pointer :: BranchNumber_pft(:)            => null() !main branch numeric id,[-]
   integer,  pointer :: NumOfBranches_pft(:)           => null() !number of branches,[-]
@@ -330,8 +330,8 @@ implicit none
   real(r8), pointer :: fTCanopyGroth_pft(:)               => null()     !canopy temperature growth function,                                  [-]
   real(r8), pointer :: HoursTooLowPsiCan_pft(:)           => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
   real(r8), pointer :: TCChill4Seed_pft(:)           => null()     !temperature below which seed set is adversely affected, [oC]
-  real(r8), pointer :: iPlantThermoAdaptZone_pft(:)  => null()     !plant thermal adaptation zone,                          [-]
-  real(r8), pointer :: PlantInitThermoAdaptZone(:)   => null()     !initial plant thermal adaptation zone,                  [-]
+  real(r8), pointer :: rPlantThermoAdaptZone_pft(:)  => null()     !plant thermal adaptation zone,                          [-]
+  real(r8), pointer :: PlantInitThermoAdaptZone_pft(:)   => null()     !initial plant thermal adaptation zone,                  [-]
   real(r8), pointer :: HighTempLimitSeed_pft(:)      => null()     !temperature above which seed set is adversely affected, [oC]
   real(r8), pointer :: SeedTempSens_pft(:)           => null()     !sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
   real(r8), pointer :: NetCumElmntFlx2Plant_pft(:,:) => null()     !effect of canopy element status on seed set,            [-]
@@ -1704,8 +1704,7 @@ implicit none
   allocate(this%CH2OSunlit_pft(JP1));this%CH2OSunlit_pft=0._r8
   allocate(this%CH2OSunsha_pft(JP1));this%CH2OSunsha_pft=0._r8
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
-  allocate(this%LeafAreaSunlit_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
-  this%LeafAreaSunlit_zsec=spval
+  allocate(this%LeafAreaSunlit_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafAreaSunlit_zsec=0._r8
   allocate(this%CPOOL3_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3_node=spval
   allocate(this%CPOOL4_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4_node=spval
   allocate(this%CMassCO2BundleSheath_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CMassCO2BundleSheath_node=spval
@@ -1739,7 +1738,7 @@ implicit none
   allocate(this%VmaxSpecRubCarboxyRef_pft(JP1));this%VmaxSpecRubCarboxyRef_pft=spval
   allocate(this%XKCO2_pft(JP1));this%XKCO2_pft=spval
   allocate(this%XKO2_pft(JP1));this%XKO2_pft=spval
-  allocate(this%RubiscoActivity_brch(MaxNumBranches,JP1));this%RubiscoActivity_brch=spval
+  allocate(this%RubiscoActivity_brch(MaxNumBranches,JP1));this%RubiscoActivity_brch=1._r8
   allocate(this%C4PhotosynDowreg_brch(MaxNumBranches,JP1));this%C4PhotosynDowreg_brch=spval
   allocate(this%aquCO2Intraleaf_pft(JP1));this%aquCO2Intraleaf_pft=spval
   allocate(this%Km4LeafaqCO2_pft(JP1));this%Km4LeafaqCO2_pft=spval
@@ -1785,8 +1784,8 @@ implicit none
   allocate(this%ShutRutNonstElmntConducts_pft(JP1));this%ShutRutNonstElmntConducts_pft=spval
   allocate(this%SeedTempSens_pft(JP1));this%SeedTempSens_pft=spval
   allocate(this%HighTempLimitSeed_pft(JP1));this%HighTempLimitSeed_pft=spval
-  allocate(this%PlantInitThermoAdaptZone(JP1));this%PlantInitThermoAdaptZone=spval
-  allocate(this%iPlantThermoAdaptZone_pft(JP1));this%iPlantThermoAdaptZone_pft=0
+  allocate(this%PlantInitThermoAdaptZone_pft(JP1));this%PlantInitThermoAdaptZone_pft=spval
+  allocate(this%rPlantThermoAdaptZone_pft(JP1));this%rPlantThermoAdaptZone_pft=0
   allocate(this%IsPlantActive_pft(JP1));this%IsPlantActive_pft=0
   allocate(this%iPlantState_pft(JP1));this%iPlantState_pft=0
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
@@ -1894,8 +1893,8 @@ implicit none
   allocate(this%CanopyStemArea_pft(JP1));this%CanopyStemArea_pft=spval
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
-  allocate(this%NIXBotRootLayer_pft(JP1));this%NIXBotRootLayer_pft=0
-  allocate(this%NumRootAxes_pft(JP1));this%NumRootAxes_pft=0
+  allocate(this%NMaxRootBotLayer_pft(JP1));this%NMaxRootBotLayer_pft=0
+  allocate(this%NumPrimeRootAxes_pft(JP1));this%NumPrimeRootAxes_pft=0
   allocate(this%NumCogrowthNode_pft(JP1));this%NumCogrowthNode_pft=0
   allocate(this%BranchNumber_pft(JP1));this%BranchNumber_pft=0
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0

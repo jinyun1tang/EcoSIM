@@ -209,7 +209,7 @@ implicit none
     NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft           ,& !input  :soil layer at planting depth, [-]
     NU                          => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
-    NumRootAxes_pft             => plt_morph%NumRootAxes_pft              ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft             => plt_morph%NumPrimeRootAxes_pft              ,& !input  :root primary axis number,[-]
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch          ,& !input  :branch sheath structural element, [g d-2]
     RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr     ,& !input  :root layer element primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr     ,& !input  :root layer element secondary axes, [g d-2]
@@ -315,7 +315,7 @@ implicit none
                 +ElmAllocmat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
             ENDDO    
 
-            DO NR=1,NumRootAxes_pft(NZ)
+            DO NR=1,NumPrimeRootAxes_pft(NZ)
               DO NE=1,NumPlantChemElms
                 dRootMyco=AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))
                 LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)&
@@ -388,7 +388,7 @@ implicit none
     k_fine_litr               => pltpar%k_fine_litr                  ,& !input  :fine litter complex id
     k_woody_litr              => pltpar%k_woody_litr                 ,& !input  :woody litter complex id
     LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !inoput :plant LitrFall element, [g d-2 h-1]
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           ,& !inoput :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !inoput :root primary axis number,[-]
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft     ,& !inoput :gaseous flux fron root disturbance, [g d-2 h-1]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !inoput :root layer element primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !inoput :root layer element secondary axes, [g d-2]
@@ -397,7 +397,7 @@ implicit none
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !inoput :root layer nodule element, [g d-2]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr            ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr            ,& !inoput :root aqueous content, [g d-2]
-    NIXBotRootLayer_pft       => plt_morph%NIXBotRootLayer_pft       ,& !output :maximum soil layer number for all root axes, [-]
+    NMaxRootBotLayer_pft       => plt_morph%NMaxRootBotLayer_pft       ,& !output :maximum soil layer number for all root axes, [-]
     NIXBotRootLayer_rpft      => plt_morph%NIXBotRootLayer_rpft      ,& !output :maximum soil layer number for root axes, [-]
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr         ,& !output :root layer C, [gC d-2]
     Root1stDepz_pft           => plt_morph%Root1stDepz_pft           ,& !output :root layer depth, [m]
@@ -444,7 +444,7 @@ implicit none
     ENDDO  
 
 
-    DO  NR=1,NumRootAxes_pft(NZ)
+    DO  NR=1,NumPrimeRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays        
         DO N=1,Myco_pft(NZ)
           DO M=1,jsken
@@ -482,7 +482,7 @@ implicit none
 !     RESET STATE VARIABLES OF DEAD ROOTS
 !
 !
-    D8870: DO NR=1,NumRootAxes_pft(NZ)
+    D8870: DO NR=1,NumPrimeRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays             
         DO N=1,Myco_pft(NZ)        
           RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
@@ -543,14 +543,14 @@ implicit none
 !     RESET DEPTH VARIABLES OF DEAD ROOTS
 !
 !   
-    D8795: DO NR=1,NumRootAxes_pft(NZ)
+    D8795: DO NR=1,NumPrimeRootAxes_pft(NZ)
       NIXBotRootLayer_rpft(NR,NZ)=NGTopRootLayer_pft(NZ)
       D8790: DO N=1,Myco_pft(NZ)
         Root1stDepz_pft(N,NR,NZ)=SeedDepth_pft(NZ)
       ENDDO D8790
     ENDDO D8795
-    NIXBotRootLayer_pft(NZ) = NGTopRootLayer_pft(NZ)
-    NumRootAxes_pft(NZ)     = 0
+    NMaxRootBotLayer_pft(NZ) = NGTopRootLayer_pft(NZ)
+    NumPrimeRootAxes_pft(NZ)     = 0
   ENDIF
   end associate
   end subroutine LiterFallDeadRoots
@@ -734,7 +734,7 @@ implicit none
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !output :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !output :branch nodule structural element, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !output :branch nonstructural element, [g d-2]
@@ -787,7 +787,7 @@ implicit none
 !
 !     RESET ROOT STATE VARIABLES
 !
-  DO  NR=1,NumRootAxes_pft(NZ)
+  DO  NR=1,NumPrimeRootAxes_pft(NZ)
     DO  N=1,Myco_pft(NZ)
       RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)=0._r8
     ENDDO
@@ -796,7 +796,7 @@ implicit none
   D6416: DO L=NU,MaxNumRootLays
     DO  N=1,Myco_pft(NZ)
        RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)=0._r8
-      DO  NR=1,NumRootAxes_pft(NZ)
+      DO  NR=1,NumPrimeRootAxes_pft(NZ)
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
         Root1stLen_rpvr(N,L,NR,NZ)                              = 0._r8

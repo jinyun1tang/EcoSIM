@@ -334,7 +334,7 @@ contains
     icwood                     => pltpar%icwood                         ,& !input  :group id of coarse woody litter
     iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft          ,& !input  :N2 fixation type,[-]
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft          ,& !input  :soil layer at planting depth, [-]
-    NumRootAxes_pft            => plt_morph%NumRootAxes_pft             ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft            => plt_morph%NumPrimeRootAxes_pft             ,& !input  :root primary axis number,[-]
     trcg_rootml_pvr            => plt_rbgc%trcg_rootml_pvr              ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr            => plt_rbgc%trcs_rootml_pvr              ,& !inoput :root aqueous content, [g d-2]
     RootMycoNonstElms_rpvr     => plt_biom%RootMycoNonstElms_rpvr       ,& !inoput :root layer nonstructural element, [g d-2]
@@ -374,7 +374,7 @@ contains
   call PrintInfo('beg '//subname)
   XHVST1=1._r8-XHVST
   
-  DO NR=1,NumRootAxes_pft(NZ)
+  DO NR=1,NumPrimeRootAxes_pft(NZ)
     DO N=1,Myco_pft(NZ)
       DO NE=1,NumPlantChemElms
         RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*XHVST
@@ -390,7 +390,7 @@ contains
               *ElmAllocmat4Litr(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
           ENDDO
 
-        DO NR=1,NumRootAxes_pft(NZ)
+        DO NR=1,NumPrimeRootAxes_pft(NZ)
           DO NE=1,NumPlantChemElms
             LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,L,NZ)+XHVST1 &
               *ElmAllocmat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
@@ -434,7 +434,7 @@ contains
 !     RootAreaPerPlant_pvr=root surface area per plant
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
-      D8960: DO NR=1,NumRootAxes_pft(NZ)
+      D8960: DO NR=1,NumPrimeRootAxes_pft(NZ)
         DO NE=1,NumPlantChemElms
           RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
           RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST

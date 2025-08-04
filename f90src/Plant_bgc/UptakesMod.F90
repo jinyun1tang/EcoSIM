@@ -111,6 +111,7 @@ module UptakesMod
     PSICanopy_pft             => plt_ew%PSICanopy_pft              ,& !inoput :canopy total water potential, [Mpa]
     EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft         ,& !output  :canopy latent heat flux, [MJ d-2 h-1]    
     Transpiration_pft         => plt_ew%Transpiration_pft          ,& !output :canopy transpiration, [m2 d-2 h-1]
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft            ,& !output :canopy temperature, [oC]    
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft          & !output :canopy evaporation, [m2 d-2 h-1]
   )
 
@@ -198,7 +199,7 @@ module UptakesMod
 
       Air_Heat_Latent_store_col = Air_Heat_Latent_store_col+EvapTransLHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*CanopyBndlResist_pft(NZ)
-
+      TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
       if(.not.ldo_sp_mode) then      
         call SetCanopyGrowthFuncs(I,J,NZ)
     
@@ -260,7 +261,6 @@ module UptakesMod
     call ZeroNutrientUptake(NZ)
 
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
-!     TdegCCanopy_pft(NZ)=TKC_pft(NZ)-TC2K
 
     RadNet2Canopy_pft(NZ)                                = 0.0_r8
     plt_ew%EvapTransLHeat_pft(NZ)                        = 0.0_r8
@@ -357,8 +357,6 @@ module UptakesMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     ZERO4PlantDisplace_col    => plt_ew%ZERO4PlantDisplace_col        ,& !input  :zero plane displacement height, [m]
     KMinNumLeaf4GroAlloc_brch => plt_morph%KMinNumLeaf4GroAlloc_brch  ,& !output :NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
-    LeafAreaSunlit_zsec       => plt_photo%LeafAreaSunlit_zsec        ,& !output :leaf irradiated surface area in different leaf sector, [m2 d-2]
-    LeafAreaSunlit_pft        => plt_photo%LeafAreaSunlit_pft         ,& !output :leaf irradiated surface area, [m2 d-2]    
     CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !output :canopy roughness height, [m]
     TKCanopy_pft              => plt_ew%TKCanopy_pft                   & !output :canopy temperature, [K]
   )
@@ -368,7 +366,7 @@ module UptakesMod
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
   call PrintInfo('beg '//subname)
-  LeafAreaSunlit_pft(NZ)=0._r8
+
   D500: DO NB=1,NumOfBranches_pft(NZ)
     D550: DO K=1,MaxNodesPerBranch1
 !
@@ -376,27 +374,15 @@ module UptakesMod
 !
 !     LeafArea_node=leaf area
 !     LeafProteinCNode_brch=leaf protein content
-!     LeafAreaSunlit_zsec,LeafAreaZsec_brch=unself-shaded,total leaf surface area
 !     ClumpFactorNow_pft=clumping factor from PFT file
 !
       IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
         KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
       ENDIF
 
-      D600: DO L=NumCanopyLayers1,1,-1
-        D650: DO N=1,NumLeafZenithSectors1
-          LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
-          LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
-          IF(I==10.and.J==16.and..false. .and. LeafAreaZsec_brch(N,L,K,NB,NZ)>0._r8)then
-          write(4447,*)'SURF(',N,L,K,'NB,NZ)',LeafAreaZsec_brch(N,L,K,NB,NZ)
-          endif
-        ENDDO D650
-      ENDDO D600
     ENDDO D550
   ENDDO D500
-  IF(I==10.and.J==16.and..false.)THEN
-  WRITE(*,*)'LEAF',I,J,LeafAreaSunlit_pft(NZ),ClumpFactorNow_pft(NZ)
-  ENDIF
+
   if(lverb)write(*,*)'   CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER',LeafStalkArea_pft(NZ)
   !
   !     DIFFUSIVE RESISTANCE OF OTHER TALLER CANOPIES TO HEAT AND VAPOR
@@ -478,7 +464,7 @@ module UptakesMod
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
     Myco_pft                => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
     NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
-    NumRootAxes_pft         => plt_morph%NumRootAxes_pft          ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft         => plt_morph%NumPrimeRootAxes_pft          ,& !input  :root primary axis number,[-]
     PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
     Root1stDepz_pft         => plt_morph%Root1stDepz_pft          ,& !input  :root layer depth, [m]
@@ -503,7 +489,7 @@ module UptakesMod
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       !obtain plant rooting depth
       RootDepZ=0.0_r8
-      D2005: DO NR=1,NumRootAxes_pft(NZ)
+      D2005: DO NR=1,NumPrimeRootAxes_pft(NZ)
         RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
       ENDDO D2005
 
@@ -597,7 +583,6 @@ module UptakesMod
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft               ,& !output :canopy temperature, [oC]
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft             & !output :canopy heat capacity, [MJ d-2 K-1]
   )
   IF(NN.GE.MaxIterNum)THEN
@@ -612,7 +597,6 @@ module UptakesMod
       plt_ew%VapXAir2Canopy_pft(NZ) = 0.0_r8
       plt_ew%Transpiration_pft(NZ)  = 0.0_r8
       TKC_pft(NZ)                   = TairK+DeltaTKC_pft(NZ)
-      TdegCCanopy_pft(NZ)           = units%Kelvin2Celcius(TKC_pft(NZ))
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
       LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
@@ -743,8 +727,7 @@ module UptakesMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft            ,& !output :canopy evaporation, [m2 d-2 h-1]
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
-    RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr         ,& !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft                & !output :canopy temperature, [oC]
+    RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr          & !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
   )
   
   !CCPOLT: total nonstructural canopy C,N,P concentration
@@ -1063,7 +1046,6 @@ module UptakesMod
 !     DeltaTKC_pft=TKC-TairK for next hour
 !
   TKC_pft(NZ)         = TKCanopy_pft(NZ)
-  TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
   DeltaTKC_pft(NZ)    = TKC_pft(NZ)-TairK
 
   end associate
@@ -1273,7 +1255,6 @@ module UptakesMod
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
     RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft            ,& !output :canopy net radiation, [MJ d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft               ,& !output :canopy temperature, [oC]
     Transpiration_pft         => plt_ew%Transpiration_pft             ,& !output :canopy transpiration, [m2 d-2 h-1]
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft            ,& !output :canopy heat capacity, [MJ d-2 K-1]
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft             & !output :canopy evaporation, [m2 d-2 h-1]
@@ -1290,7 +1271,7 @@ module UptakesMod
   ELSE
     TKC_pft(NZ)=TKSnow
   ENDIF
-  TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
+
   FTHRM                  = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
   LWRadCanopy_pft(NZ)    = FTHRM*TKC_pft(NZ)**4._r8
   PSICanopy_pft(NZ)      = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))

@@ -75,8 +75,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rProteinC2P_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
-  real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)            !initial plant thermal adaptation zone, [-]
-  real(r8),target,allocatable ::  iPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  PlantInitThermoAdaptZone_pft(:,:,:)            !initial plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  rPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                  !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
@@ -243,8 +243,8 @@ contains
   allocate(rProteinC2P_pft(JP,JY,JX));     rProteinC2P_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
-  allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
-  allocate(iPlantThermoAdaptZone_pft(JP,JY,JX));     iPlantThermoAdaptZone_pft=0._r8
+  allocate(PlantInitThermoAdaptZone_pft(JP,JY,JX));    PlantInitThermoAdaptZone_pft=0._r8
+  allocate(rPlantThermoAdaptZone_pft(JP,JY,JX));     rPlantThermoAdaptZone_pft=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX_pft(JP,JY,JX));   GROUPX_pft=0._r8
@@ -409,8 +409,8 @@ contains
   call destroy(rProteinC2P_pft)
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
-  call destroy(PlantInitThermoAdaptZone)
-  call destroy(iPlantThermoAdaptZone_pft)
+  call destroy(PlantInitThermoAdaptZone_pft)
+  call destroy(rPlantThermoAdaptZone_pft)
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
   call destroy(GROUPX_pft)

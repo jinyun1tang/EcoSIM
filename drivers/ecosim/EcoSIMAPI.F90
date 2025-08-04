@@ -13,6 +13,7 @@ module EcoSIMAPI
   use WatsubMod,         only: watsub
   use PlantMgmtDataType, only: NP_col
   use FireMod,           only: config_fire
+  use EcoSIMSolverPar,   only: oscal_test
   USE EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcoSIMCtrlMod  
@@ -163,7 +164,7 @@ contains
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&

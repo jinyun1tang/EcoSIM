@@ -213,11 +213,24 @@ implicit none
     StomatalStress_pft(NZ,NY,NX)    = plt_biom%StomatalStress_pft(NZ)
     Eco_RadSW_col(NY,NX)            = Eco_RadSW_col(NY,NX)+RadSWbyCanopy_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWbyCanopy_pft(NZ,NY,NX)
+    LeafAreaSunlit_pft(NZ,NY,NX)    = plt_photo%LeafAreaSunlit_pft(NZ)
+    PARSunlit_pft(NZ,NY,NX)         = plt_photo%PARSunlit_pft(NZ)
+    PARSunsha_pft(NZ,NY,NX)         = plt_photo%PARSunsha_pft(NZ)
+    DO NB=1,NumOfBranches_pft(NZ,NY,NX)
+      DO K=1,MaxNodesPerBranch
+        DO  L=1,NumCanopyLayers
+          DO N=1,NumLeafZenithSectors
+            LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)  = plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
+            LeafAreaSunlit_zsec(N,L,K,NB,NZ,NY,NX) = plt_photo%LeafAreaSunlit_zsec(N,L,K,NB,NZ)                        
+          ENDDO  
+        ENDDO
+      ENDDO  
+    ENDDO
     DO L=1,NumCanopyLayers
       DO M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafZenithSectors
           RadDifPAR_zsec(N,M,L,NZ,NY,NX)=plt_rad%RadDifPAR_zsec(N,M,L,NZ)
-          RadTotPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadTotPAR_zsec(N,M,L,NZ)
+          RadTotPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadTotPAR_zsec(N,M,L,NZ)          
         ENDDO
       ENDDO
     ENDDO

@@ -447,7 +447,7 @@ module WthrMod
         !     ATCA,ATCS=mean annual air,soil temperature
         !     TempOffset_col=shift in Arrhenius curve for MFT activity in nitro.f
         !     TempOffset_pft=shift in Arrhenius curve for PFT activity in uptake.f
-        !     iPlantThermoAdaptZone_pft=PFT thermal adaptation zone
+        !     rPlantThermoAdaptZone_pft=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
 !
@@ -457,14 +457,14 @@ module WthrMod
           ATCS_col(NY,NX)=ATCAI_col(NY,NX)+DTS
           TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
           DO NZ=1,NP_col(NY,NX)
-            iPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
-            TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone_pft(NZ,NY,NX))
+            rPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone_pft(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
+            TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
-              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ELSE
-              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX_pft(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN

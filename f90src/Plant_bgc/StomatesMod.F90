@@ -730,9 +730,6 @@
 !     LeafArea_node,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
 !     ProteinLeafAreaDensity=leaf protein surficial density
 !
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'RubiscoActivity_brch',RubiscoActivity_brch(NB,NZ),iPlantBranchState_brch(NB,NZ).EQ.iLive
-  endif
 
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
     call LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
@@ -880,6 +877,7 @@
     VcMaxRubiscoRef_brch(NB,NZ)    = 0._r8
     VoMaxRubiscoRef_brch(NB,NZ)    = 0._r8
     VcMaxPEPCarboxyRef_brch(NB,NZ) = 0._r8
+
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
       .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
       .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN

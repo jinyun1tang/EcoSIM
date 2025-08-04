@@ -2,13 +2,14 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod, only : safe_adb,AZMAX1
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use minimathmod,         only: safe_adb, AZMAX1
+  use data_kind_mod,       only: r8 => DAT_KIND_R8
   use EcoSIMCtrlMod,       only: lverb
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
   use PlantNonstElmDynMod, only: PlantNonstElmTransfer
   use PlantDebugMod,       only: PrintRootTracer
+  use DebugToolMod,        only: PrintInfo
   use EcosimConst
   use PlantBGCPars
   use PlantAPIData
@@ -101,6 +102,9 @@ module grosubsMod
     call SumPlantBiom(I,J,NZ,'exgrosubs')
     call PrintRootTracer(I,J,NZ,'afddeadt')    
   ENDDO
+!  IF(I>=266 .and. I<=278)then
+!  write(5544,*)('-',K=1,50)
+!  endif
   end associate
   END subroutine GrowPlants
 
@@ -375,6 +379,8 @@ module grosubsMod
   real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
+  real(r8), parameter :: dscal=0.999992087_r8
+  character(len=*), parameter :: subname='StagePlantForGrowth'
 !     begin_execution
 
   associate(                                                               &
@@ -421,7 +427,7 @@ module grosubsMod
     RootProteinC_pvr            => plt_biom%RootProteinC_pvr              ,& !output :root layer protein C, [gC d-2]
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr             & !output :root respiration unconstrained by O2, [g d-2 h-1]
   )
-
+  call PrintInfo('beg '//subname)
   D2: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)=0._r8
     CanopyLeafCLyr_pft(L,NZ)=0._r8
@@ -497,13 +503,6 @@ module grosubsMod
     FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_litr))
     FracRootElmAlloc2Litr(NE,k_fine_litr)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_litr))
   ENDDO
-!  write(556,*)I*100+J,FRTX,FRTX*CanopySapwoodC_pft(NZ),StalkStrutElms_pft(ielmc,NZ),CanopySapwoodC_pft(NZ)
-!  write(556,*)CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-!  write(556,*)FracShootLeafElmAlloc2Litr(ielmc,:),'shoot',FracShootLeafElmAlloc2Litr(ielmn,:),FracShootLeafElmAlloc2Litr(ielmp,:),'leaf',&
-!    FracShootPetolElmAlloc2Litr(ielmn,:),FracShootPetolElmAlloc2Litr(ielmp,:),'pet'
-!  write(556,*)FracWoodStalkElmAlloc2Litr(ielmc,:),'wood',FracWoodStalkElmAlloc2Litr(ielmn,:),FracWoodStalkElmAlloc2Litr(ielmp,:)
-!  write(556,*)FracRootElmAlloc2Litr(ielmc,:),'root',FracRootElmAlloc2Litr(ielmn,:),FracRootElmAlloc2Litr(ielmp,:)
-!  write(556,*)'------------------'
   
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
@@ -530,20 +529,19 @@ module grosubsMod
 !     WTRT,PP=root mass,PFT population
 !     RootPrimeAxsNum=multiplier for number of primary root axes
 !
-  RootBiomCPerPlant_pft(NZ)=AMAX1(0.999992087_r8*RootBiomCPerPlant_pft(NZ),&
-    RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-  RootPrimeAxsNum=AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
-!
-!     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
-!     FROM CANOPY TURGOR
-!
-!     WFNS=turgor expansion,extension function
-!     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
-!     Stomata_Stress=stomatal resistance function of canopy turgor
-!     PSICanopy_pft=canopy water potential
-!     WaterStress4Groth=growth function of canopy water potential
-!     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
-!
+  RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+  RootPrimeAxsNum           = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  !
+  !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
+  !     FROM CANOPY TURGOR
+  !
+  !     WFNS=turgor expansion,extension function
+  !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
+  !     Stomata_Stress=stomatal resistance function of canopy turgor
+  !     PSICanopy_pft=canopy water potential
+  !     WaterStress4Groth=growth function of canopy water potential
+  !     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
+  !
   WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
@@ -555,9 +553,11 @@ module grosubsMod
     Stomata_Stress    = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
-!  write(119,*)I*1000+J,Stomata_Stress,RCS_pft(NZ),PSICanopyTurg_pft(NZ),PSICanopy_pft(NZ),plt_ew%PSICanopyOsmo_pft(NZ)
+
   CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
+
+  call PrintInfo('end '//subname)
   end associate
   end subroutine StagePlantForGrowth
 

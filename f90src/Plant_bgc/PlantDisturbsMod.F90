@@ -505,7 +505,7 @@ module PlantDisturbsMod
     SolarNoonHour_col          => plt_site%SolarNoonHour_col            ,& !input  :time of solar noon, [h]
     ZEROS                      => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]
     AREA3                      => plt_site%AREA3                        ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    NumRootAxes_pft            => plt_morph%NumRootAxes_pft             ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft            => plt_morph%NumPrimeRootAxes_pft             ,& !input  :root primary axis number,[-]
     SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch          ,& !input  :branch stalk structural element mass, [g d-2]
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch       ,& !input  :plant branch leaf + sheath C, [g d-2]
@@ -638,7 +638,7 @@ module PlantDisturbsMod
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       FracLeftThin=1.0_r8-THIN_pft(NZ)
 
-      DO NR=1,NumRootAxes_pft(NZ)
+      DO NR=1,NumPrimeRootAxes_pft(NZ)
         DO N=1,Myco_pft(NZ)
           DO NE=1,NumPlantChemElms
             RootMyco1stElm_raxs(NE,N,NR,NZ)=RootMyco1stElm_raxs(NE,N,NR,NZ)*FracLeftThin
@@ -900,6 +900,9 @@ module PlantDisturbsMod
     IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.isclose(THIN_pft(NZ),0._r8))THEN
       InternodeHeightDead_brch(K,NB,NZ) = FHVSETS*InternodeHeightDead_brch(K,NB,NZ)
       LiveInterNodeHight_brch(K,NB,NZ)   = AMIN1(LiveInterNodeHight_brch(K,NB,NZ),FracCanopyHeightCut_pft(NZ))
+      IF(I>=266 .and. I<=278 .and. K>=11)then   
+      write(5544,*)'livd',I*1000+J,K,NB,LiveInterNodeHight_brch(K,NB,NZ),FracCanopyHeightCut_pft(NZ)
+      endif
     ENDIF
 
   ENDDO D9820
@@ -1701,7 +1704,7 @@ module PlantDisturbsMod
     ElmAllocmat4Litr          => plt_soilchem%ElmAllocmat4Litr       ,& !input  :litter kinetic fraction, [-]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !input  :root layer nonstructural element, [g d-2]
     THIN_pft                  => plt_distb%THIN_pft                  ,& !input  :thinning of plant population, [-]
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     DCORP                     => plt_distb%DCORP                     ,& !input  :soil mixing fraction with tillage, [-]
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
     k_fine_litr               => pltpar%k_fine_litr                  ,& !input  :fine litter complex id
@@ -1737,7 +1740,7 @@ module PlantDisturbsMod
     !nonstructural root biomass
     call RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
 
-    DO NR=1,NumRootAxes_pft(NZ)
+    DO NR=1,NumPrimeRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
         FrcMassNotHarvst(NE)=XHVST1*ElmAllocmat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
           +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
@@ -1784,7 +1787,7 @@ module PlantDisturbsMod
   real(r8), intent(in) :: FracLeftThin,XHVST1
   integer :: NE,NR,M
   associate(                                                          &
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     inonstruct                => pltpar%inonstruct                   ,& !input  :group id of plant nonstructural litter
     iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
@@ -1832,7 +1835,7 @@ module PlantDisturbsMod
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
 
-    D3960: DO NR=1,NumRootAxes_pft(NZ)
+    D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
         RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracLeftThin

@@ -169,7 +169,7 @@ module PlantNonstElmDynMod
   associate(                                                    &
     NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
-    NIXBotRootLayer_pft    => plt_morph%NIXBotRootLayer_pft    ,& !input  :maximum soil layer number for all root axes, [-]
+    NMaxRootBotLayer_pft    => plt_morph%NMaxRootBotLayer_pft    ,& !input  :maximum soil layer number for all root axes, [-]
     PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr      ,& !input  :root layer C, [gC d-2]
     ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft        ,& !input  :threshold zero for leaf calculation, [-]
     Myco_pft               => plt_morph%Myco_pft               ,& !input  :mycorrhizal type (no or yes),[-]
@@ -187,12 +187,12 @@ module PlantNonstElmDynMod
 !     FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)
 !  
   DO NE=1,NumPlantChemElms
-    mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
+    mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:NMaxRootBotLayer_pft(NZ),NZ))
   ENDDO
 
   !this enables extension to other mycorrhizae
   DO N=2,Myco_pft(NZ)
-    D425: DO L=NU,NIXBotRootLayer_pft(NZ)
+    D425: DO L=NU,NMaxRootBotLayer_pft(NZ)
       IF(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND. PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         !root
@@ -223,7 +223,7 @@ module PlantNonstElmDynMod
   ENDDO
 
   DO NE=1,NumPlantChemElms
-    mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:NIXBotRootLayer_pft(NZ),NZ))
+    mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:NMaxRootBotLayer_pft(NZ),NZ))
   ENDDO
   end associate
   end subroutine RootMycoNonstTransfer
@@ -338,7 +338,7 @@ module PlantNonstElmDynMod
     k_fine_litr                   => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
     NIXBotRootLayer_rpft          => plt_morph%NIXBotRootLayer_rpft           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
-    NumRootAxes_pft               => plt_morph%NumRootAxes_pft                ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft               => plt_morph%NumPrimeRootAxes_pft                ,& !input  :root primary axis number,[-]
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !inoput :root layer structural C, [gC d-2]
     PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !inoput :root layer C, [gC d-2]
@@ -361,7 +361,7 @@ module PlantNonstElmDynMod
     D5450: DO L=NU,MaxSoiL4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ) = 0._r8
       PopuRootMycoC_pvr(N,L,NZ)       = 0._r8
-      D5460: DO NR=1,NumRootAxes_pft(NZ)
+      D5460: DO NR=1,NumPrimeRootAxes_pft(NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
         PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ) &
           +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
@@ -370,7 +370,7 @@ module PlantNonstElmDynMod
       Eco_AutoR_CumYr_col = Eco_AutoR_CumYr_col+RootCO2Autor_pvr(N,L,NZ)
     ENDDO D5450
 
-    DO  NR=1,NumRootAxes_pft(NZ)
+    DO  NR=1,NumPrimeRootAxes_pft(NZ)
       RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_rpft(NR,NZ),NZ)=RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_rpft(NR,NZ),NZ)&
         +RootMyco1stElm_raxs(ielmc,N,NR,NZ)
     ENDDO

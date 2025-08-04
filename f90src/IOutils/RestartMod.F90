@@ -493,34 +493,34 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NumRootAxes_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumPrimeRootAxes_pft', dim1name='pft',&
      long_name='root primary axis number', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumRootAxes_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumPrimeRootAxes_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)
   else
     !print*,'NRT'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumRootAxes_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumPrimeRootAxes_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NumRootAxes_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NumPrimeRootAxes_pft', dim1name='pft',&
      long_name='root primary axis number', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval)    
   endif
 
   if(flag=='read')then
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NIXBotRootLayer_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NMaxRootBotLayer_pft', dim1name='pft',&
      long_name='Bottom soil layer number that has root', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NIXBotRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NMaxRootBotLayer_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else 
-    !print*,'NIXBotRootLayer_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NIXBotRootLayer_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    !print*,'NMaxRootBotLayer_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NMaxRootBotLayer_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)    
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='NIXBotRootLayer_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='NMaxRootBotLayer_pft', dim1name='pft',&
      long_name='Bottom soil layer number that has root', units='none', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)     
 

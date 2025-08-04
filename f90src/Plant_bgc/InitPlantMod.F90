@@ -402,10 +402,10 @@ module InitPlantMod
 
   associate(                                                           &
     DATAP                     => plt_site%DATAP                       ,& !input  :parameter file name,[-]
-    PlantInitThermoAdaptZone  => plt_pheno%PlantInitThermoAdaptZone   ,& !input  :initial plant thermal adaptation zone, [-]
+    PlantInitThermoAdaptZone_pft  => plt_pheno%PlantInitThermoAdaptZone_pft   ,& !input  :initial plant thermal adaptation zone, [-]
     iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
     TempOffset_pft            => plt_pheno%TempOffset_pft             ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-    iPlantThermoAdaptZone_pft => plt_pheno%iPlantThermoAdaptZone_pft  ,& !output :plant thermal adaptation zone, [-]
+    rPlantThermoAdaptZone_pft => plt_pheno%rPlantThermoAdaptZone_pft  ,& !output :plant thermal adaptation zone, [-]
     HighTempLimitSeed_pft     => plt_pheno%HighTempLimitSeed_pft      ,& !output :temperature above which seed set is adversely affected, [oC]
     SeedTempSens_pft          => plt_pheno%SeedTempSens_pft           ,& !output :sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
     TC4LeafOff_pft            => plt_pheno%TC4LeafOff_pft             ,& !output :threshold temperature for autumn leafoff/hardening, [oC]
@@ -414,26 +414,26 @@ module InitPlantMod
 !
 !     PFT THERMAL ACCLIMATION
 !
-!     ZTYP,PlantInitThermoAdaptZone=dynamic,initial thermal adaptation zone from PFT file
+!     ZTYP,PlantInitThermoAdaptZone_pft=dynamic,initial thermal adaptation zone from PFT file
 !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation (oC)
 !     TCZ,TC4LeafOff_pft=threshold temperature for leafout,leafoff
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  iPlantThermoAdaptZone_pft(NZ) = PlantInitThermoAdaptZone(NZ)
-  TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-iPlantThermoAdaptZone_pft(NZ))
+  rPlantThermoAdaptZone_pft(NZ) = PlantInitThermoAdaptZone_pft(NZ)
+  TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)            = TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)            = AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
-      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
+      HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ELSE
-      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
+      HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8
     ENDIF
   ELSE
-    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*iPlantThermoAdaptZone_pft(NZ)
+    HighTempLimitSeed_pft(NZ)=27.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ)
     SeedTempSens_pft(NZ)=0.005_r8
   ENDIF
   end associate
@@ -476,7 +476,7 @@ module InitPlantMod
     CNRTS_pft             => plt_allom%CNRTS_pft              ,& !output :root N:C ratio x root growth yield, [-]
     CPRTS_pft             => plt_allom%CPRTS_pft              ,& !output :root P:C ratio x root growth yield, [-]
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft     ,& !output :soil layer at planting depth, [-]
-    NIXBotRootLayer_pft   => plt_morph%NIXBotRootLayer_pft    ,& !output :maximum soil layer number for all root axes, [-]
+    NMaxRootBotLayer_pft   => plt_morph%NMaxRootBotLayer_pft    ,& !output :maximum soil layer number for all root axes, [-]
     NIXBotRootLayer_rpft  => plt_morph%NIXBotRootLayer_rpft   ,& !output :maximum soil layer number for root axes, [-]
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft     ,& !output :specific root length primary axes, [m g-1]
     Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft    ,& !output :root cross-sectional area primary axes, [m2]
@@ -513,7 +513,7 @@ module InitPlantMod
     IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
       .AND.SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
       NGTopRootLayer_pft(NZ)  = L
-      NIXBotRootLayer_pft(NZ) = L
+      NMaxRootBotLayer_pft(NZ) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
         NIXBotRootLayer_rpft(NR,NZ)=L
       ENDDO D9790
@@ -926,7 +926,7 @@ module InitPlantMod
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
     RootPoreVol_rpvr           => plt_morph%RootPoreVol_rpvr            ,& !output :root layer volume air, [m2 d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr               ,& !output :root layer volume water, [m2 d-2]
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft            ,& !output :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft            ,& !output :root primary axis number,[-]
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !output :root turgor water potential, [Mpa]
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr          ,& !output :root layer diameter primary axes, [m]
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr          ,& !output :root layer diameter secondary axes, [m]
@@ -941,7 +941,7 @@ module InitPlantMod
 !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
-  NumRootAxes_pft(NZ)=0
+  NumPrimeRootAxes_pft(NZ)=0
   plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
   plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
   plt_rbgc%RootH2PO4Uptake_pft(NZ) = 0._r8

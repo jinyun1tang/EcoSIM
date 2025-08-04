@@ -364,7 +364,7 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    NumRootAxes_pft           => plt_morph%NumRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !input  :root layer element primary axes, [g d-2]
@@ -379,12 +379,12 @@ implicit none
 
   DO NE=1,NumPlantChemElms
     DO L=NU,MaxNumRootLays
-      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
-        sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumRootAxes_pft(NZ),NZ)) + &
+      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+        sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
         sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),L,NZ))
     ENDDO
-    massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
-    massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumRootAxes_pft(NZ),NZ))
+    massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
+    massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
     DO N=1,Myco_pft(NZ)
       RootMycoNonstElms_pft(NE,N,NZ)=sum(RootMycoNonstElms_rpvr(NE,N,NU:MaxNumRootLays,NZ))

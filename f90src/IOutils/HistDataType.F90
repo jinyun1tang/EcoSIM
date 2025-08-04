@@ -3898,7 +3898,7 @@ implicit none
           this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
           this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
-          DO NR=1,NumRootAxes_pft(NZ,NY,NX)
+          DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_pvr(nptc,L)= this%h2D_Root1stStrutC_pvr(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root1stStrutN_pvr(nptc,L)= this%h2D_Root1stStrutN_pvr(nptc,L) + &
