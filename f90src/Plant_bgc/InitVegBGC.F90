@@ -38,8 +38,11 @@ module InitVegBGC
 
   !NumOfSkyAzimuthSects: number of sky azimuth sectors
   !NumOfLeafAzimuthSectors: number of leaf azimuth sectors
+  !the following configuration is specific to NumOfSkyAzimuthSects equal to 4, so that the whole sky is separated into 4 zones.
+  !in Grant 1989, six sky azimuth angles are used, so that the whole sky is separated into 10 zones.
+  ! 
   D230: DO N=1,NumOfSkyAzimuthSects
-    SkyAzimuthAngle(N)   = PICON*(2*N-1)/real(NumOfSkyAzimuthSects,r8)
+    SkyAzimuthAngle(N)   = PICON*(2._r8*N-1)/real(NumOfSkyAzimuthSects,r8)
     YAGL                 = PICON/real(NumOfSkyAzimuthSects,r8)
     YSIN(N)              = SIN(YAGL)
     YCOS(N)              = COS(YAGL)
@@ -48,7 +51,8 @@ module InitVegBGC
     D225: DO L=1,NumOfLeafAzimuthSectors
       DAZI=COS(ZAZI(L)-SkyAzimuthAngle(N))
       DO  M=1,NumLeafZenithSectors
-        OMEGY        = CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI
+        !eq. (13) in Grant 1989
+        OMEGY        = CosineLeafAngle(M)*YSIN(N)+SineLeafAngle(M)*YCOS(N)*DAZI    
         OMEGA(N,M,L) = ABS(OMEGY)
         OMEGX(N,M,L) = OMEGA(N,M,L)/YSIN(N)
         IF(CosineLeafAngle(M).GT.YSIN(N))THEN

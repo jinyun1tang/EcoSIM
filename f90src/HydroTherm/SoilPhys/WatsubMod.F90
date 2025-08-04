@@ -54,7 +54,6 @@ module WatsubMod
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   real(r8), parameter :: tiny_wat=1.e-12_r8   !threshold water flux
   integer :: curday,curhour
   logical :: do_warming
@@ -101,6 +100,8 @@ module WatsubMod
   real(r8) :: Qinfl2MacP_col(JY,JX)
   real(r8) :: twatmass0(JY,JX)
   integer  :: NUX0(JY,JX)
+  logical  :: found_frozen
+  real(r8) :: VLSoilPoreMicPX
 !  real(r8) :: dtime
 ! begin_execution
 
@@ -177,6 +178,23 @@ module WatsubMod
 !  write(444,*)(VLWatMacP1_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
 !  write(444,*)((VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE,L=NUM_col(NY,NX),NL_col(NY,NX))
 !  if(I==3.and.j==3)stop
+  !diagnose surface ice
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      found_frozen=.false.
+      DO L=NUM_col(NY,NX),NL_col(NY,NX)
+        VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+        VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
+        ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP1_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
+          VLiceMacP1_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)   
+        if(ThetaICEZ_vr(L,NY,NX)>0.9_r8 .and. .not. found_frozen)then
+          found_frozen=.true.
+          NLF_col(NY,NX)=L
+        endif   
+      ENDDO  
+    ENDDO  
+  ENDDO
+
   END subroutine watsub
 
 !------------------------------------------------------------------------------------------  
@@ -932,10 +950,9 @@ module WatsubMod
                 !including lateral connection or woking on vertical direction
 
                 ! IF NO WATER TABLE
-
                 IF((IDWaterTable_col(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection) .AND. .not.isclose(Recharg2WTBLScal,0.0_r8))THEN    
                   !vertical flow or lateral drainage
-                  call BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
+                  call VertBoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
                   !
                   !lateral flow
                 ELSE
@@ -1094,7 +1111,7 @@ module WatsubMod
   end subroutine XBoundaryFlowM
 !------------------------------------------------------------------------------------------
 
-  subroutine BoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargDist2WTBL,Recharg2WTBLScal)    
+  subroutine VertBoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat,XN,RechargDist2WTBL,Recharg2WTBLScal)    
   !
   !Drainage across the lateral or bottom boundaries.      
   implicit none
@@ -1104,10 +1121,10 @@ module WatsubMod
   integer,  intent(in) :: M4,M5,M6  !dest, when XN=1, N2=M5,N1=M4
   real(r8), intent(in) :: RainEkReducedKsat 
   real(r8), intent(in) :: XN        !direction
-  real(r8), intent(in) :: RechargDist2WTBL
+  real(r8), intent(in) :: RechargDist2WTBL    !lateral distance to external water table, [m]
   real(r8), intent(in) :: Recharg2WTBLScal
 
-  character(len=*), parameter :: subname='BoundaryDrainM'
+  character(len=*), parameter :: subname='VertBoundaryDrainM'
   real(r8) :: THETA1,HydcondSrc,RechargRate
   real(r8) :: watflx,heatflx,HydGrad
   integer :: K1
@@ -1149,7 +1166,7 @@ module WatsubMod
   HeatDrain_col(N2,N1) = HeatDrain_col(N2,N1)-XN*heatflx
 
   call PrintInfo('end '//subname)
-  end subroutine BoundaryDrainM
+  end subroutine VertBoundaryDrainM
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateSoilMoistTemp(I,J,M,NHW,NHE,NVN,NVS,twatmass0)

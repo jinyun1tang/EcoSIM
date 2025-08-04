@@ -15,7 +15,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlantTurnoverPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
-  real(r8), target, allocatable :: PlantInitThermoAdaptZone_tab(:)
+  real(r8), target, allocatable :: PlantInitThermoAdaptZone_pft_tab(:)
   real(r8), target, allocatable :: VmaxRubCarboxyRef_tab(:)
   real(r8), target, allocatable :: VmaxRubOxyRef_tab(:)
   real(r8), target, allocatable :: VmaxPEPCarboxyRef_tab(:)
@@ -27,7 +27,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
   real(r8), target, allocatable :: LeafC3ChlorofilConc_tab(:)
   real(r8), target, allocatable :: LeafC4ChlorofilConc_tab(:)
-  real(r8), target, allocatable :: CanPCi2CaRatio_tab(:)
+  real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
   real(r8), target, allocatable :: RadSWLeafTransmis_tab(:)
@@ -129,7 +129,7 @@ module PlantTraitTableMod
   allocate(iPlantTurnoverPattern_tab(npfts));iPlantTurnoverPattern_tab=0
   allocate(iPlantGrainType_tab(npfts));iPlantGrainType_tab=0
   allocate(Myco_tab(npfts));Myco_tab=0
-  allocate(PlantInitThermoAdaptZone_tab(npfts));PlantInitThermoAdaptZone_tab=0.0_r8
+  allocate(PlantInitThermoAdaptZone_pft_tab(npfts));PlantInitThermoAdaptZone_pft_tab=0.0_r8
   allocate(VmaxRubCarboxyRef_tab(npfts));VmaxRubCarboxyRef_tab=0.0_r8
   allocate(VmaxRubOxyRef_tab(npfts));VmaxRubOxyRef_tab=0.0_r8
   allocate(VmaxPEPCarboxyRef_tab(npfts));VmaxPEPCarboxyRef_tab=0.0_r8
@@ -141,7 +141,7 @@ module PlantTraitTableMod
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
   allocate(LeafC3ChlorofilConc_tab(npfts));LeafC3ChlorofilConc_tab=0._r8
   allocate(LeafC4ChlorofilConc_tab(npfts));LeafC4ChlorofilConc_tab=0._r8
-  allocate(CanPCi2CaRatio_tab(npfts));CanPCi2CaRatio_tab=0._r8
+  allocate(CanopyCi2CaRatio_pft_tab(npfts));CanopyCi2CaRatio_pft_tab=0._r8
   allocate(RadSWLeafAlbedo_tab(npfts));RadSWLeafAlbedo_tab=0._r8
   allocate(CanopyPARalbedo_tab(npfts));CanopyPARalbedo_tab=0._r8
   allocate(RadSWLeafTransmis_tab(npfts));RadSWLeafTransmis_tab=0._r8
@@ -243,7 +243,7 @@ module PlantTraitTableMod
   call destroy(iPlantTurnoverPattern_tab)
   call destroy(iPlantGrainType_tab)
   call destroy(Myco_tab)
-  call destroy(PlantInitThermoAdaptZone_tab)
+  call destroy(PlantInitThermoAdaptZone_pft_tab)
   call destroy(VmaxRubCarboxyRef_tab)
   call destroy(VmaxRubOxyRef_tab)
   call destroy(VmaxPEPCarboxyRef_tab)
@@ -255,7 +255,7 @@ module PlantTraitTableMod
   call destroy(SpecChloryfilAct_tab)
   call destroy(LeafC3ChlorofilConc_tab)
   call destroy(LeafC4ChlorofilConc_tab)
-  call destroy(CanPCi2CaRatio_tab)
+  call destroy(CanopyCi2CaRatio_pft_tab)
   call destroy(RadSWLeafAlbedo_tab)
   call destroy(CanopyPARalbedo_tab)
   call destroy(RadSWLeafTransmis_tab)

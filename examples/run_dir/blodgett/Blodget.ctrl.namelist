@@ -35,8 +35,8 @@ NCYC_SNOW=20
 hist_mfilt=7300 !, 8760
 !hist_fincl2 = 'AIR_TEMP','TEMP_vr','PREC','SOIL_RN','SOIL_LE','SOIL_G','SOIL_H','SOL_RADN','WIND','EVAPN',
 !  'RUNOFF_FLX','rWatFILLP_vr','rIceFILLP_vr','SNOWPACK','SURF_WTR'
-hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_col','CO2_DIF_FLX_col', 
-  'TEMP_vr','rWatFLP_vr','BOTDEPZ_vr','tSOC_vr','RootC_vr','RootC_2nd_pvr','CanopyLAIZ_plyr','CFIX_rC2L_pft',
+hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_col'
+  'TEMP_vr','rWatFLP_vr','BOTDEPZ_vr','tSOC_vr','RootC_vr','RootC_2nd_pvr','CanopyLAIZ_plyr',
   'RUB_ACTVN_pft','RootNutUptk_fClim_pvr','RootNutUptk_fNlim_pvr','RootNutUptk_fPlim_pvr','RootNutUptk_fProtC_pvr',
   'HR_CO2_vr','Root_OXYSTRESS_pvr','Decomp_OStress_vr','Decomp_OStress_LITR','GasXSurfConduct_col'
 

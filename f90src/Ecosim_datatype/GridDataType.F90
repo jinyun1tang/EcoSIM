@@ -19,6 +19,7 @@ implicit none
   real(r8),target,allocatable ::  DIST_3D(:,:,:,:)                   !distance between adjacent layers:1=EW,2=NS,3=vertical, [m]
   integer,target,allocatable ::  NU_col(:,:)                         !soil surface layer number,[-]
   integer,target,allocatable ::  NUI_col(:,:)                        !initial soil surface layer number,[-]
+  integer,target,allocatable ::  NLF_col(:,:)                        !id of the frozen layer, [-]
   integer,target,allocatable ::  MaxNumRootLays_col(:,:)             !maximum root layer number,[-]
   integer,target,allocatable ::  NK_col(:,:)                         !additional soil lower boundary layers,[-]
   integer,target,allocatable ::  NLI_col(:,:)                        !initial lowest soil layer number,[-]
@@ -36,6 +37,7 @@ contains
   subroutine InitGridData
 
   implicit none
+  allocate(NLF_col(JY,JX)); NLF_col=0
   allocate(CumDepz2LayBottom_vr(0:JZ,JY,JX));  CumDepz2LayBottom_vr=0._r8
   allocate(DLYR_3D(3,0:JZ,JY,JX)); DLYR_3D=0._r8
   allocate(DLYRI_3D(3,0:JZ,JY,JX));DLYRI_3D=0._r8
@@ -65,6 +67,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(NLF_col)
   call destroy(CumDepz2LayBottom_vr)
   call destroy(DLYR_3D)
   call destroy(DLYRI_3D)

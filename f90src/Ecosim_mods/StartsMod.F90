@@ -10,7 +10,7 @@ module StartsMod
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
-  use TracerPropMod,    only : gas_solubility
+  use TracerPropMod,    only: gas_solubility
   use DebugToolMod
   use EcosimConst
   use TracerIDMod
@@ -210,9 +210,12 @@ module StartsMod
     DO  NY=NVN,NVS
 !     INITIALIZE SNOWPACK LAYERS
       call InitSnowLayers(NY,NX,XWS)
+
       WatMass_col(NY,NX) = WatMass_col(NY,NX)+XWS
+
     ENDDO  
   ENDDO
+
   call PrintInfo('end starts')
   RETURN
   END subroutine starts

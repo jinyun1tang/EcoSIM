@@ -424,10 +424,10 @@ implicit none
 !
 !   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
-    VmaxRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
     VmaxRubOxyRef_pft(NZ,NY,NX)      = 2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecChloryfilAct_pft(NZ,NY,NX)   = 2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
+    SpecLeafChlAct_pft(NZ,NY,NX)     = 2.5_r8*SpecLeafChlAct_pft(NZ,NY,NX)
     LeafSWabsorpty_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
     LeafPARabsorpty_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
     RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
@@ -450,8 +450,8 @@ implicit none
     ENDIF
     D5: DO NB=1,NumCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
-        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
       ELSE
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
@@ -487,9 +487,9 @@ implicit none
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, Myco_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxSpecRubCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VOMX', loc, VmaxRubOxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VCMX4', loc, VmaxPEPCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2_pft(NZ,NY,NX))
@@ -497,10 +497,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecChloryfilAct_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
@@ -630,9 +630,9 @@ implicit none
   iPlantTurnoverPattern_pft(NZ,NY,NX) = iPlantTurnoverPattern_tab(loc)
   iPlantGrainType_pft(NZ,NY,NX)       = iPlantGrainType_tab(loc)
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
-  PlantInitThermoAdaptZone(NZ,NY,NX)  = PlantInitThermoAdaptZone_tab(loc)
+  PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
 
-  VmaxRubCarboxyRef_pft(NZ,NY,NX)         = VmaxRubCarboxyRef_tab(loc)
+  VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)         = VmaxRubCarboxyRef_tab(loc)
   VmaxRubOxyRef_pft(NZ,NY,NX)             = VmaxRubOxyRef_tab(loc)
   VmaxPEPCarboxyRef_pft(NZ,NY,NX)         = VmaxPEPCarboxyRef_tab(loc)
   XKCO2_pft(NZ,NY,NX)                     = XKCO2_tab(loc)
@@ -640,10 +640,10 @@ implicit none
   Km4PEPCarboxy_pft(NZ,NY,NX)             = Km4PEPCarboxy_tab(loc)
   LeafRuBPConc_pft(NZ,NY,NX)              = LeafRuBPConc_tab(loc)
   FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX) = FracLeafProtAsPEPCarboxyl_tab(loc)
-  SpecChloryfilAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
+  SpecLeafChlAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
   LeafC3ChlorofilConc_pft(NZ,NY,NX)       = LeafC3ChlorofilConc_tab(loc)
   LeafC4ChlorofilConc_pft(NZ,NY,NX)       = LeafC4ChlorofilConc_tab(loc)
-  CanPCi2CaRatio(NZ,NY,NX)                = CanPCi2CaRatio_tab(loc)
+  CanopyCi2CaRatio_pft(NZ,NY,NX)                = CanopyCi2CaRatio_pft_tab(loc)
 
   RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_tab(loc)
   CanopyPARalbedo_pft(NZ,NY,NX)    = CanopyPARalbedo_tab(loc)
@@ -713,8 +713,8 @@ implicit none
   RootBiomGrosYld_pft(NZ,NY,NX)      = RootBiomGrosYld_tab(loc)
   NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)
 
-  rNCLeaf_pft(NZ,NY,NX)       = rNCLeaf_tab(loc)
-  rNCSheath_pft(NZ,NY,NX)      = rNCSheath_tab(loc)
+  rNCLeaf_pft(NZ,NY,NX)    = rNCLeaf_tab(loc)
+  rNCSheath_pft(NZ,NY,NX)  = rNCSheath_tab(loc)
   rNCStalk_pft(NZ,NY,NX)   = rNCStalk_tab(loc)
   rNCReserve_pft(NZ,NY,NX) = rNCReserve_tab(loc)
   rNCHusk_pft(NZ,NY,NX)    = rNCHusk_tab(loc)
@@ -723,15 +723,15 @@ implicit none
   rNCRoot_pft(NZ,NY,NX)    = rNCRoot_tab(loc)
   rNCNodule_pft(NZ,NY,NX)  = rNCNodule_tab(loc)
 
-  rPCLeaf_pft(NZ,NY,NX)=rPCLeaf_tab(loc)
-  rPCSheath_pft(NZ,NY,NX)=rPCSheath_tab(loc)
-  rPCStalk_pft(NZ,NY,NX)=rPCStalk_tab(loc)
-  rPCReserve_pft(NZ,NY,NX)=rPCReserve_tab(loc)
-  rPCHusk_pft(NZ,NY,NX)=rPCHusk_tab(loc)
-  rPCEar_pft(NZ,NY,NX)=rPCEar_tab(loc)
-  rPCGrain_pft(NZ,NY,NX)=rPCGrain_tab(loc)
-  rPCRootr_pft(NZ,NY,NX)=rPCRootr_tab(loc)
-  rPCNoduler_pft(NZ,NY,NX)=rPCNoduler_tab(loc)
+  rPCLeaf_pft(NZ,NY,NX)    = rPCLeaf_tab(loc)
+  rPCSheath_pft(NZ,NY,NX)  = rPCSheath_tab(loc)
+  rPCStalk_pft(NZ,NY,NX)   = rPCStalk_tab(loc)
+  rPCReserve_pft(NZ,NY,NX) = rPCReserve_tab(loc)
+  rPCHusk_pft(NZ,NY,NX)    = rPCHusk_tab(loc)
+  rPCEar_pft(NZ,NY,NX)     = rPCEar_tab(loc)
+  rPCGrain_pft(NZ,NY,NX)   = rPCGrain_tab(loc)
+  rPCRootr_pft(NZ,NY,NX)   = rPCRootr_tab(loc)
+  rPCNoduler_pft(NZ,NY,NX) = rPCNoduler_tab(loc)
 
   if(disp_planttrait)then
     call pft_display(nu_plt,NZ,NY,NX,pft_lname,koppen_climl,koppen_clims)
@@ -772,7 +772,7 @@ implicit none
 !                   :if iPlantRootProfile_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType_pft=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
-!   PlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   PlantInitThermoAdaptZone_pft=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
@@ -913,20 +913,19 @@ implicit none
   end select
   call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
 
-  select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
-  case (ithermozone_arcboreal)
-    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_cooltempr)
-    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_warmtempr)
-    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_subtropic)
-    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_tropical)
-    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case default
-    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone(NZ,NY,NX)
-  end select
+  if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
+    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_arcboreal)then
+    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_cooltempr)then
+    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_warmtempr)then
+    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_subtropic)then
+    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_tropical)then
+    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  endif
   
   call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
   end subroutine pft_display
@@ -942,16 +941,16 @@ implicit none
   character(len=81) :: line
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
-  call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxRubCarboxyRef_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific rubisco oxygenase (umol O2 g-1 s-1) VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific PEP carboxylase activity (umol g-1 s-1) VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxSpecRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft (uM) XKO2',XKO2_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft (uM) XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in rubisco (g rub/(g protein)) RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)) PEPC',&
     FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecChloryfilAct_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein)) CHL',&
       LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
@@ -961,7 +960,7 @@ implicit none
     call writefixl(nu_plt,'fraction of leaf protein in mesophyll chlorophyll(C4) (g Chl /(g protein)) CHL4',&
       LeafC4ChlorofilConc_pft(NZ,NY,NX),90)
   endif
-  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanPCi2CaRatio(NZ,NY,NX),90)
+  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanopyCi2CaRatio_pft(NZ,NY,NX),90)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1526,7 +1525,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IBTYP', iPlantTurnoverPattern_tab)
   call ncd_getvar(pft_nfid, 'IRTYP', iPlantGrainType_tab)
   call ncd_getvar(pft_nfid, 'MY',  Myco_tab)
-  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_tab)
+  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_pft_tab)
   call ncd_getvar(pft_nfid, 'VCMX',  VmaxRubCarboxyRef_tab)
   call ncd_getvar(pft_nfid, 'VOMX',  VmaxRubOxyRef_tab)
   call ncd_getvar(pft_nfid, 'VCMX4', VmaxPEPCarboxyRef_tab)
@@ -1538,7 +1537,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'ETMX', SpecChloryfilAct_tab)
   call ncd_getvar(pft_nfid, 'CHL',  LeafC3ChlorofilConc_tab)
   call ncd_getvar(pft_nfid, 'CHL4', LeafC4ChlorofilConc_tab)
-  call ncd_getvar(pft_nfid, 'FCO2', CanPCi2CaRatio_tab)
+  call ncd_getvar(pft_nfid, 'FCO2', CanopyCi2CaRatio_pft_tab)
   call ncd_getvar(pft_nfid, 'ALBR', RadSWLeafAlbedo_tab)
   call ncd_getvar(pft_nfid, 'ALBP', CanopyPARalbedo_tab)
   call ncd_getvar(pft_nfid, 'TAUR', RadSWLeafTransmis_tab)

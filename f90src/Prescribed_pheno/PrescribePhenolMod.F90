@@ -282,8 +282,8 @@ implicit none
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
 
           !the following two are fillers, which will be updated later
-          Root1stXNumL_pvr(ipltroot,L,NZ,NY,NX) = 2._r8
-          Root2ndXNumL_pvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
+          Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 2._r8
+          Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
         ENDDO
       ENDDO
     ENDDO

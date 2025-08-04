@@ -1,5 +1,6 @@
 module EcosimConst
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only: GravAcceleration=>DAT_CONST_G  
   implicit none
   character(len=*),private, parameter :: mod_filename = &
     __FILE__
@@ -48,4 +49,6 @@ module EcosimConst
   real(r8), parameter :: ppmc=1.0E-06_r8                   !part per million,[-]
   real(r8), parameter :: stefboltz_const=5.670374419e-8_r8*3600e-6 !stefan boltzman constant, [MJ/(hr m^2 K^4)]
   integer , parameter :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000 
+
 end module EcosimConst

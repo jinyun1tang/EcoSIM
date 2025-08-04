@@ -316,7 +316,7 @@ module WthrMod
         RadSWDirect_col(NY,NX)  = safe_adb(RADN_col(NY,NX)-RADZ,SineSunInclAngle_col(NY,NX))
         RadSWDirect_col(NY,NX)  = AMIN1(4.167_r8,RadSWDirect_col(NY,NX))
         RadSWDiffus_col(NY,NX)  = RADZ/TotSineSkyAngles_grd
-        RadPARDirect_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
+        RadDirectPAR_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
         RadPARDiffus_col(NY,NX) = RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES 
@@ -364,7 +364,7 @@ module WthrMod
       !     ELSE
       !     RADS=DIRECT SW RADIATION (MJ M-2 H-1)
       !     RadSWDiffus_col=INDIRECT SW RADIATION (MJ M-2 H-1)
-      !     RadPARDirect_col=DIRECT PAR (UMOL M-2 S-1)
+      !     RadDirectPAR_col=DIRECT PAR (UMOL M-2 S-1)
       !     RadPARDiffus_col=INDIRECT PAR (UMOL M-2 S-1)
       !     THSX=LW RADIATION (MJ M-2 H-1)
       !     TCA=AIR TEMPERATURE (C)
@@ -447,7 +447,7 @@ module WthrMod
         !     ATCA,ATCS=mean annual air,soil temperature
         !     TempOffset_col=shift in Arrhenius curve for MFT activity in nitro.f
         !     TempOffset_pft=shift in Arrhenius curve for PFT activity in uptake.f
-        !     iPlantThermoAdaptZone_pft=PFT thermal adaptation zone
+        !     rPlantThermoAdaptZone_pft=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
 !
@@ -457,14 +457,14 @@ module WthrMod
           ATCS_col(NY,NX)=ATCAI_col(NY,NX)+DTS
           TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
           DO NZ=1,NP_col(NY,NX)
-            iPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
-            TempOffset_pft(NZ,NY,NX)=2.667*(2.5-iPlantThermoAdaptZone_pft(NZ,NY,NX))
+            rPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone_pft(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
+            TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
             IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
-              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ELSE
-              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*iPlantThermoAdaptZone_pft(NZ,NY,NX)
+              HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ENDIF
             MatureGroup_pft(NZ,NY,NX)=GROUPX_pft(NZ,NY,NX)+0.30_r8*DTA
             IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
@@ -494,7 +494,7 @@ module WthrMod
 !
       RadSWDirect_col(NY,NX)  = RadSWDirect_col(NY,NX)*TDRAD(N,NY,NX)
       RadSWDiffus_col(NY,NX)  = RadSWDiffus_col(NY,NX)*TDRAD(N,NY,NX)
-      RadPARDirect_col(NY,NX) = RadPARDirect_col(NY,NX)*TDRAD(N,NY,NX)
+      RadDirectPAR_col(NY,NX) = RadDirectPAR_col(NY,NX)*TDRAD(N,NY,NX)
       RadPARDiffus_col(NY,NX) = RadPARDiffus_col(NY,NX)*TDRAD(N,NY,NX)
       WindSpeedAtm_col(NY,NX) = WindSpeedAtm_col(NY,NX)*TDWND(N,NY,NX)
       VPK_col(NY,NX)          = AMIN1(VPS(NY,NX),VPK_col(NY,NX)*TDHUM(N,NY,NX))
@@ -525,8 +525,9 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)TRAD_col(NY,NX)= &
-        RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)then
+        TRAD_col(NY,NX)= RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+      endif  
       HUDX_col(NY,NX)  = AMAX1(HUDX_col(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN_col(NY,NX)  = AMIN1(HUDN_col(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
       TWIND_col(NY,NX) = TWIND_col(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]

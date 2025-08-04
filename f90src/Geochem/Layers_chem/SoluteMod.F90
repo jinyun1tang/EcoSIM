@@ -521,7 +521,7 @@ module SoluteMod
 !     ROWN=NH4 fertilizer band row width
 !     DPNH4=NH4 fertilizer band depth
 !
-  IF(IFNHB_col(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
+  IF(IFNHB_col(NY,NX).EQ.1 .AND. ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
     IF(L.EQ.NU_col(NY,NX).OR.CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
