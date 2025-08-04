@@ -197,7 +197,7 @@ implicit none
       Gas_WetDepo2litr_slow_flx_col(:,NY,NX)  = 0._r8
       Gas_litr2Soil_slow_flx_col(:,NY,NX)     = 0._r8
       trcs_sno2litr_slow_flx_col(:,NY,NX)     = 0._r8
-      dom_dribble_slow_beg_col(:,:,NY,NX)          = 0._r8
+      dom_dribble_slow_beg_col(:,:,NY,NX)     = 0._r8
       do idg=idg_beg,idg_NH3
         trcs_drib_litr_slow_begf(idg,NY,NX)  = trcs_solml_drib_vr(idg,0,NY,NX)
       enddo
@@ -315,8 +315,8 @@ implicit none
       DOM_mass_now(:,:)=0._r8
       DO K=1,micpar%NumOfLitrCmplxs
         DO idom=idom_beg,idom_end
-          DOM_mass_now(idom,K)=DOM_MicP2_vr(idom,K,0,NY,NX)
-          dom_dribble_col(idom,K)=dom_dribble_col(idom,K)+DOM_MicP_drib_vr(idom,K,0,NY,NX)
+          DOM_mass_now(idom,K)    = DOM_MicP2_vr(idom,K,0,NY,NX)
+          dom_dribble_col(idom,K) = dom_dribble_col(idom,K)+DOM_MicP_drib_vr(idom,K,0,NY,NX)
         ENDDO        
       ENDDO
       
@@ -330,17 +330,17 @@ implicit none
       ENDDO
 
       DO idg=idg_beg,idg_NH3
-        GasDiff2Surf_flx_col(idg,NY,NX)    = GasDiff2Surf_flx_col(idg,NY,NX)+AtmGasDiff2Surf_slow_flx_col(idg,NY,NX)
-        GasHydroLoss_flx_col(idg,NY,NX)    = GasHydroLoss_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg,NY,NX)
-        Gas_WetDeposit_flx_col(idg,NY,NX)  = Gas_WetDeposit_flx_col(idg,NY,NX)+Gas_WetDeposit_slow_flx_col(idg,NY,NX)
-        RGasNetProd_col(idg,NY,NX)         = RGasNetProd_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg,NY,NX)
-        AtmGasDiff2Litr_flx_col(idg,NY,NX) = AtmGasDiff2Litr_flx_col(idg,NY,NX)+AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)
-        Gas_litr2Soil_flx_col(idg,NY,NX) =Gas_litr2Soil_flx_col(idg,NY,NX)+Gas_litr2Soil_slow_flx_col(idg,NY,NX)
-        trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)=trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+trcs_sno2litr_slow_flx_col(idg,NY,NX)
+        GasDiff2Surf_flx_col(idg,NY,NX)       = GasDiff2Surf_flx_col(idg,NY,NX)+AtmGasDiff2Surf_slow_flx_col(idg,NY,NX)
+        GasHydroLoss_flx_col(idg,NY,NX)       = GasHydroLoss_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg,NY,NX)
+        Gas_WetDeposit_flx_col(idg,NY,NX)     = Gas_WetDeposit_flx_col(idg,NY,NX)+Gas_WetDeposit_slow_flx_col(idg,NY,NX)
+        RGasNetProd_col(idg,NY,NX)            = RGasNetProd_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg,NY,NX)
+        AtmGasDiff2Litr_flx_col(idg,NY,NX)    = AtmGasDiff2Litr_flx_col(idg,NY,NX)+AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)
+        Gas_litr2Soil_flx_col(idg,NY,NX)      = Gas_litr2Soil_flx_col(idg,NY,NX)+Gas_litr2Soil_slow_flx_col(idg,NY,NX)
+        trcg_AquaADV_Snow2Litr_flx(idg,NY,NX) = trcg_AquaADV_Snow2Litr_flx(idg,NY,NX)+trcs_sno2litr_slow_flx_col(idg,NY,NX)
 
         !loss through hydrological runoff
-        GasHydroLoss_litr_flx_col(idg,NY,NX)=GasHydroLoss_litr_flx_col(idg,NY,NX)+GasHydroLoss_litr_slow_flx_col(idg,NY,NX)
-        trcs_drainage_flx_col(idg,NY,NX)=trcs_drainage_flx_col(idg,NY,NX)+trcs_drainage_slow_flx_col(idg,NY,NX)
+        GasHydroLoss_litr_flx_col(idg,NY,NX) = GasHydroLoss_litr_flx_col(idg,NY,NX)+GasHydroLoss_litr_slow_flx_col(idg,NY,NX)
+        trcs_drainage_flx_col(idg,NY,NX)     = trcs_drainage_flx_col(idg,NY,NX)+trcs_drainage_slow_flx_col(idg,NY,NX)
 
         dmass = trcg_mass_begs(idg,NY,NX)-trcg_mass_now(idg)
         err   = dmass+trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg,NY,NX) &
@@ -357,7 +357,7 @@ implicit none
         endif
 
         errmass_slow(idg,NY,NX)=errmass_slow(idg,NY,NX)+err
-        if(abs(err)>1.e-5_r8 .OR. iVerbLevel==1)then
+        if(abs(err)>1.e-5_r8 .or. abs(errmass_slow(idg,NY,NX))>1.e-5_r8 .OR. iVerbLevel==1)then
           if((iVerbLevel==1 .or. abs(err)>1.e-4_r8))then
             write(201,*)('-',L=1,50)
             write(201,*)(I*1000+J)*10+M,'iterm=',iterm,trcs_names(idg),NY,NX,'SLOW'
@@ -386,10 +386,10 @@ implicit none
             write(201,*)'err litr      =',trcg_mass_litr_begs(idg,NY,NX)-trcg_mass_litr_now(idg)-trcs_drib_litr_slow_begf(idg,NY,NX)+ &
               trcs_solml_drib_vr(idg,0,NY,NX)+AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)+Gas_WetDepo2litr_slow_flx_col(idg,NY,NX)  &
               - Gas_litr2Soil_slow_flx_col(idg,NY,NX)+trcs_sno2litr_slow_flx_col(idg,NY,NX)
-            write(201,*)'drib beg/end. =',trcs_drib_litr_slow_begf(idg,NY,NX),trcs_solml_drib_vr(idg,0,NY,NX)
-            write(201,*)'atm dif2litr. =',AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)
-            write(201,*)'wetdep2litr.  =',Gas_WetDepo2litr_slow_flx_col(idg,NY,NX)
-            write(201,*)'litr2soil.    =',Gas_litr2Soil_slow_flx_col(idg,NY,NX)
+            write(201,*)'drib beg/end  =',trcs_drib_litr_slow_begf(idg,NY,NX),trcs_solml_drib_vr(idg,0,NY,NX)
+            write(201,*)'atm dif2litr  =',AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)
+            write(201,*)'wetdep2litr   =',Gas_WetDepo2litr_slow_flx_col(idg,NY,NX)
+            write(201,*)'litr2soil     =',Gas_litr2Soil_slow_flx_col(idg,NY,NX)
             write(201,*)'sno2litr      =',trcs_sno2litr_slow_flx_col(idg,NY,NX)  
           endif
           if(abs(err)>1.e-4_r8)call endrun(trim(mod_filename)//' at line',__LINE__)          
@@ -696,9 +696,9 @@ implicit none
           trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)=trcs_NetFlow2Litr_slow_flx_col(idg,NY,NX)+ ppscal(idg) &
             *(trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)+RGasAtmDisol2LitrM_col(idg,NY,NX)+trcg_SurfRunoff_flxM(idg,NY,NX))
 
-          Gas_Snowloss_flx_col(idg,NY,NX)  =Gas_Snowloss_flx_col(idg,NY,NX)+ flux
+          Gas_Snowloss_flx_col(idg,NY,NX)      = Gas_Snowloss_flx_col(idg,NY,NX)+ flux
 
-          Gas_Snowloss_slow_flx_col(idg,NY,NX)  =Gas_Snowloss_slow_flx_col(idg,NY,NX)+ flux
+          Gas_Snowloss_slow_flx_col(idg,NY,NX) = Gas_Snowloss_slow_flx_col(idg,NY,NX)+ flux
             
           AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)=AtmGasDiff2Litr_slow_flx_col(idg,NY,NX)+ppscal(idg)*RGasAtmDisol2LitrM_col(idg,NY,NX)
 
@@ -2682,11 +2682,14 @@ implicit none
 
 ! ----------------------------------------------------------------------
   subroutine BubbleEffluxM(I,J,M,NHE,NHW,NVS,NVN)
+
+  !
+  !bubbling are diagnosed from the first unfrozen layer, upward, and deposited to the first layer with gas phase 
   implicit none
   integer, intent(in) :: I,J,M,NHE,NHW,NVS,NVN
 
   integer  :: N1,N2,N3
-  integer  :: iDisableEbu                        !bubbling flag
+  logical  :: iDisableEbu                        !bubbling flag
 
   character(len=*), parameter :: subname='BubbleEffluxM'  
   real(r8) :: THETW1
@@ -2697,20 +2700,23 @@ implicit none
   real(r8) :: FracEbu                      !fraction removed through ebullition
   real(r8) :: dPond
   integer  :: LG
-
+  real(r8) :: ThetaIce=0.99_r8
   !
   call PrintInfo('beg '//subname)
   LG=0
   DO N1=NHW,NHE
     DO N2=NVN,NVS
-      iDisableEbu=ifalse
-      dPond=0._r8
-      DO N3=NUM_col(N2,N1),NL_col(N2,N1)  !sweep downward untill reaching layer where ebullition is disabled
+      iDisableEbu = .false.
+      trcg_Ebu_flxM_vr(idg_beg:idg_end,NUM_col(N2,N1):NL_col(N2,N1),N2,N1)=0.0_r8      
+
+      DO N3=NLF_col(N2,N1),NUM_col(N2,N1),-1  !sweep upward assuming bubbles go upward
         !
         THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
         !
-        IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1) & ! has significant water 
-          .AND. iDisableEbu.EQ.ifalse)THEN        ! ebullition is allowed
+        IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1)     & ! has significant water 
+          .AND. .not.iDisableEbu)THEN                 ! ebullition is allowed
+
+          dPond=AZMAX1(CumDepz2LayBottom_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))*10._r8
 
           do idg=idg_beg,idg_NH3
             GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,N3,N2,N1)  !conver into carbon g /mol
@@ -2728,21 +2734,12 @@ implicit none
           !     VTATM=molar gas concentration at atmospheric pressure
           !     VTGAS=total molar gas concentration, should the gaseous phase be included as well?     
           !    
-          if(iPondFlag_col(N2,N1))then 
-            if(SoilBulkDensity_vr(N3,N2,N1).LE.ZERO)then
-              !still in the ponding water, \rho*g*h,  1.e3*10
-              dPond=(CumDepz2LayBottom_vr(N3,N2,N1)-CumDepz2LayBottom_vr(NUM_col(N2,N1)-1,N2,N1))*10._r8
-            else
-              !in the soil
-              dPond=(CumDepz2LayBottom_vr(iPondBotLev_col(N2,N1),N2,N1)-CumDepz2LayBottom_vr(NUM_col(N2,N1)-1,N2,N1))*10._r8
-            endif  
-          endif  
           VTATM = AZMAX1((PBOT_col(N2,N1)+dPond)*VLWatMicPM_vr(M,N3,N2,N1)/(RGasC*TKS_vr(N3,N2,N1)))*1.E3_r8  !mol gas/ d2
           VTGAS = sum(trcg_VOLG(idg_beg:idg_end))
-          !
-          !     PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
-          !
 
+          !
+          ! PROPORTIONAL REMOVAL OF EXCESS AQUEOUS GASES
+          !
           IF(VTGAS.GT.VTATM)THEN
             DVTGAS  = 0.5_r8*(VTATM-VTGAS)         !<0, bubbling occurs
             FracEbu = AZMIN1(DVTGAS/VTGAS)
@@ -2754,7 +2751,8 @@ implicit none
                 write(134,*)(I*1000+J)*100+M,trcs_names(idg),N3,trcs_solml2_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                 call endrun(trim(mod_filename)//' at line',__LINE__)
               endif
-              if(LG==0)then
+
+              if(N3==NUM_col(N2,N1) .or. dPond>0._r8)then !surface layer or below water table
                 !accumulate bubbling flux
                 if(idg==idg_NH3B)then
                   trcg_ebu_flx_col(idg_NH3,N2,N1) = trcg_ebu_flx_col(idg_NH3,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)
@@ -2762,31 +2760,46 @@ implicit none
                   trcg_ebu_flx_col(idg,N2,N1) = trcg_ebu_flx_col(idg,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)                
                 endif
               else
-                 if(idg/=idg_NH3B)then
-                   trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                   if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
-                     write(*,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                     stop
-                   endif
-                 else
-                   trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)    
-                   if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
-                     write(*,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                     stop
-                   endif             
-                 endif
-                 
+                !add to the gas phase, which will then go through gaseous transport, triggering bubbling
+                if(idg/=idg_NH3B)then
+                  trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
+                    write(*,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                    stop
+                  endif
+                else
+                  trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)    
+                  if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
+                    write(*,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                    stop
+                  endif             
+                endif                
               endif              
             ENDDO
             RO2AquaSourcePrev_vr(N3,N2,N1) = RO2AquaSourcePrev_vr(N3,N2,N1)+trcg_Ebu_flxM_vr(idg_O2,N3,N2,N1)
             RCH4PhysexchPrev_vr(N3,N2,N1)  = RCH4PhysexchPrev_vr(N3,N2,N1)+trcg_Ebu_flxM_vr(idg_CH4,N3,N2,N1)
-          ELSE
-            LG=N3
-            trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
           ENDIF
         ELSE
-          iDisableEbu=itrue
-          trcg_Ebu_flxM_vr(idg_beg:idg_end,N3,N2,N1)=0.0_r8
+          iDisableEbu=.true.
+          DO idg=idg_beg,idg_end
+            !add to the gas phase, which will then go through gaseous transport, triggering bubbling
+            if(trcg_ebu_flx_col(idg,N2,N1)<0._r8)then
+              if(idg/=idg_NH3B)then
+                trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
+                if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
+                  write(*,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  stop
+                endif
+              else
+                trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
+                if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
+                  write(*,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  stop
+                endif             
+              endif
+              trcg_ebu_flx_col(idg,N2,N1)=0._r8
+            endif 
+          ENDDO      
         ENDIF
       ENDDO  
     ENDDO
@@ -3541,9 +3554,6 @@ implicit none
               endif  
             endif
             if(lfupdate)then
-!              if(idg==idg_O2 .and. NY==1 .and. NX==1)then
-!                write(555,*)L,trcg_solsml2_snvr(idg,L,NY,NX),trcg_solsml_snvr(idg,L,NY,NX),trcg_Aqua_flxM_snvr(idg,L,NY,NX),dpscal(idg),pscal(idg)
-!              endif
               trcg_solsml2_snvr(idg,L,NY,NX)=trcg_solsml_snvr(idg,L,NY,NX)
             endif
           endif  

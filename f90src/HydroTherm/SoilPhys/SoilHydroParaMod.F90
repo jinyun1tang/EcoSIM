@@ -26,7 +26,6 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   real(r8), parameter :: tiny_val=1.e-6_r8   !minimum value 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty

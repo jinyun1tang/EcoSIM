@@ -108,19 +108,19 @@ implicit none
 
   DO L=NM+1,JZ
     CumDepz2LayBottom_vr(L,NY,NX) = 2.0_r8*CumDepz2LayBottom_vr(L-1,NY,NX)-1.0_r8*CumDepz2LayBottom_vr(L-2,NY,NX)
-    SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L-1,NY,NX)
-    FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L-1,NY,NX)
-    WiltPoint_vr(L,NY,NX)        = WiltPoint_vr(L-1,NY,NX)
-    SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L-1,NY,NX)
-    SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L-1,NY,NX)
-    CSAND_vr(L,NY,NX)               = CSAND_vr(L-1,NY,NX)
-    CSILT_vr(L,NY,NX)               = CSILT_vr(L-1,NY,NX)
-    CCLAY_vr(L,NY,NX)               = CCLAY_vr(L-1,NY,NX)
-    SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L-1,NY,NX)
-    ROCK_vr(L,NY,NX)             = ROCK_vr(L-1,NY,NX)
-    PH_vr(L,NY,NX)                  = PH_vr(L-1,NY,NX)
-    CEC_vr(L,NY,NX)              = CEC_vr(L-1,NY,NX)
-    AEC_vr(L,NY,NX)              = AEC_vr(L-1,NY,NX)
+    SoiBulkDensityt0_vr(L,NY,NX)  = SoiBulkDensityt0_vr(L-1,NY,NX)
+    FieldCapacity_vr(L,NY,NX)     = FieldCapacity_vr(L-1,NY,NX)
+    WiltPoint_vr(L,NY,NX)         = WiltPoint_vr(L-1,NY,NX)
+    SatHydroCondVert_vr(L,NY,NX)  = SatHydroCondVert_vr(L-1,NY,NX)
+    SatHydroCondHrzn_vr(L,NY,NX)  = SatHydroCondHrzn_vr(L-1,NY,NX)
+    CSAND_vr(L,NY,NX)             = CSAND_vr(L-1,NY,NX)
+    CSILT_vr(L,NY,NX)             = CSILT_vr(L-1,NY,NX)
+    CCLAY_vr(L,NY,NX)             = CCLAY_vr(L-1,NY,NX)
+    SoilFracAsMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L-1,NY,NX)
+    ROCK_vr(L,NY,NX)              = ROCK_vr(L-1,NY,NX)
+    PH_vr(L,NY,NX)                = PH_vr(L-1,NY,NX)
+    CEC_vr(L,NY,NX)               = CEC_vr(L-1,NY,NX)
+    AEC_vr(L,NY,NX)               = AEC_vr(L-1,NY,NX)
 
 !     IF(IDWaterTable_col(NY,NX).EQ.0)THEN
 !       0.25_r8 is the geometric decreasing ratio (tunable)
@@ -186,7 +186,7 @@ implicit none
   real(r8) :: HeatDiffusByWat1,HeatDiffusByAir1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
   REAL(R8) :: XNUSW1,XNUSA1,ThermalConducByWater,ThermalConducByAir,WTHET1
 
-  IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO.OR.FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
+  IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO .OR. FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
     HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
     HeatDiffusByAir1     = AZMAX1(FracAirFilledSoilPore_vr(N3,N2,N1)-TRBA)**3._r8

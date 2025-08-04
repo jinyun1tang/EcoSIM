@@ -78,9 +78,9 @@ contains
   real(r8), intent(in)  :: SeedCMass   !carbon mass per seed
   real(r8), intent(out) :: SeedVolumeMean,SeedLengthMean,SeedArea
 
-  SeedVolumeMean=SeedCMass*5.0E-06_r8
-  SeedLengthMean=2.0_r8*(0.75_r8*SeedVolumeMean/PICON)**0.33_r8
-  SeedArea=4.0_r8*PICON*(SeedLengthMean/2.0_r8)**2_r8
+  SeedVolumeMean = SeedCMass*5.0E-06_r8
+  SeedLengthMean = 2.0_r8*(0.75_r8*SeedVolumeMean/PICON)**0.33_r8
+  SeedArea       = 4.0_r8*PICON*(SeedLengthMean/2.0_r8)**2
 
   end subroutine calc_seed_geometry
 !--------------------------------------------------------------------------------

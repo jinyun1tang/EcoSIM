@@ -112,8 +112,8 @@ module RedistMod
 !
       call SinkSediments(NY,NX)
 !
-!     RUNOFF AND SUBSURFACE BOUNDARY FLUXES
-!
+!     RUNOFF AND SUBSURFACE BOUNDARY FLUXES, will be removed in the future as they are now integrated
+!     into the transport code
 !      call XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     CHANGE EXTERNAL WATER TABLE DEPTH THROUGH DISTURBANCE
@@ -265,8 +265,7 @@ module RedistMod
     ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
       VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
     ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
-      VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
-
+      VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)    
   ENDDO D9945
 
   call PrintInfo('end '//subname)

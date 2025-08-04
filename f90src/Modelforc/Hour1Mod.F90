@@ -1,18 +1,20 @@
 module Hour1Mod
-  use data_kind_mod,  only: r8 => DAT_KIND_R8
-  use data_const_mod, only: GravAcceleration=>DAT_CONST_G
-  use minimathmod,    only: isclose, AZMAX1, AZMIN1
-  use abortutils,     only: endrun,  print_info
-  use fileUtil,      only: iulog
-  use PlantMod,      only: PlantCanopyRadsModel
-  use FertilizerMod, only: ApplyFertilizerAtNoon
-  use EcoSIMConfig     , only : jcplx=>jcplxc,nlbiomcp=>NumLiveMicrbCompts
-  use EcoSIMConfig     , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc
-  use EcoSIMConfig     , only : NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx,do_instequil
+  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
+  use minimathmod,       only: isclose, AZMAX1, AZMIN1
+  use abortutils,        only: endrun, print_info
+  use fileUtil,          only: iulog
+  use PlantMod,          only: PlantCanopyRadsModel
+  use FertilizerMod,     only: ApplyFertilizerAtNoon
+  use EcoSIMConfig,      only: jcplx=>jcplxc, nlbiomcp=>NumLiveMicrbCompts
+  use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
+  use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
   use SoilBGCNLayMod,    only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
+  use EcosimConst,       only: mGravAccelerat  
+  use HydrologyDiagMod , only: DiagWaterTBLDepz  
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -64,7 +66,6 @@ module Hour1Mod
   public :: InitHour1
 
   real(r8), pointer :: THETRX(:)
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 !
 !     FoliarWatRetcap=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
@@ -95,7 +96,6 @@ module Hour1Mod
 
   character(len=*), parameter :: subname='hour1'
   integer :: L,NX,NY
-  real(r8) :: THETPZ_vr(JZ)   !air-filled soil pore
   real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
@@ -161,7 +161,6 @@ module Hour1Mod
 !     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
 !
-      if(lverb)write(*,*)'RESET HOURLY ACCUMULATORS'
       call SetHourlyDiagnostics(I,J,NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
@@ -177,7 +176,9 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call GetChemicalConcsInSoil(I,J,NY,NX,THETPZ_vr)
+      call DiagWaterTBLDepz(I,J,NY,NX)
+
+      call GetChemicalConcsInSoil(I,J,NY,NX)
 
       call GetSoluteConcentrations(NY,NX)
 
@@ -191,7 +192,6 @@ module Hour1Mod
       call DiagActiveLayerDepth(NY,NX)
 
 !     OUTPUT FOR WATER TABLE DEPTH
-      call DiagWaterTBLDepz(NY,NX,THETPZ_vr)
 
       call GetSurfResidualProperties(I,J,NY,NX,DepthSurfWatIce)
 
@@ -229,7 +229,7 @@ module Hour1Mod
 !     NIXBotRootLayer_rpft=number of lowest rooted layer
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
-        NIXBotRootLayer_pft(NZ,NY,NX) = MAX(NIXBotRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
+        NMaxRootBotLayer_pft(NZ,NY,NX) = MAX(NMaxRootBotLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         DO  NR=1,NumCanopyLayers
           NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
@@ -682,10 +682,11 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NX,NY
-
   integer :: L
+  character(len=*), parameter :: subname='SetHourlyDiagnostics'
+  
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
   trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
@@ -737,46 +738,50 @@ module Hour1Mod
   tHxPO4_col(NY,NX)                          = 0._r8
   tXPO4_col(NY,NX)                           = 0._r8
   UION_col(NY,NX)                            = 0._r8
-  QDischarg2WTBL_col(NY,NX)                        = 0._r8
+  QDischarg2WTBL_col(NY,NX)                  = 0._r8
   PrecHeat_col(NY,NX)                        = 0._r8
   QDrain_col(NY,NX)                          = 0._r8
-  QDrainloss_vr(:,NY,NX)   =0._r8
-  HeatDrain_col(NY,NX)                       = 0._r8
-  trcg_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8
-  trcn_AquaADV_Snow2Litr_flx(:,NY,NX)        = 0._r8
-  trcn_AquaADV_Snow2Soil_flx(:,NY,NX)        = 0._r8
-  trcn_AquaADV_Snow2Band_flx(:,NY,NX)        = 0._r8
-  trcg_AquaADV_Snow2Soil_flx(:,NY,NX)        = 0._r8
-  RootCO2Ar2Soil_col(NY,NX)                  = 0._r8
-  RootCO2Ar2Root_col(NY,NX)                  = 0._r8
-  GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
-  GasHydroSubsLoss_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
-  GasHydroSurfLoss_flx_col(idg_beg:idg_NH3,NY,NX)=0._r8
-  trcn_SurfRunoff_flx_col(:,NY,NX)               = 0._r8
-  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
-  GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)        = 0._r8
-  WatFLo2LitR_col(NY,NX)                             = 0._r8
-  HeatFLoByWat2LitR_col(NY,NX)                       = 0._r8
-  TLitrIceFlxThaw_col(NY,NX)                         = 0._r8
-  TLitrIceHeatFlxFrez_col(NY,NX)                     = 0._r8
-  HeatByRad2Surf_col(NY,NX)                          = 0._r8
-  HeatSensAir2Surf_col(NY,NX)                        = 0._r8
-  HeatEvapAir2Surf_col(NY,NX)                        = 0._r8
-  HeatSensVapAir2Surf_col(NY,NX)                     = 0._r8
-  HeatNet2Surf_col(NY,NX)                            = 0._r8
-  VapXAir2GSurf_col(NY,NX)                           = 0._r8
-  THeatSnowThaw_col(NY,NX)                           = 0._r8
-  THeatSoiThaw_col(NY,NX)                            = 0._r8
-  TPlantRootH2OUptake_col(NY,NX)                   = 0._r8
-  CanopyWat_col(NY,NX)                             = 0._r8
-  WatHeldOnCanopy_col(NY,NX)                       = 0._r8
-  Prec2Canopy_col(NY,NX)                           = 0._r8
-  PrecIntceptByCanopy_col(NY,NX)                   = 0._r8
-  QVegET_col(NY,NX)                                = 0._r8
-  VapXAir2Canopy_col(NY,NX)                        = 0._r8
-  HeatFlx2Canopy_col(NY,NX)                        = 0._r8
-  CanopyHeatStor_col(NY,NX)                        = 0._r8
-  
+  QDrainloss_vr(:,NY,NX)                          = 0._r8
+  HeatDrain_col(NY,NX)                            = 0._r8
+  trcg_AquaADV_Snow2Litr_flx(:,NY,NX)             = 0._r8
+  trcn_AquaADV_Snow2Litr_flx(:,NY,NX)             = 0._r8
+  trcn_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
+  trcn_AquaADV_Snow2Band_flx(:,NY,NX)             = 0._r8
+  trcg_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
+  RootCO2Ar2Soil_col(NY,NX)                       = 0._r8
+  RootCO2Ar2Root_col(NY,NX)                       = 0._r8
+  GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
+  GasHydroSubsLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  GasHydroSurfLoss_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  trcn_SurfRunoff_flx_col(:,NY,NX)                = 0._r8
+  SurfGasEmiss_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
+  GasDiff2Surf_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
+  WatFLo2LitR_col(NY,NX)                          = 0._r8
+  HeatFLoByWat2LitR_col(NY,NX)                    = 0._r8
+  TLitrIceFlxThaw_col(NY,NX)                      = 0._r8
+  TLitrIceHeatFlxFrez_col(NY,NX)                  = 0._r8
+  HeatByRad2Surf_col(NY,NX)                       = 0._r8
+  HeatSensAir2Surf_col(NY,NX)                     = 0._r8
+  HeatEvapAir2Surf_col(NY,NX)                     = 0._r8
+  HeatSensVapAir2Surf_col(NY,NX)                  = 0._r8
+  HeatNet2Surf_col(NY,NX)                         = 0._r8
+  VapXAir2GSurf_col(NY,NX)                        = 0._r8
+  THeatSnowThaw_col(NY,NX)                        = 0._r8
+  THeatSoiThaw_col(NY,NX)                         = 0._r8
+  TPlantRootH2OUptake_col(NY,NX)                  = 0._r8
+  CanopyWat_col(NY,NX)                            = 0._r8
+  WatHeldOnCanopy_col(NY,NX)                      = 0._r8
+  Prec2Canopy_col(NY,NX)                          = 0._r8
+  PrecIntceptByCanopy_col(NY,NX)                  = 0._r8
+  QVegET_col(NY,NX)                               = 0._r8
+  VapXAir2Canopy_col(NY,NX)                       = 0._r8
+  HeatFlx2Canopy_col(NY,NX)                       = 0._r8
+  CanopyHeatStor_col(NY,NX)                       = 0._r8
+
+  LeafAreaSunlit_pft(:,NY,NX) = 0._r8
+  PARSunlit_pft(:,NY,NX)      = 0._r8
+  PARSunsha_pft(:,NY,NX)      = 0._r8
+
   TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0._r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -804,22 +809,23 @@ module Hour1Mod
     trcSalt_snowMassloss_col(:,NY,NX)      = 0._r8
     trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8    
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine SetHourlyDiagnostics
 !------------------------------------------------------------------------------------------
 
   subroutine SetArrays4PlantSoilTransfer(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-
+  character(len=*), parameter :: subname='SetArrays4PlantSoilTransfer'
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   LitrfalStrutElms_vr(1:NumPlantChemElms,1:jsken,1:pltpar%NumOfPlantLitrCmplxs,0:NL_col(NY,NX),NY,NX) = 0._r8
   HeatSource_col(NY,NX)                                                               = 0._r8
   REcoDOMProd_vr(idom_beg:idom_end,1:jcplx,0:NL_col(NY,NX),NY,NX)                     = 0._r8
   RProd_Hp_vr(0:NL_col(NY,NX),NY,NX)                                                  = 0._r8
-  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)                = 0._r8
-  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                       = 0._r8
-  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                    = 0._r8
+  trcn_RprodChem_soil_vr(ids_nut_beg:ids_nuts_end,0:NL_col(NY,NX),NY,NX)              = 0._r8
+  TRProd_chem_sol_NH3_soil_vr(0:NL_col(NY,NX),NY,NX)                                  = 0._r8
+  TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
   TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
@@ -829,95 +835,9 @@ module Hour1Mod
   REcoUptkSoilO2M_vr(1:NPH,0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   RainLitr_col(NY,NX)                                                                 = 0._r8
   trcs_netpro_vr(:,:,NY,NX)                                                           = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine SetArrays4PlantSoilTransfer
-!------------------------------------------------------------------------------------------
 
-  subroutine DiagWaterTBLDepz(NY,NX,THETPZ_vr)
-  !
-  !Description:
-  !Diagnose water table depth in the soil column
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  real(r8), intent(in) :: THETPZ_vr(JZ)  !air-filled porosity in layer
-  real(r8) :: PSIEquil                   !equilibrium matric potential
-  real(r8) :: THETW1
-  real(r8) :: THETWM
-  real(r8) :: THETPX
-  real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)  
-  real(r8) :: THETWP  
-  integer :: LL,L
-  logical :: FoundWaterTable
-!     begin_execution
-
-  THETPW          = 0.01_r8
-  THETWP          = 1.0_r8-THETPW
-  FoundWaterTable = .false.
-
-  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
-!     IDWaterTable=water table flag from site file
-!     THETPZ,THETPW=current,minimum air-filled, porosity for water table
-!     DPTH,ExtWaterTable=depth of soil layer midpoint, water table
-!     PSIEquil=water potential in hydraulic equilibrium with layer below
-!     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
-!     DepzIntWTBL_col=water table depth
-!
-    IF(IDWaterTable_col(NY,NX).NE.0)THEN
-      IF(FoundWaterTable)exit
-
-      IF(THETPZ_vr(L).LT.THETPW .OR. L.EQ.NL_col(NY,NX))THEN
-        FoundWaterTable=.true.
-        IF(SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !above external water table
-          D5705: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
-            IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL_col(NY,NX))THEN
-              !air-filled pore greater minimum, i.e. not saturated
-              FoundWaterTable=.false.
-              exit
-            ELSE IF(SoilDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN
-              !current layer is lower than external water table
-              exit
-            ENDIF
-          END DO D5705
-        ENDIF
-
-          !THETPW=saturation criterion for water table identification
-          IF(FoundWaterTable)THEN
-
-            IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL_col(NY,NX))THEN !saturated and inside the hydrologically active zone
-              !not bottom layer, saturated
-              !PSIeqv in saturated layer
-              PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L+1,NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
-              THETWM   = THETWP*POROS_vr(L,NY,NX)
-              THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD_vr(L,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L,NY,NX)))
-
-              IF(THETWM.GT.THETW1)THEN
-                THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
-                DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)
-              ELSE
-                DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
-              ENDIF
-            ELSEIF(L.GT.NU_col(NY,NX))THEN
-              !not bottom layer, and not topsoil layer, partially saturated
-              PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(L-1,NY,NX))
-              THETWM   = THETWP*POROS_vr(L-1,NY,NX)
-              THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-                *PSD_vr(L-1,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
-              IF(THETWM.GT.THETW1)THEN
-                THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
-                DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
-              ELSE
-                DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
-              ENDIF
-            ELSE
-              DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
-            ENDIF
-          ENDIF
-        ENDIF
-      
-    ENDIF
-  END DO
-  end subroutine DiagWaterTBLDepz
 !------------------------------------------------------------------------------------------
 
   subroutine SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
@@ -1537,12 +1457,15 @@ module Hour1Mod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine GetChemicalConcsInSoil(I,J,NY,NX,THETPZ_vr)
+  subroutine GetChemicalConcsInSoil(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: NY,NX
-  real(r8), intent(out) :: THETPZ_vr(JZ)  !air-filled soil pore, m3/d2
+
   integer :: L,idg
+  character(len=*), parameter :: subname='GetChemicalConcsInSoil'
+
+  call PrintInfo('beg '//subname)
 !     begin_execution
 
 !     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
@@ -1552,21 +1475,10 @@ module Hour1Mod
 !
 
   DO L=NUI_col(NY,NX),NLI_col(NY,NX)
-
-    IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
-      THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
-      THETI_vr(L,NY,NX)    = 0._r8
-      ThetaAir_vr(L,NY,NX) = 0._r8
-    ELSE
-      THETW_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      THETI_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
-    ENDIF
-    THETPZ_vr(L)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
-!
-!     GAS CONCENTRATIONS
-!
-    IF(ThetaAir_vr(L,NY,NX).GT.AirFillPore_Min)THEN
+    !
+    !     GAS CONCENTRATIONS
+    !
+    IF(VLsoiAirP_vr(L,NY,NX).GT.AirFillPore_Min)THEN
       DO idg=idg_beg,idg_NH3
         trcg_gascl_vr(idg,L,NY,NX)=AZMAX1(trcg_gasml_vr(idg,L,NY,NX)/VLsoiAirP_vr(L,NY,NX))
       ENDDO
@@ -1581,8 +1493,6 @@ module Hour1Mod
     ELSE
       trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
     ENDIF
-!    print*,L,trcs_solml_vr(idg_CH4,L,NY,NX),VLWatMicP_vr(L,NY,NX)
-
 !
 !     CORGC=SOC concentration
 !
@@ -1592,6 +1502,7 @@ module Hour1Mod
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
   ENDDO
+  call PrintInfo('end '//subname)  
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------
 
@@ -1600,8 +1511,9 @@ module Hour1Mod
   integer, intent(in) :: NY,NX
 
   integer :: K,L,NTSA
+  character(len=*), parameter :: subname='ZeroHourlyArrays'
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   RootN2Fix_col(NY,NX)        = 0._r8
   RUptkRootO2_col(NY,NX)      = 0._r8
   RootCO2Emis2Root_col(NY,NX) = 0._r8
@@ -1665,6 +1577,7 @@ module Hour1Mod
   ENDDO
   trcg_ebu_flx_col(idg_beg:idg_NH3,NY,NX)      = 0._r8
   trcg_air2root_flx_col(idg_beg:idg_NH3,NY,NX) = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine ZeroHourlyArrays
 
 !------------------------------------------------------------------------------------------
