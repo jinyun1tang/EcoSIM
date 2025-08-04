@@ -190,9 +190,11 @@ implicit none
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
+  call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+
   call SetCanopyProfile(I,J,LeafAreaZsec_lpft, StemAreaZsec_lpft)
 
-  call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+  !call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 

@@ -224,6 +224,10 @@ implicit none
 
   write(*,*) "(PrescribePheno) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
 
+  dofmon = day_of_month
+  kmo = current_month
+  ndaysmon = total_days_in_month
+
   t = (dofmon-0.5_r8) / ndaysmon
   it(1) = t + 0.5_r8
   it(2) = it(1) + 1
