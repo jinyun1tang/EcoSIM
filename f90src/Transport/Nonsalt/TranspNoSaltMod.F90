@@ -270,8 +270,8 @@ module TranspNoSaltMod
             write(121,*)'irrig.                    =',trcs_irrig_flx_col(idg,NY,NX)
             write(121,*)'netpro(incl uptk2plt)     =',RGasNetProdSoil_col(idg,NY,NX)
             write(121,*)'drib                      =',trcs_solml_drib_soil_col(idg) 
-            write(121,*)'tflx soil                 =',AtmGasDiff2Soil_flx_col(idg,NY,NX) &
-              +Gas_WetDepo2Soil_col(idg,NY,nX)+Gas_litr2Soil_flx_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) &
+            write(121,*)'netflx soil               =',AtmGasDiff2Soil_flx_col(idg,NY,NX) &
+              +Gas_WetDepo2Soil_col(idg,NY,NX)+Gas_litr2Soil_flx_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flx(idg,NY,NX) &
               -trcs_drainage_flx_col(idg,NY,NX)+trcs_SubsurTransp_flx_2DH(idg,NY,NX)+trcg_ebu_flx_col(idg,NY,NX) &
               + trcs_irrig_flx_col(idg,NY,NX)+RGasNetProdSoil_col(idg,NY,NX)
             write(121,*)'------------------------'

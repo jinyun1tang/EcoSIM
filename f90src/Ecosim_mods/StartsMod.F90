@@ -138,6 +138,7 @@ module StartsMod
       AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_NH3B,NY,NX)= AtmGasCgperm3_col(idg_NH3,NY,NX)
 
       DO idg=idg_beg,idg_NH3
         trcs_solcoef_col(idg,NY,NX)= AMAX1(AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,ATCA_col(NY,NX))*1.e-2_r8,1.e-10_r8)
@@ -1048,7 +1049,7 @@ module StartsMod
 !     TairKClimMean_col=mean annual air temperature (K)
 !     tPBOT = # atmosphere
       tPBOT=1._r8   
-      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      CCO2EI_gperm3_col(NY,NX)         = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
@@ -1056,6 +1057,7 @@ module StartsMod
       AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
       AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
+      AtmGasCgperm3_col(idg_NH3B,NY,NX)= AtmGasCgperm3_col(idg_NH3,NY,NX) 
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
