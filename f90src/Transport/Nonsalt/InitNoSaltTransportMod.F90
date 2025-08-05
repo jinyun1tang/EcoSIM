@@ -143,18 +143,18 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       DO idg=idg_beg,idg_NH3
-        AtmGasDiff2Litr_flx_col(idg,NY,NX)                    = 0._r8
+        AtmGasDiff2Litr_flx_col(idg,NY,NX)                 = 0._r8
         Gas_WetDepo2Litr_col(idg,NY,NX)                    = 0._r8
         Gas_litr2Soil_flx_col(idg,NY,NX)                   = 0._r8
         GasHydroLoss_litr_flx_col(idg,NY,NX)               = 0._r8
-        AtmGasDiff2Soil_flx_col(idg,NY,NX)                    = 0._r8
+        AtmGasDiff2Soil_flx_col(idg,NY,NX)                 = 0._r8
         Gas_WetDepo2Soil_col(idg,NY,NX)                    = 0._r8
         RGasNetProdSoil_col(idg,NY,NX)                     = 0._r8
         trc_topsoil_flx_col(idg,NY,NX)                     = 0._r8
         TranspNetSoil_flx_col(idg,NY,NX)                   = 0._r8
         TranspNetSoil_flx2_col(idg,NY,NX)                  = 0._r8
         Gas_WetDepo2Snow_col(idg,NY,NX)                    = 0._r8
-        Gas_Snowloss_flx_col(idg,NY,NX)                        = 0._r8
+        Gas_Snowloss_flx_col(idg,NY,NX)                    = 0._r8
         transp_diff_slow_vr(idg,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
       ENDDO
       RBGCSinkGasMM_vr(:,:,NY,NX)=0._r8

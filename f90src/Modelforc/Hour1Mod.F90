@@ -301,7 +301,8 @@ module Hour1Mod
       AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
       AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
       AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
-
+      AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
+      
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
            /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))
