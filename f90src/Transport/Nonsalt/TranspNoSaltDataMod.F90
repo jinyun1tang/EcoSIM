@@ -56,7 +56,8 @@ implicit none
   real(r8), allocatable ::  GasDifctScaledMM_vr(:,:,:,:)           !time scaled gas diffusivity
   real(r8), allocatable ::  SoluteDifusivitytscaledM_vr(:,:,:,:)   !time scaled solute diffusivity
   real(r8), allocatable ::  trcg_VLWatMicP_vr(:,:,:,:)             !solubility-scaled effective volume for dissolved gas species [m3 d-2]
-  real(r8), allocatable ::  trcs_solml_dribM_beg_col(:,:,:)             !total dribbling tracer mass at the beginning of transport iteration, [g d-2]
+  real(r8), allocatable ::  trcs_drib_soil_slow_begf(:,:,:)        !total dribbling tracer mass in soil at the beginning of transport iteration, [g d-2]
+  real(r8), allocatable ::  trcs_solml_dribM_beg_col(:,:,:)         !total dribbling tracer mass at the beginning of transport iteration, [g d-2]
   real(r8), allocatable ::  trcs_solml_drib_beg_col(:,:,:)             !total dribbling tracer mass at the beginning of transport, [g d-2]  
   real(r8), allocatable ::  trcs_solml_drib_soi_beg_col(:,:,:)           !soil dribbling tracer mass at the beginning of transport, [g d-2]  
   real(r8), allocatable ::  dom_dribble_slow_beg_col(:,:,:,:)              !dom dribbling mass at the beginning of transport, [g d-2]  
@@ -135,6 +136,7 @@ implicit none
   real(r8), allocatable :: AtmGasDiff2Surf_slow_flx_col(:,:,:)         !surface diffusion in one iteration of slow transport, [g d-2]
   real(r8), allocatable :: AtmGasDiff2Litr_slow_flx_col(:,:,:)         !atmospheric diffusion into litter during slow transport, [g d-2]
   real(r8), allocatable :: trcs_NetProd_slow_flxM_col(:,:,:)            !net tracer production flux during slow transport, [g d-2]
+  real(r8), allocatable :: trcs_NetProd_slow_soil_col(:,:,:)            !net tracer production flux in soil during slow transport, [g d-2]
   real(r8), allocatable :: DOM_NetProd_slow_flxM_col(:,:,:,:)           !net dom production flux during slow transport, [g d-2]
   real(r8), allocatable :: trcs_hydrloss_slow_flx_col(:,:,:)           !tracer loss through snow drift, surf/subsurf runoff, and drainage in slow transport, [g d-2]
   real(r8), allocatable :: trcs_hydrloss_fast_flx_col(:,:,:)           !tracer loss through hydrological pathway in fast transport, [g d-2]
@@ -149,6 +151,7 @@ implicit none
   real(r8), allocatable :: Gas_WetDepo2litr_slow_flx_col(:,:,:)        !wet deposition to litter during slow transport iteration, [g d-2]
   real(r8), allocatable :: Gas_litr2Soil_slow_flx_col(:,:,:)           !transport from litter to soil during slow transport iteration, [g d-2]
   real(r8), allocatable :: trcs_sno2litr_slow_flx_col(:,:,:)           !tracer transport from snow to litter during slow transport, [g d-2]
+  real(r8), allocatable :: Gas_WeDepo2soil_slow_flx_col(:,:,:)         !wet deposition to soil during slow transport iteration, [g d-2]  
 !----------------------------------------------------------------------
 
 contains
@@ -166,6 +169,7 @@ contains
   allocate(trcs_solml_drib_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_drib_beg_col=0._r8
   allocate(trcs_solml_drib_soi_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_drib_soi_beg_col=0._r8  
   allocate(trcs_solml_dribM_beg_col(ids_beg:ids_end,JY,JX));trcs_solml_dribM_beg_col=0._r8
+  allocate(trcs_drib_soil_slow_begf(ids_beg:ids_end,JY,JX));trcs_drib_soil_slow_begf=0._r8
   allocate(DOM_NetProd_slow_flxM_col(idom_beg:idom_end,1:jcplx,JY,JX)); DOM_NetProd_slow_flxM_col=0._r8
   allocate(GasDiff2Surf_fast_flx_col(idg_beg:idg_NH3,JY,JX)); GasDiff2Surf_fast_flx_col=0._r8
   allocate(errmass_slow(ids_beg:ids_end,JY,JX)); errmass_slow=0._r8
@@ -179,6 +183,7 @@ contains
   allocate(trcg_mass_soil_begs(idg_beg:idg_NH3,JY,JX)); trcg_mass_soil_begs=0._r8
   allocate(trcs_hydrloss_slow_flx_col(ids_beg:ids_end,JY,JX)); trcs_hydrloss_slow_flx_col=0._r8
   allocate(trcs_NetProd_slow_flxM_col(ids_beg:ids_end,JY,JX)); trcs_NetProd_slow_flxM_col=0._r8
+  allocate(trcs_NetProd_slow_soil_col(ids_beg:ids_end,JY,JX)); trcs_NetProd_slow_soil_col=0._r8
   allocate(AtmGasDiff2Surf_slow_flx_col(idg_beg:idg_NH3,JY,JX)); AtmGasDiff2Surf_slow_flx_col=0._r8
   allocate(AtmGasDiff2Litr_slow_flx_col(idg_beg:idg_NH3,JY,JX)); AtmGasDiff2Litr_slow_flx_col=0._r8
   allocate(Gas_WetDeposit_slow_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDeposit_slow_flx_col=0._r8
@@ -307,6 +312,7 @@ contains
   allocate(TranspNetSoil_slow_flxM_col(idg_beg:idg_end,JY,JX)); TranspNetSoil_slow_flxM_col=0._r8
   allocate(trcg_NetPro_fast_col(idg_beg:idg_NH3,JY,JX)); trcg_NetPro_fast_col=0._r8
   allocate(Gas_WetDepo2litr_slow_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_WetDepo2litr_slow_flx_col=0._r8
+  allocate(Gas_WeDepo2soil_slow_flx_col(idg_beg:idg_NH3,JY,JX)); Gas_WeDepo2soil_slow_flx_col=0._r8
   allocate(trcs_sno2litr_slow_flx_col(idg_beg:idg_NH3,JY,JX)); trcs_sno2litr_slow_flx_col=0._r8
   end subroutine InitTransfrData
 
@@ -329,6 +335,7 @@ contains
   call destroy(trcs_solml_drib_beg_col)
   call destroy(trcs_solml_drib_soi_beg_col)  
   call destroy(trcs_solml_dribM_beg_col)  
+  call destroy(trcs_drib_soil_slow_begf)
   call destroy(DOM_NetProd_slow_flxM_col)
   call destroy(RBGCSink_DOM_micpM_vr)
   call destroy(GasDiff2Surf_fast_flx_col)
@@ -346,9 +353,11 @@ contains
   call destroy(trcs_hydrloss_slow_flx_col)
   call destroy(trcs_hydrloss_fast_flx_col)
   call destroy(trcs_NetProd_slow_flxM_col)
+  call destroy(trcs_NetProd_slow_soil_col)
   call destroy(AtmGasDiff2Surf_slow_flx_col)
   call destroy(AtmGasDiff2Litr_slow_flx_col)
   call destroy(Gas_WetDepo2litr_slow_flx_col)
+  call destroy(Gas_WeDepo2soil_slow_flx_col)
   call destroy(Gas_WetDeposit_slow_flx_col)
   call destroy(DOM_mass3_col)
   call destroy(DOM_mass4_col)
