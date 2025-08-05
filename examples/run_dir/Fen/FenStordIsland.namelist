@@ -19,7 +19,7 @@ disp_planttrait      = .true.
 plant_model          = .true.
 microbial_model      = .true.
 soichem_model        = .true.
-ldo_transpt_bubbling = .true.
+!ldo_transpt_bubbling = .false.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '19800101000000'
