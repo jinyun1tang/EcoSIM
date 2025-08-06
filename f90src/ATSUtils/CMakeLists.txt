@@ -16,7 +16,7 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
    ${CMAKE_BINARY_DIR}/f90src/Mesh/
    ${CMAKE_BINARY_DIR}/f90src/Modelpars/
-   ${CMAKE_BINARY_DIR}/f90src/Balances/   
+   ${CMAKE_BINARY_DIR}/f90src/Balances/
    ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
@@ -24,7 +24,9 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
    ${CMAKE_BINARY_DIR}/f90src/APIData/
    ${CMAKE_BINARY_DIR}/f90src/Ecosim_mods/
-   ${CMAKE_BINARY_DIR}/f90src/Prescribed_pheno/   
+   ${CMAKE_BINARY_DIR}/f90src/Prescribed_pheno/
+   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
+   ${CMAKE_BINARY_DIR}/f90src/APIs/
 )
 
 
@@ -33,7 +35,7 @@ set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods)
 
 install(TARGETS ATSUtils_mods DESTINATION ${CMAKE_BINARY_DIR}/lib)
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS ATSUtils_mods DESTINATION lib)
-  file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/)
+    install(TARGETS ATSUtils_mods DESTINATION lib)
+    file(GLOB HEADERS *.h)
+    install(FILES ${HEADERS} DESTINATION include/)
 endif()

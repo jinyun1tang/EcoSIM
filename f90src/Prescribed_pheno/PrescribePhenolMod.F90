@@ -1,7 +1,7 @@
 module PrescribePhenolMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use EcoSimConst,   only: PICON2h
-  use EcoSIMCtrlMod, only: etimer
+  use EcoSIMCtrlMod, only: etimer, ats_cpl_mode
   use EcoSIMCtrlDataType, only : ZEROS, current_month, day_of_month, total_days_in_month
   use ElmIDMod
   use GridDataType
@@ -218,15 +218,20 @@ implicit none
     ENDDO
   ENDDO
 
-  !ndaysmon = etimer%get_curr_mon_days()
-  !dofmon   = etimer%get_curr_dom()
-  !kmo      = etimer%get_curr_mon()
+  if(ats_cpl_mode)then
+    dofmon = day_of_month
+    kmo = current_month
+    ndaysmon = total_days_in_month
+  else
+    !ndaysmon = etimer%get_curr_mon_days()
+    !dofmon   = etimer%get_curr_dom()
+    !kmo      = etimer%get_curr_mon()
+    ndaysmon = 31
+    kmo = 1
+    dofmon = 1
+  end if
 
   write(*,*) "(PrescribePheno) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
-
-  dofmon = day_of_month
-  kmo = current_month
-  ndaysmon = total_days_in_month
 
   t = (dofmon-0.5_r8) / ndaysmon
   it(1) = t + 0.5_r8

@@ -11,6 +11,7 @@ module ATSEcoSIMAdvanceMod
   USE SoilPhysDataType
   use SnowDataType
   use LandSurfDataType
+  use PlantTraitDataType
   use CanopyDataType, only: RadSWGrnd_col
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
@@ -27,7 +28,9 @@ module ATSEcoSIMAdvanceMod
   use ClimForcDataType
   use PrescribePhenolMod
   use RootDataType
+  use FlagDataType
   use ATSUtilsMod
+  use EcoSIMCtrlMod,      only: ldo_sp_mode
 
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -44,6 +47,8 @@ implicit none
   use SnowBalanceMod    , only : SnowMassUpdate
   use StartsMod         , only : set_ecosim_solver
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
+  use SurfaceRadiationMod
+  use PlantMod
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
@@ -68,16 +73,16 @@ implicit none
   real(r8) :: VLWat_test(JZ,JY,JX)
 
   !All the necessary sizes are taken from GridConsts
-  real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
-  real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
+  !real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
+  !real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
   NPH_Test=1
   NX=1
-
-  LeafAreaZsec_lpft(:,:,:) = 0.2
-  StemAreaZsec_lpft(:,:,:) = 0.05
+  ldo_sp_mode = .True.
+  !LeafAreaZsec_lpft(:,:,:) = 0.2
+  !StemAreaZsec_lpft(:,:,:) = 0.05
 
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
@@ -182,19 +187,25 @@ implicit none
     !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
+
+    !testing canopy height
+    CanopyHeight_col(NY,NX) = 17.0
+    call PlantCanopyRadsModel(I,J,NY,NX,0.0)
+
   ENDDO
 
   !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s"
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
 
-  call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+  !call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
+  !call SetCanopyProfile(I,J,LeafAreaZsec_lpft, StemAreaZsec_lpft)
+
+  !call PlantCanopyRadsModel(I,J,NY,NX,0.0)
 
   call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
-  call SetCanopyProfile(I,J,LeafAreaZsec_lpft, StemAreaZsec_lpft)
-
-  !call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+  call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   VHeatCapacity1_vr(0,1,1) = 0.0
 
