@@ -8,7 +8,7 @@ implicit none
 
   public :: InitAlloc
   contains
-  subroutine InitAlloc(NOMicrobeGuilds)
+  subroutine InitAlloc()
   !
   !DESCRIPTION
   !allocate memeory for ecosim data
@@ -59,10 +59,10 @@ implicit none
   use PlantBGCPars          , only : InitPlantTraitTable
   use GridConsts  
   implicit none
-  integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
+  
 ! begin_execution
 
-  call InitSOMBGC(NOMicrobeGuilds)
+  call InitSOMBGC()
 
   call InitPlantMorphSize()
 

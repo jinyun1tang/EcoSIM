@@ -85,7 +85,7 @@ PROGRAM main
 !
   call SetMesh(NHW,NVN,NHE,NVS)
 
-  call  InitModules(nmicbguilds)
+  call  InitModules()
 
   if(lverb)WRITE(*,*)'read initialization information READI'
   CALL readi(NHW,NHE,NVN,NVS)

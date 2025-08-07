@@ -96,7 +96,7 @@ implicit none
   class(micsttype) :: this
   integer :: jcplx,NumMicbFunGrupsPerCmplx,jsken
   integer, pointer :: ndbiomcp, nlbiomcp
-  integer, pointer :: NumMicrobAutrophCmplx, NumHetetr1MicCmplx
+  integer, pointer :: NumMicrobAutoTrophCmplx, NumHetetr1MicCmplx
   integer, pointer :: NumLiveHeterBioms
   integer, pointer :: NumLiveAutoBioms
 
@@ -107,7 +107,7 @@ implicit none
   jsken=micpar%jsken
   ndbiomcp =>micpar%ndbiomcp
   nlbiomcp =>micpar%nlbiomcp
-  NumMicrobAutrophCmplx=>micpar%NumMicrobAutrophCmplx
+  NumMicrobAutoTrophCmplx=>micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx=>micpar%NumHetetr1MicCmplx
   NumLiveHeterBioms => micpar%NumLiveHeterBioms
 

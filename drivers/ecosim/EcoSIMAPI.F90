@@ -134,6 +134,7 @@ contains
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
   use readsmod       , only : clim_var  
+  use MicrobeConfigMod,only : ReadMicrobeNamelist
   use HistFileMod
   implicit none
   character(len=*), parameter :: mod_filename = &
@@ -143,7 +144,6 @@ contains
   character(len=80)    , intent(out) :: prefix
   integer              , intent(out) :: LYRG
   integer              , intent(out) :: nmicbguilds
-
 
   logical :: do_regression_test
   integer :: num_of_simdays
@@ -240,6 +240,7 @@ contains
   atm_ch4_fix        = -100._r8
   first_topou        = .false.
   ldo_radiation_test = .false.
+  
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
@@ -309,6 +310,8 @@ contains
     clim_var%SRAD_Wm2  = SRAD_Wm2
     clim_var%Atm_kPa   = Atm_kPa
   endif
+
+  call ReadMicrobeNamelist(nml_buffer)
 
 end subroutine readnamelist
 ! ----------------------------------------------------------------------

@@ -366,10 +366,10 @@ type, public :: Cumlate_Flux_Diag_type
   class(Microbe_Flux_type) :: this
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
   integer :: ndbiomcp
-  integer :: NumMicrobAutrophCmplx
+  integer :: NumMicrobAutoTrophCmplx
   integer :: NumHetetr1MicCmplx
   ndbiomcp=micpar%ndbiomcp
-  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
+  NumMicrobAutoTrophCmplx=micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
 
   allocate(this%RO2UptkHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2UptkHeter=spval
@@ -425,54 +425,54 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RH1PO4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilBandHeter=spval
   allocate(this%RH1PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilLitrHeter=spval
 
-  allocate(this%RSOxidSoilAutor(NumMicrobAutrophCmplx));this%RSOxidSoilAutor=spval
-  allocate(this%RSOxidBandAutor(NumMicrobAutrophCmplx));this%RSOxidBandAutor=spval
+  allocate(this%RSOxidSoilAutor(NumMicrobAutoTrophCmplx));this%RSOxidSoilAutor=spval
+  allocate(this%RSOxidBandAutor(NumMicrobAutoTrophCmplx));this%RSOxidBandAutor=spval
   allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetr1MicCmplx,1:jcplx));this%XferBiomeHeterK=spval
   allocate(this%ROQC4HeterMicrobAct(NumHetetr1MicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
   allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetr1MicCmplx,1:jcplx));this%RCCMEheter=spval
 
-  allocate(this%RO2UptkAutor(NumMicrobAutrophCmplx));this%RO2UptkAutor=spval
-  allocate(this%Resp4NFixAutor(NumMicrobAutrophCmplx));this%Resp4NFixAutor=spval
-  allocate(this%RespGrossAutor(NumMicrobAutrophCmplx));this%RespGrossAutor=spval
-  allocate(this%RO2Dmnd4RespAutor(NumMicrobAutrophCmplx));this%RO2Dmnd4RespAutor=spval
-  allocate(this%RO2DmndAutor(NumMicrobAutrophCmplx));this%RO2DmndAutor=spval
-  allocate(this%RO2Uptk4RespAutor(NumMicrobAutrophCmplx));this%RO2Uptk4RespAutor=spval
-  allocate(this%RNO3UptkAutor(NumMicrobAutrophCmplx));this%RNO3UptkAutor=spval
-  allocate(this%RNO2ReduxAutorSoil(NumMicrobAutrophCmplx));this%RNO2ReduxAutorSoil=spval
-  allocate(this%RNO2ReduxAutorBand(NumMicrobAutrophCmplx));this%RNO2ReduxAutorBand=spval
-  allocate(this%RNOxReduxRespAutorLim(NumMicrobAutrophCmplx));this%RNOxReduxRespAutorLim=spval
-  allocate(this%RMaintDmndAutor(2,NumMicrobAutrophCmplx));this%RMaintDmndAutor=spval
-  allocate(this%RNH4TransfSoilAutor(NumMicrobAutrophCmplx));this%RNH4TransfSoilAutor=spval
-  allocate(this%RNO3TransfSoilAutor(NumMicrobAutrophCmplx));this%RNO3TransfSoilAutor=spval
-  allocate(this%RH2PO4TransfSoilAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfSoilAutor=spval
-  allocate(this%RNH4TransfBandAutor(NumMicrobAutrophCmplx));this%RNH4TransfBandAutor=spval
-  allocate(this%RNO3TransfBandAutor(NumMicrobAutrophCmplx));this%RNO3TransfBandAutor=spval
-  allocate(this%RH2PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfBandAutor=spval
-  allocate(this%RkillLitfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitfalOMAutor=spval
-  allocate(this%RkillLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2HumOMAutor=spval
-  allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
-  allocate(this%DOMuptk4GrothAutor(idom_beg:idom_end,NumMicrobAutrophCmplx));this%DOMuptk4GrothAutor=spval
-  allocate(this%RMaintDefcitLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfalOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfal2HumOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitLitrfal2ResduOMAutor=spval
-  allocate(this%RN2FixAutor(NumMicrobAutrophCmplx));this%RN2FixAutor=spval
-  allocate(this%RKillOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RKillOMAutor=spval
-  allocate(this%RkillRecycOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RkillRecycOMAutor=spval
-  allocate(this%RMaintDefcitKillOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitKillOMAutor=spval
-  allocate(this%RMaintDefcitRecycOMAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%RMaintDefcitRecycOMAutor=spval
-  allocate(this%RNH4TransfLitrAutor(NumMicrobAutrophCmplx));this%RNH4TransfLitrAutor=spval
-  allocate(this%RNO3TransfLitrAutor(NumMicrobAutrophCmplx));this%RNO3TransfLitrAutor=spval
-  allocate(this%RH2PO4TransfLitrAutor(NumMicrobAutrophCmplx));this%RH2PO4TransfLitrAutor=spval
-  allocate(this%AttenfNH4Autor(NumMicrobAutrophCmplx));this%AttenfNH4Autor=spval
-  allocate(this%AttenfNO3Autor(NumMicrobAutrophCmplx));this%AttenfNO3Autor=spval
-  allocate(this%AttenfH2PO4Autor(NumMicrobAutrophCmplx));this%AttenfH2PO4Autor=spval
-  allocate(this%NonstX2stBiomAutor(NumPlantChemElms,2,NumMicrobAutrophCmplx));this%NonstX2stBiomAutor=spval
-  allocate(this%AttenfH1PO4Autor(NumMicrobAutrophCmplx));this%AttenfH1PO4Autor=spval
-  allocate(this%RCO2ProdAutor(NumMicrobAutrophCmplx));this%RCO2ProdAutor=spval
-  allocate(this%RCH4ProdAutor(NumMicrobAutrophCmplx));this%RCH4ProdAutor=spval
-  allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfSoilAutor=spval
-  allocate(this%RH1PO4TransfBandAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfBandAutor=spval
-  allocate(this%RH1PO4TransfLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4TransfLitrAutor=spval
+  allocate(this%RO2UptkAutor(NumMicrobAutoTrophCmplx));this%RO2UptkAutor=spval
+  allocate(this%Resp4NFixAutor(NumMicrobAutoTrophCmplx));this%Resp4NFixAutor=spval
+  allocate(this%RespGrossAutor(NumMicrobAutoTrophCmplx));this%RespGrossAutor=spval
+  allocate(this%RO2Dmnd4RespAutor(NumMicrobAutoTrophCmplx));this%RO2Dmnd4RespAutor=spval
+  allocate(this%RO2DmndAutor(NumMicrobAutoTrophCmplx));this%RO2DmndAutor=spval
+  allocate(this%RO2Uptk4RespAutor(NumMicrobAutoTrophCmplx));this%RO2Uptk4RespAutor=spval
+  allocate(this%RNO3UptkAutor(NumMicrobAutoTrophCmplx));this%RNO3UptkAutor=spval
+  allocate(this%RNO2ReduxAutorSoil(NumMicrobAutoTrophCmplx));this%RNO2ReduxAutorSoil=spval
+  allocate(this%RNO2ReduxAutorBand(NumMicrobAutoTrophCmplx));this%RNO2ReduxAutorBand=spval
+  allocate(this%RNOxReduxRespAutorLim(NumMicrobAutoTrophCmplx));this%RNOxReduxRespAutorLim=spval
+  allocate(this%RMaintDmndAutor(2,NumMicrobAutoTrophCmplx));this%RMaintDmndAutor=spval
+  allocate(this%RNH4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfSoilAutor=spval
+  allocate(this%RNO3TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RNO3TransfSoilAutor=spval
+  allocate(this%RH2PO4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RH2PO4TransfSoilAutor=spval
+  allocate(this%RNH4TransfBandAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfBandAutor=spval
+  allocate(this%RNO3TransfBandAutor(NumMicrobAutoTrophCmplx));this%RNO3TransfBandAutor=spval
+  allocate(this%RH2PO4TransfBandAutor(NumMicrobAutoTrophCmplx));this%RH2PO4TransfBandAutor=spval
+  allocate(this%RkillLitfalOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillLitfalOMAutor=spval
+  allocate(this%RkillLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillLitrfal2HumOMAutor=spval
+  allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
+  allocate(this%DOMuptk4GrothAutor(idom_beg:idom_end,NumMicrobAutoTrophCmplx));this%DOMuptk4GrothAutor=spval
+  allocate(this%RMaintDefcitLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfalOMAutor=spval
+  allocate(this%RMaintDefcitLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2HumOMAutor=spval
+  allocate(this%RMaintDefcitLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2ResduOMAutor=spval
+  allocate(this%RN2FixAutor(NumMicrobAutoTrophCmplx));this%RN2FixAutor=spval
+  allocate(this%RKillOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RKillOMAutor=spval
+  allocate(this%RkillRecycOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillRecycOMAutor=spval
+  allocate(this%RMaintDefcitKillOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitKillOMAutor=spval
+  allocate(this%RMaintDefcitRecycOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitRecycOMAutor=spval
+  allocate(this%RNH4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfLitrAutor=spval
+  allocate(this%RNO3TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNO3TransfLitrAutor=spval
+  allocate(this%RH2PO4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RH2PO4TransfLitrAutor=spval
+  allocate(this%AttenfNH4Autor(NumMicrobAutoTrophCmplx));this%AttenfNH4Autor=spval
+  allocate(this%AttenfNO3Autor(NumMicrobAutoTrophCmplx));this%AttenfNO3Autor=spval
+  allocate(this%AttenfH2PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH2PO4Autor=spval
+  allocate(this%NonstX2stBiomAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%NonstX2stBiomAutor=spval
+  allocate(this%AttenfH1PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH1PO4Autor=spval
+  allocate(this%RCO2ProdAutor(NumMicrobAutoTrophCmplx));this%RCO2ProdAutor=spval
+  allocate(this%RCH4ProdAutor(NumMicrobAutoTrophCmplx));this%RCH4ProdAutor=spval
+  allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfSoilAutor=spval
+  allocate(this%RH1PO4TransfBandAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfBandAutor=spval
+  allocate(this%RH1PO4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfLitrAutor=spval
 
   call this%ZeroOut()
   end subroutine nit_micf_init
@@ -484,8 +484,8 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Microbe_State_type) :: this
   integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
-  integer :: NumMicrobAutrophCmplx,NumHetetr1MicCmplx
-  NumMicrobAutrophCmplx=micpar%NumMicrobAutrophCmplx
+  integer :: NumMicrobAutoTrophCmplx,NumHetetr1MicCmplx
+  NumMicrobAutoTrophCmplx=micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
 
   allocate(this%rCNBiomeActHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%rCNBiomeActHeter=1._r8
@@ -503,20 +503,20 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%FCP(NumHetetr1MicCmplx,1:jcplx));this%FCP=spval
   allocate(this%FBiomStoiScalarHeter(NumHetetr1MicCmplx,1:jcplx));this%FBiomStoiScalarHeter=spval
 
-  allocate(this%rCNBiomeActAutor(NumPlantChemElms,NumMicrobAutrophCmplx));this%rCNBiomeActAutor=1.0_r8
-  allocate(this%OMActAutor(NumMicrobAutrophCmplx));this%OMActAutor=spval
-  allocate(this%FracOMActAutor(NumMicrobAutrophCmplx));this%FracOMActAutor=spval
-  allocate(this%FracNO2ReduxAutor(NumMicrobAutrophCmplx));this%FracNO2ReduxAutor=spval
-  allocate(this%FracAutorBiomOfActK(NumMicrobAutrophCmplx));this%FracAutorBiomOfActK=spval
-  allocate(this%OMC2Autor(NumMicrobAutrophCmplx));this%OMC2Autor=spval
-  allocate(this%GrowthEnvScalAutor(NumMicrobAutrophCmplx));this%GrowthEnvScalAutor=spval
-  allocate(this%TSensMaintRAutor(NumMicrobAutrophCmplx));this%TSensMaintRAutor=spval
-  allocate(this%OMN2Autor(NumMicrobAutrophCmplx));this%OMN2Autor=spval
-  allocate(this%FOM2Autor(NumMicrobAutrophCmplx));this%FOM2Autor=spval
-  allocate(this%fLimO2Autor(NumMicrobAutrophCmplx));this%fLimO2Autor=spval
-  allocate(this%FCNAutor(NumMicrobAutrophCmplx));this%FCNAutor=spval
-  allocate(this%FCPAutor(NumMicrobAutrophCmplx));this%FCPAutor=spval
-  allocate(this%FBiomStoiScalarAutor(NumMicrobAutrophCmplx));this%FBiomStoiScalarAutor=spval
+  allocate(this%rCNBiomeActAutor(NumPlantChemElms,NumMicrobAutoTrophCmplx));this%rCNBiomeActAutor=1.0_r8
+  allocate(this%OMActAutor(NumMicrobAutoTrophCmplx));this%OMActAutor=spval
+  allocate(this%FracOMActAutor(NumMicrobAutoTrophCmplx));this%FracOMActAutor=spval
+  allocate(this%FracNO2ReduxAutor(NumMicrobAutoTrophCmplx));this%FracNO2ReduxAutor=spval
+  allocate(this%FracAutorBiomOfActK(NumMicrobAutoTrophCmplx));this%FracAutorBiomOfActK=spval
+  allocate(this%OMC2Autor(NumMicrobAutoTrophCmplx));this%OMC2Autor=spval
+  allocate(this%GrowthEnvScalAutor(NumMicrobAutoTrophCmplx));this%GrowthEnvScalAutor=spval
+  allocate(this%TSensMaintRAutor(NumMicrobAutoTrophCmplx));this%TSensMaintRAutor=spval
+  allocate(this%OMN2Autor(NumMicrobAutoTrophCmplx));this%OMN2Autor=spval
+  allocate(this%FOM2Autor(NumMicrobAutoTrophCmplx));this%FOM2Autor=spval
+  allocate(this%fLimO2Autor(NumMicrobAutoTrophCmplx));this%fLimO2Autor=spval
+  allocate(this%FCNAutor(NumMicrobAutoTrophCmplx));this%FCNAutor=spval
+  allocate(this%FCPAutor(NumMicrobAutoTrophCmplx));this%FCPAutor=spval
+  allocate(this%FBiomStoiScalarAutor(NumMicrobAutoTrophCmplx));this%FBiomStoiScalarAutor=spval
   end subroutine nit_mics_init
 !------------------------------------------------------------------------------------------
 
@@ -753,7 +753,7 @@ type, public :: Cumlate_Flux_Diag_type
       DO NGL=micpar%JGniH(groupid),micpar%JGnfH(groupid)
         FSubs_limiter=FSubs_limiter+this%FSBSTHeter(NGL,K)
       ENDDO
-    ENDDO
+    ENDDO    
     FSubs_limiter=FSubs_limiter/real((micpar%JGnfH(groupid)-micpar%JGniH(groupid)+1)*micpar%jcplx,kind=r8)
 
   elseif(groupid==micpar%mid_Aerob_Fungi)then
@@ -763,11 +763,10 @@ type, public :: Cumlate_Flux_Diag_type
       ENDDO
     ENDDO
     FSubs_limiter=FSubs_limiter/real((micpar%JGnfH(groupid)-micpar%JGniH(groupid)+1)*micpar%jcplx,kind=r8)
-
   endif
 
   end subroutine mic_diag_summary
-
+TjS#ZMi3d8w%A4ah
 
 !------------------------------------------------------------------------------------------  
   subroutine mic_diag_destroy(this)
@@ -872,14 +871,14 @@ type, public :: Cumlate_Flux_Diag_type
   subroutine mic_diag_init(this)
   implicit none
   class(Microbe_Diag_type) :: this
-  integer :: NumMicrobAutrophCmplx,NumHetetr1MicCmplx
+  integer :: NumMicrobAutoTrophCmplx,NumHetetr1MicCmplx
   integer :: jcplx
 
   jcplx=micpar%jcplx
-  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
+  NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
   allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:jcplx));   this%FSBSTHeter=0._r8
-  allocate(this%FSBSTAutor(1:NumMicrobAutrophCmplx)); this%FSBSTAutor=0._r8
+  allocate(this%FSBSTAutor(1:NumMicrobAutoTrophCmplx)); this%FSBSTAutor=0._r8
   allocate(this%ROQC4HeterMicActCmpK(1:jcplx));this%ROQC4HeterMicActCmpK=0._r8
   allocate(this%RHydrolysisScalCmpK(1:jcplx));this%RHydrolysisScalCmpK=0._r8
   end subroutine mic_diag_init
