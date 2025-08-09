@@ -464,6 +464,9 @@ implicit none
   real(r8),pointer   :: h3D_SOMHydrylScalCps_vr(:,:,:)
   real(r8),pointer   :: h3D_MicrobActCps_vr(:,:,:)
   real(r8),pointer   :: h3D_HydrolCSOMCps_vr(:,:,:)
+  real(r8),pointer   :: h3D_Aerobic_Bacteria_vr(:,:,:)
+  real(r8),pointer   :: h3D_Aerobic_Fungi_vr(:,:,:)
+  real(r8),pointer   :: h3D_Facult_Denitf_vr(:,:,:)
   real(r8),pointer   :: h2D_AeroHrBactP_vr(:,:)   
   real(r8),pointer   :: h2D_AeroHrFungP_vr(:,:)   
   real(r8),pointer   :: h2D_faculDenitP_vr(:,:)  
@@ -1869,7 +1872,6 @@ implicit none
   call hist_addfld1d(fname='Ci_mesophyll_pft',units='uM',avgflag='A',&
     long_name='Intracellular CO2 concentration for photosynthesis',ptr_patch=data1d_ptr,default='inactive')      
 
-
   data1d_ptr => this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='BLYR_RSC_CO2_pft',units='s/m',avgflag='A',&
     long_name='Canopy boundary layer resistance for CO2',ptr_patch=data1d_ptr,&
@@ -2888,6 +2890,46 @@ implicit none
     call hist_addfld2d(fname='MicrobAct_'//trim(micpar%cplxname(jj))//'_cplx_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
       long_name='Layer resolved respiration-based microbial acitivity for hydrolysis in '//trim(micpar%cplxname(jj))//' complex',&
       ptr_col=data2d_ptr,default='inactive')       
+  ENDDO
+
+  DO jj=1,micpar%FG_guidls_heter(micpar%mid_Aerob_HeteroBacter)
+
+  enddo
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Aerob_Fungi)   
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Facult_DenitBacter) 
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_aerob_N2Fixer)  
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Anaerob_N2Fixer) 
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_fermentor)
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_AcetoMethanogArchea) 
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_H2GenoMethanogArchea)  
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_AmmoniaOxidBacter)  
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_NitriteOxidBacter)  
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_AerobicMethanotrofBacter)
+  
   ENDDO
 
   data2d_ptr =>  this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)

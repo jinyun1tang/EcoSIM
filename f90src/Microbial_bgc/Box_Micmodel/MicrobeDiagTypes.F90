@@ -173,7 +173,12 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RCH4ProdHeter(:,:)
   real(r8),allocatable :: RSOxidSoilAutor(:)
   real(r8),allocatable :: RSOxidBandAutor(:)
-
+  real(r8),allocatable :: ECHZAutor(:)
+  real(r8),allocatable :: ECHZHeter(:,:)
+  real(r8),allocatable :: RGOCP(:,:)
+  real(r8),allocatable :: FOQC(:,:)
+  REAL(R8),allocatable :: FGOCP(:,:)
+  REAL(R8),allocatable :: FGOAP(:,:)  
   real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
   real(r8),allocatable :: RH1PO4imobilSoilHeter(:,:)
   real(r8),allocatable :: RH1PO4imobilBandHeter(:,:)
@@ -247,9 +252,6 @@ type, public :: Cumlate_Flux_Diag_type
   type, public :: OMCplx_State_type
     real(r8),allocatable :: TOMEAutoK(:)
     real(r8),allocatable :: BulkSOMC(:)
-    real(r8),allocatable :: TOMK(:)
-    real(r8),allocatable :: TONK(:)
-    real(r8),allocatable :: TOPK(:)
     real(r8),allocatable :: FOCA(:)
     real(r8),allocatable :: FOAA(:)
     real(r8),allocatable :: rCNDOM(:)
@@ -285,6 +287,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: ZNH4T
   real(r8) :: ZNO3T
   real(r8) :: ZNO2T
+  real(r8),allocatable :: TOMEK(:,:)                     !total elemental biomass in complex K
   real(r8),allocatable :: FSBSTHeter(:,:)                !limitation of primary substrate for heterotrophs, [0->1, less limitation]              
   real(r8),allocatable :: FSBSTAutor(:)                  !limitation of primary substrate for autotrophs, [0->1, less limitation]              
   real(r8),allocatable :: ROQC4HeterMicActCmpK(:)        !microbial activity in hydrolysis of organic complex
@@ -430,7 +433,12 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetr1MicCmplx,1:jcplx));this%XferBiomeHeterK=spval
   allocate(this%ROQC4HeterMicrobAct(NumHetetr1MicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
   allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetr1MicCmplx,1:jcplx));this%RCCMEheter=spval
-
+  allocate(this%ECHZAutor(1:NumMicrobAutoTrophCmplx));this%ECHZAutor=spval
+  allocate(this%ECHZHeter(1:NumHetetr1MicCmplx,1:jcplx));this%ECHZHeter=spval
+  allocate(this%FOQC(1:NumHetetr1MicCmplx,1:jcplx));this%FOQC=spval
+  allocate(this%RGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOCP=spval
+  allocate(this%FGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOCP=spval
+  allocate(this%FGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOAP=spval  
   allocate(this%RO2UptkAutor(NumMicrobAutoTrophCmplx));this%RO2UptkAutor=spval
   allocate(this%Resp4NFixAutor(NumMicrobAutoTrophCmplx));this%Resp4NFixAutor=spval
   allocate(this%RespGrossAutor(NumMicrobAutoTrophCmplx));this%RespGrossAutor=spval
@@ -581,7 +589,12 @@ type, public :: Cumlate_Flux_Diag_type
   this%RH1PO4imobilSoilHeter    = 0._r8
   this%RH1PO4imobilBandHeter    = 0._r8
   this%RH1PO4imobilLitrHeter    = 0._r8
-
+  this%ECHZAutor                = 0._r8
+  this%ECHZHeter                = 0._r8
+  this%FOQC                     = 0._r8
+  this%FGOCP                    = 0._r8
+  this%RGOCP                    = 0._r8
+  this%FGOAP                    = 0._r8
   this%RO2UptkAutor                     = 0._r8
   this%Resp4NFixAutor                   = 0._r8
   this%RespGrossAutor                   = 0._r8
@@ -766,7 +779,6 @@ type, public :: Cumlate_Flux_Diag_type
   endif
 
   end subroutine mic_diag_summary
-TjS#ZMi3d8w%A4ah
 
 !------------------------------------------------------------------------------------------  
   subroutine mic_diag_destroy(this)
@@ -777,6 +789,7 @@ TjS#ZMi3d8w%A4ah
   call destroy(this%FSBSTAutor)
   call destroy(this%ROQC4HeterMicActCmpK)
   call destroy(this%RHydrolysisScalCmpK)
+  call destroy(this%TOMEK)
   end subroutine mic_diag_destroy
 !------------------------------------------------------------------------------------------  
   subroutine nit_mics_destroy(this)
@@ -877,10 +890,12 @@ TjS#ZMi3d8w%A4ah
   jcplx=micpar%jcplx
   NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx    = micpar%NumHetetr1MicCmplx
+
   allocate(this%FSBSTHeter(1:NumHetetr1MicCmplx,1:jcplx));   this%FSBSTHeter=0._r8
   allocate(this%FSBSTAutor(1:NumMicrobAutoTrophCmplx)); this%FSBSTAutor=0._r8
   allocate(this%ROQC4HeterMicActCmpK(1:jcplx));this%ROQC4HeterMicActCmpK=0._r8
   allocate(this%RHydrolysisScalCmpK(1:jcplx));this%RHydrolysisScalCmpK=0._r8
+  allocate(this%TOMEK(1:NumPlantChemElms,1:jcplx));this%TOMEK=spval
   end subroutine mic_diag_init
 
 !------------------------------------------------------------------------------------------
@@ -892,9 +907,6 @@ TjS#ZMi3d8w%A4ah
   ncplx=micpar%jcplx
   allocate(this%BulkSOMC(1:ncplx));this%BulkSOMC=spval
   allocate(this%TOMEAutoK(1:NumPlantChemElms)); this%TOMEAutoK=spval
-  allocate(this%TOMK(1:ncplx+1));this%TOMK=spval
-  allocate(this%TONK(1:ncplx+1));this%TONK=spval
-  allocate(this%TOPK(1:ncplx+1));this%TOPK=spval
   allocate(this%FOCA(1:ncplx));this%FOCA=spval
   allocate(this%FOAA(1:ncplx));this%FOAA=spval
   allocate(this%rCNDOM(1:ncplx));this%rCNDOM=spval
@@ -933,7 +945,7 @@ TjS#ZMi3d8w%A4ah
   this%ZNH4T               = 0._r8
   this%ZNO3T               = 0._r8
   this%ZNO2T               = 0._r8
-
+  this%TOMEK                = 0._r8
   end subroutine mic_diag_zero
 !------------------------------------------------------------------------------------------
 
@@ -943,9 +955,6 @@ TjS#ZMi3d8w%A4ah
   class(OMCplx_State_type) :: this
 
   this%BulkSOMC=0._r8
-  this%TOMK=0._r8
-  this%TONK=0._r8
-  this%TOPK=0._r8
   this%FOCA=0._r8
   this%FOAA=0._r8
   this%rCNDOM=0._r8
@@ -967,9 +976,6 @@ TjS#ZMi3d8w%A4ah
   class(OMCplx_State_type) :: this
 
   call destroy(this%BulkSOMC)
-  call destroy(this%TOMK)
-  call destroy(this%TONK)
-  call destroy(this%TOPK)
   call destroy(this%FOCA)
   call destroy(this%FOAA)
   call destroy(this%rCNDOM)

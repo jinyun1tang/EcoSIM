@@ -74,7 +74,9 @@ module MicForcTypeMod
   real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)
   real(r8), allocatable :: ElmAllocmatMicrblitr2POMU(:)
   real(r8), allocatable :: RDOMEcoDmndPrev(:)
+  real(r8), allocatable :: RAcetateUptkHeterPrev(:,:)    
   real(r8), allocatable :: RAcetateEcoDmndPrev(:)
+  real(r8), allocatable :: RDOCUptkHeterPrev(:,:)        
   real(r8), allocatable :: DiffusivitySolutEff(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
@@ -100,12 +102,15 @@ module MicForcTypeMod
   allocate(this%ElmAllocmatMicrblitr2POMU(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POMU=spval
   allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval
   allocate(this%RAcetateEcoDmndPrev(1:jcplx));this%RAcetateEcoDmndPrev=spval
+  allocate(this%RDOCUptkHeterPrev(1:micpar%NumHetetr1MicCmplx,1:jcplx))      ;this%RDOCUptkHeterPrev=0._r8  
   allocate(this%VLWatMicPM(NPH));this%VLWatMicPM=spval
   allocate(this%THETPM(NPH));this%THETPM=spval
   allocate(this%FILM(NPH));this%FILM=spval
   allocate(this%TortMicPM(NPH));this%TortMicPM=spval
   allocate(this%VLsoiAirPM(NPH));this%VLsoiAirPM=spval
   allocate(this%DiffusivitySolutEff(NPH));this%DiffusivitySolutEff=spval
+  allocate(this%RAcetateUptkHeterPrev(1:micpar%NumHetetr1MicCmplx,1:jcplx))  ;this%RAcetateUptkHeterPrev=0._r8
+
   end subroutine Init
 !------------------------------------------------------------------------------------------
 
@@ -115,6 +120,8 @@ module MicForcTypeMod
   implicit none
   class(micforctype) :: this
 
+  call destroy(this%RAcetateUptkHeterPrev)
+  call destroy(this%RDOCUptkHeterPrev)
   call destroy(this%VLWatMicPM)
   call destroy(this%THETPM)
   call destroy(this%FILM)

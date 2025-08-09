@@ -74,8 +74,9 @@ implicit none
   real(r8), pointer :: OQCK(:)                      !fractions of SOC in DOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:) !logical switch for autotrophic group
   logical,  pointer :: is_activeMicrbFungrpHeter(:) !logical switch for heterotrophic group
-  logical,  pointer :: is_aerobic_hetr(:)
-  logical,  pointer :: is_anaerobic_hetr(:)
+  logical,  pointer :: is_aerobic_hetr(:)           !logical flag for aerobic heterotrophs
+  logical,  pointer :: is_anaerobic_hetr(:)         !logical flag for anaerobic heterotrophs
+  logical,  pointer :: is_aerobic_autor(:)          !logical flag for aerobic autotrophs
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
@@ -212,6 +213,10 @@ contains
 
   this%is_anaerobic_hetr(this%mid_fermentor)       = .true.
   this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer) = .true.
+
+  this%is_aerobic_autor(this%mid_AmmoniaOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_NitriteOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AerobicMethanotrofBacter)=.true.
 
   this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .true.
   this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .true.
@@ -440,6 +445,7 @@ contains
   allocate(this%is_CO2_autotroph(NumMicbFunGrupsPerCmplx)); this%is_CO2_autotroph=.false.
   allocate(this%is_aerobic_hetr(NumMicbFunGrupsPerCmplx)); this%is_aerobic_hetr=.false.
   allocate(this%is_anaerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anaerobic_hetr=.false.
+  allocate(this%is_aerobic_autor(NumMicbFunGrupsPerCmplx));this%is_aerobic_autor=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -490,4 +496,28 @@ contains
 
   end function get_micb_id
 
+!------------------------------------------------------------------------------------------
+
+  pure function is_group_defined(this,igroup,isauto)result(isdef)
+  implicit none
+  class(MicParType), intent(in) :: this
+  integer, intent(in) :: igroup
+  logical, intent(in) :: isauto  
+  logical :: isdef
+
+  if(isauto)then
+    isdef=igroup == this%mid_AmmoniaOxidBacter     .or. &
+       igroup == this%mid_NitriteOxidBacter        .or. & 
+       igroup == this%mid_AerobicMethanotrofBacter .or. &
+       igroup == this%mid_H2GenoMethanogArchea
+  else
+    isdef=igroup == this%mid_Aerob_HeteroBacter  .or. &
+       igroup == this%mid_Facult_DenitBacter     .or. &
+       igroup == this%mid_Aerob_Fungi            .or. &
+       igroup == this%mid_fermentor              .or. &
+       igroup == this%mid_AcetoMethanogArchea    .or. &
+       igroup == this%mid_aerob_N2Fixer          .or. &
+       igroup == this%mid_Anaerob_N2Fixer
+  endif
+  end function is_group_defined
 end module MicBGCPars

@@ -849,12 +849,11 @@ module MicBGCMod
 
     DO NGL=JGniA(N),JGnfA(N)
       WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
-      OXKX                    = OXKA
       GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
       TSensMaintRAutor(NGL)   = TSensMaintR
       IF(OMActAutor(NGL).GT.0.0_r8)THEN
         call ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
-          OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
+          TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
           micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
       ENDIF
     ENDDO
@@ -2437,8 +2436,8 @@ module MicBGCMod
     RH2PO4DmndBandHeterPrev => micflx%RH2PO4DmndBandHeterPrev, &
     RH1PO4DmndSoilHeterPrev => micflx%RH1PO4DmndSoilHeterPrev, &
     RH1PO4DmndBandHeterPrev => micflx%RH1PO4DmndBandHeterPrev, &
-    RDOCUptkHeterPrev       => micflx%RDOCUptkHeterPrev,       &
-    RAcetateUptkHeterPrev   => micflx%RAcetateUptkHeterPrev,   &
+    RDOCUptkHeterPrev       => micfor%RDOCUptkHeterPrev,       &
+    RAcetateUptkHeterPrev   => micfor%RAcetateUptkHeterPrev,   &
     RNH4DmndLitrHeterPrev   => micflx%RNH4DmndLitrHeterPrev,   &
     RNO3DmndLitrHeterPrev   => micflx%RNO3DmndLitrHeterPrev,   &
     RH2PO4DmndLitrHeterPrev => micflx%RH2PO4DmndLitrHeterPrev, &

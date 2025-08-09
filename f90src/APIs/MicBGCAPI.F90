@@ -125,6 +125,7 @@ implicit none
       call SOMRemovalByDisturbance(I,J,NY,NX)
     ENDDO D9990
   ENDDO D9995
+  
   RETURN
   END subroutine MicrobeModel
 
@@ -140,7 +141,7 @@ implicit none
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
   
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
-
+  
   call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag,nmicdiag)
   
   end subroutine Micbgc1Layer
@@ -383,8 +384,8 @@ implicit none
   micflx%RH1PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH1PO4DmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RH1PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL)    = RH1PO4DmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RO2DmndHetertPrev(1:NumHetetr1MicCmplx,1:KL)          = RO2DmndHetert_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RDOCUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)          = RDOCUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
-  micflx%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RAcetateUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micfor%RDOCUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)          = RDOCUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+  micfor%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:KL)      = RAcetateUptkHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RNO3ReduxDmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO3ReduxDmndSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RNO3ReduxDmndBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO3ReduxDmndBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO2DmndReduxSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
