@@ -157,7 +157,7 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,continue_run,visual_out,restart_out,&
+    NPXS,NPYS,continue_run,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
@@ -188,7 +188,6 @@ contains
   NCYC_SNOW             = 20
   grid_mode             = 3
   iErosionMode          = -1
-  visual_out            = .false.
   restart_out           = .false.
   do_budgets            = .false.
   plant_model           = .true.
@@ -326,7 +325,6 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts
-  use VisualMod,       only: visual
   use WthrMod,         only: wthr
   use RestartMod,      only: restFile
   use PlantInfoMod,    only: ReadPlantInfo

@@ -426,6 +426,7 @@ implicit none
   real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_vr(:,:)
+  real(r8),pointer   :: h2D_RootMassC_pvr(:,:)
   real(r8),pointer   :: h2D_RootMassN_vr(:,:)
   real(r8),pointer   :: h2D_RootMassP_vr(:,:)
   real(r8),pointer   :: h1D_TSolidOMActC_litr_col(:)  
@@ -917,7 +918,7 @@ implicit none
   allocate(this%h2D_RootMassC_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassC_vr(:,:)=spval
   allocate(this%h2D_RootMassN_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassN_vr(:,:)=spval
   allocate(this%h2D_RootMassP_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassP_vr(:,:)=spval
-
+  allocate(this%h2D_RootMassC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMassC_pvr(:,:)=spval
   allocate(this%h2D_DOC_vr(beg_col:end_col,1:JZ)); this%h2D_DOC_vr(:,:)=spval
   allocate(this%h2D_DON_vr(beg_col:end_col,1:JZ)); this%h2D_DON_vr(:,:)=spval
   allocate(this%h2D_DOP_vr(beg_col:end_col,1:JZ)); this%h2D_DOP_vr(:,:)=spval
@@ -1702,7 +1703,7 @@ implicit none
   data1d_ptr => this%h1D_WTR_TBL_col(beg_col:end_col)      
   call hist_addfld1d(fname='WTR_TBL_col',units='m',avgflag='A',&
     long_name='internal water table depth (<0 below soil surface)',&
-    ptr_col=data1d_ptr,default='inactive')            
+    ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_N2O_SEMIS_FLX_col(beg_col:end_col)      
   call hist_addfld1d(fname='N2O_SEMIS_FLX_col',units='gN/m2/hr',&
@@ -2607,6 +2608,10 @@ implicit none
   data2d_ptr =>  this%h2D_RootMassC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RootC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Root C density profile',ptr_col=data2d_ptr)       
+
+  data2d_ptr =>  this%h2D_RootMassC_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootC_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Root C density profile of different pft',ptr_patch=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_RootMassN_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RootN_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
@@ -3907,6 +3912,7 @@ implicit none
         ENDDO  
 
         DO L=1,JZ
+          this%h2D_RootMassC_pvr(nptc,L) = RootMassElm_pvr(ielmc,L,NZ,NY,NX)
           this%h2D_RootNutupk_fClim_pvr(nptc,L) = Nutruptk_fClim_rpvr(ipltroot,L,NZ,NY,NX)                      
           this%h2D_RootNutupk_fNlim_pvr(nptc,L) = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)                      
           this%h2D_RootNutupk_fPlim_pvr(nptc,L) = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)                      
