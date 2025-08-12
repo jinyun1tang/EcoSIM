@@ -190,18 +190,13 @@ implicit none
 
     !testing canopy height
     CanopyHeight_col(NY,NX) = 17.0
-    call PlantCanopyRadsModel(I,J,NY,NX,0.0)
+    call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
 
   ENDDO
 
   !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s"
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
-
-  !call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
-  !call SetCanopyProfile(I,J,LeafAreaZsec_lpft, StemAreaZsec_lpft)
-
-  !call PlantCanopyRadsModel(I,J,NY,NX,0.0)
 
   call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 

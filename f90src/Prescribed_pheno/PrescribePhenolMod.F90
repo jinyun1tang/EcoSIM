@@ -245,7 +245,8 @@ implicit none
   timwt(2) = 1._r8-timwt(1)
 
   !write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon
-
+  write(*,*) "interpolating between month: ", months(1), " to ", months(2)
+  write(*,*) "interp between lai(1): ", tlai_mon_pft(months(1),NZ,1,1), " lai(2) ", tlai_mon_pft(months(2),NZ,1,1)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !==========================================

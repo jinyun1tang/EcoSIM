@@ -454,6 +454,7 @@ module SurfaceRadiationMod
       FracPARads2Canopy_pft(NZ)=0.0_r8
     ENDDO D146
   ENDIF
+  write(*,*) "(SurfaceRadiation) FracSWRad2Grnd_col: ", FracSWRad2Grnd_col
   if(I==6.and.J==22.and..false.)then
   write(456,*)'fpar',FracPARads2Canopy_pft(1)
   endif
