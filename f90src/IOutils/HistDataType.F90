@@ -520,8 +520,8 @@ implicit none
   real(r8),pointer   :: h2D_HeatUptk_vr(:,:)   
   real(r8),pointer   :: h2D_HeatFlow_vr(:,:)   
   real(r8),pointer   :: h2D_VSPore_vr(:,:)
-  real(r8),pointer   :: h2D_VSM_vr(:,:)    
-  real(r8),pointer   :: h2D_VSICE_vr(:,:)   
+  real(r8),pointer   :: h2D_rVSM_vr(:,:)    
+  real(r8),pointer   :: h2D_rVSICE_vr(:,:)   
   real(r8),pointer   :: h2D_PSI_vr(:,:)        
   real(r8),pointer   :: h2D_PsiO_vr(:,:)
   real(r8),pointer   :: h2D_cNH4t_vr(:,:)                                                     
@@ -1042,9 +1042,9 @@ implicit none
 
   allocate(this%h2D_HeatFlow_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatFlow_vr(:,:)=spval
   allocate(this%h2D_HeatUptk_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatUptk_vr(:,:)=spval
-  allocate(this%h2D_VSM_vr    (beg_col:end_col,1:JZ))     ;this%h2D_VSM_vr    (:,:)=spval
+  allocate(this%h2D_rVSM_vr    (beg_col:end_col,1:JZ))     ;this%h2D_rVSM_vr    (:,:)=spval
   allocate(this%h2D_VSPore_vr (beg_col:end_col,1:JZ))     ;this%h2D_VSPore_vr (:,:)=spval
-  allocate(this%h2D_VSICE_vr    (beg_col:end_col,1:JZ))       ;this%h2D_VSICE_vr    (:,:)=spval
+  allocate(this%h2D_rVSICE_vr    (beg_col:end_col,1:JZ))       ;this%h2D_rVSICE_vr    (:,:)=spval
   allocate(this%h2D_PSI_vr(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr(:,:)=spval
   allocate(this%h2D_PsiO_vr(beg_col:end_col,1:JZ)) ; this%h2D_PsiO_vr(:,:)=spval
   allocate(this%h2D_RootH2OUP_vr(beg_col:end_col,1:JZ))  ;this%h2D_RootH2OUP_vr(:,:)=spval
@@ -1818,12 +1818,12 @@ implicit none
   
   data1d_ptr => this%h1D_dCAN_GPP_CLIM_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='dCAN_GPP_CLIM_pft',units='gC/m2/hr',avgflag='A',&
-    long_name='Plant canopy CO2-limited gross CO2 fixation minus acutal value',ptr_patch=data1d_ptr,&
+    long_name='Plant canopy CO2-limited gross CO2 fixation minus acutal value (>0 light-limitation)',ptr_patch=data1d_ptr,&
     default='inactive')      
 
   data1d_ptr => this%h1D_dCAN_GPP_eLIM_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='dCAN_GPP_eLIM_pft',units='gC/m2/hr',avgflag='A',&
-    long_name='Plant canopy light-limited gross CO2 fixation minus actual value',ptr_patch=data1d_ptr,&
+    long_name='Plant canopy light-limited gross CO2 fixation minus actual value (>0 C-limitation)',ptr_patch=data1d_ptr,&
     default='inactive')      
 
   data1d_ptr => this%h1D_CAN_RA_ptc(beg_ptc:end_ptc)    
@@ -2897,43 +2897,43 @@ implicit none
       ptr_col=data2d_ptr,default='inactive')       
   ENDDO
 
-  DO jj=1,micpar%FG_guidls_heter(micpar%mid_Aerob_HeteroBacter)
+  DO jj=1,micpar%FG_guilds_heter(micpar%mid_Aerob_HeteroBacter)
 
   enddo
 
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Aerob_Fungi)   
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_Aerob_Fungi)   
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Facult_DenitBacter) 
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_Facult_DenitBacter) 
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_aerob_N2Fixer)  
-
-  ENDDO
-
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_Anaerob_N2Fixer) 
-  ENDDO
-
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_fermentor)
-  ENDDO
-
-  DO JJ=1,micpar%FG_guidls_heter(micpar%mid_AcetoMethanogArchea) 
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_aerob_N2Fixer)  
 
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_H2GenoMethanogArchea)  
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_Anaerob_N2Fixer) 
+  ENDDO
+
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_fermentor)
+  ENDDO
+
+  DO JJ=1,micpar%FG_guilds_heter(micpar%mid_AcetoMethanogArchea) 
 
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_AmmoniaOxidBacter)  
+  DO JJ=1,micpar%FG_guilds_autor(micpar%mid_H2GenoMethanogArchea)  
 
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_NitriteOxidBacter)  
+  DO JJ=1,micpar%FG_guilds_autor(micpar%mid_AmmoniaOxidBacter)  
 
   ENDDO
 
-  DO JJ=1,micpar%FG_guidls_autor(micpar%mid_AerobicMethanotrofBacter)
+  DO JJ=1,micpar%FG_guilds_autor(micpar%mid_NitriteOxidBacter)  
+
+  ENDDO
+
+  DO JJ=1,micpar%FG_guilds_autor(micpar%mid_AerobicMethanotrofBacter)
   
   ENDDO
 
@@ -3055,11 +3055,11 @@ implicit none
   call hist_addfld2d(fname='VSPore_vr',units='m3 pore/m3 soil',type2d='levsoi',avgflag='A',&
     long_name='Volumetric soil porosity',ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr => this%h2D_VSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
+  data2d_ptr => this%h2D_rVSM_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
   call hist_addfld2d(fname='rWatFLP_vr',units='m3 H2O/m3 soil pore',type2d='levsoi',avgflag='A',&
     long_name='Fraction of soil porosity filled by water (relative saturation)',ptr_col=data2d_ptr)       
 
-  data2d_ptr => this%h2D_VSICE_vr(beg_col:end_col,1:JZ)        
+  data2d_ptr => this%h2D_rVSICE_vr(beg_col:end_col,1:JZ)        
   call hist_addfld2d(fname='rIceFLP_vr',units='m3 ice/m3 soil pore',type2d='levsoi',avgflag='A',&
     long_name='fraction of soil porosity filled by ice',ptr_col=data2d_ptr,default='inactive')       
 
@@ -3597,8 +3597,8 @@ implicit none
         this%h2D_HeatFlow_vr(ncol,L)        = THeatFlowCellSoil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)        = THeatLossRoot2Soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_VSPore_vr(ncol,L)          = POROS_vr(L,NY,NX)
-        this%h2D_VSM_vr    (ncol,L)         = ThetaH2OZ_vr(L,NY,NX)
-        this%h2D_VSICE_vr  (ncol,L)         = ThetaICEZ_vr(L,NY,NX)
+        this%h2D_rVSM_vr    (ncol,L)        = ThetaH2OZ_vr(L,NY,NX)
+        this%h2D_rVSICE_vr  (ncol,L)        = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_PsiO_vr(ncol,L)            = PSISoilOsmotic_vr(L,NY,NX)
         this%h2D_RootH2OUP_vr(ncol,L)       = TWaterPlantRoot2SoilPrev_vr(L,NY,NX)
@@ -3912,11 +3912,11 @@ implicit none
         ENDDO  
 
         DO L=1,JZ
-          this%h2D_RootMassC_pvr(nptc,L) = RootMassElm_pvr(ielmc,L,NZ,NY,NX)
-          this%h2D_RootNutupk_fClim_pvr(nptc,L) = Nutruptk_fClim_rpvr(ipltroot,L,NZ,NY,NX)                      
-          this%h2D_RootNutupk_fNlim_pvr(nptc,L) = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)                      
-          this%h2D_RootNutupk_fPlim_pvr(nptc,L) = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)                      
-          this%h2D_RootNutupk_fProtC_pvr(nptc,L)= Nutruptk_fProtC_rpvr(ipltroot,L,NZ,NY,NX)                     
+          this%h2D_RootMassC_pvr(nptc,L)         = RootMassElm_pvr(ielmc,L,NZ,NY,NX)
+          this%h2D_RootNutupk_fClim_pvr(nptc,L)  = Nutruptk_fClim_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_RootNutupk_fNlim_pvr(nptc,L)  = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_RootNutupk_fPlim_pvr(nptc,L)  = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_RootNutupk_fProtC_pvr(nptc,L) = Nutruptk_fProtC_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_O2_rootconduct_pvr(nptc,L)    = RootGasConductance_rpvr(idg_O2,ipltroot,L,NZ,NY,NX)
           this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootGasConductance_rpvr(idg_CO2,ipltroot,L,NZ,NY,NX)
           this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)

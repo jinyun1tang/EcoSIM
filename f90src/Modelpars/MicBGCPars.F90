@@ -41,8 +41,8 @@ implicit none
   real(r8), pointer :: CPRH(:)                     !default P:C ratios in SOC complexes, [gN gC-1]
   real(r8), pointer :: OMCF(:)                     !heterotrophic microbial biomass composition in SOC, [gC gC-1]
   real(r8), pointer :: OMCA(:)                     !autotrophic microbial biomass composition in SOC, [gC gC-1]
-  integer  :: FG_guidls_heter(NumMicbFunGrupsPerCmplx)  !# of guilds
-  integer  :: FG_guidls_autor(NumMicbFunGrupsPerCmplx)  !# of guilds
+  integer  :: FG_guilds_heter(NumMicbFunGrupsPerCmplx)  !# of guilds
+  integer  :: FG_guilds_autor(NumMicbFunGrupsPerCmplx)  !# of guilds
 
   !terminate  [label for variable parsing]
   integer :: jcplx   !# of microbe-substrate complexes
@@ -191,18 +191,20 @@ contains
   this%mid_AerobicMethanotrofBacter = 3
   this%mid_H2GenoMethanogArchea     = 5
 
-  this%FG_guidls_heter(this%mid_Aerob_HeteroBacter)  = NumGuild_Heter_Aerob_Bact
-  this%FG_guidls_heter(this%mid_Aerob_Fungi)         = NumGuild_Heter_Aerob_Fung
-  this%FG_guidls_heter(this%mid_Facult_DenitBacter)  = NumGuild_Heter_Facul_Dent
-  this%FG_guidls_heter(this%mid_aerob_N2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
-  this%FG_guidls_heter(this%mid_Anaerob_N2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
-  this%FG_guidls_heter(this%mid_fermentor)           = NumGuild_Heter_Anaer_Fermentor
-  this%FG_guidls_heter(this%mid_AcetoMethanogArchea) = NumGuild_Heter_AcetoMethanogen
+  this%FG_guilds_heter = 0
+  this%FG_guilds_autor = 0
+  this%FG_guilds_heter(this%mid_Aerob_HeteroBacter)  = NumGuild_Heter_Aerob_Bact
+  this%FG_guilds_heter(this%mid_Aerob_Fungi)         = NumGuild_Heter_Aerob_Fung
+  this%FG_guilds_heter(this%mid_Facult_DenitBacter)  = NumGuild_Heter_Facul_Dent
+  this%FG_guilds_heter(this%mid_aerob_N2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
+  this%FG_guilds_heter(this%mid_Anaerob_N2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
+  this%FG_guilds_heter(this%mid_fermentor)           = NumGuild_Heter_Anaer_Fermentor
+  this%FG_guilds_heter(this%mid_AcetoMethanogArchea) = NumGuild_Heter_AcetoMethanogen
 
-  this%FG_guidls_autor(this%mid_H2GenoMethanogArchea)     = NumGuild_Autor_H2genMethanogen
-  this%FG_guidls_autor(this%mid_AmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
-  this%FG_guidls_autor(this%mid_NitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
-  this%FG_guidls_autor(this%mid_AerobicMethanotrofBacter) = NumGuild_Autor_AerobMethOxid
+  this%FG_guilds_autor(this%mid_H2GenoMethanogArchea)     = NumGuild_Autor_H2genMethanogen
+  this%FG_guilds_autor(this%mid_AmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
+  this%FG_guilds_autor(this%mid_NitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
+  this%FG_guilds_autor(this%mid_AerobicMethanotrofBacter) = NumGuild_Autor_AerobMethOxid
 
   call this%Initallocate()
 
@@ -402,8 +404,8 @@ contains
   do N=1,NumMicbFunGrupsPerCmplx
     this%JGniH(n)                = kh
     this%JGniA(n)                = ka
-    kh                           = kh+this%FG_guidls_heter(N)
-    ka                           = ka+this%FG_guidls_autor(N)
+    kh                           = kh+this%FG_guilds_heter(N)
+    ka                           = ka+this%FG_guilds_autor(N)
     this%JGnfH(n)                = kh-1
     this%JGnfA(n)                = ka-1
     if(this%JGnfA(n)>=this%JGniA(n))then

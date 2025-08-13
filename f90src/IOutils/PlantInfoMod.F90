@@ -47,7 +47,7 @@ implicit none
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
   if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(yearc,yeari,NHW,NHE,NVN,NVS)
+  CALL ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
@@ -416,8 +416,7 @@ implicit none
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-!    write(101,*)'NZ=',NZ,DATAP(NZ,NY,NX)
-!    call ReadPlantTraitsNC(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
+
     call SetPlantTraits(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
@@ -617,7 +616,7 @@ implicit none
   character(len=64):: koppen_climl
   character(len=3) :: koppen_clims
   integer :: loc,N
-
+  
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
 
   iPlantPhotosynthesisType(NZ,NY,NX)  = iPlantPhotosynthesisType_tab(loc)
@@ -775,7 +774,7 @@ implicit none
 !   PlantInitThermoAdaptZone_pft=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
-  write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
+  write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
   call writefixsl(nu_plt,'Plant name ',pft_lname,40)
   strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,40)
@@ -1149,43 +1148,6 @@ implicit none
   call writefixl(nu_plt,'leaf SW transmission TAUR',RadSWLeafTransmis_pft(NZ,NY,NX),50)
   call writefixl(nu_plt,'leaf PAR transmission TAUP',RadPARLeafTransmis_pft(NZ,NY,NX),50)
   end subroutine plant_optic_trait_disp
-!------------------------------------------------------------------------------------------
-
-  SUBROUTINE routq(yearc,yeari,NHW,NHE,NVN,NVS)
-!
-!     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
-!     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
-!
-      use data_kind_mod, only : r8 => DAT_KIND_R8
-  implicit none
-  integer, intent(in) :: yearc,yeari
-  integer, intent(in) :: NHW,NHE,NVN,NVS
-
-  CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
-  CHARACTER(len=4) :: CHARY
-  integer :: IDATE,NY,NX,NZ
-
-! begin_execution
-!
-! OPEN CHECKPOINT FILES FOR PLANT VARIABLES
-!
-  IF(is_first_year)THEN
-    D9999: DO NX=NHW,NHE
-      DO  NY=NVN,NVS
-        DO NZ=1,JP
-          iDayPlanting_pft(NZ,NY,NX)      = -1E+06
-          iYearPlanting_pft(NZ,NY,NX)     = -1E+06
-          iDayPlantHarvest_pft(NZ,NY,NX)  = 1E+06
-          iYearPlantHarvest_pft(NZ,NY,NX) = 1E+06
-        enddo
-      enddo
-    ENDDO D9999
-
-  ENDIF
-  if(lverb)write(*,*)'ReadPlantInfoNC'
-  call ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
-
-  END subroutine routq
 
 
 !------------------------------------------------------------------------------------------
@@ -1209,8 +1171,23 @@ implicit none
   logical :: readvar
   integer :: pft_dflag
   integer :: iyear,year
-  integer :: ret
+  integer :: ret,kk
+  character(len=1) :: cc
   character(len=10) :: pft_gtype(JP)
+
+  IF(is_first_year)THEN
+    D9999: DO NX=NHW,NHE
+      DO  NY=NVN,NVS
+        DO NZ=1,JP
+          iDayPlanting_pft(NZ,NY,NX)      = -1E+06
+          iYearPlanting_pft(NZ,NY,NX)     = -1E+06
+          iDayPlantHarvest_pft(NZ,NY,NX)  = 1E+06
+          iYearPlantHarvest_pft(NZ,NY,NX) = 1E+06
+        enddo
+      enddo
+    ENDDO D9999
+
+  ENDIF
 
   if (len_trim(pft_mgmt_in)==0)then
    !no plant management info to read
@@ -1297,10 +1274,15 @@ implicit none
                 IF(KoppenClimZone_col(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone_col(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
-                  DATAX_pft(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
-                !consider cases when koppen climate zone is zero  
+                  DATAX_pft(NZ)=trim(pft_gtype(NZ)(1:4)//CLIMATE)                  
+                  !consider cases when koppen climate zone is zero  
                 elseif(KoppenClimZone_col(NY,NX)==0)then
-                  DATAX_pft(NZ)=pft_gtype(NZ)
+                  DATAX_pft(NZ)=''
+                  DO kk=1,10
+                    cc=pft_gtype(NZ)(kk:kk)
+                    if(ichar(cc)==0)exit
+                    DATAX_pft(NZ)(kk:kk)=cc
+                  ENDDO
                 ENDIF
               ENDDO D4965
               if(first_pft)then
@@ -1330,134 +1312,6 @@ implicit none
     call ncd_pio_closefile(pftinfo_nfid)
   endif
   end subroutine ReadPlantInfoNC
-
-!------------------------------------------------------------------------------------------
-
-  subroutine read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-  implicit none
-  integer, intent(in) :: NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS
-  integer :: NY,NX,NZ,NN
-  integer :: IDATE,IYR
-  integer :: NPP(JY,JX)
-  CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
-
-  NPP =0
-
-  REWIND(30)
-
-8000  CONTINUE
-
-!  recover DATAZ from checkpoint file, read year by year
-  D9995: DO NX=NHW,NHE
-    D9990: DO NY=NVN,NVS
-! read one line
-      READ(30,90,END=1002)IDATE,IYR,NPP(NY,NX) &
-        ,(DATAZ(NZ,NY,NX),IsPlantActive_pft(NZ,NY,NX),NZ=1,NPP(NY,NX))
-90        FORMAT(2I4,1I3,5(A16,I4))
-    ENDDO D9990
-  ENDDO D9995
-
-  IF(IDATE.LT.IDAYR.OR.IYR.LT.IYRR)THEN
-! mot reaching the recovery date, keep reading
-    GO TO 8000
-  ELSEIF(IDATE.GE.IDAYR.AND.IYR.EQ.IYRR)THEN
-!
-!       MATCH PREVIOUS AND CURRENT PLANT SPECIES
-! make of copy using pft information from the topographic unit just read in
-    D7975: DO NX=NHW,NHE
-      D7970: DO NY=NVN,NVS
-        D7965: DO NZ=1,NS
-          DATAA(NZ,NY,NX)=DATAX_pft(NZ)
-          DATAB(NZ,NY,NX)=DATAY(NZ)
-        ENDDO D7965
-      ENDDO D7970
-    ENDDO D7975
-
-    D7995: DO NX=NH1,NH2
-      D7990: DO NY=NV1,NV2
-        NP_col(NY,NX)=MAX(NS,NPP(NY,NX))
-        D195: DO NN=1,NP_col(NY,NX)
-          DATAP(NN,NY,NX)='NO'
-          DATAM(NN,NY,NX)='NO'
-        ENDDO D195
-! assign the values fo active pft from the record
-        IF(NPP(NY,NX).GT.0)THEN
-! the check point file has non-zero pft
-          D200: DO NN=1,NPP(NY,NX)
-            D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX_pft(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
-                DATAP(NN,NY,NX)=DATAX_pft(NZ)
-                DATAM(NN,NY,NX)=DATAY(NZ)
-                DATAA(NZ,NY,NX)='NO'
-                DATAB(NZ,NY,NX)='NO'
-              ENDIF
-            ENDDO D205
-          ENDDO D200
-!
-!             ADD NEW PLANT SPECIES
-!
-          D250: DO NN=1,NP_col(NY,NX)
-            IF(DATAP(NN,NY,NX).EQ.'NO')THEN
-              D255: DO NZ=1,NS
-                IF(DATAA(NZ,NY,NX).NE.'NO')THEN
-                  DATAP(NN,NY,NX)=DATAA(NZ,NY,NX)
-                  DATAM(NN,NY,NX)=DATAB(NZ,NY,NX)
-                  DATAA(NZ,NY,NX)='NO'
-                  DATAB(NZ,NY,NX)='NO'
-                  EXIT
-                ENDIF
-              ENDDO D255
-            ENDIF
-          ENDDO D250
-
-          D201: DO NZ=NP_col(NY,NX)+1,JP
-            DATAP(NZ,NY,NX)='NO'
-            DATAM(NZ,NY,NX)='NO'
-          ENDDO D201
-        ELSE
-
-! assign using information from pft files
-          D265: DO NZ=1,NS
-            DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-            DATAM(NZ,NY,NX)=DATAY(NZ)
-          ENDDO D265
-          D270: DO NZ=NS+1,JP
-            DATAP(NZ,NY,NX)='NO'
-            DATAM(NZ,NY,NX)='NO'
-          ENDDO D270
-        ENDIF
-!
-!           SET NUMBER OF PLANT SPECIES
-!
-        NN=JP
-        D202: DO NZ=JP,1,-1
-          IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
-            NN=NN-1
-          ELSE
-            EXIT
-          ENDIF
-        ENDDO D202
-        NP_col(NY,NX)=NN
-        NP0_col(NY,NX)=NN
-      ENDDO D7990
-    ENDDO D7995
-  ENDIF
-1002 continue
-  D6995: DO NX=NHW,NHE
-    D6990: DO NY=NVN,NVS
-      NP_col(NY,NX)=NS
-      D300: DO NZ=1,NP_col(NY,NX)
-        DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-        DATAM(NZ,NY,NX)=DATAY(NZ)
-      ENDDO D300
-      D301: DO NZ=NP_col(NY,NX)+1,JP
-        DATAP(NZ,NY,NX)='NO'
-        DATAM(NZ,NY,NX)='NO'
-      ENDDO D301
-    ENDDO D6990
-  ENDDO D6995
-
-  end subroutine read_checkpt
 
 !------------------------------------------------------------------------------------------
 

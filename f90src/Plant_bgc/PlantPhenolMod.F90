@@ -34,11 +34,11 @@ module PlantPhenolMod
   real(r8), parameter :: PSIMin4LeafOff(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)  !minimum leaf water potential of leave off, [h]
   integer , parameter :: BranchNumMax(0:3)=(/5,1,1,1/)                           !maximum branch number
 
-  public :: hfuncs
+  public :: PhenologyUpdate
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
-  subroutine hfuncs(I,J)
+  subroutine PhenologyUpdate(I,J)
 !
 !     THIS subroutine CALCULATES PLANT PHENOLOGY
 !
@@ -101,7 +101,7 @@ module PlantPhenolMod
   ENDDO D9985
   RETURN
   end associate
-  END subroutine hfuncs
+  END subroutine PhenologyUpdate
 
 !----------------------------------------------------------------------------------------------------
   subroutine Emerged_plant_Phenology(I,J,NZ)
