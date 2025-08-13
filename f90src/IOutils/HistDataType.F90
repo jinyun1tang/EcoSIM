@@ -6,8 +6,8 @@ module HistDataType
   use data_const_mod,   only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
   use SoilBGCNLayMod,   only: SumMicbGroup, sumDOML, sumMicBiomLayL,SumSolidOML
   use UnitMod,          only: units
-  use MiniMathMod,      only: safe_adb,     AZMAX1
-  use EcoSiMParDataMod, only: pltpar,       micpar
+  use MiniMathMod,      only: safe_adb, AZMAX1,AZERO
+  use EcoSiMParDataMod, only: pltpar, micpar
   use DebugToolMod,     only: DebugPrint
   use MicrobialDataType
   use CanopyRadDataType
@@ -3731,9 +3731,8 @@ implicit none
         this%h1D_SHOOT_NONSTP_ptc(nptc) = CanopyNonstElms_pft(ielmp,NZ,NY,NX)
 
         if(CO2FixLL_pft(NZ,NY,NX)/=spval .and. CO2FixCL_pft(NZ,NY,NX)/=spval)then
-          this%h1D_dCAN_GPP_CLIM_ptc(nptc) = (CO2FixCL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-          this%h1D_dCAN_GPP_eLIM_ptc(nptc) = (CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-!          if(CO2FixLL_pft(NZ,NY,NX)>1.e-8_r8)this%h1D_CFIX_lmtf_ptc(nptc)  = CO2FixCL_pft(NZ,NY,NX)/CO2FixLL_pft(NZ,NY,NX)
+          this%h1D_dCAN_GPP_CLIM_ptc(nptc) = AZERO(CO2FixCL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          this%h1D_dCAN_GPP_eLIM_ptc(nptc) = AZERO(CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         endif
 
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin_pft(NZ,NY,NX)
