@@ -1133,7 +1133,7 @@ module WatsubMod
   call PrintInfo('beg '//subname)
 ! IDWaterTable=water table flag
 
-  RechargRate=Recharg2WTBLScal*dts_HeatWatTP/RechargDist2WTBL
+  RechargRate=Recharg2WTBLScal*dts_HeatWatTP*RechargDist2WTBL
   !involve no water table or in vertical direction
   THETA1 = AMAX1(SoilWatAirDry_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
   K1     = MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(N3,N2,N1)-THETA1)/POROS_vr(N3,N2,N1))+1))
@@ -1147,12 +1147,12 @@ module WatsubMod
   HydCondSoil_3D(N,N3,N2,N1) = HydcondSrc
 
   !x-section area scaled hydraulic gradient, HydGrad > 0, when XN=-1, ES; HydGrad < 0, when XN=1, WN
-  hydGrad=XN*mGravAccelerat*(-ABS(SLOPE_col(N,N2,N1)))*AREA_3D(3,N3,N2,N1)
+  HydGrad=XN*mGravAccelerat*(-ABS(SLOPE_col(N,N2,N1)))*AREA_3D(3,N3,N2,N1)
 
   WaterFlow2Micpt_3D(N,M6,M5,M4)=AZERO(RechargRate*AMIN1(VLWatMicP1_vr(N3,N2,N1)*dts_wat, HydGrad*HydcondSrc))
 
   WaterFlow2MicptX_3D(N,M6,M5,M4) = WaterFlow2Micpt_3D(N,M6,M5,M4)  
-  WaterFlow2Macpt_3D(N,M6,M5,M4)  = AZERO(RechargRate*AMIN1(VLWatMacP1_vr(N3,N2,N1)*dts_wat,hydGrad*HydroCondMacP1_vr(N3,N2,N1))) 
+  WaterFlow2Macpt_3D(N,M6,M5,M4)  = AZERO(RechargRate*AMIN1(VLWatMacP1_vr(N3,N2,N1)*dts_wat,HydGrad*HydroCondMacP1_vr(N3,N2,N1))) 
     
   watflx                        = WaterFlow2Micpt_3D(N,M6,M5,M4)+WaterFlow2Macpt_3D(N,M6,M5,M4)
   heatflx                       = cpw*TKSoil1_vr(N3,N2,N1)*watflx
