@@ -14,6 +14,7 @@ module PlantBGCPars
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]  
   real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to petiole, [-]
+!
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
   real(r8) :: RSpecLiterFall                      !rate constant for LitrFall at end of growing season, [h-1]
   real(r8) :: Hours4PhyslMature                   !number of hours with no grain filling required for physilogical maturity, [h]
@@ -79,7 +80,7 @@ module PlantBGCPars
   real(r8) :: CCNGR                               !parameter to calculate nonstructural C,N,P exchange,[-]
   real(r8) :: CCNGB                               !parameter to calculate nonstructural C,N,P exchange, [-]
   real(r8) :: NodulBiomCAtInfection               !initial bacterial mass at infection, [gC]
-  real(r8) :: CZKM                                !Km for nonstructural Nuptake by bacteria, [gN] 
+  real(r8) :: CZKM                                !Km for nonstructural Nuptake by bacteria, [gN]
   real(r8) :: CPKM                                !Km for nonstructural P uptake by bacteria, [gP]
   real(r8) :: RCCZR                               !minimum fractions for root C recycling,[-]
   real(r8) :: RCCYR                               !maximum fractions for root C recycling,[-]
@@ -139,7 +140,7 @@ module PlantBGCPars
   integer :: NumLeafZenithSectors1     !number of sectors for the leaf zenith [0,pi/2]
   integer :: MaxNodesPerBranch1          !maximum number of canopy nodes, 25
   integer :: jsken                       !number of kinetic components in litter
-  integer :: NumLitterGroups             !number of litter groups nonstructural(0,*)                         
+  integer :: NumLitterGroups             !number of litter groups nonstructural(0,*)
   integer :: NumOfPlantMorphUnits        !number of plant organs
   integer :: NumOfPlantLitrCmplxs        !number of plant litter microbial-om complexes
   integer :: iprotein                    !kinetic id of litter component as protein
@@ -164,7 +165,7 @@ module PlantBGCPars
   integer :: npft,nkopenclms,npfts_tab
 
   call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  
+
   NumGrowthStages = pltpar%NumGrowthStages
   MaxNumRootAxes  = pltpar%MaxNumRootAxes
 
@@ -174,7 +175,7 @@ module PlantBGCPars
 
 !----------------------------------------------------------------------------------------------------
   subroutine InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid
+  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid,ats_cpl_mode
   use abortutils, only : endrun
   use fileUtil, only : file_exists
   use ncdio_pio
@@ -184,7 +185,7 @@ module PlantBGCPars
   integer, intent(out) :: nkopenclms  !
   integer, intent(out) :: npfts_tab   !total pft records, pft_short name + numerical koppen climate code
 
-  if (len_trim(pft_file_in) == 0)then
+  if (len_trim(pft_file_in) == 0 .or. ats_cpl_mode)then
     write(*,*) "Setting PFTs to one"
     npfts_tab=1
   else
@@ -196,7 +197,7 @@ module PlantBGCPars
       npft       = get_dim_len(pft_file_in, 'npft')
       nkopenclms = get_dim_len(pft_file_in,'nkopenclms')
     endif
-  endif  
+  endif
   pltpar%inonstruct = 0
   pltpar%ifoliar    = 1
   pltpar%inonfoliar = 2
@@ -309,7 +310,7 @@ module PlantBGCPars
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
   Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
   HourReq2InitSStor4LeafOut=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
-  
+
   end subroutine InitVegPars
 
 end module PlantBGCPars
