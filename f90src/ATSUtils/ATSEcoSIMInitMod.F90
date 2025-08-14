@@ -26,7 +26,10 @@ implicit none
   subroutine Init_EcoSIM_Soil(NYS)
   use EcoSimConst
   use GridMod           , only : SetMeshATS
-  use InitAllocMod
+  !use InitAllocMod
+  use InitEcoSIM
+  use UptakesMod
+  use PlantBGCPars
   use StartsMod, only : startsim, set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
@@ -43,7 +46,7 @@ implicit none
   !That ecosim needs to recognize that it is running in coupled mode
   !with ATS and to turn off features unsupported in the coupler
   ATS_cpl_mode=.true.
-  plant_model=.false.
+  plant_model=.true.
   microbial_model=.false.
   soichem_model=.false.
   snowRedist_model=.false.
@@ -54,9 +57,12 @@ implicit none
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(30, 10, 20, 20)
-  call InitAlloc(NOMicrobeGuilds=1)
+  call InitModules(NOMicrobeGuilds=1)
+  !call InitAlloc(NOMicrobeGuilds=1)
+  !call InitUptake
+  !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
 
-  !setting a few variables 
+  !setting a few variables
   FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays_col   = 1 !Is the number of layers down the roots go
   NX               = 1
@@ -65,7 +71,7 @@ implicit none
   TFLWT  = 0.0_r8
   VOLPT  = 0.0_r8
   VOLTT  = 0.0_r8
- 
+
   do NY=1,NYS
     TXCO2(NY,NX)            = 0.0_r8
     DORGE(NY,NX)            = 0.0_r8
@@ -91,7 +97,7 @@ implicit none
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
-    
+
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
     !Need to check if litter area is set or not
@@ -99,7 +105,7 @@ implicit none
       VGeomLayer_vr(0,NY,NX) = 0.1
     endif
     POROS0_col(NY,NX) = 0.5
-    
+
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
@@ -113,7 +119,7 @@ implicit none
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
-      
+
       DH_col(NY,NX) = 1.0
       DV_col(NY,NX) = 1.0
 

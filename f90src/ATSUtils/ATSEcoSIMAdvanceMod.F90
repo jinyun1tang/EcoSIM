@@ -230,8 +230,7 @@ implicit none
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
 
-  !write(*,*) "After SnowMassUpdate computation of Qinfl2MicP: "
-  ! Check for NaN in surf_w_source
+  call PlantModel(I,J,NHW,NHE,NVN,NVS)
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var

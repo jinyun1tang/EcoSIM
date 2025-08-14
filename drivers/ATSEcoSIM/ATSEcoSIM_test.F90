@@ -7,7 +7,7 @@ program EcoATSTest
   use EcoSIMCtrlMod, only: etimer
   !use ecosim_Time_Mod  , only : ecosim_time_type
   implicit none
-  
+
   ! Declare variables
   type (BGCState) :: state
   type (BGCProperties) :: props
@@ -16,14 +16,13 @@ program EcoATSTest
   integer :: ncells_per_col_, ncol
   !real, dimension(6) :: rain_array
   real, dimension(6) :: rain_array = (/1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3/)
- 
-  !rain_array = 1.6e-5
 
+  !rain_array = 1.6e-5
   NX = 1
   NYS = 1
   ncells_per_col_ = 100
   ncol = 1
-  
+
   ! Initialize sizes structure
   sizes%num_components = 1
   sizes%ncells_per_col_ = 100
@@ -53,7 +52,7 @@ subroutine Init_ATSEcoSIM_driver()
   use SharedDataMod
   use GridDataType
   implicit none
-  
+
   ! Declare variables
   type (BGCState) :: state
   type (BGCProperties) :: props
@@ -87,7 +86,7 @@ subroutine Init_ATSEcoSIM_driver()
   dofmon = 15
   kmo = 3
 
-  write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon 
+  write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon
 
   ! needed in starts
   !pressure_at_field_capacity = 0.001
@@ -151,7 +150,7 @@ subroutine Init_ATSEcoSIM_driver()
     p_rain(NY) = 0.0
     p_snow(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
-    
+
     vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
 
@@ -161,4 +160,3 @@ subroutine Init_ATSEcoSIM_driver()
   enddo
 
 end subroutine Init_ATSEcoSIM_driver
-
