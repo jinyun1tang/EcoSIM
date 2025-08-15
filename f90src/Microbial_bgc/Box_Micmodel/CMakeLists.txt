@@ -1,7 +1,7 @@
 set(BOX_MODEL_SOURCES
   MicrobMathFuncMod.F90
-  MicAutoCPLXMod.F90
-  MicBGCMod.F90
+  MicAutoCplxFGMod.F90
+  MicBGCFGMod.F90
   MicFluxTypeMod.F90
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90

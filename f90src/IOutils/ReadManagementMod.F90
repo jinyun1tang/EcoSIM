@@ -192,8 +192,8 @@ implicit none
         IIRRA(4,NY,NX) = INT(IHRE/100)
         FIRRA_col(NY,NX)   = FIRRX
         CIRRA_col(NY,NX)   = CIRRX
-        DIRRA(1,NY,NX) = DIRRX
-        DIRRA(2,NY,NX) = WDPTHI
+        DIRRA(1,NY,NX) = DIRRX    !depth
+        DIRRA(2,NY,NX) = WDPTHI   !width
         D220: DO I     = 1, 366
           PHQ(IDY,NY,NX)                                    = PHQX
           NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8

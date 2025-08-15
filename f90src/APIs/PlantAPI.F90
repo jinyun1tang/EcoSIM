@@ -332,7 +332,9 @@ implicit none
       RootN2Fix_pvr(L,NZ,NY,NX)                              = plt_bgcr%RootN2Fix_pvr(L,NZ)
       fTgrowRootP_vr(L,NZ,NY,NX)                             = plt_pheno%fTgrowRootP_vr(L,NZ)
       RootN2Fix_vr(L,NY,NX)                                  = RootN2Fix_vr(L,NY,NX)+RootN2Fix_pvr(L,NZ,NY,NX)
- 
+      DO NE=1,NumPlantChemElms
+        RootMassElm_pvr(NE,L,NZ,NY,NX)                       = plt_biom%RootMassElm_pvr(NE,L,NZ)
+      ENDDO
     ENDDO
     DO L=1,NumCanopyLayers
       CanopyLeafAreaZ_pft(L,NZ,NY,NX) = plt_morph%CanopyLeafAreaZ_pft(L,NZ)

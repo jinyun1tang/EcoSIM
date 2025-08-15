@@ -1593,7 +1593,7 @@ implicit none
   trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3,3,0,NY,NX) &
     -solute_adv_Lit2Soil_flxM(idg_NH3B)-trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
 
-  trcs_MicpTranspFlxM_3D(idg_NH3,3,NU_col(NY,NX),NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3,3,NU_col(NY,NX),NY,NX) &
+  trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX) &
     +solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
 
   Gas_litr2Soil_flxM_col(idg_NH3B,NY,NX)= solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
