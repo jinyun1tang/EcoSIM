@@ -2278,9 +2278,9 @@ module WatsubMod
     heatflx                = cpw*TKSoil1_vr(N3,N2,N1)*watflx
 
     if(N3==M6 .and. N2==M5 .and. N1==M4)then
-      QDischarg2WTBL_col(N2,N1)    = QDischarg2WTBL_col(N2,N1)-watflx
-      QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
-      HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
+      QDischarg2WTBL_col(N2,N1) = QDischarg2WTBL_col(N2,N1)-watflx
+      QDischarM_col(N2,N1)      = QDischarM_col(N2,N1)-watflx
+      HeatDischar_col(N2,N1)    = HeatDischar_col(N2,N1)-heatflx
     else
       QDischarg2WTBL_col(N2,N1)    = QDischarg2WTBL_col(N2,N1)+watflx
       QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
@@ -2319,13 +2319,13 @@ module WatsubMod
     AirfMacP                       = AirfMacP-XN*watflx
 
     if(N3==M6 .and. N2==M5 .and. N1==M4)then
-      QDischarg2WTBL_col(N2,N1)    = QDischarg2WTBL_col(N2,N1)-watflx
-      QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)-watflx
-      HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)-heatflx
+      QDischarg2WTBL_col(N2,N1) = QDischarg2WTBL_col(N2,N1)-watflx
+      QDischarM_col(N2,N1)      = QDischarM_col(N2,N1)-watflx
+      HeatDischar_col(N2,N1)    = HeatDischar_col(N2,N1)-heatflx
     else
-      QDischarg2WTBL_col(N2,N1)    = QDischarg2WTBL_col(N2,N1)+watflx
-      QDischarM_col(N2,N1)   = QDischarM_col(N2,N1)+watflx
-      HeatDischar_col(N2,N1) = HeatDischar_col(N2,N1)+heatflx
+      QDischarg2WTBL_col(N2,N1) = QDischarg2WTBL_col(N2,N1)+watflx
+      QDischarM_col(N2,N1)      = QDischarM_col(N2,N1)+watflx
+      HeatDischar_col(N2,N1)    = HeatDischar_col(N2,N1)+heatflx
     endif
   ENDIF
   call PrintInfo('end '//subname)    

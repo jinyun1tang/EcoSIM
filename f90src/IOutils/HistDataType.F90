@@ -1766,7 +1766,7 @@ implicit none
 
   data1d_ptr => this%h1D_QDISCHG_FLX_col(beg_col:end_col)   
   call hist_addfld1d(fname='QDischarge_FLX_col',units='mmH2O/m2/hr',avgflag='A',&
-    long_name='grid water discharge (>0 out of grid)',ptr_col=data1d_ptr)      
+    long_name='grid water lateral discharge with respect external water table (>0 out of grid)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_HeatDISCHG_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='HeatDischarge_FLX_col',units='MJ/m2/hr',avgflag='A',&

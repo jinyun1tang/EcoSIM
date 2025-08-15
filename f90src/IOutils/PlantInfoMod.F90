@@ -72,9 +72,12 @@ implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
   character(len=128) :: fnm_loc
+  logical :: pft_changed
 
 ! begin_execution
-  if(disp_planttrait)then
+  call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
+
+  if(disp_planttrait .and. pft_changed)then
     nu_plt=getavu()
     write(fnm_loc,'(A,I4,A)')'plant_trait.',etimer%get_curr_yearAD(),'.desc'
     call opnfil(fnm_loc,nu_plt,'f')    
@@ -88,15 +91,14 @@ implicit none
 !       each column has its own management
 !       PREFIX=path for files in current or higher level directory
 !       DATAP=PFT file name
-        call ReadPlantProperties(nu_plt,NZ,NY,NX)
+        call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
 
       ENDDO D9985
     ENDDO D9990
   ENDDO D9995
 
-  if(disp_planttrait)call relavu(nu_plt)
+  if(disp_planttrait .and. pft_changed)call relavu(nu_plt)
 
-  call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -327,14 +329,14 @@ implicit none
   end subroutine readplantmgmtinfo
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
   !
   !
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari   !forcing data year
   integer, intent(in) :: yearc   !current model year
-
+  logical, optional, intent(out):: pft_changed
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
   logical :: readvar
@@ -342,7 +344,9 @@ implicit none
   integer :: iyear     !data record year
   integer :: year      !year of the data
   integer :: ntopou,NY,NX,NZ
+  logical :: pft_changed_loc
 
+  pft_changed_loc=.false.
   if (len_trim(pft_mgmt_in)==0)return
   
   call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
@@ -355,11 +359,11 @@ implicit none
   !obtain the number of topographic units
   ntopou=get_dim_len(pftinfo_nfid, 'ntopou')    
   if(first_topou)ntopou=1
-
   
   if(pft_dflag==0)then
     if(lverb)write(iulog,*)'Constant pft data'
     if(IGO==0)then
+      pft_changed_loc=.true.
       iyear=1    
       call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
       call InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -369,6 +373,7 @@ implicit none
     endif
    
   elseif(pft_dflag==1)then
+    pft_changed_loc=.true.
     if(lverb)write(iulog,*)'Transient pft data',yeari,yearc
     iyear=1
     DO while(.true.)
@@ -379,6 +384,7 @@ implicit none
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
+    pft_changed_loc=.true.
     !transient pft data (flexible inputs)
     iyear=1
     DO while(.true.)
@@ -399,14 +405,16 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
+  if(present(pft_changed))pft_changed=pft_changed_loc
   end subroutine ReadPlantManagementNC
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantProperties(nu_plt,NZ,NY,NX)
+  subroutine ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
 
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
+  logical, intent(in) :: pft_changed
   integer :: N, NB
   real(r8) :: VRNXI,VRNLI
 
@@ -417,7 +425,7 @@ implicit none
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
 
-    call SetPlantTraits(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
+    call SetPlantTraits(nu_plt,pft_changed,NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
@@ -605,13 +613,15 @@ implicit none
 
   end subroutine ReadPlantTraitsNC
 !------------------------------------------------------------------------------------------
-  subroutine SetPlantTraits(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
+  subroutine SetPlantTraits(nu_plt,pft_changed,NZ,NY,NX,VRNLI,VRNXI)
 
   use ncdio_pio
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
+  logical, intent(in) :: pft_changed
   real(r8), intent(out) :: VRNLI,VRNXI
+
   character(len=40) :: pft_lname
   character(len=64):: koppen_climl
   character(len=3) :: koppen_clims
@@ -732,7 +742,7 @@ implicit none
   rPCRootr_pft(NZ,NY,NX)   = rPCRootr_tab(loc)
   rPCNoduler_pft(NZ,NY,NX) = rPCNoduler_tab(loc)
 
-  if(disp_planttrait)then
+  if(disp_planttrait.and.pft_changed)then
     call pft_display(nu_plt,NZ,NY,NX,pft_lname,koppen_climl,koppen_clims)
     call photosyns_trait_disp(nu_plt,NZ,NY,NX)
     call plant_optic_trait_disp(nu_plt,NZ,NY,NX)
