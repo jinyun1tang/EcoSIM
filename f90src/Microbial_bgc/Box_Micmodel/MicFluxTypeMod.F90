@@ -49,7 +49,10 @@ implicit none
   real(r8) :: tRHydlyBioReSOM(1:NumPlantChemElms)
   real(r8) :: tRHydlySoprtOM(1:NumPlantChemElms)
   real(r8) :: RNO2DmndSoilChemoPrev
-  real(r8) :: RNO2DmndBandChemoPrev  
+  real(r8) :: RNO2DmndBandChemoPrev
+
+  real(r8), allocatable :: RMaintDefcitcitAutor(:)
+  real(r8), allocatable :: RMaintRespAutor(:)
   real(r8), allocatable :: RGrowthRespAutor(:)      !growth respiration of autotrophs
   real(r8), allocatable :: REcoDOMProd(:,:)
   real(r8), allocatable :: RO2DmndAutort(:)
@@ -110,8 +113,6 @@ implicit none
   real(r8), allocatable :: RH1PO4DmndSoilHeterPrev(:,:)
   real(r8), allocatable :: RH1PO4DmndBandHeterPrev(:,:)
   real(r8), allocatable :: RO2DmndHetertPrev(:,:)      
-  real(r8), allocatable :: RDOCUptkHeterPrev(:,:)      
-  real(r8), allocatable :: RAcetateUptkHeterPrev(:,:)  
   real(r8), allocatable :: RNH3OxidAutorPrev(:) 
   real(r8), allocatable :: RNH3OxidAutorBandPrev(:)
   real(R8), allocatable :: RGrowthRespHeter(:,:)  !growth respiraiton of heterotrophs
@@ -142,14 +143,14 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
-  integer :: NumHetetr1MicCmplx, NumMicrobAutrophCmplx,NPH
+  integer :: jcplx,NumMicbFunGrupsPerCmplx
+  integer :: NumHetetr1MicCmplx, NumMicrobAutoTrophCmplx,NPH
   NPH=60
   jcplx                   = micpar%jcplx
-  JG                      = micpar%jguilds
+
   NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
   NumHetetr1MicCmplx      = micpar%NumHetetr1MicCmplx
-  NumMicrobAutrophCmplx   = micpar%NumMicrobAutrophCmplx
+  NumMicrobAutoTrophCmplx   = micpar%NumMicrobAutoTrophCmplx
 
   allocate(this%RGrowthRespHeter(1:NumHetetr1MicCmplx,1:jcplx));     this%RGrowthRespHeter=0._r8
   allocate(this%RNH4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx)) ;this%RNH4DmndSoilHeterPrev=0._r8
@@ -161,19 +162,19 @@ implicit none
   allocate(this%RH1PO4DmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RH1PO4DmndSoilHeterPrev=0._r8
   allocate(this%RH1PO4DmndBandHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RH1PO4DmndBandHeterPrev=0._r8
   allocate(this%RO2DmndHetertPrev(1:NumHetetr1MicCmplx,1:jcplx))      ;this%RO2DmndHetertPrev=0._r8
-  allocate(this%RDOCUptkHeterPrev(1:NumHetetr1MicCmplx,1:jcplx))      ;this%RDOCUptkHeterPrev=0._r8
-  allocate(this%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:jcplx))  ;this%RAcetateUptkHeterPrev=0._r8
+  allocate(this%RNH4UptkSoilAutorPrev(1:NumMicrobAutoTrophCmplx));this%RNH4UptkSoilAutorPrev=0._r8   
+  allocate(this%RNH4UptkBandAutorPrev(1:NumMicrobAutoTrophCmplx));this%RNH4UptkBandAutorPrev=0._r8   
+  allocate(this%RNO3UptkSoilAutorPrev(1:NumMicrobAutoTrophCmplx));  this%RNO3UptkSoilAutorPrev=0._r8
+  allocate(this%RNO3UptkBandAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RNO3UptkBandAutorPrev=0._r8  
+  allocate(this%RH2PO4UptkSoilAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RH2PO4UptkSoilAutorPrev=0._r8
+  allocate(this%RH2PO4UptkBandAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RH2PO4UptkBandAutorPrev=0._r8
+  allocate(this%RH1PO4UptkSoilAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RH1PO4UptkSoilAutorPrev=0._r8
+  allocate(this%RH1PO4UptkBandAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RH1PO4UptkBandAutorPrev=0._r8
+  allocate(this%RO2DmndAutortPrev(1:NumMicrobAutoTrophCmplx))       ;this%RO2DmndAutortPrev=0._r8
+  allocate(this%RGrowthRespAutor(1:NumMicrobAutoTrophCmplx));this%RGrowthRespAutor=0._r8
+  allocate(this%RMaintDefcitcitAutor(1:NumMicrobAutoTrophCmplx));this%RMaintDefcitcitAutor=0._r8
+  allocate(this%RMaintRespAutor(1:NumMicrobAutoTrophCmplx)); this%RMaintRespAutor=0._r8
 
-  allocate(this%RNH4UptkSoilAutorPrev(1:NumMicrobAutrophCmplx));this%RNH4UptkSoilAutorPrev=0._r8   
-  allocate(this%RNH4UptkBandAutorPrev(1:NumMicrobAutrophCmplx));this%RNH4UptkBandAutorPrev=0._r8   
-  allocate(this%RNO3UptkSoilAutorPrev(1:NumMicrobAutrophCmplx));  this%RNO3UptkSoilAutorPrev=0._r8
-  allocate(this%RNO3UptkBandAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RNO3UptkBandAutorPrev=0._r8  
-  allocate(this%RH2PO4UptkSoilAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH2PO4UptkSoilAutorPrev=0._r8
-  allocate(this%RH2PO4UptkBandAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH2PO4UptkBandAutorPrev=0._r8
-  allocate(this%RH1PO4UptkSoilAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH1PO4UptkSoilAutorPrev=0._r8
-  allocate(this%RH1PO4UptkBandAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RH1PO4UptkBandAutorPrev=0._r8
-  allocate(this%RO2DmndAutortPrev(1:NumMicrobAutrophCmplx))       ;this%RO2DmndAutortPrev=0._r8
-  allocate(this%RGrowthRespAutor(1:NumMicrobAutrophCmplx));this%RGrowthRespAutor=0._r8
   allocate(this%RHydlySOCK(1:jcplx)); this%RHydlySOCK=0._r8
   allocate(this%REcoUptkSoilO2M(NPH));this%REcoUptkSoilO2M = spval
   allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
@@ -197,37 +198,37 @@ implicit none
   allocate(this%RNO3DmndLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3DmndLitrHeter=spval
   allocate(this%RH2PO4DmndLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4DmndLitrHeter=spval
   allocate(this%RH1PO4DmndLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4DmndLitrHeter=spval
-  allocate(this%RO2DmndAutort(NumMicrobAutrophCmplx));this%RO2DmndAutort=spval
-  allocate(this%RNH4UptkSoilAutor(NumMicrobAutrophCmplx));this%RNH4UptkSoilAutor=spval
-  allocate(this%RNH4UptkBandAutor(NumMicrobAutrophCmplx));this%RNH4UptkBandAutor=spval
-  allocate(this%RNO3UptkSoilAutor(NumMicrobAutrophCmplx));this%RNO3UptkSoilAutor=spval
-  allocate(this%RNO3UptkBandAutor(NumMicrobAutrophCmplx));this%RNO3UptkBandAutor=spval
-  allocate(this%RH2PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkSoilAutor=spval
-  allocate(this%RH2PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkBandAutor=spval
-  allocate(this%RH1PO4UptkSoilAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkSoilAutor=spval
-  allocate(this%RH1PO4UptkBandAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkBandAutor=spval
-  allocate(this%RNH4UptkLitrAutor(NumMicrobAutrophCmplx));this%RNH4UptkLitrAutor=spval
-  allocate(this%RNO3UptkLitrAutor(NumMicrobAutrophCmplx));this%RNO3UptkLitrAutor=spval
-  allocate(this%RH2PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH2PO4UptkLitrAutor=spval
-  allocate(this%RH1PO4UptkLitrAutor(NumMicrobAutrophCmplx));this%RH1PO4UptkLitrAutor=spval
-  allocate(this%RNH3OxidAutor(NumMicrobAutrophCmplx));this%RNH3OxidAutor=spval
-  allocate(this%RNH3OxidAutorBand(NumMicrobAutrophCmplx));this%RNH3OxidAutorBand=spval
-  allocate(this%RNO2OxidAutor(NumMicrobAutrophCmplx));this%RNO2OxidAutor=spval
-  allocate(this%RNO2OxidAutorBand(NumMicrobAutrophCmplx));this%RNO2OxidAutorBand=spval
+  allocate(this%RO2DmndAutort(NumMicrobAutoTrophCmplx));this%RO2DmndAutort=spval
+  allocate(this%RNH4UptkSoilAutor(NumMicrobAutoTrophCmplx));this%RNH4UptkSoilAutor=spval
+  allocate(this%RNH4UptkBandAutor(NumMicrobAutoTrophCmplx));this%RNH4UptkBandAutor=spval
+  allocate(this%RNO3UptkSoilAutor(NumMicrobAutoTrophCmplx));this%RNO3UptkSoilAutor=spval
+  allocate(this%RNO3UptkBandAutor(NumMicrobAutoTrophCmplx));this%RNO3UptkBandAutor=spval
+  allocate(this%RH2PO4UptkSoilAutor(NumMicrobAutoTrophCmplx));this%RH2PO4UptkSoilAutor=spval
+  allocate(this%RH2PO4UptkBandAutor(NumMicrobAutoTrophCmplx));this%RH2PO4UptkBandAutor=spval
+  allocate(this%RH1PO4UptkSoilAutor(NumMicrobAutoTrophCmplx));this%RH1PO4UptkSoilAutor=spval
+  allocate(this%RH1PO4UptkBandAutor(NumMicrobAutoTrophCmplx));this%RH1PO4UptkBandAutor=spval
+  allocate(this%RNH4UptkLitrAutor(NumMicrobAutoTrophCmplx));this%RNH4UptkLitrAutor=spval
+  allocate(this%RNO3UptkLitrAutor(NumMicrobAutoTrophCmplx));this%RNO3UptkLitrAutor=spval
+  allocate(this%RH2PO4UptkLitrAutor(NumMicrobAutoTrophCmplx));this%RH2PO4UptkLitrAutor=spval
+  allocate(this%RH1PO4UptkLitrAutor(NumMicrobAutoTrophCmplx));this%RH1PO4UptkLitrAutor=spval
+  allocate(this%RNH3OxidAutor(NumMicrobAutoTrophCmplx));this%RNH3OxidAutor=spval
+  allocate(this%RNH3OxidAutorBand(NumMicrobAutoTrophCmplx));this%RNH3OxidAutorBand=spval
+  allocate(this%RNO2OxidAutor(NumMicrobAutoTrophCmplx));this%RNO2OxidAutor=spval
+  allocate(this%RNO2OxidAutorBand(NumMicrobAutoTrophCmplx));this%RNO2OxidAutorBand=spval
 
   allocate(this%RNH4DmndLitrHeterPrev(1:NumHetetr1MicCmplx,1:micpar%NumOfLitrCmplxs));this%RNH4DmndLitrHeterPrev=0._r8
   allocate(this%RNO3DmndLitrHeterPrev(1:NumHetetr1MicCmplx,1:micpar%NumOfLitrCmplxs));this%RNO3DmndLitrHeterPrev=0._r8
   allocate(this%RH2PO4DmndLitrHeterPrev(1:NumHetetr1MicCmplx,1:micpar%NumOfLitrCmplxs));this%RH2PO4DmndLitrHeterPrev=0._r8
   allocate(this%RH1PO4DmndLitrHeterPrev(1:NumHetetr1MicCmplx,1:micpar%NumOfLitrCmplxs));this%RH1PO4DmndLitrHeterPrev=0._r8
-  allocate(this%RNH4UptkLitrAutorPrev(1:NumMicrobAutrophCmplx));this%RNH4UptkLitrAutorPrev=0._r8
-  allocate(this%RNO3UptkLitrAutorPrev(1:NumMicrobAutrophCmplx));this%RNO3UptkLitrAutorPrev=0._r8
-  allocate(this%RH2PO4UptkLitrAutorPrev(1:NumMicrobAutrophCmplx));this%RH2PO4UptkLitrAutorPrev=0._r8
-  allocate(this%RH1PO4UptkLitrAutorPrev(1:NumMicrobAutrophCmplx));this%RH1PO4UptkLitrAutorPrev=0._r8
+  allocate(this%RNH4UptkLitrAutorPrev(1:NumMicrobAutoTrophCmplx));this%RNH4UptkLitrAutorPrev=0._r8
+  allocate(this%RNO3UptkLitrAutorPrev(1:NumMicrobAutoTrophCmplx));this%RNO3UptkLitrAutorPrev=0._r8
+  allocate(this%RH2PO4UptkLitrAutorPrev(1:NumMicrobAutoTrophCmplx));this%RH2PO4UptkLitrAutorPrev=0._r8
+  allocate(this%RH1PO4UptkLitrAutorPrev(1:NumMicrobAutoTrophCmplx));this%RH1PO4UptkLitrAutorPrev=0._r8
 
-  allocate(this%RNO2OxidAutorPrev(1:NumMicrobAutrophCmplx)) ;this%RNO2OxidAutorPrev=0._r8     
-  allocate(this%RNO2OxidAutorBandPrev(1:NumMicrobAutrophCmplx));this%RNO2OxidAutorBandPrev=0._r8
-  allocate(this%RNH3OxidAutorPrev(1:NumMicrobAutrophCmplx)); this%RNH3OxidAutorPrev=0._r8
-  allocate(this%RNH3OxidAutorBandPrev(1:NumMicrobAutrophCmplx));this%RNH3OxidAutorBandPrev=0._r8
+  allocate(this%RNO2OxidAutorPrev(1:NumMicrobAutoTrophCmplx)) ;this%RNO2OxidAutorPrev=0._r8     
+  allocate(this%RNO2OxidAutorBandPrev(1:NumMicrobAutoTrophCmplx));this%RNO2OxidAutorBandPrev=0._r8
+  allocate(this%RNH3OxidAutorPrev(1:NumMicrobAutoTrophCmplx)); this%RNH3OxidAutorPrev=0._r8
+  allocate(this%RNH3OxidAutorBandPrev(1:NumMicrobAutoTrophCmplx));this%RNH3OxidAutorBandPrev=0._r8
   allocate(this%RNO3ReduxDmndSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RNO3ReduxDmndSoilHeterPrev=0._r8
   allocate(this%RNO3ReduxDmndBandHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RNO3ReduxDmndBandHeterPrev=0._r8
   allocate(this%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RNO2DmndReduxSoilHeterPrev=0._r8
@@ -241,6 +242,8 @@ implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
+  this%RMaintDefcitcitAutor   = 0._r8
+  this%RMaintRespAutor        = 0._r8
   this%RGrowthRespAutor       = 0._r8
   this%RGrowthRespHeter       = 0._r8
   this%TRDOE2DIE              = 0._r8
@@ -307,6 +310,16 @@ implicit none
   implicit none
   class(micfluxtype) :: this
 
+
+  call destroy(this%RNO2OxidAutorPrev)
+  call destroy(this%RNO2OxidAutorBandPrev)
+  call destroy(this%RNH3OxidAutorPrev)
+  call destroy(this%RNH3OxidAutorBandPrev)
+  call destroy(this%RNO3ReduxDmndSoilHeterPrev)
+  call destroy(this%RNO3ReduxDmndBandHeterPrev)
+  call destroy(this%RNO2DmndReduxSoilHeterPrev)
+  call destroy(this%RNO2DmndReduxBandHeterPrev)
+  call destroy(this%RN2ODmndReduxHeterPrev)
   call destroy(this%RGrowthRespAutor)
   call destroy(this%RGrowthRespHeter)
   call destroy(this%RHydlySOCK)

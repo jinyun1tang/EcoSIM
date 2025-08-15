@@ -262,20 +262,19 @@
       IF(Lirri_auto)THEN
       !automated irrigation
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
-          TFZ=0._r8
-          TWP=0._r8
-          TVW=0._r8
-          DIRRA1=DIRRA(1,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
-          DIRRA2=DIRRA(2,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+          TFZ    = 0._r8
+          TWP    = 0._r8
+          TVW    = 0._r8
+          DIRRA1 = DIRRA(1,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+          DIRRA2 = DIRRA(2,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
 
           D165: DO L=NU_col(NY,NX),NL_col(NY,NX)
             IF(CumDepz2LayBottom_vr(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0_r8,(DIRRA1-CumDepz2LayBottom_vr(L-1,NY,NX)) &
-                /(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX)))
-              FZ=AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA_col(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
-              TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
-              TWP=TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-              TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
+              FW  = AMIN1(1.0_r8,(DIRRA1-CumDepz2LayBottom_vr(L-1,NY,NX))/(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX)))
+              FZ  = AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA_col(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
+              TFZ = TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
+              TWP = TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+              TVW = TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
             ENDIF
           ENDDO D165
 

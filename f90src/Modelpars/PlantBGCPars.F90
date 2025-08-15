@@ -3,6 +3,7 @@ module PlantBGCPars
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts, only : jroots
+  use EcoSIMConfig, only : jcplxc
   implicit none
   public
   save
@@ -193,7 +194,7 @@ module PlantBGCPars
   pltpar%istalk     = 3
   pltpar%iroot      = 4
   pltpar%icwood     = 5
-
+  pltpar%jcplx      = jcplxc
   pltpar%jroots=jroots
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
   PART1X                      = 0.05_r8

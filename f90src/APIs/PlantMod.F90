@@ -1,7 +1,7 @@
 module PlantMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use grosubsMod,        only: GrowPlants
-  use PlantPhenolMod,    only: hfuncs
+  use PlantPhenolMod,    only: PhenologyUpdate
   use UptakesMod,        only: RootUptakes
   use PlantDisturbMod,   only: PrepLandscapeGrazing
   use PlantMgmtDataType, only: NP_col
@@ -72,7 +72,7 @@ implicit none
         ENDDO
 
         !Phenological update, determine living/active branches      
-        CALL HFUNCs(I,J)
+        CALL PhenologyUpdate(I,J)
 
         DO NZ=1,NP_col(NY,NX)
           call PrintRootTracer(I,J,NZ,'afhfunc')

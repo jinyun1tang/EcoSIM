@@ -99,10 +99,10 @@ module WthrMod
   call CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
 !
 
-  IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
-    !climate data will be perturbed
-    call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col,VPS)
-  ENDIF
+!  IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
+!    !perturb climate data
+!    call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col,VPS)
+!  ENDIF
 !
   mon=etimer%get_curr_mon()
   DO NX=NHW,NHE
@@ -450,12 +450,12 @@ module WthrMod
         !     rPlantThermoAdaptZone_pft=PFT thermal adaptation zone
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
-!
+        !
         IF(ICLM.EQ.2.AND.J.EQ.1)THEN
-          DTS=0.5_r8*DTA
-          ATCA_col(NY,NX)=ATCAI_col(NY,NX)+DTA
-          ATCS_col(NY,NX)=ATCAI_col(NY,NX)+DTS
-          TempOffset_col(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
+          DTS                   = 0.5_r8*DTA
+          ATCA_col(NY,NX)       = ATCAI_col(NY,NX)+DTA
+          ATCS_col(NY,NX)       = ATCAI_col(NY,NX)+DTS
+          TempOffset_col(NY,NX) = 0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
           DO NZ=1,NP_col(NY,NX)
             rPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone_pft(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
@@ -474,9 +474,9 @@ module WthrMod
 
           ENDDO
         ENDIF
-!
+        !
         !     ADJUST VAPOR PRESSURE FOR TEMPERATURE CHANGE
-!
+        !
         IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK_col(NY,NX))) &

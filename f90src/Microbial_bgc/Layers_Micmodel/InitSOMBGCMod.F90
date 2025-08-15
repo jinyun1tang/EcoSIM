@@ -35,20 +35,19 @@ module InitSOMBGCMOD
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSOMBGC(nmicbguilds)
+  subroutine InitSOMBGC()
   implicit none
-  integer, intent(in) :: nmicbguilds
 
-  call MicPar%Init(nmicbguilds)
+  call MicPar%Init()
 
   JGniH  => micpar%JGniH
   JGnfH  => micpar%JGnfH
   JGniA  => micpar%JGniA
   JGnfA  => micpar%JGnfA
-  NumMicrobAutrophCmplx = micpar%NumMicrobAutrophCmplx
-  NumHetetr1MicCmplx     = micpar%NumHetetr1MicCmplx
-  NumLiveHeterBioms     = micpar%NumLiveHeterBioms
-  NumLiveAutoBioms      = micpar%NumLiveAutoBioms
+  NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
+  NumHetetr1MicCmplx      = micpar%NumHetetr1MicCmplx
+  NumLiveHeterBioms       = micpar%NumLiveHeterBioms
+  NumLiveAutoBioms        = micpar%NumLiveAutoBioms
   allocate(CORGCX(1:jcplx))
   allocate(CORGNX(1:jcplx))
   allocate(CORGPX(1:jcplx))
@@ -255,13 +254,14 @@ module InitSOMBGCMOD
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbFunGrupsPerCmplx
-      tglds=JGnfH(N)-JGniH(N)+1._r8
+
       D8991: DO M=1,nlbiomcp
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
         OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
         OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
 
-        do NGL=JGniH(N),JGnfH(N)
+        tglds=JGnfH(N)-JGniH(N)+1._r8
+        DO NGL=JGniH(N),JGnfH(N)
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
@@ -759,12 +759,13 @@ module InitSOMBGCMOD
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
 
   DO N=1,NumMicbFunGrupsPerCmplx
-    tglds=JGnfH(N)-JGniH(N)+1._r8
+    
     DO M=1,nlbiomcp
       OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
       OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
       OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
-
+      
+      tglds=JGnfH(N)-JGniH(N)+1._r8
       do NGL=JGniH(N),JGnfH(N)
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms

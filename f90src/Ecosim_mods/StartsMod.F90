@@ -705,7 +705,7 @@ module StartsMod
       ELSE
         ALTY=MAX(ALTY,ALT_col(NY,NX))
       ENDIF
-      WRITE(*,1111)NX,NY,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
+      WRITE(*,1111)NY,NX,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,ALT_col(NY,NX),DH_col(NY,NX),DV_col(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
         ,SLOPE_col(0,NY,NX),SLOPE_col(iWestEastDirection,NY,NX),SLOPE_col(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)

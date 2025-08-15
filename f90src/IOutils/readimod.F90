@@ -247,27 +247,6 @@ module readiMod
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-
-    write(*,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
-    write(*,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
-    write(*,*)'slope of natural water table relative to landscape '// &
-      'surface: DTBLGG',DTBLGG
-    write(*,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
-    write(*,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
-    write(*,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
-    write(*,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
-
-    write(*,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
-    write(*,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
-    write(*,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
-    write(*,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
-
-    write(*,*)'N distance to water table (m): RCHGNTG',RCHGNTG
-    write(*,*)'E distance to water table (m): RCHGETG',RCHGETG
-    write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
-    write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
-
-    write(*,*)'lower boundary conditions for water flow:RCHGDG', RCHGDG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'width of each W-E landscape column: DHI'
     write(*,*)(DHI(NX),NX=1,NHE)
@@ -275,21 +254,42 @@ module readiMod
     write(*,*)(DVI(NY),NY=1,NVS)
     write(*,'(100A)')('=',ll=1,100)
   endif
+  write(iulog,*)'water table config:',WaterTableStatus(iWaterTabelMode)
+  write(iulog,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
+  write(iulog,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
+  write(iulog,*)'slope of natural water table relative to landscape surface: DTBLGG',DTBLGG
+
+  write(iulog,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
+  write(iulog,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
+  write(iulog,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
+  write(iulog,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
+
+  write(iulog,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
+  write(iulog,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
+  write(iulog,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
+  write(iulog,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
+
+  write(iulog,*)'N distance to water table (m): RCHGNTG',RCHGNTG
+  write(iulog,*)'E distance to water table (m): RCHGETG',RCHGETG
+  write(iulog,*)'S distance to water table (m): RCHGSTG',RCHGSTG
+  write(iulog,*)'W distance to water table (m): RCHGWTG',RCHGWTG
+  write(iulog,*)'Lower boundary scaling rate for water flow:RCHGDG', RCHGDG
+  
 
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
-      ALAT_col(NY,NX)               = ALATG
-      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
-      ALTI_col(NY,NX)               = ALTIG
-      ATCAI_col(NY,NX)              = ATCAG
-      IDWaterTable_col(NY,NX)   = iWaterTabelMode
-      OXYE_col(NY,NX)           = ao2_ppm
-      Z2GE_col(NY,NX)           = an2_ppm
-      CO2EI_col(NY,NX)              = aco2_ppm
-      CH4E_col(NY,NX)           = ach4_ppm
-      Z2OE_col(NY,NX)           = an2o_ppm
-      ARGE_col(NY,NX)           = arg_ppm
-      ZNH3E_col(NY,NX)          = anh3_ppm
+      ALAT_col(NY,NX)             = ALATG
+      PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
+      ALTI_col(NY,NX)             = ALTIG
+      ATCAI_col(NY,NX)            = ATCAG
+      IDWaterTable_col(NY,NX)     = iWaterTabelMode
+      OXYE_col(NY,NX)             = ao2_ppm
+      Z2GE_col(NY,NX)             = an2_ppm
+      CO2EI_col(NY,NX)            = aco2_ppm
+      CH4E_col(NY,NX)             = ach4_ppm
+      Z2OE_col(NY,NX)             = an2o_ppm
+      ARGE_col(NY,NX)             = arg_ppm
+      ZNH3E_col(NY,NX)            = anh3_ppm
       KoppenClimZone_col(NY,NX)   = IETYPG
       FlowDirIndicator_col(NY,NX) = grid_mode
       NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
