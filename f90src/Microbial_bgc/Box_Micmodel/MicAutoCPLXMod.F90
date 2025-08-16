@@ -25,14 +25,14 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
   subroutine ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,&
-    SPOMK, RMOMK, OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,&
+    SPOMK, RMOMK, TotBiomNO2Consumers,RH2UptkAutor,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: NGL,N
   real(r8), intent(in) :: VOLWZ
-  real(r8), intent(in):: OXKX,WatStressMicb,TSensGrowth,XCO2
-  real(r8), intent(in) :: TotActMicrobiom,TotBiomNO2Consumers
+  real(r8), intent(in):: WatStressMicb,TSensGrowth,XCO2
+  real(r8), intent(in) :: TotBiomNO2Consumers
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
   real(r8), intent(in) :: SPOMK(2)
   real(r8), intent(in)  :: RMOMK(2)
@@ -49,7 +49,6 @@ module MicAutoCPLXMod
   integer  :: M
   real(r8) :: COMC
   real(r8) :: ECHZ
-  real(r8) :: FOXYX
   real(r8) :: FNH4X
   real(r8) :: FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX
   real(r8) :: FOQC,FOQA
@@ -85,6 +84,7 @@ module MicAutoCPLXMod
     mid_NitriteOxidBacter        => micpar%mid_NitriteOxidBacter,        &
     mid_H2GenoMethanogArchea     => micpar%mid_H2GenoMethanogArchea,     &
     mid_AerobicMethanotrofBacter => micpar%mid_AerobicMethanotrofBacter, &
+    TotActMicrobiom              => nmicdiag%TotActMicrobiom,            &    
     ZEROS                        => micfor%ZEROS,                        &
     SoilMicPMassLayer            => micfor%SoilMicPMassLayer,            &
     litrm                        => micfor%litrm,                        &
@@ -114,7 +114,7 @@ module MicAutoCPLXMod
   ! FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
   ! AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
   !
-  call SubstrateCompetAuto(NGL,N,FOXYX,FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
+  call SubstrateCompetAuto(NGL,N,FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     micfor,naqfdiag,nmicf,nmics,micflx)
   !
   !     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
@@ -129,52 +129,54 @@ module MicAutoCPLXMod
     ! NH3 OXIDIZERS
     call AmmoniaOxidizerCatabolism(NGL,N,XCO2,VOLWZ,TSensGrowth,ECHZ,RGOMP,RVOXP,&
       RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+    call AerobicAutorO2Uptake(NGL,N,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx,naqfdiag)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
     ! NO2 OXIDIZERS
     call NitriteOxidizerCatabolism(NGL,N,XCO2,ECHZ,RGOMP,RVOXP,RVOXPA,RVOXPB,&
       micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+    call AerobicAutorO2Uptake(NGL,N,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx,naqfdiag)
 
   elseif (N.eq.mid_H2GenoMethanogArchea)then
     ! H2TROPHIC METHANOGENS
     call H2MethanogensCatabolism(NGL,N,ECHZ,RGOMP,XCO2,micfor,micstt,&
       naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
-  elseif (N.eq.mid_AerobicMethanotrofBacter)then
-    ! METHANOTROPHS
-    call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
-      RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
-  else
-    RGOMP                  = 0.0_r8
-    RO2Dmnd4RespAutor(NGL) = 0.0_r8
-    RO2DmndAutor(NGL)      = 0.0_r8
-    RO2DmndAutort(NGL)     = 0.0_r8
-  ENDif
-!
-!  write(*,*)'O2 UPTAKE BY AEROBES'
-!
-! RO2UptkHeter, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
-! RUPMX=O2-unlimited rate of O2 uptake
-! FOXYX=fraction of O2 uptake by N,K relative to total
-! dts_gas=1/(NPH*NPT)
-! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
-! O2AquaDiffusvity=aqueous O2 diffusivity
-! OXYG,OXYS=gaseous, aqueous O2 amounts
-! Rain2LitRSurf,Irrig2LitRSurf_col=surface water flux from precipitation, irrigation
-! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf_col
-!
-  RO2UptkAutor(NGL)=0.0_r8
-
-  if (N.eq.mid_AmmoniaOxidBacter .or. N.eq.mid_NitriteOxidBacter .or. N.eq.mid_AerobicMethanotrofBacter)then
-    call AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx)
-    
-  elseif (N.eq.mid_H2GenoMethanogArchea)then
     RespGrossAutor(NGL)    = RGOMP
     RCO2ProdAutor(NGL)     = 0.0_r8
     RCH4ProdAutor(NGL)     = RespGrossAutor(NGL)
     RO2Uptk4RespAutor(NGL) = RO2Dmnd4RespAutor(NGL)
     RH2UptkAutor           = 0.667_r8*RespGrossAutor(NGL)
-  ENDIF
+    RO2UptkAutor(NGL)      = 0.0_r8
+
+  elseif (N.eq.mid_AerobicMethanotrofBacter)then
+    ! METHANOTROPHS
+    call MethanotrophCatabolism(I,J,NGL,N,ECHZ,RGOMP,&
+      RVOXP,RVOXPA,RVOXPB,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+
+    call AerobicAutorO2Uptake(NGL,N,RGOMP,RVOXP,RVOXPA,RVOXPB,micfor,micstt,nmicf,nmics,micflx,naqfdiag)
+
+  else
+    RGOMP                  = 0.0_r8
+    RO2Dmnd4RespAutor(NGL) = 0.0_r8
+    RO2DmndAutor(NGL)      = 0.0_r8
+    RO2DmndAutort(NGL)     = 0.0_r8
+    RO2UptkAutor(NGL)      = 0.0_r8
+  ENDif
+  !
+  !  write(*,*)'O2 UPTAKE BY AEROBES'
+  !
+  ! RO2UptkHeter, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
+  ! RUPMX=O2-unlimited rate of O2 uptake
+  ! FOXYX=fraction of O2 uptake by N,K relative to total
+  ! dts_gas=1/(NPH*NPT)
+  ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
+  ! O2AquaDiffusvity=aqueous O2 diffusivity
+  ! OXYG,OXYS=gaseous, aqueous O2 amounts
+  ! Rain2LitRSurf,Irrig2LitRSurf_col=surface water flux from precipitation, irrigation
+  ! O2_rain_conc,O2_irrig_conc=O2 concentration in Rain2LitRSurf,Irrig2LitRSurf_col
+  !
+
 !
 !     AUTOTROPHIC DENITRIFICATION
 !
@@ -205,8 +207,7 @@ module MicAutoCPLXMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SubstrateCompetAuto(NGL,N,FOXYX,&
-    FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
+  subroutine SubstrateCompetAuto(NGL,N,FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     micfor,naqfdiag,nmicf,nmics,micflx)
   !
   !Description:
@@ -214,7 +215,7 @@ module MicAutoCPLXMod
   !  
   implicit none
   integer, intent(in) :: NGL,N
-  real(r8), intent(out):: FOXYX,FNH4X
+  real(r8), intent(out):: FNH4X
   real(r8),intent(out) :: FNB3X,FNB4X,FNO3X
   real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
   type(micforctype), intent(in) :: micfor
@@ -223,14 +224,13 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(micfluxtype), intent(inout) :: micflx
 ! begin_execution
-  associate(                                               &
+  associate(                                                   &
     FracOMActAutor          => nmics%FracOMActAutor,           &
     FracAutorBiomOfActK     => nmics%FracAutorBiomOfActK,      &
     AttenfNH4Autor          => nmicf%AttenfNH4Autor,           &
     AttenfNO3Autor          => nmicf%AttenfNO3Autor,           &
     AttenfH1PO4Autor        => nmicf%AttenfH1PO4Autor,         &
     AttenfH2PO4Autor        => nmicf%AttenfH2PO4Autor,         &
-    RO2EcoDmndPrev          => micfor%RO2EcoDmndPrev,          &
     RNH4EcoDmndSoilPrev     => micfor%RNH4EcoDmndSoilPrev,     &
     RNH4EcoDmndBandPrev     => micfor%RNH4EcoDmndBandPrev,     &
     RNO3EcoDmndSoilPrev     => micfor%RNO3EcoDmndSoilPrev,     &
@@ -266,8 +266,7 @@ module MicAutoCPLXMod
     RNO3UptkBandAutorPrev   => micflx%RNO3UptkBandAutorPrev,   &
     RNO3UptkSoilAutorPrev   => micflx%RNO3UptkSoilAutorPrev,   &
     RNH4UptkBandAutorPrev   => micflx%RNH4UptkBandAutorPrev,   &
-    RNH4UptkSoilAutorPrev   => micflx%RNH4UptkSoilAutorPrev,   &
-    RO2DmndAutortPrev       => micflx%RO2DmndAutortPrev        &
+    RNH4UptkSoilAutorPrev   => micflx%RNH4UptkSoilAutorPrev    &
   )
 ! F*=fraction of substrate uptake relative to total uptake from
 ! previous hour. OXYX=O2, NH4X=NH4 non-band, NB4X=NH4 band
@@ -275,11 +274,7 @@ module MicAutoCPLXMod
 ! POBX=H2PO4 band,P14X=HPO4 non-band, P1BX=HPO4 band, OQC=DOC
 ! oxidation, OQA=acetate oxidation
 !
-  IF(RO2EcoDmndPrev.GT.ZEROS)THEN
-    FOXYX=AMAX1(FMN,RO2DmndAutortPrev(NGL)/RO2EcoDmndPrev)
-  ELSE
-    FOXYX=AMAX1(FMN,FracOMActAutor(NGL))
-  ENDIF
+  
   IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
     FNH4X=AMAX1(FMN,RNH4UptkSoilAutorPrev(NGL)/RNH4EcoDmndSoilPrev)
   ELSE
@@ -320,7 +315,7 @@ module MicAutoCPLXMod
   ELSE
     FP1BX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
-  naqfdiag%TFOXYX = naqfdiag%TFOXYX+FOXYX
+
   naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
   naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
   naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
@@ -597,21 +592,21 @@ module MicAutoCPLXMod
   end subroutine GatherAutotrophAnabolicFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobicAutorO2Uptake(NGL,N,FOXYX,OXKX,RGOMP,RVOXP,RVOXPA,RVOXPB,&
-    micfor,micstt,nmicf,nmics,micflx)
+  subroutine AerobicAutorO2Uptake(NGL,N,RGOMP,RVOXP,RVOXPA,RVOXPB,&
+    micfor,micstt,nmicf,nmics,micflx,naqfdiag)
   implicit none
   integer, intent(in) :: NGL   !guild id
   integer, intent(in) :: N     !functional group id
-  real(r8), intent(in) :: OXKX,FOXYX
   real(r8), intent(in) :: RGOMP,RVOXP
   real(r8), intent(in) :: RVOXPA
   real(r8), intent(in) :: RVOXPB
   type(MicForcType), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
+  type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag  
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_State_type),intent(inout) :: nmics
   type(micfluxtype), intent(inout) :: micflx
-
+  real(r8) :: FOXYX,OXKX
   integer  :: M,MX
   real(r8) :: COXYS1,DIFOX
   real(r8) :: B,C,O2AquaDiffusvity1
@@ -629,6 +624,7 @@ module MicAutoCPLXMod
   associate(                                               &
     fLimO2Autor           => nmics%fLimO2Autor,            &
     OMActAutor            => nmics%OMActAutor,             &
+    FracOMActAutor        => nmics%FracOMActAutor,         & 
     RO2UptkAutor          => nmicf%RO2UptkAutor,           &
     RespGrossAutor        => nmicf%RespGrossAutor,         &
     RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,      &
@@ -637,11 +633,13 @@ module MicAutoCPLXMod
     RCO2ProdAutor         => nmicf%RCO2ProdAutor,          &
     RCH4ProdAutor         => nmicf%RCH4ProdAutor,          &
     RSOxidSoilAutor       => nmicf%RSOxidSoilAutor,        &
-    RSOxidBandAutor       => nmicf%RSOxidBandAutor,        &
+    RSOxidBandAutor       => nmicf%RSOxidBandAutor,        &    
     mid_AmmoniaOxidBacter => micpar%mid_AmmoniaOxidBacter, &
     mid_NitriteOxidBacter => micpar%mid_NitriteOxidBacter, &
     RO2GasXchangePrev     => micfor%RO2GasXchangePrev,     &
+    RO2DmndAutortPrev     => micflx%RO2DmndAutortPrev,     &        
     COXYE                 => micfor%COXYE,                 &
+    RO2EcoDmndPrev        => micfor%RO2EcoDmndPrev,        &    
     O2_rain_conc          => micfor%O2_rain_conc,          &
     O2_irrig_conc         => micfor%O2_irrig_conc,         &
     Irrig2LitRSurf_col    => micfor%Irrig2LitRSurf_col,    &
@@ -663,13 +661,22 @@ module MicAutoCPLXMod
     OXYG                  => micstt%OXYG,                  &
     OXYS                  => micstt%OXYS,                  &
     COXYG                 => micstt%COXYG,                 &
-    REcoUptkSoilO2M          => micflx%REcoUptkSoilO2M,          &
+    REcoUptkSoilO2M       => micflx%REcoUptkSoilO2M,       &
     RNH3OxidAutor         => micflx%RNH3OxidAutor,         &
     RNH3OxidAutorBand     => micflx%RNH3OxidAutorBand,     &
     RNO2OxidAutor         => micflx%RNO2OxidAutor,         &
     RNO2OxidAutorBand     => micflx%RNO2OxidAutorBand      &
   )
 
+
+  IF(RO2EcoDmndPrev.GT.ZEROS)THEN
+    FOXYX=AMAX1(FMN,RO2DmndAutortPrev(NGL)/RO2EcoDmndPrev)
+  ELSE
+    FOXYX=AMAX1(FMN,FracOMActAutor(NGL))
+  ENDIF
+  naqfdiag%TFOXYX   = naqfdiag%TFOXYX+FOXYX
+  OXKX              = OXKA
+  RO2UptkAutor(NGL) = 0._r8
   IF(RO2DmndAutor(NGL).GT.ZEROS .AND. FOXYX.GT.ZERO)THEN
     IF(.not.litrm .OR. VLSoilPoreMicP.GT.ZEROS)THEN
       !
@@ -770,7 +777,6 @@ module MicAutoCPLXMod
       fLimO2Autor(NGL)  = 1.0_r8
     ENDIF
   ELSE
-    RO2UptkAutor(NGL) = 0.0_r8
     fLimO2Autor(NGL)  = 1.0_r8
   ENDIF
   !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'

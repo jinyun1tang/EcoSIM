@@ -445,7 +445,7 @@ data:
 
  RCHGNUG = 0 ;
 
- RCHGEUG = 0 ;
+ RCHGEUG = 1 ;
 
  RCHGSUG = 0 ;
 
@@ -453,7 +453,7 @@ data:
 
  RCHGNTG = 0 ;
 
- RCHGETG = 1 ;
+ RCHGETG = 0 ;
 
  RCHGSTG = 0 ;
 

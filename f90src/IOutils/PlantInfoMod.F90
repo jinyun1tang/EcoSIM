@@ -47,7 +47,7 @@ implicit none
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
   if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(yearc,yeari,NHW,NHE,NVN,NVS)
+  CALL ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
@@ -72,9 +72,12 @@ implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
   character(len=128) :: fnm_loc
+  logical :: pft_changed
 
 ! begin_execution
-  if(disp_planttrait)then
+  call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
+
+  if(disp_planttrait .and. pft_changed)then
     nu_plt=getavu()
     write(fnm_loc,'(A,I4,A)')'plant_trait.',etimer%get_curr_yearAD(),'.desc'
     call opnfil(fnm_loc,nu_plt,'f')    
@@ -88,15 +91,14 @@ implicit none
 !       each column has its own management
 !       PREFIX=path for files in current or higher level directory
 !       DATAP=PFT file name
-        call ReadPlantProperties(nu_plt,NZ,NY,NX)
+        call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
 
       ENDDO D9985
     ENDDO D9990
   ENDDO D9995
 
-  if(disp_planttrait)call relavu(nu_plt)
+  if(disp_planttrait .and. pft_changed)call relavu(nu_plt)
 
-  call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -327,14 +329,14 @@ implicit none
   end subroutine readplantmgmtinfo
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
   !
   !
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari   !forcing data year
   integer, intent(in) :: yearc   !current model year
-
+  logical, optional, intent(out):: pft_changed
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
   logical :: readvar
@@ -342,7 +344,9 @@ implicit none
   integer :: iyear     !data record year
   integer :: year      !year of the data
   integer :: ntopou,NY,NX,NZ
+  logical :: pft_changed_loc
 
+  pft_changed_loc=.false.
   if (len_trim(pft_mgmt_in)==0)return
   
   call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
@@ -355,11 +359,11 @@ implicit none
   !obtain the number of topographic units
   ntopou=get_dim_len(pftinfo_nfid, 'ntopou')    
   if(first_topou)ntopou=1
-
   
   if(pft_dflag==0)then
     if(lverb)write(iulog,*)'Constant pft data'
     if(IGO==0)then
+      pft_changed_loc=.true.
       iyear=1    
       call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
       call InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -369,6 +373,7 @@ implicit none
     endif
    
   elseif(pft_dflag==1)then
+    pft_changed_loc=.true.
     if(lverb)write(iulog,*)'Transient pft data',yeari,yearc
     iyear=1
     DO while(.true.)
@@ -379,6 +384,7 @@ implicit none
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
+    pft_changed_loc=.true.
     !transient pft data (flexible inputs)
     iyear=1
     DO while(.true.)
@@ -399,14 +405,16 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
+  if(present(pft_changed))pft_changed=pft_changed_loc
   end subroutine ReadPlantManagementNC
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantProperties(nu_plt,NZ,NY,NX)
+  subroutine ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
 
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
+  logical, intent(in) :: pft_changed
   integer :: N, NB
   real(r8) :: VRNXI,VRNLI
 
@@ -416,18 +424,17 @@ implicit none
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-!    write(101,*)'NZ=',NZ,DATAP(NZ,NY,NX)
-!    call ReadPlantTraitsNC(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
-    call SetPlantTraits(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
+
+    call SetPlantTraits(nu_plt,pft_changed,NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
 !   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
 !
-    VmaxRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
     VmaxRubOxyRef_pft(NZ,NY,NX)      = 2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecChloryfilAct_pft(NZ,NY,NX)   = 2.5_r8*SpecChloryfilAct_pft(NZ,NY,NX)
+    SpecLeafChlAct_pft(NZ,NY,NX)     = 2.5_r8*SpecLeafChlAct_pft(NZ,NY,NX)
     LeafSWabsorpty_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
     LeafPARabsorpty_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
     RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
@@ -450,8 +457,8 @@ implicit none
     ENDIF
     D5: DO NB=1,NumCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
-        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
-        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
+        HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
       ELSE
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
@@ -487,9 +494,9 @@ implicit none
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, Myco_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxRubCarboxyRef_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VCMX', loc, VmaxSpecRubCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VOMX', loc, VmaxRubOxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VCMX4', loc, VmaxPEPCarboxyRef_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2_pft(NZ,NY,NX))
@@ -497,10 +504,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecChloryfilAct_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3ChlorofilConc_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'FCO2', loc, CanPCi2CaRatio(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
@@ -606,18 +613,20 @@ implicit none
 
   end subroutine ReadPlantTraitsNC
 !------------------------------------------------------------------------------------------
-  subroutine SetPlantTraits(nu_plt,NZ,NY,NX,VRNLI,VRNXI)
+  subroutine SetPlantTraits(nu_plt,pft_changed,NZ,NY,NX,VRNLI,VRNXI)
 
   use ncdio_pio
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
+  logical, intent(in) :: pft_changed
   real(r8), intent(out) :: VRNLI,VRNXI
+
   character(len=40) :: pft_lname
   character(len=64):: koppen_climl
   character(len=3) :: koppen_clims
   integer :: loc,N
-
+  
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
 
   iPlantPhotosynthesisType(NZ,NY,NX)  = iPlantPhotosynthesisType_tab(loc)
@@ -630,9 +639,9 @@ implicit none
   iPlantTurnoverPattern_pft(NZ,NY,NX) = iPlantTurnoverPattern_tab(loc)
   iPlantGrainType_pft(NZ,NY,NX)       = iPlantGrainType_tab(loc)
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
-  PlantInitThermoAdaptZone(NZ,NY,NX)  = PlantInitThermoAdaptZone_tab(loc)
+  PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
 
-  VmaxRubCarboxyRef_pft(NZ,NY,NX)         = VmaxRubCarboxyRef_tab(loc)
+  VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)         = VmaxRubCarboxyRef_tab(loc)
   VmaxRubOxyRef_pft(NZ,NY,NX)             = VmaxRubOxyRef_tab(loc)
   VmaxPEPCarboxyRef_pft(NZ,NY,NX)         = VmaxPEPCarboxyRef_tab(loc)
   XKCO2_pft(NZ,NY,NX)                     = XKCO2_tab(loc)
@@ -640,10 +649,10 @@ implicit none
   Km4PEPCarboxy_pft(NZ,NY,NX)             = Km4PEPCarboxy_tab(loc)
   LeafRuBPConc_pft(NZ,NY,NX)              = LeafRuBPConc_tab(loc)
   FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX) = FracLeafProtAsPEPCarboxyl_tab(loc)
-  SpecChloryfilAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
+  SpecLeafChlAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
   LeafC3ChlorofilConc_pft(NZ,NY,NX)       = LeafC3ChlorofilConc_tab(loc)
   LeafC4ChlorofilConc_pft(NZ,NY,NX)       = LeafC4ChlorofilConc_tab(loc)
-  CanPCi2CaRatio(NZ,NY,NX)                = CanPCi2CaRatio_tab(loc)
+  CanopyCi2CaRatio_pft(NZ,NY,NX)                = CanopyCi2CaRatio_pft_tab(loc)
 
   RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_tab(loc)
   CanopyPARalbedo_pft(NZ,NY,NX)    = CanopyPARalbedo_tab(loc)
@@ -713,8 +722,8 @@ implicit none
   RootBiomGrosYld_pft(NZ,NY,NX)      = RootBiomGrosYld_tab(loc)
   NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)
 
-  rNCLeaf_pft(NZ,NY,NX)       = rNCLeaf_tab(loc)
-  rNCSheath_pft(NZ,NY,NX)      = rNCSheath_tab(loc)
+  rNCLeaf_pft(NZ,NY,NX)    = rNCLeaf_tab(loc)
+  rNCSheath_pft(NZ,NY,NX)  = rNCSheath_tab(loc)
   rNCStalk_pft(NZ,NY,NX)   = rNCStalk_tab(loc)
   rNCReserve_pft(NZ,NY,NX) = rNCReserve_tab(loc)
   rNCHusk_pft(NZ,NY,NX)    = rNCHusk_tab(loc)
@@ -723,17 +732,17 @@ implicit none
   rNCRoot_pft(NZ,NY,NX)    = rNCRoot_tab(loc)
   rNCNodule_pft(NZ,NY,NX)  = rNCNodule_tab(loc)
 
-  rPCLeaf_pft(NZ,NY,NX)=rPCLeaf_tab(loc)
-  rPCSheath_pft(NZ,NY,NX)=rPCSheath_tab(loc)
-  rPCStalk_pft(NZ,NY,NX)=rPCStalk_tab(loc)
-  rPCReserve_pft(NZ,NY,NX)=rPCReserve_tab(loc)
-  rPCHusk_pft(NZ,NY,NX)=rPCHusk_tab(loc)
-  rPCEar_pft(NZ,NY,NX)=rPCEar_tab(loc)
-  rPCGrain_pft(NZ,NY,NX)=rPCGrain_tab(loc)
-  rPCRootr_pft(NZ,NY,NX)=rPCRootr_tab(loc)
-  rPCNoduler_pft(NZ,NY,NX)=rPCNoduler_tab(loc)
+  rPCLeaf_pft(NZ,NY,NX)    = rPCLeaf_tab(loc)
+  rPCSheath_pft(NZ,NY,NX)  = rPCSheath_tab(loc)
+  rPCStalk_pft(NZ,NY,NX)   = rPCStalk_tab(loc)
+  rPCReserve_pft(NZ,NY,NX) = rPCReserve_tab(loc)
+  rPCHusk_pft(NZ,NY,NX)    = rPCHusk_tab(loc)
+  rPCEar_pft(NZ,NY,NX)     = rPCEar_tab(loc)
+  rPCGrain_pft(NZ,NY,NX)   = rPCGrain_tab(loc)
+  rPCRootr_pft(NZ,NY,NX)   = rPCRootr_tab(loc)
+  rPCNoduler_pft(NZ,NY,NX) = rPCNoduler_tab(loc)
 
-  if(disp_planttrait)then
+  if(disp_planttrait.and.pft_changed)then
     call pft_display(nu_plt,NZ,NY,NX,pft_lname,koppen_climl,koppen_clims)
     call photosyns_trait_disp(nu_plt,NZ,NY,NX)
     call plant_optic_trait_disp(nu_plt,NZ,NY,NX)
@@ -772,10 +781,10 @@ implicit none
 !                   :if iPlantRootProfile_pft=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
 !   iPlantGrainType_pft=storage organ:0=above ground,1=below ground
 !   MY=mycorrhizal:1=no,2=yes
-!   PlantInitThermoAdaptZone=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   PlantInitThermoAdaptZone_pft=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,100)
-  write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,DATAP(NZ,NY,NX)(1:6)
+  write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
   call writefixsl(nu_plt,'Plant name ',pft_lname,40)
   strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,40)
@@ -913,20 +922,19 @@ implicit none
   end select
   call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
 
-  select case(INT(PlantInitThermoAdaptZone(NZ,NY,NX)+0.50005_r8))
-  case (ithermozone_arcboreal)
-    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_cooltempr)
-    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_warmtempr)
-    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_subtropic)
-    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case (ithermozone_tropical)
-    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone(NZ,NY,NX)
-  case default
-    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone(NZ,NY,NX)
-  end select
+  if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
+    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_arcboreal)then
+    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_cooltempr)then
+    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_warmtempr)then
+    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_subtropic)then
+    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_tropical)then
+    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+  endif
   
   call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
   end subroutine pft_display
@@ -942,16 +950,16 @@ implicit none
   character(len=81) :: line
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
-  call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxRubCarboxyRef_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific rubisco oxygenase (umol O2 g-1 s-1) VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Specific PEP carboxylase activity (umol g-1 s-1) VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxSpecRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft (uM) XKO2',XKO2_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft (uM) XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in rubisco (g rub/(g protein)) RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
   call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)) PEPC',&
     FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecChloryfilAct_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
     call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein)) CHL',&
       LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
@@ -961,7 +969,7 @@ implicit none
     call writefixl(nu_plt,'fraction of leaf protein in mesophyll chlorophyll(C4) (g Chl /(g protein)) CHL4',&
       LeafC4ChlorofilConc_pft(NZ,NY,NX),90)
   endif
-  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanPCi2CaRatio(NZ,NY,NX),90)
+  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanopyCi2CaRatio_pft(NZ,NY,NX),90)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1150,43 +1158,6 @@ implicit none
   call writefixl(nu_plt,'leaf SW transmission TAUR',RadSWLeafTransmis_pft(NZ,NY,NX),50)
   call writefixl(nu_plt,'leaf PAR transmission TAUP',RadPARLeafTransmis_pft(NZ,NY,NX),50)
   end subroutine plant_optic_trait_disp
-!------------------------------------------------------------------------------------------
-
-  SUBROUTINE routq(yearc,yeari,NHW,NHE,NVN,NVS)
-!
-!     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
-!     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
-!
-      use data_kind_mod, only : r8 => DAT_KIND_R8
-  implicit none
-  integer, intent(in) :: yearc,yeari
-  integer, intent(in) :: NHW,NHE,NVN,NVS
-
-  CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
-  CHARACTER(len=4) :: CHARY
-  integer :: IDATE,NY,NX,NZ
-
-! begin_execution
-!
-! OPEN CHECKPOINT FILES FOR PLANT VARIABLES
-!
-  IF(is_first_year)THEN
-    D9999: DO NX=NHW,NHE
-      DO  NY=NVN,NVS
-        DO NZ=1,JP
-          iDayPlanting_pft(NZ,NY,NX)      = -1E+06
-          iYearPlanting_pft(NZ,NY,NX)     = -1E+06
-          iDayPlantHarvest_pft(NZ,NY,NX)  = 1E+06
-          iYearPlantHarvest_pft(NZ,NY,NX) = 1E+06
-        enddo
-      enddo
-    ENDDO D9999
-
-  ENDIF
-  if(lverb)write(*,*)'ReadPlantInfoNC'
-  call ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
-
-  END subroutine routq
 
 
 !------------------------------------------------------------------------------------------
@@ -1210,8 +1181,23 @@ implicit none
   logical :: readvar
   integer :: pft_dflag
   integer :: iyear,year
-  integer :: ret
+  integer :: ret,kk
+  character(len=1) :: cc
   character(len=10) :: pft_gtype(JP)
+
+  IF(is_first_year)THEN
+    D9999: DO NX=NHW,NHE
+      DO  NY=NVN,NVS
+        DO NZ=1,JP
+          iDayPlanting_pft(NZ,NY,NX)      = -1E+06
+          iYearPlanting_pft(NZ,NY,NX)     = -1E+06
+          iDayPlantHarvest_pft(NZ,NY,NX)  = 1E+06
+          iYearPlantHarvest_pft(NZ,NY,NX) = 1E+06
+        enddo
+      enddo
+    ENDDO D9999
+
+  ENDIF
 
   if (len_trim(pft_mgmt_in)==0)then
    !no plant management info to read
@@ -1298,10 +1284,15 @@ implicit none
                 IF(KoppenClimZone_col(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')KoppenClimZone_col(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
-                  DATAX_pft(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
-                !consider cases when koppen climate zone is zero  
+                  DATAX_pft(NZ)=trim(pft_gtype(NZ)(1:4)//CLIMATE)                  
+                  !consider cases when koppen climate zone is zero  
                 elseif(KoppenClimZone_col(NY,NX)==0)then
-                  DATAX_pft(NZ)=pft_gtype(NZ)
+                  DATAX_pft(NZ)=''
+                  DO kk=1,10
+                    cc=pft_gtype(NZ)(kk:kk)
+                    if(ichar(cc)==0)exit
+                    DATAX_pft(NZ)(kk:kk)=cc
+                  ENDDO
                 ENDIF
               ENDDO D4965
               if(first_pft)then
@@ -1331,134 +1322,6 @@ implicit none
     call ncd_pio_closefile(pftinfo_nfid)
   endif
   end subroutine ReadPlantInfoNC
-
-!------------------------------------------------------------------------------------------
-
-  subroutine read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-  implicit none
-  integer, intent(in) :: NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS
-  integer :: NY,NX,NZ,NN
-  integer :: IDATE,IYR
-  integer :: NPP(JY,JX)
-  CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
-
-  NPP =0
-
-  REWIND(30)
-
-8000  CONTINUE
-
-!  recover DATAZ from checkpoint file, read year by year
-  D9995: DO NX=NHW,NHE
-    D9990: DO NY=NVN,NVS
-! read one line
-      READ(30,90,END=1002)IDATE,IYR,NPP(NY,NX) &
-        ,(DATAZ(NZ,NY,NX),IsPlantActive_pft(NZ,NY,NX),NZ=1,NPP(NY,NX))
-90        FORMAT(2I4,1I3,5(A16,I4))
-    ENDDO D9990
-  ENDDO D9995
-
-  IF(IDATE.LT.IDAYR.OR.IYR.LT.IYRR)THEN
-! mot reaching the recovery date, keep reading
-    GO TO 8000
-  ELSEIF(IDATE.GE.IDAYR.AND.IYR.EQ.IYRR)THEN
-!
-!       MATCH PREVIOUS AND CURRENT PLANT SPECIES
-! make of copy using pft information from the topographic unit just read in
-    D7975: DO NX=NHW,NHE
-      D7970: DO NY=NVN,NVS
-        D7965: DO NZ=1,NS
-          DATAA(NZ,NY,NX)=DATAX_pft(NZ)
-          DATAB(NZ,NY,NX)=DATAY(NZ)
-        ENDDO D7965
-      ENDDO D7970
-    ENDDO D7975
-
-    D7995: DO NX=NH1,NH2
-      D7990: DO NY=NV1,NV2
-        NP_col(NY,NX)=MAX(NS,NPP(NY,NX))
-        D195: DO NN=1,NP_col(NY,NX)
-          DATAP(NN,NY,NX)='NO'
-          DATAM(NN,NY,NX)='NO'
-        ENDDO D195
-! assign the values fo active pft from the record
-        IF(NPP(NY,NX).GT.0)THEN
-! the check point file has non-zero pft
-          D200: DO NN=1,NPP(NY,NX)
-            D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX_pft(NZ).AND.IsPlantActive_pft(NN,NY,NX).EQ.iActive)THEN
-                DATAP(NN,NY,NX)=DATAX_pft(NZ)
-                DATAM(NN,NY,NX)=DATAY(NZ)
-                DATAA(NZ,NY,NX)='NO'
-                DATAB(NZ,NY,NX)='NO'
-              ENDIF
-            ENDDO D205
-          ENDDO D200
-!
-!             ADD NEW PLANT SPECIES
-!
-          D250: DO NN=1,NP_col(NY,NX)
-            IF(DATAP(NN,NY,NX).EQ.'NO')THEN
-              D255: DO NZ=1,NS
-                IF(DATAA(NZ,NY,NX).NE.'NO')THEN
-                  DATAP(NN,NY,NX)=DATAA(NZ,NY,NX)
-                  DATAM(NN,NY,NX)=DATAB(NZ,NY,NX)
-                  DATAA(NZ,NY,NX)='NO'
-                  DATAB(NZ,NY,NX)='NO'
-                  EXIT
-                ENDIF
-              ENDDO D255
-            ENDIF
-          ENDDO D250
-
-          D201: DO NZ=NP_col(NY,NX)+1,JP
-            DATAP(NZ,NY,NX)='NO'
-            DATAM(NZ,NY,NX)='NO'
-          ENDDO D201
-        ELSE
-
-! assign using information from pft files
-          D265: DO NZ=1,NS
-            DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-            DATAM(NZ,NY,NX)=DATAY(NZ)
-          ENDDO D265
-          D270: DO NZ=NS+1,JP
-            DATAP(NZ,NY,NX)='NO'
-            DATAM(NZ,NY,NX)='NO'
-          ENDDO D270
-        ENDIF
-!
-!           SET NUMBER OF PLANT SPECIES
-!
-        NN=JP
-        D202: DO NZ=JP,1,-1
-          IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
-            NN=NN-1
-          ELSE
-            EXIT
-          ENDIF
-        ENDDO D202
-        NP_col(NY,NX)=NN
-        NP0_col(NY,NX)=NN
-      ENDDO D7990
-    ENDDO D7995
-  ENDIF
-1002 continue
-  D6995: DO NX=NHW,NHE
-    D6990: DO NY=NVN,NVS
-      NP_col(NY,NX)=NS
-      D300: DO NZ=1,NP_col(NY,NX)
-        DATAP(NZ,NY,NX)=DATAX_pft(NZ)
-        DATAM(NZ,NY,NX)=DATAY(NZ)
-      ENDDO D300
-      D301: DO NZ=NP_col(NY,NX)+1,JP
-        DATAP(NZ,NY,NX)='NO'
-        DATAM(NZ,NY,NX)='NO'
-      ENDDO D301
-    ENDDO D6990
-  ENDDO D6995
-
-  end subroutine read_checkpt
 
 !------------------------------------------------------------------------------------------
 
@@ -1526,7 +1389,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IBTYP', iPlantTurnoverPattern_tab)
   call ncd_getvar(pft_nfid, 'IRTYP', iPlantGrainType_tab)
   call ncd_getvar(pft_nfid, 'MY',  Myco_tab)
-  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_tab)
+  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_pft_tab)
   call ncd_getvar(pft_nfid, 'VCMX',  VmaxRubCarboxyRef_tab)
   call ncd_getvar(pft_nfid, 'VOMX',  VmaxRubOxyRef_tab)
   call ncd_getvar(pft_nfid, 'VCMX4', VmaxPEPCarboxyRef_tab)
@@ -1538,7 +1401,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'ETMX', SpecChloryfilAct_tab)
   call ncd_getvar(pft_nfid, 'CHL',  LeafC3ChlorofilConc_tab)
   call ncd_getvar(pft_nfid, 'CHL4', LeafC4ChlorofilConc_tab)
-  call ncd_getvar(pft_nfid, 'FCO2', CanPCi2CaRatio_tab)
+  call ncd_getvar(pft_nfid, 'FCO2', CanopyCi2CaRatio_pft_tab)
   call ncd_getvar(pft_nfid, 'ALBR', RadSWLeafAlbedo_tab)
   call ncd_getvar(pft_nfid, 'ALBP', CanopyPARalbedo_tab)
   call ncd_getvar(pft_nfid, 'TAUR', RadSWLeafTransmis_tab)

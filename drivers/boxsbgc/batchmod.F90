@@ -33,8 +33,7 @@ contains
   integer :: nvars
   integer :: nmicbguilds
 
-  nmicbguilds=1
-  call micpar%Init(nmicbguilds)
+  call micpar%Init()
   call micpar%SetPars()
 
   call Initboxbgc(nvars)
@@ -55,17 +54,16 @@ contains
   call initNitro1Layer
 
 
-  associate(                                                 &
-    nlbiomcp               => micpar%nlbiomcp,               &
-    ndbiomcp               => micpar%ndbiomcp,               &
-    jsken                  => micpar%jsken,                  &
-    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
-    NumHetetr1MicCmplx => micpar%NumHetetr1MicCmplx, &
-    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
-    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
-    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
-    jcplx                  => micpar%jcplx,                  &
-    JG                     => micpar%jguilds                 &
+  associate(                                                   &
+    nlbiomcp                => micpar%nlbiomcp,                &
+    ndbiomcp                => micpar%ndbiomcp,                &
+    jsken                   => micpar%jsken,                   &
+    NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
+    NumHetetr1MicCmplx      => micpar%NumHetetr1MicCmplx,      &
+    NumMicrobAutoTrophCmplx => micpar%NumMicrobAutoTrophCmplx, &
+    NumLiveHeterBioms       => micpar%NumLiveHeterBioms,       &
+    NumLiveAutoBioms        => micpar%NumLiveAutoBioms,        &
+    jcplx                   => micpar%jcplx                    &
   )
 
   ystates0l(cid_oqc_b:cid_oqc_e)=forc%DOM(idom_doc,1:jcplx)
@@ -115,21 +113,20 @@ contains
 
   call err_status%reset()
 
-  associate(                                                 &
-    nlbiomcp               => micpar%nlbiomcp,               &
-    ndbiomcp               => micpar%ndbiomcp,               &
-    NumHetetr1MicCmplx => micpar%NumHetetr1MicCmplx, &
-    NumMicrobAutrophCmplx  => micpar%NumMicrobAutrophCmplx,  &
-    k_humus                => micpar%k_humus,                &
-    k_POM                  => micpar%k_POM,                  &
-    icarbhyro              => micpar%icarbhyro,              &
-    iprotein               => micpar%iprotein,               &
-    jsken                  => micpar%jsken,                  &
-    NumMicbFunGrupsPerCmplx       => micpar%NumMicbFunGrupsPerCmplx,       &
-    NumLiveHeterBioms      => micpar%NumLiveHeterBioms,      &
-    NumLiveAutoBioms       => micpar%NumLiveAutoBioms,       &
-    jcplx                  => micpar%jcplx,                  &
-    JG                     => micpar%jguilds                 &
+  associate(                                                   &
+    nlbiomcp                => micpar%nlbiomcp,                &
+    ndbiomcp                => micpar%ndbiomcp,                &
+    NumHetetr1MicCmplx      => micpar%NumHetetr1MicCmplx,      &
+    NumMicrobAutoTrophCmplx => micpar%NumMicrobAutoTrophCmplx, &
+    k_humus                 => micpar%k_humus,                 &
+    k_POM                   => micpar%k_POM,                   &
+    icarbhyro               => micpar%icarbhyro,               &
+    iprotein                => micpar%iprotein,                &
+    jsken                   => micpar%jsken,                   &
+    NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
+    NumLiveHeterBioms       => micpar%NumLiveHeterBioms,       &
+    NumLiveAutoBioms        => micpar%NumLiveAutoBioms,        &
+    jcplx                   => micpar%jcplx                    &
   )
   micfor%ZERO  =ZERO
   micfor%ZEROS2=ZEROS2
@@ -324,7 +321,7 @@ contains
     jcplx                   => micpar%jcplx,                   &
     jsken                   => micpar%jsken,                   &
     NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
-    NumMicrobAutrophCmplx   => micpar%NumMicrobAutrophCmplx,   &
+    NumMicrobAutoTrophCmplx   => micpar%NumMicrobAutoTrophCmplx,   &
     NumHetetr1MicCmplx       => micpar%NumHetetr1MicCmplx,       &
     NumLiveHeterBioms       => micpar%NumLiveHeterBioms,       &
     NumLiveAutoBioms        => micpar%NumLiveAutoBioms,        &
@@ -533,7 +530,7 @@ contains
     NumLiveAutoBioms        => micpar%NumLiveAutoBioms,        &
     NumLiveHeterBioms       => micpar%NumLiveHeterBioms,       &
     NumHetetr1MicCmplx       => micpar%NumHetetr1MicCmplx,       &
-    NumMicrobAutrophCmplx   => micpar%NumMicrobAutrophCmplx,   &
+    NumMicrobAutoTrophCmplx   => micpar%NumMicrobAutoTrophCmplx,   &
     VLWatMicP               => micfor%VLWatMicP                &
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
@@ -672,13 +669,12 @@ contains
   integer :: iknen,icplx
   integer :: jj,ll,k,m,n,ngl
 
-  associate(                                     &
-    jcplx            => micpar%jcplx,            &
-    JG               => micpar%jguilds,          &
-    jsken            => micpar%jsken,            &
+  associate(                                                   &
+    jcplx                   => micpar%jcplx,                   &
+    jsken                   => micpar%jsken,                   &
     NumMicbFunGrupsPerCmplx => micpar%NumMicbFunGrupsPerCmplx, &
-    nlbiomcp         => micpar%nlbiomcp,         &
-    ndbiomcp         => micpar%ndbiomcp          &
+    nlbiomcp                => micpar%nlbiomcp,                &
+    ndbiomcp                => micpar%ndbiomcp                 &
   )
 
   !configure variables

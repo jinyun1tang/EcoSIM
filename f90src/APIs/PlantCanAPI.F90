@@ -82,7 +82,9 @@ implicit none
     plt_morph%CanopyHeightZ_col(L)   = CanopyHeightZ_col(L,NY,NX)
     plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)
   ENDDO
-  plt_rad%TAU_DirectRTransmit(NumCanopyLayers+1)=TAU_DirectRTransmit(NumCanopyLayers+1,NY,NX)
+  DO L=1,NumCanopyLayers+1
+    plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)  
+  ENDDO  
 
   DO L=0,NL_col(NY,NX)
     plt_site%AREA3(L)                 = AREA_3D(3,L,NY,NX)
@@ -99,7 +101,7 @@ implicit none
   plt_rad%RadSWDiffus_col          = RadSWDiffus_col(NY,NX)
   plt_rad%RadPARDiffus_col         = RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col          = RadSWDirect_col(NY,NX)
-  plt_rad%RadPARDirect_col         = RadPARDirect_col(NY,NX)
+  plt_rad%RadDirectPAR_col         = RadDirectPAR_col(NY,NX)
   plt_site%SoilSurfRoughnesst0_col = SoilSurfRoughnesst0_col(NY,NX)
   plt_ew%VcumWatSnow_col           = VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col           = VcumIceSnow_col(NY,NX)
@@ -186,7 +188,7 @@ implicit none
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col
   RadSWDirect_col(NY,NX)     = plt_rad%RadSWDirect_col
   RadSWDiffus_col(NY,NX)     = plt_rad%RadSWDiffus_col
-  RadPARDirect_col(NY,NX)    = plt_rad%RadPARDirect_col
+  RadDirectPAR_col(NY,NX)    = plt_rad%RadDirectPAR_col
   RadPARDiffus_col(NY,NX)    = plt_rad%RadPARDiffus_col
   RadSWGrnd_col(NY,NX)       = plt_rad%RadSWGrnd_col
   FracSWRad2Grnd_col(NY,NX)  = plt_rad%FracSWRad2Grnd_col
@@ -196,9 +198,9 @@ implicit none
   DO L=0,NumCanopyLayers
     CanopyHeightZ_col(L,NY,NX)=plt_morph%CanopyHeightZ_col(L)
   ENDDO
-  DO L=1,NumCanopyLayers
+  DO L=1,NumCanopyLayers+1
     TAU_DirectRTransmit(L,NY,NX) = plt_rad%TAU_DirectRTransmit(L)
-    TAU_RadThru(L,NY,NX)      = plt_rad%TAU_RadThru(L)
+    TAU_RadThru(L,NY,NX)         = plt_rad%TAU_RadThru(L)
   ENDDO
   LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col
   
@@ -211,11 +213,24 @@ implicit none
     StomatalStress_pft(NZ,NY,NX)    = plt_biom%StomatalStress_pft(NZ)
     Eco_RadSW_col(NY,NX)            = Eco_RadSW_col(NY,NX)+RadSWbyCanopy_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWbyCanopy_pft(NZ,NY,NX)
+    LeafAreaSunlit_pft(NZ,NY,NX)    = plt_photo%LeafAreaSunlit_pft(NZ)
+    PARSunlit_pft(NZ,NY,NX)         = plt_photo%PARSunlit_pft(NZ)
+    PARSunsha_pft(NZ,NY,NX)         = plt_photo%PARSunsha_pft(NZ)
+    DO NB=1,NumOfBranches_pft(NZ,NY,NX)
+      DO K=1,MaxNodesPerBranch
+        DO  L=1,NumCanopyLayers
+          DO N=1,NumLeafZenithSectors
+            LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)  = plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
+            LeafAreaSunlit_zsec(N,L,K,NB,NZ,NY,NX) = plt_photo%LeafAreaSunlit_zsec(N,L,K,NB,NZ)                        
+          ENDDO  
+        ENDDO
+      ENDDO  
+    ENDDO
     DO L=1,NumCanopyLayers
       DO M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafZenithSectors
           RadDifPAR_zsec(N,M,L,NZ,NY,NX)=plt_rad%RadDifPAR_zsec(N,M,L,NZ)
-          RadPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadPAR_zsec(N,M,L,NZ)
+          RadTotPAR_zsec(N,M,L,NZ,NY,NX)   =plt_rad%RadTotPAR_zsec(N,M,L,NZ)          
         ENDDO
       ENDDO
     ENDDO

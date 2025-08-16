@@ -13,6 +13,7 @@ module EcoSIMAPI
   use WatsubMod,         only: watsub
   use PlantMgmtDataType, only: NP_col
   use FireMod,           only: config_fire
+  use EcoSIMSolverPar,   only: oscal_test
   USE EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcoSIMCtrlMod  
@@ -133,6 +134,7 @@ contains
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
   use readsmod       , only : clim_var  
+  use MicrobeConfigMod,only : ReadMicrobeNamelist
   use HistFileMod
   implicit none
   character(len=*), parameter :: mod_filename = &
@@ -142,7 +144,6 @@ contains
   character(len=80)    , intent(out) :: prefix
   integer              , intent(out) :: LYRG
   integer              , intent(out) :: nmicbguilds
-
 
   logical :: do_regression_test
   integer :: num_of_simdays
@@ -156,14 +157,14 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,continue_run,visual_out,restart_out,&
+    NPXS,NPYS,continue_run,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -187,7 +188,6 @@ contains
   NCYC_SNOW             = 20
   grid_mode             = 3
   iErosionMode          = -1
-  visual_out            = .false.
   restart_out           = .false.
   do_budgets            = .false.
   plant_model           = .true.
@@ -239,6 +239,7 @@ contains
   atm_ch4_fix        = -100._r8
   first_topou        = .false.
   ldo_radiation_test = .false.
+  
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
@@ -309,6 +310,8 @@ contains
     clim_var%Atm_kPa   = Atm_kPa
   endif
 
+  call ReadMicrobeNamelist(nml_buffer)
+
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
@@ -322,7 +325,6 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts
-  use VisualMod,       only: visual
   use WthrMod,         only: wthr
   use RestartMod,      only: restFile
   use PlantInfoMod,    only: ReadPlantInfo

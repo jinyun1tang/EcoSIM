@@ -81,16 +81,16 @@ contains
   integer :: L
 !     begin_execution
 
-  WatFLo2Litr_col(NY,NX)                      = 0.0_r8
-  HeatFLoByWat2LitR_col(NY,NX)                = 0.0_r8
-  TLitrIceFlxThaw_col(NY,NX)                  = 0.0_r8
-  TLitrIceHeatFlxFrez_col(NY,NX)              = 0.0_r8
-  HeatByRad2Surf_col(NY,NX)               = 0.0_r8
-  HeatSensAir2Surf_col(NY,NX)             = 0.0_r8
-  HeatEvapAir2Surf_col(NY,NX)             = 0.0_r8
-  HeatSensVapAir2Surf_col(NY,NX)          = 0.0_r8
-  HeatNet2Surf_col(NY,NX)                 = 0.0_r8
-  VapXAir2GSurf_col(NY,NX)                = 0.0_r8
+  WatFLo2Litr_col(NY,NX)         = 0.0_r8
+  HeatFLoByWat2LitR_col(NY,NX)   = 0.0_r8
+  TLitrIceFlxThaw_col(NY,NX)     = 0.0_r8
+  TLitrIceHeatFlxFrez_col(NY,NX) = 0.0_r8
+  HeatByRad2Surf_col(NY,NX)      = 0.0_r8
+  HeatSensAir2Surf_col(NY,NX)    = 0.0_r8
+  HeatEvapAir2Surf_col(NY,NX)    = 0.0_r8
+  HeatSensVapAir2Surf_col(NY,NX) = 0.0_r8
+  HeatNet2Surf_col(NY,NX)        = 0.0_r8
+  VapXAir2GSurf_col(NY,NX)       = 0.0_r8
 
   !TFLWCI(NY,NX)           = 0.0_r8
   PrecIntceptByCanopy_col(NY,NX) = 0.0_r8

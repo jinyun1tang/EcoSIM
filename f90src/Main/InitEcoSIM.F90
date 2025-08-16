@@ -12,7 +12,7 @@ module InitEcoSIM
   public :: InitModules
   contains
 
-  subroutine InitModules(NOMicrobeGuilds)
+  subroutine InitModules()
 
   use PlantDisturbsMod, only: InitPlantDisturbance
   use UptakesMod,       only: InitUptake
@@ -31,9 +31,7 @@ module InitEcoSIM
 
   implicit  none
 
-  integer   , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
-
-  call InitAlloc(NOMicrobeGuilds)
+  call InitAlloc()
 
   !load plant trait table
   if(plant_model .and. .not. ats_cpl_mode) call ReadPlantTraitTable()

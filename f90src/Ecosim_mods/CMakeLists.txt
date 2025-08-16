@@ -3,7 +3,6 @@ set(ECOSIM_MOD_SOURCES
 	StarteMod.F90
 	StartsMod.F90
 	StartqMod.F90  
-	VisualMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})
@@ -16,6 +15,7 @@ target_include_directories(ecosim_mods  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys

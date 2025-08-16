@@ -42,9 +42,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                    !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                 !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                !sheath angle, [degree from horizontal]
-  real(r8),target,allocatable ::  ReistanceCanopy_pft(:,:,:)                 !canopy roughness height, [m]
+  real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
-  real(r8),target,allocatable ::  LeafNodeArea_brch(:,:,:,:,:)               !leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)             !sheath height, [m]
   real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)         !Live internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
@@ -75,8 +75,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rProteinC2P_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
-  real(r8),target,allocatable ::  PlantInitThermoAdaptZone(:,:,:)            !initial plant thermal adaptation zone, [-]
-  real(r8),target,allocatable ::  iPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  PlantInitThermoAdaptZone_pft(:,:,:)            !initial plant thermal adaptation zone, [-]
+  real(r8),target,allocatable ::  rPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                  !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
@@ -209,10 +209,10 @@ contains
   allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
   allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
-  allocate(ReistanceCanopy_pft(JP,JY,JX));      ReistanceCanopy_pft=0._r8
+  allocate(CanopyIsothBndlResist_pft(JP,JY,JX));      CanopyIsothBndlResist_pft=0._r8
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
-  allocate(LeafNodeArea_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafNodeArea_brch=0._r8
+  allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
   allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
   allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
@@ -243,8 +243,8 @@ contains
   allocate(rProteinC2P_pft(JP,JY,JX));     rProteinC2P_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
-  allocate(PlantInitThermoAdaptZone(JP,JY,JX));    PlantInitThermoAdaptZone=0._r8
-  allocate(iPlantThermoAdaptZone_pft(JP,JY,JX));     iPlantThermoAdaptZone_pft=0._r8
+  allocate(PlantInitThermoAdaptZone_pft(JP,JY,JX));    PlantInitThermoAdaptZone_pft=0._r8
+  allocate(rPlantThermoAdaptZone_pft(JP,JY,JX));     rPlantThermoAdaptZone_pft=0._r8
   allocate(MatureGroup_brch(MaxNumBranches,JP,JY,JX)); MatureGroup_brch=0._r8
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX_pft(JP,JY,JX));   GROUPX_pft=0._r8
@@ -375,9 +375,9 @@ contains
   call destroy(PetioleAngle_pft)
   call destroy(SineBranchAngle_pft)
   call destroy(SinePetioleAngle_pft)
-  call destroy(ReistanceCanopy_pft)
+  call destroy(CanopyIsothBndlResist_pft)
   call destroy(CanopyHeight4WatUptake_pft)
-  call destroy(LeafNodeArea_brch)
+  call destroy(LeafArea_node)
   call destroy(PetoleLensNode_brch)
   call destroy(LiveInterNodeHight_brch)
   call destroy(LeafAreaLive_brch)
@@ -409,8 +409,8 @@ contains
   call destroy(rProteinC2P_pft)
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
-  call destroy(PlantInitThermoAdaptZone)
-  call destroy(iPlantThermoAdaptZone_pft)
+  call destroy(PlantInitThermoAdaptZone_pft)
+  call destroy(rPlantThermoAdaptZone_pft)
   call destroy(MatureGroup_brch)
   call destroy(MatureGroup_pft)
   call destroy(GROUPX_pft)

@@ -707,9 +707,9 @@ module MicBGCMod
   )
 
   TOMCNK(:)=0.0_r8
-  DO NGL=JGniH(N),JGnfH(N)
+  DO NGL=JGniA(N),JGnfA(N)
     DO M=1,2
-      MID=micpar%get_micb_id(M,NGL)          
+      MID=micpar%get_micb_id(M,NGL) 
       TOMCNK(M)=TOMCNK(M)+mBiomeAutor(ielmc,MID)
     ENDDO
   ENDDO  
@@ -809,12 +809,15 @@ module MicBGCMod
       if(.not.is_activeMicrbFungrpHeter(N))cycle
       call GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL,SPOMK,RMOMK)
 
+      !loop over all guilds of a given functional group
       DO NGL=JGniH(N),JGnfH(N)        
         ! WatStressMicb=water potential (PSISoilMatricP_vr) effect on microbial respiration
         ! OXKX=Km for O2 uptake
         ! OXKM=Km for heterotrophic O2 uptake set in starts.f
         !  GrowthEnvScalHeter=combined temp and water stress effect on growth respiration
         !  TempMaintRHeter=temperature effect on maintenance respiration
+        !
+        !different guilds can have different temperature and moisture sensitivity
         IF(N.EQ.mid_Aerob_Fungi)THEN
           WatStressMicb=EXP(0.1_r8*AMAX1(PSISoilMatricP,-500._r8))
         ELSE
@@ -846,12 +849,11 @@ module MicBGCMod
 
     DO NGL=JGniA(N),JGnfA(N)
       WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
-      OXKX                    = OXKA
       GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
       TSensMaintRAutor(NGL)   = TSensMaintR
       IF(OMActAutor(NGL).GT.0.0_r8)THEN
         call ActiveAutotrophs(I,J,NGL,N,VOLWZ,XCO2,TSensGrowth,WatStressMicb,SPOMK, RMOMK, &
-          OXKX,TotActMicrobiom,TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
+          TotBiomNO2Consumers,RH2UptkAutor,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T, &
           micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
       ENDIF
     ENDDO
@@ -2434,8 +2436,8 @@ module MicBGCMod
     RH2PO4DmndBandHeterPrev => micflx%RH2PO4DmndBandHeterPrev, &
     RH1PO4DmndSoilHeterPrev => micflx%RH1PO4DmndSoilHeterPrev, &
     RH1PO4DmndBandHeterPrev => micflx%RH1PO4DmndBandHeterPrev, &
-    RDOCUptkHeterPrev       => micflx%RDOCUptkHeterPrev,       &
-    RAcetateUptkHeterPrev   => micflx%RAcetateUptkHeterPrev,   &
+    RDOCUptkHeterPrev       => micfor%RDOCUptkHeterPrev,       &
+    RAcetateUptkHeterPrev   => micfor%RAcetateUptkHeterPrev,   &
     RNH4DmndLitrHeterPrev   => micflx%RNH4DmndLitrHeterPrev,   &
     RNO3DmndLitrHeterPrev   => micflx%RNO3DmndLitrHeterPrev,   &
     RH2PO4DmndLitrHeterPrev => micflx%RH2PO4DmndLitrHeterPrev, &
@@ -2739,8 +2741,8 @@ module MicBGCMod
 ! RGOMP=O2-unlimited respiration of DOC+DOA
 ! RGOCP,RGOAP,RGOMP=O2-unlimited respiration of DOC, DOA, DOC+DOA
 !
-  FSBSTC       = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
-  FSBSTA       = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
+  FSBSTC            = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
+  FSBSTA            = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
   FSBSTHeter(NGL,K) = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
 
   RGOCY  = AZMAX1(FBiomStoiScalarHeter(NGL,K)*OMActHeter(NGL,K))*VMXO*WatStressMicb*TSensGrowth
@@ -2778,6 +2780,7 @@ module MicBGCMod
   ECHZ                     = EO2Q*FGOCP+EO2A*FGOAP
   RO2Dmnd4RespHeter(NGL,K) = 2.667_r8*RGOMP
   RO2DmndHeter(NGL,K)      = RO2Dmnd4RespHeter(NGL,K)
+
   !make a copy for flux limiter 
   RO2DmndHetert(NGL,K)       = RO2DmndHeter(NGL,K)
   RDOCUptkHeter(NGL,K)       = RGOCZ   !potential DOC (unlimited) uptake flux

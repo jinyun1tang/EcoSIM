@@ -16,12 +16,12 @@ target_include_directories(modelforc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/CanopyPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
   ${CMAKE_BINARY_DIR}/f90src/APIs/
-  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/Prescribed_pheno/
   ${CMAKE_BINARY_DIR}/f90src/Geochem/Box_chem

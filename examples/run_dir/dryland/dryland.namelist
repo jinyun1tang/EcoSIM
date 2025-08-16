@@ -32,7 +32,7 @@ NPYS=10,10,10   !number of cycles per NPX for gas flux calcns
 NCYC_LITR=30
 NCYC_SNOW=20
 !set up output frequency
-hist_mfilt=8760
+hist_mfilt=3650
 hist_nhtfrq=-24
 /
 &bbgcforc
