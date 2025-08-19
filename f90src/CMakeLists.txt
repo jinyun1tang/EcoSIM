@@ -17,10 +17,10 @@ add_subdirectory(APIs)
 add_subdirectory(IOutils)
 add_subdirectory(Ecosim_mods)
 add_subdirectory(Balances)
-add_subdirectory(ATSUtils)
 add_subdirectory(Modelforc)
 add_subdirectory(Transport)
 add_subdirectory(Main)
+add_subdirectory(ATSUtils)
 
 #message("ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES}")
 # Collect all the intermediate libraries

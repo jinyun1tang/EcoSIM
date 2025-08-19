@@ -122,6 +122,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_MATP(ncells_per_col_, ncol))
   allocate(a_PORO(ncells_per_col_, ncol))
   allocate(a_LDENS(ncells_per_col_, ncol))
+  allocate(a_LSAT(ncells_per_col_, ncol))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
@@ -139,6 +140,7 @@ subroutine Init_ATSEcoSIM_driver()
       a_MATP(L,NY) = -6.9
       a_PORO(L,NY) = 0.5
       a_LDENS(L,NY) = 1.0
+      a_LSAT(L,NY) = 0.5
     enddo
     a_ASP(NY) = 0.0
     tairc(NY) = 242.13003959655759

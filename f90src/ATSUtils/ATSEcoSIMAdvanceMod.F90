@@ -49,6 +49,7 @@ implicit none
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   use SurfaceRadiationMod
   use PlantMod
+  use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
@@ -89,8 +90,11 @@ implicit none
   write(*,*) "(ATSEcoSIMAdvance) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
-
+  !call InitModules()
   NX=1
+
+  !load NK_col here?
+  NK_col(NX,1) = 14
 
   do NY=1, NYS
     call SetHourlyAccumulatorsATS(NY,NX)
@@ -129,6 +133,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
+
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
@@ -148,6 +153,13 @@ implicit none
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
       !AREA3(L,NY,NX)              = a_AREA3(L,NY)
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
+
+      !Additional parameters for phenology
+      VLSoilPoreMicP_vr(L,NY,NX) = SoilFracAsMicP_vr(L,NY,NX) !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered
+      VLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX) !soil moisture
+      HYCDMicP4RootUptake_vr(L,NY,NX) = PSISM1_vr(L,NY,NX)!soil hydraulic conductivity for water uptake
+      THETW_vr(L,NY,NX) = a_LSAT(L,NY) !relative Saturation of soil micropores in layerL
+
       IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
         !fraction as water
         FracSoiPAsWat_vr(L,NY,NX)=AZMAX1t(VLWatMicP1_vr(L,NY,NX)/VLTSoiPore)

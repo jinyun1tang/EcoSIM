@@ -57,7 +57,7 @@ implicit none
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(30, 10, 20, 20)
-  call InitModules(NOMicrobeGuilds=1)
+  call InitModules()
   !call InitAlloc(NOMicrobeGuilds=1)
   !call InitUptake
   !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
