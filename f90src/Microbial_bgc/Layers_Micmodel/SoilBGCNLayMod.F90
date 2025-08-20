@@ -40,6 +40,7 @@ module SoilBGCNLayMod
   public :: sumHumOMLayL
   public :: SumMicbGroup
   public :: sumDOML
+  public :: SumSolidOML
   contains
 
 !------------------------------------------------------------------------------------------
@@ -76,15 +77,15 @@ module SoilBGCNLayMod
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
 !     FracLitrMix=mixing fraction for subsurface litter
 !
-    IF(L.LT.NL(NY,NX))THEN
+    IF(L.LT.NL_col(NY,NX))THEN
 !     get mixing rate
       IF(L.EQ.0)THEN
-        LL=NU(NY,NX)
+        LL=NU_col(NY,NX)
         DOC_s=0._r8;DOC_u=0._r8
         DO K=1,micpar%NumOfLitrCmplxs
           if(.not.micpar%is_finelitter(K))cycle
-          DOC_s=DOC_s+DOM_vr(idom_doc,K,L,NY,NX)
-          DOC_u=DOC_u+DOM_vr(idom_doc,K,LL,NY,NX)
+          DOC_s=DOC_s+DOM_MicP_vr(idom_doc,K,L,NY,NX)
+          DOC_u=DOC_u+DOM_MicP_vr(idom_doc,K,LL,NY,NX)
         ENDDO
         ActL  = DOC_s
         ActLL = DOC_u
@@ -92,18 +93,13 @@ module SoilBGCNLayMod
 
         IF(OMLitrC_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FracLitrMix=FOSCZ0/OMLitrC_vr(L,NY,NX)*TMicHeterActivity_vr(L,NY,NX)
-!          if(ActD>0._r8)then
-!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_s)
-!          elseif(actD<0._r8)then
-!            FracLitrMix=AMIN1(1.0_r8,FracLitrMix*ActD/DOC_u)
-!          endif
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
-!        write(113,*)I+J/24.,ActD,DOM_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
+!        write(113,*)I+J/24.,ActD,DOM_MicP_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
 
       ELSE
-        D1100: DO LN=L+1,NL(NY,NX)
+        D1100: DO LN=L+1,NL_col(NY,NX)
           IF(VLSoilPoreMicP_vr(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
             LL=LN
             exit
@@ -166,7 +162,7 @@ module SoilBGCNLayMod
     D7971: DO K=1,micpar%NumOfLitrCmplxs
       if(.not.micpar%is_finelitter(K))cycle
       D7961: DO N=1,NumMicbFunGrupsPerCmplx
-        DO NGL=JGnio(N),JGnfo(N)
+        DO NGL=JGniH(N),JGnfH(N)
           D7962: DO M=1,micpar%nlbiomcp
             MID=micpar%get_micb_id(M,NGL)            
             DO NE=1,NumPlantChemElms            
@@ -195,15 +191,15 @@ module SoilBGCNLayMod
       !mix dissolved organic matter
 
       DO NE=idom_beg,idom_end
-        OQMXS  = FracLitrMix*AZMAX1(DOM_vr(NE,K,L1,NY,NX))
+        OQMXS  = FracLitrMix*AZMAX1(DOM_MicP_vr(NE,K,L1,NY,NX))
         OQMHXS = FracLitrMix*AZMAX1(DOM_MacP_vr(NE,K,L1,NY,NX))
         OHMXS  = FracLitrMix*AZMAX1(SorbedOM_vr(NE,K,L1,NY,NX))
 
-        DOM_vr(NE,K,L,NY,NX)      = DOM_vr(NE,K,L,NY,NX)-OQMXS
+        DOM_MicP_vr(NE,K,L,NY,NX) = DOM_MicP_vr(NE,K,L,NY,NX)-OQMXS
         DOM_MacP_vr(NE,K,L,NY,NX) = DOM_MacP_vr(NE,K,L,NY,NX)-OQMHXS
         SorbedOM_vr(NE,K,L,NY,NX) = SorbedOM_vr(NE,K,L,NY,NX)-OHMXS
 
-        DOM_vr(NE,K,LL,NY,NX)      = DOM_vr(NE,K,LL,NY,NX)+OQMXS
+        DOM_MicP_vr(NE,K,LL,NY,NX) = DOM_MicP_vr(NE,K,LL,NY,NX)+OQMXS
         DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
         SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
       ENDDO
@@ -272,7 +268,7 @@ module SoilBGCNLayMod
   DK100: DO K=1,jcplx1
     !add heterotrophic microbes
     DC100: DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,nelms
@@ -298,23 +294,23 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      if(abs(DOM_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_vr(idom,K,L,NY,NX)=0._r8    
+      if(abs(DOM_MicP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MicP_vr(idom,K,L,NY,NX)=0._r8    
       if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
       if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
     ENDDO  
 
     DO NE=1,nelms      
-      ORGM(NE)=ORGM(NE)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+      ORGM(NE)=ORGM(NE)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
         if(ORGM(NE)<0._r8)then
-        print*,'orgm2',NE,ORGM,DOM_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
+        print*,'orgm2',NE,ORGM,DOM_MicP_vr(NE,K,L,NY,NX),DOM_MacP_vr(NE,K,L,NY,NX),SorbedOM_vr(NE,K,L,NY,NX)
         stop
         endif
     ENDDO
 
-    ORGM(ielmc)=ORGM(ielmc)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    ORGM(ielmc)=ORGM(ielmc)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     if(ORGM(ielmc)<0._r8)then
-    print*,'orgmxxx',ORGM,DOM_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    print*,'orgmxxx',ORGM,DOM_MicP_vr(idom_acetate,K,L,NY,NX),DOM_MacP_vr(idom_acetate,K,L,NY,NX),SorbedOM_vr(idom_acetate,K,L,NY,NX)    
     print*,'L=',L
     if(present(info))print*,info
     stop
@@ -335,6 +331,29 @@ module SoilBGCNLayMod
   ENDDO DK200   
 
   end subroutine sumORGMLayL
+!------------------------------------------------------------------------------------------
+  subroutine SumSolidOML(ielm,L,NY,NX,SOMe)
+
+  implicit none
+  integer,intent(in) :: ielm
+  integer,intent(in) :: L,NY,NX
+  real(r8),intent(out) :: SOMe(1:jcplx)
+  integer :: K,M,KL
+
+  SOMe=0._r8
+  if(L==0)then
+    KL=micpar%NumOfLitrCmplxs
+  else
+    KL=jcplx
+  endif  
+  
+  DO K=1,KL
+    DO  M=1,jsken
+      SOMe(K)=SOMe(K)+SolidOM_vr(ielm,M,K,L,NY,NX)
+    ENDDO
+  ENDDO
+  
+  end subroutine SumSolidOML
 !------------------------------------------------------------------------------------------
 
   subroutine sumLitrOMLayL(L,NY,NX,ORGM,I,J)
@@ -367,7 +386,7 @@ module SoilBGCNLayMod
   DO K=1,micpar%NumOfLitrCmplxs
     !add live heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -386,7 +405,7 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
 
@@ -439,7 +458,7 @@ module SoilBGCNLayMod
   DO  K=micpar%NumOfLitrCmplxs+1,jcplx
    !sumup heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -457,7 +476,7 @@ module SoilBGCNLayMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
     ENDDO
     DO NE=1,NumPlantChemElms
@@ -489,7 +508,7 @@ module SoilBGCNLayMod
   !sum up litter OM in layer L
   implicit none
   integer, intent(in) :: L, NY,NX
-  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
+  real(r8), intent(out) :: ORGM(1:NumPlantChemElms)  !microbial biomass 
   integer :: K,N,NGL,M,MID,NE,jcplx1
 
   ORGM=0._r8
@@ -511,11 +530,11 @@ module SoilBGCNLayMod
       enddo
     enddo
   enddo
-
+  !add heterotrophs
   DO K=1,jcplx1
     !add heterotrophic microbes
     DO  N=1,NumMicbFunGrupsPerCmplx
-      DO NGL=JGnio(N),JGnfo(N)
+      DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -551,7 +570,7 @@ module SoilBGCNLayMod
 
   DO K=1,micpar%NumOfLitrCmplxs
     DO  N=1,NumMicbFunGrupsPerCmplx
-      do NGL=JGnio(n),JGnfo(n)
+      do NGL=JGniH(n),JGnfH(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           NE=ielmc
@@ -567,10 +586,10 @@ module SoilBGCNLayMod
 
     !add dom
     NE=ielmc
-    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     
     !add acetate
-    SOMHeterK(K)=SOMHeterK(K)+DOM_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     DO M=1,jsken
       NE=ielmc
@@ -628,7 +647,7 @@ module SoilBGCNLayMod
     endif
     
     DO K=1,micpar%NumOfLitrCmplxs    
-      do NGL=JGnio(igroup),JGnfo(igroup)
+      do NGL=JGniH(igroup),JGnfH(igroup)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
@@ -657,7 +676,7 @@ module SoilBGCNLayMod
   DOM_macp = 0._r8
   DO K = 1, micpar%NumOfLitrCmplxs
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom)+DOM_vr(idom,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom)+DOM_MicP_vr(idom,K,L,NY,NX)
       DOM_macp(idom) = DOM_macp(idom)+DOM_MacP_vr(idom,K,L,NY,NX)
     ENDDO
   ENDDO

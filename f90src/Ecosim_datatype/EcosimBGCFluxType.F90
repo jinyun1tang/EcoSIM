@@ -23,18 +23,17 @@ module EcosimBGCFluxType
   real(r8),target,allocatable ::  ECO_HR_CO2_vr(:,:,:)                              !Vertically resolved heterotrophic respiraiton as CO2 [gC/d2/hr]
   real(r8),target,allocatable ::  ECO_HR_CH4_vr(:,:,:)                              !heterotrophic respiration as CH4, [gC d-2]  
   real(r8),target,allocatable ::  ECO_HR_CH4_col(:,:)                               !heterotrophic respiration as CH4, [gC d-2]
-  real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                    !ecosystem harvest , [g d-2]
-  real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                   !total NH4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                   !total H2PO4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),target,allocatable ::  GPP(:,:)                                          !gross primary productivity, [g d-2 h-1]
-  real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                               !total net CO2 fixation
-  real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                      !total LitrFall element, [g d-2 h-1]
-  real(r8),target,allocatable ::  ECO_ER_col(:,:)                                   !ecosystem respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                            !total NBP, [g d-2]
-  real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                   !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
-  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                   !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_col(:,:,:)                    !ecosystem harvest , [gC d-2]
+  real(r8),target,allocatable ::  NetNH4Mineralize_CumYr_col(:,:)                   !total NH4 net mineraln (-ve) or immobiln (+ve),[gN d-2]
+  real(r8),target,allocatable ::  NetPO4Mineralize_CumYr_col(:,:)                   !total H2PO4 net mineraln (-ve) or immobiln (+ve), [gP d-2]
+  real(r8),target,allocatable ::  Canopy_NEE_col(:,:)                               !total net CO2 fixation, [gC d-2 h-1]
+  real(r8),target,allocatable ::  LitrFallStrutElms_col(:,:,:)                      !total LitrFall chemical elements, [g d-2 h-1]
+  real(r8),target,allocatable ::  ECO_ER_col(:,:)                                   !ecosystem respiration, [gC d-2 h-1]
+  real(r8),target,allocatable ::  Eco_NBP_CumYr_col(:,:)                            !cumulative NBP, [gC d-2]
+  real(r8),target,allocatable ::  REcoH1PO4DmndSoil_vr(:,:,:)                       !Current HPO4 demand in non-band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RH1PO4EcoDmndSoilPrev_vr(:,:,:)                   !previous time step HPO4 demand in non-band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  REcoH1PO4DmndBand_vr(:,:,:)                       !Current HPO4 demand in band by all microbial,root,myco populations, [gN d-2 h-1]
+  real(r8),target,allocatable ::  RH1PO4EcoDmndBandPrev_vr(:,:,:)                   !Previous time step HPO4 demand in band by all microbial,root,myco populations, [gN d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -56,7 +55,6 @@ contains
   allocate(EcoHavstElmnt_CumYr_col(NumPlantChemElms,JY,JX));      EcoHavstElmnt_CumYr_col=0._r8
   allocate(NetNH4Mineralize_CumYr_col(JY,JX));      NetNH4Mineralize_CumYr_col=0._r8
   allocate(NetPO4Mineralize_CumYr_col(JY,JX));      NetPO4Mineralize_CumYr_col=0._r8
-  allocate(GPP(JY,JX));         GPP=0._r8
   allocate(Canopy_NEE_col(JY,JX));       Canopy_NEE_col=0._r8
   allocate(LitrFallStrutElms_col(NumPlantChemElms,JY,JX));       LitrFallStrutElms_col=0._r8
   allocate(ECO_ER_col(JY,JX));        ECO_ER_col=0._r8
@@ -86,7 +84,6 @@ contains
   call destroy(EcoHavstElmnt_CumYr_col)
   call destroy(NetNH4Mineralize_CumYr_col)
   call destroy(NetPO4Mineralize_CumYr_col)
-  call destroy(GPP)
   call destroy(Canopy_NEE_col)
   call destroy(LitrFallStrutElms_col)
   call destroy(ECO_ER_col)

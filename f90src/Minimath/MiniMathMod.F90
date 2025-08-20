@@ -26,7 +26,13 @@ module minimathmod
   public :: yearday,isletter
   public :: dssign
   public :: flux_mass_limiter
-  public :: AZERO
+  public :: AZERO,AZERO1  
+  public :: SubstrateLimit
+  public :: SubstrateDribbling
+  interface SubstrateDribbling
+    module procedure SubstrateDribbling_vec
+    module procedure SubstrateDribbling_scal
+  end interface SubstrateDribbling
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
@@ -36,7 +42,8 @@ module minimathmod
     module procedure AZMIN1_s
     module procedure AZMIN1_d
   end interface AZMIN1
-
+  
+  public :: get_flux_scalar
   public :: addone
   public :: RichardsonNumber
   real(r8), parameter :: tiny_val=1.e-14_r8
@@ -205,14 +212,29 @@ module minimathmod
   real(r8), intent(in) :: val
 
   real(r8) :: ans
-
-  if(abs(val)>=tiny_val)then
+  real(r8), parameter :: tiny_val1=1.e-13_r8
+  if(abs(val)>=tiny_val1)then
     ans=val
   else  
     ans=0._r8
   endif
 
   end function AZERO
+
+!------------------------------------------------------------------------------------------
+  pure function AZERO1(val,tiny_val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: tiny_val2
+  real(r8) :: ans
+
+  if(abs(val)>=tiny_val2)then
+    ans=val
+  else  
+    ans=0._r8
+  endif
+
+  end function AZERO1
 !------------------------------------------------------------------------------------------
 
   pure function AZMAX1_s(val)result(ans)
@@ -456,4 +478,90 @@ module minimathmod
     ans=-AMIN1(-flux,massa)+tiny_val
   endif
   end function flux_mass_limiter
+
+! ----------------------------------------------------------------------
+  subroutine get_flux_scalar(x0,flux,x1,pscal)
+  implicit none
+  real(r8), intent(in) :: x0,flux
+  real(r8), intent(out):: x1
+  real(r8), intent(inout):: pscal
+  real(r8) :: p1
+
+  x1=x0
+  if(isclose(flux,0._r8))return
+  if(pscal>1.e-6_r8)x1=x1+flux  
+  if(x1<0._r8)then
+    p1=safe_adb(-x0,flux)
+    pscal=AMIN1(0.999_r8,pscal,p1) 
+    x1=0._r8
+  endif
+
+  end subroutine get_flux_scalar
+! ----------------------------------------------------------------------
+
+  subroutine SubstrateLimit(n1,n2,demand_flux,y,scal)
+  implicit none
+  integer, intent(in) :: n1,n2
+  real(r8), intent(inout) :: demand_flux(n1:n2)  !consumption/demand flux
+  real(r8), intent(inout) :: Y  
+  real(r8), optional, intent(out)   :: scal
+  real(r8) :: tDemand,scal1
+  integer :: N
+
+  tDemand = sum(demand_flux)
+  scal1    = 1._r8
+  if(y-tDemand>=tiny_val .or. tDemand<=tiny_val)then
+    y=AZMAX1(y-tDemand)
+  else
+    scal1=safe_adb(y,tDemand)
+    DO n=n1,n2
+      demand_flux(n)=demand_flux(n)*scal1
+    enddo
+    y=0._r8
+  endif
+  if(present(scal))scal=scal1
+  end subroutine SubstrateLimit
+
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_scal(demand_flux,dribbling_flx,y)
+
+  implicit none
+  real(r8), intent(in) :: demand_flux        !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = demand_flux + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_scal
+!------------------------------------------------------------------------
+  subroutine SubstrateDribbling_vec(n1,n2,demand_flux,dribbling_flx,y)
+
+  implicit none
+  integer, intent(in) :: n1,n2
+  real(r8), intent(in) :: demand_flux(n1:n2)  !consumption/demand flux
+  real(r8), intent(inout) :: dribbling_flx    !>0
+  real(r8), intent(inout) :: Y
+  real(r8) :: tDemand
+
+  tDemand = sum(demand_flux) + dribbling_flx
+
+  if(y>tDemand)then
+    y=y-tDemand
+    dribbling_flx=0._r8
+  else
+    dribbling_flx=tDemand-y
+    y=0._r8
+  endif
+  
+  end subroutine SubstrateDribbling_vec
+
 end module minimathmod

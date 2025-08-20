@@ -219,7 +219,7 @@ implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
   integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NumMicbFunGrupsPerCmplx,jsken,NumHetetrMicCmplx,NumMicrobAutrophCmplx
+  integer :: NumMicbFunGrupsPerCmplx,jsken,NumHetetr1MicCmplx,NumMicrobAutoTrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
   integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
@@ -228,8 +228,8 @@ implicit none
 
   jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  NumHetetrMicCmplx=get_dim_len(ncf,'NumHetetrMicCmplx')
-  NumMicrobAutrophCmplx=get_dim_len(ncf,'NumMicrobAutrophCmplx')
+  NumHetetr1MicCmplx=get_dim_len(ncf,'NumHetetr1MicCmplx')
+  NumMicrobAutoTrophCmplx=get_dim_len(ncf,'NumMicrobAutoTrophCmplx')
   NumLiveHeterBioms = get_dim_len(ncf,'NumLiveHeterBioms')
   NumLiveAutoBioms = get_dim_len(ncf,'NumLiveAutoBioms')
   NumPlantChemElms=get_dim_len(ncf,'element')

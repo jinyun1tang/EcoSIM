@@ -178,14 +178,16 @@ def write_site_topo_data(config_dict):
     RCHQEG=float(arr[1])
     RCHQSG=float(arr[2])
     RCHQWG=float(arr[3])
-    RCHGNUG=float(arr[4])
-    RCHGEUG=float(arr[5])
-    RCHGSUG=float(arr[6])
-    RCHGWUG=float(arr[7])
-    RCHGNTG=float(arr[8])
-    RCHGETG=float(arr[9])
-    RCHGSTG=float(arr[10])
-    RCHGWTG=float(arr[11])
+      
+    RCHGNUG=float(arr[8])
+    RCHGEUG=float(arr[9])
+    RCHGSUG=float(arr[10])
+    RCHGWUG=float(arr[11])
+      
+    RCHGNTG=float(arr[4])      
+    RCHGETG=float(arr[5])
+    RCHGSTG=float(arr[6])
+    RCHGWTG=float(arr[7])
     RCHGDG=float(arr[12])
 
     line=sife_file.readline()
@@ -201,6 +203,9 @@ def write_site_topo_data(config_dict):
 #write grid file
 
   current_dateTime = datetime.now()
+  odir=config_dict['outdir']
+  print('outputdir=%s'%odir)  
+  os.makedirs(odir, exist_ok=True)  
   nc_f=config_dict['outdir']+case+'_grid_%4d%02d%02d.nc'%(current_dateTime.year,current_dateTime.month,current_dateTime.day)
   nc_fid = Dataset(nc_f, 'w')
     

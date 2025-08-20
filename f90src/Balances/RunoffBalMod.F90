@@ -4,6 +4,7 @@ module RunoffBalMod
   use EcoSiMParDataMod    , only : micpar  
   use EcoSIMConfig, only : jcplx => jcplxc  
   use EcosimConst, only : patomw,natomw
+  use DebugToolMod
   USE EcoSimSumDataType
   USE ChemTranspDataType
   use GridConsts
@@ -23,11 +24,14 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: RunXGridBounds
+  public :: XGridBoundRunoffs
 
   contains
 
-  subroutine RunXGridBounds(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  !
+  !Diagnose fluxes across the landscape boundariers 
+  !N-W-S-E, and bottom
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
   integer :: N
@@ -40,7 +44,7 @@ implicit none
 
   CXR=0._r8;ZXR=0._r8;PXR=0._r8;ZGR=0._r8
 
-  D9985: DO L=NU(NY,NX),NL(NY,NX)
+  D9985: DO L=NU_col(NY,NX),NL_col(NY,NX)
 !
 !     LOCATE EXTERNAL BOUNDARIES
 !
@@ -49,87 +53,72 @@ implicit none
 !
 !flow from west to east, north to south, up to down
     N1=NX;N2=NY
-    D9980: DO N=FlowDirIndicator(NY,NX),3
+    D9980: DO N=FlowDirIndicator_col(NY,NX),3
       D9975: DO NN=1,2
-        IF(N.EQ.iEastWestDirection)THEN
-          !east-west direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(NX.EQ.NHE)THEN
-              !eastern boundary
-              N4 = NX+1
-              N5 = NY
-              N6 = L
+
+        IF(N.EQ.iWestEastDirection)THEN !east-west direction          
+          IF(NN.EQ.iFront)THEN
+            IF(NX.EQ.NHE)THEN !eastern boundary              
+              N4 = NX+1;N5 = NY;N6 = L
               XN = -1.0_r8   !going out of eastern boundary
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
-            IF(NX.EQ.NHW)THEN
-              !western boundary
-              N4 = NX
-              N5 = NY
-              N6 = L
-              XN = 1.0_r8    !coming in from western boundary
+          ELSEIF(NN.EQ.iBehind)THEN
+            IF(NX.EQ.NHW)THEN  !western boundary              
+              N4 = NX;N5 = NY;N6 = L
+              XN = 1.0_r8       !coming in from western boundary
             ELSE
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.iNorthSouthDirection)THEN
-          !north-south direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(NY.EQ.NVS)THEN
-              !south boundary
-              N4 = NX
-              N5 = NY+1
-              N6 = L
-              XN = -1.0_r8   !going out of southern boundary
+        ELSEIF(N.EQ.iNorthSouthDirection)THEN  !north-south direction          
+          IF(NN.EQ.iFront)THEN
+            IF(NY.EQ.NVS)THEN  !south boundary              
+              N4 = NX;N5 = NY+1;N6 = L
+              XN = -1.0_r8      !going out of southern boundary
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
-            IF(NY.EQ.NVN)THEN
-              !north boundary
-              N4 = NX
-              N5 = NY
-              N6 = L
+          ELSEIF(NN.EQ.iBehind)THEN
+            IF(NY.EQ.NVN)THEN  !north boundary              
+              N4 = NX;N5 = NY;N6 = L
               XN = 1.0_r8       !coming in from northern boundary
             ELSE
               cycle
             ENDIF
           ENDIF
-        ELSEIF(N.EQ.iVerticalDirection)THEN
-          !vertical direction
-          IF(NN.EQ.iOutflow)THEN
-            IF(L.EQ.NL(NY,NX))THEN
-              N4 = NX
-              N5 = NY
-              N6 = L+1
+        ELSEIF(N.EQ.iVerticalDirection)THEN !vertical direction          
+          IF(NN.EQ.iFront)THEN  
+            IF(L.EQ.NL_col(NY,NX))THEN  !at the bottom
+              N4 = NX;N5 = NY;N6 = L+1
               XN = -1.0_r8       !going out from layer L into L+1
             ELSE
               cycle
             ENDIF
-          ELSEIF(NN.EQ.iInflow)THEN
+          ELSEIF(NN.EQ.iBehind)THEN
             cycle
           ENDIF
         ENDIF
 !
-        call RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+        call XBoundarySurfRunoffs(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
-        call SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
+        call XBoundarySubSurfRunoffs(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
 
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
-        call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
-
+        IF(N.NE.3 .AND. L.EQ.NU_col(NY,NX)) &
+          call WaterHeatSoluteBySnowDrift(N,NN,N4,N5,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+        
       ENDDO D9975
 !
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine RunXGridBounds
+  end subroutine XGridBoundRunoffs
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RunoffXBoundaryFluxes(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
+  subroutine XBoundarySurfRunoffs(I,J,L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: L   !vertical layer
@@ -160,10 +149,11 @@ implicit none
 !     snowpack snow,water,ice from watsub.f
 !     CRUN,Qrunoff_CumYr_col=cumulative water and snow runoff
 !     HeatOut_lnds=cumulative heat loss through lateral and lower boundaries
+
 ! surface runoff
-  IF(N.NE.iVerticalDirection .AND. L.EQ.NU(NY,NX))THEN
+  IF(N.NE.iVerticalDirection .AND. L.EQ.NU_col(NY,NX))THEN
     !horizontal direction and surface layer
-    WQRN                = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    
+    WQRN                 = XN*XGridSurfRunoff_2DH(N,NN,N5,N4)    
 !    QRunSurf_col(N2,N1) = QRunSurf_col(N2,N1)+WQRN
     
     IF(ABS(WQRN).GT.ZEROS(N5,N4))THEN
@@ -177,15 +167,15 @@ implicit none
 !
 !     XN=direction indicator
 !
-      CXR=XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
-      ZXR=XN*(trcn_FloXSurRunoff_2D(ids_NH4,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_NH3,N,NN,N5,N4) &
+      CXR = XN*(trcg_FloXSurRunoff_2D(idg_CO2,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_CH4,N,NN,N5,N4))
+      ZXR = XN*(trcn_FloXSurRunoff_2D(ids_NH4,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_NH3,N,NN,N5,N4) &
         +trcn_FloXSurRunoff_2D(ids_NO3,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_NO2,N,NN,N5,N4))
-      ZGR=XN*(trcg_FloXSurRunoff_2D(idg_N2O,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_N2,N,NN,N5,N4))
-      PXR=XN*(trcn_FloXSurRunoff_2D(ids_H2PO4,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_H1PO4,N,NN,N5,N4))
-      OMRof(:)=0.0_r8
-      D2575: DO K=1,jcplx
+      ZGR      = XN*(trcg_FloXSurRunoff_2D(idg_N2O,N,NN,N5,N4)+trcg_FloXSurRunoff_2D(idg_N2,N,NN,N5,N4))
+      PXR      = XN*(trcn_FloXSurRunoff_2D(ids_H2PO4,N,NN,N5,N4)+trcn_FloXSurRunoff_2D(ids_H1PO4,N,NN,N5,N4))
+      OMRof(:) = 0.0_r8
+      D2575: DO K = 1, jcplx
         DO idom=idom_beg,idom_end
-          OMRof(idom)=OMRof(idom)+XN*DOM_FloXSurRunoff_2D(idom,K,N,NN,N5,N4)
+          OMRof(idom)=OMRof(idom)+XN*DOM_FloXSurRunoff_2DH(idom,K,N,NN,N5,N4)
         ENDDO
       ENDDO D2575
       TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXR-OMRof(ielmc)-OMRof(idom_acetate)
@@ -193,9 +183,9 @@ implicit none
       TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXR-OMRof(ielmp)
       HydroSufDOCFlx_col(NY,NX)       = -OMRof(ielmc)-OMRof(idom_acetate)
       HydroSufDICFlx_col(NY,NX)       = -CXR
-      HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-OMRof(ielmn)
+      HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-OMRof(ielmn)
       HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-OMRof(ielmp)
+      HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-OMRof(ielmp)
       HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
       OXR                             = XN*trcg_FloXSurRunoff_2D(idg_O2,N,NN,N5,N4)
       OXYGOU                          = OXYGOU-OXR
@@ -239,7 +229,7 @@ implicit none
           +trcSalt_FloXSurRunoff_2D(idsalt_H3PO4,N,NN,N5,N4)+trcSalt_FloXSurRunoff_2D(idsalt_FeH2PO4,N,NN,N5,N4) &
           +trcSalt_FloXSurRunoff_2D(idsalt_CaH4P2O8,N,NN,N5,N4)) &
           +XN*5.0_r8*(trcSalt_FloXSurRunoff_2D(idsalt_AlOH4,N,NN,N5,N4)+trcSalt_FloXSurRunoff_2D(idsalt_FeOH4,N,NN,N5,N4))
-        PSS=PSS+XN*patomw*trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,N5,N4)
+        PSS=PSS+XN*patomw*trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,NN,N5,N4)
         TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
@@ -312,10 +302,10 @@ implicit none
           D3580: DO K=1,jcplx
             DO NO=1,NumMicbFunGrupsPerCmplx
               DO M=1,nlbiomcp
-                DO NGL=JGnio(NO),JGnfo(NO)
+                DO NGL=JGniH(NO),JGnfH(NO)
                   MID=micpar%get_micb_id(M,NGL)                
                   DO NE=1,NumPlantChemElms
-                    MOE(NE)=MOE(NE)+XN*OMEERhetr(NE,MID,K,N,NN,N5,N4)
+                    MOE(NE)=MOE(NE)+XN*OMEERhetr_2D(NE,MID,K,N,NN,N5,N4)
                   ENDDO
                 enddo
               enddo
@@ -326,7 +316,7 @@ implicit none
               DO NGL=JGniA(NO),JGnfA(NO)
                 MID=micpar%get_micb_id(M,NGL)
                 DO NE=1,NumPlantChemElms
-                  MOE(NE)=MOE(NE)+XN*OMEERauto(NE,MID,N,NN,N5,N4)
+                  MOE(NE)=MOE(NE)+XN*OMEERauto_2D(NE,MID,N,NN,N5,N4)
                 ENDDO
               enddo
             enddo
@@ -362,8 +352,8 @@ implicit none
           TOMOU_lnds(ielmp) = TOMOU_lnds(ielmp)-PPE
 
           HydroSufDOCFlx_col(NY,NX)       = HydroSufDOCFlx_col(NY,NX)-MOE(ielmc)
-          HydroSufDONFlx_CumYr_col(NY,NX) = HydroSufDONFlx_CumYr_col(NY,NX)-MOE(ielmn)
-          HydroSufDOPFlx_CumYr_col(NY,NX) = HydroSufDOPFlx_CumYr_col(NY,NX)-MOE(ielmp)
+          HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)-MOE(ielmn)
+          HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)-MOE(ielmp)
           HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-MXE(ielmc)
           HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-MXE(ielmn)-ZPE
           HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-MXE(ielmp)-PPE
@@ -372,21 +362,6 @@ implicit none
 
 !         *ER=sediment flux from erosion.f
 !         sediment code
-!           :NH4,NH3,NHU,NO3=fertilizer NH4,NH3,urea,NO3 in non-band
-!           :NH4B,NH3B,NHUB,NO3B=fertilizer NH4,NH3,urea,NO3 in band
-!           :XN4,XNB=adsorbed NH4 in non-band,band
-!           :XHY,XAL,XFE,XCA,XMG,XNA,XKA,XHC,AL2,FE2
-!            =adsorbed H,Al,Fe,Ca,Mg,Na,K,HCO3,AlOH2,FeOH2
-!           :XOH0,XOH1,XOH2=adsorbed R-,R-OH,R-OH2 in non-band
-!           :XOH0B,XOH1B,XOH2B=adsorption sites R-,R-OH,R-OH2 in band
-!           :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
-!           :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
-!           :PALO,PFEO=precip AlOH,FeOH
-!           :PCAC,PCAS=precip CaCO3,CaSO4
-!           :PALP,PFEP=precip AlPO4,FEPO4 in non-band
-!           :PALPB,PFEPB=precip AlPO4,FEPO4 in band
-!           :PCPM,PCPD,PCPH=precip CaH4P2O8,CaHPO4,apatite in non-band
-!           :PCPMB,PCPDB,PCPHB=precip CaH4P2O8,CaHPO4,apatite in band
 !         TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
@@ -420,10 +395,10 @@ implicit none
       ENDIF
     ENDIF
   ENDIF
-  end subroutine RunoffXBoundaryFluxes
+  end subroutine XBoundarySurfRunoffs
 !------------------------------------------------------------------------------------------
 
-  subroutine SubsurfXBoundaryFlow(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
+  subroutine XBoundarySubSurfRunoffs(I,J,N,NY,NX,N1,N2,N4,N5,N6,XN)
   !
   !Description
   !Subsurface across boundary flow
@@ -445,10 +420,10 @@ implicit none
 !
 !     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     QH2OLoss_lnds,HeatOut_lnds=cumulative water, heat loss through lateral and lower boundaries
-!     H2OLoss_CumYr_col,QDischar_col=cumulative,hourly water loss through lateral and lower boundaries
+!     H2OLoss_CumYr_col,QDischarg2WTBL_col=cumulative,hourly water loss through lateral and lower boundaries
 !
 
-  IF(FlowDirIndicator(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
+  IF(FlowDirIndicator_col(NY,NX).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     HO           = XN*HeatFlow2Soil_3D(N,N6,N5,N4)
     HeatOut_lnds = HeatOut_lnds-HO
     WO           = XN*(WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlowSoiMacP_3D(N,N6,N5,N4))   !XN<0, going out grid
@@ -459,9 +434,6 @@ implicit none
       H2OLoss_CumYr_col(N2,N1) = H2OLoss_CumYr_col(N2,N1)-WO
 !
 !     SUBSURFACE BOUNDARY FLUXES OF N2O, N2, NH4, NH3, NO3, NO2 AND DON
-      if(N.NE.iVerticalDirection)THEN
-
-      endif
 
 !!
       MOD=0.0_r8
@@ -644,75 +616,76 @@ implicit none
 !      SG=SG+trcs_TransptMicP_3D(idg_H2,N,N6,N5,N4)+Gas_AdvDif_Flx_3D(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
-  end subroutine SubsurfXBoundaryFlow
+  end subroutine XBoundarySubSurfRunoffs
 
 !------------------------------------------------------------------------------------------
 
-  subroutine WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+  subroutine WaterHeatSoluteBySnowDrift(N,NN,N4,N5,NY,NX,CXR,ZXR,PXR,ZGR,XN)
   implicit none
-  integer, intent(in) :: N,L,NY,NX,N4,N5
+  integer, intent(in) :: N,NY,NX,N4,N5
   REAL(R8), INTENT(IN) :: CXR,ZXR,PXR,ZGR
   real(r8), intent(in) :: XN
+  integer, intent(in) :: NN
+  character(len=*), parameter :: subname='WaterHeatSoluteBySnowDrift'
   real(r8) :: CXS,ZXS,ZGS,PXS
   real(r8) :: SS1,SS2,SS3,SS4,SSR
   real(r8) :: WQRS,HQRS,OXS,PSS
 !     begin_execution
-  if(lverb)write(*,*)'WaterHeatSoluteBySnowDrift',N,N5,N4
-
+  call PrintInfo('beg '//subname)
   !check for it is at surface for lateral flow
-  IF(N.NE.3 .AND. L.EQ.NU(NY,NX))THEN
-    WQRS=XN*(DrySnoBySnoRedistrib_2DH(N,N5,N4)+WatBySnowRedistrib_2DH(N,N5,N4)+IceBySnowRedistrib_2DH(N,N5,N4))
-    IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
-      CRUN                            = CRUN-WQRS
-      Qrunoff_CumYr_col(NY,NX)        = Qrunoff_CumYr_col(NY,NX)-WQRS
-      HQRS                            = XN*HeatBySnowRedistrib_2DH(N,N5,N4)
-      HeatOut_lnds                    = HeatOut_lnds-HQRS
-      CXS                             = XN*(trcg_FloXSnow_2DH(idg_CO2,N,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,N5,N4))
-      ZXS                             = XN*(trcn_FloXSnow_2DH(ids_NH4,N,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,N5,N4)+trcn_FloXSnow_2DH(ids_NO3,N,N5,N4))
-      ZGS                             = XN*(trcg_FloXSnow_2DH(idg_N2O,N,N5,N4)+trcg_FloXSnow_2DH(idg_N2,N,N5,N4))
-      PXS                             = XN*(trcn_FloXSnow_2DH(ids_H2PO4,N,N5,N4)+trcn_FloXSnow_2DH(ids_H1PO4,N,N5,N4))
-      TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXS
-      TOMOU_lnds(ielmn)               = TOMOU_lnds(ielmn)-ZXS-ZGS
-      TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXS
-      HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-CXR
-      HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
-      HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
-      OXS                             = XN*trcg_FloXSnow_2DH(idg_O2,N,N5,N4)
-      OXYGOU                          = OXYGOU-OXS
-      IF(salt_model)THEN
-        PSS=XN*patomw*(trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,N5,N4))
-        TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
-        SS1=XN*(trcSalt_FloXSnow_2DH(idsalt_Al,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Fe,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_Hp,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Ca,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_Mg,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Na,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_K,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_OH,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_SO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Cl,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_CO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,N5,N4))
-        SS2=XN*2.0*(trcSalt_FloXSnow_2DH(idsalt_HCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_AlOH,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_AlSO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_FeOH,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeSO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_CaOH,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaCO3,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_CaSO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgOH2,N,N5,N4)&
-          +trcSalt_FloXSnow_2DH(idsalt_MgCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgSO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_NaCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_NaSO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_KSO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,N5,N4))
-        SS3=XN*3.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH2,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH2,N,N5,N4)&
-          +trcSalt_FloXSnow_2DH(idsalt_CaHCO3,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_MgHCO3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,N5,N4))
-        SS4=XN*4.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH3,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH3,N,N5,N4) &
-          +trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,N5,N4)&
-          +trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,N5,N4)) &
-          +XN*5.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH4,N,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH4,N,N5,N4))
-        SSR=SS1+SS2+SS3+SS4
-        TIONOU=TIONOU-SSR
-        HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
-      ENDIF
+  
+  WQRS=XN*(DrySnoByRedistrib_2DH(N,NN,N5,N4)+WatSnoByRedist_2DH(N,NN,N5,N4)+IceSnoBySnowRedist_2DH(N,NN,N5,N4))
+  IF(ABS(WQRS).GT.ZEROS(N5,N4))THEN
+    CRUN                            = CRUN-WQRS
+    Qrunoff_CumYr_col(NY,NX)        = Qrunoff_CumYr_col(NY,NX)-WQRS
+    HQRS                            = XN*HeatSnoByRedist_2DH(N,NN,N5,N4)
+    HeatOut_lnds                    = HeatOut_lnds-HQRS
+    CXS                             = XN*(trcg_FloXSnow_2DH(idg_CO2,N,NN,N5,N4)+trcg_FloXSnow_2DH(idg_CH4,N,NN,N5,N4))
+    ZXS                             = XN*(trcn_FloXSnow_2DH(ids_NH4,N,NN,N5,N4)+trcg_FloXSnow_2DH(idg_NH3,N,NN,N5,N4)+trcn_FloXSnow_2DH(ids_NO3,N,NN,N5,N4))
+    ZGS                             = XN*(trcg_FloXSnow_2DH(idg_N2O,N,NN,N5,N4)+trcg_FloXSnow_2DH(idg_N2,N,NN,N5,N4))
+    PXS                             = XN*(trcn_FloXSnow_2DH(ids_H2PO4,N,NN,N5,N4)+trcn_FloXSnow_2DH(ids_H1PO4,N,NN,N5,N4))
+    TOMOU_lnds(ielmc)               = TOMOU_lnds(ielmc)-CXS
+    TOMOU_lnds(ielmn)               = TOMOU_lnds(ielmn)-ZXS-ZGS
+    TOMOU_lnds(ielmp)               = TOMOU_lnds(ielmp)-PXS
+    HydroSufDICFlx_col(NY,NX)       = HydroSufDICFlx_col(NY,NX)-CXR
+    HydroSufDINFlx_CumYr_col(NY,NX) = HydroSufDINFlx_CumYr_col(NY,NX)-ZXR-ZGR
+    HydroSufDIPFlx_CumYr_col(NY,NX) = HydroSufDIPFlx_CumYr_col(NY,NX)-PXR
+    OXS                             = XN*trcg_FloXSnow_2DH(idg_O2,N,NN,N5,N4)
+    OXYGOU                          = OXYGOU-OXS
+    IF(salt_model)THEN
+      PSS=XN*patomw*(trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,NN,N5,N4))
+      TOMOU_lnds(ielmp)=TOMOU_lnds(ielmp)-PSS
+      SS1=XN*(trcSalt_FloXSnow_2DH(idsalt_Al,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Fe,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_Hp,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Ca,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_Mg,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Na,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_K,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_OH,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_SO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_Cl,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_CO3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_H0PO4,N,NN,N5,N4))
+      SS2=XN*2.0*(trcSalt_FloXSnow_2DH(idsalt_HCO3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_AlOH,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_AlSO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_FeOH,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeSO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_CaOH,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaCO3,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_CaSO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgOH2,N,NN,N5,N4)&
+        +trcSalt_FloXSnow_2DH(idsalt_MgCO3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgSO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_NaCO3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_NaSO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_KSO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_CaPO4,N,NN,N5,N4))
+      SS3=XN*3.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH2,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH2,N,NN,N5,N4)&
+        +trcSalt_FloXSnow_2DH(idsalt_CaHCO3,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_MgHCO3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeHPO4,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_CaHPO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_MgHPO4,N,NN,N5,N4))
+      SS4=XN*4.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH3,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH3,N,NN,N5,N4) &
+        +trcSalt_FloXSnow_2DH(idsalt_H3PO4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeH2PO4,N,NN,N5,N4)&
+        +trcSalt_FloXSnow_2DH(idsalt_CaH4P2O8,N,NN,N5,N4)) &
+        +XN*5.0*(trcSalt_FloXSnow_2DH(idsalt_AlOH4,N,NN,N5,N4)+trcSalt_FloXSnow_2DH(idsalt_FeOH4,N,NN,N5,N4))
+      SSR=SS1+SS2+SS3+SS4
+      TIONOU=TIONOU-SSR
+      HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SSR
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine WaterHeatSoluteBySnowDrift
 
 end module RunoffBalMod

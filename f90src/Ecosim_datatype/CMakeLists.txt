@@ -21,6 +21,8 @@ set(ECOSIM_DATATYPE_SOURCES
   SurfSoilDataType.F90
   CanopyDataType.F90
   RootDataType.F90
+  PlantTraitTableMod.F90
+  NumericalAuxMod.F90
   EcoSimSumDataType.F90
   EcosimBGCFluxType.F90
   AqueChemDatatype.F90

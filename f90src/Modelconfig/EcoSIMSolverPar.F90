@@ -22,5 +22,5 @@ module EcoSIMSolverPar
   integer :: NPG             !number of model cycles per hour for gas fluxes
   integer :: NPR             !number of cycles per time step used to calculate hat and water transfer in surface litter
   integer :: NPS             !number of cycles for solving snowpack heat and water fluxes
-
+  real(r8) :: oscal_test=0._r8
 end module EcoSIMSolverPar

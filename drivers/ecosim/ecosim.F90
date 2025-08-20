@@ -16,13 +16,12 @@ PROGRAM main
   use EcoSIMConfig      , only : case_name,set_sim_type,start_date,is_restart,datestrlen
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
-  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   use ClimReadMod       , only : get_clm_years
   use PerturbationMod   , only : config_soil_warming
+  use EcoSIMAPI         , only : AdvanceModelOneYear,readnamelist,regressiontest,write_modelconfig
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
-  use EcoSIMAPI         , only : soil,readnamelist,regressiontest,write_modelconfig
   use EcosimConst
   implicit none
 
@@ -86,7 +85,7 @@ PROGRAM main
 !
   call SetMesh(NHW,NVN,NHE,NVS)
 
-  call  InitModules(nmicbguilds)
+  call  InitModules()
 
   if(lverb)WRITE(*,*)'read initialization information READI'
   CALL readi(NHW,NHE,NVN,NVS)
@@ -124,8 +123,6 @@ PROGRAM main
   DO nn1=1,nperiods
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
-    call MicAPI_Init
-
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
       !determine the step size
@@ -139,7 +136,7 @@ PROGRAM main
         nlend=.false.
         IGO=yeari-year_ini
         if(frectyp%yearcur==yeari)then
-          call soil(NHW,NHE,NVN,NVS,nlend)
+          call AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1
@@ -149,7 +146,6 @@ PROGRAM main
       end do
       if(nlend)exit
     end do
-    call MicAPI_cleanup
     if(nlend)exit
   end do
 

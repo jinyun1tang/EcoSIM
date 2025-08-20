@@ -28,10 +28,13 @@ implicit none
   __FILE__
 
   public :: ReadManagementFiles
+  public :: ReadFire
   contains
 
 !------------------------------------------------------------------------------------------
   subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2)
+  !
+  !read soil tillage information. It also includes events due to fire and drainage
   implicit none
   character(len=*), intent(in) :: FileTillage
   integer, intent(in) :: NH1,NH2,NV1,NV2
@@ -53,7 +56,7 @@ implicit none
   endif
   call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find tillage file '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
   endif
 
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf),&
@@ -62,8 +65,8 @@ implicit none
 !
 !     DY=date DDMMYYYY
 !     IPLOW,DPLOW=intensity,depth of disturbance
-!     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-!     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
+!     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
+!     DepzCorp_col=intensity (fire) or depth (tillage,drainage) of disturbance
 !
   kk=1
   do while(len_trim(tillf(kk))>0)
@@ -84,7 +87,7 @@ implicit none
     D8995: DO NX=NH1,NH2
       D8990: DO NY=NV1,NV2
         iSoilDisturbType_col(IDY,NY,NX) = IPLOW
-        DepzCorp_col(IDY,NY,NX)                = DPLOW
+        DepzCorp_col(IDY,NY,NX)         = DPLOW
       ENDDO D8990
     ENDDO D8995
     kk=kk+1
@@ -101,7 +104,7 @@ implicit none
 
   integer :: NY,NX,LPY,J,JEN
   integer :: IDY1,IDY2,IDY3,I,IDY
-  integer :: IDYS,IHRS,IFLGVX,JST,IDYE,IHRE
+  integer :: IDYS,IHRS,IFLGV_colX,JST,IDYE,IHRE
   real(r8):: DY
   real(r8) :: DST,DEN,CIRRX,RR,FIRRX
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
@@ -113,7 +116,8 @@ implicit none
   character(len=128) :: irrigf(24)
   integer :: nirrig
 
-  nirrig=get_dim_len(soilmgmt_nfid,'nirrig')
+  nirrig=get_dim_len(soilmgmt_nfid,'nirri')
+
   if(nirrig>24)then
     call endrun("not enough size for array irrigf in "//trim(mod_filename), __LINE__)
   endif
@@ -121,7 +125,7 @@ implicit none
   call check_var(soilmgmt_nfid, FileIrrig, vardesc, readvar)
 
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FileIrrig)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find irrigation file '//trim(FileIrrig)//' in '//trim(mod_filename), __LINE__)
   endif
 
   IF(FileIrrig(1:4).EQ.'auto')THEN
@@ -129,9 +133,9 @@ implicit none
 !       AUTOMATED IRRIGATION
 !
 !       DST,DEN=start,end dates,hours DDMMHHHH
-!       IFLGVX=flag for irrigation criterion,0=SWC,1=canopy water potl
-!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV=0),or minimum canopy
-!       water potential(IFLGV=1), to trigger irrigation
+!       IFLGV_colX=flag for irrigation criterion,0=SWC,1=canopy water potl
+!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV_col=0),or minimum canopy
+!       water potential(IFLGV_col=1), to trigger irrigation
 !       CIRRX= fraction of FC to which irrigation will raise SWC
 !       DIRRX= depth to which water depletion and rewatering is calculated
 !       WDPTHI=depth at which irrigation is applied
@@ -143,14 +147,14 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1)),&
       trim(mod_filename))
 
-    READ(irrigf(1),*)DST,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+    READ(irrigf(1),*)DST,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
       ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
       ,CSOQX,CCLQX
     READ(irrigf(1),'(I2,I2,I4)')IDY1,IDY2,IDY3
 
     IF(lverb)then
       print*,irrigf(1)
-      print*,IDY1,IDY2,IDY3,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+      print*,IDY1,IDY2,IDY3,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
         ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
         ,CSOQX,CCLQX
     endif
@@ -181,15 +185,15 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
-        IFLGV(NY,NX)   = IFLGVX
+        IFLGV_col(NY,NX)   = IFLGV_colX
         IIRRA(1,NY,NX) = IDYS
         IIRRA(2,NY,NX) = IDYE
         IIRRA(3,NY,NX) = INT(IHRS/100)
         IIRRA(4,NY,NX) = INT(IHRE/100)
-        FIRRA(NY,NX)   = FIRRX
-        CIRRA(NY,NX)   = CIRRX
-        DIRRA(1,NY,NX) = DIRRX
-        DIRRA(2,NY,NX) = WDPTHI
+        FIRRA_col(NY,NX)   = FIRRX
+        CIRRA_col(NY,NX)   = CIRRX
+        DIRRA(1,NY,NX) = DIRRX    !depth
+        DIRRA(2,NY,NX) = WDPTHI   !width
         D220: DO I     = 1, 366
           PHQ(IDY,NY,NX)                                    = PHQX
           NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
@@ -208,7 +212,7 @@ implicit none
     ENDDO D7965
   ELSE
 !
-!       SCHEDULED IRRIGATION
+!    print*,'   SCHEDULED IRRIGATION'
 !
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf),&
       trim(mod_filename))
@@ -307,7 +311,7 @@ implicit none
 
   call check_var(soilmgmt_nfid, FertFile, vardesc, readvar)
   if(.not. readvar)then
-    call endrun('fail to find '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
+    call endrun('fail to find fertilizer '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
   endif
 
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf),&
@@ -412,14 +416,19 @@ implicit none
   character(len=10) :: fertf
   character(len=10) :: tillf
   character(len=10) :: irrigf
-  integer :: iyear,year
+  integer :: iyear,year,nyears
 !
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
 
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
-
+  nyears=get_dim_len(soilmgmt_nfid, 'year')
+  if(nyears==0)then
+    !no fertilization, tillage, or irrigation
+    call ncd_pio_closefile(soilmgmt_nfid)
+    return
+  endif
   iyear=1
   DO while(.true.)
     call ncd_getvar(soilmgmt_nfid,'year',iyear,year)
@@ -449,7 +458,7 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf, &
       start = (/1,ntopou,iyear/),count = (/len(fertf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!!!!
+    !!!!
     call check_var(soilmgmt_nfid, 'tillf', vardesc, readvar)
     if(.not. readvar)then
       call endrun('fail to find tillf in '//trim(mod_filename), __LINE__)
@@ -458,7 +467,7 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf, &
       start = (/1,ntopou,iyear/),count = (/len(tillf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-!!!!
+    !!!!
     call check_var(soilmgmt_nfid, 'irrigf', vardesc, readvar)
     if(.not. readvar)then
       call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
@@ -493,4 +502,51 @@ implicit none
   call ncd_pio_closefile(soilmgmt_nfid)
 
   end subroutine ReadManagementFiles
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+  use EcoSIMCtrlMod, only : soil_mgmt_in  
+  implicit none
+  character(len=10), intent(in) :: fire_event_entry
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  type(file_desc_t) :: soilmgmt_nfid
+  character(len=10) :: firef
+  integer :: ntopou,ntopo
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  integer :: NH1,NH2,NV1,NV2
+
+  call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
+
+  ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
+  if(ntopou==0)return
+  if(first_topou)ntopou=1  
+  DO NTOPO=1,ntopou
+    call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(soilmgmt_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(soilmgmt_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(soilmgmt_nfid,'NV2',ntopo,NV2)
+
+    if(any((/NH1,NH2,NV1,NV2/)<0))THEN
+      call endrun('something wrong in NHX or NHX indices on file '//trim(soil_mgmt_in)&
+        //' in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_var(soilmgmt_nfid, fire_event_entry, vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
+      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
+
+    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2)
+  ENDDO  
+  call ncd_pio_closefile(soilmgmt_nfid)
+
+    
+  end subroutine ReadFire  
+  
 end module ReadManagementMod

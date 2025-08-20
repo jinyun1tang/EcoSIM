@@ -50,13 +50,14 @@
 !     ALAT=latitude +ve=N,-ve=S
 !
 
-      IF((ALAT(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
-        !to be revised for GDD 
-        Gas_Prod_TP_cumRes_col(:,NY,NX)     = 0._r8
+      IF((ALAT_col(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT_col(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN        
+        !to be revised for GDD         
+        GasHydroLoss_cumflx_col(:,NY,NX)  = 0._r8
+        Gas_Prod_TP_cumRes_col(:,NY,NX)   = 0._r8
         QdewCanopy_CumYr_pft(:,NY,NX)     = 0._r8
         trcg_mass_cumerr_col(:,NY,NX)     = 0._r8
         GDD_col(NY,NX)                    = 0._r8
-        AmendCFlx_CumYr_col(NY,NX)        = 0._r8
+        AmendC_CumYr_flx_col(NY,NX)        = 0._r8
         LiterfalOrgM_col(:,NY,NX)         = 0._r8
         RootResp_CumYr_col(NY,NX)         = 0._r8
         Eco_NBP_CumYr_col(NY,NX)          = 0._r8
@@ -66,11 +67,9 @@
         SedmErossLoss_CumYr_col(NY,NX)    = 0._r8
         H2OLoss_CumYr_col(NY,NX)          = 0._r8
         HydroIonFlx_CumYr_col(NY,NX)      = 0._r8
-        FertNFlx_CumYr_col(NY,NX)         = 0._r8
-        HydroSufDONFlx_CumYr_col(NY,NX)   = 0._r8
+        FertN_Flx_CumYr_col(NY,NX)         = 0._r8
         HydroSufDINFlx_CumYr_col(NY,NX)   = 0._r8
         FerPFlx_CumYr_col(NY,NX)          = 0._r8
-        HydroSufDOPFlx_CumYr_col(NY,NX)   = 0._r8
         HydroSufDIPFlx_CumYr_col(NY,NX)   = 0._r8
         CO2byFire_CumYr_col(NY,NX)        = 0._r8
         CH4byFire_CumYr_col(NY,NX)        = 0._r8
@@ -86,14 +85,14 @@
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
-        D960: DO NZ=1,NP0(NY,NX)
+        QDrain_cum_col(NY,NX) = 0._r8        
+        D960: DO NZ=1,NP0_col(NY,NX)
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
           DO NE=1,NumPlantChemElms
             NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &
               +PlantExudElm_CumYr_pft(NE,NZ,NY,NX)-LitrfalStrutElms_CumYr_pft(NE,NZ,NY,NX)
               
             EcoHavstElmntCum_pft(NE,NZ,NY,NX)=EcoHavstElmntCum_pft(NE,NZ,NY,NX)+EcoHavstElmnt_CumYr_pft(NE,NZ,NY,NX)
-            NodulInfectElmsCum_pft(NE,NZ,NY,NX)=0._r8
           ENDDO
           NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmc,NZ,NY,NX) &
             +GrossCO2Fix_CumYr_pft(NZ,NY,NX)+GrossRespC_CumYr_pft(NZ,NY,NX) &
@@ -125,7 +124,7 @@
           LitrfalStrutElms_CumYr_pft(:,NZ,NY,NX)     = 0._r8
         ENDDO D960
         IF(iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
-          TSED(NY,NX)=0._r8
+          TSED_col(NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D950

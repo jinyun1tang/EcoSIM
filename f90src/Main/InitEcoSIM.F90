@@ -2,8 +2,9 @@ module InitEcoSIM
 !
 !! DESCRIPTION
 ! initialize the data structure for EcoSIM
-  use EcoSIMCtrlMod
-  use EcoSiMParDataMod    , only : micpar,pltpar
+  use EcoSiMParDataMod, only: micpar, pltpar
+  use abortutils,       only: endrun
+  use EcoSIMCtrlMod  
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = &
@@ -11,7 +12,7 @@ module InitEcoSIM
   public :: InitModules
   contains
 
-  subroutine InitModules(NOMicrobeGuilds)
+  subroutine InitModules()
 
   use PlantDisturbsMod, only: InitPlantDisturbance
   use UptakesMod,       only: InitUptake
@@ -24,13 +25,16 @@ module InitEcoSIM
   use InitAllocMod,     only: InitAlloc
   use UnitMod,          only: units
   use TranspNoSaltMod,  only: InitTranspNoSalt
+  use PlantInfoMod,     only: ReadPlantTraitTable
+  use MicBGCAPI,        only: MicAPI_Init
   use GridConsts
+
   implicit  none
 
-  integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
+  call InitAlloc()
 
-
-  call InitAlloc(NOMicrobeGuilds)
+  !load plant trait table
+  if(plant_model)call ReadPlantTraitTable()
 
   call units%Initailize()
 
@@ -49,6 +53,8 @@ module InitEcoSIM
   call InitTranspNoSalt
 
   call hist_ecosim%Init(bounds)
+
+  call MicAPI_Init
 
   end subroutine InitModules
 

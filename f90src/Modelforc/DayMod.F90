@@ -1,9 +1,12 @@
 
   module DayMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcosimConst
-  use minimathmod  , only : isLeap,AZMAX1
-  use MiniFuncMod  , only : GetDayLength
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use minimathmod,        only: isLeap, AZMAX1
+  use MiniFuncMod,        only: GetDayLength
+  use PrescribePhenolMod, only: PrescribePhenologyInterp
+  use SurfLitterDataType, only : XTillCorp_col
+  use CanopyRadDataType
+  use EcosimConst  
   use EcoSIMCtrlMod
   use GridConsts
   use SoilPhysDataType
@@ -15,7 +18,7 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-  use SurfLitterDataType, only : XTillCorp_col
+
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -28,6 +31,7 @@
   use SedimentDataType
   use GridDataType
   use EcoSIMConfig
+
   implicit none
 
   private
@@ -79,6 +83,9 @@
   ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+
+  if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+
   RETURN
 
   END subroutine day
@@ -99,11 +106,9 @@
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
 !
-      TAMX(NY,NX)=-100.0_r8
-      TAMN(NY,NX)=100.0_r8
-      HUDX(NY,NX)=0._r8
-      HUDN(NY,NX)=100.0_r8
-      TWIND(NY,NX)=0._r8
+      HUDX_col(NY,NX)=0._r8
+      HUDN_col(NY,NX)=100.0_r8
+      TWIND_col(NY,NX)=0._r8
 !      PrecDaily_col(NY,NX)=0._r8
 !
 !
@@ -114,7 +119,7 @@
 !
       DayLenthPrev_col(NY,NX)=DayLensCurr_col(NY,NX)
 
-      DayLensCurr_col(NY,NX)=GetDayLength(ALAT(NY,NX),I)
+      DayLensCurr_col(NY,NX)=GetDayLength(ALAT_col(NY,NX),I)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
@@ -211,8 +216,7 @@
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
-!
-  use EcoSIMCtrlMod, only : Lirri_auto
+  !
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
@@ -245,38 +249,37 @@
 !     DIRRX=depth to which water depletion and rewatering is calculated(1)
 !     DIRRA=depth to,at which irrigation is applied(1,2)
 !     POROS,FC,WP=water content at saturation,field capacity,wilting point
-!     CIRRA= fraction of FC to which irrigation will raise SWC
+!     CIRRA_col= fraction of FC to which irrigation will raise SWC
 !     FW=fraction of soil layer in irrigation zone
 !     FZ=SWC at which irrigation is triggered
 !     VLSoilPoreMicP_vr,VOLW,VOLI=total,water,ice volume
-!     IFLGV=flag for irrigation criterion,0=SWC,1=canopy water potential
-!     FIRRA=depletion of SWC from CIRRA to WP(IFLGV=0),or minimum canopy
-!     water potential(IFLGV=1), to trigger irrigation
+!     IFLGV_col=flag for irrigation criterion,0=SWC,1=canopy water potential
+!     FIRRA_col=depletion of SWC from CIRRA_col to WP(IFLGV_col=0),or minimum canopy
+!     water potential(IFLGV_col=1), to trigger irrigation
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
       IF(Lirri_auto)THEN
       !automated irrigation
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
-          TFZ=0._r8
-          TWP=0._r8
-          TVW=0._r8
-          DIRRA1=DIRRA(1,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
-          DIRRA2=DIRRA(2,NY,NX)+CumDepz2LayBottom_vr(NU(NY,NX)-1,NY,NX)
+          TFZ    = 0._r8
+          TWP    = 0._r8
+          TVW    = 0._r8
+          DIRRA1 = DIRRA(1,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+          DIRRA2 = DIRRA(2,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
 
-          D165: DO L=NU(NY,NX),NL(NY,NX)
+          D165: DO L=NU_col(NY,NX),NL_col(NY,NX)
             IF(CumDepz2LayBottom_vr(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0_r8,(DIRRA1-CumDepz2LayBottom_vr(L-1,NY,NX)) &
-                /(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX)))
-              FZ=AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
-              TFZ=TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
-              TWP=TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-              TVW=TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
+              FW  = AMIN1(1.0_r8,(DIRRA1-CumDepz2LayBottom_vr(L-1,NY,NX))/(CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(L-1,NY,NX)))
+              FZ  = AMIN1(POROS_vr(L,NY,NX),WiltPoint_vr(L,NY,NX)+CIRRA_col(NY,NX)*(FieldCapacity_vr(L,NY,NX)-WiltPoint_vr(L,NY,NX)))
+              TFZ = TFZ+FW*FZ*VLSoilPoreMicP_vr(L,NY,NX)
+              TWP = TWP+FW*WiltPoint_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+              TVW = TVW+FW*(VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
             ENDIF
           ENDDO D165
 
-          IF((IFLGV(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
-            .OR.(IFLGV(NY,NX).EQ.1.AND.PSICanPDailyMin(1,NY,NX).LT.FIRRA(NY,NX)))THEN
+          IF((IFLGV_col(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA_col(NY,NX)*(TFZ-TWP)) &
+            .OR.(IFLGV_col(NY,NX).EQ.1.AND.PSICanPDailyMin_pft(1,NY,NX).LT.FIRRA_col(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
@@ -284,8 +287,8 @@
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
               WRITE(*,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
-                ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSICanPDailyMin(1,NY,NX) &
-                ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
+                ,IFLGV_col(NY,NX),RR,TFZ,TVW,TWP,FIRRA_col(NY,NX),PSICanPDailyMin_pft(1,NY,NX) &
+                ,CIRRA_col(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 
 2222  FORMAT(A8,5I6,40E12.4)
             ENDIF

@@ -1,7 +1,7 @@
 module SoilDiagsMod
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use CanopyDataType,     only: QVegET_col
-  use GridDataType,       only: NU, NL
+  use GridDataType,       only: NU_col, NL_col
   use EcoSimConst,        only: RGasC
   use abortutils,         only: endrun
   use TracerPropMod,      only: MolecularWeight
@@ -41,7 +41,7 @@ implicit none
   call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      DO L=NU(NY,NX),NL(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         if(VLWatMicP_vr(L,NY,NX).GT.ZEROS(NY,NX) .and. trcs_solml_vr(idg_CO2,L,NY,NX).GT.ZEROS(NY,NX))THEN
           do idg=idg_beg,idg_NH3
             GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,L,NY,NX)*VLWatMicP_vr(L,NY,NX)  !conver into carbon g C/mol
@@ -54,17 +54,13 @@ implicit none
             GasPres(idg)                  = trcs_solml_vr(idg,L,NY,NX)*RGasC*TKS_vr(L,NY,NX)/GasMassSolubility(idg)
             Soil_Gas_pressure_vr(L,NY,NX) = Soil_Gas_pressure_vr(L,NY,NX)+GasPres(idg)
           enddo
-
-          CO2_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CO2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
-          CH4_Gas_Frac_vr(L,NY,NX) = GasPres(idg_CH4)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
-          Ar_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_Ar)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
-          O2_Gas_Frac_vr(L,NY,NX)  = GasPres(idg_O2)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+          do idg=idg_beg,idg_NH3
+            Soil_Gas_Frac_vr(idg,L,NY,NX) = GasPres(idg)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
+          ENDDO
+          Soil_Gas_Frac_vr(idg_NH3,L,NY,NX)=Soil_Gas_Frac_vr(idg_NH3,L,NY,NX)+GasPres(idg_NH3B)/Soil_Gas_pressure_vr(L,NY,NX)*1.E6_r8
         ELSE
-          Soil_Gas_pressure_vr(L,NY,NX) = 0._r8
-          CO2_Gas_Frac_vr(L,NY,NX)      = 0._r8
-          CH4_Gas_Frac_vr(L,NY,NX)      = 0._r8
-          Ar_Gas_Frac_vr(L,NY,NX)       = 0._r8
-          O2_Gas_Frac_vr(L,NY,NX)       = 0._r8
+          Soil_Gas_pressure_vr(L,NY,NX)             = 0._r8
+          Soil_Gas_Frac_vr(idg_beg:idg_NH3,L,NY,NX) = 0._r8
         ENDIF
       ENDDO
     ENDDO

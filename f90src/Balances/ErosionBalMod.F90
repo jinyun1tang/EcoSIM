@@ -48,10 +48,10 @@ implicit none
 ! FSINK=hourly rate for sediment sinking
 !
   call PrintInfo('beg '//subname)
-  D9885: DO L=NL(NY,NX)-1,1,-1
+  D9885: DO L=NL_col(NY,NX)-1,1,-1
     IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
-      D9880: DO LL=L+1,NL(NY,NX)
+      D9880: DO LL=L+1,NL_col(NY,NX)
         IF(DLYR_3D(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
       ENDDO D9880
 
@@ -62,15 +62,15 @@ implicit none
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
 !
-      FSAN           = FSINK*SAND(L,NY,NX)
-      FSIL           = FSINK*SILT(L,NY,NX)
-      FCLA           = FSINK*CLAY(L,NY,NX)
-      SAND(L,NY,NX)  = SAND(L,NY,NX)-FSAN
-      SILT(L,NY,NX)  = SILT(L,NY,NX)-FSIL
-      CLAY(L,NY,NX)  = CLAY(L,NY,NX)-FCLA
-      SAND(LL,NY,NX) = SAND(LL,NY,NX)+FSAN
-      SILT(LL,NY,NX) = SILT(LL,NY,NX)+FSIL
-      CLAY(LL,NY,NX) = CLAY(LL,NY,NX)+FCLA
+      FSAN           = FSINK*SAND_vr(L,NY,NX)
+      FSIL           = FSINK*SILT_vr(L,NY,NX)
+      FCLA           = FSINK*CLAY_vr(L,NY,NX)
+      SAND_vr(L,NY,NX)  = SAND_vr(L,NY,NX)-FSAN
+      SILT_vr(L,NY,NX)  = SILT_vr(L,NY,NX)-FSIL
+      CLAY_vr(L,NY,NX)  = CLAY_vr(L,NY,NX)-FCLA
+      SAND_vr(LL,NY,NX) = SAND_vr(LL,NY,NX)+FSAN
+      SILT_vr(LL,NY,NX) = SILT_vr(LL,NY,NX)+FSIL
+      CLAY_vr(LL,NY,NX) = CLAY_vr(LL,NY,NX)+FCLA
 !
 !     FERTILIZER POOLS
 !
@@ -131,7 +131,7 @@ implicit none
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
         D1960: DO N=1,NumMicbFunGrupsPerCmplx
-          DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=JGniH(N),JGnfH(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
               DO NE=1,NumPlantChemElms

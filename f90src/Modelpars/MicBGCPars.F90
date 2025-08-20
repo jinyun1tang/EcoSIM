@@ -9,12 +9,45 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
+  
+  integer, public :: NumGuild_Heter_Aerob_Bact      = 1
+  integer, public :: NumGuild_Heter_Aerob_Fung      = 1
+  integer, public :: NumGuild_Heter_Facul_Dent      = 1
+  integer, public :: NumGuild_Heter_Aerob_N2Fixer   = 1
+  integer, public :: NumGuild_Heter_Anaer_N2Fixer   = 1
+  integer, public :: NumGuild_Heter_Anaer_Fermentor = 1
+  integer, public :: NumGuild_Heter_AcetoMethanogen = 1
+  integer, public :: NumGuild_Autor_H2genMethanogen = 1
+  integer, public :: NumGuild_Autor_AmoniaOxidBact  = 1
+  integer, public :: NumGuild_Autor_NitritOxidBact  = 1
+  integer, public :: NumGuild_Autor_AerobMethOxid   = 1
 
   type, public :: MicParType
+  real(r8), pointer :: ORCI(:,:)                   !allocation of residue to kinetic components, [-]
+  real(r8), pointer :: FL(:)                       !allocation to microbial kinetic fractions, [-]
+  real(r8), pointer :: rNCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial P:C,  [gP gC-1]
+  real(r8), pointer :: rNCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial P:C, [gP gC-1]
+  real(r8), pointer :: rNCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+  real(r8), pointer :: DOSA(:)                     !rate constant for litter colonization by heterotrophs, [h-1]
+  real(r8), pointer :: SPOSC(:,:)                  !specific decomposition rate constant, [h-1]
+  real(r8), pointer :: CNOFC(:,:)                  !fractions to allocate N to kinetic components,[-]
+  real(r8), pointer :: CPOFC(:,:)                  !fractions to allocate P to kinetic components, [-]
+  real(r8), pointer :: CNRH(:)                     !default N:C ratios in SOC complexes,[gN gC-1]
+  real(r8), pointer :: CPRH(:)                     !default P:C ratios in SOC complexes, [gN gC-1]
+  real(r8), pointer :: OMCF(:)                     !heterotrophic microbial biomass composition in SOC, [gC gC-1]
+  real(r8), pointer :: OMCA(:)                     !autotrophic microbial biomass composition in SOC, [gC gC-1]
+  integer  :: FG_guilds_heter(NumMicbFunGrupsPerCmplx)  !# of guilds
+  integer  :: FG_guilds_autor(NumMicbFunGrupsPerCmplx)  !# of guilds
+
+  !terminate  [label for variable parsing]
   integer :: jcplx   !# of microbe-substrate complexes
   integer :: jsken   !# of kinetic components of the substrates
-  integer :: jguilds !# of guilds
-  integer :: NumMicbFunGrupsPerCmplx    !# of functional groups
+  integer :: NumMicbFunGrupsPerCmplx             !# of functional groups
   integer :: k_woody_litr
   integer :: k_fine_litr
   integer :: k_manure
@@ -34,32 +67,16 @@ implicit none
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), pointer :: OMCI(:,:)             !initializes microbial biomass
-  real(r8), pointer :: OHCK(:)    !fractions of SOC in adsorbed C
-  real(r8), pointer :: OMCK(:)    !fractions of SOC in biomass
-  real(r8), pointer :: ORCK(:)    !fractions of SOC in litter
-  real(r8), pointer :: OQCK(:)    !fractions of SOC in DOC
-  real(r8), pointer :: ORCI(:,:)   !allocation of residue to kinetic components
-  real(r8), pointer :: FL(:)       !allocation to microbial kinetic fractions
-  real(r8), pointer :: rNCOMC(:,:,:)        !maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMC(:,:,:)        !maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCAutor(:,:)        !maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCAutor(:,:)        !maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCa(:,:,:)         !average maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCa(:,:,:)         !average maximum/minimum mass based microbial P:C
-  real(r8), pointer :: rNCOMCAutora(:,:)         !average maximum/minimum mass based microbial N:C
-  real(r8), pointer :: rPCOMCAutora(:,:)         !average maximum/minimum mass based microbial P:C
-  real(r8), pointer :: DOSA(:)
-  real(r8), pointer :: SPOSC(:,:)
-  real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
-  real(r8), pointer :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
-  real(r8), pointer :: CNRH(:)                            !default N:C ratios in SOC complexes
-  real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC complexes
-  real(r8), pointer :: OMCF(:)                            !hetero microbial biomass composition in SOC
-  real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
-  logical,  pointer :: is_activeMicrbFungrpAutor(:)
-  logical,  pointer :: is_aerobic_hetr(:)
-  logical,  pointer :: is_anaerobic_hetr(:)
+  real(r8), pointer :: OMCI(:,:)                    !initializes microbial biomass
+  real(r8), pointer :: OHCK(:)                      !fractions of SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)                      !fractions of SOC in biomass
+  real(r8), pointer :: ORCK(:)                      !fractions of SOC in litter
+  real(r8), pointer :: OQCK(:)                      !fractions of SOC in DOC
+  logical,  pointer :: is_activeMicrbFungrpAutor(:) !logical switch for autotrophic group
+  logical,  pointer :: is_activeMicrbFungrpHeter(:) !logical switch for heterotrophic group
+  logical,  pointer :: is_aerobic_hetr(:)           !logical flag for aerobic heterotrophs
+  logical,  pointer :: is_anaerobic_hetr(:)         !logical flag for anaerobic heterotrophs
+  logical,  pointer :: is_aerobic_autor(:)          !logical flag for aerobic autotrophs
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
@@ -69,12 +86,12 @@ implicit none
   character(len=16) :: amicname(NumMicbFunGrupsPerCmplx)
   character(len=16) :: micresb(0:NumDeadMicrbCompts-1)      !residual biomass name
   character(len=16) :: micbiom(1:NumLiveMicrbCompts)        !microbial biomass pool name
-  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
-  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
-  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
-  integer :: NumMicrobAutrophCmplx        !total number of microbial guilds in the autotrophic complex
-  integer :: NumHetetrMicCmplx         !total number of microbial guilds in one organic-microbial complex
+  integer, pointer :: JGniH(:)   !hetetroph guid indices for organic-microbial complex
+  integer, pointer :: JGnfH(:)   !hetetroph guid indices for organic-microbial complex
+  integer, pointer :: JGniA(:)   !autotroph guid indices for autotrophic-microbial complex
+  integer, pointer :: JGnfA(:)   !autotroph guid indices for autotrophic-microbial complex
+  integer :: NumMicrobAutoTrophCmplx        !total number of microbial guilds in the autotrophic complex
+  integer :: NumHetetr1MicCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
   integer :: NumOfPlantLitrCmplxs           !number of plant litter complexs, woody + fine litter
   integer :: NumLiveHeterBioms              !total number of biomass components in one heterotrophic OM complexes
@@ -94,10 +111,9 @@ implicit none
 
 contains
 
-  subroutine Init(this,nmicbguilds)
+  subroutine Init(this)
   implicit none
   class(MicParType) :: this
-  integer, intent(in) :: nmicbguilds
 
   !organic matter is grouped into five complexes, including woody(1),
   ! non-woody(2), manure(3), litter, POC(4) and humus(5) (g Mg-1)
@@ -105,9 +121,9 @@ contains
   this%ndbiomcp = NumDeadMicrbCompts  !number of necrobiomass components
   this%nlbiomcp = NumLiveMicrbCompts  !number of living biomass components
   
-  this%jcplx                   = jcplxc         !# of microbe-substrate complexes
-  this%jsken                   = jskenc         !# of kinetic components of the substrates
-  this%jguilds                 = nmicbguilds
+  this%jcplx                   = jcplxc         !number of microbe-substrate complexes
+  this%jsken                   = jskenc         !number of kinetic components of the substrates
+
   this%NumMicbFunGrupsPerCmplx = NumMicbFunGrupsPerCmplx
 
   !woody, non_woody litter and manure are defined as litter
@@ -159,10 +175,8 @@ contains
   this%micbiom(2)  = 'resist'
   this%micbiom(3)  = 'active'
 
-  call this%Initallocate()
-
-!set up functional group ids
-! five om-complexes
+  !set up functional group ids
+  ! five om-complexes
   this%mid_Aerob_HeteroBacter  = 1
   this%mid_Facult_DenitBacter  = 2
   this%mid_Aerob_Fungi         = 3
@@ -171,6 +185,29 @@ contains
   this%mid_aerob_N2Fixer       = 6
   this%mid_Anaerob_N2Fixer     = 7
 
+  !the autotrophic complex
+  this%mid_AmmoniaOxidBacter        = 1
+  this%mid_NitriteOxidBacter        = 2
+  this%mid_AerobicMethanotrofBacter = 3
+  this%mid_H2GenoMethanogArchea     = 5
+
+  this%FG_guilds_heter = 0
+  this%FG_guilds_autor = 0
+  this%FG_guilds_heter(this%mid_Aerob_HeteroBacter)  = NumGuild_Heter_Aerob_Bact
+  this%FG_guilds_heter(this%mid_Aerob_Fungi)         = NumGuild_Heter_Aerob_Fung
+  this%FG_guilds_heter(this%mid_Facult_DenitBacter)  = NumGuild_Heter_Facul_Dent
+  this%FG_guilds_heter(this%mid_aerob_N2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
+  this%FG_guilds_heter(this%mid_Anaerob_N2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
+  this%FG_guilds_heter(this%mid_fermentor)           = NumGuild_Heter_Anaer_Fermentor
+  this%FG_guilds_heter(this%mid_AcetoMethanogArchea) = NumGuild_Heter_AcetoMethanogen
+
+  this%FG_guilds_autor(this%mid_H2GenoMethanogArchea)     = NumGuild_Autor_H2genMethanogen
+  this%FG_guilds_autor(this%mid_AmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
+  this%FG_guilds_autor(this%mid_NitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
+  this%FG_guilds_autor(this%mid_AerobicMethanotrofBacter) = NumGuild_Autor_AerobMethOxid
+
+  call this%Initallocate()
+
   this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter) = .true.
   this%is_aerobic_hetr(this%mid_Facult_DenitBacter) = .true.
   this%is_aerobic_hetr(this%mid_Aerob_Fungi)        = .true.
@@ -178,16 +215,23 @@ contains
 
   this%is_anaerobic_hetr(this%mid_fermentor)       = .true.
   this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer) = .true.
-!the autotrophic complex
-  this%mid_AmmoniaOxidBacter        = 1
-  this%mid_NitriteOxidBacter        = 2
-  this%mid_AerobicMethanotrofBacter = 3
-  this%mid_H2GenoMethanogArchea     = 5
 
-  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .True.
-  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .True.
+  this%is_aerobic_autor(this%mid_AmmoniaOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_NitriteOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AerobicMethanotrofBacter)=.true.
+
+  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .true.
+
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_HeteroBacter)  = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)  = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)         = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_fermentor)           = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_AcetoMethanogArchea) = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_aerob_N2Fixer)       = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Anaerob_N2Fixer)     = .true.
 
   this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)    = .true.
   this%is_CO2_autotroph(this%mid_NitriteOxidBacter)    = .true.
@@ -223,8 +267,7 @@ contains
     CNRH        => this%CNRH,        &
     CPRH        => this%CPRH,        &
     OMCF        => this%OMCF,        &
-    OMCA        => this%OMCA,        &
-    JG          => this%jguilds      &
+    OMCA        => this%OMCA         &
   )
   OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
@@ -243,7 +286,7 @@ contains
     ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
     ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))
 
-  !SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*0.5_r8
+  !SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*5._r8
 
   CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
   CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
@@ -282,34 +325,34 @@ contains
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbFunGrupsPerCmplx
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
-        DO NGL=this%JGnio(n),this%JGnfo(n)
+        DO NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(1,NGL,K)=0.15_r8           !maximum
           rNCOMC(2,NGL,K)=0.09_r8           !minimum
           rPCOMC(1,NGL,K)=0.015_r8
           rPCOMC(2,NGL,K)=0.009_r8
         ENDDO
-        this%rNCOMCa(1,N,K)=0.15_r8           !maximum
-        this%rNCOMCa(2,N,K)=0.09_r8           !minimum
-        this%rPCOMCa(1,N,K)=0.015_r8
-        this%rPCOMCa(2,N,K)=0.009_r8
+        this%rNCOMC_ave(1,N,K)=0.15_r8           !maximum
+        this%rNCOMC_ave(2,N,K)=0.09_r8           !minimum
+        this%rPCOMC_ave(1,N,K)=0.015_r8
+        this%rPCOMC_ave(2,N,K)=0.009_r8
       ELSE
-        do NGL=this%JGnio(n),this%JGnfo(n)
+        do NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(1,NGL,K)=0.225_r8
           rNCOMC(2,NGL,K)=0.135_r8
           rPCOMC(1,NGL,K)=0.0225_r8
           rPCOMC(2,NGL,K)=0.0135_r8
         enddo
-        this%rNCOMCa(1,N,K)=0.225_r8
-        this%rNCOMCa(2,N,K)=0.135_r8
-        this%rPCOMCa(1,N,K)=0.0225_r8
-        this%rPCOMCa(2,N,K)=0.0135_r8
+        this%rNCOMC_ave(1,N,K)=0.225_r8
+        this%rNCOMC_ave(2,N,K)=0.135_r8
+        this%rPCOMC_ave(1,N,K)=0.0225_r8
+        this%rPCOMC_ave(2,N,K)=0.0135_r8
       ENDIF
-      do NGL=this%JGnio(n),this%JGnfo(n)
+      do NGL=this%JGniH(n),this%JGnfH(n)
         rNCOMC(3,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
         rPCOMC(3,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
       enddo
-      this%rNCOMCa(3,N,K)=DOT_PRODUCT(FL,this%rNCOMCa(1:2,N,K))
-      this%rPCOMCa(3,N,K)=DOT_PRODUCT(FL,this%rPCOMCa(1:2,N,K))
+      this%rNCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
+      this%rPCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
     enddo
   ENDDO D95
   DO  N=1,this%NumMicbFunGrupsPerCmplx
@@ -319,16 +362,16 @@ contains
       rPCOMCAutor(1,NGL)=0.0225_r8
       rPCOMCAutor(2,NGL)=0.0135_r8
     enddo
-    this%rNCOMCAutora(1,N)=0.225_r8
-    this%rNCOMCAutora(2,N)=0.135_r8
-    this%rPCOMCAutora(1,N)=0.0225_r8
-    this%rPCOMCAutora(2,N)=0.0135_r8
+    this%rNCOMCAutor_ave(1,N)=0.225_r8
+    this%rNCOMCAutor_ave(2,N)=0.135_r8
+    this%rPCOMCAutora_ave(1,N)=0.0225_r8
+    this%rPCOMCAutora_ave(2,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
       rPCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutora(1:2,N))
-    this%rPCOMCAutora(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora(1:2,N))
+    this%rNCOMCAutor_ave(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
+    this%rPCOMCAutora_ave(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
   enddo
 
   end associate
@@ -339,37 +382,41 @@ contains
   implicit none
   class(MicParType) :: this
 
-  integer :: jguilds
   integer :: NumMicbFunGrupsPerCmplx
   integer :: jcplx
   integer :: jsken
-  integer :: n, k
-
-  jguilds = this%jguilds
+  integer :: n, kh,ka
+  
   NumMicbFunGrupsPerCmplx  =this%NumMicbFunGrupsPerCmplx
   jcplx =this%jcplx
   jsken =this%jsken
-  allocate(this%JGnio(NumMicbFunGrupsPerCmplx))
-  allocate(this%JGnfo(NumMicbFunGrupsPerCmplx))
+  allocate(this%JGniH(NumMicbFunGrupsPerCmplx))
+  allocate(this%JGnfH(NumMicbFunGrupsPerCmplx))
 
   allocate(this%JGniA(NumMicbFunGrupsPerCmplx))
   allocate(this%JGnfA(NumMicbFunGrupsPerCmplx))
 
-  k=1
-  this%NumMicrobAutrophCmplx=0
-  this%NumHetetrMicCmplx=0
+  kh=1
+  ka=1
+  this%NumMicrobAutoTrophCmplx=0
+  this%NumHetetr1MicCmplx=0
   !replace the functional group specification with external input later
-  do n=1,NumMicbFunGrupsPerCmplx
-    this%JGnio(n)              = k
-    this%JGniA(n)              = k
-    k                          = k+jguilds
-    this%JGnfo(n)              = k-1
-    this%JGnfA(n)              = k-1
-    this%NumMicrobAutrophCmplx = this%NumMicrobAutrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
-    this%NumHetetrMicCmplx     = this%NumHetetrMicCmplx+this%JGnfo(n)-this%JGnio(n)+1
+  do N=1,NumMicbFunGrupsPerCmplx
+    this%JGniH(n)                = kh
+    this%JGniA(n)                = ka
+    kh                           = kh+this%FG_guilds_heter(N)
+    ka                           = ka+this%FG_guilds_autor(N)
+    this%JGnfH(n)                = kh-1
+    this%JGnfA(n)                = ka-1
+    if(this%JGnfA(n)>=this%JGniA(n))then
+      this%NumMicrobAutoTrophCmplx = this%NumMicrobAutoTrophCmplx+this%JGnfA(n)-this%JGniA(n)+1
+    endif
+    if(this%JGnfH(n)>=this%JGniH(n))then    
+      this%NumHetetr1MicCmplx      = this%NumHetetr1MicCmplx+this%JGnfH(n)-this%JGniH(n)+1
+    endif
   enddo
-  this%NumLiveHeterBioms=this%nlbiomcp*this%NumHetetrMicCmplx
-  this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutrophCmplx
+  this%NumLiveHeterBioms=this%nlbiomcp*this%NumHetetr1MicCmplx
+  this%NumLiveAutoBioms=this%nlbiomcp*this%NumMicrobAutoTrophCmplx
 
   allocate(this%DOSA(1:jcplx))
   allocate(this%SPOSC(jsken,1:jcplx))
@@ -379,14 +426,14 @@ contains
   allocate(this%OQCK(1:jcplx))
   allocate(this%ORCI(NumDeadMicrbCompts,1:jcplx))
   allocate(this%OMCI(NumLiveMicrbCompts,1:jcplx))
-  allocate(this%rNCOMC(NumLiveMicrbCompts,this%NumHetetrMicCmplx,1:jcplx))
-  allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumHetetrMicCmplx,1:jcplx))
-  allocate(this%rNCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
-  allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutrophCmplx))
-  allocate(this%rNCOMCa(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rPCOMCa(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rNCOMCAutora(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
-  allocate(this%rPCOMCAutora(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+  allocate(this%rNCOMC(NumLiveMicrbCompts,this%NumHetetr1MicCmplx,1:jcplx))
+  allocate(this%rPCOMC(NumLiveMicrbCompts,this%NumHetetr1MicCmplx,1:jcplx))
+  allocate(this%rNCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutoTrophCmplx))
+  allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutoTrophCmplx))
+  allocate(this%rNCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
+  allocate(this%rPCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
+  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
 
   allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))
@@ -396,9 +443,11 @@ contains
   allocate(this%OMCA(NumMicbFunGrupsPerCmplx))
   allocate(this%FL(2))
   allocate(this%is_activeMicrbFungrpAutor(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpAutor=.false.
+  allocate(this%is_activeMicrbFungrpHeter(NumMicbFunGrupsPerCmplx)); this%is_activeMicrbFungrpHeter=.false.
   allocate(this%is_CO2_autotroph(NumMicbFunGrupsPerCmplx)); this%is_CO2_autotroph=.false.
   allocate(this%is_aerobic_hetr(NumMicbFunGrupsPerCmplx)); this%is_aerobic_hetr=.false.
   allocate(this%is_anaerobic_hetr(NumMicbFunGrupsPerCmplx));this%is_anaerobic_hetr=.false.
+  allocate(this%is_aerobic_autor(NumMicbFunGrupsPerCmplx));this%is_aerobic_autor=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -449,4 +498,28 @@ contains
 
   end function get_micb_id
 
+!------------------------------------------------------------------------------------------
+
+  pure function is_group_defined(this,igroup,isauto)result(isdef)
+  implicit none
+  class(MicParType), intent(in) :: this
+  integer, intent(in) :: igroup
+  logical, intent(in) :: isauto  
+  logical :: isdef
+
+  if(isauto)then
+    isdef=igroup == this%mid_AmmoniaOxidBacter     .or. &
+       igroup == this%mid_NitriteOxidBacter        .or. & 
+       igroup == this%mid_AerobicMethanotrofBacter .or. &
+       igroup == this%mid_H2GenoMethanogArchea
+  else
+    isdef=igroup == this%mid_Aerob_HeteroBacter  .or. &
+       igroup == this%mid_Facult_DenitBacter     .or. &
+       igroup == this%mid_Aerob_Fungi            .or. &
+       igroup == this%mid_fermentor              .or. &
+       igroup == this%mid_AcetoMethanogArchea    .or. &
+       igroup == this%mid_aerob_N2Fixer          .or. &
+       igroup == this%mid_Anaerob_N2Fixer
+  endif
+  end function is_group_defined
 end module MicBGCPars

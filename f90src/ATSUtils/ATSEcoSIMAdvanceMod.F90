@@ -1,7 +1,7 @@
 module ATSEcoSIMAdvanceMod
   !
   !Description
-  
+
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SoilWaterDataType
   use SharedDataMod
@@ -15,11 +15,11 @@ module ATSEcoSIMAdvanceMod
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
-      VPA_col, WindSpeedAtm_col, RainH, VPK_col  
+      VPA_col, WindSpeedAtm_col, RainH, VPK_col
   use SoilPropertyDataType
   use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
       SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, AirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
+      FracSoiPAsIce_vr, FracAirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -56,7 +56,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test 
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -74,7 +74,7 @@ implicit none
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
-  real(r8) :: VLWat_test(JZ,JY,JX)  
+  real(r8) :: VLWat_test(JZ,JY,JX)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -94,7 +94,7 @@ implicit none
     NL(NY,NX)               = a_NL(NY)
 
     ASP_col(NY,NX)=a_ASP(NY)
-    !TairKClimMean(NY,NX) = a_ATKA(NY)
+    !TairKClimMean_col(NY,NX) = a_ATKA(NY)
     !CO2E_col(NY,NX)      = atm_co2
     !CH4E_col(NY,NX)      = atm_ch4
     !OXYE_col(NY,NX)      = atm_o2
@@ -106,7 +106,7 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
-    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI(NY,NX)/7272.0_r8)
+    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
@@ -120,7 +120,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    DO L=NU(NY,NX),NL(NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
       SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
@@ -145,12 +145,12 @@ implicit none
         !fraction as ice
         FracSoiPAsIce_vr(L,NY,NX)=AZMAX1t(VLiceMicP1_vr(L,NY,NX)/VLTSoiPore)
         !fraction as air
-        AirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
+        FracAirFilledSoilPore_vr(L,NY,NX)=AZMAX1t(VLairMicP1_vr(L,NY,NX)/VLTSoiPore)
       ELSE
         FracSoiPAsWat_vr(L,NY,NX)=POROS_vr(L,NY,NX)
         FracSoiPAsIce_vr(L,NY,NX)=0.0_r8
-        AirFilledSoilPore_vr(L,NY,NX)=0.0_r8
-      ENDIF    
+        FracAirFilledSoilPore_vr(L,NY,NX)=0.0_r8
+      ENDIF
     ENDDO
 
     !Setting the snow, if passed as total precipitation do full temp calc, else
@@ -168,7 +168,7 @@ implicit none
       ENDIF
     else
       RainFalPrec_col(NY,NX)=p_rain(NY)*3600.0 !convert from m/s to m/hr
-      SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0 !convert from m SWE/s to mSWE/hr 
+      SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0 !convert from m SWE/s to mSWE/hr
     endif
     !Set Prec equal to variables for after Irrigation and canopy processing
     !since that is not included yet
@@ -180,7 +180,7 @@ implicit none
     POROS_vr(0,NY,NX) = 1.0
   ENDDO
 
-  !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s" 
+  !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s"
   PSIAtFldCapacity = pressure_at_field_capacity
   PSIAtWiltPoint = pressure_at_wilting_point
 
@@ -209,7 +209,7 @@ implicit none
 
     Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
     Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
-    !also update state variables for iteration M 
+    !also update state variables for iteration M
     call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
@@ -232,7 +232,7 @@ implicit none
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
   ENDDO
- 
+
   !write(*,*) "After setting surf_w_source to Qinfl2MicP: "
   ! Check for NaN in surf_w_source
   if (any(is_nan(surf_w_source))) then

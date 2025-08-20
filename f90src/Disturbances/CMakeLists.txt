@@ -1,5 +1,6 @@
 set(DISTURB_MOD_SOURCES
 	ErosionMod.F90
+  FireMod.F90
   PerturbationMod.F90
   PlantDisturbMod.F90
   SoilDisturbMod.F90

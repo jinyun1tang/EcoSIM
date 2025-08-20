@@ -88,12 +88,12 @@ module readiMod
 
   if(.not.column_mode)then
     DO  NX=NHW,NHE
-      NL(NVS+1,NX)=NL(NVS,NX)
+      NL_col(NVS+1,NX)=NL_col(NVS,NX)
     ENDDO
     DO  NY=NVN,NVS
-      NL(NY,NHE+1)=NL(NY,NHE)
+      NL_col(NY,NHE+1)=NL_col(NY,NHE)
     ENDDO
-    NL(NVS+1,NHE+1)=NL(NVS,NHE)
+    NL_col(NVS+1,NHE+1)=NL_col(NVS,NHE)
   endif
   IOLD=0
   call ncd_pio_closefile(grid_nfid)
@@ -247,24 +247,6 @@ module readiMod
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-
-    write(*,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
-    write(*,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
-    write(*,*)'slope of natural water table relative to landscape '// &
-      'surface: DTBLGG',DTBLGG
-    write(*,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
-    write(*,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
-    write(*,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
-    write(*,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
-    write(*,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
-    write(*,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
-    write(*,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
-    write(*,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
-    write(*,*)'N distance to water table (m): RCHGNTG',RCHGNTG
-    write(*,*)'E distance to water table (m): RCHGETG',RCHGETG
-    write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
-    write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
-    write(*,*)'lower boundary conditions for water flow:RCHGDG', RCHGDG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'width of each W-E landscape column: DHI'
     write(*,*)(DHI(NX),NX=1,NHE)
@@ -272,58 +254,79 @@ module readiMod
     write(*,*)(DVI(NY),NY=1,NVS)
     write(*,'(100A)')('=',ll=1,100)
   endif
+  write(iulog,*)'water table config:',WaterTableStatus(iWaterTabelMode)
+  write(iulog,*)'depth of natural water table: DTBLIG',WTBLDepz_nat
+  write(iulog,*)'depth of artificial water table: DTBLDIG',WTBLDepz_tile
+  write(iulog,*)'slope of natural water table relative to landscape surface: DTBLGG',DTBLGG
+
+  write(iulog,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
+  write(iulog,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
+  write(iulog,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
+  write(iulog,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
+
+  write(iulog,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
+  write(iulog,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
+  write(iulog,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
+  write(iulog,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
+
+  write(iulog,*)'N distance to water table (m): RCHGNTG',RCHGNTG
+  write(iulog,*)'E distance to water table (m): RCHGETG',RCHGETG
+  write(iulog,*)'S distance to water table (m): RCHGSTG',RCHGSTG
+  write(iulog,*)'W distance to water table (m): RCHGWTG',RCHGWTG
+  write(iulog,*)'Lower boundary scaling rate for water flow:RCHGDG', RCHGDG
+  
 
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
-      ALAT(NY,NX)               = ALATG
-      PBOT_col(NY,NX)           = PBOT_col(NY,NX)*exp(-ALT(NY,NX)/hpresc)
-      ALTI(NY,NX)               = ALTIG
-      ATCAI(NY,NX)              = ATCAG
-      IDWaterTable_col(NY,NX)   = iWaterTabelMode
-      OXYE_col(NY,NX)           = ao2_ppm
-      Z2GE_col(NY,NX)           = an2_ppm
-      CO2EI(NY,NX)              = aco2_ppm
-      CH4E_col(NY,NX)           = ach4_ppm
-      Z2OE_col(NY,NX)           = an2o_ppm
-      ARGE_col(NY,NX)           = arg_ppm
-      ZNH3E_col(NY,NX)          = ZNH3EG
-      KoppenClimZone_col(NY,NX) = IETYPG
-      FlowDirIndicator(NY,NX)   = grid_mode
-      NatWtblDepz_col(NY,NX)    = WTBLDepz_nat
-      WtblDepzTile_col(NY,NX)   = WTBLDepz_tile
-      WaterTBLSlope_col(NY,NX)  = DTBLGG
+      ALAT_col(NY,NX)             = ALATG
+      PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
+      ALTI_col(NY,NX)             = ALTIG
+      ATCAI_col(NY,NX)            = ATCAG
+      IDWaterTable_col(NY,NX)     = iWaterTabelMode
+      OXYE_col(NY,NX)             = ao2_ppm
+      Z2GE_col(NY,NX)             = an2_ppm
+      CO2EI_col(NY,NX)            = aco2_ppm
+      CH4E_col(NY,NX)             = ach4_ppm
+      Z2OE_col(NY,NX)             = an2o_ppm
+      ARGE_col(NY,NX)             = arg_ppm
+      ZNH3E_col(NY,NX)            = anh3_ppm
+      KoppenClimZone_col(NY,NX)   = IETYPG
+      FlowDirIndicator_col(NY,NX) = grid_mode
+      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
+      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
+      WaterTBLSlope_col(NY,NX)    = DTBLGG
 
-      RechargNorthSurf(NY,NX) = RCHQNG
-      RechargEastSurf(NY,NX)  = RCHQEG
-      RechargSouthSurf(NY,NX) = RCHQSG
-      RechargWestSurf(NY,NX)  = RCHQWG
+      RechargNorthSurf_col(NY,NX) = RCHQNG
+      RechargEastSurf_col(NY,NX)  = RCHQEG
+      RechargSouthSurf_col(NY,NX) = RCHQSG
+      RechargWestSurf_col(NY,NX)  = RCHQWG 
 
-      RechargNorthSubSurf(NY,NX) = RCHGNUG
-      RechargEastSubSurf(NY,NX)  = RCHGEUG
-      RechargSouthSubSurf(NY,NX) = RCHGSUG
-      RechargWestSubSurf(NY,NX)  = RCHGWUG
+      RechrgDistNorthSubSurf_col(NY,NX) = RCHGNTG
+      RechrgDistEastSubSurf_col(NY,NX)  = RCHGETG
+      RechrgDistSouthSubSurf_col(NY,NX) = RCHGSTG
+      RechrgDistWestSubSurf_col(NY,NX)  = RCHGWTG
 
-      RechargRateNorthWTBL(NY,NX) = RCHGNTG
-      RechargRateEastWTBL(NY,NX)  = RCHGETG
-      RechargRateSouthWTBL(NY,NX) = RCHGSTG
-      RechargRateWestWTBL(NY,NX)  = RCHGWTG
-      
-      RechargBottom_col(NY,NX)                = RCHGDG
-      DH(NY,NX)                   = DHI(NX)
-      DV(NY,NX)                   = DVI(NY)
-      CO2E_col(NY,NX)             = CO2EI(NY,NX)
-      H2GE_col(NY,NX)                 = 1.0E-03_r8
+      RechargRateNorthWTBL_col(NY,NX) = RCHGNUG
+      RechargRateEastWTBL_col(NY,NX)  = RCHGEUG
+      RechargRateSouthWTBL_col(NY,NX) = RCHGSUG
+      RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
+      RechargBottom_col(NY,NX) = RCHGDG
+
+      DH_col(NY,NX)                = DHI(NX)
+      DV_col(NY,NX)                = DVI(NY)
+      CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
+      H2GE_col(NY,NX)          = ah2_ppm
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
-!     DayLenthMax=maximum daylength (h)
+!     DayLenthMax_col=maximum daylength (h)
 !
-      IF(ALAT(NY,NX).GT.0.0_r8)THEN
+      IF(ALAT_col(NY,NX).GT.0.0_r8)THEN
         XI=173
       ELSE
         XI=356
       ENDIF
-      DayLenthMax(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
+      DayLenthMax_col(NY,NX)=GetDayLength(ALAT_col(NY,NX),XI)
 
     ENDDO D9890
   ENDDO D9895
@@ -379,7 +382,7 @@ module readiMod
 !     SURFACE SLOPES AND ASPECTS
 !
         ASP_col(NY,NX)       = ASPX
-        SL(NY,NX)            = SL0
+        SL_col(NY,NX)            = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
@@ -391,34 +394,35 @@ module readiMod
       ENDDO
     ENDDO
 
-    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity_col(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH_vr(0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSPf',  ntp,RSP(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSCw',  ntp,RSC(k_woody_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSNw',  ntp,RSN(k_woody_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSPw',  ntp,RSP(k_woody_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSCm',  ntp,RSC(k_manure,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSNm',  ntp,RSN(k_manure,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSPm',  ntp,RSP(k_manure,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC_vr(k_fine_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN_vr(k_fine_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSPf',  ntp,RSP_vr(k_fine_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSCw',  ntp,RSC_vr(k_woody_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSNw',  ntp,RSN_vr(k_woody_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSPw',  ntp,RSP_vr(k_woody_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSCm',  ntp,RSC_vr(k_manure,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSNm',  ntp,RSN_vr(k_manure,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSPm',  ntp,RSP_vr(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP1',ntp,iLitrType_col(1,NV1,NH1))
     call ncd_getvar(grid_nfid, 'IXTYP2',ntp,iLitrType_col(2,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NUI'   ,ntp,NUI_col(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'NJ'    ,ntp,MaxNumRootLays_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
-    call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR_col(NV1,NH1))
     
-    NU(NV1,NH1) = NUI(NV1,NH1)
-    NK(NV1,NH1) = MaxNumRootLays(NV1,NH1)+1
-    NM(NV1,NH1) = MaxNumRootLays(NV1,NH1)+NL1
+    NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
+    NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
+    NM(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+NL1
+    
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
-    NLI(NV1,NH1) = NM(NV1,NH1)+NL2
-    NL(NV1,NH1)  = NLI(NV1,NH1)
+    NLI_col(NV1,NH1) = NM(NV1,NH1)+NL2
+    NL_col(NV1,NH1)  = NLI_col(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepz2LayBottom_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0_vr(1:JZ,NV1,NH1))
@@ -429,7 +433,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn_vr(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND_vr(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK_vr(1:JZ,NV1,NH1))
 
@@ -476,67 +480,67 @@ module readiMod
     call ncd_getvar(grid_nfid, 'THW',ntp,THW_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'THI',ntp,THI_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'RSCfL',ntp,dat1(1:JZ));RSC(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSNfL',ntp,dat1(1:JZ));RSN(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSPfL',ntp,dat1(1:JZ));RSP(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSCwL',ntp,dat1(1:JZ));RSC(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSNwL',ntp,dat1(1:JZ));RSN(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSPwL',ntp,dat1(1:JZ));RSP(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSCmL',ntp,dat1(1:JZ));RSC(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSNmL',ntp,dat1(1:JZ));RSN(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSPmL',ntp,dat1(1:JZ));RSP(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSCfL',ntp,dat1(1:JZ));RSC_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSNfL',ntp,dat1(1:JZ));RSN_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSPfL',ntp,dat1(1:JZ));RSP_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSCwL',ntp,dat1(1:JZ));RSC_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSNwL',ntp,dat1(1:JZ));RSN_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSPwL',ntp,dat1(1:JZ));RSP_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSCmL',ntp,dat1(1:JZ));RSC_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSNmL',ntp,dat1(1:JZ));RSN_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSPmL',ntp,dat1(1:JZ));RSP_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
 
     DO  NX=NH1,NH2
       DO  NY=NV1,NV2
         IF (NX/=NH1 .OR. NY/=NV1) THEN
-!
-!     SURFACE PROPERTIES
-!
-!     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
-!     SoilAlbedo=wet soil albedo
-!     PH=litter pH
-!     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
-!     IXTYP=surface litter type:1=plant,2=manure
-!     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
-!     NL1,NL2=number of additional layers below NJ with,without data in file
-!     ISOILR=natural(0),reconstructed(1) soil profile
-!
-          PSIAtFldCapacity(NY,NX)   = PSIAtFldCapacity(NV1,NH1)
-          PSIAtWiltPoint(NY,NX)     = PSIAtWiltPoint(NV1,NH1)
+          !
+          !     SURFACE PROPERTIES
+          !
+          !     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
+          !     SoilAlbedo=wet soil albedo
+          !     PH=litter pH
+          !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
+          !     IXTYP=surface litter type:1=plant,2=manure
+          !     NUI,MaxNumRootLays=number of soil surface layer,maximum rooting layer
+          !     NL1,NL2=number of additional layers below NJ with,without data in file
+          !     ISOILR_col=natural(0),reconstructed(1) soil profile
+          !
+          PSIAtFldCapacity_col(NY,NX)   = PSIAtFldCapacity_col(NV1,NH1)
+          PSIAtWiltPoint_col(NY,NX)     = PSIAtWiltPoint_col(NV1,NH1)
           SoilAlbedo_col(NY,NX)     = SoilAlbedo_col(NV1,NH1)
           PH_vr(0,NY,NX)               = PH_vr(0,NV1,NH1)
-          RSC(k_fine_litr,0,NY,NX)  = RSC(k_fine_litr,0,NV1,NH1)
-          RSN(k_fine_litr,0,NY,NX)  = RSN(k_fine_litr,0,NV1,NH1)
-          RSP(k_fine_litr,0,NY,NX)  = RSP(k_fine_litr,0,NV1,NH1)
-          RSC(k_woody_litr,0,NY,NX) = RSC(k_woody_litr,0,NV1,NH1)
-          RSN(k_woody_litr,0,NY,NX) = RSN(k_woody_litr,0,NV1,NH1)
-          RSP(k_woody_litr,0,NY,NX) = RSP(k_woody_litr,0,NV1,NH1)
-          RSC(k_manure,0,NY,NX)     = RSC(k_manure,0,NV1,NH1)
-          RSN(k_manure,0,NY,NX)     = RSN(k_manure,0,NV1,NH1)
-          RSP(k_manure,0,NY,NX)     = RSP(k_manure,0,NV1,NH1)
+          RSC_vr(k_fine_litr,0,NY,NX)  = RSC_vr(k_fine_litr,0,NV1,NH1)
+          RSN_vr(k_fine_litr,0,NY,NX)  = RSN_vr(k_fine_litr,0,NV1,NH1)
+          RSP_vr(k_fine_litr,0,NY,NX)  = RSP_vr(k_fine_litr,0,NV1,NH1)
+          RSC_vr(k_woody_litr,0,NY,NX) = RSC_vr(k_woody_litr,0,NV1,NH1)
+          RSN_vr(k_woody_litr,0,NY,NX) = RSN_vr(k_woody_litr,0,NV1,NH1)
+          RSP_vr(k_woody_litr,0,NY,NX) = RSP_vr(k_woody_litr,0,NV1,NH1)
+          RSC_vr(k_manure,0,NY,NX)     = RSC_vr(k_manure,0,NV1,NH1)
+          RSN_vr(k_manure,0,NY,NX)     = RSN_vr(k_manure,0,NV1,NH1)
+          RSP_vr(k_manure,0,NY,NX)     = RSP_vr(k_manure,0,NV1,NH1)
           iLitrType_col(1,NY,NX)            = iLitrType_col(1,NV1,NH1)
           iLitrType_col(2,NY,NX)            = iLitrType_col(2,NV1,NH1)
-          NUI(NY,NX)                = NUI(NV1,NH1)
-          MaxNumRootLays(NY,NX)     = MaxNumRootLays(NV1,NH1)
-          ISOILR(NY,NX)             = ISOILR(NV1,NH1)
-          NU(NY,NX)                 = NU(NV1,NH1)
-          NK(NY,NX)                 = NK(NV1,NH1)
+          NUI_col(NY,NX)                = NUI_col(NV1,NH1)
+          MaxNumRootLays_col(NY,NX)     = MaxNumRootLays_col(NV1,NH1)
+          ISOILR_col(NY,NX)             = ISOILR_col(NV1,NH1)
+          NU_col(NY,NX)                 =NU_col(NV1,NH1)
+          NK_col(NY,NX)                 = NK_col(NV1,NH1)
           NM(NY,NX)                 = NM(NV1,NH1)
-!  the extra soil layer below root zone cannot be greater than what is allowed
-          NLI(NY,NX) = NLI(NV1,NH1)
-          NL(NY,NX)  = NLI(NV1,NH1)
+          !  the extra soil layer below root zone cannot be greater than what is allowed
+          NLI_col(NY,NX) = NLI_col(NV1,NH1)
+          NL_col(NY,NX)  = NLI_col(NV1,NH1)
         ENDIF
 
-!
-!     PHYSICAL PROPERTIES
-!
-!     CDPTH=depth to bottom (m) > 0
-!     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
-!
-!
+        !
+        !     PHYSICAL PROPERTIES
+        !
+        !     CDPTH=depth to bottom (m) > 0
+        !     SoiBulkDensityt0_vr=initial bulk density (Mg m-3,0=water), it refers to solid matter
+        !
+        !
         iPondFlag_col(NY,NX)=.false.
         IF (NX/=NH1 .OR. NY/=NV1) THEN
-          DO L=NU(NY,NX),NM(NY,NX)
+          DO L=NU_col(NY,NX),NM(NY,NX)
             CumDepz2LayBottom_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NV1,NH1)
             SoiBulkDensityt0_vr(L,NY,NX)  = SoiBulkDensityt0_vr(L,NV1,NH1)
             if(.not.iPondFlag_col(NY,NX))iPondFlag_col(NY,NX)=SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO
@@ -546,7 +550,7 @@ module readiMod
             SatHydroCondVert_vr(L,NY,NX)  = SatHydroCondVert_vr(L,NV1,NH1)
             SatHydroCondHrzn_vr(L,NY,NX)  = SatHydroCondHrzn_vr(L,NV1,NH1)
             CSAND_vr(L,NY,NX)             = CSAND_vr(L,NV1,NH1)
-            CSILT(L,NY,NX)                = CSILT(L,NV1,NH1)
+            CSILT_vr(L,NY,NX)                = CSILT_vr(L,NV1,NH1)
             SoilFracAsMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)              = ROCK_vr(L,NV1,NH1)
             PH_vr(L,NY,NX)                = PH_vr(L,NV1,NH1)
@@ -589,19 +593,20 @@ module readiMod
             THW_vr(L,NY,NX) = THW_vr(L,NV1,NH1)
             THI_vr(L,NY,NX) = THI_vr(L,NV1,NH1)
 
-            RSC(k_fine_litr,L,NY,NX)  = RSC(k_fine_litr,L,NV1,NH1)
-            RSN(k_fine_litr,L,NY,NX)  = RSN(k_fine_litr,L,NV1,NH1)
-            RSP(k_fine_litr,L,NY,NX)  = RSP(k_fine_litr,L,NV1,NH1)
-            RSC(k_woody_litr,L,NY,NX) = RSC(k_woody_litr,L,NV1,NH1)
-            RSN(k_woody_litr,L,NY,NX) = RSN(k_woody_litr,L,NV1,NH1)
-            RSP(k_woody_litr,L,NY,NX) = RSP(k_woody_litr,L,NV1,NH1)
-            RSC(k_manure,L,NY,NX)     = RSC(k_manure,L,NV1,NH1)
-            RSN(k_manure,L,NY,NX)     = RSN(k_manure,L,NV1,NH1)
-            RSP(k_manure,L,NY,NX)     = RSP(k_manure,L,NV1,NH1)
-
+            RSC_vr(k_fine_litr,L,NY,NX)  = RSC_vr(k_fine_litr,L,NV1,NH1)
+            RSN_vr(k_fine_litr,L,NY,NX)  = RSN_vr(k_fine_litr,L,NV1,NH1)
+            RSP_vr(k_fine_litr,L,NY,NX)  = RSP_vr(k_fine_litr,L,NV1,NH1)
+            RSC_vr(k_woody_litr,L,NY,NX) = RSC_vr(k_woody_litr,L,NV1,NH1)
+            RSN_vr(k_woody_litr,L,NY,NX) = RSN_vr(k_woody_litr,L,NV1,NH1)
+            RSP_vr(k_woody_litr,L,NY,NX) = RSP_vr(k_woody_litr,L,NV1,NH1)
+            RSC_vr(k_manure,L,NY,NX)     = RSC_vr(k_manure,L,NV1,NH1)
+            RSN_vr(k_manure,L,NY,NX)     = RSN_vr(k_manure,L,NV1,NH1)
+            RSP_vr(k_manure,L,NY,NX)     = RSP_vr(k_manure,L,NV1,NH1)
           ENDDO
         ENDIF
-        DO L=1,NL(NY,NX)
+        
+        DO L=1,NL_col(NY,NX)
+
           if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
             if(CSoilOrgM_vr(ielmn,L,NY,NX)*1.e-3_r8>CSoilOrgM_vr(ielmc,L,NY,NX))then
               write(iulog,*)'Likely too larger N/C ratio',1.e-3_r8*safe_adb(CSoilOrgM_vr(ielmn,L,NY,NX),CSoilOrgM_vr(ielmc,L,NY,NX)), 'in L,NY,NX',L,NY,NX
@@ -613,28 +618,29 @@ module readiMod
             endif
           endif  
         ENDDO
+
         if(lverb)then
-          CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
+          CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
-!        RSC(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
-!        RSN(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
-!        RSP(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
+!        RSC_vr(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_litr,0,NY,NX))
+!        RSN_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_litr,0,NY,NX))
+!        RSP_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_litr,0,NY,NX))
 
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
-!
-!     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
-!
-!     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
-!
-        call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
+        !
+        !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
+        !
+        !     ISOIL=flag for calculating FC(1),WiltPoint_vr(2),SatHydroCondVert_vr(3),SatHydroCondHrzn_vr(4)
+        !
+        call ComputeSoilHydroPars(NY,NX,NU_col(NY,NX),NM(NY,NX))
 
-!
-!     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
-!     below is for soil repacking, whence NU>1
-!     root zone from NU to NM, why use 0.025?
-!
-        IF(NU(NY,NX).GT.1)THEN
-          DO  L=NU(NY,NX)-1,0,-1
+        !
+        !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
+        !     below is for soil repacking, whence NU>1
+        !     root zone from NU to NM, why use 0.025?
+        !
+        IF(NU_col(NY,NX).GT.1)THEN
+          DO  L=NU_col(NY,NX)-1,0,-1
             IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
               CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.01_r8
             ELSE
@@ -647,7 +653,7 @@ module readiMod
               SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L+1,NY,NX)
               SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L+1,NY,NX)
               CSAND_vr(L,NY,NX)            = CSAND_vr(L+1,NY,NX)
-              CSILT(L,NY,NX)               = CSILT(L+1,NY,NX)
+              CSILT_vr(L,NY,NX)               = CSILT_vr(L+1,NY,NX)
               CCLAY_vr(L,NY,NX)            = CCLAY_vr(L+1,NY,NX)
               SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
@@ -685,42 +691,42 @@ module readiMod
               GKCK_vr(L,NY,NX)             = GKCK_vr(L+1,NY,NX)
               THW_vr(L,NY,NX)              = THW_vr(L+1,NY,NX)
               THI_vr(L,NY,NX)              = THI_vr(L+1,NY,NX)
-              ISOIL(1:4,L,NY,NX)           = ISOIL(1:4,L+1,NY,NX)
-              RSC(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSN(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSP(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSC(k_woody_litr,L,NY,NX)    = 0.0_r8
-              RSN(k_woody_litr,L,NY,NX)    = 0.0_r8
-              RSP(k_woody_litr,L,NY,NX)    = 0.0_r8
-              RSC(k_manure,L,NY,NX)        = 0.0_r8
-              RSN(k_manure,L,NY,NX)        = 0.0_r8
-              RSP(k_manure,L,NY,NX)        = 0.0_r8
+              ISOIL_vr(1:4,L,NY,NX)           = ISOIL_vr(1:4,L+1,NY,NX)
+              RSC_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSN_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSP_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
+              RSC_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSN_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSP_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSC_vr(k_manure,L,NY,NX)        = 0.0_r8
+              RSN_vr(k_manure,L,NY,NX)        = 0.0_r8
+              RSP_vr(k_manure,L,NY,NX)        = 0.0_r8
             ENDIF
           ENDDO
         ENDIF
-!
-!     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
-!     depth of layer (L-1) is at the middle between that of layer L-2 and L
+        !
+        !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
+        !     depth of layer (L-1) is at the middle between that of layer L-2 and L
         if(lverb)write(*,*)'SetDeepSoil'
         call SetDeepSoil(NY,NX,NM(NY,NX),JZ)
 
-!
-!   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
-!
-!   FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
-!   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
-!   CSAND_vr,CSILT,CCLAY_vr=sand,silt,clay content converted to g Mg-1
-!   CORGC,CORGR=SOC,POC converted to g Mg-1
-!   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
-!   CNH4...=solute concentrations converted to mol Mg-1
-!   SoiBulkDensityt0_vr: initial bulk density
-
-        DO  L=1,NL(NY,NX)
-  !   SoilFracAsMacP: macropore fraction
+        !
+        !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
+        !
+        !   FracSoiAsMicP_vr=micropore fraction excluding macropore,rock
+        !   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
+        !   CSAND_vr,CSILT,CCLAY_vr=sand,silt,clay content converted to g Mg-1
+        !   CORGC,CORGR=SOC,POC converted to g Mg-1
+        !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
+        !   CNH4...=solute concentrations converted to mol Mg-1
+        !   SoiBulkDensityt0_vr: initial bulk density
+        
+        DO  L=1,NL_col(NY,NX)
+        !   SoilFracAsMacP: macropore fraction
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
           IF(isclose(SoilBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
-  !     fraction of soil as micropore
+        !     fraction of soil as micropore
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
   !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
   !  both macropores and micropores    
@@ -729,15 +735,15 @@ module readiMod
   !
           SatHydroCondVert_vr(L,NY,NX)=0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           SatHydroCondHrzn_vr(L,NY,NX)=0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-          CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT(L,NY,NX)))
+          CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
           CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C (C is input as Kg/Mg soil, N and P are input as g/Mg soil)
           COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI_vr(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)
-  ! soil texture is reported based on mass basis soley for mineral component of the soil
+        ! soil texture is reported based on mass basis soley for mineral component of the soil
           corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
           CSAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*corrector
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*corrector
+          CSILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*corrector
           CCLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*corrector
           CEC_vr(L,NY,NX)=CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           AEC_vr(L,NY,NX)=AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
@@ -760,12 +766,12 @@ module readiMod
           CFEOH_vr(L,NY,NX)=CFEOH_vr(L,NY,NX)/56.0_r8
           CCACO_vr(L,NY,NX)=CCACO_vr(L,NY,NX)/40.0_r8
           CCASO_vr(L,NY,NX)=CCASO_vr(L,NY,NX)/40.0_r8
-  !
-  !     ESTIMATE SON,SOP,CEC IF UNKNOWN
-  !     BIOCHEMISTRY 130:117-131
-  !
+        !
+        !     ESTIMATE SON,SOP,CEC IF UNKNOWN
+        !     BIOCHEMISTRY 130:117-131
+        !
           IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
-  !  default ORGN parameterization
+        !  default ORGN parameterization
             CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
               8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
@@ -776,7 +782,7 @@ module readiMod
           IF(CEC_vr(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
             CEC_vr(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+06_r8 &
-              +80.0_r8*CCLAY_vr(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
+              +80.0_r8*CCLAY_vr(L,NY,NX)+20.0_r8*CSILT_vr(L,NY,NX) &
               +5.0_r8*CSAND_vr(L,NY,NX))
           ENDIF
         ENDDO
@@ -785,7 +791,8 @@ module readiMod
       ENDDO
     ENDDO
   ENDDO
-  write(*,*)'ieadTo',RSC(1:micpar%NumOfLitrCmplxs,0,1,1)
+
+  write(*,*)'ieadTo',RSC_vr(1:micpar%NumOfLitrCmplxs,0,1,1)
 
   end associate
   end subroutine readTopoNC
@@ -809,31 +816,31 @@ module readiMod
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP_col(NY,NX)
-  write(*,*)'Slope (o): SL0',SL(NY,NX)
+  write(*,*)'Slope (o): SL0',SL_col(NY,NX)
   write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth_col(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 
   write(*,*)''
   write(*,*)'NY,NX=',NY,NX
-  write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity(NY,NX)
-  write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint(NY,NX)
+  write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity_col(NY,NX)
+  write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint_col(NY,NX)
   write(*,*)'Wet soil albedo',SoilAlbedo_col(NY,NX)
 
   write(*,*)'Litter pH',PH_vr(0,NY,NX)
-  write(*,*)'C in surface fine litter (g m-2)',RSC(k_fine_litr,0,NY,NX)
-  write(*,*)'N in surface fine litter (g m-2)',RSN(k_fine_litr,0,NY,NX)
-  write(*,*)'P in surface fine litter (g m-2)',RSP(k_fine_litr,0,NY,NX)
-  write(*,*)'C in surface woody litter (g m-2)',RSC(k_woody_litr,0,NY,NX)
-  write(*,*)'N in surface woody litter (g m-2)',RSN(k_woody_litr,0,NY,NX)
-  write(*,*)'P in surface woody litter (g m-2)',RSP(k_woody_litr,0,NY,NX)
-  write(*,*)'C in surface manure litter (g m-2)',RSC(k_manure,0,NY,NX)
-  write(*,*)'N in surface manure litter (g m-2)',RSN(k_manure,0,NY,NX)
-  write(*,*)'P in surface manure litter (g m-2)',RSP(k_manure,0,NY,NX)
+  write(*,*)'C in surface fine litter (g m-2)',RSC_vr(k_fine_litr,0,NY,NX)
+  write(*,*)'N in surface fine litter (g m-2)',RSN_vr(k_fine_litr,0,NY,NX)
+  write(*,*)'P in surface fine litter (g m-2)',RSP_vr(k_fine_litr,0,NY,NX)
+  write(*,*)'C in surface woody litter (g m-2)',RSC_vr(k_woody_litr,0,NY,NX)
+  write(*,*)'N in surface woody litter (g m-2)',RSN_vr(k_woody_litr,0,NY,NX)
+  write(*,*)'P in surface woody litter (g m-2)',RSP_vr(k_woody_litr,0,NY,NX)
+  write(*,*)'C in surface manure litter (g m-2)',RSC_vr(k_manure,0,NY,NX)
+  write(*,*)'N in surface manure litter (g m-2)',RSN_vr(k_manure,0,NY,NX)
+  write(*,*)'P in surface manure litter (g m-2)',RSP_vr(k_manure,0,NY,NX)
   write(*,*)'surface litter type:1=plant,2=manure',iLitrType_col(1,NY,NX),iLitrType_col(2,NY,NX)
-  write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
-  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays(NY,NX)
-  write(*,*)'number of layers involved in model calculation',NL(NY,NX)
-  write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
+  write(*,*)'layer number of soil surface layer NUI',NUI_col(NY,NX)
+  write(*,*)'layer number of maximum rooting layer NJ',MaxNumRootLays_col(NY,NX)
+  write(*,*)'number of layers involved in model calculation',NL_col(NY,NX)
+  write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR_col(NY,NX)
   write(*,*)
   write(*,'(A,I2,A,I2)')'read data for layers from layer NU ',NU,' to layer NM ',NM
 
@@ -870,7 +877,7 @@ module readiMod
   write(*,*)'Sand (kg Mg-1): CSAND_vr'
   write(*,*)(CSAND_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Silt (kg Mg-1): CSILT'
-  write(*,*)(CSILT(L,NY,NX),L=NU,NM)
+  write(*,*)(CSILT_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Macropore fraction (0-1): FOHL'
   write(*,*)(SoilFracAsMacP_vr(L,NY,NX),L=NU,NM)
   write(*,*)'Rock fraction (0-1): ROCK'
@@ -995,24 +1002,24 @@ module readiMod
 !     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 !
   write(*,*)''
-  write(*,*)'Initial fine litter C (gC m-2): RSC(k_fine_litr)'
-  write(*,*)(RSC(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial fine litter N (gN m-2): RSN(k_fine_litr)'
-  write(*,*)(RSN(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial fine litter P (gP m-2): RSP(k_fine_litr)'
-  write(*,*)(RSP(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody liter C (gC m-2): RSC(k_woody_litr)'
-  write(*,*)(RSC(k_woody_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody litter N (gN m-2): RSN(k_woody_litr)'
-  write(*,*)(RSN(k_woody_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody litter P (gP m-2): RSP(k_woody_litr)'
-  write(*,*)(RSP(k_woody_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial manure liter C (gC m-2): RSC(k_manure)'
-  write(*,*)(RSC(k_manure,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial manure litter N (gN m-2): RSN(k_manure)'
-  write(*,*)(RSN(k_manure,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial manure litter P (gP m-2): RSP(k_manure)'
-  write(*,*)(RSP(k_manure,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter C (gC m-2): RSC_vr(k_fine_litr)'
+  write(*,*)(RSC_vr(k_fine_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter N (gN m-2): RSN_vr(k_fine_litr)'
+  write(*,*)(RSN_vr(k_fine_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter P (gP m-2): RSP_vr(k_fine_litr)'
+  write(*,*)(RSP_vr(k_fine_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody liter C (gC m-2): RSC_vr(k_woody_litr)'
+  write(*,*)(RSC_vr(k_woody_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody litter N (gN m-2): RSN_vr(k_woody_litr)'
+  write(*,*)(RSN_vr(k_woody_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody litter P (gP m-2): RSP_vr(k_woody_litr)'
+  write(*,*)(RSP_vr(k_woody_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial manure liter C (gC m-2): RSC_vr(k_manure)'
+  write(*,*)(RSC_vr(k_manure,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial manure litter N (gN m-2): RSN_vr(k_manure)'
+  write(*,*)(RSN_vr(k_manure,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial manure litter P (gP m-2): RSP_vr(k_manure)'
+  write(*,*)(RSP_vr(k_manure,L,NY,NX),L=NU,NM)
   write(*,'(100A)')('=',ll=1,100)
 
   end associate

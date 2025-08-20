@@ -1,19 +1,20 @@
 module EcoSIMAPI
+  use timings,           only: start_timer,     end_timer
+  use MicBGCAPI,         only: MicrobeModel,   MicAPI_Init,      MicAPI_cleanup
+  use TracerIDMod,       only: ids_NO2B,           ids_NO2,          idg_O2
+  use PerturbationMod,   only: check_Soil_Warming, set_soil_warming, config_soil_warming
+  use ErosionMod,        only: erosion
+  use Hour1Mod,          only: hour1
+  use RedistMod,         only: redist
+  use GeochemAPI,        only: soluteModel
+  use PlantMod,          only: PlantModel
+  use TranspNoSaltMod,   only: TranspNoSalt
+  use TranspSaltMod,     only: TranspSalt
+  use WatsubMod,         only: watsub
+  use PlantMgmtDataType, only: NP_col
+  use FireMod,           only: config_fire
+  use EcoSIMSolverPar,   only: oscal_test
   USE EcoSIMCtrlDataType
-  use timings,         only: start_timer,        end_timer
-  use ErosionMod,      only: erosion
-  use Hour1Mod,        only: hour1
-  use RedistMod,       only: redist
-  use GeochemAPI,      only: soluteModel
-  use PlantMod,        only: PlantModel
-  use MicBGCAPI,       only: MicrobeModel,       MicAPI_Init,      MicAPI_cleanup
-  use TranspNoSaltMod, only: TranspNoSalt
-  use TranspSaltMod,   only: TranspSalt
-  use SoilBGCDataType, only: trcs_soHml_vr,       trcs_solml_vr
-  use TracerIDMod,     only: ids_NO2B,           ids_NO2,          idg_O2
-  use PerturbationMod, only: check_Soil_Warming, set_soil_warming, config_soil_warming
-  use WatsubMod,       only: watsub
-  use PlantMgmtDataType, only: NP  
   use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
@@ -22,7 +23,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: soil
+  public :: AdvanceModelOneYear
   public :: readnamelist
   public :: regressiontest,write_modelconfig
   logical :: do_timing
@@ -63,7 +64,7 @@ contains
   !   UPDATE PLANT biogeochemistry
   !
   if(lverb)WRITE(*,334)'PlantModel'
-  if(plant_model)then
+  if(plant_model .and. (.not.ldo_radiation_test))then
     if(do_timing)call start_timer(t1)  
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('PlantModel',t1)    
@@ -132,8 +133,8 @@ contains
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
-  use readsmod       , only : clim_var
-  use EcoSIMCtrlMod
+  use readsmod       , only : clim_var  
+  use MicrobeConfigMod,only : ReadMicrobeNamelist
   use HistFileMod
   implicit none
   character(len=*), parameter :: mod_filename = &
@@ -150,19 +151,20 @@ contains
   integer :: num_microbial_guilds
   integer :: do_doy,do_year,do_layer
   character(len=64) :: bgc_fname
+  character(len=256):: FireEvents
   real(r8) :: airT_C,Wind_ms,vap_Kpa,Rain_mmhr,SRAD_Wm2,Atm_kPa
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,continue_run,visual_out,restart_out,&
+    NPXS,NPYS,continue_run,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
-    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
+    soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,ldebug_day
-
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
+    ldo_radiation_test,ldo_transpt_bubbling
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -181,12 +183,11 @@ contains
   NPYS         = 20   !number of cycles per NPX for gas flux calculations
 
 
-  ldebug_day  =-1
+  idebug_day  =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
   grid_mode             = 3
   iErosionMode          = -1
-  visual_out            = .false.
   restart_out           = .false.
   do_budgets            = .false.
   plant_model           = .true.
@@ -201,6 +202,7 @@ contains
   brnch_retain_casename = .false.
   hist_yrclose          = .false.
   fixWaterLevel         = .false.
+  FireEvents            =''
   forc_periods      = 0
   forc_periods(1:9) = (/1980,1980,1,1981,1988,2,1989,2008,1/)
 
@@ -217,25 +219,26 @@ contains
   bgc_fname            = 'bbforc.nc'
   do_instequil         = .false.
 
-  clm_factor_in    = 'NO'
-  pft_file_in      = ''
-  grid_file_in     = ''
-  pft_mgmt_in      = 'NO'
-  clm_hour_file_in = ''
-  clm_day_file_in  = ''
-  soil_mgmt_in     = 'NO'
-  atm_ghg_in       = ''
-  aco2_ppm         = 280._r8
-  ach4_ppm         = 1.144_r8
-  an2o_ppm         = 0.270_r8
-  ao2_ppm          = 0.209e6_r8
-  arg_ppm          = 0.00934e6_r8
-  an2_ppm          = 0.78e6_r8
-  anh3_ppm         = 5.e-3_r8
-  atm_co2_fix      = -100._r8
-  atm_n2o_fix      = -100._r8
-  atm_ch4_fix      = -100._r8
-  first_topou      = .false.
+  clm_factor_in      = 'NO'
+  pft_file_in        = ''
+  grid_file_in       = ''
+  pft_mgmt_in        = 'NO'
+  clm_hour_file_in   = ''
+  clm_day_file_in    = ''
+  soil_mgmt_in       = 'NO'
+  atm_ghg_in         = ''
+  aco2_ppm           = 280._r8
+  ach4_ppm           = 1.144_r8
+  an2o_ppm           = 0.270_r8
+  ao2_ppm            = 0.209e6_r8
+  arg_ppm            = 0.00934e6_r8
+  an2_ppm            = 0.78e6_r8
+  anh3_ppm           = 5.e-3_r8
+  atm_co2_fix        = -100._r8
+  atm_n2o_fix        = -100._r8
+  atm_ch4_fix        = -100._r8
+  first_topou        = .false.
+  ldo_radiation_test = .false.
   
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
@@ -276,9 +279,16 @@ contains
   if(.not.soichem_model)then
     salt_model=.false.
   endif
-
+  !radiation test can only be on for sp mode
+  if(ldo_radiation_test)ldo_sp_mode=.true.
+  if(ldo_sp_mode)then
+    ! when using prescribed phenolgoy, turn on plant model for memory allocation, turn off soil chemistry model and microbial bgc
+    plant_model           = .true.
+    soichem_model         = .false.
+    microbial_model       = .false.
+  endif
   call config_soil_warming(warming_exp)
-
+  call config_fire(FireEvents)
   if(fixClime)then
 
     read(nml_buffer, nml=FixClimForc, iostat=nml_error, iomsg=ioerror_msg)
@@ -300,21 +310,21 @@ contains
     clim_var%Atm_kPa   = Atm_kPa
   endif
 
+  call ReadMicrobeNamelist(nml_buffer)
+
 end subroutine readnamelist
 ! ----------------------------------------------------------------------
 
-subroutine soil(NHW,NHE,NVN,NVS,nlend)
+subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
   use data_kind_mod,   only: r8 => DAT_KIND_R8
   use DayMod,          only: day
-  use ExecMod,         only: exec
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts
-  use VisualMod,       only: visual
   use WthrMod,         only: wthr
   use RestartMod,      only: restFile
   use PlantInfoMod,    only: ReadPlantInfo
@@ -403,7 +413,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   lverb0 = lverb
   DazCurrYear=etimer%get_days_cur_year()
   DO I=1,DazCurrYear    
-    if(ldebug_day==I)then
+    if(idebug_day==I)then
       lverb=.true.      
     else
       lverb=lverb0
@@ -413,10 +423,11 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
     !
     if(lverb)WRITE(*,333)'DAY'
     CALL DAY(I,NHW,NHE,NVN,NVS)
-    
+
     call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
-    
+
     DO J=1,24
+
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -425,8 +436,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
           call restFile(flag='read')
           if (j==1)call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
 
-          call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
-          
+          call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)          
         endif
       endif
       if(frectyp%lskip_loop)then
@@ -477,7 +487,7 @@ subroutine soil(NHW,NHE,NVN,NVS,nlend)
   END DO
   if(lverb)write(*,333)'exit soil'
   RETURN
-END subroutine soil
+END subroutine AdvanceModelOneYear
 ! ----------------------------------------------------------------------
 
 subroutine regressiontest(nmfile,case_name, NX, NY)
@@ -515,16 +525,16 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     write(*,*)'write regression file'
     call regression%OpenOutput()
 
-    do NZ=1,NP(NY,NX)
+    do NZ=1,NP_col(NY,NX)
       IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
         datv=0._r8
         do ll=1,12
-          if(AREA(3,ll,NY,NX)>0._r8)then
+          if(AREA_3D(3,ll,NY,NX)>0._r8)then
             datv(ll)=safe_adb(RootNutUptake_pvr(ids_NH4,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4,2,ll,NZ,NY,NX) &
-              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA(3,ll,NY,NX))
+              +RootNutUptake_pvr(ids_NH4B,1,ll,NZ,NY,NX)+RootNutUptake_pvr(ids_NH4B,2,ll,NZ,NY,NX),AREA_3D(3,ll,NY,NX))
           endif
         enddo
         call regression%writedata(category,name, datv)

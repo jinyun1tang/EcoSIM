@@ -17,11 +17,11 @@ implicit none
   integer, parameter :: ieros_frzthawsomeros = 3
 
 ! water flux direction
-  integer, parameter :: iEastWestDirection   = 1   !east-west direction
+  integer, parameter :: iWestEastDirection   = 1   !east-west direction
   integer, parameter :: iNorthSouthDirection = 2   !north-south direction
   integer, parameter :: iVerticalDirection   = 3   !vertical direction
-  integer, parameter :: iOutflow             = 1
-  integer, parameter :: iInflow              = 2
+  integer, parameter :: iFront             = 1
+  integer, parameter :: iBehind              = 2
 ! soil properties
   integer, parameter :: isoi_fc    = 1   !field capacity
   integer, parameter :: isoi_wp    = 2   !wilting point
@@ -143,4 +143,8 @@ implicit none
   integer, parameter :: ithermozone_warmtempr = 3
   integer, parameter :: ithermozone_subtropic = 4
   integer, parameter :: ithermozone_tropical  = 5
+
+  integer, parameter :: itill_rmlitr = 21
+  integer, parameter :: itill_fire   = 22
+  
 end module ElmIDMod
