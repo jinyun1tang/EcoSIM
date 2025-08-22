@@ -222,6 +222,7 @@ module Hour1Mod
       ECO_ER_col(NY,NX)                = 0._r8
 
       DO  NZ=1,NP_col(NY,NX)
+        NetPrimProduct_pft(NZ,NY,NX) =0._r8
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !

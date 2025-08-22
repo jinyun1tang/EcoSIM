@@ -36,7 +36,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ElmBalanceCum_pft(:,:,:,:)                     !plant element balance, [g d-2]
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)            !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfalStrutElms_pvr(:,:,:,:,:,:,:)            !plant LitrFall element, [g d-2 h-1]
-  real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !total net primary productivity, [g d-2]
+  real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !Hourly net primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable ::  cumNPP_pft(:,:,:)                              !cumulative net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration  <0 into atmosphere, [m d-2]
   real(r8),target,allocatable ::  CanopyRespC_CumYr_pft(:,:,:)                   !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_pft(:,:,:,:)               !plant element harvest, [g d-2 ]
@@ -177,6 +178,7 @@ module PlantDataRateType
   allocate(LitrfalStrutElms_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_pft=0._r8
   allocate(LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfalStrutElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
+  allocate(cumNPP_pft(JP,JY,JX)); cumNPP_pft=0._r8
   allocate(ETCanopy_CumYr_pft(JP,JY,JX));    ETCanopy_CumYr_pft=0._r8
   allocate(CanopyRespC_CumYr_pft(JP,JY,JX));    CanopyRespC_CumYr_pft=0._r8
   allocate(EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_CumYr_pft=0._r8
@@ -307,6 +309,7 @@ module PlantDataRateType
   call destroy(LitrfalStrutElms_pft)
   call destroy(LitrfalStrutElms_pvr)
   call destroy(NetPrimProduct_pft)
+  call destroy(cumNPP_pft)
   call destroy(ETCanopy_CumYr_pft)
   call destroy(CanopyRespC_CumYr_pft)
   call destroy(EcoHavstElmnt_CumYr_pft)

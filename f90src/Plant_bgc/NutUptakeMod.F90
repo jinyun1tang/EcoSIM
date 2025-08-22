@@ -75,7 +75,7 @@ module NutUptakeMod
   real(r8) :: ZPOOLB
   integer :: NB
 
-  associate(                                                      &
+  associate(                                                          &
     TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft              ,& !input  :canopy temperature, [oC]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]

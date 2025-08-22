@@ -961,17 +961,26 @@ module PlantPhenolMod
 !   only annual plants depends on moisture
     call DebugPrint('LeafAppearRate',LeafAppearRate)
     call DebugPrint('PSICanopy_pft(NZ)',PSICanopy_pft(NZ))
+
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
       IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
         WFNG           = EXP(0.025_r8*AMAX1(PSICanopy_pft(NZ),-1000._r8))
         NodeInitRate   = NodeInitRate*WFNG
         LeafAppearRate = LeafAppearRate*WFNG
       ENDIF
+
       IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
         OFNG           = SQRT(PlantO2Stress_pft(NZ))
         NodeInitRate   = NodeInitRate*OFNG
         LeafAppearRate = LeafAppearRate*OFNG
       ENDIF
+!    ELSE 
+      !perennial plants tend to maintain stronger antioxidant defenses and show delayed senescence compared to annuals    
+!      IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
+!        OFNG           = PlantO2Stress_pft(NZ)**0.5_r8
+!        NodeInitRate   = NodeInitRate*OFNG
+!        LeafAppearRate = LeafAppearRate*OFNG
+!      ENDIF      
     ENDIF
     call DebugPrint('NodeInitRate',NodeInitRate)
 !

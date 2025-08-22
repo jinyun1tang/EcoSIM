@@ -20,11 +20,11 @@ microbial_model=.true.
 soichem_model=.true.
 !set up output variable lists
 !set up the first year of simulation
-start_date  = '19800101000000'
+start_date  = '19610101000000'
 grid_mode=1    !enable lateral runoff
 continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
-forc_periods=2013,2013,1,2022,2012,1,2013,2022,2,2012,2022,1
+forc_periods=2012,2013,10,2022,2012,1,2013,2022,2,2012,2022,1
 
 !set up solvers
 NPXS=30,30,30      !number of cycles per hour for water,heat,solute flux calcns
@@ -38,8 +38,8 @@ hist_mfilt=7300 !, 8760
 hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_col'
   'TEMP_vr','rWatFLP_vr','BOTDEPZ_vr','tSOC_vr','RootC_vr','RootC_2nd_pvr','CanopyLAIZ_plyr',
   'RUB_ACTVN_pft','RootNutUptk_fClim_pvr','RootNutUptk_fNlim_pvr','RootNutUptk_fPlim_pvr','RootNutUptk_fProtC_pvr',
-  'HR_CO2_vr','Root_OXYSTRESS_pvr','Decomp_OStress_vr','Decomp_OStress_LITR','GasXSurfConduct_col'
-
+  'HR_CO2_vr','Root_OXYSTRESS_pvr','Decomp_OStress_vr','Decomp_OStress_LITR','GasXSurfConduct_col','CO2_DIF_FLX_col',
+  'CO2_PLTROOT_FLX_col'
 !hist_fincl2='TEMP_vr','CO2_SEMIS_FLX_col','Root_AR_col','ECO_HR_CO2_col','ECO_RADSW_col'
 !hist_fincl2='RadSW_Grnd_col'
 hist_nhtfrq=-24 !, -1
@@ -53,7 +53,7 @@ hist_nhtfrq=-24 !, -1
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=22             !this shall overwrite what is set in forc_periods
+stop_n=100             !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

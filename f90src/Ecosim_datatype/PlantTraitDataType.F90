@@ -80,9 +80,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                  !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
-  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [m-2]
+  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [# m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
-  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [m-2]
+  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [# m-2]
   integer,target,allocatable ::   NumActivePlants_col(:,:)                        !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]

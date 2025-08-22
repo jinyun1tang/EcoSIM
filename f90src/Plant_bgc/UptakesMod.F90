@@ -611,6 +611,7 @@ module UptakesMod
       CanopyBndlResist_pft(NZ)   = CanopyIsothBndlResist_pft(NZ)
       VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC_pft(NZ)           = 0.0_r8
+      !greater value of RCS_pft(NZ), more sensitive to turgor change.
       Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
       CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
         +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress

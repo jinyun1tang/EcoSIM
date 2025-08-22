@@ -746,7 +746,7 @@ module InitSOMBGCMOD
   integer :: M,N,NGL,MID,NE,NN
   real(r8) :: FOSCI,FOSNI,FOSPI,tglds
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8), parameter :: scal=0.05_r8    !scalar for incoming microbial biomass associated with litterfall.
+  real(r8), parameter :: scal=0.01_r8    !scalar for incoming microbial biomass associated with litterfall.
   associate(                         &
     rNCOMC_ave => micpar%rNCOMC_ave, &
     rPCOMC_ave => micpar%rPCOMC_ave, &

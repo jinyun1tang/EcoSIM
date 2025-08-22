@@ -314,7 +314,8 @@ implicit none
     Km4LeafaqCO2_pft(NZ,NY,NX)                 = plt_photo%Km4LeafaqCO2_pft(NZ)
     Km4RubiscoCarboxy_pft(NZ,NY,NX)            = plt_photo%Km4RubiscoCarboxy_pft(NZ)
     CanopyHeight_pft(NZ,NY,NX)                 = plt_morph%CanopyHeight_pft(NZ)
-    NetPrimProduct_pft(NZ,NY,NX)               = plt_bgcr%NetPrimProduct_pft(NZ)
+    NetPrimProduct_pft(NZ,NY,NX) = plt_bgcr%NetPrimProduct_pft(NZ)
+    cumNPP_pft(NZ,NY,NX)         = cumNPP_pft(NZ,NY,NX) + NetPrimProduct_pft(NZ,NY,NX)
     ZERO4Groth_pft(NZ,NY,NX)                   = plt_biom%ZERO4Groth_pft(NZ)
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
@@ -1186,8 +1187,7 @@ implicit none
     plt_biom%ZERO4LeafVar_pft(NZ)   = ZERO4LeafVar_pft(NZ,NY,NX)
     plt_biom%ZERO4Groth_pft(NZ)     = ZERO4Groth_pft(NZ,NY,NX)
     plt_morph%CanopyHeight_pft(NZ)  = CanopyHeight_pft(NZ,NY,NX)
-    plt_bgcr%NetPrimProduct_pft(NZ) = NetPrimProduct_pft(NZ,NY,NX)
-
+    
     DO L=1,NK_col(NY,NX)
       DO K=1,jcplx
         DO N=1,Myco_pft(NZ,NY,NX)

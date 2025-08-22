@@ -92,11 +92,6 @@
   !
   LeafIntracellularCO2_pft(NZ)=CanopyCi2CaRatio_pft(NZ)*CanopyGasCO2_pft(NZ)
 
-  if(I==10.and.J==16.and..false.)then  
-  write(4444,*)'FCO2',CanopyCi2CaRatio_pft(NZ),CanopyGasCO2_pft(NZ),AirConc_pft(NZ)
-  write(4444,*)'LeafIntracellularCO2_pft',LeafIntracellularCO2_pft(NZ)
-  write(4444,*)'SineSunInclAngle_col',SineSunInclAngle_col,CanopyLeafArea_pft(NZ)
-  endif
   IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
     if(lverb)write(*,*)'PhotoActivePFT'
@@ -105,10 +100,7 @@
 !
     CanopyMinStomaResistH2O_pft(NZ)=H2OCuticleResist_pft(NZ)
   ENDIF
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'======================================================='
-  stop
-  endif
+  
   RETURN
   end associate
   END subroutine StomatalDynamics
@@ -741,7 +733,7 @@
   subroutine PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(out) :: CH2O
+  real(r8), intent(out) :: CH2O                !carboxylation rate
   real(r8), intent(out) :: TFN_Carboxy
   real(r8), intent(out) :: TFN_Oxygen
   real(r8), intent(out) :: TFN_eTranspt
@@ -818,11 +810,6 @@
   Km4RubOxy                 = XKO2_pft(NZ)*EXP(8.067_r8-20000._r8/RTK)
   Km4RubiscoCarboxy_pft(NZ) = Km4LeafaqCO2_pft(NZ)*(1.0_r8+O2L_pft(NZ)/Km4RubOxy)
 
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'O2L,dif',O2L_pft(NZ),DiffCO2Atmos2Intracel_pft(NZ)
-  write(4444,*)'TFN',TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,TempOffset_pft(NZ)
-  write(4444,*)'KM',Km4RubiscoCarboxy_pft(NZ)
-  endif
   end associate
   end subroutine PrepPhotosynthesis
 
@@ -834,7 +821,7 @@
 
   integer :: NB,K
   real(r8) :: CH2O
-  real(r8) :: RSX
+  real(r8) :: RSX              !minimum canopy stomatal resistance to CO2
   real(r8) :: TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy
   real(r8), parameter :: secsperhour=3600.0_r8
 
@@ -904,12 +891,14 @@
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
+! determine minimum canopy stomatal resistance to CO2 based on CO2 gradient
   IF(CH2O.GT.ZERO4Groth_pft(NZ))THEN
     RSX=FracPARads2Canopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=H2OCuticleResist_pft(NZ)*1.56_r8
   ENDIF
-  CanopyMinStomaResistH2O_pft(NZ)=AMIN1(H2OCuticleResist_pft(NZ),AMAX1(RSMY_stomaCO2,RSX*0.641_r8))
+
+  CanopyMinStomaResistH2O_pft(NZ)=AMIN1(H2OCuticleResist_pft(NZ),AMAX1(RSMY_stomaCO2,RSX/1.56_r8))
   end associate
   end subroutine PhotoActivePFT
   ![tail]
