@@ -167,6 +167,9 @@ contains
   call c_f_pointer(props%vegetation_type%data, data, (/num_cols/))
   a_VEG = data(:)
 
+  call c_f_pointer(props%snow_albedo%data, data, (/num_cols/))
+  a_SALB = data(:)
+
   !a_MATP(:,:) = -6.9
   !do i = 1, size_col
   !  a_MATP(i, 1) = 100.0

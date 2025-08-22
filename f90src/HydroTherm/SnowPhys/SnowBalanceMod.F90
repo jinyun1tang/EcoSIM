@@ -123,15 +123,6 @@ implicit none
   SnowDepth_col(NY,NX)    = sum(SnowThickL_snvr(1:JS,NY,NX))
   VcumSnowWE_col(NY,NX)   = VcumDrySnoWE_col(NY,NX)+VcumIceSnow_col(NY,NX)*DENSICE+VcumWatSnow_col(NY,NX)
 
-  !if(NY.EQ.1)then
-  !  write(*,*) "After summation: "
-  !  write(*,*) "   VcumDrySnoWE_col(NY,NX): ", VcumDrySnoWE_col(NY,NX)
-  !  write(*,*) "   VcumWatSnow_col(NY,NX):  ", VcumWatSnow_col(NY,NX)
-  !  write(*,*) "   VcumIceSnow_col(NY,NX):  ", VcumIceSnow_col(NY,NX)
-  !  write(*,*) "   VcumSnoDWI_col(NY,NX):   ", VcumSnoDWI_col(NY,NX)
-  !  write(*,*) "   SnowDepth_col(NY,NX):    ", SnowDepth_col(NY,NX)
-  !  write(*,*) "   VcumSnowWE_col(NY,NX):   ", VcumSnowWE_col(NY,NX)
-  !endif
 !
 ! IF SNOWPACK DISAPPEARS
 

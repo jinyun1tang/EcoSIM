@@ -45,14 +45,15 @@ implicit none
   !Setting some variables
   !That ecosim needs to recognize that it is running in coupled mode
   !with ATS and to turn off features unsupported in the coupler
-  ATS_cpl_mode=.true.
-  plant_model=.true.
-  microbial_model=.false.
-  soichem_model=.false.
-  snowRedist_model=.false.
-  disp_planttrait=.false.
-  disp_modelconfig=.false.
-  column_mode=.true.
+  ATS_cpl_mode     = .true.
+  plant_model      = .true.
+  microbial_model  = .false.
+  soichem_model    = .false.
+  snowRedist_model = .false.
+  disp_planttrait  = .false.
+  disp_modelconfig = .false.
+  column_mode      = .true.
+  mod_snow_albedo  = .true.
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)

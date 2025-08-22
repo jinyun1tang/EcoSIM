@@ -21,7 +21,8 @@ implicit none
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.
-  logical :: ldo_sp_mode        =.false.   !do satellite phenology mode
+  logical :: ldo_sp_mode       =.false.   !do satellite phenology mode
+  logical :: mod_snow_albedo   =.false.
   logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy
   logical :: ldo_transpt_bubbling=.true.   !flag to turn on/off ebullition during transport
   integer :: yearf1       !first year of daily climate forcing

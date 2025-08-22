@@ -107,6 +107,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(sunrad(1:ncells_per_col_))
   allocate(p_rain(1:ncells_per_col_))
   allocate(p_snow(1:ncells_per_col_))
+  allocate(a_SALB(1:ncells_per_col_))
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
@@ -143,6 +144,7 @@ subroutine Init_ATSEcoSIM_driver()
       a_LSAT(L,NY) = 0.5
     enddo
     a_ASP(NY) = 0.0
+    a_SALB(NY) = 0.5
     tairc(NY) = 242.13003959655759
     !double counting the conversions I think
     !vpair(NY) = 736.3/1.0e6_r8
