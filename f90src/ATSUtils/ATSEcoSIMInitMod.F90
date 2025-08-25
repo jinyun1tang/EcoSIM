@@ -50,6 +50,7 @@ implicit none
   disp_planttrait  = .false.
   disp_modelconfig = .false.
   column_mode      = .true.
+  mod_snow_albedo  = .true.
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)

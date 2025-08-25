@@ -8,7 +8,7 @@ module SnowPhysMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL  
   use abortutils,    only: endrun
-  use EcoSIMCtrlMod, only: fixWaterLevel
+  use EcoSIMCtrlMod, only: fixWaterLevel, mod_snow_albedo
   use DebugToolMod,  only: PrintInfo
   use SnowDataType
   use SurfLitterDataType
@@ -797,8 +797,12 @@ contains
   real(r8) :: SnofallDry,Snofallice
   real(r8) :: RadSWbySnow                                !shortwave radiation absorbed by snow [MJ]
 
-  SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
+  if(mod_snow_albedo)then
+    SnowAlbedo = SnowAlbedo_col(NY,NX)
+  else
+    SnowAlbedo=(0.85_r8*(VLDrySnoWE0M_snvr(1,NY,NX)+SnoFall)+0.30_r8*(VLIceSnow0M_snvr(1,NY,NX)+IceFall) &
     +0.06_r8*(VLWatSnow0M_snvr(1,NY,NX)+RainFall))/SnowVolume
+  endif
 
   RadSWbySnow          = (1.0_r8-SnowAlbedo)*RadSW2Sno_col(NY,NX)
   RFLX0                = RadSWbySnow+LWRad2Snow_col(NY,NX)                            !incoming radiation, short + longwave

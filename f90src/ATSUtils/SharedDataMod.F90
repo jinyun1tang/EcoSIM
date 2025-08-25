@@ -17,6 +17,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
+  real(r8), allocatable :: a_LDENS(:,:)   !ATS liquid density (mols)
   real(r8), allocatable :: a_CumDepz2LayBottom_vr(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_Volume(:,:)   !volume
   real(r8), allocatable :: a_dz(:,:)      !distance between layers  
@@ -33,8 +34,13 @@ Module SharedDataMod
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
   real(r8), allocatable :: a_ALT(:)       !Altitude
+  real(r8), allocatable :: a_LAI(:)       !Leaf Area Index
+  real(r8), allocatable :: a_SAI(:)       !Stem Area Index
+  real(r8), allocatable :: a_VEG(:)       !Vegetation type
+  real(r8), allocatable :: a_SALB(:)      !Snow Albedo
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
+  real(r8), allocatable :: a_WC_rev(:,:)  !Soil water content testing
   real(r8), allocatable :: a_LSAT(:,:)    !liquid saturation
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
   real(r8), allocatable :: a_HCOND(:,:)   !hydraulic conductivity
@@ -47,8 +53,9 @@ Module SharedDataMod
 
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
-  real(r8), allocatable :: p_rain(:)      !precipitation, mm H2O/hr
-  real(r8), allocatable :: p_snow(:)      !precipitation snow, mm H2O/hr 
+  real(r8), allocatable :: p_rain(:)      !precipitation, m H2O/s
+  real(r8), allocatable :: p_snow(:)      !precipitation snow, m (SWE) /s 
+  real(r8), allocatable :: p_total(:)     !total precipitation m H20/s
   real(r8), allocatable :: sunrad(:)      !solar radiation,
   real(r8), allocatable :: swrad(:)       !shortwave radiation,
   real(r8), allocatable :: vpair(:)       !vapor pressure deficit
@@ -61,6 +68,7 @@ Module SharedDataMod
   integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays_col(:)
   integer :: NYS, I                       !total number of columns
+  logical :: p_bool
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
@@ -76,32 +84,43 @@ Module SharedDataMod
     JX=1;JY=ncol
     JZ = ncells_per_col_
    
-    !write(*,*) "In Shared data after setting: "
-    !write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
+    write(*,*) "In Shared data after setting: "
+    write(*,*) "JX=", JX, ", JY=", JY, ", JZ=", JZ
 
     allocate(a_csand(ncells_per_col_,ncol))
+    write(*,*) "silt: "
     allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
     !allocate(a_AreaZ(ncells_per_col_,ncol))   !actually need to allocate area
     !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
     !allocate(a_CumDepz2LayBottom_vr(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
     !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
     !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+    write(*,*) "fhol "
     allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
+    write(*,*) "rock"
     allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
+    write(*,*) "orgc"
     allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
+    write(*,*) "orgN"
     allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
+    write(*,*) "orgp"
     allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
     !allocate(a_PORO(ncells_per_col_,ncol))
     !allocate(a_AREA3(ncells_per_col_))
+
+    write(*,*) "nu: ", ncol
     allocate(a_NU(ncol))
+    write(*,*) "nl: ", ncol
     allocate(a_NL(ncol))
     !allocate(a_ASP(ncells_per_col_))
+    write(*,*) "alt"
     allocate(a_ALT(ncells_per_col_))
     !allocate(tairc(1:ncells_per_col_))
     !allocate(uwind(1:ncells_per_col_))
     !allocate(prec(1:ncells_per_col_))
     !allocate(sunrad(1:ncells_per_col_))
     !allocate(vpair(1:ncells_per_col_))
+    write(*,*) "atka"
     allocate(a_ATKA(1:ncells_per_col_))
  
     !allocate(a_BKDSI(ncells_per_col_, ncol))        ! bulk density
@@ -135,6 +154,7 @@ Module SharedDataMod
     !allocate(surf_e_source(ncells_per_col_))        ! surface energy source
     !allocate(surf_w_source(ncells_per_col_))        ! surface water source
     !allocate(surf_snow_depth(ncells_per_col_))        ! surface snow depth
+    write(*,*) "after allocate vars: "
 
     a_NU=1
     a_NL=ncells_per_col_
@@ -151,11 +171,14 @@ Module SharedDataMod
   call destroy(a_csand)
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
+  call destroy(a_LDENS)
   call destroy(a_MATP)
   call destroy(a_AreaZ)
   call destroy(a_CumDepz2LayBottom_vr)
   call destroy(a_FC)
   call destroy(a_WP)
+  call destroy(a_WC)
+  call destroy(a_WC_rev)
   call destroy(a_FHOL)
   call destroy(a_ROCK)
   call destroy(a_CORGC)
