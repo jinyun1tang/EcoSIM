@@ -109,13 +109,6 @@ implicit none
 
   ENDDO D9780
 
-  if(NY.EQ.1)then
-    do L=1,JS
-      write(*,*) "In L = ", L, " SnowThickL_snvr: ", SnowThickL_snvr(1:JS,NY,NX) , " m, VLSnoDWIprev_snvr: ",&
-              VLSnoDWIprev_snvr(L,NY,NX) , " mH2O"
-    enddo
-  endif
-
   VcumDrySnoWE_col(NY,NX) = sum(VLDrySnoWE_snvr(1:JS,NY,NX))
   VcumWatSnow_col(NY,NX)  = sum(VLWatSnow_snvr(1:JS,NY,NX))
   VcumIceSnow_col(NY,NX)  = sum(VLIceSnow_snvr(1:JS,NY,NX))
