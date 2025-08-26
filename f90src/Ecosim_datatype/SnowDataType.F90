@@ -13,6 +13,7 @@ module SnowDataType
   real(r8),target, allocatable ::  WatFlowInSnowM_snvr(:,:,:,:)            !snowpack water flux, [m3 d-2 h-1]
   real(r8),target, allocatable ::  DrySnoFlxByRedistM_2DH(:,:,:,:,:)       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  SoilAlbedo_col(:,:)                     !snowpack albedo, [-]
+  REAL(R8),target, allocatable ::  SnowAlbedo_col(:,:)                     !snow albedo, [-]
   real(r8),target, allocatable ::  NewSnowDens_col(:,:)                    !new snowpack density, [Mg m-3]
   real(r8),target, allocatable ::  TCSnow_snvr(:,:,:)                      !snow temperature, [oC]
   real(r8),target, allocatable ::  TKSnow_snvr(:,:,:)                      !snow temperature, [K]
@@ -118,6 +119,7 @@ contains
   allocate(WatFlowInSnowM_snvr(60,JS,JY,JX)); WatFlowInSnowM_snvr=0._r8
   allocate(DrySnoFlxByRedistM_2DH(60,2,2,JV,JH));    DrySnoFlxByRedistM_2DH=0._r8
   allocate(SoilAlbedo_col(JY,JX));        SoilAlbedo_col=0._r8
+  allocate(SnowAlbedo_col(JY,JX));        SnowAlbedo_col=0._r8
   allocate(NewSnowDens_col(JY,JX));       NewSnowDens_col=0._r8
   allocate(TCSnow_snvr(JS,JY,JX));      TCSnow_snvr=0._r8
   allocate(TKSnow_snvr(JS,JY,JX));      TKSnow_snvr=0._r8
@@ -206,6 +208,7 @@ contains
   call destroy(WatFlowInSnowM_snvr)
   call destroy(DrySnoFlxByRedistM_2DH)
   call destroy(SoilAlbedo_col)
+  call destroy(SnowAlbedo_col)
   call destroy(NewSnowDens_col)
   call destroy(trcg_solsml_snvr)
   call destroy(TCSnow_snvr)
