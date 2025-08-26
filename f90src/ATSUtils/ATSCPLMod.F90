@@ -13,6 +13,19 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
+  ! Function to check for NaN in an array
+  !function is_nan(x) result(mask)
+  !  real(r8), intent(in) :: x(:)
+  !  logical, dimension(size(x)) :: mask
+  !  integer :: i
+
+    !allocate(mask(size(x)))
+  !  do i = 1, size(x)
+  !    mask(i) = (x(i) /= x(i))  ! NaN is the only value that is not equal to itself
+  !  end do
+  !end function is_nan
+
+
   subroutine ATS2EcoSIMData(ncol, state, props, sizes)
   implicit none
 
@@ -41,9 +54,6 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
 
-  !write(*,*) "capacity_cells: ", state%temperature%cap_rows
-  !write(*,*) "capacity_columns: ", state%temperature%cap_cols
-
   size_col_pad = size_col+30
 
   allocate(temp_array(size_col, num_cols))
@@ -70,7 +80,7 @@ contains
 
   data_ptr = state%water_content%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_WC = data2D(:,:)*2.32e-7
+  a_WC = data2D(:,:)
 
   data_ptr = props%volume%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -86,7 +96,11 @@ contains
 
   data_ptr = state%bulk_density%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_BKDSI = data2D(:,:)*0.0408
+  a_BKDSI = data2D(:,:)
+
+  data_ptr = state%liquid_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_LDENS = data2D(:,:)  
 
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -116,6 +130,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_SSWS = data2D(:,:)
 
+  data_ptr = state%subsurface_energy_source%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_SSES = data2D(:,:)
+
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   swrad = data(:)
 
@@ -131,8 +149,8 @@ contains
   call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
   uwind = data(:)
 
-  call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-  p_rain = data(:)
+  !call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+  !p_rain = data(:)
 
   !call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
   !p_snow = data(:)
@@ -140,8 +158,19 @@ contains
   call c_f_pointer(props%aspect%data, data, (/num_cols/))
   a_ASP = data(:)
 
-  a_MATP(:,:) = -6.9
+  call c_f_pointer(props%LAI%data, data, (/num_cols/))
+  a_LAI = data(:)  
 
+  call c_f_pointer(props%SAI%data, data, (/num_cols/))
+  a_SAI = data(:)
+
+  call c_f_pointer(props%vegetation_type%data, data, (/num_cols/))
+  a_VEG = data(:)
+
+  call c_f_pointer(props%snow_albedo%data, data, (/num_cols/))
+  a_SALB = data(:)
+
+  !a_MATP(:,:) = -6.9
   !do i = 1, size_col
   !  a_MATP(i, 1) = 100.0
   !end do
@@ -156,6 +185,18 @@ contains
   heat_capacity = props%heat_capacity
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
+  p_bool = props%p_bool
+
+  if(p_bool)THEN
+    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+    p_total = data(:)
+  else
+    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
+    p_rain = data(:)
+
+    call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
+    p_snow = data(:)
+  endif
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   surf_w_source = data(:)
@@ -184,25 +225,12 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
 
-  !call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_BKDSI
+  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
+  data2D(:,:)=a_SSWS
 
-  !call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_WC
+  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
+  data2D(:,:)=a_SSES
 
-  !call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_HCOND
-
-  !call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_TEMP
-
-  !call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_SSWS
-
-  !call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/size_procs/)])
-  !data2D(:,:)=a_SSES
-
-  write(*,*) "(In EcoSIM2ATSData) snow_depth, Q_e, Q_w ", surf_snow_depth(1), surf_e_source(1), surf_w_source(1)
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
 
@@ -273,7 +301,6 @@ contains
 
     type (BGCSizes), intent(out) :: sizes
 
-    write(*,*) "(SetBGCSizes): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
     sizes%num_columns = 1

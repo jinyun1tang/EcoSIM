@@ -183,6 +183,10 @@ module BGCContainers_module
      type (BGCVectorDouble) :: elevation
      type (BGCVectorDouble) :: aspect
      type (BGCVectorDouble) :: slope
+     type (BGCVectorDouble) :: LAI
+     type (BGCVectorDouble) :: SAI
+     type (BGCVectorDouble) :: vegetation_type
+     type (BGCVectorDouble) :: snow_albedo
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
      real (c_double) :: atm_co2
@@ -193,6 +197,7 @@ module BGCContainers_module
      real (c_double) :: heat_capacity
      real (c_double) :: field_capacity
      real (c_double) :: wilting_point
+     logical (c_bool) :: p_bool
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
