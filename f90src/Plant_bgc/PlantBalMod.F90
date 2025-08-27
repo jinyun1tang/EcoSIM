@@ -192,6 +192,7 @@ implicit none
 !     TOTAL STANDING DEAD
 !
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
+! standing dead are made up of different kinetic components
 !add standing dead to shoot
   DO NE=1,NumPlantChemElms
     StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))    
@@ -411,13 +412,19 @@ implicit none
   implicit none
   INTEGER, INTENT(IN) :: I,J
   integer, intent(in) :: NP
-  INTEGER :: NZ
+  INTEGER :: NZ,NE
 
   DO NZ=1,NP
-    plt_biom%RootElmsBeg_pft(:,NZ)           = plt_biom%RootElms_pft(:,NZ)
-    plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = plt_biom%StandDeadStrutElms_pft(:,NZ)
-    plt_biom%ShootElmsBeg_pft(:,NZ)          = plt_biom%ShootElms_pft(:,NZ)
-    plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = plt_biom%SeasonalNonstElms_pft(:,NZ)
+    DO NE=1,NumPlantChemElms
+      plt_distb%PlantElmDistLoss_pft(NE,NZ)    = 0._r8
+      plt_biom%RootElmsBeg_pft(NE,NZ)           = plt_biom%RootElms_pft(NE,NZ)
+      plt_biom%StandDeadStrutElmsBeg_pft(NE,NZ) = plt_biom%StandDeadStrutElms_pft(NE,NZ)
+      plt_biom%ShootElmsBeg_pft(NE,NZ)          = plt_biom%ShootElms_pft(NE,NZ)
+      plt_biom%SeasonalNonstElmsbeg_pft(NE,NZ)  = plt_biom%SeasonalNonstElms_pft(NE,NZ)
+      plt_biom%TotBegVegE_pft(NE,NZ)            = plt_biom%RootElms_pft(NE,NZ)+plt_biom%ShootElms_pft(NE,NZ) &
+        +plt_biom%SeasonalNonstElms_pft(NE,NZ) + plt_biom%StandDeadStrutElms_pft(NE,NZ)
+
+    ENDDO
   ENDDO
   end subroutine EnterPlantBalance
 
@@ -436,8 +443,8 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NP
-  integer :: NZ
-  real(r8) :: balE(1:NP)
+  integer :: NZ,NE
+  real(r8) :: balC(1:NP)
 
   associate(                                                          &
     GrossCO2Fix_pft           => plt_bgcr%GrossCO2Fix_pft            ,& !input  :total gross CO2 fixation, [gC d-2 ]
@@ -452,21 +459,20 @@ implicit none
     StandDeadStrutElmsBeg_pft => plt_biom%StandDeadStrutElmsBeg_pft  ,& !input  :standing dead element at previous time step, [g d-2]
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     ,& !input  :standing dead element, [g d-2]
     ShootElmsBeg_pft          => plt_biom%ShootElmsBeg_pft           ,& !input  :previous whole plant shoot element mass, [g d-2]
-    ShootElms_pft             => plt_biom%ShootElms_pft               & !input  :current time whole plant shoot element mass, [g d-2]
+    ShootElms_pft             => plt_biom%ShootElms_pft              ,& !input  :current time whole plant shoot element mass, [g d-2]
+    TotBegVegE_pft            => plt_biom%TotBegVegE_pft             ,& !Input  :total vegetation carbon at the beginning of the time step,[g d-2]
+    TotEndVegE_pft            => plt_biom%TotEndVegE_pft              & !output :total vegetation carbon at the end of the time step,[g d-2]
   )
 
   DO NZ=1,NP
-    balE(NZ)=RootElms_pft(ielmc,NZ)-RootElmsBeg_pft(ielmc,NZ)  &
-      +ShootElms_pft(ielmc,NZ)-ShootElmsBeg_pft(ielmc,NZ)   &
-      +StandDeadStrutElms_pft(ielmc,NZ)-StandDeadStrutElmsBeg_pft(ielmc,NZ)  &
-      +SeasonalNonstElms_pft(ielmc,NZ)-SeasonalNonstElmsbeg_pft(ielmc,NZ) &
+    DO NE=1,NumPlantChemElms
+      TotEndVegE_pft(NE,NZ) = RootElms_pft(NE,NZ)+ShootElms_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)      
+    ENDDO
+    balC(NZ)=TotEndVegE_pft(ielmc,NZ)-TotBegVegE_pft(ielmc,NZ) &
       -GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   &
       -NodulInfectElms_pft(ielmc,NZ)  &      
       -RootMycoExudElms_pft(ielmc,NZ) &
-      +LitrfalStrutElms_pft(ielmc,NZ) 
-!    if(plt_rad%RadPARbyCanopy_pft(NZ)>0._r8)then
-!      write(123,*)I+J/24.,GrossCO2Fix_pft(NZ)/plt_rad%RadPARbyCanopy_pft(NZ),plt_rad%RadPARbyCanopy_pft(NZ)
-!    endif
+      +LitrfalStrutElms_pft(ielmc,NZ)     
   ENDDO
   end associate
 

@@ -15,7 +15,9 @@ implicit none
   integer, parameter :: ieros_frzthaweros    = 1
   integer, parameter :: ieros_frzthawsom     = 2
   integer, parameter :: ieros_frzthawsomeros = 3
-
+! irrigation
+  integer, parameter :: iIrrig_swc=0  !by soil water content
+  integer, parameter :: iIrrig_cwp=1  !by canopy water potential
 ! water flux direction
   integer, parameter :: iWestEastDirection   = 1   !east-west direction
   integer, parameter :: iNorthSouthDirection = 2   !north-south direction
@@ -38,19 +40,22 @@ implicit none
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3
 ! fertilizer
-  integer, parameter :: ifert_nh4               = 1
-  integer, parameter :: ifert_nh3               = 2
-  integer, parameter :: ifert_urea              = 3
-  integer, parameter :: ifert_no3               = 4
-  integer, parameter :: ifert_nh4_band          = 5
-  integer, parameter :: ifert_nh3_band          = 6
-  integer, parameter :: ifert_urea_band         = 7
-  integer, parameter :: ifert_no3_band          = 8
+  integer, parameter :: ifert_on                = 1
+  integer, parameter :: ifert_off               = 0
+  integer, parameter :: ifert_N_nh4               = 1
+  integer, parameter :: ifert_N_nh3               = 2
+  integer, parameter :: ifert_N_urea              = 3
+  integer, parameter :: ifert_N_no3               = 4
+  integer, parameter :: ifert_N_nh4_band          = 5
+  integer, parameter :: ifert_N_nh3_band          = 6
+  integer, parameter :: ifert_N_urea_band         = 7
+  integer, parameter :: ifert_N_no3_band          = 8
   integer, parameter :: ifert_P_Ca_H2PO4_2      = 9
   integer, parameter :: ifert_P_Ca_H2PO4_2_band = 10
   integer, parameter :: ifert_P_apatite         = 11
   integer, parameter :: ifert_Ca_lime           = 12
   integer, parameter :: ifert_Ca_gypsum         = 13
+
   integer, parameter :: ifert_plant_resC        = 14
   integer, parameter :: ifert_plant_resN        = 15
   integer, parameter :: ifert_plant_resP        = 16
@@ -146,5 +151,7 @@ implicit none
 
   integer, parameter :: itill_rmlitr = 21
   integer, parameter :: itill_fire   = 22
-  
+  integer, parameter :: iHarvst_pft  = 1    !indicator for pft specific harvest
+  integer, parameter :: iHarvst_col  = 2    !indicator for col mean harvest
+
 end module ElmIDMod

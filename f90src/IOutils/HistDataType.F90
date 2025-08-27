@@ -188,7 +188,8 @@ implicit none
   real(r8),pointer   :: h1D_tHeat_col(:) 
   real(r8),pointer   :: h1D_QDISCHG_FLX_col(:)  
   real(r8),pointer   :: h1D_HeatDISCHG_FLX_col(:)
-  real(r8),pointer   :: h1D_SNOWPACK_col(:)     
+  real(r8),pointer   :: h1D_SNOWPACK_col(:)    
+  real(r8),pointer   :: h1D_SNOWDENS_col(:) 
   real(r8),pointer   :: h1D_SURF_WTR_col(:)     
   real(r8),pointer   :: h1D_ThetaW_litr_col(:)  
   real(r8),pointer   :: h1D_ThetaI_litr_col(:)    
@@ -549,6 +550,7 @@ implicit none
   real(r8),pointer   :: h2D_RootNutupk_fProtC_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stAxesNumL_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndAxesNumL_pvr(:,:)
+  REAL(R8),pointer   :: h2D_RootResist4H2O_pvr(:,:)
   contains
     procedure, public :: Init  => init_hist_data
     procedure, public :: hist_update
@@ -730,6 +732,7 @@ implicit none
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
   allocate(this%h1D_tHeat_col(beg_col:end_col))           ;this%h1D_tHeat_col(:)=spval
   allocate(this%h1D_SNOWPACK_col(beg_col:end_col))        ;this%h1D_SNOWPACK_col(:)=spval
+  allocate(this%h1D_SNOWDENS_col(beg_col:end_col))        ;this%h1D_SNOWDENS_col(:)=spval
   allocate(this%h1D_SURF_WTR_col(beg_col:end_col))        ;this%h1D_SURF_WTR_col(:)=spval
   allocate(this%h1D_ThetaW_litr_col(beg_col:end_col))    ;this%h1D_ThetaW_litr_col(:)=spval
   allocate(this%h1D_ThetaI_litr_col(beg_col:end_col))    ;this%h1D_ThetaI_litr_col(:)=spval
@@ -887,6 +890,8 @@ implicit none
   allocate(this%h2D_AeroBact_PrimS_lim_vr(beg_col:end_col,1:JZ)); this%h2D_AeroBact_PrimS_lim_vr(:,:)=spval
   allocate(this%h2D_AeroFung_PrimS_lim_vr(beg_col:end_col,1:JZ)); this%h2D_AeroFung_PrimS_lim_vr(:,:)=spval  
   allocate(this%h2D_tSOCL_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOCL_vr(:,:)=spval
+  allocate(this%h2D_NO3_vr(beg_col:end_col,1:JZ)); this%h2D_NO3_vr(:,:)=spval
+  allocate(this%h2D_NH4_vr(beg_col:end_col,1:JZ)); this%h2D_NH4_vr(:,:)=spval
   allocate(this%h2D_tSON_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSON_vr(:,:)=spval
   allocate(this%h2D_tSOP_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOP_vr(:,:)=spval
   allocate(this%h2D_litrC_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrC_vr(:,:)=spval
@@ -1082,6 +1087,7 @@ implicit none
   allocate(this%h2D_Root2ndStrutN_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutN_pvr=spval
   allocate(this%h2D_Root2ndStrutP_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutP_pvr=spval
   allocate(this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root2ndAxesNumL_pvr=spval
+  allocate(this%h2D_RootResist4H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootResist4H2O_pvr=spval
   allocate(this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root1stAxesNumL_pvr=spval
   allocate(this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_pvr=spval
   allocate(this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_fRootGrowPSISense_pvr=spval
@@ -1161,15 +1167,15 @@ implicit none
 
   data1d_ptr => this%h1D_AMENDED_C_col(beg_col:end_col)   
   call hist_addfld1d(fname='AMENDED_C_col',units='gC/m2',avgflag='A',&
-    long_name='total fertilizer C amendment',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated total organic fertilizer C amendment',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_AMENDED_N_col(beg_col:end_col)   
   call hist_addfld1d(fname='AMENDED_N_col',units='gN/m2',avgflag='A',&
-    long_name='total fertilizer N amendment',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated total organic fertilizer N amendment',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_AMENDED_P_col(beg_col:end_col)        
   call hist_addfld1d(fname='AMENDED_P_col',units='gP/m2',avgflag='A',&
-    long_name='Column integrated total fertilizer P amendment',ptr_col=data1d_ptr,default='inactive')      
+    long_name='Column-integrated total organic fertilizer P amendment',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_tLITRf_C_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITRf_C_col',units='gC/m2/hr',avgflag='A',&
@@ -1698,6 +1704,10 @@ implicit none
   call hist_addfld1d(fname='SNOWPACK_col',units='mmH2O/m2',&
     avgflag='A',long_name='total water equivalent snow',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_SNOWDENS_col(beg_col:end_col)      
+  call hist_addfld1d(fname='SNOWDENS_col',units='kg/m3',&
+    avgflag='A',long_name='snow density',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_SURF_WTR_col(beg_col:end_col)   
   call hist_addfld1d(fname='SURF_WTR_col',units='m3/m3',avgflag='A',&
     long_name='Volumetric water content in surface litter layer',ptr_col=data1d_ptr)      
@@ -1743,8 +1753,7 @@ implicit none
 
   data1d_ptr => this%h1D_RootN_Fix_col(beg_col:end_col)
   call hist_addfld1d(fname='Root_N_FIX_col',units='gN/m2/hr',&
-    avgflag='A',long_name='Root N fixation',ptr_col=data1d_ptr,&
-    default='inactive')            
+    avgflag='A',long_name='Root N2 fixation',ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_AR_WetDep_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_WetDep_FLX_col',units='gAr/m2/hr',&
@@ -1957,7 +1966,7 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='N2_FIXN_FLX_pft',units='gN/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='N2_FIX_FLX_pft',units='gN/m2/hr',avgflag='A',&
     long_name='total root N2 fixation',ptr_patch=data1d_ptr,&
     default='inactive')            
 
@@ -2276,7 +2285,7 @@ implicit none
     default='inactive')      
 
   data1d_ptr => this%h1D_TL_N_FIXED_FLX_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='TL_N_FIXED_FLX_pft',units='gN/m2',avgflag='A',&
+  call hist_addfld1d(fname='cumN_FIXED_FLX_pft',units='gN/m2',avgflag='A',&
     long_name='cumulative plant N2 fixation',ptr_patch=data1d_ptr,&
     default='inactive')            
 
@@ -2530,6 +2539,16 @@ implicit none
   data2d_ptr => this%h2D_tSOP_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='tSOP_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved total soil organic P (everything organic)',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_NO3_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='NO3_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved dissolved NO3 concentration',&
+    ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_NH4_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='NH4_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved dissolved NH4 concentration',&
     ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_VHeatCap_vr(beg_col:end_col,1:JZ)       
@@ -3244,6 +3263,10 @@ implicit none
   call hist_addfld2d(fname='Root2nd_AxesNumL_pvr',units='1/d2',type2d='levsoi',avgflag='A',&
     long_name='Secondary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_RootResist4H2O_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='RootResist4H2O_pvr',units='MPa h-1',type2d='levsoi',avgflag='A',&
+    long_name='Root resistance to water uptake in soil layer',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_prtUP_NH4_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='prtUP_NH4_pvr',units='gN/m3/hr',type2d='levsoi',avgflag='A',&
     long_name='Root uptake of NH4',ptr_patch=data2d_ptr,default='inactive')       
@@ -3478,6 +3501,11 @@ implicit none
       this%h1D_QDISCHG_FLX_col(ncol)      = QDischarg2WTBL_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_HeatDISCHG_FLX_col(ncol)   = HeatDischar_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SNOWPACK_col(ncol)         = AZMAX1((VcumSnowWE_col(NY,NX))*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX))
+      if(this%h1D_SNOWPACK_col(ncol)>0._r8)then
+        this%h1D_SNOWDENS_col(ncol)         = this%h1D_SNOWPACK_col(ncol)/SnowDepth_col(NY,NX)
+      else
+        this%h1D_SNOWDENS_col(ncol)         =0._r8
+      endif
       this%h1D_SURF_WTR_col(ncol)         = ThetaH2OZ_vr(0,NY,NX)
       this%h1D_SURF_ICE_col(ncol)         = ThetaICEZ_vr(0,NY,NX)
       this%h1D_ThetaW_litr_col(ncol)      = safe_adb(VLWatMicP_vr(0,NY,NX),VLitR_col(NY,NX))
@@ -3622,6 +3650,8 @@ implicit none
         this%h2D_tSOP_vr(ncol,L)            = SoilOrgM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_VHeatCap_vr(ncol,L)        = VHeatCapacity_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_Root_CO2_vr(ncol,L)        = trcg_root_vr(idg_CO2,L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_NO3_vr(ncol,L)             = trc_solcl_vr(ids_NO3,L,NY,NX)
+        this%h2D_NH4_vr(ncol,L)             = trc_solcl_vr(ids_NH4,L,NY,NX)
         this%h2D_Aqua_CO2_vr(ncol,L)        = trc_solcl_vr(idg_CO2,L,NY,NX)
         this%h2D_Aqua_CH4_vr(ncol,L)        = trc_solcl_vr(idg_CH4,L,NY,NX)
         this%h2D_Aqua_O2_vr(ncol,L)         = trc_solcl_vr(idg_O2,L,NY,NX)
@@ -3992,6 +4022,7 @@ implicit none
           this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
           this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_RootResist4H2O_pvr(nptc,L)= RootResist4H2O_pvr(ipltroot,L,NZ,NY,NX)
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_pvr(nptc,L)= this%h2D_Root1stStrutC_pvr(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)

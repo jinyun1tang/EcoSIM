@@ -296,7 +296,7 @@ implicit none
             +trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_AlPO4B,N,NN,N5,N4) &
             +trcp_Eros_2D(idsp_FePO4B,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
             +2.0_r8*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-            +3.0_r8*(trcp_Eros_2D(idsp_HA,N,NN,N5,N4)+trcp_Eros_2D(idsp_HAB,N,NN,N5,N4)))
+            +3.0_r8*(trcp_Eros_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_2D(idsp_ApatiteBand,N,NN,N5,N4)))
           MOE(:)=0.0_r8
           
           D3580: DO K=1,jcplx
@@ -384,7 +384,7 @@ implicit none
               +XN*3.0*(trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
               +XN*4.0*(trcp_Eros_2D(idsp_AlOH3,N,NN,N5,N4)+trcp_Eros_2D(idsp_FeOH3,N,NN,N5,N4)) &
               +XN*7.0*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-              +XN*9.0*(trcp_Eros_2D(idsp_HA,N,NN,N5,N4)+trcp_Eros_2D(idsp_HAB,N,NN,N5,N4))
+              +XN*9.0*(trcp_Eros_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_2D(idsp_ApatiteBand,N,NN,N5,N4))
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
             HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SET

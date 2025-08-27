@@ -998,13 +998,13 @@ module PlantPhenolMod
 !
 !   NodeNumNormByMatgrp_brch=vegetative node number normalized for maturity group
 !   MatureGroup_pft=node number required for floral initiation
-    call DebugPrint('MatureGroup_pft(NZ)',MatureGroup_pft(NZ))
+
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
       NodeNumNormByMatgrp_brch(NB,NZ)      = (ShootNodeNum_brch(NB,NZ)-NodeNum2InitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
       HourlyNodeNumNormByMatgrp_brch       = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4VegetaPheno)
       TotalNodeNumNormByMatgrp_brch(NB,NZ) = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch
     ENDIF
-    call DebugPrint('TotalNodeNumNormByMatgrp_brch(NB,NZ)',TotalNodeNumNormByMatgrp_brch(NB,NZ))
+
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0)THEN
       ReprodNodeNumNormByMatrgrp_brch(NB,NZ)   = (ShootNodeNum_brch(NB,NZ)-NodeNumberAtAnthesis_brch(NB,NZ))/MatureGroup_pft(NZ)
       dReproNodeNumNormByMatG_brch(NB,NZ)      = NodeInitRate/(MatureGroup_pft(NZ)*GrowStageNorm4ReprodPheno)

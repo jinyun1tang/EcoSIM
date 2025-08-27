@@ -714,12 +714,12 @@ module InitPlantMod
     DO K=0,MaxNodesPerBranch1
       LeafArea_node(K,NB,NZ)                                   = 0._r8
       LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
+      plt_morph%DeadInternodeHeight_brch(K,NB,NZ)                  = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
       plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
       plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
-      plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
+      plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
       plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
 
       D55: DO L=1,NumCanopyLayers1
@@ -773,7 +773,7 @@ module InitPlantMod
   implicit none
   integer, intent(in) :: NZ
   integer :: M,NE
-  real(r8) :: WTSTDX
+  real(r8) :: StandDeadC_pft
 
   associate(                                                                    &
     AREA3                          => plt_site%AREA3                           ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
@@ -826,15 +826,15 @@ module InitPlantMod
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)          = 0._r8
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
     ETCanopy_CumYr_pft(NZ)                                   = 0._r8
-    WTSTDX                                                   = StandingDeadInitC_pft(NZ)*AREA3(NU)
+    StandDeadC_pft                                           = StandingDeadInitC_pft(NZ)*AREA3(NU)
+    !standing dead is assumed to exist as stalk only
     D155: DO M=1,jsken
-      StandDeadKCompElms_pft(ielmc,M,NZ)=WTSTDX*ElmAllocmat4Litr(ielmc,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*ElmAllocmat4Litr(ielmn,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmp,M,NZ)=WTSTDX*rPCStalk_pft(NZ)*ElmAllocmat4Litr(ielmp,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmc,M,NZ)=StandDeadC_pft*ElmAllocmat4Litr(ielmc,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmn,M,NZ)=StandDeadC_pft*rNCStalk_pft(NZ)*ElmAllocmat4Litr(ielmn,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmp,M,NZ)=StandDeadC_pft*rPCStalk_pft(NZ)*ElmAllocmat4Litr(ielmp,icwood,M,NZ)
     ENDDO D155
     DO NE=1,NumPlantChemElms
-      StandDeadStrutElms_pft(NE,NZ)=StandDeadStrutElms_pft(NE,NZ)+&
-        sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
+      StandDeadStrutElms_pft(NE,NZ)=StandDeadStrutElms_pft(NE,NZ)+sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
     ENDDO
   ENDIF
   end associate

@@ -98,7 +98,7 @@ module RootDataType
   real(r8),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
   real(r8),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
   real(r8),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
-
+  real(r8),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]     
 !----------------------------------------------------------------------
 
 contains
@@ -195,13 +195,14 @@ contains
   allocate(RootNonstructElmConc_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_rpvr=0._r8
   allocate(RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
   allocate(RootProteinConc_rpvr(jroots,JZ,JP,JY,JX));RootProteinConc_rpvr=0._r8
+  allocate(RootResist4H2O_pvr(jroots,JZ,JP,JY,JX)); RootResist4H2O_pvr=0._r8
   end subroutine InitRootData
 
 !----------------------------------------------------------------------
   subroutine DestructRootData
   use abortutils, only : destroy
   implicit none
-
+  call destroy(RootResist4H2O_pvr)
   call destroy(ROOTNLim_rpvr)
   call destroy(ROOTPLim_rpvr)  
   call destroy(RootMaintDef_CO2_pvr)

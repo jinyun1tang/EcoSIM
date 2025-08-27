@@ -1683,7 +1683,7 @@ implicit none
 !
 !     SOIL FERTILIZER BANDS
 !
-    IF(IFNHB_col(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
+    IF(iFertNH4Band_col(NY,NX).EQ.ifert_on .AND. ROWSpaceNH4_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
         WDNHBDL                   = BandWidthNH4_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDNHBD0                   = BandWidthNH4_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1711,7 +1711,7 @@ implicit none
         trcs_VLN_vr(idg_NH3,L0,NY,NX)  = trcs_VLN_vr(ids_NH4,L0,NY,NX)
       ENDIF
     ENDIF
-    IF(IFNOB_col(NY,NX).EQ.1.AND.ROWSpaceNO3_col(NY,NX).GT.0.0)THEN
+    IF(iFertNO3Band_col(NY,NX).EQ.ifert_off .AND. ROWSpaceNO3Band_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
         WDNOBDL                   = BandWidthNO3_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDNOBD0                   = BandWidthNO3_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1727,9 +1727,9 @@ implicit none
           BandThicknessNO3_vr(L0,NY,NX) = BandThicknessNO3_vr(L0,NY,NX)-FXDPNOB
         ENDIF
         trcs_VLN_vr(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L1,NY,NX) &
-          /ROWSpaceNO3_col(NY,NX)*BandThicknessNO3_vr(L1,NY,NX)/DLYR_3D(3,L1,NY,NX)))
+          /ROWSpaceNO3Band_col(NY,NX)*BandThicknessNO3_vr(L1,NY,NX)/DLYR_3D(3,L1,NY,NX)))
         trcs_VLN_vr(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L0,NY,NX) &
-          /ROWSpaceNO3_col(NY,NX)*BandThicknessNO3_vr(L0,NY,NX)/DLYR_3D(3,L0,NY,NX)))
+          /ROWSpaceNO3Band_col(NY,NX)*BandThicknessNO3_vr(L0,NY,NX)/DLYR_3D(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L1,NY,NX)
         trcs_VLN_vr(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L0,NY,NX)
 
@@ -1739,7 +1739,7 @@ implicit none
         trcs_VLN_vr(ids_NO2B,L0,NY,NX) = trcs_VLN_vr(ids_NO3B,L0,NY,NX)
       ENDIF
     ENDIF
-    IF(IFPOB_col(NY,NX).EQ.1 .AND. ROWSpacePO4_col(NY,NX).GT.0.0)THEN
+    IF(iFertPO4Band_col(NY,NX).EQ.ifert_on .AND. ROWSpacePO4_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
         WDPOBDL                   = BandWidthPO4_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDPOBD0                   = BandWidthPO4_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1777,16 +1777,16 @@ implicit none
     FBO=AMIN1(0.1,FX*SoiBulkDensityt0_vr(L1,NY,NX)/SoiBulkDensityt0_vr(L0,NY,NX))
   ENDIF
 !     SoilBulkDensity_vr(L1,NY,NX)=(1.0-FO)*SoilBulkDensity_vr(L1,NY,NX)+FO*SoiBulkDensityt0_vr(L0,NY,NX)
-  PH_vr(L1,NY,NX)      = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
+  PH_vr(L1,NY,NX)   = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
   FXSAND            = FBO*SAND_vr(L0,NY,NX)
-  SAND_vr(L1,NY,NX)    = SAND_vr(L1,NY,NX)+FXSAND
-  SAND_vr(L0,NY,NX)    = SAND_vr(L0,NY,NX)-FXSAND
+  SAND_vr(L1,NY,NX) = SAND_vr(L1,NY,NX)+FXSAND
+  SAND_vr(L0,NY,NX) = SAND_vr(L0,NY,NX)-FXSAND
   FXSILT            = FBO*SILT_vr(L0,NY,NX)
-  SILT_vr(L1,NY,NX)    = SILT_vr(L1,NY,NX)+FXSILT
-  SILT_vr(L0,NY,NX)    = SILT_vr(L0,NY,NX)-FXSILT
+  SILT_vr(L1,NY,NX) = SILT_vr(L1,NY,NX)+FXSILT
+  SILT_vr(L0,NY,NX) = SILT_vr(L0,NY,NX)-FXSILT
   FXCLAY            = FBO*CLAY_vr(L0,NY,NX)
-  CLAY_vr(L1,NY,NX)    = CLAY_vr(L1,NY,NX)+FXCLAY
-  CLAY_vr(L0,NY,NX)    = CLAY_vr(L0,NY,NX)-FXCLAY
+  CLAY_vr(L1,NY,NX) = CLAY_vr(L1,NY,NX)+FXCLAY
+  CLAY_vr(L0,NY,NX) = CLAY_vr(L0,NY,NX)-FXCLAY
   FXROCK            = FBO*ROCK_vr(L0,NY,NX)
   ROCK_vr(L1,NY,NX) = ROCK_vr(L1,NY,NX)+FXROCK
   ROCK_vr(L0,NY,NX) = ROCK_vr(L0,NY,NX)-FXROCK

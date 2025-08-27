@@ -568,12 +568,12 @@ implicit none
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
   real(r8) :: VLWatMicP10,VLiceMicP10,VLWatLitR,VLicelitR
-
+  real(r8) :: deltaT,dHeat
 
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
   call PrintInfo('beg '//subname)
-
+  
   VLWatMicP10                   = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10                   = VLiceMicP1_vr(0,NY,NX)
 
@@ -614,21 +614,29 @@ implicit none
     FracAirFilledSoilPore_vr(0,NY,NX) = 1.0_r8
   ENDIF
 
-  FracAirFilledSoilPoreM_vr(M+1,0,NY,NX)        = FracAirFilledSoilPore_vr(0,NY,NX)
-  VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                      !heat capacity
-  TK0Prev                    = TKSoil1_vr(0,NY,NX)                             !residual temperature
-  ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
-  VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
-  
+  FracAirFilledSoilPoreM_vr(M+1,0,NY,NX) = FracAirFilledSoilPore_vr(0,NY,NX)
+  VLHeatCapLitRPre                       = VHeatCapacity1_vr(0,NY,NX)                      !heat capacity
+  TK0Prev                                = TKSoil1_vr(0,NY,NX)                             !residual temperature
+  ENGYR                                  = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
+  VHeatCapacity1_vr(0,NY,NX)             = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+
+  deltaT=safe_adb(HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)*cpw)
+  dHeat=TK0Prev*10._r8
+  if(deltaT>dHeat)then
+    HeatFLoByWat2LitRM_col(NY,NX)=dHeat*WatFLo2LitrM_col(NY,NX)*cpw
+  elseif(deltaT<-dHeat)then
+    HeatFLoByWat2LitRM_col(NY,NX)=-dHeat*WatFLo2LitrM_col(NY,NX)*cpw
+  endif
+
+  !write(3334,*)(I*1000+J)*100+M,safe_adb(HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)*cpw)
+!  if(I==146 .and. J==13)write(*,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX),VLHeatCapLitRPre,VHeatCapacity1_vr(0,NY,NX),&
+!    SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX),HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)*cpw,safe_adb(HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)*cpw)
+
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
-    TKSoil1_vr(0,NY,NX)=(ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
-!    if(I==149 .and. J==10 .and. NX==1)then
-!      write(117,*)(I*1000+J)*100+M,TKSoil1_vr(0,NY,NX),TK0Prev
-!      write(117,*)(I*1000+J)*100+M,VLHeatCapLitRPre,VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRM_col(NY,NX),&
-!        SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX)
-!    endif  
+    TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
+
 !    if(I>=66)print*,TK0Prev,TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX),FracSurfByLitR_col(NY,NX),&
-!      LWRad2LitR_col(NY,NX),LWRad2Snow_col(NY,NX),LWRad2Soil_col(NY,NX)
+!      LWRad2LitR_col(NY,NX),LWRad2Snow_col(NY,NX),LWRad2Soil_col(NY,NX) 
     if(TKSoil1_vr(0,NY,NX)<200._r8 .or. (TKSoil1_vr(0,NY,NX)>360._r8 .and. VHeatCapacity1_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)) )then
       write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX)
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre,FracSurfByLitR_col(NY,NX)

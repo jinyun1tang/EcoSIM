@@ -17,9 +17,10 @@ implicit none
   public :: CutBranchNonstalByGrazing
   public :: GrazingPlant
 
-!     GY,GZ=partitioning of grazed material to removal,respiration
+! GY,GZ=partitioning of grazed material to removal,respiration
+!
   real(r8),PARAMETER :: GY=1._r8
-  real(r8),parameter :: GZ=1._r8-GY
+  real(r8),parameter :: GZ=1._r8-GY  !respiraiton ratio of grazers
 contains
 ![header]
 !------------------------------------------------------------------------------------------
@@ -78,7 +79,7 @@ contains
   real(r8) :: WHVSTD
 
   associate(   &
-    FracCanopyHeightCut_pft => plt_distb%FracCanopyHeightCut_pft, &
+    CanopyHeightCut_pft => plt_distb%CanopyHeightCut_pft, &
     NU                      => plt_site%NU,                       &
     AREA3                   => plt_site%AREA3,                    &
     StandDeadStrutElms_pft  => plt_biom%StandDeadStrutElms_pft,   &
@@ -87,7 +88,7 @@ contains
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            &
     )
   IF(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
-    WHVSTD=FracCanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(1,4,NZ)
+    WHVSTD=CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(iHarvst_pft,4,NZ)
     FHVSE=AZMAX1(1._r8-WHVSTD/StandDeadStrutElms_pft(ielmc,NZ))
     FHVSH=FHVSE
   ELSE
@@ -127,10 +128,10 @@ contains
     FracBiomHarvsted => plt_distb%FracBiomHarvsted, &
     IYTYP            => plt_distb%IYTYP             &
   )
-  EHVST21h = 1._r8-FracBiomHarvsted(2,iplthvst_leaf,NZ)*0.5_r8
-  EHVST22h = 1._r8-FracBiomHarvsted(2,iplthvst_finenonleaf,NZ)*0.5_r8
-  EHVST23h = 1._r8-FracBiomHarvsted(2,iplthvst_woody,NZ)*0.5_r8
-  EHVST24h = 1._r8-FracBiomHarvsted(2,iplthvst_stdead,NZ)*0.5_r8
+  EHVST21h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ)*0.5_r8
+  EHVST22h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ)*0.5_r8
+  EHVST23h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ)*0.5_r8
+  EHVST24h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ)*0.5_r8
 
   NonstructElmnt2Litr(ielmc)   = NonstructElmntRemoval(ielmc)*EHVST21
   LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
@@ -192,9 +193,9 @@ contains
 
   associate(                                                             &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,          &
-    LeafElmsByLayerNode_brch => plt_biom%LeafElmsByLayerNode_brch, &
+    LeafElmsByLayerNode_brch    => plt_biom%LeafElmsByLayerNode_brch,    &
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,              &
-    FracCanopyHeightCut_pft     => plt_distb%FracCanopyHeightCut_pft,    &
+    CanopyHeightCut_pft     => plt_distb%CanopyHeightCut_pft,    &
     iHarvstType_pft             => plt_distb%iHarvstType_pft,            &
     LeafStrutElms_pft           => plt_biom%LeafStrutElms_pft,           &
     HuskStrutElms_pft           => plt_biom%HuskStrutElms_pft,           &
@@ -226,7 +227,7 @@ contains
 !     NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
 ! 24. has unit of hour
   IF(AvgCanopyBiomC2Graze_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
-    TotPhytomassRemoval=FracCanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
+    TotPhytomassRemoval=CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
       *AREA3(NU)*ShootStrutElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
   ELSE
     TotPhytomassRemoval=0._r8
@@ -240,22 +241,20 @@ contains
 !
 !     LEAF,BACTERIA GRAZED,REMOVED
 !
-!     FracBiomHarvsted(1,1,FracBiomHarvsted(1,2,FracBiomHarvsted(1,3,FracBiomHarvsted(1,4=fraction of
-!           leaf,non-foliar,woody, standing dead removed from PFT
-!     FracBiomHarvsted(2,1,FracBiomHarvsted(2,2,FracBiomHarvsted(2,3,FracBiomHarvsted(2,4=fraction of
-!           leaf,non-foliar,woody, standing dead removed from ecosyst
+!     FracBiomHarvsted(iHarvst_pft,1:4)=fraction of leaf,non-foliar,woody, standing dead removed from PFT
+!     FracBiomHarvsted(iHarvst_col,1:4=fraction of leaf,non-foliar,woody, standing dead removed from ecosyst
 !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
 !     WTLF=PFT leaf C mass
 !     CGrazedDeficit=grazing requirement unmet by leaf
 ! grazing from leaf, 
-  WHVSLX      = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_leaf,NZ)
+  WHVSLX      = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ)
   WHVSLY      = AMIN1(LeafStrutElms_pft(ielmc,NZ),WHVSLX)
   HvstedLeafC = WHVSLY*(1._r8-CCPOLX)
   
   WHVSCL         = WHVSLY*CCPOLX
   WHVSNL         = WHVSLY*CCPLNX
   CGrazedDeficit = AZMAX1(WHVSLX-WHVSLY)
-  WHVSSX         = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_finenonleaf,NZ)
+  WHVSSX         = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ)
 !
 !     OTHER NON-FOLIAR GRAZED,REMOVED
 !
@@ -300,7 +299,7 @@ contains
   ENDIF
   WHVSCP = WHVSCL+WHVSCS
   WHVSNP = WHVSNL+WHVSNS
-  WHVSKX = TotPhytomassRemoval*FracBiomHarvsted(1,iplthvst_woody,NZ)
+  WHVSKX = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ)
 !
 !     STALK GRAZED, REMOVED
 !

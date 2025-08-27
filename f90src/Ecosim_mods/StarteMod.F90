@@ -477,12 +477,12 @@ module StarteMod
     trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)     = solutevar%Precp_AlPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_FePO4,L,NY,NX)     = solutevar%Precp_FePO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)    = solutevar%Precp_CaHPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcp_saltpml_vr(idsp_HA,L,NY,NX)        = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_Apatite,L,NY,NX)        = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)  = 0._r8
     trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)    = solutevar%Precp_AlPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)    = solutevar%Precp_FePO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)   = solutevar%Precp_CaHPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcp_saltpml_vr(idsp_HAB,L,NY,NX)       = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX)       = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX) = 0._r8
     ElectricConductivity_vr(L,NY,NX)        = 0._r8
     SolutesIonStrenth_vr(L,NY,NX)           = 0._r8
@@ -525,12 +525,12 @@ module StarteMod
     trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)     = 0._r8
     trcp_saltpml_vr(idsp_FePO4,0,NY,NX)     = 0._r8
     trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX)    = 0._r8
-    trcp_saltpml_vr(idsp_HA,0,NY,NX)        = 0._r8
+    trcp_saltpml_vr(idsp_Apatite,0,NY,NX)        = 0._r8
     trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX)  = 0._r8
     trcp_saltpml_vr(idsp_AlPO4B,0,NY,NX)    = 0._r8
     trcp_saltpml_vr(idsp_FePO4B,0,NY,NX)    = 0._r8
     trcp_saltpml_vr(idsp_CaHPO4B,0,NY,NX)   = 0._r8
-    trcp_saltpml_vr(idsp_HAB,0,NY,NX)       = 0._r8
+    trcp_saltpml_vr(idsp_ApatiteBand,0,NY,NX)       = 0._r8
     trcp_saltpml_vr(idsp_CaH4P2O8B,0,NY,NX) = 0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK

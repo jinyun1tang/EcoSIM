@@ -583,14 +583,14 @@ module RedistMod
     !
     !     FERTILIZER POOLS
 !
-    FertN_mole_soil_vr(ifert_nh4,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_nh4,NU_col(NY,NX),NY,NX)+TNH4Eros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_nh3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_nh3,NU_col(NY,NX),NY,NX)+TNH3Eros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_urea,NU_col(NY,NX),NY,NX)      = FertN_mole_soil_vr(ifert_urea,NU_col(NY,NX),NY,NX)+TNUreaEros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_no3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_no3,NU_col(NY,NX),NY,NX)+TNO3Eros_col(NY,NX)
-    FertN_mole_Band_vr(ifert_nh4_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_nh4_band,NU_col(NY,NX),NY,NX)+TNH4ErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_nh3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_nh3_band,NU_col(NY,NX),NY,NX)+TNH3ErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_urea_band,NU_col(NY,NX),NY,NX) = FertN_mole_Band_vr(ifert_urea_band,NU_col(NY,NX),NY,NX)+TNUreaErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_no3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_no3_band,NU_col(NY,NX),NY,NX)+TNO3ErosBand_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)+TNH4Eros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)+TNH3Eros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)      = FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)+TNUreaEros_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)+TNO3Eros_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)+TNH4ErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)+TNH3ErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX) = FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)+TNUreaErosBand_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)+TNO3ErosBand_col(NY,NX)
 !
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -715,7 +715,7 @@ module RedistMod
     stop
   endif
   Z4X             = natomw*trcx_solml_vr(idx_NH4,0,NY,NX)
-  Z4F             = natomw*(FertN_mole_soil_vr(ifert_nh4,0,NY,NX)+FertN_mole_soil_vr(ifert_urea,0,NY,NX)+FertN_mole_soil_vr(ifert_nh3,0,NY,NX))
+  Z4F             = natomw*(FertN_mole_soil_vr(ifert_N_nh4,0,NY,NX)+FertN_mole_soil_vr(ifert_N_urea,0,NY,NX)+FertN_mole_soil_vr(ifert_N_nh3,0,NY,NX))
   TDisolNH4_lnd   = TDisolNH4_lnd+Z4S+Z4X+Z4F
   tNH4_col(NY,NX) = tNH4_col(NY,NX)+Z4S+Z4X
   if(Z4X<0._r8)then
@@ -723,7 +723,7 @@ module RedistMod
     stop
   endif
   ZOS             = trcs_solml_vr(ids_NO3,0,NY,NX)+trcs_solml_vr(ids_NO2,0,NY,NX)
-  ZOF             = natomw*FertN_mole_soil_vr(ifert_no3,0,NY,NX)
+  ZOF             = natomw*FertN_mole_soil_vr(ifert_N_no3,0,NY,NX)
   tNO3_lnd        = tNO3_lnd+ZOS+ZOF
   tNO3_col(NY,NX) = tNO3_col(NY,NX)+ZOS
 
@@ -731,7 +731,7 @@ module RedistMod
   POX = patomw*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))
   POP = patomw*(trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)+trcp_saltpml_vr(idsp_FePO4,0,NY,NX) &
     +trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX) &
-    +3._r8*patomw*trcp_saltpml_vr(idsp_HA,0,NY,NX)
+    +3._r8*patomw*trcp_saltpml_vr(idsp_Apatite,0,NY,NX)
   TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
   tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
   tXPO4_col(NY,NX)  = tXPO4_col(NY,NX)+POP
@@ -1136,9 +1136,9 @@ module RedistMod
     endif
 
     Z4X=natomw*(trcx_solml_vr(idx_NH4,L,NY,NX)+trcx_solml_vr(idx_NH4B,L,NY,NX))
-    Z4F=natomw*(FertN_mole_soil_vr(ifert_nh4,L,NY,NX)+FertN_mole_soil_vr(ifert_urea,L,NY,NX) &
-      +FertN_mole_soil_vr(ifert_nh3,L,NY,NX)+FertN_mole_Band_vr(ifert_nh4_band,L,NY,NX) &
-      +FertN_mole_Band_vr(ifert_urea_band,L,NY,NX)+FertN_mole_Band_vr(ifert_nh3_band,L,NY,NX))
+    Z4F=natomw*(FertN_mole_soil_vr(ifert_N_nh4,L,NY,NX)+FertN_mole_soil_vr(ifert_N_urea,L,NY,NX) &
+      +FertN_mole_soil_vr(ifert_N_nh3,L,NY,NX)+FertN_mole_Band_vr(ifert_N_nh4_band,L,NY,NX) &
+      +FertN_mole_Band_vr(ifert_N_urea_band,L,NY,NX)+FertN_mole_Band_vr(ifert_N_nh3_band,L,NY,NX))
 
     TSoilH2G_lnd    = TSoilH2G_lnd+HS
     TSoilO2G_lnd    = TSoilO2G_lnd+OS
@@ -1149,7 +1149,7 @@ module RedistMod
       write(*,*)'Z4S+Z4X',Z4S,Z4X
       stop
     endif
-    ZOF             = natomw*(FertN_mole_soil_vr(ifert_no3,L,NY,NX)+FertN_mole_soil_vr(ifert_no3,L,NY,NX))
+    ZOF             = natomw*(FertN_mole_soil_vr(ifert_N_no3,L,NY,NX)+FertN_mole_soil_vr(ifert_N_no3,L,NY,NX))
     tNO3_lnd        = tNO3_lnd+ZOS+ZOF
     tNO3_col(NY,NX) = tNO3_col(NY,NX)+ZOS
 
@@ -1162,7 +1162,7 @@ module RedistMod
       +trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)+trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)&
       +trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)) &
       +2._r8*patomw*(trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)) &
-      +3._r8*patomw*(trcp_saltpml_vr(idsp_HA,L,NY,NX)+trcp_saltpml_vr(idsp_HAB,L,NY,NX))
+      +3._r8*patomw*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX))
 
     TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
     tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
@@ -1234,11 +1234,11 @@ module RedistMod
  
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
-  SSF=FertN_mole_soil_vr(ifert_nh3,L,NY,NX)+FertN_mole_soil_vr(ifert_urea,L,NY,NX) &
-    +FertN_mole_soil_vr(ifert_no3,L,NY,NX) &
-    +FertN_mole_Band_vr(ifert_nh3_band,L,NY,NX)+FertN_mole_Band_vr(ifert_urea_band,L,NY,NX) &
-    +FertN_mole_Band_vr(ifert_no3_band,L,NY,NX) &
-    +2.0_r8*(FertN_mole_soil_vr(ifert_nh4,L,NY,NX)+FertN_mole_Band_vr(ifert_nh4_band,L,NY,NX))
+  SSF=FertN_mole_soil_vr(ifert_N_nh3,L,NY,NX)+FertN_mole_soil_vr(ifert_N_urea,L,NY,NX) &
+    +FertN_mole_soil_vr(ifert_N_no3,L,NY,NX) &
+    +FertN_mole_Band_vr(ifert_N_nh3_band,L,NY,NX)+FertN_mole_Band_vr(ifert_N_urea_band,L,NY,NX) &
+    +FertN_mole_Band_vr(ifert_N_no3_band,L,NY,NX) &
+    +2.0_r8*(FertN_mole_soil_vr(ifert_N_nh4,L,NY,NX)+FertN_mole_Band_vr(ifert_N_nh4_band,L,NY,NX))
 
   SSX=trcx_solml_vr(idx_Hp,L,NY,NX)+trcx_solml_vr(idx_Al,L,NY,NX) &
     +trcx_solml_vr(idx_Fe,L,NY,NX)+trcx_solml_vr(idx_Ca,L,NY,NX)+trcx_solml_vr(idx_Mg,L,NY,NX) &
@@ -1257,7 +1257,7 @@ module RedistMod
     +3.0_r8*(trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)) &
     +4.0_r8*(trcp_saltpml_vr(idsp_AlOH3,L,NY,NX)+trcp_saltpml_vr(idsp_FeOH3,L,NY,NX)) &
     +7.0_r8*(trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)) &
-    +9.0_r8*(trcp_saltpml_vr(idsp_HA,L,NY,NX)+trcp_saltpml_vr(idsp_HAB,L,NY,NX))
+    +9.0_r8*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX))
 
   SST=SSS+SSH+SSF+SSX+SSP
   TION=TION+SST

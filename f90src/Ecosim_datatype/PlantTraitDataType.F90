@@ -54,7 +54,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
-  real(r8),target,allocatable ::  InternodeHeightDead_brch(:,:,:,:,:)        !Dead internode height, [m]
+  real(r8),target,allocatable ::  DeadInternodeHeight_brch(:,:,:,:,:)        !Dead internode height, [m]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCSheath_pft(:,:,:)                           !sheath N:C ratio, [g g-1]
@@ -222,7 +222,7 @@ contains
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
-  allocate(InternodeHeightDead_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDead_brch=0._r8
+  allocate(DeadInternodeHeight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));DeadInternodeHeight_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
   allocate(rNCSheath_pft(JP,JY,JX));    rNCSheath_pft=0._r8
@@ -387,7 +387,7 @@ contains
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
-  call destroy(InternodeHeightDead_brch)
+  call destroy(DeadInternodeHeight_brch)
   call destroy(PARTS_brch)
   call destroy(rNCLeaf_pft)
   call destroy(rPCLeaf_pft)

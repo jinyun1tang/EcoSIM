@@ -115,6 +115,7 @@ module grosubsMod
 
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
+  real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
 !     begin_execution
 
   associate(                                                                    &
@@ -184,11 +185,12 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
-    
+!    
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=1.5814E-05_r8*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
+        XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
