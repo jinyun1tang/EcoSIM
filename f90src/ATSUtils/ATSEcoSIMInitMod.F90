@@ -17,18 +17,24 @@ module ATSEcoSIMInitMod
   use SurfLitterDataType
   use EcoSIMConfig
   use MiniMathMod
+  use EcoSiMParDataMod, only : micpar
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
+
+  public :: THETRX
+  real(r8), pointer :: THETRX(:)
+
   public :: Init_EcoSIM_Soil
   contains
 
   subroutine Init_EcoSIM_Soil(NYS)
   use EcoSimConst
   use GridMod           , only : SetMeshATS
-  !use InitAllocMod
-  use InitEcoSIM
+  use InitAllocMod
+  !use InitEcoSIM
   use UptakesMod
+  !use Hour1Mod,         only: InitHour1
   use PlantBGCPars
   use StartsMod, only : startsim, set_ecosim_solver
   implicit none
@@ -58,9 +64,11 @@ implicit none
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(30, 10, 20, 20)
-  call InitModules()
-  !call InitAlloc(NOMicrobeGuilds=1)
-  !call InitUptake
+  !call InitModules()
+  call InitAlloc()
+  call InitUptake
+  allocate(THETRX(1:micpar%NumOfLitrCmplxs))
+  THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
   !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
 
   !setting a few variables

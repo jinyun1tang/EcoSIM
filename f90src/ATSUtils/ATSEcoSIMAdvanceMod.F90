@@ -48,8 +48,9 @@ implicit none
   use StartsMod         , only : set_ecosim_solver
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   use SurfaceRadiationMod
+  use SoilHydroParaMod  , only : SetColdRunSoilStates
   use PlantMod
-  use InitEcoSIM
+  !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
@@ -157,9 +158,29 @@ implicit none
 
       !Additional parameters for phenology
       VLSoilPoreMicP_vr(L,NY,NX) = SoilFracAsMicP_vr(L,NY,NX) !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered
+      VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX) !soil moisture
-      HYCDMicP4RootUptake_vr(L,NY,NX) = PSISM1_vr(L,NY,NX)!soil hydraulic conductivity for water uptake
+      !HYCDMicP4RootUptake_vr(L,NY,NX) = PSISM1_vr(L,NY,NX)!soil hydraulic conductivity for water uptake
+      HYCDMicP4RootUptake_vr(L,NY,NX) = 0.000571
       THETW_vr(L,NY,NX) = a_LSAT(L,NY) !relative Saturation of soil micropores in layerL
+
+      !Parameters needed for water balance after phenology is added:
+      !Do I need to compute VGeom or is it already there
+      FracSoiAsMicP_vr(L,NY,NX)  = 0.1 !
+      VGeomLayer_vr(L,NY,NX)     = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+
+      WiltPoint_vr(L,NY,NX) = 0.25_r8
+      FieldCapacity_vr(L,NY,NX) = 0.5_r8
+      LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
+      LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
+      LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
+      PSD_vr(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+      FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+      SRP_vr(L,NY,NX)               = 1.00_r8
+
+      !call SetColdRunSoilStates(I,J,L,NY,NX)
 
       IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN
         !fraction as water

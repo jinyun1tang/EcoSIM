@@ -26,11 +26,12 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
-  real(r8), parameter :: tiny_val=1.e-6_r8   !minimum value 
+  real(r8), parameter :: tiny_val=1.e-6_r8   !minimum value
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
   PUBLIC :: ComputeSoilHydroPars
+  public :: SetColdRunSoilStates
 contains
 !------------------------------------------------------------------------------------------
 
@@ -72,15 +73,15 @@ contains
       IF(THETW1.LT.FieldCapacity_vr(L,NY,NX))THEN
         PSISoilMatricP_vr(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX) &
           +((LOGFldCapacity_vr(L,NY,NX)-LOG(THETW1))/FCD_vr(L,NY,NX)*LOGPSIMND_col(NY,NX))))
-      !water content exceeds field capacity but less than sturation    
+      !water content exceeds field capacity but less than sturation
       ELSE IF(THETW1.LT.POROS_vr(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP_vr(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(L,NY,NX)-LOG(THETW1)) &
           /PSD_vr(L,NY,NX))**SRP_vr(L,NY,NX)*LOGPSIMXD_col(NY,NX)))
-      !saturated    
+      !saturated
       ELSE
         PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)
       ENDIF
-      !ice 
+      !ice
     ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX) .and. THETI_vr(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX  = FCI*THETI_vr(L,NY,NX)
       WPX  = WPI*THETI_vr(L,NY,NX)
@@ -131,7 +132,7 @@ contains
 !
     K=MAX(1,MIN(100,INT(100.0_r8*(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX))/POROS_vr(L,NY,NX))+1))
     HYCDMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
-    
+
   END DO
   call PrintInfo('end '//subname)
   end subroutine GetSoilHydraulicVars
@@ -159,13 +160,13 @@ contains
   ELSE
     SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
-  
+
   if(lverb)write(*,*)'SoilHydroProperty::setshape',POROS_vr(L,NY,NX),cold_run()
 ! double check cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
   IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
-  ! read from check point file or if soil properties are set with soil file    
+  ! read from check point file or if soil properties are set with soil file
     LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
     LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
     PSD_vr(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
@@ -301,7 +302,7 @@ contains
   subroutine SetColdRunSoilStates(I,J,L,NY,NX)
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  
+
 ! restart is defined as simulation starting from a previous run
   IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
     !calculating FC or WP
@@ -382,7 +383,7 @@ contains
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
   ENDIF
   end subroutine SetColdRunSoilStates
-!------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------
   subroutine LitterHydroproperty(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
