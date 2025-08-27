@@ -33,6 +33,7 @@ implicit none
   public :: LitterHydroproperty
   PUBLIC :: ComputeSoilHydroPars
 
+  public :: SetColdRunSoilStates
 contains
 !------------------------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ contains
     !
     K=getMoistK(THETW_vr(L,NY,NX),POROS_vr(L,NY,NX))
     HYCDMicP4RootUptake_vr(L,NY,NX)=0.5_r8*(HydroCond_3D(1,K,L,NY,NX)+HydroCond_3D(3,K,L,NY,NX))
-    
+
   END DO
   call PrintInfo('end '//subname)
   end subroutine GetSoilHydraulicVars
@@ -148,12 +149,14 @@ contains
   ELSE
     SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
+<<<<<<< HEAD
   
   ! double check cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
   IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
     ! read from check point file or if soil properties are set with soil file    
+
     LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
     LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
     PSD_vr(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
@@ -297,7 +300,7 @@ contains
   subroutine SetColdRunSoilStates(I,J,L,NY,NX)
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  
+
 ! restart is defined as simulation starting from a previous run
   IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
     !calculating FC or WP
@@ -382,7 +385,7 @@ contains
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
   ENDIF
   end subroutine SetColdRunSoilStates
-!------------------------------------------------------------------------------------------  
+!------------------------------------------------------------------------------------------
   subroutine LitterHydroproperty(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
