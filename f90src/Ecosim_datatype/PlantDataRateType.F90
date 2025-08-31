@@ -65,6 +65,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootOUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2EmisPot_pvr(:,:,:,:,:)                  !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8),target,allocatable ::  VmaxNH4Root_pvr(:,:,:,:,:)                     !maximum NH4 uptake rate, [gN h-1 (gC root)-1]
+  real(r8),target,allocatable ::  VmaxNO3Root_pvr(:,:,:,:,:)                     !maximum NO3 uptake rate, [gN h-1 (gC root)-1]
   real(r8),target,allocatable ::  RootNH4DmndSoil_pvr(:,:,:,:,:)                 !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3DmndSoil_pvr(:,:,:,:,:)                 !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4DmndBand_pvr(:,:,:,:,:)                 !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
@@ -208,6 +210,8 @@ module PlantDataRateType
   allocate(RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootOUlmNutUptake_pvr=0._r8
   allocate(RootCO2EmisPot_pvr(jroots,JZ,JP,JY,JX));RootCO2EmisPot_pvr=0._r8
   allocate(RootNH4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndSoil_pvr=0._r8
+  allocate(VmaxNH4Root_pvr(jroots,JZ,JP,JY,JX)); VmaxNH4Root_pvr=0._r8
+  allocate(VmaxNO3Root_pvr(jroots,JZ,JP,JY,JX)); VmaxNO3Root_pvr=0._r8
   allocate(RootNO3DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndSoil_pvr=0._r8
   allocate(RootNH4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndBand_pvr=0._r8
   allocate(RootNO3DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndBand_pvr=0._r8
@@ -336,6 +340,8 @@ module PlantDataRateType
   call destroy(RootCUlmNutUptake_pvr)
   call destroy(RootCO2EmisPot_pvr)
   call destroy(RootNH4DmndSoil_pvr)
+  call destroy(VmaxNH4Root_pvr)
+  call destroy(VmaxNO3Root_pvr)
   call destroy(RootNO3DmndSoil_pvr)
   call destroy(RootNH4DmndBand_pvr)
   call destroy(RootNO3DmndBand_pvr)

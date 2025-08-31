@@ -135,9 +135,6 @@ implicit none
 
   DO L=1,NK_col(NY,NX)
     TWaterPlantRoot2Soil_vr(L,NY,NX)  = plt_ew%TWaterPlantRoot2Soil_vr(L)  
-    DO NE=1,NumPlantChemElms
-      RootMassElm_vr(NE,L,NY,NX)=  sum(plt_biom%RootMassElm_pvr(NE,L,1:NP0_col(NY,NX)))
-    ENDDO
     totRootLenDens_vr(L,NY,NX)                    = plt_morph%totRootLenDens_vr(L)
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
@@ -149,9 +146,11 @@ implicit none
     DO  K=1,jcplx
       tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)
     ENDDO
+    RootMycoMassElm_vr(:,:,L,NY,NX)=0._r8
   ENDDO
 
   DO NZ=1,NP0_col(NY,NX)
+
     Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+plt_bgcr%GrossCO2Fix_pft(NZ)
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
@@ -194,9 +193,10 @@ implicit none
     NoduleNonstructCconc_pft(NZ,NY,NX)  = plt_biom%NoduleNonstructCconc_pft(NZ)
     CO2NetFix_pft(NZ,NY,NX)             = plt_bgcr%CO2NetFix_pft(NZ)
     RCanMaintDef_CO2_pft(NZ,NY,NX)      = plt_bgcr%RCanMaintDef_CO2_pft(NZ)
-    CanopyVcMaxRubisco_pft(NZ,NY,NX)    = plt_photo%CanopyVcMaxRubisco_pft(NZ)
-    CanopyVoMaxRubisco_pft(NZ,NY,NX)    = plt_photo%CanopyVoMaxRubisco_pft(NZ)
-    CanopyVcMaxPEP_pft(NZ,NY,NX)        = plt_photo%CanopyVcMaxPEP_pft(NZ)
+    CanopyVcMaxRubisco25C_pft(NZ,NY,NX)    = plt_photo%CanopyVcMaxRubisco25C_pft(NZ)
+    CanopyVoMaxRubisco25C_pft(NZ,NY,NX)    = plt_photo%CanopyVoMaxRubisco25C_pft(NZ)
+    CanopyVcMaxPEP25C_pft(NZ,NY,NX)        = plt_photo%CanopyVcMaxPEP25C_pft(NZ)
+    ElectronTransptJmax25C_pft(NZ,NY,NX) = plt_photo%ElectronTransptJmax25C_pft(NZ)
     TFN_Carboxy_pft(NZ,NY,NX)           = plt_photo%TFN_Carboxy_pft(NZ)    
     TFN_Oxygen_pft(NZ,NY,NX)            = plt_photo%TFN_Oxygen_pft(NZ)    
     TFN_eTranspt_pft(NZ,NY,NX)          = plt_photo%TFN_eTranspt_pft(NZ)  
@@ -314,8 +314,9 @@ implicit none
     Km4LeafaqCO2_pft(NZ,NY,NX)                 = plt_photo%Km4LeafaqCO2_pft(NZ)
     Km4RubiscoCarboxy_pft(NZ,NY,NX)            = plt_photo%Km4RubiscoCarboxy_pft(NZ)
     CanopyHeight_pft(NZ,NY,NX)                 = plt_morph%CanopyHeight_pft(NZ)
-    NetPrimProduct_pft(NZ,NY,NX) = plt_bgcr%NetPrimProduct_pft(NZ)
-    cumNPP_pft(NZ,NY,NX)         = cumNPP_pft(NZ,NY,NX) + NetPrimProduct_pft(NZ,NY,NX)
+    TreeRingAveRadius_pft(NZ,NY,NX)            = plt_morph%TreeRingAveRadius_pft(NZ)
+    NetPrimProduct_pft(NZ,NY,NX)               = plt_bgcr%NetPrimProduct_pft(NZ)
+    cumNPP_pft(NZ,NY,NX)                       = cumNPP_pft(NZ,NY,NX) + NetPrimProduct_pft(NZ,NY,NX)
     ZERO4Groth_pft(NZ,NY,NX)                   = plt_biom%ZERO4Groth_pft(NZ)
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
@@ -334,7 +335,10 @@ implicit none
       fTgrowRootP_vr(L,NZ,NY,NX)                             = plt_pheno%fTgrowRootP_vr(L,NZ)
       RootN2Fix_vr(L,NY,NX)                                  = RootN2Fix_vr(L,NY,NX)+RootN2Fix_pvr(L,NZ,NY,NX)
       DO NE=1,NumPlantChemElms
-        RootMassElm_pvr(NE,L,NZ,NY,NX)                       = plt_biom%RootMassElm_pvr(NE,L,NZ)
+        DO N=1,Myco_pft(NZ,NY,NX)
+          RootMycoMassElm_pvr(NE,N,L,NZ,NY,NX)                 = plt_biom%RootMycoMassElm_pvr(NE,N,L,NZ)
+          RootMycoMassElm_vr(NE,N,L,NY,NX)= RootMycoMassElm_vr(NE,N,L,NY,NX)+ plt_biom%RootMycoMassElm_pvr(NE,N,L,NZ)
+        ENDDO
       ENDDO
     ENDDO
     DO L=1,NumCanopyLayers
@@ -431,8 +435,8 @@ implicit none
 
       DO K=0,MaxNodesPerBranch
         LeafArea_node(K,NB,NZ,NY,NX)                          = plt_morph%LeafArea_node(K,NB,NZ)
-        DeadInternodeHeight_brch(K,NB,NZ,NY,NX)                  = plt_morph%DeadInternodeHeight_brch(K,NB,NZ)
-        LiveInterNodeHight_brch(K,NB,NZ,NY,NX)                    = plt_morph%LiveInterNodeHight_brch(K,NB,NZ)
+        StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                  = plt_morph%StalkNodeVertLength_brch(K,NB,NZ)
+        StalkNodeHeight_brch(K,NB,NZ,NY,NX)                    = plt_morph%StalkNodeHeight_brch(K,NB,NZ)
         PetoleLensNode_brch(K,NB,NZ,NY,NX)                        = plt_morph%PetoleLensNode_brch(K,NB,NZ)
         StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
@@ -473,6 +477,7 @@ implicit none
         NutrientCtrlonC4Carboxy_node(K,NB,NZ,NY,NX)  = plt_photo%NutrientCtrlonC4Carboxy_node(K,NB,NZ)
         CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX)    = plt_photo%CMassHCO3BundleSheath_node(K,NB,NZ)
         Vmax4RubiscoCarboxy_node(K,NB,NZ,NY,NX)       = plt_photo%Vmax4RubiscoCarboxy_node(K,NB,NZ)
+        ProteinCperm2LeafArea_node(K,NB,NZ,NY,NX)     = plt_photo%ProteinCperm2LeafArea_node(K,NB,NZ)
         CO2lmtRubiscoCarboxyRate_node(K,NB,NZ,NY,NX) = plt_photo%CO2lmtRubiscoCarboxyRate_node(K,NB,NZ)
         Vmax4PEPCarboxy_node(K,NB,NZ,NY,NX)           = plt_photo%Vmax4PEPCarboxy_node(K,NB,NZ)
         CO2lmtPEPCarboxyRate_node(K,NB,NZ,NY,NX)     = plt_photo%CO2lmtPEPCarboxyRate_node(K,NB,NZ)
@@ -542,6 +547,8 @@ implicit none
         trcg_Root_gas2aqu_flx_vr(idg_NH3,N,L,NZ,NY,NX)             = plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_NH3,N,L,NZ)
         trcg_Root_gas2aqu_flx_vr(idg_H2,N,L,NZ,NY,NX)              = plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_H2,N,L,NZ)
         RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)                          = plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)
+        VmaxNH4Root_pvr(N,L,NZ,NY,NX)                              = plt_rbgc%VmaxNH4Root_pvr(N,L,NZ)
+        VmaxNO3Root_pvr(N,L,NZ,NY,NX)                              = plt_rbgc%VmaxNO3Root_pvr(N,L,NZ)
         RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)                    = plt_rbgc%RootNutUptake_pvr(ids_NH4,N,L,NZ)
         RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)                = plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4,N,L,NZ)
         RootCUlmNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)                = plt_rbgc%RootCUlmNutUptake_pvr(ids_NH4,N,L,NZ)
@@ -1289,9 +1296,9 @@ implicit none
       ENDDO
       DO K=0,MaxNodesPerBranch
         plt_morph%LeafArea_node(K,NB,NZ)                         = LeafArea_node(K,NB,NZ,NY,NX)
-        plt_morph%DeadInternodeHeight_brch(K,NB,NZ)                 = DeadInternodeHeight_brch(K,NB,NZ,NY,NX)
+        plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                 = StalkNodeVertLength_brch(K,NB,NZ,NY,NX)
         plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = PetoleLensNode_brch(K,NB,NZ,NY,NX)
-        plt_morph%LiveInterNodeHight_brch(K,NB,NZ)                   = LiveInterNodeHight_brch(K,NB,NZ,NY,NX)
+        plt_morph%StalkNodeHeight_brch(K,NB,NZ)                   = StalkNodeHeight_brch(K,NB,NZ,NY,NX)
         plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = LeafProteinCNode_brch(K,NB,NZ,NY,NX)

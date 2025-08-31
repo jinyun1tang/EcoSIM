@@ -280,7 +280,7 @@ module UptakesMod
     DO  L=NU,MaxNumRootLays
       DO  N=1,Myco_pft(NZ)
         plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                      = 0._r8
-        plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                    = 0.0_r8
+        plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                      = 0.0_r8
         plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                        = 0.0_r8
         plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
         plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8

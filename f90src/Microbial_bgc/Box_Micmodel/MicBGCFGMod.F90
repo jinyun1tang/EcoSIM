@@ -3181,7 +3181,7 @@ module MicBGCMod
     !     RNO3ReduxHeterSoil,RNO3ReduxHeterBand=substrate-limited NO3 reduction in non-band,band
     !     RGOM3X,RNOxReduxRespDenitLim3=substrate-unltd,-ltd respn from NO3 reduction
     !     RNO3ReduxDmndSoilHeter,RNO3ReduxDmndBandHeter=demand for NO3 reduction in non-band,band
-    !
+    !non-band soil
     ROXYD=AZMAX1(RO2Dmnd4RespHeter(NGL,K)-RO2Uptk4RespHeter(NGL,K))
     VMXD3=0.875_r8*ROXYD
     IF(CNO3S.GT.ZERO)THEN
@@ -3189,13 +3189,15 @@ module MicBGCMod
     ELSE
       VMXDXS=0.0_r8
     ENDIF
+    !band-soil
     IF(CNO3B.GT.ZERO)THEN
       VMXDXB=FNO3B*VMXD3*CNO3B/(CNO3B+Z3KM)/(1.0_r8+(CNO2B*Z3KM)/(CNO3B*Z2KM))
     ELSE
       VMXDXB=0.0_r8
     ENDIF
+
     VMXDXT=VMXDXS+VMXDXB
-    IF(VOLWZ.GT.ZEROS2.AND.FracBulkSOMC(K).GT.ZERO)THEN
+    IF(VOLWZ.GT.ZEROS2 .AND. FracBulkSOMC(K).GT.ZERO)THEN
       FVMXDX=1.0_r8/(1.0_r8+VMXDXT/(VMKI*VOLWZ*FracBulkSOMC(K)))
     ELSE
       FVMXDX=0.0_r8
@@ -3231,6 +3233,7 @@ module MicBGCMod
     ELSE
       FNO2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
     ENDIF
+    
     IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
       FNB2=AMAX1(FMN,RNO2DmndReduxBandHeterPrev(NGL,K)/RNO2EcoUptkBandPrev)
     ELSE

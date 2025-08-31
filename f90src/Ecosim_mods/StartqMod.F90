@@ -565,8 +565,8 @@ module StartqMod
 
     DO K=0,MaxNodesPerBranch
       LeafArea_node(K,NB,NZ,NY,NX)                          = 0._r8
-      LiveInterNodeHight_brch(K,NB,NZ,NY,NX)                    = 0._r8
-      DeadInternodeHeight_brch(K,NB,NZ,NY,NX)                  = 0._r8
+      StalkNodeHeight_brch(K,NB,NZ,NY,NX)                    = 0._r8
+      StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                  = 0._r8
       PetoleLensNode_brch(K,NB,NZ,NY,NX)                        = 0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8

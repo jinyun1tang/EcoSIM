@@ -136,7 +136,7 @@ implicit none
   real(r8) :: TotRootSurfaceArea
   real(r8) :: WTRTTX
   real(r8) :: WTRVCX
-  real(r8) :: Root2ndC,Root1stC
+  real(r8) :: Root1stC,Root2ndC !primary/secondary root C
   real(r8) :: WTRTLX
   real(r8) :: WTRTTT
   real(r8) :: TotRootC
@@ -300,7 +300,7 @@ implicit none
         !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=loss of root CO2, O2, CH4, N2O, NH3, H2
         !     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
         !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
-        !
+        !account for fine roots only
         IF(N.EQ.ipltroot)THEN
           TotRoot1stLen=TotRoot1stLen*FracRootElmAlloc2Litr(ielmc,k_fine_litr)
           TotRoot2ndLen=TotRoot2ndLen*FracRootElmAlloc2Litr(ielmc,k_fine_litr)
@@ -308,7 +308,7 @@ implicit none
 
         TotPopuRoot1stLen_rpvr = TotRoot1stLen*PlantPopulation_pft(NZ)
         TotPopuRootLen         = TotRoot2ndLen+TotPopuRoot1stLen_rpvr
-        TotRootC                  = Root2ndC+Root1stC
+        TotRootC               = Root2ndC+Root1stC
         
         IF(TotPopuRootLen.GT.ZERO4Groth_pft(NZ) .AND. TotRootC.GT.ZERO4Groth_pft(NZ) &
           .AND. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -797,7 +797,9 @@ implicit none
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: fRootGrowPSISense
-  real(r8), intent(out) :: TotRoot2ndLen,TotRoot1stLen,Root2ndC,Root1stC
+  real(r8), intent(out) :: TotRoot2ndLen,TotRoot1stLen
+  real(r8), intent(out) :: Root2ndC  !secondary root carbon
+  real(r8), intent(out) :: Root1stC  !primary root carbon
   integer , intent(inout) :: NRX(pltpar%jroots,JZ1)  
   integer , intent(inout) :: iRootXsUpdateFlag(pltpar%jroots,JZ1)  
   real(r8), intent(out) :: litrflx(NumPlantChemElms)
@@ -905,11 +907,9 @@ implicit none
 
         call Grow1stRootAxes(I,J,N,NR,L,L1,NZ,CNPG,RootPrimeAxsNum,Root1stSink_pvr,&
           Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-          DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
-          NRX,litrflxt,RCO2flxt)
-          litrflx=litrflx+litrflxt+litrflx2
-          RCO2flx=RCO2flx+RCO2flxt+RCO2flx2
-
+          DMRTD,CNRTW,CPRTW,iRootXsUpdateFlag,NRX,litrflxt,RCO2flxt)
+        litrflx = litrflx+litrflxt+litrflx2
+        RCO2flx = RCO2flx+RCO2flxt+RCO2flx2
       ENDIF
 !     TotRoot1stLen=total primary root length
 !     Root1stC=total primary root C mass      
@@ -926,7 +926,7 @@ implicit none
 !----------------------------------------------------------------------------------------------------
   subroutine Grow1stRootAxes(I,J,N,NR,L,L1,NZ,CNPG,RootPrimeAxsNum,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-    DMRTD,CNRTW,CPRTW,TotRoot1stLen,Root1stC,iRootXsUpdateFlag,&
+    DMRTD,CNRTW,CPRTW,iRootXsUpdateFlag,&
     NRX,litrflxt,RCO2flxt)
   !
   !grow root axes
@@ -944,8 +944,6 @@ implicit none
   real(r8), intent(in) :: CNPG
   integer,  intent(inout) :: iRootXsUpdateFlag(pltpar%jroots,JZ1)
   integer,  intent(inout) :: NRX(pltpar%jroots,JZ1)  
-  real(r8), intent(inout) :: TotRoot1stLen
-  real(r8), intent(inout) :: Root1stC
   real(r8), intent(out) :: litrflxt(NumPlantChemElms)
   real(r8), intent(out) :: RCO2flxt
   real(r8) :: Root1stDepz2Surf
@@ -1227,8 +1225,7 @@ implicit none
         call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)
       ENDIF
 
-      call ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow_Oltd(ielmc),Root1stNetGrowthElms,&
-        TotRoot1stLen,Root1stC)
+      call PrimeRootsExtension(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonst4Grow_Oltd(ielmc),Root1stNetGrowthElms)
     ENDIF  
 
 !    print*,'RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)',RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ),&
@@ -1236,7 +1233,7 @@ implicit none
     
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))THEN
  
-      call WithdrawPrimeRoots(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr,Root1stSink_pvr &
+      call PrimeRootsWithdraw(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr,Root1stSink_pvr &
         ,Root2ndSink_pvr,RootPrimeAxsNum)
     ENDIF
 
@@ -1262,8 +1259,6 @@ implicit none
 !     WTRT1=primary root C mass in soil layer
 !     NIXBotRootLayer_rpft=deepest root layer
 !
-!    TotRoot1stLen=TotRoot1stLen+Root1stLen_rpvr(N,L,NR,NZ)
-!    Root1stC=Root1stC+RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
     NIXBotRootLayer_rpft(NR,NZ)=MIN(NIXBotRootLayer_rpft(NR,NZ),MaxNumRootLays)
     IF(L.EQ.NIXBotRootLayer_rpft(NR,NZ))NRX(N,NR)=itrue
   !   call SumRootBiome(NZ,mass_finale)  
@@ -1573,8 +1568,7 @@ implicit none
   end subroutine RemobilizePrimeRoots
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ExtendPrimeRoots(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonstC4Grow_Oltd,RootNetGrowthElms,&
-    TotRoot1stLen,Root1stC)
+  subroutine PrimeRootsExtension(L,L1,N,NR,NZ,WFNR,FRTN,RootMycoNonstC4Grow_Oltd,RootNetGrowthElms)
   !
   !
   implicit none
@@ -1585,7 +1579,6 @@ implicit none
   real(r8), intent(in):: WFNR,FRTN
   real(r8), intent(in) :: RootMycoNonstC4Grow_Oltd !oxygen limited root C yield for growth
   real(r8), intent(in) :: RootNetGrowthElms(NumPlantChemElms)
-  real(r8), intent(inout) :: TotRoot1stLen,Root1stC
   real(r8) :: Root1stExtension
   real(r8) :: FGROL,FGROZ
   integer :: NE
@@ -1716,8 +1709,6 @@ implicit none
     PopuRootMycoC_pvr(N,L1,NZ)  = PopuRootMycoC_pvr(N,L1,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L1,NR,NZ)
     Root1stLen_rpvr(N,L1,NR,NZ) = Root1stLen_rpvr(N,L1,NR,NZ)+Root1stExtension*FGROZ
     Root1stRadius_pvr(N,L1,NZ)  = Root1stRadius_pvr(N,L,NZ)
-    TotRoot1stLen               = TotRoot1stLen+Root1stLen_rpvr(N,L1,NR,NZ)
-    Root1stC                    = Root1stC+RootMyco1stStrutElms_rpvr(ielmc,N,L1,NR,NZ)
 
     DO NE=1,NumPlantChemElms
       XFRE(NE)                           = FRTN* RootMycoNonstElms_rpvr(NE,N,L,NZ)
@@ -1730,10 +1721,10 @@ implicit none
     NIXBotRootLayer_rpft(NR,NZ) = MAX(NGTopRootLayer_pft(NZ),L+1)
   ENDIF
   end associate
-  end subroutine ExtendPrimeRoots
+  end subroutine PrimeRootsExtension
 
 !----------------------------------------------------------------------------------------------------
-  subroutine WithdrawPrimeRoots(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr &
+  subroutine PrimeRootsWithdraw(L,NR,NZ,N,Root1stDepz2Surf,RootSinkC_vr &
     ,Root1stSink_pvr,Root2ndSink_pvr,RootPrimeAxsNum)
   implicit none
   integer, intent(in) :: L,NR,NZ,N
@@ -1880,7 +1871,7 @@ implicit none
     ENDIF
   ENDDO D5115
   end associate
-  end subroutine WithdrawPrimeRoots
+  end subroutine PrimeRootsWithdraw
 
 !----------------------------------------------------------------------------------------------------
   subroutine SummarizeRootSink(I,J,NZ,RootPrimeAxsNum,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)

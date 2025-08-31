@@ -834,7 +834,7 @@ implicit none
     GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch     ,& !output :maximum grain C during grain fill, [g d-2]
     GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch          ,& !output :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch         => plt_biom%HuskStrutElms_brch           ,& !output :branch husk structural element mass, [g d-2]
-    DeadInternodeHeight_brch   => plt_morph%DeadInternodeHeight_brch    ,& !output :internode height, [m]
+    StalkNodeVertLength_brch   => plt_morph%StalkNodeVertLength_brch    ,& !output :internode height, [m]
     StructInternodeElms_brch    => plt_biom%StructInternodeElms_brch      ,& !output :internode C, [g d-2]
     LeafAreaLive_brch          => plt_morph%LeafAreaLive_brch           ,& !output :branch leaf area, [m2 d-2]
     LeafAreaZsec_brch          => plt_morph%LeafAreaZsec_brch           ,& !output :leaf surface area, [m2 d-2]
@@ -843,7 +843,7 @@ implicit none
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch       ,& !output :plant branch leaf + sheath C, [g d-2]
     LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch        ,& !output :layer leaf protein C, [g d-2]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !output :branch leaf structural element mass, [g d-2]
-    LiveInterNodeHight_brch    => plt_morph%LiveInterNodeHight_brch     ,& !output :internode height, [m]
+    StalkNodeHeight_brch    => plt_morph%StalkNodeHeight_brch     ,& !output :internode height, [m]
     PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch        ,& !output :sheath chemical element, [g d-2]
     PetoleLensNode_brch        => plt_morph%PetoleLensNode_brch         ,& !output :sheath height, [m]
     PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch      ,& !output :layer sheath protein C, [g d-2]
@@ -910,8 +910,8 @@ implicit none
       CMassHCO3BundleSheath_node(K,NB,NZ) = 0._r8
     ENDIF
     LeafArea_node(K,NB,NZ)                          = 0._r8
-    LiveInterNodeHight_brch(K,NB,NZ)                    = 0._r8
-    DeadInternodeHeight_brch(K,NB,NZ)                  = 0._r8
+    StalkNodeHeight_brch(K,NB,NZ)                    = 0._r8
+    StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
     PetoleLensNode_brch(K,NB,NZ)                        = 0._r8
     LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
     PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8

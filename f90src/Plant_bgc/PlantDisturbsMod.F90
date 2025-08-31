@@ -784,10 +784,10 @@ module PlantDisturbsMod
     StalkStrutElms_pft       => plt_biom%StalkStrutElms_pft         ,& !input  :canopy stalk structural element mass, [g d-2]
     iHarvstType_pft          => plt_distb%iHarvstType_pft           ,& !input  :type of harvest,[-]
     StalkRsrvElms_brch       => plt_biom%StalkRsrvElms_brch         ,& !inoput :branch reserve element mass, [g d-2]
-    DeadInternodeHeight_brch => plt_morph%DeadInternodeHeight_brch  ,& !inoput :internode height, [m]
+    StalkNodeVertLength_brch => plt_morph%StalkNodeVertLength_brch  ,& !inoput :internode height, [m]
     SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !inoput :branch live stalk C, [gC d-2]
     StalkStrutElms_brch      => plt_biom%StalkStrutElms_brch        ,& !inoput :branch stalk structural element mass, [g d-2]
-    LiveInterNodeHight_brch  => plt_morph%LiveInterNodeHight_brch   ,& !inoput :internode height, [m]
+    StalkNodeHeight_brch  => plt_morph%StalkNodeHeight_brch   ,& !inoput :internode height, [m]
     SenecStalkStrutElms_brch => plt_biom%SenecStalkStrutElms_brch   ,& !inoput :branch stalk structural element, [g d-2]
     StructInternodeElms_brch  => plt_biom%StructInternodeElms_brch     & !inoput :internode C, [g d-2]
   )
@@ -863,7 +863,7 @@ module PlantDisturbsMod
 !
 !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!     DeadInternodeHeight_brch,LiveInterNodeHight_brch=stalk height,stalk internode length
+!     StalkNodeVertLength_brch,StalkNodeHeight_brch=stalk height,stalk internode length
 !     FracNodeLenLeft=fraction of internode length not harvested
 !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
 !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
@@ -873,10 +873,10 @@ module PlantDisturbsMod
 !
   D9820: DO K=MaxNodesPerBranch1,0,-1
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-      IF(DeadInternodeHeight_brch(K,NB,NZ).GT.ZERO)THEN
+      IF(StalkNodeVertLength_brch(K,NB,NZ).GT.ZERO)THEN
         IF(iHarvstType_pft(NZ).NE.iharvtyp_pruning)THEN
-          FracNodeLenLeft=AZMAX1(AMIN1(1.0_r8,(LiveInterNodeHight_brch(K,NB,NZ)-CanopyHeightCut_pft(NZ))/&
-            DeadInternodeHeight_brch(K,NB,NZ)))
+          FracNodeLenLeft=AZMAX1(AMIN1(1.0_r8,(StalkNodeHeight_brch(K,NB,NZ)-CanopyHeightCut_pft(NZ))/&
+            StalkNodeVertLength_brch(K,NB,NZ)))
         ELSE
           FracNodeLenLeft=0._r8
         ENDIF
@@ -900,10 +900,10 @@ module PlantDisturbsMod
       StructInternodeElms_brch(NE,K,NB,NZ)=FHVSETS*StructInternodeElms_brch(NE,K,NB,NZ)
     ENDDO
     IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.isclose(THIN_pft(NZ),0._r8))THEN
-      DeadInternodeHeight_brch(K,NB,NZ) = FHVSETS*DeadInternodeHeight_brch(K,NB,NZ)
-      LiveInterNodeHight_brch(K,NB,NZ)   = AMIN1(LiveInterNodeHight_brch(K,NB,NZ),CanopyHeightCut_pft(NZ))
+      StalkNodeVertLength_brch(K,NB,NZ) = FHVSETS*StalkNodeVertLength_brch(K,NB,NZ)
+      StalkNodeHeight_brch(K,NB,NZ)   = AMIN1(StalkNodeHeight_brch(K,NB,NZ),CanopyHeightCut_pft(NZ))
       IF(I>=266 .and. I<=278 .and. K>=11)then   
-      write(5544,*)'livd',I*1000+J,K,NB,LiveInterNodeHight_brch(K,NB,NZ),CanopyHeightCut_pft(NZ)
+      write(5544,*)'livd',I*1000+J,K,NB,StalkNodeHeight_brch(K,NB,NZ),CanopyHeightCut_pft(NZ)
       endif
     ENDIF
 
@@ -1201,7 +1201,7 @@ module PlantDisturbsMod
     PetoleStrutElms_pft        => plt_biom%PetoleStrutElms_pft          ,& !input  :canopy sheath structural element mass, [g d-2]
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft               ,& !input  :threshold zero for plang growth calculation, [-]
     CanopyHeightCut_pft    => plt_distb%CanopyHeightCut_pft     ,& !input  :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
-    LiveInterNodeHight_brch    => plt_morph%LiveInterNodeHight_brch     ,& !input  :internode height, [m]
+    StalkNodeHeight_brch    => plt_morph%StalkNodeHeight_brch     ,& !input  :internode height, [m]
     k_fine_litr                => pltpar%k_fine_litr                    ,& !input  :fine litter complex id
     k_woody_litr               => pltpar%k_woody_litr                   ,& !input  :woody litter complex id
     FracShootPetolElmAlloc2Litr => plt_allom%FracShootPetolElmAlloc2Litr  ,& !input  :woody element allocation, [-]
@@ -1220,7 +1220,7 @@ module PlantDisturbsMod
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     WTSHE,WTSHEB=PFT,branch petiole C mass
 !     PetoleCRmved_brnch,WHVSHH=branch, PFT petiole C mass removed
-!     LiveInterNodeHight_brch=internode length
+!     StalkNodeHeight_brch=internode length
 !     RMedInternodeLen=internode length removed
 !
   RMedInternodeLen=0._r8
@@ -1232,7 +1232,7 @@ module PlantDisturbsMod
   ENDIF
 
   D9805: DO K=MaxNodesPerBranch1,0,-1
-    IF(LiveInterNodeHight_brch(K,NB,NZ).GT.0.0_r8) RMedInternodeLen=AMAX1(RMedInternodeLen,LiveInterNodeHight_brch(K,NB,NZ))
+    IF(StalkNodeHeight_brch(K,NB,NZ).GT.0.0_r8) RMedInternodeLen=AMAX1(RMedInternodeLen,StalkNodeHeight_brch(K,NB,NZ))
 !
 !     HARVESTED SHEATH OR PETIOLE C,N,P
 !
@@ -1245,7 +1245,7 @@ module PlantDisturbsMod
 !     PetioleElmntHarv2Litr=harvested petiole C,N,P to litter
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
-!     PetoleLensNode_brch,LiveInterNodeHight_brch=petiole,internode length
+!     PetoleLensNode_brch,StalkNodeHeight_brch=petiole,internode length
 !
     IF((iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
       .OR. PetoleCRmved_brnch.GT.0.0_r8)THEN
@@ -1292,7 +1292,7 @@ module PlantDisturbsMod
       ENDDO
 !            PetoleProteinCNode_brch(K,NB,NZ)=FracIntnodeNotHvsted(K)*PetoleProteinCNode_brch(K,NB,NZ)
       IF(iHarvstType_pft(NZ).LE.iharvtyp_allabv.AND.PetoleLensNode_brch(K,NB,NZ).GT.0.0_r8)THEN
-        FHGT=AZMAX1(AMIN1(1.0_r8,(LiveInterNodeHight_brch(K,NB,NZ) &
+        FHGT=AZMAX1(AMIN1(1.0_r8,(StalkNodeHeight_brch(K,NB,NZ) &
           +PetoleLensNode_brch(K,NB,NZ)-CanopyHeightCut_pft(NZ))/PetoleLensNode_brch(K,NB,NZ)))
         PetoleLensNode_brch(K,NB,NZ)=(1._r8-FHGT)*PetoleLensNode_brch(K,NB,NZ)
       ELSE
@@ -1301,7 +1301,7 @@ module PlantDisturbsMod
       PetioleCAfHvst_brch=PetioleCAfHvst_brch+PetioleElmntNode_brch(ielmc,K,NB,NZ)
 
 !     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
-!     IF(LiveInterNodeHight_brch(K,NB,NZ).GT.CanopyHeightCut_pft(NZ)
+!     IF(StalkNodeHeight_brch(K,NB,NZ).GT.CanopyHeightCut_pft(NZ)
 !    2.OR.iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
 !     IF(isclose(FracIntnodeNotHvsted(K),0._r8).AND.K.GT.0)THEN
 !     IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN

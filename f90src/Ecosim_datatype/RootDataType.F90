@@ -88,9 +88,9 @@ module RootDataType
   real(r8),target,allocatable ::  RootNonstructElmConc_rpvr(:,:,:,:,:,:)         !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)               !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                !root layer protein C concentration, [g g-1]
-  real(r8),target,allocatable :: RootMassElm_vr(:,:,:,:)                         !root chemical element mass in soil layer, [g d-2]
-  real(r8),target,allocatable :: RootMassElm_pvr(:,:,:,:,:)                      !pft root chemical elemental mass in soil layer, [g d-2]
-  real(r8),target,allocatable :: RootGasConductance_rpvr(:,:,:,:,:,:)             !Root Conductance for gas uptake, [m3 d-2 h-1]
+  real(r8),target,allocatable :: RootMycoMassElm_vr(:,:,:,:,:)                   !root chemical element mass in soil layer, [g d-2]
+  real(r8),target,allocatable :: RootMycoMassElm_pvr(:,:,:,:,:,:)                  !pft root chemical elemental mass in soil layer, [g d-2]
+  real(r8),target,allocatable :: RootGasConductance_rpvr(:,:,:,:,:,:)            !Root Conductance for gas uptake, [m3 d-2 h-1]
   real(r8),target,allocatable :: Nutruptk_fClim_rpvr(:,:,:,:,:)                  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8),target,allocatable :: Nutruptk_fNlim_rpvr(:,:,:,:,:)                  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
@@ -114,8 +114,8 @@ contains
   allocate(Nutruptk_fNlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fNlim_rpvr=0._r8
   allocate(Nutruptk_fPlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fPlim_rpvr=0._r8
   allocate(Nutruptk_fProtC_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fProtC_rpvr=0._r8
-  allocate(RootMassElm_vr(NumPlantChemElms,JZ,JY,JX)); RootMassElm_vr =0._r8
-  allocate(RootMassElm_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootMassElm_pvr=0._r8
+  allocate(RootMycoMassElm_vr(NumPlantChemElms,jroots,JZ,JY,JX)); RootMycoMassElm_vr =0._r8
+  allocate(RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoMassElm_pvr=0._r8
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
@@ -207,8 +207,8 @@ contains
   call destroy(ROOTPLim_rpvr)  
   call destroy(RootMaintDef_CO2_pvr)
   call destroy(RootGasConductance_rpvr)
-  call destroy(RootMassElm_pvr)
-  call destroy(RootMassElm_vr)
+  call destroy(RootMycoMassElm_pvr)
+  call destroy(RootMycoMassElm_vr)
   call destroy(NumPrimeRootAxes_pft)
   call destroy(NIXBotRootLayer_rpft)
   call destroy(iPlantRootState_pft)

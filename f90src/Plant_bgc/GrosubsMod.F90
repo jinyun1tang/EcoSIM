@@ -60,21 +60,21 @@ module grosubsMod
   integer :: L,K,M
   integer :: NZ,NE
 ! begin_execution
-  associate(                                           &
-    IsPlantActive_pft => plt_pheno%IsPlantActive_pft  ,& !input  :flag for living pft, [-]
-    NP                => plt_site%NP                  ,& !input  :current number of plant species,[-]
-    NP0               => plt_site%NP0                 ,& !input  :intitial number of plant species,[-]
-    CanopyHeight_pft  => plt_morph%CanopyHeight_pft    & !inoput :canopy height, [m]
+  associate(                                                               &
+    IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
+    NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
+    NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)             = 0._r8
-    plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
-    plt_rbgc%canopy_growth_pft(NZ)   = 0._r8
+    CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)                   = 0._r8
+    plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
+    plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -655,10 +655,7 @@ module grosubsMod
     RootNodulElms_pft         => plt_biom%RootNodulElms_pft          ,& !output :root nodule chemical element mass, [g d-2]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         ,& !output :canopy shoot structural chemical element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
-    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
-    CanopyVcMaxRubisco_pft    => plt_photo%CanopyVcMaxRubisco_pft    ,& !output :Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
-    CanopyVoMaxRubisco_pft    => plt_photo%CanopyVoMaxRubisco_pft    ,& !output :Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
-    CanopyVcMaxPEP_pft        => plt_photo%CanopyVcMaxPEP_pft         & !output :Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
+    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft          & !output :canopy stalk structural element mass, [g d-2]
   )
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
@@ -692,28 +689,17 @@ module grosubsMod
   CanopySeedNum_pft(NZ)    = 0._r8
   CanopyLeafArea_pft(NZ)   = 0._r8
   CanopyStemArea_pft(NZ)   = 0._r8
-  CanopyVcMaxRubisco_pft(NZ)=0._r8
-  CanopyVoMaxRubisco_pft(NZ)=0._r8
-  CanopyVcMaxPEP_pft(NZ)    =0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
     CanopyLeafShethC_pft(NZ)   = CanopyLeafShethC_pft(NZ) +LeafPetolBiomassC_brch(NB,NZ)
     CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedNumSet_brch(NB,NZ)
     CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
-    CanopyVcMaxRubisco_pft(NZ) = CanopyVcMaxRubisco_pft(NZ)+VcMaxRubiscoRef_brch(NB,NZ)
-    CanopyVoMaxRubisco_pft(NZ) = CanopyVoMaxRubisco_pft(NZ)+VoMaxRubiscoRef_brch(NB,NZ)
-    CanopyVcMaxPEP_pft(NZ)     = CanopyVcMaxPEP_pft(NZ) +VcMaxPEPCarboxyRef_brch(NB,NZ)
 
     DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
-  if(CanopyLeafArea_pft(NZ)>ZEROS)then
-    CanopyVcMaxRubisco_pft(NZ)=CanopyVcMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVoMaxRubisco_pft(NZ)=CanopyVoMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVcMaxPEP_pft(NZ)    =CanopyVcMaxPEP_pft(NZ)/CanopyLeafArea_pft(NZ)
-  endif
 
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES

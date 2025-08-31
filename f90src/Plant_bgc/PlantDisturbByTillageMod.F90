@@ -208,8 +208,8 @@ contains
   !     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
 
       PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST
-  !     LiveInterNodeHight_brch(K,NB,NZ)=LiveInterNodeHight_brch(K,NB,NZ)*XHVST
-  !     DeadInternodeHeight_brch(K,NB,NZ)=DeadInternodeHeight_brch(K,NB,NZ)*XHVST
+  !     StalkNodeHeight_brch(K,NB,NZ)=StalkNodeHeight_brch(K,NB,NZ)*XHVST
+  !     StalkNodeVertLength_brch(K,NB,NZ)=StalkNodeVertLength_brch(K,NB,NZ)*XHVST
       DO NE=1,NumPlantChemElms
         StructInternodeElms_brch(NE,K,NB,NZ) = StructInternodeElms_brch(NE,K,NB,NZ)*XHVST
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST

@@ -607,7 +607,7 @@ module InitPlantMod
     LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch                  ,& !output :leaf surface area, [m2 d-2]
     LeafArea_node                 => plt_morph%LeafArea_node                  ,& !output :leaf area, [m2 d-2]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
-    LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch            ,& !output :internode height, [m]
+    StalkNodeHeight_brch           => plt_morph%StalkNodeHeight_brch            ,& !output :internode height, [m]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
@@ -713,8 +713,8 @@ module InitPlantMod
 
     DO K=0,MaxNodesPerBranch1
       LeafArea_node(K,NB,NZ)                                   = 0._r8
-      LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%DeadInternodeHeight_brch(K,NB,NZ)                  = 0._r8
+      StalkNodeHeight_brch(K,NB,NZ)                             = 0._r8
+      plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
       plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8

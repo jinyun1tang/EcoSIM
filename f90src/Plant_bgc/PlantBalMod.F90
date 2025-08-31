@@ -365,7 +365,7 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    NumPrimeRootAxes_pft           => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !input  :root layer element primary axes, [g d-2]
@@ -373,16 +373,17 @@ implicit none
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !input  :root layer nonstructural element, [g d-2]
     RootMycoNonstElms_pft     => plt_biom%RootMycoNonstElms_pft      ,& !output :nonstructural root-myco chemical element, [g d-2]
     RootStrutElms_pft         => plt_biom%RootStrutElms_pft          ,& !output :plant root structural element mass, [g d-2]
-    RootMassElm_pvr           => plt_biom%RootMassElm_pvr             & !output :root biomass in chemical elements, [g d-2]
+    RootMycoMassElm_pvr       => plt_biom%RootMycoMassElm_pvr         & !output :root biomass in chemical elements, [g d-2]
   )
   massr1st1=0._r8;massr2nd1=0._r8;massnodul1=0._r8
   mass_roots=0._r8
 
   DO NE=1,NumPlantChemElms
     DO L=NU,MaxNumRootLays
-      RootMassElm_pvr(NE,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-        sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-        sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),L,NZ))
+      DO N=1,Myco_pft(NZ)
+        RootMycoMassElm_pvr(NE,N,L,NZ)= sum(RootMyco1stStrutElms_rpvr(NE,ipltroot,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+          sum(RootMyco2ndStrutElms_rpvr(NE,ipltroot,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)
+      ENDDO  
     ENDDO
     massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
     massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
@@ -415,6 +416,12 @@ implicit none
   INTEGER :: NZ,NE
 
   DO NZ=1,NP
+    plt_photo%CanopyVcMaxRubisco25C_pft(NZ) = 0._r8
+    plt_photo%CanopyVoMaxRubisco25C_pft(NZ) = 0._r8
+    plt_photo%CanopyVcMaxPEP25C_pft(NZ)     = 0._r8
+    plt_photo%ProteinCperm2LeafArea_node(:,:,NZ)= 0._r8
+    plt_photo%ElectronTransptJmax25C_pft(NZ)=0._r8
+
     DO NE=1,NumPlantChemElms
       plt_distb%PlantElmDistLoss_pft(NE,NZ)    = 0._r8
       plt_biom%RootElmsBeg_pft(NE,NZ)           = plt_biom%RootElms_pft(NE,NZ)

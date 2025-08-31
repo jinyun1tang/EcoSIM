@@ -3207,34 +3207,34 @@ implicit none
 
   if(flag=='read')then 
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='LiveInterNodeHight_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='StalkNodeHeight_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LiveInterNodeHight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkNodeHeight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'LiveInterNodeHight_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LiveInterNodeHight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
+    !print*,'StalkNodeHeight_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkNodeHeight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='LiveInterNodeHight_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='StalkNodeHeight_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='living internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
   endif  
 
   if(flag=='read')then 
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='DeadInternodeHeight_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='StalkNodeVertLength_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='senescing internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,DeadInternodeHeight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkNodeVertLength_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'DeadInternodeHeight_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,DeadInternodeHeight_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
+    !print*,'StalkNodeVertLength_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StalkNodeVertLength_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:MaxNodesPerBranch+1,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='DeadInternodeHeight_brch', dim1name='pft',dim2name='nodes1',&
+    call restartvar(ncid, flag, varname='StalkNodeVertLength_brch', dim1name='pft',dim2name='nodes1',&
      dim3name='nbranches',long_name='senescing internode height', units='m', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
