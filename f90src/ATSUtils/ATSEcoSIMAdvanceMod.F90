@@ -169,6 +169,7 @@ implicit none
       FracSoiAsMicP_vr(L,NY,NX)  = 0.1 !
       VGeomLayer_vr(L,NY,NX)     = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
       WiltPoint_vr(L,NY,NX) = 0.25_r8
@@ -180,6 +181,8 @@ implicit none
       FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
       SRP_vr(L,NY,NX)               = 1.00_r8
 
+      !Root2ndMaxRadius_pft(1,L) = 0.0002_r8
+      !Root2ndMaxRadius_pft(2,L) = 5.0e-06_r8
       !call SetColdRunSoilStates(I,J,L,NY,NX)
 
       IF(VLTSoiPore.GT.ZEROS2(NY,NX))THEN

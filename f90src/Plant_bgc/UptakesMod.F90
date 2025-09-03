@@ -2,8 +2,8 @@ module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use StomatesMod   , only : StomatalDynamics
-  use EcoSIMCtrlMod , only : etimer, lverb,ldo_sp_mode  
-  use UnitMod       , only : units  
+  use EcoSIMCtrlMod , only : etimer, lverb,ldo_sp_mode, ats_cpl_mode
+  use UnitMod       , only : units
   use PlantBalMod   , only : SumPlantRootGas
   use PlantBGCPars
   use minimathmod
@@ -39,7 +39,7 @@ module UptakesMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine RootUptakes(I,J)
-!  
+!
 !  Description: MAIN_CALL
 !
 !     THIS subroutine CALCULATES EXCHANGES OF ENERGY, C, N AND P
@@ -47,7 +47,7 @@ module UptakesMod
 !
   implicit none
   integer, intent(in) :: I, J
-  
+
   character(len=*), parameter :: subname='RootUptakes'
   integer :: NN,N,NZ,K,L
   real(r8) :: FracGrndByPFT
@@ -109,9 +109,9 @@ module UptakesMod
     Air_Heat_Latent_store_col => plt_ew%Air_Heat_Latent_store_col  ,& !inoput :total latent heat flux x boundary layer resistance, [MJ m-1]
     Air_Heat_Sens_store_col   => plt_ew%Air_Heat_Sens_store_col    ,& !inoput :total sensible heat flux x boundary layer resistance, [MJ m-1]
     PSICanopy_pft             => plt_ew%PSICanopy_pft              ,& !inoput :canopy total water potential, [Mpa]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft         ,& !output  :canopy latent heat flux, [MJ d-2 h-1]    
+    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft         ,& !output  :canopy latent heat flux, [MJ d-2 h-1]
     Transpiration_pft         => plt_ew%Transpiration_pft          ,& !output :canopy transpiration, [m2 d-2 h-1]
-    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft            ,& !output :canopy temperature, [oC]    
+    TdegCCanopy_pft           => plt_ew%TdegCCanopy_pft            ,& !output :canopy temperature, [oC]
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft          & !output :canopy evaporation, [m2 d-2 h-1]
   )
 
@@ -124,11 +124,11 @@ module UptakesMod
   DO NZ=1,NP
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
-      
+
       call UpdateCanopyProperty(I,J,NZ)
 
 !     STOMATE=solve for minimum canopy stomatal resistance
-      
+
       CALL StomatalDynamics(I,J,NZ)
 !
       if(lverb)write(*,*)'CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS'
@@ -140,7 +140,7 @@ module UptakesMod
 !
       CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopySapwoodC_pft(NZ))
       VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
-      
+
       if(ldo_sp_mode .and. LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ))then
         HydroActivePlant=.true.
       else
@@ -150,15 +150,15 @@ module UptakesMod
           .and. CanopyMassC>0._r8
       endif
 
-      IF(HydroActivePlant)THEN  
-      
+      IF(HydroActivePlant)THEN
+
         call CalcResistance(NZ,PathLen_rvr,FineRootRadius_rvr,RootLateralAreaDivRadius_pvr,RootResist_rvr,RootRadialResist_rvr,&
           Root1stAxialResist_rvr,Root2ndAxialResist_rvr,SoiH2OResist_rvr,SoilRootResistance_rvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
-        ! 
+        !
         !       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
         !       BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
         !
-        
+
         PSICanopy_pft(NZ)      = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
         Transpiration_pft(NZ)  = 0.0_r8
         VapXAir2Canopy_pft(NZ) = 0.0_r8
@@ -200,12 +200,12 @@ module UptakesMod
       Air_Heat_Latent_store_col = Air_Heat_Latent_store_col+EvapTransLHeat_pft(NZ)*CanopyBndlResist_pft(NZ)
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*CanopyBndlResist_pft(NZ)
       TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
-      if(.not.ldo_sp_mode) then      
+      if(.not.ldo_sp_mode) then
         call SetCanopyGrowthFuncs(I,J,NZ)
-    
+
         call PlantNutientO2Uptake(I,J,NZ,FDMP,PathLen_rvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
           FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootLateralAreaDivRadius_pvr)
-      endif    
+      endif
     ENDIF
   ENDDO
 
@@ -224,7 +224,7 @@ module UptakesMod
   real(r8), intent(out) :: AirMicPore4Fill_vr(JZ1)
   real(r8), intent(out) :: WatAvail4Uptake_vr(JZ1)
 
-  character(len=*), parameter :: subname='PrepH2ONutrientUptake'  
+  character(len=*), parameter :: subname='PrepH2ONutrientUptake'
   integer :: NZ, L, N
 
   associate(                                                          &
@@ -291,10 +291,10 @@ module UptakesMod
     enddo
   ENDDO D9984
   DO L=NU,NK
-    plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L) =0._r8      
-  ENDDO    
+    plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L) =0._r8
+  ENDDO
 !
-! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
+! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics
   D9000: DO L=NU,NK
     !remove elevation dependence
     TotalSoilPSIMPa_vr(L)=ElvAdjstedSoilH2OPSIMPa_vr(L)-mGravAccelerat*ALT
@@ -404,7 +404,7 @@ module UptakesMod
         ENDIF
       ENDDO D700
       ALFZ=2.0_r8*TFRADP
-      
+
       IF(AbvCanopyBndlResist_col.GT.ZERO .AND. CanopyHeight_col.GT.ZERO .AND. ALFZ.GT.ZERO)THEN
         BndlCanopyReistance_pft(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
           /(ALFZ/AbvCanopyBndlResist_col)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
@@ -431,7 +431,7 @@ module UptakesMod
   ! DeltaTKC_pft = TKC-TairK from previous hour
   !
   TKCanopy_pft(NZ)=TairK+DeltaTKC_pft(NZ)
-  
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine UpdateCanopyProperty
@@ -468,10 +468,14 @@ module UptakesMod
     PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
     Root1stDepz_pft         => plt_morph%Root1stDepz_pft          ,& !input  :root layer depth, [m]
+       Root1stRadius_pvr    => plt_morph%Root1stRadius_pvr   ,& !output :root layer diameter primary axes, [m]
     Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
     Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
     RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
+    Root2ndRadius_rpvr      => plt_morph%Root2ndRadius_rpvr       ,& !output :root layer diameter secondary axes, [m]
+    RootAxialResist_pft     => plt_morph%RootAxialResist_pft      ,& !output :root axial resistivity, [MPa h m-4]
+    RootRadialResist_pft    => plt_morph%RootRadialResist_pft     ,& !output :root radial resistivity, [MPa h m-2]
     RootPorosity_pft        => plt_morph%RootPorosity_pft         ,& !input  :root porosity, [m3 m-3]
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
     SeedDepth_pft           => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
@@ -483,8 +487,19 @@ module UptakesMod
     N=ipltroot
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       FracSoilLBy1stRoots_pvr(L,NZ)=1.0_r8
-    ENDDO      
-
+    ENDDO
+    if(ats_cpl_mode)then
+        RootAxialResist_pft(N,NZ) = 500.0_r8
+        RootRadialResist_pft(N,NZ) = 400000.0_r8
+        DO N=1,Myco_pft(NZ)
+            !test vals
+            Root2ndMaxRadius_pft(N,NZ) = 0.0002_r8
+            DO L=NU,MaxSoiL4Root_pft(NZ)
+                Root2ndradius_rpvr(N,L,NZ) = 0.0002_r8
+                Root1stRadius_pvr(N,L,NZ) = 0.001_r8
+            ENDDO
+        ENDDO
+    endif
   else
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       !obtain plant rooting depth
@@ -528,7 +543,7 @@ module UptakesMod
       ELSE
         FineRootRadius_rvr(N,L)       = Root2ndMaxRadius_pft(N,NZ)
         PathLen_rvr(N,L)              = 1.001_r8*FineRootRadius_rvr(N,L)
-        RootLateralAreaDivRadius_pvr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)       
+        RootLateralAreaDivRadius_pvr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)
       ENDIF
     enddo
   ENDDO D2000
@@ -614,7 +629,7 @@ module UptakesMod
       Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
       CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
         +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
-      
+
       D4290: DO N=1,Myco_pft(NZ)
         DO  L=NU,MaxSoiL4Root_pft(NZ)
           PSIRoot_pvr(N,L,NZ) = TotalSoilPSIMPa_vr(L)
@@ -657,7 +672,7 @@ module UptakesMod
   logical  , intent(in) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
   real(r8) , intent(out):: VHeatCapCanopyAir,DIFF
   real(r8) , intent(out):: cumPRootH2OUptake
-  real(r8) , intent(out):: CumPlantHeatLoss2Soil  
+  real(r8) , intent(out):: CumPlantHeatLoss2Soil
   real(r8) , intent(out):: HeatEvapSens   !sensible heat due to evaporation/condensation  [MJ]
   real(r8) , intent(out):: FDMP
   real(r8) :: APSILT
@@ -729,19 +744,19 @@ module UptakesMod
     QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
     RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr          & !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
   )
-  
+
   !CCPOLT: total nonstructural canopy C,N,P concentration
-  !FTHRM:coefficient for LW emitted by canopy  
+  !FTHRM:coefficient for LW emitted by canopy
   !LWRad2Canopy:long-wave absorbed by canopy
   FTHRM        = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)
   LWRad2Canopy = (LWRadSky_col+LWRadGrnd_col)*FracPARads2Canopy_pft(NZ)
-  
+
   if(ldo_sp_mode)then
     CCPOLT=0.1_r8
   else
     CCPOLT   = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) &
       +CanopyNonstElmConc_pft(ielmp,NZ)
-  endif  
+  endif
 
 
   cumPRootH2OUptake     = 0.0_r8
@@ -787,7 +802,7 @@ module UptakesMod
     RA1               = CanopyBndlResist_pft(NZ)
     EvapConductCanopy = EffGrndAreaByPFT4H2O/CanopyBndlResist_pft(NZ)  !m2/(h/m)                 = m3/h
     VHeatCapCanopyAir = EffGrndAreaByPFT4Heat/CanopyBndlResist_pft(NZ) !canopy air heat capacity,
-    
+
 !
 !     CANOPY WATER AND OSMOTIC POTENTIALS
 !
@@ -826,15 +841,15 @@ module UptakesMod
 
     VPC = vapsat(tkc1)*EXP(18.0_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8)/(RGASC*TKC1))  !ton H2O/m3
     EX  = EvapConductCanopy*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3] = [ton H2O/(h*m2)]
-    
+
     !Dew condensation to canopy >0 to canopy
-    IF(EX.GT.0.0_r8)THEN     
+    IF(EX.GT.0.0_r8)THEN
       VapXAir2Canopy_pft(NZ) = EX*CanopyBndlResist_pft(NZ)/(CanopyBndlResist_pft(NZ)+RZ)
       QdewCanopy_pft(NZ)     = VapXAir2Canopy_pft(NZ)
       EX                     = 0.0_r8
       HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TairK               !enthalpy of condensed water add to canopy, MJ/(h)
-    !canopy lose water, and there is canopy-held water  
-    ELSEIF(EX.LE.0.0_r8)THEN 
+    !canopy lose water, and there is canopy-held water
+    ELSEIF(EX.LE.0.0_r8)THEN
       if(WatHeldOnCanopy_pft(NZ).GT.0.0_r8)THEN
         !evaporation, and there is water stored in canopy
         !VapXAir2Canopy_pft <0._r8, off canopy as evaporation, cannot be more than WatHeldOnCanopy_pft(NZ)
@@ -843,10 +858,10 @@ module UptakesMod
         HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TKC1          !enthalpy of evaporated water leaving canopy
       ELSE
         VapXAir2Canopy_pft(NZ) =0._r8
-        HeatEvapSens = 0._r8  
+        HeatEvapSens = 0._r8
       ENDIF
     ENDIF
-    
+
     !Transpiration_pft<0 means canopy lose water through transpiration
     !EvapTransLHeat_pft:latent heat flux, negative means into atmosphere
 
@@ -871,7 +886,7 @@ module UptakesMod
 !   canopy bound water is changing
     VHeatCapCanopy_pft(NZ)=VHeatCapCanopyPrev_pft+cpw*(PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ) &
        +Transpiration_pft(NZ)-cumPRootH2OUptake)
-!   new canopy temperature 
+!   new canopy temperature
     TKCY=(TKCX*VHeatCapCanopyPrev_pft+HeatAdd2Can+TairK*VHeatCapCanopyAir)/(VHeatCapCanopy_pft(NZ)+VHeatCapCanopyAir)
 
     !limit canopy temperature to no different from air for more than 10 K
@@ -911,10 +926,10 @@ module UptakesMod
 !     RPlantRootH2OUptk_pvr=root water uptake from soil layer > 0
 !     WatAvail4Uptake_vr,AirMicPore4Fill_vr=water volume available for uptake,air volume
 !     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
-!     PSILC=height corrected canopy water potential 
+!     PSILC=height corrected canopy water potential
 !     SoilRootResistance_rvr=total soil+root resistance
-!     cumPRootH2OUptake=total root water uptake from soil 
-!     CumPlantHeatLoss2Soil (<0.), add heat to canopy 
+!     cumPRootH2OUptake=total root water uptake from soil
+!     CumPlantHeatLoss2Soil (<0.), add heat to canopy
 
       CumPlantHeatLoss2Soil=0._r8
       D4200: DO N=1,Myco_pft(NZ)
@@ -924,9 +939,9 @@ module UptakesMod
             RootH2OUptkStress_pvr(N,L,NZ) = AZMAX1(PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L)
             RPlantRootH2OUptk_pvr(N,L,NZ)=AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
               AMIN1((PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResistance_rvr(N,L), AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
-            
+
             !plant/myco lose water to soil > 0
-            IF(RPlantRootH2OUptk_pvr(N,L,NZ).GT.0.0_r8)THEN              
+            IF(RPlantRootH2OUptk_pvr(N,L,NZ).GT.0.0_r8)THEN
               !jinyun tang: why multiply 0.1 here? I don't know. Perhaps for numerical purpose.
               RPlantRootH2OUptk_pvr(N,L,NZ)=0.1_r8*RPlantRootH2OUptk_pvr(N,L,NZ)
 
@@ -954,17 +969,17 @@ module UptakesMod
 !     DIFFZ= extra canopy water binding capacity
 !     DIFFU= change to canopy binded water
 !     DIFFU-DIFFZ=residual of canopy binded water,
-!     >0 gain binded water (increase leaf P, more positive), <0 lose binded water (more uptake, decrease leaf water P) 
+!     >0 gain binded water (increase leaf P, more positive), <0 lose binded water (more uptake, decrease leaf water P)
 !     DIFF=normalized difference between DIFFZ and DIFFU
 !     5.0E-03=acceptance criterion for DIFF
 !     RSSZ=change in canopy water potl vs change in canopy water cnt
 !     RSSU=change in canopy water potl vs change in transpiration
-      
-      SymplasmicWat = ppmc*CanopyMassC/FDMP              
+
+      SymplasmicWat = ppmc*CanopyMassC/FDMP
       DIFFZ         = SymplasmicWat-CanopyBiomWater_pft(NZ)    !biomass water deficit
       DIFFU         = Transpiration_pft(NZ)-cumPRootH2OUptake  !root water uptake excess
 
-      !ideally, the difference between DIFFZ and DIFFU should be as small as possible      
+      !ideally, the difference between DIFFZ and DIFFU should be as small as possible
       IF(.not.isclose(cumPRootH2OUptake,0.0_r8))THEN
         DIFF=ABS((DIFFU-DIFFZ)/cumPRootH2OUptake)
       ELSE
@@ -978,7 +993,7 @@ module UptakesMod
         CALL StomatalDynamics(I,J,NZ)
         CYCLE
       ENDIF
-      
+
       IF(ABS(SymplasmicWat-SymplasmicWatPrev).GT.ZERO4Groth_pft(NZ))THEN
         RSSZ=ABS((PSICanopy_pft(NZ)-PSICanPPre)/(SymplasmicWat-SymplasmicWatPrev))
       ELSEIF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
@@ -986,7 +1001,7 @@ module UptakesMod
       ELSE
         RSSZ=ZERO4LeafVar_pft(NZ)
       ENDIF
-      
+
       IF(ABS(Transpiration_pft(NZ)-PTransPre).GT.ZERO4Groth_pft(NZ))THEN
         RSSUX=ABS((PSICanopy_pft(NZ)-PSICanPPre)/(Transpiration_pft(NZ)-PTransPre))
         IF(CNDT.GT.ZERO4Groth_pft(NZ))THEN
@@ -1023,7 +1038,7 @@ module UptakesMod
       IF((NN.GE.30 .AND. ABS(DPSI).LT.1.0E-03_r8) .OR. NN.GE.MaxIterNum)then
         IF(LIterationExit)EXIT
         LIterationExit=.true.
-        CALL StomatalDynamics(I,J,NZ)      
+        CALL StomatalDynamics(I,J,NZ)
       ELSE
         !prepare for next iteration
         PSICanPPre           = PSICanopy_pft(NZ)
@@ -1061,7 +1076,7 @@ module UptakesMod
   real(r8), intent(in)  :: PathLen_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in)  :: FineRootRadius_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in)  :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
-  real(r8), intent(out) :: RootResist_rvr(pltpar%jroots,JZ1)           !total root resistance for water uptake     
+  real(r8), intent(out) :: RootResist_rvr(pltpar%jroots,JZ1)           !total root resistance for water uptake
   real(r8), intent(out) :: RootRadialResist_rvr(pltpar%jroots,JZ1)     !radial root resistance for water uptake
   real(r8), intent(out) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)   !primary root axial resistance for water uptake
   real(r8), intent(out) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)   !secondary root axial resistance for water uptake
@@ -1072,8 +1087,8 @@ module UptakesMod
   logical , intent(out) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 
   character(len=*), parameter :: subname='CalcResistance'
-  real(r8) :: FRADW 
-  real(r8) :: FRAD1   !relative radius of the primary roots with respect to 
+  real(r8) :: FRADW
+  real(r8) :: FRAD1   !relative radius of the primary roots with respect to
   real(r8) :: FRAD2
   real(r8) :: RSSL,Root2ndSurfArea
   integer :: N, L
@@ -1130,17 +1145,17 @@ module UptakesMod
 !
   D3880: DO N=1,Myco_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
- 
-      SoiLayerHasRoot_rvr(N,L)=VLSoilPoreMicP_vr(L).GT.ZEROS2         &  
+
+      SoiLayerHasRoot_rvr(N,L)=VLSoilPoreMicP_vr(L).GT.ZEROS2         &
         .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2                          &
         .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO                 &
         .AND. HYCDMicP4RootUptake_vr(L).GT.ZERO                       &
         .AND. Root1stXNumL_rpvr(ipltroot,L,NZ).GT.ZERO4Groth_pft(NZ)  &
         .AND. Root2ndXNumL_rpvr(N,L,NZ).GT.ZERO4Groth_pft(NZ)         &
         .AND. THETW_vr(L).GT.ZERO
-        
+
       if(SoiLayerHasRoot_rvr(N,L))THEN
-        
+
         !
         !     SOIL HYDRAULIC RESISTANCE FROM RADIAL UPTAKE GEOMETRY
         !     AND SOIL HYDRAULIC CONDUCTIVITY
@@ -1149,7 +1164,7 @@ module UptakesMod
         !     PP=plant population
         !     PathLen_rvr=path length of water and nutrient uptake
         !     FineRootRadius_rvr,RootLateralAreaDivRadius_pvr=root radius,surface/radius area
-        
+
         RSSL              = LOG(PathLen_rvr(N,L)/FineRootRadius_rvr(N,L))/(RootLateralAreaDivRadius_pvr(N,L)*PlantPopulation_pft(NZ))
         SoiH2OResist_rvr(N,L) = RSSL/HYCDMicP4RootUptake_vr(L)
         !
@@ -1298,7 +1313,7 @@ module UptakesMod
       PSIRoot_pvr(N,L,NZ)              = TotalSoilPSIMPa_vr(L)
       if(ldo_sp_mode)then
         CCPOLT =0.4_r8
-      else  
+      else
         CCPOLT = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
       endif
       RPlantRootH2OUptk_pvr(N,L,NZ) = 0.0_r8
@@ -1370,7 +1385,7 @@ module UptakesMod
   !     VHeatCapCanopyAir=canopy sensible heat conductance
   !     HeatEvapSens=convective heat flux from latent heat flux (>0)
   !     PrecpHeatbyCanopy=convective heat flux from precip to canopy
-  !     cumPRootH2OUptake < 0., add water to canopy 
+  !     cumPRootH2OUptake < 0., add water to canopy
   !     Transpiration_pft < 0., lost from canopy
   CanopyBiomWater_pft(NZ) = CanopyBiomWater_pft(NZ)+Transpiration_pft(NZ)-cumPRootH2OUptake
   CanopyMassC             = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopySapwoodC_pft(NZ))
@@ -1395,13 +1410,13 @@ module UptakesMod
           +PSICanopy_pft(NZ)*SoiH2OResist_rvr(N,L))/SoilRootResistance_rvr(N,L))
       ELSE
         PSIRoot_pvr(N,L,NZ)=TotalSoilPSIMPa_vr(L)
-      ENDIF           
+      ENDIF
       !obtain total reserve
       if(ldo_sp_mode)then
         CCPOLT=0.4_r8
-      else  
+      else
         CCPOLT=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
-      endif  
+      endif
 
       CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
