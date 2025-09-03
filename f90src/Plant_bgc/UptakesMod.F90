@@ -56,9 +56,6 @@ module UptakesMod
   real(r8) :: TotalSoilPSIMPa_vr(JZ1)     !total soil matric pressure, removing elevation adjustment [MPa]
   real(r8) :: PathLen_rvr(pltpar%jroots,JZ1)
   real(r8) :: FineRootRadius_rvr(pltpar%jroots,JZ1)
-  real(r8) :: RootRadialResist_rvr(pltpar%jroots,JZ1)
-  real(r8) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)
-  real(r8) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)
   real(r8) :: SoilResist4H2O_rvr(pltpar%jroots,JZ1)
   real(r8) :: SoilRootResist4H2O_pvr(pltpar%jroots,JZ1)
   real(r8) :: AllRootC_vr(JZ1)
@@ -136,9 +133,9 @@ module UptakesMod
 !
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
-!
+!     [SpecStalkVolume]=[m3/gC]
       CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopySapwoodC_pft(NZ))
-      VHeatCapCanopyPrev_pft = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
+      VHeatCapCanopyPrev_pft = cpo*CanopyMassC+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
       
       if(ldo_sp_mode .and. LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ))then
         HydroActivePlant=.true.
@@ -151,8 +148,8 @@ module UptakesMod
 
       IF(HydroActivePlant)THEN  
       
-        call CalcResistance(NZ,PathLen_rvr,FineRootRadius_rvr,RootLateralAreaDivRadius_pvr,RootRadialResist_rvr,&
-          Root1stAxialResist_rvr,Root2ndAxialResist_rvr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
+        call CalcResistance(NZ,PathLen_rvr,FineRootRadius_rvr,RootLateralAreaDivRadius_pvr,&
+          SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
         ! 
         !       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
         !       BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
@@ -187,7 +184,7 @@ module UptakesMod
 !
         call HandlingDivergence(I,J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
 
-        call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
+        call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,CanopyMassC,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
           TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
 !
 !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
@@ -470,7 +467,7 @@ module UptakesMod
     Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
     Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
-    RootLenPerPlant_pvr     => plt_morph%RootLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr     => plt_morph%RootTotLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
     RootPorosity_pft        => plt_morph%RootPorosity_pft         ,& !input  :root porosity, [m3 m-3]
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
     SeedDepth_pft           => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
@@ -519,15 +516,15 @@ module UptakesMod
 
       IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and..not.ldo_sp_mode)THEN
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
-          /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootLenPerPlant_pvr(N,L,NZ))))
+          /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootTotLenPerPlant_pvr(N,L,NZ))))
 
         PathLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
           1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
-        RootLateralAreaDivRadius_pvr(N,L)=TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ)
+        RootLateralAreaDivRadius_pvr(N,L)=TwoPiCON*RootTotLenPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ)
       ELSE
         FineRootRadius_rvr(N,L)       = Root2ndMaxRadius_pft(N,NZ)
         PathLen_rvr(N,L)              = 1.001_r8*FineRootRadius_rvr(N,L)
-        RootLateralAreaDivRadius_pvr(N,L) = TwoPiCON*RootLenPerPlant_pvr(N,L,NZ)       
+        RootLateralAreaDivRadius_pvr(N,L) = TwoPiCON*RootTotLenPerPlant_pvr(N,L,NZ)       
       ENDIF
     enddo
   ENDDO D2000
@@ -687,47 +684,47 @@ module UptakesMod
   integer :: N,L
 !     begin_execution
 
-  associate(                                                           &
-    AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !input  :canopy water content, [m3 d-2]
-    CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
-    H2OCuticleResist_pft      => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
-    LWRadGrnd_col             => plt_rad%LWRadGrnd_col                    ,& !input  :longwave radiation emitted by ground surface, [MJ m-2 h-1]
-    LWRadSky_col              => plt_rad%LWRadSky_col                 ,& !input  :sky longwave radiation , [MJ d-2 h-1]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+  associate(                                                               &
+    AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    CanOsmoPsi0pt_pft           => plt_ew%CanOsmoPsi0pt_pft               ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !input  :canopy water content, [m3 d-2]
+    CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
+    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft         ,& !input  :maximum stomatal resistance to vapor, [s h-1]
+    LWRadGrnd_col               => plt_rad%LWRadGrnd_col                  ,& !input  :longwave radiation emitted by ground surface, [MJ m-2 h-1]
+    LWRadSky_col                => plt_rad%LWRadSky_col                   ,& !input  :sky longwave radiation , [MJ d-2 h-1]
+    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft             ,& !input  :maximum soil layer number for all root axes,[-]
     CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
-    Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
-    NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
-    PSICanopyOsmo_pft         => plt_ew%PSICanopyOsmo_pft             ,& !input  :canopy osmotic water potential, [Mpa]
-    PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
-    PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft        ,& !input  :water flux into canopy, [m3 d-2 h-1]
-    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
-    RIB                       => plt_ew%RIB                           ,& !input  :Richardson number for calculating boundary layer resistance, [-]
-    RadSWbyCanopy_pft         => plt_rad%RadSWbyCanopy_pft            ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
-    CanopyIsothBndlResist_pft       => plt_ew%CanopyIsothBndlResist_pft           ,& !input  :canopy roughness height, [m]
-    TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
-    TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
-    VPA                       => plt_ew%VPA                           ,& !input  :vapor concentration, [m3 m-3]
-    WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft           ,& !input  :canopy surface water content, [m3 d-2]
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
-    ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft            ,& !input  :threshold zero for leaf calculation, [-]
-    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !inoput :root water uptake, [m3 d-2 h-1]
-    PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !inoput :canopy total water potential, [Mpa]
-    TKCanopy_pft              => plt_ew%TKCanopy_pft                  ,& !inoput :canopy temperature, [K]
-    CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
-    CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft            ,& !output :canopy latent heat flux, [MJ d-2 h-1]
-    LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft              ,& !output :canopy longwave radiation, [MJ d-2 h-1]
-    RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft            ,& !output :canopy net radiation, [MJ d-2 h-1]
-    TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
-    Transpiration_pft         => plt_ew%Transpiration_pft             ,& !output :canopy transpiration, [m2 d-2 h-1]
-    VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft            ,& !output :canopy heat capacity, [MJ d-2 K-1]
-    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft            ,& !output :canopy evaporation, [m2 d-2 h-1]
-    DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
-    QdewCanopy_pft            => plt_ew%QdewCanopy_pft                ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
-    RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr          & !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
+    Myco_pft                    => plt_morph%Myco_pft                     ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                          => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
+    PSICanopyOsmo_pft           => plt_ew%PSICanopyOsmo_pft               ,& !input  :canopy osmotic water potential, [Mpa]
+    PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
+    PrecIntcptByCanopy_pft      => plt_ew%PrecIntcptByCanopy_pft          ,& !input  :water flux into canopy, [m3 d-2 h-1]
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RIB                         => plt_ew%RIB                             ,& !input  :Richardson number for calculating boundary layer resistance, [-]
+    RadSWbyCanopy_pft           => plt_rad%RadSWbyCanopy_pft              ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    CanopyIsothBndlResist_pft   => plt_ew%CanopyIsothBndlResist_pft       ,& !input  :canopy roughness height, [m]
+    TKS_vr                      => plt_ew%TKS_vr                          ,& !input  :mean annual soil temperature, [K]
+    TairK                       => plt_ew%TairK                           ,& !input  :air temperature, [K]
+    VPA                         => plt_ew%VPA                             ,& !input  :vapor concentration, [m3 m-3]
+    WatHeldOnCanopy_pft         => plt_ew%WatHeldOnCanopy_pft             ,& !input  :canopy surface water content, [m3 d-2]
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft            => plt_biom%ZERO4LeafVar_pft              ,& !input  :threshold zero for leaf calculation, [-]
+    RPlantRootH2OUptk_pvr       => plt_ew%RPlantRootH2OUptk_pvr           ,& !inoput :root water uptake, [m3 d-2 h-1]
+    PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !inoput :canopy total water potential, [Mpa]
+    TKCanopy_pft                => plt_ew%TKCanopy_pft                    ,& !inoput :canopy temperature, [K]
+    CanPStomaResistH2O_pft      => plt_photo%CanPStomaResistH2O_pft       ,& !output :canopy stomatal resistance, [h m-1]
+    CanopyBndlResist_pft        => plt_photo%CanopyBndlResist_pft         ,& !output :canopy boundary layer resistance, [h m-1]
+    EvapTransLHeat_pft          => plt_ew%EvapTransLHeat_pft              ,& !output :canopy latent heat flux, [MJ d-2 h-1]
+    LWRadCanopy_pft             => plt_rad%LWRadCanopy_pft                ,& !output :canopy longwave radiation, [MJ d-2 h-1]
+    RadNet2Canopy_pft           => plt_rad%RadNet2Canopy_pft              ,& !output :canopy net radiation, [MJ d-2 h-1]
+    TKC_pft                     => plt_ew%TKC_pft                         ,& !output :canopy temperature, [K]
+    Transpiration_pft           => plt_ew%Transpiration_pft               ,& !output :canopy transpiration, [m2 d-2 h-1]
+    VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft              ,& !output :canopy heat capacity, [MJ d-2 K-1]
+    VapXAir2Canopy_pft          => plt_ew%VapXAir2Canopy_pft              ,& !output :canopy evaporation, [m2 d-2 h-1]
+    DeltaTKC_pft                => plt_ew%DeltaTKC_pft                    ,& !output :change in canopy temperature, [K]
+    QdewCanopy_pft              => plt_ew%QdewCanopy_pft                  ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
+    RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr            & !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
   )
   
   !CCPOLT: total nonstructural canopy C,N,P concentration
@@ -822,7 +819,7 @@ module UptakesMod
 !     EvapTransLHeat_pft=canopy latent heat flux
 !     HeatEvapSens=convective heat flux from EvapTransLHeat_pft, <0, into air
 !     VAP=latent heat of evaporation
-!     EvapConductCanopy=aerodynamic conductance
+!     EvapConductCanopy=aerodynamic conductance, [m/h]
 
     VPC = vapsat(tkc1)*EXP(18.0_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8)/(RGASC*TKC1))  !ton H2O/m3
     EX  = EvapConductCanopy*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3] = [ton H2O/(h*m2)]
@@ -833,8 +830,9 @@ module UptakesMod
       QdewCanopy_pft(NZ)     = VapXAir2Canopy_pft(NZ)
       EX                     = 0.0_r8
       HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TairK               !enthalpy of condensed water add to canopy, MJ/(h)
-    !canopy lose water, and there is canopy-held water  
+    
     ELSEIF(EX.LE.0.0_r8)THEN 
+      !canopy loses water, and there is canopy-held water  
       if(WatHeldOnCanopy_pft(NZ).GT.0.0_r8)THEN
         !evaporation, and there is water stored in canopy
         !VapXAir2Canopy_pft <0._r8, off canopy as evaporation, cannot be more than WatHeldOnCanopy_pft(NZ)
@@ -908,7 +906,8 @@ module UptakesMod
 !     SOIL + ROOT HYDRAULIC RESISTANCES
 !
 !     SoiLayerHasRoot_rvr=rooted layer flag
-!     RPlantRootH2OUptk_pvr=root water uptake from soil layer > 0
+!     RPlantRootH2OUptk_pvr=root water uptake from soil layer > 0, [m3 H2O/h] = [MPa] /[], => []=[m3 H2O/(MPa h)]=[m3 H2O/(kg m-1 h-2 h)]
+!     =[kg H2O/(kg m-1 h-1)]=[h m] over grid, =[h/m] specific area
 !     WatAvail4Uptake_vr,AirMicPore4Fill_vr=water volume available for uptake,air volume
 !     FracPRoot4Uptake_pvr=PFT fraction of biome root mass
 !     PSILC=height corrected canopy water potential 
@@ -1053,17 +1052,13 @@ module UptakesMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine CalcResistance(NZ,PathLen_rvr,FineRootRadius_rvr,RootLateralAreaDivRadius_pvr,&
-    RootRadialResist_rvr,Root1stAxialResist_rvr,Root2ndAxialResist_rvr,SoilResist4H2O_rvr,&
-    SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
+    SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 
   implicit none
   integer, intent(in)   :: NZ
   real(r8), intent(in)  :: PathLen_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in)  :: FineRootRadius_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in)  :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
-  real(r8), intent(out) :: RootRadialResist_rvr(pltpar%jroots,JZ1)     !radial root resistance for water uptake
-  real(r8), intent(out) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)   !primary root axial resistance for water uptake
-  real(r8), intent(out) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)   !secondary root axial resistance for water uptake
   real(r8), intent(out) :: SoilResist4H2O_rvr(pltpar%jroots,JZ1)         !soil resistance for water uptake
   real(r8), intent(out) :: SoilRootResist4H2O_pvr(pltpar%jroots,JZ1)   !added soil and root resistance, [MPa h d2 m-3]
   real(r8), intent(out) :: CNDT                   !total root conductance
@@ -1071,12 +1066,16 @@ module UptakesMod
   logical , intent(out) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 
   character(len=*), parameter :: subname='CalcResistance'
+  real(r8) :: RootRadialResist_rvr(pltpar%jroots,JZ1)     !radial root resistance for water uptake, [MPa h m-3]    
+  real(r8) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)   !secondary root axial resistance for water uptake,[MPa h m-3]      
+  real(r8) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)   !primary root axial resistance for water uptake,[MPa h m-3]      
   real(r8) :: FRADW 
   real(r8) :: FRAD1   !relative radius of the primary roots with respect to 
   real(r8) :: FRAD2
-  real(r8) :: RSSL,Root2ndSurfArea
+  real(r8) :: RSSL,Root2ndSurfArea,StalkAxialResist
   integer :: N, L
   associate(                                                                  &
+    DLYR3                       => plt_site%DLYR3                            ,& !input  :vertical thickness of soil layer, [m]  
     CanopyHeight_pft            => plt_morph%CanopyHeight_pft                ,& !input  :canopy height, [m]
     CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr              ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     HYCDMicP4RootUptake_vr      => plt_soilchem%HYCDMicP4RootUptake_vr       ,& !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
@@ -1092,9 +1091,9 @@ module UptakesMod
     Root2ndRadius_rpvr          => plt_morph%Root2ndRadius_rpvr              ,& !input  :root layer diameter secondary axes, [m]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr               ,& !input  :root layer number axes, [d-2]
     RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
+    RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-1]    
     RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr         ,& !input  :root layer length density, [m m-3]
-    RootLenPerPlant_pvr         => plt_morph%RootLenPerPlant_pvr             ,& !input  :root layer length per plant, [m p-1]
-    RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-2]
+    RootTotLenPerPlant_pvr         => plt_morph%RootTotLenPerPlant_pvr             ,& !input  :root layer length per plant, [m p-1]
     THETW_vr                    => plt_soilchem%THETW_vr                     ,& !input  :volumetric water content, [m3 m-3]
     VLMicP_vr                   => plt_soilchem%VLMicP_vr                    ,& !input  :total volume in micropores, [m3 d-2]
     VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr            ,& !input  :volume of soil layer, [m3 d-2]
@@ -1102,7 +1101,9 @@ module UptakesMod
     ZERO                        => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
     ZEROS2                      => plt_site%ZEROS2                           ,& !input  :threshold zero for numerical stability,[-]
-    RootResist4H2O_pvr          => plt_ew%RootResist4H2O_pvr                 ,& !output :total root (axial+radial) resistance for water uptake
+    RootResist4H2O_pvr          => plt_ew%RootResist4H2O_pvr                 ,& !output :total root (axial+radial) resistance for water uptake,[MPa h m-3]
+    RootRadialKond2H2O_pvr      => plt_ew%RootRadialKond2H2O_pvr             ,& !output :radial root conductance for water uptake, [m5 H2O h-1 MPa-1]
+    RootAxialKond2H2O_pvr       => plt_ew%RootAxialKond2H2O_pvr              ,& !output :axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
     CanopyHeight4WatUptake_pft  => plt_morph%CanopyHeight4WatUptake_pft       & !output :canopy height, [m]
   )
 
@@ -1122,7 +1123,7 @@ module UptakesMod
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
   !      VLSoilPoreMicP_vr,VLWatMicPM,THETW=soil,water volume,content
-  !     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
+  !     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
   !     HYCDMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
   !     Root1stXNumL_rpvr,Root2ndXNumL_rpvr=number of root,myco primary,secondary axes
   !     SoiLayerHasRoot_rvr:1=rooted,0=not rooted
@@ -1157,12 +1158,12 @@ module UptakesMod
         !     ENTERED IN 'READQ'
         !
         !     Root2ndRadius_rpvr=secondary root radius
-        !     RootLenPerPlant_pvr=root length per plant
+        !     RootTotLenPerPlant_pvr=root length per plant
         !     RootRadialResist_rvr=radial resistance
         !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
-        !eq. (30) in Grant, 1998
-        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        !eq. (31) in Grant, 1998
+        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootTotLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootRadialResist_rvr(N,L) = RootRadialResist_pft(N,NZ)/Root2ndSurfArea*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)
         !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
@@ -1171,17 +1172,17 @@ module UptakesMod
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum
         !     secondary radius from PFT file Root2ndMaxRadius_pft at which RootAxialResist_pft is defined
         !     Root1stRadius_pvr,Root2ndRadius_rpvr=primary,secondary root radius
-        !     RootAxialResist_pft=axial resistivity from PFT file
+        !     RootAxialResist_pft=axial resistivity from PFT file, [MPa h m-2]=[kg m-1 h-2 h m-2]=[kg m-3 h-1]
         !     DPTHZ=depth of primary root from surface
-        !     Root1stAxialResist_rvr,Root2ndAxialResist_rvr=axial resistance of primary,secondary roots,[MPa h d2 m-3]
+        !     Root1stAxialResist_rvr,Root2ndAxialResist_rvr=axial resistance of primary,secondary roots,[MPa h d2 m-3] =[MPa h m-1]=[]*m
         !     Root2ndMeanLens_rpvr=average secondary root length
         !     Root1stXNumL_rpvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
-        FRAD1 = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
-        FRAD2 = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
-
-        Root1stAxialResist_rvr(N,L) = RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_rpvr(ipltroot,L,NZ)) &
-          +RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_rpvr(ipltroot,L,NZ))
+        FRAD1                       = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
+        FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
+        StalkAxialResist            = RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_rpvr(ipltroot,L,NZ))
+        Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_rpvr(ipltroot,L,NZ))
+                    
         Root2ndAxialResist_rvr(N,L) = RootAxialResist_pft(N,NZ)*Root2ndMeanLens_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
@@ -1190,10 +1191,11 @@ module UptakesMod
         !     SoilRootResist4H2O_pvr=total soil+root resistance, [MPa h d2 m-3]
         !     CNDT=total soil+root conductance for all layers
         ! assuming all roots work in parallel
-
-        RootResist4H2O_pvr(N,L,NZ)  = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)
-        SoilRootResist4H2O_pvr(N,L) = SoilResist4H2O_rvr(N,L)+RootResist4H2O_pvr(N,L,NZ)
-        CNDT                        = CNDT+1.0_r8/SoilRootResist4H2O_pvr(N,L)
+        RootRadialKond2H2O_pvr(N,L,NZ) = 1._r8/RootRadialResist_rvr(N,L)
+        RootAxialKond2H2O_pvr(N,L,NZ)  = DLYR3(L)**2/(Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L))
+        RootResist4H2O_pvr(N,L,NZ)     = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)
+        SoilRootResist4H2O_pvr(N,L)    = SoilResist4H2O_rvr(N,L)+RootResist4H2O_pvr(N,L,NZ)
+        CNDT                           = CNDT+1.0_r8/SoilRootResist4H2O_pvr(N,L)
 
       ENDIF
     enddo
@@ -1236,7 +1238,7 @@ module UptakesMod
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !input  :root osmotic water potential, [Mpa]
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !input  :root turgor water potential, [Mpa]
     RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
-    CanopyIsothBndlResist_pft       => plt_ew%CanopyIsothBndlResist_pft           ,& !input  :canopy roughness height, [m]
+    CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy roughness height, [m]
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     SnowDepth                 => plt_ew%SnowDepth                     ,& !input  :snowpack depth, [m]
@@ -1248,7 +1250,7 @@ module UptakesMod
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
     TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
     RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !output :root water uptake, [m3 d-2 h-1]
-    RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr           ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
+    RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr         ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]
     DeltaTKC_pft              => plt_ew%DeltaTKC_pft                  ,& !output :change in canopy temperature, [K]
@@ -1312,7 +1314,7 @@ module UptakesMod
   end subroutine HandleBareSoil
 
 !----------------------------------------------------------------------------------------------------
-  subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
+  subroutine UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,CanopyMassC,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
     TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
   !
   !Description
@@ -1320,6 +1322,7 @@ module UptakesMod
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(in) :: VHeatCapCanopyAir
+  real(r8), intent(in) :: CanopyMassC         ![gC/m2]
   real(r8), intent(in) :: TotalSoilPSIMPa_vr(JZ1)    !Elevation adjusted soil water potential [MPa]
   real(r8), intent(in) :: SoilResist4H2O_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: SoilRootResist4H2O_pvr(pltpar%jroots,JZ1)
@@ -1331,7 +1334,7 @@ module UptakesMod
   logical , intent(in) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)  !indicator of root prescence
 
   character(len=*), parameter :: subname='UpdatePlantWaterVars'
-  real(r8) :: CCPOLT,CanopyMassC
+  real(r8) :: CCPOLT
   real(r8) :: OSWT
   integer :: N,L
   associate(                                                          &
@@ -1373,9 +1376,8 @@ module UptakesMod
   !     cumPRootH2OUptake < 0., add water to canopy 
   !     Transpiration_pft < 0., lost from canopy, [m3 d-2 h-1]
   CanopyBiomWater_pft(NZ) = CanopyBiomWater_pft(NZ)+Transpiration_pft(NZ)-cumPRootH2OUptake
-  CanopyMassC             = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopySapwoodC_pft(NZ))
   WatHeldOnCanopy_pft(NZ) = WatHeldOnCanopy_pft(NZ)+PrecIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  VHeatCapCanopy_pft(NZ)  = cpw*(CanopyMassC*SpecStalkVolume+WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
+  VHeatCapCanopy_pft(NZ)  = cpo*CanopyMassC+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
   HeatXAir2PCan_pft(NZ)   = VHeatCapCanopyAir*(TairK-TKCanopy_pft(NZ))
   HeatStorCanopy_pft(NZ)  = TKCX*VHeatCapCanopyPrev_pft-TKCanopy_pft(NZ)*VHeatCapCanopy_pft(NZ)+HeatEvapSens+PrecpHeatbyCanopy
   !

@@ -374,7 +374,7 @@ module grosubsMod
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum
+  real(r8), intent(out) :: RootPrimeAxsNum !Numer of primary root axes
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
@@ -421,8 +421,8 @@ module grosubsMod
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
-    Root1stXNumL_rpvr            => plt_morph%Root1stXNumL_rpvr             ,& !output :root layer number primary axes, [d-2]
-    Root2ndXNumL_rpvr             => plt_morph%Root2ndXNumL_rpvr              ,& !output :root layer number axes, [d-2]
+    Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr            ,& !output :root layer number primary axes, [d-2]
+    Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr                 ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -461,8 +461,8 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
-    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
+    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
+    .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
     FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
     FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8

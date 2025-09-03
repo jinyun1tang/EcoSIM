@@ -262,7 +262,7 @@ implicit none
   allocate(RNO2DmndBandChemo_vr(0:JZ,JY,JX));  RNO2DmndBandChemo_vr=0._r8
   allocate(trcg_DisolEvap_Atm2Litr_flx(idg_beg:idg_NH3,JY,JX));      trcg_DisolEvap_Atm2Litr_flx=0._r8
   allocate(trcg_ebu_flx_vr(idg_beg:idg_end,JZ,JY,JX));  trcg_ebu_flx_vr=0._r8
-  allocate(trcg_ebu_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_ebu_flx_col=0._r8
+  allocate(trcg_ebu_flx_col(idg_beg:idg_end,JY,JX)); trcg_ebu_flx_col=0._r8
   allocate(trcg_air2root_flx_col(idg_beg:idg_NH3,JY,JX)); trcg_air2root_flx_col=0._r8
 
   allocate(RProd_Hp_vr(0:JZ,JY,JX));  RProd_Hp_vr=0._r8

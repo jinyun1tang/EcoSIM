@@ -1075,7 +1075,7 @@ implicit none
           RootProteinC_pvr(N,L1,NZ,NY,NX)        = RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_rpvr(N,L1,NZ,NY,NX)        = Root1stXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)         = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootPoreVol_rpvr(N,L1,NZ,NY,NX)         = RootPoreVol_rpvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L1,NZ,NY,NX)            = RootVH2O_pvr(N,L1,NZ,NY,NX)+FX*RootVH2O_pvr(N,L0,NZ,NY,NX)
@@ -1249,7 +1249,7 @@ implicit none
           RootProteinC_pvr(N,L0,NZ,NY,NX)        = FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
           Root1stXNumL_rpvr(N,L0,NZ,NY,NX)        = FY*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = FY*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootPoreVol_rpvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L0,NZ,NY,NX)            = FY*RootVH2O_pvr(N,L0,NZ,NY,NX)
@@ -1445,9 +1445,9 @@ implicit none
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX) = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FXRTNL
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX) = Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)-FXRTNL
 
-          FXRTLGP                            = FRO*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTLGP
-          RootLenPerPlant_pvr(N,L0,NZ,NY,NX) = RootLenPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTLGP
+          FXRTLGP                            = FRO*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX) = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTLGP
+          RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX) = RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTLGP
 
           FXRTDNP                                = FRO*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTDNP

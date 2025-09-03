@@ -160,7 +160,7 @@ implicit none
         plt_morph%Root1stXNumL_rpvr(N,L,NZ)  = Root1stXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndMeanLens_rpvr(N,L,NZ) = Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)        
-        plt_morph%RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ,NY,NX)
+        plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO
     ENDDO
     !variables updated from surface energy calculation

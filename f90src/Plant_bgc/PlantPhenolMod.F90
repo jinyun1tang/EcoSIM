@@ -1036,24 +1036,23 @@ module PlantPhenolMod
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    
 
     call InitiateBranchFlora(I,J,NB,NZ,DayLenChk)
-!
+  !
   ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN
 
     call BranchStemJointing(I,J,NB,NZ,DayLenChk)
-!
-!   iPlantCalendar_brch(ipltcal_Elongation,=mid stem elongation
-!
+    !
+    !   ipltcal_Elongation,=mid stem elongation
+    !
   ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN
 
     call BranchStemElongation(I,J,NB,NZ,DayLenChk)
-!
-!   iPlantCalendar_brch(ipltcal_Heading,=end of stem elongation and setting max seed number
-!
+    !
+    !   ipltcal_Heading,=end of stem elongation and setting max seed number
+    !
   ELSEIF(iPlantCalendar_brch(ipltcal_Heading,NB,NZ).EQ.0)THEN
 
     call BranchHeading(I,J,NB,NZ,DayLenChk) 
-!!
-
+    !!
   ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
   
     call BranchAnthesis(I,J,NB,NZ,DayLenChk) 
@@ -1235,8 +1234,8 @@ module PlantPhenolMod
     LeafNumberAtFloralInit_brch => plt_pheno%LeafNumberAtFloralInit_brch   & !output :leaf number at floral initiation, [-]
   )
   call PrintInfo('beg '//subname)
-  NodeNumChk=NodeNumNormByMatgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4VegetaPheno    
-  LeafOffChk=Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
+  NodeNumChk = NodeNumNormByMatgrp_brch(NB,NZ).GT.0.50_r8*GrowStageNorm4VegetaPheno
+  LeafOffChk = Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
   PhenoChk1=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
     .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short .AND. DayLenChk
   PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
@@ -1245,7 +1244,7 @@ module PlantPhenolMod
                 .OR. PhenoChk2 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk)THEN
     iPlantCalendar_brch(ipltcal_Elongation,NB,NZ)=I
 
-    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
+    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
       LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
     ENDIF
   ENDIF

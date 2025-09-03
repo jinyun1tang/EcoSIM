@@ -50,7 +50,8 @@ module RootDataType
   real(r8),target,allocatable ::  RootNodulElms_pft(:,:,:,:)                     !root nodule chemical element, [g d-2]
   real(r8),target,allocatable ::  RootPoreTortu4Gas_pft(:,:,:,:)                 !root tortuosity to calculate root gaseous diffusivity, [-]
   real(r8),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)             !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, [m p-1]
+  real(r8),target,allocatable ::  RootTotLenPerPlant_pvr(:,:,:,:,:)              !root layer length per plant, including root hair [m p-1]
+  real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
   real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
@@ -99,6 +100,9 @@ module RootDataType
   real(r8),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
   real(r8),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
   real(r8),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]     
+  real(r8),target,allocatable :: RootRadialKond2H2O_pvr(:,:,:,:,:)               !radial root conductance for water uptake, [m3 H2O h-1 MPa-1]
+  real(r8),target,allocatable :: RootAxialKond2H2O_pvr(:,:,:,:,:)                !axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
+
 !----------------------------------------------------------------------
 
 contains
@@ -157,6 +161,7 @@ contains
   allocate(RootBranchFreq_pft(JP,JY,JX));     RootBranchFreq_pft=0._r8
   allocate(RootPoreTortu4Gas_pft(jroots,JP,JY,JX));  RootPoreTortu4Gas_pft=0._r8
   allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._r8
+  allocate(RootTotLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootTotLenPerPlant_pvr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
   allocate(Root1stLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._r8
@@ -196,12 +201,17 @@ contains
   allocate(RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
   allocate(RootProteinConc_rpvr(jroots,JZ,JP,JY,JX));RootProteinConc_rpvr=0._r8
   allocate(RootResist4H2O_pvr(jroots,JZ,JP,JY,JX)); RootResist4H2O_pvr=0._r8
+  allocate(RootRadialKond2H2O_pvr(jroots,JZ,JP,JY,JX));RootRadialKond2H2O_pvr=0._r8
+  allocate(RootAxialKond2H2O_pvr(jroots,JZ,JP,JY,JX));RootAxialKond2H2O_pvr=0._r8
+
   end subroutine InitRootData
 
 !----------------------------------------------------------------------
   subroutine DestructRootData
   use abortutils, only : destroy
   implicit none
+  call destroy(RootRadialKond2H2O_pvr)
+  call destroy(RootAxialKond2H2O_pvr)
   call destroy(RootResist4H2O_pvr)
   call destroy(ROOTNLim_rpvr)
   call destroy(ROOTPLim_rpvr)  
@@ -248,6 +258,7 @@ contains
   call destroy(RootBranchFreq_pft)
   call destroy(RootPoreTortu4Gas_pft)
   call destroy(RootNodulNonstElms_rpvr)
+  call destroy(RootTotLenPerPlant_pvr)
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLen_rpvr)
   call destroy(Root2ndLen_rpvr)

@@ -362,7 +362,7 @@ contains
     RootPoreVol_rpvr            => plt_morph%RootPoreVol_rpvr             ,& !inoput :root layer volume air, [m2 d-2]
     RootLenDensPerPlant_pvr    => plt_morph%RootLenDensPerPlant_pvr     ,& !inoput :root layer length density, [m m-3]
     Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr            ,& !inoput :root layer number primary axes, [d-2]
-    RootLenPerPlant_pvr        => plt_morph%RootLenPerPlant_pvr         ,& !inoput :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr        => plt_morph%RootTotLenPerPlant_pvr         ,& !inoput :root layer length per plant, [m p-1]
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !inoput :root layer number secondary axes, [d-2]
     Root2ndLen_rpvr            => plt_morph%Root2ndLen_rpvr             ,& !inoput :root layer length secondary axes, [m d-2]
     Root2ndXNumL_rpvr            => plt_morph%Root2ndXNumL_rpvr              & !inoput :root layer number axes, [d-2]
@@ -433,7 +433,7 @@ contains
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
 !     RootProteinC_pvr=root protein C mass
 !     RTN1,Root2ndXNumL_rpvr=number of primary,secondary root axes
-!     RootLenDensPerPlant_pvr,RootLenPerPlant_pvr=root length density,root length per plant
+!     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_rpvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
@@ -456,7 +456,7 @@ contains
       RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*XHVST
       Root1stXNumL_rpvr(N,L,NZ)        = Root1stXNumL_rpvr(N,L,NZ)*XHVST
       Root2ndXNumL_rpvr(N,L,NZ)         = Root2ndXNumL_rpvr(N,L,NZ)*XHVST
-      RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ)*XHVST
+      RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ)*XHVST
       RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
       RootPoreVol_rpvr(N,L,NZ)         = RootPoreVol_rpvr(N,L,NZ)*XHVST
       RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*XHVST

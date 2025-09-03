@@ -124,7 +124,7 @@ module RootGasMod
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !input  :root layer diameter primary axes, [m]
     Root2ndMeanLens_rpvr      => plt_morph%Root2ndMeanLens_rpvr          ,& !input  :root layer average length, [m]
     RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr              ,& !input  :root layer volume air, [m2 d-2]
-    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
@@ -219,7 +219,7 @@ module RootGasMod
 !
 
     IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
-      .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      .AND. RootTotLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX = RootLateralAreaDivRadius_pvr(N,L)/RootRaidus_rpft(N,NZ)       !length to radius ratio~tortuosity
       DIFOP  = O2AquaDiffusvityP*RTARRX
       DO idg  = idg_beg, idg_NH3
@@ -619,7 +619,7 @@ module RootGasMod
 !  if(N==ipltroot)then
 !  write(4444,*)'WFR ODmd FOXY DF RV RTB FRT',I+J/24.,L,RAutoRootO2Limter_rpvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ),&
 !    FOXYX,DFAGas(idg_O2),RootPoreVol_rpvr(N,L,NZ),RootStrutElms_pft(ielmc,NZ),FracSoiLayByPrimRoot_pvr(L,NZ),RTCRA,&
-!    iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ),RootLenPerPlant_pvr(N,L,NZ)
+!    iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ),RootTotLenPerPlant_pvr(N,L,NZ)
 !  endif
   call PrintInfo('end '//subname)
   end associate

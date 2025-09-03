@@ -62,12 +62,6 @@
 !     CanopyCO2BndlResist_pft=canopy boundary layer resistance to CO2, h/m
 !     AirConc_pft=number of moles of air per m3
 !
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'IJ stomate',I,J
-  write(4444,*)'RIB,TairK,TKCanopy_pft(NZ)',RIB,TairK,TKCanopy_pft(NZ),CanopyIsothBndlResist_pft(NZ)
-  write(4444,*)'NetCO2Flx2Canopy_col,CO2E',NetCO2Flx2Canopy_col,CO2E
-  write(4444,*)'Ci2Ca',CanopyCi2CaRatio_pft(NZ)
-  endif
   RI                       = RichardsonNumber(RIB,TairK,TKCanopy_pft(NZ))
   CanopyCO2BndlResist_pft  = 1.34_r8*AMAX1(5.56E-03_r8,CanopyIsothBndlResist_pft(NZ)/(1.0_r8-10.0_r8*RI))
   AirConc_pft(NZ)          = GetMolAirPerm3(TKCanopy_pft(NZ))    !assuming pressure is one atmosphere
@@ -150,11 +144,6 @@
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
   CH2O = CH2O+VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
 
-!  if(LP==1.and.PAR_zsec>0._r8)then
-!  IF(I==10.and.J==16.and..false..and.LP==1)then
-!  write(4445,*)M,N,L,K,CH2O,VL,LeafAreaSunlit_zsec(N,L,K,NB,NZ),TAU_Rad
-!  endif
-!  endif
   call PrintInfo('end '//subname)
   end associate
   end subroutine C3FixCO2
@@ -179,9 +168,7 @@
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,NumLeafZenithSectors1
-    if(I==10.and.J==16.and..false.)then
-    write(4446,*)'NLKLB',N,L,K,NB,NZ,LeafAreaSunlit_zsec(N,L,K,NB,NZ)
-    endif
+
     DO M=1,NumOfSkyAzimuthSects1
       IF(LeafAreaSunlit_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !

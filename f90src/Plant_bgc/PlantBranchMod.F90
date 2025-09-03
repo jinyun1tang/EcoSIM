@@ -562,9 +562,7 @@ module PlantBranchMod
 !     IF BEFORE FLORAL INDUCTION
 !
 !     iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
-!  IF(I>=266 .and. I<=278)then       
-!  write(7777,*)'cal',I*1000+J,NB,iPlantCalendar_brch(:,NB,NZ)
-!  ENDIF
+
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
     PART(ibrch_leaf)   = 0.725_r8
     PART(ibrch_petole) = 0.275_r8
@@ -611,6 +609,7 @@ module PlantBranchMod
     !     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
     !
   ELSE
+    !for determinate growth pattern, stops growing and all put to grain
     IF(iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
       PART(ibrch_grain)=1.0_r8
     ELSE
@@ -972,7 +971,7 @@ module PlantBranchMod
     PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch       ,& !inoput :layer sheath protein C, [g d-2]
     LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch         ,& !inoput :layer leaf protein C, [g d-2]
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
-    LeafArea_node           => plt_morph%LeafArea_node            ,& !inoput :leaf area, [m2 d-2]
+    LeafArea_node               => plt_morph%LeafArea_node                ,& !inoput :leaf area, [m2 d-2]
     LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch            ,& !inoput :branch leaf structural element mass, [g d-2]
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch            ,& !inoput :leaf element, [g d-2]
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch          ,& !inoput :branch sheath structural element, [g d-2]

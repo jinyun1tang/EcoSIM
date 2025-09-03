@@ -225,8 +225,9 @@ implicit none
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8), pointer :: Root1stLen_rpvr(:,:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
-  real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !root layer length per plant,                                                [m p-1]
-  real(r8), pointer :: Root2ndMeanLens_rpvr(:,:,:)      => null() !root layer average length,                                                  [m]
+  real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
+  real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !fine root length per plant, [m p-1]
+  real(r8), pointer :: Root2ndMeanLens_rpvr(:,:,:)     => null() !root layer average length,                                                  [m]
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
@@ -291,7 +292,7 @@ implicit none
   integer,  pointer :: BranchNumber_brch(:,:)         => null() !branch meric id,                             [-]
   integer,  pointer :: NGTopRootLayer_pft(:)          => null() !soil layer at planting depth,                [-]
   integer,  pointer :: KLeafNumber_brch(:,:)          => null() !leaf number,                                 [-]
-
+  
   real(r8), pointer :: NumOfLeaves_brch(:,:)          => null() !leaf number,                          [-]
   real(r8), pointer :: MaxPotentSeedNumber_pft(:)     => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)       => null() !maximum grain number per node,        [-]
@@ -617,6 +618,8 @@ implicit none
   real(r8), pointer :: ETCanopy_CumYr_pft(:)          => null()    !total transpiration,                                          [m H2O d-2]
   real(r8), pointer :: QdewCanopy_pft(:)              => null()    !dew fall on to canopy,                                        [m3 H2O d-2 h-1]
   real(r8), pointer :: RootResist4H2O_pvr(:,:,:)      => null()    !total root (axial+radial) resistance for water uptake,        [MPa-1 h-1]     
+  real(r8), pointer :: RootRadialKond2H2O_pvr(:,:,:)  => null()    !radial root conductance for water uptake, [m3 H2O h-1 MPa-1]
+  real(r8), pointer :: RootAxialKond2H2O_pvr(:,:,:)   => null()    !axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
 
   contains
     procedure, public :: Init => plt_ew_init
@@ -1168,6 +1171,8 @@ implicit none
   class(plant_ew_type) :: this
 
   allocate(this%RootResist4H2O_pvr(jroots,JZ1,JP1)); this%RootResist4H2O_pvr=spval
+  allocate(this%RootRadialKond2H2O_pvr(jroots,JZ1,JP1));this%RootRadialKond2H2O_pvr=spval
+  allocate(this%RootAxialKond2H2O_pvr(jroots,JZ1,JP1));this%RootAxialKond2H2O_pvr=spval
   allocate(this%QdewCanopy_pft(JP1)); this%QdewCanopy_pft=spval
   allocate(this%ETCanopy_CumYr_pft(JP1));this%ETCanopy_CumYr_pft=spval
   allocate(this%ElvAdjstedSoilH2OPSIMPa_vr(0:JZ1));this%ElvAdjstedSoilH2OPSIMPa_vr=spval
@@ -1889,7 +1894,8 @@ implicit none
   allocate(this%Root2ndMaxRadius_pft(jroots,JP1));this%Root2ndMaxRadius_pft=spval
 
   allocate(this%Root1stDepz_pft(jroots,MaxNumRootAxes,JP1));this%Root1stDepz_pft=spval
-  allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=spval
+  allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
+  allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
   allocate(this%Root2ndMeanLens_rpvr(jroots,JZ1,JP1));this%Root2ndMeanLens_rpvr=spval
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval
   allocate(this%Root2ndSpecLen_pft(jroots,JP1));this%Root2ndSpecLen_pft=spval

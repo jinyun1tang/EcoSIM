@@ -170,7 +170,7 @@ module NutUptakeMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr    ,& !input  :O2 constraint to root respiration (0-1), [-]
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr        ,& !input  :root respiration unconstrained by O2, [g d-2 h-1]
-    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
     trcs_solml_vr             => plt_soilchem%trcs_solml_vr         ,& !input  :aqueous tracer, [g d-2]
     trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr         ,& !input  :gas layer mass, [g d-2]
     Myco_pft                  => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
@@ -275,10 +275,10 @@ module NutUptakeMod
 !     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
 !     FCUP=limitation to active uptake respiration from CPOOLR
 !     FWSRT=protein concentration relative to 5%
-!     RootLenPerPlant_pvr=root,myco length per plant
+!     RootTotLenPerPlant_pvr=root,myco length per plant
 !
           IF(RAutoRootO2Limter_rpvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
-            .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+            .AND. RootTotLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
 !         

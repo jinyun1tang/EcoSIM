@@ -12,8 +12,8 @@ module UptakePars
 !     MaxIterNum=max number of cycles in convergence soln for water uptake
 !     DIFFX,DIFFY=acceptance criteria in convergence soln
 !     FMN=min PFT:total population ratio
-!     MinCanopyBndlResist_pft,RACX=min,max canopy boundary layer resistance (h m-1)
-!     RZ=surface resistance to evaporation (h m-1)
+!     MinCanopyBndlResist_pft,RACX=min,max canopy boundary layer resistance [h m-1]
+!     RZ=surface resistance to evaporation [h m-1]
 !     EMODW=wood modulus of elasticity (MPa)
 
 !     EMMC=canopy emissivity

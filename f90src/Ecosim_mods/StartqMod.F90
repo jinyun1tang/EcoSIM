@@ -746,7 +746,7 @@ module StartqMod
       RootProteinC_pvr(N,L,NZ,NY,NX)             = 0._r8
       Root1stXNumL_rpvr(N,L,NZ,NY,NX)             = 0._r8
       Root2ndXNumL_rpvr(N,L,NZ,NY,NX)              = 0._r8
-      RootLenPerPlant_pvr(N,L,NZ,NY,NX)          = 0._r8
+      RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)          = 0._r8
       RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)      = 0._r8
       RootPoreVol_rpvr(N,L,NZ,NY,NX)              = 0._r8
       RootVH2O_pvr(N,L,NZ,NY,NX)                 = 0._r8

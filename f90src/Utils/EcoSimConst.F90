@@ -8,7 +8,7 @@ module EcosimConst
   real(r8), parameter :: secsphour       = 3600._r8            !seconds per hour, [s/hour]
   real(r8), parameter :: secspday        = 86400._r8           !seconds per day, [s/day]
   real(r8), parameter :: secspyear       = 86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: cpw             = 4.186_r8            !volumetric heat capacity for water,     [J/g/K~MJ/m3/K]
+  real(r8), parameter :: cpw             = 4.186_r8            !volumetric heat capacity for water,     [J/g/K]~[MJ/m3/K]
   real(r8), parameter :: cpi             = 1.9274_r8           !volumetric heat capacity for ice,        [MJ/m3/K]
   real(r8), parameter :: cpo             = 2.496E-06_r8        !heat capacity for organic matter,        [MJ/K/gC]
   real(r8), parameter :: cps             = 2.095_r8            !volumetric heat capacity for fresh snow, [MJ/m3/K]
