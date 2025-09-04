@@ -87,6 +87,7 @@
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
         QDrain_cum_col(NY,NX) = 0._r8        
         D960: DO NZ=1,NP0_col(NY,NX)
+          cumNPP_pft(NZ,NY,NX)=0._r8
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
           DO NE=1,NumPlantChemElms
             NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &

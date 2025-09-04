@@ -778,16 +778,16 @@ module StartsMod
   TDCNO(:,:,:) = 1.0_r8
 
   iUreaHydInhibitorType_col(:,:) = 0
-  IFNHB_col(:,:)                 = 0
-  IFNOB_col(:,:)                 = 0
-  IFPOB_col(:,:)                 = 0
+  iFertNH4Band_col(:,:)          = ifert_off
+  iFertNO3Band_col(:,:)          = ifert_off
+  iFertPO4Band_col(:,:)          = ifert_off
   iResetSoilProf_col(:,:)        = itrue
-  NumActivePlants_col(:,:)           = 0
-  ATCA_col(:,:)               = ATCAI_col(:,:)
-  ATCS_col(:,:)               = ATCAI_col(:,:)
-  TairKClimMean_col(:,:)      = units%Celcius2Kelvin(ATCA_col)
-  ATKS_col(:,:)               = units%Celcius2Kelvin(ATCS_col)
-  QRain_CumYr_col(:,:)    = 0.0_r8
+  NumActivePlants_col(:,:)       = 0
+  ATCA_col(:,:)                  = ATCAI_col(:,:)
+  ATCS_col(:,:)                  = ATCAI_col(:,:)
+  TairKClimMean_col(:,:)         = units%Celcius2Kelvin(ATCA_col)
+  ATKS_col(:,:)                  = units%Celcius2Kelvin(ATCS_col)
+  QRain_CumYr_col(:,:)           = 0.0_r8
 
   CO2byFire_CumYr_col(:,:)       = 0.0_r8
   CH4byFire_CumYr_col(:,:)       = 0.0_r8

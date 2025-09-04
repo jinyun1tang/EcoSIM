@@ -104,7 +104,7 @@ implicit none
 
   integer :: NY,NX,LPY,J,JEN
   integer :: IDY1,IDY2,IDY3,I,IDY
-  integer :: IDYS,IHRS,IFLGV_colX,JST,IDYE,IHRE
+  integer :: IDYS,IHRS,iIrrigOptX,JST,IDYE,IHRE
   real(r8):: DY
   real(r8) :: DST,DEN,CIRRX,RR,FIRRX
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
@@ -133,9 +133,9 @@ implicit none
 !       AUTOMATED IRRIGATION
 !
 !       DST,DEN=start,end dates,hours DDMMHHHH
-!       IFLGV_colX=flag for irrigation criterion,0=SWC,1=canopy water potl
-!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV_col=0),or minimum canopy
-!       water potential(IFLGV_col=1), to trigger irrigation
+!       iIrrigOptX=flag for irrigation criterion,0=SWC,1=canopy water potl
+!       FIRRX=depletion of SWC from CIRRX to WP(iIrrigOpt_col=0),or minimum canopy
+!       water potential(iIrrigOpt_col=1), to trigger irrigation
 !       CIRRX= fraction of FC to which irrigation will raise SWC
 !       DIRRX= depth to which water depletion and rewatering is calculated
 !       WDPTHI=depth at which irrigation is applied
@@ -147,14 +147,14 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1)),&
       trim(mod_filename))
 
-    READ(irrigf(1),*)DST,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
+    READ(irrigf(1),*)DST,DEN,iIrrigOptX,FIRRX,CIRRX,DIRRX,WDPTHI &
       ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
       ,CSOQX,CCLQX
     READ(irrigf(1),'(I2,I2,I4)')IDY1,IDY2,IDY3
 
     IF(lverb)then
       print*,irrigf(1)
-      print*,IDY1,IDY2,IDY3,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
+      print*,IDY1,IDY2,IDY3,DEN,iIrrigOptX,FIRRX,CIRRX,DIRRX,WDPTHI &
         ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
         ,CSOQX,CCLQX
     endif
@@ -185,16 +185,16 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
-        IFLGV_col(NY,NX)   = IFLGV_colX
-        IIRRA(1,NY,NX) = IDYS
-        IIRRA(2,NY,NX) = IDYE
-        IIRRA(3,NY,NX) = INT(IHRS/100)
+        iIrrigOpt_col(NY,NX) = iIrrigOptX
+        IIRRA(1,NY,NX)       = IDYS
+        IIRRA(2,NY,NX)       = IDYE
+        IIRRA(3,NY,NX)       = INT(IHRS/100)
         IIRRA(4,NY,NX) = INT(IHRE/100)
         FIRRA_col(NY,NX)   = FIRRX
         CIRRA_col(NY,NX)   = CIRRX
         DIRRA(1,NY,NX) = DIRRX    !depth
         DIRRA(2,NY,NX) = WDPTHI   !width
-        D220: DO I     = 1, 366
+        D220: DO I = 1, 366
           PHQ(IDY,NY,NX)                                    = PHQX
           NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
           NO3_irrig_mole_conc(IDY,NY,NX)                    = CNOQX/14.0_r8
@@ -351,14 +351,14 @@ implicit none
 !
 !         NH4,NH3,UREA,NO3 BROADCAST (A) AND BANDED (B)
 !
-        FERT(ifert_nh4,IDY,NY,NX)       = Z4A        !NH4 broadcast
-        FERT(ifert_nh3,IDY,NY,NX)       = Z3A        !NH3 broadcast
-        FERT(ifert_urea,IDY,NY,NX)      = ZUA        !Urea broadcast
-        FERT(ifert_no3,IDY,NY,NX)       = ZOA        !NO3 broadcast
-        FERT(ifert_nh4_band,IDY,NY,NX)  = Z4B        !NH4 band
-        FERT(ifert_nh3_band,IDY,NY,NX)  = Z3B        !NH3 band
-        FERT(ifert_urea_band,IDY,NY,NX) = ZUB        !Urea band
-        FERT(ifert_no3_band,IDY,NY,NX)  = ZOB        !NO3 band
+        FERT(ifert_N_nh4,IDY,NY,NX)       = Z4A        !NH4 broadcast
+        FERT(ifert_N_nh3,IDY,NY,NX)       = Z3A        !NH3 broadcast
+        FERT(ifert_N_urea,IDY,NY,NX)      = ZUA        !Urea broadcast
+        FERT(ifert_N_no3,IDY,NY,NX)       = ZOA        !NO3 broadcast
+        FERT(ifert_N_nh4_band,IDY,NY,NX)  = Z4B        !NH4 band
+        FERT(ifert_N_nh3_band,IDY,NY,NX)  = Z3B        !NH3 band
+        FERT(ifert_N_urea_band,IDY,NY,NX) = ZUB        !Urea band
+        FERT(ifert_N_no3_band,IDY,NY,NX)  = ZOB        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)

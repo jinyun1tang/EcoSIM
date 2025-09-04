@@ -83,6 +83,14 @@ module MicForcTypeMod
   real(r8), allocatable :: VLWatMicPM(:)
   real(r8), allocatable :: TortMicPM(:)
   real(r8), allocatable :: VLsoiAirPM(:)
+  real(r8),allocatable :: AttenfNH4HeterR(:,:)      !litter layer NH4 relative demand
+  real(r8),allocatable :: AttenfNO3HeterR(:,:)      !litter layer NO3 relative demand
+  real(r8),allocatable :: AttenfH2PO4HeterR(:,:)    !litter layer H2PO4 relative demand
+  real(r8),allocatable :: AttenfH1PO4HeterR(:,:)    !litter layer H1PO4 relative demand
+  real(r8),allocatable :: AttenfNH4AutorR(:)
+  real(r8),allocatable :: AttenfNO3AutorR(:)
+  real(r8),allocatable :: AttenfH2PO4AutorR(:)
+  real(r8),allocatable :: AttenfH1PO4AutorR(:)
   contains
    procedure, public :: Init
    procedure, public :: destroy=>Destruct
@@ -95,9 +103,12 @@ module MicForcTypeMod
 
   implicit none
   class(micforctype) :: this
-  integer :: jcplx,NPH
+  integer :: jcplx,NPH,NumHetetr1MicCmplx,NumMicrobAutoTrophCmplx
+
   jcplx=micpar%jcplx
   NPH=60
+  NumMicrobAutoTrophCmplx=micpar%NumMicrobAutoTrophCmplx
+  NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx
   allocate(this%ElmAllocmatMicrblitr2POM(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POM=spval
   allocate(this%ElmAllocmatMicrblitr2POMU(1:micpar%ndbiomcp));this%ElmAllocmatMicrblitr2POMU=spval
   allocate(this%RDOMEcoDmndPrev(1:jcplx));this%RDOMEcoDmndPrev=spval
@@ -109,8 +120,15 @@ module MicForcTypeMod
   allocate(this%TortMicPM(NPH));this%TortMicPM=spval
   allocate(this%VLsoiAirPM(NPH));this%VLsoiAirPM=spval
   allocate(this%DiffusivitySolutEff(NPH));this%DiffusivitySolutEff=spval
-  allocate(this%RAcetateUptkHeterPrev(1:micpar%NumHetetr1MicCmplx,1:jcplx))  ;this%RAcetateUptkHeterPrev=0._r8
-
+  allocate(this%RAcetateUptkHeterPrev(1:NumHetetr1MicCmplx,1:jcplx))  ;this%RAcetateUptkHeterPrev=0._r8
+  allocate(this%AttenfNH4HeterR(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4HeterR=spval
+  allocate(this%AttenfNO3HeterR(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3HeterR=spval
+  allocate(this%AttenfH2PO4HeterR(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4HeterR=spval
+  allocate(this%AttenfH1PO4HeterR(NumHetetr1MicCmplx,1:jcplx));this%AttenfH1PO4HeterR=spval
+  allocate(this%AttenfNH4AutorR(NumMicrobAutoTrophCmplx));this%AttenfNH4AutorR=spval
+  allocate(this%AttenfNO3AutorR(NumMicrobAutoTrophCmplx));this%AttenfNO3AutorR=spval
+  allocate(this%AttenfH2PO4AutorR(NumMicrobAutoTrophCmplx));this%AttenfH2PO4AutorR=spval
+  allocate(this%AttenfH1PO4AutorR(NumMicrobAutoTrophCmplx));this%AttenfH1PO4AutorR=spval  
   end subroutine Init
 !------------------------------------------------------------------------------------------
 
@@ -132,7 +150,14 @@ module MicForcTypeMod
   call destroy(this%RAcetateEcoDmndPrev)
   call destroy(this%ElmAllocmatMicrblitr2POM)
   call destroy(this%ElmAllocmatMicrblitr2POMU)
-
+  call destroy(this%AttenfNH4HeterR)
+  call destroy(this%AttenfNO3HeterR)
+  call destroy(this%AttenfH2PO4HeterR)
+  call destroy(this%AttenfH1PO4HeterR)
+  call destroy(this%AttenfNH4AutorR)
+  call destroy(this%AttenfNO3AutorR)
+  call destroy(this%AttenfH2PO4AutorR)
+  call destroy(this%AttenfH1PO4AutorR)  
   end subroutine Destruct
 
 end module MicForcTypeMod

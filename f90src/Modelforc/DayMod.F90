@@ -4,7 +4,8 @@
   use minimathmod,        only: isLeap, AZMAX1
   use MiniFuncMod,        only: GetDayLength
   use PrescribePhenolMod, only: PrescribePhenologyInterp
-  use SurfLitterDataType, only : XTillCorp_col
+  use SurfLitterDataType, only: XTillCorp_col
+  use fileUtil,           only: iulog
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -18,7 +19,6 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -253,9 +253,9 @@
 !     FW=fraction of soil layer in irrigation zone
 !     FZ=SWC at which irrigation is triggered
 !     VLSoilPoreMicP_vr,VOLW,VOLI=total,water,ice volume
-!     IFLGV_col=flag for irrigation criterion,0=SWC,1=canopy water potential
-!     FIRRA_col=depletion of SWC from CIRRA_col to WP(IFLGV_col=0),or minimum canopy
-!     water potential(IFLGV_col=1), to trigger irrigation
+!     iIrrigOpt_col=flag for irrigation criterion,0=SWC,1=canopy water potential
+!     FIRRA_col=depletion of SWC from CIRRA_col to WP(iIrrigOpt_col=0),or minimum canopy
+!     water potential(iIrrigOpt_col=1), to trigger irrigation
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
@@ -278,16 +278,16 @@
             ENDIF
           ENDDO D165
 
-          IF((IFLGV_col(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA_col(NY,NX)*(TFZ-TWP)) &
-            .OR.(IFLGV_col(NY,NX).EQ.1.AND.PSICanPDailyMin_pft(1,NY,NX).LT.FIRRA_col(NY,NX)))THEN
+          IF((iIrrigOpt_col(NY,NX).EQ.iIrrig_swc .AND. TVW.LT.TWP+FIRRA_col(NY,NX)*(TFZ-TWP)) &
+            .OR. (iIrrigOpt_col(NY,NX).EQ.iIrrig_cwp .AND. PSICanPDailyMin_pft(1,NY,NX).LT.FIRRA_col(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
-              WRITE(*,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
-                ,IFLGV_col(NY,NX),RR,TFZ,TVW,TWP,FIRRA_col(NY,NX),PSICanPDailyMin_pft(1,NY,NX) &
+              WRITE(iulog,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
+                ,iIrrigOpt_col(NY,NX),RR,TFZ,TVW,TWP,FIRRA_col(NY,NX),PSICanPDailyMin_pft(1,NY,NX) &
                 ,CIRRA_col(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 
 2222  FORMAT(A8,5I6,40E12.4)

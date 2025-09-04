@@ -51,6 +51,15 @@ implicit none
   real(r8) :: RNO2DmndSoilChemoPrev
   real(r8) :: RNO2DmndBandChemoPrev
 
+! allocatable flux ratios
+  real(r8),allocatable :: AttenfNH4Heter(:,:)
+  real(r8),allocatable :: AttenfNO3Heter(:,:)
+  real(r8),allocatable :: AttenfH2PO4Heter(:,:)
+  real(r8),allocatable :: AttenfH1PO4Heter(:,:)
+  real(r8),allocatable :: AttenfNH4Autor(:)
+  real(r8),allocatable :: AttenfNO3Autor(:)
+  real(r8),allocatable :: AttenfH2PO4Autor(:)
+  real(r8),allocatable :: AttenfH1PO4Autor(:)  
   real(r8), allocatable :: RMaintDefcitcitAutor(:)
   real(r8), allocatable :: RMaintRespAutor(:)
   real(r8), allocatable :: RGrowthRespAutor(:)      !growth respiration of autotrophs
@@ -174,7 +183,10 @@ implicit none
   allocate(this%RGrowthRespAutor(1:NumMicrobAutoTrophCmplx));this%RGrowthRespAutor=0._r8
   allocate(this%RMaintDefcitcitAutor(1:NumMicrobAutoTrophCmplx));this%RMaintDefcitcitAutor=0._r8
   allocate(this%RMaintRespAutor(1:NumMicrobAutoTrophCmplx)); this%RMaintRespAutor=0._r8
-
+  allocate(this%AttenfNH4Autor(NumMicrobAutoTrophCmplx));this%AttenfNH4Autor=0._r8
+  allocate(this%AttenfNO3Autor(NumMicrobAutoTrophCmplx));this%AttenfNO3Autor=0._r8
+  allocate(this%AttenfH2PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH2PO4Autor=0._r8
+  allocate(this%AttenfH1PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH1PO4Autor=0._r8
   allocate(this%RHydlySOCK(1:jcplx)); this%RHydlySOCK=0._r8
   allocate(this%REcoUptkSoilO2M(NPH));this%REcoUptkSoilO2M = spval
   allocate(this%REcoDOMProd(idom_beg:idom_end,1:jcplx));this%REcoDOMProd=spval
@@ -234,6 +246,11 @@ implicit none
   allocate(this%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RNO2DmndReduxSoilHeterPrev=0._r8
   allocate(this%RNO2DmndReduxBandHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RNO2DmndReduxBandHeterPrev=0._r8
   allocate(this%RN2ODmndReduxHeterPrev(1:NumHetetr1MicCmplx,1:jcplx));this%RN2ODmndReduxHeterPrev=0._r8
+  allocate(this%AttenfNH4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4Heter=spval
+  allocate(this%AttenfNO3Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3Heter=spval
+  allocate(this%AttenfH2PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
+  allocate(this%AttenfH1PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH1PO4Heter=spval  
+
   end subroutine Init
 !------------------------------------------------------------------------------------------
   subroutine ZeroOut(this)
@@ -242,6 +259,14 @@ implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
 
+  this%AttenfNH4Autor=0._r8
+  this%AttenfNO3Autor=0._r8
+  this%AttenfH2PO4Autor=0._r8
+  this%AttenfH1PO4Autor=0._r8
+  this%AttenfNH4Heter           = 0._r8
+  this%AttenfNO3Heter           = 0._r8
+  this%AttenfH2PO4Heter         = 0._r8
+  this%AttenfH1PO4Heter         = 0._r8
   this%RMaintDefcitcitAutor   = 0._r8
   this%RMaintRespAutor        = 0._r8
   this%RGrowthRespAutor       = 0._r8
@@ -362,6 +387,14 @@ implicit none
   call destroy(this%RH2PO4UptkLitrAutor)
   call destroy(this%RH1PO4UptkLitrAutor)
   call destroy(this%RO2DmndAutort)
+  call destroy(this%AttenfNH4Heter)
+  call destroy(this%AttenfNO3Heter)
+  call destroy(this%AttenfH2PO4Heter)
+  call destroy(this%AttenfH1PO4Heter)  
+  call destroy(this%AttenfNH4Autor)
+  call destroy(this%AttenfNO3Autor)
+  call destroy(this%AttenfH2PO4Autor)
+  call destroy(this%AttenfH1PO4Autor)  
 
   end subroutine Destruct
 end module MicFluxTypeMod

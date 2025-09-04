@@ -448,15 +448,15 @@ module ErosionMod
 !
 !     *ER=sediment flux from erosion.f
 !
-              XNH4Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_nh4,NU_col(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_nh3,NU_col(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_soil_vr(ifert_urea,NU_col(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_no3,NU_col(N2,N1),N2,N1)
+              XNH4Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+              XNH3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+              XUreaSoil_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+              XNO3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
 
-              XNH4Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU_col(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU_col(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU_col(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU_col(N2,N1),N2,N1)
+              XNH4Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+              XNH3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+              XUreaBand_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+              XNO3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !     sediment code
@@ -591,14 +591,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_nh4,NU_col(N2,N1),N2,N1)
-                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_nh3,NU_col(N2,N1),N2,N1)
-                XUreaSoil_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_soil_vr(ifert_urea,NU_col(N2,N1),N2,N1)
-                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_no3,NU_col(N2,N1),N2,N1)
-                XNH4Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU_col(N2,N1),N2,N1)
-                XNH3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU_col(N2,N1),N2,N1)
-                XUreaBand_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU_col(N2,N1),N2,N1)
-                XNO3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU_col(N2,N1),N2,N1)
+                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+                XUreaSoil_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+                XNH4Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+                XNH3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+                XUreaBand_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+                XNO3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -883,14 +883,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_nh4,NU_col(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_nh3,NU_col(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_urea,NU_col(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_no3,NU_col(N2,N1),N2,N1)
-              XNH4Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_nh4_band,NU_col(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_nh3_band,NU_col(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_urea_band,NU_col(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_no3_band,NU_col(N2,N1),N2,N1)
+              XNH4Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+              XNH3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+              XUreaSoil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+              XNO3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+              XNH4Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+              XNH3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+              XUreaBand_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+              XNO3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !

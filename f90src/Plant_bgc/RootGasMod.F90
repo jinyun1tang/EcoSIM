@@ -124,7 +124,7 @@ module RootGasMod
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !input  :root layer diameter primary axes, [m]
     Root2ndMeanLens_rpvr      => plt_morph%Root2ndMeanLens_rpvr          ,& !input  :root layer average length, [m]
     RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr              ,& !input  :root layer volume air, [m2 d-2]
-    RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
@@ -199,11 +199,13 @@ module RootGasMod
 !     ROOT CONDUCTANCE TO GAS TRANSFER
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
-      !primary roots conductance scalar
+      !primary roots conductance scalar[m]
       RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_rpvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
-      !secondary roots conductance scalar
-      RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2/Root2ndMeanLens_rpvr(N,L,NZ))/FracSoiLayByPrimRoot_pvr(L,NZ)
+      !secondary roots conductance scalar, [m]
+      RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndMeanLens_rpvr(N,L,NZ))
+      
       IF(RTCR2.GT.RTCR1)THEN
+        !consider the relationship between primary and secondary roots as serial, so the resistance adds up
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE
         RTCRA = RTCR1
@@ -217,7 +219,7 @@ module RootGasMod
 !
 
     IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
-      .AND. RootLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      .AND. RootTotLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX = RootLateralAreaDivRadius_pvr(N,L)/RootRaidus_rpft(N,NZ)       !length to radius ratio~tortuosity
       DIFOP  = O2AquaDiffusvityP*RTARRX
       DO idg  = idg_beg, idg_NH3
@@ -235,9 +237,7 @@ module RootGasMod
     DO idg=idg_beg,idg_NH3
       RootGasConductance_rpvr(idg,N,L,NZ) = AMIN1(DFAGas(idg),RootPoreVol_rpvr(N,L,NZ))
     ENDDO
-!    if(N==ipltroot)then
-!      write(3333,*)I+J/24.,L,RootGasConductance_rpvr(idg_O2,N,L,NZ),RootPoreVol_rpvr(N,L,NZ),FracSoiLayByPrimRoot_pvr(L,NZ)
-!    endif
+
     DFGP                = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
     !The root respiration below is from the previous time step
     RootCO2Prod_tscaled = -RootCO2AutorX_pvr(N,L,NZ)*dts_gas
@@ -514,9 +514,8 @@ module RootGasMod
                 trcs_maxRootml_loc(idg)=AZMAX1(trcs_rootml_loc(idg)+RootUptkSoiSolute(idg))
               endif
               
-              Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg)) &
-                *DisolvedGasVolume(idg)-trcs_maxRootml_loc(idg)*RootPoreVol_rpvr(N,L,NZ)) &
-                /(DisolvedGasVolume(idg)+RootPoreVol_rpvr(N,L,NZ)))
+              Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg))*DisolvedGasVolume(idg) &
+                -trcs_maxRootml_loc(idg)*RootPoreVol_rpvr(N,L,NZ))/(DisolvedGasVolume(idg)+RootPoreVol_rpvr(N,L,NZ)))
               !>0._r8 into root, <0._r8 into atmosphere, assuming specific rate 1/hr
               trcg_air2root_flx_loc(idg)=RootGasConductance_rpvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
             enddo
@@ -620,7 +619,7 @@ module RootGasMod
 !  if(N==ipltroot)then
 !  write(4444,*)'WFR ODmd FOXY DF RV RTB FRT',I+J/24.,L,RAutoRootO2Limter_rpvr(N,L,NZ),RootO2Dmnd4Resp_pvr(N,L,NZ),&
 !    FOXYX,DFAGas(idg_O2),RootPoreVol_rpvr(N,L,NZ),RootStrutElms_pft(ielmc,NZ),FracSoiLayByPrimRoot_pvr(L,NZ),RTCRA,&
-!    iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ),RootLenPerPlant_pvr(N,L,NZ)
+!    iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ),RootTotLenPerPlant_pvr(N,L,NZ)
 !  endif
   call PrintInfo('end '//subname)
   end associate

@@ -24,12 +24,11 @@ module MicAutoCPLXMod
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine ActiveAutotrophs(I,J,N,TSensGrowth,SPOMK, RMOMK, &
+  subroutine ActiveAutotrophs(I,J,N,SPOMK, RMOMK, &
     micfor,micstt,micflx,naqfdiag,nmicf,nmics,ncplxf,ncplxs,nmicdiag)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: N
-  real(r8), intent(in):: TSensGrowth
   real(r8), intent(in) :: SPOMK(2)
   real(r8), intent(in)  :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
@@ -84,7 +83,7 @@ module MicAutoCPLXMod
   !
   if (N.eq.mid_AmmoniaOxidBacter)then
     ! NH3 OXIDIZERS
-    call AmmoniaOxidizerCatabolism(I,J,N,TOMEAutoK(ielmc),VOLWZ,TSensGrowth,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+    call AmmoniaOxidizerCatabolism(I,J,N,TOMEAutoK(ielmc),VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
 
   elseif (N.eq.mid_NitriteOxidBacter)then
     ! NO2 OXIDIZERS
@@ -158,15 +157,20 @@ module MicAutoCPLXMod
     FracAutorBiomOfActK => nmics%FracAutorBiomOfActK,    &
     ZEROS               => micfor%ZEROS,                 &    
     TSensMaintRAutor    => nmics%TSensMaintRAutor,       &
-  GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &    
+    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,     &    
     TotBiomNO2Consumers => nmicdiag%TotBiomNO2Consumers, &
     TotActMicrobiom     => nmicdiag%TotActMicrobiom,     &
-    TSensGrowth         => nmicdiag%TSensGrowth,         &
+    WSensGroAutor       => nmics%WSensGroAutor,          &
+    TSensGroAutor       => nmics%TSensGroAutor,          &
+    TSensGrowth         => nmicdiag%TSensGrowth  ,       &
     TSensMaintR         => nmicdiag%TSensMaintR          &
   )
-
+  !replace with trait specific parameterization
   WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
-  GrowthEnvScalAutor(NGL) = TSensGrowth*WatStressMicb
+  WSensGroAutor(NGL)      = WatStressMicb
+  TSensGroAutor(NGL)      = TSensGrowth
+
+  GrowthEnvScalAutor(NGL) = TSensGroAutor(NGL)*WSensGroAutor(NGL)
   TSensMaintRAutor(NGL)   = TSensMaintR
 
 ! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
@@ -213,10 +217,10 @@ module MicAutoCPLXMod
   associate(                                                   &
     FracOMActAutor          => nmics%FracOMActAutor,           &
     FracAutorBiomOfActK     => nmics%FracAutorBiomOfActK,      &
-    AttenfNH4Autor          => nmicf%AttenfNH4Autor,           &
-    AttenfNO3Autor          => nmicf%AttenfNO3Autor,           &
-    AttenfH1PO4Autor        => nmicf%AttenfH1PO4Autor,         &
-    AttenfH2PO4Autor        => nmicf%AttenfH2PO4Autor,         &
+    AttenfNH4Autor          => micflx%AttenfNH4Autor,          &
+    AttenfNO3Autor          => micflx%AttenfNO3Autor,          &
+    AttenfH1PO4Autor        => micflx%AttenfH1PO4Autor,        &
+    AttenfH2PO4Autor        => micflx%AttenfH2PO4Autor,        &
     RNH4EcoDmndSoilPrev     => micfor%RNH4EcoDmndSoilPrev,     &
     RNH4EcoDmndBandPrev     => micfor%RNH4EcoDmndBandPrev,     &
     RNO3EcoDmndSoilPrev     => micfor%RNO3EcoDmndSoilPrev,     &
@@ -341,10 +345,10 @@ module MicAutoCPLXMod
   ENDIF
   !top soil layer
   IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
-    naqfdiag%TFNH4X=naqfdiag%TFNH4X+AttenfNH4Autor(NGL)
-    naqfdiag%TFNO3X=naqfdiag%TFNO3X+AttenfNO3Autor(NGL)
-    naqfdiag%TFPO4X=naqfdiag%TFPO4X+AttenfH2PO4Autor(NGL)
-    naqfdiag%TFP14X=naqfdiag%TFP14X+AttenfH1PO4Autor(NGL)
+    naqfdiag%TFNH4X=naqfdiag%TFNH4X+micfor%AttenfNH4AutorR(NGL)
+    naqfdiag%TFNO3X=naqfdiag%TFNO3X+micfor%AttenfNO3AutorR(NGL)
+    naqfdiag%TFPO4X=naqfdiag%TFPO4X+micfor%AttenfH2PO4AutorR(NGL)
+    naqfdiag%TFP14X=naqfdiag%TFP14X+micfor%AttenfH1PO4AutorR(NGL)
   ENDIF
   end associate
   end subroutine SubstrateCompetAuto
@@ -923,7 +927,7 @@ module MicAutoCPLXMod
   end associate
   end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine AmmoniaOxidizerCatabolism(I,J,N,TOMEAutoKC,VOLWZ,TSensGrowth,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+  subroutine AmmoniaOxidizerCatabolism(I,J,N,TOMEAutoKC,VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
   !
   !Description:
   ! autotrophic NH3 oxidizer  
@@ -931,7 +935,6 @@ module MicAutoCPLXMod
   integer,  intent(in)  :: I,J,N
   REAL(R8), INTENT(IN)  :: VOLWZ
   real(r8), intent(in)  :: TOMEAutoKC
-  real(r8), intent(in)  :: TSensGrowth   !temperature sensitivity
 
   real(r8)  :: RGOMP         !O2-unlimited/potential respiration [gC h-1]
   real(r8)  :: RVOXP         !potential NH3 oxidation, [gN h-1 d-2]
@@ -961,6 +964,7 @@ module MicAutoCPLXMod
     FSBSTAutor            => nmicdiag%FSBSTAutor,          &
     FracOMActAutor        => nmics%FracOMActAutor,         &
     OMActAutor            => nmics%OMActAutor,             &
+    TSensGroAutor         => nmics%TSensGroAutor,          &    
     RO2Dmnd4RespAutor     => nmicf%RO2Dmnd4RespAutor,      &
     RO2DmndAutor          => nmicf%RO2DmndAutor,           &
     ECHZAutor             => nmicf%ECHZAutor,              &
@@ -1027,7 +1031,7 @@ module MicAutoCPLXMod
     !     ZNFN4S,ZNFN4B=inhibition in non-band, band
     !
     IF(ZNFN0.GT.ZEROS)THEN
-      ZNFNI=ZNFNI*(1.0_r8-RNFNI*TSensGrowth)
+      ZNFNI=ZNFNI*(1.0_r8-RNFNI*TSensGroAutor(NGL))
       ZNFN4S=ZNFN0-ZNFNI/(1.0_r8+CNH4S/ZHKI)
       ZNFN4B=ZNFN0-ZNFNI/(1.0_r8+CNH4B/ZHKI)
     ELSE
@@ -1040,11 +1044,11 @@ module MicAutoCPLXMod
     !     NH3 CONCENTRATIONS IN BAND AND NON-BAND SOIL ZONES
     !
     !     ECHZ=growth respiration efficiency
-    !     VMXX=potential NH3 oxidation, VMXH=specific oxidation
+    !     VMXX=potential NH3 oxidation, VMXNH3Oxi=specific oxidation
     !     TFNG=temperature+water limitation, FBiomStoiScalarAutorr=N,P limitation
     !     XCO2=aqueous CO2 limitation, OMA=active biomass
     !     VMXA= non-substrate limited NH3 oxidation
-    !     VHKI=nonlinear increase in VMXA with VMXH
+    !     VHKI=nonlinear increase in VMXA with VMXNH3Oxi
     !     FNH4S,FNHBS=fractions of NH4 in non-band, band
     !     CNH4S,CNH4B=NH4 concentration in non-band, band
     !     ZHKM=Km for NH4 uptake
@@ -1056,7 +1060,7 @@ module MicAutoCPLXMod
     !     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
     !
     ECHZAutor(NGL)=EO2X
-    VMXX=VMXH*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
+    VMXX=VMXNH3Oxi*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
     IF(VOLWZ.GT.ZEROS2)THEN
       VMXA=VMXX/(1.0_r8+VMXX/(VHKI*VOLWZ))
     ELSE
@@ -1199,7 +1203,7 @@ module MicAutoCPLXMod
   !     RNO2DmndReduxSoilHeter_vr,RNO2DmndReduxBandHeter_vr=nitrifier demand for NO2 in non-band, band
   !
 
-    VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXN
+    VMXA=GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXNO2Oxi
     ECHZAutor(NGL)              = EO2X
     FCN2S                  = FNH4S*CNO2S/(CNO2S+ZNKM)
     FCN2B                  = FNHBS*CNO2B/(CNO2B+ZNKM)
@@ -1302,7 +1306,7 @@ module MicAutoCPLXMod
     GH2X            = RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
     GH2H            = GH2X/12.08_r8
     ECHZAutor(NGL)       = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
-    VMXA            = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXC
+    VMXA            = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXCH4gH2
     H2GSX           = H2GS+0.111_r8*naqfdiag%tCResp4H2Prod
     FSBSTAutor(NGL) = CH2GS/(CH2GS+H2KM)
     !why 1.5? 
@@ -1406,7 +1410,7 @@ module MicAutoCPLXMod
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
     ECHZAutor(NGL)   = EH4X
-    VMXA   = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMX4
+    VMXA   = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*OMActAutor(NGL)*VMXCH4OxiAero
     RCH4L1 = RCH4PhysexchPrev*dts_gas
     RCH4F1 = RCH4GasXchangePrev*dts_gas
     RCH4S1 = (naqfdiag%tCH4ProdAceto+naqfdiag%tCH4ProdH2)*dts_gas
@@ -1531,10 +1535,10 @@ module MicAutoCPLXMod
   associate(                                             &
    GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,    &
    OMActAutor            => nmics%OMActAutor,            &
-   AttenfNH4Autor        => nmicf%AttenfNH4Autor,        &
-   AttenfNO3Autor        => nmicf%AttenfNO3Autor,        &
-   AttenfH2PO4Autor      => nmicf%AttenfH2PO4Autor,      &
-   AttenfH1PO4Autor      => nmicf%AttenfH1PO4Autor,      &
+   AttenfNH4Autor        => micflx%AttenfNH4Autor,       &
+   AttenfNO3Autor        => micflx%AttenfNO3Autor,       &
+   AttenfH2PO4Autor      => micflx%AttenfH2PO4Autor,     &
+   AttenfH1PO4Autor      => micflx%AttenfH1PO4Autor,     &
    RNH4TransfSoilAutor   => nmicf%RNH4TransfSoilAutor,   &
    RNO3TransfSoilAutor   => nmicf%RNO3TransfSoilAutor,   &
    RH2PO4TransfSoilAutor => nmicf%RH2PO4TransfSoilAutor, &

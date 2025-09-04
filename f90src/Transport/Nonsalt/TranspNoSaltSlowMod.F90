@@ -533,7 +533,7 @@ implicit none
         ENDDO
       ENDDO
 
-      DO L=1,nsnol_col(NY,NX)
+      DO L=1,JS
         DO idg=idg_beg,idg_NH3
           trcg_solsml2_snvr(idg,L,NY,NX)  = AZERO(trcg_solsml_snvr(idg,L,NY,NX))
         ENDDO

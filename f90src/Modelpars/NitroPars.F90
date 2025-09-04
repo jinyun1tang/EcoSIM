@@ -37,11 +37,11 @@ module NitroPars
   real(r8) :: DCKML        !Km for SOC decomposition, [g C g-1 soil] 
   real(r8) :: VMXO         !specific oxidation rates for all bacteria, [g C g-1C h-1]
   real(r8) :: VMXF         !specific oxidation rates for all fungi, [g C g-1C h-1] 
-  real(r8) :: VMXM         !specific oxidation rates for acetotrophic methanogens,[g C g-1C h-1] 
-  real(r8) :: VMXH         !specific oxidation rates for ammonia oxidizers, [g  g-1C h-1] 
-  real(r8) :: VMXN         !specific oxidation rates for nitrite oxidizers, [g  g-1C h-1] 
-  real(r8) :: VMX4         !specific oxidation rates for methanotrophs, [g   g-1C h-1] 
-  real(r8) :: VMXC         !specific oxidation rates for hydrogenotrophic methanogens,[g   g-1C h-1] 
+  real(r8) :: VMXCH4gAcet         !specific oxidation rates for acetotrophic methanogens,[g C g-1C h-1] 
+  real(r8) :: VMXNH3Oxi         !specific oxidation rates for ammonia oxidizers, [g  g-1C h-1] 
+  real(r8) :: VMXNO2Oxi           !specific oxidation rates for nitrite oxidizers, [g  g-1C h-1] 
+  real(r8) :: VMXCH4OxiAero     !specific oxidation rates for methanotrophs, [g   g-1C h-1] 
+  real(r8) :: VMXCH4gH2         !specific oxidation rates for hydrogenotrophic methanogens,[g   g-1C h-1] 
   real(r8) :: OQKM         !Km for DOC uptake by heterotrophs bacteria and fungi, [g C m-3]
   real(r8) :: OQKA         !Km for acetate uptake by heterotrophic fermenters, [g C m-3]
   real(r8) :: OQKAM        !Km for acetate uptake  by acetotrophic methanogens,[g C m-3]
@@ -135,11 +135,11 @@ module NitroPars
   DCKML  = 1.0E+03_r8
   VMXO   = 0.125_r8
   VMXF   = 0.125_r8
-  VMXM   = 0.125_r8  !acetoclastic methanogenesis
-  VMXH       = 0.375_r8
-  VMXN       = 0.25_r8
-  VMX4       = 0.375_r8
-  VMXC       = 0.125_r8  !hydrogenotrophic methanogenesis
+  VMXCH4gAcet   = 0.125_r8*0.125_r8 !acetoclastic methanogenesis
+  VMXNH3Oxi       = 0.375_r8
+  VMXNO2Oxi       = 0.25_r8
+  VMXCH4OxiAero  = 0.375_r8
+  VMXCH4gH2       = 0.125_r8*0.125_r8 !hydrogenotrophic methanogenesis
   OQKM       = 1.2E+01_r8
   OQKA       = 1.2E+01_r8
   OQKAM      = 1.2E+01_r8

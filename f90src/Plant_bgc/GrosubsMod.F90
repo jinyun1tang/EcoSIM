@@ -60,21 +60,21 @@ module grosubsMod
   integer :: L,K,M
   integer :: NZ,NE
 ! begin_execution
-  associate(                                           &
-    IsPlantActive_pft => plt_pheno%IsPlantActive_pft  ,& !input  :flag for living pft, [-]
-    NP                => plt_site%NP                  ,& !input  :current number of plant species,[-]
-    NP0               => plt_site%NP0                 ,& !input  :intitial number of plant species,[-]
-    CanopyHeight_pft  => plt_morph%CanopyHeight_pft    & !inoput :canopy height, [m]
+  associate(                                                               &
+    IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
+    NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
+    NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)             = 0._r8
-    plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
-    plt_rbgc%canopy_growth_pft(NZ)   = 0._r8
+    CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)                   = 0._r8
+    plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
+    plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -115,6 +115,7 @@ module grosubsMod
 
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
+  real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
 !     begin_execution
 
   associate(                                                                    &
@@ -184,11 +185,12 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall
 !
-    
+!    
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=1.5814E-05_r8*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
+        XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
           LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
           LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
@@ -372,7 +374,7 @@ module grosubsMod
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum
+  real(r8), intent(out) :: RootPrimeAxsNum !Numer of primary root axes
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
@@ -419,8 +421,8 @@ module grosubsMod
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
-    Root1stXNumL_rpvr            => plt_morph%Root1stXNumL_rpvr             ,& !output :root layer number primary axes, [d-2]
-    Root2ndXNumL_rpvr             => plt_morph%Root2ndXNumL_rpvr              ,& !output :root layer number axes, [d-2]
+    Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr            ,& !output :root layer number primary axes, [d-2]
+    Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr                 ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -459,8 +461,8 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
-    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
+    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
+    .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
     FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
     FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
@@ -653,10 +655,7 @@ module grosubsMod
     RootNodulElms_pft         => plt_biom%RootNodulElms_pft          ,& !output :root nodule chemical element mass, [g d-2]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         ,& !output :canopy shoot structural chemical element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
-    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
-    CanopyVcMaxRubisco_pft    => plt_photo%CanopyVcMaxRubisco_pft    ,& !output :Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
-    CanopyVoMaxRubisco_pft    => plt_photo%CanopyVoMaxRubisco_pft    ,& !output :Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
-    CanopyVcMaxPEP_pft        => plt_photo%CanopyVcMaxPEP_pft         & !output :Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
+    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft          & !output :canopy stalk structural element mass, [g d-2]
   )
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
@@ -690,28 +689,17 @@ module grosubsMod
   CanopySeedNum_pft(NZ)    = 0._r8
   CanopyLeafArea_pft(NZ)   = 0._r8
   CanopyStemArea_pft(NZ)   = 0._r8
-  CanopyVcMaxRubisco_pft(NZ)=0._r8
-  CanopyVoMaxRubisco_pft(NZ)=0._r8
-  CanopyVcMaxPEP_pft(NZ)    =0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
     CanopyLeafShethC_pft(NZ)   = CanopyLeafShethC_pft(NZ) +LeafPetolBiomassC_brch(NB,NZ)
     CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedNumSet_brch(NB,NZ)
     CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
-    CanopyVcMaxRubisco_pft(NZ) = CanopyVcMaxRubisco_pft(NZ)+VcMaxRubiscoRef_brch(NB,NZ)
-    CanopyVoMaxRubisco_pft(NZ) = CanopyVoMaxRubisco_pft(NZ)+VoMaxRubiscoRef_brch(NB,NZ)
-    CanopyVcMaxPEP_pft(NZ)     = CanopyVcMaxPEP_pft(NZ) +VcMaxPEPCarboxyRef_brch(NB,NZ)
 
     DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
-  if(CanopyLeafArea_pft(NZ)>ZEROS)then
-    CanopyVcMaxRubisco_pft(NZ)=CanopyVcMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVoMaxRubisco_pft(NZ)=CanopyVoMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVcMaxPEP_pft(NZ)    =CanopyVcMaxPEP_pft(NZ)/CanopyLeafArea_pft(NZ)
-  endif
 
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES

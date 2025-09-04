@@ -142,7 +142,7 @@ implicit none
   
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
   
-  call MicAPIRecv(I,J,L,NY,NX,micfor%litrm,micstt,micflx,naqfdiag,nmicdiag)
+  call MicAPIRecv(I,J,L,NY,NX,micfor,micstt,micflx,naqfdiag,nmicdiag)
   
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
@@ -206,8 +206,8 @@ implicit none
   if(micfor%litrm)then
     KL=micpar%NumOfLitrCmplxs  
     micfor%TKS            = FracSurfByLitR_col(NY,NX)*TKS_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*TKS_vr(NU_col(NY,NX),NY,NX)
-    micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+ &
-      (1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU_col(NY,NX),NY,NX)
+    micfor%PSISoilMatricP = FracSurfByLitR_col(NY,NX)*PSISoilMatricP_vr(0,NY,NX)+(1._r8-FracSurfByLitR_col(NY,NX))*PSISoilMatricP_vr(NU_col(NY,NX),NY,NX)
+    micfor%PSISoilMatricP = PSISoilMatricP_vr(0,NY,NX)
   else
     KL=jcplx
     micfor%TKS            = TKS_vr(L,NY,NX)
@@ -396,24 +396,36 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  subroutine MicAPIRecv(I,J,L,NY,NX,litrM,micstt,micflx,naqfdiag,nmicdiag)
+  subroutine MicAPIRecv(I,J,L,NY,NX,micfor,micstt,micflx,naqfdiag,nmicdiag)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: L,NY,NX
-  logical, intent(in) :: litrM
+
+  type(micforctype), intent(inout) :: micfor
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
   type(Cumlate_Flux_Diag_type), intent(in) :: naqfdiag
   type(Microbe_Diag_type), intent(in) :: nmicdiag
-
+  logical :: litrM
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutoTrophCmplx
   integer :: NE,idom,K,idg,KL,NN
   
+  litrM=micfor%litrM
+
   NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
   if(litrM)then
     KL=micpar%NumOfLitrCmplxs
+
+    micfor%AttenfNH4HeterR(:,1:KL)   = micflx%AttenfNH4Heter(:,1:KL)
+    micfor%AttenfNO3HeterR(:,1:KL)   = micflx%AttenfNO3Heter(:,1:KL)
+    micfor%AttenfH2PO4HeterR(:,1:KL) = micflx%AttenfH2PO4Heter(:,1:KL)
+    micfor%AttenfH1PO4HeterR(:,1:KL) = micflx%AttenfH1PO4Heter(:,1:KL)
+    micfor%AttenfNH4AutorR           = micflx%AttenfNH4Autor
+    micfor%AttenfNO3AutorR           = micflx%AttenfNO3Autor
+    micfor%AttenfH2PO4AutorR         = micflx%AttenfH2PO4Autor
+    micfor%AttenfH1PO4AutorR         = micflx%AttenfH1PO4Autor
   else
     KL=jcplx
   endif

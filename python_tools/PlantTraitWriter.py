@@ -347,6 +347,7 @@ def write_plant_traits(pft_path,gfname,outdir):
     'CPRT':'PC ratio in plant root:gP gC-1:f4',
     'CPND':'PC ratio in plant nodule:gP gC-1:f4'
     }
+    print('npfts=%d'%npfts)
 
     for j in range(npfts):
         pfile=pft_path+pft_names[j]
@@ -373,7 +374,6 @@ def write_plant_traits(pft_path,gfname,outdir):
                 x=line.split(',')
             else:
                 x=line.split()
-#            print(x)
             ICTYP[j]=int(x[0])
             IGTYP[j]=int(x[1])
             ISTYP[j]=int(x[2])
