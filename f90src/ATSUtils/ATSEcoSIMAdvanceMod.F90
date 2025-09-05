@@ -82,7 +82,7 @@ implicit none
   I=1;J=1
   NPH_Test=1
   NX=1
-  ldo_sp_mode = .True.
+  !ldo_sp_mode = .True.
   !LeafAreaZsec_lpft(:,:,:) = 0.2
   !StemAreaZsec_lpft(:,:,:) = 0.05
 
@@ -227,7 +227,7 @@ implicit none
 
     !testing canopy height
     CanopyHeight_col(NY,NX) = 17.0
-    call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+    if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
 
   ENDDO
 
@@ -235,7 +235,7 @@ implicit none
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
 
-  call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
+  if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
@@ -267,7 +267,7 @@ implicit none
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
 
-  call PlantModel(I,J,NHW,NHE,NVN,NVS)
+  if(ldo_sp_mode) call PlantModel(I,J,NHW,NHE,NVN,NVS)
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
