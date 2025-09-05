@@ -190,8 +190,8 @@ module ExtractsMod
     RUptkRootO2_vr            => plt_bgcr%RUptkRootO2_vr             ,& !inoput :total root internal O2 flux, [g d-2 h-1]
     RootCO2Emis2Root_vr       => plt_bgcr%RootCO2Emis2Root_vr        ,& !inoput :total root CO2 flux, [gC d-2 h-1]
     RootO2_TotSink_vr         => plt_bgcr%RootO2_TotSink_vr          ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
-    THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr        ,& !inoput :total root heat uptake, [MJ d-2]
-    TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr      ,& !inoput :total root water uptake, [m3 d-2]
+    THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr        ,& !inoput :total root heat uptake, [MJ d-2 h-1]
+    TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr      ,& !inoput :total root water uptake, [m3 d-2 h-1]
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr      ,& !inoput :total root element exchange, [g d-2 h-1]
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr         ,& !inoput :total root length density, [m m-3]
     trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr       ,& !inoput :total internal root gas flux, [gC d-2 h-1]
@@ -207,7 +207,7 @@ module ExtractsMod
 !     RootLenDensPerPlant_pvr=PFT root length density per plant
 !     RPlantRootH2OUptk_pvr=total water uptake
 !     RPlantRootH2OUptk_pvr=PFT root water uptake
-!     THeatLossRoot2Soil_vr=total convective heat in root water uptake
+!     THeatLossRoot2Soil_vr=total convective heat in root water uptake, 
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
 !

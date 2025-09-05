@@ -133,7 +133,7 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-
+    if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
     !planting information
     call check_var(pftinfo_nfid, 'pft_pltinfo', vardesc, readvar)
     if(.not. readvar)then
@@ -187,18 +187,18 @@ implicit none
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
         DO M=1,366
-          iHarvstType_pft(NZ,M,NY,NX)                         = -1
-          jHarvst_pft(NZ,M,NY,NX)                             = 0
-          FracCanopyHeightCut_pft(NZ,M,NY,NX)                 = 1.0E+06_r8
-          THIN_pft(NZ,M,NY,NX)                                = -1.0_r8
-          FracBiomHarvsted(1,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-          FracBiomHarvsted(1,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
-          FracBiomHarvsted(2,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+          iHarvstType_pft(NZ,M,NY,NX)                                   = -1
+          jHarvstType_pft(NZ,M,NY,NX)                                       = 0
+          CanopyHeightCut_pft(NZ,M,NY,NX)                               = 1.0E+06_r8
+          THIN_pft(NZ,M,NY,NX)                                          = -1.0_r8
+          FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
+          FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
+          FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
+          FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
         ENDDO
       ENDDO
     ENDDO
@@ -257,6 +257,7 @@ implicit none
         start = (/1,1,1,NTOPO,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
         trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     endif
+    if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
 
     DO NX=NH1,NH2
       DO NY=NV1,NV2
@@ -266,6 +267,7 @@ implicit none
             DO nn1=1,pft_nmgnt(NZ)
               if(len_trim(pft_mgmtinfo(NN1,NZ))==0)cycle
               tstr=trim(pft_mgmtinfo(NN1,NZ))
+              !read day/month/year when management occurs
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
               READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
@@ -283,20 +285,20 @@ implicit none
                 IYR=yearc
                 iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               ENDIF
-
+              !harvest is specified with two type numbers, first is large categroy, second is pft-specific operation
               iHarvstType_pft(NZ,IDY,NY,NX)                         = ICUT
-              jHarvst_pft(NZ,IDY,NY,NX)                             = JCUT
-              FracCanopyHeightCut_pft(NZ,IDY,NY,NX)                 = HCUT
+              jHarvstType_pft(NZ,IDY,NY,NX)                         = JCUT
+              CanopyHeightCut_pft(NZ,IDY,NY,NX)                     = HCUT
               THIN_pft(NZ,IDY,NY,NX)                                = PCUT
-              FracBiomHarvsted(1,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
-              FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
-              FracBiomHarvsted(1,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
-              FracBiomHarvsted(1,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
+              FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
+              FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
+              FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
+              FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
               
-              FracBiomHarvsted(2,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
-              FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
-              FracBiomHarvsted(2,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
-              FracBiomHarvsted(2,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
+              FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
+              FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
+              FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
+              FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
                 !animal or insect biomass
@@ -305,17 +307,17 @@ implicit none
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
                     iHarvstType_pft(NZ,IDYG,NY,NX)                         = ICUT
-                    jHarvst_pft(NZ,IDYG,NY,NX)                             = JCUT
-                    FracCanopyHeightCut_pft(NZ,IDYG,NY,NX)                 = HCUT
+                    jHarvstType_pft(NZ,IDYG,NY,NX)                             = JCUT
+                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                     = HCUT
                     THIN_pft(NZ,IDYG,NY,NX)                                = PCUT
-                    FracBiomHarvsted(1,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
-                    FracBiomHarvsted(1,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
-                    FracBiomHarvsted(1,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
-                    FracBiomHarvsted(1,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
-                    FracBiomHarvsted(2,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT21
-                    FracBiomHarvsted(2,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT22
-                    FracBiomHarvsted(2,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT23
-                    FracBiomHarvsted(2,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT24
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
+                    FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT21
+                    FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT22
+                    FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT23
+                    FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT24
                   ENDDO D580
                 endif
                 IDYS=IDY
@@ -950,26 +952,26 @@ implicit none
   character(len=81) :: line
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
-  call writefixl(nu_plt,'Specific rubisco carboxylase (umol C g-1 s-1) VCMX',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific rubisco oxygenase (umol O2 g-1 s-1) VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific PEP carboxylase activity (umol g-1 s-1) VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxSpecRubCarboxyRef_pft(uM) XKCO2',XKCO2_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft (uM) XKO2',XKO2_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft (uM) XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Fraction of leaf protein in rubisco (g rub/(g protein)) RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase (g pep/(g protein)) PEPC',&
+  call writefixl(nu_plt,'Specific rubisco carboxylase [umol C g-1 s-1] VCMX',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific rubisco oxygenase [umol O2 g-1 s-1] VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific PEP carboxylase activity [umol g-1 s-1] VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxSpecRubCarboxyRef_pft [uM] XKCO2',XKCO2_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft [uM] XKO2',XKO2_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft [uM] XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Fraction of leaf protein in rubisco [g rub/(gC protein)] RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase [g PEP/(gC protein)] PEPC',&
     FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific chlorophyll activity (umol e- gC-1 s-1) ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Specific chlorophyll activity [umol e- gC-1 s-1] ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
-    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) (g Chl /(g protein)) CHL',&
+    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) [g Chl /(gC protein)] CHL',&
       LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
   elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
-    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in bundle sheath(C4) (g Chl /(g protein)) CHL',&
+    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in bundle sheath(C4) [g Chl /(gC protein)] CHL',&
       LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
-    call writefixl(nu_plt,'fraction of leaf protein in mesophyll chlorophyll(C4) (g Chl /(g protein)) CHL4',&
+    call writefixl(nu_plt,'Fraction of leaf protein in mesophyll chlorophyll(C4) [g Chl /(gC protein)] CHL4',&
       LeafC4ChlorofilConc_pft(NZ,NY,NX),90)
   endif
-  call writefixl(nu_plt,'intercellular-to-atmospheric CO2 concentration ratio FCO2',CanopyCi2CaRatio_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'Intercellular-to-atmospheric CO2 concentration ratio [-]FCO2',CanopyCi2CaRatio_pft(NZ,NY,NX),90)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -985,17 +987,17 @@ implicit none
   write(nu_plt,*)('-',j=1,100)
 
   write(nu_plt,*)'PHENOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'Rate of node initiation at 25oC (h-1) XRNI',RefNodeInitRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Rate of leaf appearance at 25oC (h-1) XRLA',RefLeafAppearRate_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss (oC) CTC',TCChill4Seed_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Hour requirement for spring leafout VRNLI',VRNLI,70)
-  call writefixl(nu_plt,'Hour requirement for autumn leafoff VRNXI',VRNXI,70)
-  call writefixl(nu_plt,'Leaf length:width ratio WDLF',rLen2WidthLeaf_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB',NonstCMinConc2InitBranch_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Maturity group, node number required for floral initiation, GROUPX',GROUPX_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Node number at planting XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Critical photoperiod (h) <= maximum daylength XDL',CriticPhotoPeriod_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'Photoperiod sensitivity (node h-1) XPPD',PhotoPeriodSens_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'Rate of node initiation at 25oC [h-1] XRNI',RefNodeInitRate_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Rate of leaf appearance at 25oC [h-1] XRLA',RefLeafAppearRate_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss [oC] CTC',TCChill4Seed_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Hour requirement for spring leafout [h] VRNLI',VRNLI,84)
+  call writefixl(nu_plt,'Hour requirement for autumn leafoff [h] VRNXI',VRNXI,84)
+  call writefixl(nu_plt,'Leaf length:width ratio WDLF [-]',rLen2WidthLeaf_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB [gC]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Maturity group, node number required for floral initiation [-] GROUPX',GROUPX_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Node number at planting [-] XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Critical photoperiod <= maximum daylength [h] XDL',CriticPhotoPeriod_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Photoperiod sensitivity [node h-1] XPPD',PhotoPeriodSens_pft(NZ,NY,NX),84)
 
 
   end subroutine Phenology_trait_disp
@@ -1009,21 +1011,21 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC_pft(NZ,NY,NX),84)
   call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
-    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),70)
-  call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),70)
+    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),84)
+  call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),84)
   call writefixl(nu_plt,'maximum potential seed mumber from '// &
-    'pre-anthesis stalk growth STMX',MaxPotentSeedNumber_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'maximum seed size per SDMX (g) GRMX',SeedCMassMax_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass_pft(NZ,NY,NX),70)    !could be greater than SeedCMassMax, accouting for seedling
-  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),70)
+    'pre-anthesis stalk growth STMX',MaxPotentSeedNumber_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'maximum seed size per SDMX (gC) GRMX',SeedCMassMax_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass_pft(NZ,NY,NX),84)    !could be greater than SeedCMassMax, accouting for seedling
+  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),84)
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1035,16 +1037,16 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'radius of primary roots (m) RRAD1M',Root1stMaxRadius_pft(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'radius of secondary roots (m) RRAD2M',Root2ndMaxRadius_pft(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'primary/fine root porosity (m3 m-3) PORT',RootPorosity_pft(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'nonstructural C concentration needed for root'// &
-    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),73)
-  call writefixl(nu_plt,'radial root resistivity for water uptake (m2 MPa-1 h-1) RSRR',RootRadialResist_pft(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'axial root resistivity for water uptake (m2 MPa-1 h-1) RSRA',RootAxialResist_pft(1,NZ,NY,NX),73)
-  call writefixl(nu_plt,'rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn PTSHT',ShutRutNonstElmntConducts_pft(NZ,NY,NX),73)
-  call writefixl(nu_plt,'root branching frequency (m-1) RTFQ',RootBranchFreq_pft(NZ,NY,NX),73)
+  call writefixl(nu_plt,'Radius of fine roots [m] RRAD1M',Root1stMaxRadius_pft(1,NZ,NY,NX),84)
+  call writefixl(nu_plt,'Radius of root hairs [m] RRAD2M',Root2ndMaxRadius_pft(1,NZ,NY,NX),84)
+  call writefixl(nu_plt,'Primary/fine root porosity [m3 m-3] PORT',RootPorosity_pft(1,NZ,NY,NX),84)
+  call writefixl(nu_plt,'Nonstructural C concentration needed for root'// &
+    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Radial resistivity per m2 root surface area for water uptake [MPa h m-1] RSRR',RootRadialResist_pft(1,NZ,NY,NX),84)
+  call writefixl(nu_plt,'Axial resistivity per m root length for water uptake [MPa h m-4] RSRA',RootAxialResist_pft(1,NZ,NY,NX),84)
+  call writefixl(nu_plt,'Rate constant for equilibrating shoot-root '// &
+    'nonstructural C concn PTSHT',ShutRutNonstElmntConducts_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'Branching frequency from 1st to 2nd roots [m-1] RTFQ',RootBranchFreq_pft(NZ,NY,NX),84)
   end subroutine Root_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1056,15 +1058,15 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ROOT UPTAKE PARAMETERS'
-  call writefixl(nu_plt,'NH4 max uptake (g m-2 h-1) UPMXZH',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'NH4 uptake Km (uM) UPKMZH',KmNH4Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'NH4 uptake min concn (uM) UPMNZH',CMinNH4Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'NO3 max uptake (g m-2 h-1) UPMXZO',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'NO3 uptake Km (uM) UPKMZO',KmNO3Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'NO3 uptake min concn (uM) UPMNZO',CMinNO3Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 max uptake (g m-2 h-1) UPMXPO',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake Km (uM) UPKMPO',KmPO4Root_pft(ipltroot,NZ,NY,NX),70)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake min conc (uM) UPMNPO',CMinPO4Root_pft(ipltroot,NZ,NY,NX),70)
+  call writefixl(nu_plt,'NH4 max uptake [g m-2 h-1] UPMXZH',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'NH4 uptake Km [uM] UPKMZH',KmNH4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'NH4 uptake min concn [uM] UPMNZH',CMinNH4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'NO3 max uptake [g m-2 h-1] UPMXZO',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'NO3 uptake Km [uM] UPKMZO',KmNO3Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'NO3 uptake min concn [uM] UPMNZO',CMinNO3Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'H2PO4 or H1PO4 max uptake [g m-2 h-1] UPMXPO',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake Km [uM] UPKMPO',KmPO4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake min conc [uM] UPMNPO',CMinPO4Root_pft(ipltroot,NZ,NY,NX),84)
   end subroutine Root_nutrient_trait_disp
 
 
@@ -1078,10 +1080,10 @@ implicit none
   write(nu_plt,*)('-',j=1,100)  
   write(nu_plt,*)'WATER RELATIONS'
   call writefixl(nu_plt,'leaf osmotic potential at zero leaf water '// &
-     'potential (MPa) OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),70)
+     'potential [MPa] OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),84)
   call writefixl(nu_plt,'shape parameter for stomatal resistance vs '// &
-     'leaf turgor potential RCS',RCS_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'H2O cuticular resistance (s m-1) RSMX',CuticleResist_pft(NZ,NY,NX),70)
+     'leaf turgor potential [MPa-1] RCS',RCS_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'H2O cuticular resistance [s m-1] RSMX',CuticleResist_pft(NZ,NY,NX),84)
   end subroutine plant_water_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1123,24 +1125,24 @@ implicit none
 
   write(nu_plt,*)('-',j=1,100)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
-  call writefixl(nu_plt,'NC ratio in plant leaves (gN/gC) CNLF',rNCLeaf_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant petiole (gN/gC) CNSHE',rNCSheath_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant stalk (gN/gC) CNSTK',rNCStalk_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant stalk reserve (gN/gC) CNRSV',rNCReserve_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant husk (gN/gC) CNHSK',rNCHusk_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant ear (gN/gC) CNEAR',rNCEar_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant grain (gN/gC) CNGR',rNCGrain_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant root (gN/gC) CNRT',rNCRoot_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'NC ratio in plant nodule (gN/gC) CNND',rNCNodule_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant leaves (gP/gC) CPLF',rPCLeaf_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant petiole (gP/gC) CPSHE',rPCSheath_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant stalk (gP/gC) CPSTK',rPCStalk_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant stalk reserve (gP/gC) CPRSV',rPCReserve_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant husk (gP/gC) CPHSK',rPCHusk_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant ear (gP/gC) CPEAR',rPCEar_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant grain (gP/gC) CPGR',rPCGrain_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant root (gP/gC) CPRT',rPCRootr_pft(NZ,NY,NX),70)
-  call writefixl(nu_plt,'PC ratio in plant nodule (gP/gC) CPND',rPCNoduler_pft(NZ,NY,NX),70)
+  call writefixl(nu_plt,'NC ratio in plant leaves (gN/gC) CNLF',rNCLeaf_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant petiole (gN/gC) CNSHE',rNCSheath_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant stalk (gN/gC) CNSTK',rNCStalk_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant stalk reserve (gN/gC) CNRSV',rNCReserve_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant husk (gN/gC) CNHSK',rNCHusk_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant ear (gN/gC) CNEAR',rNCEar_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant grain (gN/gC) CNGR',rNCGrain_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant root (gN/gC) CNRT',rNCRoot_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'NC ratio in plant nodule (gN/gC) CNND',rNCNodule_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant leaves (gP/gC) CPLF',rPCLeaf_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant petiole (gP/gC) CPSHE',rPCSheath_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant stalk (gP/gC) CPSTK',rPCStalk_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant stalk reserve (gP/gC) CPRSV',rPCReserve_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant husk (gP/gC) CPHSK',rPCHusk_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant ear (gP/gC) CPEAR',rPCEar_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant grain (gP/gC) CPGR',rPCGrain_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant root (gP/gC) CPRT',rPCRootr_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'PC ratio in plant nodule (gP/gC) CPND',rPCNoduler_pft(NZ,NY,NX),84)
   end subroutine plant_biomstoich_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1257,6 +1259,7 @@ implicit none
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
 
         NN=1
+        if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
         D4995: DO NX=NH1,NH2
           D4990: DO NY=NV1,NV2
             NP0_col(NY,NX)=NS

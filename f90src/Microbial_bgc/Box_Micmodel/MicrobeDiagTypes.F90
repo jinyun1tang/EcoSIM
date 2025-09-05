@@ -74,7 +74,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: RNO2ReduxChemo
 
   contains
-    procedure, public :: ZeroOut => nit_aqmf_diag
+    procedure, public :: ZeroOut => nit_aqmf_diag    
   end type Cumlate_Flux_Diag_type
 
   type, public :: Microbe_State_type
@@ -103,6 +103,10 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: OMC2Autor(:)
   real(r8),allocatable :: GrowthEnvScalAutor(:)
   real(r8),allocatable :: TSensMaintRAutor(:)
+  real(r8),allocatable :: TSensGroAutor(:)          !temperature sensitivity of autotrophic microbes
+  real(r8),allocatable :: WSensGroAutor(:)          !moisture sensitivity of autotrophic microbes
+  real(r8),allocatable :: TSensGroHeter(:,:)        !temperature sensitivity of microbial growth
+  real(r8),allocatable :: WSensGroHeter(:,:)        !moisture sensitivity of microbial growth
   real(r8),allocatable :: OMN2Autor(:)
   real(r8),allocatable :: FOM2Autor(:)
   real(r8),allocatable :: fLimO2Autor(:)
@@ -119,11 +123,6 @@ type, public :: Cumlate_Flux_Diag_type
   !fluxes
   real(r8) :: RTotNH3OxidSoilAutor
   real(r8) :: RTotNH3OxidBandAutor  
-! allocatable flux ratios
-  real(r8),allocatable :: AttenfNH4Heter(:,:)
-  real(r8),allocatable :: AttenfNO3Heter(:,:)
-  real(r8),allocatable :: AttenfH2PO4Heter(:,:)
-  real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! allocatable fluxes
   real(r8),allocatable :: DOMuptk4GrothHeter(:,:,:)
   real(r8),allocatable :: RMetabDOCUptkHeter(:,:)
@@ -216,11 +215,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RNH4TransfLitrAutor(:)
   real(r8),allocatable :: RNO3TransfLitrAutor(:)
   real(r8),allocatable :: RH2PO4TransfLitrAutor(:)
-  real(r8),allocatable :: AttenfNH4Autor(:)
-  real(r8),allocatable :: AttenfNO3Autor(:)
-  real(r8),allocatable :: AttenfH2PO4Autor(:)
   real(r8),allocatable :: NonstX2stBiomAutor(:,:,:)
-  real(r8),allocatable :: AttenfH1PO4Autor(:)
   real(r8),allocatable :: RCO2ProdAutor(:)
   real(r8),allocatable :: RCH4ProdAutor(:)
   real(r8),allocatable :: RH1PO4TransfSoilAutor(:)
@@ -362,6 +357,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%RNO2ReduxChemo     = 0._r8
 
   end subroutine nit_aqmf_diag
+
 !------------------------------------------------------------------------------------------
 
   subroutine nit_micf_init(this,jcplx,NumMicbFunGrupsPerCmplx)
@@ -415,12 +411,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNH4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilLitrHeter=spval
   allocate(this%RNO3imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilLitrHeter=spval
   allocate(this%RH2PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4imobilLitrHeter=spval
-  allocate(this%AttenfNH4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4Heter=spval
-  allocate(this%AttenfNO3Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3Heter=spval
-  allocate(this%AttenfH2PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
   allocate(this%RNOxReduxRespDenitUlm(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitUlm=spval
   allocate(this%NonstX2stBiomHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%NonstX2stBiomHeter=spval
-  allocate(this%AttenfH1PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH1PO4Heter=spval
   allocate(this%RCO2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCO2ProdHeter=spval
   allocate(this%RAcettProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcettProdHeter=spval
   allocate(this%RCH4ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCH4ProdHeter=spval
@@ -471,11 +463,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNH4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfLitrAutor=spval
   allocate(this%RNO3TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNO3TransfLitrAutor=spval
   allocate(this%RH2PO4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RH2PO4TransfLitrAutor=spval
-  allocate(this%AttenfNH4Autor(NumMicrobAutoTrophCmplx));this%AttenfNH4Autor=spval
-  allocate(this%AttenfNO3Autor(NumMicrobAutoTrophCmplx));this%AttenfNO3Autor=spval
-  allocate(this%AttenfH2PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH2PO4Autor=spval
+
   allocate(this%NonstX2stBiomAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%NonstX2stBiomAutor=spval
-  allocate(this%AttenfH1PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH1PO4Autor=spval
   allocate(this%RCO2ProdAutor(NumMicrobAutoTrophCmplx));this%RCO2ProdAutor=spval
   allocate(this%RCH4ProdAutor(NumMicrobAutoTrophCmplx));this%RCH4ProdAutor=spval
   allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfSoilAutor=spval
@@ -519,6 +508,10 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%OMC2Autor(NumMicrobAutoTrophCmplx));this%OMC2Autor=spval
   allocate(this%GrowthEnvScalAutor(NumMicrobAutoTrophCmplx));this%GrowthEnvScalAutor=spval
   allocate(this%TSensMaintRAutor(NumMicrobAutoTrophCmplx));this%TSensMaintRAutor=spval
+  allocate(this%TSensGroAutor(NumMicrobAutoTrophCmplx));this%TSensGroAutor=spval
+  allocate(this%WSensGroAutor(NumMicrobAutoTrophCmplx));this%WSensGroAutor=spval
+  allocate(this%WSensGroHeter(NumHetetr1MicCmplx,1:jcplx));this%WSensGroHeter=spval
+  allocate(this%TSensGroHeter(NumHetetr1MicCmplx,1:jcplx));this%TSensGroHeter=spval
   allocate(this%OMN2Autor(NumMicrobAutoTrophCmplx));this%OMN2Autor=spval
   allocate(this%FOM2Autor(NumMicrobAutoTrophCmplx));this%FOM2Autor=spval
   allocate(this%fLimO2Autor(NumMicrobAutoTrophCmplx));this%fLimO2Autor=spval
@@ -573,13 +566,9 @@ type, public :: Cumlate_Flux_Diag_type
   this%RNH4imobilLitrHeter      = 0._r8
   this%RNO3imobilLitrHeter      = 0._r8
   this%RH2PO4imobilLitrHeter    = 0._r8
-  this%AttenfNH4Heter           = 0._r8
-  this%AttenfNO3Heter           = 0._r8
-  this%AttenfH2PO4Heter         = 0._r8
   this%RNOxReduxRespDenitUlm    = 0._r8
   this%ROQC4HeterMicrobAct      = 0._r8
   this%NonstX2stBiomHeter       = 0._r8
-  this%AttenfH1PO4Heter         = 0._r8
   this%RCO2ProdHeter            = 0._r8
   this%RAcettProdHeter          = 0._r8
   this%RCH4ProdHeter            = 0._r8
@@ -627,12 +616,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RMaintDefcitRecycOMAutor = 0._r8
   this%RNH4TransfLitrAutor      = 0._r8
   this%RNO3TransfLitrAutor      = 0._r8
-  this%RH2PO4TransfLitrAutor    = 0._r8
-  this%AttenfNH4Autor           = 0._r8
-  this%AttenfNO3Autor           = 0._r8
-  this%AttenfH2PO4Autor         = 0._r8
+  this%RH2PO4TransfLitrAutor    = 0._r8  
   this%NonstX2stBiomAutor       = 0._r8
-  this%AttenfH1PO4Autor         = 0._r8
   this%RCO2ProdAutor            = 0._r8
   this%RCH4ProdAutor            = 0._r8
   this%RH1PO4TransfSoilAutor    = 0._r8
@@ -688,13 +673,9 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNH4imobilLitrHeter)
   call destroy(this%RNO3imobilLitrHeter)
   call destroy(this%RH2PO4imobilLitrHeter)
-  call destroy(this%AttenfNH4Heter)
-  call destroy(this%AttenfNO3Heter)
-  call destroy(this%AttenfH2PO4Heter)
   call destroy(this%RNOxReduxRespDenitUlm)
   call destroy(this%ROQC4HeterMicrobAct)
   call destroy(this%NonstX2stBiomHeter)
-  call destroy(this%AttenfH1PO4Heter)
   call destroy(this%RCO2ProdHeter)
   call destroy(this%RAcettProdHeter)
   call destroy(this%RCH4ProdHeter)
@@ -737,11 +718,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNH4TransfLitrAutor)
   call destroy(this%RNO3TransfLitrAutor)
   call destroy(this%RH2PO4TransfLitrAutor)
-  call destroy(this%AttenfNH4Autor)
-  call destroy(this%AttenfNO3Autor)
-  call destroy(this%AttenfH2PO4Autor)
+
   call destroy(this%NonstX2stBiomAutor)
-  call destroy(this%AttenfH1PO4Autor)
   call destroy(this%RCO2ProdAutor)
   call destroy(this%RCH4ProdAutor)
   call destroy(this%RH1PO4TransfSoilAutor)
@@ -810,7 +788,6 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%FCN)
   call destroy(this%FCP)
   call destroy(this%FBiomStoiScalarHeter)
-
   call destroy(this%rCNBiomeActAutor)
   call destroy(this%OMActAutor)
   call destroy(this%FracOMActAutor)
@@ -819,6 +796,10 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%OMC2Autor)
   call destroy(this%GrowthEnvScalAutor)
   call destroy(this%TSensMaintRAutor)
+  call destroy(this%TSensGroAutor)
+  call destroy(this%WSensGroAutor)  
+  call destroy(this%TSensGroHeter)
+  call destroy(this%WSensGroHeter)
   call destroy(this%OMN2Autor)
   call destroy(this%FOM2Autor)
   call destroy(this%fLimO2Autor)

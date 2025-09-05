@@ -33,11 +33,11 @@ NPYS=20,20,20,20,20      !number of cycles per NPX for gas flux calcns
 NCYC_LITR=30
 NCYC_SNOW=20
 !set up output frequency
-hist_mfilt=7665 , 8760
-!hist_fincl2 = 'AIR_TEMP','TEMP_vr','PREC','SOIL_RN','SOIL_LE','SOIL_G','SOIL_H','SOL_RADN','WIND','EVAPN',
-!  'RUNOFF_FLX','rWatFILLP_vr','rIceFILLP_vr','SNOWPACK','SURF_WTR'
-!hist_fincl2='TEMP_vr'
-hist_nhtfrq=-24, -1
+hist_mfilt=7665 , 7665
+hist_fincl2 = 'TEMP_vr','PREC_col','SOIL_RN_col','SOIL_LE_col','SOIL_G_col','SOIL_H_col','SOL_RADN_col','EVAPN_col',
+  'RUNOFF_FLX_col','rWatFLP_vr','rIceFLP_vr','SNOWPACK_col','SURF_WTR_col'
+
+hist_nhtfrq=-24, -24
 /
 
 &bbgcforc

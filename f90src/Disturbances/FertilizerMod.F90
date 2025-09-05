@@ -76,7 +76,7 @@ implicit none
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
 ! urea application
-  IF(FERT(ifert_urea,I,NY,NX).GT.0._r8 .OR. FERT(ifert_urea_band,I,NY,NX).GT.0._r8)THEN  
+  IF(FERT(ifert_N_urea,I,NY,NX).GT.0._r8 .OR. FERT(ifert_N_urea_band,I,NY,NX).GT.0._r8)THEN  
     IF(IYTYP(0,I,NY,NX).EQ.0)THEN
       iUreaHydInhibitorType_col(NY,NX)=0
     ELSEIF(IYTYP(0,I,NY,NX).EQ.1 .OR. IYTYP(0,I,NY,NX).EQ.3)THEN
@@ -164,71 +164,71 @@ implicit none
 !     MAIZE
 !
     IF(IYTYP(1,I,NY,NX).EQ.1)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.080_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.245_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.613_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.062_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.080_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.245_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.613_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.062_r8
 !
 !     WHEAT
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.171_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.144_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.125_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.171_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.144_r8
 !
 !     SOYBEAN
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.138_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.426_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.316_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.120_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.138_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.426_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.316_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.120_r8
 !
 !     OLD STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.125_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.550_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.250_r8
 !
 !     STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.036_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.044_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.767_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.153_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.036_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.044_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.767_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.153_r8
 !
 !     COMPOST
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.143_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.015_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.640_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.143_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.015_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.640_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.202_r8
 !
 !     GREEN MANURE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.013_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.225_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.202_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.013_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.225_r8
 !
 !     SIMPLE SUBSTRATE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=1.000_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.000_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 1.000_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.000_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.000_r8
     ELSE
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
+      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.125_r8
+      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.550_r8
+      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.250_r8
     ENDIF
 !
 !     ALLOCATION OF ANIMAL MANURE APPLICATION TO
@@ -237,34 +237,34 @@ implicit none
 !     RUMINANT
 !
     IF(IYTYP(2,I,NY,NX).EQ.1)THEN
-      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
-      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
-      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
-      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.036_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.044_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.630_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)   = 0.290_r8
 !
 !     NON-RUMINANT
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
-      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
-      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
-      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
-      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.138_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.401_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.316_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)   = 0.145_r8
 !
 !     GRAZING
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
-      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
-      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
-      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
-      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.036_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.044_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.630_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)   = 0.290_r8
 !
 !     OTHER
 !
     ELSE
-      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
-      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
-      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
-      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
+      CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.138_r8
+      CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.401_r8
+      CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.316_r8
+      CFOSC_vr(ilignin,k_manure,LFDPTH,NY,NX)   = 0.145_r8
     ENDIF
 !
 !     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE complex
@@ -392,12 +392,12 @@ implicit none
           VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
         ENDIF
       ENDDO D2970
-      tAmendOrgC_lnd=tAmendOrgC_lnd+OSCI
-      TORGN=TORGN+OSNI
-      TORGP=TORGP+OSPI
-      AmendC_CumYr_flx_col(NY,NX)=AmendC_CumYr_flx_col(NY,NX)+OSCI
-      FertN_Flx_CumYr_col(NY,NX)=FertN_Flx_CumYr_col(NY,NX)+OSNI
-      FerPFlx_CumYr_col(NY,NX)=FerPFlx_CumYr_col(NY,NX)+OSPI
+      tAmendOrgC_lnd              = tAmendOrgC_lnd+OSCI
+      TORGN                       = TORGN+OSNI
+      TORGP                       = TORGP+OSPI
+      AmendC_CumYr_flx_col(NY,NX) = AmendC_CumYr_flx_col(NY,NX)+OSCI
+      FertN_Flx_CumYr_col(NY,NX)  = FertN_Flx_CumYr_col(NY,NX)+OSNI
+      FerPFlx_CumYr_col(NY,NX)    = FerPFlx_CumYr_col(NY,NX)+OSPI
       IF(IYTYP(2,I,NY,NX).LT.3)THEN
         Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+OSCI
       ENDIF
@@ -414,8 +414,8 @@ implicit none
   integer, intent(out) :: LFDPTH
 
   character(len=*), parameter :: subname='ApplyMineralFertilizer'
-  real(r8) :: BAREF
-  real(r8) :: CVRDF
+  real(r8) :: frcFert2Topsoil
+  real(r8) :: frcFert2SurfLitr
   real(r8) :: CAC
   real(r8) :: CAS
   real(r8) :: CACX
@@ -444,36 +444,41 @@ implicit none
 !     *A,*B=broadcast,banded
 !     Z4,Z3,ZU,ZO=NH4,NH3,urea,NO3
 !
+!   Z4A: NH4,Z3A:NH3,ZUA:urea,ZOA:NO3,Z4B:NH4Band,Z3B:NH3Band,ZUB:UreaBand,ZOB:NO3Band
+!   PMA:CaH4P2O8,PMB:CaH4P2O8Band,PHA:apatite,CAC:CaCO3,CAS:CaSO4
+! 
+
   call PrintInfo('beg '//subname)
-  Z4A=FERT(1,I,NY,NX)
-  Z3A=FERT(2,I,NY,NX)
-  ZUA=FERT(3,I,NY,NX)
-  ZOA=FERT(4,I,NY,NX)
-  Z4B=FERT(5,I,NY,NX)
-  Z3B=FERT(6,I,NY,NX)
-  ZUB=FERT(7,I,NY,NX)
-  ZOB=FERT(8,I,NY,NX)
+  Z4A=FERT(ifert_N_nh4,I,NY,NX)
+  Z3A=FERT(ifert_N_nh3,I,NY,NX)
+  ZUA=FERT(ifert_N_urea,I,NY,NX)
+  ZOA=FERT(ifert_N_no3,I,NY,NX)
+  Z4B=FERT(ifert_N_nh4_band,I,NY,NX)
+  Z3B=FERT(ifert_N_nh3_band,I,NY,NX)
+  ZUB=FERT(ifert_N_urea_band,I,NY,NX)
+  ZOB=FERT(ifert_N_no3_band,I,NY,NX)
 !
 !     MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE
 !
 !     PM*,PH*=Ca(H2PO4)2,apatite
 !
-  PMA=FERT(9,I,NY,NX)
-  PMB=FERT(10,I,NY,NX)
-  PHA=FERT(11,I,NY,NX)
+  PMA=FERT(ifert_P_Ca_H2PO4_2,I,NY,NX)
+  PMB=FERT(ifert_P_Ca_H2PO4_2_band,I,NY,NX)
+  PHA=FERT(ifert_P_apatite,I,NY,NX)
 !
 !     LIME AND GYPSUM
 !
 !     CAC,CAS=CaCO3,CaSO4
 !
-  CAC=FERT(12,I,NY,NX)
-  CAS=FERT(13,I,NY,NX)
+  CAC=FERT(ifert_Ca_lime,I,NY,NX)
+  CAS=FERT(ifert_Ca_gypsum,I,NY,NX)
 !
 !     PLANT(1) AND ANIMAL(2) RESIDUE C, N AND P
 !
   OFC(1)=FERT(14,I,NY,NX)
   OFN(1)=FERT(15,I,NY,NX)
   OFP(1)=FERT(16,I,NY,NX)
+
   OFC(2)=FERT(17,I,NY,NX)
   OFN(2)=FERT(18,I,NY,NX)
   OFP(2)=FERT(19,I,NY,NX)
@@ -481,24 +486,24 @@ implicit none
 !     SOIL LAYER NUMBER AT DEPTH OF FERTILIZER APPLICATION
 !
 !     LFDPTH=layer number
-!     CVRDF=fraction of fertilizer applied to surface litter
+!     frcFert2SurfLitr=fraction of fertilizer applied to surface litter
 !
   IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0._r8)THEN
     FDPTHF=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     IF(FDPTHF.LE.0._r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
-      CVRDF=1.0_r8-EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA_3D(3,0,NY,NX)))
+      frcFert2SurfLitr=1.0_r8-EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA_3D(3,0,NY,NX)))
     ELSE
       D65: DO L=NUI_col(NY,NX),JZ
         IF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHF)THEN
           LFDPTH=L
-          CVRDF=1.0_r8
+          frcFert2SurfLitr=1.0_r8
           exit
         ENDIF
       ENDDO D65
     ENDIF
 
-    BAREF=1.0_r8-CVRDF
+    frcFert2Topsoil=1.0_r8-frcFert2SurfLitr
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
@@ -507,9 +512,9 @@ implicit none
 !     DPNHB,WDNHB=depth,width of NH4 band
 !     VLNHB,VLNH4=soil volume in NH4 band,non-band
 !
-    IF((Z4B+Z3B+ZUB.GT.0._r8).OR.((trcs_solml_vr(ids_NH4B,LFDPTH,NY,NX).GT.0._r8 &
-      .OR.trcs_solml_vr(idg_NH3B,LFDPTH,NY,NX).GT.0._r8).AND.IFNHB_col(NY,NX).EQ.0))THEN
-      IFNHB_col(NY,NX)=1
+    IF((Z4B+Z3B+ZUB.GT.0._r8) .OR. ((trcs_solml_vr(ids_NH4B,LFDPTH,NY,NX).GT.0._r8 &
+      .OR. trcs_solml_vr(idg_NH3B,LFDPTH,NY,NX).GT.0._r8).AND.iFertNH4Band_col(NY,NX).EQ.ifert_off))THEN
+      iFertNH4Band_col(NY,NX)=ifert_on
       ROWSpaceNH4_col(NY,NX)=ROWI(I,NY,NX)
       D50: DO L=NUI_col(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
@@ -551,23 +556,23 @@ implicit none
 !     DPNOB,WDNOB=depth,width of NO3 band
 !     VLNOB,VLNO3=soil volume in NO3 band,non-band
 !
-    IF((Z4B+Z3B+ZUB+ZOB.GT.0._r8).OR.((trcs_solml_vr(ids_NO3B,LFDPTH,NY,NX).GT.0._r8 &
-      .OR.trcs_solml_vr(ids_NO2B,LFDPTH,NY,NX).GT.0._r8).AND.IFNOB_col(NY,NX).EQ.0))THEN
-      IFNOB_col(NY,NX)=1
-      ROWSpaceNO3_col(NY,NX)=ROWI(I,NY,NX)
+    IF((Z4B+Z3B+ZUB+ZOB.GT.0._r8) .OR. ((trcs_solml_vr(ids_NO3B,LFDPTH,NY,NX).GT.0._r8 &
+      .OR. trcs_solml_vr(ids_NO2B,LFDPTH,NY,NX).GT.0._r8) .AND. iFertNO3Band_col(NY,NX).EQ.ifert_off))THEN
+      iFertNO3Band_col(NY,NX)=ifert_on
+      ROWSpaceNO3Band_col(NY,NX)=ROWI(I,NY,NX)
       D45: DO L=NUI_col(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
-          BandThicknessNO3_vr(L,NY,NX)=DLYR_3D(3,L,NY,NX)
-          BandWidthNO3_vr(L,NY,NX)=0._r8
+          BandThicknessNO3_vr(L,NY,NX) = DLYR_3D(3,L,NY,NX)
+          BandWidthNO3_vr(L,NY,NX)     = 0._r8
         ELSEIF(L.EQ.LFDPTH)THEN
           BandThicknessNO3_vr(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CumDepz2LayBottom_vr(L-1,NY,NX))
-          BandWidthNO3_vr(L,NY,NX)=AMIN1(0.01_r8,ROWSpaceNO3_col(NY,NX))
+          BandWidthNO3_vr(L,NY,NX)=AMIN1(0.01_r8,ROWSpaceNO3Band_col(NY,NX))
         ELSE
           BandThicknessNO3_vr(L,NY,NX)=0._r8
           BandWidthNO3_vr(L,NY,NX)=0._r8
         ENDIF
         IF(DLYR_3D(3,L,NY,NX).GT.ZERO2)THEN
-          trcs_VLN_vr(ids_NO3B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNO3_vr(L,NY,NX)/ROWSpaceNO3_col(NY,NX) &
+          trcs_VLN_vr(ids_NO3B,L,NY,NX)=AMIN1(0.999_r8,BandWidthNO3_vr(L,NY,NX)/ROWSpaceNO3Band_col(NY,NX) &
             *BandThicknessNO3_vr(L,NY,NX)/DLYR_3D(3,L,NY,NX))
         ELSE
           trcs_VLN_vr(ids_NO3B,L,NY,NX)=0._r8
@@ -594,8 +599,8 @@ implicit none
 !     DPPOB,WDPOB=depth,width of H2PO4 band
 !     VLPOB,VLPO4=soil volume in H2PO4 band,non-band
 !
-    IF((PMB.GT.0.0).OR.(trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX).GT.0._r8.AND.IFPOB_col(NY,NX).EQ.0))THEN
-      IFPOB_col(NY,NX)=1
+    IF((PMB.GT.0.0_r8) .OR. (trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX).GT.0._r8 .AND. iFertPO4Band_col(NY,NX).EQ.ifert_off))THEN
+      iFertPO4Band_col(NY,NX)=ifert_on
       ROWSpacePO4_col(NY,NX)=ROWI(I,NY,NX)
       DO  L=NUI_col(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
@@ -628,7 +633,7 @@ implicit none
         PALPOT = trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)+trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)
         PFEPOT = trcp_saltpml_vr(idsp_FePO4,L,NY,NX)+trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)
         PCAPDT = trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)
-        PCAPHT = trcp_saltpml_vr(idsp_HA,L,NY,NX)+trcp_saltpml_vr(idsp_HAB,L,NY,NX)
+        PCAPHT = trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX)
         PCAPMT = trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)
 
         trcs_solml_vr(ids_H1PO4,L,NY,NX)  = H1PO4T*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
@@ -649,12 +654,12 @@ implicit none
         trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)     = PALPOT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trcp_saltpml_vr(idsp_FePO4,L,NY,NX)     = PFEPOT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)    = PCAPDT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-        trcp_saltpml_vr(idsp_HA,L,NY,NX)        = PCAPHT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+        trcp_saltpml_vr(idsp_Apatite,L,NY,NX)        = PCAPHT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)  = PCAPMT*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
         trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)    = PALPOT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)    = PFEPOT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)   = PCAPDT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-        trcp_saltpml_vr(idsp_HAB,L,NY,NX)       = PCAPHT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+        trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX)       = PCAPHT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
         trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX) = PCAPMT*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
 
         if(salt_model)then
@@ -699,10 +704,10 @@ implicit none
 !     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH4P2O8,CaHPO4,apatite in non-band
 !     PCAPMB,PCAPDB,PCAPHB=concn of precip CaH4P2O8,CaHPO4,apatite in band
 !     PCACO,PCASO=precipitated CaCO3,CaSO4
-!
-    Z4AX = Z4A*AREA_3D(3,LFDPTH,NY,NX)/natomw
-    Z3AX = Z3A*AREA_3D(3,LFDPTH,NY,NX)/natomw
-    ZUAX = ZUA*AREA_3D(3,LFDPTH,NY,NX)/natomw
+
+    Z4AX = Z4A*AREA_3D(3,LFDPTH,NY,NX)/natomw   !NH4
+    Z3AX = Z3A*AREA_3D(3,LFDPTH,NY,NX)/natomw   !NH3 
+    ZUAX = ZUA*AREA_3D(3,LFDPTH,NY,NX)/natomw   !urea
     ZOAX = ZOA*AREA_3D(3,LFDPTH,NY,NX)/natomw
     Z4BX = Z4B*AREA_3D(3,LFDPTH,NY,NX)/natomw
     Z3BX = Z3B*AREA_3D(3,LFDPTH,NY,NX)/natomw
@@ -714,37 +719,37 @@ implicit none
     CACX = CAC*AREA_3D(3,LFDPTH,NY,NX)/40._r8
     CASX = CAS*AREA_3D(3,LFDPTH,NY,NX)/40._r8
 
-    FertN_mole_soil_vr(ifert_nh4,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_nh4,LFDPTH,NY,NX)+Z4AX*CVRDF)
-    FertN_mole_soil_vr(ifert_urea,LFDPTH,NY,NX) = AZMAX1(FertN_mole_soil_vr(ifert_urea,LFDPTH,NY,NX)+ZUAX*CVRDF)
-    FertN_mole_soil_vr(ifert_no3,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_no3,LFDPTH,NY,NX)+ZOAX*CVRDF)
+    FertN_mole_soil_vr(ifert_N_nh4,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_nh4,LFDPTH,NY,NX)+Z4AX*frcFert2SurfLitr)
+    FertN_mole_soil_vr(ifert_N_urea,LFDPTH,NY,NX) = AZMAX1(FertN_mole_soil_vr(ifert_N_urea,LFDPTH,NY,NX)+ZUAX*frcFert2SurfLitr)
+    FertN_mole_soil_vr(ifert_N_no3,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_no3,LFDPTH,NY,NX)+ZOAX*frcFert2SurfLitr)
 
-    FertN_mole_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_nh4_band,LFDPTH,NY,NX)+Z4BX*CVRDF)
-    FertN_mole_Band_vr(ifert_urea_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF)
-    FertN_mole_Band_vr(ifert_no3_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF)
+    FertN_mole_Band_vr(ifert_N_nh4_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_nh4_band,LFDPTH,NY,NX)+Z4BX*frcFert2SurfLitr)
+    FertN_mole_Band_vr(ifert_N_urea_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_N_urea_band,LFDPTH,NY,NX)+ZUBX*frcFert2SurfLitr)
+    FertN_mole_Band_vr(ifert_N_no3_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_no3_band,LFDPTH,NY,NX)+ZOBX*frcFert2SurfLitr)
 
-    trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)  = trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
-    trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
-    trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)        = trcp_saltpml_vr(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
-    trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)       = trcp_saltpml_vr(idsp_HAB,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
+    trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)    = trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*frcFert2SurfLitr
+    trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)   = trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*frcFert2SurfLitr+PMBX*frcFert2SurfLitr
+    trcp_saltpml_vr(idsp_Apatite,LFDPTH,NY,NX)     = trcp_saltpml_vr(idsp_Apatite,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*frcFert2SurfLitr
+    trcp_saltpml_vr(idsp_ApatiteBand,LFDPTH,NY,NX) = trcp_saltpml_vr(idsp_ApatiteBand,LFDPTH,NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*frcFert2SurfLitr
 
     IF(LFDPTH.EQ.0)THEN
-      FertN_mole_soil_vr(ifert_nh4,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_nh4,NU_col(NY,NX),NY,NX)+Z4AX*BAREF)
-      FertN_mole_soil_vr(ifert_nh3,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_nh3,NU_col(NY,NX),NY,NX)+Z3AX)
-      FertN_mole_soil_vr(ifert_urea,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_urea,NU_col(NY,NX),NY,NX)+ZUAX*BAREF)
-      FertN_mole_soil_vr(ifert_no3,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_no3,NU_col(NY,NX),NY,NX)+ZOAX*BAREF)
+      FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)+Z4AX*frcFert2Topsoil)
+      FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)+Z3AX)
+      FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)+ZUAX*frcFert2Topsoil)
+      FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)+ZOAX*frcFert2Topsoil)
 
-      FertN_mole_Band_vr(ifert_nh4_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_nh4_band,NU_col(NY,NX),NY,NX)+Z4BX*BAREF)
-      FertN_mole_Band_vr(ifert_nh3_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_nh3_band,NU_col(NY,NX),NY,NX)+Z3BX)
-      FertN_mole_Band_vr(ifert_urea_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_urea_band,NU_col(NY,NX),NY,NX)+ZUBX*BAREF)
-      FertN_mole_Band_vr(ifert_no3_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_no3_band,NU_col(NY,NX),NY,NX)+ZOBX*BAREF)
+      FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)+Z4BX*frcFert2Topsoil)
+      FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)+Z3BX)
+      FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)+ZUBX*frcFert2Topsoil)
+      FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)=AZMAX1(FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)+ZOBX*frcFert2Topsoil)
 
-      trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)  = trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*BAREF
-      trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*BAREF+PMBX*BAREF
-      trcp_saltpml_vr(idsp_HA,NU_col(NY,NX),NY,NX)        = trcp_saltpml_vr(idsp_HA,NU_col(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*BAREF
-      trcp_saltpml_vr(idsp_HAB,NU_col(NY,NX),NY,NX)       = trcp_saltpml_vr(idsp_HAB,NU_col(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*BAREF
+      trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)  = trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*frcFert2Topsoil
+      trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX) = trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*frcFert2Topsoil+PMBX*frcFert2Topsoil
+      trcp_saltpml_vr(idsp_Apatite,NU_col(NY,NX),NY,NX)        = trcp_saltpml_vr(idsp_Apatite,NU_col(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*frcFert2Topsoil
+      trcp_saltpml_vr(idsp_ApatiteBand,NU_col(NY,NX),NY,NX)       = trcp_saltpml_vr(idsp_ApatiteBand,NU_col(NY,NX),NY,NX)+PHAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*frcFert2Topsoil
     ELSE
-      FertN_mole_soil_vr(ifert_nh3,LFDPTH,NY,NX)      = AZMAX1(FertN_mole_soil_vr(ifert_nh3,LFDPTH,NY,NX)+Z3AX*CVRDF)
-      FertN_mole_Band_vr(ifert_nh3_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_nh3_band,LFDPTH,NY,NX)+Z3BX*CVRDF)
+      FertN_mole_soil_vr(ifert_N_nh3,LFDPTH,NY,NX)      = AZMAX1(FertN_mole_soil_vr(ifert_N_nh3,LFDPTH,NY,NX)+Z3AX*frcFert2SurfLitr)
+      FertN_mole_Band_vr(ifert_N_nh3_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_N_nh3_band,LFDPTH,NY,NX)+Z3BX*frcFert2SurfLitr)
     ENDIF
     trcp_saltpml_vr(idsp_CaCO3,NU_col(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaCO3,NU_col(NY,NX),NY,NX)+CACX
     trcp_saltpml_vr(idsp_CaSO4,NU_col(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaSO4,NU_col(NY,NX),NY,NX)+CASX

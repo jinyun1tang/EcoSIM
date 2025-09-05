@@ -349,7 +349,7 @@ contains
             write(111,*)'tracersnowfall   =',trcg_AquaAdv_flx_snvr(idg,1,NY,NX)
             write(111,*)'snowmass err     =',tracer_snowmass_err
             write(111,*)'------------------'
-            write(111,*)'xroot beg_end_delta mass.    =',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),&
+            write(111,*)'xroot beg_end_delta mass     =',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),&
               trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX),trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX) &
               -(trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX))  
 !            write(194,*)'balmas',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX)  

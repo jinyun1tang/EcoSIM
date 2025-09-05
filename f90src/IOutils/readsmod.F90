@@ -185,7 +185,7 @@ module readsmod
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
       ROWSpaceNH4_col(NY,NX) = 0.0_r8
-      ROWSpaceNO3_col(NY,NX) = 0.0_r8
+      ROWSpaceNO3Band_col(NY,NX) = 0.0_r8
       ROWSpacePO4_col(NY,NX) = 0.0_r8
       D325: DO I=1,366
         iSoilDisturbType_col(I,NY,NX) = 0

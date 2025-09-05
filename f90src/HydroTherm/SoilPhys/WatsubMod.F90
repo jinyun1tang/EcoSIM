@@ -414,7 +414,7 @@ module WatsubMod
         VLHeatCapacityA_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX) &
           +cpi*VLiceMicP1_vr(L,NY,NX)
         if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
-          VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)      
+          VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))      
         endif  
         VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
         VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
@@ -1250,7 +1250,7 @@ module WatsubMod
           
           VLHeatCapacityA_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
           if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
-            VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*RootMassElm_vr(ielmc,L,NY,NX)
+            VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
           endif
           VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
           VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
@@ -2371,7 +2371,7 @@ module WatsubMod
 !     FIceThawedMacP_vr=soil water flux from macropore freeze-thaw
 !
   if(plantOM4Heat)then
-    dcpo = cpo*RootMassElm_vr(ielmc,N3,N2,N1)
+    dcpo = cpo*sum(RootMycoMassElm_vr(ielmc,:,N3,N2,N1))
   else
     dcpo=0._r8
   endif

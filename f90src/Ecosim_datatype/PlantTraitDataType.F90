@@ -24,6 +24,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                    !pft canopy height, [m]
+  real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
@@ -46,7 +47,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
   real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)             !sheath height, [m]
-  real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)         !Live internode height, [m]
+  real(r8),target,allocatable ::  StalkNodeHeight_brch(:,:,:,:,:)         !Live internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                  !branch height, [m]
@@ -54,7 +55,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
-  real(r8),target,allocatable ::  InternodeHeightDead_brch(:,:,:,:,:)        !Dead internode height, [m]
+  real(r8),target,allocatable ::  StalkNodeVertLength_brch(:,:,:,:,:)        !Dead internode height, [m]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCSheath_pft(:,:,:)                           !sheath N:C ratio, [g g-1]
@@ -80,9 +81,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                  !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
-  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [m-2]
+  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [# m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
-  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [m-2]
+  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [# m-2]
   integer,target,allocatable ::   NumActivePlants_col(:,:)                        !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
@@ -191,6 +192,7 @@ contains
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
   allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
+  allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
@@ -214,7 +216,7 @@ contains
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
   allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
-  allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
+  allocate(StalkNodeHeight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeHeight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
@@ -222,7 +224,7 @@ contains
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
-  allocate(InternodeHeightDead_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDead_brch=0._r8
+  allocate(StalkNodeVertLength_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeVertLength_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
   allocate(rNCSheath_pft(JP,JY,JX));    rNCSheath_pft=0._r8
@@ -379,7 +381,7 @@ contains
   call destroy(CanopyHeight4WatUptake_pft)
   call destroy(LeafArea_node)
   call destroy(PetoleLensNode_brch)
-  call destroy(LiveInterNodeHight_brch)
+  call destroy(StalkNodeHeight_brch)
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
@@ -387,7 +389,7 @@ contains
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
-  call destroy(InternodeHeightDead_brch)
+  call destroy(StalkNodeVertLength_brch)
   call destroy(PARTS_brch)
   call destroy(rNCLeaf_pft)
   call destroy(rPCLeaf_pft)

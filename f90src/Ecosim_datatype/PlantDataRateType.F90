@@ -36,7 +36,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ElmBalanceCum_pft(:,:,:,:)                     !plant element balance, [g d-2]
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)            !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfalStrutElms_pvr(:,:,:,:,:,:,:)            !plant LitrFall element, [g d-2 h-1]
-  real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !total net primary productivity, [g d-2]
+  real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !Hourly net primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable ::  cumNPP_pft(:,:,:)                              !cumulative net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration  <0 into atmosphere, [m d-2]
   real(r8),target,allocatable ::  CanopyRespC_CumYr_pft(:,:,:)                   !total autotrophic respiration, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_pft(:,:,:,:)               !plant element harvest, [g d-2 ]
@@ -64,6 +65,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootOUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCUlmNutUptake_pvr(:,:,:,:,:,:)             !root uptake of NH4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2EmisPot_pvr(:,:,:,:,:)                  !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8),target,allocatable ::  VmaxNH4Root_pvr(:,:,:,:,:)                     !maximum NH4 uptake rate, [gN h-1 (gC root)-1]
+  real(r8),target,allocatable ::  VmaxNO3Root_pvr(:,:,:,:,:)                     !maximum NO3 uptake rate, [gN h-1 (gC root)-1]
   real(r8),target,allocatable ::  RootNH4DmndSoil_pvr(:,:,:,:,:)                 !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3DmndSoil_pvr(:,:,:,:,:)                 !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4DmndBand_pvr(:,:,:,:,:)                 !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
@@ -177,6 +180,7 @@ module PlantDataRateType
   allocate(LitrfalStrutElms_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_pft=0._r8
   allocate(LitrfalStrutElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfalStrutElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
+  allocate(cumNPP_pft(JP,JY,JX)); cumNPP_pft=0._r8
   allocate(ETCanopy_CumYr_pft(JP,JY,JX));    ETCanopy_CumYr_pft=0._r8
   allocate(CanopyRespC_CumYr_pft(JP,JY,JX));    CanopyRespC_CumYr_pft=0._r8
   allocate(EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_CumYr_pft=0._r8
@@ -206,6 +210,8 @@ module PlantDataRateType
   allocate(RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootOUlmNutUptake_pvr=0._r8
   allocate(RootCO2EmisPot_pvr(jroots,JZ,JP,JY,JX));RootCO2EmisPot_pvr=0._r8
   allocate(RootNH4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndSoil_pvr=0._r8
+  allocate(VmaxNH4Root_pvr(jroots,JZ,JP,JY,JX)); VmaxNH4Root_pvr=0._r8
+  allocate(VmaxNO3Root_pvr(jroots,JZ,JP,JY,JX)); VmaxNO3Root_pvr=0._r8
   allocate(RootNO3DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndSoil_pvr=0._r8
   allocate(RootNH4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNH4DmndBand_pvr=0._r8
   allocate(RootNO3DmndBand_pvr(jroots,JZ,JP,JY,JX));RootNO3DmndBand_pvr=0._r8
@@ -307,6 +313,7 @@ module PlantDataRateType
   call destroy(LitrfalStrutElms_pft)
   call destroy(LitrfalStrutElms_pvr)
   call destroy(NetPrimProduct_pft)
+  call destroy(cumNPP_pft)
   call destroy(ETCanopy_CumYr_pft)
   call destroy(CanopyRespC_CumYr_pft)
   call destroy(EcoHavstElmnt_CumYr_pft)
@@ -333,6 +340,8 @@ module PlantDataRateType
   call destroy(RootCUlmNutUptake_pvr)
   call destroy(RootCO2EmisPot_pvr)
   call destroy(RootNH4DmndSoil_pvr)
+  call destroy(VmaxNH4Root_pvr)
+  call destroy(VmaxNO3Root_pvr)
   call destroy(RootNO3DmndSoil_pvr)
   call destroy(RootNH4DmndBand_pvr)
   call destroy(RootNO3DmndBand_pvr)

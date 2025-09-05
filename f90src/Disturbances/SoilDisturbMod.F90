@@ -330,7 +330,7 @@ module SoilDisturbMod
           trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)
           trcp_saltpml_vr(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_FePO4,L,NY,NX)
           trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)
-          trcp_saltpml_vr(idsp_HA,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_HA,L,NY,NX)
+          trcp_saltpml_vr(idsp_Apatite,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_Apatite,L,NY,NX)
           trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end

@@ -607,7 +607,7 @@ module InitPlantMod
     LeafAreaZsec_brch                 => plt_morph%LeafAreaZsec_brch                  ,& !output :leaf surface area, [m2 d-2]
     LeafArea_node                 => plt_morph%LeafArea_node                  ,& !output :leaf area, [m2 d-2]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
-    LiveInterNodeHight_brch           => plt_morph%LiveInterNodeHight_brch            ,& !output :internode height, [m]
+    StalkNodeHeight_brch           => plt_morph%StalkNodeHeight_brch            ,& !output :internode height, [m]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
@@ -713,13 +713,13 @@ module InitPlantMod
 
     DO K=0,MaxNodesPerBranch1
       LeafArea_node(K,NB,NZ)                                   = 0._r8
-      LiveInterNodeHight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%InternodeHeightDead_brch(K,NB,NZ)                  = 0._r8
+      StalkNodeHeight_brch(K,NB,NZ)                             = 0._r8
+      plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
       plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
       plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
       plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
       plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
-      plt_biom%InternodeStrutElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
+      plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
       plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
 
       D55: DO L=1,NumCanopyLayers1
@@ -773,7 +773,7 @@ module InitPlantMod
   implicit none
   integer, intent(in) :: NZ
   integer :: M,NE
-  real(r8) :: WTSTDX
+  real(r8) :: StandDeadC_pft
 
   associate(                                                                    &
     AREA3                          => plt_site%AREA3                           ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
@@ -826,15 +826,15 @@ module InitPlantMod
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)          = 0._r8
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
     ETCanopy_CumYr_pft(NZ)                                   = 0._r8
-    WTSTDX                                                   = StandingDeadInitC_pft(NZ)*AREA3(NU)
+    StandDeadC_pft                                           = StandingDeadInitC_pft(NZ)*AREA3(NU)
+    !standing dead is assumed to exist as stalk only
     D155: DO M=1,jsken
-      StandDeadKCompElms_pft(ielmc,M,NZ)=WTSTDX*ElmAllocmat4Litr(ielmc,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmn,M,NZ)=WTSTDX*rNCStalk_pft(NZ)*ElmAllocmat4Litr(ielmn,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmp,M,NZ)=WTSTDX*rPCStalk_pft(NZ)*ElmAllocmat4Litr(ielmp,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmc,M,NZ)=StandDeadC_pft*ElmAllocmat4Litr(ielmc,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmn,M,NZ)=StandDeadC_pft*rNCStalk_pft(NZ)*ElmAllocmat4Litr(ielmn,icwood,M,NZ)
+      StandDeadKCompElms_pft(ielmp,M,NZ)=StandDeadC_pft*rPCStalk_pft(NZ)*ElmAllocmat4Litr(ielmp,icwood,M,NZ)
     ENDDO D155
     DO NE=1,NumPlantChemElms
-      StandDeadStrutElms_pft(NE,NZ)=StandDeadStrutElms_pft(NE,NZ)+&
-        sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
+      StandDeadStrutElms_pft(NE,NZ)=StandDeadStrutElms_pft(NE,NZ)+sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))
     ENDDO
   ENDIF
   end associate
@@ -968,7 +968,7 @@ module InitPlantMod
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
       plt_morph%Root1stXNumL_rpvr(N,L,NZ)                       = 0._r8
       plt_morph%Root2ndXNumL_rpvr(N,L,NZ)                        = 0._r8
-      plt_morph%RootLenPerPlant_pvr(N,L,NZ)                    = 0._r8
+      plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)                    = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
       RootPoreVol_rpvr(N,L,NZ)                                  = 0._r8
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8

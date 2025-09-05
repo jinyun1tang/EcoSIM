@@ -207,13 +207,20 @@ module minimathmod
   end function AZMIN1d
 
 !------------------------------------------------------------------------------------------
-  pure function AZERO(val)result(ans)
+  pure function AZERO(val,tiny1)result(ans)
   implicit none
   real(r8), intent(in) :: val
-
+  real(r8), optional, intent(in) :: tiny1
   real(r8) :: ans
-  real(r8), parameter :: tiny_val1=1.e-13_r8
-  if(abs(val)>=tiny_val1)then
+  real(r8), parameter :: tiny_val1=1.e-10_r8
+  real(r8) :: tiny  
+  if(present(tiny1))then
+    tiny=tiny1
+  else
+    tiny=tiny_val1
+  endif  
+
+  if(abs(val)>=tiny)then
     ans=val
   else  
     ans=0._r8

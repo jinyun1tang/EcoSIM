@@ -706,8 +706,8 @@ contains
   WaterFlow2MicptX_3D(3,NUM_col(NY,NX),NY,NX) = CumWatXFlx2SoiMicP
   WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)  = CumWatFlx2SoiMacP
   HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)   = cumSnoHeatFlow2Soil
-  WatFLo2LitrM_col(NY,NX)                 = CumSnowWatFlow2LitR
-  HeatFLoByWat2LitRM_col(NY,NX)           = CumSnoHeatFlow2LitR
+  WatFLo2LitrM_col(NY,NX)                     = CumSnowWatFlow2LitR
+  HeatFLoByWat2LitRM_col(NY,NX)               = CumSnoHeatFlow2LitR
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
@@ -742,7 +742,7 @@ contains
   WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)  = WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)+NetWatFlxAir2SoiMacP
   HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)   = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+cumHeatSensAir2Soil
   !fluxes to litter
-  WatFLo2LitrM_col(NY,NX)   = WatFLo2LitrM_col(NY,NX)+NetWatFlxAir2LitR
+  WatFLo2LitrM_col(NY,NX)       = WatFLo2LitrM_col(NY,NX)+NetWatFlxAir2LitR
   HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)+CumHeatSensAir2LitR
 
 !  if(I==149 .and. J==10 .and. NX==1)then
@@ -882,29 +882,23 @@ contains
 
     WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlxLitR2Soi
-    WatFLo2LitrM_col(NY,NX)                = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
-    HeatFLoByWat2LitRM_col(NY,NX)          = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
-    WatFLoLitr2SoilM_col(M,NY,NX)                  = WatDarcyFloLitR2SoiMicP
 
-!    if(I==149 .and. J==10 .and. NX==1)then
-!      write(120,*)(I*1000+J)*100+M,'wat3',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)
-!    endif
+    WatFLo2LitrM_col(NY,NX)                    = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
+    HeatFLoByWat2LitRM_col(NY,NX)              = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
+    WatFLoLitr2SoilM_col(M,NY,NX)              = WatDarcyFloLitR2SoiMicP
 
     !soil to litter
   ELSE
     !top layer is water
-    WatDarcyFloLitR2SoiMicP                = XVLMobileWatMicP(NY,NX)*dts_wat
-    HeatFlxLitR2Soi                        = cpw*TKSoil1_vr(0,NY,NX)*WatDarcyFloLitR2SoiMicP*HeatAdv_scal
+    WatDarcyFloLitR2SoiMicP                    = XVLMobileWatMicP(NY,NX)*dts_wat
+    HeatFlxLitR2Soi                            = cpw*TKSoil1_vr(0,NY,NX)*WatDarcyFloLitR2SoiMicP*HeatAdv_scal
     WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlxLitR2Soi
-    WatFLo2LitrM_col(NY,NX)                = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
-    HeatFLoByWat2LitRM_col(NY,NX)          = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
-    WatFLoLitr2SoilM_col(M,NY,NX)          = WatDarcyFloLitR2SoiMicP
 
-!    if(I==149 .and. J==10 .and. NX==1)then
-!      write(120,*)(I*1000+J)*100+M,'wat4',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)
-!    endif
 
+    WatFLo2LitrM_col(NY,NX)                    = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
+    HeatFLoByWat2LitRM_col(NY,NX)              = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
+    WatFLoLitr2SoilM_col(M,NY,NX)              = WatDarcyFloLitR2SoiMicP
   ENDIF
 
 !     OVERLAND FLOW INTO SOIL MACROPORES WHEN WATER STORAGE CAPACITY
