@@ -127,7 +127,7 @@ implicit none
     !convert WindSpeedAtm_col from ATS units (m s^-1) to EcoSIM (m h^-1)
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
-    RadSWGrnd_col(NY,NX) = 0.0
+    RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
 
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
