@@ -27,9 +27,10 @@ module ATSEcoSIMAdvanceMod
   use MiniMathMod
   use ClimForcDataType
   use PrescribePhenolMod
-  use RootDataType
+  !use RootDataType
   use FlagDataType
   use ATSUtilsMod
+  use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
 
 implicit none
@@ -73,6 +74,9 @@ implicit none
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
+
+  associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
+  )
 
   !All the necessary sizes are taken from GridConsts
   !real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
@@ -277,19 +281,14 @@ implicit none
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP)
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
+    !Now update subsurface flux from roots
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
+        a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,NY)
+    ENDDO
   ENDDO
 
-  !write(*,*) "After setting surf_w_source to Qinfl2MicP: "
-  ! Check for NaN in surf_w_source
-  if (any(is_nan(surf_w_source))) then
-    write(*,*) "NaN found in surf_w_source at indices:", pack([(i, i=1,NYS)], is_nan(surf_w_source))
-  end if
 
-  !Compute potential water loss(or gain) before next EcoSIM run
-  !Wat_next = VLWatMicP1_vr(1,1,1) - Qinfl2MicP(NY,1) / (dts_HeatWatTP)
-  !write(*,*) "(End EcoSIM Advance) Total Water Volume in top layer: ", VLWatMicP1_vr(1,1,1), " m, Q_w: ", surf_w_source(1)
-  !write(*,*) "After an hour of this flux the water content should be: ", Wat_next
-
+  !end associate
   end subroutine RunEcoSIMSurfaceBalance
 
 end module ATSEcoSIMAdvanceMod
