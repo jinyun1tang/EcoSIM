@@ -27,9 +27,10 @@ module ATSEcoSIMAdvanceMod
   use MiniMathMod
   use ClimForcDataType
   use PrescribePhenolMod
-  use RootDataType
+  !use RootDataType
   use FlagDataType
   use ATSUtilsMod
+  use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
 
 implicit none
@@ -73,6 +74,9 @@ implicit none
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
+
+  associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
+  )
 
   !All the necessary sizes are taken from GridConsts
   !real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
@@ -277,8 +281,12 @@ implicit none
     surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP)
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
+    !Now update subsurface flux from roots
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
+        a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,NY)
+    ENDDO
   ENDDO
-
+  end associate
   end subroutine RunEcoSIMSurfaceBalance
 
 end module ATSEcoSIMAdvanceMod
