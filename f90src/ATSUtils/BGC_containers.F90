@@ -201,6 +201,8 @@ module BGCContainers_module
      integer (c_int) :: current_day
      integer (c_int) :: current_year
      logical (c_bool) :: p_bool
+     logical (c_bool) :: a_bool
+     logical (c_bool) :: pheno_bool
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData

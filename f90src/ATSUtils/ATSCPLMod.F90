@@ -100,7 +100,7 @@ contains
 
   data_ptr = state%liquid_density%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_LDENS = data2D(:,:)  
+  a_LDENS = data2D(:,:)
 
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -159,7 +159,7 @@ contains
   a_ASP = data(:)
 
   call c_f_pointer(props%LAI%data, data, (/num_cols/))
-  a_LAI = data(:)  
+  a_LAI = data(:)
 
   call c_f_pointer(props%SAI%data, data, (/num_cols/))
   a_SAI = data(:)
@@ -186,6 +186,8 @@ contains
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
   p_bool = props%p_bool
+  a_bool = props%a_bool
+  pheno_bool = props%pheno_bool
   current_day = props%current_day
   current_year = props%current_year
 
