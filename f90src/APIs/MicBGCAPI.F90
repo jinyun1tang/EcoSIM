@@ -7,7 +7,7 @@ module MicBGCAPI
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
-  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1
+  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1,real_truncate
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref

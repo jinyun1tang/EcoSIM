@@ -14,6 +14,7 @@ implicit none
   real(r8), parameter :: umol2gC_hr=0.0432_r8 !=3600*12.e-6_r8
   contains
   ![header]
+
 !----------------------------------------------------------------------------------------------------
   subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CO2FCL,CO2FLL)
 
@@ -70,6 +71,7 @@ implicit none
 ! FOR EACH CANOPY LAYER
   CO2FCL=0._r8;CO2FLL=0._r8
   D210: DO L=NumCanopyLayers1,1,-1
+
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION

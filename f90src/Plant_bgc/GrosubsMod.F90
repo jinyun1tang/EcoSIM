@@ -2,7 +2,7 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod,         only: safe_adb, AZMAX1
+  use minimathmod,         only: safe_adb, AZMAX1,real_truncate
   use data_kind_mod,       only: r8 => DAT_KIND_R8
   use EcoSIMCtrlMod,       only: lverb
   use EcoSiMParDataMod,    only: pltpar
@@ -314,7 +314,7 @@ module grosubsMod
   real(r8) :: TFN5
   real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
-  real(r8) :: WFNS,CanTurgPSIFun4Expans
+  real(r8) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
   real(r8) :: RootSinkC_vr(pltpar%jroots,JZ1),RootSinkC(pltpar%jroots)
   real(r8) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
@@ -331,14 +331,14 @@ module grosubsMod
     BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
       if(lverb)write(*,*)'GrowOneBranch'
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
+        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,PTRT,CanopyN2Fix_pft,BegRemoblize)
     ENDDO
 
     call PrintRootTracer(I,J,NZ,'afgrowbranch')
@@ -370,7 +370,7 @@ module grosubsMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
@@ -378,7 +378,7 @@ module grosubsMod
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
-  real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
+  real(r8), intent(out) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
   real(r8), parameter :: dscal=0.999992087_r8
@@ -398,7 +398,7 @@ module grosubsMod
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
-    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RootElms_pft                => plt_biom%RootElms_pft                  ,& !input  :plant root element mass, [g d-2]
     rNCRoot_pft                 => plt_allom%rNCRoot_pft                  ,& !input  :root N:C ratio, [gN gC-1]
     rPCRootr_pft                => plt_allom%rPCRootr_pft                 ,& !input  :root P:C ratio, [gP gC-1]
@@ -431,17 +431,17 @@ module grosubsMod
   )
   call PrintInfo('beg '//subname)
   D2: DO L=1,NumCanopyLayers1
-    CanopyLeafAreaZ_pft(L,NZ)=0._r8
-    CanopyLeafCLyr_pft(L,NZ)=0._r8
-    CanopyStemAreaZ_pft(L,NZ)=0._r8
+    CanopyLeafAreaZ_pft(L,NZ) = 0._r8
+    CanopyLeafCLyr_pft(L,NZ)  = 0._r8
+    CanopyStemAreaZ_pft(L,NZ) = 0._r8
   ENDDO D2
 
 
   D6: DO L=1,NK
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
-      Root1stXNumL_rpvr(N,L,NZ)   = 0._r8
-      Root2ndXNumL_rpvr(N,L,NZ)    = 0._r8
+      Root1stXNumL_rpvr(N,L,NZ)  = 0._r8
+      Root2ndXNumL_rpvr(N,L,NZ)  = 0._r8
       RootRespPotent_pvr(N,L,NZ) = 0._r8
       RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
       RootCO2Autor_pvr(N,L,NZ)   = 0._r8
@@ -517,12 +517,12 @@ module grosubsMod
 !     8.3143,710.0=gas constant,enthalpy
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
-  TKCM=TKC_pft(NZ)+TempOffset_pft(NZ)
+  TKCM=real_truncate(TKC_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
 
   TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays
-    TKSM=TKS_vr(L)+TempOffset_pft(NZ)
-    TFN6_vr(L)=calc_plant_maint_tempf(TKSM)  
+    TKSM       = real_truncate(TKS_vr(L)+TempOffset_pft(NZ),1.e-3_r8)
+    TFN6_vr(L) = calc_plant_maint_tempf(TKSM)
   ENDDO D7
 !
 !     PRIMARY ROOT NUMBER
@@ -537,14 +537,14 @@ module grosubsMod
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
   !     FROM CANOPY TURGOR
   !
-  !     WFNS=turgor expansion,extension function
-  !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
+  !     TurgEff4LeafPetolExpansion=turgor expansion,extension function
+  !     PSICanopyTurg_pft,TurgPSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
   !     Stomata_Stress=stomatal resistance function of canopy turgor
   !     PSICanopy_pft=canopy water potential
   !     WaterStress4Groth=growth function of canopy water potential
-  !     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
+  !     TurgEff4CanopyResp=expansion,extension function of canopy water potential
   !
-  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
+  TurgEff4LeafPetolExpansion=real_truncate(AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-TurgPSIMin4OrganExtens)),1.e-3_r8)
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
@@ -552,11 +552,11 @@ module grosubsMod
     WaterStress4Groth = EXP(0.05_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ELSE
     !others
-    Stomata_Stress    = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress    = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
-
-  CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
+  WaterStress4Groth               = real_truncate(WaterStress4Groth,1.e-3_r8)
+  TurgEff4CanopyResp            = fRespWatSens(TurgEff4LeafPetolExpansion,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
 
   call PrintInfo('end '//subname)
@@ -621,7 +621,7 @@ module grosubsMod
     RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft          ,& !input  :total root uptake of NO3, [g d-2 h-1]
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
-    SeedNumSet_brch           => plt_morph%SeedNumSet_brch           ,& !input  :branch grain number, [d-2]
+    SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch           ,& !input  :branch grain number, [d-2]
     ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch        ,& !input  :branch shoot structural element mass, [g d-2]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch         ,& !input  :branch reserve element mass, [g d-2]
@@ -693,7 +693,7 @@ module grosubsMod
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
     CanopyLeafShethC_pft(NZ)   = CanopyLeafShethC_pft(NZ) +LeafPetolBiomassC_brch(NB,NZ)
-    CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedNumSet_brch(NB,NZ)
+    CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedSitesSet_brch(NB,NZ)
     CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
 
     DO L=1,NumCanopyLayers1

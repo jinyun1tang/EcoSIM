@@ -1,12 +1,11 @@
 module StartqMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use EcosimConst
+  use minimathmod, only : AZMAX1,isclose  
   use GridConsts
   use FlagDataType
   use EcosimConst
   use TracerIDMod
   use EcoSIMCtrlDataType
-  use minimathmod, only : AZMAX1
   use PlantDataRateType
   use ClimForcDataType
   use PlantTraitDataType
@@ -420,8 +419,17 @@ module StartqMod
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
+    IF(isclose(SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(L,NY,NX)))then
+      SeedDepth_pft(NZ,NY,NX)=AMAX1(CumSoilThickness_vr(L,NY,NX)-ppmc,ppmc)
+      exit
+    endif
+  ENDDO
+  PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
+!  write(9333,*)SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(1:3,NY,NX),'yyy'
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
-    IF(SeedDepth_pft(NZ,NY,NX)+1.e-6.GE.CumSoilThickness_vr(L-1,NY,NX) &
+
+    IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
       .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
@@ -433,8 +441,8 @@ module StartqMod
   ENDDO D9795  
   CNRTS_pft(NZ,NY,NX)                      = rNCRoot_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
   CPRTS_pft(NZ,NY,NX)                      = rPCRootr_pft(NZ,NY,NX)*RootBiomGrosYld_pft(NZ,NY,NX)
-  Root1stMaxRadius_pft(imycorrhz,NZ,NY,NX) = 5.0E-06
-  Root2ndMaxRadius_pft(imycorrhz,NZ,NY,NX) = 5.0E-06
+  Root1stMaxRadius_pft(imycorrhz,NZ,NY,NX) = 8.0E-06_r8     !transport hyphae
+  Root2ndMaxRadius_pft(imycorrhz,NZ,NY,NX) = 2.0E-06_r8     !absorbing hyphae
   RootPorosity_pft(imycorrhz,NZ,NY,NX)     = RootPorosity_pft(1,NZ,NY,NX)
   VmaxNH4Root_pft(imycorrhz,NZ,NY,NX)      = VmaxNH4Root_pft(1,NZ,NY,NX)
   KmNH4Root_pft(imycorrhz,NZ,NY,NX)        = KmNH4Root_pft(1,NZ,NY,NX)
@@ -455,9 +463,9 @@ module StartqMod
 !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
   D500: DO N=1,2
-    RootPoreTortu4Gas_pft(N,NZ,NY,NX)     = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
+    RootPoreTortu4Gas_pft(N,NZ,NY,NX) = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
-    RootVolPerMassC_pft(N,NZ,NY,NX)   = ppmc/(0.05_r8*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
+    RootVolPerMassC_pft(N,NZ,NY,NX)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))
     Root1stSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
     Root2ndSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
     Root1stMaxRadius1_pft(N,NZ,NY,NX) = Root1stMaxRadius_pft(N,NZ,NY,NX)
@@ -549,7 +557,7 @@ module StartqMod
     SapwoodBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
     LeafPetolBiomassC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
-    SeedNumSet_brch(NB,NZ,NY,NX)         = 0._r8
+    SeedSitesSet_brch(NB,NZ,NY,NX)         = 0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX) = 0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)       = 0._r8
     NH3Dep2Can_brch(NB,NZ,NY,NX)         = 0._r8
@@ -571,7 +579,7 @@ module StartqMod
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8
       StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = 0._r8
-      LeafProteinCNode_brch(K,NB,NZ,NY,NX)                      = 0._r8
+      LeafProteinC_node(K,NB,NZ,NY,NX)                      = 0._r8
       PetoleProteinCNode_brch(K,NB,NZ,NY,NX)                    = 0._r8
 
       D55: DO L=1,NumCanopyLayers
@@ -753,7 +761,7 @@ module StartqMod
       Root1stRadius_pvr(N,L,NZ,NY,NX)            = Root1stMaxRadius_pft(N,NZ,NY,NX)
       Root2ndRadius_rpvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
       RootAreaPerPlant_pvr(N,L,NZ,NY,NX)         = 0._r8
-      Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)            = 1.0E-03
+      Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)            = 1.0E-03
       RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_NO3,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_H2PO4,N,L,NZ,NY,NX)  = 0._r8

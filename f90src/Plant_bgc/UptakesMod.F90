@@ -1,7 +1,7 @@
 module UptakesMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : GravAcceleration=>DAT_CONST_G
-  use StomatesMod   , only : StomatalDynamics
+  use StomatesMod   , only : StomatalDynamics,PhotosynsDiag
   use EcoSIMCtrlMod , only : etimer, lverb,ldo_sp_mode  
   use UnitMod       , only : units  
   use PlantBalMod   , only : SumPlantRootGas
@@ -120,7 +120,9 @@ module UptakesMod
   DO NZ=1,NP
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
-      
+
+      call PhotosynsDiag(I,J,NZ)  
+
       call UpdateCanopyProperty(I,J,NZ)
 
 !     STOMATE=solve for minimum canopy stomatal resistance
@@ -343,7 +345,7 @@ module UptakesMod
     KoppenClimZone            => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
     LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       ,& !input  :layer leaf protein C, [g d-2]
+    LeafProteinC_node     => plt_biom%LeafProteinC_node       ,& !input  :layer leaf protein C, [g d-2]
     LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     NP                        => plt_site%NP                          ,& !input  :current number of plant species,[-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
@@ -363,21 +365,21 @@ module UptakesMod
 !
   call PrintInfo('beg '//subname)
 
-  D500: DO NB=1,NumOfBranches_pft(NZ)
-    D550: DO K=1,MaxNodesPerBranch1
+!  D500: DO NB=1,NumOfBranches_pft(NZ)
+!    D550: DO K=1,MaxNodesPerBranch1
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
 !     LeafArea_node=leaf area
-!     LeafProteinCNode_brch=leaf protein content
+!     LeafProteinC_node=leaf protein content
 !     ClumpFactorNow_pft=clumping factor from PFT file
 !
-      IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinCNode_brch(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-        KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
-      ENDIF
+!      IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinC_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+!        KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
+!      ENDIF
 
-    ENDDO D550
-  ENDDO D500
+!    ENDDO D550
+!  ENDDO D500
 
   if(lverb)write(*,*)'   CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER',LeafStalkArea_pft(NZ)
   !
@@ -563,7 +565,7 @@ module UptakesMod
     PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !input  :root osmotic water potential, [Mpa]
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !input  :root turgor water potential, [Mpa]
-    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy isothermal boundary later resistance, [h m-1]
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
@@ -608,7 +610,7 @@ module UptakesMod
       VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC_pft(NZ)           = 0.0_r8
       !greater value of RCS_pft(NZ), more sensitive to turgor change.
-      Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
+      Stomata_Stress             = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
       CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
         +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
       
@@ -700,7 +702,7 @@ module UptakesMod
     PSICanopyOsmo_pft           => plt_ew%PSICanopyOsmo_pft               ,& !input  :canopy osmotic water potential, [Mpa]
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PrecIntcptByCanopy_pft      => plt_ew%PrecIntcptByCanopy_pft          ,& !input  :water flux into canopy, [m3 d-2 h-1]
-    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RIB                         => plt_ew%RIB                             ,& !input  :Richardson number for calculating boundary layer resistance, [-]
     RadSWbyCanopy_pft           => plt_rad%RadSWbyCanopy_pft              ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     CanopyIsothBndlResist_pft   => plt_ew%CanopyIsothBndlResist_pft       ,& !input  :canopy roughness height, [m]
@@ -801,7 +803,7 @@ module UptakesMod
 !     CanopyMinStomaResistH2O_pft=minimum CanPStomaResistH2O_pftat PSICanopy_pft=0 from stomate.f
 !     CuticleResist_pft=cuticular resistance from PFT file
 !
-    Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress             = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
     CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ)+Stomata_Stress &
       *(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))
 
@@ -1087,7 +1089,7 @@ module UptakesMod
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
     Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr               ,& !input  :root layer number primary axes, [d-2]
     Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft            ,& !input  :maximum radius of secondary roots, [m]
-    Root2ndMeanLens_rpvr        => plt_morph%Root2ndMeanLens_rpvr            ,& !input  :root layer average length, [m]
+    Root2ndEffLen4uptk_rpvr     => plt_morph%Root2ndEffLen4uptk_rpvr         ,& !input  :Layer effective root length four resource uptake, [m]
     Root2ndRadius_rpvr          => plt_morph%Root2ndRadius_rpvr              ,& !input  :root layer diameter secondary axes, [m]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr               ,& !input  :root layer number axes, [d-2]
     RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
@@ -1175,7 +1177,7 @@ module UptakesMod
         !     RootAxialResist_pft=axial resistivity from PFT file, [MPa h m-2]=[kg m-1 h-2 h m-2]=[kg m-3 h-1]
         !     DPTHZ=depth of primary root from surface
         !     Root1stAxialResist_rvr,Root2ndAxialResist_rvr=axial resistance of primary,secondary roots,[MPa h d2 m-3] =[MPa h m-1]=[]*m
-        !     Root2ndMeanLens_rpvr=average secondary root length
+        !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         !     Root1stXNumL_rpvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
         FRAD1                       = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
@@ -1183,7 +1185,7 @@ module UptakesMod
         StalkAxialResist            = RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_rpvr(ipltroot,L,NZ))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_rpvr(ipltroot,L,NZ))
                     
-        Root2ndAxialResist_rvr(N,L) = RootAxialResist_pft(N,NZ)*Root2ndMeanLens_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
+        Root2ndAxialResist_rvr(N,L) = RootAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !
@@ -1237,7 +1239,7 @@ module UptakesMod
     PSICanopyTurg_pft         => plt_ew%PSICanopyTurg_pft             ,& !input  :plant canopy turgor water potential, [MPa]
     PSIRootOSMO_vr            => plt_ew%PSIRootOSMO_vr                ,& !input  :root osmotic water potential, [Mpa]
     PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                ,& !input  :root turgor water potential, [Mpa]
-    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy roughness height, [m]
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
     ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
@@ -1288,7 +1290,7 @@ module UptakesMod
   call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
-  Stomata_Stress             = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
+  Stomata_Stress             = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
   CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
     +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ) = CanopyIsothBndlResist_pft(NZ)
@@ -1453,7 +1455,7 @@ module UptakesMod
     !after seed emergence
     TKGroth_pft(NZ)=TKC_pft(NZ)
   ENDIF
-  TCGroth_pft(NZ)=units%Kelvin2Celcius(TKGroth_pft(NZ))
+  TCGroth_pft(NZ)=real_truncate(units%Kelvin2Celcius(TKGroth_pft(NZ)),1.e-3_r8)
   !
   !     ARRHENIUS FUNCTION FOR CANOPY AND ROOT GROWTH WITH OFFSET
   !     FOR ZONE OF THERMAL ADAPTATION ENTERED IN 'READQ'
@@ -1466,11 +1468,11 @@ module UptakesMod
   !     62500,197500,222500=energy of activn,high,low temp inactivn(KJ mol-1)
   !     PSICanPDailyMin=minimum daily canopy water potential
   !
-  TKGO                  = TKGroth_pft(NZ)+TempOffset_pft(NZ)
+  TKGO                  = real_truncate(TKGroth_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
   fTCanopyGroth_pft(NZ) = calc_canopy_grow_tempf(TKGO)
 
   D100: DO L=NU,MaxNumRootLays
-    TKSO                 = TKS_vr(L)+TempOffset_pft(NZ)
+    TKSO                 = real_truncate(TKS_vr(L)+TempOffset_pft(NZ),1.e-3_r8)
     fTgrowRootP_vr(L,NZ) = calc_root_grow_tempf(TKSO)
   ENDDO D100
 

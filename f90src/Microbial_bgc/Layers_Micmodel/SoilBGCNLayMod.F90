@@ -4,10 +4,14 @@ module SoilBGCNLayMod
 ! codes to do soil biological transformations
 !
 ! USES:
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils  , only : endrun
-  use minimathmod, only : safe_adb,AZMAX1
-  use EcoSiMParDataMod, only : micpar
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: endrun
+  use minimathmod,      only: safe_adb, AZMAX1,AZERO
+  use EcoSiMParDataMod, only: micpar
+  use SoilHeatDataType, only: TCS_vr
+  use PlantMgmtDataType,only: iDayPlanting_pft
+  use SoilWaterDataType
+  use SurfLitterDataType
   use MicrobialDataType
   use NitroPars
   use SOMDataType
@@ -284,7 +288,7 @@ module SoilBGCNLayMod
     !add microbial residual
     DO  M=1,ndbiomcp
       DO NE=1,nelms
-        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+        ORGM(NE)=AZERO(ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX))
         if(ORGM(NE)<0._r8)then
         print*,'orgm3',ORGM
         stop
@@ -366,18 +370,24 @@ module SoilBGCNLayMod
   integer :: K,N,NGL,M,MID,NE,idom
   real(r8) :: DOM_micp(idom_beg:idom_end)
   real(r8) :: DOM_macp(idom_beg:idom_end) 
+  real(r8) :: BiomA(NumPlantChemElms),BiomH(NumPlantChemElms),BiomDead(NumPlantChemElms)
+  real(r8) :: OMSorb(NumPlantChemElms), OMSolid(NumPlantChemElms)
 
-
-  ORGM=0._r8
-  DOM_micp=0._r8
-  DOM_macp=0._r8
+  ORGM     = 0._r8
+  DOM_micp = 0._r8
+  DOM_macp = 0._r8
+  BiomA    = 0._r8
+  BiomH    = 0._r8
+  BiomDead = 0._r8
+  OMSolid  = 0._r8
+  OMSorb   = 0._r8
   !add autotrophic microbes
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
         DO NE=1,NumPlantChemElms
-          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
+          BiomA(NE)=BiomA(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
         ENDDO
       enddo
     enddo
@@ -390,16 +400,16 @@ module SoilBGCNLayMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+            BiomH(NE)=BiomH(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
     enddo
-
+    
    !add microbial residual
     DO  M=1,ndbiomcp
       DO NE=1,NumPlantChemElms
-        ORGM(NE)=ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
+        BiomDead(NE)=BiomDead(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX)
       ENDDO    
     ENDDO
 
@@ -411,20 +421,30 @@ module SoilBGCNLayMod
 
     !add dom
     DO NE=1,NumPlantChemElms
-      ORGM(NE)=ORGM(NE)+SorbedOM_vr(NE,K,L,NY,NX)
+      OMSorb(NE)=OMSorb(NE)+SorbedOM_vr(NE,K,L,NY,NX)
     ENDDO
-    ORGM(ielmc)=ORGM(ielmc)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+
+    OMSorb(ielmc)=OMSorb(ielmc)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
     !add solid organic matter
     DO  M=1,jsken
       DO NE=1,NumPlantChemElms
-        ORGM(NE)=ORGM(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
+        OMSolid(NE)=OMSolid(NE)+SolidOM_vr(NE,M,K,L,NY,NX)
       ENDDO  
     ENDDO  
-  ENDDO    
-  ORGM=ORGM+DOM_micp(1:NumPlantChemElms) + DOM_macp(1:NumPlantChemElms)
-
+  ENDDO   
+  
+  DO NE=1,NumPlantChemElms
+    ORGM(NE)=BiomA(NE)+BiomH(NE)+BiomDead(NE)+OMSorb(NE)+OMSolid(NE)+DOM_micp(NE)+DOM_macp(NE)
+  ENDDO
   ORGM(ielmc)=ORGM(ielmc)+DOM_micp(idom_acetate) + DOM_macp(idom_acetate)
+  
+!  if(present(I))then    
+!    if(L==0)then
+!      write(601,*)I*100+J,BiomH(ielmc),TCS_vr(0,NY,NX),iDayPlanting_pft(1,NY,NX),VLWatMicP_vr(0,NY,NX),VWatLitRHoldCapcity_col(NY,NX)
+!    endif  
+!  endif
+
   end subroutine sumLitrOMLayL
 
 !------------------------------------------------------------------------------------------
@@ -503,16 +523,18 @@ module SoilBGCNLayMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine sumMicBiomLayL(L,NY,NX,ORGM)
+  subroutine sumMicBiomLayL(L,NY,NX,ORGM,I,J)
   !
   !sum up litter OM in layer L
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)  !microbial biomass 
+  integer,optional, intent(in) :: I,J
   integer :: K,N,NGL,M,MID,NE,jcplx1
+  real(r8) :: BiomHK(NumPlantChemElms,jcplx)
 
-  ORGM=0._r8
-
+  ORGM   = 0._r8
+  BiomHK = 0._r8
   if(L==0)then
     jcplx1=micpar%NumOfLitrCmplxs
   else
@@ -530,6 +552,7 @@ module SoilBGCNLayMod
       enddo
     enddo
   enddo
+
   !add heterotrophs
   DO K=1,jcplx1
     !add heterotrophic microbes
@@ -538,12 +561,20 @@ module SoilBGCNLayMod
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
-            ORGM(NE)=ORGM(NE)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
+            BiomHK(NE,K)=BiomHK(NE,K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)
           ENDDO
         enddo
       enddo
     enddo
+    DO NE=1,NumPlantChemElms
+      ORGM(NE)=ORGM(NE)+BiomHK(NE,K)    
+    enddo  
   enddo  
+!  if(present(I))then
+!    if(I<=15.and.L==1)then
+!      write(633,*)I*100+J,ORGM(ielmc),BiomHK(ielmc,:)    
+!    endif
+!  endif
   end subroutine sumMicBiomLayL
 !------------------------------------------------------------------------------------------
 

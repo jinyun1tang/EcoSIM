@@ -689,7 +689,7 @@ module Hour1Mod
   
 !     begin_execution
   call PrintInfo('beg '//subname)
-  RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
+  RootCO2AutorPrev_col(NY,NX)        = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
   trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
   trcg_snowMassloss_col(:,NY,NX)     = 0._r8
@@ -698,7 +698,8 @@ module Hour1Mod
   DOM_draing_col(:,:,NY,NX)          = 0._r8
   trcs_drainage_flx_col(:,NY,NX)     = 0._r8
   DOM_SurfRunoff_flx_col(:,:,NY,NX)  = 0._r8
-
+  RootRadialKond2H2O_pvr(:,:,:,NY,NX)= 0._r8
+  RootAxialKond2H2O_pvr(:,:,:,NY,NX) =0._r8
   trcn_snowMassloss_col(:,NY,NX)                  = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)                   = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
@@ -750,6 +751,7 @@ module Hour1Mod
   trcn_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
   trcn_AquaADV_Snow2Band_flx(:,NY,NX)             = 0._r8
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
+  SpecificLeafArea_pft(:,NY,NX)                   = 0._r8
   RootCO2Ar2Soil_col(NY,NX)                       = 0._r8
   RootCO2Ar2Root_col(NY,NX)                       = 0._r8
   GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8

@@ -1,7 +1,7 @@
 module InitPlantMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use UnitMod,          only: units
-  use minimathmod,      only: AZMAX1
+  use minimathmod,      only: AZMAX1,isclose
   use EcoSiMParDataMod, only: pltpar
   use EcosimConst
   use EcoSIMConfig
@@ -374,8 +374,9 @@ module InitPlantMod
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowthNode_pft=number of concurrently growing nodes
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2!
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+    !Annual plant (e.g.crops) or grass or bryophyte
+    !The following may be revised for maize or soybean, or crops in general
     FracGroth2Node_pft(NZ)=1.0_r8
     IF(MatureGroup_pft(NZ).LE.10)THEN
       NumCogrowthNode_pft(NZ)=3
@@ -385,9 +386,9 @@ module InitPlantMod
       NumCogrowthNode_pft(NZ)=5
     ENDIF
   ELSE
-    !not grasslike plant
-    FracGroth2Node_pft(NZ)=AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ))
-    NumCogrowthNode_pft(NZ)=24
+    !perrenial tree-like
+    FracGroth2Node_pft(NZ)  = AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ))
+    NumCogrowthNode_pft(NZ) = MaxNodesPerBranch1-1
   ENDIF
   end associate
   end subroutine PlantLitterFraction
@@ -509,10 +510,17 @@ module InitPlantMod
 !     RootRadialResist_pft,RootAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
+  DO L=NU,NL
+    if(isclose(SeedDepth_pft(NZ),CumSoilThickness_vr(L)))then
+      SeedDepth_pft(NZ)=AMAX1(CumSoilThickness_vr(L)-ppmc,ppmc)
+      exit
+    endif
+  ENDDO
+!  write(9333,*)SeedDepth_pft(NZ),CumSoilThickness_vr(1:3),'xxx'
   D9795: DO L=NU,NL
     IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
-      .AND.SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
-      NGTopRootLayer_pft(NZ)  = L
+      .AND. SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
+      NGTopRootLayer_pft(NZ)   = L
       NMaxRootBotLayer_pft(NZ) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
         NIXBotRootLayer_rpft(NR,NZ)=L
@@ -618,7 +626,7 @@ module InitPlantMod
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
-    SeedNumSet_brch                   => plt_morph%SeedNumSet_brch                    ,& !output :branch grain number, [d-2]
+    SeedSitesSet_brch                   => plt_morph%SeedSitesSet_brch                    ,& !output :branch grain number, [d-2]
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
@@ -698,7 +706,7 @@ module InitPlantMod
     plt_biom%SapwoodBiomassC_brch(NB,NZ)   = 0._r8
     plt_biom%LeafPetolBiomassC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
-    SeedNumSet_brch(NB,NZ)                   = 0._r8
+    SeedSitesSet_brch(NB,NZ)                   = 0._r8
     plt_allom%GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
     LeafAreaLive_brch(NB,NZ)                 = 0._r8
     plt_rbgc%NH3Dep2Can_brch(NB,NZ)          = 0._r8
@@ -712,15 +720,15 @@ module InitPlantMod
     ENDDO D5
 
     DO K=0,MaxNodesPerBranch1
-      LeafArea_node(K,NB,NZ)                                   = 0._r8
-      StalkNodeHeight_brch(K,NB,NZ)                             = 0._r8
-      plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
-      plt_morph%PetoleLensNode_brch(K,NB,NZ)                       = 0._r8
-      plt_biom%LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
-      plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
-      plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
+      LeafArea_node(K,NB,NZ)                                        = 0._r8
+      StalkNodeHeight_brch(K,NB,NZ)                                 = 0._r8
+      plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                   = 0._r8
+      plt_morph%PetoleLensNode_brch(K,NB,NZ)                        = 0._r8
+      plt_biom%LeafProteinC_node(K,NB,NZ)                           = 0._r8
+      plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                     = 0._r8
+      plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)       = 0._r8
       plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
-      plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
+      plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = 0._r8
 
       D55: DO L=1,NumCanopyLayers1
         CanopyLeafArea_lnode(L,K,NB,NZ)=0._r8
@@ -975,7 +983,7 @@ module InitPlantMod
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_rpvr(N,L,NZ)                                = Root2ndMaxRadius_pft(N,NZ)
       plt_morph%RootAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
-      plt_morph%Root2ndMeanLens_rpvr(N,L,NZ)                    = 1.0E-03
+      plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)                    = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8
       plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)                     = 0._r8

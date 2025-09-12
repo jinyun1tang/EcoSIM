@@ -432,11 +432,11 @@ implicit none
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
 !   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
-!
-    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
-    VmaxRubOxyRef_pft(NZ,NY,NX)      = 2.5_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
-    VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 2.5_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecLeafChlAct_pft(NZ,NY,NX)     = 2.5_r8*SpecLeafChlAct_pft(NZ,NY,NX)
+!   2.5 converts g enzyme mass into g enzyme C
+    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)  = 1.92_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxRubOxyRef_pft(NZ,NY,NX)      = 1.92_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
+    VmaxPEPCarboxyRef_pft(NZ,NY,NX)  = 1.92_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
+    SpecLeafChlAct_pft(NZ,NY,NX)     = 1.35_r8*SpecLeafChlAct_pft(NZ,NY,NX)
     LeafSWabsorpty_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
     LeafPARabsorpty_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
     RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
@@ -459,9 +459,10 @@ implicit none
     ENDIF
     D5: DO NB=1,NumCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+        !perennial evergreen
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
-      ELSE
+      ELSE        
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=VRNLI
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=VRNXI
       ENDIF
@@ -504,11 +505,11 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKO2', loc, XKO2_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XKCO24', loc, Km4PEPCarboxy_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRuBPConc_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PEPC', loc, FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRubisco2Protein_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PEPC', loc, LeafPEP2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3ChlorofilConc_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4ChlorofilConc_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3Chl2Protein_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4Chl2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
@@ -538,20 +539,20 @@ implicit none
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetioleAngle_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'STMX', loc,MaxPotentSeedNumber_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'STMX', loc,GrothStalkMaxSeedSites_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'SDMX', loc,MaxSeedNumPerSite_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRMX', loc,SeedCMassMax_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Root1stMaxRadius_pft(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Root2ndMaxRadius_pft(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,Root1stMaxRadius_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,Root2ndMaxRadius_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,MinNonstC2InitRoot_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RSRR', loc,RootRadialResist_pft(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'RSRA', loc,RootAxialResist_pft(1,NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShutRutNonstElmntConducts_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRR', loc,RootRadialResist_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRA', loc,RootAxialResist_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PTSHT', loc,ShootRootNonstElmConduts_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RTFQ', loc,RootBranchFreq_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'UPMXZH', loc,VmaxNH4Root_pft(ipltroot,NZ,NY,NX))
@@ -643,18 +644,18 @@ implicit none
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
   PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
 
-  VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)         = VmaxRubCarboxyRef_tab(loc)
-  VmaxRubOxyRef_pft(NZ,NY,NX)             = VmaxRubOxyRef_tab(loc)
-  VmaxPEPCarboxyRef_pft(NZ,NY,NX)         = VmaxPEPCarboxyRef_tab(loc)
-  XKCO2_pft(NZ,NY,NX)                     = XKCO2_tab(loc)
-  XKO2_pft(NZ,NY,NX)                      = XKO2_tab(loc)
-  Km4PEPCarboxy_pft(NZ,NY,NX)             = Km4PEPCarboxy_tab(loc)
-  LeafRuBPConc_pft(NZ,NY,NX)              = LeafRuBPConc_tab(loc)
-  FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX) = FracLeafProtAsPEPCarboxyl_tab(loc)
-  SpecLeafChlAct_pft(NZ,NY,NX)          = SpecChloryfilAct_tab(loc)
-  LeafC3ChlorofilConc_pft(NZ,NY,NX)       = LeafC3ChlorofilConc_tab(loc)
-  LeafC4ChlorofilConc_pft(NZ,NY,NX)       = LeafC4ChlorofilConc_tab(loc)
-  CanopyCi2CaRatio_pft(NZ,NY,NX)                = CanopyCi2CaRatio_pft_tab(loc)
+  VmaxSpecRubCarboxyRef_pft(NZ,NY,NX) = VmaxRubCarboxyRef_tab(loc)
+  VmaxRubOxyRef_pft(NZ,NY,NX)         = VmaxRubOxyRef_tab(loc)
+  VmaxPEPCarboxyRef_pft(NZ,NY,NX)     = VmaxPEPCarboxyRef_tab(loc)
+  XKCO2_pft(NZ,NY,NX)                 = XKCO2_tab(loc)
+  XKO2_pft(NZ,NY,NX)                  = XKO2_tab(loc)
+  Km4PEPCarboxy_pft(NZ,NY,NX)         = Km4PEPCarboxy_tab(loc)
+  LeafRubisco2Protein_pft(NZ,NY,NX)   = LeafRubisco2Protein_tab(loc)
+  LeafPEP2Protein_pft(NZ,NY,NX)       = LeafPEP2Protein_tab(loc)
+  SpecLeafChlAct_pft(NZ,NY,NX)        = SpecChloryfilAct_tab(loc)
+  LeafC3Chl2Protein_pft(NZ,NY,NX)     = LeafC3Chl2Protein_tab(loc)
+  LeafC4Chl2Protein_pft(NZ,NY,NX)     = LeafC4Chl2Protein_tab(loc)
+  CanopyCi2CaRatio_pft(NZ,NY,NX)      = CanopyCi2CaRatio_pft_tab(loc)
 
   RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_tab(loc)
   CanopyPARalbedo_pft(NZ,NY,NX)    = CanopyPARalbedo_tab(loc)
@@ -682,7 +683,7 @@ implicit none
   ClumpFactorInit_pft(NZ,NY,NX)                       = ClumpFactorInit_tab(loc)
   BranchAngle_pft(NZ,NY,NX)                           = BranchAngle_tab(loc)
   PetioleAngle_pft(NZ,NY,NX)                          = PetioleAngle_tab(loc)
-  MaxPotentSeedNumber_pft(NZ,NY,NX)                   = MaxPotentSeedNumber_tab(loc)
+  GrothStalkMaxSeedSites_pft(NZ,NY,NX)                   = MaxPotentSeedNumber_tab(loc)
   MaxSeedNumPerSite_pft(NZ,NY,NX)                     = MaxSeedNumPerSite_tab(loc)
   SeedCMassMax_pft(NZ,NY,NX)                          = SeedCMassMax_tab(loc)
   SeedCMass_pft(NZ,NY,NX)                             = SeedCMass_tab(loc)
@@ -695,7 +696,7 @@ implicit none
   MinNonstC2InitRoot_pft(NZ,NY,NX)        = MinNonstC2InitRoot_tab(loc)
   RootRadialResist_pft(1,NZ,NY,NX)        = RootRadialResist_tab(loc)
   RootAxialResist_pft(1,NZ,NY,NX)         = RootAxialResist_tab(loc)
-  ShutRutNonstElmntConducts_pft(NZ,NY,NX) = ShutRutNonstElmntConducts_tab(loc)
+  ShootRootNonstElmConduts_pft(NZ,NY,NX) = ShutRutNonstElmntConducts_tab(loc)
   RootBranchFreq_pft(NZ,NY,NX)            = RootBranchFreq_tab(loc)
 
   VmaxNH4Root_pft(ipltroot,NZ,NY,NX) = VmaxNH4Root_tab(loc)
@@ -785,7 +786,7 @@ implicit none
 !   MY=mycorrhizal:1=no,2=yes
 !   PlantInitThermoAdaptZone_pft=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
-  write(nu_plt,*)('=',j=1,100)
+  write(nu_plt,*)('=',j=1,110)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
   call writefixsl(nu_plt,'Plant name ',pft_lname,40)
   strval=koppen_clims//','//koppen_climl
@@ -950,28 +951,31 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
   character(len=81) :: line
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
-  call writefixl(nu_plt,'Specific rubisco carboxylase [umol C g-1 s-1] VCMX',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific rubisco oxygenase [umol O2 g-1 s-1] VOMX',VmaxRubOxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific PEP carboxylase activity [umol g-1 s-1] VCMX4',VmaxPEPCarboxyRef_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxSpecRubCarboxyRef_pft [uM] XKCO2',XKCO2_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Km for VmaxRubOxyRef_pft [uM] XKO2',XKO2_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'KM for VmaxPEPCarboxyRef_pft [uM] XKCO24',Km4PEPCarboxy_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Fraction of leaf protein in rubisco [g rub/(gC protein)] RUBP',LeafRuBPConc_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Fraction of leaf protein in PEP carboxylase [g PEP/(gC protein)] PEPC',&
-    FracLeafProtAsPEPCarboxyl_pft(NZ,NY,NX),90)
-  call writefixl(nu_plt,'Specific chlorophyll activity [umol e- gC-1 s-1] ETMX',SpecLeafChlAct_pft(NZ,NY,NX),90)
+
   if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
-    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in mesophyll (C3) [g Chl /(gC protein)] CHL',&
-      LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
+    call writefixl(nu_plt,'VCMX','Saturated specific carboxylation rate by Rubisco at 25oC  [umol CO2 (g rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'VOMX','Saturated specific oxygenation rate  at 25oC by Rubisco  [umol O2 (g rubisco)-1 s-1]',VmaxRubOxyRef_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'XKCO2','Reference Km for rubisco carboxylation of CO2  at 25oC  [uM] ',XKCO2_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'XKO2','Reference Km for rubisco oxygenation  at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'RUBP','Carbon mass ratio of rubisco enzyme to total leaf protein  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'CHL','Carbon mass ratio of mesophyll chlorophyll to total leaf protein  [gC Chl /(gC protein)]',LeafC3Chl2Protein_pft(NZ,NY,NX),110)
   elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
-    call writefixl(nu_plt,'Fraction of leaf protein as chlorophyll in bundle sheath(C4) [g Chl /(gC protein)] CHL',&
-      LeafC3ChlorofilConc_pft(NZ,NY,NX),90)
-    call writefixl(nu_plt,'Fraction of leaf protein in mesophyll chlorophyll(C4) [g Chl /(gC protein)] CHL4',&
-      LeafC4ChlorofilConc_pft(NZ,NY,NX),90)
+    call writefixl(nu_plt,'VCMX','Saturated specific carboxylation rate by Rubisco  at 25oC  [umol CO2 (g rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'VOMX','Saturated specific oxygenation rate by Rubisco  at 25oC  [umol O2 (g rubisco)-1 s-1]',VmaxRubOxyRef_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'XKCO2','Reference Km for rubisco carboxylation of CO2  at 25oC  [uM]',XKCO2_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'XKO2','Reference Km for rubisco oxygenation at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'RUBP','Carbon mass ratio of rubisco enzyme to total leaf protein  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'VCMX4','Saturated specific PEP carboxylation rate  at 25oC  [umol CO2 (g PEPC)-1 s-1]',VmaxPEPCarboxyRef_pft(NZ,NY,NX),110)  
+    call writefixl(nu_plt,'XKCO24','Reference KM for PEP carboxylation  at 25oC  [uM]',Km4PEPCarboxy_pft(NZ,NY,NX),110)    
+    call writefixl(nu_plt,'PEPC','Carbon mass ratio of PEPC enzyme to total leaf protein  [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'CHL','Carbon mass ratio of bundle sheath chlorophyll to total leaf protein  [gC Chl  (gC protein)-1]',LeafC3Chl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,'CHL4','Carbon mass ratio of mesophyll chlorophyll to total leaf protein  [gC Chl (gC protein)-1]',LeafC4Chl2Protein_pft(NZ,NY,NX),110)
   endif
-  call writefixl(nu_plt,'Intercellular-to-atmospheric CO2 concentration ratio [-]FCO2',CanopyCi2CaRatio_pft(NZ,NY,NX),90)
+  call writefixl(nu_plt,'FCO2','Intercellular-to-atmospheric CO2 concentration ratio  [-]',CanopyCi2CaRatio_pft(NZ,NY,NX),110)
   end subroutine photosyns_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -984,20 +988,20 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: J
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
 
   write(nu_plt,*)'PHENOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'Rate of node initiation at 25oC [h-1] XRNI',RefNodeInitRate_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Rate of leaf appearance at 25oC [h-1] XRLA',RefLeafAppearRate_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Chilling temperature for CO2 fixation, seed loss [oC] CTC',TCChill4Seed_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Hour requirement for spring leafout [h] VRNLI',VRNLI,84)
-  call writefixl(nu_plt,'Hour requirement for autumn leafoff [h] VRNXI',VRNXI,84)
-  call writefixl(nu_plt,'Leaf length:width ratio WDLF [-]',rLen2WidthLeaf_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Nonstructural C concentration needed for branching PB [gC]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Maturity group, node number required for floral initiation [-] GROUPX',GROUPX_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Node number at planting [-] XTLI',ShootNodeNumAtPlanting_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Critical photoperiod <= maximum daylength [h] XDL',CriticPhotoPeriod_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Photoperiod sensitivity [node h-1] XPPD',PhotoPeriodSens_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'XRNI','Rate of node initiation at 25oC [h-1]',RefNodeInitRate_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'XRLA','Rate of leaf appearance at 25oC [h-1]',RefLeafAppearRate_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CTC','Chilling temperature for CO2 fixation, seed loss [oC]',TCChill4Seed_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'VRNLI','Hours that meet leafout condition (temp or water) required for spring leafout [h]',VRNLI,100)
+  call writefixl(nu_plt,'VRNXI','Hours that meet leafoff condition (temp or water) required for autumn leafoff [h]',VRNXI,100)
+  call writefixl(nu_plt,'WDLF','Leaf length:width ratio [-]',rLen2WidthLeaf_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'PB','Nonstructural C concentration needed for branching [gC]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'GROUPX','Maturity group, node number required for floral initiation [-]',GROUPX_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'XTLI','Embryonic node number at planting [-]',ShootNodeNumAtPlanting_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'XDL','Critical photoperiod <= maximum daylength [h]',CriticPhotoPeriod_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'XPPD','Photoperiod sensitivity [node h-1]',PhotoPeriodSens_pft(NZ,NY,NX),100)
 
 
   end subroutine Phenology_trait_disp
@@ -1009,23 +1013,22 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: N,j
 
-  write(nu_plt,*)('-',j=1,100)  
+  write(nu_plt,*)('-',j=1,110)  
   write(nu_plt,*)'MORPHOLOGICAL PROPERTIES'
-  call writefixl(nu_plt,'growth in leaf area vs mass (m2 g-1) SLA1',SLA1_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'growth in petiole length vs mass (m g-1) SSL1',PetoLen2Mass_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'growth in internode length vs mass (m g-1) SNL1',NodeLenPergC_pft(NZ,NY,NX),84)
-  call writeafixl(nu_plt,'fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS',&
-    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),84)
-  call writefixl(nu_plt,'initial clumping factor CFI',ClumpFactorInit_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'stem angle from horizontal ANGBR',BranchAngle_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'petiole angle from horizontal ANGSH',PetioleAngle_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'maximum potential seed mumber from '// &
-    'pre-anthesis stalk growth STMX',MaxPotentSeedNumber_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'maximum seed number per STMX (none) SDMX',MaxSeedNumPerSite_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'maximum seed size per SDMX (gC) GRMX',SeedCMassMax_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'seed size at planting (gC) GRDM',SeedCMass_pft(NZ,NY,NX),84)    !could be greater than SeedCMassMax, accouting for seedling
-  call writefixl(nu_plt,'grain filling rate at 25 oC (g seed-1 h-1) GFILL',GrainFillRate25C_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'mass of dead standing biomass at planting (gC m-2) WTSTDI',StandingDeadInitC_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'SLA1','Specific leaf area vs mass [m2 gC-1]',SLA1_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'SSL1','Specific petiole length vs mass [m gC-1]',PetoLen2Mass_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
+  call writeafixl(nu_plt,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes [-]',LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
+  call writefixl(nu_plt,'CFI','Initial clumping factor seedling [-]',ClumpFactorInit_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'ANGBR','Stem angle from horizontal',BranchAngle_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'ANGSH','Petiole angle from horizontal',PetioleAngle_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'STMX','Maximum potential seed sites for '// &
+    'pre-anthesis stalk growth [sites (gC stalk)-1]',GrothStalkMaxSeedSites_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'SDMX','Maximum seed number per grain site [seeds site-1]',MaxSeedNumPerSite_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'GRMX','Maximum seed size per seed [gC seed-1]',SeedCMassMax_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'GRDM','Seed size at planting [gC seed-1]',SeedCMass_pft(NZ,NY,NX),100)    !could be greater than SeedCMassMax, accouting for seedling
+  call writefixl(nu_plt,'GFILL','Grain filling rate at 25 oC [gC seed-1 h-1]',GrainFillRate25C_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'WTSTDI','Mass of dead standing biomass at planting [gC m-2]',StandingDeadInitC_pft(NZ,NY,NX),100)
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1035,18 +1038,18 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'Radius of fine roots [m] RRAD1M',Root1stMaxRadius_pft(1,NZ,NY,NX),84)
-  call writefixl(nu_plt,'Radius of root hairs [m] RRAD2M',Root2ndMaxRadius_pft(1,NZ,NY,NX),84)
-  call writefixl(nu_plt,'Primary/fine root porosity [m3 m-3] PORT',RootPorosity_pft(1,NZ,NY,NX),84)
-  call writefixl(nu_plt,'Nonstructural C concentration needed for root'// &
-    ' branching (gC/gC) PR',MinNonstC2InitRoot_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Radial resistivity per m2 root surface area for water uptake [MPa h m-1] RSRR',RootRadialResist_pft(1,NZ,NY,NX),84)
-  call writefixl(nu_plt,'Axial resistivity per m root length for water uptake [MPa h m-4] RSRA',RootAxialResist_pft(1,NZ,NY,NX),84)
-  call writefixl(nu_plt,'Rate constant for equilibrating shoot-root '// &
-    'nonstructural C concn PTSHT',ShutRutNonstElmntConducts_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'Branching frequency from 1st to 2nd roots [m-1] RTFQ',RootBranchFreq_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'RRAD1M','Radius of fine roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'RRAD2M','Radius of root hairs [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'PR','Nonstructural C concentration needed for root'// &
+    ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'RSRR','Radial resistivity per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'RSRA','Axial resistivity per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'PTSHT','Rate constant for equilibrating shoot-root '// &
+    'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'RTFQ','Branching frequency from 1st to 2nd roots [m-1]',RootBranchFreq_pft(NZ,NY,NX),100)
   end subroutine Root_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1056,19 +1059,18 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT UPTAKE PARAMETERS'
-  call writefixl(nu_plt,'NH4 max uptake [g m-2 h-1] UPMXZH',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'NH4 uptake Km [uM] UPKMZH',KmNH4Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'NH4 uptake min concn [uM] UPMNZH',CMinNH4Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'NO3 max uptake [g m-2 h-1] UPMXZO',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'NO3 uptake Km [uM] UPKMZO',KmNO3Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'NO3 uptake min concn [uM] UPMNZO',CMinNO3Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 max uptake [g m-2 h-1] UPMXPO',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake Km [uM] UPKMPO',KmPO4Root_pft(ipltroot,NZ,NY,NX),84)
-  call writefixl(nu_plt,'H2PO4 or H1PO4 uptake min conc [uM] UPMNPO',CMinPO4Root_pft(ipltroot,NZ,NY,NX),84)
+  call writefixl(nu_plt,'UPMXZH','Maximum rate for NH4 uptake [gN m-2 absorption area h-1]',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMZH','Half saturation Km for NH4 uptake [uM]',KmNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNZH','Minimum concentration required for NH4 uptake [uM]',CMinNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMXZO','Maximum rate for NO3 uptake [gN m-2 absorption area h-1]',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMZO','Half saturation Km for NO3 uptake [uM]',KmNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNZO','Minimum concentration for NO3 uptake [uM]',CMinNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMXPO','Maximum rate for H2PO4 or H1PO4 uptake [gP m-2 absorption area h-1]',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMPO','Half saturation Km for H2PO4 or H1PO4 uptake [uM]',KmPO4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNPO','Minimum concentration required for H2PO4 or H1PO4 uptake [uM]',CMinPO4Root_pft(ipltroot,NZ,NY,NX),100)
   end subroutine Root_nutrient_trait_disp
-
 
 !------------------------------------------------------------------------------------------
   subroutine plant_water_trait_disp(nu_plt,NZ,NY,NX)
@@ -1077,13 +1079,11 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)  
+  write(nu_plt,*)('-',j=1,110)  
   write(nu_plt,*)'WATER RELATIONS'
-  call writefixl(nu_plt,'leaf osmotic potential at zero leaf water '// &
-     'potential [MPa] OSMO',CanOsmoPsi0pt_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'shape parameter for stomatal resistance vs '// &
-     'leaf turgor potential [MPa-1] RCS',RCS_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'H2O cuticular resistance [s m-1] RSMX',CuticleResist_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'OSMO','Leaf osmotic potential at zero leaf water potential [MPa]',CanOsmoPsi0pt_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'RCS','e-folding turgor pressure for stomatal resistance [MPa]',RCS_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'RSMX','Cuticular resistance for H2O [s m-1]',CuticleResist_pft(NZ,NY,NX),100)
   end subroutine plant_water_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1093,27 +1093,17 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN GROWTH YIELDS'
-  call writefixl(nu_plt,'leaf dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMLF',LeafBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'petiole dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMSHE',PetioleBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'stalk dry matter C production vs '// &
-    'nonstructural C consumption (g g-1) DMSTK',StalkBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'stalk reserve C production vs '// &
-    'nonstructural C consumption (g g-1) DMRSV',ReserveBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'husk dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1) DMHSK',HuskBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'ear dry matter C production vs '// &
-    'nonstructural Cconsumption (g g-1) DMEAR',EarBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'grain C production vs nonstructural C'// &
-    ' consumption (g g-1) DMGR',GrainBiomGrowthYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'root dry matter C production vs nonstructural C'// &
-    ' consumption (g g-1) DMRT',RootBiomGrosYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'nodule bacteria in root, canopy dry matter '// &
-    'C production vs nonstructural C consumption (g g-1) DMND' &
-    ,NoduGrowthYield_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMLF','Leaf dry matter C production yield [gC leaf g-1 nonstrucal C]',LeafBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMSHE','Petiole dry matter C production yield [gC petiole g-1 nonstrucal C]',PetioleBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMSTK','Stalk dry matter C production yield [gC stalk g-1 nonstrucal C]',StalkBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMRSV','Stalk reserve C production yield [g reserve g-1 nonstrucal C]',ReserveBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMHSK','Husk dry matter C production yield [gC husk g-1 nonstrucal C]',HuskBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMEAR','Ear dry matter C production yiled [gC ear g-1 nonstrucal C]',EarBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMGR','Grain C production yiled [gC grain g-1 nonstrucal C]',GrainBiomGrowthYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMRT','Root dry matter C production yield [gC root g-1 nonstrucal C]',RootBiomGrosYld_pft(NZ,NY,NX),101)
+  call writefixl(nu_plt,'DMND','Canopy/root nodule bacteria dry matter C production yiled [gC g-1 nonstrucal C]',NoduGrowthYield_pft(NZ,NY,NX),101)
   end subroutine plant_biomyield_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1123,26 +1113,26 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
-  call writefixl(nu_plt,'NC ratio in plant leaves (gN/gC) CNLF',rNCLeaf_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant petiole (gN/gC) CNSHE',rNCSheath_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant stalk (gN/gC) CNSTK',rNCStalk_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant stalk reserve (gN/gC) CNRSV',rNCReserve_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant husk (gN/gC) CNHSK',rNCHusk_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant ear (gN/gC) CNEAR',rNCEar_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant grain (gN/gC) CNGR',rNCGrain_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant root (gN/gC) CNRT',rNCRoot_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'NC ratio in plant nodule (gN/gC) CNND',rNCNodule_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant leaves (gP/gC) CPLF',rPCLeaf_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant petiole (gP/gC) CPSHE',rPCSheath_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant stalk (gP/gC) CPSTK',rPCStalk_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant stalk reserve (gP/gC) CPRSV',rPCReserve_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant husk (gP/gC) CPHSK',rPCHusk_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant ear (gP/gC) CPEAR',rPCEar_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant grain (gP/gC) CPGR',rPCGrain_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant root (gP/gC) CPRT',rPCRootr_pft(NZ,NY,NX),84)
-  call writefixl(nu_plt,'PC ratio in plant nodule (gP/gC) CPND',rPCNoduler_pft(NZ,NY,NX),84)
+  call writefixl(nu_plt,'CNLF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNSHE','Plant petiole NC ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNSTK','Plant stalk NC ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNRSV','Plant stalk reserve NC ratio [gN (gC)-1]',rNCReserve_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNHSK','Plant husk NC ratio [gN (gC)-1]',rNCHusk_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNEAR','Plant ear NC ratio [gN (gC)-1]',rNCEar_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNGR','Plant grain NC ratio [gN (gC)-1]',rNCGrain_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNRT','Plant root NC ratio [gN (gC)-1]',rNCRoot_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CNND','Plant nodule NC ratio [gN (gC)-1]',rNCNodule_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPLF','Plant leaf PC ratio [gP (gC)-1]',rPCLeaf_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPSHE','Plant petiole PC ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPSTK','Plant stalk PC ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPRSV','Plant stalk reserve PC ratio [gP (gC)-1]',rPCReserve_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPHSK','Plant husk PC ratio [gP (gC)-1]',rPCHusk_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPEAR','Plant ear PC ratio [gP (gC)-1]',rPCEar_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPGR','Plant grain PC ratio [gP (gC)-1]',rPCGrain_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPRT','Plant root PC ratio [gP (gC)-1]',rPCRootr_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPND','Plant nodule PC ratio [gP (gC)-1]',rPCNoduler_pft(NZ,NY,NX),100)
   end subroutine plant_biomstoich_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1153,12 +1143,12 @@ implicit none
   integer, intent(in) :: nu_plt
   integer :: j
 
-  write(nu_plt,*)('-',j=1,100)
+  write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'OPTICAL PROPERTIES'
-  call writefixl(nu_plt,'leaf SW albedo ALBR',RadSWLeafAlbedo_pft(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf PAR albedo ALBP',CanopyPARalbedo_pft(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf SW transmission TAUR',RadSWLeafTransmis_pft(NZ,NY,NX),50)
-  call writefixl(nu_plt,'leaf PAR transmission TAUP',RadPARLeafTransmis_pft(NZ,NY,NX),50)
+  call writefixl(nu_plt,'ALBR','Leaf shortwave (0.3-2.5 um) radiation albedo [-]',RadSWLeafAlbedo_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,'ALBP','Leaf PAR (0.4-0.7 um) albedo [-]',CanopyPARalbedo_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,'TAUR','Leaf shortwave radiation (0.3-2.5 um) transmission [-]',RadSWLeafTransmis_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,'TAUP','Leaf PAR (0.4-0.7 um) transmission [-]',RadPARLeafTransmis_pft(NZ,NY,NX),80)
   end subroutine plant_optic_trait_disp
 
 
@@ -1328,46 +1318,58 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine writefixl(nu_plt,desc,value,width)
+  subroutine writefixl(nu_plt,varname, desc,value,width)
   implicit none
   integer,intent(in)  :: nu_plt
+  character(len=*), intent(in) :: varname
   character(len=*), intent(in) :: desc
   integer, intent(in) :: width
   real(r8),intent(in) :: value
-
+  character(len=10) :: vname
   character(len=width) :: line
+  character(len=256) :: lines
   line=desc
   line(width:width)=':'
-  write(nu_plt,*)line,value
+  write(vname,*)varname
+  write(lines,*)line,value
+  write(nu_plt,'(A10,A)')vname, ': '//trim(lines)
   end subroutine writefixl
 !------------------------------------------------------------------------------------------
 
   subroutine writefixsl(nu_plt,desc,value,width)
   implicit none
-  integer,intent(in)  :: nu_plt
+  integer,intent(in)  :: nu_plt  
   character(len=*), intent(in) :: desc
   integer, intent(in) :: width
   character(len=*),intent(in) :: value
 
   character(len=width) :: line
+
   line=desc
   line(width:width)=':'
-  write(nu_plt,*)line,' ',value
+  write(nu_plt,*)line,value
+
   end subroutine writefixsl
 
 !------------------------------------------------------------------------------------------
 
-  subroutine writeafixl(nu_plt,desc,values,width)
+  subroutine writeafixl(nu_plt,varname,desc,values,width)
   implicit none
   integer,intent(in)  :: nu_plt
+  character(len=*), intent(in) :: varname
   character(len=*), intent(in) :: desc
   integer, intent(in) :: width
   real(r8),dimension(:),intent(in) :: values
 
   character(len=width) :: line
+  character(len=256) :: lines
+  character(len=10) :: vname
+
   line=desc
   line(width:width)=':'
-  write(nu_plt,*)line,values
+  write(vname,*)varname
+  write(lines,*)line,values
+  write(nu_plt,'(A10,A)')vname,': '//trim(lines)
   end subroutine writeafixl
 !------------------------------------------------------------------------------------------
 
@@ -1399,11 +1401,11 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO2', XKCO2_tab)
   call ncd_getvar(pft_nfid, 'XKO2',  XKO2_tab)
   call ncd_getvar(pft_nfid, 'XKCO24',Km4PEPCarboxy_tab)
-  call ncd_getvar(pft_nfid, 'RUBP', LeafRuBPConc_tab)
-  call ncd_getvar(pft_nfid, 'PEPC', FracLeafProtAsPEPCarboxyl_tab)
+  call ncd_getvar(pft_nfid, 'RUBP', LeafRubisco2Protein_tab)
+  call ncd_getvar(pft_nfid, 'PEPC', LeafPEP2Protein_tab)
   call ncd_getvar(pft_nfid, 'ETMX', SpecChloryfilAct_tab)
-  call ncd_getvar(pft_nfid, 'CHL',  LeafC3ChlorofilConc_tab)
-  call ncd_getvar(pft_nfid, 'CHL4', LeafC4ChlorofilConc_tab)
+  call ncd_getvar(pft_nfid, 'CHL',  LeafC3Chl2Protein_tab)
+  call ncd_getvar(pft_nfid, 'CHL4', LeafC4Chl2Protein_tab)
   call ncd_getvar(pft_nfid, 'FCO2', CanopyCi2CaRatio_pft_tab)
   call ncd_getvar(pft_nfid, 'ALBR', RadSWLeafAlbedo_tab)
   call ncd_getvar(pft_nfid, 'ALBP', CanopyPARalbedo_tab)

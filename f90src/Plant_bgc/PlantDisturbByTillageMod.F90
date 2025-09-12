@@ -51,7 +51,7 @@ contains
     CPOOL3_node                 => plt_photo%CPOOL3_node                  ,& !inoput :minimum sink strength for nonstructural C transfer, [g d-2]
     CPOOL4_node                 => plt_photo%CPOOL4_node                  ,& !inoput :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
     QH2OLoss_lnds               => plt_site%QH2OLoss_lnds                 ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
-    LeafProteinCNode_brch       => plt_biom%LeafProteinCNode_brch         ,& !inoput :layer leaf protein C, [g d-2]
+    LeafProteinC_node       => plt_biom%LeafProteinC_node         ,& !inoput :layer leaf protein C, [g d-2]
     StructInternodeElms_brch     => plt_biom%StructInternodeElms_brch       ,& !inoput :internode C, [g d-2]
     CanopyLeafShethC_pft        => plt_biom%CanopyLeafShethC_pft          ,& !inoput :canopy leaf + sheath C, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
@@ -79,7 +79,7 @@ contains
     LeafArea_node               => plt_morph%LeafArea_node                ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
-    SeedNumSet_brch             => plt_morph%SeedNumSet_brch              ,& !inoput :branch grain number, [d-2]
+    SeedSitesSet_brch             => plt_morph%SeedSitesSet_brch              ,& !inoput :branch grain number, [d-2]
     PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch       ,& !inoput :layer sheath protein C, [g d-2]
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
@@ -189,7 +189,7 @@ contains
     ENDDO
 
     PotentialSeedSites_brch(NB,NZ) = PotentialSeedSites_brch(NB,NZ)*XHVST
-    SeedNumSet_brch(NB,NZ)         = SeedNumSet_brch(NB,NZ)*XHVST
+    SeedSitesSet_brch(NB,NZ)         = SeedSitesSet_brch(NB,NZ)*XHVST
     GrainSeedBiomCMean_brch(NB,NZ) = GrainSeedBiomCMean_brch(NB,NZ)*XHVST
     LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
     LeafPetolBiomassC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
@@ -204,7 +204,7 @@ contains
       ENDIF
       LeafArea_node(K,NB,NZ)=LeafArea_node(K,NB,NZ)*XHVST
 
-      LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*XHVST
+      LeafProteinC_node(K,NB,NZ)=LeafProteinC_node(K,NB,NZ)*XHVST
   !     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
 
       PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST

@@ -403,7 +403,7 @@ implicit none
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr         ,& !output :root layer diameter primary axes, [m]
     Root1stXNumL_rpvr          => plt_morph%Root1stXNumL_rpvr          ,& !output :root layer number primary axes, [d-2]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !output :root layer length secondary axes, [m d-2]
-    Root2ndMeanLens_rpvr       => plt_morph%Root2ndMeanLens_rpvr       ,& !output :root layer average length, [m]
+    Root2ndEffLen4uptk_rpvr       => plt_morph%Root2ndEffLen4uptk_rpvr       ,& !output :root layer average length, [m]
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr         ,& !output :root layer diameter secondary axes, [m]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr           ,& !output :root layer number axes, [d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !output :root layer number secondary axes, [d-2]
@@ -510,7 +510,7 @@ implicit none
         Root1stRadius_pvr(N,L,NZ)        = Root1stMaxRadius_pft(N,NZ)
         Root2ndRadius_rpvr(N,L,NZ)        = Root2ndMaxRadius_pft(N,NZ)
         RootAreaPerPlant_pvr(N,L,NZ)     = 0._r8
-        Root2ndMeanLens_rpvr(N,L,NZ)        = Root2ndMeanLensMin
+        Root2ndEffLen4uptk_rpvr(N,L,NZ)        = Root2ndTipLen4uptk
       ENDDO
     ENDDO    
 !
@@ -841,7 +841,7 @@ implicit none
     LeafElmntNode_brch         => plt_biom%LeafElmntNode_brch           ,& !output :leaf element, [g d-2]
     LeafArea_node          => plt_morph%LeafArea_node           ,& !output :leaf area, [m2 d-2]
     LeafPetolBiomassC_brch     => plt_biom%LeafPetolBiomassC_brch       ,& !output :plant branch leaf + sheath C, [g d-2]
-    LeafProteinCNode_brch      => plt_biom%LeafProteinCNode_brch        ,& !output :layer leaf protein C, [g d-2]
+    LeafProteinC_node      => plt_biom%LeafProteinC_node        ,& !output :layer leaf protein C, [g d-2]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !output :branch leaf structural element mass, [g d-2]
     StalkNodeHeight_brch    => plt_morph%StalkNodeHeight_brch     ,& !output :internode height, [m]
     PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch        ,& !output :sheath chemical element, [g d-2]
@@ -849,7 +849,7 @@ implicit none
     PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch      ,& !output :layer sheath protein C, [g d-2]
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch         ,& !output :branch sheath structural element, [g d-2]
     PotentialSeedSites_brch    => plt_morph%PotentialSeedSites_brch     ,& !output :branch potential grain number, [d-2]
-    SeedNumSet_brch            => plt_morph%SeedNumSet_brch             ,& !output :branch grain number, [d-2]
+    SeedSitesSet_brch            => plt_morph%SeedSitesSet_brch             ,& !output :branch grain number, [d-2]
     SenecStalkStrutElms_brch   => plt_biom%SenecStalkStrutElms_brch     ,& !output :branch stalk structural element, [g d-2]
     ShootStrutElms_brch        => plt_biom%ShootStrutElms_brch          ,& !output :branch shoot structural element mass, [g d-2]
     SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !output :branch live stalk C, [gC d-2]
@@ -871,14 +871,14 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     SeedNumSet_brch=seed set number
+!     SeedSitesSet_brch=seed set number
 !     PotentialSeedSites_brch=potential number of seed set sites
 !     GrainSeedBiomCMean_brch=individual seed size
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
-!     LeafProteinCNode_brch=leaf protein mass
+!     LeafProteinC_node=leaf protein mass
 !     LeafAreaLive_brch=branch leaf area
-!     WGLF,WGLFN,WGLFP,LeafProteinCNode_brch=node leaf C,N,P,protein mass
+!     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
 !     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinCNode_brch=node petiole C,N,P,protein mass
 !     StructInternodeElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
@@ -897,7 +897,7 @@ implicit none
   SapwoodBiomassC_brch(NB,NZ)                           = 0._r8
   LeafPetolBiomassC_brch(NB,NZ)                       = 0._r8
   PotentialSeedSites_brch(NB,NZ)                      = 0._r8
-  SeedNumSet_brch(NB,NZ)                              = 0._r8
+  SeedSitesSet_brch(NB,NZ)                              = 0._r8
   GrainSeedBiomCMean_brch(NB,NZ)                      = 0._r8
   LeafAreaLive_brch(NB,NZ)                            = 0._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)  = 0._r8
@@ -913,7 +913,7 @@ implicit none
     StalkNodeHeight_brch(K,NB,NZ)                    = 0._r8
     StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
     PetoleLensNode_brch(K,NB,NZ)                        = 0._r8
-    LeafProteinCNode_brch(K,NB,NZ)                      = 0._r8
+    LeafProteinC_node(K,NB,NZ)                      = 0._r8
     PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8

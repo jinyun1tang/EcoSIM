@@ -57,7 +57,7 @@ module PlantPhenolMod
     DATAP                         => plt_site%DATAP                           ,& !input  :parameter file name,[-]
     NP                            => plt_site%NP                              ,& !input  :current number of plant species,[-]
     PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
-    MainBranchNum_pft             => plt_morph%MainBranchNum_pft              ,& !input  :number of main branch,[-]
+    MainBranchNum_pft             => plt_morph%MainBranchNum_pft              ,& !input  :id number of main branch,[-]
     PlantPopu_col                 => plt_site%PlantPopu_col                    & !inoput :total plant population, [plants d-2]
   )
   call PrintInfo('beg '//subname)
@@ -256,6 +256,7 @@ module PlantPhenolMod
   integer, intent(in) :: I,J,NZ
   integer :: NB
   character(len=*), parameter :: subname='root_shoot_branching'
+  integer :: BranchNumber_new
 ! begin_execution
   associate(                                                                 &
     CanopyNonstElmConc_pft       => plt_biom%CanopyNonstElmConc_pft         ,& !input  :canopy nonstructural element concentration, [g d-2]
@@ -270,7 +271,7 @@ module PlantPhenolMod
     PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
     PSIRootTurg_vr               => plt_ew%PSIRootTurg_vr                   ,& !input  :root turgor water potential, [Mpa]
     FracGroth2Node_pft           => plt_allom%FracGroth2Node_pft            ,& !input  :parameter for allocation of growth to nodes, [-]
-    MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
+    MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :id number of main branch,[-]
     NumCogrowthNode_pft          => plt_morph%NumCogrowthNode_pft           ,& !input  :number of concurrently growing nodes,[-]
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
     ShootNodeNumAtPlanting_pft   => plt_morph%ShootNodeNumAtPlanting_pft    ,& !input  :number of nodes in seed, [-]
@@ -318,8 +319,8 @@ module PlantPhenolMod
 
             D120: DO NB=1,MaxNumBranches
               IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
-                IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-                  .GT.BranchNumber_pft(NZ)+NumCogrowthNode_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+                BranchNumber_new=BranchNumber_pft(NZ)+NumCogrowthNode_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ)
+                IF(NB.EQ.MainBranchNum_pft(NZ) .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ).GT.BranchNumber_new)THEN
                   !initiate a new branch
                   BranchNumber_pft(NZ)          = BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)         = MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
@@ -380,7 +381,7 @@ module PlantPhenolMod
     iPlantBranchState_brch => plt_pheno%iPlantBranchState_brch  ,& !input  :flag to detect branch death, [-]
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft       ,& !input  :number of branches,[-]
     BranchNumber_brch      => plt_morph%BranchNumber_brch       ,& !input  :branch meric id, [-]
-    MainBranchNum_pft      => plt_morph%MainBranchNum_pft        & !output :number of main branch,[-]
+    MainBranchNum_pft      => plt_morph%MainBranchNum_pft        & !output :id number of main branch,[-]
   )
   call PrintInfo('beg '//subname)
   MainBranchNum_pft(NZ) = 1
@@ -528,7 +529,7 @@ module PlantPhenolMod
 ! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
 ! HypoctoHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
-! Root1stDepz_pft=primary root depth
+! Root1stDepz_pft=primary root depth,avoid plant the seed at the grid interface
 ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
 !
   
@@ -537,7 +538,7 @@ module PlantPhenolMod
     CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_pft(ipltroot,1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
 !    write(666,*)I+J/24.,(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)),(ShootArea.GT.ZERO4LeafVar_pft(NZ)),&
-!      RootChk,CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),HypoctoHeight_pft(NZ),Root1stDepz_pft(ipltroot,1,NZ)
+!      RootChk,CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),Root1stDepz_pft(ipltroot,1,NZ)
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanopy_pft(NZ)=cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))
@@ -704,7 +705,7 @@ module PlantPhenolMod
       Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
     ENDIF
     IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
-      IF(TCGroth_pft(NZ).LT.TCChill4Seed_pft(NZ).OR.PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
+      IF(TCGroth_pft(NZ).LT.TCChill4Seed_pft(NZ) .OR. PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
         Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.5_r8)
       ENDIF
     ENDIF
@@ -889,7 +890,7 @@ module PlantPhenolMod
   real(r8) :: NodeInitRate,LeafAppearRate,HourlyNodeNumNormByMatgrp_brch
   integer :: kk
   logical :: NodeNumChk,PlantDayChk,LeafOutChk,LeafOffChk,CalChk
-  logical :: DayLenChk,CanHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
+  logical :: DayLenChk,CanopyHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
 ! begin_execution
   associate(                                                                           &
     PSICanopy_pft                     => plt_ew%PSICanopy_pft                         ,& !input  :canopy total water potential, [Mpa]
@@ -907,7 +908,7 @@ module PlantPhenolMod
     RefNodeInitRate_pft               => plt_pheno%RefNodeInitRate_pft                ,& !input  :rate of node initiation, [h-1 at 25 oC]
     NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !input  :shoot node number at floral initiation, [-]
     NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !input  :shoot node number at anthesis, [-]
-    MainBranchNum_pft                 => plt_morph%MainBranchNum_pft                  ,& !input  :number of main branch,[-]
+    MainBranchNum_pft                 => plt_morph%MainBranchNum_pft                  ,& !input  :id number of main branch,[-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                ,& !inoput :plant growth stage, [-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !inoput :leaf number, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !inoput :normalized node number during reproductive growth stages, [-]
@@ -1145,7 +1146,7 @@ module PlantPhenolMod
     iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft  ,& !input  :photoperiod type (neutral, long day, short day),[-]
     NodeNum2InitFloral_brch   => plt_morph%NodeNum2InitFloral_brch    ,& !input  :shoot node number at floral initiation, [-]
     doPlantLeafOut_brch       => plt_pheno%doPlantLeafOut_brch        ,& !input  :branch phenology flag, [-]
-    MainBranchNum_pft         => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft          ,& !input  :id number of main branch,[-]
     ShootNodeNum_brch         => plt_morph%ShootNodeNum_brch          ,& !input  :shoot node number, [-]
     iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch        ,& !inoput :plant growth stage, [-]
     NodeNumberAtAnthesis_brch => plt_morph%NodeNumberAtAnthesis_brch   & !output :shoot node number at anthesis, [-]
@@ -1299,7 +1300,7 @@ module PlantPhenolMod
   integer, intent(in) :: NZ
   logical, intent(in) :: DayLenChk
   character(len=*), parameter :: subname='InitiateBranchFlora'
-  logical :: NodeNumChk,LeafOutChk,PlantDayChk,CanHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
+  logical :: NodeNumChk,LeafOutChk,PlantDayChk,CanopyHeightChk,PhenoChk1,PhenoChk2,PhotoPrdChk
   real(r8) :: PPD
 
   associate(                                                               &
@@ -1327,11 +1328,11 @@ module PlantPhenolMod
   )
 
   call PrintInfo('beg '//subname)
-  NodeNumChk   = ShootNodeNum_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ)
-  LeafOutChk   = Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
-  PlantDayChk  = I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
-  CanHeightChk = CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
-  PhenoChk1    = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
+  NodeNumChk      = ShootNodeNum_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+NodeNum2InitFloral_brch(NB,NZ)
+  LeafOutChk      = Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
+  PlantDayChk     = I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
+  CanopyHeightChk = CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
+  PhenoChk1       = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
     (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
 
   !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
@@ -1339,7 +1340,7 @@ module PlantPhenolMod
   PhenoChk2=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
 
   IF((NodeNumChk .AND. (LeafOutChk.OR.PlantDayChk)) .OR. &
-    ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk .AND. DayLenChk))THEN
+    ((PhenoChk1.OR.PhenoChk2) .AND. CanopyHeightChk .AND. DayLenChk))THEN
 !
 !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
 !     AND ON MATURITY GROUP, CRITICAL PHOTOPERIOD AND PHOTOPERIOD
@@ -1362,7 +1363,7 @@ module PlantPhenolMod
       .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ)) &
       .OR.(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
 
-    IF( PhotoPrdChk .OR. ((PhenoChk1.OR.PhenoChk2) .AND. CanHeightChk.AND.DayLenChk))THEN
+    IF( PhotoPrdChk .OR. ((PhenoChk1.OR.PhenoChk2) .AND. CanopyHeightChk.AND.DayLenChk))THEN
       iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ) = I
       NodeNum2InitFloral_brch(NB,NZ)                = ShootNodeNum_brch(NB,NZ)
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN

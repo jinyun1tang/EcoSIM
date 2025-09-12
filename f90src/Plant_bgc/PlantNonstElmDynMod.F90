@@ -333,7 +333,7 @@ module PlantNonstElmDynMod
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantBranchState_brch        => plt_pheno%iPlantBranchState_brch         ,& !input  :flag to detect branch death, [-]
     iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft        ,& !input  :plant growth habit: annual or perennial,[-]
-    ShutRutNonstElmntConducts_pft => plt_pheno%ShutRutNonstElmntConducts_pft  ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
+    ShootRootNonstElmConduts_pft => plt_pheno%ShootRootNonstElmConduts_pft  ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
     RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     k_fine_litr                   => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
     NIXBotRootLayer_rpft          => plt_morph%NIXBotRootLayer_rpft           ,& !input  :maximum soil layer number for root axes, [-]
@@ -427,8 +427,8 @@ module PlantNonstElmDynMod
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
 !     BranchSinkWeight_pft=branch sink weighting factor
-!     ShutRutNonstElmntConducts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
-!     PTRT=allocation to leaf+petiole used to modify ShutRutNonstElmntConducts_pft,in annuals
+!     ShootRootNonstElmConduts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
+!     PTRT=allocation to leaf+petiole used to modify ShootRootNonstElmConduts_pft,in annuals
 !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     FWODB=C woody fraction in branch:0=woody,1=non-woody
@@ -449,9 +449,9 @@ module PlantNonstElmDynMod
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)*PTRT**0.167_r8
+        PTSHTR=ShootRootNonstElmConduts_pft(NZ)*PTRT**0.167_r8
       ELSE
-        PTSHTR=ShutRutNonstElmntConducts_pft(NZ)
+        PTSHTR=ShootRootNonstElmConduts_pft(NZ)
       ENDIF
 
       D415: DO L=NU,MaxSoiL4Root_pft(NZ)

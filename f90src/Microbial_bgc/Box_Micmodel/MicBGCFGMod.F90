@@ -7,7 +7,7 @@ module MicBGCMod
   use data_kind_mod,        only: r8 => DAT_KIND_R8
   use abortutils,           only: endrun,   destroy
   use EcoSIMCtrlMod,        only: etimer
-  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux,SubstrateDribbling
+  use minimathmod,          only: safe_adb, AZMAX1,fixEXConsumpFlux,SubstrateDribbling,real_truncate
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicForcTypeMod,       only: micforctype
@@ -393,7 +393,7 @@ module MicBGCMod
     ThetaZ = AZMAX1((AMIN1(AMAX1(0.5_r8*POROS,FieldCapacity),THETW)-THETY))
     VOLWZ  = ThetaZ/(1._r8+ThetaZ)*VLSoilPoreMicP  !effective water volume
   ENDIF
-
+  VOLWZ=real_truncate(VOLWZ,1.e-4)
 
 !     TKS=soil temperature
 !     TempOffset=adjustment for acclimation based on MAT in starts.f
@@ -403,7 +403,7 @@ module MicBGCMod
 !     222500,232500 high temp inactivation for growth,maintenance
 !     TSensGrowth,TSensMaintR=temperature function for growth,maintenance respiration
 ! the offset could be micobial guild/group specific
-  TKSO=TKS+TempOffset
+  TKSO=real_truncate(TKS+TempOffset,1.e-3_r8)
 
   call MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
 
@@ -780,7 +780,8 @@ module MicBGCMod
   ELSE
     WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
   ENDIF
-  WSensGroHeter(NGL,K)=WatStressMicb
+
+  WSensGroHeter(NGL,K)=real_truncate(WatStressMicb,1.e-3_r8)
   TSensGroHeter(NGL,K)=TSensGrowth
 
   GrowthEnvScalHeter(NGL,K) = WSensGroHeter(NGL,K)*TSensGroHeter(NGL,K)
@@ -2534,7 +2535,7 @@ module MicBGCMod
   !loop over all guilds of a given functional group
   DO NGL=JGniH(N),JGnfH(N)        
     IF(OMActHeter(NGL,K).LE.0.0_r8)cycle
-    WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
+    WatStressMicb=real_truncate(EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8)),1.e-3_r8)
     !prepare parameters
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA,micfor,naqfdiag,nmicdiag,nmics)
 

@@ -51,7 +51,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                  !branch height, [m]
-  real(r8),target,allocatable ::  SeedNumSet_brch(:,:,:,:)                   !branch grain number, [d-2]
+  real(r8),target,allocatable ::  SeedSitesSet_brch(:,:,:,:)                   !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
@@ -146,7 +146,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                  !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                     !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                 !flag to detect canopy death , [-]
-  real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)             !maximum grain node number per branch, [-]
+  real(r8),target,allocatable ::  GrothStalkMaxSeedSites_pft(:,:,:)             !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)               !maximum grain number per node , [-]
   real(r8),target,allocatable ::  SeedCMassMax_pft(:,:,:)                    !maximum grain size   , [g]
   real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)          !number of nodes in seed, [-]
@@ -220,7 +220,7 @@ contains
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
-  allocate(SeedNumSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumSet_brch=0._r8
+  allocate(SeedSitesSet_brch(MaxNumBranches,JP,JY,JX)); SeedSitesSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
@@ -315,7 +315,7 @@ contains
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
-  allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
+  allocate(GrothStalkMaxSeedSites_pft(JP,JY,JX));     GrothStalkMaxSeedSites_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(SeedCMassMax_pft(JP,JY,JX));     SeedCMassMax_pft=0._r8
   allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
@@ -385,7 +385,7 @@ contains
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
-  call destroy(SeedNumSet_brch)
+  call destroy(SeedSitesSet_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
@@ -481,7 +481,7 @@ contains
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)
   call destroy(iPlantShootState_pft)
-  call destroy(MaxPotentSeedNumber_pft)
+  call destroy(GrothStalkMaxSeedSites_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(SeedCMassMax_pft)
   call destroy(ShootNodeNumAtPlanting_pft)

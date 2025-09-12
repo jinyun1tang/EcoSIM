@@ -303,9 +303,11 @@ contains
           +trcs_Soil2plant_uptake_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)+TRootGasLossDisturb_col(idg,NY,NX)
 
         if(idg==idg_NH3)then           
-          tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX) &
-             +trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)  
+          tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX) 
+                       
           tracer_mass_err=tracer_mass_err+trcs_solml_drib_col(idg_NH3B) 
+
+          tracer_rootmass_err=tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
 
         if(idg==idg_O2)then
@@ -383,7 +385,13 @@ contains
               write(111,*)'ar2root, deltaErr  =',RootCO2Ar2Root_col(NY,NX),dCO2err
             else
               dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)
-              write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX),dgaserr
+              if(idg==idg_NH3)then
+                dgaserr=dgaserr+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)-trcs_Soil2plant_uptakep_col(idg_NH3B,NY,NX)
+                write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX)+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX),&
+                  trcs_Soil2plant_uptakep_col(idg,NY,NX)+trcs_Soil2plant_uptakep_col(idg_NH3B,NY,NX),dgaserr
+              else
+                write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX),dgaserr
+              endif
             endif
             write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)
           endif

@@ -407,7 +407,7 @@ implicit none
               write(201,*)'drib beg/end  =',trcs_drib_soil_slow_begf(idg,NY,NX)+trcs_drib_soil_slow_begf(idg_NH3B,NY,NX),&
                 trcs_drib_soil_slow_col(idg)+trcs_drib_soil_slow_col(idg_NH3B)
               write(201,*)'netflo2soil   =',trcs_netflow2soil_slow_flx_col(idg,NY,NX)+trcs_netflow2soil_slow_flx_col(idg_NH3B,NY,NX)
-              write(201,*)'netprod2soil  =',trcs_NetProd_slow_soil_col(idg,NY,NX)+trcs_NetProd_slow_soil_col(idg_NH3B,NY,NX)                 
+              write(201,*)'netprod2soil NH3,NH3B =',trcs_NetProd_slow_soil_col(idg,NY,NX),trcs_NetProd_slow_soil_col(idg_NH3B,NY,NX)                 
               write(201,*)'wetdep2soil   =',Gas_WeDepo2soil_slow_flx_col(idg,NY,NX)              
             else
               write(201,*)'err soil      =',trcg_mass_soil_begs(idg,NY,NX)-trcg_mass_soil_now(idg)-trcs_drib_soil_slow_begf(idg,NY,NX) + &

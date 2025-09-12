@@ -979,7 +979,7 @@ module PlantDisturbsMod
     GrainStrutElms_brch     => plt_biom%GrainStrutElms_brch       ,& !inoput :branch grain structural element mass, [g d-2]
     EarStrutElms_brch       => plt_biom%EarStrutElms_brch         ,& !inoput :branch ear structural chemical element mass, [g d-2]
     PotentialSeedSites_brch => plt_morph%PotentialSeedSites_brch  ,& !inoput :branch potential grain number, [d-2]
-    SeedNumSet_brch         => plt_morph%SeedNumSet_brch          ,& !inoput :branch grain number, [d-2]
+    SeedSitesSet_brch         => plt_morph%SeedSitesSet_brch          ,& !inoput :branch grain number, [d-2]
     GrainSeedBiomCMean_brch => plt_allom%GrainSeedBiomCMean_brch  ,& !inoput :maximum grain C during grain fill, [g d-2]
     HuskStrutElms_brch      => plt_biom%HuskStrutElms_brch         & !inoput :branch husk structural element mass, [g d-2]
   )
@@ -1066,7 +1066,7 @@ module PlantDisturbsMod
     GrainStrutElms_brch(NE,NB,NZ) = FracGrainNotHvsted*GrainStrutElms_brch(NE,NB,NZ)
   ENDDO
   PotentialSeedSites_brch(NB,NZ) = FracGrainNotHvsted*PotentialSeedSites_brch(NB,NZ)
-  SeedNumSet_brch(NB,NZ)         = FracGrainNotHvsted*SeedNumSet_brch(NB,NZ)
+  SeedSitesSet_brch(NB,NZ)         = FracGrainNotHvsted*SeedSitesSet_brch(NB,NZ)
   GrainSeedBiomCMean_brch(NB,NZ) = FracGrainNotHvsted*GrainSeedBiomCMean_brch(NB,NZ)
   end associate
   END subroutine BranchCutReprodOrgans
@@ -1487,7 +1487,7 @@ module PlantDisturbsMod
     CanopyLeafCLyr_pft       => plt_biom%CanopyLeafCLyr_pft        ,& !inoput :canopy layer leaf C, [g d-2]
     LeafAreaLive_brch        => plt_morph%LeafAreaLive_brch        ,& !inoput :branch leaf area, [m2 d-2]
     LeafArea_node        => plt_morph%LeafArea_node        ,& !inoput :leaf area, [m2 d-2]
-    LeafProteinCNode_brch    => plt_biom%LeafProteinCNode_brch     ,& !inoput :layer leaf protein C, [g d-2]
+    LeafProteinC_node    => plt_biom%LeafProteinC_node     ,& !inoput :layer leaf protein C, [g d-2]
     LeafStrutElms_brch       => plt_biom%LeafStrutElms_brch        ,& !inoput :branch leaf structural element mass, [g d-2]
     CanopyLeafAreaZ_pft      => plt_morph%CanopyLeafAreaZ_pft       & !inoput :canopy layer leaf area, [m2 d-2]
   )
@@ -1550,7 +1550,7 @@ module PlantDisturbsMod
 !
 !     WGLF=leaf node C mass
 !     LeafAreaLive_brch,LeafArea_node=branch,node leaf area
-!     LeafProteinCNode_brch=leaf protein mass
+!     LeafProteinC_node=leaf protein mass
 !
     LeafCbfCut_brch=LeafCbfCut_brch+LeafElmntNode_brch(ielmc,K,NB,NZ)
     DO NE=1,NumPlantChemElms
@@ -1558,9 +1558,9 @@ module PlantDisturbsMod
     ENDDO
     LeafAreaLive_brch(NB,NZ)=LeafAreaLive_brch(NB,NZ)-LeafArea_node(K,NB,NZ)+ARLFG
     IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      LeafProteinCNode_brch(K,NB,NZ)=LeafProteinCNode_brch(K,NB,NZ)*ARLFG/LeafArea_node(K,NB,NZ)
+      LeafProteinC_node(K,NB,NZ)=LeafProteinC_node(K,NB,NZ)*ARLFG/LeafArea_node(K,NB,NZ)
     ELSE
-      LeafProteinCNode_brch(K,NB,NZ)=0._r8
+      LeafProteinC_node(K,NB,NZ)=0._r8
     ENDIF
     LeafArea_node(K,NB,NZ)=ARLFG
 
