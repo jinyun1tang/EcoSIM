@@ -69,7 +69,7 @@ Module SharedDataMod
   integer,  allocatable :: a_MaxNumRootLays_col(:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
-  logical :: p_bool
+  logical :: p_bool, a_bool, pheno_bool
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)

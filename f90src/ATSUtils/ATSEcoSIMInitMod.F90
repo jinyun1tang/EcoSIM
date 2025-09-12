@@ -53,14 +53,14 @@ implicit none
   !with ATS and to turn off features unsupported in the coupler
   ATS_cpl_mode     = .true.
   column_mode      = .true.
-  plant_model      = .false.
-  ldo_sp_mode      = .false.
+  plant_model      = pheno_bool
+  ldo_sp_mode      = pheno_bool
   microbial_model  = .false.
   soichem_model    = .false.
   snowRedist_model = .false.
   disp_planttrait  = .false.
   disp_modelconfig = .false.
-  mod_snow_albedo  = .true.
+  mod_snow_albedo  = a_bool
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
