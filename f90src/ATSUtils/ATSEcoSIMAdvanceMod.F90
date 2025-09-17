@@ -51,6 +51,7 @@ implicit none
   use SurfaceRadiationMod
   use SoilHydroParaMod  , only : SetColdRunSoilStates
   use PlantMod
+  use WthrMod
   !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
@@ -105,6 +106,8 @@ implicit none
     call SetHourlyAccumulatorsATS(NY,NX)
   enddo
 
+  write(*,*) "Set Hourly Weather"
+  !call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
   do NY=1,NYS
@@ -139,6 +142,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
+    !SineSunInclAngle_col(NY,NX) = 1.0_r8
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
@@ -225,17 +229,27 @@ implicit none
     PrecRainAndIrrig_col = RainFalPrec_col
     RainPrecThrufall_col = RainFalPrec_col
 
+
     !RainFalPrec_col(NY,NX)=PrecAsRain(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
 
     !testing canopy height
     CanopyHeight_col(NY,NX) = 17.0
-    if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+    !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
 
   ENDDO
 
-  !write(*,*) "(ATSEcoSIMAdvance) RainFalPrec_col: ", RainFalPrec_col(1,1), "m/s, PrecAsSnow: " , SnoFalPrec_col(1,1), " m/s"
+  !Need submodules of wthr to compute precipitation variables
+  !And Canopy Radiation variables
+  IWTHR = 2 !runs Hourly weather
+  call wthr(I,J,NHW,NHE,NVN,NVS)
+  if(ldo_sp_mode)then
+    do NY=1,NYS
+        call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+    enddo
+  endif
+
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
 

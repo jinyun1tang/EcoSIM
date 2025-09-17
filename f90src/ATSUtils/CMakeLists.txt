@@ -16,6 +16,7 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/Minimath/
    ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
    ${CMAKE_BINARY_DIR}/f90src/Mesh/
+   ${CMAKE_BINARY_DIR}/f90src/Modelforc/
    ${CMAKE_BINARY_DIR}/f90src/Modelpars/
    ${CMAKE_BINARY_DIR}/f90src/Balances/
    ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
