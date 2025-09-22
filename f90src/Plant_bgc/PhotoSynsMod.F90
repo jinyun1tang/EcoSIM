@@ -216,8 +216,8 @@ implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in):: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress
-  real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CH2O4K
+  real(r8), intent(out) :: CH2O3K      !C3 product in bundle sheath
+  real(r8), intent(out) :: CH2O4K      !C4 product in mesophyll
   real(r8), intent(out) :: CO2FCL
   real(r8), intent(out) :: CO2FLL
   integer :: L,NN,M,N,LP
@@ -383,13 +383,13 @@ implicit none
                   clscal=LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
                   CO2FCL = CO2FCL+VGROX*cfscal*clscal
                   CO2FLL = CO2FLL+EGROX*cfscal*clscal
-!
-!               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
-!
-!               CH2O4=total C4 CO2 fixation
-!               LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
-!
+                  !
+                  !  ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
+                  !
+                  !  CH2O4=total C4 CO2 fixation
+                  !  LeafAreaSunlit_zsec=unself-shaded leaf surface area
+                  !  TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+                  !
                   CH2O4K=CH2O4K+VL*clscal
                   if(LP==1)then
                     CH2OSunlit_pft(NZ)=CH2OSunlit_pft(NZ)+VL*clscal*umol2gC_hr
@@ -489,8 +489,8 @@ implicit none
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
-              CO2F    = CO2F+CH2O4(K)
-              CH2O    = CH2O+CH2O3(K)
+              CO2F    = CO2F+CH2O4(K)     !carbon fixation in mesophyll cells
+              CH2O    = CH2O+CH2O3(K)     !carbon fixation in bundle sheath cells
               CH2OClm = CH2OClm+CO2FCL
               CH2OLlm = CH2OLlm+CO2FLL
 
@@ -508,9 +508,9 @@ implicit none
             ENDIF
           ENDIF
         ENDDO D100
-!
-!         CO2F,CH2O=total CO2 fixation,CH2O production
-!
+        !
+        !         CO2F,CH2O=total CO2 fixation,CH2O production
+        !
         CO2F = CO2F*umol2gC_hr
         CH2O = CH2O*umol2gC_hr
 !

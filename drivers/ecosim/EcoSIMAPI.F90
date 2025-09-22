@@ -287,6 +287,8 @@ contains
     soichem_model         = .false.
     microbial_model       = .false.
   endif
+  if(.not.plant_model)plantOM4Heat=.false.
+  
   call config_soil_warming(warming_exp)
   call config_fire(FireEvents)
   if(fixClime)then

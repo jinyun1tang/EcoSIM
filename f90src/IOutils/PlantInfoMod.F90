@@ -1000,9 +1000,8 @@ implicit none
   call writefixl(nu_plt,'PB','Nonstructural C concentration needed for branching [gC]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'GROUPX','Maturity group, node number required for floral initiation [-]',GROUPX_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'XTLI','Embryonic node number at planting [-]',ShootNodeNumAtPlanting_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'XDL','Critical photoperiod <= maximum daylength [h]',CriticPhotoPeriod_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'XPPD','Photoperiod sensitivity [node h-1]',PhotoPeriodSens_pft(NZ,NY,NX),100)
-
+  call writefixl(nu_plt,'XDL','Critical photoperiod for leaf and flora development (<= maximum daylength;<0=maximum) [h]',CriticPhotoPeriod_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'XPPD','Critical difference between critical photoperiod and current day length [h]',PhotoPeriodSens_pft(NZ,NY,NX),100)
 
   end subroutine Phenology_trait_disp
 
@@ -1020,8 +1019,8 @@ implicit none
   call writefixl(nu_plt,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   call writeafixl(nu_plt,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes [-]',LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
   call writefixl(nu_plt,'CFI','Initial clumping factor seedling [-]',ClumpFactorInit_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'ANGBR','Stem angle from horizontal',BranchAngle_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'ANGSH','Petiole angle from horizontal',PetioleAngle_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'ANGBR','Stem angle from horizontal [degrees]',BranchAngle_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'ANGSH','Petiole angle from horizontal [degrees]',PetioleAngle_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'STMX','Maximum potential seed sites for '// &
     'pre-anthesis stalk growth [sites (gC stalk)-1]',GrothStalkMaxSeedSites_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'SDMX','Maximum seed number per grain site [seeds site-1]',MaxSeedNumPerSite_pft(NZ,NY,NX),100)
@@ -1040,16 +1039,17 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'RRAD1M','Radius of fine roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),100)
-  call writefixl(nu_plt,'RRAD2M','Radius of root hairs [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),100)
-  call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),100)
+  call writefixl(nu_plt,'RRAD1M','Radius of fine roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RRAD2M','Radius of root hairs [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PR','Nonstructural C concentration needed for root'// &
-    ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'RSRR','Radial resistivity per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),100)
-  call writefixl(nu_plt,'RSRA','Axial resistivity per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),100)
+    ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRR','Radial resistivity per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRA','Axial resistivity per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PTSHT','Rate constant for equilibrating shoot-root '// &
-    'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'RTFQ','Branching frequency from 1st to 2nd roots [m-1]',RootBranchFreq_pft(NZ,NY,NX),100)
+    'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
+  !as a rule of thumb, RTFQ often takes the value of .  
+  call writefixl(nu_plt,'RTFQ','Square root of (fine root branching frequency on 1st roots) X (root hair frequency on fine roots) [m-1]',RootBranchFreq_pft(NZ,NY,NX),105)
   end subroutine Root_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1061,15 +1061,15 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT UPTAKE PARAMETERS'
-  call writefixl(nu_plt,'UPMXZH','Maximum rate for NH4 uptake [gN m-2 absorption area h-1]',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPKMZH','Half saturation Km for NH4 uptake [uM]',KmNH4Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPMNZH','Minimum concentration required for NH4 uptake [uM]',CMinNH4Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPMXZO','Maximum rate for NO3 uptake [gN m-2 absorption area h-1]',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPKMZO','Half saturation Km for NO3 uptake [uM]',KmNO3Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPMNZO','Minimum concentration for NO3 uptake [uM]',CMinNO3Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPMXPO','Maximum rate for H2PO4 or H1PO4 uptake [gP m-2 absorption area h-1]',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPKMPO','Half saturation Km for H2PO4 or H1PO4 uptake [uM]',KmPO4Root_pft(ipltroot,NZ,NY,NX),100)
-  call writefixl(nu_plt,'UPMNPO','Minimum concentration required for H2PO4 or H1PO4 uptake [uM]',CMinPO4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMXZH','Maximum rate for root uptake of NH4 [gN m-2 absorption area h-1]',VMaxNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMZH','Half saturation Km for root uptake of NH4 [uM]',KmNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNZH','Minimum concentration required for root uptake of NH4 [uM]',CMinNH4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMXZO','Maximum rate for root uptake of NO3 [gN m-2 absorption area h-1]',VMaxNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMZO','Half saturation Km for root uptake of NO3 [uM]',KmNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNZO','Minimum concentration for root uptake of NO3 [uM]',CMinNO3Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMXPO','Maximum rate for root uptake of H2PO4 or H1PO4 [gP m-2 absorption area h-1]',VMaxPO4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPKMPO','Half saturation Km for root uptake of H2PO4 or H1PO4 [uM]',KmPO4Root_pft(ipltroot,NZ,NY,NX),100)
+  call writefixl(nu_plt,'UPMNPO','Minimum concentration required for root uptake of H2PO4 or H1PO4 [uM]',CMinPO4Root_pft(ipltroot,NZ,NY,NX),100)
   end subroutine Root_nutrient_trait_disp
 
 !------------------------------------------------------------------------------------------

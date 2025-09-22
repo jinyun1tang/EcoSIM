@@ -81,7 +81,7 @@ module NutUptakeMod
     AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
     AtmGasc                   => plt_site%AtmGasc                    ,& !input  :atmospheric gas concentrations, [g m-3]
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
     LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch  ,& !input  :branch nonstructural C concentration, [g d-2]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    ,& !input  :canopy stomatal resistance, [h m-1]
@@ -113,7 +113,7 @@ module NutUptakeMod
   FNH3P = 1.0E-04_r8*FDMP
   if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
-      IF(LeafPetolBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
+      IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         CNH3P                  = AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB                 = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
@@ -1413,7 +1413,7 @@ module NutUptakeMod
         PPOOLX                                = 0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
         XFRE(ielmn)                           = (DOM_MicP_vr(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM_MicP_vr(idom_doc,K,L))/CPOOLT
         XFRE(ielmp)                           = (DOM_MicP_vr(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM_MicP_vr(idom_doc,K,L))/CPOOLT
-        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ) = FEXUDE(ielmn)*XFRE(ielmn)
+        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ) = FEXUDE(ielmn)*XFRE(ielmn)    !>0 into roots
         RootMycoExudEUptk_pvr(ielmp,N,K,L,NZ) = FEXUDE(ielmp)*XFRE(ielmp)
       ELSE
         RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ)=0.0_r8

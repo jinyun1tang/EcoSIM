@@ -9,6 +9,7 @@ module ExtractsMod
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
   use EcoSIMCtrlMod, only: lverb, ldo_sp_mode
+  use DebugToolMod,  only: PrintInfo
   use EcosimConst
   use PlantBGCPars
   use PlantAPIData
@@ -27,9 +28,10 @@ module ExtractsMod
   implicit none
 
   integer, intent(in) :: I, J
-
+  character(len=*), parameter :: subname='extracts'
   integer :: NZ
 
+  call PrintInfo('beg '//subname)
   call TotalLitrFall()
 
   call SumPlantRootGas(I,J)
@@ -48,6 +50,7 @@ module ExtractsMod
     ENDIF
   ENDDO
 
+  call PrintInfo('end '//subname)  
   RETURN
   END subroutine extracts
 
@@ -59,8 +62,8 @@ module ExtractsMod
   integer :: NZ,L,K,M
   integer :: NE
   associate(                                                          &
-    LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
-    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pft      => plt_bgcr%LitrfallElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
+    LitrfallElms_pvr      => plt_bgcr%LitrfallElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NP0                       => plt_site%NP0                        ,& !input  :intitial number of plant species,[-]
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     ,& !input  :standing dead element, [g d-2]
@@ -81,11 +84,11 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P LitrFall from grosub.f
 !   StandingDeadStrutElms_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitrfalStrutElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
+!   LitrfallElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
 !   LitrfalStrutElms_vr,=cumulative total C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
-      LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)+LitrfalStrutElms_pft(NE,NZ)
+      LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)+LitrfallElms_pft(NE,NZ)
       StandingDeadStrutElms_col(NE)=StandingDeadStrutElms_col(NE)+StandDeadStrutElms_pft(NE,NZ)
     ENDDO
 
@@ -93,9 +96,9 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfalStrutElms_pvr(NE,M,K,L,NZ))
+            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfallElms_pvr(NE,M,K,L,NZ))
             if(LitrfalStrutElms_vr(NE,M,K,L)<0._r8)then
-              write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+              write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfallElms_pvr(NE,M,K,L,NZ)
             endif
           enddo
         ENDDO
@@ -297,12 +300,12 @@ module ExtractsMod
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !input  :canopy water content, [m3 d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !input  :plant stem area, [m2 d-2]
-    ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
+    PlantElmBalCum_pft         => plt_site%PlantElmBalCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
     EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
     HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           ,& !input  :canopy storage heat flux, [MJ d-2 h-1]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft            ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             ,& !input  :canopy longwave radiation, [MJ d-2 h-1]
-    NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft             ,& !input  :canopy NH3 flux, [g d-2 h-1]
+    NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft             ,& !input  :canopy NH3 flux, [gN d-2 h-1]
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft   ,& !input  :net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
     RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft           ,& !input  :canopy net radiation, [MJ d-2 h-1]
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft     ,& !input  :gaseous flux fron root disturbance, [g d-2 h-1]
@@ -383,7 +386,7 @@ module ExtractsMod
 
   DO NE=1,NumPlantChemElms
     LitrFallStrutElms_col(NE)     = LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)
-    PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
+    PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+PlantElmBalCum_pft(NE,NZ)
   ENDDO
 
   DO idg=idg_beg,idg_NH3

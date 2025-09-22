@@ -60,15 +60,10 @@ implicit none
 
         call EnterPlantBalance(I,J,NP_col(NY,NX))
 
-        !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
-        !     zero out plant hourly fluxes
-        call ZeroGrosub()  
-
         if(lverb)WRITE(*,333)'HFUNC'
 
         DO NZ=1,NP_col(NY,NX)
           call PrintRootTracer(I,J,NZ,'BEEfhfunc')
-  !       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
         ENDDO
 
         !Phenological update, determine living/active branches      
@@ -76,20 +71,11 @@ implicit none
 
         DO NZ=1,NP_col(NY,NX)
           call PrintRootTracer(I,J,NZ,'afhfunc')
-  !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
         ENDDO
-
-  !      call SumPlantRootGas(I,J)
 
         !Predict uptake fluxes of nutrients and O2
         if(lverb)write(*,*)'uptake'
         CALL ROOTUPTAKES(I,J)
-
-  !      call SumPlantRootGas(I,J)
-
-  !      DO NZ=1,NP_col(NY,NX)
-  !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
-  !      ENDDO
 
         !Do growth of active branches and roots
         if(lverb)write(*,*)'grosub'
@@ -99,7 +85,6 @@ implicit none
 
         !aggregate varaibles
         CALL EXTRACTs(I,J)
-  !      if(I==140 .and. J>=20)write(116,*)'afextract'        
 
         DO NZ=1,NP_col(NY,NX)
           Call ReSeedPlants(I,J,NZ)

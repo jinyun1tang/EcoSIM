@@ -227,12 +227,12 @@ module Hour1Mod
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
-!     NIXBotRootLayer_rpft=number of lowest rooted layer
+!     NIXBotRootLayer_raxes=number of lowest rooted layer
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         NMaxRootBotLayer_pft(NZ,NY,NX) = MAX(NMaxRootBotLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         DO  NR=1,NumCanopyLayers
-          NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
+          NIXBotRootLayer_raxes(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_raxes(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
 

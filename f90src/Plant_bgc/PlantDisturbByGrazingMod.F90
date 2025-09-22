@@ -70,29 +70,30 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveStandDeadByGrazing(I,J,NZ,FHVSE,FHVSH)
+  subroutine RemoveStandDeadByGrazing(I,J,NZ,FracStdeadLeft,FHVSH)
   implicit none
   integer,  intent(in) :: I,J
   integer,  intent(in) :: NZ
-  real(r8), intent(out) :: FHVSE
-  real(r8), intent(out) :: FHVSH
-  real(r8) :: WHVSTD
+  real(r8), intent(out) :: FracStdeadLeft  !fraction of remaining C after harvest
+  real(r8), intent(out) :: FHVSH  !
+  real(r8) :: HarvestedStdeadC              !harvested standing dead C, [gC d-2]
 
-  associate(   &
-    CanopyHeightCut_pft => plt_distb%CanopyHeightCut_pft, &
+  associate(                                                      &
+    CanopyHeightCut_pft     => plt_distb%CanopyHeightCut_pft,     &
     NU                      => plt_site%NU,                       &
     AREA3                   => plt_site%AREA3,                    &
     StandDeadStrutElms_pft  => plt_biom%StandDeadStrutElms_pft,   &
     FracBiomHarvsted        => plt_distb%FracBiomHarvsted,        &
     THIN_pft                => plt_distb%THIN_pft,                &
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            &
-    )
+  )
+
   IF(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
-    WHVSTD=CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(iHarvst_pft,4,NZ)
-    FHVSE=AZMAX1(1._r8-WHVSTD/StandDeadStrutElms_pft(ielmc,NZ))
-    FHVSH=FHVSE
+    HarvestedStdeadC = CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ)
+    FracStdeadLeft  = AZMAX1(1._r8-HarvestedStdeadC/StandDeadStrutElms_pft(ielmc,NZ))
+    FHVSH  = FracStdeadLeft
   ELSE
-    FHVSE=1.0_r8
+    FracStdeadLeft=1.0_r8
     FHVSH=1.0_r8
   ENDIF
   end associate  
@@ -167,44 +168,45 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  subroutine GrazingPlant(I,J,NZ,HvstedLeafC,HvstedShethC,HvstedEarC,HvstedGrainC,&
-    WHVSCP,HvstedStalkC,HvstedRsrvC,WHVSHH,WHVSNP,LeafC_lbrch)
+  subroutine GrazingPlant(I,J,NZ,HarvestedLeafC,HarvestedShethC,HarvestedEarC,HarvestedGrainC,&
+    GrazedCanopyNonstC,HarvestedStalkC,HarvestedStalkRsrvC,HarvestedPetoleC,GrazedCanopyNoduleC,LeafLayerC_brch)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(out):: HvstedLeafC
-  real(r8), intent(out):: HvstedShethC
-  real(r8), intent(out):: HvstedEarC
-  real(r8), intent(out):: HvstedGrainC
-  real(r8), intent(out):: WHVSCP
-  real(r8), intent(out):: HvstedStalkC
-  real(r8), intent(out):: HvstedRsrvC
-  real(r8), intent(out) :: WHVSHH
-  real(r8), intent(out) :: WHVSNP  
-  REAL(R8), intent(out) :: LeafC_lbrch(NumCanopyLayers1,JP1,JP1)  
-  real(r8) :: totShootC,TotPhytomassRemoval
-  real(r8) :: WHVSLX,WHVSLY,WHVSCL,WHVSNL,CGrazedDeficit,WHVSSX
-  real(r8) :: WHVSTY  
+  real(r8), intent(out):: HarvestedLeafC
+  real(r8), intent(out):: HarvestedShethC
+  real(r8), intent(out):: HarvestedEarC
+  real(r8), intent(out):: HarvestedGrainC
+  real(r8), intent(out):: GrazedCanopyNonstC
+  real(r8), intent(out):: HarvestedStalkC
+  real(r8), intent(out):: HarvestedStalkRsrvC
+  real(r8), intent(out) :: HarvestedPetoleC
+  real(r8), intent(out) :: GrazedCanopyNoduleC  
+  REAL(R8), intent(out) :: LeafLayerC_brch(NumCanopyLayers1,JP1,JP1)  
+  real(r8) :: totShootC,TotPhytomassRemoved
+  real(r8) :: GrazingDemndLeafC,GrazingMeetLeafC,GrazedLeafNonstC,GrazedLeafNoduleC,GrazingUnMetLeafC,GrazedPhytoLeafC_pft
+  real(r8) :: GrazedDmndStalkC  
   real(r8) :: TotStalkC  
-  real(r8) :: WHVSHY,WHVSCS,WHVSNS,WHVEAX,WHVEAY,WHVGRX,WHVGRY  
-  real(r8) :: WHVSHX,WHVHSX,WHVHSY,WHVRVX,WHVRVY,WHVSKX,WHVSTX
-  real(r8) :: CCPOLX  
-  real(r8) :: CCPLNX  
+  real(r8) :: GrazingMeetPetoleC,GrazedPetoleNonstC,GrazedPetoleNoduleC,GrazingDmndEarC,GrazedEarC,GrazingDmdGrainC,GrazedGrainC  
+  real(r8) :: GrazingDmndPetole,GrazingDmndHuskC,GrazedHuskC,GrazingDmndStalkRsrvC
+  real(r8) :: GrazedStalkRsrvC,GrazedPhytoStalkC_pft,GrazingDmndStalkC
+  real(r8) :: CCPOLX  !grazing preference based on nonstructural C
+  real(r8) :: CCPLNX  !grazing preference based on canopy nodule amount
   integer :: K,NB,L
 
   associate(                                                             &
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft,          &
-    LeafElmsByLayerNode_brch    => plt_biom%LeafElmsByLayerNode_brch,    &
+    LeafLayerElms_node          => plt_biom%LeafLayerElms_node,          &
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft,              &
-    CanopyHeightCut_pft     => plt_distb%CanopyHeightCut_pft,    &
+    CanopyHeightCut_pft         => plt_distb%CanopyHeightCut_pft,        &
     iHarvstType_pft             => plt_distb%iHarvstType_pft,            &
     LeafStrutElms_pft           => plt_biom%LeafStrutElms_pft,           &
     HuskStrutElms_pft           => plt_biom%HuskStrutElms_pft,           &
-    ShootStrutElms_pft          => plt_biom%ShootStrutElms_pft,          &
+    ShootElms_pft               => plt_biom%ShootElms_pft,               &
     AREA3                       => plt_site%AREA3,                       &
     NU                          => plt_site%NU,                          &
     FracBiomHarvsted            => plt_distb%FracBiomHarvsted,           &
     THIN_pft                    => plt_distb%THIN_pft,                   &
-    NoduleNonstructCconc_pft    => plt_biom%NoduleNonstructCconc_pft,    &
+    CanopyNoduleNonstCConc_pft  => plt_biom%CanopyNoduleNonstCConc_pft,  &
     GrainStrutElms_pft          => plt_biom%GrainStrutElms_pft,          &
     StalkStrutElms_pft          => plt_biom%StalkStrutElms_pft,          &
     StalkRsrvElms_pft           => plt_biom%StalkRsrvElms_pft,           &
@@ -214,166 +216,166 @@ contains
     fTCanopyGroth_pft           => plt_pheno%fTCanopyGroth_pft,          &
     AvgCanopyBiomC2Graze_pft    => plt_biom%AvgCanopyBiomC2Graze_pft     &
   )
-!
-!     AvgCanopyBiomC2Graze_pft=average biomass in landscape grazing section
-!     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
-!          iHarvstType_pft=3:reduction of clumping factor
-!          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
-!     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
-!          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
-!     TotPhytomassRemoval=total phytomass grazed, removed
-!     fTCanopyGroth_pft=temperature function for canopy growth
-!     CCPOLP=nonstructural C concentration in canopy
-!     NoduleNonstructCconc_pft=nonstructural C concentration in canopy nodules
-! 24. has unit of hour
+  !
+  !     AvgCanopyBiomC2Graze_pft=average biomass in landscape grazing section
+  !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
+  !          iHarvstType_pft=3:reduction of clumping factor
+  !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
+  !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
+  !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
+  !     TotPhytomassRemoved=total phytomass grazed, removed
+  !     fTCanopyGroth_pft=temperature function for canopy growth
+  !     CCPOLP=nonstructural C concentration in canopy
+  !     CanopyNoduleNonstCConc_pft=nonstructural C concentration in canopy nodules
+  ! 24. has unit of hour, 0.45 is biomass C fraction
   IF(AvgCanopyBiomC2Graze_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
-    TotPhytomassRemoval=CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
-      *AREA3(NU)*ShootStrutElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
+    TotPhytomassRemoved=CanopyHeightCut_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
+      *AREA3(NU)*ShootElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)
   ELSE
-    TotPhytomassRemoval=0._r8
+    TotPhytomassRemoved=0._r8
   ENDIF
+
   !herbivory, means fauna/insect cutting?
   IF(iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-    TotPhytomassRemoval=TotPhytomassRemoval*fTCanopyGroth_pft(NZ)
+    TotPhytomassRemoved=TotPhytomassRemoved*fTCanopyGroth_pft(NZ)
   ENDIF
-  CCPOLX=CanopyNonstElmConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstElmConc_pft(ielmc,NZ))
-  CCPLNX=NoduleNonstructCconc_pft(NZ)/(1.0_r8+NoduleNonstructCconc_pft(NZ))
-!
-!     LEAF,BACTERIA GRAZED,REMOVED
-!
-!     FracBiomHarvsted(iHarvst_pft,1:4)=fraction of leaf,non-foliar,woody, standing dead removed from PFT
-!     FracBiomHarvsted(iHarvst_col,1:4=fraction of leaf,non-foliar,woody, standing dead removed from ecosyst
-!     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
-!     WTLF=PFT leaf C mass
-!     CGrazedDeficit=grazing requirement unmet by leaf
-! grazing from leaf, 
-  WHVSLX      = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ)
-  WHVSLY      = AMIN1(LeafStrutElms_pft(ielmc,NZ),WHVSLX)
-  HvstedLeafC = WHVSLY*(1._r8-CCPOLX)
+  CCPOLX = CanopyNonstElmConc_pft(ielmc,NZ)/(1.0_r8+CanopyNonstElmConc_pft(ielmc,NZ))
+  CCPLNX = CanopyNoduleNonstCConc_pft(NZ)/(1.0_r8+CanopyNoduleNonstCConc_pft(NZ))
+  !
+  !     LEAF,BACTERIA GRAZED,REMOVED
+  !
+  !     FracBiomHarvsted(iHarvst_pft,1:4)=fraction of leaf,non-foliar,woody, standing dead removed from PFT
+  !     FracBiomHarvsted(iHarvst_col,1:4=fraction of leaf,non-foliar,woody, standing dead removed from ecosyst
+  !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
+  !     WTLF=PFT leaf C mass
+  !     GrazingUnMetLeafC=grazing requirement unmet by leaf
+  ! grazing from leaf, 
+  GrazingDemndLeafC = TotPhytomassRemoved*FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ)
+  GrazingMeetLeafC  = AMIN1(LeafStrutElms_pft(ielmc,NZ),GrazingDemndLeafC)
+  HarvestedLeafC       = GrazingMeetLeafC*(1._r8-CCPOLX)
   
-  WHVSCL         = WHVSLY*CCPOLX
-  WHVSNL         = WHVSLY*CCPLNX
-  CGrazedDeficit = AZMAX1(WHVSLX-WHVSLY)
-  WHVSSX         = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ)
-!
-!     OTHER NON-FOLIAR GRAZED,REMOVED
-!
-!     WTSHE,WTHSK,WTEAR,WTGR=PFT petiole,husk,ear,grain C mass
-!     WHVSH*,WHVHS*,WHVEA*,WHVGR*,WHVSC*=
-!            petiole,husk,ear,grain,nonstructural C removed
-!     CGrazedDeficit=grazing requirement unmet by non-foliar removal
-!
-  totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ) &
-    +EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
+  GrazedLeafNonstC     = GrazingMeetLeafC*CCPOLX
+  GrazedLeafNoduleC    = GrazingMeetLeafC*CCPLNX
+  GrazingUnMetLeafC    = AZMAX1(GrazingDemndLeafC-GrazingMeetLeafC)
+  GrazedPhytoLeafC_pft = TotPhytomassRemoved*FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ)
+  !
+  !     OTHER NON-FOLIAR GRAZED,REMOVED
+  !
+  !     WTSHE,WTHSK,WTEAR,WTGR=PFT petiole,husk,ear,grain C mass
+  !     WHVSH*,WHVHS*,WHVEA*,WHVGR*,WHVSC*=
+  !            petiole,husk,ear,grain,nonstructural C removed
+  !     GrazingUnMetLeafC=grazing requirement unmet by non-foliar removal
+  !
+  totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ)+EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
   
   IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-    WHVSHX = WHVSSX*PetoleStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVSHY = AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
-    WHVSHH = WHVSHY*(1._r8-CCPOLX)
-    WHVSCS = WHVSHY*CCPOLX
-    WHVSNS = WHVSHY*CCPLNX
+    GrazingDmndPetole   = GrazedPhytoLeafC_pft*PetoleStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
+    GrazingMeetPetoleC  = AMIN1(PetoleStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
+    HarvestedPetoleC    = GrazingMeetPetoleC*(1._r8-CCPOLX)
+    GrazedPetoleNonstC  = GrazingMeetPetoleC*CCPOLX
+    GrazedPetoleNoduleC = GrazingMeetPetoleC*CCPLNX
 
-    CGrazedDeficit = AZMAX1(WHVSHX-WHVSHY)
-    WHVHSX         = WHVSSX*HuskStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVHSY         = AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
-    HvstedShethC   = WHVHSY
+    GrazingUnMetLeafC = AZMAX1(GrazingDmndPetole-GrazingMeetPetoleC)
+    GrazingDmndHuskC  = GrazedPhytoLeafC_pft*HuskStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
+    GrazedHuskC       = AMIN1(HuskStrutElms_pft(ielmc,NZ),GrazingDmndHuskC)
+    HarvestedShethC   = GrazedHuskC
 
-    CGrazedDeficit = AZMAX1(WHVHSX-WHVHSY)
-    WHVEAX         = WHVSSX*EarStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVEAY         = AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
-    HvstedEarC     = WHVEAY
+    GrazingUnMetLeafC = AZMAX1(GrazingDmndHuskC-GrazedHuskC)
+    GrazingDmndEarC   = GrazedPhytoLeafC_pft*EarStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
+    GrazedEarC        = AMIN1(EarStrutElms_pft(ielmc,NZ),GrazingDmndEarC)
+    HarvestedEarC     = GrazedEarC
 
-    CGrazedDeficit = AZMAX1(WHVEAX-WHVEAY)
-    WHVGRX         = WHVSSX*GrainStrutElms_pft(ielmc,NZ)/totShootC+CGrazedDeficit
-    WHVGRY         = AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
-    HvstedGrainC   = WHVGRY
-    CGrazedDeficit = AZMAX1(WHVGRX-WHVGRY)
+    GrazingUnMetLeafC = AZMAX1(GrazingDmndEarC-GrazedEarC)
+    GrazingDmdGrainC  = GrazedPhytoLeafC_pft*GrainStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
+    GrazedGrainC      = AMIN1(GrainStrutElms_pft(ielmc,NZ),GrazingDmdGrainC)
+    HarvestedGrainC   = GrazedGrainC
+    GrazingUnMetLeafC = AZMAX1(GrazingDmdGrainC-GrazedGrainC)
   ELSE
-    WHVSHH         = 0._r8
-    WHVSCS         = 0._r8
-    WHVSNS         = 0._r8
-    HvstedShethC   = 0._r8
-    HvstedEarC     = 0._r8
-    HvstedGrainC   = 0._r8
-    CGrazedDeficit = CGrazedDeficit+WHVSSX
+    HarvestedPetoleC    = 0._r8
+    GrazedPetoleNonstC  = 0._r8
+    GrazedPetoleNoduleC = 0._r8
+    HarvestedShethC     = 0._r8
+    HarvestedEarC       = 0._r8
+    HarvestedGrainC     = 0._r8
+    GrazingUnMetLeafC   = GrazingUnMetLeafC+GrazedPhytoLeafC_pft
   ENDIF
-  WHVSCP = WHVSCL+WHVSCS
-  WHVSNP = WHVSNL+WHVSNS
-  WHVSKX = TotPhytomassRemoval*FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ)
-!
-!     STALK GRAZED, REMOVED
-!
-!     WTSTK,WTRSV=stalk,reserve C mass
-!     WHVST*,WHVRV*=stalk,reserve C removed
-!     CGrazedDeficit=grazing requirement unmet by stalk,reserve
-!
+
+  GrazedCanopyNonstC    = GrazedLeafNonstC+GrazedPetoleNonstC
+  GrazedCanopyNoduleC   = GrazedLeafNoduleC+GrazedPetoleNoduleC
+  GrazedPhytoStalkC_pft = TotPhytomassRemoved*FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ)
+  !
+  !     STALK GRAZED, REMOVED
+  !
+  !     WTSTK,WTRSV=stalk,reserve C mass
+  !     WHVST*,WHVRV*=stalk,reserve C removed
+  !     GrazingUnMetLeafC=grazing requirement unmet by stalk,reserve
+  !
   TotStalkC=StalkStrutElms_pft(ielmc,NZ)+StalkRsrvElms_pft(ielmc,NZ)
-  IF(TotStalkC.GT.WHVSKX+CGrazedDeficit)THEN
-    WHVSTX       = WHVSKX*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
-    WHVSTY       = AMIN1(StalkStrutElms_pft(ielmc,NZ),WHVSTX)
-    HvstedStalkC = WHVSTY
+  IF(TotStalkC.GT.GrazedPhytoStalkC_pft+GrazingUnMetLeafC)THEN
+    GrazingDmndStalkC = GrazedPhytoStalkC_pft*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+GrazingUnMetLeafC
+    GrazedDmndStalkC  = AMIN1(StalkStrutElms_pft(ielmc,NZ),GrazingDmndStalkC)
+    HarvestedStalkC      = GrazedDmndStalkC
 
-    CGrazedDeficit = AZMAX1(WHVSTX-WHVSTY)
-    WHVRVX         = WHVSKX*StalkRsrvElms_pft(ielmc,NZ)/TotStalkC+CGrazedDeficit
-    WHVRVY         = AMIN1(StalkRsrvElms_pft(ielmc,NZ),WHVRVX)
-    HvstedRsrvC    = WHVRVY
-    CGrazedDeficit = AZMAX1(WHVRVX-WHVRVY)
+    GrazingUnMetLeafC     = AZMAX1(GrazingDmndStalkC-GrazedDmndStalkC)
+    GrazingDmndStalkRsrvC = GrazedPhytoStalkC_pft*StalkRsrvElms_pft(ielmc,NZ)/TotStalkC+GrazingUnMetLeafC
+    GrazedStalkRsrvC      = AMIN1(StalkRsrvElms_pft(ielmc,NZ),GrazingDmndStalkRsrvC)
+    HarvestedStalkRsrvC      = GrazedStalkRsrvC
+    GrazingUnMetLeafC     = AZMAX1(GrazingDmndStalkRsrvC-GrazedStalkRsrvC)
   ELSE
-    HvstedStalkC   = 0._r8
-    HvstedRsrvC    = 0._r8
-    CGrazedDeficit = AZMAX1(WHVSKX)
-!
-!     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
-!     EAR,GRAIN
-!
-!     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
-!     WHVSH*,WHVHS,WHVEA,WHVGR,WHVSC=
-!            petiole,husk,ear,grain,nonstructural C removed
-!
-    IF(CGrazedDeficit.GT.0.0_r8)THEN
-      WHVSLY      = AMIN1(LeafStrutElms_pft(ielmc,NZ)-HvstedLeafC-WHVSCL,CGrazedDeficit)
-      HvstedLeafC = HvstedLeafC+WHVSLY*(1._r8-CCPOLX)
+    HarvestedStalkC      = 0._r8
+    HarvestedStalkRsrvC  = 0._r8
+    GrazingUnMetLeafC = AZMAX1(GrazedPhytoStalkC_pft)
+    !
+    !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
+    !     EAR,GRAIN
+    !
+    !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
+    !     WHVSH*,WHVHS,WHVEA,WHVGR,WHVSC=
+    !            petiole,husk,ear,grain,nonstructural C removed
+    !
+    IF(GrazingUnMetLeafC.GT.0.0_r8)THEN
+      GrazingMeetLeafC      = AMIN1(LeafStrutElms_pft(ielmc,NZ)-HarvestedLeafC-GrazedLeafNonstC,GrazingUnMetLeafC)
+      HarvestedLeafC = HarvestedLeafC+GrazingMeetLeafC*(1._r8-CCPOLX)
 
-      WHVSCL = WHVSCL+WHVSLY*CCPOLX
-      WHVSNL = WHVSNL+WHVSLY*CCPLNX
+      GrazedLeafNonstC = GrazedLeafNonstC+GrazingMeetLeafC*CCPOLX
+      GrazedLeafNoduleC = GrazedLeafNoduleC+GrazingMeetLeafC*CCPLNX
 
-      CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVSLY)
+      GrazingUnMetLeafC = AZMAX1(GrazingUnMetLeafC-GrazingMeetLeafC)
 
       IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-        WHVSHX = CGrazedDeficit*PetoleStrutElms_pft(ielmc,NZ)/totShootC
-        WHVSHY = AMIN1(PetoleStrutElms_pft(ielmc,NZ),WHVSHX)
-        WHVSHH = WHVSHH+WHVSHY*(1._r8-CCPOLX)
-        WHVSCS = WHVSCS+WHVSHY*CCPOLX
-        WHVSNS = WHVSNS+WHVSHY*CCPLNX
+        GrazingDmndPetole = GrazingUnMetLeafC*PetoleStrutElms_pft(ielmc,NZ)/totShootC
+        GrazingMeetPetoleC     = AMIN1(PetoleStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
+        HarvestedPetoleC            = HarvestedPetoleC+GrazingMeetPetoleC*(1._r8-CCPOLX)
+        GrazedPetoleNonstC            = GrazedPetoleNonstC+GrazingMeetPetoleC*CCPOLX
+        GrazedPetoleNoduleC            = GrazedPetoleNoduleC+GrazingMeetPetoleC*CCPLNX
 
-        CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVSHY)
-        WHVHSX         = CGrazedDeficit*HuskStrutElms_pft(ielmc,NZ)/totShootC
-        WHVHSY         = AMIN1(HuskStrutElms_pft(ielmc,NZ),WHVHSX)
-        HvstedShethC   = HvstedShethC+WHVHSY
+        GrazingUnMetLeafC = AZMAX1(GrazingUnMetLeafC-GrazingMeetPetoleC)
+        GrazingDmndHuskC  = GrazingUnMetLeafC*HuskStrutElms_pft(ielmc,NZ)/totShootC
+        GrazedHuskC       = AMIN1(HuskStrutElms_pft(ielmc,NZ),GrazingDmndHuskC)
+        HarvestedShethC      = HarvestedShethC+GrazedHuskC
 
-        CGrazedDeficit = AZMAX1(CGrazedDeficit-WHVHSY)
-        WHVEAX         = CGrazedDeficit*EarStrutElms_pft(ielmc,NZ)/totShootC
-        WHVEAY         = AMIN1(EarStrutElms_pft(ielmc,NZ),WHVEAX)
-        HvstedEarC     = HvstedEarC+WHVEAY
+        GrazingUnMetLeafC = AZMAX1(GrazingUnMetLeafC-GrazedHuskC)
+        GrazingDmndEarC   = GrazingUnMetLeafC*EarStrutElms_pft(ielmc,NZ)/totShootC
+        GrazedEarC        = AMIN1(EarStrutElms_pft(ielmc,NZ),GrazingDmndEarC)
+        HarvestedEarC        = HarvestedEarC+GrazedEarC
 
-        CGrazedDeficit = AZMAX1(WHVEAX-WHVEAY)
-        WHVGRX         = CGrazedDeficit*GrainStrutElms_pft(ielmc,NZ)/totShootC
-        WHVGRY         = AMIN1(GrainStrutElms_pft(ielmc,NZ),WHVGRX)
-        HvstedGrainC   = HvstedGrainC+WHVGRY
+        GrazingUnMetLeafC = AZMAX1(GrazingDmndEarC-GrazedEarC)
+        GrazingDmdGrainC  = GrazingUnMetLeafC*GrainStrutElms_pft(ielmc,NZ)/totShootC
+        GrazedGrainC      = AMIN1(GrainStrutElms_pft(ielmc,NZ),GrazingDmdGrainC)
+        HarvestedGrainC      = HarvestedGrainC+GrazedGrainC
         
-        CGrazedDeficit = AZMAX1(WHVGRX-WHVGRY)
+        GrazingUnMetLeafC = AZMAX1(GrazingDmdGrainC-GrazedGrainC)
       ENDIF
     ENDIF
   ENDIF
-
-!     ALL HARVEST REMOVALS
-!
-!     LeafC_lbrch=branch leaf C mass in canopy layer
-!
+  !     ALL HARVEST REMOVALS
+  !
+  !     LeafLayerC_brch=branch leaf C mass in canopy layer
+  !
   D9860: DO NB=1,NumOfBranches_pft(NZ)
     DO  L=1,NumCanopyLayers1
       DO  K=0,MaxNodesPerBranch1
-        LeafC_lbrch(L,NB,NZ)=0._r8
+        LeafLayerC_brch(L,NB,NZ)=0._r8
       enddo
     enddo
   ENDDO D9860
@@ -381,7 +383,7 @@ contains
   D9870: DO NB=1,NumOfBranches_pft(NZ)
     DO  L=1,NumCanopyLayers1
       DO  K=0,MaxNodesPerBranch1
-        LeafC_lbrch(L,NB,NZ)=LeafC_lbrch(L,NB,NZ)+LeafElmsByLayerNode_brch(ielmc,L,K,NB,NZ)
+        LeafLayerC_brch(L,NB,NZ)=LeafLayerC_brch(L,NB,NZ)+LeafLayerElms_node(ielmc,L,K,NB,NZ)
       enddo
     enddo
   ENDDO D9870
@@ -390,62 +392,60 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  subroutine CutBranchNonstalByGrazing(I,J,NB,NZ,WHVSCP,CanopyNonstElmCopy,&
-    WHVSNP,CanopyNodulNonstElmCopy,CanopyNonstElmAfhvst,CanopyNodulNonstElmAfhvst,&
+  subroutine CutBranchNonstalByGrazing(I,J,NB,NZ,GrazedCanopyNonstC,CanopyNonstElmCopy_brch,&
+    GrazedCanopyNoduleC,CanopyNodulNonstElmCopy_brch,CanopyNonstElmAfhvst_brch,CanopyNodulNonstElmAfhvst,&
     CanopyNodulStrutElmAfhvst)
   implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NB,NZ
-  real(r8), intent(in) :: WHVSCP
-  real(r8), intent(in) :: CanopyNonstElmCopy(NumPlantChemElms)
-  real(r8), intent(in) :: WHVSNP
-  real(r8), intent(in) :: CanopyNodulNonstElmCopy(NumPlantChemElms)
-  REAL(R8),intent(out):: CanopyNonstElmAfhvst(NumPlantChemElms)
-  REAL(R8),intent(out):: CanopyNodulNonstElmAfhvst(NumPlantChemElms)
-  real(r8),intent(out) :: CanopyNodulStrutElmAfhvst(NumPlantChemElms)
-  real(r8) :: WHVSNX
-  real(r8) :: WHVSCX
-  real(r8) :: WTLSBX  
+  integer, intent(in)   :: I,J
+  integer, intent(in)   :: NB,NZ
+  real(r8), intent(in)  :: GrazedCanopyNonstC
+  real(r8), intent(in)  :: CanopyNonstElmCopy_brch(NumPlantChemElms)
+  real(r8), intent(in)  :: GrazedCanopyNoduleC
+  real(r8), intent(in)  :: CanopyNodulNonstElmCopy_brch(NumPlantChemElms)
+  REAL(R8), intent(out) :: CanopyNonstElmAfhvst_brch(NumPlantChemElms)        !canopy nonstructural element after harvest
+  REAL(R8), intent(out) :: CanopyNodulNonstElmAfhvst(NumPlantChemElms)   !canopy nodule nonstrucal element after harvest
+  real(r8), intent(out) :: CanopyNodulStrutElmAfhvst(NumPlantChemElms)  !canopy nodule structural element after harvest
+  real(r8) :: HarvestedCanopyNoduleC
+  real(r8) :: HarvestedCanopyNonstC_brch
+  real(r8) :: FracSheath_brch  
   integer  :: NE
   associate(                                                         &
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft,      &
+    CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft,     &
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch, &
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch,    &
+    CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch,    &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch,      &
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch, &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft,            &
     ZERO4LeafVar_pft          => plt_biom%ZERO4LeafVar_pft           &
   )
-  IF(CanopyLeafShethC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
-    WTLSBX=AZMAX1(LeafPetolBiomassC_brch(NB,NZ))
+  IF(CanopyLeafSheathC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
+    FracSheath_brch=AZMAX1(CanopyLeafSheathC_brch(NB,NZ))/CanopyLeafSheathC_pft(NZ)
     IF(CanopyNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      WHVSCX=AZMAX1(WHVSCP)*WTLSBX/CanopyLeafShethC_pft(NZ)
-      CanopyNonstElmAfhvst(ielmc)=AZMAX1(CanopyNonstElmCopy(ielmc)-WHVSCX)
+      HarvestedCanopyNonstC_brch  = AZMAX1(GrazedCanopyNonstC)*FracSheath_brch
+      CanopyNonstElmAfhvst_brch(ielmc) = AZMAX1(CanopyNonstElmCopy_brch(ielmc)-HarvestedCanopyNonstC_brch)
       DO NE=2,NumPlantChemElms
-        CanopyNonstElmAfhvst(NE)=AZMAX1(CanopyNonstElmCopy(NE) &
-          -WHVSCX*CanopyNonstElmCopy(NE)/CanopyNonstElms_brch(ielmc,NB,NZ))
+        CanopyNonstElmAfhvst_brch(NE)=CanopyNonstElmCopy_brch(NE)*(1._r8-HarvestedCanopyNonstC_brch/CanopyNonstElms_brch(ielmc,NB,NZ))
       ENDDO
     ELSE
-      CanopyNonstElmAfhvst(:)=0._r8
+      CanopyNonstElmAfhvst_brch(:)=0._r8
     ENDIF
 
     IF(CanopyNodulNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      WHVSNX=AZMAX1(WHVSNP)*WTLSBX/CanopyLeafShethC_pft(NZ)
-      CanopyNodulNonstElmAfhvst(ielmc)=AZMAX1(CanopyNodulNonstElmCopy(ielmc)-WHVSNX)
+      HarvestedCanopyNoduleC=AZMAX1(GrazedCanopyNoduleC)*FracSheath_brch
+      CanopyNodulNonstElmAfhvst(ielmc)=AZMAX1(CanopyNodulNonstElmCopy_brch(ielmc)-HarvestedCanopyNoduleC)
       DO NE=2,NumPlantChemElms
-        CanopyNodulNonstElmAfhvst(NE)=AZMAX1(CanopyNodulNonstElmCopy(NE) &
-          -WHVSNX*CanopyNodulNonstElmCopy(NE)/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
+        CanopyNodulNonstElmAfhvst(NE)=CanopyNodulNonstElmCopy_brch(NE)*AZMAX1(1._r8-HarvestedCanopyNoduleC/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
       ENDDO
 
       DO NE=1,NumPlantChemElms
-        CanopyNodulStrutElmAfhvst(NE)=CanopyNodulStrutElms_brch(NE,NB,NZ)*(1._r8-WHVSNX/CanopyNodulNonstElmCopy(NE))
+        CanopyNodulStrutElmAfhvst(NE)=CanopyNodulStrutElms_brch(NE,NB,NZ)*(1._r8-HarvestedCanopyNoduleC/CanopyNodulNonstElmCopy_brch(NE))
       ENDDO
     ELSE
       CanopyNodulNonstElmAfhvst(:)=0._r8
       CanopyNodulStrutElmAfhvst(:)=0._r8
     ENDIF
   ELSE
-    CanopyNonstElmAfhvst(:)      = 0._r8
+    CanopyNonstElmAfhvst_brch(:)      = 0._r8
     CanopyNodulNonstElmAfhvst(:) = 0._r8
     CanopyNodulStrutElmAfhvst(:) = 0._r8
   ENDIF

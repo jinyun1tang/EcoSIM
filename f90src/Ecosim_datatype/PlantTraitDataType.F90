@@ -14,8 +14,8 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootLeafElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootPetolElmAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracShootLeafAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
@@ -118,7 +118,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)              !hours above threshold temperature required for spring leafout/dehardening, [h]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                    !number of branches of the plant, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                     !main branch number, [-]
-  integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                  !branch number id, [-]
+  integer,target,allocatable ::  BranchNumerID_brch(:,:,:,:)                  !branch number id, [-]
   integer,target,allocatable ::  MainBranchNum_pft(:,:,:)                    !number of main branch, [-]
   integer,target,allocatable ::  Prep4Literfall_brch(:,:,:,:)                !branch phenology flag for senescence, [-]
   integer,target,allocatable ::  Hours4LiterfalAftMature_brch(:,:,:,:)       !hour counter for phenological senescence of a branch , [h]
@@ -183,8 +183,8 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootPetolElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolElmAlloc2Litr=0._r8
-  allocate(FracShootLeafElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafElmAlloc2Litr=0._r8
+  allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
+  allocate(FracShootLeafAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafAlloc2Litr=0._r8
   allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
@@ -287,7 +287,7 @@ contains
   allocate(HourReq4LeafOut_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
-  allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
+  allocate(BranchNumerID_brch(MaxNumBranches,JP,JY,JX));  BranchNumerID_brch=0
   allocate(MainBranchNum_pft(JP,JY,JX));      MainBranchNum_pft=0
   allocate(Prep4Literfall_brch(MaxNumBranches,JP,JY,JX)); Prep4Literfall_brch=ifalse
   allocate(Hours4LiterfalAftMature_brch(MaxNumBranches,JP,JY,JX)); Hours4LiterfalAftMature_brch=0
@@ -351,7 +351,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootLeafElmAlloc2Litr)
+  call destroy(FracShootLeafAlloc2Litr)
   call destroy(FracRootElmAlloc2Litr)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
@@ -453,7 +453,7 @@ contains
   call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
-  call destroy(BranchNumber_brch)
+  call destroy(BranchNumerID_brch)
   call destroy(MainBranchNum_pft)
   call destroy(Prep4Literfall_brch)
   call destroy(Hours4LiterfalAftMature_brch)

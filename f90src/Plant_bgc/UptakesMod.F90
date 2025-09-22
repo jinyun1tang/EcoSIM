@@ -80,7 +80,7 @@ module UptakesMod
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft        ,& !input  :canopy water content, [m3 d-2]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft    ,& !input  :canopy boundary layer resistance, [h m-1]
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft     ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft     ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft       ,& !input  :canopy active stalk C, [g d-2]
     CumSoilThickness_vr       => plt_site%CumSoilThickness_vr      ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft     ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -136,7 +136,7 @@ module UptakesMod
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
 !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
 !     [SpecStalkVolume]=[m3/gC]
-      CanopyMassC            = AZMAX1(CanopyLeafShethC_pft(NZ)+CanopySapwoodC_pft(NZ))
+      CanopyMassC            = AZMAX1(CanopyLeafSheathC_pft(NZ)+CanopySapwoodC_pft(NZ))
       VHeatCapCanopyPrev_pft = cpo*CanopyMassC+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
       
       if(ldo_sp_mode .and. LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ))then
@@ -568,7 +568,7 @@ module UptakesMod
     RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy isothermal boundary later resistance, [h m-1]
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    ShootElms_pft        => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
     TairK                     => plt_ew%TairK                         ,& !input  :air temperature, [K]
     iYearCurrent              => plt_site%iYearCurrent                ,& !input  :current year,[-]
@@ -607,7 +607,7 @@ module UptakesMod
         PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
       CanopyBndlResist_pft(NZ)   = CanopyIsothBndlResist_pft(NZ)
-      VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
+      VHeatCapCanopy_pft(NZ)     = cpw*(ShootElms_pft(ielmc,NZ)*10.0E-06_r8)
       DeltaTKC_pft(NZ)           = 0.0_r8
       !greater value of RCS_pft(NZ), more sensitive to turgor change.
       Stomata_Stress             = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
@@ -1242,7 +1242,7 @@ module UptakesMod
     RCS_pft                   => plt_photo%RCS_pft                    ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     CanopyIsothBndlResist_pft => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy roughness height, [m]
     RootNonstructElmConc_rpvr => plt_biom%RootNonstructElmConc_rpvr   ,& !input  :root layer nonstructural C concentration, [g g-1]
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    ShootElms_pft        => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     SnowDepth                 => plt_ew%SnowDepth                     ,& !input  :snowpack depth, [m]
     TKS_vr                    => plt_ew%TKS_vr                        ,& !input  :mean annual soil temperature, [K]
     TKSnow                    => plt_ew%TKSnow                        ,& !input  :snow temperature, [K]
@@ -1294,7 +1294,7 @@ module UptakesMod
   CanPStomaResistH2O_pft(NZ) = CanopyMinStomaResistH2O_pft(NZ) &
     +(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
   CanopyBndlResist_pft(NZ) = CanopyIsothBndlResist_pft(NZ)
-  VHeatCapCanopy_pft(NZ)     = cpw*(ShootStrutElms_pft(ielmc,NZ)*10.0E-06_r8)
+  VHeatCapCanopy_pft(NZ)     = cpw*(ShootElms_pft(ielmc,NZ)*10.0E-06_r8)
   DeltaTKC_pft(NZ)         = 0.0_r8
 
   DO N=1,Myco_pft(NZ)
@@ -1341,7 +1341,7 @@ module UptakesMod
   integer :: N,L
   associate(                                                          &
     CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !input  :canopy active stalk C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]

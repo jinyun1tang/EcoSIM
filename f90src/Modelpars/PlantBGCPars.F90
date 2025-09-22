@@ -93,7 +93,7 @@ module PlantBGCPars
   real(r8) :: RateK4RootSeaStorNonstEXfer(0:3)    !rate constant for root-storage nonstructural chemical element exchange, [h-1]
   real(r8) :: FXRT(0:1)                           !root partitioning of storage C during leafout,[-]
   real(r8) :: FXSH(0:1)                           !shoot partitioning of storage C during leafout,[-]
-  real(r8) :: FXRN(6)                             !rate constant for plant-bacteria nonstructl C,N,P exchange,[h-1]
+  real(r8) :: FXRN(6)                             !rate constant for plant-nodule bacteria nonstructl C,N,P exchange,[h-1]
   REAL(R8) :: RCCX(0:3)                           !maximum fractions for shoot N recycling,[-]
   real(r8) :: RCCQ(0:3)                           !maximum fractions for shoot P recycling,[-]
   REAL(R8) :: RCCZ(0:3)                           !minimum fractions for shoot C recycling,[-]
