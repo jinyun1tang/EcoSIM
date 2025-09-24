@@ -94,20 +94,17 @@ implicit none
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
   write(*,*) "(ATSEcoSIMAdvance) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
+  I = current_day+1
+  J = 12
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
   !call InitModules()
-  NX=1
-
   !load NK_col here?
   NK_col(NX,1) = 14
 
   do NY=1, NYS
     call SetHourlyAccumulatorsATS(NY,NX)
   enddo
-
-  write(*,*) "Set Hourly Weather"
-  !call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
   do NY=1,NYS
@@ -127,6 +124,8 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
+    SolarNoonHour_col(NY,NX) = 12.0_r8
+    ALAT_col(NY,NX)       = 40.0_r8
     !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
@@ -135,6 +134,7 @@ implicit none
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
+    RMAX = swrad(NY)*0.0036_r8
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
 
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
@@ -240,10 +240,12 @@ implicit none
 
   ENDDO
 
+  if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
   !Need submodules of wthr to compute precipitation variables
   !And Canopy Radiation variables
-  IWTHR = 2 !runs Hourly weather
+  IWTHR = -999 !runs Hourly weather
   call wthr(I,J,NHW,NHE,NVN,NVS)
+
   if(ldo_sp_mode)then
     do NY=1,NYS
         call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
@@ -252,8 +254,6 @@ implicit none
 
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
-
-  if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 

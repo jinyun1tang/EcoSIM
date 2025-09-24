@@ -5,11 +5,11 @@ module WthrMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
   use MiniFuncMod,       only: get_sun_declin
-  use EcoSIMCtrlMod,     only: etimer, frectyp,fixClime
+  use EcoSIMCtrlMod,     only: etimer, frectyp,fixClime, ats_cpl_mode
   use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
-  use DebugToolMod  
+  use DebugToolMod
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -79,7 +79,7 @@ module WthrMod
   !     IWTHR=weather data type in first(1) or second(2) scene
   !     ITYPE=weather data type:1=daily,2=hourly
   !
-  
+
   ITYPE=IWTHR
 
   !
@@ -92,6 +92,9 @@ module WthrMod
     !     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
     !     AND PRECIPITATION FROM HOURLY WEATHER ARRAYS LOADED IN 'READS'
     !
+  else if (IWTHR.EQ.-999)then
+    write(*,*) "ATS weather:"
+    RADN_col = RMAX
   ELSE
     call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   ENDIF
@@ -105,14 +108,14 @@ module WthrMod
 !  ENDIF
 !
   mon=etimer%get_curr_mon()
-  DO NX=NHW,NHE
-    DO NY=NVN,NVS
-      CO2EI_col(NY,NX)=atm_co2_mon(mon)
-      CH4E_col(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
-      Z2OE_col(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
-      CO2E_col(NY,NX)=CO2EI_col(NY,NX)   !used in photosynthesis, soil CO2 transport
-    ENDDO
-  ENDDO
+  !DO NX=NHW,NHE
+  !  DO NY=NVN,NVS
+  !    CO2EI_col(NY,NX)=atm_co2_mon(mon)
+  !    CH4E_col(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
+  !    Z2OE_col(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
+  !    CO2E_col(NY,NX)=CO2EI_col(NY,NX)   !used in photosynthesis, soil CO2 transport
+  !  ENDDO
+  !ENDDO
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
   call PrintInfo('end '//subname)
@@ -187,7 +190,7 @@ module WthrMod
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
       VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
       VPK_col(NY,NX) = AMIN1(VPS(NY,NX),VPK_col(NY,NX))
-      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT_col(NY,NX)/hpresc)      
+      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT_col(NY,NX)/hpresc)
 !
       !     UA=wind speed
 !
@@ -298,7 +301,7 @@ module WthrMod
         else
           SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
           SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
-        endif  
+        endif
 
         !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
         IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
@@ -319,7 +322,7 @@ module WthrMod
         RadDirectPAR_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
         RadPARDiffus_col(NY,NX) = RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
-        !     ATMOSPHERIC RADIATIVE PROPERTIES 
+        !     ATMOSPHERIC RADIATIVE PROPERTIES
         !  Duarte et al., 2006, AFM 139:171
         !     CLD=cloudiness factor for EMM
         !     EMM=sky emissivity
@@ -352,7 +355,7 @@ module WthrMod
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
 
-        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8 
+        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
 
       IF(RadLWClm(J,I).GT.0.0_r8)THEN
         SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
@@ -527,7 +530,7 @@ module WthrMod
     DO  NY=NVN,NVS
       IF(SineSunInclAngle_col(NY,NX).GT.0._r8)then
         TRAD_col(NY,NX)= RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
-      endif  
+      endif
       HUDX_col(NY,NX)  = AMAX1(HUDX_col(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN_col(NY,NX)  = AMIN1(HUDN_col(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]
       TWIND_col(NY,NX) = TWIND_col(NY,NX)+WindSpeedAtm_col(NY,NX)       !wind speed, [m/hr]
@@ -541,9 +544,12 @@ module WthrMod
       !     PRECI,PRECU=surface,subsurface irrigation
       !     PRECA,PrecAtm_col=rain+irrigation,rain+snow
       !     THS=sky LW radiation
-!
-      RainFalPrec_col(NY,NX)      = PrecAsRain_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-      SnoFalPrec_col(NY,NX)       = PrecAsSnow_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+      !
+      if(.not.ats_cpl_mode)then
+        RainFalPrec_col(NY,NX)      = PrecAsRain_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+        SnoFalPrec_col(NY,NX)       = PrecAsSnow_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+      endif
+
       IrrigSurface_col(NY,NX)     = PRECII_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
       IrrigSubsurf_col(NY,NX)     = PRECUI_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
       Irrigation_col(NY,NX)       = IrrigSurface_col(NY,NX)+IrrigSubsurf_col(NY,NX)

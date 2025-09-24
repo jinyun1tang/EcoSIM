@@ -27,7 +27,8 @@ program EcoATSTest
   sizes%num_components = 1
   sizes%ncells_per_col_ = 100
   sizes%num_columns = 1
-
+  a_bool = .false.
+  pheno_bool = .true.
   call Init_ATSEcoSIM_driver()
 
   call Init_EcoSIM(sizes)
@@ -124,6 +125,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_PORO(ncells_per_col_, ncol))
   allocate(a_LDENS(ncells_per_col_, ncol))
   allocate(a_LSAT(ncells_per_col_, ncol))
+  allocate(a_SSWS(ncells_per_col_,ncol))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
