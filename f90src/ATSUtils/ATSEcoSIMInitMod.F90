@@ -72,6 +72,9 @@ implicit none
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
   !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
 
+  open(unit=99, file='snow_debug.txt', status='replace')
+  write(99,*) 'TKSnow1_snvr    ENGY0   NetHeat2LayL    HeatByFrezThaw'
+  write(99,*) '------------------------------------------------------'
   !setting a few variables
   FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays_col   = 1 !Is the number of layers down the roots go
