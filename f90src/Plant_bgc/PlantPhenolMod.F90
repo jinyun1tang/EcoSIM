@@ -44,10 +44,12 @@ module PlantPhenolMod
 !
 !     THIS subroutine CALCULATES PLANT PHENOLOGY
 !
+  use PlantBalMod, only : SumPlantBiomStates
   implicit none
 
   integer, intent(in) :: I,J
   INTEGER :: NB, NZ
+  integer :: NE
   character(len=*), parameter :: subname='PhenologyUpdate'
 ! begin_execution
   associate(                                                                   &
@@ -74,6 +76,7 @@ module PlantPhenolMod
 !         DATAP=PFT file name
 !
       call set_plant_flags(I,J,NZ)
+
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
@@ -86,6 +89,7 @@ module PlantPhenolMod
         call TestPlantEmergence(I,J,NZ)
 
         call root_shoot_branching(I,J,NZ)
+
 !
 !           THE REST OF THE subroutine MODELS THE PHENOLOGY OF EACH BRANCH
 !
@@ -94,10 +98,12 @@ module PlantPhenolMod
 !
         IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR. doInitPlant_pft(NZ).EQ.itrue)THEN          
           call Emerged_plant_Phenology(I,J,NZ)
-        ENDIF
+        ENDIF        
       ENDIF
+      
     ENDIF
   ENDDO D9985
+
   call PrintInfo('end '//subname)
   RETURN
   end associate
@@ -307,9 +313,9 @@ module PlantPhenolMod
     IF(J.EQ.1 .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
       !first hour of the day, population > 0
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
-        IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .OR. &
-          iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
+        IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .OR. iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
+
           IF((NumOfBranches_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinConc2InitBranch_pft(NZ) &
             .AND. NonstCMinConc2InitBranch_pft(NZ).GT.0.0_r8))THEN
@@ -321,7 +327,7 @@ module PlantPhenolMod
                   !initiate a new branch
                   BranchNumber_pft(NZ)          = BranchNumber_pft(NZ)+1
                   NumOfBranches_pft(NZ)         = MIN(BranchNumMax(iPlantTurnoverPattern_pft(NZ)),MAX(NB,NumOfBranches_pft(NZ)))
-                  BranchNumerID_brch(NB,NZ)      = BranchNumber_pft(NZ)-1
+                  BranchNumerID_brch(NB,NZ)     = BranchNumber_pft(NZ)-1
                   iPlantShootState_pft(NZ)      = iLive
                   iPlantBranchState_brch(NB,NZ) = iLive
                   Hours4Leafout_brch(NB,NZ)     = 0.0_r8

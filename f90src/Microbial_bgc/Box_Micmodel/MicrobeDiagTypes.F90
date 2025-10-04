@@ -154,9 +154,10 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillLitrfal2ResduOMHeter(:,:,:,:)
   real(r8),allocatable :: RH2ProdHeter(:,:)
   real(r8),allocatable :: RMaintDefcitLitrfalOMHeter(:,:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2HumOMHeter(:,:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMHeter(:,:,:,:)
-  real(r8),allocatable :: RCCMEheter(:,:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2HumOMHeter(:,:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2ResduOMHeter(:,:,:,:)
+  real(r8),allocatable :: RCCMEheter(:,:,:)
+  real(r8),allocatable :: RCCMEAutor(:,:,:)
   real(r8),allocatable :: RN2FixHeter(:,:)
   real(r8),allocatable :: RKillOMHeter(:,:,:,:)
   real(r8),allocatable :: RkillRecycOMHeter(:,:,:,:)
@@ -205,8 +206,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillLitrfal2ResduOMAutor(:,:,:)
   real(r8),allocatable :: DOMuptk4GrothAutor(:,:)            !C-uptake (CH4 or CO2) flux uptake by autotrophs, [g d-2 h-1]  
   real(r8),allocatable :: RMaintDefcitLitrfalOMAutor(:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2HumOMAutor(:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMAutor(:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2HumOMAutor(:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2ResduOMAutor(:,:,:)
   real(r8),allocatable :: RN2FixAutor(:)
   real(r8),allocatable :: RKillOMAutor(:,:,:)
   real(r8),allocatable :: RkillRecycOMAutor(:,:,:)
@@ -251,8 +252,6 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8),allocatable :: FOAA(:)
     real(r8),allocatable :: rCNDOM(:)
     real(r8),allocatable :: rCPDOM(:)
-    real(r8),allocatable :: rCNSorbOM(:)
-    real(r8),allocatable :: rCPSorbOM(:)
     real(r8),allocatable :: OMBioResduK(:)
     real(r8),allocatable :: SolidOMCK(:)
     real(r8),allocatable :: SolidOMActK(:)
@@ -399,8 +398,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
   allocate(this%RH2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2HumOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2ResduOMHeter=spval
+  allocate(this%RMaintDefLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefLitrfal2HumOMHeter=spval
+  allocate(this%RMaintDefLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefLitrfal2ResduOMHeter=spval
   allocate(this%RN2FixHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2FixHeter=spval
   allocate(this%RKillOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RKillOMHeter=spval
   allocate(this%RkillRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillRecycOMHeter=spval
@@ -424,7 +423,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RSOxidBandAutor(NumMicrobAutoTrophCmplx));this%RSOxidBandAutor=spval
   allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetr1MicCmplx,1:jcplx));this%XferBiomeHeterK=spval
   allocate(this%ROQC4HeterMicrobAct(NumHetetr1MicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
-  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetr1MicCmplx,1:jcplx));this%RCCMEheter=spval
+  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,1:jcplx));this%RCCMEheter=spval
+  allocate(this%RCCMEAutor(NumPlantChemElms,ndbiomcp,1:jcplx));this%RCCMEAutor=spval
   allocate(this%ECHZAutor(1:NumMicrobAutoTrophCmplx));this%ECHZAutor=spval
   allocate(this%ECHZHeter(1:NumHetetr1MicCmplx,1:jcplx));this%ECHZHeter=spval
   allocate(this%FOQC(1:NumHetetr1MicCmplx,1:jcplx));this%FOQC=spval
@@ -453,8 +453,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
   allocate(this%DOMuptk4GrothAutor(idom_beg:idom_end,NumMicrobAutoTrophCmplx));this%DOMuptk4GrothAutor=spval
   allocate(this%RMaintDefcitLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfalOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2HumOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2ResduOMAutor=spval
+  allocate(this%RMaintDefLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefLitrfal2HumOMAutor=spval
+  allocate(this%RMaintDefLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefLitrfal2ResduOMAutor=spval
   allocate(this%RN2FixAutor(NumMicrobAutoTrophCmplx));this%RN2FixAutor=spval
   allocate(this%RKillOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RKillOMAutor=spval
   allocate(this%RkillRecycOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillRecycOMAutor=spval
@@ -551,10 +551,11 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillLitrfal2ResduOMHeter        = 0._r8
   this%DOMuptk4GrothHeter               = 0._r8
   this%RH2ProdHeter                     = 0._r8
-  this%RMaintDefcitLitrfal2HumOMHeter   = 0._r8
-  this%RMaintDefcitLitrfal2ResduOMHeter = 0._r8
+  this%RMaintDefLitrfal2HumOMHeter   = 0._r8
+  this%RMaintDefLitrfal2ResduOMHeter = 0._r8
   this%RMaintDefcitLitrfalOMHeter       = 0._r8
   this%RCCMEheter                       = 0._r8
+  this%RCCMEAutor                       = 0._r8
   this%RN2FixHeter                      = 0._r8
 
   this%RKillOMHeter             = 0._r8
@@ -606,8 +607,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillLitrfal2ResduOMAutor        = 0._r8
   this%DOMuptk4GrothAutor               = 0._r8
   this%RMaintDefcitLitrfalOMAutor       = 0._r8
-  this%RMaintDefcitLitrfal2HumOMAutor   = 0._r8
-  this%RMaintDefcitLitrfal2ResduOMAutor = 0._r8
+  this%RMaintDefLitrfal2HumOMAutor   = 0._r8
+  this%RMaintDefLitrfal2ResduOMAutor = 0._r8
   this%RN2FixAutor                      = 0._r8
 
   this%RKillOMAutor             = 0._r8
@@ -659,8 +660,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillLitrfal2ResduOMHeter)
   call destroy(this%DOMuptk4GrothHeter)
   call destroy(this%RH2ProdHeter)
-  call destroy(this%RMaintDefcitLitrfal2HumOMHeter)
-  call destroy(this%RMaintDefcitLitrfal2ResduOMHeter)
+  call destroy(this%RMaintDefLitrfal2HumOMHeter)
+  call destroy(this%RMaintDefLitrfal2ResduOMHeter)
   call destroy(this%RMaintDefcitLitrfalOMHeter)
   call destroy(this%RCCMEheter)
   call destroy(this%RN2FixHeter)
@@ -708,8 +709,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillLitrfal2ResduOMAutor)
   call destroy(this%DOMuptk4GrothAutor)
   call destroy(this%RMaintDefcitLitrfalOMAutor)
-  call destroy(this%RMaintDefcitLitrfal2HumOMAutor)
-  call destroy(this%RMaintDefcitLitrfal2ResduOMAutor)
+  call destroy(this%RMaintDefLitrfal2HumOMAutor)
+  call destroy(this%RMaintDefLitrfal2ResduOMAutor)
   call destroy(this%RN2FixAutor)
   call destroy(this%RKillOMAutor)
   call destroy(this%RkillRecycOMAutor)
@@ -892,8 +893,6 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%FOAA(1:ncplx));this%FOAA=spval
   allocate(this%rCNDOM(1:ncplx));this%rCNDOM=spval
   allocate(this%rCPDOM(1:ncplx));this%rCPDOM=spval
-  allocate(this%rCNSorbOM(1:ncplx));this%rCNSorbOM=spval
-  allocate(this%rCPSorbOM(1:ncplx));this%rCPSorbOM=spval
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
   allocate(this%SolidOMCK(1:ncplx));this%SolidOMCK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
@@ -940,8 +939,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%FOAA=0._r8
   this%rCNDOM=0._r8
   this%rCPDOM=0._r8
-  this%rCNSorbOM=0._r8
-  this%rCPSorbOM=0._r8
+
   this%OMBioResduK=0._r8
   this%SolidOMCK=0._r8
   this%SolidOMActK=0._r8
@@ -961,8 +959,6 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%FOAA)
   call destroy(this%rCNDOM)
   call destroy(this%rCPDOM)
-  call destroy(this%rCNSorbOM)
-  call destroy(this%rCPSorbOM)
   call destroy(this%OMBioResduK)
   call destroy(this%SolidOMCK)
   call destroy(this%SolidOMActK)

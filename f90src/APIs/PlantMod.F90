@@ -36,7 +36,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8) :: t1
+  real(r8) :: t1,tvegE(NumPlantChemElms)
   integer :: NY,NX,NZ
 
 333   FORMAT(A8)
@@ -60,34 +60,22 @@ implicit none
 
         call EnterPlantBalance(I,J,NP_col(NY,NX))
 
-        if(lverb)WRITE(*,333)'HFUNC'
-
-        DO NZ=1,NP_col(NY,NX)
-          call PrintRootTracer(I,J,NZ,'BEEfhfunc')
-        ENDDO
-
         !Phenological update, determine living/active branches      
         CALL PhenologyUpdate(I,J)
 
-        DO NZ=1,NP_col(NY,NX)
-          call PrintRootTracer(I,J,NZ,'afhfunc')
-        ENDDO
-
-        !Predict uptake fluxes of nutrients and O2
-        if(lverb)write(*,*)'uptake'
+        !Predict uptake fluxes of nutrients and O2        
         CALL ROOTUPTAKES(I,J)
 
         !Do growth of active branches and roots
-        if(lverb)write(*,*)'grosub'
         CALL GROWPLANTS(I,J)
-
-        if(lverb)write(*,*)'EXTRACT'
 
         !aggregate varaibles
         CALL EXTRACTs(I,J)
 
         DO NZ=1,NP_col(NY,NX)
+
           Call ReSeedPlants(I,J,NZ)
+
         ENDDO
 
         call ExitPlantBalance(I,J,NP_col(NY,NX))

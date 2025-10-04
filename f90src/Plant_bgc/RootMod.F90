@@ -73,26 +73,7 @@ implicit none
   )
 !     ROOT GROWTH
 !
-  if(I==245 .and. .false.)then
-    call SumRootBiome(NZ,mass_inital)
-    mass_inital=mass_inital+SeasonalNonstElms_pft(:,NZ)
 
-    litrflx=0._r8
-
-    DO L=NU,MaxSoiL4Root_pft(NZ)
-      DO K=1,NumOfPlantLitrCmplxs
-        DO M=1,jsken
-          DO NE=1,NumPlantChemElms
-            litrflx(NE)=litrflx(NE)+LitrfallElms_pvr(NE,M,K,L,NZ)
-          ENDDO
-        ENDDO  
-      ENDDO
-    ENDDO     
-    write(1111,*)('-',K=1,50)
-    write(1111,*)litrflx
-    write(1111,*)'upk',RootNutUptakeN_pft(NZ),RootNutUptakeP_pft(NZ)
-
-  ENDIF
 
 !  call RootCheck(I,J,NZ,'head')
   
@@ -136,52 +117,6 @@ implicit none
 
 !   call SumRootBiome(NZ,mass_finale)
   
-  if(I==245.and..false.)then
-    call SumRootBiome(NZ,mass_finale)
-    RCO2flx=0._r8;litrflx=0._r8
-    DO N=1,Myco_pft(NZ)
-      DO L=NU,MaxSoiL4Root_pft(NZ)
-        RCO2flx=RCO2flx+RootCO2Autor_pvr(N,L,NZ)
-      ENDDO     
-    ENDDO      
-
-    DO L=NU,MaxSoiL4Root_pft(NZ)
-      DO K=1,NumOfPlantLitrCmplxs
-        DO M=1,jsken
-          DO NE=1,NumPlantChemElms
-            litrflx(NE)=litrflx(NE)+LitrfallElms_pvr(NE,M,K,L,NZ)
-          ENDDO
-        ENDDO  
-      ENDDO
-    ENDDO     
-
-    mass_finale=mass_finale+SeasonalNonstElms_pft(:,NZ)
-    NE=ielmc
-    err=mass_finale(NE)-mass_inital(NE)+litrflx(NE)
-    write(1111,*)I+J/24.
-    write(1111,*)'C err =',err-RCO2flx
-    write(1111,*)'end beg C. =',mass_finale(NE),mass_inital(NE),mass_finale(NE)-mass_inital(NE)
-    write(1111,*)'CO2        =',RCO2flx
-    write(1111,*)'litrfall.  =',litrflx(NE)
-    write(1111,*)'sstor      =',SeasonalNonstElms_pft(NE,NZ)
-    write(1111,*)('=',K=1,30)
-    NE=ielmn
-    err=mass_finale(NE)-mass_inital(NE)+litrflx(NE)-RootNutUptakeN_pft(NZ)
-    write(1111,*)'N err       =',err
-    write(1111,*)'N end, beg  =',mass_finale(NE),mass_inital(NE),mass_finale(NE)-mass_inital(NE)
-    write(1111,*)'uptk N      =',RootNutUptakeN_pft(NZ)
-    write(1111,*)'litrfall.  =',litrflx(NE)
-    write(1111,*)'sstor      =',SeasonalNonstElms_pft(NE,NZ)
-    write(1111,*)('=',K=1,30)
-    NE=ielmp
-    err=mass_finale(NE)-mass_inital(NE)+litrflx(NE)-RootNutUptakeP_pft(NZ)
-    write(1111,*)'P err       =',err
-    write(1111,*)'P end, beg  =',mass_finale(NE),mass_inital(NE),mass_finale(NE)-mass_inital(NE)
-    write(1111,*)'uptk P      =',RootNutUptakeP_pft(NZ)
-    write(1111,*)'litrfall.  =',litrflx(NE)
-    write(1111,*)'sstor      =',SeasonalNonstElms_pft(NE,NZ)
-
-  endif  
   end associate
   end subroutine RootBGCModel
 

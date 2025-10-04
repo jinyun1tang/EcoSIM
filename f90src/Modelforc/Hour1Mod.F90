@@ -1626,7 +1626,8 @@ module Hour1Mod
 !     VLitR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-  real(r8) :: VWatLitRHoldCapcity0,VLitR0
+  real(r8) :: VWatLitRHoldCapcity0     !litter water holding capacity
+  real(r8) :: VLitR0                   !litter volume
   integer  :: K
 
   DO  NX=NHW,NHE
@@ -1634,8 +1635,8 @@ module Hour1Mod
       VWatLitRHoldCapcity0 = 0._r8
       VLitR0               = 0._r8
       DO K=1, micpar%NumOfLitrCmplxs
-        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0_col(K,NY,NX)
-        VLitR0               = VLitR0+RC0_col(K,NY,NX)/BulkDensLitR(K)
+        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*SurfLitterC_col(K,NY,NX)
+        VLitR0               = VLitR0+SurfLitterC_col(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
       VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)

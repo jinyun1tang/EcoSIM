@@ -80,7 +80,7 @@ module UptakesMod
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft        ,& !input  :canopy water content, [m3 d-2]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft    ,& !input  :canopy boundary layer resistance, [h m-1]
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
-    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft     ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft    ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft       ,& !input  :canopy active stalk C, [g d-2]
     CumSoilThickness_vr       => plt_site%CumSoilThickness_vr      ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft     ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -113,7 +113,7 @@ module UptakesMod
 
   call PrintInfo('beg '//subname)
 
-  call PrepH2ONutrientUptake(TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
+  call PrepH2ONutrientUptake(I,J,TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
   !
   !     IF PLANT SPECIES EXISTS
 
@@ -205,6 +205,7 @@ module UptakesMod
           FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootLateralAreaDivRadius_pvr)
       endif    
     ENDIF
+
   ENDDO
 
   call PrintInfo('end '//subname)
@@ -213,10 +214,11 @@ module UptakesMod
   END subroutine RootUptakes
 
 !----------------------------------------------------------------------------------------------------
-  subroutine PrepH2ONutrientUptake(TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
+  subroutine PrepH2ONutrientUptake(I,J,TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
 !
 !     prepare for uptake calculation
   implicit none
+  integer, intent(in) :: I,J
   real(r8), intent(out) :: TotalSoilPSIMPa_vr(JZ1)   !total soil matric pressure after removing elevation adjustment, [MPa]
   real(r8), intent(out) :: AllRootC_vr(JZ1)          !total root C profile, [gC d-2]
   real(r8), intent(out) :: AirMicPore4Fill_vr(JZ1)
@@ -255,42 +257,10 @@ module UptakesMod
 !
   call PrintInfo('beg '//subname)
 
-  D9984: DO NZ=1,NP0
-    call ZeroNutrientUptake(NZ)
+  call ZeroNutrientUptake
 
 !     TKC_pft(NZ)=TairK+DeltaTKC_pft(NZ)
 
-    RadNet2Canopy_pft(NZ)                                = 0.0_r8
-    plt_ew%EvapTransLHeat_pft(NZ)                        = 0.0_r8
-    plt_ew%HeatXAir2PCan_pft(NZ)                         = 0.0_r8
-    plt_ew%HeatStorCanopy_pft(NZ)                        = 0.0_r8
-    LWRadCanopy_pft(NZ)                                  = 0.0_r8
-    plt_ew%Transpiration_pft(NZ)                         = 0.0_r8
-    plt_ew%VapXAir2Canopy_pft(NZ)                        = 0.0_r8
-    plt_rbgc%RootMycoExudElms_pft(1:NumPlantChemElms,NZ) = 0.0_r8
-    plt_rbgc%RootNH4Uptake_pft(NZ)                       = 0.0_r8
-    plt_rbgc%RootNO3Uptake_pft(NZ)                       = 0.0_r8
-    plt_rbgc%RootH2PO4Uptake_pft(NZ)                     = 0.0_r8
-    plt_rbgc%RootHPO4Uptake_pft(NZ)                      = 0.0_r8
-    plt_rbgc%RootN2Fix_pft(NZ)                           = 0.0_r8
-!
-!     RESET UPTAKE ARRAYS
-!
-    DO  L=NU,MaxNumRootLays
-      DO  N=1,Myco_pft(NZ)
-        plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                      = 0._r8
-        plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                      = 0.0_r8
-        plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                        = 0.0_r8
-        plt_rbgc%RootO2Uptk_pvr(N,L,NZ)                           = 0.0_r8
-        plt_rbgc%RootUptkSoiSol_pvr(idg_beg:idg_end,N,L,NZ)       = 0.0_r8
-        plt_rbgc%trcg_air2root_flx_pvr(idg_beg:idg_NH3,N,L,NZ)    = 0.0_r8
-        plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_beg:idg_NH3,N,L,NZ) = 0.0_r8
-      enddo
-    enddo
-  ENDDO D9984
-  DO L=NU,NK
-    plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L) =0._r8      
-  ENDDO    
 !
 ! NPH is the last iteration from solving for soil heat-moisture hydrothermal dynamics 
   D9000: DO L=NU,NK
@@ -1095,7 +1065,7 @@ module UptakesMod
     RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
     RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-1]    
     RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr         ,& !input  :root layer length density, [m m-3]
-    RootTotLenPerPlant_pvr         => plt_morph%RootTotLenPerPlant_pvr             ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr      => plt_morph%RootTotLenPerPlant_pvr          ,& !input  :root layer length per plant, [m p-1]
     THETW_vr                    => plt_soilchem%THETW_vr                     ,& !input  :volumetric water content, [m3 m-3]
     VLMicP_vr                   => plt_soilchem%VLMicP_vr                    ,& !input  :total volume in micropores, [m3 d-2]
     VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr            ,& !input  :volume of soil layer, [m3 d-2]

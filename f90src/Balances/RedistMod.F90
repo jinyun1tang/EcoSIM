@@ -678,7 +678,7 @@ module RedistMod
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
 !
-  call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
+  call sumSurfOMCK(NY,NX,SurfLitterC_col(:,NY,NX),RC0ff_col(NY,NX))
 
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
 

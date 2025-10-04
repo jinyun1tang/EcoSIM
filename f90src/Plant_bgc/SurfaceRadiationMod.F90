@@ -342,12 +342,7 @@ module SurfaceRadiationMod
   !     RadSWbyCanopy_pft,RADP=total SW,PAR absorbed by canopy
   !     ClumpFactorNow_pft=clumping factor for self-shading
   !
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'IJ',I,J
-  write(4444,*)'SineSunInclAngle_col',SineSunInclAngle_col,TotSineSkyAngles_grd,SolarNoonHour_col
-  write(4444,*)'swdir/dif',RadSWDirect_col,RadSWDiffus_col
-  write(4444,*)'pardir/dif',RadDirectPAR_col,RadPARDiffus_col
-  endif
+
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     RadSWSolarBeam_col =RadSWDirect_col*SineSunInclAngle_col+RadSWDiffus_col*TotSineSkyAngles_grd
     RadPARSolarBeam_col=RadDirectPAR_col*SineSunInclAngle_col+RadPARDiffus_col*TotSineSkyAngles_grd
@@ -673,7 +668,9 @@ module SurfaceRadiationMod
   !direct radiation only applies to sunlit leaf/stalk, diffusive radiation applies to all.
   D1800: DO L=NumCanopyLayers1,1,-1
     !only compute radiation for canopy layers above snow and ponding water
-    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)THEN
+
       !incoming radiation, shortwave /par, due to transmission and downward scattering from L+1 to L
       RadSWDiffusL           = RadSWDiffusL *TAU_DifuseRTransmit(L+1)+RadSWFwdScat2NextL(L+1)
       RadPARDiffusL          = RadPARDiffusL*TAU_DifuseRTransmit(L+1)+RadPARFwdScat2NextL(L+1)

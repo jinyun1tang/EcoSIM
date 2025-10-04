@@ -91,43 +91,10 @@ module PlantBranchMod
     canopy_growth_pft          => plt_rbgc%canopy_growth_pft           ,& !inoput :canopy structural C growth rate, [gC d-2 h-1]
     CanopyLeafSheathC_brch     => plt_biom%CanopyLeafSheathC_brch       & !output :plant branch leaf + sheath C, [g d-2]
   )
-  if(.false. .and. I==246)then
-    NE=ielmc
-    WRITE(9193,*)I+J/24.,'000litrfall   =',NB,plt_bgcr%LitrFallElms_brch(NE,NB,NZ),sum(plt_bgcr%LitrfallElms_pvr(NE,:,:,0,NZ))  
-  ENDIF      
+
   call PrintInfo('beg '//subname)
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
 
-      if(.false. .and. I==246)then
-        CALL SumPlantBranchBiome(NB,NZ)
-        NE=ielmc
-        arr(1)=plt_biom%ShootElms_brch(NE,NB,NZ)
-        arr(2)=plt_biom%LeafStrutElms_brch(NE,NB,NZ)
-        arr(3)=plt_biom%PetoleStrutElms_brch(NE,NB,NZ)
-        arr(4)=plt_biom%StalkStrutElms_brch(NE,NB,NZ)
-        arr(5)=plt_biom%StalkRsrvElms_brch(NE,NB,NZ)
-        arr(6)=plt_biom%HuskStrutElms_brch(NE,NB,NZ)
-        arr(7)=plt_biom%EarStrutElms_brch(NE,NB,NZ)
-        arr(8)=plt_biom%GrainStrutElms_brch(NE,NB,NZ)
-        arr(9)=plt_biom%CanopyNonstElms_brch(NE,NB,NZ)
-        arr(10)=plt_biom%StandDeadStrutElms_pft(NE,NZ)      
-        arr(11)=plt_biom%SeasonalNonstElms_pft(NE,NZ)     
-        arr(12)=plt_biom%C4PhotoShootNonstC_brch(NB,NZ)       
-        write(919,*)'br         =',NB
-        write(919,*)'shoot      =',plt_biom%ShootElms_brch(NE,NB,NZ)
-        write(919,*)'leaf       =',plt_biom%LeafStrutElms_brch(NE,NB,NZ)
-        write(919,*)'petol      =',plt_biom%PetoleStrutElms_brch(NE,NB,NZ)
-        write(919,*)'stalkst.   =',plt_biom%StalkStrutElms_brch(NE,NB,NZ)
-        write(919,*)'stalkrsv   =',plt_biom%StalkRsrvElms_brch(NE,NB,NZ)
-        write(919,*)'husk       =',plt_biom%HuskStrutElms_brch(NE,NB,NZ)
-        write(919,*)'earst      =',plt_biom%EarStrutElms_brch(NE,NB,NZ)
-        write(919,*)'grain.     =',plt_biom%GrainStrutElms_brch(NE,NB,NZ)
-        write(919,*)'canopnst   =',plt_biom%CanopyNonstElms_brch(NE,NB,NZ)
-        write(919,*)'stddead    =',plt_biom%StandDeadStrutElms_pft(NE,NZ)      
-        write(919,*)'ssstor     =',plt_biom%SeasonalNonstElms_pft(NE,NZ)
-        write(919,*)'c4buf      =',plt_biom%C4PhotoShootNonstC_brch(NB,NZ)      
-        write(919,*)'-----------------xxxxxxx'
-      ENDIF  
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,LRemob_brch,BegRemoblize)
 
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
@@ -156,11 +123,6 @@ module PlantBranchMod
     call BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
       DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeID)
 
-    if(.false. .and. I==246)then
-      write(919,*)I+J/24.,NB,'grw',sum(Growth_brch(ielmc,:)),RNonstC4Groth_brch*(1._r8-YCO2Gro_brch)
-      write(919,*)Growth_brch(ielmc,:)
-    endif
-
     CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
 !
 !     DISTRIBUTE SHEATH OR PETIOLE GROWTH AMONG CURRENTLY GROWING NODES
@@ -171,29 +133,6 @@ module PlantBranchMod
 !   DISTRIBUTE STALK GROWTH AMONG CURRENTLY GROWING NODES
 !
     call GrowStalkOnBranch(I,J,NZ,NB,Growth_brch(:,ibrch_stalk),EtoliationCoeff)
-
-      if(.false. .and. I==246)then
-        CALL SumPlantBranchBiome(NB,NZ)
-        NE=ielmc
-        write(919,*)'shoot      =',plt_biom%ShootElms_brch(NE,NB,NZ)-arr(1)-plt_rbgc%GPP_brch(NB,NZ)-plt_bgcr%CanopyResp_brch(NB,NZ)+plt_bgcr%LitrFallElms_brch(NE,NB,NZ)
-        write(919,*)'leaf       =',plt_biom%LeafStrutElms_brch(NE,NB,NZ)-arr(2)-Growth_brch(NE,ibrch_leaf)
-        write(919,*)'petol      =',plt_biom%PetoleStrutElms_brch(NE,NB,NZ)-arr(3)-Growth_brch(NE,ibrch_petole)
-        write(919,*)'stalkst.   =',plt_biom%StalkStrutElms_brch(NE,NB,NZ)-arr(4)-Growth_brch(NE,ibrch_stalk)
-        write(919,*)'stalkrsv   =',plt_biom%StalkRsrvElms_brch(NE,NB,NZ)-arr(5)-Growth_brch(NE,ibrch_resrv)
-        write(919,*)'husk       =',plt_biom%HuskStrutElms_brch(NE,NB,NZ)-arr(6)-Growth_brch(NE,ibrch_husk)
-        write(919,*)'earst      =',plt_biom%EarStrutElms_brch(NE,NB,NZ)-arr(7)-Growth_brch(NE,ibrch_ear)
-        write(919,*)'grain      =',plt_biom%GrainStrutElms_brch(NE,NB,NZ)-arr(8)
-        write(919,*)'canopnst   =',plt_biom%CanopyNonstElms_brch(NE,NB,NZ)-arr(9)
-        write(919,*)'stddead    =',plt_biom%StandDeadStrutElms_pft(NE,NZ)-arr(10)      
-        write(919,*)'ssstor     =',plt_biom%SeasonalNonstElms_pft(NE,NZ)-arr(11)      
-        write(919,*)'c4buf      =',plt_biom%C4PhotoShootNonstC_brch(NB,NZ)-arr(12)              
-        write(919,*)'GPP        =',plt_rbgc%GPP_brch(NB,NZ),sum(CH2O3)
-        write(919,*)'resp       =',plt_bgcr%CanopyResp_brch(NB,NZ)
-        WRITE(919,*)'litrfall   =',plt_bgcr%LitrFallElms_brch(NE,NB,NZ)
-        write(919,*)'RMxess_brch=',RMxess_brch,BegRemoblize,LRemob_brch,ifalse
-        write(919,*)'dflx       =',plt_rbgc%GPP_brch(NB,NZ)+plt_bgcr%CanopyResp_brch(NB,NZ)-plt_bgcr%LitrFallElms_brch(NE,NB,NZ)
-        write(919,*)'-----------------xxxxxxx'
-      ENDIF  
 
     !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
@@ -4082,12 +4021,12 @@ module PlantBranchMod
       
       D6305: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          dRemoblE                                     = FSNCS*AZMAX1(PetioleChemElmRemob_brch(NE,NB,NZ)-PetioleChemElmRemobFlx_brch(NE,NB,NZ))
-          dFall=PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dRemoblE*FracShootPetolAlloc2Litr(NE,k_woody_litr)
+          dRemoblE                                 = FSNCS*AZMAX1(PetioleChemElmRemob_brch(NE,NB,NZ)-PetioleChemElmRemobFlx_brch(NE,NB,NZ))
+          dFall                                    = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dRemoblE*FracShootPetolAlloc2Litr(NE,k_woody_litr)
           LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ) = LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)              = LitrFallElms_brch(NE,NB,NZ)+dFall
 
-          dFall=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*dRemoblE*FracShootPetolAlloc2Litr(NE,k_fine_litr)
+          dFall                                   = PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*dRemoblE*FracShootPetolAlloc2Litr(NE,k_fine_litr)
           LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ) = LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
         ENDDO    

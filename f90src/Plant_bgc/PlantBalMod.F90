@@ -469,6 +469,7 @@ implicit none
       plt_biom%TotBegVegE_pft(NE,NZ)            = plt_biom%TotEndVegE_pft(NE,NZ)
       plt_biom%RootNoduleElmsBeg_pft(NE,NZ)     = plt_biom%RootNoduleElms_pft(NE,NZ)
     ENDDO
+
   ENDDO
 
   !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
@@ -552,7 +553,7 @@ implicit none
       err_rel=1.e-10_r8
     endif
     if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then
-      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balC',balE(ielmc),err_rel
+      write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ)
       write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
       write(888,*)'rootC             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
       write(888,*)'shootC            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)

@@ -786,7 +786,7 @@ module StartqMod
       trcg_air2root_flx_pvr(idg_CO2,N,L,NZ,NY,NX)     = 0._r8
       trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ,NY,NX)  = 0._r8
       RootUptkSoiSol_pvr(idg_CO2,N,L,NZ,NY,NX)         = 0._r8
-      RCO2Emis2Root_pvr(N,L,NZ,NY,NX)                   = 0._r8
+      RCO2Emis2Root_rpvr(N,L,NZ,NY,NX)                   = 0._r8
       COXYA                                           = AtmGasCgperm3_col(idg_O2,NY,NX)
       COXYP                                           = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA_col(NY,NX))*OXYE_col(NY,NX)
       trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
@@ -846,9 +846,7 @@ module StartqMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedPlantedElm_pft(ielmc,NZ,NY,NX)    = SeedCMass_pft(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
-!  SeasonalNonstElms_pft(ielmc,NZ,NY,NX) = SeedPlantedElm_pft(ielmc,NZ,NY,NX)
-!  SeasonalNonstElms_pft(ielmn,NZ,NY,NX) = rNCGrain_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
-!  SeasonalNonstElms_pft(ielmp,NZ,NY,NX) = rPCGrain_pft(NZ,NY,NX)*SeasonalNonstElms_pft(ielmc,NZ,NY,NX)
+
   LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = rNCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = rPCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafSheathC_brch(1,NZ,NY,NX)    = LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)

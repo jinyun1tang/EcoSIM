@@ -2198,7 +2198,7 @@ implicit none
     integer :: t                                 ! tape index
     integer :: f                                 ! field index
     integer :: varid                             ! variable id
-    integer, allocatable :: itemp2d(:,:)         ! 2D temporary
+    integer, allocatable :: itemp2d(:)           ! 2D temporary
     real(r8), pointer :: hbuf(:,:)               ! history buffer
     real(r8), pointer :: hbuf1d(:)               ! 1d history buffer
     integer , pointer :: nacs(:,:)               ! accumulation counter
@@ -2453,7 +2453,7 @@ implicit none
 
        start(1)=1
 
-       allocate(itemp2d(max_nflds,ntapes))
+       allocate(itemp2d(max_nflds))
 
        !
        ! Add history namelist data to each history restart tape
@@ -2467,17 +2467,29 @@ implicit none
 
           call ncd_io(varname='is_endhist', data=tape(t)%is_endhist, ncid=ncid_hist(t), flag='write')
 
-          itemp2d(:,:) = 0
-          do f=1,tape(t)%nflds
-             itemp2d(f,t) = tape(t)%hlist(f)%field%num2d
-          end do
-          call ncd_io(varname='num2d', data=itemp2d(:,t), ncid=ncid_hist(t), flag='write')
+!          itemp2d(:,:) = 0
+!          do f=1,tape(t)%nflds
+!             itemp2d(f,t) = tape(t)%hlist(f)%field%num2d
+!          end do
+!          call ncd_io(varname='num2d', data=itemp2d(:,t), ncid=ncid_hist(t), flag='write')
 
-          itemp2d(:,:) = 0
+!          itemp2d(:,:) = 0
+!          do f=1,tape(t)%nflds
+!             itemp2d(f,t) = tape(t)%hlist(f)%field%hpindex
+!          end do
+!          call ncd_io(varname='hpindex', data=itemp2d(:,t), ncid=ncid_hist(t), flag='write')
+
+          itemp2d(:) = 0
           do f=1,tape(t)%nflds
-             itemp2d(f,t) = tape(t)%hlist(f)%field%hpindex
+             itemp2d(f) = tape(t)%hlist(f)%field%num2d
           end do
-          call ncd_io(varname='hpindex', data=itemp2d(:,t), ncid=ncid_hist(t), flag='write')
+          call ncd_io(varname='num2d', data=itemp2d(:), ncid=ncid_hist(t), flag='write')
+
+          itemp2d(:) = 0
+          do f=1,tape(t)%nflds
+             itemp2d(f) = tape(t)%hlist(f)%field%hpindex
+          end do
+          call ncd_io(varname='hpindex', data=itemp2d(:), ncid=ncid_hist(t), flag='write')
 
           call ncd_io('nflds',        tape(t)%nflds,   'write', ncid_hist(t) )
           call ncd_io('ntimes',       tape(t)%ntimes,  'write', ncid_hist(t) )
@@ -2546,7 +2558,7 @@ implicit none
 
                 call ncd_inqdlen(ncid_hist(1),dimid,max_nflds,name='max_nflds')
 
-                allocate(itemp2d(max_nflds,ntapes))
+                allocate(itemp2d(max_nflds))
              end if
 
              call ncd_inqvid(ncid_hist(t), 'name',           varid, name_desc)
@@ -2577,14 +2589,14 @@ implicit none
 
              call ncd_io(varname='is_endhist', data=tape(t)%is_endhist, ncid=ncid_hist(t), flag='read')
              
-             call ncd_io(varname='num2d', data=itemp2d(:,t), ncid=ncid_hist(t), flag='read')
+             call ncd_io(varname='num2d', data=itemp2d(:), ncid=ncid_hist(t), flag='read')
              do f=1,tape(t)%nflds
-                tape(t)%hlist(f)%field%num2d = itemp2d(f,t)
+                tape(t)%hlist(f)%field%num2d = itemp2d(f)
              end do
 
-             call ncd_io(varname='hpindex', data=itemp2d(:,t), ncid=ncid_hist(t), flag='read')
+             call ncd_io(varname='hpindex', data=itemp2d(:), ncid=ncid_hist(t), flag='read')
              do f=1,tape(t)%nflds
-                tape(t)%hlist(f)%field%hpindex = itemp2d(f,t)
+                tape(t)%hlist(f)%field%hpindex = itemp2d(f)
              end do
 
              D101: do f=1,tape(t)%nflds

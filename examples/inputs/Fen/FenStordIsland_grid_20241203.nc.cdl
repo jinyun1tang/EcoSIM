@@ -429,7 +429,7 @@ data:
 
  IETYPG = 0 ;
 
- DTBLIG = 0.06 ;
+ DTBLIG = 0.02 ;
 
  DTBLDIG = 5 ;
 
@@ -491,11 +491,11 @@ data:
 
  PH0 = 5 ;
 
- RSCf = 300 ;
+ RSCf = 50 ;
 
- RSNf = 10 ;
+ RSNf = 1.62 ;
 
- RSPf = 1 ;
+ RSPf = 0.162 ;
 
  RSCw = 0 ;
 

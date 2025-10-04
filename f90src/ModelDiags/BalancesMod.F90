@@ -294,8 +294,8 @@ contains
       DO idg=idg_beg,idg_NH3        
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX) &
-          +SurfGasEmiss_all_flx_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
-          +trcs_solml_drib_col(idg) 
+          +SurfGasEmiss_all_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
+          +trcs_solml_drib_col(idg)+RGasNetProd_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX) 
 
         GasHydroLoss_cumflx_col(idg,NY,NX)=GasHydroLoss_cumflx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX)
 
@@ -325,7 +325,7 @@ contains
             write(111,*)('-',ii=1,50)
             write(111,*)'NU   =',NU_col(NY,NX)
             write(111,*)I*1000+J,'NY NX=',NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX),'Final'
-            write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
+            write(111,*)'beg end delta mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
               trcg_TotalMass_beg_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
             write(111,*)'mass_err         =',tracer_mass_err
             write(111,*)'gasdif,ebu       =',GasDiff2Surf_flx_col(idg,NY,NX),trcg_ebu_flx_col(idg,NY,NX)
@@ -379,6 +379,7 @@ contains
             if(idg==idg_O2)then
               write(111,*)'total O2Sink      =',RootO2_TotSink_col(NY,NX)
             endif  
+            
             if(idg==idg_CO2)then
               dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)
               write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)
@@ -394,10 +395,6 @@ contains
               endif
             endif
             write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)
-          endif
-
-          if(idg==idg_CO2)then
-            dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)          
           endif
 
           if(abs(tracer_mass_err)>1.e-1_r8) &

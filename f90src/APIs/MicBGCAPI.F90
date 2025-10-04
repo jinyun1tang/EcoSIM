@@ -11,6 +11,7 @@ module MicBGCAPI
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
+  use DebugToolMod
   use abortutils,           only: endrun
   use NumericalAuxMod
   use EcoSIMSolverPar  
@@ -85,9 +86,11 @@ implicit none
   real(r8) :: dOrGM(1:NumPlantChemElms)
   real(r8) :: tdOrGM(1:NumPlantChemElms)
   integer :: L,NX,NY
+  character(len=*), parameter :: subname='MicrobeModel'
 
 !   begin_execution
-  curI=I; curJ=J
+  call PrintInfo('beg '//subname)
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
 !
@@ -125,6 +128,7 @@ implicit none
       call SOMRemovalByDisturbance(I,J,NY,NX)
     ENDDO D9990
   ENDDO D9995
+  call PrintInfo('end '//subname)
   
   RETURN
   END subroutine MicrobeModel
@@ -154,10 +158,11 @@ implicit none
   type(micforctype), intent(inout) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
-
+  character(len=*), parameter :: subname='MicAPISend'
   integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus, idom, K,KL
   integer :: ndbiomcp, nlbiomcp, NumMicrobAutoTrophCmplx, NumHetetr1MicCmplx,NE
   
+  call PrintInfo('beg '//subname)
   NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
   jcplx                   = micpar%jcplx
 
@@ -391,6 +396,9 @@ implicit none
   micflx%RNO2DmndReduxSoilHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO2DmndReduxSoilHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RNO2DmndReduxBandHeterPrev(1:NumHetetr1MicCmplx,1:KL) = RNO2DmndReduxBandHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
   micflx%RN2ODmndReduxHeterPrev(1:NumHetetr1MicCmplx,1:KL)     = RN2ODmndReduxHeter_vr(1:NumHetetr1MicCmplx,1:KL,L,NY,NX)
+
+  call PrintInfo('end '//subname)
+
   end subroutine MicAPISend
 
 !------------------------------------------------------------------------------------------
@@ -406,10 +414,13 @@ implicit none
   type(micfluxtype), intent(in) :: micflx
   type(Cumlate_Flux_Diag_type), intent(in) :: naqfdiag
   type(Microbe_Diag_type), intent(in) :: nmicdiag
+  character(len=*), parameter :: subname='MicAPIRecv'
   logical :: litrM
   integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutoTrophCmplx
   integer :: NE,idom,K,idg,KL,NN
-  
+
+  call PrintInfo('beg '//subname)
+
   litrM=micfor%litrM
 
   NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
@@ -556,14 +567,14 @@ implicit none
     DO idom=idom_beg,idom_end
       DOM_MicP_vr(idom,K,L,NY,NX)      = AZERO1(micstt%DOM(idom,K),1.e-11_r8)
       DOM_MicP_drib_vr(idom,K,L,NY,NX) = micstt%DOM_MicP_drib(idom,K)
-      SorbedOM_vr(idom,K,L,NY,NX) = AZERO1(micstt%SorbedOM(idom,K),1.e-11_r8)
-
+      SorbedOM_vr(idom,K,L,NY,NX)      = AZERO1(micstt%SorbedOM(idom,K),1.e-11_r8)
     enddo
   enddo
   OMBioResdu_vr(1:NumPlantChemElms,1:ndbiomcp,1:KL,L,NY,NX)           = micstt%OMBioResdu(1:NumPlantChemElms,1:ndbiomcp,1:KL)
   mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:KL,L,NY,NX) = micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:KL)
   mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)       = micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)
   tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)                             = tRDIM2DOM_col(1:NumPlantChemElms,NY,NX)+micflx%TRDOE2DIE(1:NumPlantChemElms)
+  call PrintInfo('end '//subname)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

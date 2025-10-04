@@ -59,6 +59,7 @@ module grosubsMod
   real(r8) :: CanopyHeight_copy(JP1)
   integer :: L,K,M
   integer :: NZ,NE
+  real(r8) :: tvegE(NumPlantChemElms),tvegE1(NumPlantChemElms)
 ! begin_execution
   associate(                                                               &
     IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
@@ -75,6 +76,7 @@ module grosubsMod
     CanopyHeight_pft(NZ)                   = 0._r8
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
+
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -83,24 +85,23 @@ module grosubsMod
     call StageDisturbances(I,J,NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iActive)THEN      
+
       call GrowOnePlant(I,J,NZ,CanopyHeight_copy)
+
     ENDIF  
 
     call AccumulateStates(I,J,NZ)
 
     call RemoveBiomassByDisturbance(I,J,NZ)
 
-    call PrintRootTracer(I,J,NZ,'afdist')
-
   ENDDO D9985
 !
-
   call LiveDeadTransformation(I,J)
   
   DO NZ=1,NP
 
     call SumPlantBiome(I,J,NZ,'exgrosubs')
-    call PrintRootTracer(I,J,NZ,'afddeadt')    
+
   ENDDO
 
   end associate
@@ -139,7 +140,6 @@ module grosubsMod
     RootElms_pft                   => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft           ,& !input  :plant stored nonstructural element at current step, [g d-2]
     ShootElms_pft                  => plt_biom%ShootElms_pft                   ,& !input  :canopy shoot structural chemical element mass, [g d-2]
-    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft          ,& !input  :standing dead element, [g d-2]
     doPlantLeafOut_brch            => plt_pheno%doPlantLeafOut_brch            ,& !input  :branch phenology flag, [-]
     fTCanopyGroth_pft              => plt_pheno%fTCanopyGroth_pft              ,& !input  :canopy temperature growth function, [-]
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]

@@ -198,11 +198,10 @@ module NutUptakeMod
   trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
 
 !  dmass0=sum(trcs_solml_vr(idg_O2,NU:plt_site%NL))+sum(trcg_gasml_vr(idg_O2,NU:plt_site%NL))
-  call PrintRootTracer(I,J,NZ,'nutB')
   
   D950: DO L=NU,NK
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=MaxSoiL4Root_pft(NZ)) then
-      trc_solml_new                   = 0._r8;trc_gasml_new = 0._r8
+      trc_solml_new  = 0._r8;trc_gasml_new = 0._r8
       
       D955: DO N  = 1, Myco_pft(NZ)
         if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
@@ -230,10 +229,6 @@ module NutUptakeMod
             trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2))
             trc_solml_loc(idg_O2)  = trcs_solml_vr(idg_O2,L)*FOXYX
 
-  !          DO idg=idg_beg,idg_end
-  !            trc_solml_copy(idg)=trc_solml_copy(idg)-trc_solml_loc(idg)
-  !          ENDDO
-
         !  the two lines below may be redundant
 
             DO idg=idg_beg,idg_NH3
@@ -244,10 +239,6 @@ module NutUptakeMod
             trc_gasml_loc(idg_O2)  = AZMAX1(trcg_gasml_vr(idg_O2,L)*FOXYX)
             trc_gasml_loc(idg_CO2) = AZMAX1(trc_gasml_loc(idg_CO2))
 
-  !          DO idg=idg_beg,idg_NH3
-  !            trc_gasml_copy(idg)=trc_gasml_copy(idg)-trc_gasml_loc(idg)
-  !          ENDDO
-
             call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
               RootLateralAreaDivRadius_pvr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
           
@@ -257,10 +248,11 @@ module NutUptakeMod
             !update the soil gas
             DO idg=idg_beg,idg_NH3
               trc_gasml_new(idg)=trc_gasml_new(idg)+trc_gasml_loc(idg)
-            ENDDO    
-            DO idg=idg_beg,idg_end
               trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
-            ENDDO
+            ENDDO    
+
+            idg=idg_NH3B
+            trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
 
             call RootExudates(I,J,N,L,NZ)
 
@@ -314,55 +306,61 @@ module NutUptakeMod
   end subroutine RootMycoO2NutrientUptake
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ZeroNutrientUptake(NZ)
+  subroutine ZeroNutrientUptake()
 
   implicit none
-  integer, intent(in) :: NZ
 
-  integer :: K, L1,L2,NN
   !     begin_execution
+  plt_rbgc%RootCO2Ar2RootX_rpvr       = 0._r8
+  plt_rbgc%RootCO2Ar2Soil_pvr         = 0._r8
+  plt_bgcr%RootO2_TotSink_pvr         = 0._r8
+  plt_rbgc%RootCO2Ar2RootX_pvr        = 0._r8
+  plt_rbgc%RCO2Emis2Root_rpvr         = 0.0_r8
+  plt_rbgc%RootMycoExudEUptk_pvr      = 0.0_r8
+  plt_rbgc%RAutoRootO2Limter_rpvr     = 0.0_r8
+  plt_rbgc%RootNH4DmndSoil_pvr        = 0.0_r8
+  plt_rbgc%RootNutUptake_pvr          = 0.0_r8
+  plt_rbgc%RootOUlmNutUptake_pvr      = 0.0_r8
+  plt_rbgc%RootNH4DmndBand_pvr        = 0.0_r8
+  plt_rbgc%RootNO3DmndSoil_pvr        = 0.0_r8
+  plt_rbgc%RootNO3DmndBand_pvr        = 0.0_r8
+  plt_rbgc%RootCUlmNutUptake_pvr      = 0.0_r8
+  plt_rbgc%RootH2PO4DmndSoil_pvr      = 0.0_r8
+  plt_rbgc%RootH2PO4DmndBand_pvr      = 0.0_r8
+  plt_rbgc%RootH1PO4DmndSoil_pvr      = 0.0_r8
+  plt_rbgc%RootH1PO4DmndBand_pvr      = 0.0_r8
+  plt_bgcr%RootN2Fix_pvr              = 0.0_r8
+  plt_bgcr%RootCO2Emis2Root_pvr       = 0._r8
+  plt_bgcr%RootCO2Emis2Root_vr        = 0._r8
+  plt_rbgc%trcs_Soil2plant_uptake_pvr = 0._r8
 
-  L1=plt_site%NU;L2=plt_site%NK;NN=plt_morph%Myco_pft(NZ)
+  plt_rad%RadNet2Canopy_pft     = 0.0_r8
+  plt_rad%LWRadCanopy_pft       = 0.0_r8
+  plt_ew%EvapTransLHeat_pft     = 0.0_r8
+  plt_ew%HeatXAir2PCan_pft      = 0.0_r8
+  plt_ew%HeatStorCanopy_pft     = 0.0_r8
+  plt_ew%Transpiration_pft      = 0.0_r8
+  plt_ew%VapXAir2Canopy_pft     = 0.0_r8
+  plt_rbgc%RootMycoExudElms_pft = 0.0_r8
+  plt_rbgc%RootNH4Uptake_pft    = 0.0_r8
+  plt_rbgc%RootNO3Uptake_pft    = 0.0_r8
+  plt_rbgc%RootH2PO4Uptake_pft  = 0.0_r8
+  plt_rbgc%RootHPO4Uptake_pft   = 0.0_r8
+  plt_rbgc%RootN2Fix_pft        = 0.0_r8
+  !
+  !     RESET UPTAKE ARRAYS
+  !
+  plt_ew%RootH2OUptkStress_pvr      = 0._r8
+  plt_ew%RPlantRootH2OUptk_pvr      = 0.0_r8
+  plt_rbgc%RCO2Emis2Root_rpvr       = 0.0_r8
+  plt_rbgc%RootO2Uptk_pvr           = 0.0_r8
+  plt_rbgc%RootUptkSoiSol_pvr       = 0.0_r8
+  plt_rbgc%trcg_air2root_flx_pvr    = 0.0_r8
+  plt_rbgc%trcg_Root_gas2aqu_flx_vr = 0.0_r8
+    
+  plt_rbgc%trcs_Soil2plant_uptake_vr  =0._r8      
+  
 
-  plt_rbgc%RootCO2Ar2Soil_pvr(:,NZ)                                        = 0._r8
-  plt_bgcr%RootO2_TotSink_pvr(:,1:L2,NZ)                                   = 0._r8
-  plt_rbgc%RootCO2Ar2RootX_pvr(:,NZ)                                       = 0._r8
-  plt_rbgc%RCO2Emis2Root_pvr(1:NN,L1:L2,NZ)                                = 0.0_r8
-  plt_rbgc%RootMycoExudEUptk_pvr(1:NumPlantChemElms,1:NN,1:jcplx,L1:L2,NZ) = 0.0_r8
-  plt_rbgc%RAutoRootO2Limter_rpvr(1:NN,L1:L2,NZ)                           = 0.0_r8
-  plt_rbgc%RootNH4DmndSoil_pvr(1:NN,L1:L2,NZ)                              = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                        = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                    = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_NH4,1:NN,L1:L2,NZ)                    = 0.0_r8
-  plt_rbgc%RootNH4DmndBand_pvr(1:NN,L1:L2,NZ)                              = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)                       = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)                   = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_NH4B,1:NN,L1:L2,NZ)                   = 0.0_r8
-  plt_rbgc%RootNO3DmndSoil_pvr(1:NN,L1:L2,NZ)                              = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)                        = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)                    = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_NO3,1:NN,L1:L2,NZ)                    = 0.0_r8
-  plt_rbgc%RootNO3DmndBand_pvr(1:NN,L1:L2,NZ)                              = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)                       = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)                   = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_NO3B,1:NN,L1:L2,NZ)                   = 0.0_r8
-  plt_rbgc%RootH2PO4DmndSoil_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)                      = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)                  = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_H2PO4,1:NN,L1:L2,NZ)                  = 0.0_r8
-  plt_rbgc%RootH2PO4DmndBand_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)                     = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)                 = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_H2PO4B,1:NN,L1:L2,NZ)                 = 0.0_r8
-  plt_rbgc%RootH1PO4DmndSoil_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)                      = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)                  = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4,1:NN,L1:L2,NZ)                  = 0.0_r8
-  plt_rbgc%RootH1PO4DmndBand_pvr(1:NN,L1:L2,NZ)                            = 0.0_r8
-  plt_rbgc%RootNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)                     = 0.0_r8
-  plt_rbgc%RootOUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)                 = 0.0_r8
-  plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,1:NN,L1:L2,NZ)                 = 0.0_r8
-  plt_bgcr%RootN2Fix_pvr(L1:L2,NZ)                                         = 0.0_r8
   end subroutine ZeroNutrientUptake
 
 

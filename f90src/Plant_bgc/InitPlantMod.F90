@@ -833,15 +833,7 @@ module InitPlantMod
     plt_distb%EcoHavstElmntCum_pft(1:NumPlantChemElms,NZ)    = 0._r8
     plt_distb%EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ)          = 0._r8
-    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)            = 0._r8
     ETCanopy_CumYr_pft(NZ)                                   = 0._r8
-    StandDeadC_pft                                           = StandingDeadInitC_pft(NZ)*AREA3(NU)
-    !standing dead is assumed to exist as stalk only
-    D155: DO M=1,jsken
-      StandDeadKCompElms_pft(ielmc,M,NZ)=StandDeadC_pft*PlantElmAllocMat4Litr(ielmc,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmn,M,NZ)=StandDeadC_pft*rNCStalk_pft(NZ)*PlantElmAllocMat4Litr(ielmn,icwood,M,NZ)
-      StandDeadKCompElms_pft(ielmp,M,NZ)=StandDeadC_pft*rPCStalk_pft(NZ)*PlantElmAllocMat4Litr(ielmp,icwood,M,NZ)
-    ENDDO D155
   ENDIF
   end associate
   end subroutine InitMassBalance
@@ -1001,7 +993,7 @@ module InitPlantMod
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
       plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)       = 0._r8
-      plt_rbgc%RCO2Emis2Root_pvr(N,L,NZ)                = 0._r8
+      plt_rbgc%RCO2Emis2Root_rpvr(N,L,NZ)                = 0._r8
       COXYA                                             = COXYE
       COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
       plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_rpvr(N,L,NZ)

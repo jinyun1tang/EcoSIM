@@ -145,6 +145,7 @@ implicit none
   real(r8),pointer   :: h1D_NH3_LITR_col(:)     
   real(r8),pointer   :: h1D_SOL_RADN_col(:)     
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)     
+  real(r8),pointer   :: h1D_FreeNFix_col(:)
   real(r8),pointer   :: h1D_PATM_col(:)         
   real(r8),pointer   :: h1D_HUM_col(:)          
   real(r8),pointer   :: h1D_WIND_col(:)         
@@ -218,6 +219,8 @@ implicit none
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)    
   real(r8),pointer   :: h3D_SOC_Cps_vr(:,:,:)  
   real(r8),pointer   :: h2D_tSOC_vr(:,:)      
+  real(r8),pointer   :: h2D_POM_C_vr(:,:)
+  real(r8),pointer   :: h2D_MAOM_C_vr(:,:)
   real(r8),pointer   :: h2D_microbC_vr(:,:)
   real(r8),pointer   :: h2D_microbN_vr(:,:)
   real(r8),pointer   :: h2D_microbP_vr(:,:)
@@ -551,6 +554,7 @@ implicit none
   real(r8),pointer   :: h2D_cNO3t_vr(:,:)                                                     
   real(r8),pointer   :: h2D_cPO4_vr(:,:)       
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)    
+  real(r8),pointer   :: h2D_microb_N2fix_vr(:,:)
   real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:) 
   real(r8),pointer   :: h2D_HydCondSoil_vr(:,:)
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
@@ -705,6 +709,7 @@ implicit none
   allocate(this%h1D_NH3_LITR_col(beg_col:end_col))        ;this%h1D_NH3_LITR_col(:)=spval
   allocate(this%h1D_SOL_RADN_col(beg_col:end_col))        ;this%h1D_SOL_RADN_col(:)=spval
   allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))        ;this%h1D_AIR_TEMP_col(:)=spval
+  allocate(this%h1D_FreeNFix_col(beg_col:end_col))       ;this%h1D_FreeNFix_col(:)=spval
   allocate(this%h1D_PATM_col(beg_col:end_col))            ;this%h1D_PATM_col(:)=spval
   allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
   allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
@@ -911,6 +916,8 @@ implicit none
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
   allocate(this%h2D_tSOC_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr(:,:)=spval
+  allocate(this%h2D_POM_C_vr(beg_col:end_col,1:JZ)) ; this%h2D_POM_C_vr(:,:)=spval
+  allocate(this%h2D_MAOM_C_vr(beg_col:end_col,1:JZ)); this%h2D_MAOM_C_vr(:,:)=spval
   allocate(this%h2D_microbC_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbC_vr(:,:)=spval
   allocate(this%h2D_microbN_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbN_vr(:,:)=spval
   allocate(this%h2D_microbP_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbP_vr(:,:)=spval    
@@ -1100,6 +1107,7 @@ implicit none
                                                              
   allocate(this%h2D_cPO4_vr(beg_col:end_col,1:JZ))       ;this%h2D_cPO4_vr(:,:)=spval
   allocate(this%h2D_cEXCH_P_vr(beg_col:end_col,1:JZ))    ;this%h2D_cEXCH_P_vr(:,:)=spval
+  allocate(this%h2D_microb_N2fix_vr(beg_col:end_col,1:JZ)); this%h2D_microb_N2fix_vr(:,:)=spval
   allocate(this%h2D_ElectricConductivity_vr(beg_col:end_col,1:JZ))       ;this%h2D_ElectricConductivity_vr(:,:)=spval
   allocate(this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
@@ -1551,6 +1559,10 @@ implicit none
   data1d_ptr => this%h1D_AIR_TEMP_col(beg_col:end_col)      
   call hist_addfld1d(fname='AIR_TEMP_col',units='oC',avgflag='A',&
     long_name='air temperature',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_FreeNFix_col(beg_col:end_col)      
+  call hist_addfld1d(fname='FreeNFix_col',units='gN/hr/m2',avgflag='A',&
+    long_name='N fixation by free-living microbes',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_PATM_col(beg_col:end_col)      
   call hist_addfld1d(fname='PATM_col',units='kPa',avgflag='A',&
@@ -2564,6 +2576,16 @@ implicit none
     long_name='Vertically resolved total soil organic C (everything organic)',&
     ptr_col=data2d_ptr)       
 
+  data2d_ptr => this%h2D_POM_C_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='POM_C_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved particulate organic C (resulting from the humification process)',&
+    ptr_col=data2d_ptr)       
+
+  data2d_ptr => this%h2D_MAOM_C_vr(beg_col:end_col,1:JZ)      
+  call hist_addfld2d(fname='MAOM_C_vr',units='gC (kg soil)-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved mineral associated organic C (resulting from sorption process)',&
+    ptr_col=data2d_ptr)       
+
   data2d_ptr => this%h2D_microbC_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='tMicrobeC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved total live microbial C',&
@@ -3237,6 +3259,10 @@ implicit none
   call hist_addfld2d(fname='cEXCH_P_vr',units='gP/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='total exchangeable soil PO4 concentration',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_microb_N2fix_vr(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='Free_N2Fix_vr',units='ugN/m3 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Free dizotrophic N2 fixation in soil',ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)  
   call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='levsoi',avgflag='X',&
     long_name='Soil maximum temperature profile',ptr_col=data2d_ptr,default='inactive')       
@@ -3690,6 +3716,7 @@ implicit none
       this%h1D_tDON_soil_col(ncol)=0._r8
       this%h1D_tDOP_soil_col(ncol)=0._r8            
       this%h1D_tAcetate_soil_col(ncol)=0._r8      
+      this%h1D_FreeNFix_col(ncol)=Micb_N2Fixation_vr(0,NY,NX)
       DO L=1,JZ        
         call SumSolidOML(ielmc,L,NY,NX,SOMC)
         DO jj=1,jcplx
@@ -3729,6 +3756,8 @@ implicit none
         this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_litrP_vr(ncol,L)           = litrOM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_tSOC_vr(ncol,L)            = SoilOrgM_vr(ielmc,L,NY,NX)/DVOLL
+        this%h2D_POM_C_vr(ncol,L)           = 1.e-3_r8*sum(SolidOM_vr(ielmc,:,micpar%k_POM,L,NY,NX))/VLSoilMicPMass_vr(L,NY,NX)
+        this%h2D_MAOM_C_vr(ncol,L)          = 1.e-3_r8*(sum(SorbedOM_vr(idom_doc,:,L,NY,NX))+sum(SorbedOM_vr(idom_acetate,:,L,NY,NX)))/VLSoilMicPMass_vr(L,NY,NX)
         this%h2D_microbC_vr(ncol,L)         =  micBE(ielmc)/DVOLL
         this%h2D_microbN_vr(ncol,L)         =  micBE(ielmn)/DVOLL
         this%h2D_microbP_vr(ncol,L)         =  micBE(ielmp)/DVOLL
@@ -3778,7 +3807,9 @@ implicit none
         this%h2D_cEXCH_P_vr(ncol,L)= patomw*safe_adb(trcx_solml_vr(idx_HPO4,L,NY,NX)+trcx_solml_vr(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
-        this%h2D_ElectricConductivity_vr(ncol,L)     = ElectricConductivity_vr(L,NY,NX)
+        this%h2D_microb_N2fix_vr(ncol,L)         = 1.e6_r8*Micb_N2Fixation_vr(L,NY,NX)/DVOLL
+        this%h1D_FreeNFix_col(ncol)              = this%h1D_FreeNFix_col(ncol)+ Micb_N2Fixation_vr(L,NY,NX)
+        this%h2D_ElectricConductivity_vr(ncol,L) = ElectricConductivity_vr(L,NY,NX)
         
         this%h2D_HydCondSoil_vr(ncol,L) = HydCondSoil_3D(3,L,NY,NX)
 

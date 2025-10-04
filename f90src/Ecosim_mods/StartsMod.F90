@@ -524,7 +524,7 @@ module StartsMod
 
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
-  call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
+  call sumSurfOMCK(NY,NX,SurfLitterC_col(:,NY,NX),RC0ff_col(NY,NX))
 
   !
   !  INITIALIZE FERTILIZER ARRAYS

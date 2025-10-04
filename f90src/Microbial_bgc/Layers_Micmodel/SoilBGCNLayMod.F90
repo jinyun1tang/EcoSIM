@@ -10,6 +10,7 @@ module SoilBGCNLayMod
   use EcoSiMParDataMod, only: micpar
   use SoilHeatDataType, only: TCS_vr
   use PlantMgmtDataType,only: iDayPlanting_pft
+  use DebugToolMod
   use SoilWaterDataType
   use SurfLitterDataType
   use MicrobialDataType
@@ -69,7 +70,10 @@ module SoilBGCNLayMod
   real(r8) :: OSCXD
   integer :: LL,LN,K
   real(r8) :: DOC_s,DOC_u,ActL,ActLL,ActD
+  character(len=*), parameter :: subname='DownwardMixOM'
+
 !     begin_execution
+  call PrintInfo('beg '//subname)
 
   IF(FOSCZ0.GT.ZERO)THEN
 !     OMLitrC_vr=total litter C
@@ -100,7 +104,6 @@ module SoilBGCNLayMod
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
-!        write(113,*)I+J/24.,ActD,DOM_MicP_vr(idom_doc,micpar%k_fine_litr,L,NY,NX),FracLitrMix
 
       ELSE
         D1100: DO LN=L+1,NL_col(NY,NX)
@@ -124,7 +127,7 @@ module SoilBGCNLayMod
         ENDIF
 
         IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          FracLitrMix=FOSCZL*FOSCXD*TMicHeterActivity_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)          
+          FracLitrMix=FOSCZL*FOSCXD*TMicHeterActivity_vr(L,NY,NX)/VGeomLayer_vr(L,NY,NX)  
         ELSE
           FracLitrMix=0.0_r8
         ENDIF
@@ -135,6 +138,8 @@ module SoilBGCNLayMod
     ENDIF
 
   ENDIF
+  call PrintInfo('end '//subname)
+
   end subroutine DownwardMixOM
 !------------------------------------------------------------------------------------------
 
@@ -150,8 +155,10 @@ module SoilBGCNLayMod
   real(r8) :: OQMXS,OQMHXS,OHMXS
   real(r8) :: OSMXS,OSAXS
   integer :: K,M,N,NGL,MID,NE,L1
-  
+  character(len=*), parameter :: subname='ApplyVerticalMix'
 !     begin_execution
+  call PrintInfo('beg '//subname)
+
   IF(FracLitrMix.GT.0.0_r8)THEN
     L1=L
   ELSE
@@ -206,6 +213,7 @@ module SoilBGCNLayMod
         DOM_MicP_vr(NE,K,LL,NY,NX) = DOM_MicP_vr(NE,K,LL,NY,NX)+OQMXS
         DOM_MacP_vr(NE,K,LL,NY,NX) = DOM_MacP_vr(NE,K,LL,NY,NX)+OQMHXS
         SorbedOM_vr(NE,K,LL,NY,NX) = SorbedOM_vr(NE,K,LL,NY,NX)+OHMXS
+
       ENDDO
 
       !mix solid organic matter
@@ -221,6 +229,8 @@ module SoilBGCNLayMod
       ENDDO D7931
     ENDDO D7901
   ENDIF
+  call PrintInfo('end '//subname)
+
   end subroutine ApplyVerticalMix
 
 !------------------------------------------------------------------------------------------
@@ -578,53 +588,52 @@ module SoilBGCNLayMod
   end subroutine sumMicBiomLayL
 !------------------------------------------------------------------------------------------
 
-  subroutine sumSurfOMCK(NY,NX,SOMHeterK,SOMAutor)
+  subroutine sumSurfOMCK(NY,NX,SOMHeterKC,SOMAutorC)
   implicit none
   integer, intent(in) :: NY,NX
-  real(r8), intent(out) :: SOMHeterK(1:micpar%NumOfLitrCmplxs)
-  real(r8), intent(out) :: SOMAutor
+  real(r8), intent(out) :: SOMHeterKC(1:micpar%NumOfLitrCmplxs)  !total organic C in each litter complex
+  real(r8), intent(out) :: SOMAutorC
   integer :: K,N,NGL,M,MID,NE,L
 
-  SOMHeterK=0._r8
-  SOMAutor=0._r8
-  L=0
+  SOMHeterKC = 0._r8
+  SOMAutorC  = 0._r8
 
+  L  = 0
+  NE=ielmc
+  !autotrophs
   DO  N=1,NumMicbFunGrupsPerCmplx
     do NGL=JGniA(n),JGnfA(n)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
-        NE=ielmc
-        SOMAutor=SOMAutor+mBiomeAutor_vr(NE,MID,L,NY,NX)        
+        SOMAutorC=SOMAutorC+mBiomeAutor_vr(NE,MID,L,NY,NX)        
       ENDDO
     ENDDO
   enddo
-
+  !live microbes
   DO K=1,micpar%NumOfLitrCmplxs
     DO  N=1,NumMicbFunGrupsPerCmplx
       do NGL=JGniH(n),JGnfH(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
-          NE=ielmc
-          SOMHeterK(K)=SOMHeterK(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)          
+          SOMHeterKC(K)=SOMHeterKC(K)+mBiomeHeter_vr(NE,MID,K,L,NY,NX)          
         enddo
       enddo  
     enddo    
 
+    !microbial residue
     DO  M=1,ndbiomcp
-      NE=ielmc
-      SOMHeterK(K)=SOMHeterK(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)              
+      SOMHeterKC(K)=SOMHeterKC(K)+OMBioResdu_vr(NE,M,K,L,NY,NX)              
     ENDDO  
 
     !add dom
-    NE=ielmc
-    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
+    SOMHeterKC(K)=SOMHeterKC(K)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
     
     !add acetate
-    SOMHeterK(K)=SOMHeterK(K)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
+    SOMHeterKC(K)=SOMHeterKC(K)+DOM_MicP_vr(idom_acetate,K,L,NY,NX)+DOM_MacP_vr(idom_acetate,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)    
 
+    !add solid om
     DO M=1,jsken
-      NE=ielmc
-      SOMHeterK(K)=SOMHeterK(K)+SolidOM_vr(NE,M,K,L,NY,NX)      
+      SOMHeterKC(K)=SOMHeterKC(K)+SolidOM_vr(NE,M,K,L,NY,NX)      
     ENDDO  
   ENDDO
   

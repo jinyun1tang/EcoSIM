@@ -9,6 +9,11 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: NumPlantChemElms=3   !totally three elements
+! biomass component ids for microbes
+  integer, parameter :: ibiom_kinetic = 1
+  integer, parameter :: ibiom_struct  = 2
+  integer, parameter :: ibiom_reserve = 3
+
 ! erosion model options
   integer, parameter :: ieros_noaction       = -1
   integer, parameter :: ieros_frzthawelv     = 0
