@@ -22,11 +22,11 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: XKCO2_tab(:)
   real(r8), target, allocatable :: XKO2_tab(:)
   real(r8), target, allocatable :: Km4PEPCarboxy_tab(:)
-  real(r8), target, allocatable :: LeafRuBPConc_tab(:)
-  real(r8), target, allocatable :: FracLeafProtAsPEPCarboxyl_tab(:)
+  real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
+  real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
-  real(r8), target, allocatable :: LeafC3ChlorofilConc_tab(:)
-  real(r8), target, allocatable :: LeafC4ChlorofilConc_tab(:)
+  real(r8), target, allocatable :: LeafC3Chl2Protein_tab(:)
+  real(r8), target, allocatable :: LeafC4Chl2Protein_tab(:)
   real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
@@ -136,11 +136,11 @@ module PlantTraitTableMod
   allocate(XKCO2_tab(npfts));XKCO2_tab=0.0_r8
   allocate(XKO2_tab(npfts));XKO2_tab=0.0_r8
   allocate(Km4PEPCarboxy_tab(npfts));Km4PEPCarboxy_tab=0.0_r8
-  allocate(LeafRuBPConc_tab(npfts));LeafRuBPConc_tab=0.0_r8
-  allocate(FracLeafProtAsPEPCarboxyl_tab(npfts));FracLeafProtAsPEPCarboxyl_tab=0.0_r8
+  allocate(LeafRubisco2Protein_tab(npfts));LeafRubisco2Protein_tab=0.0_r8
+  allocate(LeafPEP2Protein_tab(npfts));LeafPEP2Protein_tab=0.0_r8
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
-  allocate(LeafC3ChlorofilConc_tab(npfts));LeafC3ChlorofilConc_tab=0._r8
-  allocate(LeafC4ChlorofilConc_tab(npfts));LeafC4ChlorofilConc_tab=0._r8
+  allocate(LeafC3Chl2Protein_tab(npfts));LeafC3Chl2Protein_tab=0._r8
+  allocate(LeafC4Chl2Protein_tab(npfts));LeafC4Chl2Protein_tab=0._r8
   allocate(CanopyCi2CaRatio_pft_tab(npfts));CanopyCi2CaRatio_pft_tab=0._r8
   allocate(RadSWLeafAlbedo_tab(npfts));RadSWLeafAlbedo_tab=0._r8
   allocate(CanopyPARalbedo_tab(npfts));CanopyPARalbedo_tab=0._r8
@@ -250,11 +250,11 @@ module PlantTraitTableMod
   call destroy(XKCO2_tab)
   call destroy(XKO2_tab)
   call destroy(Km4PEPCarboxy_tab)
-  call destroy(LeafRuBPConc_tab)
-  call destroy(FracLeafProtAsPEPCarboxyl_tab)
+  call destroy(LeafRubisco2Protein_tab)
+  call destroy(LeafPEP2Protein_tab)
   call destroy(SpecChloryfilAct_tab)
-  call destroy(LeafC3ChlorofilConc_tab)
-  call destroy(LeafC4ChlorofilConc_tab)
+  call destroy(LeafC3Chl2Protein_tab)
+  call destroy(LeafC4Chl2Protein_tab)
   call destroy(CanopyCi2CaRatio_pft_tab)
   call destroy(RadSWLeafAlbedo_tab)
   call destroy(CanopyPARalbedo_tab)

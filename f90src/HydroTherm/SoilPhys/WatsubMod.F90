@@ -2376,9 +2376,8 @@ module WatsubMod
     dcpo=0._r8
   endif
   PSISMX          = PSISoilMatricPtmp_vr(N3,N2,N1)+PSISoilOsmotic_vr(N3,N2,N1)
-  !apply the Clausis-Clapeyron equation for depressed freezing temperature, 
-  !Cary and Mayland (1972), 9.0959E+04_r8~=273.15*LtHeatIceMelt  
-  TFREEZ          = -9.0959E+04_r8/(PSISMX-LtHeatIceMelt)
+  
+  TFREEZ=get_Tfrez(PSISMX)
 !  TFREEZ = TFICE
   !obtain the potential water
   VLWatMicP1X     = VLWatMicP1_vr(N3,N2,N1)+WatNetFlow2MicP_3DM_vr(N3,N2,N1)+FWatExMacP2MicPiM_vr(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)

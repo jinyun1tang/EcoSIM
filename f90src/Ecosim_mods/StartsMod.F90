@@ -4,8 +4,8 @@ module StartsMod
 ! code to initalize soil variables
 
   use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use abortutils,       only: padr,          print_info,     check_bool
-  use minimathMod,      only: isclose,       AZMAX1,         AZMIN1
+  use abortutils,       only: padr,   print_info, check_bool
+  use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate
   use EcoSiMParDataMod, only: micpar
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
@@ -338,6 +338,7 @@ module StartsMod
   implicit none
   integer, intent(in) :: NY,NX
   REAL(R8),INTENT(IN) :: LandScape1stSoiLayDepth
+  character(len=*), parameter :: subname='InitSoilProfile'
   integer  :: L,M,K,N,KK,NN
   real(r8) :: CORGCM,HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
@@ -358,7 +359,7 @@ module StartsMod
 !
 !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
 !
-  call PrintInfo('beg InitSoilProfile')
+  call PrintInfo('beg '//subname)
   TORGC=0.0_r8
   D1190: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !     CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
@@ -523,13 +524,13 @@ module StartsMod
 
   WatMass_col(NY,NX) = WatMass_col(NY,NX)+XS
 
-  call sumSurfOMCK(NY,NX,RC0_col(:,NY,NX),RC0ff_col(NY,NX))
+  call sumSurfOMCK(NY,NX,SurfLitterC_col(:,NY,NX),RC0ff_col(NY,NX))
 
   !
   !  INITIALIZE FERTILIZER ARRAYS
   call initFertArrays(NY,NX)
  
-  call PrintInfo('end InitSoilProfile')
+  call PrintInfo('end '//subname)
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
 
@@ -929,7 +930,8 @@ module StartsMod
       DLYR_3D(3,L,NY,NX)           = DLYRI_3D(3,L,NY,NX)
       SoilDepthMidLay_vr(L,NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
       CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)+DLYR_3D(3,NU_col(NY,NX),NY,NX)
-      CumSoilThickMidL_vr(L,NY,NX)            = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
+      CumSoilThickness_vr(L,NY,NX) = real_truncate(CumSoilThickness_vr(L,NY,NX),1.e-6_r8)
+      CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)

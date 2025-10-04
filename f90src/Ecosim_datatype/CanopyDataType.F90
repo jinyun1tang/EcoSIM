@@ -20,7 +20,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CuticleResist_pft(:,:,:)                   !maximum stomatal resistance to vapor, [s m-1]
   real(r8),target,allocatable ::  CO2CuticleResist_pft(:,:,:)                !maximum stomatal resistance to CO2, [s h-1]
   real(r8),target,allocatable ::  H2OCuticleResist_pft(:,:,:)                !maximum stomatal resistance to vapor, [s h-1]
-  real(r8),target,allocatable ::  RCS_pft(:,:,:)                             !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8),target,allocatable ::  RCS_pft(:,:,:)                             !e-folding turgor pressure for stomatal resistance, [MPa]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)              !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyMinStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
   real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                  !canopy boundary layer resistance, [m h-1]
@@ -49,6 +49,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  C4CarboxyEff_node(:,:,:,:,:)               !C4 carboxylation efficiency, [umol umol-1]
   real(r8),target,allocatable ::  CPOOL4_node(:,:,:,:,:)                     !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
   real(r8),target,allocatable ::  CMassHCO3BundleSheath_node(:,:,:,:,:)      !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
+  real(r8),target,allocatable ::  LeafProteinC_brch(:,:,:,:)                  !Protein C for the branches, [gC protein d-2]
+  real(r8),target,allocatable ::  LeafProteinCperm2LA_pft(:,:,:)             !Protein C for the plant, [gC protein m-2 leaf area]
   real(r8),target,allocatable ::  RubiscoActivity_brch(:,:,:,:)              !branch down-regulation of CO2 fixation, [-]
   real(r8),target,allocatable ::  NutrientCtrlonC4Carboxy_node(:,:,:,:,:)    !down-regulation of C4 photosynthesis, [-]
   real(r8),target,allocatable ::  C4PhotosynDowreg_brch(:,:,:,:)             !down-regulation of C4 photosynthesis, [-]
@@ -59,11 +61,11 @@ module CanopyDataType
   real(r8),target,allocatable ::  XKCO2_pft(:,:,:)                           !Km for rubisco carboxylase activity, [uM]
   real(r8),target,allocatable ::  XKO2_pft(:,:,:)                            !Km for rubisco oxygenase activity, [uM]
   real(r8),target,allocatable ::  Km4PEPCarboxy_pft(:,:,:)                   !Km for PEP carboxylase activity, [uM]
-  real(r8),target,allocatable ::  LeafRuBPConc_pft(:,:,:)                    !leaf rubisco content, [g g-1]
-  real(r8),target,allocatable ::  FracLeafProtAsPEPCarboxyl_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
+  real(r8),target,allocatable ::  LeafRubisco2Protein_pft(:,:,:)                    !leaf rubisco content, [g g-1]
+  real(r8),target,allocatable ::  LeafPEP2Protein_pft(:,:,:)     !leaf PEP carboxylase content, [g g-1]
   real(r8),target,allocatable ::  SpecLeafChlAct_pft(:,:,:)                !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8),target,allocatable ::  LeafC3ChlorofilConc_pft(:,:,:)             !leaf C3 chlorophyll content, [g g-1]
-  real(r8),target,allocatable ::  LeafC4ChlorofilConc_pft(:,:,:)             !leaf C4 chlorophyll content, [g g-1]
+  real(r8),target,allocatable ::  LeafC3Chl2Protein_pft(:,:,:)             !leaf C3 chlorophyll content, [g g-1]
+  real(r8),target,allocatable ::  LeafC4Chl2Protein_pft(:,:,:)             !leaf C4 chlorophyll content, [g g-1]
   real(r8),target,allocatable ::  CanopyCi2CaRatio_pft(:,:,:)                      !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2Canopy_pft(:,:,:)                   !canopy net radiation , [MJ d-2 h-1] >0
   real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                     !canopy longwave radiation , [MJ d-2 h-1]
@@ -75,9 +77,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                    !fraction of radiation intercepted by ground surface, [-]
   real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                         !shortwave radiation incident on ground surface, [MJ h-1]
   real(r8),target,allocatable ::  LWRadCanGPrev_col(:,:)                     !longwave radiation emitted by canopy, [MJ h-1]
-  real(r8),target,allocatable ::  LWRadGrnd_col(:,:)                             !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8),target,allocatable ::  LWRadGrnd_col(:,:)                         !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8),target,allocatable ::  WatHeldOnCanopy_col(:,:)                   !canopy held water content, [m3 d-2]
-  real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                       !net ice transfer to canopy, [MJ d-2 t-1]
+  real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                       !precipitation to canopy over the grid, [MJ d-2 h-1]
   real(r8),target,allocatable ::  PrecIntceptByCanopy_col(:,:)               !grid net precipitation water interception to canopy, [MJ d-2 t-1]
   real(r8),target,allocatable ::  EvapTransLHeat_pft(:,:,:)                  !canopy latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatXAir2PCan_pft(:,:,:)                   !air to canopy sensible heat flux, [MJ d-2 h-1]
@@ -109,13 +111,12 @@ module CanopyDataType
   real(r8),target,allocatable ::  TdegCCanopy_pft(:,:,:)                     !canopy temperature, [oC]
   real(r8),target,allocatable ::  DeltaTKC_pft(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature during canopy energy iteration, [K]
-  real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                     !minimum sink strength for nonstructural C transfer, [g d-2]
+  real(r8),target,allocatable ::  CPOOL3_node(:,:,:,:,:)                     !bundle sheath C4 carbon product to support C3 photosynthesis, [gC d-2]
   real(r8),target,allocatable ::  NetCumElmntFlx2Plant_pft(:,:,:,:)          !effect of canopy chemical element status on seed setting, []
-  real(r8),target,allocatable ::  tCanLeafC_clyr(:,:,:)                        !total leaf mass, [g d-2]
-  real(r8),target,allocatable ::  ElmAllocmat4Litr(:,:,:,:,:,:)              !litter kinetic fraction, [-]
-  real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                     !shoot structural chemical element, [g d-2]
+  real(r8),target,allocatable ::  tCanLeafC_clyr(:,:,:)                      !total leaf mass, [g d-2]
+  real(r8),target,allocatable ::  PlantElmAllocMat4Litr(:,:,:,:,:,:)              !litter kinetic fraction, [-]
   real(r8),target,allocatable ::  C4PhotoShootNonstC_brch(:,:,:,:)           !C4 specific nonstructural shoot C in branch, [gC d-2]
-  real(r8),target,allocatable ::  ShootStrutElms_pft(:,:,:,:)                !canopy shoot chemical element, [g d-2]
+  real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                     !canopy shoot chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_pft(:,:,:,:)                 !canopy leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetoleStrutElms_pft(:,:,:,:)               !canopy sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StalkStrutElms_pft(:,:,:,:)                !canopy stalk chemical element, [g d-2]
@@ -124,7 +125,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  HuskStrutElms_pft(:,:,:,:)                 !canopy husk chemical element, [g d-2]
   real(r8),target,allocatable ::  EarStrutElms_pft(:,:,:,:)                  !canopy ear chemical element, [g d-2]
   real(r8),target,allocatable ::  GrainStrutElms_pft(:,:,:,:)                !canopy grain chemical element, [g d-2]
-  real(r8),target,allocatable ::  CanopyLeafShethC_pft(:,:,:)                !plant canopy leaf + sheath C, [gC d-2]
+  real(r8),target,allocatable ::  CanopyLeafSheathC_pft(:,:,:)                !plant canopy leaf + sheath C, [gC d-2]
   real(r8),target,allocatable ::  CanopyLeafAreaZ_pft(:,:,:,:)               !canopy layer-distributed leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                       !canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  RCanMaintDef_CO2_pft(:,:,:)                !canopy maintenance respiraiton deficit as CO2,  [gC d-2 h-1]  
@@ -133,11 +134,11 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyNonstElmConc_pft(:,:,:,:)            !canopy nonstructural chemical element concentration, [g d-2]
   real(r8),target,allocatable ::  CanopyStemAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)          !canopy nodule nonstructural chemical element, [g d-2]
-  real(r8),target,allocatable ::  CanopyNodulElms_pft(:,:,:,:)               !canopy nodule chemical elemental biomass [g d-2]
-  real(r8),target,allocatable ::  SapwoodBiomassC_brch(:,:,:,:)            !branch active stalk C, [g d-2]
+  real(r8),target,allocatable ::  ShootNoduleElms_pft(:,:,:,:)               !canopy nodule chemical elemental biomass [g d-2]
+  real(r8),target,allocatable ::  SapwoodBiomassC_brch(:,:,:,:)              !branch active stalk C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_brch(:,:,:,:,:)            !branch nonstructural chemical element, [g d-2]
-  real(r8),target,allocatable ::  LeafPetolBiomassC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
-  real(r8),target,allocatable ::  ShootStrutElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
+  real(r8),target,allocatable ::  CanopyLeafSheathC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
+  real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_brch(:,:,:,:,:)              !branch leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetoleStrutElms_brch(:,:,:,:,:)            !branch sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StalkStrutElms_brch(:,:,:,:,:)             !branch stalk chemical element, [g d-2]
@@ -149,23 +150,23 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyNodulNonstElms_brch(:,:,:,:,:)       !branch nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulStrutElms_brch(:,:,:,:,:)       !branch nodule chemical element, [g d-2]
   real(r8),target,allocatable ::  PetioleChemElmRemob_brch(:,:,:,:,:)        !branch sheath structural chemical element, [g d-2]
-  real(r8),target,allocatable ::  SenecStalkStrutElms_brch(:,:,:,:,:)        !branch stalk structural C, [g d-2]
+  real(r8),target,allocatable ::  SenecStalkStrutElms_brch(:,:,:,:,:)        !senescing branch stalk structural chemical elements, [g d-2]
   real(r8),target,allocatable ::  LeafChemElmRemob_brch(:,:,:,:,:)           !branch leaf structural chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)            !leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)         !sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StructInternodeElms_brch(:,:,:,:,:,:)       !internode chemical element, [g d-2]
-  real(r8),target,allocatable ::  LeafElmsByLayerNode_brch(:,:,:,:,:,:,:)    !layer leaf chemical element, [g d-2]
+  real(r8),target,allocatable ::  LeafLayerElms_node(:,:,:,:,:,:,:)    !layer leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_lnode(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  LeafProteinCNode_brch(:,:,:,:,:)           !layer leaf protein C, [g d-2]
+  real(r8),target,allocatable ::  LeafProteinC_node(:,:,:,:,:)           !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  PetoleProteinCNode_brch(:,:,:,:,:)         !layer sheath protein C, [g d-2]
-  real(r8),target,allocatable ::  NoduleNonstructCconc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
+  real(r8),target,allocatable ::  CanopyNoduleNonstCConc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)           !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  CanopyNLimFactor_brch(:,:,:,:)             !Canopy N-limitation factor, [0->1] weaker limitation,[-]
   real(r8),target,allocatable ::  CanopyPLimFactor_brch(:,:,:,:)             !Canopy P-limitation factor, [0->1] weaker limitation,[-]
   real(r8),target,allocatable ::  StandDeadKCompElms_pft(:,:,:,:,:)          !standing dead chemical element fraction, [g d-2]
   real(r8),target,allocatable ::  StandDeadStrutElms_pft(:,:,:,:)            !standing dead chemical element, [g d-2]
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
-  real(r8),target,allocatable ::  SeedCPlanted_pft(:,:,:)                    !plant stored nonstructural C at planting, [g d-2]
+  real(r8),target,allocatable ::  SeedPlantedElm_pft(:,:,:,:)              !plant stored nonstructural chemical elements at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)            !landscape average canopy shoot C, [g d-2]
   real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1] 
   real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate,[gC d2 h-1]
@@ -182,6 +183,15 @@ module CanopyDataType
   real(r8),target,allocatable :: PARSunsha_pft(:,:,:)                        !PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
   real(r8),target,allocatable :: CH2OSunlit_pft(:,:,:)                       !carbon fixation by sun-lit leaf, [gC d-2 h-1]
   real(r8),target,allocatable :: CH2OSunsha_pft(:,:,:)                       !carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
+!  real(r8),target,allocatable :: LeafC3ChlC_brch(:,:,:,:)                    !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
+!  real(r8),target,allocatable :: LeafC4ChlC_brch(:,:,:,:)                    !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+!  real(r8),target,allocatable :: LeafRubiscoC_brch(:,:,:,:)                  !Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
+!  real(r8),target,allocatable :: LeafPEPC_brch(:,:,:,:)                      !PEP C for the branches, [gC PEP d-2]
+  real(r8),target,allocatable :: LeafC3ChlCperm2LA_pft(:,:,:)                       !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
+  real(r8),target,allocatable :: LeafC4ChlCperm2LA_pft(:,:,:)                       !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+  real(r8),target,allocatable :: LeafRubiscoCperm2LA_pft(:,:,:)                     !Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
+  real(r8),target,allocatable :: LeafPEPCperm2LA_pft(:,:,:)                         !PEP C for the branches, [gC PEP d-2]
+  real(r8),target,allocatable :: SpecificLeafArea_pft(:,:,:)                   !specifc leaf area per g C of leaf mass, [m2 leaf area (gC leaf C)-1]
 
   contains
 !----------------------------------------------------------------------
@@ -194,7 +204,7 @@ module CanopyDataType
   allocate(PARSunsha_pft(JP,JY,JX));PARSunsha_pft=0._r8
   allocate(CH2OSunlit_pft(JP,JY,JX));CH2OSunlit_pft=0._r8
   allocate(CH2OSunsha_pft(JP,JY,JX));CH2OSunsha_pft=0._r8
-
+  ALLOCATE(SpecificLeafArea_pft(JP,JY,JX)); SpecificLeafArea_pft=0._r8
   allocate(LeafAreaSunlit_pft(JP,JY,JX)); LeafAreaSunlit_pft=0._r8
   allocate(TFN_Carboxy_pft(JP,JY,JX));TFN_Carboxy_pft=0._r8
   allocate(TFN_Oxygen_pft(JP,JY,JX)); TFN_Oxygen_pft=0._r8
@@ -251,6 +261,8 @@ module CanopyDataType
   allocate(CPOOL4_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL4_node=0._r8
   allocate(CMassHCO3BundleSheath_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CMassHCO3BundleSheath_node=0._r8
   allocate(RubiscoActivity_brch(MaxNumBranches,JP,JY,JX));  RubiscoActivity_brch=0._r8
+  allocate(LeafProteinC_brch(MaxNumBranches,JP,JY,JX)); LeafProteinC_brch=0._r8
+  allocate(LeafProteinCperm2LA_pft(JP,JY,JX)); LeafProteinCperm2LA_pft=0._r8
   allocate(NutrientCtrlonC4Carboxy_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));NutrientCtrlonC4Carboxy_node=0._r8
   allocate(C4PhotosynDowreg_brch(MaxNumBranches,JP,JY,JX)); C4PhotosynDowreg_brch=0._r8
   allocate(NetCO2Flx2Canopy_col(JY,JX));       NetCO2Flx2Canopy_col=0._r8
@@ -260,11 +272,11 @@ module CanopyDataType
   allocate(XKCO2_pft(JP,JY,JX));    XKCO2_pft=0._r8
   allocate(XKO2_pft(JP,JY,JX));     XKO2_pft=0._r8
   allocate(Km4PEPCarboxy_pft(JP,JY,JX));   Km4PEPCarboxy_pft=0._r8
-  allocate(LeafRuBPConc_pft(JP,JY,JX));     LeafRuBPConc_pft=0._r8
-  allocate(FracLeafProtAsPEPCarboxyl_pft(JP,JY,JX));     FracLeafProtAsPEPCarboxyl_pft=0._r8
+  allocate(LeafRubisco2Protein_pft(JP,JY,JX));     LeafRubisco2Protein_pft=0._r8
+  allocate(LeafPEP2Protein_pft(JP,JY,JX));     LeafPEP2Protein_pft=0._r8
   allocate(SpecLeafChlAct_pft(JP,JY,JX));     SpecLeafChlAct_pft=0._r8
-  allocate(LeafC3ChlorofilConc_pft(JP,JY,JX));      LeafC3ChlorofilConc_pft=0._r8
-  allocate(LeafC4ChlorofilConc_pft(JP,JY,JX));     LeafC4ChlorofilConc_pft=0._r8
+  allocate(LeafC3Chl2Protein_pft(JP,JY,JX));      LeafC3Chl2Protein_pft=0._r8
+  allocate(LeafC4Chl2Protein_pft(JP,JY,JX));     LeafC4Chl2Protein_pft=0._r8
   allocate(CanopyCi2CaRatio_pft(JP,JY,JX));     CanopyCi2CaRatio_pft=0._r8
   allocate(RadNet2Canopy_pft(JP,JY,JX));     RadNet2Canopy_pft=0._r8
   allocate(LWRadCanopy_pft(JP,JY,JX));    LWRadCanopy_pft=0._r8
@@ -309,8 +321,7 @@ module CanopyDataType
   allocate(CPOOL3_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CPOOL3_node=0._r8
   allocate(NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP,JY,JX));    NetCumElmntFlx2Plant_pft=0._r8
   allocate(tCanLeafC_clyr(NumCanopyLayers,JY,JX));    tCanLeafC_clyr=0._r8
-  allocate(ElmAllocmat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));ElmAllocmat4Litr=0._r8
-  allocate(ShootStrutElms_pft(NumPlantChemElms,JP,JY,JX)); ShootStrutElms_pft=0._r8
+  allocate(PlantElmAllocMat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));PlantElmAllocMat4Litr=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
   allocate(PetoleStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetoleStrutElms_pft=0._r8
   allocate(StalkStrutElms_pft(NumPlantChemElms,JP,JY,JX)); StalkStrutElms_pft=0._r8
@@ -319,7 +330,7 @@ module CanopyDataType
   allocate(HuskStrutElms_pft(NumPlantChemElms,JP,JY,JX));    HuskStrutElms_pft=0._r8
   allocate(EarStrutElms_pft(NumPlantChemElms,JP,JY,JX));    EarStrutElms_pft=0._r8
   allocate(GrainStrutElms_pft(NumPlantChemElms,JP,JY,JX));     GrainStrutElms_pft=0._r8
-  allocate(CanopyLeafShethC_pft(JP,JY,JX));     CanopyLeafShethC_pft=0._r8
+  allocate(CanopyLeafSheathC_pft(JP,JY,JX));     CanopyLeafSheathC_pft=0._r8
   allocate(CanopyLeafAreaZ_pft(NumCanopyLayers,JP,JY,JX)); CanopyLeafAreaZ_pft=0._r8
   allocate(CO2NetFix_pft(JP,JY,JX));     CO2NetFix_pft=0._r8
   allocate(RCanMaintDef_CO2_pft(JP,JY,JX)); RCanMaintDef_CO2_pft=0._r8
@@ -327,14 +338,22 @@ module CanopyDataType
   allocate(CanopyNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElms_pft=0._r8
   allocate(CanopyNonstElmConc_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElmConc_pft=0._r8
   allocate(CanopyStemAreaZ_pft(NumCanopyLayers,JP,JY,JX)); CanopyStemAreaZ_pft=0._r8
-  allocate(CanopyNodulElms_pft(NumPlantChemElms,JP,JY,JX));CanopyNodulElms_pft=0._r8
+  allocate(ShootNoduleElms_pft(NumPlantChemElms,JP,JY,JX));ShootNoduleElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
   allocate(SapwoodBiomassC_brch(MaxNumBranches,JP,JY,JX));SapwoodBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
+!  allocate(LeafC3ChlC_brch(MaxNumBranches,JP,JY,JX)); LeafC3ChlC_brch=0._r8             
+!  allocate(LeafC4ChlC_brch(MaxNumBranches,JP,JY,JX)); LeafC4ChlC_brch=0._r8
+!  allocate(LeafRubiscoC_brch(MaxNumBranches,JP,JY,JX)); LeafRubiscoC_brch=0._r8           
+!  allocate(LeafPEPC_brch(MaxNumBranches,JP,JY,JX));LeafPEPC_brch=0._r8               
+  allocate(LeafC3ChlCperm2LA_pft(JP,JY,JX));LeafC3ChlCperm2LA_pft=0._r8                
+  allocate(LeafC4ChlCperm2LA_pft(JP,JY,JX));LeafC4ChlCperm2LA_pft=0._r8
+  allocate(LeafRubiscoCperm2LA_pft(JP,JY,JX));LeafRubiscoCperm2LA_pft=0._r8             
+  allocate(LeafPEPCperm2LA_pft(JP,JY,JX));LeafPEPCperm2LA_pft=0._r8                  
   allocate(C4PhotoShootNonstC_brch(MaxNumBranches,JP,JY,JX));C4PhotoShootNonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
-  allocate(LeafPetolBiomassC_brch(MaxNumBranches,JP,JY,JX)); LeafPetolBiomassC_brch=0._r8
-  allocate(ShootStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootStrutElms_brch=0._r8
+  allocate(CanopyLeafSheathC_brch(MaxNumBranches,JP,JY,JX)); CanopyLeafSheathC_brch=0._r8
+  allocate(ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootElms_brch=0._r8
   allocate(LeafStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafStrutElms_brch=0._r8
   allocate(PetoleStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetoleStrutElms_brch=0._r8
   allocate(StalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkStrutElms_brch=0._r8
@@ -351,17 +370,17 @@ module CanopyDataType
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
   allocate(StructInternodeElms_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StructInternodeElms_brch=0._r8
-  allocate(LeafElmsByLayerNode_brch(NumPlantChemElms,NumCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
-  LeafElmsByLayerNode_brch=0._r8
+  allocate(LeafLayerElms_node(NumPlantChemElms,NumCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
+  LeafLayerElms_node=0._r8
   allocate(CanopyLeafArea_lnode(NumCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafArea_lnode=0._r8
-  allocate(LeafProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinCNode_brch=0._r8
+  allocate(LeafProteinC_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinC_node=0._r8
   allocate(PetoleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinCNode_brch=0._r8
-  allocate(NoduleNonstructCconc_pft(JP,JY,JX));   NoduleNonstructCconc_pft=0._r8
+  allocate(CanopyNoduleNonstCConc_pft(JP,JY,JX));   CanopyNoduleNonstCConc_pft=0._r8
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
   allocate(StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandDeadKCompElms_pft=0._r8
   allocate(StandDeadStrutElms_pft(NumPlantChemElms,JP,JY,JX));    StandDeadStrutElms_pft=0._r8
   allocate(SeasonalNonstElms_pft(NumPlantChemElms,JP,JY,JX));  SeasonalNonstElms_pft=0._r8
-  allocate(SeedCPlanted_pft(JP,JY,JX));    SeedCPlanted_pft=0._r8
+  allocate(SeedPlantedElm_pft(NumPlantChemElms,JP,JY,JX));    SeedPlantedElm_pft=0._r8
   allocate(AvgCanopyBiomC2Graze_pft(JP,JY,JX));   AvgCanopyBiomC2Graze_pft=0._r8
   end subroutine InitCanopyData
 
@@ -370,6 +389,11 @@ module CanopyDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(SpecificLeafArea_pft)
+  call destroy(LeafC3ChlCperm2LA_pft)
+  call destroy(LeafC4ChlCperm2LA_pft)
+  call destroy(LeafRubiscoCperm2LA_pft)
+  call destroy(LeafPEPCperm2LA_pft)
   call destroy(PARSunlit_pft)
   call destroy(PARSunsha_pft)
   call destroy(CH2OSunlit_pft)
@@ -438,11 +462,11 @@ module CanopyDataType
   call destroy(XKCO2_pft)
   call destroy(XKO2_pft)
   call destroy(Km4PEPCarboxy_pft)
-  call destroy(LeafRuBPConc_pft)
-  call destroy(FracLeafProtAsPEPCarboxyl_pft)
+  call destroy(LeafRubisco2Protein_pft)
+  call destroy(LeafPEP2Protein_pft)
   call destroy(SpecLeafChlAct_pft)
-  call destroy(LeafC3ChlorofilConc_pft)
-  call destroy(LeafC4ChlorofilConc_pft)
+  call destroy(LeafC3Chl2Protein_pft)
+  call destroy(LeafC4Chl2Protein_pft)
   call destroy(CanopyCi2CaRatio_pft)
   call destroy(RadNet2Canopy_pft)
   call destroy(LWRadCanopy_pft)
@@ -488,8 +512,7 @@ module CanopyDataType
   call destroy(ShootElms_pft)
   call destroy(NetCumElmntFlx2Plant_pft)
   call destroy(tCanLeafC_clyr)
-  call destroy(ElmAllocmat4Litr)
-  call destroy(ShootStrutElms_pft)
+  call destroy(PlantElmAllocMat4Litr)
   call destroy(LeafStrutElms_pft)
   call destroy(PetoleStrutElms_pft)
   call destroy(StalkStrutElms_pft)
@@ -498,7 +521,7 @@ module CanopyDataType
   call destroy(HuskStrutElms_pft)
   call destroy(EarStrutElms_pft)
   call destroy(GrainStrutElms_pft)
-  call destroy(CanopyLeafShethC_pft)
+  call destroy(CanopyLeafSheathC_pft)
   call destroy(CanopyLeafAreaZ_pft)
   call destroy(CO2NetFix_pft)
   call destroy(RCanMaintDef_CO2_pft)
@@ -507,12 +530,12 @@ module CanopyDataType
   call destroy(CanopyNonstElmConc_pft)
   call destroy(CanopyStemAreaZ_pft)
   call destroy(CanopyNodulNonstElms_pft)
-  call destroy(CanopyNodulElms_pft)
+  call destroy(ShootNoduleElms_pft)
   call destroy(SapwoodBiomassC_brch)
   call destroy(CanopyNonstElms_brch)
   call destroy(C4PhotoShootNonstC_brch)
-  call destroy(LeafPetolBiomassC_brch)
-  call destroy(ShootStrutElms_brch)
+  call destroy(CanopyLeafSheathC_brch)
+  call destroy(ShootElms_brch)
   call destroy(LeafStrutElms_brch)
   call destroy(PetoleStrutElms_brch)
   call destroy(StalkStrutElms_brch)
@@ -529,16 +552,16 @@ module CanopyDataType
   call destroy(LeafElmntNode_brch)
   call destroy(PetioleElmntNode_brch)
   call destroy(StructInternodeElms_brch)
-  call destroy(LeafElmsByLayerNode_brch)
+  call destroy(LeafLayerElms_node)
   call destroy(CanopyLeafArea_lnode)
-  call destroy(LeafProteinCNode_brch)
+  call destroy(LeafProteinC_node)
   call destroy(PetoleProteinCNode_brch)
-  call destroy(NoduleNonstructCconc_pft)
+  call destroy(CanopyNoduleNonstCConc_pft)
   call destroy(GrainSeedBiomCMean_brch)
   call destroy(StandDeadKCompElms_pft)
   call destroy(StandDeadStrutElms_pft)
   call destroy(SeasonalNonstElms_pft)
-  call destroy(SeedCPlanted_pft)
+  call destroy(SeedPlantedElm_pft)
   call destroy(AvgCanopyBiomC2Graze_pft)
   end subroutine DestructCanopyData
 

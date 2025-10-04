@@ -24,19 +24,21 @@ implicit none
   end type PlantSoluteUptakeConfig_type
 contains
 
-  pure function get_FDM(PSICanopy)result(FDMP)
+  function get_FDM(PSICanopy,FDMP0)result(FDMP)
   !
   !compute the Ratio of leaf+sheath dry mass to symplasmic water (g g–1)
   !as a function of absolute value of leaf water potential (MPa)
   
   implicit none
   real(r8), intent(in) :: PSICanopy !canopy water potential, MPa
+  real(r8), optional, intent(out) ::  FDMP0
   
   real(r8) :: APSILT    !abosolute value of psi
   real(r8) :: FDMP      !=dry matter/water
 
   APSILT = ABS(PSICanopy)
   FDMP   = 0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
+  if(present(FDMP0))FDMP0=0.16_r8
 
   end function get_FDM
 
@@ -54,15 +56,16 @@ contains
   real(r8), intent(out) :: PSITurg    !turgor pressure of the organ, MPa
   real(r8), optional, intent(out) :: FDMP1
 
-  real(r8) :: OSWT
-  real(r8) :: FDMP
-
-  FDMP=get_FDM(PSICanopy)
-  if(present(fdmp1))FDMP1=FDMP
+  real(r8) :: OSWT   !average molecular weight of CCPOLT 
+  real(r8) :: FDMP   !Ratio of leaf+sheath dry mass to symplasmic water (g/g)
+  real(r8) :: FDMP0  !FDMP at zero canopy water potential. 
+  
+  FDMP    = get_FDM(PSICanopy,FDMP0)
   OSWT    = 36.0_r8+840.0_r8*AZMAX1(CCPOLT)
-  PSIOsmo = FDMP/0.16_r8*OSMO-RGASC*TKP*FDMP*CCPOLT/OSWT
+  PSIOsmo = FDMP*(OSMO/FDMP0-RGASC*TKP*CCPOLT/OSWT)
   PSITurg = AZMAX1(PSICanopy-PSIOsmo)
 
+  if(present(fdmp1))FDMP1=FDMP
   end subroutine update_osmo_turg_pressure
 !--------------------------------------------------------------------------------
 

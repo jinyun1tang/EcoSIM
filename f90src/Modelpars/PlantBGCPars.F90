@@ -15,7 +15,7 @@ module PlantBGCPars
   real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
-  real(r8) :: FSNR                                !rate constant for LitrFall at end of growing season, [h-1]
+  real(r8) :: RSpecLiterFall                      !rate constant for LitrFall at end of growing season, [h-1]
   real(r8) :: Hours4PhyslMature                   !number of hours with no grain filling required for physilogical maturity, [h]
   real(r8) :: Hours4FullSenes                     !number of hours until full senescence after physl maturity, [h]
   real(r8) :: XFRX                                !maximum storage C content for remobiln from stalk,root reserves, [gC]
@@ -26,10 +26,10 @@ module PlantBGCPars
   real(r8) :: CNKI                                !nonstructural N inhibition constant on growth, [g N, g-1 C]
   real(r8) :: CPKI                                !nonstructural P inhibition constant on growth, [g P g-1 C]
   real(r8) :: RmSpecPlant                         !specific maintenance respiration rate, [g C g-1 N h-1]
-  real(r8) :: PSIMin4OrganExtens                  !minimum water potential for organ expansion,extension, [MPa]
+  real(r8) :: TurgPSIMin4OrganExtens              !minimum tugor pressure for plant organ expansion,extension, [MPa]
   real(r8) :: RCMN                                !minimum stomatal resistance to CO2, [s m-1]
   real(r8) :: RTDPX                               !distance behind growing point for secondary roots, [m]
-  real(r8) :: Root2ndMeanLensMin                  !minimum average secondary root length, [m]
+  real(r8) :: Root2ndTipLen4uptk                  !effective root tip length four resource uptake, not whole root hair 4 uptake, [m]
   real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
   real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
   real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
@@ -46,9 +46,9 @@ module PlantBGCPars
   real(r8) :: FCMassCO2BundleSheath_node          !partition decarboxylation to CO2 in C4, [-]
   real(r8) :: FCMassHCO3BundleSheath_node         !partition leakage to HCO3 in C4, [-]
   real(r8) :: COMP4                               !C4 CO2 compensation point, [uM] 
-  real(r8) :: FDML                                !leaf water content, (g H2O g-1 C)
-  real(r8) :: FBS                                 !leaf water content in bundle sheath, in C4 CO2 fixn, [m3 H2O (gC)-1]
-  real(r8) :: FMP                                 !leaf water content in mesophyll in C4 CO2 fixn, [m3 H2O (gC)-1]
+  real(r8) :: FWCLeaf                             !leaf water content, (g H2O (gC leaf)-1)
+  real(r8) :: FWCBundlSheath                      !leaf water content in bundle sheath, in C4 CO2 fixiation, [m3 H2O (gC)-1]
+  real(r8) :: FWCMesophyll                        !leaf water content in mesophyll in C4 CO2 fixation, [m3 H2O (gC)-1]
   real(r8) :: ZPLFM                               !min N:C,P:C in leaves relative to max values from PFT file, [-]
 
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
@@ -93,7 +93,7 @@ module PlantBGCPars
   real(r8) :: RateK4RootSeaStorNonstEXfer(0:3)    !rate constant for root-storage nonstructural chemical element exchange, [h-1]
   real(r8) :: FXRT(0:1)                           !root partitioning of storage C during leafout,[-]
   real(r8) :: FXSH(0:1)                           !shoot partitioning of storage C during leafout,[-]
-  real(r8) :: FXRN(6)                             !rate constant for plant-bacteria nonstructl C,N,P exchange,[h-1]
+  real(r8) :: FXRN(6)                             !rate constant for plant-nodule bacteria nonstructl C,N,P exchange,[h-1]
   REAL(R8) :: RCCX(0:3)                           !maximum fractions for shoot N recycling,[-]
   real(r8) :: RCCQ(0:3)                           !maximum fractions for shoot P recycling,[-]
   REAL(R8) :: RCCZ(0:3)                           !minimum fractions for shoot C recycling,[-]
@@ -200,7 +200,7 @@ module PlantBGCPars
   PART1X                      = 0.05_r8
   PART2X                      = 0.02_r8
   VMXC                        = 0.015_r8
-  FSNR                        = 2.884E-03_r8
+  RSpecLiterFall              = 2.884E-03_r8
   Hours4PhyslMature           = 168.0_r8
   Hours4FullSenes             = 240.0_r8
   XFRX                        = 2.5E-02_r8
@@ -211,10 +211,10 @@ module PlantBGCPars
   CNKI                        = 1.0E-01_r8
   CPKI                        = 1.0E-02_r8
   RmSpecPlant                 = 0.010_r8
-  PSIMin4OrganExtens          = 0.1_r8
+  TurgPSIMin4OrganExtens      = 0.1_r8
   RCMN                        = 1.560E+01_r8
   RTDPX                       = 0.00_r8
-  Root2ndMeanLensMin            = 1.0E-03_r8
+  Root2ndTipLen4uptk          = 2.0E-03_r8
   EMODR                       = 5.0_r8
   QNTM                        = 0.45_r8
   CURV                        = 0.70_r8
@@ -226,9 +226,9 @@ module PlantBGCPars
   FCMassCO2BundleSheath_node  = 0.02_r8
   FCMassHCO3BundleSheath_node = 1.0_r8-FCMassCO2BundleSheath_node
   COMP4                       = 0.5_r8
-  FDML                        = 6.0_r8
-  FBS                         = 0.2_r8*FDML
-  FMP                         = 0.8_r8*FDML
+  FWCLeaf                        = 6.0_r8
+  FWCBundlSheath                         = 0.2_r8*FWCLeaf
+  FWCMesophyll                         = 0.8_r8*FWCLeaf
   ZPLFM                       = 0.33_r8
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8

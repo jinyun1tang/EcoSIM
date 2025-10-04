@@ -134,7 +134,7 @@ implicit none
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
     plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
-    plt_biom%CanopyLeafShethC_pft(NZ)       = CanopyLeafShethC_pft(NZ,NY,NX)    !need to convert from leaf area
+    plt_biom%CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
     plt_biom%CanopySapwoodC_pft(NZ)           = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
     plt_site%PlantPopulation_pft(NZ)        = PlantPopulation_pft(NZ,NY,NX)
     plt_biom%ZERO4LeafVar_pft(NZ)           = ZERO4LeafVar_pft(NZ,NY,NX)
@@ -158,7 +158,7 @@ implicit none
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndRadius_rpvr(N,L,NZ) = Root2ndRadius_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stXNumL_rpvr(N,L,NZ)  = Root1stXNumL_rpvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndMeanLens_rpvr(N,L,NZ) = Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ) = Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)        
         plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO

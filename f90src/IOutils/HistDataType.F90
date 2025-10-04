@@ -9,6 +9,7 @@ module HistDataType
   use MiniMathMod,      only: safe_adb, AZMAX1,AZERO
   use EcoSiMParDataMod, only: pltpar, micpar
   use DebugToolMod,     only: DebugPrint
+  use EcoSIMCtrlMod
   use MicrobialDataType
   use CanopyRadDataType
   use GridConsts
@@ -144,6 +145,7 @@ implicit none
   real(r8),pointer   :: h1D_NH3_LITR_col(:)     
   real(r8),pointer   :: h1D_SOL_RADN_col(:)     
   real(r8),pointer   :: h1D_AIR_TEMP_col(:)     
+  real(r8),pointer   :: h1D_FreeNFix_col(:)
   real(r8),pointer   :: h1D_PATM_col(:)         
   real(r8),pointer   :: h1D_HUM_col(:)          
   real(r8),pointer   :: h1D_WIND_col(:)         
@@ -217,6 +219,8 @@ implicit none
   real(r8),pointer   :: h1D_LEAF_PC_ptc(:)    
   real(r8),pointer   :: h3D_SOC_Cps_vr(:,:,:)  
   real(r8),pointer   :: h2D_tSOC_vr(:,:)      
+  real(r8),pointer   :: h2D_POM_C_vr(:,:)
+  real(r8),pointer   :: h2D_MAOM_C_vr(:,:)
   real(r8),pointer   :: h2D_microbC_vr(:,:)
   real(r8),pointer   :: h2D_microbN_vr(:,:)
   real(r8),pointer   :: h2D_microbP_vr(:,:)
@@ -290,10 +294,7 @@ implicit none
   real(r8),pointer   :: h2D_Root2ndStrutP_pvr(:,:)
   real(r8),pointer   :: h2D_QDrainloss_vr(:,:)  
   real(r8),pointer   :: h1D_SHOOT_C_ptc(:)      
-  real(r8),pointer   :: h1D_RCanMaintDef_CO2_pft(:)
-  real(r8),pointer   :: h1D_SHOOTST_C_ptc(:)       
-  real(r8),pointer   :: h1D_SHOOTST_N_ptc(:)       
-  real(r8),pointer   :: h1D_SHOOTST_P_ptc(:)             
+  real(r8),pointer   :: h1D_RCanMaintDef_CO2_pft(:)           
   real(r8),pointer   :: h1D_LEAF_C_ptc(:)       
   real(r8),pointer   :: h1D_Petole_C_ptc(:)     
   real(r8),pointer   :: h1D_STALK_C_ptc(:)      
@@ -306,8 +307,11 @@ implicit none
   real(r8),pointer   :: h1D_ROOT_C_ptc(:)       
   real(r8),pointer   :: h1D_ROOTST_C_ptc(:)     
   real(r8),pointer   :: h1D_ROOTST_N_ptc(:) 
-  real(r8),pointer   :: h1D_ROOTST_P_ptc(:)   
-  real(r8),pointer   :: h1D_NODULE_C_ptc(:)     
+  real(r8),pointer   :: h1D_ROOTST_P_ptc(:) 
+  real(r8),pointer   :: h1D_ShootNodule_C_ptc(:)     
+  real(r8),pointer   :: h1D_ShootNodule_N_ptc(:)     
+  real(r8),pointer   :: h1D_ShootNodule_P_ptc(:)             
+  real(r8),pointer   :: h1D_RootNodule_C_ptc(:)     
   real(r8),pointer   :: h1D_STORED_C_ptc(:)     
   real(r8),pointer   :: h1D_GRAIN_NO_ptc(:)     
   real(r8),pointer   :: h1D_CondGasXSurf_col(:)
@@ -336,7 +340,7 @@ implicit none
   real(r8),pointer   :: h1D_HUSK_N_ptc(:)     
   real(r8),pointer   :: h1D_GRAIN_N_ptc(:)    
   real(r8),pointer   :: h1D_ROOT_N_ptc(:)     
-  real(r8),pointer   :: h1D_NODULE_N_ptc(:)   
+  real(r8),pointer   :: h1D_RootNodule_N_ptc(:)   
   real(r8),pointer   :: h1D_STORED_N_ptc(:)   
   real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)     
   real(r8),pointer   :: h1D_Uptk_N_Flx_ptc(:)
@@ -350,6 +354,7 @@ implicit none
   real(r8),pointer   :: h1D_STANDING_DEAD_N_ptc(:)  
   real(r8),pointer   :: h1D_FIREp_N_FLX_ptc(:)      
   real(r8),pointer   :: h1D_VcMaxRubisco_ptc(:)
+  real(r8),pointer   :: h1D_LeafProteinCperm2_ptc(:)
   real(r8),pointer   :: h1D_PARSunlit_ptc(:)
   real(r8),pointer   :: h1D_PARSunsha_ptc(:)
   real(r8),pointer   :: h1D_CH2OSunlit_ptc(:)
@@ -358,6 +363,7 @@ implicit none
   real(r8),pointer   :: h1D_VcMaxPEP_ptc(:)  
   real(r8),pointer   :: h1D_JMaxPhoto_ptc(:)
   real(r8),pointer   :: h1D_TFN_Carboxy_ptc(:)
+  real(r8),pointer   :: h1D_SLA_ptc(:)
   real(r8),pointer   :: h1D_TFN_Oxygen_ptc(:)
   real(r8),pointer   :: h1D_TFN_eTranspt_ptc(:)  
   real(r8),pointer   :: h1D_LeafAreaSunlit_ptc(:)
@@ -371,7 +377,7 @@ implicit none
   real(r8),pointer   :: h1D_HUSK_P_ptc(:)     
   real(r8),pointer   :: h1D_GRAIN_P_ptc(:)    
   real(r8),pointer   :: h1D_ROOT_P_ptc(:)     
-  real(r8),pointer   :: h1D_NODULE_P_ptc(:)   
+  real(r8),pointer   :: h1D_RootNodule_P_ptc(:)   
   real(r8),pointer   :: h1D_STORED_P_ptc(:)    
   real(r8),pointer   :: h1D_EXUD_P_FLX_ptc(:)  
   real(r8),pointer   :: h1D_LITTERf_P_ptc(:)   
@@ -381,13 +387,18 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_P_FLX_ptc(:)       
   real(r8),pointer   :: h1D_SURF_LITRf_P_FLX_ptc(:) 
   real(r8),pointer   :: h2D_RootMaintDef_CO2_pvr(:,:)
+  real(r8),pointer   :: h2D_RootSurfAreaPP_pvr(:,:)
   real(r8),pointer   :: h2D_ROOTNLim_rpvr(:,:)
   real(r8),pointer   :: h2D_ROOTPLim_rpvr(:,:)  
   real(r8),pointer   :: h1D_RootMaintDef_CO2_pft(:)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)    
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)  
-  real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:)  
+  real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:) 
+  real(r8),pointer   :: h1D_LeafC3ChlCperm2LA_ptc(:) 
+  real(r8),pointer   :: h1D_LeafC4ChlCperm2LA_ptc(:) 
+  real(r8),pointer   :: h1D_LeafRubiscoCperm2LA_ptc(:)
+  real(r8),pointer   :: h1D_LeafPEPCperm2LA_ptc(:)    
 !  real(r8),pointer   :: h1D_CFIX_lmtf_ptc(:)
   real(r8),pointer   :: h1D_MainBranchNO_ptc(:)
   real(r8),pointer   :: h1D_Ar_mass_col(:)       
@@ -543,6 +554,7 @@ implicit none
   real(r8),pointer   :: h2D_cNO3t_vr(:,:)                                                     
   real(r8),pointer   :: h2D_cPO4_vr(:,:)       
   real(r8),pointer   :: h2D_cEXCH_P_vr(:,:)    
+  real(r8),pointer   :: h2D_microb_N2fix_vr(:,:)
   real(r8),pointer   :: h2D_ElectricConductivity_vr(:,:) 
   real(r8),pointer   :: h2D_HydCondSoil_vr(:,:)
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
@@ -697,6 +709,7 @@ implicit none
   allocate(this%h1D_NH3_LITR_col(beg_col:end_col))        ;this%h1D_NH3_LITR_col(:)=spval
   allocate(this%h1D_SOL_RADN_col(beg_col:end_col))        ;this%h1D_SOL_RADN_col(:)=spval
   allocate(this%h1D_AIR_TEMP_col(beg_col:end_col))        ;this%h1D_AIR_TEMP_col(:)=spval
+  allocate(this%h1D_FreeNFix_col(beg_col:end_col))       ;this%h1D_FreeNFix_col(:)=spval
   allocate(this%h1D_PATM_col(beg_col:end_col))            ;this%h1D_PATM_col(:)=spval
   allocate(this%h1D_HUM_col(beg_col:end_col))             ;this%h1D_HUM_col(:)=spval
   allocate(this%h1D_WIND_col(beg_col:end_col))            ;this%h1D_WIND_col(:)=spval
@@ -712,6 +725,7 @@ implicit none
   allocate(this%h1D_ECO_Heat2G_col(beg_col:end_col))           ;this%h1D_ECO_Heat2G_col(:)=spval
   allocate(this%h1D_O2_LITR_col(beg_col:end_col))         ;this%h1D_O2_LITR_col(:)=spval
   allocate(this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc))         ;this%h1D_MIN_LWP_ptc(:)=spval
+  allocate(this%h1D_SLA_ptc(beg_ptc:end_ptc)); this%h1D_SLA_ptc(:)=spval
   allocate(this%h1D_CO2_SEMIS_FLX_col(beg_col:end_col))    ;this%h1D_CO2_SEMIS_FLX_col(:)=spval
   allocate(this%h1D_AR_SEMIS_FLX_col(beg_col:end_col))     ;this%h1D_AR_SEMIS_FLX_col(:)=spval
   allocate(this%h1D_ECO_CO2_FLX_col(beg_col:end_col))     ;this%h1D_ECO_CO2_FLX_col(:)=spval
@@ -788,9 +802,7 @@ implicit none
   allocate(this%h1D_TC_Groth_ptc(beg_ptc:end_ptc))        ;this%h1D_TC_Groth_ptc(:)=spval
   allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
-  allocate(this%h1D_SHOOTST_C_ptc(beg_ptc:end_ptc))       ;this%h1D_SHOOTST_C_ptc(:)=spval
-  allocate(this%h1D_SHOOTST_N_ptc(beg_ptc:end_ptc))       ;this%h1D_SHOOTST_N_ptc(:)=spval
-  allocate(this%h1D_SHOOTST_P_ptc(beg_ptc:end_ptc))       ;this%h1D_SHOOTST_P_ptc(:)=spval
+
   allocate(this%h1D_Plant_C_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_C_ptc(:)=spval
   allocate(this%h1D_frcPARabs_ptc(beg_ptc:end_ptc))       ;this%h1D_frcPARabs_ptc(:)=spval
   allocate(this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PAR_CAN_ptc(:)=spval
@@ -804,7 +816,10 @@ implicit none
   allocate(this%h1D_ROOTST_C_ptc(beg_ptc:end_ptc))        ;this%h1D_ROOTST_C_ptc(:)=spval  
   allocate(this%h1D_ROOTST_N_ptc(beg_ptc:end_ptc))        ;this%h1D_ROOTST_N_ptc(:)=spval  
   allocate(this%h1D_ROOTST_P_ptc(beg_ptc:end_ptc))        ;this%h1D_ROOTST_P_ptc(:)=spval      
-  allocate(this%h1D_NODULE_C_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_C_ptc(:)=spval
+  allocate(this%h1D_ShootNodule_C_ptc(beg_ptc:end_ptc))    ;this%h1D_ShootNodule_C_ptc(:)=spval
+  allocate(this%h1D_ShootNodule_N_ptc(beg_ptc:end_ptc))    ;this%h1D_ShootNodule_N_ptc(:)=spval
+  allocate(this%h1D_ShootNodule_P_ptc(beg_ptc:end_ptc))    ;this%h1D_ShootNodule_P_ptc(:)=spval      
+  allocate(this%h1D_RootNodule_C_ptc(beg_ptc:end_ptc))    ;this%h1D_RootNodule_C_ptc(:)=spval
   allocate(this%h1D_STORED_C_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_C_ptc(:)=spval
   allocate(this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc))        ;this%h1D_GRAIN_NO_ptc(:)=spval
   allocate(this%h1D_LAIb_ptc(beg_ptc:end_ptc))            ;this%h1D_LAIb_ptc(:)=spval
@@ -824,6 +839,7 @@ implicit none
   allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
   allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_OXY_STRESS_ptc(:)=spval
   allocate(this%h1D_VcMaxRubisco_ptc(beg_ptc:end_ptc))    ;this%h1D_VcMaxRubisco_ptc(:)=spval
+  allocate(this%h1D_LeafProteinCperm2_ptc(beg_ptc:end_ptc));this%h1D_LeafProteinCperm2_ptc(:)=spval
   allocate(this%h1D_VoMaxRubisco_ptc(beg_ptc:end_ptc))    ;this%h1D_VoMaxRubisco_ptc(:)=spval
   allocate(this%h1D_VcMaxPEP_ptc(beg_ptc:end_ptc))        ;this%h1D_VcMaxPEP_ptc(:)=spval
   allocate(this%h1D_JMaxPhoto_ptc(beg_ptc:end_ptc))       ;this%h1D_JMaxPhoto_ptc(:)=spval
@@ -846,7 +862,7 @@ implicit none
   allocate(this%h1D_HUSK_N_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_N_ptc(:)=spval
   allocate(this%h1D_GRAIN_N_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_N_ptc(:)=spval
   allocate(this%h1D_ROOT_N_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_N_ptc(:)=spval
-  allocate(this%h1D_NODULE_N_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_N_ptc(:)=spval
+  allocate(this%h1D_RootNodule_N_ptc(beg_ptc:end_ptc))        ;this%h1D_RootNodule_N_ptc(:)=spval
   allocate(this%h1D_STORED_N_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_N_ptc(:)=spval
   allocate(this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_N_FLX_ptc(:)=spval
   allocate(this%h1D_Uptk_N_Flx_ptc(beg_ptc:end_ptc))      ;this%h1D_Uptk_N_Flx_ptc(:)=spval
@@ -873,7 +889,7 @@ implicit none
   allocate(this%h1D_HUSK_P_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_P_ptc(:)=spval
   allocate(this%h1D_GRAIN_P_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_P_ptc(:)=spval
   allocate(this%h1D_ROOT_P_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_P_ptc(:)=spval
-  allocate(this%h1D_NODULE_P_ptc(beg_ptc:end_ptc))        ;this%h1D_NODULE_P_ptc(:)=spval
+  allocate(this%h1D_RootNodule_P_ptc(beg_ptc:end_ptc))        ;this%h1D_RootNodule_P_ptc(:)=spval
   allocate(this%h1D_STORED_P_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_P_ptc(:)=spval
   allocate(this%h1D_EXUD_P_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_P_FLX_ptc(:)=spval
   allocate(this%h1D_LITTERf_P_ptc(beg_ptc:end_ptc))       ;this%h1D_LITTERf_P_ptc(:)=spval
@@ -887,6 +903,11 @@ implicit none
   allocate(this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
+
+  allocate(this%h1D_LeafC3ChlCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafC3ChlCperm2LA_ptc=spval
+  allocate(this%h1D_LeafC4ChlCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafC4ChlCperm2LA_ptc=spval 
+  allocate(this%h1D_LeafRubiscoCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafRubiscoCperm2LA_ptc=spval
+  allocate(this%h1D_LeafPEPCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafPEPCperm2LA_ptc=spval    
 !  allocate(this%h1D_CFIX_lmtf_ptc(beg_ptc:end_ptc))        ;this%h1D_CFIX_lmtf_ptc(:)=spval
   allocate(this%h1D_MainBranchNO_ptc(beg_ptc:end_ptc))     ;this%h1D_MainBranchNO_ptc(:)=ispval
   allocate(this%h1D_RCanMaintDef_CO2_pft(beg_ptc:end_ptc)) ;this%h1D_RCanMaintDef_CO2_pft(:)=spval
@@ -895,6 +916,8 @@ implicit none
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
   allocate(this%h2D_tSOC_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr(:,:)=spval
+  allocate(this%h2D_POM_C_vr(beg_col:end_col,1:JZ)) ; this%h2D_POM_C_vr(:,:)=spval
+  allocate(this%h2D_MAOM_C_vr(beg_col:end_col,1:JZ)); this%h2D_MAOM_C_vr(:,:)=spval
   allocate(this%h2D_microbC_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbC_vr(:,:)=spval
   allocate(this%h2D_microbN_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbN_vr(:,:)=spval
   allocate(this%h2D_microbP_vr(beg_col:end_col,1:JZ))  ;this%h2D_microbP_vr(:,:)=spval    
@@ -1084,10 +1107,12 @@ implicit none
                                                              
   allocate(this%h2D_cPO4_vr(beg_col:end_col,1:JZ))       ;this%h2D_cPO4_vr(:,:)=spval
   allocate(this%h2D_cEXCH_P_vr(beg_col:end_col,1:JZ))    ;this%h2D_cEXCH_P_vr(:,:)=spval
+  allocate(this%h2D_microb_N2fix_vr(beg_col:end_col,1:JZ)); this%h2D_microb_N2fix_vr(:,:)=spval
   allocate(this%h2D_ElectricConductivity_vr(beg_col:end_col,1:JZ))       ;this%h2D_ElectricConductivity_vr(:,:)=spval
   allocate(this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
   allocate(this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMaintDef_CO2_pvr(:,:)=spval
+  allocate(this%h2D_RootSurfAreaPP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootSurfAreaPP_pvr(:,:)=spval
   allocate(this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTNLim_rpvr(:,:)=spval
   allocate(this%h2D_ROOTPLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTPLim_rpvr(:,:)=spval
   allocate(this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_ROOT_OSTRESS_pvr(:,:)=spval
@@ -1147,7 +1172,7 @@ implicit none
 
   data1d_ptr => this%h1D_tLITR_C_col(beg_col:end_col)   
   call hist_addfld1d(fname='tLITR_C_col',units='gC/m2',avgflag='A',&
-    long_name='column integrated total litter C',ptr_col=data1d_ptr)      
+    long_name='column integrated total (above+belowground) litter C',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tRAD_col(beg_col:end_col)
   call hist_addfld1d(fname='RADN_col',units='MJ/m2/hr',avgflag='A',&
@@ -1155,7 +1180,7 @@ implicit none
 
   data1d_ptr => this%h1D_tLITR_N_col(beg_col:end_col)      
   call hist_addfld1d(fname='tLITR_N_col',units='gN/m2',avgflag='A',&
-    long_name='column integrated total litter N',ptr_col=data1d_ptr)      
+    long_name='column integrated total (above+belowground) litter N',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RootAR_col(beg_col:end_col)
   call hist_addfld1d(fname='Root_AR_col',units='gC/m2/h',avgflag='A',&
@@ -1167,7 +1192,7 @@ implicit none
 
   data1d_ptr => this%h1D_tLITR_P_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITR_P_col',units='gP/m2',avgflag='A',&
-    long_name='column integrated total litter P',ptr_col=data1d_ptr,default='inactive')      
+    long_name='column integrated total (above+belowground) litter P',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_HUMUS_C_col(beg_col:end_col) 
   call hist_addfld1d(fname='HUMUS_C_col',units='gC/m2',avgflag='A',&
@@ -1195,15 +1220,15 @@ implicit none
 
   data1d_ptr => this%h1D_tLITRf_C_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITRf_C_col',units='gC/m2/hr',avgflag='A',&
-    long_name='Column-integrated total LitrFall C',ptr_col=data1d_ptr,default='inactive')
+    long_name='Column-integrated total (above+belowground) litrFall C flux',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_tLITRf_N_FLX_col(beg_col:end_col)  
   call hist_addfld1d(fname='tLITRf_N_FLX',units='gN/m2/hr',avgflag='A',&
-    long_name='Column-integrated total LitrFall N',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated total (above+belowground) litrFall N',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_tLITRf_P_FLX_col(beg_col:end_col) 
   call hist_addfld1d(fname='tLITRf_P',units='gP/m2/hr',avgflag='A',&
-    long_name='Column-integrated total LitrFall P',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Column-integrated total (above+belowground) litrFall P',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_tEXCH_PO4_col(beg_col:end_col)      
   call hist_addfld1d(fname='tEXCH_PO4_col',units='gP/m2',avgflag='A',&
@@ -1396,15 +1421,15 @@ implicit none
 
   data1d_ptr => this%h1D_OMC_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='Surf_LitrC_col',units='gC/m2',avgflag='A',&
-    long_name='total litter residual C, including microbes',ptr_col=data1d_ptr)            
+    long_name='Total surface litter C, including microbes',ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_OMN_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='Surf_LitrN_col',units='gN/m2',avgflag='A',&
-    long_name='total litter residual N, including microbes',ptr_col=data1d_ptr)      
+    long_name='Total surface litter N, including microbes',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_OMP_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='Surf_LitrP_col',units='gP/m2',avgflag='A',&
-    long_name='total litter residual P, including microbes',ptr_col=data1d_ptr,default='inactive')            
+    long_name='Total surface litter P, including microbes',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_ATM_CO2_col(beg_col:end_col)   
   call hist_addfld1d(fname='ATM_CO2_col',units='umol/mol',avgflag='A',&
@@ -1535,6 +1560,10 @@ implicit none
   call hist_addfld1d(fname='AIR_TEMP_col',units='oC',avgflag='A',&
     long_name='air temperature',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_FreeNFix_col(beg_col:end_col)      
+  call hist_addfld1d(fname='FreeNFix_col',units='gN/hr/m2',avgflag='A',&
+    long_name='N fixation by free-living microbes',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_PATM_col(beg_col:end_col)      
   call hist_addfld1d(fname='PATM_col',units='kPa',avgflag='A',&
     long_name='atmospheric pressure',ptr_col=data1d_ptr)      
@@ -1597,6 +1626,10 @@ implicit none
   data1d_ptr => this%h1D_MIN_LWP_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='MIN_LWP_pft',units='MPa',avgflag='A',&
     long_name='minimum daily canopy water potential',ptr_patch=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1D_SLA_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='SLA_pft',units='cm2 leaf (gC leaf)-1',avgflag='A',&
+    long_name='Specific leaf area',ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_CO2_SEMIS_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_SEMIS_FLX_col',units='umol C/m2/s',avgflag='A',&
@@ -2010,21 +2043,6 @@ implicit none
     long_name='Live plant shoot C',ptr_patch=data1d_ptr,&
     default='inactive')                  
 
-  data1d_ptr => this%h1D_SHOOTST_C_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='SHOOTST_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant shoot structural C',ptr_patch=data1d_ptr,&
-    default='inactive')                  
-
-  data1d_ptr => this%h1D_SHOOTST_N_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='SHOOTST_N_pft',units='gN/m2',avgflag='A',&
-    long_name='Plant shoot structural N',ptr_patch=data1d_ptr,&
-    default='inactive')                  
-
-  data1d_ptr => this%h1D_SHOOTST_P_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='SHOOTST_P_pft',units='gP/m2',avgflag='A',&
-    long_name='Plant shoot structural P',ptr_patch=data1d_ptr,&
-    default='inactive')                  
-
   data1d_ptr => this%h1D_frcPARabs_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='frcPARabs_pft',units='none',avgflag='A',&
     long_name='fraction of PAR absorbed by plant',ptr_patch=data1d_ptr,&
@@ -2065,7 +2083,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOT_C_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='Root_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant root C',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant root C, exluding nodule',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_ROOTST_C_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='RootST_C_pft',units='gC/m2',avgflag='A',&
@@ -2079,9 +2097,21 @@ implicit none
   call hist_addfld1d(fname='RootST_P_pft',units='gP/m2',avgflag='A',&
     long_name='Plant root structural P',ptr_patch=data1d_ptr,default='inactive')                  
 
-  data1d_ptr => this%h1D_NODULE_C_ptc(beg_ptc:end_ptc)      
-  call hist_addfld1d(fname='NODULE_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Root total nodule C',ptr_patch=data1d_ptr,default='inactive')                  
+  data1d_ptr => this%h1D_RootNodule_C_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='RootNodule_C_pft',units='gC/m2',avgflag='A',&
+    long_name='Root total nodule C',ptr_patch=data1d_ptr,default='inactive')     
+
+  data1d_ptr => this%h1D_ShootNodule_C_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='ShootNodule_C_pft',units='gC/m2',avgflag='A',&
+    long_name='Shoot total nodule C',ptr_patch=data1d_ptr,default='inactive')    
+
+  data1d_ptr => this%h1D_ShootNodule_N_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='ShootNodule_N_pft',units='gN/m2',avgflag='A',&
+    long_name='Shoot total nodule N',ptr_patch=data1d_ptr,default='inactive')    
+
+  data1d_ptr => this%h1D_ShootNodule_P_ptc(beg_ptc:end_ptc)      
+  call hist_addfld1d(fname='ShootNodule_P_pft',units='gP/m2',avgflag='A',&
+    long_name='Shoot total nodule P',ptr_patch=data1d_ptr,default='inactive')    
 
   data1d_ptr => this%h1D_STORED_C_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='SSTORED_C_pft',units='gC/m2',avgflag='A',&
@@ -2110,6 +2140,22 @@ implicit none
   data1d_ptr => this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOT_NONSTP_pft',units='gP/m2',avgflag='A',&
     long_name='Plant leaf storage of nonstructural P',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_LeafC3ChlCperm2LA_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafC3ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
+    long_name='Cholorophyll carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_LeafC4ChlCperm2LA_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafC4ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
+    long_name='chlorophyll carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_LeafRubiscoCperm2LA_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafRubisco_pft',units='gC rubisco m-2 leaf area',avgflag='A',&
+    long_name='Rubisco carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_LeafPEPCperm2LA_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafPEPC_pft',units='gC PEP m-2 leaf area',avgflag='A',&
+    long_name='PEP carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO_pft',units='1/m2',avgflag='A',&
@@ -2141,7 +2187,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='Plant_BALANCE_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant C balance?',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Cumulative plant C conservation error',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STANDING_DEAD_C_pft',units='gC/m2',avgflag='A',&
@@ -2182,22 +2228,27 @@ implicit none
     long_name='Plant root O2 stress indicator [0->1 weaker stress]',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_VcMaxRubisco_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='VcMax25C_RUBISCO_pft',units='umol s-1 m-2',avgflag='A',&
+  call hist_addfld1d(fname='VcMax25C_RUBISCO_pft',units='umol CO2 s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum carboxylation rate by Rubisco at 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
+  data1d_ptr => this%h1D_LeafProteinCperm2_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafProteinC_pft',units='gC protein m-2 leaf area',avgflag='A',&
+    long_name='Protein carbon mass per unit of leaf area',&
+    ptr_patch=data1d_ptr,default='inactive')
+
   data1d_ptr => this%h1D_VoMaxRubisco_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='VoMax25C_RUBISCO_pft',units='umol s-1 m-2',avgflag='A',&
+  call hist_addfld1d(fname='VoMax25C_RUBISCO_pft',units='umol O2 s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum oxygenation rate by Rubisco at 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_VcMaxPEP_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='VcMax25C_PEP_pft',units='umol s-1 m-2',avgflag='A',&
+  call hist_addfld1d(fname='VcMax25C_PEP_pft',units='umol CO2 s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum carboxylation rate by PEP at 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_JMaxPhoto_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='JMax25C_photo_pft',units='umol e- s-1 m-2',avgflag='A',&
+  call hist_addfld1d(fname='JMax25C_photo_pft',units='umol e- s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum electron transport rate at 25oC',&
     ptr_patch=data1d_ptr,default='inactive')      
 
@@ -2280,8 +2331,8 @@ implicit none
   call hist_addfld1d(fname='Root_N_pft',units='gN/m2',avgflag='A',&
     long_name='Root nitrogen',ptr_patch=data1d_ptr,default='inactive')                  
 
-  data1d_ptr => this%h1D_NODULE_N_ptc(beg_ptc:end_ptc)        
-  call hist_addfld1d(fname='NODULE_N_pft',units='gN/m2',avgflag='A',&
+  data1d_ptr => this%h1D_RootNodule_N_ptc(beg_ptc:end_ptc)        
+  call hist_addfld1d(fname='RootNodule_N_pft',units='gN/m2',avgflag='A',&
     long_name='Root total nodule N',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_STORED_N_ptc(beg_ptc:end_ptc)  
@@ -2331,8 +2382,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='Plant_BALANCE_N_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant N balance?',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Cumulative plant N conservation error',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_STANDING_DEAD_N_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STANDING_DEAD_N_pft',units='gN/m2',avgflag='A',&
@@ -2404,8 +2454,8 @@ implicit none
     long_name='Plant root P',ptr_patch=data1d_ptr,&
     default='inactive')            
 
-  data1d_ptr => this%h1D_NODULE_P_ptc(beg_ptc:end_ptc)       
-  call hist_addfld1d(fname='NODULE_P_pft',units='gP/m2',avgflag='A',&
+  data1d_ptr => this%h1D_RootNodule_P_ptc(beg_ptc:end_ptc)       
+  call hist_addfld1d(fname='RootNodule_P_pft',units='gP/m2',avgflag='A',&
     long_name='Root total nodule P',ptr_patch=data1d_ptr,&
     default='inactive')            
 
@@ -2456,8 +2506,7 @@ implicit none
 
   data1d_ptr => this%h1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='Plant_BALANCE_P_pft',units='gP/m2',avgflag='A',&
-    long_name='Plant P balance?',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Cumulative plant P conservation error',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_STANDING_DEAD_P_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='STANDING_DEAD_P_pft',units='gP/m2',avgflag='A',&
@@ -2469,7 +2518,7 @@ implicit none
     long_name='Plant PO4 emission from fire',ptr_patch=data1d_ptr,&
     default='inactive')            
 
-  data1d_ptr => this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc)         !SurfLitrfalStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+  data1d_ptr => this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc)         !SurfLitrfallElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
   call hist_addfld1d(fname='SURF_LITRf_P_FLX_pft',units='gP/m2/hr',avgflag='A',&
     long_name='Plant LitrFall P to the soil surface',ptr_patch=data1d_ptr,&
     default='inactive')            
@@ -2525,6 +2574,16 @@ implicit none
   data2d_ptr => this%h2D_tSOC_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='tSOC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved total soil organic C (everything organic)',&
+    ptr_col=data2d_ptr)       
+
+  data2d_ptr => this%h2D_POM_C_vr(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='POM_C_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved particulate organic C (resulting from the humification process)',&
+    ptr_col=data2d_ptr)       
+
+  data2d_ptr => this%h2D_MAOM_C_vr(beg_col:end_col,1:JZ)      
+  call hist_addfld2d(fname='MAOM_C_vr',units='gC (kg soil)-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved mineral associated organic C (resulting from sorption process)',&
     ptr_col=data2d_ptr)       
 
   data2d_ptr => this%h2D_microbC_vr(beg_col:end_col,1:JZ)       
@@ -2692,11 +2751,11 @@ implicit none
 
   data2d_ptr =>  this%h2D_RootRadialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='KH2ORadial_pvr',units='m H2O h-1 MPa-1',type2d='levsoi',avgflag='A',&
-    long_name='Radial root conductance for water uptake by different pft',ptr_patch=data2d_ptr)       
+    long_name='Radial root conductance for water uptake',ptr_patch=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_RootAxialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='KH2OAxial_pvr',units='m3 H2O h-1 MPa-1',type2d='levsoi',avgflag='A',&
-    long_name='Axial root conductance for water uptake by different pft',ptr_patch=data2d_ptr)       
+    long_name='Axial root conductance for water uptake',ptr_patch=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_VmaxNH4Root_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='VmaxNH4Root_pvr',units='umolN h-1 (gC root)-1',type2d='levsoi',avgflag='A',&
@@ -3106,7 +3165,7 @@ implicit none
 
   data2d_ptr =>  this%h2D_MicroBiomeE_litr_col(beg_col:end_col,1:NumPlantChemElms)
   call hist_addfld2d(fname='MicroBiomE_litr',units='g/m2',type2d='elements',avgflag='A',&
-    long_name='Total micorobial elemental biomass in litter',ptr_col=data2d_ptr,default='inactive')       
+    long_name='Total micorobial elemental biomass in litter',ptr_col=data2d_ptr)
 
   data2d_ptr =>  this%h2D_AeroHrBactE_litr_col(beg_col:end_col,1:NumPlantChemElms)
   call hist_addfld2d(fname='Aerobic_HetrBacterE_litr',units='g/m2',type2d='elements',avgflag='A',&
@@ -3200,6 +3259,10 @@ implicit none
   call hist_addfld2d(fname='cEXCH_P_vr',units='gP/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='total exchangeable soil PO4 concentration',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_microb_N2fix_vr(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='Free_N2Fix_vr',units='ugN/m3 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Free dizotrophic N2 fixation in soil',ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_TEMP_vr(beg_col:end_col,1:JZ)  
   call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='levsoi',avgflag='X',&
     long_name='Soil maximum temperature profile',ptr_col=data2d_ptr,default='inactive')       
@@ -3264,6 +3327,10 @@ implicit none
   data2d_ptr => this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='RootMaintDef_CO2_pvr',units='g CO2 m-2 h-1',type2d='levsoi',avgflag='A',&
     long_name='Plant root maintenance deficit each pft (<0 deficit)',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootSurfAreaPP_pvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='RootSurfAreaPP_pvr',units='m2 surface',type2d='levsoi',avgflag='A',&
+    long_name='Root surface area per plant (for nutrient uptake)',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='RootNlim_pvr',units='-',type2d='levsoi',avgflag='A',&
@@ -3331,7 +3398,7 @@ implicit none
 
   data2d_ptr => this%h2D_DNS_RT_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootLDS_pvr',units='cm/cm3',type2d='levsoi',avgflag='A',&
-    long_name='Root layer length density',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root length density (including root hair)',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootNutupk_fClim_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootNutUptk_fClim_pvr',units='-',type2d='levsoi',avgflag='A',&
@@ -3395,6 +3462,7 @@ implicit none
 
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
+      
       ncol=get_col(NY,NX)
       this%h1D_cumFIRE_CO2_col(ncol)        =  CO2byFire_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_cumFIRE_CH4_col(ncol)        =  CH4byFire_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3648,6 +3716,7 @@ implicit none
       this%h1D_tDON_soil_col(ncol)=0._r8
       this%h1D_tDOP_soil_col(ncol)=0._r8            
       this%h1D_tAcetate_soil_col(ncol)=0._r8      
+      this%h1D_FreeNFix_col(ncol)=Micb_N2Fixation_vr(0,NY,NX)
       DO L=1,JZ        
         call SumSolidOML(ielmc,L,NY,NX,SOMC)
         DO jj=1,jcplx
@@ -3669,12 +3738,9 @@ implicit none
         this%h2D_Gchem_CO2_prod_vr(ncol,L)= TProd_CO2_geochem_soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         
         if(DVOLL<=1.e-8_r8)cycle
-        this%h2D_RootMassC_vr(ncol,L)     = RootMycoMassElm_vr(ielmc,ipltroot,L,NY,NX)/DVOLL
-        this%h2D_RootMassN_vr(ncol,L)     = RootMycoMassElm_vr(ielmn,ipltroot,L,NY,NX)/DVOLL
-        this%h2D_RootMassP_vr(ncol,L)     = RootMycoMassElm_vr(ielmp,ipltroot,L,NY,NX)/DVOLL                
 
         call sumDOML(L,NY,NX,DOM)
-        call sumMicBiomLayL(L,NY,NX,micBE)    
+        call sumMicBiomLayL(L,NY,NX,micBE,I,J)    
         this%h1D_tDOC_soil_col(ncol)=this%h1D_tDOC_soil_col(ncol)+DOM(idom_doc)
         this%h1D_tDON_soil_col(ncol)=this%h1D_tDON_soil_col(ncol)+DOM(idom_don)
         this%h1D_tDOP_soil_col(ncol)=this%h1D_tDOP_soil_col(ncol)+DOM(idom_dop)
@@ -3690,6 +3756,8 @@ implicit none
         this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_litrP_vr(ncol,L)           = litrOM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_tSOC_vr(ncol,L)            = SoilOrgM_vr(ielmc,L,NY,NX)/DVOLL
+        this%h2D_POM_C_vr(ncol,L)           = 1.e-3_r8*sum(SolidOM_vr(ielmc,:,micpar%k_POM,L,NY,NX))/VLSoilMicPMass_vr(L,NY,NX)
+        this%h2D_MAOM_C_vr(ncol,L)          = 1.e-3_r8*(sum(SorbedOM_vr(idom_doc,:,L,NY,NX))+sum(SorbedOM_vr(idom_acetate,:,L,NY,NX)))/VLSoilMicPMass_vr(L,NY,NX)
         this%h2D_microbC_vr(ncol,L)         =  micBE(ielmc)/DVOLL
         this%h2D_microbN_vr(ncol,L)         =  micBE(ielmn)/DVOLL
         this%h2D_microbP_vr(ncol,L)         =  micBE(ielmp)/DVOLL
@@ -3739,7 +3807,9 @@ implicit none
         this%h2D_cEXCH_P_vr(ncol,L)= patomw*safe_adb(trcx_solml_vr(idx_HPO4,L,NY,NX)+trcx_solml_vr(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml_vr(idx_HPO4B,L,NY,NX)+trcx_solml_vr(idx_H2PO4B,L,NY,NX),&
                                                VLSoilMicPMass_vr(L,NY,NX))
-        this%h2D_ElectricConductivity_vr(ncol,L)     = ElectricConductivity_vr(L,NY,NX)
+        this%h2D_microb_N2fix_vr(ncol,L)         = 1.e6_r8*Micb_N2Fixation_vr(L,NY,NX)/DVOLL
+        this%h1D_FreeNFix_col(ncol)              = this%h1D_FreeNFix_col(ncol)+ Micb_N2Fixation_vr(L,NY,NX)
+        this%h2D_ElectricConductivity_vr(ncol,L) = ElectricConductivity_vr(L,NY,NX)
         
         this%h2D_HydCondSoil_vr(ncol,L) = HydCondSoil_3D(3,L,NY,NX)
 
@@ -3841,6 +3911,11 @@ implicit none
         this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RootAR2soil_vr(ncol,L)=-RootCO2Ar2Soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RootAR2Root_vr(ncol,L)=-RootCO2Ar2Root_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        if(plant_model)then
+          this%h2D_RootMassC_vr(ncol,L)     = RootMycoMassElm_vr(ielmc,ipltroot,L,NY,NX)/DVOLL
+          this%h2D_RootMassN_vr(ncol,L)     = RootMycoMassElm_vr(ielmn,ipltroot,L,NY,NX)/DVOLL
+          this%h2D_RootMassP_vr(ncol,L)     = RootMycoMassElm_vr(ielmp,ipltroot,L,NY,NX)/DVOLL                
+        endif
       ENDDO
       this%h1D_RCH4Oxi_aero_col(ncol) = this%h1D_RCH4Oxi_aero_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RootAR_col(ncol)  = -RootCO2Autor_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
@@ -3860,7 +3935,13 @@ implicit none
           this%h1D_dCAN_GPP_eLIM_ptc(nptc) = AZERO(CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         endif
 
+        this%h1D_LeafC3ChlCperm2LA_ptc(nptc)   = LeafC3ChlCperm2LA_pft(NZ,NY,NX)*1.e3_r8
+        this%h1D_LeafC4ChlCperm2LA_ptc(nptc)   = LeafC4ChlCperm2LA_pft(NZ,NY,NX)*1.e3_r8
+        this%h1D_LeafRubiscoCperm2LA_ptc(nptc) = LeafRubiscoCperm2LA_pft(NZ,NY,NX)
+        this%h1D_LeafPEPCperm2LA_ptc(nptc)     = LeafPEPCperm2LA_pft(NZ,NY,NX)
+
         this%h1D_MIN_LWP_ptc(nptc)      = PSICanPDailyMin_pft(NZ,NY,NX)
+        this%h1D_SLA_ptc(nptc)          = 1.e4_r8*SpecificLeafArea_pft(NZ,NY,NX)        
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3899,7 +3980,6 @@ implicit none
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)
         this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
-        this%h1D_SHOOTST_C_ptc(nptc)     = ShootStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)       = (ShootElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3914,7 +3994,11 @@ implicit none
         this%h1D_ROOTST_C_ptc(nptc)      = RootStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_ROOTST_N_ptc(nptc)      = RootStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_ROOTST_P_ptc(nptc)      = RootStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
-        this%h1D_NODULE_C_ptc(nptc)      = NodulStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RootNodule_C_ptc(nptc)  = RootNoduleElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_ShootNodule_C_ptc(nptc)  = ShootNoduleElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_ShootNodule_N_ptc(nptc)  = ShootNoduleElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_ShootNodule_P_ptc(nptc)  = ShootNoduleElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+
         this%h1D_STORED_C_ptc(nptc)      = SeasonalNonstElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_GRAIN_NO_ptc(nptc)      = CanopySeedNum_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_LAIb_ptc(nptc)          = CanopyLeafArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3925,9 +4009,9 @@ implicit none
         this%h1D_HVST_C_FLX_ptc(nptc)       = EcoHavstElmnt_CumYr_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_HVST_N_FLX_ptc(nptc)       = EcoHavstElmnt_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_HVST_P_FLX_ptc(nptc)       = EcoHavstElmnt_CumYr_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_PLANT_BALANCE_C_ptc(nptc)  = ElmBalanceCum_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_PLANT_BALANCE_N_ptc(nptc)  = ElmBalanceCum_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_PLANT_BALANCE_P_ptc(nptc)  = ElmBalanceCum_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_PLANT_BALANCE_C_ptc(nptc)  = PlantElmBalCum_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_PLANT_BALANCE_N_ptc(nptc)  = PlantElmBalCum_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_PLANT_BALANCE_P_ptc(nptc)  = PlantElmBalCum_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_C_ptc(nptc)  = StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_CO2_FLX_ptc(nptc)    = CO2ByFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_CH4_FLX_ptc(nptc)    = CH4ByFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3936,7 +4020,7 @@ implicit none
         this%h1D_POPN_ptc(nptc)             = PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)         = -ETCanopy_CumYr_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_WTR_STRESS_ptc(nptc)       = HoursTooLowPsiCan_pft(NZ,NY,NX)
-
+        this%h1D_LeafProteinCperm2_ptc(nptc)=LeafProteinCperm2LA_pft(NZ,NY,NX)
         this%h1D_VcMaxRubisco_ptc(nptc) = CanopyVcMaxRubisco25C_pft(NZ,NY,NX)
         this%h1D_VoMaxRubisco_ptc(nptc) = CanopyVoMaxRubisco25C_pft(NZ,NY,NX)
         this%h1D_VcMaxPEP_ptc(nptc)     = CanopyVcMaxPEP25C_pft(NZ,NY,NX)
@@ -3952,7 +4036,6 @@ implicit none
         this%h1D_fClump_ptc(nptc)  = ClumpFactorNow_pft(NZ,NY,NX)
         this%h1D_LeafAreaSunlit_ptc(nptc)=LeafAreaSunlit_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress_pft(NZ,NY,NX)
-        this%h1D_SHOOTST_N_ptc(nptc)    = ShootStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SHOOT_N_ptc(nptc)      = ShootElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
         this%h1D_Plant_N_ptc(nptc)      = (ShootElms_pft(ielmn,NZ,NY,NX)&
           +RootElms_pft(ielmn,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3964,7 +4047,7 @@ implicit none
           +EarStrutElms_pft(ielmn,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_GRAIN_N_ptc(nptc)          = GrainStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_ROOT_N_ptc(nptc)           = RootElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_NODULE_N_ptc(nptc)         = NodulStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RootNodule_N_ptc(nptc)     = RootNoduleElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STORED_N_ptc(nptc)         = SeasonalNonstElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Uptk_N_Flx_ptc(nptc)       = RootUptk_N_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3976,7 +4059,6 @@ implicit none
         this%h1D_STANDING_DEAD_N_ptc(nptc)  = StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_N_FLX_ptc(nptc)      = NH3byFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_N_FLX_ptc(nptc) = SurfLitrfalStrutElms_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_SHOOTST_P_ptc(nptc)        = ShootStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SHOOT_P_ptc(nptc)          = ShootElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_P_ptc(nptc)          = (ShootElms_pft(ielmp,NZ,NY,NX) &
           +RootElms_pft(ielmp,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)        
@@ -3990,7 +4072,7 @@ implicit none
           +EarStrutElms_pft(ielmp,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_GRAIN_P_ptc(nptc)          = GrainStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_ROOT_P_ptc(nptc)           = RootElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_NODULE_P_ptc(nptc)         = NodulStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RootNodule_P_ptc(nptc)     = RootNoduleElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STORED_P_ptc(nptc)         = SeasonalNonstElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_P_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_LITRf_P_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4066,6 +4148,7 @@ implicit none
           this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)
           this%h2D_fRootGrowPSISense_pvr(nptc,L) = fRootGrowPSISense_pvr(ipltroot,L,NZ,NY,NX)
 
+          this%h2D_RootSurfAreaPP_pvr(nptc,L) = RootAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)  
           this%h2D_ROOT_OSTRESS_pvr(nptc,L) = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_PSI_RT_pvr(nptc,L)       = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
           this%h2D_RootH2OUptkStress_pvr(nptc,L)=RootH2OUptkStress_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
