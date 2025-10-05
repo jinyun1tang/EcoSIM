@@ -3,6 +3,7 @@ module MicBGCPars
 ! define microbial parameters
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
+  use ElmIDMod
   use EcoSIMConfig
 implicit none
   private
@@ -286,7 +287,7 @@ contains
     ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
     ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))
 
-  !SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*5._r8
+  SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
 
   CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
   CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
@@ -326,52 +327,52 @@ contains
     DO  N=1,this%NumMicbFunGrupsPerCmplx
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
         DO NGL=this%JGniH(n),this%JGnfH(n)
-          rNCOMC(1,NGL,K)=0.15_r8           !maximum
-          rNCOMC(2,NGL,K)=0.09_r8           !minimum
-          rPCOMC(1,NGL,K)=0.015_r8
-          rPCOMC(2,NGL,K)=0.009_r8
+          rNCOMC(ibiom_kinetic,NGL,K) = 0.15_r8           !maximum
+          rNCOMC(ibiom_struct,NGL,K) = 0.09_r8           !maximum
+          rPCOMC(ibiom_kinetic,NGL,K) = 0.015_r8
+          rPCOMC(ibiom_struct,NGL,K) = 0.009_r8
         ENDDO
-        this%rNCOMC_ave(1,N,K)=0.15_r8           !maximum
-        this%rNCOMC_ave(2,N,K)=0.09_r8           !minimum
-        this%rPCOMC_ave(1,N,K)=0.015_r8
-        this%rPCOMC_ave(2,N,K)=0.009_r8
+        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.15_r8           !maximum of
+        this%rNCOMC_ave(ibiom_struct,N,K)=0.09_r8            !maximum of 
+        this%rPCOMC_ave(ibiom_kinetic,N,K)=0.015_r8
+        this%rPCOMC_ave(ibiom_struct,N,K)=0.009_r8
       ELSE
         do NGL=this%JGniH(n),this%JGnfH(n)
-          rNCOMC(1,NGL,K)=0.225_r8
-          rNCOMC(2,NGL,K)=0.135_r8
-          rPCOMC(1,NGL,K)=0.0225_r8
-          rPCOMC(2,NGL,K)=0.0135_r8
+          rNCOMC(ibiom_kinetic,NGL,K)=0.225_r8
+          rNCOMC(ibiom_struct,NGL,K)=0.135_r8
+          rPCOMC(ibiom_kinetic,NGL,K)=0.0225_r8
+          rPCOMC(ibiom_struct,NGL,K)=0.0135_r8
         enddo
-        this%rNCOMC_ave(1,N,K)=0.225_r8
-        this%rNCOMC_ave(2,N,K)=0.135_r8
-        this%rPCOMC_ave(1,N,K)=0.0225_r8
-        this%rPCOMC_ave(2,N,K)=0.0135_r8
+        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.225_r8
+        this%rNCOMC_ave(ibiom_struct,N,K)=0.135_r8
+        this%rPCOMC_ave(ibiom_kinetic,N,K)=0.0225_r8
+        this%rPCOMC_ave(ibiom_struct,N,K)=0.0135_r8
       ENDIF
       do NGL=this%JGniH(n),this%JGnfH(n)
-        rNCOMC(3,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
-        rPCOMC(3,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
+        rNCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
+        rPCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
       enddo
-      this%rNCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
-      this%rPCOMC_ave(3,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
+      this%rNCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
+      this%rPCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
     enddo
   ENDDO D95
   DO  N=1,this%NumMicbFunGrupsPerCmplx
     do NGL=this%JGniA(n),this%JGnfA(n)
-      rNCOMCAutor(1,NGL)=0.225_r8
-      rNCOMCAutor(2,NGL)=0.135_r8
-      rPCOMCAutor(1,NGL)=0.0225_r8
-      rPCOMCAutor(2,NGL)=0.0135_r8
+      rNCOMCAutor(ibiom_kinetic,NGL) = 0.225_r8
+      rNCOMCAutor(ibiom_struct,NGL)  = 0.135_r8
+      rPCOMCAutor(ibiom_kinetic,NGL) = 0.0225_r8
+      rPCOMCAutor(ibiom_struct,NGL)  = 0.0135_r8
     enddo
-    this%rNCOMCAutor_ave(1,N)=0.225_r8
-    this%rNCOMCAutor_ave(2,N)=0.135_r8
-    this%rPCOMCAutora_ave(1,N)=0.0225_r8
-    this%rPCOMCAutora_ave(2,N)=0.0135_r8
+    this%rNCOMCAutor_ave(ibiom_kinetic,N)=0.225_r8
+    this%rNCOMCAutor_ave(ibiom_struct,N)=0.135_r8
+    this%rPCOMCAutora_ave(ibiom_kinetic,N)=0.0225_r8
+    this%rPCOMCAutora_ave(ibiom_struct,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
-      rNCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
-      rPCOMCAutor(3,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
+      rNCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
+      rPCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCAutor_ave(3,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
-    this%rPCOMCAutora_ave(3,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
+    this%rNCOMCAutor_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
+    this%rPCOMCAutora_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
   enddo
 
   end associate

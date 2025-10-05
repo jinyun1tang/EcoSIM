@@ -9,6 +9,11 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: NumPlantChemElms=3   !totally three elements
+! biomass component ids for microbes
+  integer, parameter :: ibiom_kinetic = 1
+  integer, parameter :: ibiom_struct  = 2
+  integer, parameter :: ibiom_reserve = 3
+
 ! erosion model options
   integer, parameter :: ieros_noaction       = -1
   integer, parameter :: ieros_frzthawelv     = 0
@@ -32,10 +37,10 @@ implicit none
   integer, parameter :: isoi_set   = 0
   integer, parameter :: isoi_unset = 1
 ! plant harvest
-  integer, parameter :: iplthvst_leaf=1 !leaf
+  integer, parameter :: iplthvst_leaf       =1 !leaf
   integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
-  integer, parameter :: iplthvst_woody=3 !woody
-  integer, parameter :: iplthvst_stdead=4 !standing dead
+  integer, parameter :: iplthvst_woody      =3 !woody
+  integer, parameter :: iplthvst_stdead     =4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3
@@ -92,8 +97,6 @@ implicit none
   integer, parameter :: jharvtyp_terminate = 1
   integer, parameter :: jharvtyp_tmareseed = 2
 
-  integer, parameter :: ihav_pft = 1
-  integer, parameter :: ihav_eco = 2
   integer, parameter :: iharvtyp_none    = 0
   integer, parameter :: iharvtyp_grain   = 1
   integer, parameter :: iharvtyp_allabv  = 2

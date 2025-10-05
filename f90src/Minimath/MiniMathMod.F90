@@ -28,6 +28,7 @@ module minimathmod
   public :: flux_mass_limiter
   public :: AZERO,AZERO1  
   public :: SubstrateLimit
+  public :: real_truncate
   public :: SubstrateDribbling
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
@@ -212,7 +213,7 @@ module minimathmod
   real(r8), intent(in) :: val
   real(r8), optional, intent(in) :: tiny1
   real(r8) :: ans
-  real(r8), parameter :: tiny_val1=1.e-10_r8
+  real(r8), parameter :: tiny_val1=1.e-11_r8
   real(r8) :: tiny  
   if(present(tiny1))then
     tiny=tiny1
@@ -402,7 +403,7 @@ module minimathmod
   implicit none
   real(r8), intent(inout) :: mass
   real(r8), intent(inout) :: consum_flux
-  integer, optional, intent(in) :: dsgn
+  integer, optional, intent(in) :: dsgn  !sign of consumption flux
   integer :: dsgnl
 
   dsgnl=1
@@ -414,16 +415,18 @@ module minimathmod
   !return for zero flux
   if(isclose(consum_flux,0._r8))return
 
-  !udpate as mass=mass-flux
+  
   if(dsgnl>0)then  
+    !udpate as mass=mass-flux
     if(mass<consum_flux)then
       consum_flux = mass
       mass        = 0._r8
     else
       mass=mass-consum_flux  
     endif
-  !update as mass=mass+flux
+    
   else  
+    !update as mass=mass+flux
     if(mass<-consum_flux)then  
       consum_flux = -mass
       mass        = 0._r8
@@ -570,5 +573,18 @@ module minimathmod
   endif
   
   end subroutine SubstrateDribbling_vec
+!------------------------------------------------------------------------
+
+  pure function real_truncate(val,precision)result(ans)
+  !
+  !truncate val to precision
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: precision
+  real(r8) :: ans
+
+  ans=aint(val/precision)*precision
+
+  end function real_truncate
 
 end module minimathmod

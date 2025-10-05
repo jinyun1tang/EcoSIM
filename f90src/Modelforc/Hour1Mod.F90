@@ -227,12 +227,12 @@ module Hour1Mod
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
-!     NIXBotRootLayer_rpft=number of lowest rooted layer
+!     NIXBotRootLayer_raxes=number of lowest rooted layer
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         NMaxRootBotLayer_pft(NZ,NY,NX) = MAX(NMaxRootBotLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         DO  NR=1,NumCanopyLayers
-          NIXBotRootLayer_rpft(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_rpft(NR,NZ,NY,NX),NU_col(NY,NX))
+          NIXBotRootLayer_raxes(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_raxes(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
 
@@ -689,7 +689,7 @@ module Hour1Mod
   
 !     begin_execution
   call PrintInfo('beg '//subname)
-  RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
+  RootCO2AutorPrev_col(NY,NX)        = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
   trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
   trcg_snowMassloss_col(:,NY,NX)     = 0._r8
@@ -698,7 +698,8 @@ module Hour1Mod
   DOM_draing_col(:,:,NY,NX)          = 0._r8
   trcs_drainage_flx_col(:,NY,NX)     = 0._r8
   DOM_SurfRunoff_flx_col(:,:,NY,NX)  = 0._r8
-
+  RootRadialKond2H2O_pvr(:,:,:,NY,NX)= 0._r8
+  RootAxialKond2H2O_pvr(:,:,:,NY,NX) =0._r8
   trcn_snowMassloss_col(:,NY,NX)                  = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)                   = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
@@ -750,6 +751,7 @@ module Hour1Mod
   trcn_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
   trcn_AquaADV_Snow2Band_flx(:,NY,NX)             = 0._r8
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
+  SpecificLeafArea_pft(:,NY,NX)                   = 0._r8
   RootCO2Ar2Soil_col(NY,NX)                       = 0._r8
   RootCO2Ar2Root_col(NY,NX)                       = 0._r8
   GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
@@ -1624,7 +1626,8 @@ module Hour1Mod
 !     VLitR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-  real(r8) :: VWatLitRHoldCapcity0,VLitR0
+  real(r8) :: VWatLitRHoldCapcity0     !litter water holding capacity
+  real(r8) :: VLitR0                   !litter volume
   integer  :: K
 
   DO  NX=NHW,NHE
@@ -1632,8 +1635,8 @@ module Hour1Mod
       VWatLitRHoldCapcity0 = 0._r8
       VLitR0               = 0._r8
       DO K=1, micpar%NumOfLitrCmplxs
-        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*RC0_col(K,NY,NX)
-        VLitR0               = VLitR0+RC0_col(K,NY,NX)/BulkDensLitR(K)
+        VWatLitRHoldCapcity0 = VWatLitRHoldCapcity0+THETRX(K)*SurfLitterC_col(K,NY,NX)
+        VLitR0               = VLitR0+SurfLitterC_col(K,NY,NX)/BulkDensLitR(K)
       ENDDO
 
       VWatLitRHoldCapcity_col(NY,NX) = AZMAX1(VWatLitRHoldCapcity0)

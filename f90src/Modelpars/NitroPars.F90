@@ -135,11 +135,11 @@ module NitroPars
   DCKML  = 1.0E+03_r8
   VMXO   = 0.125_r8
   VMXF   = 0.125_r8
-  VMXCH4gAcet   = 0.125_r8*0.125_r8 !acetoclastic methanogenesis
+  VMXCH4gAcet     = 0.125_r8*0.125_r8 !acetoclastic methanogenesis
+  VMXCH4gH2       = 0.125_r8*0.125_r8 !hydrogenotrophic methanogenesis
   VMXNH3Oxi       = 0.375_r8
   VMXNO2Oxi       = 0.25_r8
   VMXCH4OxiAero  = 0.375_r8
-  VMXCH4gH2       = 0.125_r8*0.125_r8 !hydrogenotrophic methanogenesis
   OQKM       = 1.2E+01_r8
   OQKA       = 1.2E+01_r8
   OQKAM      = 1.2E+01_r8
@@ -201,8 +201,8 @@ module NitroPars
   SPOHA = 0.25_r8
   RMOM  = 0.010_r8
 
-  SPORC = (/7.5_r8,1.5_r8/)                               !hydrolysis of microbial residue
-  SPOMC = (/1.0E-02_r8,0.1E-02_r8/)                       !basal mortality rates
+  SPORC = (/7.5_r8,1.5_r8/)                                 !hydrolysis rate of microbial residue
+  SPOMC = (/1.0E-02_r8,0.1E-02_r8/)                         !basal mortality rates
   EN2F  = (/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y/)
   EFIRE = reshape((/1.0_r8,1.0_r8,0.917_r8,0.167_r8/),shape(EFIRE))
 

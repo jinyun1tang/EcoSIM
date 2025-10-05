@@ -22,7 +22,7 @@ implicit none
   PUBLIC :: CalcSoilWatPotential
   public :: SetDeepSoil
   public :: CalcSoilThermConductivity
-
+  public :: get_Tfrez
   contains
 !------------------------------------------------------------------------------------------
   subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
@@ -207,4 +207,20 @@ implicit none
     TCND1=0.0_r8
   ENDIF
   end subroutine CalcSoilThermConductivity
+!------------------------------------------------------------------------------------------
+
+  pure function get_Tfrez(PSI)result(TFREEZ)
+  !
+  !computing freezing temeprature after considering depression.
+  !apply the Clausis-Clapeyron equation for depressed freezing temperature, 
+  !Cary and Mayland (1972), 9.0959E+04_r8~=273.15*LtHeatIceMelt  
+
+  implicit none
+  REAL(R8), intent(in) :: PSI   !matric pressure, [MPa]
+  real(r8) :: TFREEZ
+
+  !-5.5_r8 is used for numerical stability
+  TFREEZ  = -9.0959E+04_r8/(AMAX1(PSI,-5.5_r8)-LtHeatIceMelt)
+
+  END function get_Tfrez  
 end  module SoilPhysParaMod

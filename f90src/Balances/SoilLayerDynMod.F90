@@ -1082,7 +1082,7 @@ implicit none
           Root1stRadius_pvr(N,L1,NZ,NY,NX)       = Root1stRadius_pvr(N,L1,NZ,NY,NX)+FX*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX)       = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)       = Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)       = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX) = RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX)+FX*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1256,7 +1256,7 @@ implicit none
           Root1stRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
           RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)=FY*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1473,9 +1473,9 @@ implicit none
           RootAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_pvr
           RootAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_pvr
 
-          FXRTLGA                          = FRO*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX) = Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)+FXRTLGA
-          Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX) = Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)-FXRTLGA
+          FXRTLGA                          = FRO*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX) = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FXRTLGA
+          Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX) = Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)-FXRTLGA
         ENDDO
 !
 !     ROOT NODULES

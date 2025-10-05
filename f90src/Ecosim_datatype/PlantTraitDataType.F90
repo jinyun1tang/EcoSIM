@@ -14,8 +14,8 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootLeafElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootPetolElmAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracShootLeafAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
@@ -51,7 +51,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                  !branch height, [m]
-  real(r8),target,allocatable ::  SeedNumSet_brch(:,:,:,:)                   !branch grain number, [d-2]
+  real(r8),target,allocatable ::  SeedSitesSet_brch(:,:,:,:)                   !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
@@ -118,7 +118,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)              !hours above threshold temperature required for spring leafout/dehardening, [h]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                    !number of branches of the plant, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                     !main branch number, [-]
-  integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                  !branch number id, [-]
+  integer,target,allocatable ::  BranchNumerID_brch(:,:,:,:)                  !branch number id, [-]
   integer,target,allocatable ::  MainBranchNum_pft(:,:,:)                    !number of main branch, [-]
   integer,target,allocatable ::  Prep4Literfall_brch(:,:,:,:)                !branch phenology flag for senescence, [-]
   integer,target,allocatable ::  Hours4LiterfalAftMature_brch(:,:,:,:)       !hour counter for phenological senescence of a branch , [h]
@@ -146,7 +146,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                  !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                     !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                 !flag to detect canopy death , [-]
-  real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)             !maximum grain node number per branch, [-]
+  real(r8),target,allocatable ::  GrothStalkMaxSeedSites_pft(:,:,:)             !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)               !maximum grain number per node , [-]
   real(r8),target,allocatable ::  SeedCMassMax_pft(:,:,:)                    !maximum grain size   , [g]
   real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)          !number of nodes in seed, [-]
@@ -183,8 +183,8 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootPetolElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolElmAlloc2Litr=0._r8
-  allocate(FracShootLeafElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafElmAlloc2Litr=0._r8
+  allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
+  allocate(FracShootLeafAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafAlloc2Litr=0._r8
   allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
@@ -220,7 +220,7 @@ contains
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
-  allocate(SeedNumSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumSet_brch=0._r8
+  allocate(SeedSitesSet_brch(MaxNumBranches,JP,JY,JX)); SeedSitesSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
@@ -287,7 +287,7 @@ contains
   allocate(HourReq4LeafOut_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
-  allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
+  allocate(BranchNumerID_brch(MaxNumBranches,JP,JY,JX));  BranchNumerID_brch=0
   allocate(MainBranchNum_pft(JP,JY,JX));      MainBranchNum_pft=0
   allocate(Prep4Literfall_brch(MaxNumBranches,JP,JY,JX)); Prep4Literfall_brch=ifalse
   allocate(Hours4LiterfalAftMature_brch(MaxNumBranches,JP,JY,JX)); Hours4LiterfalAftMature_brch=0
@@ -315,7 +315,7 @@ contains
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
-  allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
+  allocate(GrothStalkMaxSeedSites_pft(JP,JY,JX));     GrothStalkMaxSeedSites_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(SeedCMassMax_pft(JP,JY,JX));     SeedCMassMax_pft=0._r8
   allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
@@ -351,7 +351,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootLeafElmAlloc2Litr)
+  call destroy(FracShootLeafAlloc2Litr)
   call destroy(FracRootElmAlloc2Litr)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
@@ -385,7 +385,7 @@ contains
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
-  call destroy(SeedNumSet_brch)
+  call destroy(SeedSitesSet_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
@@ -453,7 +453,7 @@ contains
   call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
-  call destroy(BranchNumber_brch)
+  call destroy(BranchNumerID_brch)
   call destroy(MainBranchNum_pft)
   call destroy(Prep4Literfall_brch)
   call destroy(Hours4LiterfalAftMature_brch)
@@ -481,7 +481,7 @@ contains
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)
   call destroy(iPlantShootState_pft)
-  call destroy(MaxPotentSeedNumber_pft)
+  call destroy(GrothStalkMaxSeedSites_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(SeedCMassMax_pft)
   call destroy(ShootNodeNumAtPlanting_pft)

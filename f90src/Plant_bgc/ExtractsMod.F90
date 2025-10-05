@@ -9,6 +9,7 @@ module ExtractsMod
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
   use EcoSIMCtrlMod, only: lverb, ldo_sp_mode
+  use DebugToolMod,  only: PrintInfo
   use EcosimConst
   use PlantBGCPars
   use PlantAPIData
@@ -27,9 +28,10 @@ module ExtractsMod
   implicit none
 
   integer, intent(in) :: I, J
+  character(len=*), parameter :: subname='extracts'
+  integer :: NZ,L
 
-  integer :: NZ
-
+  call PrintInfo('beg '//subname)
   call TotalLitrFall()
 
   call SumPlantRootGas(I,J)
@@ -48,6 +50,7 @@ module ExtractsMod
     ENDIF
   ENDDO
 
+  call PrintInfo('end '//subname)  
   RETURN
   END subroutine extracts
 
@@ -59,8 +62,8 @@ module ExtractsMod
   integer :: NZ,L,K,M
   integer :: NE
   associate(                                                          &
-    LitrfalStrutElms_pft      => plt_bgcr%LitrfalStrutElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
-    LitrfalStrutElms_pvr      => plt_bgcr%LitrfalStrutElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pft      => plt_bgcr%LitrfallElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
+    LitrfallElms_pvr      => plt_bgcr%LitrfallElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NP0                       => plt_site%NP0                        ,& !input  :intitial number of plant species,[-]
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     ,& !input  :standing dead element, [g d-2]
@@ -81,11 +84,11 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P LitrFall from grosub.f
 !   StandingDeadStrutElms_col=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   LitrfalStrutElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
+!   LitrfallElms_pvr,=cumulative PFT C,N,P LitrFall from grosub.f
 !   LitrfalStrutElms_vr,=cumulative total C,N,P LitrFall
 !
     DO NE=1,NumPlantChemElms
-      LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)+LitrfalStrutElms_pft(NE,NZ)
+      LitrFallStrutElms_col(NE)=LitrFallStrutElms_col(NE)+LitrfallElms_pft(NE,NZ)
       StandingDeadStrutElms_col(NE)=StandingDeadStrutElms_col(NE)+StandDeadStrutElms_pft(NE,NZ)
     ENDDO
 
@@ -93,9 +96,9 @@ module ExtractsMod
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO NE=1,NumPlantChemElms
           DO  M=1,pltpar%jsken
-            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfalStrutElms_pvr(NE,M,K,L,NZ))
+            LitrfalStrutElms_vr(NE,M,K,L)=LitrfalStrutElms_vr(NE,M,K,L)+AZMAX1(LitrfallElms_pvr(NE,M,K,L,NZ))
             if(LitrfalStrutElms_vr(NE,M,K,L)<0._r8)then
-              write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+              write(*,*)'extract',K,L,LitrfalStrutElms_vr(NE,M,K,L),LitrfallElms_pvr(NE,M,K,L,NZ)
             endif
           enddo
         ENDDO
@@ -159,7 +162,7 @@ module ExtractsMod
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     PlantPopulation_pft       => plt_site%PlantPopulation_pft        ,& !input  :plant population, [d-2]
-    RCO2Emis2Root_pvr         => plt_rbgc%RCO2Emis2Root_pvr          ,& !input  :aqueous CO2 flux from roots to root water, [g d-2 h-1]
+    RCO2Emis2Root_rpvr         => plt_rbgc%RCO2Emis2Root_rpvr          ,& !input  :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     RootH1PO4DmndBand_pvr     => plt_rbgc%RootH1PO4DmndBand_pvr      ,& !input  :HPO4 demand in band by each root population, [g d-2 h-1]
     RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr      ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
     RootH2PO4DmndBand_pvr     => plt_rbgc%RootH2PO4DmndBand_pvr      ,& !input  :root uptake of H2PO4 band, [g d-2 h-1]
@@ -178,6 +181,8 @@ module ExtractsMod
     TKCanopy_pft              => plt_ew%TKCanopy_pft                 ,& !input  :canopy temperature, [K]
     TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr      ,& !input  :gaseous tracer flux through roots, [g d-2 h-1]
+    RootCO2Ar2RootX_rpvr      => plt_rbgc%RootCO2Ar2RootX_rpvr       ,& !input  :root/myco respiration released to root/myco, [gC d-2 h-1]    
+    RootCO2Ar2RootX_pvr      => plt_rbgc%RootCO2Ar2RootX_pvr         ,& !input  :root respiration released to root, [gC d-2 h-1]        
     REcoH1PO4DmndBand_vr      => plt_bgcr%REcoH1PO4DmndBand_vr       ,& !inoput :HPO4 demand in band by all microbial, root, myco populations, [gP d-2 h-1]
     REcoH1PO4DmndSoil_vr      => plt_bgcr%REcoH1PO4DmndSoil_vr       ,& !inoput :HPO4 demand in non-band by all microbial, root, myco populations, [gP d-2 h-1]
     REcoH2PO4DmndBand_vr      => plt_bgcr%REcoH2PO4DmndBand_vr       ,& !inoput :total root + microbial PO4 uptake band, [gP d-2 h-1]
@@ -189,12 +194,14 @@ module ExtractsMod
     REcoO2DmndResp_vr         => plt_bgcr%REcoO2DmndResp_vr          ,& !inoput :total root + microbial O2 uptake, [g d-2 h-1]
     RUptkRootO2_vr            => plt_bgcr%RUptkRootO2_vr             ,& !inoput :total root internal O2 flux, [g d-2 h-1]
     RootCO2Emis2Root_vr       => plt_bgcr%RootCO2Emis2Root_vr        ,& !inoput :total root CO2 flux, [gC d-2 h-1]
+    RootCO2Emis2Root_pvr      => plt_bgcr%RootCO2Emis2Root_pvr       ,& !inoput :root CO2 flux, [gC d-2 h-1]    
     RootO2_TotSink_vr         => plt_bgcr%RootO2_TotSink_vr          ,& !inoput :all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     THeatLossRoot2Soil_vr     => plt_ew%THeatLossRoot2Soil_vr        ,& !inoput :total root heat uptake, [MJ d-2 h-1]
     TWaterPlantRoot2Soil_vr   => plt_ew%TWaterPlantRoot2Soil_vr      ,& !inoput :total root water uptake, [m3 d-2 h-1]
     tRootMycoExud2Soil_vr     => plt_bgcr%tRootMycoExud2Soil_vr      ,& !inoput :total root element exchange, [g d-2 h-1]
     totRootLenDens_vr         => plt_morph%totRootLenDens_vr         ,& !inoput :total root length density, [m m-3]
-    trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr       ,& !inoput :total internal root gas flux, [gC d-2 h-1]
+    trcg_air2root_flx_vr      => plt_rbgc%trcg_air2root_flx_vr       ,& !inoput :total internal root gas flux, [gC d-2 h-1]    
+    trcs_Soil2plant_uptake_pvr=> plt_rbgc%trcs_Soil2plant_uptake_pvr ,& !inoput :plant root-soil solute flux non-band, [g d-2 h-1]    
     trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr   & !inoput :total root-soil solute flux non-band, [g d-2 h-1]
   )
   
@@ -233,19 +240,22 @@ module ExtractsMod
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
       RootO2_TotSink_vr(L)      = RootO2_TotSink_vr(L) + RootO2_TotSink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
-      RootCO2Emis2Root_vr(L) = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_pvr(N,L,NZ)
+      RootCO2Emis2Root_vr(L)    = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_rpvr(N,L,NZ)
+      RootCO2Emis2Root_pvr(L,NZ)=RootCO2Emis2Root_pvr(L,NZ)+RCO2Emis2Root_rpvr(N,L,NZ)
       RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       !(>0) uptake from soil into roots
       DO idg=idg_beg,idg_end
-        trcs_Soil2plant_uptake_vr(idg,L)=trcs_Soil2plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
+        trcs_Soil2plant_uptake_vr(idg,L)     = trcs_Soil2plant_uptake_vr(idg,L)+RootUptkSoiSol_pvr(idg,N,L,NZ)
+        trcs_Soil2plant_uptake_pvr(idg,L,NZ) = trcs_Soil2plant_uptake_pvr(idg,L,NZ)+RootUptkSoiSol_pvr(idg,N,L,NZ)
       ENDDO
-
+      RootCO2Ar2RootX_pvr(L,NZ) = RootCO2Ar2RootX_pvr(L,NZ)+RootCO2Ar2RootX_rpvr(N,L,NZ)
+ 
       !Nutrients are sorted according to band|soil
       do ids=ids_NH4B,ids_nuts_end
         trcs_Soil2plant_uptake_vr(ids,L)=trcs_Soil2plant_uptake_vr(ids,L)+RootNutUptake_pvr(ids,N,L,NZ)
+        trcs_Soil2plant_uptake_pvr(ids,L,NZ)=trcs_Soil2plant_uptake_pvr(ids,L,NZ)+RootNutUptake_pvr(ids,N,L,NZ)
       ENDDO
-
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
@@ -273,8 +283,8 @@ module ExtractsMod
       REcoH2PO4DmndBand_vr(L) = REcoH2PO4DmndBand_vr(L)+RootH2PO4DmndBand_pvr(N,L,NZ)
       REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
-
   ENDDO
+
   end associate
   end subroutine TotalGasandSoluteUptake
 
@@ -297,12 +307,12 @@ module ExtractsMod
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !input  :canopy water content, [m3 d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !input  :plant stem area, [m2 d-2]
-    ElmBalanceCum_pft         => plt_site%ElmBalanceCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
+    PlantElmBalCum_pft         => plt_site%PlantElmBalCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
     EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
     HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           ,& !input  :canopy storage heat flux, [MJ d-2 h-1]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft            ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             ,& !input  :canopy longwave radiation, [MJ d-2 h-1]
-    NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft             ,& !input  :canopy NH3 flux, [g d-2 h-1]
+    NH3Dep2Can_pft            => plt_bgcr%NH3Dep2Can_pft             ,& !input  :canopy NH3 flux, [gN d-2 h-1]
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft   ,& !input  :net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
     RadNet2Canopy_pft         => plt_rad%RadNet2Canopy_pft           ,& !input  :canopy net radiation, [MJ d-2 h-1]
     RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft     ,& !input  :gaseous flux fron root disturbance, [g d-2 h-1]
@@ -383,7 +393,7 @@ module ExtractsMod
 
   DO NE=1,NumPlantChemElms
     LitrFallStrutElms_col(NE)     = LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)
-    PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+ElmBalanceCum_pft(NE,NZ)
+    PlantElemntStoreLandscape(NE) = PlantElemntStoreLandscape(NE)+PlantElmBalCum_pft(NE,NZ)
   ENDDO
 
   DO idg=idg_beg,idg_NH3

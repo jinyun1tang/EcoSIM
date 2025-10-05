@@ -85,6 +85,7 @@
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
+        PlantElmBalCum_pft(:,:,NY,NX)      = 0._r8
         QDrain_cum_col(NY,NX) = 0._r8        
         D960: DO NZ=1,NP0_col(NY,NX)
           cumNPP_pft(NZ,NY,NX)=0._r8
