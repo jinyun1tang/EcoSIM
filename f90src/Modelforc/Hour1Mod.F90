@@ -1013,10 +1013,10 @@ module Hour1Mod
   trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
   trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
 
-! initialize all band nutrients to zero
+  ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-! exclude NH3B,
+    ! exclude NH3B,
     DO idg=idg_beg,idg_NH3
       trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)-trcs_solml_drib_vr(idg,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
     ENDDO

@@ -374,6 +374,7 @@ module SoluteMod
     NH3_aque_mole_conc    = 0._r8
     XNH4_mole_conc        = 0._r8
   ENDIF
+  
   IF(VLWatMicPNB.GT.ZEROS2(NY,NX))THEN
     VLWatMicPNX            = natomw*VLWatMicPNB
     REcoReleaz_NH4BX       = (RNut_MicbRelease_vr(ids_NH4B,L,NY,NX)-trcs_Soil2plant_uptake_vr(ids_NH4B,L,NY,NX) &

@@ -97,6 +97,7 @@ module InitSOMBGCMOD
     rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
+    mid_Aerob_HeteroBacter=> micpar%mid_Aerob_HeteroBacter,&    
     OHCK                  => micpar%OHCK,                  &
     OMCK                  => micpar%OMCK,                  &
     OQCK                  => micpar%OQCK,                  &
@@ -114,7 +115,6 @@ module InitSOMBGCMOD
   D975: DO K=1,micpar%NumOfLitrCmplxs
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
-!    write(*,*)'RSC',K,RSC_vr(K,L,NY,NX)
     IF(RSC_vr(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
       RNT=0.0_r8
       RPT=0.0_r8
@@ -188,15 +188,14 @@ module InitSOMBGCMOD
       OSNI(K) = CORGNX(K)*VGeomLayer_vr(L,NY,NX)
       OSPI(K) = CORGPX(K)*VGeomLayer_vr(L,NY,NX)
     ENDIF
-!    write(111,*)'LK1',L,K,CORGCX(K),VLSoilMicPMass_vr(L,NY,NX),VGeomLayer_vr(L,NY,NX)
 
     TOSCK(K) = OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
     TOSNK(K) = ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
     TOSPK(K) = ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
 !   based on aerobic heterotrophs
 
-    TOSNK(K)=TOSNK(K)+OMCI(1,K)*rNCOMC_ave(1,1,K)+OMCI(2,K)*rNCOMC_ave(2,1,K)
-    TOSPK(K)=TOSPK(K)+OMCI(1,K)*rPCOMC_ave(1,1,K)+OMCI(2,K)*rPCOMC_ave(2,1,K)
+    TOSNK(K)=TOSNK(K)+OMCI(ibiom_kinetic,K)*rNCOMC_ave(ibiom_kinetic,mid_Aerob_HeteroBacter,K)+OMCI(ibiom_struct,K)*rNCOMC_ave(ibiom_struct,mid_Aerob_HeteroBacter,K)
+    TOSPK(K)=TOSPK(K)+OMCI(ibiom_kinetic,K)*rPCOMC_ave(ibiom_kinetic,mid_Aerob_HeteroBacter,K)+OMCI(ibiom_struct,K)*rPCOMC_ave(ibiom_struct,mid_Aerob_HeteroBacter,K)
 
     TOSCI   = TOSCI+OSCI(K)*TOSCK(K)
     TOSNI   = TOSNI+OSCI(K)*TOSNK(K)
@@ -234,7 +233,6 @@ module InitSOMBGCMOD
         FOSCI = AMIN1(1.0_r8,OSCI(KK)/TOSCI)
         FOSNI = AMIN1(1.0_r8,OSCI(KK)*CNOSCT(KK)/TOSNI)
         FOSPI = AMIN1(1.0_r8,OSCI(KK)*CPOSCT(KK)/TOSPI)
-!        write(111,*)'LKK',L,KK,OSCI(KK),CNOSCT(KK),CPOSCT(KK),TOSCI,TOSNI,TOSPI
       ELSE
         FOSCI = 0.0_r8
         FOSNI = 0.0_r8
@@ -286,26 +284,26 @@ module InitSOMBGCMOD
         ENDDO D8992
       ENDDO D8991
     ENDDO D8990
-!
-!     MICROBIAL RESIDUE C, N AND P
-!
-!     ORC,ORN,ORP=microbial residue C,N,P
-!     ORCI=allocation of microbial residue to kinetic components
-!  X is an indicator of surface residual layer
+    !
+    !     MICROBIAL RESIDUE C, N AND P
+    !
+    !     ORC,ORN,ORP=microbial residue C,N,P
+    !     ORCI=allocation of microbial residue to kinetic components
+    !  X is an indicator of surface residual layer, 1 for subsurface layer
     D8985: DO M=1,ndbiomcp
       OMBioResdu_vr(ielmc,M,K,L,NY,NX) = X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMC_ave(M,1,K)*FOSNI)
-      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMC_ave(M,1,K)*FOSPI)
+      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMC_ave(M,mid_Aerob_HeteroBacter,K)*FOSNI)
+      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMC_ave(M,mid_Aerob_HeteroBacter,K)*FOSPI)
       OSCX(KK)                         = OSCX(KK)+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
       OSNX(KK)                         = OSNX(KK)+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
       OSPX(KK)                         = OSPX(KK)+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
     ENDDO D8985
-!
-!     DOC, DON AND DOP
-!
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
-!     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
-!
+    !
+    !     DOC, DON AND DOP
+    !
+    !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
+    !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
+    !
     DOM_MicP_vr(idom_doc,K,L,NY,NX)               = X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
     DOM_MicP_vr(idom_don,K,L,NY,NX)               = AZMAX1(DOM_MicP_vr(idom_doc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
     DOM_MicP_vr(idom_dop,K,L,NY,NX)               = AZMAX1(DOM_MicP_vr(idom_doc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
@@ -314,11 +312,11 @@ module InitSOMBGCMOD
     OSCX(KK)                                 = OSCX(KK)+DOM_MicP_vr(idom_doc,K,L,NY,NX)
     OSNX(KK)                                 = OSNX(KK)+DOM_MicP_vr(idom_don,K,L,NY,NX)
     OSPX(KK)                                 = OSPX(KK)+DOM_MicP_vr(idom_dop,K,L,NY,NX)
-!
-!     ADSORBED C, N AND P
-!
-!     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
-!
+    !
+    !     ADSORBED C, N AND P
+    !
+    !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
+    !
     SorbedOM_vr(ielmc,K,L,NY,NX)        = X*AZMAX1(OSCM(K)*OHCK(K)*FOSCI)
     SorbedOM_vr(ielmn,K,L,NY,NX)        = AZMAX1(SorbedOM_vr(ielmc,K,L,NY,NX)*CNOSCT(KK)*FOSNI)
     SorbedOM_vr(ielmp,K,L,NY,NX)        = AZMAX1(SorbedOM_vr(ielmc,K,L,NY,NX)*CPOSCT(KK)*FOSPI)
@@ -326,10 +324,10 @@ module InitSOMBGCMOD
     OSCX(KK)                            = OSCX(KK)+SorbedOM_vr(ielmc,K,L,NY,NX)+SorbedOM_vr(idom_acetate,K,L,NY,NX)
     OSNX(KK)                            = OSNX(KK)+SorbedOM_vr(ielmn,K,L,NY,NX)
     OSPX(KK)                            = OSPX(KK)+SorbedOM_vr(ielmp,K,L,NY,NX)
-!
-!     HUMUS C, N AND P
-!
-!     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
+    !
+    !     HUMUS C, N AND P
+    !
+    !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     D8980: DO M=1,jsken
 
@@ -355,9 +353,9 @@ module InitSOMBGCMOD
     ENDDO D8980
   ENDDO D8995
 
-!
-!     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
-!
+  !
+  !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
+  !
 
   RO2DmndHetert_vr(:,:,L,NY,NX)             = 0.0_r8
   RNO3ReduxDmndSoilHeter_vr(:,:,L,NY,NX) = 0.0_r8
@@ -399,9 +397,9 @@ module InitSOMBGCMOD
   call sumORGMLayL(L,NY,NX,ORGM)
 
   SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=ORGM(1:NumPlantChemElms)
-!  write(*,*)'ORGC',L,SoilOrgM_vr(ielmc,L,NY,NX)
+
   ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
-!  if(L==1)stop  
+
   call sumLitrOMLayL(L,NY,NX,litrOM)
 
   OMLitrC_vr(L,NY,NX)=litrOM(ielmc)
@@ -438,30 +436,30 @@ module InitSOMBGCMOD
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.2)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
-!
+      !
       !     SOYBEAN
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.3)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
 
       !     NEW STRAW
-!
+      !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.4)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
 
       !     OLD STRAW
-!
+      !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.5)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
-!
+      !
       !     COMPOST
-!
+      !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.6)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
-!
+      !
       !     GREEN MANURE
-!
+      !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.7)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
 
@@ -480,20 +478,20 @@ module InitSOMBGCMOD
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.10)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
-!
+      !
       !     OLD CONIFEROUS FOREST
-!
+      !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.11)THEN
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
       !     DEFAULT
-!
+      !
     ELSE
       CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
     ENDIF
-!
+    !
     !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
-!
+    !
   ELSE
     CFOSC_vr(1:jsken,k_woody_litr,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
     CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)

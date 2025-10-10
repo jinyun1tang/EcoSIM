@@ -36,7 +36,6 @@ module SurfaceRadiationMod
   real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)    
 
   iyrc=etimer%get_curr_yearAD()
-  dowrite=I==197.and.J==17.and.IYRC==1981.and..false.  
 
   if(ldo_sp_mode)then
     !do prescribed phenolgoy mode
@@ -92,7 +91,8 @@ module SurfaceRadiationMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
-  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
+!  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
+  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO)then 
     ARLSG                  = ARLSC/AREA3(NU)
     ZX                     = EXP(-0.5_r8*ARLSG)
     ZY                     = 1.0_r8-ZX
@@ -240,7 +240,8 @@ module SurfaceRadiationMod
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumCanopyLayers1    
         !above snow and water    
-        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+         IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)then
           !above snow depth and above water/ice surface
           !add all nodes over a branch
           D1130: DO K=1,MaxNodesPerBranch1
@@ -269,7 +270,8 @@ module SurfaceRadiationMod
   D1200: DO NZ=1,NP
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumCanopyLayers1
-        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
+!        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
+        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO)then
           D1205: DO N=1,NumLeafZenithSectors1
             D1210: DO K=1,MaxNodesPerBranch1
               LeafAreaZsec_lpft(N,L,NZ)=LeafAreaZsec_lpft(N,L,NZ)+LeafAreaZsec_brch(N,L,K,NB,NZ)
@@ -965,16 +967,10 @@ module SurfaceRadiationMod
   RADYG = RadSWDiffusL*TAU_DifuseRTransmit(1)+RadSWFwdScat2NextL(1)
   RAPSG = RadDirectPAR_col*TAU_DirectRTransmit(1)
   RAPYG = RadPARDiffusL*TAU_DifuseRTransmit(1)+RadPARFwdScat2NextL(1)
-  if(dowrite)then
-  write(4444,*)'rads0'
-  write(4444,*)RadSWDiffusL,TAU_DifuseRTransmit(1),RadSWFwdScat2NextL(1)
-  write(4444,*)RadPARDiffusL,TAU_DifuseRTransmit(1),RadPARFwdScat2NextL(1)
-  endif
+
   RadSW_Grnd  = ABS(GrndIncidSolarAngle)*RADSG
   RadPAR_Grnd = ABS(GrndIncidSolarAngle)*RAPSG
-  if(dowrite)then
-  write(4444,*)'rads',RadSW_Grnd,RadPAR_Grnd,RADYG,RAPYG
-  endif
+
   D20: DO N=1,NumOfSkyAzimuthSects1
     RadSW_Grnd  = RadSW_Grnd+ABS(OMEGAG(N))*RADYG
     RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
@@ -1006,10 +1002,6 @@ module SurfaceRadiationMod
   ENDIF
   RadSWBakScat2NextL(0)  = RadSW_Grnd*GrndAlbedo/real(NumOfSkyAzimuthSects1,r8)
   RadPARBakScat2NextL(0) = RadPAR_Grnd*GrndAlbedo/real(NumOfSkyAzimuthSects1,r8)
-  if(dowrite)then
-  write(4444,*)'grnd'
-  write(4444,*)RadSW_Grnd,RadPAR_Grnd,GrndAlbedo
-  endif
   !
   !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
   !
@@ -1027,7 +1019,8 @@ module SurfaceRadiationMod
 
   D2800: DO L=1,NumCanopyLayers1
     !the following line shuts off radiation when it is below water 
-    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)THEN
       RadSWDiffusL           = RadSWDiffusL*TAU_DifuseRTransmit(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
       RadPARDiffusL          = RadPARDiffusL*TAU_DifuseRTransmit(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
       RadSWFwdScat2NextL(L)  = 0.0

@@ -141,7 +141,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RNO2ReduxHeterSoil(:,:)
   real(r8),allocatable :: RNO2ReduxHeterBand(:,:)
   real(r8),allocatable :: RN2OReduxHeter(:,:)
-  real(r8),allocatable :: RNOxReduxRespDenitLim(:,:)
+  real(r8),allocatable :: RNOxDOCReduxRespDenitLim(:,:) !DOC respiration for denitrifcation
+  real(r8),allocatable :: RNOxAcetReduxRespDenitLim(:,:) !Acetate respiration for denitrifcation  
   real(r8),allocatable :: RMaintDmndHeter(:,:,:)
   real(r8),allocatable :: RNH4imobilSoilHeter(:,:)
   real(r8),allocatable :: RNO3imobilSoilHeter(:,:)
@@ -176,7 +177,9 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: ECHZAutor(:)
   real(r8),allocatable :: ECHZHeter(:,:)
   real(r8),allocatable :: RGOCP(:,:)
+  real(r8),allocatable :: RGOAP(:,:)
   real(r8),allocatable :: FOQC(:,:)
+  real(r8),allocatable :: FOQA(:,:)
   REAL(R8),allocatable :: FGOCP(:,:)
   REAL(R8),allocatable :: FGOAP(:,:)  
   real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
@@ -384,7 +387,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNO2ReduxHeterSoil(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterSoil=spval
   allocate(this%RNO2ReduxHeterBand(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterBand=spval
   allocate(this%RN2OReduxHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2OReduxHeter=spval
-  allocate(this%RNOxReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitLim=spval
+  allocate(this%RNOxDOCReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxDOCReduxRespDenitLim=spval
+  allocate(this%RNOxAcetReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxAcetReduxRespDenitLim=spval
   allocate(this%RMaintDmndHeter(2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDmndHeter=spval
   allocate(this%RNH4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilSoilHeter=spval
   allocate(this%RNO3imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilSoilHeter=spval
@@ -428,7 +432,9 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%ECHZAutor(1:NumMicrobAutoTrophCmplx));this%ECHZAutor=spval
   allocate(this%ECHZHeter(1:NumHetetr1MicCmplx,1:jcplx));this%ECHZHeter=spval
   allocate(this%FOQC(1:NumHetetr1MicCmplx,1:jcplx));this%FOQC=spval
+  allocate(this%FOQA(1:NumHetetr1MicCmplx,1:jcplx));this%FOQA=spval  
   allocate(this%RGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOCP=spval
+  allocate(this%RGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOAP=spval
   allocate(this%FGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOCP=spval
   allocate(this%FGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOAP=spval  
   allocate(this%RO2UptkAutor(NumMicrobAutoTrophCmplx));this%RO2UptkAutor=spval
@@ -538,7 +544,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RNO2ReduxHeterSoil               = 0._r8
   this%RNO2ReduxHeterBand               = 0._r8
   this%RN2OReduxHeter                   = 0._r8
-  this%RNOxReduxRespDenitLim            = 0._r8
+  this%RNOxDOCReduxRespDenitLim         = 0._r8
+  this%RNOxAcetReduxRespDenitLim        = 0._r8
   this%RMaintDmndHeter                  = 0._r8
   this%RNH4imobilSoilHeter              = 0._r8
   this%RNO3imobilSoilHeter              = 0._r8
@@ -582,8 +589,10 @@ type, public :: Cumlate_Flux_Diag_type
   this%ECHZAutor                = 0._r8
   this%ECHZHeter                = 0._r8
   this%FOQC                     = 0._r8
+  this%FOQA                     = 0._r8  
   this%FGOCP                    = 0._r8
   this%RGOCP                    = 0._r8
+  this%RGOAP                    = 0._r8
   this%FGOAP                    = 0._r8
   this%RO2UptkAutor                     = 0._r8
   this%Resp4NFixAutor                   = 0._r8
@@ -647,7 +656,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNO2ReduxHeterSoil)
   call destroy(this%RNO2ReduxHeterBand)
   call destroy(this%RN2OReduxHeter)
-  call destroy(this%RNOxReduxRespDenitLim)
+  call destroy(this%RNOxDOCReduxRespDenitLim)
+  call destroy(this%RNOxAcetReduxRespDenitLim)
   call destroy(this%RMaintDmndHeter)
   call destroy(this%RNH4imobilSoilHeter)
   call destroy(this%RNO3imobilSoilHeter)

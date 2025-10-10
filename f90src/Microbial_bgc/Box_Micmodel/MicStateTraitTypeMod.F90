@@ -28,6 +28,8 @@ implicit none
   real(r8) :: CNO2S
   real(r8) :: CNO2B
   real(r8) :: CNO3S
+  real(r8) :: CNH3B       !NH3 concentation in band soil
+  real(r8) :: CNH3S       !NH3 concentation in non-band soil
   real(r8) :: CNO3B
   real(r8) :: CNH4S
   real(r8) :: CNH4B

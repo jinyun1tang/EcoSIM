@@ -283,6 +283,8 @@ implicit none
     micfor%ElmAllocmatMicrblitr2POM =ElmAllocmatMicrblitr2POM_vr(1:2,L,NY,NX)
   endif
 
+  micstt%CNH3B                 = trc_solcl_vr(idg_NH3,L,NY,NX)
+  micstt%CNH3S                 = trc_solcl_vr(idg_NH3B,L,NY,NX)
   micstt%CNH4B                 = trc_solcl_vr(ids_NH4B,L,NY,NX)
   micstt%CNH4S                 = trc_solcl_vr(ids_NH4,L,NY,NX)
   micstt%CH2P4                 = trc_solcl_vr(ids_H2PO4,L,NY,NX)

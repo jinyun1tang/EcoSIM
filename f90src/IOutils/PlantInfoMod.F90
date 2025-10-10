@@ -775,7 +775,7 @@ implicit none
 !   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
 !   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
-!   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate
+!   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indeterminate
 !   iPlantNfixType_pft=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
 !   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
 !   iPlantPhenolType_pft=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
@@ -828,7 +828,7 @@ implicit none
   case (0)
     strval='Determinate'
   case (1)
-    strval='Indetermimate'
+    strval='Indeterminate'
   case default
     strval='Not defined'
   end select
@@ -1150,7 +1150,6 @@ implicit none
   call writefixl(nu_plt,'TAUR','Leaf shortwave radiation (0.3-2.5 um) transmission [-]',RadSWLeafTransmis_pft(NZ,NY,NX),80)
   call writefixl(nu_plt,'TAUP','Leaf PAR (0.4-0.7 um) transmission [-]',RadPARLeafTransmis_pft(NZ,NY,NX),80)
   end subroutine plant_optic_trait_disp
-
 
 !------------------------------------------------------------------------------------------
 

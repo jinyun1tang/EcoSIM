@@ -3,6 +3,7 @@ module EcoSIMConfig
 implicit none
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
+   
   logical :: is_first_year=.false.
   logical :: transport_on=.true.
   logical :: column_mode=.false.

@@ -118,7 +118,7 @@ module MicAutoCPLXMod
   !
   !     AUTOTROPHIC DENITRIFICATION
   !
-  IF(N.EQ.mid_AmmoniaOxidBacter .AND. (.not.litrm.OR.VLSoilPoreMicP.GT.ZEROS))THEN
+  IF(N.EQ.mid_AmmoniaOxidBacter .AND. (.not.litrm .OR. VLSoilPoreMicP.GT.ZEROS))THEN
     call AutotrophDenitrificCatabolism(I,J,N,VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx)
   ENDIF
   !
@@ -931,6 +931,7 @@ module MicAutoCPLXMod
   !
   !Description:
   ! autotrophic NH3 oxidizer  
+  use SoluteParMod, only : DPN4
   implicit none
   integer,  intent(in)  :: I,J,N
   REAL(R8), INTENT(IN)  :: VOLWZ
@@ -980,6 +981,8 @@ module MicAutoCPLXMod
     ZNFN0                 => micstt%ZNFN0,                 &
     CCO2S                 => micstt%CCO2S,                 &        
     ZNFNI                 => micstt%ZNFNI,                 &
+    CNH3S                 => micstt%CNH3S,                 &
+    CNH3B                 => micstt%CNH3B,                 &
     CNH4S                 => micstt%CNH4S,                 &
     CNH4B                 => micstt%CNH4B,                 &
     ZNH4S                 => micstt%ZNH4S,                 &
@@ -1000,8 +1003,9 @@ module MicAutoCPLXMod
 !
 !     CCO2S=aqueous CO2 concentration
 !
-  XCO2=CCO2S/(CCO2S+CCKM)
-  DO NGL=JGniA(N),JGnfA(N)
+
+  XCO2    = CCO2S/(CCO2S+CCKM)
+  DO NGL     = JGniA(N), JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle  
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
@@ -1059,15 +1063,15 @@ module MicAutoCPLXMod
     !     ECNH=efficiency CO2 conversion to biomass
     !     RVMX4,RVMXB=nitrifier demand for NH4 in non-band, band
     !
-    ECHZAutor(NGL)=EO2X
-    VMXX=VMXNH3Oxi*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
+    ECHZAutor(NGL) = EO2X
+    VMXX           = VMXNH3Oxi*GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)
     IF(VOLWZ.GT.ZEROS2)THEN
       VMXA=VMXX/(1.0_r8+VMXX/(VHKI*VOLWZ))
     ELSE
       VMXA=0.0_r8
     ENDIF
-    FCN4S                  = FNH4S*CNH4S/(CNH4S+ZHKM)
-    FCN4B                  = FNHBS*CNH4B/(CNH4B+ZHKM)
+    FCN4S                  = FNH4S*CNH3S/(CNH3S+ZHKM)
+    FCN4B                  = FNHBS*CNH3B/(CNH3B+ZHKM)
     FSBSTAutor(NGL)        = FCN4S+FCN4B
     VMX4S                  = VMXA*FCN4S
     VMX4B                  = VMXA*FCN4B
@@ -1305,7 +1309,7 @@ module MicAutoCPLXMod
 
     GH2X            = RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
     GH2H            = GH2X/12.08_r8
-    ECHZAutor(NGL)       = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
+    ECHZAutor(NGL)  = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
     VMXA            = GrowthEnvScalAutor(NGL)*FBiomStoiScalarAutor(NGL)*XCO2*OMActAutor(NGL)*VMXCH4gH2
     H2GSX           = H2GS+0.111_r8*naqfdiag%tCResp4H2Prod
     FSBSTAutor(NGL) = CH2GS/(CH2GS+H2KM)

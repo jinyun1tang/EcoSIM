@@ -24,7 +24,7 @@ implicit none
   integer, public :: NumGuild_Autor_AerobMethOxid   = 1
 
   type, public :: MicParType
-  real(r8), pointer :: ORCI(:,:)                   !allocation of residue to kinetic components, [-]
+  real(r8), pointer :: ORCI(:,:)                   !allocation of initial residue to kinetic components, [-]
   real(r8), pointer :: FL(:)                       !allocation to microbial kinetic fractions, [-]
   real(r8), pointer :: rNCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial N:C, [gN gC-1]
   real(r8), pointer :: rPCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial P:C,  [gP gC-1]
@@ -32,16 +32,16 @@ implicit none
   real(r8), pointer :: rPCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial P:C, [gP gC-1]
   real(r8), pointer :: rNCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial N:C, [gN gC-1]
   real(r8), pointer :: rPCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial P:C, [gP gC-1]
-  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
-  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+!  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+!  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
   real(r8), pointer :: DOSA(:)                     !rate constant for litter colonization by heterotrophs, [h-1]
   real(r8), pointer :: SPOSC(:,:)                  !specific decomposition rate constant, [h-1]
-  real(r8), pointer :: CNOFC(:,:)                  !fractions to allocate N to kinetic components,[-]
-  real(r8), pointer :: CPOFC(:,:)                  !fractions to allocate P to kinetic components, [-]
-  real(r8), pointer :: CNRH(:)                     !default N:C ratios in SOC complexes,[gN gC-1]
-  real(r8), pointer :: CPRH(:)                     !default P:C ratios in SOC complexes, [gN gC-1]
-  real(r8), pointer :: OMCF(:)                     !heterotrophic microbial biomass composition in SOC, [gC gC-1]
-  real(r8), pointer :: OMCA(:)                     !autotrophic microbial biomass composition in SOC, [gC gC-1]
+  real(r8), pointer :: CNOFC(:,:)                  !Fractions of initial litter to allocate N to kinetic components,[-]
+  real(r8), pointer :: CPOFC(:,:)                  !Fractions of iniital litter to allocate P to kinetic components, [-]
+  real(r8), pointer :: CNRH(:)                     !Default N:C ratios in SOC complexes,[gN gC-1]
+  real(r8), pointer :: CPRH(:)                     !Default P:C ratios in SOC complexes, [gN gC-1]
+  real(r8), pointer :: OMCF(:)                     !Initial fractional composition of heterotrophic microbial biomass, [gC gC-1]
+  real(r8), pointer :: OMCA(:)                     !Initial fractional composition of autotrophic microbial biomass, [gC gC-1]
   integer  :: FG_guilds_heter(NumMicbFunGrupsPerCmplx)  !# of guilds
   integer  :: FG_guilds_autor(NumMicbFunGrupsPerCmplx)  !# of guilds
 
@@ -68,11 +68,11 @@ implicit none
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), pointer :: OMCI(:,:)                    !initializes microbial biomass
-  real(r8), pointer :: OHCK(:)                      !fractions of SOC in adsorbed C
-  real(r8), pointer :: OMCK(:)                      !fractions of SOC in biomass
-  real(r8), pointer :: ORCK(:)                      !fractions of SOC in litter
-  real(r8), pointer :: OQCK(:)                      !fractions of SOC in DOC
+  real(r8), pointer :: OMCI(:,:)                    !fraction  of initial SOC/litterfall in microbial biomass
+  real(r8), pointer :: OHCK(:)                      !fractions of initial SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)                      !fractions of initial SOC as living microibal biomass
+  real(r8), pointer :: ORCK(:)                      !fractions of initial SOC as litter
+  real(r8), pointer :: OQCK(:)                      !fractions of initial SOC as DOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:) !logical switch for autotrophic group
   logical,  pointer :: is_activeMicrbFungrpHeter(:) !logical switch for heterotrophic group
   logical,  pointer :: is_aerobic_hetr(:)           !logical flag for aerobic heterotrophs
@@ -170,11 +170,11 @@ contains
   this%amicname(4) = 'null'
   this%amicname(6) = 'null'
   this%amicname(7) = 'null'
-  this%micresb(0)  = 'labile'
-  this%micresb(1)  = 'resist'
-  this%micbiom(1)  = 'labile'
-  this%micbiom(2)  = 'resist'
-  this%micbiom(3)  = 'active'
+  this%micresb(0)  = 'kinetic'
+  this%micresb(1)  = 'recalcitrant'
+  this%micbiom(1)  = 'kinetic'
+  this%micbiom(2)  = 'recalcitrant'
+  this%micbiom(3)  = 'reserve'
 
   !set up functional group ids
   ! five om-complexes
@@ -246,8 +246,7 @@ contains
   implicit none
   class(MicParType) :: this
 
-  real(r8) :: COMCI(NumLiveMicrbCompts,1:this%jcplx)
-  real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of biomass to kinetic components
+  real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of living biomass to different components
   integer :: K,M,NGL,N
   associate(                         &
     OHCK        => this%OHCK,        &
@@ -270,72 +269,68 @@ contains
     OMCF        => this%OMCF,        &
     OMCA        => this%OMCA         &
   )
-  OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
-  OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
-  ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)
-  OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8)
+  OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)      
+  OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)      
+  ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)      
+  OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8) 
 
-  OMCI1=reshape(real((/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005, &
-     0.010,0.050,0.005,0.010,0.050,0.005/),r8),shape(OMCI1))
+  OMCI1=reshape(real(   &
+    (/0.010,0.050,0.005,&
+      0.050,0.050,0.005,&
+      0.050,0.050,0.005,&
+      0.010,0.050,0.005,&
+      0.010,0.050,0.005/),r8),shape(OMCI1))
 
   ORCI=reshape(real((/0.01,0.05,0.01,0.05,0.01,0.05 &
      ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
 
-  DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
 
-  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8,7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
-    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
-    ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))
-
-  SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
-
-  CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
-  CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
-  OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
-  OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
+  CNRH = (/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
+  CPRH = (/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
+  OMCF = (/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
+  OMCA = (/0.6_r8,0.2_r8,0.1_r8,0.0_r8,0.1_r8,0.0_r8,0.0_r8/)*0.1_r8
 
   OMCI(1:NumLiveMicrbCompts,:)=OMCI1
 
-!  if(this%jguilds.GT.1)then
-!    COMCI=OMCI(1:NumLiveMicrbCompts,:)
-!    DO K=1,jcplxc
-!      DO NGL=2,this%jguilds-1
-!        DO M=1,NumLiveMicrbCompts
-!          OMCI(M+(NGL-1)*NumLiveMicrbCompts,K)=OMCI(M,K)
-!          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
-!        enddo
-!      enddo
-!      DO M=1,NumLiveMicrbCompts
-!        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
-!      ENDDO
-!    enddo
-!  endif
-
-
-! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
+  ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
+  ! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 
   CNOFC(1:jskenc,this%k_woody_litr) = real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
   CPOFC(1:jskenc,this%k_woody_litr) = real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
   CNOFC(1:jskenc,this%k_fine_litr)  = real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
   CPOFC(1:jskenc,this%k_fine_litr)  = real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
   CNOFC(1:jskenc,this%k_manure)     = real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
-  CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
-  FL(1:2)=real((/0.55,0.45/),r8)
+  CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure  
 
+  !microbial traits
+  DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
+
+  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,0.05_r8,0.0_r8,0.0_r8,0.0_r8 &
+    ,0.05_r8,0.0167_r8,0.0_r8,0.0_r8/),shape(sposc))
+
+  SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
+
+  FL(1:2)=real((/0.55,0.45/),r8)
+  !set stoichiometry of heterotrophs
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbFunGrupsPerCmplx
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
+        !Fungi      
         DO NGL=this%JGniH(n),this%JGnfH(n)
-          rNCOMC(ibiom_kinetic,NGL,K) = 0.15_r8           !maximum
-          rNCOMC(ibiom_struct,NGL,K) = 0.09_r8           !maximum
-          rPCOMC(ibiom_kinetic,NGL,K) = 0.015_r8
-          rPCOMC(ibiom_struct,NGL,K) = 0.009_r8
+          rNCOMC(ibiom_kinetic,NGL,K) = 0.15_r8           !NC ratio of kinetic biomass
+          rNCOMC(ibiom_struct,NGL,K) = 0.09_r8            !NC ratio of structural biomass
+          rPCOMC(ibiom_kinetic,NGL,K) = 0.015_r8          !PC ratio of kinetic biomass
+          rPCOMC(ibiom_struct,NGL,K) = 0.009_r8           !PC ratio of structural biomass
         ENDDO
-        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.15_r8           !maximum of
-        this%rNCOMC_ave(ibiom_struct,N,K)=0.09_r8            !maximum of 
+        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.15_r8           
+        this%rNCOMC_ave(ibiom_struct,N,K)=0.09_r8            
         this%rPCOMC_ave(ibiom_kinetic,N,K)=0.015_r8
         this%rPCOMC_ave(ibiom_struct,N,K)=0.009_r8
+
+        !bacteria  
       ELSE
         do NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(ibiom_kinetic,NGL,K)=0.225_r8
@@ -348,14 +343,18 @@ contains
         this%rPCOMC_ave(ibiom_kinetic,N,K)=0.0225_r8
         this%rPCOMC_ave(ibiom_struct,N,K)=0.0135_r8
       ENDIF
+
+      !reserve biomass
       do NGL=this%JGniH(n),this%JGnfH(n)
-        rNCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
-        rPCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
+        rNCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))     !NC ratio
+        rPCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))     !PC ratio
       enddo
       this%rNCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
       this%rPCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
     enddo
   ENDDO D95
+
+  !set stoichiometry of autotrophs
   DO  N=1,this%NumMicbFunGrupsPerCmplx
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(ibiom_kinetic,NGL) = 0.225_r8
@@ -363,16 +362,17 @@ contains
       rPCOMCAutor(ibiom_kinetic,NGL) = 0.0225_r8
       rPCOMCAutor(ibiom_struct,NGL)  = 0.0135_r8
     enddo
-    this%rNCOMCAutor_ave(ibiom_kinetic,N)=0.225_r8
-    this%rNCOMCAutor_ave(ibiom_struct,N)=0.135_r8
-    this%rPCOMCAutora_ave(ibiom_kinetic,N)=0.0225_r8
-    this%rPCOMCAutora_ave(ibiom_struct,N)=0.0135_r8
+ !   this%rNCOMCAutor_ave(ibiom_kinetic,N)=0.225_r8
+ !   this%rNCOMCAutor_ave(ibiom_struct,N)=0.135_r8
+
+!    this%rPCOMCAutora_ave(ibiom_kinetic,N)=0.0225_r8
+!    this%rPCOMCAutora_ave(ibiom_struct,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
       rPCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCAutor_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
-    this%rPCOMCAutora_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
+!    this%rNCOMCAutor_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
+!    this%rPCOMCAutora_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
   enddo
 
   end associate
@@ -433,8 +433,8 @@ contains
   allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutoTrophCmplx))
   allocate(this%rNCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
   allocate(this%rPCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
-  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+!  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+!  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
 
   allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))
