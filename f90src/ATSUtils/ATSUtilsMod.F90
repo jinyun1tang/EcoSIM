@@ -9,49 +9,9 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: ForceGasAquaEquil, ComputeDatefromATS
+  public :: ComputeDatefromATS
   ! Add this interface block
   contains
-
-  subroutine PhasePartition(VG,VW,SL,CW,CG)
-!
-! Let Cg and CW be the gaseous and aqueous concentration, then
-! Ct=CG*VG+CW*VW=CG*VG+CG*SL*VW=CG*(VG+SL*VW)
-! VW=CG*SL
-! VG: VOLP
-! VW: VOLW
-! SL: solubility
-  implicit none
-  real(r8), intent(in) :: VG,VW,SL
-  real(r8), intent(inout) :: CW,CG
-  real(r8) :: CT,VT
-
-  CT=CG*VG+CW*VW
-  VT=VG+SL*VW
-  if(VT>0._r8)then
-    CG=CT/VT
-  ELSE
-    CG=0._r8
-  ENDIF
-  CW=CG*SL
-
-  end subroutine PhasePartition
-!------------------------------------------------------------------------------------------
-  subroutine ForceGasAquaEquil(NY,NX)
-
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  integer :: L,NTG
-
-  DO L =0,NL_col(NY,NX)
-    DO NTG=idg_beg,idg_NH3
-      call PhasePartition(VLsoiAirP_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX),GasSolbility_vr(NTG,L,NY,NX),&
-        trc_solcl_vr(NTG,L,NY,NX),trcg_gascl_vr(NTG,L,NY,NX))
-    ENDDO
-  ENDDO
-
-  end subroutine ForceGasAquaEquil
 
 !------------------------------------------------------------------------------------------
   subroutine ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
