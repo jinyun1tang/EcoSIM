@@ -18,7 +18,7 @@ add_subdirectory(IOutils)
 add_subdirectory(Ecosim_mods)
 add_subdirectory(Balances)
 add_subdirectory(Modelforc)
-add_subdirectory(ATSUtils)
+ADD_SUBDIRECTORY(ATSUtils)
 add_subdirectory(Transport)
 add_subdirectory(Main)
 

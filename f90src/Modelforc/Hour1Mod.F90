@@ -13,12 +13,11 @@ module Hour1Mod
   use SoilBGCNLayMod,    only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
-  use EcosimConst,       only: mGravAccelerat  
-  use HydrologyDiagMod , only: DiagWaterTBLDepz  
+  use EcosimConst,       only: mGravAccelerat
+  use HydrologyDiagMod , only: DiagWaterTBLDepz
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
-  use ATSUtilsMod
   use TracerPropMod
   use TracerIDMod
   use EcoSimConst
@@ -127,7 +126,7 @@ module Hour1Mod
 !
   if(lverb)write(*,*)'set atms gas conc'
   DO  NX=NHW,NHE
-    DO  NY=NVN,NVS  
+    DO  NY=NVN,NVS
 
       IF(J.EQ.1)THEN
         NumActivePlants_col(NY,NX)=0
@@ -135,7 +134,7 @@ module Hour1Mod
           PSICanPDailyMin_pft(NZ,NY,NX)=0._r8
         ENDDO
       ENDIF
-    ENDDO  
+    ENDDO
   ENDDO
 
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
@@ -147,7 +146,7 @@ module Hour1Mod
   if(lverb)write(*,*)'SetLiterSoilPropAftDisturb'
   call SetLiterSoilPropAftDisturb(I,J,NHW,NHE,NVN,NVS,dosum)
 
-  if(dosum) call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)  
+  if(dosum) call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
 
   call BegCheckBalances(I,J,NHW,NHE,NVN,NVS)
 
@@ -292,17 +291,17 @@ module Hour1Mod
       tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
       tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
       CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
-      
+
       AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
       AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
       AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3 
-      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
+      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
+      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
       AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
       AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
       AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
-      
+
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
            /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))
@@ -342,7 +341,7 @@ module Hour1Mod
       HeatCanopy2Dist_col(NY,NX)     = 0._r8
       HydroSufDOCFlx_col(NY,NX)      = 0._r8
       HydroSufDONFlx_col(NY,NX)      = 0._r8
-      HydroSufDOPFlx_col(NY,NX)      = 0._r8      
+      HydroSufDOPFlx_col(NY,NX)      = 0._r8
       HydroSubsDOCFlx_col(NY,NX)     = 0._r8
       HydroSufDICFlx_col(NY,NX)      = 0._r8
       HydroSubsDICFlx_col(NY,NX)     = 0._r8
@@ -601,7 +600,7 @@ module Hour1Mod
   !Stationary water table
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
-  !Mobile water table  
+  !Mobile water table
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
@@ -674,7 +673,7 @@ module Hour1Mod
         iResetSoilProf_col(NY,NX) = ifalse
         dosum                     = .true.
       ENDIF
-    ENDDO  
+    ENDDO
   ENDDO
   end subroutine SetLiterSoilPropAftDisturb
 !------------------------------------------------------------------------------------------
@@ -685,7 +684,7 @@ module Hour1Mod
   integer, intent(in) :: NX,NY
   integer :: L
   character(len=*), parameter :: subname='SetHourlyDiagnostics'
-  
+
 !     begin_execution
   call PrintInfo('beg '//subname)
   RootCO2AutorPrev_col(NY,NX)     = RootCO2Autor_col(NY,NX)
@@ -802,13 +801,13 @@ module Hour1Mod
   MoistSensDecomp_vr(:,NY,NX)        = 0._r8
   trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1:JS,NY,NX) = 0._r8
   trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)      = 0._r8
-  
+
   IF(salt_model)THEN
     trcSalt_AquaAdv_flx_snvr(idsalt_beg:idsalt_end,1:JS,NY,NX)=0._r8
     trcSalt_AquaADV_Snow2Litr_flx(:,NY,NX) = 0._r8
     trcSalt_AquaADV_Snow2Soil_flx(:,NY,NX) = 0._r8
     trcSalt_snowMassloss_col(:,NY,NX)      = 0._r8
-    trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8    
+    trcSalt_SnowDrift_flx_col(:,NY,NX)     = 0._r8
   ENDIF
   call PrintInfo('end '//subname)
   end subroutine SetHourlyDiagnostics
@@ -882,12 +881,12 @@ module Hour1Mod
         CSILT_vr(NU_col(NY,NX),NY,NX)              = 1.0
         CCLAY_vr(NU_col(NY,NX),NY,NX)              = 0._r8
       ENDIF
-      
+
       D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT_vr(NU_col(NY,NX),NY,NX) &
         +100._r8*CSAND_vr(NU_col(NY,NX),NY,NX)+100._r8*CORGM
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
       SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA_3D(3,0,NY,NX)
-      IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
+      IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
         CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
         print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
@@ -1003,7 +1002,7 @@ module Hour1Mod
   trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
   trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
   trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
-  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
+  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
 
 ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
@@ -1032,7 +1031,7 @@ module Hour1Mod
   SoluteDifusvty_vr(idg_N2O,0,NY,NX)   = ZVSG*TFACL
   SoluteDifusvty_vr(ids_NO3,0,NY,NX)   = ZOSG*TFACL
   SoluteDifusvty_vr(ids_H1PO4,0,NY,NX) = POSG*TFACL
-  
+
   SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
   SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
   SoluteDifusvty_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
@@ -1126,7 +1125,7 @@ module Hour1Mod
           CPO4S_vr(L,NY,NX)=CPO4S_vr(L,NY,NX)+(trcSalt_solml_vr(idsalt_H0PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,L,NY,NX) &
             +trcSalt_solml_vr(idsalt_FeHPO4,L,NY,NX)+trcSalt_solml_vr(idsalt_FeH2PO4,L,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4,L,NY,NX) &
             +trcSalt_solml_vr(idsalt_CaHPO4,L,NY,NX)+trcSalt_solml_vr(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,L,NY,NX))*patomw
-        endif  
+        endif
 
         CPO4S_vr(L,NY,NX)=AZMAX1(CPO4S_vr(L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)))
 
@@ -1164,8 +1163,8 @@ module Hour1Mod
         if(salt_model)then
           CPO4B_vr(L,NY,NX)=CPO4B_vr(L,NY,NX)+(trcSalt_solml_vr(idsalt_H0PO4B,L,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4B,L,NY,NX) &
             +trcSalt_solml_vr(idsalt_FeHPO4B,L,NY,NX)+trcSalt_solml_vr(idsalt_FeH2PO4B,L,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4B,L,NY,NX) &
-            +trcSalt_solml_vr(idsalt_CaHPO4B,L,NY,NX)+trcSalt_solml_vr(idsalt_CaH4P2O8B,L,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4B,L,NY,NX))*patomw 
-        endif  
+            +trcSalt_solml_vr(idsalt_CaHPO4B,L,NY,NX)+trcSalt_solml_vr(idsalt_CaH4P2O8B,L,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4B,L,NY,NX))*patomw
+        endif
         CPO4B_vr(L,NY,NX)=AZMAX1(CPO4B_vr(L,NY,NX)/(VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)))
       ELSE
         trc_solcl_vr(ids_H1PO4B,L,NY,NX) = 0._r8
@@ -1460,7 +1459,7 @@ module Hour1Mod
 
   subroutine GetChemicalConcsInSoil(I,J,NY,NX)
   implicit none
-  integer, intent(in) :: I,J  
+  integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
 
   integer :: L,idg
@@ -1503,7 +1502,7 @@ module Hour1Mod
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
   ENDDO
-  call PrintInfo('end '//subname)  
+  call PrintInfo('end '//subname)
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------
 
@@ -1595,7 +1594,7 @@ module Hour1Mod
   ENDDO
 
   GasSolbility_vr(idg_NH3B,L,NY,NX)=GasSolbility_vr(idg_NH3,L,NY,NX)
- 
+
   DO  L=1,NL_col(NY,NX)+1
     ! S*L=solubility of gas in water
     ! TCS=soil temperature (oC)
@@ -1610,7 +1609,7 @@ module Hour1Mod
 !------------------------------------------------------------------------------------------
   subroutine UpdateLiterPropertz(NHW,NHE,NVN,NVS)
   implicit none
-  integer, intent(in) :: NHW,NHE,NVN,NVS  
+  integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: FVLitR  !litter porosity
   integer :: NY,NX
 !
@@ -1637,10 +1636,10 @@ module Hour1Mod
         FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR_col(NY,NX)
       ELSE
         FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
-      ENDIF      
-      POROS0_col(NY,NX)          = FVLitR      
+      ENDIF
+      POROS0_col(NY,NX)          = FVLitR
       FieldCapacity_vr(0,NY,NX)  = 0.500_r8*FVLitR
-      WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR      
+      WiltPoint_vr(0,NY,NX)      = 0.125_r8*FVLitR
       LOGPOROS_vr(0,NY,NX)       = LOG(POROS0_col(NY,NX))
       LOGFldCapacity_vr(0,NY,NX) = LOG(FieldCapacity_vr(0,NY,NX))
       LOGWiltPoint_vr(0,NY,NX)   = LOG(WiltPoint_vr(0,NY,NX))
@@ -1648,8 +1647,46 @@ module Hour1Mod
       FCD_vr(0,NY,NX)            = LOGFldCapacity_vr(0,NY,NX)-LOGWiltPoint_vr(0,NY,NX)
       SRP_vr(0,NY,NX)            = 1.00_r8
     enddo
-  enddo    
+  enddo
   end subroutine UpdateLiterPropertz
 
+  !------------------------------------------------------------------------------------------
+  subroutine PhasePartition(VG,VW,SL,CW,CG)
+  !
+  ! Let Cg and CW be the gaseous and aqueous concentration, then
+  ! Ct=CG*VG+CW*VW=CG*VG+CG*SL*VW=CG*(VG+SL*VW)
+  ! VW=CG*SL
+  ! VG: VOLP
+  ! VW: VOLW
+  ! SL: solubility
+  implicit none
+  real(r8), intent(in) :: VG,VW,SL
+  real(r8), intent(inout) :: CW,CG
+  real(r8) :: CT,VT
+
+  CT=CG*VG+CW*VW
+  VT=VG+SL*VW
+  if(VT>0._r8)then
+    CG=CT/VT
+  ELSE
+    CG=0._r8
+  ENDIF
+  CW=CG*SL
+  end subroutine PhasePartition
+  !------------------------------------------------------------------------------------------
+  subroutine ForceGasAquaEquil(NY,NX)
+
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: L,NTG
+
+  DO L =0,NL_col(NY,NX)
+  DO NTG=idg_beg,idg_NH3
+    call PhasePartition(VLsoiAirP_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX),GasSolbility_vr(NTG,L,NY,NX),&
+    trc_solcl_vr(NTG,L,NY,NX),trcg_gascl_vr(NTG,L,NY,NX))
+  ENDDO
+  ENDDO
+  end subroutine ForceGasAquaEquil
 
 end module Hour1Mod
