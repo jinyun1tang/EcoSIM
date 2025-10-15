@@ -8,7 +8,7 @@ module HistDataType
   use UnitMod,          only: units
   use MiniMathMod,      only: safe_adb, AZMAX1,AZERO
   use EcoSiMParDataMod, only: pltpar, micpar
-  use DebugToolMod,     only: DebugPrint
+  use DebugToolMod     
   use EcoSIMCtrlMod
   use MicrobialDataType
   use CanopyRadDataType
@@ -3452,14 +3452,14 @@ implicit none
   real(r8),parameter :: MJ2W=1.e6_r8/secs1hour
   real(r8),parameter :: m2mm=1000._r8
   real(r8),parameter :: million=1.e6_r8
-
+  character(len=*), parameter :: subname='hist_update'
   character(len=15) :: grow_stage_str(11)=(/'Planting      ','Emergence     ','Floral_init   ', &
                                             'Jointing      ','Elongation    ','Heading       ', &
                                             'Anthesis      ','Seed_fill     ','See_no_set    ', &
                                             'Seed_mass_set ','End_seed_fill '/)
   real(r8) :: DVOLL,SOMC(jcplx)                                            
   integer :: jj
-
+  call PrintInfo('beg '//subname)
   DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       
@@ -3675,12 +3675,13 @@ implicit none
 
       call SumMicbGroup(0,NY,NX,micpar%mid_H2GenoMethanogArchea,MicbE,isauto=.true.)     
       this%h2D_H2MethogenE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+      
       call sumDOML(0,NY,NX,DOM)
-      this%h1D_DOC_LITR_col(ncol)     = DOM(idom_doc)/VLitR_col(NY,NX)
-      this%h1D_DON_LITR_col(ncol)     = DOM(idom_don)/VLitR_col(NY,NX)
-      this%h1D_DOP_LITR_col(ncol)     = DOM(idom_dop)/VLitR_col(NY,NX)
-      this%h1D_acetate_LITR_col(ncol) = DOM(idom_acetate)/VLitR_col(NY,NX)
+      
+      this%h1D_DOC_LITR_col(ncol)     = safe_adb(DOM(idom_doc),VLitR_col(NY,NX))
+      this%h1D_DON_LITR_col(ncol)     = safe_adb(DOM(idom_don),VLitR_col(NY,NX))
+      this%h1D_DOP_LITR_col(ncol)     = safe_adb(DOM(idom_dop),VLitR_col(NY,NX))
+      this%h1D_acetate_LITR_col(ncol) = safe_adb(DOM(idom_acetate),VLitR_col(NY,NX))
 
       this%h1D_RCH4ProdHydrog_litr_col(ncol) = RCH4ProdHydrog_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3688,9 +3689,9 @@ implicit none
       this%h1D_RCH4Oxi_aero_col(ncol) =    RCH4Oxi_aero_vr(0,NY,NX)
       this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_NH3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_N2oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+      this%h1D_N2Oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
                                +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+      
       this%h1D_decomp_OStress_litr_col(ncol)   = OxyDecompLimiter_vr(0,NY,NX)
       this%h1D_MicrobAct_litr_col(ncol)        = TMicHeterActivity_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RO2Decomp_litr_col(ncol)        = RO2DecompUptk_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3756,8 +3757,9 @@ implicit none
         this%h2D_litrN_vr(ncol,L)           = litrOM_vr(ielmn,L,NY,NX)/DVOLL
         this%h2D_litrP_vr(ncol,L)           = litrOM_vr(ielmp,L,NY,NX)/DVOLL
         this%h2D_tSOC_vr(ncol,L)            = SoilOrgM_vr(ielmc,L,NY,NX)/DVOLL
-        this%h2D_POM_C_vr(ncol,L)           = 1.e-3_r8*sum(SolidOM_vr(ielmc,:,micpar%k_POM,L,NY,NX))/VLSoilMicPMass_vr(L,NY,NX)
-        this%h2D_MAOM_C_vr(ncol,L)          = 1.e-3_r8*(sum(SorbedOM_vr(idom_doc,:,L,NY,NX))+sum(SorbedOM_vr(idom_acetate,:,L,NY,NX)))/VLSoilMicPMass_vr(L,NY,NX)
+
+        this%h2D_POM_C_vr(ncol,L)           = sum(SolidOM_vr(ielmc,:,micpar%k_POM,L,NY,NX))*safe_adb(1.e-3_r8,VLSoilMicPMass_vr(L,NY,NX))
+        this%h2D_MAOM_C_vr(ncol,L)          = (sum(SorbedOM_vr(idom_doc,:,L,NY,NX))+sum(SorbedOM_vr(idom_acetate,:,L,NY,NX)))*safe_adb(1.e-3_r8,VLSoilMicPMass_vr(L,NY,NX))
         this%h2D_microbC_vr(ncol,L)         =  micBE(ielmc)/DVOLL
         this%h2D_microbN_vr(ncol,L)         =  micBE(ielmn)/DVOLL
         this%h2D_microbP_vr(ncol,L)         =  micBE(ielmp)/DVOLL
@@ -4201,6 +4203,7 @@ implicit none
       ENDDO 
     ENDDO 
   ENDDO    
+  call PrintInfo('end '//subname)
   end subroutine hist_update
   
 end module HistDataType
