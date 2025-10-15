@@ -540,9 +540,11 @@ module SoilBGCNLayMod
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)  !microbial biomass 
   integer,optional, intent(in) :: I,J
+  character(len=*), parameter :: subname='sumMicBiomLayL'
   integer :: K,N,NGL,M,MID,NE,jcplx1
   real(r8) :: BiomHK(NumPlantChemElms,jcplx)
 
+  call PrintInfo('beg '//subname)
   ORGM   = 0._r8
   BiomHK = 0._r8
   if(L==0)then
@@ -585,6 +587,7 @@ module SoilBGCNLayMod
 !      write(633,*)I*100+J,ORGM(ielmc),BiomHK(ielmc,:)    
 !    endif
 !  endif
+  call PrintInfo('end '//subname)
   end subroutine sumMicBiomLayL
 !------------------------------------------------------------------------------------------
 
@@ -706,11 +709,11 @@ module SoilBGCNLayMod
   implicit none
   integer,  intent(in) :: L,NY,NX
   real(r8), intent(out):: DOM(idom_beg:idom_end)
-
+  character(len=*), parameter :: subname='sumDOML'
   integer :: idom, K
   real(r8) :: DOM_micp(idom_beg:idom_end)
   real(r8) :: DOM_macp(idom_beg:idom_end) 
-  
+  call PrintInfo('beg '//subname)
   DOM      = 0._r8
   DOM_micp = 0._r8
   DOM_macp = 0._r8
@@ -721,6 +724,6 @@ module SoilBGCNLayMod
     ENDDO
   ENDDO
   DOM=DOM_micp+DOM_macp
-
+  call PrintInfo('end '//subname)
   end subroutine sumDOML
 end module SoilBGCNLayMod

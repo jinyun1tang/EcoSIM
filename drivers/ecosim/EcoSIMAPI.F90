@@ -457,8 +457,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
 
       if(do_timing)call end_timer_loop()
-      
-      if(lverb)write(*,*)'hist_update'
+            
       call hist_ecosim%hist_update(I,J,bounds)
 
       call hist_update_hbuf(bounds)
