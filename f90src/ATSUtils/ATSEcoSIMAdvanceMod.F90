@@ -18,9 +18,9 @@ module ATSEcoSIMAdvanceMod
   use ClimForcDataType, only : LWRadSky_col, TairK_col, &
       VPA_col, WindSpeedAtm_col, RainH, VPK_col
   use SoilPropertyDataType
-  use HydroThermData, only : PSISM1_vr, TKSoil1_vr, VHeatCapacity1_vr, &
-      SoilFracAsMicP_vr, VLWatMicP1_vr, VLiceMicP1_vr, FracSoiPAsWat_vr, &
-      FracSoiPAsIce_vr, FracAirFilledSoilPore_vr, VLairMicP1_vr!need the only as some vars
+  use HydroThermData
+  use SurfPhysData
+  use SnowPhysData
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -32,6 +32,7 @@ module ATSEcoSIMAdvanceMod
   use ATSUtilsMod
   use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
+
 
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -56,7 +57,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -321,6 +322,18 @@ implicit none
     surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
+    a_LWCan(NY) = LWRadCanGPrev_col(NY,NX)
+    a_CLHF(NY) = TLEX_col(NY,NX) !Boundary latent heat flux
+    a_CSHF(NY) = TSHX_col(NY,NX) !boundary sensible heat flux
+    a_CanopyWat(NY) = WatHeldOnCanopy_col(NY,NX) !water held on canopy surface
+    a_ET(NY) = QVegET_col(NY,NX) !canopy evapotranspiration
+    a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
+    a_EvapLitr(NY) = TEvapXAir2LitR_col(NY,NX) !litter evaporation
+    a_EvapSnow(NY) = EVAPW(NY,NX) !water evapoartion from snow
+    a_Sublim(NY) = EVAPS(NY,NX) !water sublimation from snow
+    !DO LS=1,JS
+    !  a_TS(LS,L) = TKSnow1_snvr(LS,NY,NX)
+    !ENDDO
     DO L=NU_col(NY,NX),NL_col(NY,NX)
         a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,NY)
     ENDDO
