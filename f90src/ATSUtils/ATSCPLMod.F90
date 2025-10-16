@@ -211,6 +211,33 @@ contains
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
 
+  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
+  a_LWCan = data(:)
+
+  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
+  a_CLHF = data(:)
+
+  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
+  a_CSHF = data(:)
+
+  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
+  a_CanopyWat = data(:)
+
+  call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
+  a_ET = data(:)
+
+  call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
+  a_EvapGrnd = data(:)
+
+  call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
+  a_EvapLitr  = data(:)
+
+  call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
+  a_EvapSnow = data(:)
+
+  call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
+  a_Sublim = data(:)
+
   !call c_f_pointer(state%canopy_height%data, data, (/num_cols/))
   !surf_canopy_height = data(:)
 
@@ -237,6 +264,36 @@ contains
 
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSES
+
+  !call c_f_pointer(state%snow_temperature%data, data2D, [(/size_col/),(/num_cols/)])
+  !data2D(:,:)=a_TS
+
+  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
+  data(:) = a_LWCan
+
+  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
+  data(:) = a_CLHF
+
+  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
+  data(:) = a_CSHF
+
+  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
+  data(:) = a_CanopyWat
+
+  call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
+  data(:) = a_ET
+
+  call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
+  data(:) = a_EvapGrnd
+
+  call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
+  data(:) = a_EvapLitr
+
+  call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
+  data(:) = a_EvapSnow
+
+  call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
+  data(:) = a_Sublim
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source

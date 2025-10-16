@@ -50,7 +50,16 @@ Module SharedDataMod
   real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
   real(r8), allocatable :: a_AREA3(:,:)
   real(r8), allocatable :: a_AREA3_pad(:,:)
-
+  real(r8), allocatable :: a_LWCan(:)         !canopy longwave radiation
+  real(r8), allocatable :: a_CLHF(:)         !Boundary latent heat flux
+  real(r8), allocatable :: a_CSHF(:)         !boundary sensible heat flux
+  real(r8), allocatable :: a_CanopyWat(:)    !water held on canopy surface
+  real(r8), allocatable :: a_ET(:)           !canopy evapotranspiration
+  real(r8), allocatable :: a_EvapGrnd(:)     !bare ground evaporation
+  real(r8), allocatable :: a_EvapLitr(:)     !litter evaporation
+  real(r8), allocatable :: a_EvapSnow(:)     !water evaporation from snow
+  real(r8), allocatable :: a_Sublim(:)       !water sublimation from snow
+  real(r8), allocatable :: a_TS(:,:)         !snow temperature (LS,L dimensions)
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
   real(r8), allocatable :: p_rain(:)      !precipitation, m H2O/s

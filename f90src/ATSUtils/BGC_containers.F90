@@ -158,7 +158,16 @@ module BGCContainers_module
      type (BGCVectorDouble) :: surface_energy_source
      type (BGCVectorDouble) :: surface_water_source
      type (BGCVectorDouble) :: snow_depth
-     type (BGCVectorDouble) :: canopy_height
+     type (BGCVectorDouble) :: canopy_longwave_radiation
+     type (BGCVectorDouble) :: boundary_latent_heat_flux
+     type (BGCVectorDouble) :: boundary_sensible_heat_flux
+     type (BGCVectorDouble) :: canopy_surface_water
+     type (BGCVectorDouble) :: evapotranspiration
+     type (BGCVectorDouble) :: evaporation_bare_ground
+     type (BGCVectorDouble) :: evaporation_litter
+     type (BGCVectorDouble) :: evaporation_snow
+     type (BGCVectorDouble) :: sublimation_snow
+     type (BGCMatrixDouble) :: snow_temperature
      type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
