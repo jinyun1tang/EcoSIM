@@ -97,7 +97,7 @@ module InitSOMBGCMOD
     rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
-    mid_Aerob_HeteroBacter=> micpar%mid_Aerob_HeteroBacter,&    
+    mid_HeterAerobBacter=> micpar%mid_HeterAerobBacter,&    
     OHCK                  => micpar%OHCK,                  &
     OMCK                  => micpar%OMCK,                  &
     OQCK                  => micpar%OQCK,                  &
@@ -194,8 +194,8 @@ module InitSOMBGCMOD
     TOSPK(K) = ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
 !   based on aerobic heterotrophs
 
-    TOSNK(K)=TOSNK(K)+OMCI(ibiom_kinetic,K)*rNCOMC_ave(ibiom_kinetic,mid_Aerob_HeteroBacter,K)+OMCI(ibiom_struct,K)*rNCOMC_ave(ibiom_struct,mid_Aerob_HeteroBacter,K)
-    TOSPK(K)=TOSPK(K)+OMCI(ibiom_kinetic,K)*rPCOMC_ave(ibiom_kinetic,mid_Aerob_HeteroBacter,K)+OMCI(ibiom_struct,K)*rPCOMC_ave(ibiom_struct,mid_Aerob_HeteroBacter,K)
+    TOSNK(K)=TOSNK(K)+OMCI(ibiom_kinetic,K)*rNCOMC_ave(ibiom_kinetic,mid_HeterAerobBacter,K)+OMCI(ibiom_struct,K)*rNCOMC_ave(ibiom_struct,mid_HeterAerobBacter,K)
+    TOSPK(K)=TOSPK(K)+OMCI(ibiom_kinetic,K)*rPCOMC_ave(ibiom_kinetic,mid_HeterAerobBacter,K)+OMCI(ibiom_struct,K)*rPCOMC_ave(ibiom_struct,mid_HeterAerobBacter,K)
 
     TOSCI   = TOSCI+OSCI(K)*TOSCK(K)
     TOSNI   = TOSNI+OSCI(K)*TOSNK(K)
@@ -292,8 +292,8 @@ module InitSOMBGCMOD
     !  X is an indicator of surface residual layer, 1 for subsurface layer
     D8985: DO M=1,ndbiomcp
       OMBioResdu_vr(ielmc,M,K,L,NY,NX) = X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMC_ave(M,mid_Aerob_HeteroBacter,K)*FOSNI)
-      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMC_ave(M,mid_Aerob_HeteroBacter,K)*FOSPI)
+      OMBioResdu_vr(ielmn,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rNCOMC_ave(M,mid_HeterAerobBacter,K)*FOSNI)
+      OMBioResdu_vr(ielmp,M,K,L,NY,NX) = AZMAX1(OMBioResdu_vr(ielmc,M,K,L,NY,NX)*rPCOMC_ave(M,mid_HeterAerobBacter,K)*FOSPI)
       OSCX(KK)                         = OSCX(KK)+OMBioResdu_vr(ielmc,M,K,L,NY,NX)
       OSNX(KK)                         = OSNX(KK)+OMBioResdu_vr(ielmn,M,K,L,NY,NX)
       OSPX(KK)                         = OSPX(KK)+OMBioResdu_vr(ielmp,M,K,L,NY,NX)
@@ -375,9 +375,10 @@ module InitSOMBGCMOD
     RH2PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
   ENDIF
 
-  RO2DmndAutort_vr(:,L,NY,NX)       = 0.0_r8
+  RO2MetaDmndAutor_vr(:,L,NY,NX)       = 0.0_r8
   RNH3OxidAutor_vr(:,L,NY,NX)          = 0.0_r8
-  RNO2OxidAutor_vr(:,L,NY,NX)          = 0.0_r8
+  RNO2XupAutor_vr(:,L,NY,NX)          = 0.0_r8
+  RNO3XupAutor_vr(:,L,NY,NX)          = 0.0_r8
   RN2ODmndReduxAutor_vr(:,L,NY,NX)  = 0.0_r8
   RNH4UptkSoilAutor_vr(:,L,NY,NX)   = 0.0_r8
   RNH4UptkBandAutor_vr(:,L,NY,NX)   = 0.0_r8

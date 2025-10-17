@@ -22,6 +22,8 @@ implicit none
   integer, public :: NumGuild_Autor_AmoniaOxidBact  = 1
   integer, public :: NumGuild_Autor_NitritOxidBact  = 1
   integer, public :: NumGuild_Autor_AerobMethOxid   = 1
+  integer, public :: NumGuild_Autor_ANMO_ANME2d     = 1
+  integer, public :: NumGuild_Autor_ANMO_ANMENC10   = 1
 
   type, public :: MicParType
   real(r8), pointer :: ORCI(:,:)                   !allocation of initial residue to kinetic components, [-]
@@ -54,17 +56,19 @@ implicit none
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
-  integer :: mid_AmmoniaOxidBacter
-  integer :: mid_NitriteOxidBacter
-  integer :: mid_AerobicMethanotrofBacter
-  integer :: mid_H2GenoMethanogArchea
-  integer :: mid_Aerob_HeteroBacter
+  integer :: mid_AutoAmmoniaOxidBacter
+  integer :: mid_AutoNitriteOxidBacter
+  integer :: mid_AutoAeroCH4OxiBacter
+  integer :: mid_AutoH2GenoCH4GenArchea
+  integer :: mid_HeterAerobBacter
   integer :: mid_Facult_DenitBacter
   integer :: mid_Aerob_Fungi
   integer :: mid_fermentor
-  integer :: mid_AcetoMethanogArchea
-  integer :: mid_aerob_N2Fixer
-  integer :: mid_Anaerob_N2Fixer
+  integer :: mid_HeterAcetoCH4GenArchea
+  integer :: mid_HeterAerobN2Fixer
+  integer :: mid_HeterAnaerobN2Fixer
+  integer :: mid_AutoAMOANME2D  !anaerobic methane oxidizer ANME-2d
+  integer :: mid_AutoAMONC10    !anaerobic methane oxidizer NC10
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
@@ -91,6 +95,7 @@ implicit none
   integer, pointer :: JGnfH(:)   !hetetroph guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !autotroph guid indices for autotrophic-microbial complex
   integer, pointer :: JGnfA(:)   !autotroph guid indices for autotrophic-microbial complex
+
   integer :: NumMicrobAutoTrophCmplx        !total number of microbial guilds in the autotrophic complex
   integer :: NumHetetr1MicCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
@@ -178,65 +183,71 @@ contains
 
   !set up functional group ids
   ! five om-complexes
-  this%mid_Aerob_HeteroBacter  = 1
-  this%mid_Facult_DenitBacter  = 2
-  this%mid_Aerob_Fungi         = 3
-  this%mid_fermentor           = 4
-  this%mid_AcetoMethanogArchea = 5
-  this%mid_aerob_N2Fixer       = 6
-  this%mid_Anaerob_N2Fixer     = 7
+  this%mid_HeterAerobBacter     = 1
+  this%mid_Facult_DenitBacter     = 2
+  this%mid_Aerob_Fungi            = 3
+  this%mid_Fermentor              = 4
+  this%mid_HeterAcetoCH4GenArchea = 5
+  this%mid_HeterAerobN2Fixer      = 6
+  this%mid_HeterAnaerobN2Fixer    = 7
 
   !the autotrophic complex
-  this%mid_AmmoniaOxidBacter        = 1
-  this%mid_NitriteOxidBacter        = 2
-  this%mid_AerobicMethanotrofBacter = 3
-  this%mid_H2GenoMethanogArchea     = 5
+  this%mid_AutoAmmoniaOxidBacter  = 1
+  this%mid_AutoNitriteOxidBacter  = 2
+  this%mid_AutoAeroCH4OxiBacter   = 3
+  this%mid_AutoH2GenoCH4GenArchea = 5
+  this%mid_AutoAMOANME2D          = 4
+  this%mid_AutoAMONC10            = 6
 
   this%FG_guilds_heter = 0
   this%FG_guilds_autor = 0
-  this%FG_guilds_heter(this%mid_Aerob_HeteroBacter)  = NumGuild_Heter_Aerob_Bact
+  this%FG_guilds_heter(this%mid_HeterAerobBacter)  = NumGuild_Heter_Aerob_Bact
   this%FG_guilds_heter(this%mid_Aerob_Fungi)         = NumGuild_Heter_Aerob_Fung
   this%FG_guilds_heter(this%mid_Facult_DenitBacter)  = NumGuild_Heter_Facul_Dent
-  this%FG_guilds_heter(this%mid_aerob_N2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
-  this%FG_guilds_heter(this%mid_Anaerob_N2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
+  this%FG_guilds_heter(this%mid_HeterAerobN2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
+  this%FG_guilds_heter(this%mid_HeterAnaerobN2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
   this%FG_guilds_heter(this%mid_fermentor)           = NumGuild_Heter_Anaer_Fermentor
-  this%FG_guilds_heter(this%mid_AcetoMethanogArchea) = NumGuild_Heter_AcetoMethanogen
+  this%FG_guilds_heter(this%mid_HeterAcetoCH4GenArchea) = NumGuild_Heter_AcetoMethanogen
 
-  this%FG_guilds_autor(this%mid_H2GenoMethanogArchea)     = NumGuild_Autor_H2genMethanogen
-  this%FG_guilds_autor(this%mid_AmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
-  this%FG_guilds_autor(this%mid_NitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
-  this%FG_guilds_autor(this%mid_AerobicMethanotrofBacter) = NumGuild_Autor_AerobMethOxid
-
+  this%FG_guilds_autor(this%mid_AutoH2GenoCH4GenArchea)     = NumGuild_Autor_H2genMethanogen
+  this%FG_guilds_autor(this%mid_AutoAmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
+  this%FG_guilds_autor(this%mid_AutoNitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
+  this%FG_guilds_autor(this%mid_AutoAeroCH4OxiBacter) = NumGuild_Autor_AerobMethOxid
+  this%FG_guilds_autor(this%mid_AutoAMOANME2D) = NumGuild_Autor_ANMO_ANME2d
+  this%FG_guilds_autor(this%mid_AutoAMONC10) =NumGuild_Autor_ANMO_ANMENC10
   call this%Initallocate()
 
-  this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter) = .true.
+  this%is_aerobic_hetr(this%mid_HeterAerobBacter) = .true.
   this%is_aerobic_hetr(this%mid_Facult_DenitBacter) = .true.
   this%is_aerobic_hetr(this%mid_Aerob_Fungi)        = .true.
-  this%is_aerobic_hetr(this%mid_aerob_N2Fixer)      = .true.
+  this%is_aerobic_hetr(this%mid_HeterAerobN2Fixer)      = .true.
 
   this%is_anaerobic_hetr(this%mid_fermentor)       = .true.
-  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer) = .true.
+  this%is_anaerobic_hetr(this%mid_HeterAnaerobN2Fixer) = .true.
 
-  this%is_aerobic_autor(this%mid_AmmoniaOxidBacter) =.true.
-  this%is_aerobic_autor(this%mid_NitriteOxidBacter) =.true.
-  this%is_aerobic_autor(this%mid_AerobicMethanotrofBacter)=.true.
+  this%is_aerobic_autor(this%mid_AutoAmmoniaOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AutoNitriteOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AutoAeroCH4OxiBacter)=.true.
 
-  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAmmoniaOxidBacter)  = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoNitriteOxidBacter)  = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAeroCH4OxiBacter)   = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoH2GenoCH4GenArchea) = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAMOANME2D)          = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAMONC10)            = .true.
 
-  this%is_activeMicrbFungrpHeter(this%mid_Aerob_HeteroBacter)  = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)  = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)         = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_fermentor)           = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_AcetoMethanogArchea) = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_aerob_N2Fixer)       = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Anaerob_N2Fixer)     = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAerobBacter)       = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)     = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)            = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_fermentor)              = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAcetoCH4GenArchea) = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAerobN2Fixer)      = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAnaerobN2Fixer)    = .true.
 
-  this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)    = .true.
-  this%is_CO2_autotroph(this%mid_NitriteOxidBacter)    = .true.
-  this%is_CO2_autotroph(this%mid_H2GenoMethanogArchea) = .true.
+  this%is_CO2_autotroph(this%mid_AutoAmmoniaOxidBacter)  = .true.
+  this%is_CO2_autotroph(this%mid_AutoNitriteOxidBacter)  = .true.
+  this%is_CO2_autotroph(this%mid_AutoH2GenoCH4GenArchea) = .true.
+  this%is_CO2_autotroph(this%mid_AutoAMONC10)            = .true.
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -288,7 +299,7 @@ contains
   CNRH = (/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
   CPRH = (/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
   OMCF = (/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
-  OMCA = (/0.6_r8,0.2_r8,0.1_r8,0.0_r8,0.1_r8,0.0_r8,0.0_r8/)*0.1_r8
+  OMCA = (/0.6_r8,0.2_r8,0.05_r8,0.025_r8,0.1_r8,0.025_r8,0.0_r8/)*0.1_r8
 
   OMCI(1:NumLiveMicrbCompts,:)=OMCI1
 
@@ -509,18 +520,18 @@ contains
   logical :: isdef
 
   if(isauto)then
-    isdef=igroup == this%mid_AmmoniaOxidBacter     .or. &
-       igroup == this%mid_NitriteOxidBacter        .or. & 
-       igroup == this%mid_AerobicMethanotrofBacter .or. &
-       igroup == this%mid_H2GenoMethanogArchea
+    isdef=igroup == this%mid_AutoAmmoniaOxidBacter     .or. &
+       igroup == this%mid_AutoNitriteOxidBacter        .or. & 
+       igroup == this%mid_AutoAeroCH4OxiBacter .or. &
+       igroup == this%mid_AutoH2GenoCH4GenArchea
   else
-    isdef=igroup == this%mid_Aerob_HeteroBacter  .or. &
+    isdef=igroup == this%mid_HeterAerobBacter  .or. &
        igroup == this%mid_Facult_DenitBacter     .or. &
        igroup == this%mid_Aerob_Fungi            .or. &
        igroup == this%mid_fermentor              .or. &
-       igroup == this%mid_AcetoMethanogArchea    .or. &
-       igroup == this%mid_aerob_N2Fixer          .or. &
-       igroup == this%mid_Anaerob_N2Fixer
+       igroup == this%mid_HeterAcetoCH4GenArchea    .or. &
+       igroup == this%mid_HeterAerobN2Fixer          .or. &
+       igroup == this%mid_HeterAnaerobN2Fixer
   endif
   end function is_group_defined
 end module MicBGCPars

@@ -28,8 +28,8 @@ module NitroPars
   real(r8) :: FPRIMM       !fraction of microbial C,N,P transferred with priming, [-]
   real(r8) :: OMGR         !rate constant for transferring nonstructural to structural microbial C,[h-1]
   real(r8) :: OQKI         !DOC product inhibition constant for decomposition, [g C m-3]
-  real(r8) :: H2KI         !H2 product inhibition for methanogenesis, [g H m-3]
-  real(r8) :: OAKI         !acetate product inhibition constant for decomposition, [g C m-3]
+  real(r8) :: H2KI         !H2 normalizing mass concentation for Gibbs free energy calculation, [gH m-3]
+  real(r8) :: OAKI         !acetate normalizing mass concentation for Gibbs free energy calculation, [gC m-3]
   real(r8) :: COMKI        !Km to slow microbial decomposition with low microbial C, [g micr C g-1 subs C]
   real(r8) :: COMKM        !Km to slow microbial maintenance respiration with low microbial C, [g micr C g-1 subs C]
   real(r8) :: CKC          !controls C remobilization of microbial C, [g C g-1 C]
@@ -66,9 +66,13 @@ module NitroPars
   real(r8) :: HPMN         !Minimum concentration for H2PO4 uptake kinetics by all microbial functional groups,[g P m-3]
   real(r8) :: ZFKM         !Km for N2 uptake by diazotrophs, [g N m-3]
   real(r8) :: H2KM         !Km for H2 uptake by hydrogenotrophic methanogens, [g H m-3]
-  real(r8) :: ECNH         !efficiency of CO2 conversion to biomass by ammonia oxidizers,[-]
-  real(r8) :: ECNO         !efficiency of CO2 conversion to biomass by nitrite oxidizers,[-]
+  real(r8) :: EAMO10       !efficiency of CO2 conversion to biomass by AMO NC10,[-]
+  real(r8) :: EAMO2D       !efficiency of CH4 conversion to biomass by AMO ANME2d,[-]
+  real(r8) :: ECNH         !efficiency of CO2 conversion to biomass (CH2O) by ammonia oxidizers,[-]
+  real(r8) :: ECNO         !efficiency of CO2 conversion to biomass (CH2O) by nitrite oxidizers,[-]
   real(r8) :: ECHO         !efficiency of CO2 conversion to biomass by methane oxidizers,[-]
+  real(r8) :: VMX2AMONC10  !maximum specific uptake rate of NO2(-) by AMO NC-10, [h-1]
+  real(r8) :: VMX3AMO2D    !maximum specific uptake rate of NO2(-) by AMO ANME-2D, [h-1]
 
   real(r8) :: RNFNI        !parameter for nitrification inhibition,[-]
   real(r8) :: ZHKI         !inhibition of nitrification inhibition by NH3, [g N m-3]
@@ -79,20 +83,25 @@ module NitroPars
   real(r8) :: EOMD         !energy requirements for microbial growth of denitrifiers, [kJ g-1 C]
   real(r8) :: EOMG         !energy requirements for microbial growth of fungi, [kJ g-1 C]
   real(r8) :: EOMF         !energy requirements for microbial growth of fermenters, [kJ g-1 C]
-  real(r8) :: EOMH         !energy requirements for microbial growth of methanogens, [kJ g-1 C]
-  real(r8) :: EOMN         !energy requirements for microbial growth of free-living diazotrophs, [kJ g-1 C]
+  real(r8) :: EOMH         !energy requirements for microbial biomass growth of methanogens, [kJ g-1 C]
+  real(r8) :: EOMN         !energy requirements for microbial biomass growth of free-living diazotrophs, [kJ g-1 C]
+  
   real(r8) :: GO2X         !free energy yields of redox reactions for DOC->CO2, [kJ g-1 C]
-  real(r8) :: GH4X         !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
+  real(r8) :: GH4X         !free energy yields of redox reactions for CH4/O2->CO2, [kJ g-1 C]
   real(r8) :: GCHX         !free energy yields of redox reactions for DOC-acetate, [kJ g-1 C]
-  real(r8) :: GO2A         !free energy yields of redox reactions for acetate-CO2, [kJ g-1 C]
+  real(r8) :: GO2A         !free energy yields of O2-driven redox reactions for acetate-CO2, [kJ g-1 C]
   real(r8) :: GC4X         !free energy yields of redox reactions for acetate-CH4, [kJ g-1 C]
   real(r8) :: GCOX         !free energy yields of redox reactions for CO2-CH4, [kJ g-1 C]
-  real(r8) :: GNOX         !free energy yields of redox reactions for NO3-NO2, NO2-N2O,N2O-N2, [kJ g-1 N]
-  real(r8) :: GN2X           !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
+  real(r8) :: GC2HX        !free energy yields of redox reactions for CH2O-CH4, [kJ g-1 C]
+  real(r8) :: GNOX         !free energy yields of redox reactions for NO3-NO2, NO2-N2O,N2O-N2, [kJ gN-1]
+  real(r8) :: GN3CX        !free energy yields of redox reaction for NO3-CH4, [kJ gC-1]
+  real(r8) :: GN2X         !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
+  real(r8) :: EN2D         !growth respiraiton efficiency for AMO ANME-2D, [-]
+
   real(r8) :: EN2X           !growth respiration efficiency for aerobic N2 fixation, [-]
   real(r8) :: EN2Y           !growth respiration efficiency for anaerobic N2 fixation, [-]
-  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-]
-  real(r8) :: EH4X           !growth respiration efficiency for fermenters, [-]
+  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-], 1g E/(1gE+biom)
+  real(r8) :: EH4X           !growth respiration efficiency for aerobic Ch4 oxidizer, [-]
   real(r8) :: EO2G           !growth respiration efficiency for fungi, [-]
   real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-]
   real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-]
@@ -112,11 +121,13 @@ module NitroPars
   subroutine initNitroPars
   implicit none
 
-  ORAD   = 1.e-6_r8     !
-  BIOS   = 1.e-6_r8/(4._r8/3._r8*PICON*ORAD**3)
-  BIOA   = BIOS*4.0_r8*PICON*ORAD**2
-  FMN    = 1.0E-03_r8    
-
+  ORAD = 1.e-6_r8     !
+  BIOS = 1.e-6_r8/(4._r8/3._r8*PICON*ORAD**3)
+  BIOA = BIOS*4.0_r8*PICON*ORAD**2
+  FMN  = 1.0E-03_r8
+  H2KI = 1.0_r8
+  OAKI = 12._r8
+  
   if(.not.ReadPars())then
     DCKI          = 2.5_r8
     RCCX          = 0.833_r8
@@ -127,7 +138,7 @@ module NitroPars
     FPRIMM        = 1.e-6_r8
     OMGR          = 2.5E-01_r8  !
     OQKI          = 1.2E+03_r8
-    H2KI          = 1.0_r8
+
     OAKI          = 12.0_r8
     COMKI         = 1.0E-03_r8
     COMKM         = 1.0E-04_r8
@@ -136,6 +147,8 @@ module NitroPars
     FOSCZL        = 2.0E-06_r8
     DCKM0         = 1.0E+03_r8
     DCKML         = 1.0E+03_r8
+    VMX2AMONC10   = 0.01_R8
+    VMX3AMO2D     = 0.01_R8 
     VMXO          = 0.125_r8
     VMXF          = 0.125_r8
     VMXCH4gAcet   = 0.125_r8*0.125_r8 !acetoclastic methanogenesis
@@ -164,6 +177,8 @@ module NitroPars
     HPMN          = 0.002_r8
     ZFKM          = 0.14_r8
     H2KM          = 0.01_r8
+    EAMO10        = 0.1_r8
+    EAMO2d        = 0.1_r8
     ECNH          = 0.30_r8
     ECNO          = 0.10_r8
     ECHO          = 0.75_r8
@@ -183,7 +198,9 @@ module NitroPars
     GCHX          = 4.50_r8
     GC4X          = 3.00_r8
     GCOX          = 11.00_r8
+    GC2HX         = 13.5_r8
     GNOX          = 10.0_r8
+    GN3CX         = 41.08_r8
     GN2X          = 187.5_r8
     TSORP         = 0.5_r8
     HSORP         = 1.0_r8
@@ -198,12 +215,13 @@ module NitroPars
   EN2X       = GO2X/GN2X
   EN2Y       = GCHX/GN2X
   EO2X       = 1._r8/(1._r8+GO2X/EOMC)   !1gC produces GO2X energy, fixes GO2X/EOMC gC, so the fraction EO2X is used for producing energy through respiraiton
-  EH4X       = EOMC/(EOMC+GH4X)
+  EH4X       = 1._r8/(1._r8+GH4X/EOMC)   !aerobic methane oxidizer respiraiton efficiency
   EO2G       = 1._r8/(1._r8+GO2X/EOMG)   !
   EO2D       = 1._r8/(1._r8+GO2X/EOMD)
   ENFX       = 1._r8/(1._r8+GO2X/EOMN)
-  ENOX       = EOMC/(EOMC+GNOX)
-  EO2A       = EOMC/(EOMC+GO2A)
+  ENOX       = 1._r8/(1._r8+GNOX/EOMC)
+  EO2A       = 1._r8/(1._r8+GO2A/EOMC)
+  EN2D       = 1._r8/(1._r8+GN3CX/EOMH)
 
   EN2F  = (/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y/)
   EFIRE = reshape((/1.0_r8,1.0_r8,0.917_r8,0.167_r8/),shape(EFIRE))
@@ -231,9 +249,7 @@ module NitroPars
   call ncd_getvar(ncfid,'FPRIM',FPRIM)
   call ncd_getvar(ncfid,'FPRIMM',FPRIMM)
   call ncd_getvar(ncfid,'OMGR',OMGR)
-  call ncd_getvar(ncfid,'H2KI',H2KI)
   call ncd_getvar(ncfid,'OQKI',OQKI)
-  call ncd_getvar(ncfid,'OAKI',OAKI)
   call ncd_getvar(ncfid,'COMKI',COMKI)
   call ncd_getvar(ncfid,'COMKM',COMKM)
   call ncd_getvar(ncfid,'CKC',CKC)
@@ -297,6 +313,8 @@ module NitroPars
   call ncd_getvar(ncfid,'RMOM',RMOM)
   call ncd_getvar(ncfid,'SPORC',SPORC)
   call ncd_getvar(ncfid,'SPOMC',SPOMC)
+  call ncd_getvar(ncfid,'VMX2AMONC10',VMX2AMONC10)
+  call ncd_getvar(ncfid,'VMX3AMO2D',VMX3AMO2D)
   call ncd_pio_closefile(ncfid)
   ans=.true.
   end function ReadPars

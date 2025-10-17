@@ -48,6 +48,7 @@ implicit none
   real(r8) :: CH2GS
   real(r8) :: H2GS
   real(r8) :: CCH4G
+  real(r8) :: CCH4S
   real(r8) :: CH4S
   real(r8) :: CH4AquaSolubility
   real(r8) :: ZNFN0

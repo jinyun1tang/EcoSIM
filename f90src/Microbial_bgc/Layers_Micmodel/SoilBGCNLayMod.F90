@@ -659,10 +659,10 @@ module SoilBGCNLayMod
 
   micBE=0._r8
   if(isauto_loc)then
-    if(igroup /= micpar%mid_AmmoniaOxidBacter        .and. &
-       igroup /= micpar%mid_NitriteOxidBacter        .and. & 
-       igroup /= micpar%mid_AerobicMethanotrofBacter .and. &
-       igroup /= micpar%mid_H2GenoMethanogArchea) then
+    if(igroup /= micpar%mid_AutoAmmoniaOxidBacter        .and. &
+       igroup /= micpar%mid_AutoNitriteOxidBacter        .and. & 
+       igroup /= micpar%mid_AutoAeroCH4OxiBacter .and. &
+       igroup /= micpar%mid_AutoH2GenoCH4GenArchea) then
       call endrun('undefined autotroph group in '//trim(mod_filename),__LINE__)
     endif
 
@@ -676,13 +676,13 @@ module SoilBGCNLayMod
     ENDDO
 
   else
-    if(igroup /= micpar%mid_Aerob_HeteroBacter  .and. &
+    if(igroup /= micpar%mid_HeterAerobBacter  .and. &
        igroup /= micpar%mid_Facult_DenitBacter  .and. &
        igroup /= micpar%mid_Aerob_Fungi         .and. &
        igroup /= micpar%mid_fermentor           .and. &
-       igroup /= micpar%mid_AcetoMethanogArchea .and. &
-       igroup /= micpar%mid_aerob_N2Fixer       .and. &
-       igroup /= micpar%mid_Anaerob_N2Fixer) then
+       igroup /= micpar%mid_HeterAcetoCH4GenArchea .and. &
+       igroup /= micpar%mid_HeterAerobN2Fixer       .and. &
+       igroup /= micpar%mid_HeterAnaerobN2Fixer) then
       call endrun('undefined heterotroph group in '//trim(mod_filename),__LINE__)
     endif
     

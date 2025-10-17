@@ -51,6 +51,7 @@ module MicForcTypeMod
   real(r8) :: RNO2EcoUptkBandPrev
   real(r8) :: RN2OEcoUptkSoilPrev
   real(r8) :: RO2EcoDmndPrev
+  real(r8) :: RCH4EcoDmndPrev
   real(r8) :: RO2GasXchangePrev
   real(r8) :: RCH4PhysexchPrev
   real(r8) :: RCH4GasXchangePrev
