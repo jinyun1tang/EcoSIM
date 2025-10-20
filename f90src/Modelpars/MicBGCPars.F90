@@ -85,11 +85,11 @@ implicit none
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
-  character(len=16) :: kiname(0:jskenc-1)
+  character(len=16) :: kiname(jskenc)
   character(len=16) :: cplxname(1:jcplxc)
   character(len=16) :: hmicname(NumMicbFunGrupsPerCmplx)
   character(len=16) :: amicname(NumMicbFunGrupsPerCmplx)
-  character(len=16) :: micresb(0:NumDeadMicrbCompts-1)      !residual biomass name
+  character(len=16) :: micresb(NumDeadMicrbCompts)      !residual biomass name
   character(len=16) :: micbiom(1:NumLiveMicrbCompts)        !microbial biomass pool name
   integer, pointer :: JGniH(:)   !hetetroph guid indices for organic-microbial complex
   integer, pointer :: JGnfH(:)   !hetetroph guid indices for organic-microbial complex
@@ -152,10 +152,10 @@ contains
   this%k_POM           = this%k_manure+1
   this%k_humus         = this%k_POM+1
   
-  this%kiname(0)   = 'protein'
-  this%kiname(1)   = 'carbhydro'
-  this%kiname(2)   = 'cellulose'
-  this%kiname(3)   = 'lignin'
+  this%kiname(1)   = 'protein'
+  this%kiname(2)   = 'carbhydro'
+  this%kiname(3)   = 'cellulose'
+  this%kiname(4)   = 'lignin'
   this%cplxname(1) = 'woodylitr'
   this%cplxname(2) = 'folialitr'
   this%cplxname(3) = 'manure'
@@ -175,8 +175,8 @@ contains
   this%amicname(4) = 'null'
   this%amicname(6) = 'null'
   this%amicname(7) = 'null'
-  this%micresb(0)  = 'kinetic'
-  this%micresb(1)  = 'recalcitrant'
+  this%micresb(1)  = 'kinetic'
+  this%micresb(2)  = 'recalcitrant'
   this%micbiom(1)  = 'kinetic'
   this%micbiom(2)  = 'recalcitrant'
   this%micbiom(3)  = 'reserve'

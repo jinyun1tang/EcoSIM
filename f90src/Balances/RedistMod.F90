@@ -295,14 +295,16 @@ module RedistMod
 !     QDischarg2WTBL_col=hourly water loss through lateral and lower boundaries
 !
   call PrintInfo('beg '//subname)
+  !external water table from input file
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
-    ! drainage is on
-    DCORPW                     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
-    NatWtblDepz_col(NY,NX)     = DCORPW
+    !natural water table depth from input file
+    NatWtblDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    !
     ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
     ExtWaterTable_col(NY,NX)   = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
+  !external water table from input file
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.24)THEN
     ! drainage in on
     DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
@@ -313,7 +315,7 @@ module RedistMod
       IDWaterTable_col(NY,NX)=4
     ENDIF
     WtblDepzTile_col(NY,NX)   = DCORPW
-    DTBLD_col(NY,NX)              = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+    DTBLD_col(NY,NX)          = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
     TileWaterTable_col(NY,NX) = DTBLD_col(NY,NX)
   ENDIF
 !

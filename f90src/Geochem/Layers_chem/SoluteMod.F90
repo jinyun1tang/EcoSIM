@@ -549,7 +549,7 @@ module SoluteMod
           BandWidthNH4_vr(L+1,NY,NX)     = BandWidthNH4_vr(L,NY,NX)
           BandThicknessNH4_vr(L,NY,NX)   = DLYR_3D(3,L,NY,NX)
         ELSEIF(BandThicknessNH4_vr(L,NY,NX).LT.0.0)THEN
-          BandThicknessNH4_vr(L-1,NY,NX) = BandThicknessNH4_vr(L-1,NY,NX)+BandThicknessNH4_vr(L,NY,NX)
+          IF(L>1)BandThicknessNH4_vr(L-1,NY,NX) = BandThicknessNH4_vr(L-1,NY,NX)+BandThicknessNH4_vr(L,NY,NX)
           BandThicknessNH4_vr(L,NY,NX)   = 0._r8
           BandWidthNH4_vr(L,NY,NX)       = 0._r8
         ENDIF

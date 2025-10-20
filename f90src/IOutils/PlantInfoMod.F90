@@ -1017,7 +1017,7 @@ implicit none
   call writefixl(nu_plt,'SLA1','Specific leaf area vs mass [m2 gC-1]',SLA1_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'SSL1','Specific petiole length vs mass [m gC-1]',PetoLen2Mass_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
-  call writeafixl(nu_plt,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes [-]',LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
+  call writeafixl(nu_plt,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
   call writefixl(nu_plt,'CFI','Initial clumping factor seedling [-]',ClumpFactorInit_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'ANGBR','Stem angle from horizontal [degrees]',BranchAngle_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'ANGSH','Petiole angle from horizontal [degrees]',PetioleAngle_pft(NZ,NY,NX),100)

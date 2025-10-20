@@ -84,7 +84,7 @@ module grosubsMod
   D9985: DO NZ=1,NP
     call StageDisturbances(I,J,NZ)
 
-    IF(IsPlantActive_pft(NZ).EQ.iActive)THEN      
+    IF(IsPlantActive_pft(NZ).EQ.iActive .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
 
       call GrowOnePlant(I,J,NZ,CanopyHeight_copy)
 
@@ -434,7 +434,6 @@ module grosubsMod
     FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_litr))
     FracRootElmAlloc2Litr(NE,k_fine_litr)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_litr))
   ENDDO
-  
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
 !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
@@ -462,6 +461,7 @@ module grosubsMod
 !
   RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
   RootPrimeAxsNum           = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+
   !
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
   !     FROM CANOPY TURGOR
