@@ -90,6 +90,21 @@ def read_fert_file(ifile,mfname,nc_fid):
             line=infile.readline().strip()
             k1=k1+1
 
+def count_lines_iterative(filepath):
+    """Counts the number of lines in a file by iterating through it."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as file:
+            line_count = 0
+            for line in file:
+                line_count += 1
+            return line_count
+    except FileNotFoundError:
+        print(f"Error: The file '{filepath}' was not found.")
+        return -1 # Or raise an exception
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return -1
+        
 def read_irrig_file(ifile,mfname,nc_fid):
     """
     read irrigation file
@@ -107,13 +122,13 @@ def read_irrig_file(ifile,mfname,nc_fid):
             line=infile.readline().strip()
             k1=k1+1
     
-def read_till_file(ifile,mfname,nc_fid):        
+def read_till_file(ifile,mfname,nc_fid,nrecors):        
     """
     read tillage file
     """
     with open(ifile,"r") as infile:
         line=infile.readline().strip()
-        for k1 in range(12):
+        for k1 in range(nrecors):
             nc_fid.variables[mfname][k1,:]=' '*24
         k1=0
         while line:
@@ -146,8 +161,7 @@ def write_soil_mgmt(config_dict):
 
     nc_fid.createDimension('ntopou', ntopu)
     nc_fid.createDimension('nchar1', 10)
-    nc_fid.createDimension('nchart', 24)
-    nc_fid.createDimension('ntill', 12)
+    nc_fid.createDimension('nchart', 24)    
     nc_fid.createDimension('nfert', 12)
     nc_fid.createDimension('nfire', 12)    
     nc_fid.createDimension('nirri', 24)    
@@ -317,9 +331,17 @@ def write_soil_mgmt(config_dict):
                             for ic in range(len(fnms[0])):                                
                                 nc_fid.variables['tillf'][jj,ng,ic]=fnms[0][ic]
                             ifile=mdir+fnms[0]    
+                            nrecords=count_lines_iterative(ifile)
+                            if 'ntill' not in nc_fid.dimensions:
+                                if nrecords > 300:
+                                    nrecord=367
+                                    nc_fid.createDimension('ntill', 367)
+                                else:
+                                    nrecord=12
+                                    nc_fid.createDimension('ntill', 12)
                             w_nc_var=nc_fid.createVariable(fnms[0], 'S1', ('ntill','nchart'))
                             w_nc_var.long_name='Tillage file'                            
-                            read_till_file(ifile,fnms[0],nc_fid)
+                            read_till_file(ifile,fnms[0],nc_fid,nrecord)
 
                                 
                         #fertilization

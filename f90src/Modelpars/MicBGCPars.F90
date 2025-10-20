@@ -22,9 +22,11 @@ implicit none
   integer, public :: NumGuild_Autor_AmoniaOxidBact  = 1
   integer, public :: NumGuild_Autor_NitritOxidBact  = 1
   integer, public :: NumGuild_Autor_AerobMethOxid   = 1
+  integer, public :: NumGuild_Autor_ANMO_ANME2d     = 1
+  integer, public :: NumGuild_Autor_ANMO_ANMENC10   = 1
 
   type, public :: MicParType
-  real(r8), pointer :: ORCI(:,:)                   !allocation of residue to kinetic components, [-]
+  real(r8), pointer :: ORCI(:,:)                   !allocation of initial residue to kinetic components, [-]
   real(r8), pointer :: FL(:)                       !allocation to microbial kinetic fractions, [-]
   real(r8), pointer :: rNCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial N:C, [gN gC-1]
   real(r8), pointer :: rPCOMC(:,:,:)               !maximum/minimum mass based heterotrophic microbial P:C,  [gP gC-1]
@@ -32,16 +34,16 @@ implicit none
   real(r8), pointer :: rPCOMCAutor(:,:)            !maximum/minimum mass based autotrophic microbial P:C, [gP gC-1]
   real(r8), pointer :: rNCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial N:C, [gN gC-1]
   real(r8), pointer :: rPCOMC_ave(:,:,:)           !group average maximum/minimum mass based microbial P:C, [gP gC-1]
-  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
-  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
+!  real(r8), pointer :: rNCOMCAutor_ave(:,:)        !group average maximum/minimum mass based microbial N:C, [gN gC-1]
+!  real(r8), pointer :: rPCOMCAutora_ave(:,:)       !group average maximum/minimum mass based microbial P:C, [gP gC-1]
   real(r8), pointer :: DOSA(:)                     !rate constant for litter colonization by heterotrophs, [h-1]
   real(r8), pointer :: SPOSC(:,:)                  !specific decomposition rate constant, [h-1]
-  real(r8), pointer :: CNOFC(:,:)                  !fractions to allocate N to kinetic components,[-]
-  real(r8), pointer :: CPOFC(:,:)                  !fractions to allocate P to kinetic components, [-]
-  real(r8), pointer :: CNRH(:)                     !default N:C ratios in SOC complexes,[gN gC-1]
-  real(r8), pointer :: CPRH(:)                     !default P:C ratios in SOC complexes, [gN gC-1]
-  real(r8), pointer :: OMCF(:)                     !heterotrophic microbial biomass composition in SOC, [gC gC-1]
-  real(r8), pointer :: OMCA(:)                     !autotrophic microbial biomass composition in SOC, [gC gC-1]
+  real(r8), pointer :: CNOFC(:,:)                  !Fractions of initial litter to allocate N to kinetic components,[-]
+  real(r8), pointer :: CPOFC(:,:)                  !Fractions of iniital litter to allocate P to kinetic components, [-]
+  real(r8), pointer :: CNRH(:)                     !Default N:C ratios in SOC complexes,[gN gC-1]
+  real(r8), pointer :: CPRH(:)                     !Default P:C ratios in SOC complexes, [gN gC-1]
+  real(r8), pointer :: OMCF(:)                     !Initial fractional composition of heterotrophic microbial biomass, [gC gC-1]
+  real(r8), pointer :: OMCA(:)                     !Initial fractional composition of autotrophic microbial biomass, [gC gC-1]
   integer  :: FG_guilds_heter(NumMicbFunGrupsPerCmplx)  !# of guilds
   integer  :: FG_guilds_autor(NumMicbFunGrupsPerCmplx)  !# of guilds
 
@@ -54,25 +56,27 @@ implicit none
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
-  integer :: mid_AmmoniaOxidBacter
-  integer :: mid_NitriteOxidBacter
-  integer :: mid_AerobicMethanotrofBacter
-  integer :: mid_H2GenoMethanogArchea
-  integer :: mid_Aerob_HeteroBacter
+  integer :: mid_AutoAmmoniaOxidBacter
+  integer :: mid_AutoNitriteOxidBacter
+  integer :: mid_AutoAeroCH4OxiBacter
+  integer :: mid_AutoH2GenoCH4GenArchea
+  integer :: mid_HeterAerobBacter
   integer :: mid_Facult_DenitBacter
   integer :: mid_Aerob_Fungi
   integer :: mid_fermentor
-  integer :: mid_AcetoMethanogArchea
-  integer :: mid_aerob_N2Fixer
-  integer :: mid_Anaerob_N2Fixer
+  integer :: mid_HeterAcetoCH4GenArchea
+  integer :: mid_HeterAerobN2Fixer
+  integer :: mid_HeterAnaerobN2Fixer
+  integer :: mid_AutoAMOANME2D  !anaerobic methane oxidizer ANME-2d
+  integer :: mid_AutoAMONC10    !anaerobic methane oxidizer NC10
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), pointer :: OMCI(:,:)                    !initializes microbial biomass
-  real(r8), pointer :: OHCK(:)                      !fractions of SOC in adsorbed C
-  real(r8), pointer :: OMCK(:)                      !fractions of SOC in biomass
-  real(r8), pointer :: ORCK(:)                      !fractions of SOC in litter
-  real(r8), pointer :: OQCK(:)                      !fractions of SOC in DOC
+  real(r8), pointer :: OMCI(:,:)                    !fraction  of initial SOC/litterfall in microbial biomass
+  real(r8), pointer :: OHCK(:)                      !fractions of initial SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)                      !fractions of initial SOC as living microibal biomass
+  real(r8), pointer :: ORCK(:)                      !fractions of initial SOC as litter
+  real(r8), pointer :: OQCK(:)                      !fractions of initial SOC as DOC
   logical,  pointer :: is_activeMicrbFungrpAutor(:) !logical switch for autotrophic group
   logical,  pointer :: is_activeMicrbFungrpHeter(:) !logical switch for heterotrophic group
   logical,  pointer :: is_aerobic_hetr(:)           !logical flag for aerobic heterotrophs
@@ -81,16 +85,17 @@ implicit none
   logical,  pointer :: is_litter(:)
   logical,  pointer :: is_finelitter(:)
   logical,  pointer :: is_CO2_autotroph(:)
-  character(len=16) :: kiname(0:jskenc-1)
+  character(len=16) :: kiname(jskenc)
   character(len=16) :: cplxname(1:jcplxc)
   character(len=16) :: hmicname(NumMicbFunGrupsPerCmplx)
   character(len=16) :: amicname(NumMicbFunGrupsPerCmplx)
-  character(len=16) :: micresb(0:NumDeadMicrbCompts-1)      !residual biomass name
+  character(len=16) :: micresb(NumDeadMicrbCompts)      !residual biomass name
   character(len=16) :: micbiom(1:NumLiveMicrbCompts)        !microbial biomass pool name
   integer, pointer :: JGniH(:)   !hetetroph guid indices for organic-microbial complex
   integer, pointer :: JGnfH(:)   !hetetroph guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !autotroph guid indices for autotrophic-microbial complex
   integer, pointer :: JGnfA(:)   !autotroph guid indices for autotrophic-microbial complex
+
   integer :: NumMicrobAutoTrophCmplx        !total number of microbial guilds in the autotrophic complex
   integer :: NumHetetr1MicCmplx         !total number of microbial guilds in one organic-microbial complex
   integer :: NumOfLitrCmplxs                !number of litter organo-microbial complexes, plant litter + manure
@@ -147,10 +152,10 @@ contains
   this%k_POM           = this%k_manure+1
   this%k_humus         = this%k_POM+1
   
-  this%kiname(0)   = 'protein'
-  this%kiname(1)   = 'carbhydro'
-  this%kiname(2)   = 'cellulose'
-  this%kiname(3)   = 'lignin'
+  this%kiname(1)   = 'protein'
+  this%kiname(2)   = 'carbhydro'
+  this%kiname(3)   = 'cellulose'
+  this%kiname(4)   = 'lignin'
   this%cplxname(1) = 'woodylitr'
   this%cplxname(2) = 'folialitr'
   this%cplxname(3) = 'manure'
@@ -170,73 +175,79 @@ contains
   this%amicname(4) = 'null'
   this%amicname(6) = 'null'
   this%amicname(7) = 'null'
-  this%micresb(0)  = 'labile'
-  this%micresb(1)  = 'resist'
-  this%micbiom(1)  = 'labile'
-  this%micbiom(2)  = 'resist'
-  this%micbiom(3)  = 'active'
+  this%micresb(1)  = 'kinetic'
+  this%micresb(2)  = 'recalcitrant'
+  this%micbiom(1)  = 'kinetic'
+  this%micbiom(2)  = 'recalcitrant'
+  this%micbiom(3)  = 'reserve'
 
   !set up functional group ids
   ! five om-complexes
-  this%mid_Aerob_HeteroBacter  = 1
-  this%mid_Facult_DenitBacter  = 2
-  this%mid_Aerob_Fungi         = 3
-  this%mid_fermentor           = 4
-  this%mid_AcetoMethanogArchea = 5
-  this%mid_aerob_N2Fixer       = 6
-  this%mid_Anaerob_N2Fixer     = 7
+  this%mid_HeterAerobBacter     = 1
+  this%mid_Facult_DenitBacter     = 2
+  this%mid_Aerob_Fungi            = 3
+  this%mid_Fermentor              = 4
+  this%mid_HeterAcetoCH4GenArchea = 5
+  this%mid_HeterAerobN2Fixer      = 6
+  this%mid_HeterAnaerobN2Fixer    = 7
 
   !the autotrophic complex
-  this%mid_AmmoniaOxidBacter        = 1
-  this%mid_NitriteOxidBacter        = 2
-  this%mid_AerobicMethanotrofBacter = 3
-  this%mid_H2GenoMethanogArchea     = 5
+  this%mid_AutoAmmoniaOxidBacter  = 1
+  this%mid_AutoNitriteOxidBacter  = 2
+  this%mid_AutoAeroCH4OxiBacter   = 3
+  this%mid_AutoH2GenoCH4GenArchea = 5
+  this%mid_AutoAMOANME2D          = 4
+  this%mid_AutoAMONC10            = 6
 
   this%FG_guilds_heter = 0
   this%FG_guilds_autor = 0
-  this%FG_guilds_heter(this%mid_Aerob_HeteroBacter)  = NumGuild_Heter_Aerob_Bact
+  this%FG_guilds_heter(this%mid_HeterAerobBacter)  = NumGuild_Heter_Aerob_Bact
   this%FG_guilds_heter(this%mid_Aerob_Fungi)         = NumGuild_Heter_Aerob_Fung
   this%FG_guilds_heter(this%mid_Facult_DenitBacter)  = NumGuild_Heter_Facul_Dent
-  this%FG_guilds_heter(this%mid_aerob_N2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
-  this%FG_guilds_heter(this%mid_Anaerob_N2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
+  this%FG_guilds_heter(this%mid_HeterAerobN2Fixer)       = NumGuild_Heter_Aerob_N2Fixer
+  this%FG_guilds_heter(this%mid_HeterAnaerobN2Fixer)     = NumGuild_Heter_Anaer_N2Fixer
   this%FG_guilds_heter(this%mid_fermentor)           = NumGuild_Heter_Anaer_Fermentor
-  this%FG_guilds_heter(this%mid_AcetoMethanogArchea) = NumGuild_Heter_AcetoMethanogen
+  this%FG_guilds_heter(this%mid_HeterAcetoCH4GenArchea) = NumGuild_Heter_AcetoMethanogen
 
-  this%FG_guilds_autor(this%mid_H2GenoMethanogArchea)     = NumGuild_Autor_H2genMethanogen
-  this%FG_guilds_autor(this%mid_AmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
-  this%FG_guilds_autor(this%mid_NitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
-  this%FG_guilds_autor(this%mid_AerobicMethanotrofBacter) = NumGuild_Autor_AerobMethOxid
-
+  this%FG_guilds_autor(this%mid_AutoH2GenoCH4GenArchea)     = NumGuild_Autor_H2genMethanogen
+  this%FG_guilds_autor(this%mid_AutoAmmoniaOxidBacter)        = NumGuild_Autor_AmoniaOxidBact
+  this%FG_guilds_autor(this%mid_AutoNitriteOxidBacter)        = NumGuild_Autor_NitritOxidBact
+  this%FG_guilds_autor(this%mid_AutoAeroCH4OxiBacter) = NumGuild_Autor_AerobMethOxid
+  this%FG_guilds_autor(this%mid_AutoAMOANME2D) = NumGuild_Autor_ANMO_ANME2d
+  this%FG_guilds_autor(this%mid_AutoAMONC10) =NumGuild_Autor_ANMO_ANMENC10
   call this%Initallocate()
 
-  this%is_aerobic_hetr(this%mid_Aerob_HeteroBacter) = .true.
+  this%is_aerobic_hetr(this%mid_HeterAerobBacter) = .true.
   this%is_aerobic_hetr(this%mid_Facult_DenitBacter) = .true.
   this%is_aerobic_hetr(this%mid_Aerob_Fungi)        = .true.
-  this%is_aerobic_hetr(this%mid_aerob_N2Fixer)      = .true.
+  this%is_aerobic_hetr(this%mid_HeterAerobN2Fixer)      = .true.
 
   this%is_anaerobic_hetr(this%mid_fermentor)       = .true.
-  this%is_anaerobic_hetr(this%mid_Anaerob_N2Fixer) = .true.
+  this%is_anaerobic_hetr(this%mid_HeterAnaerobN2Fixer) = .true.
 
-  this%is_aerobic_autor(this%mid_AmmoniaOxidBacter) =.true.
-  this%is_aerobic_autor(this%mid_NitriteOxidBacter) =.true.
-  this%is_aerobic_autor(this%mid_AerobicMethanotrofBacter)=.true.
+  this%is_aerobic_autor(this%mid_AutoAmmoniaOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AutoNitriteOxidBacter) =.true.
+  this%is_aerobic_autor(this%mid_AutoAeroCH4OxiBacter)=.true.
 
-  this%is_activeMicrbFungrpAutor(this%mid_AmmoniaOxidBacter)        = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_NitriteOxidBacter)        = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_AerobicMethanotrofBacter) = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_H2GenoMethanogArchea)     = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAmmoniaOxidBacter)  = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoNitriteOxidBacter)  = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAeroCH4OxiBacter)   = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoH2GenoCH4GenArchea) = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAMOANME2D)          = .true.
+  this%is_activeMicrbFungrpAutor(this%mid_AutoAMONC10)            = .true.
 
-  this%is_activeMicrbFungrpHeter(this%mid_Aerob_HeteroBacter)  = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)  = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)         = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_fermentor)           = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_AcetoMethanogArchea) = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_aerob_N2Fixer)       = .true.
-  this%is_activeMicrbFungrpHeter(this%mid_Anaerob_N2Fixer)     = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAerobBacter)       = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)     = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_Aerob_Fungi)            = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_fermentor)              = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAcetoCH4GenArchea) = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAerobN2Fixer)      = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterAnaerobN2Fixer)    = .true.
 
-  this%is_CO2_autotroph(this%mid_AmmoniaOxidBacter)    = .true.
-  this%is_CO2_autotroph(this%mid_NitriteOxidBacter)    = .true.
-  this%is_CO2_autotroph(this%mid_H2GenoMethanogArchea) = .true.
+  this%is_CO2_autotroph(this%mid_AutoAmmoniaOxidBacter)  = .true.
+  this%is_CO2_autotroph(this%mid_AutoNitriteOxidBacter)  = .true.
+  this%is_CO2_autotroph(this%mid_AutoH2GenoCH4GenArchea) = .true.
+  this%is_CO2_autotroph(this%mid_AutoAMONC10)            = .true.
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -246,8 +257,7 @@ contains
   implicit none
   class(MicParType) :: this
 
-  real(r8) :: COMCI(NumLiveMicrbCompts,1:this%jcplx)
-  real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of biomass to kinetic components
+  real(r8) :: OMCI1(NumLiveMicrbCompts,1:this%jcplx)  !allocation of living biomass to different components
   integer :: K,M,NGL,N
   associate(                         &
     OHCK        => this%OHCK,        &
@@ -270,72 +280,68 @@ contains
     OMCF        => this%OMCF,        &
     OMCA        => this%OMCA         &
   )
-  OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
-  OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
-  ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)
-  OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8)
+  OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)      
+  OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)      
+  ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)      
+  OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8) 
 
-  OMCI1=reshape(real((/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005, &
-     0.010,0.050,0.005,0.010,0.050,0.005/),r8),shape(OMCI1))
+  OMCI1=reshape(real(   &
+    (/0.010,0.050,0.005,&
+      0.050,0.050,0.005,&
+      0.050,0.050,0.005,&
+      0.010,0.050,0.005,&
+      0.010,0.050,0.005/),r8),shape(OMCI1))
 
   ORCI=reshape(real((/0.01,0.05,0.01,0.05,0.01,0.05 &
      ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
 
-  DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
 
-  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8,7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
-    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
-    ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))
-
-  SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
-
-  CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
-  CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
-  OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
-  OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
+  CNRH = (/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
+  CPRH = (/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
+  OMCF = (/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
+  OMCA = (/0.6_r8,0.2_r8,0.05_r8,0.025_r8,0.1_r8,0.025_r8,0.0_r8/)*0.1_r8
 
   OMCI(1:NumLiveMicrbCompts,:)=OMCI1
 
-!  if(this%jguilds.GT.1)then
-!    COMCI=OMCI(1:NumLiveMicrbCompts,:)
-!    DO K=1,jcplxc
-!      DO NGL=2,this%jguilds-1
-!        DO M=1,NumLiveMicrbCompts
-!          OMCI(M+(NGL-1)*NumLiveMicrbCompts,K)=OMCI(M,K)
-!          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
-!        enddo
-!      enddo
-!      DO M=1,NumLiveMicrbCompts
-!        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
-!      ENDDO
-!    enddo
-!  endif
-
-
-! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
+  ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
+  ! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 
   CNOFC(1:jskenc,this%k_woody_litr) = real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
   CPOFC(1:jskenc,this%k_woody_litr) = real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
   CNOFC(1:jskenc,this%k_fine_litr)  = real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
   CPOFC(1:jskenc,this%k_fine_litr)  = real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
   CNOFC(1:jskenc,this%k_manure)     = real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
-  CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
-  FL(1:2)=real((/0.55,0.45/),r8)
+  CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure  
 
+  !microbial traits
+  DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
+
+  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,0.05_r8,0.0_r8,0.0_r8,0.0_r8 &
+    ,0.05_r8,0.0167_r8,0.0_r8,0.0_r8/),shape(sposc))
+
+  SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
+
+  FL(1:2)=real((/0.55,0.45/),r8)
+  !set stoichiometry of heterotrophs
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbFunGrupsPerCmplx
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
+        !Fungi      
         DO NGL=this%JGniH(n),this%JGnfH(n)
-          rNCOMC(ibiom_kinetic,NGL,K) = 0.15_r8           !maximum
-          rNCOMC(ibiom_struct,NGL,K) = 0.09_r8           !maximum
-          rPCOMC(ibiom_kinetic,NGL,K) = 0.015_r8
-          rPCOMC(ibiom_struct,NGL,K) = 0.009_r8
+          rNCOMC(ibiom_kinetic,NGL,K) = 0.15_r8           !NC ratio of kinetic biomass
+          rNCOMC(ibiom_struct,NGL,K) = 0.09_r8            !NC ratio of structural biomass
+          rPCOMC(ibiom_kinetic,NGL,K) = 0.015_r8          !PC ratio of kinetic biomass
+          rPCOMC(ibiom_struct,NGL,K) = 0.009_r8           !PC ratio of structural biomass
         ENDDO
-        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.15_r8           !maximum of
-        this%rNCOMC_ave(ibiom_struct,N,K)=0.09_r8            !maximum of 
+        this%rNCOMC_ave(ibiom_kinetic,N,K)=0.15_r8           
+        this%rNCOMC_ave(ibiom_struct,N,K)=0.09_r8            
         this%rPCOMC_ave(ibiom_kinetic,N,K)=0.015_r8
         this%rPCOMC_ave(ibiom_struct,N,K)=0.009_r8
+
+        !bacteria  
       ELSE
         do NGL=this%JGniH(n),this%JGnfH(n)
           rNCOMC(ibiom_kinetic,NGL,K)=0.225_r8
@@ -348,14 +354,18 @@ contains
         this%rPCOMC_ave(ibiom_kinetic,N,K)=0.0225_r8
         this%rPCOMC_ave(ibiom_struct,N,K)=0.0135_r8
       ENDIF
+
+      !reserve biomass
       do NGL=this%JGniH(n),this%JGnfH(n)
-        rNCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))
-        rPCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))
+        rNCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rNCOMC(1:2,NGL,K))     !NC ratio
+        rPCOMC(ibiom_reserve,NGL,K)=DOT_PRODUCT(FL,rPCOMC(1:2,NGL,K))     !PC ratio
       enddo
       this%rNCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rNCOMC_ave(1:2,N,K))
       this%rPCOMC_ave(ibiom_reserve,N,K)=DOT_PRODUCT(FL,this%rPCOMC_ave(1:2,N,K))
     enddo
   ENDDO D95
+
+  !set stoichiometry of autotrophs
   DO  N=1,this%NumMicbFunGrupsPerCmplx
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(ibiom_kinetic,NGL) = 0.225_r8
@@ -363,16 +373,17 @@ contains
       rPCOMCAutor(ibiom_kinetic,NGL) = 0.0225_r8
       rPCOMCAutor(ibiom_struct,NGL)  = 0.0135_r8
     enddo
-    this%rNCOMCAutor_ave(ibiom_kinetic,N)=0.225_r8
-    this%rNCOMCAutor_ave(ibiom_struct,N)=0.135_r8
-    this%rPCOMCAutora_ave(ibiom_kinetic,N)=0.0225_r8
-    this%rPCOMCAutora_ave(ibiom_struct,N)=0.0135_r8
+ !   this%rNCOMCAutor_ave(ibiom_kinetic,N)=0.225_r8
+ !   this%rNCOMCAutor_ave(ibiom_struct,N)=0.135_r8
+
+!    this%rPCOMCAutora_ave(ibiom_kinetic,N)=0.0225_r8
+!    this%rPCOMCAutora_ave(ibiom_struct,N)=0.0135_r8
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rNCOMCAutor(1:2,NGL))
       rPCOMCAutor(ibiom_reserve,NGL)=DOT_PRODUCT(FL,rPCOMCAutor(1:2,NGL))
     enddo
-    this%rNCOMCAutor_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
-    this%rPCOMCAutora_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
+!    this%rNCOMCAutor_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rNCOMCAutor_ave(1:2,N))
+!    this%rPCOMCAutora_ave(ibiom_reserve,N)=DOT_PRODUCT(FL,this%rPCOMCAutora_ave(1:2,N))
   enddo
 
   end associate
@@ -433,8 +444,8 @@ contains
   allocate(this%rPCOMCAutor(NumLiveMicrbCompts,this%NumMicrobAutoTrophCmplx))
   allocate(this%rNCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
   allocate(this%rPCOMC_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx,1:jcplx))
-  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
-  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+!  allocate(this%rNCOMCAutor_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
+!  allocate(this%rPCOMCAutora_ave(NumLiveMicrbCompts,NumMicbFunGrupsPerCmplx))
 
   allocate(this%CNOFC(jsken,1:this%NumOfLitrCmplxs))
   allocate(this%CPOFC(jsken,1:this%NumOfLitrCmplxs))
@@ -509,18 +520,18 @@ contains
   logical :: isdef
 
   if(isauto)then
-    isdef=igroup == this%mid_AmmoniaOxidBacter     .or. &
-       igroup == this%mid_NitriteOxidBacter        .or. & 
-       igroup == this%mid_AerobicMethanotrofBacter .or. &
-       igroup == this%mid_H2GenoMethanogArchea
+    isdef=igroup == this%mid_AutoAmmoniaOxidBacter     .or. &
+       igroup == this%mid_AutoNitriteOxidBacter        .or. & 
+       igroup == this%mid_AutoAeroCH4OxiBacter .or. &
+       igroup == this%mid_AutoH2GenoCH4GenArchea
   else
-    isdef=igroup == this%mid_Aerob_HeteroBacter  .or. &
+    isdef=igroup == this%mid_HeterAerobBacter  .or. &
        igroup == this%mid_Facult_DenitBacter     .or. &
        igroup == this%mid_Aerob_Fungi            .or. &
        igroup == this%mid_fermentor              .or. &
-       igroup == this%mid_AcetoMethanogArchea    .or. &
-       igroup == this%mid_aerob_N2Fixer          .or. &
-       igroup == this%mid_Anaerob_N2Fixer
+       igroup == this%mid_HeterAcetoCH4GenArchea    .or. &
+       igroup == this%mid_HeterAerobN2Fixer          .or. &
+       igroup == this%mid_HeterAnaerobN2Fixer
   endif
   end function is_group_defined
 end module MicBGCPars

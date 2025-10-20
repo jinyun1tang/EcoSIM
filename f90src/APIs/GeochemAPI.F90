@@ -128,7 +128,7 @@ module GeochemAPI
             chemvar%BKVLPO             = chemvar%VLWatMicPPO
             chemvar%BKVLPB             = chemvar%VLWatMicPPB
           ENDIF
-
+          !set other variables of chemvar
           call UpdateSoilFertlizer(I,J,L,NY,NX,chemvar)
 
           call GeochemAPISend(L,NY,NX,chemvar,solflx)

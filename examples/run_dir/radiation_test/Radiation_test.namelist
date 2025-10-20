@@ -6,7 +6,7 @@
 case_name='Radiation'
 prefix='../../inputs/blodgett/'
 do_regression_test=.false.
-pft_file_in='../../inputs/blodgett/blodgett_pftpar_20241010.nc'
+pft_file_in='../../inputs/blodgett/ecosim_pftpar_20251018.nc'
 grid_file_in='../../inputs/blodgett/Blodget_grid_20240622.nc'
 pft_mgmt_in='../../inputs/blodgett/Blodget_pft_20240622.ENF.nc'
 clm_hour_file_in='../../inputs/blodgett/Blodget.clim.2012-2022.nc'

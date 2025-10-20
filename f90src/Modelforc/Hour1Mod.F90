@@ -1013,10 +1013,10 @@ module Hour1Mod
   trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
   trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3      
 
-! initialize all band nutrients to zero
+  ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
   IF(VLWatMicP_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-! exclude NH3B,
+    ! exclude NH3B,
     DO idg=idg_beg,idg_NH3
       trc_solcl_vr(idg,0,NY,NX)=AZMAX1(trcs_solml_vr(idg,0,NY,NX)-trcs_solml_drib_vr(idg,0,NY,NX))/VLWatMicP_vr(0,NY,NX)
     ENDDO
@@ -1059,6 +1059,7 @@ module Hour1Mod
 !     R*Y,R*X=total substrate uptake from previous,current hour
 !     used in nitro.f, uptake.f
 !
+  RCH4EcoDmndPrev_vr(0,NY,NX)       = RCH4EcoDmnd_vr(0,NY,NX)
   RO2EcoDmndPrev_vr(0,NY,NX)        = REcoO2DmndResp_vr(0,NY,NX)
   RNH4EcoDmndSoilPrev_vr(0,NY,NX)   = REcoNH4DmndSoil_vr(0,NY,NX)
   RNO3EcoDmndSoilPrev_vr(0,NY,NX)   = REcoNO3DmndSoil_vr(0,NY,NX)
@@ -1066,6 +1067,7 @@ module Hour1Mod
   RN2OEcoUptkSoilPrev_vr(0,NY,NX)   = RN2OEcoUptkSoil_vr(0,NY,NX)
   RH1PO4EcoDmndSoilPrev_vr(0,NY,NX) = REcoH1PO4DmndSoil_vr(0,NY,NX)
   RH2PO4EcoDmndSoilPrev_vr(0,NY,NX) = REcoH2PO4DmndSoil_vr(0,NY,NX)
+  RCH4EcoDmnd_vr(0,NY,NX)           = 0._r8
   REcoO2DmndResp_vr(0,NY,NX)        = 0._r8
   REcoNH4DmndSoil_vr(0,NY,NX)       = 0._r8
   REcoNO3DmndSoil_vr(0,NY,NX)       = 0._r8
@@ -1209,6 +1211,7 @@ module Hour1Mod
 ! R*Y,R*X=total substrate uptake from previous,current hour
 ! used in nitro.f, uptake.f
 !
+    RCH4EcoDmndPrev_vr(L,NY,NX)       = RCH4EcoDmnd_vr(L,NY,NX)
     RO2EcoDmndPrev_vr(L,NY,NX)        = REcoO2DmndResp_vr(L,NY,NX)
     RNH4EcoDmndSoilPrev_vr(L,NY,NX)   = REcoNH4DmndSoil_vr(L,NY,NX)
     RNO3EcoDmndSoilPrev_vr(L,NY,NX)   = REcoNO3DmndSoil_vr(L,NY,NX)
@@ -1221,18 +1224,19 @@ module Hour1Mod
     RNO2EcoUptkBandPrev_vr(L,NY,NX)   = RNO2EcoUptkBand_vr(L,NY,NX)
     RH1PO4EcoDmndBandPrev_vr(L,NY,NX) = REcoH1PO4DmndBand_vr(L,NY,NX)
     RH2PO4EcoDmndBandPrev_vr(L,NY,NX) = REcoH2PO4DmndBand_vr(L,NY,NX)
-    REcoO2DmndResp_vr(L,NY,NX)        = 0._r8
-    REcoNH4DmndSoil_vr(L,NY,NX)       = 0._r8
-    REcoNO3DmndSoil_vr(L,NY,NX)       = 0._r8
-    RNO2EcoUptkSoil_vr(L,NY,NX)       = 0._r8
-    RN2OEcoUptkSoil_vr(L,NY,NX)       = 0._r8
-    REcoH1PO4DmndSoil_vr(L,NY,NX)     = 0._r8
-    REcoH2PO4DmndSoil_vr(L,NY,NX)     = 0._r8
-    REcoNH4DmndBand_vr(L,NY,NX)       = 0._r8
-    REcoNO3DmndBand_vr(L,NY,NX)       = 0._r8
-    RNO2EcoUptkBand_vr(L,NY,NX)       = 0._r8
-    REcoH1PO4DmndBand_vr(L,NY,NX)     = 0._r8
-    REcoH2PO4DmndBand_vr(L,NY,NX)     = 0._r8
+    RCH4EcoDmnd_vr(L,NY,NX)       = 0._r8
+    REcoO2DmndResp_vr(L,NY,NX)    = 0._r8
+    REcoNH4DmndSoil_vr(L,NY,NX)   = 0._r8
+    REcoNO3DmndSoil_vr(L,NY,NX)   = 0._r8
+    RNO2EcoUptkSoil_vr(L,NY,NX)   = 0._r8
+    RN2OEcoUptkSoil_vr(L,NY,NX)   = 0._r8
+    REcoH1PO4DmndSoil_vr(L,NY,NX) = 0._r8
+    REcoH2PO4DmndSoil_vr(L,NY,NX) = 0._r8
+    REcoNH4DmndBand_vr(L,NY,NX)   = 0._r8
+    REcoNO3DmndBand_vr(L,NY,NX)   = 0._r8
+    RNO2EcoUptkBand_vr(L,NY,NX)   = 0._r8
+    REcoH1PO4DmndBand_vr(L,NY,NX) = 0._r8
+    REcoH2PO4DmndBand_vr(L,NY,NX) = 0._r8
 
     D5050: DO K=1,jcplx
       RDOMEcoDmndPrev_vr(K,L,NY,NX)     = RDOMEcoDmndK_vr(K,L,NY,NX)

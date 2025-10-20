@@ -69,52 +69,52 @@ implicit none
     call ncd_defdim(ncf,'hour',24,hourDimID)
     call ncd_defvar(ncf, 'TMPH', ncd_float, dim1name='ngrid', &
       dim2name='hour',dim3name='day',&
-      dim4name='year',long_name='hourly air temperature',  &
+      dim4name='year',long_name='Hourly air temperature at 2m',  &
       units='oC', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'WINDH', ncd_float,dim1name='ngrid', &
       dim2name='hour',dim3name='day',&
-      dim4name='year',long_name='horizontal wind speed',  &
+      dim4name='year',long_name='Horizontal wind speed at 10m',  &
       units='m s^-1', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'RAINH', ncd_float, dim1name='ngrid', &
       dim2name='hour',dim3name='day',&
-      dim4name='year',long_name='hourly precipitation',  &
+      dim4name='year',long_name='Hourly total precipitation',  &
       units='mm m^-2 hr^-1', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'DWPTH', ncd_float, dim1name='ngrid', &
       dim2name='hour',dim3name='day',&
-      dim4name='year',long_name='atmospheric vapor pressure',  &
+      dim4name='year',long_name='Atmospheric vapor pressure at 2m',  &
       units='kPa', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'SRADH', ncd_float, dim1name='ngrid', &
       dim2name='hour',dim3name='day',&
-      dim4name='year',long_name='Incident solar radiation',  &
+      dim4name='year',long_name='Incident surface solar radiation',  &
       units='W m^-2', missing_value=spval, fill_value=spval)
   elseif(clmtype(1:1)=='D' .or. clmtype(1:1) =='d')then
     !daily data
     call ncd_defvar(ncf, 'TMPX', ncd_float, dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='daily maximum air temperature',  &
+      dim2name='day',dim3name='year',long_name='Daily maximum air temperature at 2m',  &
       units='oC', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'TMPN', ncd_float, dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='daily minimum air temperature',  &
+      dim2name='day',dim3name='year',long_name='Daily minimum air temperature at 2m',  &
       units='oC', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'WIND', ncd_float,dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='daily mean horizontal wind speed',  &
+      dim2name='day',dim3name='year',long_name='Daily mean horizontal wind speed at 10m',  &
       units='m hr^-1', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'RAIN', ncd_float, dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='daily precipitation',  &
+      dim2name='day',dim3name='year',long_name='Daily total precipitation',  &
       units='m day^-1', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'DWPT', ncd_float, dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='atmospheric vapor pressure',  &
+      dim2name='day',dim3name='year',long_name='Daily atmospheric vapor pressure at 2m',  &
       units='kPa', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'SRAD', ncd_float, dim1name='ngrid', &
-      dim2name='day',dim3name='year',long_name='Incident daily solar radiation',  &
+      dim2name='day',dim3name='year',long_name='Incident daily surface solar radiation',  &
       units='MJ/day', missing_value=spval, fill_value=spval)    
   endif
   call ncd_defvar(ncf, 'year', ncd_int, dim1name='year', &

@@ -3,6 +3,7 @@ module EcoSIMConfig
 implicit none
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
+   
   logical :: is_first_year=.false.
   logical :: transport_on=.true.
   logical :: column_mode=.false.
@@ -20,7 +21,7 @@ implicit none
   integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
   integer, parameter :: jcplxcm1   = jcplxc-1
   integer, parameter :: NumMicbFunGrupsPerCmplx  = 7 !# of microbial functional groups in each complex
-
+  
   character(len=datestrlen)  :: ref_date  = '18000101000000'
   character(len=datestrlen)  :: start_date= '18000101000000'
   character(len=36)  :: case_name

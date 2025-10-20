@@ -118,6 +118,7 @@ implicit none
   real(r8),target,allocatable :: RCH4ProdHydrog_vr(:,:,:)             !Hydrogenotrophic CH4 production rate, [gC d-2 h-1]
   real(r8),target,allocatable :: RCH4ProdAcetcl_vr(:,:,:)             !Acetoclastic CH4 production rate, [gC d-2 h-1]
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)               !Aerobic CH4 oxidation rate, [gC d-2 h-1]
+  real(r8),target,allocatable :: RCH4Oxi_ANMO_vr(:,:,:)               !Anaerobic CH4 oxidation rate,[gC d-2 h-1]
   real(r8),target,allocatable :: RFerment_vr(:,:,:)                   !Fermentation rate, [gC d-2 h-1]
   real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)                    !NH3 oxidation rate, [gN d-2 h-1]
   real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)              !denitrification N2O production, [gN d-2 h-1]
@@ -189,6 +190,7 @@ implicit none
   allocate(RCH4ProdHydrog_vr(0:JZ,JY,JX)); RCH4ProdHydrog_vr=0._r8
   allocate(RCH4ProdAcetcl_vr(0:JZ,JY,JX)); RCH4ProdAcetcl_vr=0._r8
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
+  allocate(RCH4Oxi_ANMO_vr(0:JZ,JY,JX)); RCH4Oxi_ANMO_vr=0._r8
   allocate(RFerment_vr(0:JZ,JY,JX)); RFerment_vr=0._r8
   allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
   allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
@@ -313,6 +315,7 @@ implicit none
   call destroy(RCH4ProdAcetcl_vr)
   call destroy(RCH4ProdHydrog_vr)
   call destroy(RCH4Oxi_aero_vr)
+  CALL destroy(RCH4Oxi_ANMO_vr)
   call destroy(RFerment_vr)
   call destroy(RNH3oxi_vr)
   call destroy(RN2ONitProd_vr)  
