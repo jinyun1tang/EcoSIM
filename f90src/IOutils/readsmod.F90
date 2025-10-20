@@ -195,7 +195,7 @@ module readsmod
         D45: DO N=1,20
           FERT(N,I,NY,NX)=0.0_r8
         ENDDO D45
-        D35: DO N=0,2
+        D35: DO N=1,3
           IYTYP(N,I,NY,NX)=0
         ENDDO D35
         FDPTH(I,NY,NX)=0.0_r8

@@ -47,19 +47,19 @@ implicit none
   integer :: kk
   logical :: readvar
   type(Var_desc_t) :: vardesc
-  character(len=24) :: tillf(12)
+  character(len=24) :: tillf(367)
   integer :: ntill
 
   ntill=get_dim_len(soilmgmt_nfid,'ntill')
-  if(ntill>12)then
+  if(ntill>367)then
     call endrun('Not enough memory size for array tillf in '//trim(mod_filename),__LINE__)
   endif
   call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
   if(.not. readvar)then
     call endrun('fail to find tillage file '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
   endif
-
-  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf),&
+  
+  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf(1:ntill)),&
       trim(mod_filename))
 
 !
@@ -90,7 +90,8 @@ implicit none
         DepzCorp_col(IDY,NY,NX)         = DPLOW
       ENDDO D8990
     ENDDO D8995
-    kk=kk+1
+    if(kk==ntill)exit
+    kk=kk+1    
   enddo
   end subroutine ReadTillageFile
 !------------------------------------------------------------------------------------------
@@ -281,9 +282,9 @@ implicit none
   integer :: NY,NX,LPY
   integer :: IDY1,IDY2,IDY3,IDY
   real(r8) :: FDPTHI,DY
-  real(r8) :: Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB,Z4A
-  real(r8) :: PMA,PMB,PHA,CAS,CAC
-  real(r8) :: RSC1,RSN1,RSP1,RSC2,RSN2,RSP2
+  real(r8) :: NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band,NH4Soil
+  real(r8) :: MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,Gypsum,LimeStone
+  real(r8) :: PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP
   real(r8) :: ROWX
   integer  :: IR0,IR1,IR2
   integer  :: kk
@@ -298,10 +299,10 @@ implicit none
   endif
 !
 !     DY=date DDMMYYYY
-!     *A,*B=broadcast,banded fertilizer application
+!     *A,*B=broadGypsumt,banded fertilizer application
 !     Z4,Z3,ZU,ZO=NH4,NH3,urea,NO3
 !     PM*,PH*=Ca(H2PO4)2,apatite
-!     CAC,CAS=CaCO3,CaSO4
+!     LimeStone,Gypsum=CaCO3,CaSO4
 !     *1,*2=litter,manure amendments
 !     RSC,RSN,RSC=amendment C,N,P content
 !     FDPTHI=application depth
@@ -320,8 +321,9 @@ implicit none
   do kk=1,12
     if(len_trim(fertf(kk))==0)exit
 
-    READ(fertf(kk),*)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
-      ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
+    READ(fertf(kk),*)DY,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
+      ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
+      ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,FDPTHI &
       ,ROWX,IR0,IR1,IR2
 
     LPY=0
@@ -333,10 +335,12 @@ implicit none
      
     IF(LVERB)then
       print*,fertf(kk)
-      PRINT*,IDY1,IDY2,IDY3,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
-        ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
+      PRINT*,IDY1,IDY2,IDY3,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
+        ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
+        ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,FDPTHI &
         ,ROWX,IR0,IR1,IR2
     endif
+
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
       IDY=IDY1
@@ -351,35 +355,35 @@ implicit none
 !
 !         NH4,NH3,UREA,NO3 BROADCAST (A) AND BANDED (B)
 !
-        FERT(ifert_N_nh4,IDY,NY,NX)       = Z4A        !NH4 broadcast
-        FERT(ifert_N_nh3,IDY,NY,NX)       = Z3A        !NH3 broadcast
-        FERT(ifert_N_urea,IDY,NY,NX)      = ZUA        !Urea broadcast
-        FERT(ifert_N_no3,IDY,NY,NX)       = ZOA        !NO3 broadcast
-        FERT(ifert_N_nh4_band,IDY,NY,NX)  = Z4B        !NH4 band
-        FERT(ifert_N_nh3_band,IDY,NY,NX)  = Z3B        !NH3 band
-        FERT(ifert_N_urea_band,IDY,NY,NX) = ZUB        !Urea band
-        FERT(ifert_N_no3_band,IDY,NY,NX)  = ZOB        !NO3 band
+        FERT(ifert_N_nh4,IDY,NY,NX)       = NH4Soil        !NH4 broadcast
+        FERT(ifert_N_nh3,IDY,NY,NX)       = NH3Soil        !NH3 broadcast
+        FERT(ifert_N_urea,IDY,NY,NX)      = UreaSoil        !Urea broadcast
+        FERT(ifert_N_no3,IDY,NY,NX)       = NO3Soil        !NO3 broadcast
+        FERT(ifert_N_nh4_band,IDY,NY,NX)  = NH4Band        !NH4 band
+        FERT(ifert_N_nh3_band,IDY,NY,NX)  = NH3Band        !NH3 band
+        FERT(ifert_N_urea_band,IDY,NY,NX) = UreaBand        !Urea band
+        FERT(ifert_N_no3_band,IDY,NY,NX)  = NO3Band        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)
 !
-        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)      = PMA        !PM broadcast
-        FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = PMB        !PM band
-        FERT(ifert_P_apatite,IDY,NY,NX)         = PHA        !
+        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)      = MonocalciumPhosphateSoil        !PM broadcast
+        FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = MonocalciumPhosphateBand        !PM band
+        FERT(ifert_P_apatite,IDY,NY,NX)         = hydroxyapatite        !
 !
 !         LIME AND GYPSUM
 !
-        FERT(ifert_Ca_lime,IDY,NY,NX)   = CAC
-        FERT(ifert_Ca_gypsum,IDY,NY,NX) = CAS
+        FERT(ifert_Ca_lime,IDY,NY,NX)   = LimeStone
+        FERT(ifert_Ca_gypsum,IDY,NY,NX) = Gypsum
 !
 !         PLANT AND ANIMAL RESIDUE C, N AND P
 !
-        FERT(ifert_plant_resC,IDY,NY,NX)  = RSC1
-        FERT(ifert_plant_resN,IDY,NY,NX)  = RSN1
-        FERT(ifert_plant_resP,IDY,NY,NX)  = RSP1
-        FERT(ifert_plant_manuC,IDY,NY,NX) = RSC2
-        FERT(ifert_plant_manuN,IDY,NY,NX) = RSN2
-        FERT(ifert_plant_manuP,IDY,NY,NX) = RSP2
+        FERT(ifert_plant_resC,IDY,NY,NX)  = PlantResC
+        FERT(ifert_plant_resN,IDY,NY,NX)  = PlantResN
+        FERT(ifert_plant_resP,IDY,NY,NX)  = PlantResP
+        FERT(ifert_plant_manuC,IDY,NY,NX) = ManureC
+        FERT(ifert_plant_manuN,IDY,NY,NX) = ManureN
+        FERT(ifert_plant_manuP,IDY,NY,NX) = ManureP
 !
 !         DEPTH AND WIDTH OF APPLICATION
 !
@@ -388,9 +392,9 @@ implicit none
 !
 !         TYPE OF FERTILIZER,PLANT OR ANIMAL RESIDUE
 !
-        IYTYP(0,IDY,NY,NX)=IR0
-        IYTYP(1,IDY,NY,NX)=IR1
-        IYTYP(2,IDY,NY,NX)=IR2
+        IYTYP(iamendtyp_fert,IDY,NY,NX)=IR0
+        IYTYP(iAmendtyp_plantRes,IDY,NY,NX)=IR1
+        IYTYP(iAmendtyp_Manure,IDY,NY,NX)=IR2
       ENDDO D8980
     ENDDO D8985
   enddo

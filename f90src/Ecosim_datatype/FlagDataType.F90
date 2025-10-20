@@ -33,21 +33,21 @@ contains
   subroutine InitFlagData
 
   implicit none
-  allocate(IYTYP(0:2,366,JY,JX));IYTYP=0
+  allocate(IYTYP(3,366,JY,JX));                IYTYP=0
   allocate(iSoilDisturbType_col(366,JY,JX));   iSoilDisturbType_col=0
-  allocate(KoppenClimZone_col(JY,JX));       KoppenClimZone_col=0
-  allocate(iIrrigOpt_col(JY,JX));       iIrrigOpt_col=0
-  allocate(iResetSoilProf_col(JY,JX));       iResetSoilProf_col=itrue
-  allocate(iFertNH4Band_col(JY,JX));       iFertNH4Band_col=ifert_off
-  allocate(iFertNO3Band_col(JY,JX));       iFertNO3Band_col=ifert_off
-  allocate(iFertPO4Band_col(JY,JX));       iFertPO4Band_col=ifert_off
-  allocate(ISOIL_vr(4,JZ,JY,JX));  ISOIL_vr=isoi_unset     !soil properties unset by default
-  allocate(ISOILR_col(JY,JX));      ISOILR_col=0
-  allocate(iUreaHydInhibitorType_col(JY,JX));       iUreaHydInhibitorType_col=0
-  allocate(ITILL1_col(JY,JX));      ITILL1_col=0
-  allocate(IsPlantActive_pft(JP,JY,JX));    IsPlantActive_pft=iDormant
-  allocate(doInitPlant_pft(JP,JY,JX));    doInitPlant_pft=ifalse
-  allocate(IDWaterTable_col(JY,JX));       IDWaterTable_col=0
+  allocate(KoppenClimZone_col(JY,JX));         KoppenClimZone_col=0
+  allocate(iIrrigOpt_col(JY,JX));              iIrrigOpt_col=0
+  allocate(iResetSoilProf_col(JY,JX));         iResetSoilProf_col=itrue
+  allocate(iFertNH4Band_col(JY,JX));           iFertNH4Band_col=ifert_off
+  allocate(iFertNO3Band_col(JY,JX));           iFertNO3Band_col=ifert_off
+  allocate(iFertPO4Band_col(JY,JX));           iFertPO4Band_col=ifert_off
+  allocate(ISOIL_vr(4,JZ,JY,JX));              ISOIL_vr=isoi_unset     !soil properties unset by default
+  allocate(ISOILR_col(JY,JX));                 ISOILR_col=0
+  allocate(iUreaHydInhibitorType_col(JY,JX));  iUreaHydInhibitorType_col=0
+  allocate(ITILL1_col(JY,JX));                 ITILL1_col=0
+  allocate(IsPlantActive_pft(JP,JY,JX));       IsPlantActive_pft=iDormant
+  allocate(doInitPlant_pft(JP,JY,JX));         doInitPlant_pft=ifalse
+  allocate(IDWaterTable_col(JY,JX));           IDWaterTable_col=0
   end subroutine InitFlagData
 
 !----------------------------------------------------------------------

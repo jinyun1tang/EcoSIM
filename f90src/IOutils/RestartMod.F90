@@ -7714,17 +7714,34 @@ implicit none
   
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndAutort_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RO2MetaDmndAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='autotrophic aqueous O2 demand', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort_vr,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RO2MetaDmndAutor_vr,datrc_3d)      
   else
-    !print*,'RO2DmndAutort'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2DmndAutort_vr,datrc_3d)        
+    !print*,'RO2MetaDmndAutor'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RO2MetaDmndAutor_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RO2DmndAutort_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RO2MetaDmndAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='autotrophic aqueous O2 demand', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)   
+  endif  
+
+  if(flag=='read')then
+    datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='RCH4MetaDmndAutor_vr', dim1name='column',dim2name='automicb',&
+      dim3name='levsoi1',long_name='autotrophic aqueous CH4 demand', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RCH4MetaDmndAutor_vr,datrc_3d)      
+  else
+    !print*,'RO2MetaDmndAutor'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RCH4MetaDmndAutor_vr,datrc_3d)        
+    datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='RCH4MetaDmndAutor_vr', dim1name='column',dim2name='automicb',&
+      dim3name='levsoi1',long_name='autotrophic aqueous CH4 demand', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)   
   endif  
@@ -7748,17 +7765,34 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutor_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2XupAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor_vr,datrc_3d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2XupAutor_vr,datrc_3d)      
   else
-    !print*,'RNO2OxidAutor'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutor_vr,datrc_3d)        
+    !print*,'RNO2XupAutor'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2XupAutor_vr,datrc_3d)        
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutor_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2XupAutor_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake non-band unconstrained by NO2', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)        
+  endif  
+
+  if(flag=='read')then
+    datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='RNO3XupAutor_vr', dim1name='column',dim2name='automicb',&
+      dim3name='levsoi1',long_name='total autotrophic microbial NO3 uptake non-band unconstrained by NO2', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)        
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO3XupAutor_vr,datrc_3d)      
+  else
+    !print*,'RNO2XupAutor'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3XupAutor_vr,datrc_3d)        
+    datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
+    call restartvar(ncid, flag, varname='RNO3XupAutor_vr', dim1name='column',dim2name='automicb',&
+      dim3name='levsoi1',long_name='total autotrophic microbial NO3 uptake non-band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
   endif  
@@ -7799,16 +7833,16 @@ implicit none
 
   if(flag=='read')then
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2XupAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        
-    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand_vr,datrc_3d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,RNO2XupAutorBand_vr,datrc_3d)     
   else
-    !print*,'RNO2OxidAutorBand'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2OxidAutorBand_vr,datrc_3d)       
+    !print*,'RNO2XupAutorBand'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO2XupAutorBand_vr,datrc_3d)       
     datpr3 => datrc_3d(1:ncols,1:NumMicrobAutoTrophCmplx,1:JZ+1)    
-    call restartvar(ncid, flag, varname='RNO2OxidAutorBand_vr', dim1name='column',dim2name='automicb',&
+    call restartvar(ncid, flag, varname='RNO2XupAutorBand_vr', dim1name='column',dim2name='automicb',&
       dim3name='levsoi1',long_name='total autotrophic microbial NO2 uptake band unconstrained by NO2', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)        

@@ -29,6 +29,7 @@ module minimathmod
   public :: AZERO,AZERO1  
   public :: SubstrateLimit
   public :: real_truncate
+  public :: pMod
   public :: SubstrateDribbling
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
@@ -191,6 +192,18 @@ module minimathmod
   endif
   end function AZMAX1d
 
+!--------------------------------------------------------------------------------
+  pure function pMOD(a,b)result(c)
+  !
+  ! compute c=MOD(A,B)
+  ! if C==0 and A/=0 then C=B
+  implicit none
+  integer, intent(in) :: a,B
+  integer :: C
+  
+  c=mod(a,b)
+  if(c==0 .and. a/=0)c=b
+  end function pMOD
 !------------------------------------------------------------------------------------------
 
   pure function AZMIN1d(val,tiny_val2)result(ans)

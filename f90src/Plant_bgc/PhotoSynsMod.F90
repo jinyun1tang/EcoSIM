@@ -16,15 +16,15 @@ implicit none
   ![header]
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CO2FCL,CO2FLL)
+  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2OClmt,CH2OLlmt)
 
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress   !stomatal resistance function of canopy turgor
   real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CO2FCL          !carbon-dependent photosynthesis rate
-  real(r8), intent(out) :: CO2FLL          !light-dependent photosynthesis rate
+  real(r8), intent(out) :: CH2OClmt          !carbon-dependent photosynthesis rate
+  real(r8), intent(out) :: CH2OLlmt          !light-dependent photosynthesis rate
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB,cfscal,clscal
   real(r8) :: CO2X,CO2C,CO2Y
@@ -69,7 +69,7 @@ implicit none
     
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
-  CO2FCL=0._r8;CO2FLL=0._r8
+  CH2OClmt=0._r8;CH2OLlmt=0._r8
   D210: DO L=NumCanopyLayers1,1,-1
 
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -183,9 +183,8 @@ implicit none
                     ENDIF
                   ENDDO D225
                   clscal=LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
-                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
-                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
-!                  WRITE(123,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,VL,VGROX,EGROX,WFNB,EGROX/PAR_zsec
+                  CH2OClmt = CH2OClmt+VGROX*cfscal*clscal
+                  CH2OLlmt = CH2OLlmt+EGROX*cfscal*clscal
                   
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -211,15 +210,15 @@ implicit none
   end subroutine ComputeGPP_C3
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K,CO2FCL,CO2FLL)
+  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K,CH2OClmt,CH2OLlmt)
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in):: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(out) :: CH2O3K      !C3 product in bundle sheath
   real(r8), intent(out) :: CH2O4K      !C4 product in mesophyll
-  real(r8), intent(out) :: CO2FCL
-  real(r8), intent(out) :: CO2FLL
+  real(r8), intent(out) :: CH2OClmt
+  real(r8), intent(out) :: CH2OLlmt
   integer :: L,NN,M,N,LP
   real(r8) :: WFN4
   real(r8) :: WFNB
@@ -269,7 +268,7 @@ implicit none
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
-  CO2FCL=0._r8;CO2FLL=0._r8
+  CH2OClmt=0._r8;CH2OLlmt=0._r8
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=NumCanopyLayers1,1,-1
@@ -381,8 +380,8 @@ implicit none
                     ENDIF
                   ENDDO D125
                   clscal=LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
-                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
-                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
+                  CH2OClmt = CH2OClmt+VGROX*cfscal*clscal
+                  CH2OLlmt = CH2OLlmt+EGROX*cfscal*clscal
                   !
                   !  ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
                   !
@@ -446,7 +445,7 @@ implicit none
   real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix, [gC h-1 d-2]
   real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix,  [gC h-1 d-2]
   real(r8) :: ZADDB,PADDB
-  real(r8) :: CO2FCL,CO2FLL
+  real(r8) :: CH2OClmt,CH2OLlmt
   integer  :: K
 
 ! begin_execution
@@ -488,22 +487,22 @@ implicit none
 !
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 !
-              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
+              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CH2OClmt,CH2OLlmt)
               CO2F    = CO2F+CH2O4(K)     !carbon fixation in mesophyll cells
               CH2O    = CH2O+CH2O3(K)     !carbon fixation in bundle sheath cells
-              CH2OClm = CH2OClm+CO2FCL
-              CH2OLlm = CH2OLlm+CO2FLL
+              CH2OClm = CH2OClm+CH2OClmt
+              CH2OLlm = CH2OLlm+CH2OLlmt
 
 !
 !               C3 PHOTOSYNTHESIS
 !
             ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 
-              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
+              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2OClmt,CH2OLlmt)
               CO2F    = CO2F+CH2O3(K)
               CH2O    = CH2O+CH2O3(K)
-              CH2OClm = CH2OClm+CO2FCL
-              CH2OLlm = CH2OLlm+CO2FLL
+              CH2OClm = CH2OClm+CH2OClmt
+              CH2OLlm = CH2OLlm+CH2OLlmt
 
             ENDIF
           ENDIF

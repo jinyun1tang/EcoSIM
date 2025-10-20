@@ -374,6 +374,7 @@ def write_plant_traits(pft_path,gfname,outdir):
                 x=line.split(',')
             else:
                 x=line.split()
+            print(x[0])
             ICTYP[j]=int(x[0])
             IGTYP[j]=int(x[1])
             ISTYP[j]=int(x[2])

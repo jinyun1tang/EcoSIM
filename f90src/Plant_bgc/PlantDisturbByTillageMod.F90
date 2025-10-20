@@ -53,11 +53,11 @@ contains
     QH2OLoss_lnds               => plt_site%QH2OLoss_lnds                 ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
     LeafProteinC_node           => plt_biom%LeafProteinC_node             ,& !inoput :layer leaf protein C, [g d-2]
     StructInternodeElms_brch    => plt_biom%StructInternodeElms_brch      ,& !inoput :internode C, [g d-2]
-    CanopyLeafSheathC_pft        => plt_biom%CanopyLeafSheathC_pft          ,& !inoput :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft       => plt_biom%CanopyLeafSheathC_pft         ,& !inoput :canopy leaf + sheath C, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
     CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft            ,& !inoput :canopy active stalk C, [g d-2]
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch       ,& !inoput :flag to detect branch death, [-]
-    LitrfallElms_pvr        => plt_bgcr%LitrfallElms_pvr          ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch     ,& !inoput :branch nodule nonstructural element, [g d-2]
     CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch          ,& !inoput :branch nonstructural element, [g d-2]
     C4PhotoShootNonstC_brch     => plt_biom%C4PhotoShootNonstC_brch       ,& !inoput :branch shoot nonstrucal elelment, [g d-2]
@@ -71,7 +71,7 @@ contains
     GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch      ,& !inoput :maximum grain C during grain fill, [g d-2]
     ShootElms_brch              => plt_biom%ShootElms_brch                ,& !inoput :branch shoot structural element mass, [g d-2]
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch           ,& !inoput :branch stalk structural element mass, [g d-2]
-    LeafLayerElms_node    => plt_biom%LeafLayerElms_node      ,& !inoput :layer leaf element, [g d-2]
+    LeafLayerElms_node          => plt_biom%LeafLayerElms_node            ,& !inoput :layer leaf element, [g d-2]
     PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch          ,& !inoput :branch sheath structural element, [g d-2]
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch            ,& !inoput :leaf element, [g d-2]
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch      ,& !inoput :senescing branch stalk structural element, [g d-2]
@@ -515,6 +515,6 @@ contains
   ENDDO
   call PrintInfo('end '//subname)
   end associate
-  end subroutine RemoveRootsByTillage        
+  end subroutine RemoveRootsByTillage
   ![tail]
 end module PlantDisturbByTillageMod

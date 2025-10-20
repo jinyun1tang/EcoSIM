@@ -77,9 +77,9 @@ implicit none
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
 ! urea application
   IF(FERT(ifert_N_urea,I,NY,NX).GT.0._r8 .OR. FERT(ifert_N_urea_band,I,NY,NX).GT.0._r8)THEN  
-    IF(IYTYP(0,I,NY,NX).EQ.0)THEN
+    IF(IYTYP(iamendtyp_fert,I,NY,NX).EQ.0)THEN
       iUreaHydInhibitorType_col(NY,NX)=0
-    ELSEIF(IYTYP(0,I,NY,NX).EQ.1 .OR. IYTYP(0,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(iamendtyp_fert,I,NY,NX).EQ.1 .OR. IYTYP(iamendtyp_fert,I,NY,NX).EQ.3)THEN
       iUreaHydInhibitorType_col(NY,NX)=1
     ELSE
       !urea hydrolysis is on
@@ -97,7 +97,7 @@ implicit none
     ENDDO D9964
   ENDIF
 
-  IF(IYTYP(0,I,NY,NX).EQ.3 .OR. IYTYP(0,I,NY,NX).EQ.4)THEN
+  IF(IYTYP(iamendtyp_fert,I,NY,NX).EQ.3 .OR. IYTYP(iamendtyp_fert,I,NY,NX).EQ.4)THEN
     D9965: DO L=0,NL_col(NY,NX)
       IF(L.EQ.LFDPTH)THEN
         ZNFN0_vr(L,NY,NX)=1.0_r8
@@ -163,7 +163,7 @@ implicit none
 !
 !     MAIZE
 !
-    IF(IYTYP(1,I,NY,NX).EQ.1)THEN
+    IF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_maize)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.080_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.245_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.613_r8
@@ -171,7 +171,7 @@ implicit none
 !
 !     WHEAT
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_wheat)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.125_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.171_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
@@ -179,7 +179,7 @@ implicit none
 !
 !     SOYBEAN
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_soybean)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.138_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.426_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.316_r8
@@ -187,7 +187,7 @@ implicit none
 !
 !     OLD STRAW
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_oldStraw)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.075_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.125_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.550_r8
@@ -195,7 +195,7 @@ implicit none
 !
 !     STRAW
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_Straw)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.036_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.044_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.767_r8
@@ -203,7 +203,7 @@ implicit none
 !
 !     COMPOST
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_compost)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.143_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.015_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.640_r8
@@ -211,7 +211,7 @@ implicit none
 !
 !     GREEN MANURE
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_GreeManure)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.202_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.013_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
@@ -219,7 +219,7 @@ implicit none
 !
 !     SIMPLE SUBSTRATE
 !
-    ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
+    ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_simple)THEN
       CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.000_r8
       CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 1.000_r8
       CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.000_r8
@@ -236,7 +236,7 @@ implicit none
 !
 !     RUMINANT
 !
-    IF(IYTYP(2,I,NY,NX).EQ.1)THEN
+    IF(IYTYP(iAmendtyp_Manure,I,NY,NX).EQ.imanure_ruminant)THEN
       CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.036_r8
       CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.044_r8
       CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.630_r8
@@ -244,7 +244,7 @@ implicit none
 !
 !     NON-RUMINANT
 !
-    ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
+    ELSEIF(IYTYP(iAmendtyp_Manure,I,NY,NX).EQ.imanure_nonruminant)THEN
       CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.138_r8
       CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.401_r8
       CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.316_r8
@@ -252,7 +252,7 @@ implicit none
 !
 !     GRAZING
 !
-    ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(iAmendtyp_Manure,I,NY,NX).EQ.imanure_grazing)THEN
       CFOSC_vr(iprotein,k_manure,LFDPTH,NY,NX)  = 0.036_r8
       CFOSC_vr(icarbhyro,k_manure,LFDPTH,NY,NX) = 0.044_r8
       CFOSC_vr(icellulos,k_manure,LFDPTH,NY,NX) = 0.630_r8
@@ -398,7 +398,7 @@ implicit none
       AmendC_CumYr_flx_col(NY,NX) = AmendC_CumYr_flx_col(NY,NX)+OSCI
       FertN_Flx_CumYr_col(NY,NX)  = FertN_Flx_CumYr_col(NY,NX)+OSNI
       FerPFlx_CumYr_col(NY,NX)    = FerPFlx_CumYr_col(NY,NX)+OSPI
-      IF(IYTYP(2,I,NY,NX).LT.3)THEN
+      IF(IYTYP(iAmendtyp_Manure,I,NY,NX).LT.3)THEN
         Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+OSCI
       ENDIF
     ENDDO D2965

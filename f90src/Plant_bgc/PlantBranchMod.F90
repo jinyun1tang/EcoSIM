@@ -777,7 +777,7 @@ module PlantBranchMod
 
   character(len=*), parameter :: subname='UpdatePhotosynthates'
   real(r8) :: CO2F,CanopyNonstElm4Gros(NumPlantChemElms),CH2O
-  real(r8) :: CH2OClm,CH2OLlm,dNonstCX
+  real(r8) :: CH2OClmt,CH2OLlmt,dNonstCX
   integer :: K
   associate(                                                 &
     NH3Dep2Can_brch      => plt_rbgc%NH3Dep2Can_brch        ,& !input  :gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
@@ -794,7 +794,7 @@ module PlantBranchMod
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0)THEN
     !  
-    call ComputeGPP(I,J,NB,NZ,WaterStress4Groth,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClm,CH2OLlm)
+    call ComputeGPP(I,J,NB,NZ,WaterStress4Groth,Stomata_Stress,CH2O3,CH2O4,CH2O,CO2F,CH2OClmt,CH2OLlmt)
     
     GPP_brch(NB,NZ)  = GPP_brch(NB,NZ)+CO2F
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
@@ -803,8 +803,8 @@ module PlantBranchMod
       CO2F,CH2O,TFN5,WaterStress4Groth,TurgEff4CanopyResp,ShootStructN,CanopyNonstElm4Gros,CNPG,&
       RMxess_brch,dNonstCX,RNonstC4Groth_brch)
 
-    CO2FixCL_pft(NZ) = CO2FixCL_pft(NZ)+CH2OClm   !carbon-dependent photosynthesis
-    CO2FixLL_pft(NZ) = CO2FixLL_pft(NZ)+CH2OLlm   !light-dependent photosynthesis
+    CO2FixCL_pft(NZ) = CO2FixCL_pft(NZ)+CH2OClmt   !carbon-dependent photosynthesis
+    CO2FixLL_pft(NZ) = CO2FixLL_pft(NZ)+CH2OLlmt   !light-dependent photosynthesis
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
@@ -1068,8 +1068,8 @@ module PlantBranchMod
       LeafArea_node(K,NB,NZ)   = AZMAX1(LeafArea_node(K,NB,NZ)-Frac2fall*LeafArea_node(K,NB,NZ))
 
       DO NE=1,NumPlantChemElms
-        LeafStrutElms_brch(NE,NB,NZ)=AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-Frac2fall*LeafElmntNode_brch(NE,K,NB,NZ))
-        LeafElmntNode_brch(NE,K,NB,NZ)=AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ)-Frac2fall*LeafElmntNode_brch(NE,K,NB,NZ))
+        LeafStrutElms_brch(NE,NB,NZ)   = AZMAX1(LeafStrutElms_brch(NE,NB,NZ)-Frac2fall*LeafElmntNode_brch(NE,K,NB,NZ))
+        LeafElmntNode_brch(NE,K,NB,NZ) = AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ)-Frac2fall*LeafElmntNode_brch(NE,K,NB,NZ))
       ENDDO
       LeafProteinC_node(K,NB,NZ)=LeafProteinC_node(K,NB,NZ)-Frac2fall*LeafElmntNode_brch(ielmn,K,NB,NZ)*rProteinC2N_pft(NZ)
       LeafProteinC_node(K,NB,NZ)=AZMAX1(LeafProteinC_node(K,NB,NZ),LeafElmntNode_brch(ielmp,K,NB,NZ)*rProteinC2P_pft(NZ))

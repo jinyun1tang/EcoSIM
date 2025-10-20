@@ -95,6 +95,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootO2_TotSink_col(:,:)                        !integrated root O2 uptake from soil and atmosphere for autotrophic respiraiton, [gO d-2 h-1]  
   real(r8),target,allocatable ::  RUptkRootO2_col(:,:)                           !total root internal O2 flux take away from root O2, [g d-2 h-1]  
   real(r8),target,allocatable ::  totRootLenDens_vr(:,:,:)                       !total root length density, [m m-3]
+  real(r8),target,allocatable ::  RCH4EcoDmndPrev_vr(:,:,:)                      !total root + microbial CH4 uptake, [gCd-2 h-1]
+  real(r8),target,allocatable ::  RCH4EcoDmnd_vr(:,:,:)                          !total root + microbial CH4 uptake, [gCd-2 h-1]
   real(r8),target,allocatable ::  REcoO2DmndResp_vr(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  RO2EcoDmndPrev_vr(:,:,:)                       !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  REcoNH4DmndSoil_vr(:,:,:)                      !total root + microbial NH4 uptake non-band, [g d-2 h-1]
@@ -247,6 +249,8 @@ module PlantDataRateType
   allocate(totRootLenDens_vr(JZ,JY,JX));    totRootLenDens_vr=0._r8
   allocate(REcoO2DmndResp_vr(0:JZ,JY,JX));  REcoO2DmndResp_vr=0._r8
   allocate(RO2EcoDmndPrev_vr(0:JZ,JY,JX));  RO2EcoDmndPrev_vr=0._r8
+  allocate(RCH4EcoDmndPrev_vr(0:JZ,JY,JX)); RCH4EcoDmndPrev_vr=0._r8
+  allocate(RCH4EcoDmnd_vr(0:JZ,JY,JX)); RCH4EcoDmnd_vr=0._r8
   allocate(REcoNH4DmndSoil_vr(0:JZ,JY,JX));  REcoNH4DmndSoil_vr=0._r8
   allocate(RNH4EcoDmndSoilPrev_vr(0:JZ,JY,JX));  RNH4EcoDmndSoilPrev_vr=0._r8
   allocate(REcoNO3DmndSoil_vr(0:JZ,JY,JX));  REcoNO3DmndSoil_vr=0._r8
@@ -374,6 +378,8 @@ module PlantDataRateType
   call destroy(totRootLenDens_vr)
   call destroy(REcoO2DmndResp_vr)
   call destroy(RO2EcoDmndPrev_vr)
+  call destroy(RCH4EcoDmndPrev_vr)
+  call destroy(RCH4EcoDmnd_vr)
   call destroy(REcoNH4DmndSoil_vr)
   call destroy(RNH4EcoDmndSoilPrev_vr)
   call destroy(REcoNO3DmndSoil_vr)

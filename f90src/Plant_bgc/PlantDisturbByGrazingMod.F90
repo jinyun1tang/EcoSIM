@@ -147,12 +147,12 @@ contains
     WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*EHVST23h
     StandeadElmnt2Litr(NE)    = StandeadElmntRemoval(NE)*EHVST24h
   ENDDO
-    !
-    !     ADD MANURE FROM GRAZING TO NEXT DAY FERTILIZER
-    !
-    !     FERT=fertilizer type from fertilizer input file
-    !     IYTYP=fertilizer release type from fertilizer input file
-    !
+  !
+  !     ADD MANURE FROM GRAZING TO NEXT DAY FERTILIZER
+  !
+  !     FERT=fertilizer type from fertilizer input file
+  !     IYTYP=fertilizer release type from fertilizer input file
+  !
   FERT(17)=FERT(17)+(NonstructElmnt2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
     FineNonleafElmnt2Litr(ielmc)+WoodyElmnt2Litr(ielmc)+StandeadElmnt2Litr(ielmc))/AREA3(NU)
   FERT(18)=FERT(18)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
@@ -161,7 +161,7 @@ contains
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8
   FERT(19)=FERT(19)+(NonstructElmnt2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&
     FineNonleafElmnt2Litr(ielmp)+WoodyElmnt2Litr(ielmp)+StandeadElmnt2Litr(ielmp))/AREA3(NU)
-  IYTYP=3
+  IYTYP=imanure_grazing
   end associate
   end subroutine ApplyBiomRemovalByGrazing
 

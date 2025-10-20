@@ -525,11 +525,13 @@ implicit none
     PlantElmDistLoss_pft      => plt_distb%PlantElmDistLoss_pft      ,& !input  :plant loss to disturbance,    [g d-2 h-1]        
     RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft              ,& !input  :total root N2 fixation, [gN d-2 h-1]    
     CanopyN2Fix_pft           => plt_rbgc%CanopyN2Fix_pft            ,& !input  :total canopy N2 fixation, [gN d-2 h-1]        
-    SeedPlantedElm_pft        => plt_biom%SeedPlantedElm_pft         ,& !input  : 
+    SeedPlantedElm_pft        => plt_biom%SeedPlantedElm_pft         ,& !input  :seed biomass at planting, [g d-2] 
+    iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft      ,& !input  : day of plant harvest,[-]
     LitrfallAbvgElms_pft      => plt_bgcr%LitrfallAbvgElms_pft       ,& !input :aboveground plant element LitrFall, [g d-2 h-1]
     LitrfallBlgrElms_pft      => plt_bgcr%LitrfallBlgrElms_pft       ,& !input :belowground plant element LitrFall, [g d-2 h-1]
     TotBegVegE_pft            => plt_biom%TotBegVegE_pft             ,& !Input  :total vegetation carbon at the beginning of the time step,[g d-2]
     TotEndVegE_pft            => plt_biom%TotEndVegE_pft              & !output :total vegetation carbon at the end of the time step,[g d-2]
+
   )
 
   DO NZ=1,NP
@@ -541,6 +543,7 @@ implicit none
         -NodulInfectElms_pft(NE,NZ)-RootMycoExudElms_pft(NE,NZ) &
         +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)    
     ENDDO
+
     dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
     balE(ielmc)=balE(ielmc)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   
     balE(ielmn)=balE(ielmn)-RootNutUptakeN_pft(NZ)-CanopyN2Fix_pft(NZ)-RootN2Fix_pft(NZ)-NH3Dep2Can_pft(NZ)             
@@ -548,12 +551,12 @@ implicit none
 
     NE=ielmc
     if(abs(balE(NE))>1.e-10_r8)then
-      err_rel=balE(NE)/AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ))
+      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
     else
       err_rel=1.e-10_r8
     endif
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then
-      write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ)
+    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
+      write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
       write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
       write(888,*)'rootC             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
       write(888,*)'shootC            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
@@ -568,16 +571,21 @@ implicit none
       write(888,*)'GPP               =',GrossCO2Fix_pft(NZ),dGPP,GrossCO2Fix_pft(NZ)-dGPP
       write(888,*)'AR,rootAR,shootAR =',GrossResp_pft(NZ),RootAutoCO2_pft(NZ),CanopyGrosRCO2_pft(NZ)   
       write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)
-      call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)            
+            
+      if(I/=iDayPlantHarvest_pft(NZ))then
+        call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)                    
+      endif
     endif
+
     NE=ielmn
-    if(abs(balE(NE))>1.e-10_r8)then
-      err_rel=balE(NE)/AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ))
+    if(abs(balE(NE))>1.e-10_r8)then            
+      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))      
     else
       err_rel=1.e-10_r8
     endif
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then
-      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE)
+
+    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
+      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel
       write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
       write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
       write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
@@ -593,18 +601,19 @@ implicit none
       write(888,*)'CanopyNFix        =',CanopyN2Fix_pft(NZ)
       write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
       write(888,*)'RootNFix          =',RootN2Fix_pft(NZ)            
-      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)       
+      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
+      if(I/=plt_distb%iDayPlantHarvest_pft(NZ))&  
       call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
     endif
 
     NE=ielmp
     if(abs(balE(NE))>1.e-10_r8)then
-      err_rel=balE(NE)/AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ))
+      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
     else
       err_rel=1.e-10_r8
     endif
     if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then  
-      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'P',balE(NE)
+      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'P',balE(NE),err_rel
       write(888,*)'endP, begP       =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
       write(888,*)'rootP            =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
       write(888,*)'shootP           =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
@@ -617,7 +626,8 @@ implicit none
       write(888,*)'litfallP,abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
       write(888,*)'disturbP         =',PlantElmDistLoss_pft(NE,NZ)    
       write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
-      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)      
+      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
+      if(I/=plt_distb%iDayPlantHarvest_pft(NZ))&    
       call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
     endif
     

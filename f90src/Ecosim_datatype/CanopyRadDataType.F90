@@ -38,7 +38,7 @@ module CanopyRadDataType
   dangle=PICON2h/real(NumLeafZenithSectors,r8)         !the angle section width
 
   DO N = 1, NumLeafZenithSectors
-    aa                 = real(N-0.5,r8)*dangle
+    aa                 = real(N-0.5,r8)*dangle !leaf angle start from flat (0) to vertical (pi/2)
     SineLeafAngle(N)   = sin(aa)
     CosineLeafAngle(N) = cos(aa)
   ENDDO

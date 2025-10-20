@@ -45,7 +45,10 @@ implicit none
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3
 ! fertilizer
-  integer, parameter :: ifert_on                = 1
+  integer, parameter :: iamendtyp_fert   = 1
+  integer, parameter :: iAmendtyp_plantRes  = 2
+  integer, parameter :: iAmendtyp_Manure = 3
+  integer, parameter :: ifert_on         = 1
   integer, parameter :: ifert_off               = 0
   integer, parameter :: ifert_N_nh4               = 1
   integer, parameter :: ifert_N_nh3               = 2
@@ -67,6 +70,19 @@ implicit none
   integer, parameter :: ifert_plant_manuC       = 17
   integer, parameter :: ifert_plant_manuN       = 18
   integer, parameter :: ifert_plant_manuP       = 19
+
+  integer, parameter :: imanure_ruminant    = 1
+  integer, parameter :: imanure_nonruminant = 2
+  integer, parameter :: imanure_grazing     = 3
+
+  integer, parameter :: iPlantRes_maize      = 1
+  integer, parameter :: iPlantRes_wheat      = 2
+  integer, parameter :: iPlantRes_soybean    = 3
+  integer, parameter :: iPlantRes_oldStraw   = 4
+  integer, parameter :: iPlantRes_Straw      = 5
+  integer, parameter :: iPlantRes_compost    = 6
+  integer, parameter :: iPlantRes_GreeManure = 7
+  integer, parameter :: iPlantRes_simple     = 10
 ! root order
   integer, parameter :: iroot_1st =1
   integer, parameter :: iroot_2nd =2

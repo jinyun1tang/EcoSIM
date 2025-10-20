@@ -379,14 +379,23 @@ module PlantDisturbsMod
       IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed)THEN
 
         !terminate and reseed
-!        if(I==193)write(999,*)I+J/24.,'befreseed',SeasonalNonstElms_pft(:,NZ)
+
         DO NE=1,NumPlantChemElms
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
-!        if(I==193)write(999,*)I+J/24.,'afreseed',SeasonalNonstElms_pft(:,NZ)        
+
         !other
       ELSE
         !harvested
+        if(plt_site%PlantPopulation_pft(NZ).LE.0._r8)then
+          DO NE=1,NumPlantChemElms  
+            if(SeasonalNonstElms_pft(NE,NZ)>0._r8)then
+              PlantElmDistLoss_pft(NE,NZ) = PlantElmDistLoss_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)
+              SeasonalNonstElms_pft(NE,NZ)=0._r8
+            endif
+          ENDDO  
+        ENDIF
+
         DO NE=1,NumPlantChemElms
           EcoHavstElmnt_CumYr_pft(NE,NZ) = EcoHavstElmnt_CumYr_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
           EcoHavstElmnt_CumYr_col(NE)    = EcoHavstElmnt_CumYr_col(NE)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
@@ -592,6 +601,7 @@ module PlantDisturbsMod
         PPX_pft(NZ)             = PPI_pft(NZ)
         PlantPopulation_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
       ENDIF
+
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
         ClumpFactor_pft(NZ)=ClumpFactor_pft(NZ)*CanopyHeightCut_pft(NZ)
       ENDIF
@@ -1627,7 +1637,7 @@ module PlantDisturbsMod
     CanopyHeightCut_pft       => plt_distb%CanopyHeightCut_pft        ,& !input  :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !input  :canopy total water potential, [Mpa]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft          ,& !input  :canopy active stalk C, [g d-2]
-    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft        ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft        ,& !input  :canopy leaf + sheath C, [g d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
@@ -1680,9 +1690,9 @@ module PlantDisturbsMod
     QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
     H2OLoss_CumYr_col   = H2OLoss_CumYr_col+watflx
 
-    VHeatCapCanopy_pft(NZ)     = cpw*(CanopyMassC*SpecStalkVolume+CanopyBiomWater_pft(NZ))
-    QCanopyWat2Dist_col = QCanopyWat2Dist_col+watflx
-    HeatCanopy2Dist_col = HeatCanopy2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
+    VHeatCapCanopy_pft(NZ) = cpw*(CanopyMassC*SpecStalkVolume+CanopyBiomWater_pft(NZ))
+    QCanopyWat2Dist_col    = QCanopyWat2Dist_col+watflx
+    HeatCanopy2Dist_col    = HeatCanopy2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
     !
     !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
     !
@@ -1710,13 +1720,10 @@ module PlantDisturbsMod
     !     WVSTK=total PFT sapwood C mass
     !     CanopyStalkArea_lbrch=total PFT stalk surface area
     !
-    IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction)then
+    IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction .or. PlantPopulation_pft(NZ).LE.0.0_r8)then
       iPlantBranchState_brch(NB,NZ)=iDead      
     endif
-
-    IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
-      iPlantBranchState_brch(NB,NZ)=iDead
-    endif
+    
   ENDDO D9835
   end associate
   end subroutine CutPlant

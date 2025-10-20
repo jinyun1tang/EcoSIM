@@ -30,14 +30,14 @@ module WthrMod
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
+  real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADZ,VPX,XJ
 
   !
   !     CDIR,CDIF=fraction of solar SW,sky diffuse radiation in visible
   !     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
   !     TSNOW=temperature below which precipitation is snow (oC)
   !
-  real(r8), parameter :: SolConst=4.896_r8 !MJ/m2/hour, solar constant
+  real(r8), parameter :: SolConst=4.896_r8 !MJ/m2/hour, solar constant ~ 1360 W/m2
   real(r8), PARAMETER :: CDIR=0.42_r8   !
   real(r8), parameter :: CDIF=0.58_r8
   real(r8), parameter :: PDIR=1269.4_r8
@@ -220,7 +220,8 @@ module WthrMod
 !     Description:
 !
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  real(r8), intent(out) :: RADN_col(JY,JX),PrecAsRain_col(JY,JX),PrecAsSnow_col(JY,JX)
+  real(r8), intent(out) :: RADN_col(JY,JX)
+  real(r8), intent(out) :: PrecAsRain_col(JY,JX),PrecAsSnow_col(JY,JX)
   real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
@@ -263,13 +264,14 @@ module WthrMod
 !
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  real(r8), intent(inout) :: RADN_col(JY,JX)
+  real(r8), intent(inout) :: RADN_col(JY,JX)   !Shortwave radiation at surface horizontal surface, [MJ/hr/m2]
   real(r8), intent(out) :: PRECUI_col(JY,JX)
   real(r8), intent(out) :: PRECII_col(JY,JX)
   integer :: NY,NX
   real(r8) :: AZI  !solar azimuth contribution
   REAL(R8) :: DEC  !solar declination contribution
   real(r8) :: DECLIN
+  real(r8) :: RADX    !solar constant at horizontal surface
   real(r8), PARAMETER :: PICON12=PICON/12._r8
   !     begin_execution
   !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
@@ -284,8 +286,7 @@ module WthrMod
 !     IF OUTDOORS
 !
 !     SineSunInclAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
-!     RADX=solar constant at horizontal surface
-!     RADN_col=SW radiation at horizontal surface, MJ/
+!     
 !     IETYP: koppen climate zone
       IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT_col(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
@@ -303,6 +304,7 @@ module WthrMod
         !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
         IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
         IF(SineSunInclAngle_col(NY,NX).LE.-TWILGT)RADN_col(NY,NX)=0.0_r8
+        
         RADX            = SolConst*AZMAX1(SineSunInclAngle_col(NY,NX))
         RADN_col(NY,NX) = AMIN1(RADX,RADN_col(NY,NX))
 !
@@ -320,7 +322,7 @@ module WthrMod
         RadPARDiffus_col(NY,NX) = RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES 
-        !  Duarte et al., 2006, AFM 139:171
+        !  Duarte et al., 2006, AFM 139:171, Assessing daytime downward longwave radiation estimates for clear and cloudy skies in Southern Brazil
         !     CLD=cloudiness factor for EMM
         !     EMM=sky emissivity
         !     VPK,TairK=vapor pressure,temperature
