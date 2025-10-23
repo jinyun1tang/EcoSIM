@@ -5019,16 +5019,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='FerPFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='FerP_Flx_CumYr_col', dim1name='column',&
        long_name='total fertilizer P amendment', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,FerPFlx_CumYr_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,FerP_Flx_CumYr_col,datrc_1d) 
   else
-    !print*,'FerPFlx_CumYr_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FerPFlx_CumYr_col,datrc_1d)   
+    !print*,'FerP_Flx_CumYr_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FerP_Flx_CumYr_col,datrc_1d)   
     datpr1 => datrc_1d          
-    call restartvar(ncid, flag, varname='FerPFlx_CumYr_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='FerP_Flx_CumYr_col', dim1name='column',&
        long_name='total fertilizer P amendment', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    

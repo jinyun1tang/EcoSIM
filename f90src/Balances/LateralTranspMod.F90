@@ -166,24 +166,26 @@ implicit none
 
         !incoming from south or east grid 
         tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)+cumSed_Eros_2D(N,NN,N2,N1)
-        TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)+XSand_Eros_2D(N,NN,N2,N1)
-        TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)+XSilt_Eros_2D(N,NN,N2,N1)
-        TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)+XClay_Eros_2D(N,NN,N2,N1)
-        TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)+XNH4Soil_Eros_2D(N,NN,N2,N1)
-        TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)+XNH3Soil_Eros_2D(N,NN,N2,N1)
-        TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)+XUreaSoil_Eros_2D(N,NN,N2,N1)
-        TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)+XNO3Soil_Eros_2D(N,NN,N2,N1)
-        TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)+XNH4Band_Eros_2D(N,NN,N2,N1)
-        TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)+XNH3Band_Eros_2D(N,NN,N2,N1)
-        TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)+XUreaBand_Eros_2D(N,NN,N2,N1)
-        TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)+XNO3Band_Eros_2D(N,NN,N2,N1)
+        TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)+XSand_Eros_2D(N,NN,N2,N1)
+        TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)+XSilt_Eros_2D(N,NN,N2,N1)
+        TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)+XClay_Eros_2D(N,NN,N2,N1)
+        TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)+XNH4Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)+XNH3Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)+XUreaSoil_Eros_molN_2D(N,NN,N2,N1)
+        TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)+XNO3Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)+XNH4Band_Eros_molN_2D(N,NN,N2,N1)
+        TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)+XNH3Band_Eros_molN_2D(N,NN,N2,N1)
+        TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)+XUreaBand_Eros_molN_2D(N,NN,N2,N1)
+        TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)+XNO3Band_Eros_molN_2D(N,NN,N2,N1)
+        TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)+XPO4Soil_Eros_molP_2D(N,NN,N2,N1)
+        TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)+XPO4Band_Eros_molP_2D(N,NN,N2,N1)
 
         DO idx=idx_beg,idx_end
-          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)+trcx_Eros_2D(idx,N,NN,N2,N1)
+          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)+trcx_Eros_mol_2D(idx,N,NN,N2,N1)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
-          trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)+trcp_Eros_2D(NTP,N,NN,N2,N1)
+          trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)+trcp_Eros_mol_2D(NTP,N,NN,N2,N1)
         ENDDO
 
         DO  K=1,jcplx
@@ -230,24 +232,26 @@ implicit none
 !       outgoing
         if(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
-          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
-          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
-          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
-          TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
-          TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
-          TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
-          TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
-          TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
-          TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
-          TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
-          TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
+          TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
+          TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
+          TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
+          TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)-XNH4Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)-XNH3Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)-XUreaSoil_Eros_molN_2D(N,NN,N5,N4)
+          TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)-XNO3Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)-XNH4Band_Eros_molN_2D(N,NN,N5,N4)
+          TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)-XNH3Band_Eros_molN_2D(N,NN,N5,N4)
+          TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)-XUreaBand_Eros_molN_2D(N,NN,N5,N4)
+          TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)-XNO3Band_Eros_molN_2D(N,NN,N5,N4)
+          TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)-XPO4Soil_Eros_molP_2D(N,NN,N5,N4)
+          TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)-XPO4Band_Eros_molP_2D(N,NN,N5,N4)
 
           DO idx=idx_beg,idx_end
-            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5,N4)
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_mol_2D(idx,N,NN,N5,N4)
           ENDDO
 
           DO NTP=idsp_beg,idsp_end
-            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5,N4)
+            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_mol_2D(NTP,N,NN,N5,N4)
           ENDDO
 
           DO  K=1,jcplx
@@ -296,24 +300,26 @@ implicit none
       IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
         IF(ABS(cumSed_Eros_2D(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5B,N4B)
-          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
-          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
-          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
-          TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5B,N4B)
-          TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5B,N4B)
-          TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5B,N4B)
-          TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5B,N4B)
-          TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5B,N4B)
-          TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5B,N4B)
-          TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5B,N4B)
-          TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5B,N4B)
+          TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
+          TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
+          TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
+          TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)-XNH4Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)-XNH3Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)-XUreaSoil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)-XNO3Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)-XNH4Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)-XNH3Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)-XUreaBand_Eros_molN_2D(N,NN,N5B,N4B)
+          TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)-XNO3Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)-XPO4Soil_Eros_molP_2D(N,NN,N5B,N4B)
+          TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)-XPO4Band_Eros_molP_2D(N,NN,N5B,N4B)
 
           DO idx=idx_beg,idx_end
-            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5B,N4B)
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_mol_2D(idx,N,NN,N5B,N4B)
           ENDDO
 
           DO NTP=idsp_beg,idsp_end
-            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5B,N4B)
+            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_mol_2D(NTP,N,NN,N5B,N4B)
           ENDDO
 
           D8380: DO K=1,jcplx

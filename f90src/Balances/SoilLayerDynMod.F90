@@ -950,10 +950,12 @@ implicit none
   DO NTF=ifertn_beg,ifertn_end
     FertN_mole_soil_vr(NTF,L1,NY,NX)=FertN_mole_soil_vr(NTF,L1,NY,NX)+FX*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_soil_vr(L1,NY,NX)=FertP_mole_soil_vr(L1,NY,NX) + FX*FertP_mole_soil_vr(L0,NY,NX)
 
   DO NTF=ifertnb_beg,ifertnb_end
     FertN_mole_Band_vr(NTF,L1,NY,NX)=FertN_mole_Band_vr(NTF,L1,NY,NX)+FX*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_band_vr(L1,NY,NX)=FertP_mole_band_vr(L1,NY,NX)+FX*FertP_mole_band_vr(L0,NY,NX)
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H2PO4B .and. NTU/=ids_H1PO4B)THEN
@@ -1131,10 +1133,12 @@ implicit none
   DO NTF=ifertn_beg,ifertn_end
     FertN_mole_soil_vr(NTF,L0,NY,NX)=FY*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_soil_vr(L0,NY,NX)=FY*FertP_mole_soil_vr(L0,NY,NX)
 
   DO NTF=ifertnb_beg,ifertnb_end
     FertN_mole_Band_vr(NTF,L0,NY,NX)=FY*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_band_vr(L0,NY,NX)=FY*FertP_mole_band_vr(L0,NY,NX)
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H1PO4B .and. NTU/=ids_H2PO4B)THEN
@@ -1632,10 +1636,13 @@ implicit none
 
 ! begin_execution
   DO NTF=ifertn_beg,ifertn_end
-    FXZN                        = AMIN1(FX*FertN_mole_soil_vr(NTF,L,NY,NX),FertN_mole_soil_vr(NTF,L0,NY,NX))
+    FXZN                             = AMIN1(FX*FertN_mole_soil_vr(NTF,L,NY,NX),FertN_mole_soil_vr(NTF,L0,NY,NX))
     FertN_mole_soil_vr(NTF,L1,NY,NX) = FertN_mole_soil_vr(NTF,L1,NY,NX)+FXZN
     FertN_mole_soil_vr(NTF,L0,NY,NX) = FertN_mole_soil_vr(NTF,L0,NY,NX)-FXZN
   ENDDO
+  FXZN = AMIN1(FX*FertP_mole_soil_vr(L,NY,NX),FertP_mole_soil_vr(L0,NY,NX))
+  FertP_mole_soil_vr(L1,NY,NX) = FertP_mole_soil_vr(L1,NY,NX)+FXZN
+  FertP_mole_soil_vr(L0,NY,NX) = FertP_mole_soil_vr(L0,NY,NX)-FXZN
 
   IF (L0>0) then
     DO NTF=ifertnb_beg,ifertnb_end
@@ -1643,7 +1650,11 @@ implicit none
       FertN_mole_Band_vr(NTF,L1,NY,NX) = FertN_mole_Band_vr(NTF,L1,NY,NX)+FXZN
       FertN_mole_Band_vr(NTF,L0,NY,NX) = FertN_mole_Band_vr(NTF,L0,NY,NX)-FXZN
     ENDDO
+    FXZN = AMIN1(FX*FertP_mole_band_vr(L,NY,NX),FertP_mole_band_vr(L0,NY,NX))    
+    FertP_mole_band_vr(L1,NY,NX) = FertP_mole_band_vr(L1,NY,NX)+FXZN
+    FertP_mole_band_vr(L0,NY,NX) = FertP_mole_band_vr(L0,NY,NX)-FXZN
   endif
+
 !
 !     SOIL N,P SOLUTES IN BAND, NON-BAND
 !

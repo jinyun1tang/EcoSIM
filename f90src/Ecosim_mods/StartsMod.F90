@@ -798,7 +798,7 @@ module StartsMod
   PO4byFire_CumYr_col(:,:)       = 0.0_r8
   AmendC_CumYr_flx_col(:,:)       = 0.0_r8
   FertN_Flx_CumYr_col(:,:)        = 0.0_r8
-  FerPFlx_CumYr_col(:,:)         = 0.0_r8
+  FerP_Flx_CumYr_col(:,:)         = 0.0_r8
   H2OLoss_CumYr_col(:,:)         = 0.0_r8
   QEvap_CumYr_col(:,:)           = 0.0_r8
   Qrunoff_CumYr_col(:,:)         = 0.0_r8

@@ -19,17 +19,19 @@ implicit none
   real(r8),allocatable ::  trcSalt_Flo2MacP_vr(:,:,:,:)             !net salt flux into the grid cell through macropore flow (<0 loss) [mol d-2 h-1]
   real(r8),allocatable ::  trcSalt_SurfRunoff_flx(:,:,:)            !salt tracer loss through surface runoff [mol d-2 h-1]
 
-  real(r8),allocatable ::  TSandEros_col(:,:)                       !column sand loss through erosion (<0 loss) [g d-2 h-1]
-  real(r8),allocatable ::  TSiltEros_col(:,:)                       !column silt loss through erosion (<0 loss) [g d-2 h-1]
-  real(r8),allocatable ::  TCLAYEros_col(:,:)                       !column clay loss through erosion (<0 loss) [g d-2 h-1]
-  real(r8),allocatable ::  TNH4Eros_col(:,:)                        !column NH4 loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNH3Eros_col(:,:)                        !column NH3 loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNUreaEros_col(:,:)                      !column Urea loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNO3Eros_col(:,:)                        !column NO3 loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNH4ErosBand_col(:,:)                    !column band NH4 loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNH3ErosBand_col(:,:)                    !column band NH3 loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNUreaErosBand_col(:,:)                  !column band urea loss through erosion (<0 loss) [mol d-2 h-1]
-  real(r8),allocatable ::  TNO3ErosBand_col(:,:)                    !column band NO3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TSandErosed_col(:,:)                       !column sand loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TSiltErosed_col(:,:)                       !column silt loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TCLAYErosed_col(:,:)                       !column clay loss through erosion (<0 loss) [g d-2 h-1]
+  real(r8),allocatable ::  TNH4Erosed_molN_col(:,:)                        !column NH4 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNH3Erosed_molN_col(:,:)                        !column NH3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNUreaErosed_molN_col(:,:)                      !column Urea loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNO3Erosed_molN_col(:,:)                        !column NO3 loss through erosion (<0 loss) [mol d-2 h-1]
+  real(r8),allocatable ::  TNH4ErosBand_molN_col(:,:)                    !column band NH4 loss through erosion (<0 loss) [molN d-2 h-1]
+  real(r8),allocatable ::  TNH3ErosBand_molN_col(:,:)                    !column band NH3 loss through erosion (<0 loss) [molN d-2 h-1]
+  real(r8),allocatable ::  TNUreaErosBand_molN_col(:,:)                  !column band urea loss through erosion (<0 loss) [molN d-2 h-1]
+  real(r8),allocatable ::  TNO3ErosBand_molN_col(:,:)                    !column band NO3 loss through erosion (<0 loss) [molN d-2 h-1]
+  real(r8),allocatable ::  TPO4Erosed_molP_col(:,:)                      !column soil PO4 los through erosion (<0 loss) [molP d-2 h-1]
+  real(r8),allocatable ::  TPO4ErosBand_molP_col(:,:)                    !column band PO4 loss through erosion (<0 loss) [molP d-2 h-1]
   real(r8),allocatable ::  trcx_TER_col(:,:,:)                      !column exchangeable cation loss through erosion (<0 loss)[mol d-2 h-1]
   real(r8),allocatable ::  trcp_TER_col(:,:,:)                      !column precipitated salt loss through erosion (<0 loss) [mol d-2 h-1]
   real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                !column sediment loss through erosion (<0 loss) [g d-2 h-1]
@@ -73,17 +75,19 @@ implicit none
   allocate(trcSalt_Flo2MicP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MicP_vr=0._r8
   allocate(trcSalt_Flo2MacP_vr(idsalt_beg:idsaltb_end,JZ,JY,JX)); trcSalt_Flo2MacP_vr=0._r8
   allocate(trcSalt_SurfRunoff_flx(idsalt_beg:idsalt_end,JY,JX));           trcSalt_SurfRunoff_flx=0._r8  
-  allocate(TSandEros_col(JY,JX));      TSandEros_col=0._r8
-  allocate(TSiltEros_col(JY,JX));      TSiltEros_col=0._r8
-  allocate(TCLAYEros_col(JY,JX));      TCLAYEros_col=0._r8
-  allocate(TNH4Eros_col(JY,JX));      TNH4Eros_col=0._r8
-  allocate(TNH3Eros_col(JY,JX));      TNH3Eros_col=0._r8
-  allocate(TNUreaEros_col(JY,JX));      TNUreaEros_col=0._r8
-  allocate(TNO3Eros_col(JY,JX));      TNO3Eros_col=0._r8
-  allocate(TNH4ErosBand_col(JY,JX));      TNH4ErosBand_col=0._r8
-  allocate(TNH3ErosBand_col(JY,JX));      TNH3ErosBand_col=0._r8
-  allocate(TNUreaErosBand_col(JY,JX));      TNUreaErosBand_col=0._r8
-  allocate(TNO3ErosBand_col(JY,JX));      TNO3ErosBand_col=0._r8
+  allocate(TSandErosed_col(JY,JX));      TSandErosed_col=0._r8
+  allocate(TSiltErosed_col(JY,JX));      TSiltErosed_col=0._r8
+  allocate(TCLAYErosed_col(JY,JX));      TCLAYErosed_col=0._r8
+  allocate(TPO4Erosed_molP_col(JY,JX));  TPO4Erosed_molP_col=0._r8
+  allocate(TPO4ErosBand_molP_col(JY,JX)); TPO4ErosBand_molP_col=0._r8
+  allocate(TNH4Erosed_molN_col(JY,JX));      TNH4Erosed_molN_col=0._r8
+  allocate(TNH3Erosed_molN_col(JY,JX));      TNH3Erosed_molN_col=0._r8
+  allocate(TNUreaErosed_molN_col(JY,JX));      TNUreaErosed_molN_col=0._r8
+  allocate(TNO3Erosed_molN_col(JY,JX));      TNO3Erosed_molN_col=0._r8
+  allocate(TNH4ErosBand_molN_col(JY,JX));      TNH4ErosBand_molN_col=0._r8
+  allocate(TNH3ErosBand_molN_col(JY,JX));      TNH3ErosBand_molN_col=0._r8
+  allocate(TNUreaErosBand_molN_col(JY,JX));      TNUreaErosBand_molN_col=0._r8
+  allocate(TNO3ErosBand_molN_col(JY,JX));      TNO3ErosBand_molN_col=0._r8
   allocate(trcg_SurfRunoff_flx(idg_beg:idg_NH3,JY,JX));      trcg_SurfRunoff_flx=0._r8
 
   allocate(trcx_TER_col(idx_beg:idx_end,JY,JX));    trcx_TER_col=0._r8
@@ -139,18 +143,19 @@ implicit none
 !  call destroy(THFLWW)
 
   call destroy(trcs_TransptMacP_vr)
-
-  call destroy(TSandEros_col)
-  call destroy(TSiltEros_col)
-  call destroy(TCLAYEros_col)
-  call destroy(TNH4Eros_col)
-  call destroy(TNH3Eros_col)
-  call destroy(TNUreaEros_col)
-  call destroy(TNO3Eros_col)
-  call destroy(TNH4ErosBand_col)
-  call destroy(TNH3ErosBand_col)
-  call destroy(TNUreaErosBand_col)
-  call destroy(TNO3ErosBand_col)
+  call destroy(TPO4ErosBand_molP_col)
+  call destroy(TPO4Erosed_molP_col)
+  call destroy(TSandErosed_col)
+  call destroy(TSiltErosed_col)
+  call destroy(TCLAYErosed_col)
+  call destroy(TNH4Erosed_molN_col)
+  call destroy(TNH3Erosed_molN_col)
+  call destroy(TNUreaErosed_molN_col)
+  call destroy(TNO3Erosed_molN_col)
+  call destroy(TNH4ErosBand_molN_col)
+  call destroy(TNH3ErosBand_molN_col)
+  call destroy(TNUreaErosBand_molN_col)
+  call destroy(TNO3ErosBand_molN_col)
   call destroy(tErosionSedmLoss_col)
   call destroy(TWatFlowCellMicP_vr)
   call destroy(TWatFlowCellMicPX_vr)

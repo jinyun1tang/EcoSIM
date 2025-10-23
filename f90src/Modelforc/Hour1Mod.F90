@@ -393,21 +393,23 @@ module Hour1Mod
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
-        cumSed_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XSand_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XSilt_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XClay_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNH4Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNH3Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XUreaSoil_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNO3Soil_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNH4Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNH3Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XUreaBand_Eros_2D(1:2,1:2,NY,NX)=0._r8
-        XNO3Band_Eros_2D(1:2,1:2,NY,NX)=0._r8
+        cumSed_Eros_2D(1:2,1:2,NY,NX)         = 0._r8
+        XSand_Eros_2D(1:2,1:2,NY,NX)          = 0._r8
+        XSilt_Eros_2D(1:2,1:2,NY,NX)          = 0._r8
+        XClay_Eros_2D(1:2,1:2,NY,NX)          = 0._r8
+        XPO4Band_Eros_molP_2D(1:2,1:2,NY,NX)  = 0._r8
+        XPO4Soil_Eros_molP_2D(1:2,1:2,NY,NX)  = 0._r8
+        XNH4Soil_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
+        XNH3Soil_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
+        XUreaSoil_Eros_molN_2D(1:2,1:2,NY,NX) = 0._r8
+        XNO3Soil_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
+        XNH4Band_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
+        XNH3Band_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
+        XUreaBand_Eros_molN_2D(1:2,1:2,NY,NX) = 0._r8
+        XNO3Band_Eros_molN_2D(1:2,1:2,NY,NX)  = 0._r8
 
-        trcx_Eros_2D(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
-        trcp_Eros_2D(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
+        trcx_Eros_mol_2D(idx_beg:idx_end,1:2,1:2,NY,NX)  = 0._r8
+        trcp_Eros_mol_2D(idsp_beg:idsp_end,1:2,1:2,NY,NX) = 0._r8
 
         OMEERhetr_2D(:,:,:,1:2,1:2,NY,NX) = 0._r8
         OMEERauto_2D(:,:,1:2,1:2,NY,NX)   = 0._r8

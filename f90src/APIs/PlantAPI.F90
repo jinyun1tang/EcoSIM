@@ -86,14 +86,14 @@ implicit none
   TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX)      = plt_rbgc%TRootGasLossDisturb_col(idg_beg:idg_NH3)
   Canopy_NEE_col(NY,NX)                               = plt_bgcr%Canopy_NEE_col
   TPlantRootH2OUptake_col(NY,NX)                      = plt_ew%TPlantRootH2OUptake_col
-  FERT(17:19,I1,NY,NX)                                = plt_distb%FERT(17:19)
-  FERT(3,I1,NY,NX)                                    = plt_distb%FERT(3)
+  FERT(ifert_plant_manuC:ifert_plant_manuP,I1,NY,NX)  = plt_distb%FERT(ifert_plant_manuC:ifert_plant_manuP)
+  FERT(ifert_N_urea,I1,NY,NX)                         = plt_distb%FERT(ifert_N_urea)
   IYTYP(iAmendtyp_Manure,I1,NY,NX)                    = plt_distb%IYTYP
-  FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)       = plt_allom%FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  FracShootLeafAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)  = plt_allom%FracShootLeafAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  FracShootPetolAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) = plt_allom%FracShootPetolAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
-  QH2OLoss_lnds                                                          = plt_site%QH2OLoss_lnds
+  FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs) = plt_allom%FracWoodStalkElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)      = plt_allom%FracRootElmAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  FracShootLeafAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)    = plt_allom%FracShootLeafAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  FracShootPetolAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)   = plt_allom%FracShootPetolAlloc2Litr(1:NumPlantChemElms,1:NumOfPlantLitrCmplxs)
+  QH2OLoss_lnds                                                         = plt_site%QH2OLoss_lnds
 
   DO L=1,NumCanopyLayers
     tCanLeafC_clyr(L,NY,NX)        = plt_biom%tCanLeafC_clyr(L)

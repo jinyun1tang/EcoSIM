@@ -579,20 +579,23 @@ module RedistMod
     !
     !     SOIL MINERAL FRACTIONS
     !
-    SAND_vr(NU_col(NY,NX),NY,NX) = SAND_vr(NU_col(NY,NX),NY,NX)+TSandEros_col(NY,NX)
-    SILT_vr(NU_col(NY,NX),NY,NX) = SILT_vr(NU_col(NY,NX),NY,NX)+TSiltEros_col(NY,NX)
-    CLAY_vr(NU_col(NY,NX),NY,NX) = CLAY_vr(NU_col(NY,NX),NY,NX)+TCLAYEros_col(NY,NX)
+    SAND_vr(NU_col(NY,NX),NY,NX) = SAND_vr(NU_col(NY,NX),NY,NX)+TSandErosed_col(NY,NX)
+    SILT_vr(NU_col(NY,NX),NY,NX) = SILT_vr(NU_col(NY,NX),NY,NX)+TSiltErosed_col(NY,NX)
+    CLAY_vr(NU_col(NY,NX),NY,NX) = CLAY_vr(NU_col(NY,NX),NY,NX)+TCLAYErosed_col(NY,NX)
     !
     !     FERTILIZER POOLS
 !
-    FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)+TNH4Eros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)+TNH3Eros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)      = FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)+TNUreaEros_col(NY,NX)
-    FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)+TNO3Eros_col(NY,NX)
-    FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)+TNH4ErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)+TNH3ErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX) = FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)+TNUreaErosBand_col(NY,NX)
-    FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)+TNO3ErosBand_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh4,NU_col(NY,NX),NY,NX)+TNH4Erosed_molN_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)+TNH3Erosed_molN_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)      = FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)+TNUreaErosed_molN_col(NY,NX)
+    FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)       = FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)+TNO3Erosed_molN_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)+TNH4ErosBand_molN_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)+TNH3ErosBand_molN_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX) = FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)+TNUreaErosBand_molN_col(NY,NX)
+    FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)  = FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)+TNO3ErosBand_molN_col(NY,NX)
+    FertP_mole_soil_vr(NU_col(NY,NX),NY,NX)                   = FertP_mole_soil_vr(NU_col(NY,NX),NY,NX)+TPO4Erosed_molP_col(NY,NX)
+    FertP_mole_band_vr(NU_col(NY,NX),NY,NX)                   = FertP_mole_band_vr(NU_col(NY,NX),NY,NX)+TPO4ErosBand_molP_col(NY,NX)
+
 !
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -1164,7 +1167,8 @@ module RedistMod
       +trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)+trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)&
       +trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)) &
       +2._r8*patomw*(trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)) &
-      +3._r8*patomw*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX))
+      +3._r8*patomw*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX) &
+      +patomw*(FertP_mole_band_vr(L,NY,NX)+FertP_mole_soil_vr(L,NY,NX)))
 
     TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
     tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX

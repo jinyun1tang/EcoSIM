@@ -1698,6 +1698,7 @@ implicit none
        ! Determine if end of history interval
        tape(t)%is_endhist = .false.
        if (tape(t)%nhtfrq==0) then   !monthly average
+          !by year for monthly output
           if (mon /= monm1) tape(t)%is_endhist = .true.
        else
           if (mod(nstep,tape(t)%nhtfrq) == 0) tape(t)%is_endhist = .true.

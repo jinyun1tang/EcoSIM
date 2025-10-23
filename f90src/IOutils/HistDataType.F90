@@ -1635,7 +1635,7 @@ implicit none
 
   data1d_ptr => this%h1D_SLA_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='SLA_pft',units='cm2 leaf (gC leaf)-1',avgflag='A',&
-    long_name='Specific leaf area',ptr_patch=data1d_ptr,default='inactive')      
+    long_name='Specific leaf area',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_SEMIS_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_SEMIS_FLX_col',units='umol C/m2/s',avgflag='A',&
@@ -1978,8 +1978,7 @@ implicit none
 
   data1d_ptr => this%h1D_LAI_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='LAIstk_pft',units='m2/m2',avgflag='A',&
-    long_name='whole plant leaf area, including stalk',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='whole plant leaf area, including stalk',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PSI_CAN_pft',units='MPa',avgflag='A',&
@@ -2149,19 +2148,19 @@ implicit none
 
   data1d_ptr => this%h1D_LeafC3ChlCperm2LA_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafC3ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
-    long_name='Cholorophyll carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Cholorophyll carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_LeafC4ChlCperm2LA_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafC4ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
-    long_name='chlorophyll carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='chlorophyll carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_LeafRubiscoCperm2LA_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafRubisco_pft',units='gC rubisco m-2 leaf area',avgflag='A',&
-    long_name='Rubisco carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Rubisco carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_LeafPEPCperm2LA_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafPEPC_pft',units='gC PEP m-2 leaf area',avgflag='A',&
-    long_name='PEP carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='PEP carbon in mesophyll for C4 plants',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='GRAIN_NO_pft',units='1/m2',avgflag='A',&
@@ -2236,17 +2235,17 @@ implicit none
   data1d_ptr => this%h1D_VcMaxRubisco_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VcMax25C_RUBISCO_pft',units='umol CO2 s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum carboxylation rate by Rubisco at 25oC',&
-    ptr_patch=data1d_ptr,default='inactive')      
+    ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_LeafProteinCperm2_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafProteinC_pft',units='gC protein m-2 leaf area',avgflag='A',&
     long_name='Protein carbon mass per unit of leaf area',&
-    ptr_patch=data1d_ptr,default='inactive')
+    ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_VoMaxRubisco_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VoMax25C_RUBISCO_pft',units='umol O2 s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum oxygenation rate by Rubisco at 25oC',&
-    ptr_patch=data1d_ptr,default='inactive')      
+    ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_VcMaxPEP_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='VcMax25C_PEP_pft',units='umol CO2 s-1 m-2 leaf area',avgflag='A',&
@@ -2256,7 +2255,7 @@ implicit none
   data1d_ptr => this%h1D_JMaxPhoto_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='JMax25C_photo_pft',units='umol e- s-1 m-2 leaf area',avgflag='A',&
     long_name='Maximum electron transport rate at 25oC',&
-    ptr_patch=data1d_ptr,default='inactive')      
+    ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_TFN_Carboxy_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='TFN_Carboxy_pft',units='none',avgflag='A',&
@@ -2765,11 +2764,11 @@ implicit none
 
   data2d_ptr =>  this%h2D_VmaxNH4Root_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='VmaxNH4Root_pvr',units='umolN h-1 (gC root)-1',type2d='levsoi',avgflag='A',&
-    long_name='Maximum NH4 uptake rate for given pft',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Maximum NH4 uptake rate for given pft',ptr_patch=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_VmaxNO3Root_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='VmaxNO3Root_pvr',units='umolN h-1 (gC root)-1',type2d='levsoi',avgflag='A',&
-    long_name='Maximum NO3 uptake rate for given pft',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Maximum NO3 uptake rate for given pft',ptr_patch=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_RootMassN_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RootN_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
@@ -3495,7 +3494,7 @@ implicit none
       this%h1D_HUMUS_C_col(ncol)      = tHumOM_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_HUMUS_N_col(ncol)      = tHumOM_col(ielmn,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_HUMUS_P_col(ncol)      = tHumOM_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_AMENDED_P_col(ncol)    = FerPFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_AMENDED_P_col(ncol)    = FerP_Flx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tLITRf_C_FLX_col(ncol) = LiterfalOrgM_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tLITRf_N_FLX_col(ncol) = LiterfalOrgM_col(ielmn,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tLITRf_P_FLX_col(ncol) = LiterfalOrgM_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
