@@ -158,7 +158,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafLayerElms_node(:,:,:,:,:,:,:)    !layer leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_lnode(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafProteinC_node(:,:,:,:,:)           !layer leaf protein C, [g d-2]
-  real(r8),target,allocatable ::  PetoleProteinCNode_brch(:,:,:,:,:)         !layer sheath protein C, [g d-2]
+  real(r8),target,allocatable ::  PetoleProteinC_node(:,:,:,:,:)         !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  CanopyNoduleNonstCConc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)           !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  CanopyNLimFactor_brch(:,:,:,:)             !Canopy N-limitation factor, [0->1] weaker limitation,[-]
@@ -171,6 +171,8 @@ module CanopyDataType
   real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1] 
   real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate,[gC d2 h-1]
   real(r8),target,allocatable :: CanopyMassC_pft(:,:,:)                      !Canopy biomass, [gC d-2]
+  real(r8),target,allocatable :: fNCLFW_pft(:,:,:)                            !NC ratio of growing leaf, [gN/gC]
+  real(r8),target,allocatable :: fPCLFW_pft(:,:,:)                           !PC ratio of growing leaf, [gP/gC]
   real(r8),target,allocatable :: CanopyVcMaxRubisco25C_pft(:,:,:)               !Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
   real(r8),target,allocatable :: CanopyVoMaxRubisco25C_pft(:,:,:)               !Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
   real(r8),target,allocatable :: CanopyVcMaxPEP25C_pft(:,:,:)                   !Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
@@ -216,6 +218,8 @@ module CanopyDataType
   allocate(CanopyNLimFactor_brch(MaxNumBranches,JP,JY,JX));CanopyNLimFactor_brch=1._r8
   allocate(CanopyPLimFactor_brch(MaxNumBranches,JP,JY,JX));CanopyPLimFactor_brch=1._r8
   allocate(CanopyMassC_pft(JP,JY,jX)) ; CanopyMassC_pft=0._r8
+  allocate(fNCLFW_pft(JP,JY,JX)); fNCLFW_pft=0._r8
+  allocate(fPCLFW_pft(JP,JY,JX)); fPCLFW_pft=0._r8
   allocate(CanopyWaterMassBeg_col(JY,JX)); CanopyWaterMassBeg_col=0._r8
   allocate(CanopyWaterMassEnd_col(JY,JX)); CanopyWaterMassEnd_col=0._r8
   allocate(HeatCanopy2Dist_col(JY,JX)); HeatCanopy2Dist_col=0._r8
@@ -374,7 +378,7 @@ module CanopyDataType
   LeafLayerElms_node=0._r8
   allocate(CanopyLeafArea_lnode(NumCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));CanopyLeafArea_lnode=0._r8
   allocate(LeafProteinC_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafProteinC_node=0._r8
-  allocate(PetoleProteinCNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinCNode_brch=0._r8
+  allocate(PetoleProteinC_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinC_node=0._r8
   allocate(CanopyNoduleNonstCConc_pft(JP,JY,JX));   CanopyNoduleNonstCConc_pft=0._r8
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
   allocate(StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandDeadKCompElms_pft=0._r8
@@ -388,7 +392,8 @@ module CanopyDataType
   subroutine DestructCanopyData
   use abortutils, only : destroy
   implicit none
-
+  call destroy(fNCLFW_pft)
+  call destroy(fPCLFW_pft)
   call destroy(SpecificLeafArea_pft)
   call destroy(LeafC3ChlCperm2LA_pft)
   call destroy(LeafC4ChlCperm2LA_pft)
@@ -555,7 +560,7 @@ module CanopyDataType
   call destroy(LeafLayerElms_node)
   call destroy(CanopyLeafArea_lnode)
   call destroy(LeafProteinC_node)
-  call destroy(PetoleProteinCNode_brch)
+  call destroy(PetoleProteinC_node)
   call destroy(CanopyNoduleNonstCConc_pft)
   call destroy(GrainSeedBiomCMean_brch)
   call destroy(StandDeadKCompElms_pft)

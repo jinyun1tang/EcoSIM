@@ -18,7 +18,7 @@ module RootDataType
   real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(r8),target,allocatable ::  RootFracRemobilizableBiom_pft(:,:,:)               !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8),target,allocatable ::  RootProteinCMax_pft(:,:,:)               !reference root protein N, [gN g-1]
   real(r8),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                   !root volume:mass ratio, [m3 g-1]
   real(r8),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                 !root diameter primary axes, [m]
   real(r8),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                 !root diameter secondary axes, [m]
@@ -130,7 +130,7 @@ contains
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
   allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._r8
   allocate(MinNonstC2InitRoot_pft(JP,JY,JX));       MinNonstC2InitRoot_pft=0._r8
-  allocate(RootFracRemobilizableBiom_pft(JP,JY,JX));    RootFracRemobilizableBiom_pft=0._r8
+  allocate(RootProteinCMax_pft(JP,JY,JX));    RootProteinCMax_pft=0._r8
   allocate(RootVolPerMassC_pft(jroots,JP,JY,JX));   RootVolPerMassC_pft=0._r8
   allocate(Root1stMaxRadius1_pft(jroots,JP,JY,JX)); Root1stMaxRadius1_pft=0._r8
   allocate(Root2ndMaxRadius1_pft(jroots,JP,JY,JX)); Root2ndMaxRadius1_pft=0._r8
@@ -230,7 +230,7 @@ contains
   call destroy(RootElmsbeg_pft)
   call destroy(RootBiomGrosYld_pft)
   call destroy(MinNonstC2InitRoot_pft)
-  call destroy(RootFracRemobilizableBiom_pft)
+  call destroy(RootProteinCMax_pft)
   call destroy(RootVolPerMassC_pft)
   call destroy(Root1stMaxRadius1_pft)
   call destroy(Root2ndMaxRadius1_pft)

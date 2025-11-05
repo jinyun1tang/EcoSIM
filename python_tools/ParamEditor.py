@@ -87,11 +87,11 @@ class ParEditor:
                     
                         if iscale:
                             if verbose:
-                                print("%-80s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval*variable1[pft_loc]))
+                                print("%-100s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval*variable1[pft_loc]))
                             variable1[pft_loc]=parval*variable1[pft_loc]
                         else:
                             if verbose:
-                                print("%-80s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval))
+                                print("%-100s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval))
                             variable1[pft_loc]=parval
                         parvs[id]=float(variable1[pft_loc])
                         parnames[id]=parnm

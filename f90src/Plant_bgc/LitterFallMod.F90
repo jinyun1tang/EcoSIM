@@ -857,8 +857,8 @@ implicit none
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !output :branch leaf structural element mass, [g d-2]
     StalkNodeHeight_brch       => plt_morph%StalkNodeHeight_brch        ,& !output :internode height, [m]
     PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch        ,& !output :sheath chemical element, [g d-2]
-    PetoleLensNode_brch        => plt_morph%PetoleLensNode_brch         ,& !output :sheath height, [m]
-    PetoleProteinCNode_brch    => plt_biom%PetoleProteinCNode_brch      ,& !output :layer sheath protein C, [g d-2]
+    PetoleLength_node        => plt_morph%PetoleLength_node         ,& !output :sheath height, [m]
+    PetoleProteinC_node    => plt_biom%PetoleProteinC_node      ,& !output :layer sheath protein C, [g d-2]
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch         ,& !output :branch sheath structural element, [g d-2]
     PotentialSeedSites_brch    => plt_morph%PotentialSeedSites_brch     ,& !output :branch potential grain number, [d-2]
     SeedSitesSet_brch          => plt_morph%SeedSitesSet_brch           ,& !output :branch grain number, [d-2]
@@ -891,7 +891,7 @@ implicit none
 !     LeafProteinC_node=leaf protein mass
 !     LeafAreaLive_brch=branch leaf area
 !     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
-!     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinCNode_brch=node petiole C,N,P,protein mass
+!     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinC_node=node petiole C,N,P,protein mass
 !     StructInternodeElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
   C4PhotoShootNonstC_brch(NB,NZ)                      = 0._r8
@@ -924,9 +924,9 @@ implicit none
     LeafArea_node(K,NB,NZ)                          = 0._r8
     StalkNodeHeight_brch(K,NB,NZ)                    = 0._r8
     StalkNodeVertLength_brch(K,NB,NZ)                  = 0._r8
-    PetoleLensNode_brch(K,NB,NZ)                        = 0._r8
+    PetoleLength_node(K,NB,NZ)                        = 0._r8
     LeafProteinC_node(K,NB,NZ)                      = 0._r8
-    PetoleProteinCNode_brch(K,NB,NZ)                    = 0._r8
+    PetoleProteinC_node(K,NB,NZ)                    = 0._r8
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
     PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
     StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8

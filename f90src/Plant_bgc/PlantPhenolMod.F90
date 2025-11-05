@@ -411,7 +411,7 @@ module PlantPhenolMod
   integer :: NB,N,L,NE
 
   associate(                                                            &
-    CanopyLeafSheathC_pft        => plt_biom%CanopyLeafSheathC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft       => plt_biom%CanopyLeafSheathC_pft      ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopyLeafSheathC_brch      => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     RootMycoNonstElms_rpvr      => plt_biom%RootMycoNonstElms_rpvr     ,& !input  :root layer nonstructural element, [g d-2]
@@ -1036,31 +1036,31 @@ module PlantPhenolMod
 !
   DayLenChk=DayLenthCurrent.LT.DayLenthPrev
 
-  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    
+  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    !2
 
     call InitiateBranchFlora(I,J,NB,NZ,DayLenChk)
   !
-  ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN  !3
 
     call BranchStemJointing(I,J,NB,NZ,DayLenChk)
     !
     !   ipltcal_Elongation,=mid stem elongation
     !
-  ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN !4
 
     call BranchStemElongation(I,J,NB,NZ,DayLenChk)
     !
     !   ipltcal_Heading,=end of stem elongation and setting max seed number
     !
-  ELSEIF(iPlantCalendar_brch(ipltcal_Heading,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_Heading,NB,NZ).EQ.0)THEN !5
 
     call BranchHeading(I,J,NB,NZ,DayLenChk) 
     !!
-  ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN !6
   
     call BranchAnthesis(I,J,NB,NZ,DayLenChk) 
 !
-  ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN !7
 
     call InitBranchGrainFill(I,J,NB,NZ,DayLenChk) 
 !
@@ -1068,7 +1068,7 @@ module PlantPhenolMod
 !
 !   iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date setting for final seed number
 !
-  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN !8
     call PrintInfo('set seed number')
     IF(ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.1.00_r8*GrowStageNorm4ReprodPheno)THEN
       iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ)=I
@@ -1078,7 +1078,7 @@ module PlantPhenolMod
 !
 !   iPlantCalendar_brch(ipltcal_SetSeedMass,=end of setting max seed size
 !
-  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
+  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN  !9
     call PrintInfo('set seed number')
     IF(ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.1.50_r8*GrowStageNorm4ReprodPheno)THEN
       iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ)=I

@@ -203,13 +203,13 @@ module Hour1Mod
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
-      LWRadCanGPrev_col(NY,NX)         = LWRadCanG_col(NY,NX)
-      LWRadGrnd_col(NY,NX)                 = LWRadBySurf_col(NY,NX)
-      NetCO2Flx2Canopy_col(NY,NX)      = Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      LWRadCanG_col(NY,NX)                 = 0._r8
-      LWRadBySurf_col(NY,NX)           = 0._r8
-      TLEX_col(NY,NX)                  = Air_Heat_Latent_store_col(NY,NX)
-      TSHX_col(NY,NX)                  = Air_Heat_Sens_store_col(NY,NX)
+      LWRadCanGPrev_col(NY,NX)    = LWRadCanG_col(NY,NX)
+      LWRadGrnd_col(NY,NX)        = LWRadBySurf_col(NY,NX)
+      NetCO2Flx2Canopy_col(NY,NX) = Eco_NEE_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      LWRadCanG_col(NY,NX)        = 0._r8
+      LWRadBySurf_col(NY,NX)      = 0._r8
+      TLEX_col(NY,NX)             = Air_Heat_Latent_store_col(NY,NX)
+      TSHX_col(NY,NX)             = Air_Heat_Sens_store_col(NY,NX)
 
       Air_Heat_Latent_store_col(NY,NX) = 0._r8
       Air_Heat_Sens_store_col(NY,NX)   = 0._r8
@@ -222,7 +222,6 @@ module Hour1Mod
       ECO_ER_col(NY,NX)                = 0._r8
 
       DO  NZ=1,NP_col(NY,NX)
-        NetPrimProduct_pft(NZ,NY,NX) =0._r8
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
@@ -390,7 +389,7 @@ module Hour1Mod
 
 !     IF EROSION FLAG SET
 !
-  IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
+  IF(iErosionMode.EQ.ieros_frzthaweros .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
         cumSed_Eros_2D(1:2,1:2,NY,NX)         = 0._r8
@@ -681,6 +680,30 @@ module Hour1Mod
   ENDDO
   end subroutine SetLiterSoilPropAftDisturb
 !------------------------------------------------------------------------------------------
+  subroutine SetPlantHourlyDiagnosis(I,J,NY,NX)
+  implicit NONE 
+  integer, intent(in) :: I,J,NY,NX
+
+  if(I+J>2)return
+  LeafC4ChlCperm2LA_pft(:,NY,NX)      = 0._r8
+  LeafRubiscoCperm2LA_pft(:,NY,NX)    = 0._r8
+  LeafPEPCperm2LA_pft(:,NY,NX)        = 0._r8
+  LeafC3ChlCperm2LA_pft(:,NY,NX)      = 0._r8
+  NetPrimProduct_pft(:,NY,NX)         = 0._r8
+  LeafProteinCperm2LA_pft(:,NY,NX)    = 0._r8
+  LeafAreaSunlit_pft(:,NY,NX)         = 0._r8
+  PARSunlit_pft(:,NY,NX)              = 0._r8
+  PARSunsha_pft(:,NY,NX)              = 0._r8
+  SpecificLeafArea_pft(:,NY,NX)       = 0._r8
+  CanopyVcMaxRubisco25C_pft(:,NY,NX)  = 0._r8
+  CanopyVoMaxRubisco25C_pft(:,NY,NX)  = 0._r8
+  CanopyVcMaxPEP25C_pft(:,NY,NX)      = 0._r8
+  ElectronTransptJmax25C_pft(:,NY,NX) = 0._r8
+
+  end subroutine SetPlantHourlyDiagnosis
+
+
+!------------------------------------------------------------------------------------------
 
   subroutine SetHourlyDiagnostics(I,J,NY,NX)
   implicit none
@@ -691,6 +714,8 @@ module Hour1Mod
   
 !     begin_execution
   call PrintInfo('beg '//subname)
+  call SetPlantHourlyDiagnosis(I,J,NY,NX)
+
   RootCO2AutorPrev_col(NY,NX)        = RootCO2Autor_col(NY,NX)
   DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
   trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
@@ -753,7 +778,7 @@ module Hour1Mod
   trcn_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
   trcn_AquaADV_Snow2Band_flx(:,NY,NX)             = 0._r8
   trcg_AquaADV_Snow2Soil_flx(:,NY,NX)             = 0._r8
-  SpecificLeafArea_pft(:,NY,NX)                   = 0._r8
+
   RootCO2Ar2Soil_col(NY,NX)                       = 0._r8
   RootCO2Ar2Root_col(NY,NX)                       = 0._r8
   GasHydroLoss_flx_col(idg_beg:idg_NH3,NY,NX)     = 0._r8
@@ -785,14 +810,6 @@ module Hour1Mod
   CanopyHeatStor_col(NY,NX)                       = 0._r8
   VmaxNH4Root_pvr(:,:,:,NY,NX)                    = 0._r8
   VmaxNO3Root_pvr(:,:,:,NY,NX)                    = 0._r8
-  LeafAreaSunlit_pft(:,NY,NX)                     = 0._r8
-  PARSunlit_pft(:,NY,NX)                          = 0._r8
-  PARSunsha_pft(:,NY,NX)                          = 0._r8
-
-  CanopyVcMaxRubisco25C_pft(:,NY,NX) = 0._r8
-  CanopyVoMaxRubisco25C_pft(:,NY,NX) = 0._r8
-  CanopyVcMaxPEP25C_pft(:,NY,NX)     = 0._r8
-  ElectronTransptJmax25C_pft(:,NY,NX)= 0._r8
   TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX) = 0._r8
   LitrFallStrutElms_col(:,NY,NX)                      = 0._r8
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = 0._r8
@@ -1529,10 +1546,11 @@ module Hour1Mod
   character(len=*), parameter :: subname='ZeroHourlyArrays'
 !     begin_execution
   call PrintInfo('beg '//subname)
-  RootN2Fix_col(NY,NX)        = 0._r8
-  RUptkRootO2_col(NY,NX)      = 0._r8
-  RootCO2Emis2Root_col(NY,NX) = 0._r8
-  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX)          = 0._r8
+  RootN2Fix_col(NY,NX)                      = 0._r8
+  RUptkRootO2_col(NY,NX)                    = 0._r8
+  RootCO2Emis2Root_col(NY,NX)               = 0._r8
+
+  trcs_irrig_flx_col(ids_beg:ids_end,NY,NX) = 0._r8
   trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX)  = 0._r8
   trcs_Soil2plant_uptakep_col(ids_beg:ids_end,NY,NX) = 0._r8
   RootO2_TotSink_col(NY,NX)                          = 0._r8

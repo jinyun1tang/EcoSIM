@@ -46,7 +46,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
   real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)             !sheath height, [m]
+  real(r8),target,allocatable ::  PetoleLength_node(:,:,:,:,:)             !sheath height, [m]
   real(r8),target,allocatable ::  StalkNodeHeight_brch(:,:,:,:,:)         !Live internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
@@ -72,8 +72,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
-  real(r8),target,allocatable ::  rProteinC2N_pft(:,:,:)                   !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  rProteinC2P_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2RootN_pft(:,:,:)                 !Protein C to root N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2LeafN_pft(:,:,:)                 !Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2LeafP_pft(:,:,:)                 !Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone_pft(:,:,:)            !initial plant thermal adaptation zone, [-]
@@ -215,7 +216,7 @@ contains
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
-  allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
+  allocate(PetoleLength_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLength_node=0._r8
   allocate(StalkNodeHeight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeHeight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
@@ -241,8 +242,9 @@ contains
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
-  allocate(rProteinC2N_pft(JP,JY,JX));     rProteinC2N_pft=0._r8
-  allocate(rProteinC2P_pft(JP,JY,JX));     rProteinC2P_pft=0._r8
+  allocate(rProteinC2RootN_pft(JP,JY,JX)); rProteinC2RootN_pft=0._r8
+  allocate(rProteinC2LeafN_pft(JP,JY,JX));     rProteinC2LeafN_pft=0._r8
+  allocate(rProteinC2LeafP_pft(JP,JY,JX));     rProteinC2LeafP_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone_pft(JP,JY,JX));    PlantInitThermoAdaptZone_pft=0._r8
@@ -380,7 +382,7 @@ contains
   call destroy(CanopyIsothBndlResist_pft)
   call destroy(CanopyHeight4WatUptake_pft)
   call destroy(LeafArea_node)
-  call destroy(PetoleLensNode_brch)
+  call destroy(PetoleLength_node)
   call destroy(StalkNodeHeight_brch)
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
@@ -407,8 +409,9 @@ contains
   call destroy(rPCEar_pft)
   call destroy(rPCGrain_pft)
   call destroy(rPCNoduler_pft)
-  call destroy(rProteinC2N_pft)
-  call destroy(rProteinC2P_pft)
+  call destroy(rProteinC2RootN_pft)
+  call destroy(rProteinC2LeafN_pft)
+  call destroy(rProteinC2LeafP_pft)
   call destroy(CanOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone_pft)

@@ -44,10 +44,10 @@ module WthrMod
   real(r8), parameter :: PDIF=1269.4_r8
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
-  public :: wthr
+  public :: PrepHourlyWeather
   contains
 
-  SUBROUTINE wthr(I,J,NHW,NHE,NVN,NVS)
+  SUBROUTINe PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
   !
   !     Description:
   !
@@ -116,7 +116,7 @@ module WthrMod
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
   call PrintInfo('end '//subname)
-  END subroutine wthr
+  END subroutine PrepHourlyWeather
 !------------------------------------------------------------------------------------------
 
   subroutine DailyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)

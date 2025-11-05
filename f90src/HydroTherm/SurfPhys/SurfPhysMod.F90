@@ -1321,7 +1321,6 @@ contains
   ALT2     = Altitude_col(N2,N1)+DPTHW2-XN*SLOPE_col(N,N2,N1)*DLYR_3D(N,NUM_col(N2,N1),N2,N1)
   PondDepz = CumDepz2LayBottom_vr(NU_col(N2,N1)-1,N2,N1)-DPTHW1    !can be < 0, if the upper edge of topsoil is at 0 m,
 
-  !write(121,*)'PondDepz=',PondDepz,ExtWaterTable_col(N2,N1)
   !depth is counting downward
   !Grid elevation is higher than outside the grid, and in grid water layer higher than external water table
   !grid discharges water to external water table

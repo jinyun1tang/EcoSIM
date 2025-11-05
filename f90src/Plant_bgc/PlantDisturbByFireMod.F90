@@ -300,6 +300,7 @@ contains
   LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
   LeafElmnt2Litr(ielmn)        = LeafElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ))
   LeafElmnt2Litr(ielmp)        = LeafElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ))
+
   LeafElmntOffEcosystem(ielmn) = LeafElmntRemoval(ielmn)*EHVST21
   LeafElmntOffEcosystem(ielmp) = LeafElmntRemoval(ielmp)*EHVST21
 
@@ -313,14 +314,14 @@ contains
   WoodyElmnt2Litr(ielmc)        = WoodyElmntRemoval(ielmc)*EHVST23
   WoodyElmnt2Litr(ielmn)        = WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ))
   WoodyElmnt2Litr(ielmp)        = WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ))
+
   WoodyElmntOffEcosystem(ielmn) = WoodyElmntRemoval(ielmn)*EHVST23
   WoodyElmntOffEcosystem(ielmp) = WoodyElmntRemoval(ielmp)*EHVST23
 
   StandeadElmnt2Litr(ielmc) = StandeadElmntRemoval(ielmc)*EHVST24
-  StandeadElmnt2Litr(ielmn) = StandeadElmntRemoval(ielmn)*&
-    (1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ))
-  StandeadElmnt2Litr(ielmp)=StandeadElmntRemoval(ielmp)*&
-    (1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ))
+  StandeadElmnt2Litr(ielmn) = StandeadElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ))
+  StandeadElmnt2Litr(ielmp)=StandeadElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ))
+
   StandeadElmntOffEcosystem(ielmn) = StandeadElmntRemoval(ielmn)*EHVST24
   StandeadElmntOffEcosystem(ielmp) = StandeadElmntRemoval(ielmp)*EHVST24
   end associate

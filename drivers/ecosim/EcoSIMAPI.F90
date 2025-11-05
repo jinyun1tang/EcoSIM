@@ -328,7 +328,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts
-  use WthrMod,         only: wthr
+  use WthrMod,         only: PrepHourlyWeather
   use RestartMod,      only: restFile
   use PlantInfoMod,    only: ReadPlantInfo
   use readsmod,        only: ReadClimSoilForcing
@@ -451,7 +451,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !   set up climate forcing for the new hour
 
       if(do_timing)call start_timer(t1)
-      CALL WTHR(I,J,NHW,NHE,NVN,NVS)
+      call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
       if(do_timing)call end_timer('WTHR',t1)
 
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'

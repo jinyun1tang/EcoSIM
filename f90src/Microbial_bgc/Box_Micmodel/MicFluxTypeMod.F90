@@ -50,6 +50,10 @@ implicit none
   real(r8) :: tRHydlySoprtOM(1:NumPlantChemElms)
   real(r8) :: RNO2DmndSoilChemoPrev
   real(r8) :: RNO2DmndBandChemoPrev
+  real(r8) :: tRNH4MicrbImobilSoil
+  real(r8) :: tRNO3MicrbImobilSoil
+  real(r8) :: tRH2PO4MicrbImobilSoil
+  real(r8) :: tRH1PO4MicrbImobilSoil
 
 ! allocatable flux ratios
   real(r8),allocatable :: AttenfNH4Heter(:,:)
@@ -268,6 +272,11 @@ implicit none
   implicit none
   class(micfluxtype) :: this
   integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
+
+  this%tRNH4MicrbImobilSoil = 0._r8
+  this%tRNO3MicrbImobilSoil = 0._r8
+  this%tRH2PO4MicrbImobilSoil = 0._r8
+  this%tRH1PO4MicrbImobilSoil = 0._r8
 
   this%AttenfNH4Autor=0._r8
   this%AttenfNO3Autor=0._r8

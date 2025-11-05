@@ -151,7 +151,8 @@ implicit none
   ENDDO
 
   DO NZ=1,NP0_col(NY,NX)
-
+    fNCLFW_pft(NZ,NY,NX) = plt_pheno%fNCLFW_pft(NZ)
+    fPCLFW_pft(NZ,NY,NX) = plt_pheno%fPCLFW_pft(NZ)
     Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+plt_bgcr%GrossCO2Fix_pft(NZ)
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
@@ -188,7 +189,8 @@ implicit none
     ShootNoduleElms_pft(1:NumPlantChemElms,NZ,NY,NX)            = plt_biom%ShootNoduleElms_pft(1:NumPlantChemElms,NZ)
     TotEndVegE_pft(1:NumPlantChemElms,NZ,NY,NX)                 = plt_biom%TotEndVegE_pft(1:NumPlantChemElms,NZ)        
     TotBegVegE_pft(1:NumPlantChemElms,NZ,NY,NX)                 = plt_biom%TotBegVegE_pft(1:NumPlantChemElms,NZ)        
-    CH2OSunlit_pft(NZ,NY,NX)            = plt_photo%CH2OSunlit_pft(NZ)     
+    ShootRootXferElm_pft(1:NumPlantChemElms,NZ,NY,NX)           = plt_bgcr%ShootRootXferElm_pft(1:NumPlantChemElms,NZ)
+    CH2OSunlit_pft(NZ,NY,NX)            = plt_photo%CH2OSunlit_pft(NZ)         
     CH2OSunsha_pft(NZ,NY,NX)            = plt_photo%CH2OSunsha_pft(NZ)     
     CanopyMassC_pft(NZ,NY,NX)           = plt_biom%CanopyMassC_pft(NZ)
     CanopyStemArea_pft(NZ,NY,NX)        = plt_morph%CanopyStemArea_pft(NZ)
@@ -206,9 +208,10 @@ implicit none
     LeafIntracellularCO2_pft(NZ,NY,NX)  = plt_photo%LeafIntracellularCO2_pft(NZ)
     aquCO2Intraleaf_pft(NZ,NY,NX)       = plt_photo%aquCO2Intraleaf_pft(NZ)
     ClumpFactor_pft(NZ,NY,NX)           = plt_morph%ClumpFactor_pft(NZ)
-    rProteinC2N_pft(NZ,NY,NX)         = plt_allom%rProteinC2N_pft(NZ)
-    rProteinC2P_pft(NZ,NY,NX)         = plt_allom%rProteinC2P_pft(NZ)
-    RootFracRemobilizableBiom_pft(NZ,NY,NX) = plt_allom%RootFracRemobilizableBiom_pft(NZ)
+    rProteinC2RootN_pft(NZ,NY,NX)       = plt_allom%rProteinC2RootN_pft(NZ)
+    rProteinC2LeafN_pft(NZ,NY,NX)         = plt_allom%rProteinC2LeafN_pft(NZ)
+    rProteinC2LeafP_pft(NZ,NY,NX)         = plt_allom%rProteinC2LeafP_pft(NZ)
+    RootProteinCMax_pft(NZ,NY,NX) = plt_allom%RootProteinCMax_pft(NZ)
     CNRTS_pft(NZ,NY,NX)                 = plt_allom%CNRTS_pft(NZ)
     CPRTS_pft(NZ,NY,NX)                 = plt_allom%CPRTS_pft(NZ)
     ETCanopy_CumYr_pft(NZ,NY,NX)        = plt_ew%ETCanopy_CumYr_pft(NZ)
@@ -446,12 +449,12 @@ implicit none
         LeafArea_node(K,NB,NZ,NY,NX)                           = plt_morph%LeafArea_node(K,NB,NZ)
         StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                = plt_morph%StalkNodeVertLength_brch(K,NB,NZ)
         StalkNodeHeight_brch(K,NB,NZ,NY,NX)                    = plt_morph%StalkNodeHeight_brch(K,NB,NZ)
-        PetoleLensNode_brch(K,NB,NZ,NY,NX)                     = plt_morph%PetoleLensNode_brch(K,NB,NZ)
+        PetoleLength_node(K,NB,NZ,NY,NX)                     = plt_morph%PetoleLength_node(K,NB,NZ)
         StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafProteinC_node(K,NB,NZ,NY,NX)                      = plt_biom%LeafProteinC_node(K,NB,NZ)
         PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
-        PetoleProteinCNode_brch(K,NB,NZ,NY,NX)                    = plt_biom%PetoleProteinCNode_brch(K,NB,NZ)
+        PetoleProteinC_node(K,NB,NZ,NY,NX)                    = plt_biom%PetoleProteinC_node(K,NB,NZ)
       ENDDO
       DO  L=1,NumCanopyLayers
         DO N=1,NumLeafZenithSectors
@@ -1107,7 +1110,7 @@ implicit none
     plt_ew%PSICanopyOsmo_pft(NZ) = PSICanopyOsmo_pft(NZ,NY,NX)
 
     plt_ew%TdegCCanopy_pft(NZ)           = TdegCCanopy_pft(NZ,NY,NX)
-    plt_allom%RootFracRemobilizableBiom_pft(NZ) = RootFracRemobilizableBiom_pft(NZ,NY,NX)
+    plt_allom%RootProteinCMax_pft(NZ) = RootProteinCMax_pft(NZ,NY,NX)
     plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)
     plt_morph%ClumpFactor_pft(NZ)           = ClumpFactor_pft(NZ,NY,NX)
 
@@ -1142,8 +1145,9 @@ implicit none
     plt_photo%LeafIntracellularCO2_pft(NZ) = LeafIntracellularCO2_pft(NZ,NY,NX)
     plt_bgcr%CO2NetFix_pft(NZ)            = CO2NetFix_pft(NZ,NY,NX)
 
-    plt_allom%rProteinC2N_pft(NZ) = rProteinC2N_pft(NZ,NY,NX)
-    plt_allom%rProteinC2P_pft(NZ) = rProteinC2P_pft(NZ,NY,NX)
+    plt_allom%rProteinC2RootN_pft(NZ) = rProteinC2RootN_pft(NZ,NY,NX)
+    plt_allom%rProteinC2LeafN_pft(NZ) = rProteinC2LeafN_pft(NZ,NY,NX)
+    plt_allom%rProteinC2LeafP_pft(NZ) = rProteinC2LeafP_pft(NZ,NY,NX)
 
     plt_photo%DiffCO2Atmos2Intracel_pft(NZ) = DiffCO2Atmos2Intracel_pft(NZ,NY,NX)
     plt_photo%AirConc_pft(NZ)               = AirConc_pft(NZ,NY,NX)
@@ -1307,14 +1311,14 @@ implicit none
       DO K=0,MaxNodesPerBranch
         plt_morph%LeafArea_node(K,NB,NZ)                              = LeafArea_node(K,NB,NZ,NY,NX)
         plt_morph%StalkNodeVertLength_brch(K,NB,NZ)                   = StalkNodeVertLength_brch(K,NB,NZ,NY,NX)
-        plt_morph%PetoleLensNode_brch(K,NB,NZ)                        = PetoleLensNode_brch(K,NB,NZ,NY,NX)
+        plt_morph%PetoleLength_node(K,NB,NZ)                        = PetoleLength_node(K,NB,NZ,NY,NX)
         plt_morph%StalkNodeHeight_brch(K,NB,NZ)                       = StalkNodeHeight_brch(K,NB,NZ,NY,NX)
 
         plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)       = LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinC_node(K,NB,NZ)                           = LeafProteinC_node(K,NB,NZ,NY,NX)
         plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
-        plt_biom%PetoleProteinCNode_brch(K,NB,NZ)                     = PetoleProteinCNode_brch(K,NB,NZ,NY,NX)
+        plt_biom%PetoleProteinC_node(K,NB,NZ)                     = PetoleProteinC_node(K,NB,NZ,NY,NX)
       ENDDO
 
       DO K=0,MaxNodesPerBranch

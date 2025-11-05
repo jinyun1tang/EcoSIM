@@ -847,9 +847,9 @@ module WatsubMod
                   M1 = NX;  M2  = NY; M3 = L  !source
                   M4 = NX+1;M5 = NY;  M6 = L  !target
                   XN = -1.0_r8                !going out of eastern boundary
-                  RechargSurf     = RechargEastSurf_col(M2,M1)
+                  RechargSurf       = RechargEastSurf_col(M2,M1)
                   RechargDist2WTBL  = RechrgDistEastSubSurf_col(M2,M1)      !distance to eastern external water table [m]
-                  Recharg2WTBLScal = RechargRateEastWTBL_col(M2,M1)  
+                  Recharg2WTBLScal  = RechargRateEastWTBL_col(M2,M1)  
                   str_dir='east'
                   !do nothing if not on the boundary  
                 ELSE
@@ -859,9 +859,9 @@ module WatsubMod
                 IF(NX.EQ.NHW)THEN            !western boundary, inflow   -|-> |               
                   M4 = NX; M5 = NY; M6 = L   !target on the boundary
                   XN = 1.0_r8                !coming in from western boundary
-                  RechargSurf     = RechargWestSurf_col(M5,M4)
+                  RechargSurf       = RechargWestSurf_col(M5,M4)
                   RechargDist2WTBL  = RechrgDistWestSubSurf_col(M5,M4)      !distance to western external water table [m]
-                  Recharg2WTBLScal = RechargRateWestWTBL_col(M5,M4)
+                  Recharg2WTBLScal  = RechargRateWestWTBL_col(M5,M4)
                   str_dir='west'
                 ELSE
                   cycle
@@ -876,10 +876,10 @@ module WatsubMod
                 IF(NY.EQ.NVS)THEN              !southern boundary, outflow     \|/ !-----
                   M1 = NX; M2 = NY; M3   = L   !source
                   M4 = NX; M5 = NY+1; M6 = L   !target
-                  XN              = -1.0_r8    !going out of south boundary
-                  RechargSurf     = RechargSouthSurf_col(M2,M1)
+                  XN                = -1.0_r8    !going out of south boundary
+                  RechargSurf       = RechargSouthSurf_col(M2,M1)
                   RechargDist2WTBL  = RechrgDistSouthSubSurf_col(M2,M1)   !distance to southern external water table [m]
-                  Recharg2WTBLScal = RechargRateSouthWTBL_col(M2,M1)
+                  Recharg2WTBLScal  = RechargRateSouthWTBL_col(M2,M1)
                   str_dir='south'
                 ELSE
                   cycle
@@ -932,8 +932,8 @@ module WatsubMod
 
               !  NO runoff
               lZeroRunoff=.not.XGridRunoffFlag_2DH(NN,N,N2,N1)   &              !Runoff flag is off
-                .OR. isclose(RechargSurf,0._r8)              &              !Allowed runoff rate is zero
-                .OR. ABS(SurfRunoffPotentM_col(M,N2,N1)).LT.ZEROS(N2,N1)   !Runoff from infiltration partition is inisignificant
+                .OR. isclose(RechargSurf,0._r8)                  &              !Allowed runoff rate is zero
+                .OR. ABS(SurfRunoffPotentM_col(M,N2,N1)).LT.ZEROS(N2,N1)        !Runoff from infiltration partition is inisignificant
 
                !do runoff
               IF(.not.LZeroRunoff)then

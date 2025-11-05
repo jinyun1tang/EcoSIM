@@ -243,7 +243,7 @@ module grosubsMod
   integer  :: BegRemoblize
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8) :: PTRT
+  real(r8) :: PTRT    !main branch growth allocated to leaf and petiole
   real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
   real(r8) :: WaterStress4Groth
@@ -254,11 +254,12 @@ module grosubsMod
   real(r8) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: tvegE_beg(NumPlantChemElms)
   real(r8) :: tvegE_end(NumPlantChemElms)
-  real(r8) :: err,arr(12),arr1(11)
+  real(r8) :: err,arr(12),arr1(11),PTRTM
 ! begin_execution
   associate(                                                 &
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft     ,& !input  :number of branches,[-]
     iPlantRootState_pft  => plt_pheno%iPlantRootState_pft   ,& !input  :flag to detect root system death,[-]
+    MainBranchNum_pft    => plt_morph%MainBranchNum_pft     ,& !input  :number of main branch,[-]    
     iPlantShootState_pft => plt_pheno%iPlantShootState_pft   & !input  :flag to detect canopy death,[-]
   )
 
@@ -274,10 +275,9 @@ module grosubsMod
 
 
     DO  NB=1,NumOfBranches_pft(NZ)
-
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,PTRT,BegRemoblize)
-
+        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,PTRTM,BegRemoblize)
+      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=PTRTM
     ENDDO
 
     call RootBGCModel(I,J,NZ,BegRemoblize,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
@@ -298,11 +298,13 @@ module grosubsMod
   end subroutine GrowOnePlant
 
 !----------------------------------------------------------------------------------------------------
-  subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
+  subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
+    RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
-  REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
-  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
+  REAL(R8), INTENT(OUT) :: TFN6_vr(JZ1)
+  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW
+  real(r8), intent(out) :: CNSHW,CPSHW
+  real(r8), intent(out) :: CNRTW,CPRTW
   real(r8), intent(out) :: RootPrimeAxsNum !Numer of primary root axes
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
@@ -344,8 +346,8 @@ module grosubsMod
     k_woody_litr                => pltpar%k_woody_litr                    ,& !input  :woody litter complex id
     FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr        ,& !inoput :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !inoput :woody element allocation,[-]
-    FracShootLeafAlloc2Litr  => plt_allom%FracShootLeafAlloc2Litr   ,& !inoput :woody element allocation, [-]
-    FracShootPetolAlloc2Litr => plt_allom%FracShootPetolAlloc2Litr  ,& !inoput :leaf element allocation,[-]
+    FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !inoput :woody element allocation, [-]
+    FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !inoput :leaf element allocation,[-]
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft         ,& !inoput :root C biomass per plant, [g p-1]
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
@@ -485,7 +487,7 @@ module grosubsMod
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
   WaterStress4Groth               = real_truncate(WaterStress4Groth,1.e-3_r8)
-  TurgEff4CanopyResp            = fRespWatSens(TurgEff4LeafPetolExpansion,iPlantRootProfile_pft(NZ))
+  TurgEff4CanopyResp              = fRespWatSens(TurgEff4LeafPetolExpansion,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
 
   call PrintInfo('end '//subname)
@@ -558,11 +560,13 @@ module grosubsMod
     VcMaxRubiscoRef_brch      => plt_photo%VcMaxRubiscoRef_brch      ,& !input  :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]    
     VoMaxRubiscoRef_brch      => plt_photo%VoMaxRubiscoRef_brch      ,& !input  :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]    
     VcMaxPEPCarboxyRef_brch   => plt_photo%VcMaxPEPCarboxyRef_brch   ,& !input  :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]        
+    fNCLFW_brch               => plt_pheno%fNCLFW_brch               ,& !input : NC ratio of growing leaf on branch, [gN/gC]
+    fPCLFW_brch               => plt_pheno%fPCLFW_brch               ,& !input : PC ratio of growing leaf on branch, [gP/gC]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !output :branch leaf area, [m2 d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !output :branch leaf structural element mass, [g d-2]
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch       ,& !output :branch sheath structural element, [g d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !output :plant canopy leaf area, [m2 d-2]
-    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft       ,& !output :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft      ,& !output :canopy leaf + sheath C, [g d-2]
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !output :plant stem area, [m2 d-2]
@@ -572,7 +576,10 @@ module grosubsMod
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft          ,& !output :canopy leaf structural element mass, [g d-2]
     PetoleStrutElms_pft       => plt_biom%PetoleStrutElms_pft        ,& !output :canopy sheath structural element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
-    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft          & !output :canopy stalk structural element mass, [g d-2]
+    StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
+    fNCLFW_pft                => plt_pheno%fNCLFW_pft                ,& !output : NC ratio of growing leaf, [gN/gC]
+    fPCLFW_pft                => plt_pheno%fPCLFW_pft                 & !output : PC ratio of growing leaf, [gP/gC]
+
   )
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
@@ -597,11 +604,16 @@ module grosubsMod
     CanopyLeafSheathC_pft(NZ)   = CanopyLeafSheathC_pft(NZ) +CanopyLeafSheathC_brch(NB,NZ)
     CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedSitesSet_brch(NB,NZ)
     CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
-
+    fNCLFW_pft(NZ)             = fNCLFW_pft(NZ)+fNCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
+    fPCLFW_pft(NZ)             = fPCLFW_pft(NZ)+fPCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
     DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
+  if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
+    fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
+    fPCLFW_pft(NZ)=fPCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
+  endif
 
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES

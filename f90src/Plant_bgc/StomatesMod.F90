@@ -109,10 +109,10 @@
 
       DO K=1,MaxNodesPerBranch1          
         IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-          LeafProteinC_brch(NB,NZ) = LeafProteinC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)
-          tLeafArea                = tLeafArea+LeafArea_node(K,NB,NZ)
-          tLeafC                   = tLeafC+LeafElmntNode_brch(ielmc,K,NB,NZ)
-          ProteinCperm2LeafArea_node(K,NB,NZ)   = LeafProteinC_node(K,NB,NZ)/LeafArea_node(K,NB,NZ)      
+          LeafProteinC_brch(NB,NZ)            = LeafProteinC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)
+          tLeafArea                           = tLeafArea+LeafArea_node(K,NB,NZ)
+          tLeafC                              = tLeafC+LeafElmntNode_brch(ielmc,K,NB,NZ)
+          ProteinCperm2LeafArea_node(K,NB,NZ) = LeafProteinC_node(K,NB,NZ)/LeafArea_node(K,NB,NZ)
 
           IF(ProteinCperm2LeafArea_node(K,NB,NZ).GT.ZERO)THEN
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        

@@ -315,7 +315,7 @@ module UptakesMod
     KoppenClimZone            => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
     LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    LeafProteinC_node     => plt_biom%LeafProteinC_node       ,& !input  :layer leaf protein C, [g d-2]
+    LeafProteinC_node         => plt_biom%LeafProteinC_node           ,& !input  :layer leaf protein C, [g d-2]
     LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     NP                        => plt_site%NP                          ,& !input  :current number of plant species,[-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]

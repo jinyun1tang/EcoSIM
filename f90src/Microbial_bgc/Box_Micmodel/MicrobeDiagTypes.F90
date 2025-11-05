@@ -306,22 +306,22 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Cumlate_Flux_Diag_type) :: this
 
-  this%TFNH4B = 0._r8
-  this%TFNO3B = 0._r8
-  this%TFNO2B = 0._r8
-  this%TFP14B = 0._r8
-  this%TFPO4B = 0._r8
-  this%tCH4ProdAceto = 0._r8
-  this%tCH4ProdH2 = 0._r8
-  this%TFOQC = 0._r8
-  this%TFOQA = 0._r8
-  this%TFOXYX = 0._r8
-  this%TFNH4X = 0._r8
-  this%TFNO3X = 0._r8
-  this%TFNO2X = 0._r8
-  this%TFN2OX = 0._r8
-  this%TFP14X = 0._r8
-  this%TFPO4X = 0._r8
+  this%TFNH4B                 = 0._r8
+  this%TFNO3B                 = 0._r8
+  this%TFNO2B                 = 0._r8
+  this%TFP14B                 = 0._r8
+  this%TFPO4B                 = 0._r8
+  this%tCH4ProdAceto          = 0._r8
+  this%tCH4ProdH2             = 0._r8
+  this%TFOQC                  = 0._r8
+  this%TFOQA                  = 0._r8
+  this%TFOXYX                 = 0._r8
+  this%TFNH4X                 = 0._r8
+  this%TFNO3X                 = 0._r8
+  this%TFNO2X                 = 0._r8
+  this%TFN2OX                 = 0._r8
+  this%TFP14X                 = 0._r8
+  this%TFPO4X                 = 0._r8
   this%tRespGrossHeterUlm     = 0._r8
   this%tCResp4H2Prod          = 0._r8
   this%tRNH4MicrbImobilSoil   = 0._r8
@@ -341,25 +341,25 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxNO3Soil          = 0.0_r8
   this%TReduxNO3Band          = 0.0_r8
   this%TReduxNO2Soil          = 0.0_r8
-  this%TReduxNO2toN2OBand          = 0.0_r8
+  this%TReduxNO2toN2OBand     = 0.0_r8
   this%TReduxN2O              = 0.0_r8
   this%TFixN2                 = 0.0_r8
   this%tCH4OxiAero            = 0.0_r8
-  this%tCH4OxiANMO        = 0._r8
-  this%tRO2UptkHeterG     = 0._r8
-  this%tRO2DmndHeterG     = 0._r8
-  this%TDeniReduxNO2Band  = 0._r8
-  this%TDeniReduxNO2Soil  = 0._r8
+  this%tCH4OxiANMO            = 0._r8
+  this%tRO2UptkHeterG         = 0._r8
+  this%tRO2DmndHeterG         = 0._r8
+  this%TDeniReduxNO2Band      = 0._r8
+  this%TDeniReduxNO2Soil      = 0._r8
   this%TNitNO2Redux2N2OBand   = 0._r8
   this%TNitNO2Redux2N2OSoil   = 0._r8
-  this%tRNH3Oxi           = 0._r8
-  this%RNO2ReduxSoilChemo = 0._r8
-  this%RNO2ReduxBandChemo = 0._r8
-  this%RN2OProdSoilChemo  = 0._r8
-  this%RN2OProdBandChemo  = 0._r8
-  this%RNO3ProdSoilChemo  = 0._r8
-  this%RNO3ProdBandChemo  = 0._r8
-  this%RNO2ReduxChemo     = 0._r8
+  this%tRNH3Oxi               = 0._r8
+  this%RNO2ReduxSoilChemo     = 0._r8
+  this%RNO2ReduxBandChemo     = 0._r8
+  this%RN2OProdSoilChemo      = 0._r8
+  this%RN2OProdBandChemo      = 0._r8
+  this%RNO3ProdSoilChemo      = 0._r8
+  this%RNO3ProdBandChemo      = 0._r8
+  this%RNO2ReduxChemo         = 0._r8
 
   end subroutine nit_aqmf_diag
 

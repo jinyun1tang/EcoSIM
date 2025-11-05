@@ -300,17 +300,17 @@ implicit none
               FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
-              IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
+              IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass
                 NN=NN+1
                 if(mod(nn,2)==0)then
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
-                    iHarvstType_pft(NZ,IDYG,NY,NX)                         = ICUT
-                    jHarvstType_pft(NZ,IDYG,NY,NX)                             = JCUT
-                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                     = HCUT
-                    THIN_pft(NZ,IDYG,NY,NX)                                = PCUT
-                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
+                    iHarvstType_pft(NZ,IDYG,NY,NX)                            = ICUT
+                    jHarvstType_pft(NZ,IDYG,NY,NX)                            = JCUT
+                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                        = HCUT
+                    THIN_pft(NZ,IDYG,NY,NX)                                   = PCUT
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX) = ECUT11
                     FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
                     FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
                     FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
@@ -1044,8 +1044,8 @@ implicit none
   call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PR','Nonstructural C concentration needed for root'// &
     ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),105)
-  call writefixl(nu_plt,'RSRR','Radial resistivity per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
-  call writefixl(nu_plt,'RSRA','Axial resistivity per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRA','Axial resistance per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PTSHT','Rate constant for equilibrating shoot-root '// &
     'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
   !as a rule of thumb, RTFQ often takes the value of .  

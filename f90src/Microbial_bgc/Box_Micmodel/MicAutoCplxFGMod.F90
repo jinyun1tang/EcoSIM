@@ -311,14 +311,14 @@ module MicAutoCPLXMod
     FP1BX=AMAX1(FMN,FracOMActAutor(NGL)*VLPOB)
   ENDIF
 
-  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
-  naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
-  naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
-  naqfdiag%TFP14X = naqfdiag%TFP14X+FP14X
-  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4X
-  naqfdiag%TFNO3B = naqfdiag%TFNO3B+FNB3X
-  naqfdiag%TFPO4B = naqfdiag%TFPO4B+FPOBX
-  naqfdiag%TFP14B = naqfdiag%TFP14B+FP1BX
+!  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
+!  naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
+!  naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
+!  naqfdiag%TFP14X = naqfdiag%TFP14X+FP14X
+!  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4X
+!  naqfdiag%TFNO3B = naqfdiag%TFNO3B+FNB3X
+!  naqfdiag%TFPO4B = naqfdiag%TFPO4B+FPOBX
+!  naqfdiag%TFP14B = naqfdiag%TFP14B+FP1BX
   !
   ! FACTORS CONSTRAINING NH4, NO3, PO4 UPTAKE AMONG COMPETING
   ! MICROBIAL POPULATIONS IN SURFACE RESIDUE
@@ -349,12 +349,13 @@ module MicAutoCPLXMod
     ENDIF
   ENDIF
   !top soil layer
-  IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
-    naqfdiag%TFNH4X=naqfdiag%TFNH4X+micfor%AttenfNH4AutorR(NGL)
-    naqfdiag%TFNO3X=naqfdiag%TFNO3X+micfor%AttenfNO3AutorR(NGL)
-    naqfdiag%TFPO4X=naqfdiag%TFPO4X+micfor%AttenfH2PO4AutorR(NGL)
-    naqfdiag%TFP14X=naqfdiag%TFP14X+micfor%AttenfH1PO4AutorR(NGL)
-  ENDIF
+  !diagnostics off
+!  IF(Lsurf.AND.SoilMicPMassLayer0.GT.ZEROS)THEN
+!    naqfdiag%TFNH4X=naqfdiag%TFNH4X+micfor%AttenfNH4AutorR(NGL)
+!    naqfdiag%TFNO3X=naqfdiag%TFNO3X+micfor%AttenfNO3AutorR(NGL)
+!    naqfdiag%TFPO4X=naqfdiag%TFPO4X+micfor%AttenfH2PO4AutorR(NGL)
+!    naqfdiag%TFP14X=naqfdiag%TFP14X+micfor%AttenfH1PO4AutorR(NGL)
+!  ENDIF
   end associate
   end subroutine SubstrateCompetAuto
 !------------------------------------------------------------------------------------------
@@ -1340,8 +1341,8 @@ module MicAutoCPLXMod
     ELSE
       FNB4=AMAX1(FMN,VLNHB*FracOMActAutor(NGL))
     ENDIF
-    naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4
-    naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4
+!    naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4
+!    naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4
     !
     !     NITRIFICATION INHIBITION
     !

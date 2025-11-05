@@ -135,6 +135,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  TotEndVegE_pft(:,:,:,:)                        !total vegetation biomass at the end of time step, [g d-2]
   real(r8),target,allocatable ::  TotBegVegE_pft(:,:,:,:)                        !total vegetation biomass at the beginning of time step, [g d-2]
   real(r8),target,allocatable ::  CanopyN2Fix_pft(:,:,:)                         !total canopy N2 fixation, [g d-2 h-1]          
+  real(r8),target,allocatable ::  ShootRootXferElm_pft(:,:,:,:)                  !shoot-root nonstructural element transfer, [ g d-2 h-1]  
   private :: InitAllocate
   contains
 
@@ -281,6 +282,7 @@ module PlantDataRateType
   allocate(RootCO2Ar2Root_vr(JZ,JY,JX)); RootCO2Ar2Root_vr=0._r8
   allocate(RootCO2Autor_col(JY,JX));     RootCO2Autor_col=0._r8
   allocate(RootCO2AutorPrev_col(JY,JX)); RootCO2AutorPrev_col=0._r8
+  allocate(ShootRootXferElm_pft(NumPlantChemElms,JZ,JY,JX)); ShootRootXferElm_pft=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -399,6 +401,7 @@ module PlantDataRateType
   call destroy(REcoH2PO4DmndBand_vr)
   call destroy(RH2PO4EcoDmndBandPrev_vr)
   call destroy(RDOMEcoDmndK_vr)
+  call destroy(ShootRootXferElm_pft)
   call destroy(RDOMEcoDmndPrev_vr)
   call destroy(RAcetateEcoDmndK_vr)
   call destroy(RAcetateEcoDmndPrev_vr)

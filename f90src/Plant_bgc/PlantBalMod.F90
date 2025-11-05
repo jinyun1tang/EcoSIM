@@ -336,12 +336,19 @@ implicit none
     PARSunlit_pft         => plt_photo%PARSunlit_pft         ,& !output :PAR absorbed by sunlit leaf, [umol m-2 s-1]
     PARSunsha_pft         => plt_photo%PARSunsha_pft         ,& !output :PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
     CH2OSunlit_pft        => plt_photo%CH2OSunlit_pft        ,& !output :carbon fixation by sun-lit leaf, [gC d-2 h-1]
-    CH2OSunsha_pft        => plt_photo%CH2OSunsha_pft         & !output :carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
+    CH2OSunsha_pft        => plt_photo%CH2OSunsha_pft        ,& !output :carbon fixation by sun-shaded leaf, [gC d-2 h-1]   
+    ShootRootXferElm_pft  => plt_bgcr%ShootRootXferElm_pft   ,& !inoput :shoot-root nonstructural element transfer, [ g d-2 h-1]    
+    fNCLFW_brch           => plt_pheno%fNCLFW_brch           ,& !output : NC ratio of growing leaf on branch, [gN/gC]
+    fPCLFW_brch           => plt_pheno%fPCLFW_brch           ,& !output : PC ratio of growing leaf on branch, [gP/gC]
+    fNCLFW_pft            => plt_pheno%fNCLFW_pft            ,& !output : NC ratio of growing leaf, [gN/gC]
+    fPCLFW_pft            => plt_pheno%fPCLFW_pft             & !output : PC ratio of growing leaf, [gP/gC]
   )
   
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    fNCLFW_pft(NZ) = 0._r8  
+    fPCLFW_pft(NZ) = 0._r8
     plt_photo%CanopyVcMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVoMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVcMaxPEP25C_pft(NZ)          = 0._r8
@@ -349,6 +356,13 @@ implicit none
     plt_photo%ElectronTransptJmax25C_pft(NZ)     = 0._r8
     plt_bgcr%RCO2Nodule_pvr(:,NZ)                = 0._r8
     plt_biom%SeedPlantedElm_pft(:,NZ)            = 0._r8
+    ShootRootXferElm_pft(:,NZ)                   = 0._r8
+    plt_biom%LeafC3ChlCperm2LA_pft(NZ)           = 0._r8
+    plt_biom%LeafC4ChlCperm2LA_pft(NZ)           = 0._r8
+    plt_biom%LeafRubiscoCperm2LA_pft(NZ)         = 0._r8
+    plt_biom%LeafPEPCperm2LA_pft(NZ)             = 0._r8
+    plt_biom%SpecificLeafArea_pft(NZ)            = 0._r8
+    plt_biom%LeafProteinCperm2LA_pft(NZ)         = 0._r8
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
@@ -358,6 +372,8 @@ implicit none
         ENDDO
       ENDDO
     ENDDO D1
+    fNCLFW_brch(:,NZ)                                           = 0._r8
+    fPCLFW_brch(:,NZ)                                           = 0._r8
     LitrFallElms_brch(:,:,NZ)                                   = 0._r8
     PARSunsha_pft(NZ)                                           = 0._r8
     PARSunlit_pft(NZ)                                           = 0._r8

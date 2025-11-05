@@ -80,7 +80,7 @@ contains
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
     SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch            ,& !inoput :branch grain number, [d-2]
-    PetoleProteinCNode_brch     => plt_biom%PetoleProteinCNode_brch       ,& !inoput :layer sheath protein C, [g d-2]
+    PetoleProteinC_node     => plt_biom%PetoleProteinC_node       ,& !inoput :layer sheath protein C, [g d-2]
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !output :flag for stand replacing disturbance,[-]
@@ -208,9 +208,9 @@ contains
       LeafArea_node(K,NB,NZ)=LeafArea_node(K,NB,NZ)*XHVST
 
       LeafProteinC_node(K,NB,NZ)=LeafProteinC_node(K,NB,NZ)*XHVST
-  !     PetoleLensNode_brch(K,NB,NZ)=PetoleLensNode_brch(K,NB,NZ)*XHVST
+  !     PetoleLength_node(K,NB,NZ)=PetoleLength_node(K,NB,NZ)*XHVST
 
-      PetoleProteinCNode_brch(K,NB,NZ)=PetoleProteinCNode_brch(K,NB,NZ)*XHVST
+      PetoleProteinC_node(K,NB,NZ)=PetoleProteinC_node(K,NB,NZ)*XHVST
   !     StalkNodeHeight_brch(K,NB,NZ)=StalkNodeHeight_brch(K,NB,NZ)*XHVST
   !     StalkNodeVertLength_brch(K,NB,NZ)=StalkNodeVertLength_brch(K,NB,NZ)*XHVST
       DO NE=1,NumPlantChemElms
