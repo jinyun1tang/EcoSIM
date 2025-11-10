@@ -426,7 +426,7 @@ implicit none
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr     ,& !input  :O2 constraint to root respiration (0-1), [-]
     rProteinC2RootN_pft       => plt_allom%rProteinC2RootN_pft       ,& !input  :Protein C to leaf N ratio in roots, [-]
-    rProteinC2LeafP_pft       => plt_allom%rProteinC2LeafP_pft       ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2RootP_pft       => plt_allom%rProteinC2RootP_pft       ,& !input  :Protein C to leaf P ratio in roots, [-]
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
     CNRTS_pft                 => plt_allom%CNRTS_pft                 ,& !input  :root N:C ratio x root growth yield, [-]
     CPRTS_pft                 => plt_allom%CPRTS_pft                 ,& !input  :root P:C ratio x root growth yield, [-]
@@ -775,8 +775,9 @@ implicit none
   DO NE=1,NumPlantChemElms
     RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
   ENDDO
-  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+rProteinC2RootN_pft(NZ) &
-    *RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ)
+  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+&
+    AMIN1(rProteinC2RootN_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ),&
+      rProteinC2RootP_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
 
   !secondary root axes (root hair) addition is a quadratic function of branching frequency
   RTN2X                       = RootBranchFreq_pft(NZ)*RootPrimeAxsNum
@@ -1592,8 +1593,8 @@ implicit none
 ! begin_execution
   associate(                                                          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
-    rProteinC2RootN_pft       => plt_allom%rProteinC2RootN_pft       ,& !input  :C:N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft       => plt_allom%rProteinC2LeafP_pft       ,& !input  :C:P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2RootN_pft       => plt_allom%rProteinC2RootN_pft       ,& !input  :protein C to root N ratio in root biomass, [-]
+    rProteinC2RootP_pft       => plt_allom%rProteinC2RootP_pft       ,& !input  :protein C to root P ratio in root biomass, [-]
     FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
     CumSoilThickness_vr       => plt_site%CumSoilThickness_vr        ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     DLYR3                     => plt_site%DLYR3                      ,& !input  :vertical thickness of soil layer, [m]
@@ -1685,7 +1686,9 @@ implicit none
     RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)+RootNetGrowthElms(NE)*FGROL 
   ENDDO
 
-  RootProteinC_pvr(N,L,NZ) = RootProteinC_pvr(N,L,NZ)+rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ) 
+  RootProteinC_pvr(N,L,NZ) = RootProteinC_pvr(N,L,NZ)+ &
+    AMIN1(rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L,NR,NZ),&
+       rProteinC2RootP_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L,NR,NZ))
          
   Root1stLen_rpvr(N,L,NR,NZ)=Root1stLen_rpvr(N,L,NR,NZ)+Root1stPerPlantExtenz*FGROL
 !
@@ -1711,7 +1714,9 @@ implicit none
       RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ)+RootNetGrowthElms(NE)*FGROZ
     ENDDO
 
-    RootProteinC_pvr(N,L1,NZ) = RootProteinC_pvr(N,L1,NZ)+rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ) 
+    RootProteinC_pvr(N,L1,NZ) = RootProteinC_pvr(N,L1,NZ)+&
+      AMIN1(rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,N,L1,NR,NZ),&
+         rProteinC2RootP_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,N,L1,NR,NZ))
             
     PopuRootMycoC_pvr(N,L1,NZ)  = PopuRootMycoC_pvr(N,L1,NZ)+RootMyco1stStrutElms_rpvr(ielmc,N,L1,NR,NZ)
     Root1stLen_rpvr(N,L1,NR,NZ) = Root1stLen_rpvr(N,L1,NR,NZ)+Root1stPerPlantExtenz*FGROZ

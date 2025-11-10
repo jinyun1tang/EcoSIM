@@ -41,6 +41,7 @@ module MicAutoCPLXMod
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
   type(Microbe_Diag_type), intent(inout) :: nmicdiag
+  character(len=*), parameter :: subname='ActiveAutotrophs'
   integer  :: M
   real(r8) :: COMC
   real(r8) :: FOQC,FOQA
@@ -83,7 +84,7 @@ module MicAutoCPLXMod
   !     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
   !
   !
-  
+  call PrintInfo('beg '//subname)
   if (N.eq.mid_AutoAmmoniaOxidBacter)then
     ! NH3 OXIDIZERS
     call AmmoniaOxidizerCatabolism(I,J,N,RMOMK,TOMEAutoK(ielmc),VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
@@ -138,7 +139,7 @@ module MicAutoCPLXMod
   call GatherAutotrophRespiration(I,J,N,micfor,micflx,nmicf,nmics)
   !
   call GatherAutotrophAnabolicFlux(I,J,N,micflx,spomk,rmomk,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ActiveAutotrophs
 
@@ -175,8 +176,8 @@ module MicAutoCPLXMod
   WSensGroAutor(NGL)      = WatStressMicb
   TSensGroAutor(NGL)      = TSensGrowth
 
-  GrowthEnvScalAutor(NGL) = TSensGroAutor(NGL)*WSensGroAutor(NGL)
-  TSensMaintRAutor(NGL)   = TSensMaintR
+  GrowthEnvScalAutor(NGL) = AZMAX1(TSensGroAutor(NGL)*WSensGroAutor(NGL))
+  TSensMaintRAutor(NGL)   = AZMAX1(TSensMaintR)
 
 ! FracOMActHeter,FOMN=fraction of total active biomass C,N in each N and K
 
@@ -373,6 +374,7 @@ module MicAutoCPLXMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(OMCplx_State_type), intent(inout) :: ncplxs
+  character(len=*), parameter :: subname='GatherAutotrophAnabolicFlux'
   integer :: M,K,MID3,MID,MID1,NE,idom,NGL
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
@@ -417,7 +419,7 @@ module MicAutoCPLXMod
     mBiomeAutor                      => micstt%mBiomeAutor,                     &
     EHUM                             => micstt%EHUM                             &
   )
-
+  call PrintInfo('beg '//subname)
   !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
   !     FROM O2, NOX AND C REDUCTION
   !
@@ -489,6 +491,7 @@ module MicAutoCPLXMod
     !
     MID3  = micpar%get_micb_id(ibiom_reserve,NGL)
     CGOMZ = GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBiomeAutor(ielmc,MID3))
+
     DO M = 1, 2
       NonstX2stBiomAutor(ielmc,M,NGL)=FL(M)*CGOMZ
       IF(mBiomeAutor(ielmc,MID3).GT.ZEROS)THEN
@@ -500,6 +503,7 @@ module MicAutoCPLXMod
         NonstX2stBiomAutor(ielmn,M,NGL)=0.0_r8
         NonstX2stBiomAutor(ielmp,M,NGL)=0.0_r8
       ENDIF
+
     !
     !     MICROBIAL DECOMPOSITION FROM BIOMASS, SPECIFIC DECOMPOSITION
     !     RATE, TEMPERATURE
@@ -513,13 +517,15 @@ module MicAutoCPLXMod
     !
       MID   = micpar%get_micb_id(M,NGL)
       SPOMX = SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
+      
       DO NE=1,NumPlantChemElms
         RKillOMAutor(NE,M,NGL)=AZMAX1(mBiomeAutor(NE,MID)*SPOMX)
       ENDDO
-
+      
       RkillLitfalOMAutor(ielmc,M,NGL)=RKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
       RkillLitfalOMAutor(ielmn,M,NGL)=RKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
       RkillLitfalOMAutor(ielmp,M,NGL)=RKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+      
       DO NE=1,NumPlantChemElms
         RkillRecycOMAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)-RkillLitfalOMAutor(NE,M,NGL)
     !
@@ -536,7 +542,9 @@ module MicAutoCPLXMod
     !
         RkillLitrfal2ResduOMAutor(NE,M,NGL)=RkillLitfalOMAutor(NE,M,NGL)-RkillLitrfal2HumOMAutor(NE,M,NGL)
       ENDDO
+      
     ENDDO
+    
     !
     !     MICROBIAL DECOMPOSITION WHEN MAINTENANCE RESPIRATION
     !     EXCEEDS UPTAKE
@@ -591,6 +599,7 @@ module MicAutoCPLXMod
       ENDDO
     ENDIF
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine GatherAutotrophAnabolicFlux
 !------------------------------------------------------------------------------------------
@@ -967,6 +976,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag  
+  character(len=*), parameter :: subname='AMONC10Catabolism'
   real(r8) :: FNO2S,FNO2B,VMX2S,VMX2B,XCH4,FNO2,FNB2,XCO2,FCH4X
   real(r8) :: RNNO2,RNNOB,VMAX,RGOMP,GCH4X,GCH4O,RVOXP,SCAL,OXYI
   real(r8) :: GCNCX= 87.5_r8
@@ -1013,7 +1023,7 @@ module MicAutoCPLXMod
    CNO2S                 => micstt%CNO2S,                 &
    CH4S                  => micstt%CH4S                   &
   )
-
+  call PrintInfo('beg '//subname)
   FNO2S = VLNO3
   FNO2B = VLNOB
   ENC10 = GRNCX/EOMH
@@ -1084,6 +1094,7 @@ module MicAutoCPLXMod
     RNOxReduxAutorBand(NGL)  = RNNOB
     RCO2ProdAutor(NGL)       = RGOMP  !BIOMASS C will be CO2 from the environment
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
 
   end subroutine AMONC10Catabolism
@@ -1111,6 +1122,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag  
+  character(len=*), parameter :: subname='AMOANME2dCatabolism'
   real(r8) :: FNO3S,FNO3B,VMXDXS,VMXDXB,VMXDXT,FVMXDX,XCH4,scal
   real(r8) :: XCO2,FCH4X,OXYI
   real(r8) :: RGOMP,FNB3X,FNO3X,VMAX,RNNO3,RNN3B,RVOXP,GCH4X,GCH4O
@@ -1154,7 +1166,7 @@ module MicAutoCPLXMod
    ZNO3B                 => micstt%ZNO3B,                 &
    ZNO3S                 => micstt%ZNO3S                  &
   )
-
+  call PrintInfo('beg '//subname)
   FNO3S = VLNO3
   FNO3B = VLNOB
   OXYI  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-COXYS+2.5_r8,-50._r8)))      
@@ -1239,6 +1251,7 @@ module MicAutoCPLXMod
     RNOxReduxAutorBand(NGL)  = RNN3B
     RCO2ProdAutor(NGL)       = RGOMP    !CO2 produced from catabolic reaction, some of it will be reassimilated for biomass  
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AMOANME2dCatabolism
 !------------------------------------------------------------------------------------------
@@ -1263,6 +1276,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag  
+  character(len=*), parameter :: subname='AmmoniaOxidizerCatabolism'
   real(r8)  :: RGOMP         !O2-unlimited/potential respiration [gC h-1], as a measure of gross respiraiton/energy for maintenance+growth
   real(r8)  :: RVOXP         !potential NH3 oxidation, [gN h-1 d-2]
   real(r8)  :: RVOXPA        !potential oxidation of non-band soil NH3 [gN h-1 d-2]
@@ -1321,7 +1335,7 @@ module MicAutoCPLXMod
 !
 !     CCO2S=aqueous CO2 concentration
 !
-
+  call PrintInfo('beg '//subname)
   XCO2    = CCO2S/(CCO2S+CCKM)  
   DO NGL  = JGniA(N), JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle  
@@ -1428,6 +1442,7 @@ module MicAutoCPLXMod
     RSMetaOxidSoilAutor(NGL)    = RVOXPA
     RSMetaOxidBandAutor(NGL)    = RVOXPB
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AmmoniaOxidizerCatabolism
 !------------------------------------------------------------------------------------------
@@ -1446,6 +1461,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag  
+  character(len=*), parameter :: subname='NitriteOxidizerCatabolism'
   real(r8) :: FNH4S,FNHBS
   real(r8) :: RGOMP,RVOXP
   real(r8) :: RVOXPA,RVOXPB  
@@ -1496,6 +1512,7 @@ module MicAutoCPLXMod
 !
 !     CCO2S=aqueous CO2 concentration
 !
+  call PrintInfo('beg '//subname)
   XCO2=CCO2S/(CCO2S+CCKM)
   DO NGL=JGniA(N),JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle    
@@ -1575,6 +1592,7 @@ module MicAutoCPLXMod
     RSMetaOxidSoilAutor(NGL)    = RVOXPA
     RSMetaOxidBandAutor(NGL)    = RVOXPB
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine NitriteOxidizerCatabolism
 !------------------------------------------------------------------------------------------
@@ -1597,6 +1615,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag    
+  character(len=*), parameter :: subname='H2MethanogensCatabolism'
   real(r8) :: GH2X,GH2H
   real(r8) :: H2GSX
   real(r8) :: VMAX
@@ -1644,6 +1663,7 @@ module MicAutoCPLXMod
 !     methanogenesis GH2X at ambient H2 concentration CH2GS
 !     CCO2S=aqueous CO2 concentration
 !
+  call PrintInfo('beg '//subname)
   XCO2         = CCO2S/(CCO2S+CCKM)
   RH2UptkAutor = 0.0_r8
   DO NGL=JGniA(N),JGnfA(N)
@@ -1687,6 +1707,7 @@ module MicAutoCPLXMod
     RO2UptkAutor(NGL)      = 0.0_r8
   ENDDO
 !
+  call PrintInfo('end '//subname)
   end associate
   end subroutine H2MethanogensCatabolism
 !------------------------------------------------------------------------------------------
@@ -1707,6 +1728,7 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout):: nmics
   type(micfluxtype), intent(inout) :: micflx
   type(Microbe_Diag_type), intent(inout) :: nmicdiag      
+  character(len=*), parameter :: subname='AeroMethanotrophCatabolism'
   integer  :: M,MM,NGL
   real(r8)  :: RGOMP     !methane oxidized into CH2O
   real(r8)  :: RVOXP
@@ -1774,6 +1796,7 @@ module MicAutoCPLXMod
 !     RCHDF=gaseous-aqueous CH4 exchange
 !     DiffusivitySolutEff=rate constant for gaseous-aqueous exchange
 !
+  call PrintInfo('beg '//subname)
   DO NGL=JGniA(N),JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle    
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
@@ -1875,6 +1898,7 @@ module MicAutoCPLXMod
     RSMetaOxidSoilAutor(NGL)    = RVOXPA
     RSMetaOxidBandAutor(NGL)    = 0._r8
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AeroMethanotrophCatabolism
 !------------------------------------------------------------------------------------------
@@ -2293,7 +2317,7 @@ module MicAutoCPLXMod
   type(micfluxtype), intent(inout) :: micflx  
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
-
+  character(len=*), parameter :: subname='GatherAutotrophRespiration'
   real(r8) :: RGN2P
   integer  :: NGL
 !     begin_execution
@@ -2315,6 +2339,7 @@ module MicAutoCPLXMod
 !     TempMaintRHeter=temperature effect on maintenance respiration
 !     OMN=microbial N biomass
 !
+  call PrintInfo('beg '//subname)
   DO NGL=JGniA(N),JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle      
     RGrowthRespAutor(NGL)     = AZMAX1(RespGrossAutor(NGL)-RMaintRespAutor(NGL))
@@ -2339,7 +2364,7 @@ module MicAutoCPLXMod
     RN2FixAutor(NGL)    = 0.0_r8
     Resp4NFixAutor(NGL) = 0.0_r8
   ENDDO
-  
+  call PrintInfo('end '//subname)
   end associate
   end subroutine GatherAutotrophRespiration
 !------------------------------------------------------------------------------------------

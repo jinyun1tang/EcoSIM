@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 import json
 import os
+import stringTools as strtool
 
 class ParEditor:
     # contruct the parameter editor ParEditor
@@ -53,8 +54,101 @@ class ParEditor:
         parts0=fname.split('/')
         parts1=parts0[-1].split('.')
         return parts1[0]
+
+    def __ExtractPftPars(self,pft):
+        """
+        extract parameters for designated pft
+        """
+        try:
+            print(self.pftparfile)
+        except NameError:
+            print("The pft parameter file is not defined.")
+        new_dict={}
+        with Dataset(self.pftparfile, 'r') as nc_file:
+            variable = nc_file.variables['pfts']        
+            pft_loc=0
+            for var in variable:
+                result_string=''
+                for byte in var:
+                    if byte:
+                        result_string=''.join([result_string,byte.decode('utf-8')])
+                #locate the pft       
+                if result_string.strip()==pft:      
+                    #start extracting variables
+                    for var_name in nc_file.variables:
+                        if 'pfts' not in var_name and 'koppen' not in var_name:
+                            variable1=nc_file.variables[var_name]
+                            long_name = variable1.getncattr('long_name') if 'long_name' in variable1.ncattrs() else 'No long_name attribute'
+                            new_dict[var_name]=[long_name,str(variable1[pft_loc].data)]
+                            
+                pft_loc=pft_loc+1
+            return new_dict
+
+    def __ExtractPftKeys(self,pft):
+        """
+        extract parameters for designated pft
+        """
+        try:
+            print(self.pftparfile)
+        except NameError:
+            print("The pft parameter file is not defined.")
+        new_keys=[]
+        with Dataset(self.pftparfile, 'r') as nc_file:
+            variable = nc_file.variables['pfts']        
+            pft_loc=0
+            pft_loc_cp=-1
+            for var in variable:
+                result_string=''
+                for byte in var:
+                    if byte:
+                        result_string=''.join([result_string,byte.decode('utf-8')])
+                #locate the pft       
+                if result_string.strip()==pft:      
+                    #start extracting variables
+                    for var_name in nc_file.variables:
+                        if 'pfts' not in var_name and 'koppen' not in var_name:
+                            new_keys.append(var_name)
+                    pft_loc_cp=pft_loc        
+                pft_loc=pft_loc+1
+            return new_keys,pft_loc_cp
+    
+    def CopyPlantPft(self,pft_from,pft_to):
+        """
+        copy parameters from pft_from to pft_to
+        """
+        pft_from_keys,pft_from_loc=self.__ExtractPftKeys(pft_from)
+        if pft_from_loc ==-1:
+            print(f"Parameters for {pft_from} not found")
+            return
         
-                 
+        with Dataset(self.pftparfile, 'a') as nc_file:
+            new_index = nc_file.dimensions['npfts'].size
+            variable = nc_file.variables['pfts']
+            variable[new_index]=strtool.string2arr(pft_to,10)
+            for key in pft_from_keys:
+                var = nc_file.variables[key]
+                shape=list(var.shape)
+                shape[0]=1
+                var[new_index]=var[pft_from_loc]
+        
+    
+    def PlantParCompare(self,pft1,pft2):
+        """
+        compare the parameters for two pfts
+        """
+        pft1_dict=self.__ExtractPftPars(pft1)
+        pft2_dict=self.__ExtractPftPars(pft2)
+        print('='*100)
+        print(f"Compare plant traits: {pft1} vs {pft2}")
+        print('-'*100)
+        for key, val in pft1_dict.items():
+            val2=pft2_dict[key]
+            if val2[1]==val[1]: 
+                a='yes' 
+            else: 
+                a='NO'
+                print('%-120s(%-6s):%4s,%s,%s'%(val[0],key,a,val[1],val2[1]))
+        
     def PlantParamModify(self,pft,pars,iscale=False,verbose=False):
         """
         Modify parameter parnames using parvals for pft on file parfile

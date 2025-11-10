@@ -269,6 +269,7 @@ implicit none
               tstr=trim(pft_mgmtinfo(NN1,NZ))
               !read day/month/year when management occurs
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+              
               READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
               LPY=0
@@ -581,6 +582,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrosYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,NoduGrowthYield_pft(NZ,NY,NX))
 
+  call ncd_getvar(pft_nfid, 'CNWL', loc,rProteinC2LeafN_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPWL', loc,rProteinC2LeafP_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNWR', loc,rProteinC2RootN_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPWR', loc,rProteinC2RootP_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNLF', loc,rNCLeaf_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSHE', loc,rNCSheath_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSTK', loc,rNCStalk_pft(NZ,NY,NX))
@@ -723,8 +728,9 @@ implicit none
   EarBiomGrowthYld_pft(NZ,NY,NX)     = EarBiomGrowthYld_tab(loc)
   GrainBiomGrowthYld_pft(NZ,NY,NX)   = GrainBiomGrowthYld_tab(loc)
   RootBiomGrosYld_pft(NZ,NY,NX)      = RootBiomGrosYld_tab(loc)
-  NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)
-
+  NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)  
+  rProteinC2LeafN_pft(NZ,NY,NX) = rProteinC2LeafN_tab(loc)
+  rProteinC2RootN_pft(NZ,NY,NX) = rProteinC2RootN_tab(loc)
   rNCLeaf_pft(NZ,NY,NX)    = rNCLeaf_tab(loc)
   rNCSheath_pft(NZ,NY,NX)  = rNCSheath_tab(loc)
   rNCStalk_pft(NZ,NY,NX)   = rNCStalk_tab(loc)
@@ -735,6 +741,8 @@ implicit none
   rNCRoot_pft(NZ,NY,NX)    = rNCRoot_tab(loc)
   rNCNodule_pft(NZ,NY,NX)  = rNCNodule_tab(loc)
 
+  rProteinC2LeafP_pft(NZ,NY,NX) = rProteinC2LeafP_tab(loc)
+  rProteinC2RootP_pft(NZ,NY,NX) = rProteinC2RootP_tab(loc)
   rPCLeaf_pft(NZ,NY,NX)    = rPCLeaf_tab(loc)
   rPCSheath_pft(NZ,NY,NX)  = rPCSheath_tab(loc)
   rPCStalk_pft(NZ,NY,NX)   = rPCStalk_tab(loc)
@@ -757,7 +765,7 @@ implicit none
     call plant_biomyield_trait_disp(nu_plt,NZ,NY,NX)
     call plant_biomstoich_trait_disp(nu_plt,NZ,NY,NX)
   endif
-
+  
   end subroutine SetPlantTraits
 
 !------------------------------------------------------------------------------------------
@@ -1115,6 +1123,10 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
+
+  call writefixl(nu_plt,'CNWR','Plant root protein C to N ratio [gN (gC)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CNWL','Plant leaf protein C to N ratio [gN (gC)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
+  call writefixl(nu_plt,'CNWF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)  
   call writefixl(nu_plt,'CNLF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNSHE','Plant petiole NC ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNSTK','Plant stalk NC ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)
@@ -1124,6 +1136,8 @@ implicit none
   call writefixl(nu_plt,'CNGR','Plant grain NC ratio [gN (gC)-1]',rNCGrain_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNRT','Plant root NC ratio [gN (gC)-1]',rNCRoot_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNND','Plant nodule NC ratio [gN (gC)-1]',rNCNodule_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPWR','Plant root protein C to P ratio [gP (gC)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CPWL','Plant leaf protein C to P ratio [gP (gC)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
   call writefixl(nu_plt,'CPLF','Plant leaf PC ratio [gP (gC)-1]',rPCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSHE','Plant petiole PC ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSTK','Plant stalk PC ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
@@ -1463,6 +1477,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMGR', GrainBiomGrowthYld_tab)
   call ncd_getvar(pft_nfid, 'DMRT', RootBiomGrosYld_tab)
   call ncd_getvar(pft_nfid, 'DMND', NoduGrowthYield_tab)
+  call ncd_getvar(pft_nfid, 'CNWR', rProteinC2RootN_tab)
+  call ncd_getvar(pft_nfid, 'CNWL', rProteinC2LeafN_tab)
   call ncd_getvar(pft_nfid, 'CNLF', rNCLeaf_tab)
   call ncd_getvar(pft_nfid, 'CNSHE', rNCSheath_tab)
   call ncd_getvar(pft_nfid, 'CNSTK', rNCStalk_tab)
@@ -1472,6 +1488,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'CNGR', rNCGrain_tab)
   call ncd_getvar(pft_nfid, 'CNRT', rNCRoot_tab)
   call ncd_getvar(pft_nfid, 'CNND', rNCNodule_tab)
+  call ncd_getvar(pft_nfid, 'CPWR', rProteinC2RootP_tab)  
+  call ncd_getvar(pft_nfid, 'CPWL', rProteinC2LeafP_tab)    
   call ncd_getvar(pft_nfid, 'CPLF', rPCLeaf_tab)
   call ncd_getvar(pft_nfid, 'CPSHE',rPCSheath_tab)
   call ncd_getvar(pft_nfid, 'CPSTK', rPCStalk_tab)
@@ -1482,6 +1500,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPRT', rPCRootr_tab)
   call ncd_getvar(pft_nfid, 'CPND', rPCNoduler_tab)
   call ncd_pio_closefile(pft_nfid)
+  
   end Subroutine ReadPlantTraitTable
 
 !------------------------------------------------------------------------------------------

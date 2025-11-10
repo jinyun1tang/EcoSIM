@@ -122,6 +122,7 @@ module InitPlantMod
     iPlantingDay_pft              => plt_distb%iPlantingDay_pft               ,& !input  :day of planting,[-]
     iPlantingYear_pft             => plt_distb%iPlantingYear_pft              ,& !input  :year of planting,[-]
     PPI_pft                       => plt_site%PPI_pft                         ,& !output :initial plant population, [plants d-2]
+    rProteinC2RootP_pft           => plt_allom%rProteinC2RootP_pft            ,& !output :Protein C to root P ratio in remobilizable nonstructural biomass, [-]    
     rProteinC2RootN_pft           => plt_allom%rProteinC2RootN_pft            ,& !output :Protein C to root N ratio in remobilizable nonstructural biomass, [-]
     rProteinC2LeafN_pft           => plt_allom%rProteinC2LeafN_pft            ,& !output :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
     rProteinC2LeafP_pft           => plt_allom%rProteinC2LeafP_pft            ,& !output :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
@@ -147,11 +148,13 @@ module InitPlantMod
   H2OCuticleResist_pft(NZ)          = CuticleResist_pft(NZ)/3600.0_r8
   CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
   !the typical C to N mass ratio for protein is 3.3, given 75%~80% leaf N is as protein, then proteinC to leafN ratio is about 3.3*0.8=2.6, g protein C/g leaf N
-  rProteinC2LeafN_pft(NZ)               = 2.6_r8
-  rProteinC2LeafP_pft(NZ)               = 25.0_r8
+!  rProteinC2LeafN_pft(NZ)               = 2.6_r8
+  !ribosome carbon to phosphorus mass ratio is roughly in the range of 10 to 20, meanwhile, about 30~40 proteins are in ribosome, so the range is 25 to 66. 
+!  rProteinC2LeafP_pft(NZ)               = 25.0_r8
   !the typical C to N mass ratio for protein is 3.3, given 60%~70% ROOT N is as protein, then proteinC to rootN ratio is about 3.3*0.65=2.15  
-  rProteinC2RootN_pft(NZ)           = 2.15_r8
-  RootProteinCMax_pft(NZ) = rNCRoot_pft(NZ)*rProteinC2RootN_pft(NZ) !groot N/g rootC * gprotein C/g root N = g protein C/g root C
+!  rProteinC2RootN_pft(NZ)           = 2.15_r8
+
+  RootProteinCMax_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rProteinC2RootN_pft(NZ),rPCRootr_pft(NZ)*rProteinC2RootP_pft(NZ))  !groot N/g rootC * gprotein C/g root N = g protein C/g root C
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
     O2I_pft(NZ)=2.10E+05_r8
   ELSE

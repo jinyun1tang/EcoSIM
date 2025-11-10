@@ -73,6 +73,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rProteinC2RootN_pft(:,:,:)                 !Protein C to root N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2RootP_pft(:,:,:)                 !Protein C to root P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  rProteinC2LeafN_pft(:,:,:)                 !Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  rProteinC2LeafP_pft(:,:,:)                 !Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
@@ -243,6 +244,7 @@ contains
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
   allocate(rProteinC2RootN_pft(JP,JY,JX)); rProteinC2RootN_pft=0._r8
+  allocate(rProteinC2RootP_pft(JP,JY,JX)); rProteinC2RootP_pft=0._r8  
   allocate(rProteinC2LeafN_pft(JP,JY,JX));     rProteinC2LeafN_pft=0._r8
   allocate(rProteinC2LeafP_pft(JP,JY,JX));     rProteinC2LeafP_pft=0._r8
   allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
@@ -409,6 +411,7 @@ contains
   call destroy(rPCEar_pft)
   call destroy(rPCGrain_pft)
   call destroy(rPCNoduler_pft)
+  call destroy(rProteinC2RootP_pft)  
   call destroy(rProteinC2RootN_pft)
   call destroy(rProteinC2LeafN_pft)
   call destroy(rProteinC2LeafP_pft)

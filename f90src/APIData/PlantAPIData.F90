@@ -440,6 +440,7 @@ implicit none
   real(r8), pointer :: rNCRoot_pft(:)                   => null()  !root N:C ratio,                                          [gN gC-1]
   real(r8), pointer :: rPCRootr_pft(:)                  => null()  !root P:C ratio,                                          [gP gC-1]
   real(r8), pointer :: rProteinC2RootN_pft(:)           => null()  !Protein C to root N ratio in remobilizable nonstructural biomass,        [-]    
+  real(r8), pointer :: rProteinC2RootP_pft(:)           => null()  !Protein C to root P ratio in remobilizable nonstructural biomass,        [-]      
   real(r8), pointer :: rProteinC2LeafN_pft(:)          => null()  !Protein C to leaf N ratio in remobilizable nonstructural biomass,        [-]  
   real(r8), pointer :: rProteinC2LeafP_pft(:)          => null()  !Protein C to leaf P ratio in remobilizable nonstructural biomass,        [-]
   real(r8), pointer :: NoduGrowthYield_pft(:)           => null()  !nodule growth yield,                                     [g g-1]
@@ -1272,6 +1273,7 @@ implicit none
   allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
   allocate(this%rPCRootr_pft(JP1));this%rPCRootr_pft=spval
   allocate(this%rProteinC2RootN_pft(JP1));this%rProteinC2RootN_pft=spval
+  allocate(this%rProteinC2RootP_pft(JP1));this%rProteinC2RootP_pft=spval
   allocate(this%rProteinC2LeafN_pft(JP1));this%rProteinC2LeafN_pft=spval
   allocate(this%rProteinC2LeafP_pft(JP1));this%rProteinC2LeafP_pft=spval
   allocate(this%CPRTS_pft(JP1));this%CPRTS_pft=spval

@@ -4163,7 +4163,8 @@ implicit none
             DO NB=1,NumOfBranches_pft(NZ,NY,NX)
               this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)=this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)+ProteinCperm2LeafArea_node(K,NB,NZ,NY,NX)
             ENDDO
-            this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)=this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)/(NumOfBranches_pft(NZ,NY,NX)*rProteinC2LeafN_pft(NZ,NY,NX))
+            !assuming protein C to N mass ratio is 3.3 (median value)
+            this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)=this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)/(NumOfBranches_pft(NZ,NY,NX)*3.3_r8)
           ENDDO  
         ENDIF
         if(MainBranchNum_pft(NZ,NY,NX)> 0)then

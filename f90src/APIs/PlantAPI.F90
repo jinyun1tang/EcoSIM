@@ -208,9 +208,6 @@ implicit none
     LeafIntracellularCO2_pft(NZ,NY,NX)  = plt_photo%LeafIntracellularCO2_pft(NZ)
     aquCO2Intraleaf_pft(NZ,NY,NX)       = plt_photo%aquCO2Intraleaf_pft(NZ)
     ClumpFactor_pft(NZ,NY,NX)           = plt_morph%ClumpFactor_pft(NZ)
-    rProteinC2RootN_pft(NZ,NY,NX)       = plt_allom%rProteinC2RootN_pft(NZ)
-    rProteinC2LeafN_pft(NZ,NY,NX)         = plt_allom%rProteinC2LeafN_pft(NZ)
-    rProteinC2LeafP_pft(NZ,NY,NX)         = plt_allom%rProteinC2LeafP_pft(NZ)
     RootProteinCMax_pft(NZ,NY,NX) = plt_allom%RootProteinCMax_pft(NZ)
     CNRTS_pft(NZ,NY,NX)                 = plt_allom%CNRTS_pft(NZ)
     CPRTS_pft(NZ,NY,NX)                 = plt_allom%CPRTS_pft(NZ)
@@ -1145,6 +1142,7 @@ implicit none
     plt_photo%LeafIntracellularCO2_pft(NZ) = LeafIntracellularCO2_pft(NZ,NY,NX)
     plt_bgcr%CO2NetFix_pft(NZ)            = CO2NetFix_pft(NZ,NY,NX)
 
+    plt_allom%rProteinC2RootP_pft(NZ) = rProteinC2RootP_pft(NZ,NY,NX)
     plt_allom%rProteinC2RootN_pft(NZ) = rProteinC2RootN_pft(NZ,NY,NX)
     plt_allom%rProteinC2LeafN_pft(NZ) = rProteinC2LeafN_pft(NZ,NY,NX)
     plt_allom%rProteinC2LeafP_pft(NZ) = rProteinC2LeafP_pft(NZ,NY,NX)
