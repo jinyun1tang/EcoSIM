@@ -306,10 +306,10 @@ contains
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
   Stefboltz_area          = stefboltz_const*AREA_3D(3,NUM_col(NY,NX),NY,NX)
-  LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP
+  LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
 
-  LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
-  LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP
+  LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
+  LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
 !
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -512,7 +512,7 @@ contains
   !LWRadGrnd_col=emitted longwave radiation
   RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSW2Soil_col(NY,NX)
   tRadIncid            = RadSWbySoil+LWRad2Soil_col(NY,NX)
-  LWRadGrnd_col            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4._r8
+  LWRadGrnd_col        = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4
   Radnet2Grnd          = tRadIncid-LWRadGrnd_col
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySoil
 !

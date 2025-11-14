@@ -406,7 +406,7 @@ implicit none
   real(r8), pointer :: TScal4Difsvity_vr(:)           => null()  !temperature effect on diffusivity,[-]
   real(r8), pointer :: FracAirFilledSoilPoreM_vr(:,:) => null()  !soil air-filled porosity,                     [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEffM_vr(:,:)   => null()  !coefficient for dissolution - volatilization, [-]
-  real(r8), pointer :: SoilResit4RootPentrate_vr(:)   => null()  !soil hydraulic resistance,                    [MPa h m-2]
+  real(r8), pointer :: SoilResist4RootPentrate_vr(:)   => null()  !soil resistance to root penetration, [MPa]
   real(r8), pointer :: SoilBulkDensity_vr(:)          => null()  !soil bulk density,                            [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:)              => null()  !aqueous tracer concentration, [g m-3]
   real(r8), pointer :: trcg_gascl_vr(:,:)             => null()  !gaseous tracer concentration, [g m-3]
@@ -589,6 +589,7 @@ implicit none
   real(r8) :: HeatFlx2Canopy_col            !total canopy heat flux, [MJ  d-2]
   real(r8) :: H2OLoss_CumYr_col             !total subsurface water flux, [m3 d-2]
   real(r8) :: VPA                           !vapor concentration, [m3 m-3]
+  real(r8) :: EMS_scalar_col                !canopy longwave radiation emissivity scalar
   real(r8) :: TairK                         !air temperature, [K]
   real(r8) :: CanopyWat_col                 !total canopy water content stored with dry matter, [m3 d-2]
   real(r8) :: Eco_Heat_Latent_col           !ecosystem latent heat flux, [MJ d-2 h-1]
@@ -1567,7 +1568,7 @@ implicit none
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
   allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
-  allocate(this%SoilResit4RootPentrate_vr(JZ1));this%SoilResit4RootPentrate_vr=spval
+  allocate(this%SoilResist4RootPentrate_vr(JZ1));this%SoilResist4RootPentrate_vr=spval
   allocate(this%SoilBulkDensity_vr(0:JZ1));this%SoilBulkDensity_vr=spval
   allocate(this%HYCDMicP4RootUptake_vr(JZ1));this%HYCDMicP4RootUptake_vr=spval
 
@@ -1592,7 +1593,7 @@ implicit none
 !  if(allocated(CHSGL))deallocate(CHSGL)
 !  if(allocated(HGSGL))deallocate(HGSGL)
 !  if(allocated(OGSGL))deallocate(OGSGL)
-!  if(allocated(SoilResit4RootPentrate_vr))deallocate(SoilResit4RootPentrate_vr)
+!  if(allocated(SoilResist4RootPentrate_vr))deallocate(SoilResist4RootPentrate_vr)
 
 !   call destroy(this%GasSolbility_vr)
 !  if(allocated(THETW))deallocate(THETW)

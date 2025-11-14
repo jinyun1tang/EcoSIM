@@ -47,7 +47,7 @@ contains
   real(r8) :: FCDX
   real(r8) :: PSDX
   real(r8) :: THETW1
-  real(r8) :: WPX,WPLX
+  real(r8) :: WPX,WPLX,CC,DD,EE,CCLAY_pct,CORGCT
   integer :: K,L
 
   ! begin_execution
@@ -112,18 +112,20 @@ contains
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
 !
-!     SoilResit4RootPentrate_vr=soil resistance to root penetration (MPa)
+!     SoilResist4RootPentrate_vr=soil resistance to root penetration [MPa]
 !
-!     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-!     CCLAY_vrT=CCLAY_vr(L,NY,NX)*1.0E+02
-!     CORGCT=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E-04
-!     CC=EXP(-3.6733-0.1447*CCLAY_vrT+0.7653*CORGCT)
-!     DD=-0.4805-0.1239*CCLAY_vrT+0.2080*CORGCT
-!     EE=3.8521+0.0963*CCLAY_vrT
-!     SoilResit4RootPentrate_vr(L,NY,NX)=CC*THETW_vr(L,NY,NX)**DD*SoilBulkDensity_vr(L,NY,NX)**EE
-!     ELSE
-    SoilResit4RootPentrate_vr(L,NY,NX)=0.0_r8
-!     ENDIF
+     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+      !Eq.(8) in Grant (1993), Simulation model of soil compaction and root growth I. Model structure.
+      !fitted using data from Rickman et al. (1992)
+      CCLAY_pct = CCLAY_vr(L,NY,NX)*1.0E+02_r8
+      CORGCT    = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E-04_r8
+      CC        = EXP(-3.6733_r8-0.1447_r8*CCLAY_pct+0.7653_r8*CORGCT)
+      DD        = -0.4805_r8-0.1239_r8*CCLAY_pct+0.2080_r8*CORGCT
+      EE        = 3.8521_r8+0.0963_r8*CCLAY_pct
+      SoilResist4RootPentrate_vr(L,NY,NX) = CC*THETW_vr(L,NY,NX)**DD*SoilBulkDensity_vr(L,NY,NX)**EE
+     ELSE
+       SoilResist4RootPentrate_vr(L,NY,NX)=0.0_r8
+     ENDIF
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
 !

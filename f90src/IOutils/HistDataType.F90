@@ -64,6 +64,7 @@ implicit none
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)   
+  real(r8),pointer   :: h1D_QTRANSP_col(:)
   real(r8),pointer   :: h1D_Qdrain_col(:)            
   real(r8),pointer   :: h1D_tPREC_P_col(:)     
   real(r8),pointer   :: h1D_tMICRO_P_col(:)    
@@ -150,7 +151,8 @@ implicit none
   real(r8),pointer   :: h1D_HUM_col(:)          
   real(r8),pointer   :: h1D_WIND_col(:)         
   real(r8),pointer   :: h1D_Snofall_col(:)
-  real(r8),pointer   :: h1D_PREC_col(:)         
+  real(r8),pointer   :: h1D_PREC_col(:)   
+  real(r8),pointer   :: h1D_LWSky_col(:)
   real(r8),pointer   :: h1D_SOIL_RN_col(:)      
   real(r8),pointer   :: h1D_SOIL_LE_col(:)      
   real(r8),pointer   :: h1D_SOIL_H_col(:)       
@@ -285,6 +287,7 @@ implicit none
   real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)      
   real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)   
   real(r8),pointer   :: h1D_TC_Groth_ptc(:)
+  real(r8),pointer   :: h2D_SoilRest4RootGroth_vr(:,:)
   real(r8),pointer   :: h2D_RootNonstBConc_pvr(:,:)   
   real(r8),pointer   :: h2D_Root1stStrutC_pvr(:,:) 
   real(r8),pointer   :: h2D_Root1stStrutN_pvr(:,:)
@@ -568,6 +571,7 @@ implicit none
   real(r8),pointer   :: h2D_HydCondSoil_vr(:,:)
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
   real(r8),pointer   :: h2D_RootH2OUptkStress_pvr(:,:)
+  real(r8),pointer   :: h2D_RootH2OUptk_pvr(:,:)
   real(r8),pointer   :: h2D_ROOT_OSTRESS_pvr(:,:)
   real(r8),pointer   :: h2D_prtUP_NH4_pvr(:,:)                                                                     
   real(r8),pointer   :: h2D_prtUP_NO3_pvr(:,:)  
@@ -725,6 +729,7 @@ implicit none
   allocate(this%h1D_PREC_col(beg_col:end_col))            ;this%h1D_PREC_col(:)=spval
   allocate(this%h1D_Snofall_col(beg_col:end_col))         ;this%h1D_Snofall_col(:)=spval
   allocate(this%h1D_SOIL_RN_col(beg_col:end_col))         ;this%h1D_SOIL_RN_col(:)=spval
+  allocate(this%h1D_LWSky_col(beg_col:end_col))           ;this%h1D_LWSky_col(:)=spval
   allocate(this%h1D_SOIL_LE_col(beg_col:end_col))         ;this%h1D_SOIL_LE_col(:)=spval
   allocate(this%h1D_SOIL_H_col(beg_col:end_col))          ;this%h1D_SOIL_H_col(:)=spval
   allocate(this%h1D_SOIL_G_col(beg_col:end_col))          ;this%h1D_SOIL_G_col(:)=spval
@@ -804,6 +809,7 @@ implicit none
   allocate(this%h1D_STOML_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_STOML_RSC_H2O_ptc(:)=spval
   allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_H2O_ptc(:)=spval
   allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))         ;this%h1D_TRANSPN_ptc(:)=spval
+  allocate(this%h1D_QTRANSP_col(beg_col:end_col)); this%h1D_QTRANSP_col(:)=spval
   allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NH4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
@@ -990,6 +996,7 @@ implicit none
   allocate(this%h2D_DOC_vr(beg_col:end_col,1:JZ)); this%h2D_DOC_vr(:,:)=spval
   allocate(this%h2D_DON_vr(beg_col:end_col,1:JZ)); this%h2D_DON_vr(:,:)=spval
   allocate(this%h2D_DOP_vr(beg_col:end_col,1:JZ)); this%h2D_DOP_vr(:,:)=spval
+  allocate(this%h2D_SoilRest4RootGroth_vr(beg_col:end_col,1:JZ)); this%h2D_SoilRest4RootGroth_vr(:,:)=spval
   allocate(this%h2D_acetate_vr(beg_col:end_col,1:JZ)); this%h2D_acetate_vr(:,:)=spval
   allocate(this%h1D_tDOC_soil_col(beg_col:end_col)); this%h1D_tDOC_soil_col(:)=spval
   allocate(this%h1D_tDON_soil_col(beg_col:end_col)); this%h1D_tDON_soil_col(:)=spval
@@ -1129,6 +1136,7 @@ implicit none
   allocate(this%h2D_ElectricConductivity_vr(beg_col:end_col,1:JZ))       ;this%h2D_ElectricConductivity_vr(:,:)=spval
   allocate(this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
+  allocate(this%h2D_RootH2OUptk_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootH2OUptk_pvr(:,:)=spval
   allocate(this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMaintDef_CO2_pvr(:,:)=spval
   allocate(this%h2D_RootSurfAreaPP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootSurfAreaPP_pvr(:,:)=spval
   allocate(this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTNLim_rpvr(:,:)=spval
@@ -1316,6 +1324,10 @@ implicit none
   data1d_ptr => this%h1D_Qinfl2soi_col(beg_col:end_col)
   call hist_addfld1d(fname='Qinfl2soi_col',units='mm H2O/hr',avgflag='A',&
     long_name='Water flux into the ground',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_QTRANSP_col(beg_col:end_col)
+  call hist_addfld1d(fname='QTransp_col',units='mm H2O/hr',avgflag='A',&
+    long_name='Soil water loss through transpiration (<0 into atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_Qdrain_col(beg_col:end_col)
   call hist_addfld1d(fname='Qdrain_col',units='mm H2O/hr',avgflag='A',&
@@ -1606,6 +1618,10 @@ implicit none
   call hist_addfld1d(fname='SOIL_RN_col',units='W/m2',avgflag='A',&
     long_name='total net radiation at ground surface (incoming short/long wave - outgoing short/long wave at soil/snow/litter)',&
     ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_LWSky_col(beg_col:end_col)      
+  call hist_addfld1d(fname='LW_Sky_col',units='W/m2',avgflag='A',&
+    long_name='Incoming sky long wave radiation',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_SOIL_LE_col(beg_col:end_col)      
   call hist_addfld1d(fname='SOIL_LE_col',units='W/m2',avgflag='A',&
@@ -2829,6 +2845,10 @@ implicit none
   call hist_addfld2d(fname='DOP_vr',units='gP/m3',type2d='levsoi',avgflag='A',&
     long_name='DOP profile',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr =>  this%h2D_SoilRest4RootGroth_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='SoilRest4RootGroth_vr',units='MPa',type2d='levsoi',avgflag='A',&
+    long_name='Soil resistance for root penetration',ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr =>  this%h2D_acetate_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='acetate_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Acetate profile',ptr_col=data2d_ptr,default='inactive')      
@@ -3380,6 +3400,10 @@ implicit none
   call hist_addfld2d(fname='RootH2OUptkStress_pvr',units='m3 m-2 h-1',type2d='levsoi',avgflag='A',&
     long_name='Rate indicated root water uptake stress of each pft (>0 hydraulic stress)',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_RootH2OUptk_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootH2OUptk_pvr',units='mm H2O h-1',type2d='levsoi',avgflag='A',&
+    long_name='Plant root water uptake from soil (>0 release water to soil)',ptr_patch=data2d_ptr)
+
   data2d_ptr => this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='RootMaintDef_CO2_pvr',units='g CO2 m-2 h-1',type2d='levsoi',avgflag='A',&
     long_name='Plant root maintenance deficit each pft (<0 deficit)',ptr_patch=data2d_ptr,default='inactive')       
@@ -3635,6 +3659,7 @@ implicit none
       this%h1D_PREC_col(ncol)             = (RainFalPrec_col(NY,NX)+SnoFalPrec_col(NY,NX))*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Snofall_col(ncol)          = SnoFalPrec_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SOIL_RN_col(ncol)          = HeatByRad2Surf_col(NY,NX)*MJ2W/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_LWSky_col(ncol)            = LWRadSky_col(NY,NX)*MJ2W/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SOIL_LE_col(ncol)          = HeatEvapAir2Surf_col(NY,NX)*MJ2W/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SOIL_H_col(ncol)           = HeatSensAir2Surf_col(NY,NX)*MJ2W/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SOIL_G_col(ncol)           = -(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))*MJ2W/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -3795,7 +3820,7 @@ implicit none
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_Gchem_CO2_prod_vr(ncol,L)= TProd_CO2_geochem_soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        
+        this%h2D_SoilRest4RootGroth_vr(ncol,L) = SoilResist4RootPentrate_vr(L,NY,NX)
         if(DVOLL<=1.e-8_r8)cycle
 
         call sumDOML(L,NY,NX,DOM)
@@ -3983,9 +4008,9 @@ implicit none
       this%h1D_RCH4Oxi_aero_col(ncol) = this%h1D_RCH4Oxi_aero_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RCH4Oxi_anmo_col(ncol) = this%h1D_RCH4Oxi_anmo_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
 
-      this%h1D_RootAR_col(ncol)  = -RootCO2Autor_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
+      this%h1D_RootAR_col(ncol)  = -AZERO(RootCO2Autor_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RootCO2Relez_col(ncol)=RootCO2Emis2Root_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
-
+      this%h1D_QTRANSP_col(ncol) = 0._r8
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
@@ -4037,6 +4062,7 @@ implicit none
         this%h1D_STOML_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
         this%h1D_BLYR_RSC_H2O_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
         this%h1D_TRANSPN_ptc(nptc)       = Transpiration_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_QTRANSP_col(ncol)       = this%h1D_QTRANSP_col(ncol)+this%h1D_TRANSPN_ptc(nptc)
         this%h1D_NH4_UPTK_FLX_ptc(nptc)  = RootNH4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4224,6 +4250,7 @@ implicit none
           this%h2D_ROOT_OSTRESS_pvr(nptc,L) = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_PSI_RT_pvr(nptc,L)       = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
           this%h2D_RootH2OUptkStress_pvr(nptc,L)=RootH2OUptkStress_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          this%h2D_RootH2OUptk_pvr(nptc,L) = 1.e3*RPlantRootH2OUptk_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_RootMaintDef_CO2_pvr(nptc,L)=RootMaintDef_CO2_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_prtUP_NH4_pvr(nptc,L)    = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+&
             sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA_3D(3,L,NY,NX)

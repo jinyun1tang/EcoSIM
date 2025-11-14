@@ -52,7 +52,7 @@ implicit none
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
-  use PerturbationMod     , only : InitSoilWarming
+  use EcosysWarmingMod     , only : InitSoilWarming
   use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData

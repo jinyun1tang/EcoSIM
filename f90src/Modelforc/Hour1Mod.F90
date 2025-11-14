@@ -103,7 +103,7 @@ module Hour1Mod
 
 !     execution begins here
   call PrintInfo('beg '//subname)
-!
+  !
   if(lverb)write(*,*)'ResetLndscapeAccumlators'
   call ResetLndscapeAccumlators()
 
@@ -856,7 +856,7 @@ module Hour1Mod
   TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
-  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
+  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)  
   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                      = 0._r8
   THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                        = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8

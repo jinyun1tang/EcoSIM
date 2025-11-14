@@ -1,6 +1,9 @@
 module StartqMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : AZMAX1,isclose  
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use minimathmod,      only: AZMAX1, isclose
+  use DebugToolMod,     only: PrintInfo
+  use UnitMod,          only: units
+  use EcoSiMParDataMod, only: pltpar
   use GridConsts
   use FlagDataType
   use EcosimConst
@@ -17,8 +20,6 @@ module StartqMod
   use GridDataType
   use EcoSIMConfig
   use PlantBGCPars
-  use UnitMod, only : units
-  use EcoSiMParDataMod, only : pltpar
   use PlantMathFuncMod
   implicit none
 
@@ -35,7 +36,7 @@ module StartqMod
   implicit none
   integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ
   integer, intent(in) :: NZ1Q,NZ2Q
-
+  character(len=*), parameter :: subname='startq'
   integer :: NY,NX,K,L,M,NZ,NZ2X
 !     begin_execution
 !
@@ -51,7 +52,7 @@ module StartqMod
 !    RootProteinCMax_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
-
+  call PrintInfo('beg '//subname)
   D9995: DO NX=NHWQ,NHEQ
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP_col(NY,NX))
@@ -98,7 +99,7 @@ module StartqMod
       ENDDO D9986
     ENDDO D9990
   ENDDO D9995
-  RETURN
+  call PrintInfo('end '//subname)
   END subroutine startq
 !------------------------------------------------------------------------------------------
 
@@ -454,18 +455,18 @@ module StartqMod
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)        = KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)      = CMinPO4Root_pft(1,NZ,NY,NX)
   RootRadialResist_pft(imycorrhz,NZ,NY,NX) = 1.0E+04
-  RootAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12
-!
-!     RootPoreTortu4Gas_pft=tortuosity for gas transport
-!     RootRaidus_rpft=path length for radial diffusion within root (m)
-!     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
-!     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
-!     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
-!
+  RootAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12 
+  !
+  !     RootPoreTortu4Gas_pft=tortuosity for gas transport
+  !     RootRaidus_rpft=path length for radial diffusion within root (m)
+  !     RootVolPerMassC_pft=volume:C ratio (m3 gC-1)
+  !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
+  !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
+  !
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ,NY,NX) = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
-    RootVolPerMassC_pft(N,NZ,NY,NX)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))
+    RootVolPerMassC_pft(N,NZ,NY,NX)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))  ![50 kgC m-3 root biomass]
     Root1stSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
     Root2ndSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
     Root1stMaxRadius1_pft(N,NZ,NY,NX) = Root1stMaxRadius_pft(N,NZ,NY,NX)

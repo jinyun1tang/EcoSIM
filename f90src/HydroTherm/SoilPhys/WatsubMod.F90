@@ -11,7 +11,7 @@ module WatsubMod
   use abortutils,        only: endrun,             print_info
   use ElmIDMod,          only: iWestEastDirection, iNorthSouthDirection, iVerticalDirection
   use SurfPhysData,      only: InitSurfPhysData,   DestructSurfPhysData
-  use PerturbationMod,   only: check_Soil_Warming, is_warming_layerL
+  use EcosysWarmingMod,   only: check_warming_dates, is_warming_layerL,apply_soil_cable_warming
   use PlantDataRateType, only: TWaterPlantRoot2SoilPrev_vr
   use DebugToolMod
   use EcoSIMCtrlMod  
@@ -108,7 +108,11 @@ module WatsubMod
   call PrintInfo('beg watsub')
   if(fixWaterLevel)HeatAdv_scal=0._r8
 
-  do_warming=check_Soil_Warming(iYearCurrent,I)
+  do_warming=check_warming_dates(iYearCurrent,I,J)
+
+  if(do_warming)then
+    call apply_soil_cable_warming(I,J,NHW,NHE,NVN,NVS)  
+  endif
 ! this enters the EcoSIM interaction with the soil-water-temperature module
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS,twatmass0)
 ! 

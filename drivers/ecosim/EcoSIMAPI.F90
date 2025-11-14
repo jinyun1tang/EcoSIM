@@ -2,7 +2,7 @@ module EcoSIMAPI
   use timings,           only: start_timer,     end_timer
   use MicBGCAPI,         only: MicrobeModel,   MicAPI_Init,      MicAPI_cleanup
   use TracerIDMod,       only: ids_NO2B,           ids_NO2,          idg_O2
-  use PerturbationMod,   only: check_Soil_Warming, set_soil_warming, config_soil_warming
+  use EcosysWarmingMod,   only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
   use ErosionMod,        only: erosion
   use Hour1Mod,          only: hour1
   use RedistMod,         only: redist
@@ -393,25 +393,21 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 !
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. plant_model)THEN
     !initialize by year
-    if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
   ENDIF
   if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
-! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
-! This is done done every year, because tracer concentrations
-! in rainfall vary every year. In a more reasonable way, e.g.,
-! when coupled to atmospheric chemistry code, it should be done by
-! hour
-    if(lverb)WRITE(*,333)'STARTE'
+    ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
+    ! This is done done every year, because tracer concentrations
+    ! in rainfall vary every year. In a more reasonable way, e.g.,
+    ! when coupled to atmospheric chemistry code, it should be done by
+    ! hour
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
   iYearCurrent=frectyp%yearcur
 
-  if(check_Soil_Warming(iYearCurrent,1))then
+  if(check_warming_dates(iYearCurrent,1,1))then
     call read_soil_warming_Tref(iYearCurrent,NHW,NHE,NVN,NVS)    
-
-    call set_soil_warming(iYearCurrent,NHW,NHE,NVN,NVS)
   endif
   lverb0 = lverb
   DazCurrYear=etimer%get_days_cur_year()

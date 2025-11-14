@@ -596,7 +596,7 @@ implicit none
         RootCUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ,NY,NX)             = plt_rbgc%RootCUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ)
         RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)                          = plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)
         RPlantRootH2OUptk_pvr(N,L,NZ,NY,NX)                        = plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)
-        RootH2OUptkStress_pvr(N,L,NZ,NY,NX)                          = plt_ew%RootH2OUptkStress_pvr(N,L,NZ)
+        RootH2OUptkStress_pvr(N,L,NZ,NY,NX)                        = plt_ew%RootH2OUptkStress_pvr(N,L,NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)                      = plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)
         PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = AZMAX1(plt_biom%PopuRootMycoC_pvr(N,L,NZ))
         RootResist4H2O_pvr(N,L,NZ,NY,NX)                           = plt_ew%RootResist4H2O_pvr(N,L,NZ)
@@ -735,6 +735,7 @@ implicit none
   plt_rad%LWRadGrnd_col               = LWRadGrnd_col(NY,NX)
   plt_rad%LWRadSky_col                = LWRadSky_col(NY,NX)
   plt_ew%VPA                          = VPA_col(NY,NX)
+  plt_ew%EMS_scalar_col               = EMS_scalar_col(NY,NX)
   plt_distb%XCORP                     = XTillCorp_col(NY,NX)
   plt_site%SolarNoonHour_col          = SolarNoonHour_col(NY,NX)
   plt_site%ZEROS2                     = ZEROS2(NY,NX)
@@ -760,7 +761,7 @@ implicit none
   DO L=1,NL_col(NY,NX)
     plt_soilchem%HYCDMicP4RootUptake_vr(L) = HYCDMicP4RootUptake_vr(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)  = GasDifc_vr(idg_beg:idg_end,L,NY,NX)
-    plt_soilchem%SoilResit4RootPentrate_vr(L)   = SoilResit4RootPentrate_vr(L,NY,NX)
+    plt_soilchem%SoilResist4RootPentrate_vr(L)   = SoilResist4RootPentrate_vr(L,NY,NX)
     plt_site%CumSoilThickMidL_vr(L)             = CumSoilThickMidL_vr(L,NY,NX)
   ENDDO
 
@@ -1362,7 +1363,7 @@ implicit none
         plt_morph%RootAreaPerPlant_pvr(N,L,NZ)    = RootAreaPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)       = Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)
 
-        plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)     = RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
+        plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)         = RootO2Dmnd4Resp_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootNH4DmndSoilPrev_pvr(N,L,NZ)     = RootNH4DmndSoil_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootNH4DmndBandPrev_pvr(N,L,NZ)     = RootNH4DmndBand_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootNO3DmndSoilPrev_pvr(N,L,NZ)     = RootNO3DmndSoil_pvr(N,L,NZ,NY,NX)
@@ -1371,7 +1372,6 @@ implicit none
         plt_rbgc%RootH2PO4DmndBandPrev_pvr(N,L,NZ)   = RootH2PO4DmndBand_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootH1PO4DmndSoilPrev_pvr(N,L,NZ)   = RootH1PO4DmndSoil_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RootH1PO4DmndBandPrev_pvr(N,L,NZ)   = RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)
-        plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)    = RPlantRootH2OUptk_pvr(N,L,NZ,NY,NX)
         plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)  = RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)
         plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
         plt_biom%PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ,NY,NX)

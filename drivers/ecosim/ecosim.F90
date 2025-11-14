@@ -17,7 +17,7 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use ClimReadMod       , only : get_clm_years
-  use PerturbationMod   , only : config_soil_warming
+  use EcosysWarmingMod   , only : config_soil_warming
   use EcoSIMAPI         , only : AdvanceModelOneYear,readnamelist,regressiontest,write_modelconfig
   use EcoSIMCtrlMod
   use EcoSIMCtrlDataType

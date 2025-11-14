@@ -302,17 +302,17 @@ module grosubsMod
     RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT) :: TFN6_vr(JZ1)
-  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW
-  real(r8), intent(out) :: CNSHW,CPSHW
-  real(r8), intent(out) :: CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum !Numer of primary root axes
+  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW               !NC, PC mass ratio of leaf growth
+  real(r8), intent(out) :: CNSHW,CPSHW               !NC, PC mass ratio of shoot growth
+  real(r8), intent(out) :: CNRTW,CPRTW               !NC, PC mass ratio of root growth
+  real(r8), intent(out) :: RootPrimeAxsNum           !Numer of primary root axes
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
   real(r8), intent(out) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
-  real(r8), parameter :: dscal=0.999992087_r8
+  real(r8), parameter :: dscal=0.99999_r8
   character(len=*), parameter :: subname='StagePlantForGrowth'
 !     begin_execution
 
@@ -454,13 +454,13 @@ module grosubsMod
     TKSM       = real_truncate(TKS_vr(L)+TempOffset_pft(NZ),1.e-3_r8)
     TFN6_vr(L) = calc_plant_maint_tempf(TKSM)
   ENDDO D7
-!
-!     PRIMARY ROOT NUMBER
-!
-!     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
-!     WTRT,PP=root mass,PFT population
-!     RootPrimeAxsNum=multiplier for number of primary root axes
-!
+  !
+  !     PRIMARY ROOT NUMBER
+  !
+  !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
+  !     WTRT,PP=root mass,PFT population
+  !     RootPrimeAxsNum=multiplier for number of primary root axes
+  !
   RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
   RootPrimeAxsNum           = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
 

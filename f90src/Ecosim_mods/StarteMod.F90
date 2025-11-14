@@ -1,5 +1,8 @@
 module StarteMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use SoluteChemDataType, only: solutedtype
+  use EcoSiMParDataMod,   only: micpar
+  use DebugToolMod,       only: PrintInfo
   use SOMDataType
   use TracerPropMod
   use TracerIDMod
@@ -23,8 +26,6 @@ module StarteMod
   use EcoSIMConfig
   use InitSoluteMod
   use SoluteParMod
-  use SoluteChemDataType, only : solutedtype
-  use EcoSiMParDataMod, only : micpar
   use ChemTracerParsMod
   implicit none
 
@@ -45,15 +46,18 @@ module StarteMod
 
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  character(len=*), parameter :: subname='starte'
   type(solutedtype)  :: solutevar
   REAL(R8) :: BulkSoilMass
   integer :: NY,NX,L,I,K
-!     begin_execution
-!
-!     INITIALIZE CATION AND ANION CONCENTRATIONS
-!     IN PRECIPITATION (K=1), IRRIGATION (K=2) AND SOIL (K=3)
-!     FROM WEATHER, IRRIGATION AND SOIL FILES IN 'READS'
-!
+
+  !     begin_execution
+  !
+  !     INITIALIZE CATION AND ANION CONCENTRATIONS
+  !     IN PRECIPITATION (K=1), IRRIGATION (K=2) AND SOIL (K=3)
+  !     FROM WEATHER, IRRIGATION AND SOIL FILES IN 'READS'
+  !
+  call PrintInfo('beg '//subname)
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
       solutevar%CCO2M = CCO2EI_gperm3_col(NY,NX)/catomw
@@ -181,7 +185,7 @@ module StarteMod
 
     ENDDO
   ENDDO
-
+  call PrintInfo('end '//subname)
   END subroutine starte
 !------------------------------------------------------------------------------------------
 

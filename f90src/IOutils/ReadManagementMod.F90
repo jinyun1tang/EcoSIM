@@ -3,10 +3,11 @@ module ReadManagementMod
   ! Description
   ! code to read Soil management info
   !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils , only : endrun
-  use fileUtil   , only : open_safe,int2str
-  use minimathmod, only : isLeap
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use fileUtil,      only: open_safe, int2str
+  use minimathmod,   only: isLeap
+  use DebugToolMod,  only: PrintInfo
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -412,7 +413,7 @@ implicit none
   use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
   integer, intent(in) :: yeari
-
+  character(len=*), parameter :: subname='ReadManagementFiles'
   integer :: NH1,NV1,NH2,NV2
   type(file_desc_t) :: soilmgmt_nfid
   type(Var_desc_t) :: vardesc
@@ -427,7 +428,7 @@ implicit none
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
-
+  call PrintInfo('beg '//subname)
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
   nyears=get_dim_len(soilmgmt_nfid, 'year')
   if(nyears==0)then
@@ -506,7 +507,7 @@ implicit none
     ENDIF
   ENDDO
   call ncd_pio_closefile(soilmgmt_nfid)
-
+  call PrintInfo('end '//subname)
   end subroutine ReadManagementFiles
 
 !------------------------------------------------------------------------------------------

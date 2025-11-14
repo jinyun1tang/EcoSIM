@@ -2,10 +2,11 @@ module PlantInfoMod
 !
 ! DESCRIPTION
 ! code to read plant information
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use fileUtil, only : open_safe, check_read,int2str,getavu, relavu, opnfil,iulog
-  use minimathmod, only : isLeap
-  use abortutils, only : endrun  
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil, iulog
+  use minimathmod,   only: isLeap
+  use abortutils,    only: endrun
+  use DebugToolMod,  only: PrintInfo
   use PlantTraitTableMod  
   use netcdf
   use ncdio_pio  
@@ -46,13 +47,12 @@ implicit none
 
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
-  if(lverb)WRITE(*,333)'ROUTQ'
+ 
   CALL ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
 !
-  if(lverb)WRITE(*,333)'READQ'
   CALL READQ(yearc,yeari,NHW,NHE,NVN,NVS)
 
 333   FORMAT(A8)
@@ -71,10 +71,12 @@ implicit none
   integer, intent(in) :: yeari   !current forcing year 
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
+  character(len=*), parameter :: subname='READQ'
   character(len=128) :: fnm_loc
   logical :: pft_changed
 
 ! begin_execution
+  call PrintInfo('beg '//subname)
   call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
 
   if(disp_planttrait .and. pft_changed)then
@@ -82,6 +84,7 @@ implicit none
     write(fnm_loc,'(A,I4,A)')'plant_trait.',etimer%get_curr_yearAD(),'.desc'
     call opnfil(fnm_loc,nu_plt,'f')    
   endif
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
       D9985: DO NZ=1,NP_col(NY,NX)
@@ -98,7 +101,7 @@ implicit none
   ENDDO D9995
 
   if(disp_planttrait .and. pft_changed)call relavu(nu_plt)
-
+  call PrintInfo('end '//subname)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -340,6 +343,8 @@ implicit none
   integer, intent(in) :: yeari   !forcing data year
   integer, intent(in) :: yearc   !current model year
   logical, optional, intent(out):: pft_changed
+
+  character(len=*), parameter :: subname='ReadPlantManagementNC'
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
   logical :: readvar
@@ -349,6 +354,7 @@ implicit none
   integer :: ntopou,NY,NX,NZ
   logical :: pft_changed_loc
 
+  call PrintInfo('beg '//subname)
   pft_changed_loc=.false.
   if (len_trim(pft_mgmt_in)==0)return
   
@@ -409,6 +415,7 @@ implicit none
     ENDDO
   ENDDO
   if(present(pft_changed))pft_changed=pft_changed_loc
+  call PrintInfo('end '//subname)
   end subroutine ReadPlantManagementNC
 !------------------------------------------------------------------------------------------
 
@@ -796,9 +803,9 @@ implicit none
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,110)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
-  call writefixsl(nu_plt,'Plant name ',pft_lname,40)
+  call writefixsl(nu_plt,'Plant name ',pft_lname,60)
   strval=koppen_clims//','//koppen_climl
-  call writefixsl(nu_plt,'Koppen climate info',strval,40)
+  call writefixsl(nu_plt,'Koppen climate info',strval,60)
 
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
@@ -808,7 +815,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photosynthesis pathway',strval,40)
+  call writefixsl(nu_plt,'Photosynthesis pathway',strval,60)
 
   select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
@@ -820,7 +827,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Root profile pattern',strval,40)
+  call writefixsl(nu_plt,'Root profile pattern',strval,60)
 
   select case (iPlantPhenolPattern_pft(NZ,NY,NX))
   case (0)
@@ -830,7 +837,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Life cycle',strval,40)
+  call writefixsl(nu_plt,'Life cycle',strval,60)
 
   select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
@@ -840,7 +847,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Growth pattern IDTYP',strval,40)
+  call writefixsl(nu_plt,'Growth pattern IDTYP',strval,60)
 
   select case (iPlantNfixType_pft(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
@@ -860,7 +867,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,40)
+  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,60)
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
@@ -874,7 +881,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Phenology type IWTYP',strval,40)
+  call writefixsl(nu_plt,'Phenology type IWTYP',strval,60)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)
@@ -886,7 +893,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,40)
+  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,60)
 
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -911,7 +918,7 @@ implicit none
       write(strval,'(A,I2)')'Undefined herbaceous pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
   endif
-  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,40)
+  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,60)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
@@ -921,7 +928,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
+  call writefixsl(nu_plt,'Storage organ IRTYP',strval,60)
 
   select case(Myco_pft(NZ,NY,NX))
   case (1)
@@ -931,7 +938,7 @@ implicit none
   case default
     strval='Wrong option'
   end select
-  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
+  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,60)
 
   if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
     write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
@@ -947,7 +954,7 @@ implicit none
     write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   endif
   
-  call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
+  call writefixsl(nu_plt,'Growing season thermal adaptation zone ZTYPI',strval,60)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -1111,7 +1118,9 @@ implicit none
   call writefixl(nu_plt,'DMEAR','Ear dry matter C production yiled [gC ear g-1 nonstrucal C]',EarBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'DMGR','Grain C production yiled [gC grain g-1 nonstrucal C]',GrainBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'DMRT','Root dry matter C production yield [gC root g-1 nonstrucal C]',RootBiomGrosYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'DMND','Canopy/root nodule bacteria dry matter C production yiled [gC g-1 nonstrucal C]',NoduGrowthYield_pft(NZ,NY,NX),101)
+  if(iPlantNfixType_pft(NZ,NY,NX)/=0)then
+    call writefixl(nu_plt,'DMND','Canopy/root nodule bacteria dry matter C production yiled [gC g-1 nonstrucal C]',NoduGrowthYield_pft(NZ,NY,NX),101)
+  endif
   end subroutine plant_biomyield_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1176,6 +1185,8 @@ implicit none
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari    !forcing year information
+
+  character(len=*), parameter :: subname='ReadPlantInfoNC'
   integer :: IDATE
   integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
@@ -1190,6 +1201,7 @@ implicit none
   character(len=1) :: cc
   character(len=10) :: pft_gtype(JP)
 
+  call PrintInfo('beg '//subname)
   IF(is_first_year)THEN
     D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
@@ -1327,6 +1339,7 @@ implicit none
     ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)
   endif
+  call PrintInfo('end '//subname)
   end subroutine ReadPlantInfoNC
 
 !------------------------------------------------------------------------------------------

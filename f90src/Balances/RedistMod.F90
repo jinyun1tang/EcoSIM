@@ -876,6 +876,7 @@ module RedistMod
       ENGY                      = VHeatCapacityX*TKSX
       VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
         +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
+        
       if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
         VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
       endif

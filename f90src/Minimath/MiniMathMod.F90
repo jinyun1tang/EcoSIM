@@ -16,7 +16,7 @@ module minimathmod
   public :: p_adb
   public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
-  public :: isLeap
+  public :: isLeap,iisleap
   public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d,AZMIN1d
   public :: GetMolAirPerm3
