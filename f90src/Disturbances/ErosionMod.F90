@@ -150,7 +150,7 @@ module ErosionMod
     !     FROM 'HOUR1'
     !
           STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE_col(0,NY,NX))
-          CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
+          CSEDX=PtclDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
           IF(CSEDX.GT.CSEDD)THEN

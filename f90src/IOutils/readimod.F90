@@ -11,6 +11,7 @@ module readiMod
   use EcoSiMParDataMod, only: micpar
   use SoilHydroParaMod, only: ComputeSoilHydroPars
   use SoilPhysParaMod,  only: SetDeepSoil
+  use DebugToolMod,     only: PrintInfo
   use ncdio_pio
   use EcoSIMCtrlMod
   use SOMDataType
@@ -182,6 +183,7 @@ module readiMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: DHI(JX),DVI(JY)
+  character(len=*), parameter :: subname='readsiteNC'
   character(len=200) :: tline
   integer :: XI
   integer :: NY,NX
@@ -191,6 +193,7 @@ module readiMod
 !
 ! READ SITE DATA
 !
+  call PrintInfo('beg '//subname)
 ! ALATG,ALTIG,ATCAG=latitude,altitude,MAT(oC)
 ! iWaterTabelMode=water table flag
 ! :0=none
@@ -330,7 +333,7 @@ module readiMod
 
     ENDDO D9890
   ENDDO D9895
-
+  call PrintInfo('end '//subname)
   end subroutine readsiteNC
 
 !------------------------------------------------------------------------------------------
@@ -341,16 +344,17 @@ module readiMod
   implicit none
   integer :: jj,NY,NX,ll
   character(len=200) :: tline
+  character(len=*), parameter :: subname='readTopoNC'
   integer :: NM(JY,JX),ntp,ntopus
   real(r8) :: dat1(1:JZ)
-  real(r8) :: corrector
+  real(r8) :: corrector,OrgVolFrac
 ! begin_execution
   associate(                            &
   k_woody_litr => micpar%k_woody_litr , &
   k_fine_litr  => micpar%k_fine_litr  , &
   k_manure     => micpar%k_manure       &
   )
-
+  call PrintInfo('beg '//subname)
 !
 ! READ TOPOGRAPHY DATA AND SOIL FILE NAME FOR EACH GRID CELL
 !
@@ -368,7 +372,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NV1', ntp, NV1)
     call ncd_getvar(grid_nfid, 'NH2', ntp, NH2)
     call ncd_getvar(grid_nfid, 'NV2', ntp, NV2)
-    call ncd_getvar(grid_nfid, 'ASPX', ntp,ASPX)
+    call ncd_getvar(grid_nfid, 'ASPX', ntp,ASPX) !clockwise degrees from north
     call ncd_getvar(grid_nfid, 'SL0', ntp,SL0)
     call ncd_getvar(grid_nfid, 'DPTHSX', ntp,initSnowDepth)
 
@@ -733,32 +737,36 @@ module readiMod
   !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !     WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
-          SatHydroCondVert_vr(L,NY,NX)=0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-          SatHydroCondHrzn_vr(L,NY,NX)=0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-          CCLAY_vr(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
-          CSoilOrgM_vr(ielmc,L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8   !convert from Kg to g C (C is input as Kg/Mg soil, N and P are input as g/Mg soil)
-          COMLitrC_vr(L,NY,NX)=COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
-          CORGCI_vr(L,NY,NX)=CSoilOrgM_vr(ielmc,L,NY,NX)
-          SoilFracAsMacPt0_vr(L,NY,NX)=SoilFracAsMacP_vr(L,NY,NX)
-        ! soil texture is reported based on mass basis soley for mineral component of the soil
-          corrector=1.0E-03_r8*AZMAX1((1.0_r8-CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden))
-          CSAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*corrector
-          CSILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*corrector
-          CCLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*corrector
-          CEC_vr(L,NY,NX)=CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
-          AEC_vr(L,NY,NX)=AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
-          CNH4_vr(L,NY,NX)=CNH4_vr(L,NY,NX)/natomw
-          CNO3_vr(L,NY,NX)=CNO3_vr(L,NY,NX)/natomw
-          CPO4_vr(L,NY,NX)=CPO4_vr(L,NY,NX)/patomw
-          CAL_vr(L,NY,NX)=CAL_vr(L,NY,NX)/27.0_r8
-          CFE_vr(L,NY,NX)=CFE_vr(L,NY,NX)/56.0_r8
-          CCA_vr(L,NY,NX)=CCA_vr(L,NY,NX)/40.0_r8
-          CMG_vr(L,NY,NX)=CMG_vr(L,NY,NX)/24.3_r8
-          CNA_vr(L,NY,NX)=CNA_vr(L,NY,NX)/23.0_r8
-          CKA_vr(L,NY,NX)=CKA_vr(L,NY,NX)/39.1_r8
-          CSO4_vr(L,NY,NX)=CSO4_vr(L,NY,NX)/32.0_r8
-          CCL_vr(L,NY,NX)=CCL_vr(L,NY,NX)/35.5_r8
-          CALPO_vr(L,NY,NX)=CALPO_vr(L,NY,NX)/patomw
+          SatHydroCondVert_vr(L,NY,NX) = 0.098_r8*SatHydroCondVert_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+          SatHydroCondHrzn_vr(L,NY,NX) = 0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+          CCLAY_vr(L,NY,NX)            = AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
+          !convert from Kg to g C (C is input as kgC/Mg soil, N and P are input as g/Mg soil)
+          CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8
+          COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from kg C to g C
+          CORGCI_vr(L,NY,NX)           = CSoilOrgM_vr(ielmc,L,NY,NX)
+          SoilFracAsMacPt0_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)
+          ! soil texture is reported based on mass basis soley for mineral component of the soil
+          !volume of organic matter
+          OrgVolFrac = CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden
+          corrector  = 1.0E-03_r8*AZMAX1((1.0_r8-OrgVolFrac))
+          !convert soil texture into mass scale [0,1]
+          CSAND_vr(L,NY,NX) = CSAND_vr(L,NY,NX)*corrector 
+          CSILT_vr(L,NY,NX) = CSILT_vr(L,NY,NX)*corrector
+          CCLAY_vr(L,NY,NX) = CCLAY_vr(L,NY,NX)*corrector
+          CEC_vr(L,NY,NX)   = CEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
+          AEC_vr(L,NY,NX)   = AEC_vr(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
+          CNH4_vr(L,NY,NX)  = CNH4_vr(L,NY,NX)/natomw
+          CNO3_vr(L,NY,NX)  = CNO3_vr(L,NY,NX)/natomw
+          CPO4_vr(L,NY,NX)  = CPO4_vr(L,NY,NX)/patomw
+          CAL_vr(L,NY,NX)   = CAL_vr(L,NY,NX)/27.0_r8
+          CFE_vr(L,NY,NX)   = CFE_vr(L,NY,NX)/56.0_r8
+          CCA_vr(L,NY,NX)   = CCA_vr(L,NY,NX)/40.0_r8
+          CMG_vr(L,NY,NX)   = CMG_vr(L,NY,NX)/24.3_r8
+          CNA_vr(L,NY,NX)   = CNA_vr(L,NY,NX)/23.0_r8
+          CKA_vr(L,NY,NX)   = CKA_vr(L,NY,NX)/39.1_r8
+          CSO4_vr(L,NY,NX)  = CSO4_vr(L,NY,NX)/32.0_r8
+          CCL_vr(L,NY,NX)   = CCL_vr(L,NY,NX)/35.5_r8
+          CALPO_vr(L,NY,NX) = CALPO_vr(L,NY,NX)/patomw
           CFEPO_vr(L,NY,NX)=CFEPO_vr(L,NY,NX)/patomw
           CCAPD_vr(L,NY,NX)=CCAPD_vr(L,NY,NX)/patomw
           CCAPH_vr(L,NY,NX)=CCAPH_vr(L,NY,NX)/(patomw*3.0_r8)
@@ -766,12 +774,12 @@ module readiMod
           CFEOH_vr(L,NY,NX)=CFEOH_vr(L,NY,NX)/56.0_r8
           CCACO_vr(L,NY,NX)=CCACO_vr(L,NY,NX)/40.0_r8
           CCASO_vr(L,NY,NX)=CCASO_vr(L,NY,NX)/40.0_r8
-        !
-        !     ESTIMATE SON,SOP,CEC IF UNKNOWN
-        !     BIOCHEMISTRY 130:117-131
-        !
+          !
+          !     ESTIMATE SON,SOP,CEC IF UNKNOWN
+          ! Tipping et al (2008)   The C:N:P:S stoichiometry of soil organic matter, BIOCHEMISTRY 130:117-131
+          !
           IF(CSoilOrgM_vr(ielmn,L,NY,NX).LT.0.0_r8)THEN
-        !  default ORGN parameterization
+            !  default ORGN parameterization
             CSoilOrgM_vr(ielmn,L,NY,NX)=AMIN1(0.125_r8*CSoilOrgM_vr(ielmc,L,NY,NX),&
               8.9E+02_r8*(CSoilOrgM_vr(ielmc,L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
@@ -791,9 +799,7 @@ module readiMod
       ENDDO
     ENDDO
   ENDDO
-
-  write(*,*)'ieadTo',RSC_vr(1:micpar%NumOfLitrCmplxs,0,1,1)
-
+  Call PrintInfo('end '//subname)
   end associate
   end subroutine readTopoNC
 

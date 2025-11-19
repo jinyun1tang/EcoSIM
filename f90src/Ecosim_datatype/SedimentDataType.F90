@@ -14,7 +14,7 @@ implicit none
   real(r8),target,allocatable ::  SoilDetachability4Erosion2(:,:)   !soil detachability
   real(r8),target,allocatable ::  CER_col(:,:)                      !soil detachment/deposition, [h-1]
   real(r8),target,allocatable ::  XER_col(:,:)                      !soil detachment/deposition shape parameter, [-]
-  real(r8),target,allocatable ::  PrtcleDensitySurfLay_col(:,:)     !particle density of surface layer,[-]
+  real(r8),target,allocatable ::  PtclDensitySurfLay_col(:,:)     !particle density of surface layer,[-]
   real(r8),target,allocatable ::  VLS_col(:,:)                      !hourly sinking rate,[h-1]
   real(r8),target,allocatable ::  SED_col(:,:)                      !sediment transport, [Mg d-2 h-1]
   real(r8),target,allocatable ::  XSand_Eros_2D(:,:,:,:)            !total sand erosion , [Mg d-2 h-1]
@@ -59,7 +59,7 @@ implicit none
   allocate(SoilDetachability4Erosion2(JY,JX));        SoilDetachability4Erosion2=0._r8
   allocate(CER_col(JY,JX));         CER_col=0._r8
   allocate(XER_col(JY,JX));         XER_col=0._r8
-  allocate(PrtcleDensitySurfLay_col(JY,JX));      PrtcleDensitySurfLay_col=0._r8
+  allocate(PtclDensitySurfLay_col(JY,JX));      PtclDensitySurfLay_col=0._r8
   allocate(VLS_col(JY,JX));         VLS_col=0._r8
   allocate(SED_col(JY,JX));         SED_col=0._r8
   allocate(XSand_Eros_2D(2,2,JV,JH));  XSand_Eros_2D=0._r8
@@ -98,7 +98,7 @@ implicit none
   call destroy(SoilDetachability4Erosion2)
   call destroy(CER_col)
   call destroy(XER_col)
-  call destroy(PrtcleDensitySurfLay_col)
+  call destroy(PtclDensitySurfLay_col)
   call destroy(VLS_col)
   call destroy(SED_col)
   call destroy(XSand_Eros_2D)

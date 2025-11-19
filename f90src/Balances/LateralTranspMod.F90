@@ -2,7 +2,7 @@ module LateralTranspMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   USE abortutils,       only: endrun
   use EcoSiMParDataMod, only: micpar
-  use minimathmod,      only: AZMAX1
+  use minimathmod,      only: AZMAX1,safe_adb
   use EcoSIMConfig,     only: jcplx => jcplxc, NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
   use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
   use TracerPropMod,    only: MolecularWeight
@@ -378,10 +378,11 @@ implicit none
   integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
   integer, intent(in) :: N1,N2,N3   !source soil grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
-  integer, intent(in) :: N60      !vertical layer 
+  integer, intent(in) :: N60        !vertical layer 
   integer :: N6
   character(len=*), parameter :: subname='FlowXGrids'
   integer :: LL,K,idsalt,ids,idg,idom
+  real(r8) :: TK_loc
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
@@ -391,7 +392,7 @@ implicit none
   N6=N60
   IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     !locate the vertical layer for the dest grid
-    D1200: DO LL=N6,NL_col(N5,N4)
+    D1200: DO LL=N60,NL_col(N5,N4)
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
@@ -409,12 +410,6 @@ implicit none
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
         THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)
 
-        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)',&
-            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux_col(N5,N4)
-          write(*,*)'Ns=',N1,n2,n3,n4,n5
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
         !not vertical direction or source grid is not at surface
       ELSE
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
@@ -422,12 +417,6 @@ implicit none
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-WaterFlowSoiMacP_3D(N,N6,N5,N4)
         THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
 
-        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
-            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
-          write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
       ENDIF
       !
     ELSE
@@ -438,7 +427,6 @@ implicit none
       WatIceThawMicP_vr(N3,N2,N1)    = 0.0_r8
       WatIceThawMacP_vr(N3,N2,N1)    = 0.0_r8
       THeatSoiThaw_vr(N3,N2,N1)      = 0.0_r8
-
     ENDIF
   ENDIF
   call PrintInfo('end '//subname)

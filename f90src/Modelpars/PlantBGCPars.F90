@@ -282,7 +282,7 @@ module PlantBGCPars
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)
   RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
 
-  RTSK=real((/0.25,1.0,4.0,4.0/),r8)
+  RTSK=real((/0.25,1.0,4.0,6.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)

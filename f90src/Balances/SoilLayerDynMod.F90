@@ -121,9 +121,6 @@ implicit none
     twat=twat+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
   ENDDO
 
-!  if(I==312 .and. J==22)write(211,*)twat,(L,VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,&
-!    L=NU_col(NY,NX),NL_col(NY,NX))
-
   ICHKL=0
   D245: DO L=NU_col(NY,NX),NL_col(NY,NX)-1
     !up -> down
@@ -268,9 +265,9 @@ implicit none
   IF((iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
     .AND. ABS(DORGC_vr(LX)).GT.ZEROS(NY,NX))THEN
 
-!    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
+!    DDLEqv_OrgC = gC2MgOM*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
     !use the new definition, dVol/area
-    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/(SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
+    DDLEqv_OrgC = gC2MgOM*DORGC_vr(LX)/(SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
 
     ! LX is bottom layer, or is litter layer
     IF(LX.EQ.NL_col(NY,NX) .OR. SoilBulkDensity_vr(LX+1,NY,NX).LE.ZERO)THEN 

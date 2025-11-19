@@ -22,9 +22,9 @@ module InitSOMBGCMOD
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
-  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
-  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
+  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes, gC (Mg soil)^-1
+  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes, gN (Mg soil)-1
+  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes, gP (Mg soil)^-1
 
   public :: InitSOMVars
   public :: InitSOMProfile
@@ -97,7 +97,7 @@ module InitSOMBGCMOD
     rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
-    mid_HeterAerobBacter=> micpar%mid_HeterAerobBacter,&    
+    mid_HeterAerobBacter  => micpar%mid_HeterAerobBacter  ,&    
     OHCK                  => micpar%OHCK,                  &
     OMCK                  => micpar%OMCK,                  &
     OQCK                  => micpar%OQCK,                  &
@@ -536,7 +536,7 @@ module InitSOMBGCMOD
   real(r8), intent(in) :: TORGL
   real(r8), intent(in) :: LandScape1stSoiLayDepth
   real(r8), intent(out):: FCX
-  real(r8), intent(out):: CORGCM
+  real(r8), intent(out):: CORGCM   !OM volume in one m3 consolidated soil (excluding pores)
   real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
@@ -630,6 +630,7 @@ module InitSOMBGCMOD
 
   IF(L.GT.0)THEN
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
+      !assume 0.55 of organic matter is carbon
       CORGCM=AMIN1(orgcden,(CORGCX(k_fine_litr)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8

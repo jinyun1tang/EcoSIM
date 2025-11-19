@@ -563,7 +563,7 @@ module UptakesMod
       plt_ew%Transpiration_pft(NZ)  = 0.0_r8
       TKC_pft(NZ)                   = TairK+DeltaTKC_pft(NZ)
       FTHRM                         = EMMC*stefboltz_const*FracPARads2Canopy_pft(NZ)*AREA3(NU)*EMS_scalar_col
-      LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4._r8
+      LWRadCanopy_pft(NZ)           = FTHRM*TKC_pft(NZ)**4
       PSICanopy_pft(NZ)             = TotalSoilPSIMPa_vr(NGTopRootLayer_pft(NZ))
       if(ldo_sp_mode)then
         CCPOLT=0.1_r8

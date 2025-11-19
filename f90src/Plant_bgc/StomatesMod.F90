@@ -319,8 +319,8 @@
   associate(                                                &
     ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft        ,& !input  :threshold zero for plang growth calculation, [-]
     LeafAreaSunlit_zsec  => plt_photo%LeafAreaSunlit_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
-    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :direct incoming PAR, [umol m-2 s-1]
-    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
+    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :sunlit incoming PAR, [umol m-2 s-1]
+    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :shade incoming PAR, [umol m-2 s-1]
     LeafAreaZsec_brch    => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
     TAU_DirectRTransmit  => plt_rad%TAU_DirectRTransmit    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     TAU_RadThru          => plt_rad%TAU_RadThru             & !input  :fraction of radiation transmitted by canopy layer, [-]

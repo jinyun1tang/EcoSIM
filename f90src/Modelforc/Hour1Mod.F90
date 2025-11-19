@@ -1,7 +1,7 @@
 module Hour1Mod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
-  use minimathmod,       only: isclose, AZMAX1, AZMIN1
+  use minimathmod,       only: isclose, AZMAX1, AZMIN1,Viscosity_H2O
   use abortutils,        only: endrun, print_info
   use fileUtil,          only: iulog
   use PlantMod,          only: PlantCanopyRadsModel
@@ -489,7 +489,7 @@ module Hour1Mod
     !     BKVL=soil mass
     !     C*=concentration,ORGC=SOC,SAND=sand,SILT=silt,CLAY=clay
     !     ParticleDens=particle density
-    !     PrtcleDensitySurfLay_col=particle density of surface layer for use in erosion.f
+    !     PtclDensitySurfLay_col=particle density of surface layer for use in erosion.f
     !     POROS=porosity used in diffusivity
     !     VOLA,VOLW,VOLI,VOLP=total,water-,ice-,air-filled micropore volume
     !     VOLAH,VOLWH,VOLIH,VOLPH=total,water-,ice-,air-filled macropore volume
@@ -516,7 +516,7 @@ module Hour1Mod
       CCLAY_vr(L,NY,NX) = 0._r8
     ENDIF
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZERO)THEN
-      CORGCM       = AZMAX1(AMIN1(1.0_r8,MWC2Soil*CSoilOrgM_vr(ielmc,L,NY,NX)))
+      CORGCM       = AZMAX1(AMIN1(1.0_r8,gC2MgOM*CSoilOrgM_vr(ielmc,L,NY,NX)))
       ParticleDens = 1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
       IF(L.EQ.NU_col(NY,NX))THEN
 !surface layer
@@ -856,7 +856,8 @@ module Hour1Mod
   TProd_gas_NH3_geochem_vr(0:NL_col(NY,NX),NY,NX)                                     = 0._r8
   trcx_TRSoilChem_vr(idx_beg:idx_end,0:NL_col(NY,NX),NY,NX)                           = 0._r8
   trcp_RChem_soil_vr(idsp_psoi_beg:idsp_psoi_end,0:NL_col(NY,NX),NY,NX)               = 0._r8
-  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)  
+  TWaterPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                  = TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
+  THeatPlantRoot2SoilPrev_vr(1:NL_col(NY,NX),NY,NX)                                   = THeatLossRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)
   TWaterPlantRoot2Soil_vr(1:NL_col(NY,NX),NY,NX)                                      = 0._r8
   THeatLossRoot2Soil_vr(0:NL_col(NY,NX),NY,NX)                                        = 0._r8
   tRootMycoExud2Soil_vr(1:NumPlantChemElms,1:jcplx,NU_col(NY,NX):NL_col(NY,NX),NY,NX) = 0._r8
@@ -871,6 +872,7 @@ module Hour1Mod
   subroutine SetSurfaceProp4SedErosion(NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  character(len=*), parameter :: subname='SetSurfaceProp4SedErosion'
   integer :: NY,NX
   real(r8) :: BKVLNX
   real(r8) :: CORGM
@@ -878,7 +880,9 @@ module Hour1Mod
   real(r8) :: D50
   real(r8) :: VISCWL
   REAL(R8) :: ZD50
+  
   !     begin_execution
+  call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -893,21 +897,21 @@ module Hour1Mod
       !     ZM=surface roughness used in runoff velocity calculation in watsub.f
       !
       SoilMicPMassLayerMX(NY,NX)=AZMAX1(SoilMicPMassLayerMn(NY,NX)+&
-        MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX))
+        gC2MgOM*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX))
       BKVLNX=SAND_vr(NU_col(NY,NX),NY,NX)+SILT_vr(NU_col(NY,NX),NY,NX) &
         +CLAY_vr(NU_col(NY,NX),NY,NX)+1.82E-06*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)
       IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-        CORGM                               = MWC2Soil*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)/BKVLNX
-        CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = orgcden*CORGM
+        CORGM                                      = gC2MgOM*SoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)/BKVLNX
+        CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX)    = orgcden*CORGM
         CSAND_vr(NU_col(NY,NX),NY,NX)              = SAND_vr(NU_col(NY,NX),NY,NX)/BKVLNX
         CSILT_vr(NU_col(NY,NX),NY,NX)              = SILT_vr(NU_col(NY,NX),NY,NX)/BKVLNX
         CCLAY_vr(NU_col(NY,NX),NY,NX)              = CLAY_vr(NU_col(NY,NX),NY,NX)/BKVLNX
       ELSE
-        CORGM                               = 0._r8
+        CORGM                                   = 0._r8
         CSoilOrgM_vr(ielmc,NU_col(NY,NX),NY,NX) = 0._r8
-        CSAND_vr(NU_col(NY,NX),NY,NX)              = 0._r8
-        CSILT_vr(NU_col(NY,NX),NY,NX)              = 1.0
-        CCLAY_vr(NU_col(NY,NX),NY,NX)              = 0._r8
+        CSAND_vr(NU_col(NY,NX),NY,NX)           = 0._r8
+        CSILT_vr(NU_col(NY,NX),NY,NX)           = 1.0
+        CCLAY_vr(NU_col(NY,NX),NY,NX)           = 0._r8
       ENDIF
       
       D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT_vr(NU_col(NY,NX),NY,NX) &
@@ -917,19 +921,20 @@ module Hour1Mod
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN        
         CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8
-        print*,'SoiSurfRoughness',SoiSurfRoughness(NY,NX)
+
         SoilDetachability4Erosion1(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT_vr(NU_col(NY,NX),NY,NX)-CORGM))
         COHS=2.0_r8+10._r8*(CCLAY_vr(NU_col(NY,NX),NY,NX)+CORGM) &
           +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*totRootLenDens_vr(NU_col(NY,NX),NY,NX)))
         SoilDetachability4Erosion2(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
 
-        PrtcleDensitySurfLay_col(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
-        VISCWL                        = VISCW*EXP(0.533_r8-0.0267_r8*TCS_vr(0,NY,NX))
-        VLS_col(NY,NX)                    = 3.6E+03_r8*9.8_r8*(PrtcleDensitySurfLay_col(NY,NX)-1.0_r8) &
+        PtclDensitySurfLay_col(NY,NX) = 1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
+        VISCWL                        = Viscosity_H2O(TCS_vr(0,NY,NX))
+        VLS_col(NY,NX)                = 3.6E+03_r8*9.8_r8*(PtclDensitySurfLay_col(NY,NX)-1.0_r8) &
           *(ppmc*D50)**2/(18.0_r8*VISCWL)
       ENDIF
     ENDDO
   ENDDO
+  call PrintInfo('end '//subname)
   end subroutine SetSurfaceProp4SedErosion
 !------------------------------------------------------------------------------------------
 
@@ -1415,7 +1420,7 @@ module Hour1Mod
   VGeomLayer_vr(0,NY,NX) = VxcessWatLitR+VLitR_col(NY,NX)
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VLSoilPoreMicP_vr(0,NY,NX) = VGeomLayer_vr(0,NY,NX)
-    VLSoilMicPMass_vr(0,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,0,NY,NX)
+    VLSoilMicPMass_vr(0,NY,NX) = gC2MgOM*SoilOrgM_vr(ielmc,0,NY,NX)
     VLMicP_vr(0,NY,NX)         = AZMAX1(VLitR_col(NY,NX)-VLSoilMicPMass_vr(0,NY,NX)/1.30_r8)
     VLsoiAirP_vr(0,NY,NX)      = AZMAX1(VLMicP_vr(0,NY,NX)-VLWatMicP_vr(0,NY,NX)-VLiceMicP_vr(0,NY,NX))
     IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN

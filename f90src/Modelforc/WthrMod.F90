@@ -100,14 +100,10 @@ module WthrMod
   if(check_warming_dates(iYearCurrent,I,J))then    
     !do this before radiation calculation
     call apply_OTC_warming(I,J,NHW,NHE,NVN,NVS)
+    call apply_IR_warming(I,J,NHW,NHE,NVN,NVS) 
   endif  
 
   call CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
-
-  if(check_warming_dates(iYearCurrent,I,J))then    
-    !modify IR after radiation calculation
-    call apply_IR_warming(I,J,NHW,NHE,NVN,NVS) 
-  endif
 !
 
 !  IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN

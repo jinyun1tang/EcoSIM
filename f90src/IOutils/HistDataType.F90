@@ -212,6 +212,7 @@ implicit none
   real(r8),pointer   :: h1D_frcPARabs_ptc(:)  
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    
   real(r8),pointer   :: h1D_PAR_col(:)        
+  real(r8),pointer   :: h1d_fPAR_col(:)
   real(r8),pointer   :: h1D_Plant_C_ptc(:)    
   real(r8),pointer   :: h1D_Plant_N_ptc(:)    
   real(r8),pointer   :: h1D_Plant_P_ptc(:)    
@@ -557,6 +558,8 @@ implicit none
   real(r8),pointer   :: h2D_HeatUptk_vr(:,:)   
   real(r8),pointer   :: h2D_HeatFlow_vr(:,:)   
   real(r8),pointer   :: h2D_VSPore_vr(:,:)
+  real(r8),pointer   :: h2D_FLO_MICP_vr(:,:)
+  real(r8),pointer   :: h2D_FLO_MACP_vr(:,:)
   real(r8),pointer   :: h2D_rVSM_vr(:,:)    
   real(r8),pointer   :: h2D_rVSICE_vr(:,:)   
   real(r8),pointer   :: h2D_PSI_vr(:,:)        
@@ -765,6 +768,7 @@ implicit none
   allocate(this%h1D_CondGasXSurf_col(beg_col:end_col)); this%h1D_CondGasXSurf_col(:)=spval
   allocate(this%h1D_CANET_col(beg_col:end_col))           ;this%h1D_CANET_col(:)=spval
   allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
+  allocate(this%h1d_fPAR_col(beg_col:end_col));   this%h1d_fPAR_col(:)=spval
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
   allocate(this%h1D_tHeat_col(beg_col:end_col))           ;this%h1D_tHeat_col(:)=spval
   allocate(this%h1D_SNOWPACK_col(beg_col:end_col))        ;this%h1D_SNOWPACK_col(:)=spval
@@ -1123,6 +1127,8 @@ implicit none
   allocate(this%h2D_HeatUptk_vr(beg_col:end_col,1:JZ))   ;this%h2D_HeatUptk_vr(:,:)=spval
   allocate(this%h2D_rVSM_vr    (beg_col:end_col,1:JZ))     ;this%h2D_rVSM_vr    (:,:)=spval
   allocate(this%h2D_VSPore_vr (beg_col:end_col,1:JZ))     ;this%h2D_VSPore_vr (:,:)=spval
+  allocate(this%h2D_FLO_MICP_vr(beg_col:end_col,1:JZ)) ;this%h2D_FLO_MICP_vr(:,:)=spval
+  allocate(this%h2D_FLO_MACP_vr(beg_col:end_col,1:JZ)) ;this%h2D_FLO_MACP_vr(:,:)=spval  
   allocate(this%h2D_rVSICE_vr    (beg_col:end_col,1:JZ))       ;this%h2D_rVSICE_vr    (:,:)=spval
   allocate(this%h2D_PSI_vr(beg_col:end_col,1:JZ))        ;this%h2D_PSI_vr(:,:)=spval
   allocate(this%h2D_PsiO_vr(beg_col:end_col,1:JZ)) ; this%h2D_PsiO_vr(:,:)=spval
@@ -1827,6 +1833,11 @@ implicit none
   call hist_addfld1d(fname='PAR_col',units='umol m-2 s-1',avgflag='A',&
     long_name='Direct plus diffusive incoming photosynthetic photon flux density',&
     ptr_col=data1d_ptr,default='inactive')      
+
+  data1d_ptr => this%h1d_fPAR_col(beg_col:end_col)
+  call hist_addfld1d(fname='fPAR_col',units='-',avgflag='P',&
+    long_name='Fraction of absorbed PAR by canopy',&
+    ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CO2_WetDep_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='CO2_WetDep_FLX_col',units='gC/m2/hr',&
@@ -3303,6 +3314,14 @@ implicit none
   call hist_addfld2d(fname='rWatFLP_vr',units='m3 H2O/m3 soil pore',type2d='levsoi',avgflag='A',&
     long_name='Fraction of soil porosity filled by water (relative saturation)',ptr_col=data2d_ptr)       
 
+  data2d_ptr => this%h2D_FLO_MICP_vr(beg_col:end_col,1:JZ)      
+  call hist_addfld2d(fname='MicPFlo_vr',units='mm H2O h-1',type2d='levsoi',avgflag='A',&
+    long_name='Micropore water flow (>0) into soil layer',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_FLO_MACP_vr(beg_col:end_col,1:JZ)        !ThetaH2OZ_vr(1:JZ,NY,NX)
+  call hist_addfld2d(fname='MacPFlo_vr',units='mm H2O h-1',type2d='levsoi',avgflag='A',&
+    long_name='Macropore water flow (>0) into soil',ptr_col=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_rVSICE_vr(beg_col:end_col,1:JZ)        
   call hist_addfld2d(fname='rIceFLP_vr',units='m3 ice/m3 soil pore',type2d='levsoi',avgflag='A',&
     long_name='fraction of soil porosity filled by ice',ptr_col=data2d_ptr,default='inactive')       
@@ -3652,7 +3671,7 @@ implicit none
       this%h1D_N2O_LITR_col(ncol)         = trc_solcl_vr(idg_N2O,0,NY,NX)
       this%h1D_NH3_LITR_col(ncol)         = trc_solcl_vr(idg_NH3,0,NY,NX)
       this%h1D_SOL_RADN_col(ncol)         = RadSWSolarBeam_col(NY,NX)*MJ2W
-      this%h1D_AIR_TEMP_col(ncol)         = TCA_col(NY,NX)
+      this%h1D_AIR_TEMP_col(ncol)         = TairK_col(NY,NX)-273.15_r8
       this%h1D_HUM_col(ncol)              = VPK_col(NY,NX)
       this%h1D_PATM_col(ncol)             = PBOT_col(NY,NX)
       this%h1D_WIND_col(ncol)             = WindSpeedAtm_col(NY,NX)/secs1hour
@@ -3801,6 +3820,7 @@ implicit none
       this%h1D_tDOP_soil_col(ncol)=0._r8            
       this%h1D_tAcetate_soil_col(ncol)=0._r8      
       this%h1D_FreeNFix_col(ncol)=Micb_N2Fixation_vr(0,NY,NX)
+
       DO L=1,JZ        
         call SumSolidOML(ielmc,L,NY,NX,SOMC)
         DO jj=1,jcplx
@@ -3873,6 +3893,8 @@ implicit none
         this%h2D_HeatFlow_vr(ncol,L)        = THeatFlowCellSoil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_HeatUptk_vr(ncol,L)        = THeatLossRoot2Soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_VSPore_vr(ncol,L)          = POROS_vr(L,NY,NX)
+        this%h2D_FLO_MICP_vr(ncol,L)        = m2mm*TWatFlowCellMicP_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_FLO_MACP_vr(ncol,L)        = m2mm*TWatFlowCellMacP_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_rVSM_vr    (ncol,L)        = ThetaH2OZ_vr(L,NY,NX)
         this%h2D_rVSICE_vr  (ncol,L)        = ThetaICEZ_vr(L,NY,NX)
         this%h2D_PSI_vr(ncol,L)             = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
@@ -4010,7 +4032,7 @@ implicit none
 
       this%h1D_RootAR_col(ncol)  = -AZERO(RootCO2Autor_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RootCO2Relez_col(ncol)=RootCO2Emis2Root_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
-      this%h1D_QTRANSP_col(ncol) = 0._r8
+      this%h1d_fPAR_col(ncol) = 0._r8
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
@@ -4070,7 +4092,8 @@ implicit none
         this%h1D_TC_Groth_ptc(nptc)      = TCGroth_pft(NZ,NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)
-        this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s        
+        this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s      
+        this%h1d_fPAR_col(ncol)          = this%h1d_fPAR_col(ncol)+RadPARbyCanopy_pft(NZ,NY,NX)
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)       = (ShootElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4298,6 +4321,7 @@ implicit none
         this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         
       ENDDO 
+      this%h1d_fPAR_col(ncol)=safe_adb(this%h1d_fPAR_col(ncol),RadPARSolarBeam_col(NY,NX))
     ENDDO 
   ENDDO    
   call PrintInfo('end '//subname)

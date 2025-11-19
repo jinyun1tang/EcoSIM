@@ -806,7 +806,8 @@ implicit none
   call writefixsl(nu_plt,'Plant name ',pft_lname,60)
   strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,60)
-
+  write(nu_plt,*)('-',j=1,110)
+  write(nu_plt,*)'GENERAL CLASS INFORMATION'
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
     strval='C3'
@@ -815,7 +816,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photosynthesis pathway',strval,60)
+  call writefixsl(nu_plt,'ICTYP: Photosynthesis pathway',strval,60)
 
   select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
@@ -824,10 +825,12 @@ implicit none
     strval='Intermediate root profile, like herbs'
   case (2)
     strval='Deep root profile, like trees'
+  case (3)
+    strval='IVery deep tap root profile'  
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Root profile pattern',strval,60)
+  call writefixsl(nu_plt,'IGTYP: Root profile pattern',strval,60)
 
   select case (iPlantPhenolPattern_pft(NZ,NY,NX))
   case (0)
@@ -837,7 +840,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Life cycle',strval,60)
+  call writefixsl(nu_plt,'ISTYP: Life cycle',strval,60)
 
   select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
@@ -847,7 +850,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Growth pattern IDTYP',strval,60)
+  call writefixsl(nu_plt,'IDTYP: Growth pattern',strval,60)
 
   select case (iPlantNfixType_pft(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
@@ -867,7 +870,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,60)
+  call writefixsl(nu_plt,'INTYP: N-fixation symbiosis',strval,60)
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
@@ -881,7 +884,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Phenology type IWTYP',strval,60)
+  call writefixsl(nu_plt,'IWTYP: Phenology type',strval,60)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)
@@ -893,7 +896,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,60)
+  call writefixsl(nu_plt,'IPTYP: Photoperiod',strval,60)
 
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -918,7 +921,7 @@ implicit none
       write(strval,'(A,I2)')'Undefined herbaceous pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
   endif
-  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,60)
+  call writefixsl(nu_plt,'IBTYP: Biome turnover pattern',strval,60)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
@@ -928,7 +931,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Storage organ IRTYP',strval,60)
+  call writefixsl(nu_plt,'IRTYP: Storage organ',strval,60)
 
   select case(Myco_pft(NZ,NY,NX))
   case (1)
@@ -938,7 +941,7 @@ implicit none
   case default
     strval='Wrong option'
   end select
-  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,60)
+  call writefixsl(nu_plt,'MY   : Mycorrhizal association MY',strval,60)
 
   if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
     write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
@@ -954,7 +957,7 @@ implicit none
     write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   endif
   
-  call writefixsl(nu_plt,'Growing season thermal adaptation zone ZTYPI',strval,60)
+  call writefixsl(nu_plt,'ZTYPI: Growing season thermal adaptation zone',strval,60)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -1054,8 +1057,8 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'RRAD1M','Radius of fine roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
-  call writefixl(nu_plt,'RRAD2M','Radius of root hairs [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RRAD1M','Radius of primary root tip [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PR','Nonstructural C concentration needed for root'// &
     ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),105)
@@ -1133,8 +1136,8 @@ implicit none
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
 
-  call writefixl(nu_plt,'CNWR','Plant root protein C to N ratio [gN (gC)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
-  call writefixl(nu_plt,'CNWL','Plant leaf protein C to N ratio [gN (gC)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
+  call writefixl(nu_plt,'CNWR','Plant root protein C to N ratio [g protein C (g root N)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CNWL','Plant leaf protein C to N ratio [g protein C (g leaf N)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
   call writefixl(nu_plt,'CNWF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)  
   call writefixl(nu_plt,'CNLF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNSHE','Plant petiole NC ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
@@ -1145,8 +1148,8 @@ implicit none
   call writefixl(nu_plt,'CNGR','Plant grain NC ratio [gN (gC)-1]',rNCGrain_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNRT','Plant root NC ratio [gN (gC)-1]',rNCRoot_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNND','Plant nodule NC ratio [gN (gC)-1]',rNCNodule_pft(NZ,NY,NX),100)
-  call writefixl(nu_plt,'CPWR','Plant root protein C to P ratio [gP (gC)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
-  call writefixl(nu_plt,'CPWL','Plant leaf protein C to P ratio [gP (gC)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CPWR','Plant root protein C to P ratio [g protein C (g root P)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CPWL','Plant leaf protein C to P ratio [g protein C (g leaf P)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
   call writefixl(nu_plt,'CPLF','Plant leaf PC ratio [gP (gC)-1]',rPCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSHE','Plant petiole PC ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSTK','Plant stalk PC ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)

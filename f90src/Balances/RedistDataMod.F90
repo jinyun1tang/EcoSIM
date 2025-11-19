@@ -35,9 +35,9 @@ implicit none
   real(r8),allocatable ::  trcx_TER_col(:,:,:)                      !column exchangeable cation loss through erosion (<0 loss)[mol d-2 h-1]
   real(r8),allocatable ::  trcp_TER_col(:,:,:)                      !column precipitated salt loss through erosion (<0 loss) [mol d-2 h-1]
   real(r8),allocatable ::  tErosionSedmLoss_col(:,:)                !column sediment loss through erosion (<0 loss) [g d-2 h-1]
-  real(r8),allocatable ::  TWatFlowCellMicP_vr(:,:,:)               !
+
   real(r8),allocatable ::  TWatFlowCellMicPX_vr(:,:,:)              !
-  real(r8),allocatable ::  TWatFlowCellMacP_vr(:,:,:)               !
+
   real(r8),allocatable ::  trcg_SurfRunoff_flx(:,:,:)               !
   real(r8),allocatable ::  Gas_AdvDif_Flx_vr(:,:,:,:)               !gas flux into the grid through advection and diffusion [g d-2 h-1]
 
@@ -95,9 +95,9 @@ implicit none
   allocate(trcs_TransptMicP_vr(ids_beg:ids_end,JZ,JY,JX));   trcs_TransptMicP_vr=0._r8
 
   allocate(tErosionSedmLoss_col(JY,JX));      tErosionSedmLoss_col=0._r8
-  allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
+
   allocate(TWatFlowCellMicPX_vr(JZ,JY,JX));    TWatFlowCellMicPX_vr=0._r8
-  allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
+
   allocate(WatIceThawMicP_vr(JZ,JY,JX));    WatIceThawMicP_vr=0._r8
   allocate(THeatSoiThaw_vr(JZ,JY,JX));   THeatSoiThaw_vr=0._r8
   allocate(WatIceThawMacP_vr(JZ,JY,JX));   WatIceThawMacP_vr=0._r8
@@ -157,9 +157,7 @@ implicit none
   call destroy(TNUreaErosBand_molN_col)
   call destroy(TNO3ErosBand_molN_col)
   call destroy(tErosionSedmLoss_col)
-  call destroy(TWatFlowCellMicP_vr)
   call destroy(TWatFlowCellMicPX_vr)
-  call destroy(TWatFlowCellMacP_vr)
   call destroy(WatIceThawMicP_vr)
   call destroy(THeatSoiThaw_vr)
   call destroy(WatIceThawMacP_vr)

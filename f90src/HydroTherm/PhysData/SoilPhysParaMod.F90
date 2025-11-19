@@ -1,12 +1,13 @@
 module SoilPhysParaMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod, only: micpar
+  use DebugToolMod,     only: PrintInfo
   USE SoilWaterDataType
   use SoilPropertyDataType
   USE SoilPhysDataType
   use EcoSIMCtrlDataType
   use HydroThermData
   use PhysPars
-  use EcoSiMParDataMod, only : micpar
   use EcoSimConst
   use FlagDataType
   USE AqueChemDatatype
@@ -23,6 +24,10 @@ implicit none
   public :: SetDeepSoil
   public :: CalcSoilThermConductivity
   public :: get_Tfrez
+  public :: ComputePsiMCM  
+  public :: ComputePSIPond
+  public :: getMoistK
+
   contains
 !------------------------------------------------------------------------------------------
   subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
@@ -33,7 +38,6 @@ implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
   real(r8), intent(out) :: PSISoilMatric      ! soil matric potential
   real(r8), optional, intent(out) :: THETA1S  ! porosity
-  real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX
   real(r8) :: THETA1                          !volumetric soil moisture
   !     BKVL=soil mass
   !     FC,WP=water contents at field capacity,wilting point
@@ -51,17 +55,7 @@ implicit none
 
   IF(VLSoilMicPMass_vr(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil
-    IF(THETA1.LT.FieldCapacity_vr(N3,N2,N1))THEN
-      !water less than field capacity
-      !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
-      !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N2,N1)+((LOGFldCapacity_vr(N3,N2,N1)-LOG(THETA1))/FCD_vr(N3,N2,N1)*LOGPSIMND_col(N2,N1))))
-    ELSEIF(THETA1.LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(THETA1))/PSD_vr(N3,N2,N1))**SRP_vr(N3,N2,N1)*LOGPSIMXD_col(N2,N1)))
-    ELSE
-      THETA1        = POROS_vr(N3,N2,N1)
-      PSISoilMatric = PSISE_vr(N3,N2,N1)
-    ENDIF
+    call ComputePsiMCM(N3,N2,N1,THETA1,PSISoilMatric)    
     !
     !     SUBSURFCE UPPER WATER LAYER
     !
@@ -70,21 +64,7 @@ implicit none
     !     PSISoilMatric=matric water potential
     !
   ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-    FCX  = FCI*FracSoiPAsIce_vr(N3,N2,N1)
-    WPX  = WPI*FracSoiPAsIce_vr(N3,N2,N1)
-    FCLX = LOG(FCX)
-    WPLX = LOG(WPX)
-    PSDX = LOGPOROS_vr(N3,N2,N1)-FCLX
-    FCDX = FCLX-WPLX
-    IF(FracSoiPAsWat_vr(N3,N2,N1).LT.FCX)THEN
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N2,N1)+((FCLX-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/FCDX*LOGPSIMND_col(NY,NX))))
-    ELSEIF(FracSoiPAsWat_vr(N3,N2,N1).LT.POROS_vr(N3,N2,N1)-DTHETW)THEN
-      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS_vr(N3,N2,N1)-LOG(FracSoiPAsWat_vr(N3,N2,N1)))/PSDX)*LOGPSIMXD_col(N2,N1)))
-    ELSE
-      !saturated
-      THETA1        = POROS_vr(N3,N2,N1)
-      PSISoilMatric = PSISE_vr(N3,N2,N1)
-    ENDIF
+    call ComputePSIPond(N3,N2,N1,FracSoiPAsIce_vr(N3,N2,N1),FracSoiPAsWat_vr(N3,N2,N1),THETA1,PSISoilMatric)
   ELSE
     THETA1        = POROS_vr(N3,N2,N1)
     PSISoilMatric = PSISE_vr(N3,N2,N1)
@@ -94,6 +74,36 @@ implicit none
   end subroutine CalcSoilWatPotential
 !------------------------------------------------------------------------------------------
 
+  subroutine ComputePSIPond(L,NY,NX,ThetafI,ThetafW,ThetaW,PSI)
+  implicit none
+  integer, intent(in) :: L,NY,NX
+  real(r8), intent(in) :: ThetafI
+  real(r8), intent(inout) :: ThetafW
+  real(r8), intent(inout) :: ThetaW
+  real(r8), intent(out) :: PSI
+  real(r8) :: FCX,WPX,FCLX,WPLX,PSDX,FCDX
+  character(len=*), parameter :: subname='ComputePSIPond'
+
+  call PrintInfo('beg '//subname)
+  FCX  = FCI*ThetafI
+  WPX  = WPI*ThetafI
+  FCLX = LOG(FCX)
+  WPLX = LOG(WPX)
+  PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
+  FCDX = FCLX-WPLX
+  IF(ThetafW.LT.FCX)THEN
+    !less than field capacity
+    PSI=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+(FCLX-LOG(ThetafW))*LOGPSIMND_col(NY,NX)/FCDX))
+  ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW)THEN
+    !more than field capacity
+    PSI=-EXP(LOGPSIAtSat(NY,NX)+(LOGPOROS_vr(L,NY,NX)-LOG(ThetafW))*LOGPSIMXD_col(NY,NX)/PSDX)
+  ELSE
+    ThetaW = POROS_vr(L,NY,NX)
+    PSI    = PSISE_vr(L,NY,NX)
+  ENDIF
+  call PrintInfo('end '//subname)
+  end subroutine ComputePSIPond
+!------------------------------------------------------------------------------------------
 
   subroutine SetDeepSoil(NY,NX,NM,JZ)
 
@@ -178,6 +188,10 @@ implicit none
 
 !------------------------------------------------------------------------------------------
   subroutine CalcSoilThermConductivity(N1,N2,N3,DTKX,TCND1)
+  !
+  !Description
+  !Compute soil thermal conductivity
+  !
   implicit none
   integer , intent(in) :: N1,N2,N3
   real(r8), intent(in) :: DTKX     !absolute temeprature gradient
@@ -188,10 +202,10 @@ implicit none
 
   IF(SoilBulkDensity_vr(N3,N2,N1).GT.ZERO .OR. FracSoiPAsWat_vr(N3,N2,N1)+FracSoiPAsIce_vr(N3,N2,N1).GT.ZERO)THEN
     !it is a soil layer or pure water layer
-    HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3._r8
-    HeatDiffusByAir1     = AZMAX1(FracAirFilledSoilPore_vr(N3,N2,N1)-TRBA)**3._r8
-    RYLXW1               = DTKX*HeatDiffusByWat1
-    RYLXA1               = DTKX*HeatDiffusByAir1
+    HeatDiffusByWat1     = AZMAX1(FracSoiPAsWat_vr(N3,N2,N1)-TRBW)**3
+    HeatDiffusByAir1     = AZMAX1(FracAirFilledSoilPore_vr(N3,N2,N1)-TRBA)**3
+    RYLXW1               = DTKX*HeatDiffusByWat1*1.e-6_r8  !
+    RYLXA1               = DTKX*HeatDiffusByAir1*1.e-6_r8  !convert into energy scale MJ
     RYLNW1               = AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
     RYLNA1               = AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
     XNUSW1               = AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
@@ -223,4 +237,43 @@ implicit none
   TFREEZ  = -9.0959E+04_r8/(AMAX1(PSI,-5.5_r8)-LtHeatIceMelt)
 
   END function get_Tfrez  
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ComputePsiMCM(N6,N5,N4,THETWL,PSISM1)
+  !
+  !Description
+  !Compute soil matric pressure
+  implicit none
+  integer, intent(in) :: N6,N5,N4
+  real(r8), intent(inout) :: THETWL  !liquid water content, [m3 H2O d-2]
+  real(r8), intent(out) :: PSISM1    !Soil matric pressure [MPa]
+  character(len=*), parameter :: subname='ComputePsiMCM'
+
+  call PrintInfo('beg '//subname)
+  IF(THETWL.LT.FieldCapacity_vr(N6,N5,N4))THEN
+    !less than field capacity
+    PSISM1=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(N5,N4)+((LOGFldCapacity_vr(N6,N5,N4)-LOG(THETWL)) &
+      /FCD_vr(N6,N5,N4)*LOGPSIMND_col(N5,N4))))
+  ELSEIF(THETWL.LT.POROS_vr(N6,N5,N4)-DTHETW)THEN
+    PSISM1=-EXP(LOGPSIAtSat(N5,N4)+(((LOGPOROS_vr(N6,N5,N4)-LOG(THETWL)) &
+      /PSD_vr(N6,N5,N4))**SRP_vr(N6,N5,N4)*LOGPSIMXD_col(N5,N4)))
+  ELSE
+    !saturated
+    THETWL = POROS_vr(N6,N5,N4)
+    PSISM1 = PSISE_vr(N6,N5,N4)
+  ENDIF
+  call PrintInfo('end '//subname)
+  END subroutine ComputePsiMCM
+
+!------------------------------------------------------------------------------------------
+  pure function getMoistK(thetawl,pores)result(K)
+  implicit none
+  real(r8), intent(in) :: thetawl  !liquid water [m3 H2O d-2]
+  real(r8), intent(in) :: pores    !pore space [m3 pores d-2]
+  integer :: K
+
+  K=MAX(1,MIN(100,101-INT(100.0_r8*thetawl/pores)))
+  end function getMoistK
+
 end  module SoilPhysParaMod

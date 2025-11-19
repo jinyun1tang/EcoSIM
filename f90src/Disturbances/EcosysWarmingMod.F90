@@ -281,6 +281,13 @@ module EcosysWarmingMod
           warm_IR_power=warm_IR_power*3600._r8*1.e-6_r8 
         endif
       endif
+    case('dT')
+      if(extract_number_and_unit(values(kk), warm_dTK, unit_out))then
+        !if Fahrenheit, scale it to K 
+        if (trim(unit_out)=='F')warm_dTK=warm_dTK*0.5556_r8
+      else
+        call endrun("warming temperature not set in "//mod_filename,__LINE__)
+      endif            
     case ('beg_time')
       call Extract_year_doy(trim(values(kk)),warm_yearb,warm_doyb) 
     case ('end_time')
@@ -310,8 +317,8 @@ module EcosysWarmingMod
       endif
     end select
   ENDDO
-  write(iulog,*)'IR heating uisng ',warm_IR_power*1.e6_r8/3600._r8, 'W m-2'
-
+  write(iulog,*)'IR heating uisng ',warm_dTK, 'K'
+  
   call PrintInfo('end '//subname)
   end subroutine set_IR_heating
 
@@ -534,7 +541,7 @@ module EcosysWarmingMod
   !
   !Description
   !Apply infrared warming
-  use ClimForcDataType,  only: SkyLonwRad_col,SineSunInclAngle_col
+  use ClimForcDataType,  only: TairK_col,SineSunInclAngle_col
   use GridDataType,      only: AREA_3D, NU_col
   use PlantDataRateType, only: GrossCO2Fix_pft
   implicit none
@@ -553,7 +560,7 @@ module EcosysWarmingMod
 
         season_chk=check_warming_season(I,NY,NX)
         if(daytime_chk .and. season_chk)then
-          SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+warm_IR_power
+          TairK_col(NY,NX)=TairK_col(NY,NX)+warm_dTK          
         endif  
       endif
     ENDDO

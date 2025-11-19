@@ -1783,9 +1783,10 @@ module PlantBranchMod
       !
       TotLeafElevation = 0._r8
       D555: DO N=NumLeafZenithSectors1,1,-1
+        !assuming the maximum growth rate in 30 mm/hour, note bamboo can growth as fast as 38 mm per hour.
         LeafElevation = SineLeafAngle(N)*LeafAngleClass_pft(N,NZ)*LeafLength
-        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
-        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
+        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.03_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
+        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.03_r8,HeightLeafLow+LeafElevation)
 
         LU            = 0
         LL            = 0
@@ -2651,12 +2652,12 @@ module PlantBranchMod
   real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: TurgEff4CanopyResp
   integer :: NE
-  real(r8) :: CPOOLD
+  real(r8) :: NonstElmGradt
   real(r8) :: FracCanopyCinStalk
   real(r8) :: ShootBiomC_brch
   real(r8) :: WVSTBX
   real(r8) :: WTRTTX,WTRSBX
-  real(r8) :: WTRVCX
+  real(r8) :: WTRVCX,CPOOLT
   real(r8) :: XFRE(1:NumPlantChemElms)
   logical :: PlantingChk,RemobChk,LeafOutChk,AnnualPlantChk,LeafMobil4OutChk
   ! begin_execution
@@ -2779,31 +2780,44 @@ module PlantBranchMod
     ENDIF
 
   ENDIF
-!
-!   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
-!   SEASONAL STORAGE POOL
-!
-!   SapwoodBiomassC_brch,WVSTK=stalk,total stalk sapwood mass
-!   WTRT=total root mass
-!   WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-!   XFRX=maximum storage C content for remobiln from stalk,root reserves
-!   XFRE(ielmc)=C transfer
-!   Q: why are nitrogen and phosphorus not transferred?
+  !
+  !   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
+  !   SEASONAL STORAGE POOL 
+  !
+  !   SapwoodBiomassC_brch,WVSTK=stalk,total stalk sapwood mass
+  !   WTRT=total root mass
+  !   WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
+  !   XFRX=maximum storage C content for remobiln from stalk,root reserves
+  !   XFRE(ielmc)=C transfer
+  !   Q: why are nitrogen and phosphorus not transferred?
+   
   IF(SapwoodBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ)  &
     .AND. CanopySapwoodC_pft(NZ).GT.ZERO4Groth_pft(NZ)  &
     .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) &
     .AND. StalkRsrvElms_brch(ielmc,NB,NZ).LE.XFRX*SapwoodBiomassC_brch(NB,NZ))THEN
+
     FracCanopyCinStalk              = SapwoodBiomassC_brch(NB,NZ)/CanopySapwoodC_pft(NZ)
     WVSTBX                          = SapwoodBiomassC_brch(NB,NZ)
     WTRTTX                          = RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
     ShootBiomC_brch                 = WVSTBX+WTRTTX
     WTRSBX                          = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
     WTRVCX                          = AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FracCanopyCinStalk)
-    CPOOLD                          = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
-
-    XFRE(ielmc)                     = AZMAX1(XFRY*CPOOLD)
+    NonstElmGradt                          = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
+    !seasonal storage -> branch non-structrual
+    XFRE(ielmc)                     = XFRY*AZMAX1(NonstElmGradt)
     StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
     SeasonalNonstElms_pft(ielmc,NZ) = SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
+
+    CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
+    DO NE=2,NumPlantChemElms
+      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+      WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FracCanopyCinStalk)
+      !achor for seasonal storage is root, achor for stalkrsv is sap
+      NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT
+      XFRE(NE)                          = XFRY*AZMAX1(NonstElmGradt)
+      StalkRsrvElms_brch(ielmc,NB,NZ)   = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(NE)
+      SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRE(NE)
+    ENDDO
   ENDIF
   end associate
   end subroutine BranchElmntTransfer

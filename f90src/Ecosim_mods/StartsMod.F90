@@ -340,7 +340,8 @@ module StartsMod
   REAL(R8),INTENT(IN) :: LandScape1stSoiLayDepth
   character(len=*), parameter :: subname='InitSoilProfile'
   integer  :: L,M,K,N,KK,NN
-  real(r8) :: CORGCM,HCX,TORGC
+  real(r8) :: CORGCM          !organic matter volume concentration in cm3
+  real(r8) :: HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
   REAL(R8) :: PTDS
   real(r8) :: TORGM
@@ -414,9 +415,9 @@ module StartsMod
     !     VOLW,VOLWH=micropore,macropore water volume(m3)
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
-    !
+    !     PSISoilAirEntry_vr: soil matric potential at air entry point [MPa]
     PSISE_vr(L,NY,NX)               = PSIPS
-    PSISoilAirEntry(L,NY,NX)        = -1.5E-03_r8
+    PSISoilAirEntry_vr(L,NY,NX)           = -1.5E-03_r8
     RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
     RGasTranspFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
     RO2AquaSourcePrev_vr(L,NY,NX)   = 0.0_r8
@@ -426,7 +427,9 @@ module StartsMod
     IF(L.GT.0)THEN
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
-        !compute particle density
+        !compute particle density,
+        !particle density of solid OM is about 1.20~1.4 g/cm3, while 
+        !particle density for minearl soil is about 2.66 g/cm3
         PTDS              = ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-(SoilBulkDensity_vr(L,NY,NX)/PTDS))        
       ELSE
@@ -445,7 +448,7 @@ module StartsMod
       !     VHCM,VHCP=volumetric dry,wet soil heat capacity (MJ m-3 K-1)
       !     TKS_vr,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
-!
+      !
       SAND_vr(L,NY,NX)=CSAND_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
       SILT_vr(L,NY,NX)=CSILT_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
       CLAY_vr(L,NY,NX)=CCLAY_vr(L,NY,NX)*VLSoilMicPMass_vr(L,NY,NX)
@@ -909,7 +912,7 @@ module StartsMod
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)     = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
-      VLSoilMicPMass_vr(L,NY,NX) = MWC2Soil*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
+      VLSoilMicPMass_vr(L,NY,NX) = gC2MgOM*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
       !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX)
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA_3D(3,L,NY,NX)
@@ -971,15 +974,15 @@ module StartsMod
 
   NPR           = NCYC_LITR     !sub-cycles of litter
   NPS           = NCYC_SNOW     !sub-cycles of snow iteration
-  dts_HeatWatTP = 1.0_r8/NPH
-  dt_GasCyc     = 1.0_r8/NPT
-  dts_gas       = 1.0_r8/NPG
-  XNPR          = 1.0_r8/NPR
-  XNPS          = 1.0_r8/NPS
+  dts_HeatWatTP = 0.99999_r8/NPH
+  dt_GasCyc     = 0.99999_r8/NPT
+  dts_gas       = 0.99999_r8/NPG
+  XNPR          = 0.99999_r8/NPR
+  XNPS          = 0.99999_r8/NPS
 
   XNPV      = XNPR*XNPS
   XNPD      = 600.0_r8*dts_gas                     !600. is adjustable
-  dts_wat   = AMIN1(1.0_r8,10.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update, no greater than 1 hour
+  dts_wat   = AMIN1(1.0_r8,10.0_r8*dts_HeatWatTP)*0.99999_r8  !adjust/recompute the time step for water/heat update, no greater than 1 hour
   dts_sno   = dts_wat*XNPS
   XNPB      = dts_wat*XNPR                         !vapor flux in litter iteration
   dt_watvap = dts_wat*XNPV
@@ -1077,7 +1080,9 @@ module StartsMod
       LOGPSIAtSat(NY,NX) = LOG(-PSIPS)
       LOGPSIFLD_col(NY,NX)   = LOG(-PSIAtFldCapacity_col(NY,NX))
       LOGPSIMN_col(NY,NX)    = LOG(-PSIAtWiltPoint_col(NY,NX))
+      !for moisture interpolation between field capacity and saturation
       LOGPSIMXD_col(NY,NX)   = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
+      !for moisture interpolation between wilting point and field capacity
       LOGPSIMND_col(NY,NX)   = LOGPSIMN_col(NY,NX)-LOGPSIFLD_col(NY,NX)
 
 !     VLSoilMicPMass_vr(0,NY,NX)=0.0_r8
