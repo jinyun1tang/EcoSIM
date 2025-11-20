@@ -395,7 +395,7 @@ contains
   IF(VGeomLayer_vr(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     SoilBulkDensity_vr(0,NY,NX)=VLSoilMicPMass_vr(0,NY,NX)/VGeomLayer_vr(0,NY,NX)
   ELSE
-    SoilBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
+    SoilBulkDensity_vr(0,NY,NX)=BulkDensLitR(micpar%k_fine_comp)
   ENDIF
   SoilWatAirDry_vr(0,NY,NX)=EXP((LOGPSIFLD_col(NY,NX)-LOG(-PSIHY))*FCD_vr(0,NY,NX)/LOGPSIMND_col(NY,NX)+LOGFldCapacity_vr(0,NY,NX))
   SUM2             =0.0_r8

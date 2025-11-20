@@ -165,8 +165,8 @@ implicit none
   pltpar%icarbhyro               = micpar%icarbhyro
   pltpar%icellulos               = micpar%icellulos
   pltpar%ilignin                 = micpar%ilignin
-  pltpar%k_woody_litr            = micpar%k_woody_litr
-  pltpar%k_fine_litr             = micpar%k_fine_litr
+  pltpar%k_woody_comp            = micpar%k_woody_comp
+  pltpar%k_fine_comp             = micpar%k_fine_comp
 
   !the following variable should be consistent with the soil bgc model
   pltpar%jcplx                = micpar%jcplx

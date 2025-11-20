@@ -410,7 +410,7 @@ module StartqMod
 !
 !     SeedDepth_pft=seeding depth(m) from PFT management file
 !     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
-!     NG,NIX,NIXBotRootLayer_raxes=seeding,upper,lower rooting layer
+!     NG,NIX,NRoot1stTipLay_raxes=seeding,upper,lower rooting layer
 !     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
@@ -431,12 +431,12 @@ module StartqMod
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
 
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
-      .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
+      .AND. SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
       NMaxRootBotLayer_pft(NZ,NY,NX) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
-        NIXBotRootLayer_raxes(NR,NZ,NY,NX)=L
+        NRoot1stTipLay_raxes(NR,NZ,NY,NX)=L
       ENDDO D9790
     ENDIF
   ENDDO D9795  

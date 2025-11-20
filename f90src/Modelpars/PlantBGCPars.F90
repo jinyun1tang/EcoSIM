@@ -84,7 +84,7 @@ module PlantBGCPars
   real(r8) :: RCCYN                               !maximum fractions for bacteria C recycling,[-]
   real(r8) :: RCCXN                               !maximum fractions for bacteria N recycling,[-]
   real(r8) :: RCCQN                               !maximum fractions for bacteria P recycling,[-]
-
+  real(r8) :: RootElonZoneLenz                    !length of root elongation zone, [m]
   integer :: HoursReq4LiterfalAftMature           !required hours after physl maturity until start of LitrFall, [h]
   REAL(R8) :: FRSV(0:3)                           !rate constant for remobiln of storage chemical element during leafout, [h-1]
   real(r8) :: FXFY(0:1)                           !rate constant for leaf-reserve nonstructural C exchange, [h-1]
@@ -138,8 +138,8 @@ module PlantBGCPars
   integer :: icarbhyro                   !kinetic id of litter component as carbonhydrate
   integer :: icellulos                   !kinetic id of litter component as cellulose
   integer :: ilignin                     !kinetic id of litter component as lignin
-  integer :: k_woody_litr                !woody litter complex id
-  integer :: k_fine_litr                 !fine litter complex id
+  integer :: k_woody_comp                !woody litter complex id
+  integer :: k_fine_comp                 !fine litter complex id
   integer :: jroots                      !number of root groups, plant root + myco types
   end type plant_bgc_par_type
 
@@ -239,7 +239,7 @@ module PlantBGCPars
   RSMY_stomaCO2               = 2.78E-03_r8
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
-
+  RootElonZoneLenz            =0.03_r8
 
   FSTK                  = 0.05_r8
   ZSTX                  = 1.0E-03_r8

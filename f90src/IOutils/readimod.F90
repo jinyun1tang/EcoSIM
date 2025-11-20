@@ -350,8 +350,8 @@ module readiMod
   real(r8) :: corrector,OrgVolFrac
 ! begin_execution
   associate(                            &
-  k_woody_litr => micpar%k_woody_litr , &
-  k_fine_litr  => micpar%k_fine_litr  , &
+  k_woody_comp => micpar%k_woody_comp , &
+  k_fine_comp  => micpar%k_fine_comp  , &
   k_manure     => micpar%k_manure       &
   )
   call PrintInfo('beg '//subname)
@@ -402,12 +402,12 @@ module readiMod
     call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'ALBS',  ntp,SoilAlbedo_col(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH_vr(0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC_vr(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN_vr(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSPf',  ntp,RSP_vr(k_fine_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSCw',  ntp,RSC_vr(k_woody_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSNw',  ntp,RSN_vr(k_woody_litr,0,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'RSPw',  ntp,RSP_vr(k_woody_litr,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC_vr(k_fine_comp,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSNf',  ntp,RSN_vr(k_fine_comp,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSPf',  ntp,RSP_vr(k_fine_comp,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSCw',  ntp,RSC_vr(k_woody_comp,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSNw',  ntp,RSN_vr(k_woody_comp,0,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'RSPw',  ntp,RSP_vr(k_woody_comp,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSCm',  ntp,RSC_vr(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSNm',  ntp,RSN_vr(k_manure,0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSPm',  ntp,RSP_vr(k_manure,0,NV1,NH1))
@@ -484,12 +484,12 @@ module readiMod
     call ncd_getvar(grid_nfid, 'THW',ntp,THW_vr(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'THI',ntp,THI_vr(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'RSCfL',ntp,dat1(1:JZ));RSC_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSNfL',ntp,dat1(1:JZ));RSN_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSPfL',ntp,dat1(1:JZ));RSP_vr(k_fine_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSCwL',ntp,dat1(1:JZ));RSC_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSNwL',ntp,dat1(1:JZ));RSN_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
-    call ncd_getvar(grid_nfid, 'RSPwL',ntp,dat1(1:JZ));RSP_vr(k_woody_litr,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSCfL',ntp,dat1(1:JZ));RSC_vr(k_fine_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSNfL',ntp,dat1(1:JZ));RSN_vr(k_fine_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSPfL',ntp,dat1(1:JZ));RSP_vr(k_fine_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSCwL',ntp,dat1(1:JZ));RSC_vr(k_woody_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSNwL',ntp,dat1(1:JZ));RSN_vr(k_woody_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
+    call ncd_getvar(grid_nfid, 'RSPwL',ntp,dat1(1:JZ));RSP_vr(k_woody_comp,1:JZ,NV1,NH1)=dat1(1:JZ)
     call ncd_getvar(grid_nfid, 'RSCmL',ntp,dat1(1:JZ));RSC_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
     call ncd_getvar(grid_nfid, 'RSNmL',ntp,dat1(1:JZ));RSN_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
     call ncd_getvar(grid_nfid, 'RSPmL',ntp,dat1(1:JZ));RSP_vr(k_manure,1:JZ,NV1,NH1)=dat1(1:JZ)
@@ -513,12 +513,12 @@ module readiMod
           PSIAtWiltPoint_col(NY,NX)     = PSIAtWiltPoint_col(NV1,NH1)
           SoilAlbedo_col(NY,NX)     = SoilAlbedo_col(NV1,NH1)
           PH_vr(0,NY,NX)               = PH_vr(0,NV1,NH1)
-          RSC_vr(k_fine_litr,0,NY,NX)  = RSC_vr(k_fine_litr,0,NV1,NH1)
-          RSN_vr(k_fine_litr,0,NY,NX)  = RSN_vr(k_fine_litr,0,NV1,NH1)
-          RSP_vr(k_fine_litr,0,NY,NX)  = RSP_vr(k_fine_litr,0,NV1,NH1)
-          RSC_vr(k_woody_litr,0,NY,NX) = RSC_vr(k_woody_litr,0,NV1,NH1)
-          RSN_vr(k_woody_litr,0,NY,NX) = RSN_vr(k_woody_litr,0,NV1,NH1)
-          RSP_vr(k_woody_litr,0,NY,NX) = RSP_vr(k_woody_litr,0,NV1,NH1)
+          RSC_vr(k_fine_comp,0,NY,NX)  = RSC_vr(k_fine_comp,0,NV1,NH1)
+          RSN_vr(k_fine_comp,0,NY,NX)  = RSN_vr(k_fine_comp,0,NV1,NH1)
+          RSP_vr(k_fine_comp,0,NY,NX)  = RSP_vr(k_fine_comp,0,NV1,NH1)
+          RSC_vr(k_woody_comp,0,NY,NX) = RSC_vr(k_woody_comp,0,NV1,NH1)
+          RSN_vr(k_woody_comp,0,NY,NX) = RSN_vr(k_woody_comp,0,NV1,NH1)
+          RSP_vr(k_woody_comp,0,NY,NX) = RSP_vr(k_woody_comp,0,NV1,NH1)
           RSC_vr(k_manure,0,NY,NX)     = RSC_vr(k_manure,0,NV1,NH1)
           RSN_vr(k_manure,0,NY,NX)     = RSN_vr(k_manure,0,NV1,NH1)
           RSP_vr(k_manure,0,NY,NX)     = RSP_vr(k_manure,0,NV1,NH1)
@@ -597,12 +597,12 @@ module readiMod
             THW_vr(L,NY,NX) = THW_vr(L,NV1,NH1)
             THI_vr(L,NY,NX) = THI_vr(L,NV1,NH1)
 
-            RSC_vr(k_fine_litr,L,NY,NX)  = RSC_vr(k_fine_litr,L,NV1,NH1)
-            RSN_vr(k_fine_litr,L,NY,NX)  = RSN_vr(k_fine_litr,L,NV1,NH1)
-            RSP_vr(k_fine_litr,L,NY,NX)  = RSP_vr(k_fine_litr,L,NV1,NH1)
-            RSC_vr(k_woody_litr,L,NY,NX) = RSC_vr(k_woody_litr,L,NV1,NH1)
-            RSN_vr(k_woody_litr,L,NY,NX) = RSN_vr(k_woody_litr,L,NV1,NH1)
-            RSP_vr(k_woody_litr,L,NY,NX) = RSP_vr(k_woody_litr,L,NV1,NH1)
+            RSC_vr(k_fine_comp,L,NY,NX)  = RSC_vr(k_fine_comp,L,NV1,NH1)
+            RSN_vr(k_fine_comp,L,NY,NX)  = RSN_vr(k_fine_comp,L,NV1,NH1)
+            RSP_vr(k_fine_comp,L,NY,NX)  = RSP_vr(k_fine_comp,L,NV1,NH1)
+            RSC_vr(k_woody_comp,L,NY,NX) = RSC_vr(k_woody_comp,L,NV1,NH1)
+            RSN_vr(k_woody_comp,L,NY,NX) = RSN_vr(k_woody_comp,L,NV1,NH1)
+            RSP_vr(k_woody_comp,L,NY,NX) = RSP_vr(k_woody_comp,L,NV1,NH1)
             RSC_vr(k_manure,L,NY,NX)     = RSC_vr(k_manure,L,NV1,NH1)
             RSN_vr(k_manure,L,NY,NX)     = RSN_vr(k_manure,L,NV1,NH1)
             RSP_vr(k_manure,L,NY,NX)     = RSP_vr(k_manure,L,NV1,NH1)
@@ -626,9 +626,9 @@ module readiMod
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
-!        RSC_vr(k_fine_litr,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_litr,0,NY,NX))
-!        RSN_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_litr,0,NY,NX))
-!        RSP_vr(k_fine_litr,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_litr,0,NY,NX))
+!        RSC_vr(k_fine_comp,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_comp,0,NY,NX))
+!        RSN_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_comp,0,NY,NX))
+!        RSP_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_comp,0,NY,NX))
 
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
         !
@@ -696,12 +696,12 @@ module readiMod
               THW_vr(L,NY,NX)              = THW_vr(L+1,NY,NX)
               THI_vr(L,NY,NX)              = THI_vr(L+1,NY,NX)
               ISOIL_vr(1:4,L,NY,NX)           = ISOIL_vr(1:4,L+1,NY,NX)
-              RSC_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSN_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSP_vr(k_fine_litr,L,NY,NX)     = 0.0_r8
-              RSC_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
-              RSN_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
-              RSP_vr(k_woody_litr,L,NY,NX)    = 0.0_r8
+              RSC_vr(k_fine_comp,L,NY,NX)     = 0.0_r8
+              RSN_vr(k_fine_comp,L,NY,NX)     = 0.0_r8
+              RSP_vr(k_fine_comp,L,NY,NX)     = 0.0_r8
+              RSC_vr(k_woody_comp,L,NY,NX)    = 0.0_r8
+              RSN_vr(k_woody_comp,L,NY,NX)    = 0.0_r8
+              RSP_vr(k_woody_comp,L,NY,NX)    = 0.0_r8
               RSC_vr(k_manure,L,NY,NX)        = 0.0_r8
               RSN_vr(k_manure,L,NY,NX)        = 0.0_r8
               RSP_vr(k_manure,L,NY,NX)        = 0.0_r8
@@ -812,8 +812,8 @@ module readiMod
   integer :: LL,L
 
   associate(                            &
-  k_woody_litr => micpar%k_woody_litr , &
-  k_fine_litr  => micpar%k_fine_litr  , &
+  k_woody_comp => micpar%k_woody_comp , &
+  k_fine_comp  => micpar%k_fine_comp  , &
   k_manure     => micpar%k_manure       &
   )
 
@@ -833,12 +833,12 @@ module readiMod
   write(*,*)'Wet soil albedo',SoilAlbedo_col(NY,NX)
 
   write(*,*)'Litter pH',PH_vr(0,NY,NX)
-  write(*,*)'C in surface fine litter (g m-2)',RSC_vr(k_fine_litr,0,NY,NX)
-  write(*,*)'N in surface fine litter (g m-2)',RSN_vr(k_fine_litr,0,NY,NX)
-  write(*,*)'P in surface fine litter (g m-2)',RSP_vr(k_fine_litr,0,NY,NX)
-  write(*,*)'C in surface woody litter (g m-2)',RSC_vr(k_woody_litr,0,NY,NX)
-  write(*,*)'N in surface woody litter (g m-2)',RSN_vr(k_woody_litr,0,NY,NX)
-  write(*,*)'P in surface woody litter (g m-2)',RSP_vr(k_woody_litr,0,NY,NX)
+  write(*,*)'C in surface fine litter (g m-2)',RSC_vr(k_fine_comp,0,NY,NX)
+  write(*,*)'N in surface fine litter (g m-2)',RSN_vr(k_fine_comp,0,NY,NX)
+  write(*,*)'P in surface fine litter (g m-2)',RSP_vr(k_fine_comp,0,NY,NX)
+  write(*,*)'C in surface woody litter (g m-2)',RSC_vr(k_woody_comp,0,NY,NX)
+  write(*,*)'N in surface woody litter (g m-2)',RSN_vr(k_woody_comp,0,NY,NX)
+  write(*,*)'P in surface woody litter (g m-2)',RSP_vr(k_woody_comp,0,NY,NX)
   write(*,*)'C in surface manure litter (g m-2)',RSC_vr(k_manure,0,NY,NX)
   write(*,*)'N in surface manure litter (g m-2)',RSN_vr(k_manure,0,NY,NX)
   write(*,*)'P in surface manure litter (g m-2)',RSP_vr(k_manure,0,NY,NX)
@@ -1008,18 +1008,18 @@ module readiMod
 !     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 !
   write(*,*)''
-  write(*,*)'Initial fine litter C (gC m-2): RSC_vr(k_fine_litr)'
-  write(*,*)(RSC_vr(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial fine litter N (gN m-2): RSN_vr(k_fine_litr)'
-  write(*,*)(RSN_vr(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial fine litter P (gP m-2): RSP_vr(k_fine_litr)'
-  write(*,*)(RSP_vr(k_fine_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody liter C (gC m-2): RSC_vr(k_woody_litr)'
-  write(*,*)(RSC_vr(k_woody_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody litter N (gN m-2): RSN_vr(k_woody_litr)'
-  write(*,*)(RSN_vr(k_woody_litr,L,NY,NX),L=NU,NM)
-  write(*,*)'Initial woody litter P (gP m-2): RSP_vr(k_woody_litr)'
-  write(*,*)(RSP_vr(k_woody_litr,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter C (gC m-2): RSC_vr(k_fine_comp)'
+  write(*,*)(RSC_vr(k_fine_comp,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter N (gN m-2): RSN_vr(k_fine_comp)'
+  write(*,*)(RSN_vr(k_fine_comp,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial fine litter P (gP m-2): RSP_vr(k_fine_comp)'
+  write(*,*)(RSP_vr(k_fine_comp,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody liter C (gC m-2): RSC_vr(k_woody_comp)'
+  write(*,*)(RSC_vr(k_woody_comp,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody litter N (gN m-2): RSN_vr(k_woody_comp)'
+  write(*,*)(RSN_vr(k_woody_comp,L,NY,NX),L=NU,NM)
+  write(*,*)'Initial woody litter P (gP m-2): RSP_vr(k_woody_comp)'
+  write(*,*)(RSP_vr(k_woody_comp,L,NY,NX),L=NU,NM)
   write(*,*)'Initial manure liter C (gC m-2): RSC_vr(k_manure)'
   write(*,*)(RSC_vr(k_manure,L,NY,NX),L=NU,NM)
   write(*,*)'Initial manure litter N (gN m-2): RSN_vr(k_manure)'

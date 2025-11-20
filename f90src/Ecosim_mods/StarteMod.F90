@@ -70,7 +70,7 @@ module StarteMod
 
       DO I=1,366
         DO  L=NU_col(NY,NX),NL_col(NY,NX)
-          D2000: DO K=micpar%k_fine_litr,micpar%k_POM
+          D2000: DO K=micpar%k_fine_comp,micpar%k_POM
             BulkSoilMass=0._r8
 
             !maure applied at the soil surface
@@ -94,7 +94,7 @@ module StarteMod
               solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
+                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1)THEN
                   !     INITIALIZE RAINFALL, top layer
                   solutevar%H_1p_aque_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
@@ -202,7 +202,7 @@ module StarteMod
     iprotein  => micpar%iprotein,  &
     k_manure  => micpar%k_manure   &
   )
-  IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
+  IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1.AND.I.EQ.1)THEN
     !litter pool, top soil layer
     trcg_rain_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aque_mole_conc
     trcg_rain_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aque_mole_conc

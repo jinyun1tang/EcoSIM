@@ -11,7 +11,7 @@ module RootDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                          !root primary axis number, [-]
-  integer,target,allocatable ::  NIXBotRootLayer_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
+  integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
@@ -123,7 +123,7 @@ contains
   allocate(RootMycoMassElm_vr(NumPlantChemElms,jroots,JZ,JY,JX)); RootMycoMassElm_vr =0._r8
   allocate(RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoMassElm_pvr=0._r8
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
-  allocate(NIXBotRootLayer_raxes(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_raxes=1  !set to one to avoid numerical failure
+  allocate(NRoot1stTipLay_raxes(MaxNumRootAxes,JP,JY,JX));  NRoot1stTipLay_raxes=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
   allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
@@ -223,7 +223,7 @@ contains
   call destroy(RootMycoMassElm_pvr)
   call destroy(RootMycoMassElm_vr)
   call destroy(NumPrimeRootAxes_pft)
-  call destroy(NIXBotRootLayer_raxes)
+  call destroy(NRoot1stTipLay_raxes)
   call destroy(iPlantRootState_pft)
   call destroy(NMaxRootBotLayer_pft)
   call destroy(MaxSoiL4Root_pft)

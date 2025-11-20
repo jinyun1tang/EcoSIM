@@ -485,7 +485,7 @@ module InitPlantMod
     CPRTS_pft             => plt_allom%CPRTS_pft              ,& !output :root P:C ratio x root growth yield, [-]
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft     ,& !output :soil layer at planting depth, [-]
     NMaxRootBotLayer_pft   => plt_morph%NMaxRootBotLayer_pft    ,& !output :maximum soil layer number for all root axes, [-]
-    NIXBotRootLayer_raxes  => plt_morph%NIXBotRootLayer_raxes   ,& !output :maximum soil layer number for root axes, [-]
+    NRoot1stTipLay_raxes  => plt_morph%NRoot1stTipLay_raxes   ,& !output :maximum soil layer number for root axes, [-]
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft     ,& !output :specific root length primary axes, [m g-1]
     Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft    ,& !output :root cross-sectional area primary axes, [m2]
     Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft     ,& !output :specific root length secondary axes, [m g-1]
@@ -507,7 +507,7 @@ module InitPlantMod
 !
 !     SeedDepth_pft=seeding depth(m) from PFT management file
 !     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
-!     NG,NIX,NIXBotRootLayer_raxes=seeding,upper,lower rooting layer
+!     NG,NIX,NRoot1stTipLay_raxes=seeding,upper,lower rooting layer
 !     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
@@ -530,7 +530,7 @@ module InitPlantMod
       NGTopRootLayer_pft(NZ)   = L
       NMaxRootBotLayer_pft(NZ) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
-        NIXBotRootLayer_raxes(NR,NZ)=L
+        NRoot1stTipLay_raxes(NR,NZ)=L
       ENDDO D9790
     ENDIF
   ENDDO D9795

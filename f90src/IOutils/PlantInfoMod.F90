@@ -807,7 +807,7 @@ implicit none
   strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,60)
   write(nu_plt,*)('-',j=1,110)
-  write(nu_plt,*)'GENERAL CLASS INFORMATION'
+  write(nu_plt,*)'PLANT CLASS INFORMATION'
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
     strval='C3'

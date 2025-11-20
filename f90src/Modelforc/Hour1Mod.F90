@@ -226,12 +226,12 @@ module Hour1Mod
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
-!     NIXBotRootLayer_raxes=number of lowest rooted layer
+!     NRoot1stTipLay_raxes=number of lowest rooted layer
 !
         NGTopRootLayer_pft(NZ,NY,NX)  = MAX(NGTopRootLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         NMaxRootBotLayer_pft(NZ,NY,NX) = MAX(NMaxRootBotLayer_pft(NZ,NY,NX),NU_col(NY,NX))
         DO  NR=1,NumCanopyLayers
-          NIXBotRootLayer_raxes(NR,NZ,NY,NX)=MAX(NIXBotRootLayer_raxes(NR,NZ,NY,NX),NU_col(NY,NX))
+          NRoot1stTipLay_raxes(NR,NZ,NY,NX)=MAX(NRoot1stTipLay_raxes(NR,NZ,NY,NX),NU_col(NY,NX))
         ENDDO
       ENDDO
 
@@ -1674,7 +1674,7 @@ module Hour1Mod
       IF(AMIN1(VLitR_col(NY,NX),VWatLitRHoldCapcity_col(NY,NX)).GT.ZEROS(NY,NX))THEN
         FVLitR=VWatLitRHoldCapcity_col(NY,NX)/VLitR_col(NY,NX)
       ELSE
-        FVLitR=THETRX(micpar%k_fine_litr)/BulkDensLitR(micpar%k_fine_litr)
+        FVLitR=THETRX(micpar%k_fine_comp)/BulkDensLitR(micpar%k_fine_comp)
       ENDIF      
       POROS0_col(NY,NX)          = FVLitR      
       FieldCapacity_vr(0,NY,NX)  = 0.500_r8*FVLitR

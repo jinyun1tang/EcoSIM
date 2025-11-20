@@ -232,6 +232,7 @@ implicit none
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
   real(r8), pointer :: Root1stDepz_pft(:,:,:)          => null() !root layer depth,                                                           [m]
+  real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
   real(r8), pointer :: RootBranchFreq_pft(:)           => null() !root brancing frequency,                                                    [m-1]
@@ -287,7 +288,7 @@ implicit none
   integer,  pointer :: NumCogrowthNode_pft(:)         => null() !number of concurrently growing nodes,[-]
   integer,  pointer :: BranchNumber_pft(:)            => null() !main branch numeric id,[-]
   integer,  pointer :: NumOfBranches_pft(:)           => null() !number of branches,[-]
-  integer,  pointer :: NIXBotRootLayer_raxes(:,:)      => null() !maximum soil layer number for root axes,     [-]
+  integer,  pointer :: NRoot1stTipLay_raxes(:,:)      => null() !maximum soil layer number for root axes,     [-]
   integer,  pointer :: KMinNumLeaf4GroAlloc_brch(:,:) => null() !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
   integer,  pointer :: BranchNumerID_brch(:,:)         => null() !branch meric id,                             [-]
   integer,  pointer :: NGTopRootLayer_pft(:)          => null() !soil layer at planting depth,                [-]
@@ -307,6 +308,7 @@ implicit none
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_rpvr(:,:,:)        => null() !root layer number primary axes,       [d-2]
+  REAL(R8), POINTER :: RootPrimeAxsNum(:)              => null() !primary root axes number, [d-2]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)         => null() !root layer number axes,               [d-2]
   real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:) => null() !layer root length density,            [m m-3]
   real(r8), pointer :: RootPoreVol_rpvr(:,:,:)        => null() !root layer volume air,                [m2 d-2]
@@ -1958,6 +1960,7 @@ implicit none
   allocate(this%Root2ndMaxRadius_pft(jroots,JP1));this%Root2ndMaxRadius_pft=spval
 
   allocate(this%Root1stDepz_pft(jroots,MaxNumRootAxes,JP1));this%Root1stDepz_pft=spval
+  allocate(this%Root1stAxesTipDepz2Surf_pft(MaxNumRootAxes,JP1)); this%Root1stAxesTipDepz2Surf_pft=spval
   allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
   allocate(this%Root2ndEffLen4uptk_rpvr(jroots,JZ1,JP1));this%Root2ndEffLen4uptk_rpvr=spval
@@ -1972,6 +1975,7 @@ implicit none
   allocate(this%KLeafNumber_brch(MaxNumBranches,JP1));this%KLeafNumber_brch=0
   allocate(this%NumOfLeaves_brch(MaxNumBranches,JP1));this%NumOfLeaves_brch=spval
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
+  allocate(this%RootPrimeAxsNum(JP1)); this%RootPrimeAxsNum=0._r8
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
@@ -1983,7 +1987,7 @@ implicit none
   allocate(this%NumCogrowthNode_pft(JP1));this%NumCogrowthNode_pft=0
   allocate(this%BranchNumber_pft(JP1));this%BranchNumber_pft=0
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0
-  allocate(this%NIXBotRootLayer_raxes(MaxNumRootAxes,JP1));this%NIXBotRootLayer_raxes=0
+  allocate(this%NRoot1stTipLay_raxes(MaxNumRootAxes,JP1));this%NRoot1stTipLay_raxes=0
   allocate(this%PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP1));this%PARTS_brch=spval
   allocate(this%tlai_day_pft(JP1)); this%tlai_day_pft=spval
   allocate(this%tsai_day_pft(JP1)); this%tsai_day_pft=spval

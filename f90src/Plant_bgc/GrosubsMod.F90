@@ -145,8 +145,8 @@ module grosubsMod
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft      ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iYearCurrent                   => plt_site%iYearCurrent                    ,& !input  :current year,[-]
-    k_fine_litr                    => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
-    k_woody_litr                   => pltpar%k_woody_litr                      ,& !input  :woody litter complex id
+    k_fine_comp                    => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
+    k_woody_comp                   => pltpar%k_woody_comp                      ,& !input  :woody litter complex id
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
     LitrfallElms_pft               => plt_bgcr%LitrfallElms_pft                ,& !inoput :plant element LitrFall, [g d-2 h-1]
     LitrfallElms_pvr               => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
@@ -185,10 +185,10 @@ module grosubsMod
         
         IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
           !grass/bryophyte
-          LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
+          LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XFRE
         ELSE
           !trees
-          LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XFRE
         ENDIF
         StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
       ENDDO
@@ -244,7 +244,6 @@ module grosubsMod
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT    !main branch growth allocated to leaf and petiole
-  real(r8) :: RootPrimeAxsNum
   real(r8) :: TFN5
   real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
@@ -261,6 +260,7 @@ module grosubsMod
     iPlantRootState_pft  => plt_pheno%iPlantRootState_pft   ,& !input  :flag to detect root system death,[-]
     MainBranchNum_pft    => plt_morph%MainBranchNum_pft     ,& !input  :number of main branch,[-]    
     iPlantShootState_pft => plt_pheno%iPlantShootState_pft   & !input  :flag to detect canopy death,[-]
+
   )
 
   call PrintInfo('beg '//subname)
@@ -269,7 +269,7 @@ module grosubsMod
     BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
+      CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
 !
 !     CALCULATE GROWTH OF EACH BRANCH
 
@@ -280,8 +280,7 @@ module grosubsMod
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=PTRTM
     ENDDO
 
-    call RootBGCModel(I,J,NZ,BegRemoblize,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
-      RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+    call RootBGCModel(I,J,NZ,BegRemoblize,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
     call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 
@@ -299,13 +298,12 @@ module grosubsMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-    RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
+    TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT) :: TFN6_vr(JZ1)
   REAL(R8), INTENT(OUT) :: CNLFW,CPLFW               !NC, PC mass ratio of leaf growth
   real(r8), intent(out) :: CNSHW,CPSHW               !NC, PC mass ratio of shoot growth
   real(r8), intent(out) :: CNRTW,CPRTW               !NC, PC mass ratio of root growth
-  real(r8), intent(out) :: RootPrimeAxsNum           !Numer of primary root axes
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
@@ -342,8 +340,8 @@ module grosubsMod
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft    ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     rNCStalk_pft                => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]
     rPCStalk_pft                => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
-    k_fine_litr                 => pltpar%k_fine_litr                     ,& !input  :fine litter complex id
-    k_woody_litr                => pltpar%k_woody_litr                    ,& !input  :woody litter complex id
+    k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
+    k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr        ,& !inoput :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !inoput :woody element allocation,[-]
     FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !inoput :woody element allocation, [-]
@@ -353,6 +351,7 @@ module grosubsMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
     Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr            ,& !output :root layer number primary axes, [d-2]
+    RootPrimeAxsNum             => plt_morph%RootPrimeAxsNum              ,& !output :primary root axes number, [d-2]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
@@ -395,46 +394,46 @@ module grosubsMod
     .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
     .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
-    FracShootLeafAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = 1.0_r8    
+    FracShootLeafAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8
+    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8
+    FracRootElmAlloc2Litr(ielmc,k_fine_comp)      = 1.0_r8    
   ELSE
     !tree
-    FracShootLeafAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = AMIN1(SQRT(CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._r8)
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = AMIN1(SQRT(FRTX*CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._R8)
+    FracShootLeafAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8
+    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp) = AMIN1(SQRT(CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._r8)
+    FracRootElmAlloc2Litr(ielmc,k_fine_comp)      = AMIN1(SQRT(FRTX*CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._R8)
   ENDIF
 
-  FracShootLeafAlloc2Litr(ielmc,k_woody_litr) = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(ielmc,k_fine_litr))
-  FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr))
-  FracRootElmAlloc2Litr(ielmc,k_woody_litr)      = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_litr))
+  FracShootLeafAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(ielmc,k_fine_comp))
+  FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp))
+  FracRootElmAlloc2Litr(ielmc,k_woody_comp)      = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_comp))
 
-  CNLFW=FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_litr)*rNCLeaf_pft(NZ)
-  CPLFW=FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_litr)*rPCLeaf_pft(NZ)
-  CNSHW=FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_litr)*rNCSheath_pft(NZ)
-  CPSHW=FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_litr)*rPCSheath_pft(NZ)
-  CNRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*rNCRoot_pft(NZ)
-  CPRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*rPCRootr_pft(NZ)
+  CNLFW=FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*rNCLeaf_pft(NZ)
+  CPLFW=FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*rPCLeaf_pft(NZ)
+  CNSHW=FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*rNCSheath_pft(NZ)
+  CPSHW=FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*rPCSheath_pft(NZ)
+  CNRTW=FracRootElmAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_comp)*rNCRoot_pft(NZ)
+  CPRTW=FracRootElmAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_comp)*rPCRootr_pft(NZ)
 
   FracShootPetolAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)=FracShootLeafAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)
 
-  FracShootLeafAlloc2Litr(ielmn,k_woody_litr) = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW,1._r8)
-  FracShootLeafAlloc2Litr(ielmp,k_woody_litr) = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW,1._r8)
+  FracShootLeafAlloc2Litr(ielmn,k_woody_comp) = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNLFW,1._r8)
+  FracShootLeafAlloc2Litr(ielmp,k_woody_comp) = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPLFW,1._r8)
   
-  FracShootPetolAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW,1._r8)
-  FracShootPetolAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW,1._r8)
+  FracShootPetolAlloc2Litr(ielmn,k_woody_comp)  = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNSHW,1._r8)
+  FracShootPetolAlloc2Litr(ielmp,k_woody_comp)  = AMIN1(FracShootLeafAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPSHW,1._r8)
   
-  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW,1._r8)
-  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW,1._r8)
+  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_comp)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNRTW,1._r8)
+  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_comp)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPRTW,1._r8)
 
-  FracRootElmAlloc2Litr(ielmn,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCRoot_pft(NZ)/CNRTW,1._r8)
-  FracRootElmAlloc2Litr(ielmp,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCRootr_pft(NZ)/CPRTW,1._r8)
+  FracRootElmAlloc2Litr(ielmn,k_woody_comp)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_comp)*rNCRoot_pft(NZ)/CNRTW,1._r8)
+  FracRootElmAlloc2Litr(ielmp,k_woody_comp)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_comp)*rPCRootr_pft(NZ)/CPRTW,1._r8)
 
   DO NE=2,NumPlantChemElms
-    FracShootPetolAlloc2Litr(NE,k_fine_litr) = AZMAX1(1.0_r8-FracShootPetolAlloc2Litr(NE,k_woody_litr))
-    FracShootLeafAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(NE,k_woody_litr))
-    FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_litr))
-    FracRootElmAlloc2Litr(NE,k_fine_litr)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_litr))
+    FracShootPetolAlloc2Litr(NE,k_fine_comp) = AZMAX1(1.0_r8-FracShootPetolAlloc2Litr(NE,k_woody_comp))
+    FracShootLeafAlloc2Litr(NE,k_fine_comp)  = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(NE,k_woody_comp))
+    FracWoodStalkElmAlloc2Litr(NE,k_fine_comp)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_comp))
+    FracRootElmAlloc2Litr(NE,k_fine_comp)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_comp))
   ENDDO
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
@@ -462,7 +461,7 @@ module grosubsMod
   !     RootPrimeAxsNum=multiplier for number of primary root axes
   !
   RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-  RootPrimeAxsNum           = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  RootPrimeAxsNum(NZ)       = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
 
   !
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION

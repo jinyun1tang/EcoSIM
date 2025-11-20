@@ -401,6 +401,7 @@ implicit none
   real(r8),pointer   :: h2D_ROOTNLim_rpvr(:,:)
   real(r8),pointer   :: h2D_ROOTPLim_rpvr(:,:)  
   real(r8),pointer   :: h1D_RootMaintDef_CO2_pft(:)
+  real(r8),pointer   :: h1D_NumPrimeRootAxes_ptc(:)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)    
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)  
@@ -937,6 +938,7 @@ implicit none
   allocate(this%h1D_MainBranchNO_ptc(beg_ptc:end_ptc))     ;this%h1D_MainBranchNO_ptc(:)=ispval
   allocate(this%h1D_RCanMaintDef_CO2_pft(beg_ptc:end_ptc)) ;this%h1D_RCanMaintDef_CO2_pft(:)=spval
   allocate(this%h1D_RootMaintDef_CO2_pft(beg_ptc:end_ptc)) ;this%h1D_RootMaintDef_CO2_pft(:)=spval
+  allocate(this%h1D_NumPrimeRootAxes_ptc(beg_ptc:end_ptc)) ;this%h1D_NumPrimeRootAxes_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
@@ -2723,6 +2725,10 @@ implicit none
   call hist_addfld1d(fname='RUB_ACTVN_pft',units='none',avgflag='A',&
     long_name='mean rubisco activity for CO2 fixation across branches, 0-1',ptr_patch=data1d_ptr,default='inactive')       
 
+  data1d_ptr => this%h1D_NumPrimeRootAxes_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='N1stRootAXes_pft',units='none',avgflag='A',&
+    long_name='Mean number of primary root axes of the plant population',ptr_patch=data1d_ptr)       
+
   data1d_ptr => this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='CanopyNLim_pft',units='none',avgflag='A',&
     long_name='mean canopy nitrogen limitation across branches, 0->1 weaker limitation',ptr_patch=data1d_ptr,default='inactive')       
@@ -4033,6 +4039,7 @@ implicit none
       this%h1D_RootAR_col(ncol)  = -AZERO(RootCO2Autor_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RootCO2Relez_col(ncol)=RootCO2Emis2Root_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1d_fPAR_col(ncol) = 0._r8
+      this%h1D_QTRANSP_col(ncol)=0._r8
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
@@ -4205,7 +4212,7 @@ implicit none
         this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_RootMaintDef_CO2_pft(nptc) = sum(RootMaintDef_CO2_pvr(ipltroot,1:JZ,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+        this%h1D_NumPrimeRootAxes_ptc(nptc) = NumPrimeRootAxes_pft(NZ,NY,NX)
         IF(NumOfBranches_pft(NZ,NY,NX)>0)then
           DO K=1,MaxNodesPerBranch
             this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)=0._r8
@@ -4273,7 +4280,8 @@ implicit none
           this%h2D_ROOT_OSTRESS_pvr(nptc,L) = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_PSI_RT_pvr(nptc,L)       = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
           this%h2D_RootH2OUptkStress_pvr(nptc,L)=RootH2OUptkStress_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-          this%h2D_RootH2OUptk_pvr(nptc,L) = 1.e3*RPlantRootH2OUptk_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          
+          this%h2D_RootH2OUptk_pvr(nptc,L) = AZERO(1.e3*RPlantRootH2OUptk_pvr(ipltroot,L,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_RootMaintDef_CO2_pvr(nptc,L)=RootMaintDef_CO2_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_prtUP_NH4_pvr(nptc,L)    = (sum(RootNutUptake_pvr(ids_NH4,:,L,NZ,NY,NX))+&
             sum(RootNutUptake_pvr(ids_NH4B,:,L,NZ,NY,NX)))/AREA_3D(3,L,NY,NX)
@@ -4297,6 +4305,7 @@ implicit none
           this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_RootKond2H2O_pvr(nptc,L)= safe_adb(1._r8,RootResist4H2O_pvr(ipltroot,L,NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX))*1.e7/3600._r8
+
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stStrutC_pvr(nptc,L)= this%h2D_Root1stStrutC_pvr(nptc,L) + &
               RootMyco1stStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)

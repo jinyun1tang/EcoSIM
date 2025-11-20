@@ -38,8 +38,8 @@ contains
     FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !input  :woody element allocation, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !input  :woody element allocation,[-]
-    k_fine_litr                 => pltpar%k_fine_litr                     ,& !input  :fine litter complex id
-    k_woody_litr                => pltpar%k_woody_litr                    ,& !input  :woody litter complex id
+    k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
+    k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     iYearCurrent                => plt_site%iYearCurrent                  ,& !input  :current year,[-]
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
@@ -126,45 +126,45 @@ contains
     D6380: DO M=1,jsken
       dNonstLitr=PlantElmAllocMat4Litr(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
         +CanopyNodulNonstElms_brch(ielmc,NB,NZ)+C4PhotoShootNonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ))
-      dFoliarLitr = PlantElmAllocMat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_litr) &
+      dFoliarLitr = PlantElmAllocMat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_comp) &
         +CanopyNodulStrutElms_brch(ielmc,NB,NZ))
-      dNonFoliar = PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootPetolAlloc2Litr(ielmc,k_fine_litr) &
+      dNonFoliar = PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootPetolAlloc2Litr(ielmc,k_fine_comp) &
         +HuskStrutElms_brch(ielmc,NB,NZ)+EarStrutElms_brch(ielmc,NB,NZ))
 
-      LitrfallElms_pvr(ielmc,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_litr,0,NZ) &
+      LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ) &
         +XHVST1*(dNonstLitr+dFoliarLitr+dNonFoliar)
 
       DO NE=2,NumPlantChemElms
         dNonstLitr=PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)&
           +StalkRsrvElms_brch(NE,NB,NZ))
-        dFoliarLitr=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_fine_litr) &
+        dFoliarLitr=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_fine_comp) &
           +CanopyNodulStrutElms_brch(NE,NB,NZ))
-        dNonFoliar=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_fine_litr) &
+        dNonFoliar=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_fine_comp) &
           +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ))
 
-        LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+        LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XHVST1 &
           *(dNonstLitr+dFoliarLitr+dNonFoliar)
       ENDDO
     ENDDO D6380
 
     DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_woody_litr) &
-          +PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_woody_litr))
+        LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XHVST1 &
+          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_woody_comp) &
+          +PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_woody_comp))
 
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1 &
             *PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
         ELSE
-          LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
+          LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XHVST1 &
             *PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
         ENDIF
-        LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_litr,0,NZ)+XHVST1 &
-          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
+        LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XHVST1 &
+          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracWoodStalkElmAlloc2Litr(NE,k_woody_comp)
 
-        LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)+XHVST1 &
-          *PlantElmAllocMat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
+        LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XHVST1 &
+          *PlantElmAllocMat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)*FracWoodStalkElmAlloc2Litr(NE,k_fine_comp)
       ENDDO
     ENDDO
     !
@@ -334,8 +334,8 @@ contains
     FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
     FracRootElmAlloc2Litr      => plt_allom%FracRootElmAlloc2Litr       ,& !input  :C woody fraction in root,[-]
     NU                         => plt_site%NU                           ,& !input  :current soil surface layer number, [-]
-    k_fine_litr                => pltpar%k_fine_litr                    ,& !input  :fine litter complex id
-    k_woody_litr               => pltpar%k_woody_litr                   ,& !input  :woody litter complex id
+    k_fine_comp                => pltpar%k_fine_comp                    ,& !input  :fine litter complex id
+    k_woody_comp               => pltpar%k_woody_comp                   ,& !input  :woody litter complex id
     inonstruct                 => pltpar%inonstruct                     ,& !input  :group id of plant nonstructural litter
     iroot                      => pltpar%iroot                          ,& !input  :group id of plant root litter
     icwood                     => pltpar%icwood                         ,& !input  :group id of coarse woody litter
@@ -393,19 +393,19 @@ contains
     D8985: DO N=1,Myco_pft(NZ)
       D6385: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
+            LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XHVST1 &
               *PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)* RootMycoNonstElms_rpvr(NE,N,L,NZ)
           ENDDO
 
         DO NR=1,NumPrimeRootAxes_pft(NZ)
           DO NE=1,NumPlantChemElms
-            LitrfallElms_pvr(NE,M,k_woody_litr,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_litr,L,NZ)+XHVST1 &
+            LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XHVST1 &
               *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
-              +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_litr)
+              +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_woody_comp)
 
-            LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)+XHVST1 &
+            LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XHVST1 &
               *PlantElmAllocMat4Litr(NE,iroot,M,NZ)*(RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ) &
-              +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_litr)
+              +RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAlloc2Litr(NE,k_fine_comp)
           ENDDO
         ENDDO
       ENDDO D6385
@@ -479,7 +479,7 @@ contains
       IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
         DO NE=1,NumPlantChemElms
           D6395: DO M=1,jsken
-            LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)+&
+            LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
               XHVST1*(PlantElmAllocMat4Litr(NE,iroot,M,NZ)*RootNodulStrutElms_rpvr(NE,L,NZ) &
               +PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*RootNodulNonstElms_rpvr(NE,L,NZ))
           ENDDO D6395
@@ -501,15 +501,15 @@ contains
 !
   DO NE=1,NumPlantChemElms
     D6400: DO M=1,jsken
-      LitrfallElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ)=&
-        LitrfallElms_pvr(NE,M,k_woody_litr,NGTopRootLayer_pft(NZ),NZ) &
+      LitrfallElms_pvr(NE,M,k_woody_comp,NGTopRootLayer_pft(NZ),NZ)=&
+        LitrfallElms_pvr(NE,M,k_woody_comp,NGTopRootLayer_pft(NZ),NZ) &
         +(XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)) &
-        *FracWoodStalkElmAlloc2Litr(NE,k_woody_litr)
+        *FracWoodStalkElmAlloc2Litr(NE,k_woody_comp)
 
-      LitrfallElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ)= &
-        LitrfallElms_pvr(NE,M,k_fine_litr,NGTopRootLayer_pft(NZ),NZ) &
+      LitrfallElms_pvr(NE,M,k_fine_comp,NGTopRootLayer_pft(NZ),NZ)= &
+        LitrfallElms_pvr(NE,M,k_fine_comp,NGTopRootLayer_pft(NZ),NZ) &
         +(XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*SeasonalNonstElms_pft(NE,NZ)) &
-        *FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)
+        *FracWoodStalkElmAlloc2Litr(NE,k_fine_comp)
     ENDDO D6400
     SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*XHVST
   ENDDO

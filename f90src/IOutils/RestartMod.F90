@@ -546,18 +546,18 @@ implicit none
 
   if(flag=='read')then
     dat2pr => datip_2d(1:npfts,1:MaxNumRootAxes)    
-    call restartvar(ncid, flag, varname='NIXBotRootLayer_raxes', dim1name='pft',dim2name='rootaxs',&
+    call restartvar(ncid, flag, varname='NRoot1stTipLay_raxes', dim1name='pft',dim2name='rootaxs',&
      long_name='maximum soil layer number for root axes', units='none', &
      interpinic_flag='skip', data=dat2pr, missing_value=ispval, &
      fill_value=ispval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NIXBotRootLayer_raxes,datip_2d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NRoot1stTipLay_raxes,datip_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    !print*,'NIXBotRootLayer_raxes'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NIXBotRootLayer_raxes,datip_2d,NumActivePlants=NumActivePlants_col,&
+    !print*,'NRoot1stTipLay_raxes'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NRoot1stTipLay_raxes,datip_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
     dat2pr => datip_2d(1:npfts,1:MaxNumRootAxes)  
-    call restartvar(ncid, flag, varname='NIXBotRootLayer_raxes', dim1name='pft',dim2name='rootaxs',&
+    call restartvar(ncid, flag, varname='NRoot1stTipLay_raxes', dim1name='pft',dim2name='rootaxs',&
      long_name='maximum soil layer number for root axes', units='none', &
      interpinic_flag='skip', data=dat2pr, missing_value=ispval, fill_value=ispval)     
   endif

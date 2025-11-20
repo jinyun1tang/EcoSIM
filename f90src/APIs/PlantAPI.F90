@@ -612,7 +612,7 @@ implicit none
     ENDDO
 
     DO NR=1,pltpar%MaxNumRootAxes
-      NIXBotRootLayer_raxes(NR,NZ,NY,NX)=plt_morph%NIXBotRootLayer_raxes(NR,NZ)
+      NRoot1stTipLay_raxes(NR,NZ,NY,NX)=plt_morph%NRoot1stTipLay_raxes(NR,NZ)
       DO N=1,Myco_pft(NZ,NY,NX)
         RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
         Root1stDepz_pft(N,NR,NZ,NY,NX)                        = plt_morph%Root1stDepz_pft(N,NR,NZ)
@@ -1398,7 +1398,7 @@ implicit none
       plt_morph%Root2ndSpecLen_pft(N,NZ)    = Root2ndSpecLen_pft(N,NZ,NY,NX)
     ENDDO
     DO NR=1,pltpar%MaxNumRootAxes
-      plt_morph%NIXBotRootLayer_raxes(NR,NZ)=NIXBotRootLayer_raxes(NR,NZ,NY,NX)
+      plt_morph%NRoot1stTipLay_raxes(NR,NZ)=NRoot1stTipLay_raxes(NR,NZ,NY,NX)
       DO L=1,NK_col(NY,NX)
         DO N=1,Myco_pft(NZ,NY,NX)
           plt_morph%Root1stLen_rpvr(N,L,NR,NZ)                             = Root1stLen_rpvr(N,L,NR,NZ,NY,NX)

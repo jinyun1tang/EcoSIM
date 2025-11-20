@@ -878,8 +878,8 @@ module StartsMod
   real(r8) :: VLitR0
   associate(                                   &
     NumOfLitrCmplxs => micpar%NumOfLitrCmplxs, &
-    k_woody_litr    => micpar%k_woody_litr,    &
-    k_fine_litr     => micpar%k_fine_litr,     &
+    k_woody_comp    => micpar%k_woody_comp,    &
+    k_fine_comp     => micpar%k_fine_comp,     &
     k_manure        => micpar%k_manure         &
   )
 !     begin_execution

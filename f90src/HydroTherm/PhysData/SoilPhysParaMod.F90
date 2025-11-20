@@ -111,8 +111,8 @@ implicit none
   integer, intent(in) :: NY,NX,NM,JZ
   integer :: L
   associate(                            &
-  k_woody_litr => micpar%k_woody_litr , &
-  k_fine_litr  => micpar%k_fine_litr  , &
+  k_woody_comp => micpar%k_woody_comp , &
+  k_fine_comp  => micpar%k_fine_comp  , &
   k_manure     => micpar%k_manure       &
   )
 
@@ -173,12 +173,12 @@ implicit none
     THW_vr(L,NY,NX)           = THW_vr(L-1,NY,NX)
     THI_vr(L,NY,NX)           = THI_vr(L-1,NY,NX)
     ISOIL_vr(1:4,L,NY,NX)        = ISOIL_vr(1:4,L-1,NY,NX)
-    RSC_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSN_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSP_vr(k_fine_litr,L,NY,NX)  = 0.0_r8
-    RSC_vr(k_woody_litr,L,NY,NX) = 0.0_r8
-    RSN_vr(k_woody_litr,L,NY,NX) = 0.0_r8
-    RSP_vr(k_woody_litr,L,NY,NX) = 0.0_r8
+    RSC_vr(k_fine_comp,L,NY,NX)  = 0.0_r8
+    RSN_vr(k_fine_comp,L,NY,NX)  = 0.0_r8
+    RSP_vr(k_fine_comp,L,NY,NX)  = 0.0_r8
+    RSC_vr(k_woody_comp,L,NY,NX) = 0.0_r8
+    RSN_vr(k_woody_comp,L,NY,NX) = 0.0_r8
+    RSP_vr(k_woody_comp,L,NY,NX) = 0.0_r8
     RSC_vr(k_manure,L,NY,NX)     = 0.0_r8
     RSN_vr(k_manure,L,NY,NX)     = 0.0_r8
     RSP_vr(k_manure,L,NY,NX)     = 0.0_r8

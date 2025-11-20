@@ -138,7 +138,7 @@ implicit none
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
   associate(                           &
-    k_fine_litr => micpar%k_fine_litr, &
+    k_fine_comp => micpar%k_fine_comp, &
     k_manure    => micpar%k_manure   , &
     ilignin     => micpar%ilignin    , &
     icellulos   => micpar%icellulos  , &
@@ -169,71 +169,71 @@ implicit none
 !     MAIZE
 !
     IF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_maize)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.080_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.245_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.613_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.062_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.080_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.245_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.613_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.062_r8
 !
 !     WHEAT
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_wheat)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.125_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.171_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.144_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.125_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.171_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.560_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.144_r8
 !
 !     SOYBEAN
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_soybean)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.138_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.426_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.316_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.120_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.138_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.426_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.316_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.120_r8
 !
 !     OLD STRAW
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_oldStraw)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.075_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.125_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.550_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.250_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.125_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.550_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.250_r8
 !
 !     STRAW
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_Straw)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.036_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.044_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.767_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.153_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.036_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.044_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.767_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.153_r8
 !
 !     COMPOST
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_compost)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.143_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.015_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.640_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.202_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.143_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.015_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.640_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.202_r8
 !
 !     GREEN MANURE
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_GreeManure)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.202_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.013_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.560_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.225_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.202_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.013_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.560_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.225_r8
 !
 !     SIMPLE SUBSTRATE
 !
     ELSEIF(IYTYP(iAmendtyp_plantRes,I,NY,NX).EQ.iPlantRes_simple)THEN
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.000_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 1.000_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.000_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.000_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.000_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 1.000_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.000_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.000_r8
     ELSE
-      CFOSC_vr(iprotein,k_fine_litr,LFDPTH,NY,NX)  = 0.075_r8
-      CFOSC_vr(icarbhyro,k_fine_litr,LFDPTH,NY,NX) = 0.125_r8
-      CFOSC_vr(icellulos,k_fine_litr,LFDPTH,NY,NX) = 0.550_r8
-      CFOSC_vr(ilignin,k_fine_litr,LFDPTH,NY,NX)   = 0.250_r8
+      CFOSC_vr(iprotein,k_fine_comp,LFDPTH,NY,NX)  = 0.075_r8
+      CFOSC_vr(icarbhyro,k_fine_comp,LFDPTH,NY,NX) = 0.125_r8
+      CFOSC_vr(icellulos,k_fine_comp,LFDPTH,NY,NX) = 0.550_r8
+      CFOSC_vr(ilignin,k_fine_comp,LFDPTH,NY,NX)   = 0.250_r8
     ENDIF
 !
 !     ALLOCATION OF ANIMAL MANURE APPLICATION TO
@@ -394,7 +394,7 @@ implicit none
         SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)=SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)+OSP1
         SolidOMAct_vr(M,K,LFDPTH,NY,NX)=SolidOMAct_vr(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
         IF(LFDPTH.EQ.0)THEN
-          VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_litr)
+          VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_comp)
         ENDIF
       ENDDO D2970
       tAmendOrgC_lnd              = tAmendOrgC_lnd+OSCI
