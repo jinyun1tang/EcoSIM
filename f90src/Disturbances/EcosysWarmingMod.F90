@@ -364,6 +364,10 @@ module EcosysWarmingMod
       case default
         ihtime=0
       end select
+    case ('Depth')  
+      if(extract_number_and_unit(values(kk), warm_depz, unit_out))then
+        if(trim(unit_out)=='cm')warm_depz=warm_depz*0.01_r8
+      endif
     case ('season')
       if(trim(values(kk))=='growth')then
         !growing season only
@@ -395,7 +399,7 @@ module EcosysWarmingMod
   character(len=8) :: unit_out
 
   call PrintInfo('beg '//subname)
-
+  igrowth=0  !default all year
   wind_otc       = 0.4_r8 !default to 0.4 m/s
   ems_reduct_otc = 0.07 !default reduce 7%
   DO KK             = 1, num_found
@@ -413,8 +417,7 @@ module EcosysWarmingMod
       if(extract_number_and_unit(values(kk), taus_otc, unit_out))then
         if(trim(unit_out)=='%')taus_otc=taus_otc*0.01_r8
       endif 
-    case ('EMSReduct')  
-      write(*,*)values(kk)
+    case ('EMSReduct')        
       if(extract_number_and_unit(values(kk), ems_reduct_otc, unit_out))then
         if(trim(unit_out)=='%')ems_reduct_otc=ems_reduct_otc*0.01_r8
       endif    
@@ -456,14 +459,14 @@ module EcosysWarmingMod
   endif
   ans=.true.  
   write(fname,'(A)')trim(fname_warming_Tref)
-  write(*,*)'fname',fname
+  
   do jj = 1, 256
     if(fname(jj:jj+3)=='xxxx')then
       write(fname(jj:jj+3),'(I4)')year      
       exit
     endif
   enddo
-  write(*,*)fname
+  
   end function get_warming_fname
 
 !------------------------------------------------------------------------------------------
@@ -482,7 +485,7 @@ module EcosysWarmingMod
   logical :: daytime_chk
   logical :: season_chk
   
-  
+
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !make sure it is otc warming
@@ -525,12 +528,13 @@ module EcosysWarmingMod
 
         !use plant GPP to test growing season 
         season_chk=check_warming_season(I,NY,NX)
+
         if(daytime_chk .and. season_chk)then
           ij=(I-1)*24+J
           DO L=NU_col(NY,NX),NL_col(NY,NX)
             IF(CumDepz2LayBottom_vr(L,NY,NX).LE.warm_depz)THEN
               warm_LL(NY,NX)=L
-              TKS_ref_vr(ij,L,NY,NX)=TKS_ref_vr(ij,L,NY,NX)+warm_dTK
+              TKS_ref_vr(ij,L,NY,NX)=TKS_ref_vr(ij,L,NY,NX)+warm_dTK              
             ENDIF    
           ENDDO
         endif

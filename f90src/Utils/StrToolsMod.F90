@@ -10,6 +10,7 @@ implicit none
   public :: are_strings_equal_icase
   public :: extract_number_and_unit
   public :: is_substring_present
+  public :: to_lower_string
 contains
 
   SUBROUTINE parse_var_val_string(input_string, var_array, val_array, num_pairs_found)

@@ -1277,8 +1277,8 @@ module WatsubMod
               if(is_warming_layerL(L,NY,NX))then     
                 tk1l                   = TKSoil1_vr(L,NY,NX)
                 dHeat                  = (TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP
-                HeatSource_vr(L,NY,NX) = HeatSource_vr(L,NY,NX)+(TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP
-                TKSoil1_vr(L,NY,NX)    = tk1l+dHeat/VHeatCapacity1_vr(L,NY,NX)
+                HeatSource_vr(L,NY,NX) = HeatSource_vr(L,NY,NX)+dHeat
+                TKSoil1_vr(L,NY,NX)    = tk1l+dHeat/(VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP)
               endif
             endif
             
@@ -1297,14 +1297,7 @@ module WatsubMod
           ENDIF
         ENDIF
       ENDDO D13
-!      if(I>=317 .and. J>=18)then
-!        if(NX==1)then
-!          write(401,*)I+J/24.,NY,NX,M,'xdwat',twatmass0(NY,NX),dwat
-!          write(401,*)I+J/24.,NY,NX,M,'wat',(VLWatMicP1_vr(L,NY,NX),L=NUM_col(NY,NX), NL_col(NY,NX))
-!        else
-!          write(402,*)I+J/24.,NY,NX,M,'xdwat',twatmass0(NY,NX),dwat
-!        endif  
-!      endif
+
     ENDDO D12
   ENDDO D11
 
