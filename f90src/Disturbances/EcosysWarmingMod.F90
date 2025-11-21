@@ -177,7 +177,7 @@ module EcosysWarmingMod
   character(len=120) :: str_loc
   integer :: k, k1, it, nl, nl1, jj
   character(len=12) :: variables(10)
-  character(len=32) :: values(10)
+  character(len=256) :: values(10)
   integer :: NY,NX,KK
   integer :: num_found
 
@@ -272,6 +272,8 @@ module EcosysWarmingMod
   integer :: KK
 
   call PrintInfo('beg '//subname)
+  igrowth=0  !default all year
+  ihtime=0   !default all day
   DO KK=1,num_found
     select case(trim(variables(kk)))
     case ('power')
@@ -336,6 +338,8 @@ module EcosysWarmingMod
   !    //'beg_time[2014/01/01];end_time[2018/12/31];htime[all];season[growth]'
   call PrintInfo('beg '//subname)
 
+  igrowth=0  !default all year
+  ihtime=0   !default all day
   DO KK=1,num_found
     select case(trim(variables(kk)))
     case ('dT')
@@ -370,9 +374,6 @@ module EcosysWarmingMod
         else
           igrowth=3
         endif
-      else
-        !whole year
-        igrowth=0
       endif
     case default
     end select
@@ -453,15 +454,16 @@ module EcosysWarmingMod
     ans=.false.
     return
   endif
-  ans=.true.
+  ans=.true.  
   write(fname,'(A)')trim(fname_warming_Tref)
-
+  write(*,*)'fname',fname
   do jj = 1, 256
     if(fname(jj:jj+3)=='xxxx')then
-      write(fname(jj:jj+3),'(I4)')year
+      write(fname(jj:jj+3),'(I4)')year      
       exit
     endif
   enddo
+  write(*,*)fname
   end function get_warming_fname
 
 !------------------------------------------------------------------------------------------

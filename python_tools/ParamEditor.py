@@ -178,16 +178,18 @@ class ParEditor:
                     for parnm,parval in pars.items():
                         variable1=nc_file.variables[parnm]
                         long_name = variable1.getncattr('long_name') if 'long_name' in variable1.ncattrs() else 'No long_name attribute'
-                    
+
+                        parval1=parval
                         if iscale:
+                            parval1=parval*variable1[pft_loc]
                             if verbose:
-                                print("%-100s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval*variable1[pft_loc]))
+                                print("%-100s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval1))
                             variable1[pft_loc]=parval*variable1[pft_loc]
-                        else:
-                            if verbose:
-                                print("%-100s: %s for %s is %f, and changed to %f"%(long_name,parnm,pft,variable1[pft_loc],parval))
-                            variable1[pft_loc]=parval
-                        parvs[id]=float(variable1[pft_loc])
+                        else:                            
+                            if verbose:                                
+                                print(f"%-100s: {parnm} for {pft} is {variable1[pft_loc]}, and changed to {parval}"%(long_name))
+                            variable1[pft_loc]=parval1    
+                        parvs[id]=parval1
                         parnames[id]=parnm
                         id=id+1                    
                     new_dict={'pft':pft,'parvarnames':parnames,'parvals':parvs}

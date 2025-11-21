@@ -189,12 +189,14 @@ module WatsubMod
         if(ThetaICEZ_vr(L,NY,NX)>0.9_r8 .and. .not. found_frozen)then
           found_frozen=.true.
           NLF_col(NY,NX)=L
-        endif   
+        endif
+
         TKS_vr(L,NY,NX)        = TKSoil1_vr(L,NY,NX)
         VLWatMicP_vr(L,NY,NX)  = VLWatMicP1_vr(L,NY,NX)
         VLWatMicPX_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)
         VLiceMicP_vr(L,NY,NX)  = VLiceMicP1_vr(L,NY,NX)
         VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
+        VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
       ENDDO  
     ENDDO  
   ENDDO

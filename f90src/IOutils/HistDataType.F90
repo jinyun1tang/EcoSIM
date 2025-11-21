@@ -2086,8 +2086,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='SHOOT_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Live plant shoot C',ptr_patch=data1d_ptr,&
-    default='inactive')                  
+    long_name='Live plant shoot C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_frcPARabs_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='frcPARabs_pft',units='none',avgflag='A',&
@@ -2101,7 +2100,7 @@ implicit none
 
   data1d_ptr => this%h1D_Plant_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='Plant_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant C',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_LEAF_C_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LEAF_C_pft',units='gC/m2',avgflag='A',&
@@ -2129,7 +2128,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOT_C_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='Root_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant root C, exluding nodule',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant root C, exluding nodule',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_ROOTST_C_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='RootST_C_pft',units='gC/m2',avgflag='A',&
