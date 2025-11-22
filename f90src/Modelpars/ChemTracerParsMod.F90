@@ -51,7 +51,6 @@ module ChemTracerParsMod
   real(r8), parameter :: SN2OX=5.241E-01_r8  !N2O solubility coeficient  at 25oC, [g solute /g gas]
   real(r8), parameter :: SNH3X=2.852E+02_r8  !NH3 solubility coeficient at 25oC, [g solute /g gas]
   real(r8), parameter :: SH2GX=3.156E-02_r8  !H2 solubility coeficient at 25oC, [g solute /g gas]
-  real(r8), parameter :: VISCW=1.0E-06_r8    !water viscosity, [Mg m-1 s]
 
   !terminate [label for variable parsing]
 end module ChemTracerParsMod

@@ -16,7 +16,7 @@ module minimathmod
   public :: p_adb
   public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
-  public :: isLeap
+  public :: isLeap,iisleap
   public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d,AZMIN1d
   public :: GetMolAirPerm3
@@ -30,7 +30,8 @@ module minimathmod
   public :: SubstrateLimit
   public :: real_truncate
   public :: pMod
-  public :: SubstrateDribbling
+  public :: Viscosity_H2O
+  public :: SubstrateDribbling  
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
     module procedure SubstrateDribbling_scal
@@ -600,4 +601,15 @@ module minimathmod
 
   end function real_truncate
 
+!------------------------------------------------------------------------
+  pure function Viscosity_H2O(TEMPC)result(viscwl)
+  implicit none
+  real(r8), intent(in) :: TEMPC  !temperautre [oC]
+  real(r8), parameter :: VISCW=1.0E-06_r8    !water viscosity at oC, [Mg m-1 s]
+  
+  real(r8) :: viscwl
+  
+  VISCWL    = VISCW*EXP(0.533_r8-0.0267_r8*TEMPC)
+
+  end function Viscosity_H2O
 end module minimathmod

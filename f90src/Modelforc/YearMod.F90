@@ -69,7 +69,7 @@
         HydroIonFlx_CumYr_col(NY,NX)      = 0._r8
         FertN_Flx_CumYr_col(NY,NX)         = 0._r8
         HydroSufDINFlx_CumYr_col(NY,NX)   = 0._r8
-        FerPFlx_CumYr_col(NY,NX)          = 0._r8
+        FerP_Flx_CumYr_col(NY,NX)          = 0._r8
         HydroSufDIPFlx_CumYr_col(NY,NX)   = 0._r8
         CO2byFire_CumYr_col(NY,NX)        = 0._r8
         CH4byFire_CumYr_col(NY,NX)        = 0._r8

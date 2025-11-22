@@ -285,18 +285,21 @@ implicit none
 !         MICROBIAL C IN RUNOFF SEDIMENT
 !
           MXE(ielmc)=0.0_r8
-          MXE(ielmn)=XN*natomw*(trcx_Eros_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_2D(idx_NH4B,N,NN,N5,N4))
-          ZPE=XN*natomw*(XNH4Soil_Eros_2D(N,NN,N5,N4)+XNH3Soil_Eros_2D(N,NN,N5,N4) &
-            +XUreaSoil_Eros_2D(N,NN,N5,N4)+XNO3Soil_Eros_2D(N,NN,N5,N4)+XNH4Band_Eros_2D(N,NN,N5,N4) &
-            +XNH3Band_Eros_2D(N,NN,N5,N4)+XUreaBand_Eros_2D(N,NN,N5,N4)+XNO3Band_Eros_2D(N,NN,N5,N4))
-          MXE(ielmp)=XN*patomw*(trcx_Eros_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4,N,NN,N5,N4) &
-            +trcx_Eros_2D(idx_HPO4B,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4B,N,NN,N5,N4))
+          MXE(ielmn)=XN*natomw*(trcx_Eros_mol_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_NH4B,N,NN,N5,N4))
+          ZPE=XN*natomw*(XNH4Soil_Eros_molN_2D(N,NN,N5,N4)+XNH3Soil_Eros_molN_2D(N,NN,N5,N4) &
+            +XUreaSoil_Eros_molN_2D(N,NN,N5,N4)+XNO3Soil_Eros_molN_2D(N,NN,N5,N4)+XNH4Band_Eros_molN_2D(N,NN,N5,N4) &
+            +XNH3Band_Eros_molN_2D(N,NN,N5,N4)+XUreaBand_Eros_molN_2D(N,NN,N5,N4)+XNO3Band_Eros_molN_2D(N,NN,N5,N4))
 
-          PPE=XN*patomw*(1._r8*(trcp_Eros_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4,N,NN,N5,N4) &
-            +trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_AlPO4B,N,NN,N5,N4) &
-            +trcp_Eros_2D(idsp_FePO4B,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
-            +2.0_r8*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-            +3.0_r8*(trcp_Eros_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_2D(idsp_ApatiteBand,N,NN,N5,N4)))
+          MXE(ielmp)=XN*patomw*(trcx_Eros_mol_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_H2PO4,N,NN,N5,N4) &
+            +trcx_Eros_mol_2D(idx_HPO4B,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_H2PO4B,N,NN,N5,N4))
+
+          PPE=XN*patomw*(1._r8*(trcp_Eros_mol_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_FePO4,N,NN,N5,N4) &
+            +trcp_Eros_mol_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_AlPO4B,N,NN,N5,N4) &
+            +trcp_Eros_mol_2D(idsp_FePO4B,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
+            +2.0_r8*(trcp_Eros_mol_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
+            +3.0_r8*(trcp_Eros_mol_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_ApatiteBand,N,NN,N5,N4))&
+            +XPO4Soil_Eros_molP_2D(N,NN,N5,N4)+XPO4Band_Eros_molP_2D(N,NN,N5,N4))
+
           MOE(:)=0.0_r8
           
           D3580: DO K=1,jcplx
@@ -365,26 +368,28 @@ implicit none
 !         TIONOU,HydroIonFlx_CumYr_col=total salt loss through lateral and lower boundaries
 !
           IF(salt_model)THEN
-            SEF=XN*(XNH3Soil_Eros_2D(N,NN,N5,N4)+XUreaSoil_Eros_2D(N,NN,N5,N4)+XNO3Soil_Eros_2D(N,NN,N5,N4) &
-              +XNH3Band_Eros_2D(N,NN,N5,N4)+XUreaBand_Eros_2D(N,NN,N5,N4)+XNO3Band_Eros_2D(N,NN,N5,N4)) &
-              +2.0*(XNH4Soil_Eros_2D(N,NN,N5,N4)+XNH4Band_Eros_2D(N,NN,N5,N4))
-            SEX=XN*(trcx_Eros_2D(idx_Hp,N,NN,N5,N4)+trcx_Eros_2D(idx_Al,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_Fe,N,NN,N5,N4)+trcx_Eros_2D(idx_Ca,N,NN,N5,N4)+trcx_Eros_2D(idx_Mg,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_Na,N,NN,N5,N4)+trcx_Eros_2D(idx_K,N,NN,N5,N4)+trcx_Eros_2D(idx_COOH,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_OHe,N,NN,N5,N4)+trcx_Eros_2D(idx_OHeB,N,NN,N5,N4)) &
-              +XN*2.0*(trcx_Eros_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_2D(idx_NH4B,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_OH,N,NN,N5,N4)+trcx_Eros_2D(idx_OHB,N,NN,N5,N4)) &
-              +XN*3.0*(trcx_Eros_2D(idx_AlOH2,N,NN,N5,N4)+trcx_Eros_2D(idx_FeOH2,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_OHp,N,NN,N5,N4)+trcx_Eros_2D(idx_OHpB,N,NN,N5,N4) &
-              +trcx_Eros_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_2D(idx_HPO4B,N,NN,N5,N4)) &
-              +XN*4.0*(trcx_Eros_2D(idx_H2PO4,N,NN,N5,N4)+trcx_Eros_2D(idx_H2PO4B,N,NN,N5,N4))
-            SEP=XN*2.0*(trcp_Eros_2D(idsp_CaCO3,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaSO4,N,NN,N5,N4) &
-              +trcp_Eros_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4,N,NN,N5,N4) &
-              +trcp_Eros_2D(idsp_AlPO4B,N,NN,N5,N4)+trcp_Eros_2D(idsp_FePO4B,N,NN,N5,N4)) &
-              +XN*3.0*(trcp_Eros_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
-              +XN*4.0*(trcp_Eros_2D(idsp_AlOH3,N,NN,N5,N4)+trcp_Eros_2D(idsp_FeOH3,N,NN,N5,N4)) &
-              +XN*7.0*(trcp_Eros_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
-              +XN*9.0*(trcp_Eros_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_2D(idsp_ApatiteBand,N,NN,N5,N4))
+            SEF=XN*(XNH3Soil_Eros_molN_2D(N,NN,N5,N4)+XUreaSoil_Eros_molN_2D(N,NN,N5,N4)+XNO3Soil_Eros_molN_2D(N,NN,N5,N4) &
+              +XNH3Band_Eros_molN_2D(N,NN,N5,N4)+XUreaBand_Eros_molN_2D(N,NN,N5,N4)+XNO3Band_Eros_molN_2D(N,NN,N5,N4)) &
+              +2.0*(XNH4Soil_Eros_molN_2D(N,NN,N5,N4)+XNH4Band_Eros_molN_2D(N,NN,N5,N4))
+            SEX=XN*(trcx_Eros_mol_2D(idx_Hp,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_Al,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_Fe,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_Ca,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_Mg,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_Na,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_K,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_COOH,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_OHe,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_OHeB,N,NN,N5,N4)) &
+              +XN*2.0*(trcx_Eros_mol_2D(idx_NH4,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_NH4B,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_OH,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_OHB,N,NN,N5,N4)) &
+              +XN*3.0*(trcx_Eros_mol_2D(idx_AlOH2,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_FeOH2,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_OHp,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_OHpB,N,NN,N5,N4) &
+              +trcx_Eros_mol_2D(idx_HPO4,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_HPO4B,N,NN,N5,N4)) &
+              +XN*4.0*(trcx_Eros_mol_2D(idx_H2PO4,N,NN,N5,N4)+trcx_Eros_mol_2D(idx_H2PO4B,N,NN,N5,N4))
+            SEP=XN*2.0*(trcp_Eros_mol_2D(idsp_CaCO3,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_CaSO4,N,NN,N5,N4) &
+              +trcp_Eros_mol_2D(idsp_AlPO4,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_FePO4,N,NN,N5,N4) &
+              +trcp_Eros_mol_2D(idsp_AlPO4B,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_FePO4B,N,NN,N5,N4)) &
+              +XN*3.0*(trcp_Eros_mol_2D(idsp_CaHPO4,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_CaHPO4B,N,NN,N5,N4)) &
+              +XN*4.0*(trcp_Eros_mol_2D(idsp_AlOH3,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_FeOH3,N,NN,N5,N4)) &
+              +XN*7.0*(trcp_Eros_mol_2D(idsp_CaH4P2O8,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_CaH4P2O8B,N,NN,N5,N4)) &
+              +XN*9.0*(trcp_Eros_mol_2D(idsp_Apatite,N,NN,N5,N4)+trcp_Eros_mol_2D(idsp_ApatiteBand,N,NN,N5,N4))
+              +XN*(XPO4Soil_Eros_molP_2D(N,NN,N5,N4)+XPO4Band_Eros_molP_2D(N,NN,N5,N4))
+
             SET=SEF+SEX+SEP
             TIONOU=TIONOU-SET
             HydroIonFlx_CumYr_col(NY,NX)=HydroIonFlx_CumYr_col(NY,NX)-SET

@@ -72,9 +72,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMicPM_vr(:,:,:,:)                     !soil micropore tortuosity, [m3 m-3]
   real(r8),target,allocatable ::  TortMacPM_vr(:,:,:,:)                     !soil macropore tortuosity, [m3 m-3]
   real(r8),target,allocatable ::  DiffusivitySolutEffM_vr(:,:,:,:)          !coefficient for dissolution - volatilization, []
-  real(r8),target,allocatable ::  SoilResit4RootPentrate_vr(:,:,:)          !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  SoilResist4RootPentrate_vr(:,:,:)         !soil resistance to root penetration, [MPa]
   real(r8),target,allocatable ::  PSISE_vr(:,:,:)                           !soil water potential at saturation, [Mpa]
-  real(r8),target,allocatable ::  PSISoilAirEntry(:,:,:)                    !soil water potential at air entry, [Mpa]
+  real(r8),target,allocatable ::  PSISoilAirEntry_vr(:,:,:)                    !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                  !osmotic soil water potential , [Mpa]
   real(r8),target,allocatable ::  PSIGrav_vr(:,:,:)                         !gravimetric soil water potential , [Mpa]
   real(r8),target,allocatable ::  SoilWatAirDry_vr(:,:,:)                   !air-dry water content, [m3 m-3]
@@ -107,6 +107,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  HydCondSoil_3D(:,:,:,:)                    !3D micropore hydraulic conductivity, [m MPa-1 h-1]
+  real(r8),target,allocatable ::  TWatFlowCellMicP_vr(:,:,:)                 !water flow into cell through micropores, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  TWatFlowCellMacP_vr(:,:,:)                 !water flow into cell through macropores, [m3 H2O d-2 h-1]  
   private :: InitAllocate
   contains
 
@@ -122,6 +124,8 @@ module SoilWaterDataType
 
   implicit none
 
+  allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
+  allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
   allocate(iPondBotLev_col(JY,JX)); iPondBotLev_col=0
   allocate(iPondFlag_col(JY,JX)); iPondFlag_col =.false.
   allocate(QWatIntLaterFlow_col(JY,JX)); QWatIntLaterFlow_col=0._r8
@@ -198,9 +202,9 @@ module SoilWaterDataType
   allocate(TortMicPM_vr(60,0:JZ,JY,JX));TortMicPM_vr=0._r8
   allocate(TortMacPM_vr(60,JZ,JY,JX)); TortMacPM_vr=0._r8
   allocate(DiffusivitySolutEffM_vr(60,0:JZ,JY,JX));DiffusivitySolutEffM_vr=0._r8
-  allocate(SoilResit4RootPentrate_vr(JZ,JY,JX));     SoilResit4RootPentrate_vr=0._r8
+  allocate(SoilResist4RootPentrate_vr(JZ,JY,JX));     SoilResist4RootPentrate_vr=0._r8
   allocate(PSISE_vr(0:JZ,JY,JX));  PSISE_vr=0._r8
-  allocate(PSISoilAirEntry(0:JZ,JY,JX));  PSISoilAirEntry=0._r8
+  allocate(PSISoilAirEntry_vr(0:JZ,JY,JX));  PSISoilAirEntry_vr=0._r8
   allocate(PSISoilOsmotic_vr(0:JZ,JY,JX));  PSISoilOsmotic_vr=0._r8
   allocate(PSIGrav_vr(0:JZ,JY,JX));  PSIGrav_vr=0._r8
   allocate(SoilWatAirDry_vr(0:JZ,JY,JX));  SoilWatAirDry_vr=0._r8
@@ -280,6 +284,8 @@ module SoilWaterDataType
   call destroy(IFLBM_2DH)
   call destroy(XGridRunoffFlag_2DH)
   call destroy(IFLB_2DH)
+  call destroy(TWatFlowCellMicP_vr)
+  call destroy(TWatFlowCellMacP_vr)  
   call destroy(RechrgDistNorthSubSurf_col)
   call destroy(RechrgDistEastSubSurf_col)
   call destroy(RechrgDistSouthSubSurf_col)
@@ -303,9 +309,9 @@ module SoilWaterDataType
   call destroy(TortMicPM_vr)
   call destroy(TortMacPM_vr)
   call destroy(DiffusivitySolutEffM_vr)
-  call destroy(SoilResit4RootPentrate_vr)
+  call destroy(SoilResist4RootPentrate_vr)
   call destroy(PSISE_vr)
-  call destroy(PSISoilAirEntry)
+  call destroy(PSISoilAirEntry_vr)
   call destroy(PSISoilOsmotic_vr)
   call destroy(PSIGrav_vr)
   call destroy(SoilWatAirDry_vr)

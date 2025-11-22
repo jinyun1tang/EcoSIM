@@ -226,11 +226,12 @@ module ExtractsMod
 !
       TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)
 
-      !water lose from canopy to soil
+      
       if(RPlantRootH2OUptk_pvr(N,L,NZ)>0._r8)then
-        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)*cpw*TKCanopy_pft(NZ)
-      !water lose from soil to canopy  
+        !water lose from canopy to soil
+        THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)*cpw*TKCanopy_pft(NZ)        
       else
+        !water lose from soil to canopy  
         THeatLossRoot2Soil_vr(L)     = THeatLossRoot2Soil_vr(L)+RPlantRootH2OUptk_pvr(N,L,NZ)*cpw*TKS_vr(L)
       endif
 !

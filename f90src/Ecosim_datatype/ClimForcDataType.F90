@@ -49,6 +49,8 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
+  real(r8),target,allocatable ::  srad_scalar_col(:,:)     !solar radiation scalar due to open top chamber
+  real(r8),target,allocatable ::  EMS_scalar_col(:,:)      !emissivity scalar due to open top chamber
   real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
   real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
@@ -154,7 +156,9 @@ implicit none
   allocate(height_top_mon_pft(12,JP,JY,JX)); height_top_mon_pft=0._r8
   allocate(height_bot_mon_pft(12,JP,JY,JX)); height_bot_mon_pft=0._r8
 
-  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
+  allocate(EMS_scalar_col(JY,JX)); EMS_scalar_col = 1._r8
+  allocate(srad_scalar_col(JY,JX));srad_scalar_col=1._r8
+  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX)); trcs_solcoef_col=0._r8
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -282,7 +286,8 @@ implicit none
   call destroy(PrecIndirect2Grnd_col)
   call destroy(CO2EI_col)
   call destroy(CCO2EI_gperm3_col)
-
+  call destroy(srad_scalar_col)
+  call destroy(EMS_scalar_col)
   call destroy(AtmGasCgperm3_col)
   call destroy(AtmGmms_col)
   call destroy(TKS_ref_vr)

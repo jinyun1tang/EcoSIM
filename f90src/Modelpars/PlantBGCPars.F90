@@ -12,8 +12,8 @@ module PlantBGCPars
 !
 ! 
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]  
-  real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
-  real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
+  real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
+  real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to petiole, [-]
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
   real(r8) :: RSpecLiterFall                      !rate constant for LitrFall at end of growing season, [h-1]
   real(r8) :: Hours4PhyslMature                   !number of hours with no grain filling required for physilogical maturity, [h]
@@ -84,7 +84,7 @@ module PlantBGCPars
   real(r8) :: RCCYN                               !maximum fractions for bacteria C recycling,[-]
   real(r8) :: RCCXN                               !maximum fractions for bacteria N recycling,[-]
   real(r8) :: RCCQN                               !maximum fractions for bacteria P recycling,[-]
-
+  real(r8) :: RootElonZoneLenz                    !length of root elongation zone, [m]
   integer :: HoursReq4LiterfalAftMature           !required hours after physl maturity until start of LitrFall, [h]
   REAL(R8) :: FRSV(0:3)                           !rate constant for remobiln of storage chemical element during leafout, [h-1]
   real(r8) :: FXFY(0:1)                           !rate constant for leaf-reserve nonstructural C exchange, [h-1]
@@ -138,8 +138,8 @@ module PlantBGCPars
   integer :: icarbhyro                   !kinetic id of litter component as carbonhydrate
   integer :: icellulos                   !kinetic id of litter component as cellulose
   integer :: ilignin                     !kinetic id of litter component as lignin
-  integer :: k_woody_litr                !woody litter complex id
-  integer :: k_fine_litr                 !fine litter complex id
+  integer :: k_woody_comp                !woody litter complex id
+  integer :: k_fine_comp                 !fine litter complex id
   integer :: jroots                      !number of root groups, plant root + myco types
   end type plant_bgc_par_type
 
@@ -197,8 +197,8 @@ module PlantBGCPars
   pltpar%jcplx      = jcplxc
   pltpar%jroots=jroots
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  PART1X                      = 0.05_r8
-  PART2X                      = 0.02_r8
+  PART2LEAF_MIN               = 0.05_r8
+  PART2PETOL_MIN              = 0.02_r8
   VMXC                        = 0.015_r8
   RSpecLiterFall              = 2.884E-03_r8
   Hours4PhyslMature           = 168.0_r8
@@ -239,7 +239,7 @@ module PlantBGCPars
   RSMY_stomaCO2               = 2.78E-03_r8
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
-
+  RootElonZoneLenz            =0.03_r8
 
   FSTK                  = 0.05_r8
   ZSTX                  = 1.0E-03_r8
@@ -282,7 +282,7 @@ module PlantBGCPars
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)
   RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
 
-  RTSK=real((/0.25,1.0,4.0,4.0/),r8)
+  RTSK=real((/0.25,1.0,4.0,6.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)

@@ -3,10 +3,11 @@ module ReadManagementMod
   ! Description
   ! code to read Soil management info
   !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils , only : endrun
-  use fileUtil   , only : open_safe,int2str
-  use minimathmod, only : isLeap
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use fileUtil,      only: open_safe, int2str
+  use minimathmod,   only: isLeap
+  use DebugToolMod,  only: PrintInfo
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -281,11 +282,11 @@ implicit none
 
   integer :: NY,NX,LPY
   integer :: IDY1,IDY2,IDY3,IDY
-  real(r8) :: FDPTHI,DY
+  real(r8) :: AppDepth,DDMMYYYY
   real(r8) :: NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band,NH4Soil
   real(r8) :: MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,Gypsum,LimeStone
   real(r8) :: PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP
-  real(r8) :: ROWX
+  real(r8) :: BandWidth,PO4Soil,PO4Band
   integer  :: IR0,IR1,IR2
   integer  :: kk
   logical :: readvar
@@ -305,8 +306,8 @@ implicit none
 !     LimeStone,Gypsum=CaCO3,CaSO4
 !     *1,*2=litter,manure amendments
 !     RSC,RSN,RSC=amendment C,N,P content
-!     FDPTHI=application depth
-!     ROWX=band row width
+!     AppDepth=application depth
+!     BandWidth=band row width
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
 
@@ -320,25 +321,25 @@ implicit none
 
   do kk=1,12
     if(len_trim(fertf(kk))==0)exit
-
-    READ(fertf(kk),*)DY,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
+    !all nutrients are in g/m2
+    READ(fertf(kk),*)DDMMYYYY,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
       ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
-      ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,FDPTHI &
-      ,ROWX,IR0,IR1,IR2
+      ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,AppDepth &
+      ,BandWidth,PO4Soil,PO4Band,IR0,IR1,IR2
 
     LPY=0
-    IDY1=INT(DY/1.0E+06_r8)
+    IDY1=INT(DDMMYYYY/1.0E+06_r8)
     !return for bad fertilization data
     if(IDY1==0)return
-    IDY2=INT(DY/1.0E+04_r8-IDY1*1.0E+02_r8)
-    IDY3=INT(DY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
+    IDY2=INT(DDMMYYYY/1.0E+04_r8-IDY1*1.0E+02_r8)
+    IDY3=INT(DDMMYYYY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
      
     IF(LVERB)then
       print*,fertf(kk)
       PRINT*,IDY1,IDY2,IDY3,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
         ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
-        ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,FDPTHI &
-        ,ROWX,IR0,IR1,IR2
+        ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,AppDepth &
+        ,BandWidth,PO4Soil,PO4Band,IR0,IR1,IR2
     endif
 
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
@@ -357,19 +358,19 @@ implicit none
 !
         FERT(ifert_N_nh4,IDY,NY,NX)       = NH4Soil        !NH4 broadcast
         FERT(ifert_N_nh3,IDY,NY,NX)       = NH3Soil        !NH3 broadcast
-        FERT(ifert_N_urea,IDY,NY,NX)      = UreaSoil        !Urea broadcast
+        FERT(ifert_N_urea,IDY,NY,NX)      = UreaSoil       !Urea broadcast
         FERT(ifert_N_no3,IDY,NY,NX)       = NO3Soil        !NO3 broadcast
         FERT(ifert_N_nh4_band,IDY,NY,NX)  = NH4Band        !NH4 band
         FERT(ifert_N_nh3_band,IDY,NY,NX)  = NH3Band        !NH3 band
-        FERT(ifert_N_urea_band,IDY,NY,NX) = UreaBand        !Urea band
+        FERT(ifert_N_urea_band,IDY,NY,NX) = UreaBand       !Urea band
         FERT(ifert_N_no3_band,IDY,NY,NX)  = NO3Band        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)
 !
-        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)      = MonocalciumPhosphateSoil        !PM broadcast
+        FERT(ifert_P_Ca_H2PO4_2_soil,IDY,NY,NX) = MonocalciumPhosphateSoil        !PM broadcast
         FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = MonocalciumPhosphateBand        !PM band
-        FERT(ifert_P_apatite,IDY,NY,NX)         = hydroxyapatite        !
+        FERT(ifert_P_apatite,IDY,NY,NX)         = hydroxyapatite                  !(Ca5(PO4)3OH)
 !
 !         LIME AND GYPSUM
 !
@@ -384,17 +385,19 @@ implicit none
         FERT(ifert_plant_manuC,IDY,NY,NX) = ManureC
         FERT(ifert_plant_manuN,IDY,NY,NX) = ManureN
         FERT(ifert_plant_manuP,IDY,NY,NX) = ManureP
+        FERT(ifert_PO4_soil,IDY,NY,NX)    = PO4Soil
+        FERT(ifert_PO4_band,IDY,NY,NX)    = PO4Band
 !
 !         DEPTH AND WIDTH OF APPLICATION
 !
-        FDPTH(IDY,NY,NX) = FDPTHI    !depth
-        ROWI(IDY,NY,NX)  = ROWX       !width
+        FDPTH(IDY,NY,NX) = AppDepth    !depth
+        ROWI(IDY,NY,NX)  = BandWidth       !width
 !
 !         TYPE OF FERTILIZER,PLANT OR ANIMAL RESIDUE
 !
-        IYTYP(iamendtyp_fert,IDY,NY,NX)=IR0
-        IYTYP(iAmendtyp_plantRes,IDY,NY,NX)=IR1
-        IYTYP(iAmendtyp_Manure,IDY,NY,NX)=IR2
+        IYTYP(iamendtyp_fert,IDY,NY,NX)     = IR0
+        IYTYP(iAmendtyp_plantRes,IDY,NY,NX) = IR1
+        IYTYP(iAmendtyp_Manure,IDY,NY,NX)   = IR2
       ENDDO D8980
     ENDDO D8985
   enddo
@@ -410,7 +413,7 @@ implicit none
   use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
   integer, intent(in) :: yeari
-
+  character(len=*), parameter :: subname='ReadManagementFiles'
   integer :: NH1,NV1,NH2,NV2
   type(file_desc_t) :: soilmgmt_nfid
   type(Var_desc_t) :: vardesc
@@ -425,7 +428,7 @@ implicit none
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
-
+  call PrintInfo('beg '//subname)
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
   nyears=get_dim_len(soilmgmt_nfid, 'year')
   if(nyears==0)then
@@ -504,7 +507,7 @@ implicit none
     ENDIF
   ENDDO
   call ncd_pio_closefile(soilmgmt_nfid)
-
+  call PrintInfo('end '//subname)
   end subroutine ReadManagementFiles
 
 !------------------------------------------------------------------------------------------

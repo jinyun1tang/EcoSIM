@@ -71,6 +71,11 @@ module MicForcTypeMod
   real(r8) :: RH2PO4EcoDmndLitrPrev
   real(r8) :: RH1PO4EcoDmndLitrPrev
   real(r8) :: RO2AquaXchangePrev
+  real(r8) :: tRNH4MicrbImobilSoil
+  real(r8) :: tRNO3MicrbImobilSoil
+  real(r8) :: tRH2PO4MicrbImobilSoil
+  real(r8) :: tRH1PO4MicrbImobilSoil
+
   real(r8) :: VOLWU
   real(r8), allocatable :: ElmAllocmatMicrblitr2POM(:)
   real(r8), allocatable :: ElmAllocmatMicrblitr2POMU(:)

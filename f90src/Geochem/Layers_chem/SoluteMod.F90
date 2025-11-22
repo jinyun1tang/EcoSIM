@@ -993,16 +993,16 @@ module SoluteMod
     ELSE
       ZNHUI_vr(0,NY,NX)=0._r8
     ENDIF
-!
-!     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
-!
-!     ZNHUFA=urea fertilizer
-!     Urea_mole_conc=concentration of urea fertilizer
-!     DFNSA=effect of microbial concentration on urea hydrolysis
-!     RFertReleaz_Urea=rate of urea hydrolysis
-!     RFertUreaSpecHydrol=specific rate constant for urea hydrolysis
-!     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
-!
+    !
+    !     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
+    !
+    !     ZNHUFA=urea fertilizer
+    !     Urea_mole_conc=concentration of urea fertilizer
+    !     DFNSA=effect of microbial concentration on urea hydrolysis
+    !     RFertReleaz_Urea=rate of urea hydrolysis
+    !     RFertUreaSpecHydrol=specific rate constant for urea hydrolysis
+    !     TSens4MicbGrwoth_vr=temperature effect on microbial activity from nitro.f
+    !
     IF(FertN_mole_soil_vr(ifert_N_urea,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND. VLSoilMicPMass_vr(0,NY,NX).GT.ZEROS(NY,NX))THEN
       Urea_mole_conc = FertN_mole_soil_vr(ifert_N_urea,0,NY,NX)/VLSoilMicPMass_vr(0,NY,NX)

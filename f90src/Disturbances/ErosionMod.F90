@@ -150,7 +150,7 @@ module ErosionMod
     !     FROM 'HOUR1'
     !
           STPR=1.0E+02_r8*RunoffVelocityM_col(M,NY,NX)*ABS(SLOPE_col(0,NY,NX))
-          CSEDX=PrtcleDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
+          CSEDX=PtclDensitySurfLay_col(NY,NX)*CER_col(NY,NX)*AZMAX1(STPR-0.4_r8)**XER_col(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLMobileWatMicPM(M,NY,NX))
 
           IF(CSEDX.GT.CSEDD)THEN
@@ -229,7 +229,7 @@ module ErosionMod
           IF(NN.EQ.iFront)THEN  !            
             FERM                      = QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)/SurfRunoffPotentM_col(M,N2,N1)
             SedErosionM(N,iBehind,N5,N4)    = BaseErosionRate(N2,N1)*FERM
-            cumSed_Eros_2D(N,iBehind,N5,N4) = cumSed_Eros_2D(N,iBehind,N5,N4)+SedErosionM(N,2,N5,N4)
+            cumSed_Eros_2D(N,iBehind,N5,N4) = cumSed_Eros_2D(N,iBehind,N5,N4)+SedErosionM(N,iBehind,N5,N4)
           ELSE
             SedErosionM(N,iBehind,N5,N4)=0._r8
           ENDIF
@@ -239,7 +239,7 @@ module ErosionMod
               !well-defined dest grid
               FERM                             = QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)/SurfRunoffPotentM_col(M,N2,N1)
               SedErosionM(N,iFront,N5B,N4B)    = BaseErosionRate(N2,N1)*FERM
-              cumSed_Eros_2D(N,iFront,N5B,N4B) = cumSed_Eros_2D(N,iFront,N5B,N4B)+SedErosionM(N,1,N5B,N4B)
+              cumSed_Eros_2D(N,iFront,N5B,N4B) = cumSed_Eros_2D(N,iFront,N5B,N4B)+SedErosionM(N,iFront,N5B,N4B)
             ELSE
               SedErosionM(N,iFront,N5B,N4B)=0._r8
             ENDIF
@@ -439,30 +439,33 @@ module ErosionMod
 !     SOIL MINERALS
 !
             IF(NN.EQ.iFront)THEN
-              FSEDER=AMIN1(1.0,cumSed_Eros_2D(N,2,N5,N4)/SoilMicPMassLayerMX(N2,N1))
-              XSand_Eros_2D(N,2,N5,N4)=FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
-              XSilt_Eros_2D(N,2,N5,N4)=FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
-              XClay_Eros_2D(N,2,N5,N4)=FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
+              FSEDER = AMIN1(1.0,cumSed_Eros_2D(N,iBehind,N5,N4)/SoilMicPMassLayerMX(N2,N1))
+
+              XSand_Eros_2D(N,iBehind,N5,N4) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
+              XSilt_Eros_2D(N,iBehind,N5,N4) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
+              XClay_Eros_2D(N,iBehind,N5,N4) = FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
 !     *ER=sediment flux from erosion.f
 !
-              XNH4Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+              XNH4Soil_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+              XNH3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+              XUreaSoil_Eros_molN_2D(N,iBehind,N5,N4) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+              XNO3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+              XPO4Soil_Eros_molP_2D(N,iBehind,N5,N4) =  FSEDER*FertP_mole_soil_vr(NU_col(N2,N1),N2,N1)
 
-              XNH4Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,2,N5,N4) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,2,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+              XNH4Band_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+              XNH3Band_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+              XUreaBand_Eros_molN_2D(N,iBehind,N5,N4) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+              XNO3Band_Eros_molN_2D(N,iBehind,N5,N4)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+              XPO4Band_Eros_molP_2D(N,iBehind,N5,N4)  = FSEDER*FertP_mole_band_vr(NU_col(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !     sediment code
 !
               DO NTX=idx_beg,idx_end
-                trcx_Eros_2D(NTX,N,2,N5,N4)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
+                trcx_Eros_mol_2D(NTX,N,iBehind,N5,N4)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
@@ -470,7 +473,7 @@ module ErosionMod
 !     sediment code
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_Eros_2D(NTP,N,2,N5,N4)   =FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
+                trcp_Eros_mol_2D(NTP,N,iBehind,N5,N4)   =FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER
@@ -481,7 +484,7 @@ module ErosionMod
                     DO M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr_2D(NE,MID,K,N,2,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
+                        OMEERhetr_2D(NE,MID,K,N,iBehind,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
                       ENDDO
                     ENDDO
                   ENDDO
@@ -493,7 +496,7 @@ module ErosionMod
                   DO M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms
-                      OMEERauto_2D(NE,MID,N,2,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
+                      OMEERauto_2D(NE,MID,N,iBehind,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
@@ -502,42 +505,44 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms
-                    OMBioResdu_Eros_2D(NE,M,K,N,2,N5,N4)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
+                    OMBioResdu_Eros_2D(NE,M,K,N,iBehind,N5,N4)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  SorbedOM_Eros_2D(idom,K,N,2,N5,N4)=FSEDER*SorbedOM_vr(idom,K,NU_col(N2,N1),N2,N1)
+                  SorbedOM_Eros_2D(idom,K,N,iBehind,N5,N4)=FSEDER*SorbedOM_vr(idom,K,NU_col(N2,N1),N2,N1)
                 ENDDO
                 DO  M=1,jsken
                   DO NE=1,NumPlantChemElms
-                    SolidOM_Eros_2D(NE,M,K,N,2,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
+                    SolidOM_Eros_2D(NE,M,K,N,iBehind,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                   ENDDO
-                  SolidOMAct_Eros_2D(M,K,N,2,N5,N4)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
+                  SolidOMAct_Eros_2D(M,K,N,iBehind,N5,N4)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
                 ENDDO
               ENDDO
             ELSE
-              XSand_Eros_2D(N,2,N5,N4)=0._r8
-              XSilt_Eros_2D(N,2,N5,N4)=0._r8
-              XClay_Eros_2D(N,2,N5,N4)=0._r8
+              XSand_Eros_2D(N,iBehind,N5,N4)=0._r8
+              XSilt_Eros_2D(N,iBehind,N5,N4)=0._r8
+              XClay_Eros_2D(N,iBehind,N5,N4)=0._r8
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,2,N5,N4)  = 0._r8
-              XNH3Soil_Eros_2D(N,2,N5,N4)  = 0._r8
-              XUreaSoil_Eros_2D(N,2,N5,N4) = 0._r8
-              XNO3Soil_Eros_2D(N,2,N5,N4)  = 0._r8
-              XNH4Band_Eros_2D(N,2,N5,N4)  = 0._r8
-              XNH3Band_Eros_2D(N,2,N5,N4)  = 0._r8
-              XUreaBand_Eros_2D(N,2,N5,N4) = 0._r8
-              XNO3Band_Eros_2D(N,2,N5,N4)  = 0._r8
+              XNH4Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XNH3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XUreaSoil_Eros_molN_2D(N,iBehind,N5,N4) = 0._r8
+              XNO3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XPO4Soil_Eros_molP_2D(N,iBehind,N5,N4)  = 0._r8
+              XNH4Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XNH3Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XUreaBand_Eros_molN_2D(N,iBehind,N5,N4) = 0._r8
+              XNO3Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
+              XPO4Band_Eros_molP_2D(N,iBehind,N5,N4)  = 0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              trcx_Eros_2D(idx_beg:idx_end,N,2,N5,N4)=0._r8
+              trcx_Eros_mol_2D(idx_beg:idx_end,N,iBehind,N5,N4)=0._r8
 !
 !     PRECIPITATES
 !
-              trcp_Eros_2D(idsp_beg:idsp_end,N,2,N5,N4)=0._r8
+              trcp_Eros_mol_2D(idsp_beg:idsp_end,N,iBehind,N5,N4)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -547,7 +552,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms
-                        OMEERhetr_2D(NE,MID,K,N,2,N5,N4)=0._r8
+                        OMEERhetr_2D(NE,MID,K,N,iBehind,N5,N4)=0._r8
                       ENDDO
                     enddo
                   ENDDO
@@ -559,7 +564,7 @@ module ErosionMod
                   DO  M=1,nlbiomcp
                     MID=micpar%get_micb_id(M,NGL)
                     DO NE=1,NumPlantChemElms                    
-                      OMEERauto_2D(NE,MID,N,2,N5,N4)=0._r8
+                      OMEERauto_2D(NE,MID,N,iBehind,N5,N4)=0._r8
                     ENDDO
                   enddo
                 ENDDO
@@ -568,51 +573,54 @@ module ErosionMod
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   DO NE=1,NumPlantChemElms
-                    OMBioResdu_Eros_2D(NE,M,K,N,2,N5,N4)=0._r8
+                    OMBioResdu_Eros_2D(NE,M,K,N,iBehind,N5,N4)=0._r8
                   ENDDO
                 ENDDO
                 DO idom=idom_beg,idom_end
-                  SorbedOM_Eros_2D(idom,K,N,2,N5,N4)=0._r8
+                  SorbedOM_Eros_2D(idom,K,N,iBehind,N5,N4)=0._r8
                 ENDDO
                 DO  M=1,jsken
-                  SolidOMAct_Eros_2D(M,K,N,2,N5,N4)=0._r8       
+                  SolidOMAct_Eros_2D(M,K,N,iBehind,N5,N4)=0._r8       
                   DO NE=1,NumPlantChemElms         
-                    SolidOM_Eros_2D(NE,M,K,N,2,N5,N4)=0._r8
+                    SolidOM_Eros_2D(NE,M,K,N,iBehind,N5,N4)=0._r8
                   ENDDO
                 ENDDO
               ENDDO
             ENDIF
             IF(NN.EQ.iBehind)THEN
               IF(N4B.GT.0.AND.N5B.GT.0)THEN
-                FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,1,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
-                XSand_Eros_2D(N,1,N5B,N4B) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
-                XSilt_Eros_2D(N,1,N5B,N4B) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
-                XClay_Eros_2D(N,1,N5B,N4B) = FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
+                FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,iFront,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
+                XSand_Eros_2D(N,iFront,N5B,N4B) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
+                XSilt_Eros_2D(N,iFront,N5B,N4B) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
+                XClay_Eros_2D(N,iFront,N5B,N4B) = FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
-                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
-                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
-                XUreaSoil_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
-                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
-                XNH4Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
-                XNH3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
-                XUreaBand_Eros_2D(N,1,N5B,N4B) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
-                XNO3Band_Eros_2D(N,1,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+                XNH4Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+                XNH3Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+                XUreaSoil_Eros_molN_2D(N,iFront,N5B,N4B) = FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+                XNO3Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+                XPO4Soil_Eros_molP_2D(N,iFront,N5B,N4B)  = FSEDER*FertP_mole_soil_vr(NU_col(N2,N1),N2,N1)
+                XNH4Band_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+                XNH3Band_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+                XUreaBand_Eros_molN_2D(N,iFront,N5B,N4B) = FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+                XNO3Band_Eros_molN_2D(N,iFront,N5B,N4B)  = FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+                XPO4Band_Eros_molP_2D(N,iFront,N5B,N4B)  = FSEDER*FertP_mole_band_vr(NU_col(N2,N1),N2,N1)
+
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
 !     sediment code
 !
                 DO NTX=idx_beg,idx_end
-                  trcx_Eros_2D(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
+                  trcx_Eros_mol_2D(NTX,N,iFront,N5B,N4B)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
                 ENDDO
 !
 !     PRECIPITATES
 !
 !     sediment code
                 DO NTP=idsp_beg,idsp_end
-                  trcp_Eros_2D(NTP,N,1,N5B,N4B)=FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
+                  trcp_Eros_mol_2D(NTP,N,iFront,N5B,N4B)=FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
                 ENDDO
 !
 !     ORGANIC MATTER
@@ -623,7 +631,7 @@ module ErosionMod
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)      
                         DO NE=1,NumPlantChemElms                                                 
-                          OMEERhetr_2D(NE,MID,K,N,1,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
+                          OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
                         ENDDO
                       enddo
                     enddo
@@ -634,7 +642,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms         
-                        OMEERauto_2D(NE,MID,N,1,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
+                        OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
                       ENDDO
                     enddo
                   enddo
@@ -643,42 +651,44 @@ module ErosionMod
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     DO NE=1,NumPlantChemElms   
-                      OMBioResdu_Eros_2D(NE,M,K,N,1,N5B,N4B)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
+                      OMBioResdu_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                   DO idom=idom_beg,idom_end
-                    SorbedOM_Eros_2D(idom,K,N,1,N5B,N4B)=FSEDER*SorbedOM_vr(idom,K,NU_col(N2,N1),N2,N1)
+                    SorbedOM_Eros_2D(idom,K,N,iFront,N5B,N4B)=FSEDER*SorbedOM_vr(idom,K,NU_col(N2,N1),N2,N1)
                   ENDDO
                   DO  M=1,jsken
-                    SolidOMAct_Eros_2D(M,K,N,1,N5B,N4B)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
+                    SolidOMAct_Eros_2D(M,K,N,iFront,N5B,N4B)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
                     DO NE=1,NumPlantChemElms                      
-                      SolidOM_Eros_2D(NE,M,K,N,1,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
+                      SolidOM_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                     ENDDO  
                   ENDDO
                 ENDDO
               ELSE
-                XSand_Eros_2D(N,1,N5B,N4B) = 0._r8
-                XSilt_Eros_2D(N,1,N5B,N4B) = 0._r8
-                XClay_Eros_2D(N,1,N5B,N4B) = 0._r8
+                XSand_Eros_2D(N,iFront,N5B,N4B) = 0._r8
+                XSilt_Eros_2D(N,iFront,N5B,N4B) = 0._r8
+                XClay_Eros_2D(N,iFront,N5B,N4B) = 0._r8
 !
 !     FERTILIZER POOLS
 !
-                XNH4Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
-                XNH3Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
-                XUreaSoil_Eros_2D(N,1,N5B,N4B) = 0._r8
-                XNO3Soil_Eros_2D(N,1,N5B,N4B)  = 0._r8
-                XNH4Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
-                XNH3Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
-                XUreaBand_Eros_2D(N,1,N5B,N4B) = 0._r8
-                XNO3Band_Eros_2D(N,1,N5B,N4B)  = 0._r8
+                XNH4Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XNH3Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XUreaSoil_Eros_molN_2D(N,iFront,N5B,N4B) = 0._r8
+                XNO3Soil_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XPO4Soil_Eros_molP_2D(N,iFront,N5B,N4B)  = 0._r8
+                XNH4Band_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XNH3Band_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XUreaBand_Eros_molN_2D(N,iFront,N5B,N4B) = 0._r8
+                XNO3Band_Eros_molN_2D(N,iFront,N5B,N4B)  = 0._r8
+                XPO4Band_Eros_molP_2D(N,iFront,N5B,N4B)= 0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-                trcx_Eros_2D(idx_beg:idx_end,N,1,N5B,N4B)=0._r8
+                trcx_Eros_mol_2D(idx_beg:idx_end,N,iFront,N5B,N4B)=0._r8
 !
 !     PRECIPITATES
 !
-                trcp_Eros_2D(idsp_beg:idsp_end,N,1,N5B,N4B)=0._r8
+                trcp_Eros_mol_2D(idsp_beg:idsp_end,N,iFront,N5B,N4B)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -688,7 +698,7 @@ module ErosionMod
                       DO  M=1,nlbiomcp
                         MID=micpar%get_micb_id(M,NGL)
                         DO NE=1,NumPlantChemElms  
-                          OMEERhetr_2D(NE,MID,K,N,1,N5B,N4B)=0._r8
+                          OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=0._r8
                         ENDDO  
                       enddo
                     ENDDO
@@ -700,7 +710,7 @@ module ErosionMod
                     DO  M=1,nlbiomcp
                       MID=micpar%get_micb_id(M,NGL)
                       DO NE=1,NumPlantChemElms                        
-                        OMEERauto_2D(NE,MID,N,1,N5B,N4B)=0._r8
+                        OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=0._r8
                       ENDDO  
                     enddo
                   ENDDO
@@ -709,16 +719,16 @@ module ErosionMod
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     DO NE=1,NumPlantChemElms                    
-                      OMBioResdu_Eros_2D(NE,M,K,N,1,N5B,N4B)=0._r8
+                      OMBioResdu_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
                   DO idom=idom_beg,idom_end
-                    SorbedOM_Eros_2D(idom,K,N,1,N5B,N4B)=0._r8
+                    SorbedOM_Eros_2D(idom,K,N,iFront,N5B,N4B)=0._r8
                   ENDDO
                   DO  M=1,jsken
-                    SolidOMAct_Eros_2D(M,K,N,1,N5B,N4B)=0._r8
+                    SolidOMAct_Eros_2D(M,K,N,iFront,N5B,N4B)=0._r8
                     DO NE=1,NumPlantChemElms       
-                      SolidOM_Eros_2D(NE,M,K,N,1,N5B,N4B)=0._r8
+                      SolidOM_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
                 ENDDO
@@ -812,22 +822,24 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,NN,M5,M4)=0._r8
-              XNH3Soil_Eros_2D(N,NN,M5,M4)=0._r8
-              XUreaSoil_Eros_2D(N,NN,M5,M4)=0._r8
-              XNO3Soil_Eros_2D(N,NN,M5,M4)=0._r8
-              XNH4Band_Eros_2D(N,NN,M5,M4)=0._r8
-              XNH3Band_Eros_2D(N,NN,M5,M4)=0._r8
-              XUreaBand_Eros_2D(N,NN,M5,M4)=0._r8
-              XNO3Band_Eros_2D(N,NN,M5,M4)=0._r8
+              XNH4Soil_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XNH3Soil_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XUreaSoil_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XNO3Soil_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XPO4Soil_Eros_molP_2D(N,NN,M5,M4)=0._r8
+              XNH4Band_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XNH3Band_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XUreaBand_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XNO3Band_Eros_molN_2D(N,NN,M5,M4)=0._r8
+              XPO4Band_Eros_molP_2D(N,NN,M5,M4)=0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              trcx_Eros_2D(idx_beg:idx_end,N,NN,M5,M4)=0._r8
+              trcx_Eros_mol_2D(idx_beg:idx_end,N,NN,M5,M4)=0._r8
 !
 !     PRECIPITATES
 !
-              trcp_Eros_2D(idsp_beg:idsp_end,N,NN,M5,M4)=0._r8
+              trcp_Eros_mol_2D(idsp_beg:idsp_end,N,NN,M5,M4)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -883,25 +895,28 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
-              XNH3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
-              XUreaSoil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
-              XNO3Soil_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
-              XNH4Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
-              XNH3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
-              XUreaBand_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
-              XNO3Band_Eros_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+              XNH4Soil_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh4,NU_col(N2,N1),N2,N1)
+              XNH3Soil_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_nh3,NU_col(N2,N1),N2,N1)
+              XUreaSoil_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_urea,NU_col(N2,N1),N2,N1)
+              XNO3Soil_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_soil_vr(ifert_N_no3,NU_col(N2,N1),N2,N1)
+              XPO4Soil_Eros_molP_2D(N,NN,M5,M4)=FSEDER*FertP_mole_soil_vr(NU_col(N2,N1),N2,N1)
+
+              XNH4Band_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(N2,N1),N2,N1)
+              XNH3Band_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(N2,N1),N2,N1)
+              XUreaBand_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_urea_band,NU_col(N2,N1),N2,N1)
+              XNO3Band_Eros_molN_2D(N,NN,M5,M4)=FSEDER*FertN_mole_Band_vr(ifert_N_no3_band,NU_col(N2,N1),N2,N1)
+              XPO4Band_Eros_molP_2D(N,NN,M5,M4)=FSEDER*FertP_mole_band_vr(NU_col(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
               DO NTX=idx_beg,idx_end
-                trcx_Eros_2D(NTX,N,NN,M5,M4)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
+                trcx_Eros_mol_2D(NTX,N,NN,M5,M4)=FSEDER*trcx_solml_vr(NTX,NU_col(N2,N1),N2,N1)
               ENDDO
 !
 !     PRECIPITATES
 !
               DO NTP=idsp_beg,idsp_end
-                trcp_Eros_2D(NTP,N,NN,M5,M4)=FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
+                trcp_Eros_mol_2D(NTP,N,NN,M5,M4)=FSEDER*trcp_saltpml_vr(NTP,NU_col(N2,N1),N2,N1)
               ENDDO
 !
 !     ORGANIC MATTER

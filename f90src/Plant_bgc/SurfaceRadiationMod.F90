@@ -121,8 +121,8 @@ module SurfaceRadiationMod
 !     WindSpeedAtm_col=wind speed
 !     RIB=canopy isothermal Richardson number
 !   here 0.168 = cvonkarman**2
-    AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
-    RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2._r8*TairK)
+    AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2/(0.168_r8*WindSpeedAtm_col))
+    RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2*TairK)
 
   ELSE
     AbvCanopyBndlResist_col = RAM

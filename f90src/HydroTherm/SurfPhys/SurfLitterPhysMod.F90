@@ -141,9 +141,9 @@ implicit none
     Radt2LitR            = RadSWByLitR+LWRad2LitR_col(NY,NX)
     Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWByLitR
 
-    CNVR = VaporDiffusivityLitR_col(NY,NX)*FracAirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*FracAirFilledSoilPoreM_vr(M,0,NY,NX)/POROS_vr(0,NY,NX)
-    CNV1 = WVapDifusvitySoil_vr(NUM_col(NY,NX),NY,NX)*FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)*POROQ &
-      *FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)/POROS_vr(NUM_col(NY,NX),NY,NX)
+    CNVR = VaporDiffusivityLitR_col(NY,NX)*FracAirFilledSoilPoreM_vr(M,0,NY,NX)**2*POROQ/POROS_vr(0,NY,NX)
+    CNV1 = WVapDifusvitySoil_vr(NUM_col(NY,NX),NY,NX)*FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)**2 &
+      *POROQ/POROS_vr(NUM_col(NY,NX),NY,NX)
     !there is litter layer
     IF(CNVR.GT.ZERO.AND.CNV1.GT.ZERO)THEN
       CdVaporLit2Soil=2.0_r8*CNVR*CNV1/(CNVR*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+CNV1*DLYRR_COL(NY,NX))
@@ -795,19 +795,19 @@ implicit none
           N4B = NX;N5B = NY-1  !lower/north
         ENDIF
       ENDIF
-!
-!     ELEVATION OF EACH PAIR OF ADJACENT GRID CELLS
-!
-!     ALT1,ALT2=elevation of source,destination
-!     QRQ1=equilibrium runoff
-!     WatFlx2LitRByRunoff,HeatFlx2LitRByRunoff=runoff, convective heat from runoff
-!     QR,HQR=hourly-accumulated runoff, convective heat from runoff
-!     WatFlux4ErosionM=runoff water flux
-!     FSLOPE_2DH=partitions surface water flow in (N=1)EW,(N=2)NS direction
-!     XVLMobileWaterLitR_col: mobile water
-!     IFLBM_2DH=runoff direction (0 = E or S, 1 = W or N)
+      !
+      !     ELEVATION OF EACH PAIR OF ADJACENT GRID CELLS
+      !
+      !     ALT1,ALT2=elevation of source,destination
+      !     QRQ1=equilibrium runoff
+      !     WatFlx2LitRByRunoff,HeatFlx2LitRByRunoff=runoff, convective heat from runoff
+      !     QR,HQR=hourly-accumulated runoff, convective heat from runoff
+      !     WatFlux4ErosionM=runoff water flux
+      !     FSLOPE_2DH=partitions surface water flow in (N=1)EW,(N=2)NS direction
+      !     XVLMobileWaterLitR_col: mobile water
+      !     IFLBM_2DH=runoff direction (0 = E or S, 1 = W or N)
 
-!     There is water for runoff
+      !     There is water for runoff
       IF(SurfRunoffPotentM_col(M,N2,N1).GT.ZEROS(N2,N1))THEN
         ! there is runoff
         ! check neighbor grids by considering (N2,N1) either as the backward grid (compared to (N5,N4)), &

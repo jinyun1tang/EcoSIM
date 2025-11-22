@@ -582,11 +582,7 @@ module SoilBGCNLayMod
       ORGM(NE)=ORGM(NE)+BiomHK(NE,K)    
     enddo  
   enddo  
-!  if(present(I))then
-!    if(I<=15.and.L==1)then
-!      write(633,*)I*100+J,ORGM(ielmc),BiomHK(ielmc,:)    
-!    endif
-!  endif
+
   call PrintInfo('end '//subname)
   end subroutine sumMicBiomLayL
 !------------------------------------------------------------------------------------------

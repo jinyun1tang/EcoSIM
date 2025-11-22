@@ -1800,7 +1800,7 @@ module MicBGCMod
     NonstX2stBiomHeter             => nmicf%NonstX2stBiomHeter,             &
     Resp4NFixHeter                 => nmicf%Resp4NFixHeter,                 &
     RespGrossHeter                 => nmicf%RespGrossHeter,                 &
-    RNOxDOCReduxRespDenitLim          => nmicf%RNOxDOCReduxRespDenitLim,          &
+    RNOxDOCReduxRespDenitLim       => nmicf%RNOxDOCReduxRespDenitLim,       &
     RNO3imobilSoilHeter            => nmicf%RNO3imobilSoilHeter,            &
     RCO2ProdHeter                  => nmicf%RCO2ProdHeter,                  &
     RH2PO4imobilSoilHeter          => nmicf%RH2PO4imobilSoilHeter,          &
@@ -1808,7 +1808,7 @@ module MicBGCMod
     RNO3imobilBandHeter            => nmicf%RNO3imobilBandHeter,            &
     RH2PO4imobilBandHeter          => nmicf%RH2PO4imobilBandHeter,          &
     RkillLitrfal2HumOMHeter        => nmicf%RkillLitrfal2HumOMHeter,        &
-    RMaintDefLitrfal2HumOMHeter => nmicf%RMaintDefLitrfal2HumOMHeter, &
+    RMaintDefLitrfal2HumOMHeter    => nmicf%RMaintDefLitrfal2HumOMHeter,    &
     RN2FixHeter                    => nmicf%RN2FixHeter,                    &
     RKillOMHeter                   => nmicf%RKillOMHeter,                   &
     RkillRecycOMHeter              => nmicf%RkillRecycOMHeter,              &
@@ -2131,13 +2131,13 @@ module MicBGCMod
           naqfdiag%tRH2PO4MicrbImobilBand = naqfdiag%tRH2PO4MicrbImobilBand+RH2PO4imobilBandHeter(NGL,K)
           naqfdiag%tRH1PO4MicrbImobilBand = naqfdiag%tRH1PO4MicrbImobilBand+RH1PO4imobilBandHeter(NGL,K)
           naqfdiag%TFixN2                 = naqfdiag%TFixN2+RN2FixHeter(NGL,K)
-          IF(Lsurf)THEN
-            naqfdiag%tRNH4MicrbImobilSoil   = naqfdiag%tRNH4MicrbImobilSoil+RNH4imobilLitrHeter(NGL,K)
-            naqfdiag%tRNO3MicrbImobilSoil   = naqfdiag%tRNO3MicrbImobilSoil+RNO3imobilLitrHeter(NGL,K)
-            naqfdiag%tRH2PO4MicrbImobilSoil = naqfdiag%tRH2PO4MicrbImobilSoil+RH2PO4imobilLitrHeter(NGL,K)
-            naqfdiag%tRH1PO4MicrbImobilSoil = naqfdiag%tRH1PO4MicrbImobilSoil+RH1PO4imobilLitrHeter(NGL,K)
+          IF(litrm)THEN
+            micflx%tRNH4MicrbImobilSoil   = micflx%tRNH4MicrbImobilSoil+RNH4imobilLitrHeter(NGL,K)
+            micflx%tRNO3MicrbImobilSoil   = micflx%tRNO3MicrbImobilSoil+RNO3imobilLitrHeter(NGL,K)
+            micflx%tRH2PO4MicrbImobilSoil = micflx%tRH2PO4MicrbImobilSoil+RH2PO4imobilLitrHeter(NGL,K)
+            micflx%tRH1PO4MicrbImobilSoil = micflx%tRH1PO4MicrbImobilSoil+RH1PO4imobilLitrHeter(NGL,K)
           ENDIF
-!
+      !
           naqfdiag%tRCO2MicrbProd    = naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
           naqfdiag%tRCH4MicrbProd    = naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
           naqfdiag%tRNOxMicrbRedux   = naqfdiag%tRNOxMicrbRedux+RNOxDOCReduxRespDenitLim(NGL,K)+RNOxAcetReduxRespDenitLim(NGL,K)
@@ -2173,12 +2173,13 @@ module MicBGCMod
         naqfdiag%tRH1PO4MicrbImobilBand = naqfdiag%tRH1PO4MicrbImobilBand+RH1PO4TransfBandAutor(NGL)
         naqfdiag%TFixN2                 = naqfdiag%TFixN2+RN2FixAutor(NGL)
 
-        IF(Lsurf)THEN
-          naqfdiag%tRNH4MicrbImobilSoil   = naqfdiag%tRNH4MicrbImobilSoil+RNH4TransfLitrAutor(NGL)
-          naqfdiag%tRNO3MicrbImobilSoil   = naqfdiag%tRNO3MicrbImobilSoil+RNO3TransfLitrAutor(NGL)
-          naqfdiag%tRH2PO4MicrbImobilSoil = naqfdiag%tRH2PO4MicrbImobilSoil+RH2PO4TransfLitrAutor(NGL)
-          naqfdiag%tRH1PO4MicrbImobilSoil = naqfdiag%tRH1PO4MicrbImobilSoil+RH1PO4TransfLitrAutor(NGL)
+        IF(litrm)then
+          micflx%tRNH4MicrbImobilSoil   = micflx%tRNH4MicrbImobilSoil+RNH4TransfLitrAutor(NGL)
+          micflx%tRNO3MicrbImobilSoil   = micflx%tRNO3MicrbImobilSoil+RNO3TransfLitrAutor(NGL)
+          micflx%tRH2PO4MicrbImobilSoil = micflx%tRH2PO4MicrbImobilSoil+RH2PO4TransfLitrAutor(NGL)
+          micflx%tRH1PO4MicrbImobilSoil = micflx%tRH1PO4MicrbImobilSoil+RH1PO4TransfLitrAutor(NGL)
         ENDIF
+
         naqfdiag%tRCO2MicrbProd       = naqfdiag%tRCO2MicrbProd+RCO2ProdAutor(NGL)
         naqfdiag%tRCH4MicrbProd       = naqfdiag%tRCH4MicrbProd+RCH4ProdAutor(NGL)
         naqfdiag%tRNOxMicrbRedux      = naqfdiag%tRNOxMicrbRedux+RNOxReduxRespAutorLim(NGL)
@@ -2193,6 +2194,12 @@ module MicBGCMod
     ENDIF
   ENDDO
 
+  IF(Lsurf)THEN
+    naqfdiag%tRNH4MicrbImobilSoil   = naqfdiag%tRNH4MicrbImobilSoil+micfor%tRNH4MicrbImobilSoil
+    naqfdiag%tRNO3MicrbImobilSoil   = naqfdiag%tRNO3MicrbImobilSoil+micfor%tRNO3MicrbImobilSoil
+    naqfdiag%tRH2PO4MicrbImobilSoil = naqfdiag%tRH2PO4MicrbImobilSoil+micfor%tRH2PO4MicrbImobilSoil
+    naqfdiag%tRH1PO4MicrbImobilSoil = naqfdiag%tRH1PO4MicrbImobilSoil+micfor%tRH1PO4MicrbImobilSoil
+  ENDIF
 ! tRCO2GrothAutor=total CO2 uptake by autotrophs, ammonia oxidizer
 ! nitrite oxidizer, and hydrogenotrophic methanogens,
 ! all of which involves CO2 for both energy and C biomass.
@@ -2475,14 +2482,14 @@ module MicBGCMod
     FP1BX=AMAX1(FMN,FracOMActHeter(NGL,K)*VLPOB)
   ENDIF
 
-  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
-  naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
-  naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
-  naqfdiag%TFP14X = naqfdiag%TFP14X+FP14X
-  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4X
-  naqfdiag%TFNO3B = naqfdiag%TFNO3B+FNB3X
-  naqfdiag%TFPO4B = naqfdiag%TFPO4B+FPOBX
-  naqfdiag%TFP14B = naqfdiag%TFP14B+FP1BX
+!  naqfdiag%TFNH4X = naqfdiag%TFNH4X+FNH4X
+!  naqfdiag%TFNO3X = naqfdiag%TFNO3X+FNO3X
+!  naqfdiag%TFPO4X = naqfdiag%TFPO4X+FPO4X
+!  naqfdiag%TFP14X = naqfdiag%TFP14X+FP14X
+!  naqfdiag%TFNH4B = naqfdiag%TFNH4B+FNB4X
+!  naqfdiag%TFNO3B = naqfdiag%TFNO3B+FNB3X
+!  naqfdiag%TFPO4B = naqfdiag%TFPO4B+FPOBX
+!  naqfdiag%TFP14B = naqfdiag%TFP14B+FP1BX
 !
 ! FACTORS CONSTRAINING NH4, NO3, PO4 UPTAKE AMONG COMPETING
 ! MICROBIAL POPULATIONS IN SURFACE RESIDUE
@@ -2512,12 +2519,13 @@ module MicBGCMod
     ENDIF
   ENDIF
 
-  IF(Lsurf .AND. K.NE.micpar%k_POM .AND. K.NE.micpar%k_humus .AND. SoilMicPMassLayer0.GT.ZEROS)THEN
-    naqfdiag%TFNH4X=naqfdiag%TFNH4X+micfor%AttenfNH4HeterR(NGL,K)
-    naqfdiag%TFNO3X=naqfdiag%TFNO3X+micfor%AttenfNO3HeterR(NGL,K)
-    naqfdiag%TFPO4X=naqfdiag%TFPO4X+micfor%AttenfH2PO4HeterR(NGL,K)
-    naqfdiag%TFP14X=naqfdiag%TFP14X+micfor%AttenfH1PO4HeterR(NGL,K)
-  ENDIF
+!diagnostics off
+!  IF(Lsurf .AND. K.NE.micpar%k_POM .AND. K.NE.micpar%k_humus .AND. SoilMicPMassLayer0.GT.ZEROS)THEN
+!    naqfdiag%TFNH4X=naqfdiag%TFNH4X+micfor%AttenfNH4HeterR(NGL,K)
+!    naqfdiag%TFNO3X=naqfdiag%TFNO3X+micfor%AttenfNO3HeterR(NGL,K)
+!    naqfdiag%TFPO4X=naqfdiag%TFPO4X+micfor%AttenfH2PO4HeterR(NGL,K)
+!    naqfdiag%TFP14X=naqfdiag%TFP14X+micfor%AttenfH1PO4HeterR(NGL,K)
+!  ENDIF
   end associate
   end subroutine SubstrateAttenf4Compet
 !------------------------------------------------------------------------------------------
@@ -3751,25 +3759,25 @@ module MicBGCMod
   ENDIF
 
   NetNH4Mineralize=NetNH4Mineralize+(RNH4imobilSoilHeter(NGL,K)+RNH4imobilBandHeter(NGL,K))
-!
-!     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
-!     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
-!
-!     RINOP=NO3 immobilization (+ve) demand
-!     CNO3S,CNO3B=aqueous NO3 concentrations in non-band, band
-!     ZOMX,ZOMN,ZOKU=parameters for max NO3 uptake rate,
-!     min NO3 concentration and Km for NO3 uptake
-!     RINOX=microbially limited NO3 demand
-!     BIOA=microbial surface area, OMA=active biomass
-!     GrowthEnvScalHeter=temp+water stress
-!     FNO3S,FNO3B=fractions of NO3 in non-band, band
-!     RNO3DmndSoilHeter,RNO3DmndBandHeter=substrate-unlimited NO3 immobiln
-!     VOLW=water content
-!     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
-!     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
-!     RNO3imobilSoilHeter,RNO3imobilBandHeter=substrate-limited NO3 immobiln in non-band, band
-!     NetNH4Mineralize=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
-!
+  !
+  !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SOIL FROM MICROBIAL
+  !     C:N AND NO3 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
+  !
+  !     RINOP=NO3 immobilization (+ve) demand
+  !     CNO3S,CNO3B=aqueous NO3 concentrations in non-band, band
+  !     ZOMX,ZOMN,ZOKU=parameters for max NO3 uptake rate,
+  !     min NO3 concentration and Km for NO3 uptake
+  !     RINOX=microbially limited NO3 demand
+  !     BIOA=microbial surface area, OMA=active biomass
+  !     GrowthEnvScalHeter=temp+water stress
+  !     FNO3S,FNO3B=fractions of NO3 in non-band, band
+  !     RNO3DmndSoilHeter,RNO3DmndBandHeter=substrate-unlimited NO3 immobiln
+  !     VOLW=water content
+  !     ZNO3M,ZNOBM=NO3 not available for uptake in non-band, band
+  !     FNO3X,FNB3X=fractions of biological NO3 demand in non-band, band
+  !     RNO3imobilSoilHeter,RNO3imobilBandHeter=substrate-limited NO3 immobiln in non-band, band
+  !     NetNH4Mineralize=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
+  !
   FNO3S = VLNO3
   FNO3B = VLNOB
   RINOP = AZMAX1(RINHP-RNH4imobilSoilHeter(NGL,K)-RNH4imobilBandHeter(NGL,K))
@@ -3792,27 +3800,27 @@ module MicBGCMod
     RNO3imobilBandHeter(NGL,K) = 0.0_r8
   ENDIF
   NetNH4Mineralize=NetNH4Mineralize+(RNO3imobilSoilHeter(NGL,K)+RNO3imobilBandHeter(NGL,K))
-!
-!     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
-!     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
-!
-!     RIPOP=H2PO4 mineralization (-ve) or immobilization (+ve) demand
-!     OMC,OMP=microbial nonstructural C,P
-!     rPCOMC=maximum microbial P:C ratio
-!     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
-!     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
-!     min H2PO4 concentration and Km for H2PO4 uptake
-!     RIPOX=microbially limited H2PO4 demand
-!     BIOA=microbial surface area, OMA=active biomass
-!     GrowthEnvScalHeter=temp+water stress
-!     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
-!     RH2PO4DmndSoilHeter,RH2PO4DmndBandHeter=substrate-unlimited H2PO4 mineraln-immobiln
-!     H2POM,H2PBM=H2PO4 not available for uptake in non-band, band
-!     VOLW=water content
-!     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
-!     RH2PO4imobilSoilHeter,RH2PO4imobilBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
-!     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
-!
+  !
+  !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SOIL FROM MICROBIAL
+  !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
+  !
+  !     RIPOP=H2PO4 mineralization (-ve) or immobilization (+ve) demand
+  !     OMC,OMP=microbial nonstructural C,P
+  !     rPCOMC=maximum microbial P:C ratio
+  !     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
+  !     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
+  !     min H2PO4 concentration and Km for H2PO4 uptake
+  !     RIPOX=microbially limited H2PO4 demand
+  !     BIOA=microbial surface area, OMA=active biomass
+  !     GrowthEnvScalHeter=temp+water stress
+  !     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
+  !     RH2PO4DmndSoilHeter,RH2PO4DmndBandHeter=substrate-unlimited H2PO4 mineraln-immobiln
+  !     H2POM,H2PBM=H2PO4 not available for uptake in non-band, band
+  !     VOLW=water content
+  !     FPO4X,FPOBX=fractions of biol H2PO4 demand in non-band, band
+  !     RH2PO4imobilSoilHeter,RH2PO4imobilBandHeter=substrate-limited H2PO4 mineraln-immobn in non-band, band
+  !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
+  !
   FH2PS     = VLPO4
   FH2PB     = VLPOB
   MID3      = micpar%get_micb_id(ibiom_reserve,NGL)
@@ -3837,28 +3845,28 @@ module MicBGCMod
     RH2PO4imobilBandHeter(NGL,K) = RIPOP*FH2PB
   ENDIF
   NetPO4Mineralize=NetPO4Mineralize+(RH2PO4imobilSoilHeter(NGL,K)+RH2PO4imobilBandHeter(NGL,K))
-!
-!     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
-!     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
-!
-!     RIP1P=HPO4 mineralization (-ve) or immobilization (+ve) demand
-!     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
-!     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
-!     min HPO4 concentration and Km for HPO4 uptake
-!     RIP1X=microbially limited HPO4 demand
-!     BIOA=microbial surface area, OMA=active biomass
-!     GrowthEnvScalHeter=temp+water stress
-!     FH1PS,FH1PB=fractions of HPO4 in non-band, band
-!     RH1PO4DmndSoilHeter,RH1PO4DmndBandHeter=substrate-unlimited HPO4 mineraln-immobiln
-!     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
-!     VOLW=water content
-!     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
-!     RH1PO4imobilSoilHeter,RH1PO4imobilBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band uptake (> 0)
-!     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
-!
+  !
+  !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SOIL FROM MICROBIAL
+  !     C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
+  !
+  !     RIP1P=HPO4 mineralization (-ve) or immobilization (+ve) demand
+  !     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
+  !     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
+  !     min HPO4 concentration and Km for HPO4 uptake
+  !     RIP1X=microbially limited HPO4 demand
+  !     BIOA=microbial surface area, OMA=active biomass
+  !     GrowthEnvScalHeter=temp+water stress
+  !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
+  !     RH1PO4DmndSoilHeter,RH1PO4DmndBandHeter=substrate-unlimited HPO4 mineraln-immobiln
+  !     H1POM,H1PBM=HPO4 not available for uptake in non-band, band
+  !     VOLW=water content
+  !     FP14X,FP1BX=fractions of biol HPO4 demand in non-band, band
+  !     RH1PO4imobilSoilHeter,RH1PO4imobilBandHeter=substrate-limited HPO4 mineraln-immobn in non-band, band uptake (> 0)
+  !     NetPO4Mineralize=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
+  !
   FH1PS=VLPO4
   FH1PB=VLPOB
-! why 0.1 here?  
+  ! why 0.1 here?  
   RIP1P=0.1_r8*AZMAX1(RIPOP-RH2PO4imobilSoilHeter(NGL,K)-RH2PO4imobilBandHeter(NGL,K))
   !immobilization
   IF(RIP1P.GT.0.0_r8)THEN
@@ -3879,26 +3887,26 @@ module MicBGCMod
     RH1PO4imobilBandHeter(NGL,K) = 0.0_r8
   ENDIF
   NetPO4Mineralize=NetPO4Mineralize+(RH1PO4imobilSoilHeter(NGL,K)+RH1PO4imobilBandHeter(NGL,K))
-!
-!     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
-!     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
-!     ZONES OF SOIL SURFACE
-!
-!     RINHPR=NH4 mineralization (-ve) or immobilization (+ve) demand
-!     NU=surface layer number
-!     CNH4S,CNH4B=aqueous NH4 concentrations in non-band, band
-!     Z4MX,Z4MN,Z4KU=parameters for max NH4 uptake rate,
-!     minimum NH4 concentration and Km for NH4 uptake
-!     BIOA=microbial surface area, OMA=active biomass
-!     GrowthEnvScalHeter=temp+water stress
-!     FNH4S,FNHBS=fractions of NH4 in non-band, band
-!     RNH4DmndLitrHeter=substrate-unlimited NH4 mineraln-immobiln
-!     VOLW=water content
-!     ZNH4M=NH4 not available for uptake
-!     AttenfNH4Heter=fractions of biological NH4 demand
-!     RNH4imobilLitrHeter=substrate-limited NH4 mineraln-immobiln
-!     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
-!
+  !
+  !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SURFACE RESIDUE FROM
+  !     MICROBIAL C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL
+  !     ZONES OF SOIL SURFACE
+  !
+  !     RINHPR=NH4 mineralization (-ve) or immobilization (+ve) demand
+  !     NU=surface layer number
+  !     CNH4S,CNH4B=aqueous NH4 concentrations in non-band, band
+  !     Z4MX,Z4MN,Z4KU=parameters for max NH4 uptake rate,
+  !     minimum NH4 concentration and Km for NH4 uptake
+  !     BIOA=microbial surface area, OMA=active biomass
+  !     GrowthEnvScalHeter=temp+water stress
+  !     FNH4S,FNHBS=fractions of NH4 in non-band, band
+  !     RNH4DmndLitrHeter=substrate-unlimited NH4 mineraln-immobiln
+  !     VOLW=water content
+  !     ZNH4M=NH4 not available for uptake
+  !     AttenfNH4Heter=fractions of biological NH4 demand
+  !     RNH4imobilLitrHeter=substrate-limited NH4 mineraln-immobiln
+  !     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
+  !when there is not sufficient uptake from the litter layer, take it from soil
   IF(litrm)THEN
     RINHPR=RINHP-RNH4imobilSoilHeter(NGL,K)-RNO3imobilSoilHeter(NGL,K)
     !immobilization by tap into the top soil layer
@@ -3984,27 +3992,27 @@ module MicBGCMod
       RH2PO4imobilLitrHeter(NGL,K) = RIPOPR
     ENDIF
     NetPO4Mineralize=NetPO4Mineralize+RH2PO4imobilLitrHeter(NGL,K)
-!
-!     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
-!     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
-!     ZONES OF SOIL SURFACE
-!
-!     RIP1PR=HPO4 mineralization (-ve) or immobilization (+ve) demand
-!     NU=surface layer number
-!     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
-!     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
-!     minimum HPO4 concentration and Km for HPO4 uptake
-!     RH1PO4DmndLitrHeter=microbially limited HPO4 demand
-!     BIOA=microbial surface area, OMA=active biomass
-!     GrowthEnvScalHeter=temp+water stress
-!     FH1PS,FH1PB=fractions of HPO4 in non-band, band
-!     RH1PO4DmndLitrHeter=substrate-unlimited HPO4 mineraln-immobiln
-!     VOLW=water content
-!     H1P4M=HPO4 not available for uptake
-!     AttenfH1PO4Heter=fraction of biological HPO4 demand
-!     RH1PO4imobilLitrHeter=substrate-limited HPO4 minereraln-immobiln
-!     NetPO4Mineralize=total HPO4 net mineraln (-ve) or immobiln (+ve)
-!
+    !
+    !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
+    !     MICROBIAL C:P AND PO4 CONCENTRATION IN BAND AND NON-BAND SOIL
+    !     ZONES OF SOIL SURFACE
+    !
+    !     RIP1PR=HPO4 mineralization (-ve) or immobilization (+ve) demand
+    !     NU=surface layer number
+    !     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
+    !     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
+    !     minimum HPO4 concentration and Km for HPO4 uptake
+    !     RH1PO4DmndLitrHeter=microbially limited HPO4 demand
+    !     BIOA=microbial surface area, OMA=active biomass
+    !     GrowthEnvScalHeter=temp+water stress
+    !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
+    !     RH1PO4DmndLitrHeter=substrate-unlimited HPO4 mineraln-immobiln
+    !     VOLW=water content
+    !     H1P4M=HPO4 not available for uptake
+    !     AttenfH1PO4Heter=fraction of biological HPO4 demand
+    !     RH1PO4imobilLitrHeter=substrate-limited HPO4 minereraln-immobiln
+    !     NetPO4Mineralize=total HPO4 net mineraln (-ve) or immobiln (+ve)
+    !
     FH1PS=VLPO4
     FH1PB=VLPOB
     RIP1PR=0.1_r8*AZMAX1(RIPOPR-RH2PO4imobilLitrHeter(NGL,K))

@@ -15,8 +15,6 @@ module UptakePars
 !     MinCanopyBndlResist_pft,RACX=min,max canopy boundary layer resistance [h m-1]
 !     RZ=surface resistance to evaporation [h m-1]
 !     EMODW=wood modulus of elasticity (MPa)
-
-!     EMMC=canopy emissivity
 !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition on root,myco N,P uptake(g g-1)
 !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation (h-1)
 !
@@ -28,7 +26,7 @@ module UptakePars
   real(r8) :: MinCanopyBndlResist_pft
   real(r8) :: RACX
   real(r8) :: RZ
-  real(r8) :: EMMC
+  real(r8) :: EMMC         !canopy emissivity of longwave radiation
   real(r8) :: EMODW
   real(r8) :: ZCKI
   real(r8) :: PCKI

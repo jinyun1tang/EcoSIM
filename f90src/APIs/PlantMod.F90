@@ -56,6 +56,7 @@ implicit none
         call extracts(I,J)
         call PlantUPtakeAPIRecv(I,J,NY,NX)
       else
+      
         call  PlantAPISend(I,J,NY,NX)
 
         call EnterPlantBalance(I,J,NP_col(NY,NX))

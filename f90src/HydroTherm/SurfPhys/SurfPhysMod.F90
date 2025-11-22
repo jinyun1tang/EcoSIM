@@ -3,8 +3,8 @@ module SurfPhysMod
 !Description
 ! code for doing surface physics
 !
-  use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: endrun
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,       only: endrun
   use DebugToolMod
   use GridDataType
   use HydroThermData
@@ -57,12 +57,12 @@ implicit none
 ! RACX,LitRSurfResistance=minimum boundary layer resistances of canopy,litter (h m-1)
 
   real(r8), parameter :: FEnergyImpact4Erosion_col = 1.0E-03_r8
-  real(r8), parameter :: SatHydroCondLitR      = 25.0_r8      !saturated hydraulic conductivity of surface litter
+  real(r8), parameter :: SatHydroCondLitR      = 25.0_r8      !saturated hydraulic conductivity of surface litter [x h-1], unit needs double check
   real(r8), parameter :: LitRSurfResistance    = 0.0139_r8    !minimum boundary layer resistances of litter [h m-1]
   real(r8), parameter :: SoilEmisivity         = 0.97_r8      !soil emissivity
   real(r8), parameter :: SnowEmisivity         = 0.97_r8      !snowpack emissivity
   real(r8), parameter :: SurfLitREmisivity     = 0.97_r8      !surfce litter emissivity
-  real(r8), parameter :: RACX                  = 0.0139_r8    !total canopy boundary later resistance h/m
+  real(r8), parameter :: RACX                  = 0.0139_r8    !total canopy boundary later resistance [h/m]
 
   real(r8) :: HeatSensVapAir2Grnd
   real(r8) :: HeatSensAir2Grnd
@@ -306,10 +306,10 @@ contains
   ! SoilEmisivity,SnowEmisivity,SurfLitREmisivity=emissivities of surface soil, snow and litter
   !stefboltz_const is stefan-boltzman constant converted into [MJ /(m^2 K^4 h)]
   Stefboltz_area          = stefboltz_const*AREA_3D(3,NUM_col(NY,NX),NY,NX)
-  LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP
+  LWEmscefSnow_col(NY,NX) = SnowEmisivity*Stefboltz_area*FracSurfAsSnow_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
 
-  LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP
-  LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP
+  LWEmscefSoil_col(NY,NX) = SoilEmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
+  LWEmscefLitR_col(NY,NX) = SurfLitREmisivity*Stefboltz_area*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)*dts_HeatWatTP*EMS_scalar_col(NY,NX)
 !
   end subroutine SurfaceRadiation
 !------------------------------------------------------------------------------------------
@@ -512,7 +512,7 @@ contains
   !LWRadGrnd_col=emitted longwave radiation
   RadSWbySoil          = (1.0_r8-AlbedoGrnd)*RadSW2Soil_col(NY,NX)
   tRadIncid            = RadSWbySoil+LWRad2Soil_col(NY,NX)
-  LWRadGrnd_col            = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4._r8
+  LWRadGrnd_col        = LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**4
   Radnet2Grnd          = tRadIncid-LWRadGrnd_col
   Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWbySoil
 !
@@ -836,10 +836,11 @@ contains
     !K0 litter layer
     !K1 topsoil layer
     !DarcyFlxLitR2Soil = water flux from litter layer into the topsoil
-    K0                 = MAX(1,MIN(100,INT(100.0_r8*(AZMAX1(POROS0_col(NY,NX)-ThetaWLitR))/POROS0_col(NY,NX))+1))
-    K1                 = MAX(1,MIN(100,INT(100.0_r8*(AZMAX1(POROS_vr(NUM_col(NY,NX),NY,NX)-THETW1))/POROS_vr(NUM_col(NY,NX),NY,NX))+1))
-    CNDR               = HydroCond_3D(3,K0,0,NY,NX)
-    CND1               = HydroCond_3D(3,K1,NUM_col(NY,NX),NY,NX)*RainEkReducedKsat
+    
+    K0   = getMoistK(ThetaWLitR,POROS0_col(NY,NX))
+    K1   = getMoistK(THETW1,POROS_vr(NUM_col(NY,NX),NY,NX))
+    CNDR = HydroCond_3D(3,K0,0,NY,NX)
+    CND1 = HydroCond_3D(3,K1,NUM_col(NY,NX),NY,NX)*RainEkReducedKsat
     if(ats_cpl_mode)then
       DarcyCondLitR2Soil = 0.0
     else
@@ -901,7 +902,6 @@ contains
     HeatFlxLitR2Soi                            = cpw*TKSoil1_vr(0,NY,NX)*WatDarcyFloLitR2SoiMicP*HeatAdv_scal
     WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlxLitR2Soi
-
 
     WatFLo2LitrM_col(NY,NX)                    = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
     HeatFLoByWat2LitRM_col(NY,NX)              = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
@@ -1015,21 +1015,21 @@ contains
     FILMM_vr(M,0,NY,NX)=1.0E-03_r8
   ENDIF
   FILMM_vr(M,NUM_col(NY,NX),NY,NX)=FilmThickness(PSISM1_vr(NUM_col(NY,NX),NY,NX),is_top_layer=.true.)
-!
-!     OVERLAND FLOW WHEN WATER STORAGE CAPACITY
-!     OF THE SOIL SURFACE PLUS MACROPORES IS EXCEEDED
-!
+  !
+  !     OVERLAND FLOW WHEN WATER STORAGE CAPACITY
+  !     OF THE SOIL SURFACE PLUS MACROPORES IS EXCEEDED
+  !
   N1=NX;N2=NY
-!
-!     SURFACE WATER FLUX
-!
-!     N2,N1=NY,NX of source grid cell
-!     XVOLT,XVOLW=excess water+ice,water in source grid cell
-!     VWatStoreCapSurf_col=ground surface water retention capacity
-!     VWatExcess=ponded water volume above surface retention capacity
-!     Q=runoff from Mannings equation
+  !
+  !     SURFACE WATER FLUX
+  !
+  !     N2,N1=NY,NX of source grid cell
+  !     XVOLT,XVOLW=excess water+ice,water in source grid cell
+  !     VWatStoreCapSurf_col=ground surface water retention capacity
+  !     VWatExcess=ponded water volume above surface retention capacity
+  !     Q=runoff from Mannings equation
 
-! there is mobile water
+  ! there is mobile water
   IF(XVLMobileWaterLitR_col(N2,N1).GT.VWatStoreCapSurf_col(N2,N1))THEN
     VWatExcess                      = XVLMobileWaterLitR_col(N2,N1)-VWatStoreCapSurf_col(N2,N1)
     WatExcessDetph                  = VWatExcess/AREA_3D(3,0,N2,N1)
@@ -1321,7 +1321,6 @@ contains
   ALT2     = Altitude_col(N2,N1)+DPTHW2-XN*SLOPE_col(N,N2,N1)*DLYR_3D(N,NUM_col(N2,N1),N2,N1)
   PondDepz = CumDepz2LayBottom_vr(NU_col(N2,N1)-1,N2,N1)-DPTHW1    !can be < 0, if the upper edge of topsoil is at 0 m,
 
-  !write(121,*)'PondDepz=',PondDepz,ExtWaterTable_col(N2,N1)
   !depth is counting downward
   !Grid elevation is higher than outside the grid, and in grid water layer higher than external water table
   !grid discharges water to external water table
@@ -1467,19 +1466,19 @@ contains
     Rain2SoilSurf_col(NY,NX)  = 0.0_r8
     Irrig2SoilSurf_col(NY,NX) = 0.0_r8
   ENDIF
-!
-!     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS
-!     AMONG ATMOSPHERE, SNOWPACK, RESIDUE AND SOIL SURFACES
-!     INTO LOCAL ARRAYS FOR USE IN MASS AND ENERGY EXCHANGE
-!     ALGORITHMS
-!
-!     dts_HeatWatTP=internal time step for fluxes through soil profile
-!
-!     FLW0S,Ice2Snowt_col,Rain2Snowt_col=snow,ice,water input to snowpack
-!     PrecHeat2Snowt_col=convective heat flux to snowpack
-!     Rain2SoiMicP1_col,Rain2SoiMacP1_col,Rain2LitR1_col=rain+irrigation to micropores,macropores,litter
-!     RainHeat2SoilP1_col,HWFLY1=convective heat flux to soil,litter surfaces
-!
+  !
+  !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS
+  !     AMONG ATMOSPHERE, SNOWPACK, RESIDUE AND SOIL SURFACES
+  !     INTO LOCAL ARRAYS FOR USE IN MASS AND ENERGY EXCHANGE
+  !     ALGORITHMS
+  !
+  !     dts_HeatWatTP=internal time step for fluxes through soil profile
+  !
+  !     FLW0S,Ice2Snowt_col,Rain2Snowt_col=snow,ice,water input to snowpack
+  !     PrecHeat2Snowt_col=convective heat flux to snowpack
+  !     Rain2SoiMicP1_col,Rain2SoiMacP1_col,Rain2LitR1_col=rain+irrigation to micropores,macropores,litter
+  !     RainHeat2SoilP1_col,HWFLY1=convective heat flux to soil,litter surfaces
+  !
   SnowFallt_col(NY,NX)      = SnoFall*dts_HeatWatTP
   Ice2Snowt_col(NY,NX)      = 0.0_r8
   Rain2Snowt_col(NY,NX)     = Rain2Snow*dts_HeatWatTP

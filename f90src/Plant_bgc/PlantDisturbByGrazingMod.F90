@@ -153,13 +153,13 @@ contains
   !     FERT=fertilizer type from fertilizer input file
   !     IYTYP=fertilizer release type from fertilizer input file
   !
-  FERT(17)=FERT(17)+(NonstructElmnt2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
+  FERT(ifert_plant_manuC)=FERT(ifert_plant_manuC)+(NonstructElmnt2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
     FineNonleafElmnt2Litr(ielmc)+WoodyElmnt2Litr(ielmc)+StandeadElmnt2Litr(ielmc))/AREA3(NU)
-  FERT(18)=FERT(18)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
+  FERT(ifert_plant_manuN)=FERT(ifert_plant_manuN)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8    
-  FERT(3)=FERT(3)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
+  FERT(ifert_N_urea)=FERT(ifert_N_urea)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8
-  FERT(19)=FERT(19)+(NonstructElmnt2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&
+  FERT(ifert_plant_manuP)=FERT(ifert_plant_manuP)+(NonstructElmnt2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&
     FineNonleafElmnt2Litr(ielmp)+WoodyElmnt2Litr(ielmp)+StandeadElmnt2Litr(ielmp))/AREA3(NU)
   IYTYP=imanure_grazing
   end associate
