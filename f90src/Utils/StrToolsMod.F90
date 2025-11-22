@@ -285,12 +285,14 @@ contains
     
   END function extract_number_and_unit
 !------------------------------------------------------------------------------------------
-  CHARACTER(LEN=LEN(input_str)) FUNCTION to_lower_string(input_str)
+  FUNCTION to_lower_string(input_str)
     IMPLICIT NONE
     
     ! --- Arguments ---
     CHARACTER(LEN=*), INTENT(IN) :: input_str
     
+    ! 2. Now define the function return type using the input's length
+    CHARACTER(LEN=LEN(input_str)) :: to_lower_string    
     ! --- Local Variables ---
     INTEGER :: i
     
