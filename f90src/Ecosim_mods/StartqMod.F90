@@ -1,6 +1,9 @@
 module StartqMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : AZMAX1,isclose  
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use minimathmod,      only: AZMAX1, isclose
+  use DebugToolMod,     only: PrintInfo
+  use UnitMod,          only: units
+  use EcoSiMParDataMod, only: pltpar
   use GridConsts
   use FlagDataType
   use EcosimConst
@@ -17,8 +20,6 @@ module StartqMod
   use GridDataType
   use EcoSIMConfig
   use PlantBGCPars
-  use UnitMod, only : units
-  use EcoSiMParDataMod, only : pltpar
   use PlantMathFuncMod
   implicit none
 
@@ -35,7 +36,7 @@ module StartqMod
   implicit none
   integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ
   integer, intent(in) :: NZ1Q,NZ2Q
-
+  character(len=*), parameter :: subname='startq'
   integer :: NY,NX,K,L,M,NZ,NZ2X
 !     begin_execution
 !
@@ -47,11 +48,11 @@ module StartqMod
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
 !     CO2CuticleResist_pft=cuticular resistance to CO2 (s m-1)
-!     CNWS,rProteinC2P_pft=protein:N,protein:P ratios
-!    RootFracRemobilizableBiom_pft=maximum root protein concentration (g g-1)
+!     CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios
+!    RootProteinCMax_pft=maximum root protein concentration (g g-1)
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
-
+  call PrintInfo('beg '//subname)
   D9995: DO NX=NHWQ,NHEQ
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP_col(NY,NX))
@@ -98,7 +99,7 @@ module StartqMod
       ENDDO D9986
     ENDDO D9990
   ENDDO D9995
-  RETURN
+  call PrintInfo('end '//subname)
   END subroutine startq
 !------------------------------------------------------------------------------------------
 
@@ -115,12 +116,12 @@ module StartqMod
   PPX_pft(NZ,NY,NX)               = PPI_pft(NZ,NY,NX)
   ClumpFactor_pft(NZ,NY,NX)       = ClumpFactorInit_pft(NZ,NY,NX)       !clumping factor
   
-  H2OCuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
-  CO2CuticleResist_pft(NZ,NY,NX)      = CuticleResist_pft(NZ,NY,NX)*1.56_r8
-  rProteinC2N_pft(NZ,NY,NX)         = 2.5_r8
-  rProteinC2P_pft(NZ,NY,NX)         = 25.0_r8
-  RootFracRemobilizableBiom_pft(NZ,NY,NX) = AMIN1(rNCRoot_pft(NZ,NY,NX)*rProteinC2N_pft(NZ,NY,NX)&
-    ,rPCRootr_pft(NZ,NY,NX)*rProteinC2P_pft(NZ,NY,NX))
+  H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+  CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
+  rProteinC2RootN_pft(NZ,NY,NX)  = 2.15_r8
+  rProteinC2LeafN_pft(NZ,NY,NX)  = 2.6_r8
+  rProteinC2LeafP_pft(NZ,NY,NX)  = 25.0_r8
+  RootProteinCMax_pft(NZ,NY,NX) = rNCRoot_pft(NZ,NY,NX)*rProteinC2RootN_pft(NZ,NY,NX)    
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
   ELSE
@@ -409,7 +410,7 @@ module StartqMod
 !
 !     SeedDepth_pft=seeding depth(m) from PFT management file
 !     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
-!     NG,NIX,NIXBotRootLayer_raxes=seeding,upper,lower rooting layer
+!     NG,NIX,NRoot1stTipLay_raxes=seeding,upper,lower rooting layer
 !     CNRTS_pft,CPRTS_pft=N,P root growth yield
 !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
@@ -430,12 +431,12 @@ module StartqMod
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
 
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
-      .AND.SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
+      .AND. SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
       !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
       NMaxRootBotLayer_pft(NZ,NY,NX) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
-        NIXBotRootLayer_raxes(NR,NZ,NY,NX)=L
+        NRoot1stTipLay_raxes(NR,NZ,NY,NX)=L
       ENDDO D9790
     ENDIF
   ENDDO D9795  
@@ -454,18 +455,18 @@ module StartqMod
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)        = KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)      = CMinPO4Root_pft(1,NZ,NY,NX)
   RootRadialResist_pft(imycorrhz,NZ,NY,NX) = 1.0E+04
-  RootAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12
-!
-!     RootPoreTortu4Gas_pft=tortuosity for gas transport
-!     RootRaidus_rpft=path length for radial diffusion within root (m)
-!     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
-!     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
-!     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
-!
+  RootAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12 
+  !
+  !     RootPoreTortu4Gas_pft=tortuosity for gas transport
+  !     RootRaidus_rpft=path length for radial diffusion within root (m)
+  !     RootVolPerMassC_pft=volume:C ratio (m3 gC-1)
+  !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
+  !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
+  !
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ,NY,NX) = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
-    RootVolPerMassC_pft(N,NZ,NY,NX)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))
+    RootVolPerMassC_pft(N,NZ,NY,NX)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))  ![50 kgC m-3 root biomass]
     Root1stSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
     Root2ndSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
     Root1stMaxRadius1_pft(N,NZ,NY,NX) = Root1stMaxRadius_pft(N,NZ,NY,NX)
@@ -575,12 +576,12 @@ module StartqMod
       LeafArea_node(K,NB,NZ,NY,NX)                          = 0._r8
       StalkNodeHeight_brch(K,NB,NZ,NY,NX)                    = 0._r8
       StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                  = 0._r8
-      PetoleLensNode_brch(K,NB,NZ,NY,NX)                        = 0._r8
+      PetoleLength_node(K,NB,NZ,NY,NX)                        = 0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
       PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8
       StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = 0._r8
       LeafProteinC_node(K,NB,NZ,NY,NX)                      = 0._r8
-      PetoleProteinCNode_brch(K,NB,NZ,NY,NX)                    = 0._r8
+      PetoleProteinC_node(K,NB,NZ,NY,NX)                    = 0._r8
 
       D55: DO L=1,NumCanopyLayers
         CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)=0._r8
@@ -748,7 +749,7 @@ module StartqMod
       PSIRootTurg_vr(N,L,NZ,NY,NX)                               = AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)    = 0._r8
       RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX) = 0._r8
-      RootProteinConc_rpvr(N,L,NZ,NY,NX)                         = RootFracRemobilizableBiom_pft(NZ,NY,NX)
+      RootProteinConc_rpvr(N,L,NZ,NY,NX)                         = RootProteinCMax_pft(NZ,NY,NX)
       RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)                      = 0._r8
       PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = 0._r8
       RootProteinC_pvr(N,L,NZ,NY,NX)             = 0._r8
@@ -867,7 +868,7 @@ module StartqMod
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
-    RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootFracRemobilizableBiom_pft(NZ,NY,NX)
+    RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootProteinCMax_pft(NZ,NY,NX)
   RootMycoNonstElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= rNCGrain_pft(NZ,NY,NX)&
     *RootMycoNonstElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)
   RootMycoNonstElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX) &

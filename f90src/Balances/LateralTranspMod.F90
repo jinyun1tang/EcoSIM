@@ -2,7 +2,7 @@ module LateralTranspMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   USE abortutils,       only: endrun
   use EcoSiMParDataMod, only: micpar
-  use minimathmod,      only: AZMAX1
+  use minimathmod,      only: AZMAX1,safe_adb
   use EcoSIMConfig,     only: jcplx => jcplxc, NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
   use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
   use TracerPropMod,    only: MolecularWeight
@@ -166,24 +166,26 @@ implicit none
 
         !incoming from south or east grid 
         tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)+cumSed_Eros_2D(N,NN,N2,N1)
-        TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)+XSand_Eros_2D(N,NN,N2,N1)
-        TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)+XSilt_Eros_2D(N,NN,N2,N1)
-        TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)+XClay_Eros_2D(N,NN,N2,N1)
-        TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)+XNH4Soil_Eros_2D(N,NN,N2,N1)
-        TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)+XNH3Soil_Eros_2D(N,NN,N2,N1)
-        TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)+XUreaSoil_Eros_2D(N,NN,N2,N1)
-        TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)+XNO3Soil_Eros_2D(N,NN,N2,N1)
-        TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)+XNH4Band_Eros_2D(N,NN,N2,N1)
-        TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)+XNH3Band_Eros_2D(N,NN,N2,N1)
-        TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)+XUreaBand_Eros_2D(N,NN,N2,N1)
-        TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)+XNO3Band_Eros_2D(N,NN,N2,N1)
+        TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)+XSand_Eros_2D(N,NN,N2,N1)
+        TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)+XSilt_Eros_2D(N,NN,N2,N1)
+        TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)+XClay_Eros_2D(N,NN,N2,N1)
+        TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)+XNH4Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)+XNH3Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)+XUreaSoil_Eros_molN_2D(N,NN,N2,N1)
+        TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)+XNO3Soil_Eros_molN_2D(N,NN,N2,N1)
+        TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)+XNH4Band_Eros_molN_2D(N,NN,N2,N1)
+        TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)+XNH3Band_Eros_molN_2D(N,NN,N2,N1)
+        TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)+XUreaBand_Eros_molN_2D(N,NN,N2,N1)
+        TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)+XNO3Band_Eros_molN_2D(N,NN,N2,N1)
+        TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)+XPO4Soil_Eros_molP_2D(N,NN,N2,N1)
+        TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)+XPO4Band_Eros_molP_2D(N,NN,N2,N1)
 
         DO idx=idx_beg,idx_end
-          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)+trcx_Eros_2D(idx,N,NN,N2,N1)
+          trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)+trcx_Eros_mol_2D(idx,N,NN,N2,N1)
         ENDDO
 
         DO NTP=idsp_beg,idsp_end
-          trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)+trcp_Eros_2D(NTP,N,NN,N2,N1)
+          trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)+trcp_Eros_mol_2D(NTP,N,NN,N2,N1)
         ENDDO
 
         DO  K=1,jcplx
@@ -230,24 +232,26 @@ implicit none
 !       outgoing
         if(IFLB_2DH(N,NN,N5,N4).EQ.0)THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5,N4)
-          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
-          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
-          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
-          TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5,N4)
-          TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5,N4)
-          TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5,N4)
-          TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5,N4)
-          TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5,N4)
-          TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5,N4)
-          TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5,N4)
-          TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5,N4)
+          TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)-XSand_Eros_2D(N,NN,N5,N4)
+          TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)-XSilt_Eros_2D(N,NN,N5,N4)
+          TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)-XClay_Eros_2D(N,NN,N5,N4)
+          TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)-XNH4Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)-XNH3Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)-XUreaSoil_Eros_molN_2D(N,NN,N5,N4)
+          TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)-XNO3Soil_Eros_molN_2D(N,NN,N5,N4)
+          TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)-XNH4Band_Eros_molN_2D(N,NN,N5,N4)
+          TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)-XNH3Band_Eros_molN_2D(N,NN,N5,N4)
+          TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)-XUreaBand_Eros_molN_2D(N,NN,N5,N4)
+          TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)-XNO3Band_Eros_molN_2D(N,NN,N5,N4)
+          TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)-XPO4Soil_Eros_molP_2D(N,NN,N5,N4)
+          TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)-XPO4Band_Eros_molP_2D(N,NN,N5,N4)
 
           DO idx=idx_beg,idx_end
-            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5,N4)
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_mol_2D(idx,N,NN,N5,N4)
           ENDDO
 
           DO NTP=idsp_beg,idsp_end
-            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5,N4)
+            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_mol_2D(NTP,N,NN,N5,N4)
           ENDDO
 
           DO  K=1,jcplx
@@ -296,24 +300,26 @@ implicit none
       IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
         IF(ABS(cumSed_Eros_2D(N,NN,N5B,N4B)).GT.ZEROS(N5,N4))THEN
           tErosionSedmLoss_col(N2,N1) = tErosionSedmLoss_col(N2,N1)-cumSed_Eros_2D(N,NN,N5B,N4B)
-          TSandEros_col(N2,N1)        = TSandEros_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
-          TSiltEros_col(N2,N1)        = TSiltEros_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
-          TCLAYEros_col(N2,N1)        = TCLAYEros_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
-          TNH4Eros_col(N2,N1)         = TNH4Eros_col(N2,N1)-XNH4Soil_Eros_2D(N,NN,N5B,N4B)
-          TNH3Eros_col(N2,N1)         = TNH3Eros_col(N2,N1)-XNH3Soil_Eros_2D(N,NN,N5B,N4B)
-          TNUreaEros_col(N2,N1)       = TNUreaEros_col(N2,N1)-XUreaSoil_Eros_2D(N,NN,N5B,N4B)
-          TNO3Eros_col(N2,N1)         = TNO3Eros_col(N2,N1)-XNO3Soil_Eros_2D(N,NN,N5B,N4B)
-          TNH4ErosBand_col(N2,N1)     = TNH4ErosBand_col(N2,N1)-XNH4Band_Eros_2D(N,NN,N5B,N4B)
-          TNH3ErosBand_col(N2,N1)     = TNH3ErosBand_col(N2,N1)-XNH3Band_Eros_2D(N,NN,N5B,N4B)
-          TNUreaErosBand_col(N2,N1)   = TNUreaErosBand_col(N2,N1)-XUreaBand_Eros_2D(N,NN,N5B,N4B)
-          TNO3ErosBand_col(N2,N1)     = TNO3ErosBand_col(N2,N1)-XNO3Band_Eros_2D(N,NN,N5B,N4B)
+          TSandErosed_col(N2,N1)      = TSandErosed_col(N2,N1)-XSand_Eros_2D(N,NN,N5B,N4B)
+          TSiltErosed_col(N2,N1)      = TSiltErosed_col(N2,N1)-XSilt_Eros_2D(N,NN,N5B,N4B)
+          TCLAYErosed_col(N2,N1)      = TCLAYErosed_col(N2,N1)-XClay_Eros_2D(N,NN,N5B,N4B)
+          TNH4Erosed_molN_col(N2,N1)       = TNH4Erosed_molN_col(N2,N1)-XNH4Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH3Erosed_molN_col(N2,N1)       = TNH3Erosed_molN_col(N2,N1)-XNH3Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNUreaErosed_molN_col(N2,N1)     = TNUreaErosed_molN_col(N2,N1)-XUreaSoil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNO3Erosed_molN_col(N2,N1)       = TNO3Erosed_molN_col(N2,N1)-XNO3Soil_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH4ErosBand_molN_col(N2,N1)     = TNH4ErosBand_molN_col(N2,N1)-XNH4Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TNH3ErosBand_molN_col(N2,N1)     = TNH3ErosBand_molN_col(N2,N1)-XNH3Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TNUreaErosBand_molN_col(N2,N1)   = TNUreaErosBand_molN_col(N2,N1)-XUreaBand_Eros_molN_2D(N,NN,N5B,N4B)
+          TNO3ErosBand_molN_col(N2,N1)     = TNO3ErosBand_molN_col(N2,N1)-XNO3Band_Eros_molN_2D(N,NN,N5B,N4B)
+          TPO4Erosed_molP_col(N2,N1)       = TPO4Erosed_molP_col(N2,N1)-XPO4Soil_Eros_molP_2D(N,NN,N5B,N4B)
+          TPO4ErosBand_molP_col(N2,N1)     = TPO4ErosBand_molP_col(N2,N1)-XPO4Band_Eros_molP_2D(N,NN,N5B,N4B)
 
           DO idx=idx_beg,idx_end
-            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_2D(idx,N,NN,N5B,N4B)
+            trcx_TER_col(idx,N2,N1)=trcx_TER_col(idx,N2,N1)-trcx_Eros_mol_2D(idx,N,NN,N5B,N4B)
           ENDDO
 
           DO NTP=idsp_beg,idsp_end
-            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_2D(NTP,N,NN,N5B,N4B)
+            trcp_TER_col(NTP,N2,N1)=trcp_TER_col(NTP,N2,N1)-trcp_Eros_mol_2D(NTP,N,NN,N5B,N4B)
           ENDDO
 
           D8380: DO K=1,jcplx
@@ -372,10 +378,11 @@ implicit none
   integer, intent(in) :: N          !exchagne along direction, 1 east-west, 2 north-south, 3 vertical
   integer, intent(in) :: N1,N2,N3   !source soil grid indices
   integer, intent(in) :: N4,N5      !dest grid indices  
-  integer, intent(in) :: N60      !vertical layer 
+  integer, intent(in) :: N60        !vertical layer 
   integer :: N6
   character(len=*), parameter :: subname='FlowXGrids'
   integer :: LL,K,idsalt,ids,idg,idom
+  real(r8) :: TK_loc
 
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
@@ -385,7 +392,7 @@ implicit none
   N6=N60
   IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
     !locate the vertical layer for the dest grid
-    D1200: DO LL=N6,NL_col(N5,N4)
+    D1200: DO LL=N60,NL_col(N5,N4)
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
@@ -403,12 +410,6 @@ implicit none
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
         THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)
 
-        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)',&
-            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),LakeSurfHeatFlux_col(N5,N4)
-          write(*,*)'Ns=',N1,n2,n3,n4,n5
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
         !not vertical direction or source grid is not at surface
       ELSE
         TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
@@ -416,12 +417,6 @@ implicit none
         TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-WaterFlowSoiMacP_3D(N,N6,N5,N4)
         THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
 
-        if(THeatFlowCellSoil_vr(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)',&
-            THeatFlowCellSoil_vr(N3,N2,N1),HeatFlow2Soil_3D(N,N3,N2,N1),HeatFlow2Soil_3D(N,N6,N5,N4)
-          write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
-          call endrun(trim(mod_filename)//' at line',__LINE__)
-        endif
       ENDIF
       !
     ELSE
@@ -432,7 +427,6 @@ implicit none
       WatIceThawMicP_vr(N3,N2,N1)    = 0.0_r8
       WatIceThawMacP_vr(N3,N2,N1)    = 0.0_r8
       THeatSoiThaw_vr(N3,N2,N1)      = 0.0_r8
-
     ENDIF
   ENDIF
   call PrintInfo('end '//subname)

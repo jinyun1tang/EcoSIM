@@ -1,6 +1,7 @@
 module PlantNonstElmDynMod
-  use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use DebugToolMod,  only: PrintInfo
   use ElmIDMod
   use PlantBGCPars
   use PlantAPIData  
@@ -289,6 +290,11 @@ module PlantNonstElmDynMod
 !----------------------------------------------------------------------------------------------------
   subroutine ShootRootElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC)
+  !
+  !The shoot-root exchange of nonstrucal element is done as follows:
+  !1)sum up the strengths over all branches, and all roots LAYERS
+  !2)compute weighting factor for each branch and each root layer
+  !3)do exchange between one branch and all different root layers  
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: PTRT
@@ -296,7 +302,7 @@ module PlantNonstElmDynMod
   real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: RootSinkC(pltpar%jroots)
-
+  character(len=*), parameter :: subname='ShootRootElmTransfer'
   integer :: L,NB,N,NR,NE
   real(r8) :: ZPOOLS,ZPOOLT
   real(r8) :: ZPOOLB
@@ -316,7 +322,7 @@ module PlantNonstElmDynMod
   real(r8) :: WTRTLX
   real(r8) :: WTLSBX,WTLSBB
   real(r8) :: WTRTLR
-  real(r8) :: XFRE(NumPlantChemElms)
+  real(r8) :: XFRE
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
 
@@ -330,13 +336,14 @@ module PlantNonstElmDynMod
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
     CanopyLeafSheathC_brch        => plt_biom%CanopyLeafSheathC_brch          ,& !input  :plant branch leaf + sheath C, [g d-2]
     RootElms_pft                  => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
+    PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]    
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantBranchState_brch        => plt_pheno%iPlantBranchState_brch         ,& !input  :flag to detect branch death, [-]
     iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft        ,& !input  :plant growth habit: annual or perennial,[-]
     ShootRootNonstElmConduts_pft  => plt_pheno%ShootRootNonstElmConduts_pft   ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
     RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
-    k_fine_litr                   => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
-    NIXBotRootLayer_raxes         => plt_morph%NIXBotRootLayer_raxes          ,& !input  :maximum soil layer number for root axes, [-]
+    k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
+    NRoot1stTipLay_raxes         => plt_morph%NRoot1stTipLay_raxes          ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
@@ -344,19 +351,22 @@ module PlantNonstElmDynMod
     PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !inoput :root layer C, [gC d-2]
     RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !inoput :root layer nonstructural element, [g d-2]
     CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch            ,& !inoput :branch nonstructural element, [g d-2]
-    CanopyLeafSheathC_pft          => plt_biom%CanopyLeafSheathC_pft            ,& !inoput :canopy leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_pft         => plt_biom%CanopyLeafSheathC_pft           ,& !inoput :canopy leaf + sheath C, [g d-2]
     ECO_ER_col                    => plt_bgcr%ECO_ER_col                      ,& !inoput :ecosystem respiration, [g d-2 h-1]
+    ShootRootXferElm_pft          => plt_bgcr%ShootRootXferElm_pft            ,& !inoput :shoot-root nonstructural element transfer, [ g d-2 h-1]
     Eco_AutoR_CumYr_col           => plt_bgcr%Eco_AutoR_CumYr_col              & !inoput :ecosystem autotrophic respiration, [g d-2 h-1]
   )
-!     ROOT AND NODULE TOTALS
-!
-!     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
-!     WTRT1,WTRT2=primary,secondary root C mass in soil layer
-!     GrossResp_pft=total PFT respiration
-!     RootCO2Autor_pvr=total root respiration
-!     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_CumYr_col=total autotrophic respiration
-!
+
+  call PrintInfo('beg '//subname)
+  !     ROOT AND NODULE TOTALS
+  !
+  !     RootMycoActiveBiomC_pvr,WTRTD=active,actual root C mass
+  !     WTRT1,WTRT2=primary,secondary root C mass in soil layer
+  !     GrossResp_pft=total PFT respiration
+  !     RootCO2Autor_pvr=total root respiration
+  !     ECO_ER_col=ecosystem respiration
+  !     Eco_AutoR_CumYr_col=total autotrophic respiration
+  !
   D5445: DO N=1,Myco_pft(NZ)
     D5450: DO L=NU,MaxSoiL4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ) = 0._r8
@@ -369,39 +379,40 @@ module PlantNonstElmDynMod
       ECO_ER_col          = ECO_ER_col+RootCO2Autor_pvr(N,L,NZ)
       Eco_AutoR_CumYr_col = Eco_AutoR_CumYr_col+RootCO2Autor_pvr(N,L,NZ)
     ENDDO D5450
-
+    
     DO  NR=1,NumPrimeRootAxes_pft(NZ)
-      RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_raxes(NR,NZ),NZ)=RootMycoActiveBiomC_pvr(N,NIXBotRootLayer_raxes(NR,NZ),NZ)&
-        +RootMyco1stElm_raxs(ielmc,N,NR,NZ)
+      L=NRoot1stTipLay_raxes(NR,NZ)
+      RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco1stElm_raxs(ielmc,N,NR,NZ)
     ENDDO
   ENDDO D5445
 
-!     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT
-!
-!     SINK STRENGTH OF ROOTS IN EACH SOIL LAYER AS A FRACTION
-!     OF TOTAL SINK STRENGTH OF ROOTS IN ALL SOIL LAYERS
-!
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     WTLS,WTRT=total PFT leaf+petiole,root C mass
-!     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
-!     RootSinkC_vr,RootSinkC=root layer,root system sink strength
-!
-!     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
-!  why 2/3 here?
+  !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT
+  !
+  !     SINK STRENGTH OF ROOTS IN EACH SOIL LAYER AS A FRACTION
+  !     OF TOTAL SINK STRENGTH OF ROOTS IN ALL SOIL LAYERS
+  !
+  !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
+  !     WTLS,WTRT=total PFT leaf+petiole,root C mass
+  !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
+  !     RootSinkC_vr,RootSinkC=root layer,root system sink strength
+  !
+  !     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
+  !  why 2/3 here?
   IF(CanopyLeafSheathC_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     FWTC=AMIN1(1.0_r8,0.667_r8*RootElms_pft(ielmc,NZ)/CanopyLeafSheathC_pft(NZ))
   ELSE
     FWTC=1.0_r8
   ENDIF
+  
   IF(RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
     FWTS=AMIN1(1.0_r8,CanopyLeafSheathC_pft(NZ)/(0.667_r8*RootElms_pft(ielmc,NZ)))
   ELSE
     FWTS=1.0_r8
   ENDIF
-!     ELSE
-!     FWTC=1.0_r8
-!     FWTS=1.0_r8
-!     ENDIF
+  !     ELSE
+  !     FWTC=1.0_r8
+  !     FWTS=1.0_r8
+  !     ENDIF
   D290: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN
       RootSinkWeight_pft(L)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
@@ -409,39 +420,40 @@ module PlantNonstElmDynMod
       RootSinkWeight_pft(L)=1.0_r8
     ENDIF
   ENDDO D290
-!     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
-!     BUT IS NOT USED FOR ANNUALS DURING GRAIN FILL
-!
-!     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
-!
+  !     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
+  !     BUT IS NOT USED FOR ANNUALS DURING GRAIN FILL
+  !
+  !     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
+  !
   CanopyLeafSheathC_pft(NZ)=0._r8
   D309: DO NB=1,NumOfBranches_pft(NZ)
     CanopyLeafSheathC_pft(NZ)=CanopyLeafSheathC_pft(NZ)+CanopyLeafSheathC_brch(NB,NZ)
   ENDDO D309
     
-!
-!     SINK STRENGTH OF BRANCHES IN EACH CANOPY AS A FRACTION
-!     OF TOTAL SINK STRENGTH OF THE CANOPY
-!
-!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
-!     BranchSinkWeight_pft=branch sink weighting factor
-!     ShootRootNonstElmConduts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
-!     PTRT=allocation to leaf+petiole used to modify ShootRootNonstElmConduts_pft,in annuals
-!     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
-!     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
-!     FWODB=C woody fraction in branch:0=woody,1=non-woody
-!     FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
-!     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
-!     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!
+  !
+  !     SINK STRENGTH OF BRANCHES IN EACH CANOPY AS A FRACTION
+  !     OF TOTAL SINK STRENGTH OF THE CANOPY
+  !
+  !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
+  !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
+  !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
+  !     BranchSinkWeight_pft=branch sink weighting factor
+  !     ShootRootNonstElmConduts_pft=rate constant for equilibrating shoot-root nonstructural C concn from PFT file
+  !     PTRT=allocation to leaf+petiole used to modify ShootRootNonstElmConduts_pft,in annuals
+  !     FWTC,FWTS,FWTR=canopy,root system,root layer sink weighting factor
+  !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
+  !     FWODB=C woody fraction in branch:0=woody,1=non-woody
+  !     FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
+  !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
+  !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
+  !
     DO NE=1,NumPlantChemElms
       mass_inital(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)) &
         +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
     ENDDO
 
   D310: DO NB=1,NumOfBranches_pft(NZ)
+    !exchange between branch NB and all root layers
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
       IF(CanopyLeafSheathC_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         BranchSinkWeight_pft(NB)=AZMAX1(CanopyLeafSheathC_brch(NB,NZ)/CanopyLeafSheathC_pft(NZ))
@@ -449,40 +461,42 @@ module PlantNonstElmDynMod
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-        PTSHTR=ShootRootNonstElmConduts_pft(NZ)*PTRT**0.167_r8
+        PTSHTR=ShootRootNonstElmConduts_pft(NZ)*PTRT**0.167_r8    !0.167=(1/6)~sqrt(length), PTRT is the main branch growth allocation to leaf+petiole
       ELSE
         PTSHTR=ShootRootNonstElmConduts_pft(NZ)
       ENDIF
 
       D415: DO L=NU,MaxSoiL4Root_pft(NZ)
-        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_litr)*RootSinkWeight_pft(L)*FWTC
-        WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_litr)*BranchSinkWeight_pft(NB)*FWTS
+        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pft(L)*FWTC
+        WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
         WTLSBB       = AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR       = AZMAX1(WTRTLX,FSNK*WTLSBX)
         TwoCompMassC = WTLSBB+WTRTLR
         IF(TwoCompMassC.GT.ZERO4Groth_pft(NZ))THEN
           CPOOLB                                      = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*RootSinkWeight_pft(L))
           CPOOLS                                      = AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
-          NonstElmGradt                               = (CPOOLB*WTRTLR-CPOOLS*WTLSBB)/TwoCompMassC
-          XFRE(ielmc)                                 = PTSHTR*NonstElmGradt
           CPOOLT                                      = CPOOLS+CPOOLB
-          CanopyNonstElms_brch(ielmc,NB,NZ)           = CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
-          RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE(ielmc)
+          NonstElmGradt                               = (CPOOLB*WTRTLR-CPOOLS*WTLSBB)/TwoCompMassC
+          XFRE                                        = PTSHTR*NonstElmGradt
+          ShootRootXferElm_pft(ielmc,NZ)              = ShootRootXferElm_pft(ielmc,NZ)-XFRE
+          CanopyNonstElms_brch(ielmc,NB,NZ)           = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE)
+          RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE)
 
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
             DO NE=2,NumPlantChemElms
-              NonstElmBrchE = AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)*RootSinkWeight_pft(L))
-              NonstElmRootE = AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
+              NonstElmBrchE = CanopyNonstElms_brch(NE,NB,NZ)*RootSinkWeight_pft(L)
+              NonstElmRootE = RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)*BranchSinkWeight_pft(NB)
               NonstElmGradt = (NonstElmBrchE*CPOOLS-NonstElmRootE*CPOOLB)/CPOOLT
-              XFRE(NE)      = PTSHTR*NonstElmGradt
-              IF(XFRE(NE)>0._r8)then
-                XFRE(NE)=AMIN1(CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
+              XFRE          = PTSHTR*NonstElmGradt
+              IF(XFRE>0._r8)then
+                XFRE=AMIN1(NonstElmBrchE,XFRE)
               ELSE  
-                XFRE(NE)=AMAX1(-RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ),XFRE(NE))
+                XFRE=AMAX1(-NonstElmRootE,XFRE)
               ENDIF
-              CanopyNonstElms_brch(NE,NB,NZ)           = CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
-              RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE(NE)
+              ShootRootXferElm_pft(NE,NZ)              = ShootRootXferElm_pft(NE,NZ)-XFRE
+              CanopyNonstElms_brch(NE,NB,NZ)           = AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)-XFRE)
+              RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE)
             ENDDO
           ENDIF  
         ENDIF
@@ -493,6 +507,7 @@ module PlantNonstElmDynMod
     mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)) &
       +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ShootRootElmTransfer  
 
@@ -670,7 +685,7 @@ module PlantNonstElmDynMod
   associate(                                                       &
     NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
     ZEROS2                  => plt_site%ZEROS2                    ,& !input  :threshold zero for numerical stability,[-]
-    k_woody_litr            => pltpar%k_woody_litr                ,& !input  :woody litter complex id
+    k_woody_comp            => pltpar%k_woody_comp                ,& !input  :woody litter complex id
     SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
     VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr     ,& !input  :volume of soil layer, [m3 d-2]
     RootMycoActiveBiomC_pvr => plt_biom%RootMycoActiveBiomC_pvr   ,& !input  :root layer structural C, [gC d-2]
@@ -683,7 +698,7 @@ module PlantNonstElmDynMod
   )
   D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
-      WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_litr))
+      WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_comp))
       WTPLTX = WTRTRX+SapwoodBiomassC_brch(NB,NZ)
       IF(WTPLTX.GT.ZERO4Groth_pft(NZ))THEN
         CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*SapwoodBiomassC_brch(NB,NZ) &

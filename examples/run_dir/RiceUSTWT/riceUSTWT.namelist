@@ -33,7 +33,7 @@ hist_fincl1='dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','VSPore_vr','Root_N_FIX_col'
   'RootLDS_pvr','RootKond2H2O_pvr','Uptk_N_CumYr_FLX_pft','Growth_Stage_pft','UPTK_NH4_FLX_pft','UPTK_NO3_FLX_pft',
   'EXUD_CumYr_N_FLX_pft','CH2OSunlit_pft','CH2OSunsha_pft','PARSunlit_pft','PARSunsha_pft','RUB_ACTVN_pft','LeafProteinC_pft',
   'LeafC3ChlC_pft','LeafC4ChlC_pft','LeafRubisco_pft','LeafPEPC_pft','SLA_pft','RootSurfAreaPP_pvr','CAN_GPP_pft',
-  'TFN_Carboxy_pft','TFN_eTranspt_pft','LeafC3ChlC_pft','Canopy_PAR_pft'
+  'TFN_Carboxy_pft','TFN_eTranspt_pft','LeafC3ChlC_pft','Canopy_PAR_pft','LAIstk_pft'
 hist_nhtfrq=-24 !, -1
 hist_mfilt=4380 !, 8520
 !hist_mfilt=8760 !, 8520

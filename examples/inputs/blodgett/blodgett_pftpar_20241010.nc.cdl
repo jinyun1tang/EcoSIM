@@ -263,6 +263,12 @@ variables:
 	float DMND(npfts) ;
 		DMND:long_name = "nodule bacteria in root nodule,canopy dry matter C production vs nonstructural C consumption" ;
 		DMND:units = "gC gC-1" ;
+	float CNWR(npfts) ;
+		CNWR:long_name = "Protein C to root N ratio in plant roots" ;
+		CNWR:units = "gC gN-1" ;
+	float CNWL(npfts) ;
+		CNWL:long_name = "Protein C to leaf N ratio in plant leaves" ;
+		CNWL:units = "gC gN-1" ;		
 	float CNLF(npfts) ;
 		CNLF:long_name = "NC ratio in plant leaves" ;
 		CNLF:units = "gN gC-1" ;
@@ -290,6 +296,12 @@ variables:
 	float CNND(npfts) ;
 		CNND:long_name = "NC ratio in plant nodule" ;
 		CNND:units = "gN gC-1" ;
+	float CPWR(npfts) ;
+		CPWR:long_name = "Protein C to root P ratio in plant roots" ;
+		CPWR:units = "gC gP-1" ;
+	float CPWL(npfts) ;
+		CPWL:long_name = "Protein C to leaf P ratio in plant leaves" ;
+		CPWL:units = "gC gP-1" ;
 	float CPLF(npfts) ;
 		CPLF:long_name = "PC ratio in plant leaves" ;
 		CPLF:units = "gP gC-1" ;
@@ -489,6 +501,10 @@ data:
 
  DMND = 0.72 ;
 
+ CNWR = 2.15 ;
+
+ CNWL = 2.6 ;
+
  CNLF = 0.04 ;
 
  CNSHE = 0.02 ;
@@ -506,6 +522,10 @@ data:
  CNRT = 0.02 ;
 
  CNND = 0.1 ;
+
+ CPWR = 40.0 ;
+
+ CPWL = 28.4 ;  
 
  CPLF = 0.004 ;
 

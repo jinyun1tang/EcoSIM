@@ -58,7 +58,7 @@ module NoduleBGCMod
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     ZERO                      => plt_site%ZERO                       ,& !input  :threshold zero for numerical stability, [-]
     AREA3                     => plt_site%AREA3                      ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    k_fine_litr               => pltpar%k_fine_litr                  ,& !input  :fine litter complex id
+    k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
     PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr  ,& !input  :litter kinetic fraction, [-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft         ,& !input  :canopy temperature growth function, [-]
@@ -321,7 +321,7 @@ module NoduleBGCMod
     !
     D6470: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,0,NZ) &
+        LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
           +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
       ENDDO
     ENDDO D6470
@@ -459,7 +459,7 @@ module NoduleBGCMod
     NoduGrowthYield_pft     => plt_allom%NoduGrowthYield_pft      ,& !input  :nodule growth yield, [g g-1]
     rNCNodule_pft           => plt_allom%rNCNodule_pft            ,& !input  :nodule N:C ratio, [gN gC-1]
     rPCNoduler_pft          => plt_allom%rPCNoduler_pft           ,& !input  :nodule P:C ratio, [gP gC-1]
-    k_fine_litr             => pltpar%k_fine_litr                 ,& !input  :fine litter complex id
+    k_fine_comp             => pltpar%k_fine_comp                 ,& !input  :fine litter complex id
     iroot                   => pltpar%iroot                       ,& !input  :group id of plant root litter
     fRootGrowPSISense_pvr   => plt_pheno%fRootGrowPSISense_pvr    ,& !input  :water stress to plant root growth, [-]
     RAutoRootO2Limter_rpvr  => plt_rbgc%RAutoRootO2Limter_rpvr    ,& !input  :O2 constraint to root respiration (0-1), [-]
@@ -718,7 +718,7 @@ module NoduleBGCMod
         D6370: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dELoss=PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(NoduleElmntDecay2Litr(NE)+NodulELmSenes2Litr(NE))
-            LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_litr,L,NZ)+dELoss
+            LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+dELoss
             NoduleLitrfall(NE)=  NoduleLitrfall(NE)+dELoss
           ENDDO
         ENDDO D6370

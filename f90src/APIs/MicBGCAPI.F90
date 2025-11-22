@@ -177,7 +177,6 @@ implicit none
   micfor%litrm=(L==0)
   !is it surface layer
   micfor%Lsurf=(L==NU_col(NY,NX))
-
   micfor%VOLW0               = VLWatMicP_vr(0,NY,NX)
   micfor%ZERO                = ZERO
   micfor%CCH4E               = AtmGasCgperm3_col(idg_CH4,NY,NX)
@@ -444,6 +443,11 @@ implicit none
     micfor%AttenfNO3AutorR           = micflx%AttenfNO3Autor
     micfor%AttenfH2PO4AutorR         = micflx%AttenfH2PO4Autor
     micfor%AttenfH1PO4AutorR         = micflx%AttenfH1PO4Autor
+    micfor%tRNH4MicrbImobilSoil      = micflx%tRNH4MicrbImobilSoil
+    micfor%tRNO3MicrbImobilSoil      = micflx%tRNO3MicrbImobilSoil
+    micfor%tRH2PO4MicrbImobilSoil    = micflx%tRH2PO4MicrbImobilSoil
+    micfor%tRH1PO4MicrbImobilSoil    = micflx%tRH1PO4MicrbImobilSoil
+
   else
     KL=jcplx
   endif
@@ -539,10 +543,10 @@ implicit none
     RNO3DmndLitrHeter_col(1:NumHetetr1MicCmplx,1:KL,NY,NX)   = micflx%RNO3DmndLitrHeter(1:NumHetetr1MicCmplx,1:KL)
     RH2PO4DmndLitrHeter_col(1:NumHetetr1MicCmplx,1:KL,NY,NX) = micflx%RH2PO4DmndLitrHeter(1:NumHetetr1MicCmplx,1:KL)
     RH1PO4DmndLitrHeter_col(1:NumHetetr1MicCmplx,1:KL,NY,NX) = micflx%RH1PO4DmndLitrHeter(1:NumHetetr1MicCmplx,1:KL)
-    RNH4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)       = micflx%RNH4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
-    RNO3UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)       = micflx%RNO3UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
-    RH2PO4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)     = micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
-    RH1PO4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)     = micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
+    RNH4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)   = micflx%RNH4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
+    RNO3UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX)   = micflx%RNO3UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
+    RH2PO4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX) = micflx%RH2PO4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
+    RH1PO4UptkLitrAutor_col(1:NumMicrobAutoTrophCmplx,NY,NX) = micflx%RH1PO4UptkLitrAutor(1:NumMicrobAutoTrophCmplx)
 
     DO NE=1,NumPlantChemElms
       SolidOM_vr(NE,micpar%iprotein,micpar%k_POM,NU_col(NY,NX),NY,NX)    = micstt%SOMPomProtein(NE)

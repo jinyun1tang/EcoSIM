@@ -58,18 +58,19 @@ implicit none
   integer, parameter :: ifert_N_nh3_band          = 6
   integer, parameter :: ifert_N_urea_band         = 7
   integer, parameter :: ifert_N_no3_band          = 8
-  integer, parameter :: ifert_P_Ca_H2PO4_2      = 9
+  integer, parameter :: ifert_P_Ca_H2PO4_2_soil   = 9
   integer, parameter :: ifert_P_Ca_H2PO4_2_band = 10
   integer, parameter :: ifert_P_apatite         = 11
   integer, parameter :: ifert_Ca_lime           = 12
   integer, parameter :: ifert_Ca_gypsum         = 13
-
   integer, parameter :: ifert_plant_resC        = 14
   integer, parameter :: ifert_plant_resN        = 15
   integer, parameter :: ifert_plant_resP        = 16
   integer, parameter :: ifert_plant_manuC       = 17
   integer, parameter :: ifert_plant_manuN       = 18
   integer, parameter :: ifert_plant_manuP       = 19
+  integer, parameter :: ifert_PO4_soil          = 20
+  integer, parameter :: ifert_PO4_band          = 21
 
   integer, parameter :: imanure_ruminant    = 1
   integer, parameter :: imanure_nonruminant = 2

@@ -94,6 +94,10 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: rNCGrain_tab(:)
   real(r8), target, allocatable :: rNCRoot_tab(:)
   real(r8), target, allocatable :: rNCNodule_tab(:)
+  real(r8), target, allocatable :: rProteinC2LeafN_tab(:)
+  real(r8), target, allocatable :: rProteinC2RootN_tab(:)
+  real(r8), target, allocatable :: rProteinC2LeafP_tab(:)
+  real(r8), target, allocatable :: rProteinC2RootP_tab(:)
   real(r8), target, allocatable :: rPCLeaf_tab(:)
   real(r8), target, allocatable :: rPCSheath_tab(:)
   real(r8), target, allocatable :: rPCStalk_tab(:)
@@ -209,6 +213,10 @@ module PlantTraitTableMod
   allocate(rNCRoot_tab(npfts));rNCRoot_tab=0._r8
   allocate(rNCNodule_tab(npfts));rNCNodule_tab=0._r8
   allocate(rPCLeaf_tab(npfts));rPCLeaf_tab=0._r8
+  allocate(rProteinC2RootP_tab(npfts)); rProteinC2RootP_tab=0._r8
+  allocate(rProteinC2RootN_tab(npfts));rProteinC2RootN_tab=0._r8  
+  allocate(rProteinC2LeafP_tab(npfts)); rProteinC2LeafP_tab=0._r8
+  allocate(rProteinC2LeafN_tab(npfts));rProteinC2LeafN_tab=0._r8
   allocate(rPCSheath_tab(npfts));rPCSheath_tab=0._r8
   allocate(rPCStalk_tab(npfts));rPCStalk_tab=0._r8
   allocate(rPCReserve_tab(npfts));rPCReserve_tab=0._r8
@@ -323,6 +331,10 @@ module PlantTraitTableMod
   call destroy(rNCRoot_tab)
   call destroy(rNCNodule_tab)
   call destroy(rPCLeaf_tab)
+  call destroy(rProteinC2RootN_tab)  
+  call destroy(rProteinC2RootP_tab)
+  call destroy(rProteinC2LeafN_tab)  
+  call destroy(rProteinC2LeafP_tab)
   call destroy(rPCSheath_tab)
   call destroy(rPCStalk_tab)
   call destroy(rPCReserve_tab)

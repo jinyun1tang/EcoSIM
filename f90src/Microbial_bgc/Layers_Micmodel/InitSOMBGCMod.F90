@@ -22,9 +22,9 @@ module InitSOMBGCMOD
 
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
-  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
-  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
+  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes, gC (Mg soil)^-1
+  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes, gN (Mg soil)-1
+  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes, gP (Mg soil)^-1
 
   public :: InitSOMVars
   public :: InitSOMProfile
@@ -97,7 +97,7 @@ module InitSOMBGCMOD
     rPCOMC_ave            => micpar%rPCOMC_ave,            &
     nlbiomcp              => micpar%nlbiomcp,              &
     k_humus               => micpar%k_humus,               &
-    mid_HeterAerobBacter=> micpar%mid_HeterAerobBacter,&    
+    mid_HeterAerobBacter  => micpar%mid_HeterAerobBacter  ,&    
     OHCK                  => micpar%OHCK,                  &
     OMCK                  => micpar%OMCK,                  &
     OQCK                  => micpar%OQCK,                  &
@@ -345,7 +345,7 @@ module InitSOMBGCMOD
         SolidOM_vr(ielmp,M,K,L,NY,NX)=0.0_r8
       ENDIF
 
-      IF(K.EQ.micpar%k_woody_litr)THEN
+      IF(K.EQ.micpar%k_woody_comp)THEN
         SolidOMAct_vr(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)*OMCI(1,K)
       ELSE
         SolidOMAct_vr(M,K,L,NY,NX)=SolidOM_vr(ielmc,M,K,L,NY,NX)
@@ -414,8 +414,8 @@ module InitSOMBGCMOD
   integer, intent(in) :: L, NY,NX
 !     begin_execution
   associate(                               &
-   k_woody_litr  => micpar%k_woody_litr  , &
-   k_fine_litr   => micpar%k_fine_litr   , &
+   k_woody_comp  => micpar%k_woody_comp  , &
+   k_fine_comp   => micpar%k_fine_comp   , &
    k_manure      => micpar%k_manure        &
   )
   IF(L.EQ.0)THEN
@@ -425,77 +425,77 @@ module InitSOMBGCMOD
     !
     !     PREVIOUS COARSE WOODY RESIDUE
     !
-    CFOSC_vr(1:jsken,k_woody_litr,L,NY,NX)=real((/0.00,0.045,0.660,0.295/),r8)
+    CFOSC_vr(1:jsken,k_woody_comp,L,NY,NX)=real((/0.00,0.045,0.660,0.295/),r8)
 
     !
     !     MAIZE
     !
     IF(iLitrType_col(1,NY,NX).EQ.1)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.080,0.245,0.613,0.062/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.080,0.245,0.613,0.062/),r8)
       !
       !     WHEAT
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.2)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.125,0.171,0.560,0.144/),r8)
       !
       !     SOYBEAN
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.3)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.138,0.426,0.316,0.120/),r8)
 
       !     NEW STRAW
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.4)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.036,0.044,0.767,0.153/),r8)
 
       !     OLD STRAW
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.5)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
       !
       !     COMPOST
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.6)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.143,0.015,0.640,0.202/),r8)
       !
       !     GREEN MANURE
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.7)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.202,0.013,0.560,0.225/),r8)
 
       !     NEW DECIDUOUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.8)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.070,0.41,0.36,0.16/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.070,0.41,0.36,0.16/),r8)
 
 !
       !     NEW CONIFEROUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.9)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.07,0.25,0.38,0.30/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.07,0.25,0.38,0.30/),r8)
 
       !     OLD DECIDUOUS FOREST
 !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.10)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
       !
       !     OLD CONIFEROUS FOREST
       !
     ELSEIF(iLitrType_col(1,NY,NX).EQ.11)THEN
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.02,0.06,0.34,0.58/),r8)
       !     DEFAULT
       !
     ELSE
-      CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
+      CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)=real((/0.075,0.125,0.550,0.250/),r8)
 
     ENDIF
     !
     !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
     !
   ELSE
-    CFOSC_vr(1:jsken,k_woody_litr,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
-    CFOSC_vr(1:jsken,k_fine_litr,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)
+    CFOSC_vr(1:jsken,k_woody_comp,L,NY,NX) = real((/0.00,0.00,0.20,0.80/),r8)
+    CFOSC_vr(1:jsken,k_fine_comp,L,NY,NX)  = real((/0.02,0.06,0.34,0.58/),r8)
   ENDIF
   end associate
   end subroutine InitSurfResiduKinetiComponent
@@ -536,14 +536,14 @@ module InitSOMBGCMOD
   real(r8), intent(in) :: TORGL
   real(r8), intent(in) :: LandScape1stSoiLayDepth
   real(r8), intent(out):: FCX
-  real(r8), intent(out):: CORGCM
+  real(r8), intent(out):: CORGCM   !OM volume in one m3 consolidated soil (excluding pores)
   real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
   associate(                           &
     k_POM       => micpar%k_POM,       &
     k_humus     => micpar%k_humus,     &
-    k_fine_litr => micpar%k_fine_litr, &
+    k_fine_comp => micpar%k_fine_comp, &
     k_manure    => micpar%k_manure,    &
     iprotein    => micpar%iprotein,    &
     icarbhyro   => micpar%icarbhyro,   &
@@ -630,7 +630,8 @@ module InitSOMBGCMOD
 
   IF(L.GT.0)THEN
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AMIN1(orgcden,(CORGCX(k_fine_litr)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
+      !assume 0.55 of organic matter is carbon
+      CORGCM=AMIN1(orgcden,(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8
     endif

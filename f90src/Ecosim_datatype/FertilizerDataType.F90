@@ -10,7 +10,8 @@ module FertilizerDataType
 
   real(r8),target,allocatable :: FertN_mole_soil_vr(:,:,:,:)      !fertilizer in soil from broadcast, [mol d-2]
   real(r8),target,allocatable :: FertN_mole_Band_vr(:,:,:,:)      !fertilizer in band  from side-dressing, [mol d-2]
-
+  real(r8),target,allocatable :: FertP_mole_soil_vr(:,:,:)   !fertilizer P in soil from broadcast, [mol P d-2]
+  real(r8),target,allocatable :: FertP_mole_band_vr(:,:,:)   !fertilizer P in band from side-dressing, [mol P d-2]
   real(r8),target,allocatable :: DepzCorp_col(:,:,:)         !soil mixing fraction with tillage, [-]
   real(r8),target,allocatable :: FERT(:,:,:,:)               !fertilizer application, [g m-2]
   real(r8),target,allocatable :: FDPTH(:,:,:)                !depth of fertilizer application, [m]
@@ -41,20 +42,22 @@ module FertilizerDataType
   allocate(ROWSpacePO4_col(JY,JX)) ;ROWSpacePO4_col=0._r8                      !row spacing of PO4 fertilizer band, [m]
 
   allocate(DepzCorp_col(366,JY,JX)) ;DepzCorp_col=0._r8                 !soil mixing fraction with tillage, [-]
-  allocate(FERT(20,366,JY,JX)); FERT=0._r8                !fertilizer application, [g m-2]
+  allocate(FERT(21,366,JY,JX)); FERT=0._r8                !fertilizer application, [g m-2]
   allocate(FDPTH(366,JY,JX)); FDPTH=0._r8                  !depth of fertilizer application, [m]
   allocate(ROWI(366,JY,JX)) ;ROWI=0._r8                  !row spacing of fertilizer band, [m]
 
   allocate(FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,JY,JX)); FertN_mole_soil_vr=0._r8
   allocate(FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,JY,JX)); FertN_mole_Band_vr=0._r8
-
+  allocate(FertP_mole_soil_vr(1:JZ,JY,JX));FertP_mole_soil_vr=0._r8
+  allocate(FertP_mole_band_vr(1:JZ,JY,JX));FertP_mole_band_vr=0._r8
   end subroutine InitAllocate
 !-------------------------------------------------------
   subroutine DestructFertilizerData
   use abortutils, only : destroy
 
   implicit none
-
+  call destroy(FertP_mole_band_vr)
+  call destroy(FertP_mole_soil_vr)
   call destroy(FertN_mole_soil_vr)
   call destroy(FertN_mole_Band_vr)
 

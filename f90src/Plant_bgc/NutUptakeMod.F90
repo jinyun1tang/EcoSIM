@@ -643,7 +643,7 @@ module NutUptakeMod
       RootCUlmNutUptake_pvr(ids_NO3B,N,L,NZ),RootNutUptake_pvr(ids_NO3B,N,L,NZ))
 
   ENDIF
-  if(RootMyMassC>0._r8)VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3Root_pvr(N,L,NZ)/RootMyMassC
+  if(RootMyMassC>1.e-4_r8)VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3Root_pvr(N,L,NZ)/RootMyMassC
   end associate
   end subroutine UptakeNO3
 
@@ -830,7 +830,7 @@ module NutUptakeMod
 
   ENDIF
   !normalize by root dry weight
-  if(RootMyMassC>ZERO)VmaxNH4Root_pvr(N,L,NZ)=VmaxNH4Root_pvr(N,L,NZ)/RootMyMassC
+  if(RootMyMassC>1.e-4_r8)VmaxNH4Root_pvr(N,L,NZ)=VmaxNH4Root_pvr(N,L,NZ)/RootMyMassC
   end associate
   end subroutine UptakeNH4
 
@@ -1270,7 +1270,7 @@ module NutUptakeMod
     ZEROS                         => plt_site%ZEROS                           ,& !input  :threshold zero for numerical stability,[-]
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]
     RPlantRootH2OUptk_pvr         => plt_ew%RPlantRootH2OUptk_pvr             ,& !input  :root water uptake, [m2 d-2 h-1]
-    RootFracRemobilizableBiom_pft => plt_allom%RootFracRemobilizableBiom_pft  ,& !input  :fraction of remobilizable nonstructural biomass in root, [-]
+    RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !input  :reference root protein N, [gN g-1]
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !input  :root layer protein C, [gC d-2]
     RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !input  :root layer nonstructural element, [g d-2]
@@ -1287,16 +1287,16 @@ module NutUptakeMod
   !     PROTEIN CONTENT RELATIVE TO 5% FOR WHICH ACTIVE UPTAKE
   !     PARAMETERS ARE DEFINED
   !
-  !     RootProteinConc_rpvr,RootFracRemobilizableBiom_pft=current,maximum protein concentration
+  !     RootProteinConc_rpvr,RootProteinCMax_pft=current,maximum protein concentration
   !     RootProteinC_pvr,WTRTL=protein content,mass
   !     FWSRT=protein concentration relative to 5%
   !
   call PrintInfo('beg '//subname)
   IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-    RootProteinConc_rpvr(N,L,NZ) = AMIN1(RootFracRemobilizableBiom_pft(NZ),RootProteinC_pvr(N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
+    RootProteinConc_rpvr(N,L,NZ) = AMIN1(RootProteinCMax_pft(NZ),RootProteinC_pvr(N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))
     FWSRT                        = RootProteinConc_rpvr(N,L,NZ)/0.05_r8
   ELSE
-    RootProteinConc_rpvr(N,L,NZ)=RootFracRemobilizableBiom_pft(NZ)
+    RootProteinConc_rpvr(N,L,NZ)=RootProteinCMax_pft(NZ)
     FWSRT=1.0_r8
   ENDIF
   Nutruptk_fProtC_rpvr(N,L,NZ)=FWSRT

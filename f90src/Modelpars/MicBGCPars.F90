@@ -51,8 +51,8 @@ implicit none
   integer :: jcplx   !# of microbe-substrate complexes
   integer :: jsken   !# of kinetic components of the substrates
   integer :: NumMicbFunGrupsPerCmplx             !# of functional groups
-  integer :: k_woody_litr
-  integer :: k_fine_litr
+  integer :: k_woody_comp
+  integer :: k_fine_comp
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
@@ -136,13 +136,13 @@ contains
   allocate(this%is_litter(1:this%jcplx));this%is_litter(:)=.false.
   allocate(this%is_finelitter(1:this%jcplx));this%is_finelitter(:)=.false.
 
-  this%k_woody_litr                = 1;                   this%is_litter(this%k_woody_litr) = .true.
-  this%k_fine_litr                 = this%k_woody_litr+1; this%is_litter(this%k_fine_litr) = .true.
-  this%NumOfPlantLitrCmplxs        = this%k_fine_litr
-  this%k_manure                    = this%k_fine_litr+1;   this%is_litter(this%k_manure)   = .true.
-  this%is_litter(this%k_fine_litr) = .true.
+  this%k_woody_comp                = 1;                   this%is_litter(this%k_woody_comp) = .true.
+  this%k_fine_comp                 = this%k_woody_comp+1; this%is_litter(this%k_fine_comp) = .true.
+  this%NumOfPlantLitrCmplxs        = this%k_fine_comp
+  this%k_manure                    = this%k_fine_comp+1;   this%is_litter(this%k_manure)   = .true.
+  this%is_litter(this%k_fine_comp) = .true.
   this%is_litter(this%k_manure)    = .true.
-  this%is_finelitter(this%k_fine_litr)=.true.
+  this%is_finelitter(this%k_fine_comp)=.true.
   this%iprotein  = 1
   this%icarbhyro = 2
   this%icellulos = 3
@@ -306,10 +306,10 @@ contains
   ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
   ! rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
 
-  CNOFC(1:jskenc,this%k_woody_litr) = real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
-  CPOFC(1:jskenc,this%k_woody_litr) = real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
-  CNOFC(1:jskenc,this%k_fine_litr)  = real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
-  CPOFC(1:jskenc,this%k_fine_litr)  = real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
+  CNOFC(1:jskenc,this%k_woody_comp) = real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
+  CPOFC(1:jskenc,this%k_woody_comp) = real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
+  CNOFC(1:jskenc,this%k_fine_comp)  = real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
+  CPOFC(1:jskenc,this%k_fine_comp)  = real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
   CNOFC(1:jskenc,this%k_manure)     = real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
   CPOFC(1:jskenc,this%k_manure)     = real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure  
 

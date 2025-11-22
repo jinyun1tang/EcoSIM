@@ -7,7 +7,7 @@ PROGRAM SoilWarmReadTest
   use ClimReadMod       , only : read_soil_warming_Tref
   use ncdio_pio
   use netcdf
-  use PerturbationMod
+  use EcosysWarmingMod
   implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
@@ -19,7 +19,7 @@ PROGRAM SoilWarmReadTest
   call config_soil_warming(warming_exp)
 
   do year=2013,2020
-   if(check_Soil_Warming(year,1))then
+   if(check_warming_dates(year,1,1))then
 !     call read_soil_warming_Tref(year)
    endif
   enddo

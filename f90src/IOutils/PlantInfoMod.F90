@@ -2,10 +2,11 @@ module PlantInfoMod
 !
 ! DESCRIPTION
 ! code to read plant information
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use fileUtil, only : open_safe, check_read,int2str,getavu, relavu, opnfil,iulog
-  use minimathmod, only : isLeap
-  use abortutils, only : endrun  
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil, iulog
+  use minimathmod,   only: isLeap
+  use abortutils,    only: endrun
+  use DebugToolMod,  only: PrintInfo
   use PlantTraitTableMod  
   use netcdf
   use ncdio_pio  
@@ -46,13 +47,12 @@ implicit none
 
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
-  if(lverb)WRITE(*,333)'ROUTQ'
+ 
   CALL ReadPlantInfoNC(yeari,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
 !
-  if(lverb)WRITE(*,333)'READQ'
   CALL READQ(yearc,yeari,NHW,NHE,NVN,NVS)
 
 333   FORMAT(A8)
@@ -71,10 +71,12 @@ implicit none
   integer, intent(in) :: yeari   !current forcing year 
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nu_plt
+  character(len=*), parameter :: subname='READQ'
   character(len=128) :: fnm_loc
   logical :: pft_changed
 
 ! begin_execution
+  call PrintInfo('beg '//subname)
   call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS,pft_changed)
 
   if(disp_planttrait .and. pft_changed)then
@@ -82,6 +84,7 @@ implicit none
     write(fnm_loc,'(A,I4,A)')'plant_trait.',etimer%get_curr_yearAD(),'.desc'
     call opnfil(fnm_loc,nu_plt,'f')    
   endif
+
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
       D9985: DO NZ=1,NP_col(NY,NX)
@@ -98,7 +101,7 @@ implicit none
   ENDDO D9995
 
   if(disp_planttrait .and. pft_changed)call relavu(nu_plt)
-
+  call PrintInfo('end '//subname)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -269,6 +272,7 @@ implicit none
               tstr=trim(pft_mgmtinfo(NN1,NZ))
               !read day/month/year when management occurs
               read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+              
               READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
               LPY=0
@@ -300,17 +304,17 @@ implicit none
               FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
-              IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,IDY,NY,NX).EQ.6)THEN
+              IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass
                 NN=NN+1
                 if(mod(nn,2)==0)then
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
-                    iHarvstType_pft(NZ,IDYG,NY,NX)                         = ICUT
-                    jHarvstType_pft(NZ,IDYG,NY,NX)                             = JCUT
-                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                     = HCUT
-                    THIN_pft(NZ,IDYG,NY,NX)                                = PCUT
-                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
+                    iHarvstType_pft(NZ,IDYG,NY,NX)                            = ICUT
+                    jHarvstType_pft(NZ,IDYG,NY,NX)                            = JCUT
+                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                        = HCUT
+                    THIN_pft(NZ,IDYG,NY,NX)                                   = PCUT
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX) = ECUT11
                     FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
                     FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
                     FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
@@ -339,6 +343,8 @@ implicit none
   integer, intent(in) :: yeari   !forcing data year
   integer, intent(in) :: yearc   !current model year
   logical, optional, intent(out):: pft_changed
+
+  character(len=*), parameter :: subname='ReadPlantManagementNC'
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
   logical :: readvar
@@ -348,6 +354,7 @@ implicit none
   integer :: ntopou,NY,NX,NZ
   logical :: pft_changed_loc
 
+  call PrintInfo('beg '//subname)
   pft_changed_loc=.false.
   if (len_trim(pft_mgmt_in)==0)return
   
@@ -408,6 +415,7 @@ implicit none
     ENDDO
   ENDDO
   if(present(pft_changed))pft_changed=pft_changed_loc
+  call PrintInfo('end '//subname)
   end subroutine ReadPlantManagementNC
 !------------------------------------------------------------------------------------------
 
@@ -581,6 +589,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMRT', loc,RootBiomGrosYld_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'DMND', loc,NoduGrowthYield_pft(NZ,NY,NX))
 
+  call ncd_getvar(pft_nfid, 'CNWL', loc,rProteinC2LeafN_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPWL', loc,rProteinC2LeafP_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNWR', loc,rProteinC2RootN_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPWR', loc,rProteinC2RootP_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNLF', loc,rNCLeaf_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSHE', loc,rNCSheath_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSTK', loc,rNCStalk_pft(NZ,NY,NX))
@@ -723,8 +735,9 @@ implicit none
   EarBiomGrowthYld_pft(NZ,NY,NX)     = EarBiomGrowthYld_tab(loc)
   GrainBiomGrowthYld_pft(NZ,NY,NX)   = GrainBiomGrowthYld_tab(loc)
   RootBiomGrosYld_pft(NZ,NY,NX)      = RootBiomGrosYld_tab(loc)
-  NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)
-
+  NoduGrowthYield_pft(NZ,NY,NX)      = NoduGrowthYield_tab(loc)  
+  rProteinC2LeafN_pft(NZ,NY,NX) = rProteinC2LeafN_tab(loc)
+  rProteinC2RootN_pft(NZ,NY,NX) = rProteinC2RootN_tab(loc)
   rNCLeaf_pft(NZ,NY,NX)    = rNCLeaf_tab(loc)
   rNCSheath_pft(NZ,NY,NX)  = rNCSheath_tab(loc)
   rNCStalk_pft(NZ,NY,NX)   = rNCStalk_tab(loc)
@@ -735,6 +748,8 @@ implicit none
   rNCRoot_pft(NZ,NY,NX)    = rNCRoot_tab(loc)
   rNCNodule_pft(NZ,NY,NX)  = rNCNodule_tab(loc)
 
+  rProteinC2LeafP_pft(NZ,NY,NX) = rProteinC2LeafP_tab(loc)
+  rProteinC2RootP_pft(NZ,NY,NX) = rProteinC2RootP_tab(loc)
   rPCLeaf_pft(NZ,NY,NX)    = rPCLeaf_tab(loc)
   rPCSheath_pft(NZ,NY,NX)  = rPCSheath_tab(loc)
   rPCStalk_pft(NZ,NY,NX)   = rPCStalk_tab(loc)
@@ -757,7 +772,7 @@ implicit none
     call plant_biomyield_trait_disp(nu_plt,NZ,NY,NX)
     call plant_biomstoich_trait_disp(nu_plt,NZ,NY,NX)
   endif
-
+  
   end subroutine SetPlantTraits
 
 !------------------------------------------------------------------------------------------
@@ -788,10 +803,11 @@ implicit none
 !   3=warm temperate,4=subtropical,5=tropical
   write(nu_plt,*)('=',j=1,110)
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
-  call writefixsl(nu_plt,'Plant name ',pft_lname,40)
+  call writefixsl(nu_plt,'Plant name ',pft_lname,60)
   strval=koppen_clims//','//koppen_climl
-  call writefixsl(nu_plt,'Koppen climate info',strval,40)
-
+  call writefixsl(nu_plt,'Koppen climate info',strval,60)
+  write(nu_plt,*)('-',j=1,110)
+  write(nu_plt,*)'PLANT CLASS INFORMATION'
   select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
   case (3)
     strval='C3'
@@ -800,7 +816,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photosynthesis pathway',strval,40)
+  call writefixsl(nu_plt,'ICTYP: Photosynthesis pathway',strval,60)
 
   select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
@@ -809,10 +825,12 @@ implicit none
     strval='Intermediate root profile, like herbs'
   case (2)
     strval='Deep root profile, like trees'
+  case (3)
+    strval='IVery deep tap root profile'  
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Root profile pattern',strval,40)
+  call writefixsl(nu_plt,'IGTYP: Root profile pattern',strval,60)
 
   select case (iPlantPhenolPattern_pft(NZ,NY,NX))
   case (0)
@@ -822,7 +840,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Life cycle',strval,40)
+  call writefixsl(nu_plt,'ISTYP: Life cycle',strval,60)
 
   select case (iPlantDevelopPattern_pft(NZ,NY,NX))
   case (0)
@@ -832,7 +850,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Growth pattern IDTYP',strval,40)
+  call writefixsl(nu_plt,'IDTYP: Growth pattern',strval,60)
 
   select case (iPlantNfixType_pft(NZ,NY,NX))
 ! 1,2, 3, e.g. legumes
@@ -852,7 +870,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'N-fixation symbiosis INTYP',strval,40)
+  call writefixsl(nu_plt,'INTYP: N-fixation symbiosis',strval,60)
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
@@ -866,7 +884,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Phenology type IWTYP',strval,40)
+  call writefixsl(nu_plt,'IWTYP: Phenology type',strval,60)
 
   select case(iPlantPhotoperiodType_pft(NZ,NY,NX))
   case (iphotop_neutral)
@@ -878,7 +896,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Photoperiod IPTYP',strval,40)
+  call writefixsl(nu_plt,'IPTYP: Photoperiod',strval,60)
 
   if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
@@ -903,7 +921,7 @@ implicit none
       write(strval,'(A,I2)')'Undefined herbaceous pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
   endif
-  call writefixsl(nu_plt,'Biome turnover pattern IBTYP',strval,40)
+  call writefixsl(nu_plt,'IBTYP: Biome turnover pattern',strval,60)
 
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
@@ -913,7 +931,7 @@ implicit none
   case default
     strval='Not defined'
   end select
-  call writefixsl(nu_plt,'Storage organ IRTYP',strval,40)
+  call writefixsl(nu_plt,'IRTYP: Storage organ',strval,60)
 
   select case(Myco_pft(NZ,NY,NX))
   case (1)
@@ -923,7 +941,7 @@ implicit none
   case default
     strval='Wrong option'
   end select
-  call writefixsl(nu_plt,'Mycorrhizal association MY',strval,40)
+  call writefixsl(nu_plt,'MY   : Mycorrhizal association MY',strval,60)
 
   if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
     write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
@@ -939,7 +957,7 @@ implicit none
     write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   endif
   
-  call writefixsl(nu_plt,'Thermal adaptation zone ZTYPI',strval,40)
+  call writefixsl(nu_plt,'ZTYPI: Growing season thermal adaptation zone',strval,60)
   end subroutine pft_display
 
 !------------------------------------------------------------------------------------------
@@ -1039,13 +1057,13 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
-  call writefixl(nu_plt,'RRAD1M','Radius of fine roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
-  call writefixl(nu_plt,'RRAD2M','Radius of root hairs [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RRAD1M','Radius of primary root tip [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PR','Nonstructural C concentration needed for root'// &
     ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),105)
-  call writefixl(nu_plt,'RSRR','Radial resistivity per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
-  call writefixl(nu_plt,'RSRA','Axial resistivity per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,'RSRA','Axial resistance per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
   call writefixl(nu_plt,'PTSHT','Rate constant for equilibrating shoot-root '// &
     'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
   !as a rule of thumb, RTFQ often takes the value of .  
@@ -1103,7 +1121,9 @@ implicit none
   call writefixl(nu_plt,'DMEAR','Ear dry matter C production yiled [gC ear g-1 nonstrucal C]',EarBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'DMGR','Grain C production yiled [gC grain g-1 nonstrucal C]',GrainBiomGrowthYld_pft(NZ,NY,NX),101)
   call writefixl(nu_plt,'DMRT','Root dry matter C production yield [gC root g-1 nonstrucal C]',RootBiomGrosYld_pft(NZ,NY,NX),101)
-  call writefixl(nu_plt,'DMND','Canopy/root nodule bacteria dry matter C production yiled [gC g-1 nonstrucal C]',NoduGrowthYield_pft(NZ,NY,NX),101)
+  if(iPlantNfixType_pft(NZ,NY,NX)/=0)then
+    call writefixl(nu_plt,'DMND','Canopy/root nodule bacteria dry matter C production yiled [gC g-1 nonstrucal C]',NoduGrowthYield_pft(NZ,NY,NX),101)
+  endif
   end subroutine plant_biomyield_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1115,6 +1135,10 @@ implicit none
 
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
+
+  call writefixl(nu_plt,'CNWR','Plant root protein C to N ratio [g protein C (g root N)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CNWL','Plant leaf protein C to N ratio [g protein C (g leaf N)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
+  call writefixl(nu_plt,'CNWF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)  
   call writefixl(nu_plt,'CNLF','Plant leaf NC ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNSHE','Plant petiole NC ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNSTK','Plant stalk NC ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)
@@ -1124,6 +1148,8 @@ implicit none
   call writefixl(nu_plt,'CNGR','Plant grain NC ratio [gN (gC)-1]',rNCGrain_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNRT','Plant root NC ratio [gN (gC)-1]',rNCRoot_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CNND','Plant nodule NC ratio [gN (gC)-1]',rNCNodule_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,'CPWR','Plant root protein C to P ratio [g protein C (g root P)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,'CPWL','Plant leaf protein C to P ratio [g protein C (g leaf P)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
   call writefixl(nu_plt,'CPLF','Plant leaf PC ratio [gP (gC)-1]',rPCLeaf_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSHE','Plant petiole PC ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   call writefixl(nu_plt,'CPSTK','Plant stalk PC ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
@@ -1162,6 +1188,8 @@ implicit none
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer, intent(in) :: yeari    !forcing year information
+
+  character(len=*), parameter :: subname='ReadPlantInfoNC'
   integer :: IDATE
   integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
@@ -1176,6 +1204,7 @@ implicit none
   character(len=1) :: cc
   character(len=10) :: pft_gtype(JP)
 
+  call PrintInfo('beg '//subname)
   IF(is_first_year)THEN
     D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
@@ -1313,6 +1342,7 @@ implicit none
     ENDIF 
     call ncd_pio_closefile(pftinfo_nfid)
   endif
+  call PrintInfo('end '//subname)
   end subroutine ReadPlantInfoNC
 
 !------------------------------------------------------------------------------------------
@@ -1463,6 +1493,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'DMGR', GrainBiomGrowthYld_tab)
   call ncd_getvar(pft_nfid, 'DMRT', RootBiomGrosYld_tab)
   call ncd_getvar(pft_nfid, 'DMND', NoduGrowthYield_tab)
+  call ncd_getvar(pft_nfid, 'CNWR', rProteinC2RootN_tab)
+  call ncd_getvar(pft_nfid, 'CNWL', rProteinC2LeafN_tab)
   call ncd_getvar(pft_nfid, 'CNLF', rNCLeaf_tab)
   call ncd_getvar(pft_nfid, 'CNSHE', rNCSheath_tab)
   call ncd_getvar(pft_nfid, 'CNSTK', rNCStalk_tab)
@@ -1472,6 +1504,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'CNGR', rNCGrain_tab)
   call ncd_getvar(pft_nfid, 'CNRT', rNCRoot_tab)
   call ncd_getvar(pft_nfid, 'CNND', rNCNodule_tab)
+  call ncd_getvar(pft_nfid, 'CPWR', rProteinC2RootP_tab)  
+  call ncd_getvar(pft_nfid, 'CPWL', rProteinC2LeafP_tab)    
   call ncd_getvar(pft_nfid, 'CPLF', rPCLeaf_tab)
   call ncd_getvar(pft_nfid, 'CPSHE',rPCSheath_tab)
   call ncd_getvar(pft_nfid, 'CPSTK', rPCStalk_tab)
@@ -1482,6 +1516,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPRT', rPCRootr_tab)
   call ncd_getvar(pft_nfid, 'CPND', rPCNoduler_tab)
   call ncd_pio_closefile(pft_nfid)
+  
   end Subroutine ReadPlantTraitTable
 
 !------------------------------------------------------------------------------------------

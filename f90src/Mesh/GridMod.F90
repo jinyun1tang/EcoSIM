@@ -116,13 +116,13 @@ contains
       ENDDO
     ENDDO
   ENDDO
+  
   JZ=20
-  !read JZ from input data?
+  !read JZ from input data!
   JH=JX+nextra_grid
   JV=JY+nextra_grid
   JD=JZ+1
-  !write(iulog,*)'grid size'
-  !write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
+
   end subroutine SetMesh
 
 !------------------------------------------------------------------------
@@ -197,14 +197,12 @@ contains
       ENDDO
     ENDDO
   ENDDO
-  !read JZ from input data?
+  !read JZ from input data!
 
-  !JZ=100
   JH=JX+nextra_grid
   JV=JY+nextra_grid
   JD=JZ+1
-  !write(iulog,*)'grid size'
-  !write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
+
   write(*,*) "(SetMeshATS f) JX,JY,JZ: ", JX, JY, JZ
 
   end subroutine SetMeshATS
