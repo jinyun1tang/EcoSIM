@@ -1486,11 +1486,11 @@ implicit none
   character(len=width) :: line
 
   line=desc
-  line(width:width)='| '
+  line(width:width)=': '
   if(present(id))then
-    write(nu_plt,'(I2,A,A,A)')id,': ',line,value   
+    write(nu_plt,'(I2,A,A,A)')id,'| ',line,value   
   else
-    write(nu_plt,*)line,value   
+    write(nu_plt,'(A,A)')line,value   
   endif
 
   end subroutine writefixsl

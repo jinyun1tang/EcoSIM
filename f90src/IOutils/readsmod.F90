@@ -57,7 +57,7 @@ module readsmod
   PBOT_hrly(:,:)  = clim_var%Atm_kPa
 
   WindMesureHeight_col(:,:) = 0.5_r8
-  SolarNoonHour_col(:,:)    = 12._r8
+  SolarNoonHourYM_col(:,:)    = 12._r8
   pH_rain_col(:,:)          = 7._r8
   CN4RI_col(:,:)                = 0._r8
   CNORI_col(:,:)                = 0._r8
@@ -347,10 +347,10 @@ module readsmod
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
       WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
-      SolarNoonHour_col(NY,NX)    = ZNOONG
-      pH_rain_col(NY,NX)           = PHRG
-      CN4RI_col(NY,NX)                = CN4RIG
-      CNORI_col(NY,NX)                = CNORIG
+      SolarNoonHourYM_col(NY,NX)    = ZNOONG
+      pH_rain_col(NY,NX)          = PHRG
+      CN4RI_col(NY,NX)            = CN4RIG
+      CNORI_col(NY,NX)            = CNORIG
       NH4_rain_mole_conc(NY,NX)   = CN4RIG
       NO3_rain_mole_conc(NY,NX)   = CNORIG
       H2PO4_rain_mole_conc(NY,NX) = CPORG

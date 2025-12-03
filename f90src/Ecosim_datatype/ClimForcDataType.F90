@@ -94,7 +94,8 @@ implicit none
   real(r8),target,allocatable ::  H2GE_col(:,:)                      !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E_col(:,:)                      !atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  ARGE_col(:,:)                      !atmospheric AR concentration, [umol mol-1]
-  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
+  real(r8),target,allocatable ::  SolarNoonHourYM_col(:,:)           !year mean time of solar noon, [h]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon each day, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadDirectPAR_col(:,:)              !direct PAR, [umol m-2 s-1]
@@ -205,7 +206,8 @@ implicit none
   allocate(H2GE_col(JY,JX));        H2GE_col=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
   allocate(ARGE_col(JY,JX));        ARGE_col=0._r8
-  allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
+  allocate(SolarNoonHourYM_col(JY,JX));       SolarNoonHourYM_col=0._r8
+  allocate(SolarNoonHour_col(JY,JX)); SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
   allocate(RadDirectPAR_col(JY,JX));        RadDirectPAR_col=0._r8
@@ -299,6 +301,7 @@ implicit none
   call destroy(CH4E_col)
   call destroy(H2GE_col)
   call destroy(trcs_solcoef_col)
+  call destroy(SolarNoonHourYM_col)
   call destroy(SolarNoonHour_col)
   call destroy(CO2E_col)
   call destroy(RadSWDirect_col)

@@ -2,7 +2,7 @@
   module DayMod
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use minimathmod,        only: isLeap, AZMAX1
-  use MiniFuncMod,        only: GetDayLength
+  use MiniFuncMod,        only: GetDayLength,calculate_equation_of_time
   use PrescribePhenolMod, only: PrescribePhenologyInterp
   use SurfLitterDataType, only: XTillCorp_col
   use fileUtil,           only: iulog
@@ -38,14 +38,6 @@
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  CHARACTER(len=3) :: CHARN1,CHARN2
-  CHARACTER(len=4) :: CHARN3
-
-  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ
-  real(r8) :: RR,TFZ,TWP,TVW,XI
-
-  integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
-
   public :: day
   contains
 
@@ -58,6 +50,8 @@
 
   integer, intent(in) :: I
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NN,N,M,NY,NX
+  real(r8) :: eot,leapday
 !     execution begins here
 !     begin_execution
 !
@@ -65,22 +59,19 @@
 !
 !     CDATE=DDMMYYYY
 !
-  N=0
-  NN=0
-  D500: DO M=1,12
-    N=30*M+ICOR(M)
+  if(isLeap(iYearCurrent))then
+    leapday=1._r8
+  else
+    leapday=0._r8
+  endif
+  eot=calculate_equation_of_time(I,leapday)
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      SolarNoonHour_col(NY,NX) = SolarNoonHourYM_col(NY,NX)+ eot
+    ENDDO
+  ENDDO    
 
-!  leap year February.
-    IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
-    IF(I.LE.N)THEN
-      N1=I-NN
-      N2=M
-      N3=iYearCurrent
-      call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
-      exit
-    ENDIF
-    NN=N
-  ENDDO D500
+  call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
 
@@ -99,7 +90,7 @@
 
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
-  integer :: NE
+  integer :: NE,NX,NY,I2,I3,ITYPE,N
 
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
@@ -220,6 +211,9 @@
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
+  integer :: NY,NX,J,L
+  real(r8) :: TWP,TVW,TFZ
+  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ,RR
 
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
