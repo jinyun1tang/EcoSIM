@@ -378,7 +378,7 @@ module MicAutoCPLXMod
   integer :: M,K,MID3,MID,MID1,NE,idom,NGL
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
-  real(r8) :: CXC
+  real(r8) :: CXC,RCCE(NumPlantChemElms)
   real(r8) :: CGOXC
   real(r8) :: C3C,CNC,CPC
   real(r8) :: CGOMZ
@@ -479,6 +479,9 @@ module MicAutoCPLXMod
       RCCN = 0.0_r8
       RCCP = 0.0_r8
     ENDIF
+    RCCE(ielmc)=RCCC
+    RCCE(ielmn)=(RCCN+(1.0_r8-RCCN)*RCCC)
+    RCCE(ielmp)=(RCCP+(1.0_r8-RCCP)*RCCC)    
     !
     !     MICROBIAL ASSIMILATION OF NONSTRUCTURAL C,N,P
     !
@@ -520,14 +523,10 @@ module MicAutoCPLXMod
       
       DO NE=1,NumPlantChemElms
         RKillOMAutor(NE,M,NGL)=AZMAX1(mBiomeAutor(NE,MID)*SPOMX)
-      ENDDO
-      
-      RkillLitfalOMAutor(ielmc,M,NGL)=RKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
-      RkillLitfalOMAutor(ielmn,M,NGL)=RKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-      RkillLitfalOMAutor(ielmp,M,NGL)=RKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      
-      DO NE=1,NumPlantChemElms
-        RkillRecycOMAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)-RkillLitfalOMAutor(NE,M,NGL)
+            
+        RkillRecycOMAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)*RCCE(NE)
+
+        RkillLitfalOMAutor(NE,M,NGL)=AZMAX1(RKillOMAutor(NE,M,NGL)-RkillRecycOMAutor(NE,M,NGL))
     !
     !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
     !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
@@ -536,7 +535,7 @@ module MicAutoCPLXMod
     !     EHUM=humus transfer fraction from hour1.f
     !     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P LitrFall to residue
     !
-        RkillLitrfal2HumOMAutor(NE,M,NGL)=AZMAX1(RkillLitfalOMAutor(NE,M,NGL)*EHUM)
+        RkillLitrfal2HumOMAutor(NE,M,NGL)=RkillLitfalOMAutor(NE,M,NGL)*EHUM
     !
     !     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
     !
@@ -563,27 +562,20 @@ module MicAutoCPLXMod
       FRM=RMaintDefcitcitAutor(NGL)/RMaintRespAutor(NGL)
       DO  M=1,2
         RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBiomeAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
-        RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBiomeAutor(ielmn,MID),&
-          AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
-        RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBiomeAutor(ielmp,MID),&
-          AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
-
-        RMaintDefcitLitrfalOMAutor(ielmc,M,NGL)=RMaintDefcitKillOMAutor(ielmc,M,NGL)*(1.0_r8-RCCC)
-        RMaintDefcitLitrfalOMAutor(ielmn,M,NGL)=RMaintDefcitKillOMAutor(ielmn,M,NGL)*(1.0_r8-RCCN)*(1.0_r8-RCCC)
-        RMaintDefcitLitrfalOMAutor(ielmp,M,NGL)=RMaintDefcitKillOMAutor(ielmp,M,NGL)*(1.0_r8-RCCP)*(1.0_r8-RCCC)
+        RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBiomeAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
+        RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBiomeAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
         DO NE=1,NumPlantChemElms
-          RMaintDefcitRecycOMAutor(NE,M,NGL)=RMaintDefcitKillOMAutor(NE,M,NGL)-RMaintDefcitLitrfalOMAutor(NE,M,NGL)
-        ENDDO
-    !
-    !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
-    !     PRODUCTS
-    !
-    !     RHMMC,RHMMN,RHMMC=transfer of senesence LitrFall C,N,P to humus
-    !     EHUM=humus transfer fraction
-    !     RCMMC,RCMMN,RCMMC=transfer of senesence LitrFall C,N,P to residue
-    !
-        DO NE=1,NumPlantChemElms
-          RMaintDefLitrfal2HumOMAutor(NE,M,NGL)   = AZMAX1(RMaintDefcitLitrfalOMAutor(NE,M,NGL)*EHUM)
+          RMaintDefcitRecycOMAutor(NE,M,NGL)   = RMaintDefcitKillOMAutor(NE,M,NGL)*RCCE(NE)
+          RMaintDefcitLitrfalOMAutor(NE,M,NGL) = AZMAX1(RMaintDefcitKillOMAutor(NE,M,NGL)-RMaintDefcitRecycOMAutor(NE,M,NGL))
+          !
+          !     HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
+          !     PRODUCTS
+          !
+          !     RHMMC,RHMMN,RHMMC=transfer of senesence LitrFall C,N,P to humus
+          !     EHUM=humus transfer fraction
+          !     RCMMC,RCMMN,RCMMC=transfer of senesence LitrFall C,N,P to residue
+          !
+          RMaintDefLitrfal2HumOMAutor(NE,M,NGL)   = RMaintDefcitLitrfalOMAutor(NE,M,NGL)*EHUM
           RMaintDefLitrfal2ResduOMAutor(NE,M,NGL) = RMaintDefcitLitrfalOMAutor(NE,M,NGL)-RMaintDefLitrfal2HumOMAutor(NE,M,NGL)
         ENDDO
       ENDDO
