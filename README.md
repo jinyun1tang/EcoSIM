@@ -53,7 +53,7 @@ Run
 for a full list of optional arguments
 
 ## using docker on mac 
-1. make sure docker is installed on your machine
+1. make sure docker is installed on your machine, please see https://www.docker.com, and ask for help from whatever chatbot you have access to.
 
 2. builidng the container 
 
