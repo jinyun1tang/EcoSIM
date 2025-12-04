@@ -4144,7 +4144,7 @@ module MicBGCMod
   type(micfluxtype), intent(inout) :: micflx  
   integer :: M,MID1,MID3,MID,NE
   real(r8) :: C3C,CNC,CPC
-  real(r8) :: CCC,CXC  
+  real(r8) :: CCC,CXC,RCCE(NumPlantChemElms)  
 
   real(r8) :: RCCC,RCCN,RCCP  
   real(r8) :: CGOMX,CGOMD,AGOMD
@@ -4281,11 +4281,6 @@ module MicBGCMod
     !     RkillLitfalOMHeter,RDOMN,RDOMP=microbial C,N,P LitrFall
     !     R3OMC,R3OMN,RkillRecycOMHeter=microbial C,N,P recycling
     !
-    MID   = micpar%get_micb_id(M,NGL)
-    SPOMX = SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
-    DO NE=1,NumPlantChemElms
-      RKillOMHeter(NE,M,NGL,K)=AZMAX1(mBiomeHeter(NE,MID,K)*SPOMX)
-    ENDDO
 
     MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
 
@@ -4295,6 +4290,7 @@ module MicBGCMod
         ,mBiomeHeter(ielmp,MID3,K)/(mBiomeHeter(ielmp,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rPCOMC(ibiom_reserve,NGL,K))))
       CXC  = mBiomeHeter(ielmc,MID3,K)/mBiomeHeter(ielmc,MID1,K)
       C3C  = 1.0_r8/(1.0_r8+CXC/CKC)
+
       CNC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmn,MID3,K)/rNCOMC(ibiom_reserve,NGL,K))))
       CPC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmp,MID3,K)/rPCOMC(ibiom_reserve,NGL,K))))
       RCCC = RCCZ+AMAX1(CCC,C3C)*RCCY
@@ -4306,12 +4302,18 @@ module MicBGCMod
       RCCP = 0.0_r8
     ENDIF
 
-    RkillLitfalOMHeter(ielmc,M,NGL,K)=RKillOMHeter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
-    RkillLitfalOMHeter(ielmn,M,NGL,K)=RKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-    RkillLitfalOMHeter(ielmp,M,NGL,K)=RKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+    RCCE(ielmc)=RCCC
+    RCCE(ielmn)=(RCCN+(1.0_r8-RCCN)*RCCC)
+    RCCE(ielmp)=(RCCP+(1.0_r8-RCCP)*RCCC)
 
-    DO NE=1,NumPlantChemElms    
-      RkillRecycOMHeter(NE,M,NGL,K)=RKillOMHeter(NE,M,NGL,K)-RkillLitfalOMHeter(NE,M,NGL,K)
+    MID   = micpar%get_micb_id(M,NGL)
+    SPOMX = SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
+    DO NE=1,NumPlantChemElms
+      RKillOMHeter(NE,M,NGL,K)=AZMAX1(mBiomeHeter(NE,MID,K)*SPOMX)
+
+      RkillRecycOMHeter(NE,M,NGL,K)= RKillOMHeter(NE,M,NGL,K)*RCCE(NE)
+
+      RkillLitfalOMHeter(NE,M,NGL,K)=AZMAX1(RKillOMHeter(NE,M,NGL,K)-RkillRecycOMHeter(NE,M,NGL,K))
       !
       !     HUMIFICATION OF MICROBIAL DECOMPOSITION PRODUCTS FROM
       !     DECOMPOSITION RATE, SOIL CLAY AND OC 'EHUM' FROM 'HOUR1'
@@ -4320,7 +4322,7 @@ module MicBGCMod
       !     EHUM=humus transfer fraction from hour1.f
       !     RkillLitrfal2ResduOMHeter,RkillLitrfal2ResduOMHeter,RCOMP=transfer of microbial C,N,P LitrFall to residue
       !
-      RkillLitrfal2HumOMHeter(NE,M,NGL,K)=AZMAX1(RkillLitfalOMHeter(NE,M,NGL,K)*EHUM)
+      RkillLitrfal2HumOMHeter(NE,M,NGL,K)=RkillLitfalOMHeter(NE,M,NGL,K)*EHUM
       !
       !     NON-HUMIFIED PRODUCTS TO MICROBIAL RESIDUE
       !
@@ -4352,12 +4354,9 @@ module MicBGCMod
       RMaintDefcitKillOMHeter(ielmn,M,NGL,K) = AMIN1(mBiomeHeter(ielmn,MID,K),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)))
       RMaintDefcitKillOMHeter(ielmp,M,NGL,K) = AMIN1(mBiomeHeter(ielmp,MID,K),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmp,NGL,K)))
         
-      RMaintDefcitLitrfalOMHeter(ielmc,M,NGL,K)=RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*(1.0_r8-RCCC)
-      RMaintDefcitLitrfalOMHeter(ielmn,M,NGL,K)=RMaintDefcitKillOMHeter(ielmn,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-      RMaintDefcitLitrfalOMHeter(ielmp,M,NGL,K)=RMaintDefcitKillOMHeter(ielmp,M,NGL,K)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-
       DO NE=1,NumPlantChemElms
-        RMaintDefcitRecycOMHeter(NE,M,NGL,K)=RMaintDefcitKillOMHeter(NE,M,NGL,K)-RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)
+        RMaintDefcitRecycOMHeter(NE,M,NGL,K)   = RMaintDefcitKillOMHeter(NE,M,NGL,K)*RCCE(NE)
+        RMaintDefcitLitrfalOMHeter(NE,M,NGL,K) = AZMAX1(RMaintDefcitKillOMHeter(NE,M,NGL,K)-RMaintDefcitRecycOMHeter(NE,M,NGL,K))
         !
         ! HUMIFICATION AND RECYCLING OF RESPIRATION DECOMPOSITION
         ! PRODUCTS
@@ -4367,7 +4366,7 @@ module MicBGCMod
         ! RMaintDefLitrfal2ResduOMHeter,RCMMN,RMaintDefLitrfal2ResduOMHeter=transfer of senesence LitrFall C,N,P to residue
         !
 
-        RMaintDefLitrfal2HumOMHeter(NE,M,NGL,K)   = AZMAX1(RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)*EHUM)
+        RMaintDefLitrfal2HumOMHeter(NE,M,NGL,K)   = RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)*EHUM
         RMaintDefLitrfal2ResduOMHeter(NE,M,NGL,K) = RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)-RMaintDefLitrfal2HumOMHeter(NE,M,NGL,K)
         RCCMEheter(NE,M,K)                        = RCCMEheter(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K)+RMaintDefLitrfal2ResduOMHeter(NE,M,NGL,K)
 
