@@ -120,24 +120,24 @@ implicit none
 ! IF SNOWPACK DISAPPEARS
 
 ! intermediate disappearance
-  IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).LE.ZERO .or. SoilOrgM_vr(ielmc,0,NY,NX)<=1.e-2_r8)THEN
-    VLWatMicP_vr(NUM_col(NY,NX),NY,NX) = VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
-    VLiceMicP_vr(NUM_col(NY,NX),NY,NX) = VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
+!  IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).LE.ZERO .or. SoilOrgM_vr(ielmc,0,NY,NX)<=1.e-2_r8)THEN
+!    VLWatMicP_vr(NUM_col(NY,NX),NY,NX) = VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
+!    VLiceMicP_vr(NUM_col(NY,NX),NY,NX) = VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
 
-    TKSX = TKS_vr(NUM_col(NY,NX),NY,NX)
-    ENGY = VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)*TKSX
+!    TKSX = TKS_vr(NUM_col(NY,NX),NY,NX)
+!    ENGY = VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)*TKSX
 
-    VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
-      +cpw*(VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+VLWatMacP_vr(NUM_col(NY,NX),NY,NX)) &
-      +cpi*(VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+VLiceMacP_vr(NUM_col(NY,NX),NY,NX))
+!    VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
+!      +cpw*(VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+VLWatMacP_vr(NUM_col(NY,NX),NY,NX)) &
+!      +cpi*(VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+VLiceMacP_vr(NUM_col(NY,NX),NY,NX))
 
-    IF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX) .and. abs(QSnoHeatXfer2Soil_col(NY,NX))>ZEROS(NY,NX))THEN
-      TKS_vr(NUM_col(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)
-    ELSEIF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).LE.ZEROS(NY,NX))then
-      TKS_vr(NUM_col(NY,NX),NY,NX)=TairK_col(NY,NX)
-    ENDIF
+!    IF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX) .and. abs(QSnoHeatXfer2Soil_col(NY,NX))>ZEROS(NY,NX))THEN
+!      TKS_vr(NUM_col(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)
+!    ELSEIF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).LE.ZEROS(NY,NX))then
+!      TKS_vr(NUM_col(NY,NX),NY,NX)=TairK_col(NY,NX)
+!    ENDIF
 
-  endif
+!  endif
 
   call SnowpackDisapper(I,J,NY,NX,test_exist,QWatinfl2Mic_loc,QHeatInfl2Soil_loc)
 

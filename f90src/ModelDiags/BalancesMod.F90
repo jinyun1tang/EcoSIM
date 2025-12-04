@@ -234,7 +234,7 @@ contains
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o .and. etimer%get_nstep()>1)then
-        if(iVerbLevel==1)then
+        if(iVerbLevel==1 .or. abs(SoilWatErr_test)>err_h2o)then
           write(110,*)('=',ii=1,50)
           write(110,*)I*1000+J,'NY,NX ',NY,NX
           write(110,*)'init H2O         =',WaterErr_col(NY,NX)
@@ -273,7 +273,7 @@ contains
           write(110,*)'SoilWatErr_test  =',SoilWatErr_test
           write(110,*)'col WaterErr_test=',WaterErr_test
         endif
-        if(abs(SoilWatErr_test)>1.e-4_r8 ) & ! .or. abs(SnowMassErr_test)>1.e-3_r8*SnowMassBeg_col(NY,NX)) &
+        if(abs(SoilWatErr_test)>err_h2o ) & ! .or. abs(SnowMassErr_test)>1.e-3_r8*SnowMassBeg_col(NY,NX)) &
           call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
         
       endif
