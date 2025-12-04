@@ -1640,7 +1640,7 @@ implicit none
   !
   call PrintInfo('beg '//subname)
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 &
-    .AND.RootNonstructElmConc_rpvr(ielmc,N,L,NZ).GT.ZERO)THEN
+    .AND. RootNonstructElmConc_rpvr(ielmc,N,L,NZ).GT.ZERO)THEN
     CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(RootNonstructElmConc_rpvr(ielmn,N,L,NZ)&
       ,RootNonstructElmConc_rpvr(ielmn,N,L,NZ)+RootNonstructElmConc_rpvr(ielmc,N,L,NZ)*CNKI) &
       ,safe_adb(RootNonstructElmConc_rpvr(ielmp,N,L,NZ),RootNonstructElmConc_rpvr(ielmp,N,L,NZ)&
@@ -1672,6 +1672,7 @@ implicit none
   !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
   !     Frac2Senes1=fraction of primary root C to be remobilized
   !
+  !insufficient energy for maintenance
   IF(-RCO2XMaint1st_OUltd.GT.0.0_r8)THEN
     IF(-RCO2XMaint1st_OUltd.LT.RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)*RCCC)THEN
       RCO2Nonst4Xmaint1st_OUltd=-RCO2XMaint1st_OUltd
@@ -1694,6 +1695,7 @@ implicit none
   ENDIF
 
   IF(RCO2Nonst4Xmaint1st_Oltd.GT.0.0_r8 .AND. RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
+    !remobilization upon starvation-induced root retreat
     DO NE=1,NumPlantChemElms
       Root1stStrutRemob(NE) = RootMyco1stStrutElms_rpvr(NE,N,L,NR,NZ)*RCCE(NE)
     ENDDO
@@ -1746,8 +1748,8 @@ implicit none
 !     Root2ndStrutRemob(:)=remobilization of C,N,P from senescing root
 !     RootMycoNonst4Grow_Oltd(ielmn),RootMycoNonst4Grow_Oltd(ielmp)=nonstructural N,P ltd by O2 used in growth
 !  
-  RCO2T1st_Oltd=RCO2T1st_Oltd+RCO2Nonst4Xmaint1st_Oltd
-  RCO2T1st_OUltd=RCO2T1st_OUltd+RCO2Nonst4Xmaint1st_OUltd
+  RCO2T1st_Oltd  = RCO2T1st_Oltd+RCO2Nonst4Xmaint1st_Oltd
+  RCO2T1st_OUltd = RCO2T1st_OUltd+RCO2Nonst4Xmaint1st_OUltd
   DO NE=1,NumPlantChemElms
     dRootMycoElms(NE)=dRootMycoElms(NE)+Frac2Senes1*Root1stStrutRemob(NE)
   ENDDO 

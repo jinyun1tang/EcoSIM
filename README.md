@@ -51,3 +51,17 @@ Run
 ./build_EcoSIM.sh --help 
 
 for a full list of optional arguments
+
+## using docker on mac 
+1. make sure docker is installed on your machine
+
+2. builidng the container 
+
+docker build -f docker/ubuntu-compiler.dockerfile -t my-compiler .
+
+3. run the container
+
+docker run -it -v $(pwd):/EcoSIM -w /EcoSIM my-compiler
+
+this will allow you to access everything under the EcoSIM directory in the container
+
