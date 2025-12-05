@@ -149,9 +149,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafPetoNonstElmConc_brch(:,:,:,:,:)       !branch nonstructural C concentration, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_brch(:,:,:,:,:)       !branch nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  CanopyNodulStrutElms_brch(:,:,:,:,:)       !branch nodule chemical element, [g d-2]
-  real(r8),target,allocatable ::  PetioleChemElmRemob_brch(:,:,:,:,:)        !branch sheath structural chemical element, [g d-2]
+!  real(r8),target,allocatable ::  PetioleChemElmRemob_brch(:,:,:,:,:)        !branch sheath structural chemical element, [g d-2]
   real(r8),target,allocatable ::  SenecStalkStrutElms_brch(:,:,:,:,:)        !senescing branch stalk structural chemical elements, [g d-2]
-  real(r8),target,allocatable ::  LeafChemElmRemob_brch(:,:,:,:,:)           !branch leaf structural chemical element, [g d-2]
+!  real(r8),target,allocatable ::  LeafChemElmRemob_brch(:,:,:,:,:)           !branch leaf structural chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)            !leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)         !sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StructInternodeElms_brch(:,:,:,:,:,:)       !internode chemical element, [g d-2]
@@ -368,9 +368,9 @@ module CanopyDataType
   allocate(LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));LeafPetoNonstElmConc_brch=0._r8
   allocate(CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));CanopyNodulNonstElms_brch=0._r8
   allocate(CanopyNodulStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNodulStrutElms_brch=0._r8
-  allocate(PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetioleChemElmRemob_brch=0._r8
+!  allocate(PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetioleChemElmRemob_brch=0._r8
   allocate(SenecStalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));SenecStalkStrutElms_brch=0._r8
-  allocate(LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElmRemob_brch=0._r8
+!  allocate(LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafChemElmRemob_brch=0._r8
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
   allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
   allocate(StructInternodeElms_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StructInternodeElms_brch=0._r8
@@ -551,9 +551,9 @@ module CanopyDataType
   call destroy(LeafPetoNonstElmConc_brch)
   call destroy(CanopyNodulNonstElms_brch)
   call destroy(CanopyNodulStrutElms_brch)
-  call destroy(PetioleChemElmRemob_brch)
+!  call destroy(PetioleChemElmRemob_brch)
   call destroy(SenecStalkStrutElms_brch)
-  call destroy(LeafChemElmRemob_brch)
+!  call destroy(LeafChemElmRemob_brch)
   call destroy(LeafElmntNode_brch)
   call destroy(PetioleElmntNode_brch)
   call destroy(StructInternodeElms_brch)

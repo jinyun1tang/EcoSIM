@@ -384,7 +384,7 @@ implicit none
         HuskStrutElms_brch(NE,NB,NZ,NY,NX)        = plt_biom%HuskStrutElms_brch(NE,NB,NZ)
         GrainStrutElms_brch(NE,NB,NZ,NY,NX)       = plt_biom%GrainStrutElms_brch(NE,NB,NZ)
         CanopyNodulStrutElms_brch(NE,NB,NZ,NY,NX) = plt_biom%CanopyNodulStrutElms_brch(NE,NB,NZ)
-        PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)  = plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)
+!        PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)  = plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)
       ENDDO
     ENDDO
 
@@ -436,7 +436,7 @@ implicit none
       LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)                 = plt_pheno%LeafNumberAtFloralInit_brch(NB,NZ)
       CanopyLeafSheathC_brch(NB,NZ,NY,NX)                      = plt_biom%CanopyLeafSheathC_brch(NB,NZ)
       dReproNodeNumNormByMatG_brch(NB,NZ,NY,NX)                = plt_pheno%dReproNodeNumNormByMatG_brch(NB,NZ)
-      LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)    = plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)
+!      LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)    = plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)
       SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ,NY,NX) = plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)
       SapwoodBiomassC_brch(NB,NZ,NY,NX)                        = plt_biom%SapwoodBiomassC_brch(NB,NZ)
       CanopyNLimFactor_brch(NB,NZ,NY,NX)                       = plt_bgcr%CanopyNLimFactor_brch(NB,NZ)
@@ -1241,11 +1241,11 @@ implicit none
         plt_biom%GrainStrutElms_brch(NE,NB,NZ)       = GrainStrutElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%EarStrutElms_brch(NE,NB,NZ)         = EarStrutElms_brch(NE,NB,NZ,NY,NX)
         plt_biom%CanopyNodulStrutElms_brch(NE,NB,NZ) = CanopyNodulStrutElms_brch(NE,NB,NZ,NY,NX)
-        plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)  = PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)
+!        plt_biom%PetioleChemElmRemob_brch(NE,NB,NZ)  = PetioleChemElmRemob_brch(NE,NB,NZ,NY,NX)
       ENDDO
       plt_biom%C4PhotoShootNonstC_brch(NB,NZ)=C4PhotoShootNonstC_brch(NB,NZ,NY,NX)              
       plt_biom%CanopyLeafSheathC_brch(NB,NZ)                          = CanopyLeafSheathC_brch(NB,NZ,NY,NX)
-      plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)        = LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
+!      plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ)        = LeafChemElmRemob_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)     = SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_biom%SapwoodBiomassC_brch(NB,NZ)                              = SapwoodBiomassC_brch(NB,NZ,NY,NX)
 
