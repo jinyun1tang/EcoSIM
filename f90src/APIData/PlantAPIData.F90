@@ -543,8 +543,6 @@ implicit none
   real(r8), pointer :: GrainStrutElms_brch(:,:,:)           => null()   !branch grain structural element mass,                [g d-2]
   real(r8), pointer :: StalkStrutElms_brch(:,:,:)           => null()   !branch stalk structural element mass,                [g d-2]
   real(r8), pointer :: ShootElms_brch(:,:,:)                => null()   !branch shoot structural element mass,                [g d-2]
-!  real(r8), pointer :: LeafChemElmRemob_brch(:,:,:)         => null()   !branch leaf structural element,                      [g d-2]
-!  real(r8), pointer :: PetioleChemElmRemob_brch(:,:,:)      => null()   !branch sheath structural element,                    [g d-2]
   real(r8), pointer :: SenecStalkStrutElms_brch(:,:,:)      => null()   !branch stalk structural element,                     [g d-2]
   real(r8), pointer :: SapwoodBiomassC_brch(:,:)            => null()   !branch live stalk C,                                 [gC d-2]
   real(r8), pointer :: StalkStrutElms_pft(:,:)              => null()   !canopy stalk structural element mass,                [g d-2]
@@ -1432,8 +1430,6 @@ implicit none
   allocate(this%HuskStrutElms_pft(NumPlantChemElms,JP1));this%HuskStrutElms_pft=spval
   allocate(this%EarStrutElms_pft(NumPlantChemElms,JP1));this%EarStrutElms_pft=spval
   allocate(this%CanopyMassC_pft(JP1)); this%CanopyMassC_pft=0._r8
-!  allocate(this%LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafChemElmRemob_brch=spval
-!  allocate(this%PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemob_brch=spval
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
   allocate(this%AvgCanopyBiomC2Graze_pft(JP1));this%AvgCanopyBiomC2Graze_pft=spval
   allocate(this%LeafStrutElms_pft(NumPlantChemElms,JP1));this%LeafStrutElms_pft=spval

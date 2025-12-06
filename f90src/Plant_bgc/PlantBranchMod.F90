@@ -3896,8 +3896,6 @@ module PlantBranchMod
     LeafArea_node               => plt_morph%LeafArea_node                ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
     PetoleLength_node           => plt_morph%PetoleLength_node            ,& !inoput :sheath height, [m]
-!    PetioleChemElmRemob_brch    => plt_biom%PetioleChemElmRemob_brch      ,& !output :branch sheath structural element, [g d-2]
-!    LeafChemElmRemob_brch       => plt_biom%LeafChemElmRemob_brch         ,& !output :branch leaf structural element, [g d-2]
     CanPBranchHeight            => plt_morph%CanPBranchHeight             ,& !output :branch height, [m]
     StalkNodeVertLength_brch    => plt_morph%StalkNodeVertLength_brch     ,& !output :internode height, [m]
     LeafAreaDying_brch          => plt_morph%LeafAreaDying_brch           ,& !output :branch leaf area, [m2 d-2]
@@ -3918,11 +3916,8 @@ module PlantBranchMod
       !   WGLF,WGLFN,WGLFP=node leaf C,N,P mass
       !   LeafArea_node=node leaf area
       !
-!      LeafChemElmRemob_brch(:,NB,NZ)=0._r8
       IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
-!        DO NE=1,NumPlantChemElms
-!          LeafChemElmRemob_brch(NE,NB,NZ)=AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))
-!        ENDDO
+
         LeafAreaDying_brch(NB,NZ)=AZMAX1(LeafArea_node(K,NB,NZ))
 
         IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -3938,12 +3933,7 @@ module PlantBranchMod
       !
       !       FSNC,FSNCL=fraction of lowest leaf to be remobilized
       !
-!      IF(FSNC*LeafChemElmRemob_brch(ielmc,NB,NZ).GT.LeafElmntNode_brch(ielmc,K,NB,NZ) &
-!        .AND. LeafChemElmRemob_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-!        FracRemobAsLeaf = AZMAX1(LeafElmntNode_brch(ielmc,K,NB,NZ)/LeafChemElmRemob_brch(ielmc,NB,NZ))
-!      ELSE
-!        FracRemobAsLeaf=FSNC
-!      ENDIF
+
       FracRemobAsLeaf=AMIN1(FSNC,1.0_R8)
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
@@ -4005,11 +3995,8 @@ module PlantBranchMod
       !       CanPBranchHeight=petiole length
       !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
       !
-!      PetioleChemElmRemob_brch(:,NB,NZ)=0._r8
+
       IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
-!        DO NE=1,NumPlantChemElms
-!          PetioleChemElmRemob_brch(NE,NB,NZ)=AZMAX1(PetioleElmntNode_brch(NE,K,NB,NZ))
-!        ENDDO
 
         CanPBranchHeight(NB,NZ)=AZMAX1(PetoleLength_node(K,NB,NZ))
 
@@ -4033,12 +4020,6 @@ module PlantBranchMod
       !       FSNCS=fraction of lowest petiole to be remobilized
       !
       FSNCS=AMIN1(1._r8,FSNC)
-!      IF(FSNC*PetioleElmntNode_brch(ielmc,K,NB,NZ).GT.PetioleElmntNode_brch(ielmc,K,NB,NZ) &
-!        .AND.PetioleElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-!        FSNCS=AZMAX1(PetioleElmntNode_brch(ielmc,K,NB,NZ)/PetioleElmntNode_brch(ielmc,K,NB,NZ))
-!      ELSE
-!        FSNCS=FSNC
-!      ENDIF
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !       TO FRACTIONS SET IN 'STARTQ'

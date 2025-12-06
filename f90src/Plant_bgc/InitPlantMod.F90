@@ -704,9 +704,7 @@ module InitPlantMod
   plt_biom%EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)            = 0._r8
   plt_biom%CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)    = 0._r8
   plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)      = 0._r8
-!  plt_biom%LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)        = 0._r8
   plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = 0._r8
-!  plt_biom%PetioleChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
 
   D25: DO NB=1,MaxNumBranches

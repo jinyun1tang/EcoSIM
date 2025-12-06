@@ -550,9 +550,7 @@ module StartqMod
   CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
   LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = 0._r8
   PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
-!  PetioleChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
-!  LeafChemElmRemob_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)       = 0._r8
   
   D25: DO NB=1,MaxNumBranches
     SapwoodBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
