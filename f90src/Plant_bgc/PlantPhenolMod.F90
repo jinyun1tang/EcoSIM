@@ -539,9 +539,9 @@ module PlantPhenolMod
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
     CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
-    RootChk   = Root1stDepz_pft(ipltroot,1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
+    RootChk   = Root1stDepz_pft(1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
 !    write(666,*)I+J/24.,NZ,(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)),(ShootArea.GT.ZERO4LeafVar_pft(NZ)),&
-!      RootChk,CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),Root1stDepz_pft(ipltroot,1,NZ)
+!      RootChk,CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),Root1stDepz_pft(1,NZ)
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanopy_pft(NZ)=cpw*(ShootElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))

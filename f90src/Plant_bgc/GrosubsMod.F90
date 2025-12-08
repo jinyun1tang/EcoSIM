@@ -76,7 +76,6 @@ module grosubsMod
     CanopyHeight_pft(NZ)                   = 0._r8
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
-
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -430,22 +429,22 @@ module grosubsMod
   FracRootElmAlloc2Litr(ielmp,k_woody_comp)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_comp)*rPCRootr_pft(NZ)/CPRTW,1._r8)
 
   DO NE=2,NumPlantChemElms
-    FracShootPetolAlloc2Litr(NE,k_fine_comp) = AZMAX1(1.0_r8-FracShootPetolAlloc2Litr(NE,k_woody_comp))
-    FracShootLeafAlloc2Litr(NE,k_fine_comp)  = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(NE,k_woody_comp))
-    FracWoodStalkElmAlloc2Litr(NE,k_fine_comp)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_comp))
-    FracRootElmAlloc2Litr(NE,k_fine_comp)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_comp))
+    FracShootPetolAlloc2Litr(NE,k_fine_comp)   = AZMAX1(1.0_r8-FracShootPetolAlloc2Litr(NE,k_woody_comp))
+    FracShootLeafAlloc2Litr(NE,k_fine_comp)    = AZMAX1(1.0_r8-FracShootLeafAlloc2Litr(NE,k_woody_comp))
+    FracWoodStalkElmAlloc2Litr(NE,k_fine_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_comp))
+    FracRootElmAlloc2Litr(NE,k_fine_comp)      = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_comp))
   ENDDO
-!
-!     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
-!     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
-!
-!     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
-!     TKS_vr,TKSM=soil temperature,soil temp used in Arrhenius eqn
-!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
-!     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
-!     8.3143,710.0=gas constant,enthalpy
-!     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
-!
+  !
+  !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
+  !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
+  !
+  !     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
+  !     TKS_vr,TKSM=soil temperature,soil temp used in Arrhenius eqn
+  !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
+  !     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
+  !     8.3143,710.0=gas constant,enthalpy
+  !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
+  !
   TKCM=real_truncate(TKC_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
 
   TFN5=calc_plant_maint_tempf(TKCM)  

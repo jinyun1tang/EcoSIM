@@ -371,7 +371,14 @@ implicit none
       C4PhotoShootNonstC_brch(NB,NZ,NY,NX)=plt_biom%C4PhotoShootNonstC_brch(NB,NZ)      
     ENDDO
 
-
+    DO NR=1,pltpar%MaxNumRootAxes
+      RootSegAges_raxes(:,NR,NZ,NY,NX)      = plt_morph%RootSegAges_raxes(:,NR,NZ)   
+      RootSeglengths_raxes(:,NR,NZ,NY,NX)   = plt_morph%RootSeglengths_raxes(:,NR,NZ)  
+      NActiveRootSegs_raxes(NR,NZ,NY,NX)  = plt_morph%NActiveRootSegs_raxes(NR,NZ) 
+      RootSegBaseDepth_raxes(NR,NZ,NY,NX) = plt_morph%RootSegBaseDepth_raxes(NR,NZ)
+      IndRootSegBase_raxes(NR,NZ,NY,NX)   = plt_morph%IndRootSegBase_raxes(NR,NZ)  
+      IndRootSegTip_raxes(NR,NZ,NY,NX)    = plt_morph%IndRootSegTip_raxes(NR,NZ)   
+    ENDDO
     DO NB=1,pltpar%MaxNumBranches
       DO NE=1,NumPlantChemElms
         CanopyNodulNonstElms_brch(NE,NB,NZ,NY,NX) = plt_biom%CanopyNodulNonstElms_brch(NE,NB,NZ)
@@ -611,16 +618,15 @@ implicit none
     ENDDO
 
     DO NR=1,pltpar%MaxNumRootAxes
-      NRoot1stTipLay_raxes(NR,NZ,NY,NX)=plt_morph%NRoot1stTipLay_raxes(NR,NZ)
-      DO N=1,Myco_pft(NZ,NY,NX)
-        RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ)
-        Root1stDepz_pft(N,NR,NZ,NY,NX)                        = plt_morph%Root1stDepz_pft(N,NR,NZ)
-      ENDDO
+      NRoot1stTipLay_raxes(NR,NZ,NY,NX) = plt_morph%NRoot1stTipLay_raxes(NR,NZ)
+      Root1stDepz_pft(NR,NZ,NY,NX)      = plt_morph%Root1stDepz_pft(NR,NZ)      
+      RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ)
+      
       DO L=1,NK_col(NY,NX)
+        RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ)      
+        Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = plt_morph%Root1stLen_rpvr(L,NR,NZ)
         DO N=1,Myco_pft(NZ,NY,NX)
-          RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
-          Root1stLen_rpvr(N,L,NR,NZ,NY,NX)                              = plt_morph%Root1stLen_rpvr(N,L,NR,NZ)
           Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                               = plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)
           Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)                             = plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)
         ENDDO
@@ -1217,7 +1223,14 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-
+    DO NR=1,pltpar%MaxNumRootAxes
+      plt_morph%RootSegAges_raxes(:,NR,NZ)   =RootSegAges_raxes(:,NR,NZ,NY,NX)     
+      plt_morph%RootSeglengths_raxes(:,NR,NZ)  = RootSeglengths_raxes(:,NR,NZ,NY,NX) 
+      plt_morph%NActiveRootSegs_raxes(NR,NZ) = NActiveRootSegs_raxes(NR,NZ,NY,NX)
+      plt_morph%RootSegBaseDepth_raxes(NR,NZ) = RootSegBaseDepth_raxes(NR,NZ,NY,NX)
+      plt_morph%IndRootSegBase_raxes(NR,NZ)  = IndRootSegBase_raxes(NR,NZ,NY,NX)
+      plt_morph%IndRootSegTip_raxes(NR,NZ)   = IndRootSegTip_raxes(NR,NZ,NY,NX) 
+    ENDDO
     DO NB=1,pltpar%MaxNumBranches
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
@@ -1397,20 +1410,18 @@ implicit none
     DO NR=1,pltpar%MaxNumRootAxes
       plt_morph%NRoot1stTipLay_raxes(NR,NZ)=NRoot1stTipLay_raxes(NR,NZ,NY,NX)
       DO L=1,NK_col(NY,NX)
+        plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = &
+          RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX)      
+        plt_morph%Root1stLen_rpvr(L,NR,NZ)       = Root1stLen_rpvr(L,NR,NZ,NY,NX)          
         DO N=1,Myco_pft(NZ,NY,NX)
-          plt_morph%Root1stLen_rpvr(N,L,NR,NZ)                             = Root1stLen_rpvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)                              = Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)                            = Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)
           plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = &
             RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
-          plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = &
-            RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
         enddo
       enddo
-      DO N=1,Myco_pft(NZ,NY,NX)
-        plt_morph%Root1stDepz_pft(N,NR,NZ)                       = Root1stDepz_pft(N,NR,NZ,NY,NX)
-        plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ) = RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)
-      enddo
+      plt_morph%Root1stDepz_pft(NR,NZ)    = Root1stDepz_pft(NR,NZ,NY,NX)      
+      plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ) = RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX)      
     enddo
     
     DO M=1,jsken

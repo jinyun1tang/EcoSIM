@@ -142,7 +142,7 @@ module UptakesMod
       else
         HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
           .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
-          .AND.(Root1stDepz_pft(ipltroot,1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
+          .AND.(Root1stDepz_pft(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
           .and. CanopyMassC>0._r8
       endif
 
@@ -454,7 +454,7 @@ module UptakesMod
       !obtain plant rooting depth
       RootDepZ=0.0_r8
       D2005: DO NR=1,NumPrimeRootAxes_pft(NZ)
-        RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(ipltroot,NR,NZ))
+        RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(NR,NZ))
       ENDDO D2005
 
       IF(L.EQ.NU)THEN

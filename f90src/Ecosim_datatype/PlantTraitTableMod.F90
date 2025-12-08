@@ -21,6 +21,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: VmaxPEPCarboxyRef_tab(:)
   real(r8), target, allocatable :: XKCO2_tab(:)
   real(r8), target, allocatable :: XKO2_tab(:)
+  real(r8), target, allocatable :: RootMatureAge_tab(:)
   real(r8), target, allocatable :: Km4PEPCarboxy_tab(:)
   real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
   real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
@@ -139,6 +140,7 @@ module PlantTraitTableMod
   allocate(VmaxPEPCarboxyRef_tab(npfts));VmaxPEPCarboxyRef_tab=0.0_r8
   allocate(XKCO2_tab(npfts));XKCO2_tab=0.0_r8
   allocate(XKO2_tab(npfts));XKO2_tab=0.0_r8
+  allocate(RootMatureAge_tab(npfts)); RootMatureAge_tab=0._r8
   allocate(Km4PEPCarboxy_tab(npfts));Km4PEPCarboxy_tab=0.0_r8
   allocate(LeafRubisco2Protein_tab(npfts));LeafRubisco2Protein_tab=0.0_r8
   allocate(LeafPEP2Protein_tab(npfts));LeafPEP2Protein_tab=0.0_r8
@@ -257,6 +259,7 @@ module PlantTraitTableMod
   call destroy(VmaxPEPCarboxyRef_tab)
   call destroy(XKCO2_tab)
   call destroy(XKO2_tab)
+  call destroy(RootMatureAge_tab)
   call destroy(Km4PEPCarboxy_tab)
   call destroy(LeafRubisco2Protein_tab)
   call destroy(LeafPEP2Protein_tab)

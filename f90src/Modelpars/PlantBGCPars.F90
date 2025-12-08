@@ -141,6 +141,7 @@ module PlantBGCPars
   integer :: k_woody_comp                !woody litter complex id
   integer :: k_fine_comp                 !fine litter complex id
   integer :: jroots                      !number of root groups, plant root + myco types
+  integer :: NMaxRootSegs                !maximum number of root segments used for maturation tracking
   end type plant_bgc_par_type
 
   contains
@@ -193,9 +194,10 @@ module PlantBGCPars
   pltpar%inonfoliar = 2
   pltpar%istalk     = 3
   pltpar%iroot      = 4
-  pltpar%icwood     = 5
+  pltpar%icwood     = 5  
   pltpar%jcplx      = jcplxc
-  pltpar%jroots=jroots
+  pltpar%jroots     = jroots
+
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
   PART2LEAF_MIN               = 0.05_r8
   PART2PETOL_MIN              = 0.02_r8

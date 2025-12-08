@@ -429,10 +429,9 @@ module StartqMod
   PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
 !  write(9333,*)SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(1:3,NY,NX),'yyy'
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
-
+    !find the seeding layer, i.e. the first root layer
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
       .AND. SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
-      !find the seeding layer
       NGTopRootLayer_pft(NZ,NY,NX)  = L
       NMaxRootBotLayer_pft(NZ,NY,NX) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
@@ -734,10 +733,9 @@ module StartqMod
   RootN2Fix_pft(NZ,NY,NX)=0._r8
 
   DO NR=1,MaxNumRootAxes
-    DO N=1,pltpar%jroots
-      Root1stDepz_pft(N,NR,NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-      RootMyco1stElm_raxs(1:NumPlantChemElms,N,NR,NZ,NY,NX)=0._r8
-    ENDDO
+    RootSegBaseDepth_raxes(NR,NZ,NY,NX)                 = SeedDepth_pft(NZ,NY,NX)
+    Root1stDepz_pft(NR,NZ,NY,NX)                        = SeedDepth_pft(NZ,NY,NX)
+    RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = 0._r8
   ENDDO  
   D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL_col(NY,NX)
@@ -796,13 +794,15 @@ module StartqMod
 
       D30: DO NR=1,MaxNumRootAxes
         Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)                             = 0._r8
-        Root1stLen_rpvr(N,L,NR,NZ,NY,NX)                              = 0._r8
-        RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = 0._r8
         Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                              = 0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = 0._r8
       ENDDO D30
 
-      IF(N.EQ.1)THEN
+      IF(N.EQ.ipltroot)THEN
+        DO NR=1,MaxNumRootAxes
+          RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8      
+          Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = 0._r8          
+        ENDDO
         D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
           DO  M=1,jskenc
             LitrfallElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
@@ -855,16 +855,16 @@ module StartqMod
   CanopyNonstElms_brch(ielmn,1,NZ,NY,NX) = rNCGrain_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   CanopyNonstElms_brch(ielmp,1,NZ,NY,NX) = rPCGrain_pft(NZ,NY,NX)*CanopyNonstElms_brch(ielmc,1,NZ,NY,NX)
   
-  RootMyco1stStrutElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
-    rNCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  RootMyco1stStrutElms_rpvr(ielmp,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
-    rPCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
-  RootMyco1stElm_raxs(ielmn,ipltroot,1,NZ,NY,NX)=rNCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
-  RootMyco1stElm_raxs(ielmp,ipltroot,1,NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,ipltroot,1,NZ,NY,NX)
+  RootMyco1stStrutElms_rpvr(ielmn,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
+    rNCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  RootMyco1stStrutElms_rpvr(ielmp,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
+    rPCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmn,1,NZ,NY,NX)=rNCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,1,NZ,NY,NX)
+  RootMyco1stElm_raxs(ielmp,1,NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,1,NZ,NY,NX)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
-    RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+    RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   PopuRootMycoC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
-    RootMyco1stStrutElms_rpvr(ielmc,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+    RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootProteinC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &
     RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)*RootProteinCMax_pft(NZ,NY,NX)
   RootMycoNonstElms_rpvr(ielmn,ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= rNCGrain_pft(NZ,NY,NX)&
@@ -891,7 +891,7 @@ module StartqMod
 !    DO L=NU_col(NY,NX),NGTopRootLayer_pft(NZ,NY,NX)
 !      DO NE=1,NumPlantChemElms
 !        !add reserve to struct
-!        RootElms_pft(NE,NZ,NY,NX)=RootElms_pft(NE,NZ,NY,NX)+RootMyco1stStrutElms_rpvr(NE,ipltroot,L,NR,NZ,NY,NX)&
+!        RootElms_pft(NE,NZ,NY,NX)=RootElms_pft(NE,NZ,NY,NX)+RootMyco1stStrutElms_rpvr(NE,L,NR,NZ,NY,NX)&
 !          +RootMyco2ndStrutElms_rpvr(NE,ipltroot,L,NR,NZ,NY,NX)
 !      ENDDO
 !    ENDDO    

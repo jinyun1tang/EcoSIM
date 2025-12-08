@@ -202,7 +202,12 @@ module minimathmod
   integer, intent(in) :: a,B
   integer :: C
   
-  c=mod(a,b)
+  if(a<0)then
+    c=mod(a+b,b)
+  else
+    c=mod(a,b)
+  endif
+
   if(c==0 .and. a/=0)c=b
   end function pMOD
 !------------------------------------------------------------------------------------------

@@ -45,13 +45,14 @@ module RootDataType
   real(r8),target,allocatable ::  CPRTS_pft(:,:,:)                               !root P:C ratio x root growth yield, [-]
   real(r8),target,allocatable ::  RootMycoNonstElms_pft(:,:,:,:,:)               !non-structural chemical element in roots,[g d-2]
   real(r8),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                  !maximum radius of primary roots, [m]
+  real(r8),target,allocatable ::  RootMatureAge_pft(:,:,:)                       !Root age to trigger secondary growth, [h]
   real(r8),target,allocatable ::  Root2ndMaxRadius_pft(:,:,:,:)                  !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RootBranchFreq_pft(:,:,:)                      !root brancing frequency, [m-1]
   real(r8),target,allocatable ::  RootPoreTortu4Gas_pft(:,:,:,:)                 !root tortuosity to calculate root gaseous diffusivity, [-]
   real(r8),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)             !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootTotLenPerPlant_pvr(:,:,:,:,:)              !root layer length per plant, including root hair [m p-1]
   real(r8),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
-  real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:,:)                   !root layer length primary axes, [m d-2]
+  real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(r8),target,allocatable ::  Root1stXNumL_rpvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
@@ -65,7 +66,7 @@ module RootDataType
   real(r8),target,allocatable ::  RootVH2O_pvr(:,:,:,:,:)                        !root layer volume water, [m2 d-2]
   real(r8),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
   real(r8),target,allocatable ::  RootPoreVol_rpvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
-  real(r8),target,allocatable ::  Root1stDepz_pft(:,:,:,:,:)                     !root layer depth, [m]
+  real(r8),target,allocatable ::  Root1stDepz_pft(:,:,:,:)                     !root layer depth, [m]
   real(r8),target,allocatable ::  Root2ndRadius_rpvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
@@ -82,14 +83,14 @@ module RootDataType
   real(r8),target,allocatable ::  RootNoduleElms_pft(:,:,:,:)                    !plant root nodule element mass,                     [g d-2]
   real(r8),target,allocatable ::  RootStrutElms_pft(:,:,:,:)                     !plant root structural element, [g d-2]
   real(r8),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                    !root layer protein C, [g d-2]
-  real(r8),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:,:)       !root layer element primary axes, [g d-2]
+  real(r8),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:)       !root layer element primary axes, [g d-2]
   real(r8),target,allocatable ::  RootMyco2ndStrutElms_rpvr(:,:,:,:,:,:,:)       !root layer element secondary axes, [g d-2]
   real(r8),target,allocatable ::   PopuRootMycoC_pvr(:,:,:,:,:)                  !root layer C, [g d-2]
   real(r8),target,allocatable ::  RootNodulStrutElms_rpvr(:,:,:,:,:)             !root layer nodule element, [g d-2]
   real(r8),target,allocatable ::  RootMycoActiveBiomC_pvr(:,:,:,:,:)             !root layer structural C, [g d-2]
   real(r8),target,allocatable ::   RootMycoNonstElms_rpvr(:,:,:,:,:,:)           !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RootNonstructElmConc_rpvr(:,:,:,:,:,:)         !root  layer nonstructural element concentration, [g g-1]
-  real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:,:)               !root C primary axes, [g d-2]
+  real(r8),target,allocatable ::  RootMyco1stElm_raxs(:,:,:,:,:)               !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  RootProteinConc_rpvr(:,:,:,:,:)                !root layer protein C concentration, [g g-1]
   real(r8),target,allocatable :: RootMycoMassElm_vr(:,:,:,:,:)                   !root chemical element mass in soil layer, [g d-2]
   real(r8),target,allocatable :: RootMycoMassElm_pvr(:,:,:,:,:,:)                  !pft root chemical elemental mass in soil layer, [g d-2]
@@ -104,6 +105,12 @@ module RootDataType
   real(r8),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]     
   real(r8),target,allocatable :: RootRadialKond2H2O_pvr(:,:,:,:,:)               !radial root conductance for water uptake, [m3 H2O h-1 MPa-1]
   real(r8),target,allocatable :: RootAxialKond2H2O_pvr(:,:,:,:,:)                !axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
+  real(r8),target, allocatable :: RootSegAges_raxes(:,:,:,:,:)                   !age of different active root segments, [h]
+  integer ,target, allocatable :: NActiveRootSegs_raxes(:,:,:,:)                 !number of active root segments, [-]
+  real(r8),target, allocatable :: RootSegBaseDepth_raxes(:,:,:,:)                !base depth of different root axes, [m]
+  real(r8),target, allocatable :: RootSeglengths_raxes(:,:,:,:,:)                !root length in each segment, [m]
+  integer ,target, allocatable :: IndRootSegBase_raxes(:,:,:,:)                  !Index for base segment under tracking, [-]
+  integer ,target, allocatable :: IndRootSegTip_raxes(:,:,:,:)                   !Index for tip segment under tracking, [-]  
 
 !----------------------------------------------------------------------
 
@@ -156,6 +163,7 @@ contains
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._r8
   allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._r8
   allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._r8
+  allocate(RootMatureAge_pft(JP,JY,JX)); RootMatureAge_pft=0._r8
   allocate(RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP,JY,JX));RootMycoNonstElms_pft=0._r8
   allocate(Root1stMaxRadius_pft(jroots,JP,JY,JX)); Root1stMaxRadius_pft=0._r8
   allocate(Root2ndMaxRadius_pft(jroots,JP,JY,JX)); Root2ndMaxRadius_pft=0._r8
@@ -164,7 +172,7 @@ contains
   allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._r8
   allocate(RootTotLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootTotLenPerPlant_pvr=0._r8
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._r8
-  allocate(Root1stLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
+  allocate(Root1stLen_rpvr(JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
   allocate(Root1stXNumL_rpvr(jroots,JZ,JP,JY,JX));Root1stXNumL_rpvr=0._r8
@@ -177,7 +185,7 @@ contains
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._r8
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._r8
   allocate(RootPoreVol_rpvr(jroots,JZ,JP,JY,JX));RootPoreVol_rpvr=0._r8
-  allocate(Root1stDepz_pft(jroots,MaxNumRootAxes,JP,JY,JX));Root1stDepz_pft=0._r8
+  allocate(Root1stDepz_pft(MaxNumRootAxes,JP,JY,JX));Root1stDepz_pft=0._r8
   allocate(Root2ndRadius_rpvr(jroots,JZ,JP,JY,JX));Root2ndRadius_rpvr=0._r8
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._r8
   allocate(Root2ndSpecLen_pft(jroots,JP,JY,JX)); Root2ndSpecLen_pft=0._r8
@@ -194,18 +202,25 @@ contains
   allocate(RootNoduleElms_pft(NumPlantChemElms,JP,JY,JX)); RootNoduleElms_pft=0._r8
   allocate(RootStrutElms_pft(NumPlantChemElms,JP,JY,JX));   RootStrutElms_pft=0._r8
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._r8
-  allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._r8
+  allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._r8
   allocate(RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndStrutElms_rpvr=0._r8
   allocate( PopuRootMycoC_pvr(jroots,JZ,JP,JY,JX)); PopuRootMycoC_pvr=0._r8
   allocate(RootNodulStrutElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX)); RootNodulStrutElms_rpvr=0._r8
   allocate(RootMycoActiveBiomC_pvr(jroots,JZ,JP,JY,JX));RootMycoActiveBiomC_pvr=0._r8
   allocate(RootMycoNonstElms_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoNonstElms_rpvr=0._r8
   allocate(RootNonstructElmConc_rpvr(NumPlantChemElms,jroots,JZ,JP,JY,JX));RootNonstructElmConc_rpvr=0._r8
-  allocate(RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
+  allocate(RootMyco1stElm_raxs(NumPlantChemElms,MaxNumRootAxes,JP,JY,JX));RootMyco1stElm_raxs=0._r8
   allocate(RootProteinConc_rpvr(jroots,JZ,JP,JY,JX));RootProteinConc_rpvr=0._r8
   allocate(RootResist4H2O_pvr(jroots,JZ,JP,JY,JX)); RootResist4H2O_pvr=0._r8
   allocate(RootRadialKond2H2O_pvr(jroots,JZ,JP,JY,JX));RootRadialKond2H2O_pvr=0._r8
   allocate(RootAxialKond2H2O_pvr(jroots,JZ,JP,JY,JX));RootAxialKond2H2O_pvr=0._r8
+
+  allocate(RootSegAges_raxes(1:NMaxRootSegs,1:MaxNumRootAxes,JP,JY,JX));RootSegAges_raxes=0._r8
+  allocate(NActiveRootSegs_raxes(1:MaxNumRootAxes,JP,JY,JX));NActiveRootSegs_raxes=0
+  allocate(RootSegBaseDepth_raxes(1:MaxNumRootAxes,JP,JY,JX));RootSegBaseDepth_raxes=0._r8     
+  allocate(RootSeglengths_raxes(1:NMaxRootSegs,1:MaxNumRootAxes,JP,JY,JX));RootSeglengths_raxes=0._r8       
+  allocate(IndRootSegBase_raxes(1:MaxNumRootAxes,JP,JY,JX));IndRootSegBase_raxes=0
+  allocate(IndRootSegTip_raxes(1:MaxNumRootAxes,JP,JY,JX));IndRootSegTip_raxes=0             
 
   end subroutine InitRootData
 
@@ -255,6 +270,7 @@ contains
   call destroy(RootRaidus_rpft)
   call destroy(CNRTS_pft)
   call destroy(CPRTS_pft)
+  call destroy(RootMatureAge_pft)
   call destroy(RootMycoNonstElms_pft)
   call destroy(Root1stMaxRadius_pft)
   call destroy(Root2ndMaxRadius_pft)
@@ -302,7 +318,12 @@ contains
   call destroy(RootNonstructElmConc_rpvr)
   call destroy(RootMyco1stElm_raxs)
   call destroy(RootProteinConc_rpvr)
-
+  call destroy(RootSegAges_raxes)
+  call destroy(NActiveRootSegs_raxes)
+  call destroy(RootSegBaseDepth_raxes)
+  call destroy(RootSeglengths_raxes)
+  call destroy(IndRootSegBase_raxes)
+  call destroy(IndRootSegTip_raxes)
   call destroy(Nutruptk_fClim_rpvr)
   call destroy(Nutruptk_fNlim_rpvr)
   call destroy(Nutruptk_fPlim_rpvr)

@@ -343,7 +343,7 @@ module PlantNonstElmDynMod
     ShootRootNonstElmConduts_pft  => plt_pheno%ShootRootNonstElmConduts_pft   ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
     RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
-    NRoot1stTipLay_raxes         => plt_morph%NRoot1stTipLay_raxes          ,& !input  :maximum soil layer number for root axes, [-]
+    NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
@@ -373,18 +373,23 @@ module PlantNonstElmDynMod
       PopuRootMycoC_pvr(N,L,NZ)       = 0._r8
       D5460: DO NR=1,NumPrimeRootAxes_pft(NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
-        PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ) &
-          +RootMyco1stStrutElms_rpvr(ielmc,N,L,NR,NZ)
+        PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)           
       ENDDO D5460
       ECO_ER_col          = ECO_ER_col+RootCO2Autor_pvr(N,L,NZ)
       Eco_AutoR_CumYr_col = Eco_AutoR_CumYr_col+RootCO2Autor_pvr(N,L,NZ)
-    ENDDO D5450
-    
-    DO  NR=1,NumPrimeRootAxes_pft(NZ)
-      L=NRoot1stTipLay_raxes(NR,NZ)
-      RootMycoActiveBiomC_pvr(N,L,NZ)=RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco1stElm_raxs(ielmc,N,NR,NZ)
-    ENDDO
+    ENDDO D5450    
   ENDDO D5445
+  
+  DO  NR=1,NumPrimeRootAxes_pft(NZ)
+    L=NRoot1stTipLay_raxes(NR,NZ)
+    RootMycoActiveBiomC_pvr(ipltroot,L,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+RootMyco1stElm_raxs(ielmc,NR,NZ)
+  ENDDO
+
+  DO L=NU,MaxSoiL4Root_pft(NZ)  
+    DO NR=1,NumPrimeRootAxes_pft(NZ)
+      PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)
+    ENDDO
+  ENDDO
 
   !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT
   !

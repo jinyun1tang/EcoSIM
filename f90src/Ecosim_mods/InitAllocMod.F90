@@ -167,7 +167,7 @@ implicit none
   pltpar%ilignin                 = micpar%ilignin
   pltpar%k_woody_comp            = micpar%k_woody_comp
   pltpar%k_fine_comp             = micpar%k_fine_comp
-
+  
   !the following variable should be consistent with the soil bgc model
   pltpar%jcplx                = micpar%jcplx
   pltpar%NumOfPlantLitrCmplxs = micpar%NumOfPlantLitrCmplxs
@@ -177,7 +177,8 @@ implicit none
   pltpar%MaxNumRootAxes       = 10
   pltpar%NumGrowthStages      = 10
   pltpar%NumOfPlantMorphUnits = 7
-
+  pltpar%NMaxRootSegs = 10    !
+  NMaxRootSegs = pltpar%NMaxRootSegs
   MaxNumBranches       = pltpar%MaxNumBranches
   NumLitterGroups      = pltpar%NumLitterGroups
   MaxNumRootAxes       = pltpar%MaxNumRootAxes

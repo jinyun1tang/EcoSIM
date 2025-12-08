@@ -255,10 +255,13 @@ module NutUptakeMod
             trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
 
             call RootExudates(I,J,N,L,NZ)
-
-            RootMyMassC=sum(RootMyco1stStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-              sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-              RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+            if(N==ipltroot)then
+              RootMyMassC=sum(RootMyco1stStrutElms_rpvr(ielmc,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+                RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+            else
+              RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+                RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+            endif  
   !
   !     NUTRIENT UPTAKE
   !
