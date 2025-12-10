@@ -456,6 +456,7 @@ contains
             RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*XHVST
           ENDDO
         ENDDO  
+      Root1stXNumL_rpvr(L,NZ)        = Root1stXNumL_rpvr(L,NZ)*XHVST        
       ENDIF  
       D8960: DO NR=1,NumPrimeRootAxes_pft(NZ)
         DO NE=1,NumPlantChemElms
@@ -471,7 +472,6 @@ contains
       RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)*XHVST
       PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*XHVST
       RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*XHVST
-      Root1stXNumL_rpvr(N,L,NZ)        = Root1stXNumL_rpvr(N,L,NZ)*XHVST
       Root2ndXNumL_rpvr(N,L,NZ)         = Root2ndXNumL_rpvr(N,L,NZ)*XHVST
       RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ)*XHVST
       RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST

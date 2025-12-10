@@ -959,8 +959,9 @@ module InitPlantMod
     plt_morph%Root1stDepz_pft(NR,NZ)                       = SeedDepth_pft(NZ)
     plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ) = 0._r8    
   ENDDO      
-  D40: DO N=1,pltpar%jroots
-    D20: DO L=1,NL
+
+  D20: DO L=1,NL
+    D40: DO N=1,pltpar%jroots
       plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                        = 0._r8
       plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                        = 0._r8
       PSIRoot_pvr(N,L,NZ)                                          = -0.01_r8
@@ -972,7 +973,7 @@ module InitPlantMod
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
       plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
-      plt_morph%Root1stXNumL_rpvr(N,L,NZ)                      = 0._r8
+
       plt_morph%Root2ndXNumL_rpvr(N,L,NZ)                      = 0._r8
       plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)                 = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
@@ -1012,20 +1013,22 @@ module InitPlantMod
         plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)                              = 0._r8
         plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = 0._r8
       ENDDO D30
-      IF(N.EQ.ipltroot)THEN
-        DO NR=1,MaxNumRootAxes
-          plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8      
-          plt_morph%Root1stLen_rpvr(L,NR,NZ)                             = 0._r8          
-        ENDDO  
-        D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-          plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
-        ENDDO D6400
-        plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
-        plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ)=0._r8
-        RootN2Fix_pvr(L,NZ)=0._r8
-      ENDIF
-    ENDDO D20
-  ENDDO D40
+    ENDDO D40
+
+    plt_morph%Root1stXNumL_rpvr(L,NZ)                      = 0._r8  
+    DO NR=1,MaxNumRootAxes
+      plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8      
+      plt_morph%Root1stLen_rpvr(L,NR,NZ)                             = 0._r8          
+    ENDDO  
+
+    D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
+      plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+    ENDDO D6400
+    plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
+    plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
+    RootN2Fix_pvr(L,NZ)                                       = 0._r8
+
+  ENDDO D20
 
   plt_morph%RootLenDensPerPlant_pvr(1:2,NL+1:JZ1,NZ)=0._r8
   end associate

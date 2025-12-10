@@ -313,7 +313,7 @@ implicit none
   real(r8), pointer :: RootRadialResist_pft(:,:)      => null() !root radial resistivity,              [MPa h m-2]
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
-  real(r8), pointer :: Root1stXNumL_rpvr(:,:,:)        => null() !root layer number primary axes,       [d-2]
+  real(r8), pointer :: Root1stXNumL_rpvr(:,:)        => null() !root layer number primary axes,       [d-2]
   REAL(R8), POINTER :: RootPrimeAxsNum_pft(:)              => null() !primary root axes number, [d-2]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)         => null() !root layer number axes,               [d-2]
   real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:) => null() !layer root length density,            [m m-3]
@@ -1941,7 +1941,7 @@ implicit none
   allocate(this%RootArea2ndPP_pvr(jroots,JZ1,JP1)); this%RootArea2ndPP_pvr=0._r8
   allocate(this%RootPoreVol_rpvr(jroots,JZ1,JP1));this%RootPoreVol_rpvr=spval
   allocate(this%RootVH2O_pvr(jroots,JZ1,JP1));this%RootVH2O_pvr=spval
-  allocate(this%Root1stXNumL_rpvr(jroots,JZ1,JP1));this%Root1stXNumL_rpvr=spval
+  allocate(this%Root1stXNumL_rpvr(JZ1,JP1));this%Root1stXNumL_rpvr=spval
   allocate(this%Root2ndXNumL_rpvr(jroots,JZ1,JP1));this%Root2ndXNumL_rpvr=spval
   allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval

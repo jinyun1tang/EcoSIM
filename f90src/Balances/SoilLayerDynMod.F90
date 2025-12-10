@@ -1056,6 +1056,8 @@ implicit none
           ENDDO
           Root1stLen_rpvr(L1,NR,NZ,NY,NX)  = Root1stLen_rpvr(L1,NR,NZ,NY,NX)+FX*Root1stLen_rpvr(L0,NR,NZ,NY,NX)          
         ENDDO      
+        Root1stXNumL_rpvr(L1,NZ,NY,NX)        = Root1stXNumL_rpvr(L1,NZ,NY,NX)+FX*Root1stXNumL_rpvr(L0,NZ,NY,NX)        
+
         DO N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1077,7 +1079,6 @@ implicit none
           RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX) = RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)+FX*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           PopuRootMycoC_pvr(N,L1,NZ,NY,NX)       = PopuRootMycoC_pvr(N,L1,NZ,NY,NX)+FX* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)        = RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L1,NZ,NY,NX)        = Root1stXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)         = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
@@ -1239,7 +1240,7 @@ implicit none
           ENDDO
           Root1stLen_rpvr(L0,NR,NZ,NY,NX)  = FY*Root1stLen_rpvr(L0,NR,NZ,NY,NX)          
         ENDDO    
-
+        Root1stXNumL_rpvr(L0,NZ,NY,NX)        = FY*Root1stXNumL_rpvr(L0,NZ,NY,NX)
         DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1258,7 +1259,6 @@ implicit none
           RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX) = FY*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           PopuRootMycoC_pvr(N,L0,NZ,NY,NX)       = FY* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L0,NZ,NY,NX)        = FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L0,NZ,NY,NX)        = FY*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = FY*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
@@ -1408,6 +1408,9 @@ implicit none
           Root1stLen_rpvr(L0,NR,NZ,NY,NX) = Root1stLen_rpvr(L0,NR,NZ,NY,NX)-FXRTLG1
         ENDDO
 
+        FRootPrimeAxsNum_pft           = FRO*Root1stXNumL_rpvr(L0,NZ,NY,NX)
+        Root1stXNumL_rpvr(L1,NZ,NY,NX) = Root1stXNumL_rpvr(L1,NZ,NY,NX)+FRootPrimeAxsNum_pft
+        Root1stXNumL_rpvr(L0,NZ,NY,NX) = Root1stXNumL_rpvr(L0,NZ,NY,NX)-FRootPrimeAxsNum_pft
 
         DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
@@ -1452,10 +1455,6 @@ implicit none
           FXWSRTL                         = FRO*RootProteinC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX) = RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
           RootProteinC_pvr(N,L0,NZ,NY,NX) = RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
-
-          FRootPrimeAxsNum_pft                = FRO*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L1,NZ,NY,NX) = Root1stXNumL_rpvr(N,L1,NZ,NY,NX)+FRootPrimeAxsNum_pft
-          Root1stXNumL_rpvr(N,L0,NZ,NY,NX) = Root1stXNumL_rpvr(N,L0,NZ,NY,NX)-FRootPrimeAxsNum_pft
 
           FXRTNL                         = FRO*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX) = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FXRTNL

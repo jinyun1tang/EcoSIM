@@ -367,9 +367,9 @@ module grosubsMod
 
 
   D6: DO L=1,NK
+    Root1stXNumL_rpvr(L,NZ)  = 0._r8  
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
-      Root1stXNumL_rpvr(N,L,NZ)  = 0._r8
       Root2ndXNumL_rpvr(N,L,NZ)  = 0._r8
       RootRespPotent_pvr(N,L,NZ) = 0._r8
       RootCO2EmisPot_pvr(N,L,NZ) = 0._r8

@@ -55,7 +55,7 @@ module RootDataType
   real(r8),target,allocatable ::  Root1stLen_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(r8),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(r8),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
-  real(r8),target,allocatable ::  Root1stXNumL_rpvr(:,:,:,:,:)                    !root layer number primary axes, [d-2]
+  real(r8),target,allocatable ::  Root1stXNumL_rpvr(:,:,:,:)                    !root layer number primary axes, [d-2]
   real(r8),target,allocatable ::  Root2ndXNumL_rpvr(:,:,:,:,:)                     !root layer number axes, [d-2]
   real(r8),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(r8),target,allocatable ::  Root2ndEffLen4uptk_rpvr(:,:,:,:,:)              !Layer effective root length four resource uptake, [m]
@@ -175,7 +175,7 @@ contains
   allocate(Root1stLen_rpvr(JZ,MaxNumRootAxes,JP,JY,JX));Root1stLen_rpvr=0._r8
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._r8
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._r8
-  allocate(Root1stXNumL_rpvr(jroots,JZ,JP,JY,JX));Root1stXNumL_rpvr=0._r8
+  allocate(Root1stXNumL_rpvr(JZ,JP,JY,JX));Root1stXNumL_rpvr=0._r8
   allocate(Root2ndXNumL_rpvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_rpvr=0._r8
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._r8
   allocate(Root2ndEffLen4uptk_rpvr(jroots,JZ,JP,JY,JX));Root2ndEffLen4uptk_rpvr=0._r8

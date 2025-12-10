@@ -1893,8 +1893,9 @@ module PlantDisturbsMod
         DO NE=1,NumPlantChemElms
           RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         ENDDO
-      Root1stLen_rpvr(L,NR,NZ)  = Root1stLen_rpvr(L,NR,NZ)*FracLeftThin        
+        Root1stLen_rpvr(L,NR,NZ)  = Root1stLen_rpvr(L,NR,NZ)*FracLeftThin        
       ENDDO
+      Root1stXNumL_rpvr(L,NZ)        = Root1stXNumL_rpvr(L,NZ)*FracLeftThin      
     ENDIF
 
     D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)
@@ -1911,7 +1912,6 @@ module PlantDisturbsMod
     RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)*FracLeftThin
     PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*FracLeftThin
     RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*FracLeftThin
-    Root1stXNumL_rpvr(N,L,NZ)        = Root1stXNumL_rpvr(N,L,NZ)*FracLeftThin
     Root2ndXNumL_rpvr(N,L,NZ)         = Root2ndXNumL_rpvr(N,L,NZ)*FracLeftThin
     RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ)*FracLeftThin
     RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracLeftThin

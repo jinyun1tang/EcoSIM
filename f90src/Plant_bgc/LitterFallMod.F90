@@ -534,12 +534,12 @@ implicit none
     ENDDO D8870
 
     DO L=NU,MaxNumRootLays             
+      Root1stXNumL_rpvr(L,NZ)         = 0._r8    
       DO N=1,Myco_pft(NZ)           
         RootMycoNonstElms_rpvr(:,N,L,NZ) = 0._r8
         RootMycoActiveBiomC_pvr(N,L,NZ)  = 0._r8
         PopuRootMycoC_pvr(N,L,NZ)        = 0._r8
         RootProteinC_pvr(N,L,NZ)         = 0._r8
-        Root1stXNumL_rpvr(N,L,NZ)         = 0._r8
         Root2ndXNumL_rpvr(N,L,NZ)          = 0._r8
         RootTotLenPerPlant_pvr(N,L,NZ)      = 0._r8
         RootLenDensPerPlant_pvr(N,L,NZ)  = 0._r8

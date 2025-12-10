@@ -460,7 +460,8 @@ implicit none
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_pvr(:,:)
-  real(r8),pointer   :: h2D_RootRadialKond2H2O_pvr(:,:)
+  real(r8),pointer   :: h2D_RootSegBaseDepth_ptc(:,:)
+  real(r8),pointer   :: h2D_RootRadialKond2H2O_pvr(:,:)  
   real(r8),pointer   :: h2D_RootAxialKond2H2O_pvr(:,:)
   real(r8),pointer   :: h2D_VmaxNH4Root_pvr(:,:)
   real(r8),pointer   :: h2D_VmaxNO3Root_pvr(:,:)
@@ -996,6 +997,7 @@ implicit none
   allocate(this%h2D_RootMassP_vr(beg_col:end_col,1:JZ)); this%h2D_RootMassP_vr(:,:)=spval
   allocate(this%h2D_RootMassC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMassC_pvr(:,:)=spval
   allocate(this%h2D_RootRadialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootRadialKond2H2O_pvr(:,:)=spval
+  allocate(this%h2D_RootSegBaseDepth_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes));this%h2D_RootSegBaseDepth_ptc(:,:)=spval
   allocate(this%h2D_RootAxialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootAxialKond2H2O_pvr(:,:)=spval
   allocate(this%h2D_VmaxNH4Root_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_VmaxNH4Root_pvr(:,:)=spval
   allocate(this%h2D_VmaxNO3Root_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_VmaxNO3Root_pvr(:,:)=spval
@@ -2829,6 +2831,10 @@ implicit none
   call hist_addfld2d(fname='KH2ORadial_pvr',units='m H2O h-1 MPa-1',type2d='levsoi',avgflag='A',&
     long_name='Radial root conductance for water uptake',ptr_patch=data2d_ptr)       
 
+  data2d_ptr =>  this%h2D_RootSegBaseDepth_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes)
+  call hist_addfld2d(fname='RootSegBaseDepz_pft',units='m',type2d='rootaxs',avgflag='A',&
+    long_name='Primary root base depth that are subject to secondary growth',ptr_patch=data2d_ptr)       
+
   data2d_ptr =>  this%h2D_RootAxialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='KH2OAxial_pvr',units='m3 H2O h-1 MPa-1',type2d='levsoi',avgflag='A',&
     long_name='Axial root conductance for water uptake',ptr_patch=data2d_ptr)       
@@ -3477,7 +3483,7 @@ implicit none
     long_name='Secondary root structural biomass P density',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='1/d2',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='1/m2',type2d='levsoi',avgflag='A',&
     long_name='Primary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
@@ -4257,6 +4263,9 @@ implicit none
         ENDDO  
         this%h1D_RootAR_ptc(nptc)          = 0._r8
         this%h1D_RootLenPerPlant_ptc(nptc) = 0._r8
+        DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+          this%h2D_RootSegBaseDepth_ptc(nptc,NR)=RootSegBaseDepth_raxes(NR,NZ,NY,NX)
+        ENDDO
         DO L=1,JZ
           this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)-RootCO2Autor_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4301,7 +4310,7 @@ implicit none
           this%h2D_Root2ndStrutN_pvr(nptc,L) = 0._r8
           this%h2D_Root2ndStrutP_pvr(nptc,L) = 0._r8
           this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
-          this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_rpvr(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_RootKond2H2O_pvr(nptc,L)= safe_adb(1._r8,RootResist4H2O_pvr(ipltroot,L,NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX))*1.e7/3600._r8
 
@@ -4314,7 +4323,7 @@ implicit none
             this%h2D_Root2ndStrutN_pvr(nptc,L)=this%h2D_Root2ndStrutN_pvr(nptc,L) + &
              RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)
             this%h2D_Root2ndStrutP_pvr(nptc,L)=this%h2D_Root2ndStrutP_pvr(nptc,L) + &
-             RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
+             RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)            
           ENDDO
           this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L)/DVOLL
           this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L)/DVOLL

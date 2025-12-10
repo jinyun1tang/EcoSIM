@@ -122,9 +122,9 @@ module RootGasMod
     iPlantCalendar_brch       => plt_pheno%iPlantCalendar_brch           ,& !input  :plant growth stage, [-]
     RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft         ,& !input  :power function of root porosity used to calculate root gaseous diffusivity, [-]
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !input  :root layer diameter primary axes, [m]
-    Root2ndEffLen4uptk_rpvr      => plt_morph%Root2ndEffLen4uptk_rpvr          ,& !input  :root layer average length, [m]
+    Root2ndEffLen4uptk_rpvr   => plt_morph%Root2ndEffLen4uptk_rpvr       ,& !input  :root layer average length, [m]
     RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr              ,& !input  :root layer volume air, [m2 d-2]
-    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr           ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr        ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
@@ -136,14 +136,14 @@ module RootGasMod
     RootO2Uptk_pvr            => plt_rbgc%RootO2Uptk_pvr                 ,& !inoput :aqueous O2 flux from roots to root water, [g d-2 h-1]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr         ,& !inoput :O2 constraint to root respiration (0-1), [-]
     REcoUptkSoilO2M_vr        => plt_rbgc%REcoUptkSoilO2M_vr             ,& !inoput :total O2 sink, [g d-2 t-1]
-    RCO2Emis2Root_rpvr         => plt_rbgc%RCO2Emis2Root_rpvr              ,& !inoput :aqueous CO2 flux from roots to root water, [g d-2 h-1]
+    RCO2Emis2Root_rpvr        => plt_rbgc%RCO2Emis2Root_rpvr             ,& !inoput :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     trcg_air2root_flx_pvr     => plt_rbgc%trcg_air2root_flx_pvr          ,& !inoput :gaseous tracer flux through roots, [g d-2 h-1]
     trcg_Root_gas2aqu_flx_vr  => plt_rbgc%trcg_Root_gas2aqu_flx_vr       ,& !inoput :dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
     RootUptkSoiSol_pvr        => plt_rbgc%RootUptkSoiSol_pvr             ,& !inoput :aqueous CO2 flux from roots to soil water, [g d-2 h-1]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr                ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr                ,& !inoput :root aqueous content, [g d-2]
     RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr             ,& !inoput :root respiration released to soil, [gC d-2 h-1]
-    RootCO2Ar2RootX_rpvr      => plt_rbgc%RootCO2Ar2RootX_rpvr            ,& !inoput :root respiration released to root, [gC d-2 h-1]
+    RootCO2Ar2RootX_rpvr      => plt_rbgc%RootCO2Ar2RootX_rpvr           ,& !inoput :root respiration released to root, [gC d-2 h-1]
     RootO2_TotSink_pvr        => plt_bgcr%RootO2_TotSink_pvr             ,& !output :root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
     RootGasConductance_rpvr   => plt_rbgc%RootGasConductance_rpvr         & !output :Conductance for gas diffusion [m3 d-2 h-1]
   )
@@ -185,9 +185,9 @@ module RootGasMod
     
     ROXYLX                = -RO2AquaSourcePrev_vr(L)*FOXYX*dts_gas   !>0 into dissolved phase
     RootOxyDemandPerPlant = RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)*oscal
-!
-!     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
-!
+    !
+    !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
+    !
     do idg=idg_beg,idg_NH3
       GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas_pft(N,NZ)
       SolDifc_tscaled(idg) = SoluteDifusvty_vr(idg,L)*dts_gas*FOXYX
@@ -201,7 +201,7 @@ module RootGasMod
 !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar[m]
-      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_rpvr(N,L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
+      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_rpvr(L,NZ))*PICON*Root1stRadius_pvr(N,L,NZ)**2/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar, [m]
       RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
       
