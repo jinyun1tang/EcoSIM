@@ -830,7 +830,7 @@ implicit none
   case (2)
     strval='Deep root profile, like trees'
   case (3)
-    strval='IVery deep tap root profile'  
+    strval='Very deep tap root profile'  
   case default
     strval='Not defined'
   end select
@@ -882,13 +882,13 @@ implicit none
 
   select case(iPlantPhenolType_pft(NZ,NY,NX))
   case (iphenotyp_evgreen)
-    write(strval,'(A,X,I3)')'Evergreen',iPlantPhenolType_pft(NZ,NY,NX)
+    write(strval,'(A,I3)')'Evergreen ',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_coldecid)
-    write(strval,'(A,X,I3)')'Cold deciduous',iPlantPhenolType_pft(NZ,NY,NX)
+    write(strval,'(A,I3)')'Cold deciduous ',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_drouhtdecidu)
-    write(strval,'(A,X,I3)')'Drought deciduous',iPlantPhenolType_pft(NZ,NY,NX)
+    write(strval,'(A,I3)')'Drought deciduous ',iPlantPhenolType_pft(NZ,NY,NX)
   case (iphenotyp_coldroutdecid)
-    write(strval,'(A,X,I3)')'Cold&drought-tolerant deciduous',iPlantPhenolType_pft(NZ,NY,NX)
+    write(strval,'(A,I3)')'Cold&drought-tolerant deciduous ',iPlantPhenolType_pft(NZ,NY,NX)
   case default
     strval='Not defined'
   end select
@@ -957,17 +957,17 @@ implicit none
   call writefixsl(nu_plt,'MY   : Mycorrhizal association MY',strval,60,id)
   
   if(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<0 .or. PlantInitThermoAdaptZone_pft(NZ,NY,NX)>ithermozone_tropical)then
-    write(strval,'(A,X,F6.2)')'Not defined',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Not defined ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   elseif(PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_arcboreal)then
-    write(strval,'(A,X,F6.2)')'Arctic, boreal',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Arctic, boreal ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_cooltempr)then
-    write(strval,'(A,X,F6.2)')'Cool temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Cool temperate ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_warmtempr)then
-    write(strval,'(A,X,F6.2)')'Warm temperate',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Warm temperate ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_subtropic)then
-    write(strval,'(A,X,F6.2)')'Subtropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Subtropical ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   elseif (PlantInitThermoAdaptZone_pft(NZ,NY,NX)<=ithermozone_tropical)then
-    write(strval,'(A,X,F6.2)')'Tropical',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
+    write(strval,'(A,F6.2)')'Tropical ',PlantInitThermoAdaptZone_pft(NZ,NY,NX)
   endif
   id=addone(id)
   call writefixsl(nu_plt,'ZTYPI: Growing season thermal adaptation zone',strval,60,id)
@@ -1120,8 +1120,10 @@ implicit none
   call writefixl(nu_plt,id,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
-  id=addone(id)
-  call writefixl(nu_plt,id,'ROOMTAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
+  if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
+    id=addone(id)
+    call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
+  endif
   id=addone(id)  
   call writefixl(nu_plt,id,'PR','Nonstructural C concentration needed for root'// &
     ' branching (gC/gC)',MinNonstC2InitRoot_pft(NZ,NY,NX),105)
@@ -1549,7 +1551,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'VCMX4', VmaxPEPCarboxyRef_tab)
   call ncd_getvar(pft_nfid, 'XKCO2', XKCO2_tab)
   call ncd_getvar(pft_nfid, 'XKO2',  XKO2_tab)
-  call ncd_getvar(pft_nfid, 'ROOTAGE', RootMatureAge_tab)
+  call ncd_getvar(pft_nfid, 'ROOTMAGE', RootMatureAge_tab)
   call ncd_getvar(pft_nfid, 'XKCO24',Km4PEPCarboxy_tab)
   call ncd_getvar(pft_nfid, 'RUBP', LeafRubisco2Protein_tab)
   call ncd_getvar(pft_nfid, 'PEPC', LeafPEP2Protein_tab)

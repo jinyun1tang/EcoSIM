@@ -350,7 +350,7 @@ module grosubsMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
     Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr            ,& !output :root layer number primary axes, [d-2]
-    RootPrimeAxsNum_pft         => plt_morph%RootPrimeAxsNum_pft          ,& !output :primary root axes number, [d-2]
+    RootNumPrimeAxes_pft         => plt_morph%RootNumPrimeAxes_pft          ,& !output :primary root axes number, [d-2]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
@@ -367,7 +367,7 @@ module grosubsMod
 
 
   D6: DO L=1,NK
-    Root1stXNumL_rpvr(L,NZ)  = 0._r8  
+    Root1stXNumL_rpvr(L,NZ)      = 0._r8  
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
       Root2ndXNumL_rpvr(N,L,NZ)  = 0._r8
@@ -445,9 +445,9 @@ module grosubsMod
   !     8.3143,710.0=gas constant,enthalpy
   !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
   !
-  TKCM=real_truncate(TKC_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
-
-  TFN5=calc_plant_maint_tempf(TKCM)  
+  TKCM = real_truncate(TKC_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
+  TFN5 = calc_plant_maint_tempf(TKCM)
+  
   D7: DO L=NU,MaxNumRootLays
     TKSM       = real_truncate(TKS_vr(L)+TempOffset_pft(NZ),1.e-3_r8)
     TFN6_vr(L) = calc_plant_maint_tempf(TKSM)
@@ -457,10 +457,10 @@ module grosubsMod
   !
   !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
   !     WTRT,PP=root mass,PFT population
-  !     RootPrimeAxsNum_pft=multiplier for number of primary root axes
-  !
+  !     RootNumPrimeAxes_pft=multiplier for number of primary root axes
+  !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
   RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-  RootPrimeAxsNum_pft(NZ)   = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  RootNumPrimeAxes_pft(NZ)  = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
 
   !
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION

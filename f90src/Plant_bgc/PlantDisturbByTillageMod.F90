@@ -22,7 +22,7 @@ contains
   character(len=*), parameter :: subname='RemoveShootByTillage'
   real(r8) :: XHVST1
   real(r8) :: WVPLT
-  integer :: M,NB,NE,K,L
+  integer :: M,NB,NE,K,L,NR
   real(r8) :: FDM,VOLWPX  
   real(r8) :: dNonstLitr,dFoliarLitr,dNonFoliar  
   associate(                                                               &
@@ -41,6 +41,7 @@ contains
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     iYearCurrent                => plt_site%iYearCurrent                  ,& !input  :current year,[-]
+    NumPrimeRootAxes_pft        => plt_morph%NumPrimeRootAxes_pft         ,& !input: root primary axis number,[-]  
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col               ,& !inoput :total subsurface water flux, [m3 d-2]
@@ -57,6 +58,9 @@ contains
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
     CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft            ,& !inoput :canopy active stalk C, [g d-2]
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch       ,& !inoput :flag to detect branch death, [-]
+    RootSegBaseDepth_raxes      => plt_morph%RootSegBaseDepth_raxes       ,& !inoput : base depth of different root axes, [m]
+    Root1stDepz_raxes           => plt_morph%Root1stDepz_raxes            ,& !inoput : root layer depth, [m]    
+    MaxNumRootAxes              => pltpar%MaxNumRootAxes                  ,& !input  : maximum number root axes,[-]
     LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
     CanopyNodulNonstElms_brch   => plt_biom%CanopyNodulNonstElms_brch     ,& !inoput :branch nodule nonstructural element, [g d-2]
     CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch          ,& !inoput :branch nonstructural element, [g d-2]
@@ -80,7 +84,7 @@ contains
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
     SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch            ,& !inoput :branch grain number, [d-2]
-    PetoleProteinC_node     => plt_biom%PetoleProteinC_node       ,& !inoput :layer sheath protein C, [g d-2]
+    PetoleProteinC_node         => plt_biom%PetoleProteinC_node           ,& !inoput :layer sheath protein C, [g d-2]
     PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !output :flag for stand replacing disturbance,[-]
@@ -256,9 +260,14 @@ contains
     iPlantRootState_pft(NZ)   = iDead
     iPlantShootState_pft(NZ)  = iDead
     iPlantState_pft(NZ)       = iDead
-    jHarvstType_pft(NZ)           = jharvtyp_terminate
+    jHarvstType_pft(NZ)       = jharvtyp_terminate
     iDayPlantHarvest_pft(NZ)  = I
     iYearPlantHarvest_pft(NZ) = iYearCurrent
+    NumPrimeRootAxes_pft(NZ)  = 0._r8
+    DO NR=1,MaxNumRootAxes
+      RootSegBaseDepth_raxes(NR,NZ) = 0._r8
+      Root1stDepz_raxes(NR,NZ)      = 0._r8
+    ENDDO            
   ENDIF
   call PrintInfo('end '//subname)
   end associate

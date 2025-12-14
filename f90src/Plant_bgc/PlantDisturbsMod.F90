@@ -324,15 +324,19 @@ module PlantDisturbsMod
   real(r8), intent(out) :: HarvestElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8) :: TotalElmntRemoval(NumPlantChemElms)
-  integer :: NE
+  integer :: NE,NR
 !     begin_execution
-  associate(                                                       &
-    iHarvstType_pft         => plt_distb%iHarvstType_pft          ,& !input  :type of harvest,[-]
+  associate(                                                       &  
+    iHarvstType_pft         => plt_distb%iHarvstType_pft          ,& !input  :type of harvest,[-]    
     jHarvstType_pft         => plt_distb%jHarvstType_pft          ,& !input  :flag for stand replacing disturbance,[-]
+    MaxNumRootAxes          => pltpar%MaxNumRootAxes              ,& !input  : maximum number root axes,[-]
+    NumPrimeRootAxes_pft    => plt_morph%NumPrimeRootAxes_pft     ,& !input: root primary axis number,[-]  
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft  ,& !inoput :plant element harvest, [g d-2 ]
     EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col  ,& !inoput :ecosystem harvest element, [gC d-2]
-    PlantElmDistLoss_pft    => plt_distb%PlantElmDistLoss_pft     ,& !inoput :plant loss to disturbance,    [g d-2 h-1]    
+    PlantElmDistLoss_pft    => plt_distb%PlantElmDistLoss_pft     ,& !inoput :plant loss to disturbance,    [g d-2 h-1]   
+    RootSegBaseDepth_raxes  => plt_morph%RootSegBaseDepth_raxes   ,& !inoput : base depth of different root axes, [m]
+    Root1stDepz_raxes       => plt_morph%Root1stDepz_raxes        ,& !inoput : root layer depth, [m]    
     Eco_NBP_CumYr_col       => plt_bgcr%Eco_NBP_CumYr_col          & !inoput :total NBP, [g d-2]
   )
 !
@@ -383,7 +387,11 @@ module PlantDisturbsMod
         DO NE=1,NumPlantChemElms
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
-
+        NumPrimeRootAxes_pft(NZ) =0 
+        DO NR=1,MaxNumRootAxes
+          RootSegBaseDepth_raxes(NR,NZ) = 0._r8
+          Root1stDepz_raxes(NR,NZ)      = 0._r8
+        ENDDO
         !other
       ELSE
         !harvested
@@ -393,7 +401,12 @@ module PlantDisturbsMod
               PlantElmDistLoss_pft(NE,NZ) = PlantElmDistLoss_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)
               SeasonalNonstElms_pft(NE,NZ)=0._r8
             endif
-          ENDDO  
+          ENDDO
+          NumPrimeRootAxes_pft(NZ) =0 
+          DO NR=1,MaxNumRootAxes
+            RootSegBaseDepth_raxes(NR,NZ) = 0._r8
+            Root1stDepz_raxes(NR,NZ)      = 0._r8
+          ENDDO            
         ENDIF
 
         DO NE=1,NumPlantChemElms
@@ -597,7 +610,7 @@ module PlantDisturbsMod
         PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
         !terminate and reseed        
       ELSE
-!     PPI_pft(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
+        ! PPI_pft(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
         PPX_pft(NZ)             = PPI_pft(NZ)
         PlantPopulation_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
       ENDIF

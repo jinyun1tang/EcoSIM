@@ -1303,7 +1303,7 @@ implicit none
   real(r8) :: WTNDLE,FXEPOOLN
   real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
-  real(r8) :: FXWTRTD,FXWSRTL,FRootPrimeAxsNum_pft,FXRTNL,FXRTLGP,FXRTDNP
+  real(r8) :: FXWTRTD,FXWSRTL,FRootNumPrimeAxes_pft,FXRTNL,FXRTLGP,FXRTDNP
   real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootAreaPerPlant_pvr,FXRTLGA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
@@ -1408,9 +1408,9 @@ implicit none
           Root1stLen_rpvr(L0,NR,NZ,NY,NX) = Root1stLen_rpvr(L0,NR,NZ,NY,NX)-FXRTLG1
         ENDDO
 
-        FRootPrimeAxsNum_pft           = FRO*Root1stXNumL_rpvr(L0,NZ,NY,NX)
-        Root1stXNumL_rpvr(L1,NZ,NY,NX) = Root1stXNumL_rpvr(L1,NZ,NY,NX)+FRootPrimeAxsNum_pft
-        Root1stXNumL_rpvr(L0,NZ,NY,NX) = Root1stXNumL_rpvr(L0,NZ,NY,NX)-FRootPrimeAxsNum_pft
+        FRootNumPrimeAxes_pft           = FRO*Root1stXNumL_rpvr(L0,NZ,NY,NX)
+        Root1stXNumL_rpvr(L1,NZ,NY,NX) = Root1stXNumL_rpvr(L1,NZ,NY,NX)+FRootNumPrimeAxes_pft
+        Root1stXNumL_rpvr(L0,NZ,NY,NX) = Root1stXNumL_rpvr(L0,NZ,NY,NX)-FRootNumPrimeAxes_pft
 
         DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3

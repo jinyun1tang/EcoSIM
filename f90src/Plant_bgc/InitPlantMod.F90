@@ -956,7 +956,7 @@ module InitPlantMod
   plt_rbgc%RootN2Fix_pft(NZ)       = 0._r8
   DO NR=1,MaxNumRootAxes
     plt_morph%RootSegBaseDepth_raxes(NR,NZ)                = SeedDepth_pft(NZ)
-    plt_morph%Root1stDepz_pft(NR,NZ)                       = SeedDepth_pft(NZ)
+    plt_morph%Root1stDepz_raxes(NR,NZ)                       = SeedDepth_pft(NZ)
     plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ) = 0._r8    
   ENDDO      
 
@@ -1017,8 +1017,9 @@ module InitPlantMod
 
     plt_morph%Root1stXNumL_rpvr(L,NZ)                      = 0._r8  
     DO NR=1,MaxNumRootAxes
-      plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8      
-      plt_morph%Root1stLen_rpvr(L,NR,NZ)                             = 0._r8          
+      plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
+      plt_morph%Root1stLen_rpvr(L,NR,NZ)                             = 0._r8
+      plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
 
     D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs

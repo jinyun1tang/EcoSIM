@@ -94,7 +94,7 @@ module UptakesMod
     PlantPopu_col             => plt_site%PlantPopu_col            ,& !input  :total plant population, [plants d-2]
     PlantPopulation_pft       => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
     PrecIntcptByCanopy_pft    => plt_ew%PrecIntcptByCanopy_pft     ,& !input  :water flux into canopy, [m3 d-2 h-1]
-    Root1stDepz_pft           => plt_morph%Root1stDepz_pft         ,& !input  :root layer depth, [m]
+    Root1stDepz_raxes           => plt_morph%Root1stDepz_raxes         ,& !input  :root layer depth, [m]
     SeedDepth_pft             => plt_morph%SeedDepth_pft           ,& !input  :seeding depth, [m]
     TKC_pft                   => plt_ew%TKC_pft                    ,& !input  :canopy temperature, [K]
     TairK                     => plt_ew%TairK                      ,& !input  :air temperature, [K]
@@ -142,7 +142,7 @@ module UptakesMod
       else
         HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
           .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
-          .AND.(Root1stDepz_pft(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
+          .AND.(Root1stDepz_raxes(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))              &  !active root
           .and. CanopyMassC>0._r8
       endif
 
@@ -431,7 +431,7 @@ module UptakesMod
     NumPrimeRootAxes_pft         => plt_morph%NumPrimeRootAxes_pft          ,& !input  :root primary axis number,[-]
     PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
-    Root1stDepz_pft         => plt_morph%Root1stDepz_pft          ,& !input  :root layer depth, [m]
+    Root1stDepz_raxes         => plt_morph%Root1stDepz_raxes          ,& !input  :root layer depth, [m]
     Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
     Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
@@ -454,7 +454,7 @@ module UptakesMod
       !obtain plant rooting depth
       RootDepZ=0.0_r8
       D2005: DO NR=1,NumPrimeRootAxes_pft(NZ)
-        RootDepZ=AMAX1(RootDepZ,Root1stDepz_pft(NR,NZ))
+        RootDepZ=AMAX1(RootDepZ,Root1stDepz_raxes(NR,NZ))
       ENDDO D2005
 
       IF(L.EQ.NU)THEN

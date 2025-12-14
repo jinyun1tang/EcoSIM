@@ -618,12 +618,13 @@ implicit none
 
     DO NR=1,pltpar%MaxNumRootAxes
       NRoot1stTipLay_raxes(NR,NZ,NY,NX) = plt_morph%NRoot1stTipLay_raxes(NR,NZ)
-      Root1stDepz_pft(NR,NZ,NY,NX)      = plt_morph%Root1stDepz_pft(NR,NZ)      
+      Root1stDepz_raxes(NR,NZ,NY,NX)      = plt_morph%Root1stDepz_raxes(NR,NZ)      
       RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ)
       
       DO L=1,NK_col(NY,NX)
-        RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ)      
+        RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ)
         Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = plt_morph%Root1stLen_rpvr(L,NR,NZ)
+        RootAge_rpvr(L,NR,NZ,NY,NX)                                 = plt_morph%RootAge_rpvr(L,NR,NZ)
         DO N=1,Myco_pft(NZ,NY,NX)
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
           Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                               = plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)
@@ -1411,7 +1412,8 @@ implicit none
       DO L=1,NK_col(NY,NX)
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = &
           RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX)      
-        plt_morph%Root1stLen_rpvr(L,NR,NZ)       = Root1stLen_rpvr(L,NR,NZ,NY,NX)          
+        plt_morph%Root1stLen_rpvr(L,NR,NZ)       = Root1stLen_rpvr(L,NR,NZ,NY,NX)      
+        plt_morph%RootAge_rpvr(L,NR,NZ) = RootAge_rpvr(L,NR,NZ,NY,NX)    
         DO N=1,Myco_pft(NZ,NY,NX)
           plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)                              = Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)                            = Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)
@@ -1419,7 +1421,7 @@ implicit none
             RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
         enddo
       enddo
-      plt_morph%Root1stDepz_pft(NR,NZ)    = Root1stDepz_pft(NR,NZ,NY,NX)      
+      plt_morph%Root1stDepz_raxes(NR,NZ)    = Root1stDepz_raxes(NR,NZ,NY,NX)      
       plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ) = RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX)      
     enddo
     

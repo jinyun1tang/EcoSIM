@@ -734,7 +734,7 @@ module StartqMod
 
   DO NR=1,MaxNumRootAxes
     RootSegBaseDepth_raxes(NR,NZ,NY,NX)                 = SeedDepth_pft(NZ,NY,NX)
-    Root1stDepz_pft(NR,NZ,NY,NX)                        = SeedDepth_pft(NZ,NY,NX)
+    Root1stDepz_raxes(NR,NZ,NY,NX)                        = SeedDepth_pft(NZ,NY,NX)
     RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = 0._r8
   ENDDO  
 
@@ -801,8 +801,9 @@ module StartqMod
     ENDDO D40
     Root1stXNumL_rpvr(L,NZ,NY,NX)             = 0._r8      
     DO NR=1,MaxNumRootAxes
-      RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8      
-      Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = 0._r8          
+      RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
+      Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = 0._r8
+      RootAge_rpvr(L,NR,NZ,NY,NX)                                 = 0._r8
     ENDDO
     D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
       DO  M=1,jskenc

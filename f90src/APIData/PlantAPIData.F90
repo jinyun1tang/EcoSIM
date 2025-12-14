@@ -223,15 +223,16 @@ implicit none
   real(r8), pointer :: Root2ndMaxRadius1_pft(:,:)      => null() !root diameter secondary axes,                                               [m]
   real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [g]
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8), pointer :: Root1stLen_rpvr(:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
+  real(r8), pointer :: Root1stLen_rpvr(:,:,:)          => null() !root layer length primary axes,                                             [m d-2]
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
+  real(r8), pointer :: RootAge_rpvr(:,:,:)             => null() !root age, [h]
   real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
   real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !fine root length per plant, [m p-1]
   real(r8), pointer :: Root2ndEffLen4uptk_rpvr(:,:,:)  => null() !Layer effective root length four resource uptake, [m]
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
-  real(r8), pointer :: Root1stDepz_pft(:,:)          => null() !root layer depth,                                                           [m]
+  real(r8), pointer :: Root1stDepz_raxes(:,:)          => null() !root layer depth,                                                           [m]
   real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
@@ -314,7 +315,7 @@ implicit none
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_rpvr(:,:)        => null() !root layer number primary axes,       [d-2]
-  REAL(R8), POINTER :: RootPrimeAxsNum_pft(:)              => null() !primary root axes number, [d-2]
+  REAL(R8), POINTER :: RootNumPrimeAxes_pft(:)              => null() !primary root axes number, [d-2]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)         => null() !root layer number axes,               [d-2]
   real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:) => null() !layer root length density,            [m m-3]
   real(r8), pointer :: RootPoreVol_rpvr(:,:,:)        => null() !root layer volume air,                [m2 d-2]
@@ -1962,7 +1963,7 @@ implicit none
   allocate(this%Root1stMaxRadius_pft(jroots,JP1));this%Root1stMaxRadius_pft=spval
   allocate(this%Root2ndMaxRadius_pft(jroots,JP1));this%Root2ndMaxRadius_pft=spval
 
-  allocate(this%Root1stDepz_pft(MaxNumRootAxes,JP1));this%Root1stDepz_pft=spval
+  allocate(this%Root1stDepz_raxes(MaxNumRootAxes,JP1));this%Root1stDepz_raxes=spval
   allocate(this%Root1stAxesTipDepz2Surf_pft(MaxNumRootAxes,JP1)); this%Root1stAxesTipDepz2Surf_pft=spval
   allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
@@ -1970,6 +1971,7 @@ implicit none
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval
   allocate(this%Root2ndSpecLen_pft(jroots,JP1));this%Root2ndSpecLen_pft=spval
   allocate(this%Root1stLen_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stLen_rpvr=spval
+  allocate(this%RootAge_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootAge_rpvr=spval
   allocate(this%Root2ndLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndLen_rpvr=spval
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=spval
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
@@ -1978,7 +1980,7 @@ implicit none
   allocate(this%KLeafNumber_brch(MaxNumBranches,JP1));this%KLeafNumber_brch=0
   allocate(this%NumOfLeaves_brch(MaxNumBranches,JP1));this%NumOfLeaves_brch=spval
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
-  allocate(this%RootPrimeAxsNum_pft(JP1)); this%RootPrimeAxsNum_pft=0._r8
+  allocate(this%RootNumPrimeAxes_pft(JP1)); this%RootNumPrimeAxes_pft=0._r8
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
