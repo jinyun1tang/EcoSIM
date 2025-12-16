@@ -53,7 +53,7 @@ implicit none
 !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 !     Hours2LeafOut_brch=hourly leafout counter
-!     RubiscoActivity_brch,C4PhotosynDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
+!     RubiscoActivity_brch,GrainFillDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
 !     doInitLeafOut_brch,doPlantLeafOut_brch=flag for initializing,enabling leafout
 !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
 !     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of LitrFall
@@ -637,7 +637,7 @@ implicit none
     StandDeadKCompElms_pft            => plt_biom%StandDeadKCompElms_pft              ,& !inoput :standing dead element fraction, [g d-2]
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
     BranchNumerID_brch                => plt_morph%BranchNumerID_brch                 ,& !output :branch meric id, [-]
-    C4PhotosynDowreg_brch             => plt_photo%C4PhotosynDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch             => plt_photo%GrainFillDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
     Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch                 ,& !output :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
     Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch                 ,& !output :cold requirement for autumn leafoff/hardening, [h]
@@ -680,7 +680,7 @@ implicit none
       Hours2LeafOut_brch(NB,NZ)                = 0.0_r8
       HourFailGrainFill_brch(NB,NZ)            = 0.0_r8
       RubiscoActivity_brch(NB,NZ)              = 1.0_r8
-      C4PhotosynDowreg_brch(NB,NZ)             = 1.0_r8
+      GrainFillDowreg_brch(NB,NZ)             = 1.0_r8
       doInitLeafOut_brch(NB,NZ)                = iEnable
       doPlantLeafOut_brch(NB,NZ)               = iDisable
       doPlantLeaveOff_brch(NB,NZ)              = iEnable

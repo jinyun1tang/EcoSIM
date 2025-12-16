@@ -389,8 +389,8 @@ module grosubsMod
 !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0                      & !'Rapid, like deciduous tree '
+    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))) &
     .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
     FracShootLeafAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8

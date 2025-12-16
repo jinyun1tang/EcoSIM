@@ -100,7 +100,7 @@ implicit none
   real(r8), pointer :: XKCO2_pft(:)                         => null()  !Km for rubisco carboxylase activity,                                       [uM]
   real(r8), pointer :: XKO2_pft(:)                          => null()  !Km for rubisco oxygenase activity,                                         [uM]
   real(r8), pointer :: RubiscoActivity_brch(:,:)            => null()   !branch down-regulation of CO2 fixation,                                   [-]
-  real(r8), pointer :: C4PhotosynDowreg_brch(:,:)           => null()   !down-regulation of C4 photosynthesis,                                     [-]
+  real(r8), pointer :: GrainFillDowreg_brch(:,:)           => null()   !down-regulation of C4 photosynthesis,                                     [-]
   real(r8), pointer :: aquCO2Intraleaf_pft(:)               => null()   !leaf aqueous CO2 concentration,                                           [uM]
   real(r8), pointer :: O2I_pft(:)                           => null()   !leaf gaseous O2 concentration,                                            [umol m-3]
   real(r8), pointer :: LeafIntracellularCO2_pft(:)          => null()   !leaf gaseous CO2 concentration,                                           [umol m-3]
@@ -1824,7 +1824,7 @@ implicit none
   allocate(this%XKCO2_pft(JP1));this%XKCO2_pft=spval
   allocate(this%XKO2_pft(JP1));this%XKO2_pft=spval
   allocate(this%RubiscoActivity_brch(MaxNumBranches,JP1));this%RubiscoActivity_brch=1._r8
-  allocate(this%C4PhotosynDowreg_brch(MaxNumBranches,JP1));this%C4PhotosynDowreg_brch=spval
+  allocate(this%GrainFillDowreg_brch(MaxNumBranches,JP1));this%GrainFillDowreg_brch=spval
   allocate(this%aquCO2Intraleaf_pft(JP1));this%aquCO2Intraleaf_pft=spval
   allocate(this%Km4LeafaqCO2_pft(JP1));this%Km4LeafaqCO2_pft=spval
   allocate(this%Km4RubiscoCarboxy_pft(JP1));this%Km4RubiscoCarboxy_pft=spval

@@ -487,7 +487,7 @@
     LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch                ,& !input  :leaf element, [g d-2]
     ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft                    ,& !input  :threshold zero for plang growth calculation, [-]
     CanopyLeafArea_lnode            => plt_morph%CanopyLeafArea_lnode             ,& !input  :layer/node/branch leaf area, [m2 d-2]
-    C4PhotosynDowreg_brch           => plt_photo%C4PhotosynDowreg_brch            ,& !input  :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch           => plt_photo%GrainFillDowreg_brch            ,& !input  :down-regulation of C4 photosynthesis, [-]
     LeafC4Chl2Protein_pft           => plt_photo%LeafC4Chl2Protein_pft            ,& !input  :leaf C4 chlorophyll content, [gC gC-1]
     O2L_pft                         => plt_photo%O2L_pft                          ,& !input  :leaf aqueous O2 concentration, [uM]
     aquCO2Intraleaf_pft             => plt_photo%aquCO2Intraleaf_pft              ,& !input  :leaf aqueous CO2 concentration, [uM]
@@ -530,7 +530,7 @@
   CC4M                                  = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCMesophyll))
   CCBS                                  = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCBundlSheath))
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI_pepcarboxy)
-  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
+  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !
 !     SURFICIAL DENSITY OF LeafPEP2Protein_pftAND ITS LeafC3Chl2Protein_pftOROPHYLL
 !
@@ -806,7 +806,7 @@
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch     ,& !input  :flag to detect branch death, [-]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     RubiscoActivity_brch      => plt_photo%RubiscoActivity_brch       ,& !inoput :branch down-regulation of CO2 fixation, [-]
-    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch       & !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch      => plt_photo%GrainFillDowreg_brch        & !output :grain fill down-regulation of annual plants, [-]
   )
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
@@ -847,12 +847,12 @@
 !     HourFailGrainFill_brch=number of hours with no grain fill after start of grain fill
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
-  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
-    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
+    GrainFillDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
   ELSE
-    C4PhotosynDowreg_brch(NB,NZ)=1.0_r8
+    GrainFillDowreg_brch(NB,NZ)=1.0_r8
   ENDIF
-  RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
+  RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !
 !     FOR EACH NODE
 !
@@ -980,7 +980,7 @@
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     Vmax4RubiscoCarboxy_node    => plt_photo%Vmax4RubiscoCarboxy_node     ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     RubiscoActivity_brch        => plt_photo%RubiscoActivity_brch         ,& !output :branch down-regulation of CO2 fixation, [-]
-    C4PhotosynDowreg_brch       => plt_photo%C4PhotosynDowreg_brch        ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch       => plt_photo%GrainFillDowreg_brch        ,& !output :down-regulation of C4 photosynthesis, [-]
     Vmax4PEPCarboxy_node        => plt_photo%Vmax4PEPCarboxy_node         ,& !output :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft   & !output :canopy minimum stomatal resistance, [s m-1]
   )
@@ -1007,7 +1007,7 @@
 
     ELSE
       RubiscoActivity_brch(NB,NZ)  = 0.0_r8
-      C4PhotosynDowreg_brch(NB,NZ) = 1.0_r8
+      GrainFillDowreg_brch(NB,NZ) = 1.0_r8
       DO K=1,MaxNodesPerBranch1
         Vmax4PEPCarboxy_node(K,NB,NZ)     = 0.0_r8
         Vmax4RubiscoCarboxy_node(K,NB,NZ) = 0.0_r8

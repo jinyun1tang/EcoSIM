@@ -18,6 +18,8 @@ module PlantNonstElmDynMod
   public :: SeasonStoreShootTransfer
   public :: StalkRsrvShootNonstTransfer
   public :: StalkRsrvRootNonstTransfer
+  public :: RepleteLowSeaStorByRoot
+  public :: RepleteSeaStoreByStalk
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -764,6 +766,131 @@ module PlantNonstElmDynMod
   ENDDO
   end associate
   end subroutine SumReserveBiomass
+!----------------------------------------------------------------------------------------------------
+
+  subroutine RepleteLowSeaStorByRoot(I,J,N,L,NZ)
+  implicit none  
+  integer, intent(in) :: I,J,N,L,NZ
+  real(r8) :: FWTRT
+  real(r8) :: WTRTTX
+  real(r8) :: WTRVCX
+  real(r8) :: WTRTLX
+  real(r8) :: WTRTTT
+  real(r8) :: NonstElmGradt
+  real(r8) :: POOLEX
+  real(r8) :: XFRC,CPOOLT
+  integer :: NE
+  character(len=*), parameter :: subname='RepleteLowSeaStorByRoot'
+
+  associate(                                                              &
+    RootElms_pft              => plt_biom%RootElms_pft                   ,& !input  :plant root element mass, [g d-2]
+    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
+    RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr        ,& !input  :root layer structural C, [gC d-2]
+    NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft          ,& !input  :maximum soil layer number for all root axes, [-]    
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr         ,& !inoput :root layer nonstructural element, [g d-2]
+    SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft           & !inoput :plant stored nonstructural element at current step, [g d-2]
+  )
+  !     Note, 03/28/2024, Jinyun Tang: I need to take a careful look at the following code, particularly for WTRTLX and WTRTTX,
+  !     which are essentially the same. However, assuming the flux is driven by C concentration of the seasonal storage
+  !     and the nonstructural biomass in root, then WTRTTX should be defined with stalk volume.
+  !     Question: where is seasonal storage located?
+  !
+
+  call PrintInfo('beg '//subname)
+  IF(L.LE.NMaxRootBotLayer_pft(NZ))THEN   !within the root zone
+    IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &                      !has active root or mycorrhizae biomass
+      .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ)     &                      !root has sufficient biomass
+      .AND. SeasonalNonstElms_pft(ielmc,NZ).LT.XFRX*RootElms_pft(ielmc,NZ))THEN     !seasonal C storage is less than remobilizable root C
+      FWTRT         = RootMycoActiveBiomC_pvr(N,L,NZ)/RootElms_pft(ielmc,NZ)
+      WTRTLX        = RootMycoActiveBiomC_pvr(N,L,NZ)
+      WTRTTX        = RootElms_pft(ielmc,NZ)*FWTRT
+      WTRTTT        = WTRTLX+WTRTTX
+      POOLEX        = AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
+      WTRVCX        = AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FWTRT)
+      NonstElmGradt = (WTRVCX*WTRTLX-POOLEX*WTRTTX)/WTRTTT
+      !root storage -> seasonal storage
+      XFRC                                 = XFRY*AZMIN1(NonstElmGradt)
+      RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)+XFRC
+      SeasonalNonstElms_pft(ielmc,NZ)      = SeasonalNonstElms_pft(ielmc,NZ)-XFRC
+
+      CPOOLT=WTRTLX+RootElms_pft(ielmc,NZ)
+
+      DO NE=2,NumPlantChemElms
+        POOLEX                            = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
+        WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FWTRT)
+        !achor for seasonal storage is root, anchor for rootmyo is rootmyco actB
+        NonstElmGradt                     = (WTRVCX*WTRTLX-POOLEX*WTRTTX)/CPOOLT
+        XFRC                              = XFRY*AZMIN1(NonstElmGradt)
+        RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+XFRC
+        SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRC
+      ENDDO
+    ENDIF
+  ENDIF
+  call PrintInfo('end '//subname)
+  end associate      
+  end subroutine RepleteLowSeaStorByRoot      
+!----------------------------------------------------------------------------------------------------
+
+  subroutine RepleteSeaStoreByStalk(I,J,NB,NZ)
+ 
+  implicit none
+  integer, intent(in) :: I,J,NB,NZ
+  real(r8) :: NonstElmGradt
+  real(r8) :: FracCanopyCinStalk
+  real(r8) :: WVSTBX
+  real(r8) :: WTRTTX,WTRSBX
+  real(r8) :: WTRVCX,CPOOLT
+  real(r8) :: XFRE(1:NumPlantChemElms)
+  real(r8) :: ShootBiomC_brch
+  integer :: NE
+  character(len=*), parameter :: subname='RepleteSeaStoreByStalk'
+  
+  !   SapwoodBiomassC_brch,WVSTK=stalk,total stalk sapwood mass
+  !   WTRT=total root mass
+  !   WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
+  !   XFRX=maximum storage C content for remobiln from stalk,root reserves
+  !   XFRE(ielmc)=C transfer
+  !   Q: why are nitrogen and phosphorus not transferred?
+  associate(                                                       &
+    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
+    CanopySapwoodC_pft      => plt_biom%CanopySapwoodC_pft        ,& !input  :canopy active stalk C, [g d-2]  
+    SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !inoput :plant stored nonstructural element at current step, [g d-2]    
+    SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]    
+    RootElms_pft            => plt_biom%RootElms_pft               & !input  :plant root element mass, [g d-2]
+  )
+  call PrintInfo('beg '//subname)
+  IF(SapwoodBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ)  &
+    .AND. CanopySapwoodC_pft(NZ).GT.ZERO4Groth_pft(NZ)  &
+    .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) &
+    .AND. StalkRsrvElms_brch(ielmc,NB,NZ).LE.XFRX*SapwoodBiomassC_brch(NB,NZ))THEN
+
+    FracCanopyCinStalk = SapwoodBiomassC_brch(NB,NZ)/CanopySapwoodC_pft(NZ)
+    WVSTBX             = SapwoodBiomassC_brch(NB,NZ)
+    WTRTTX             = RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
+    ShootBiomC_brch    = WVSTBX+WTRTTX
+    WTRSBX             = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+    WTRVCX             = AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FracCanopyCinStalk)
+    NonstElmGradt      = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
+    !seasonal storage -> branch non-structrual
+    XFRE(ielmc)                     = XFRY*AZMAX1(NonstElmGradt)
+    StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
+    SeasonalNonstElms_pft(ielmc,NZ) = SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
+
+    CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
+    DO NE=2,NumPlantChemElms
+      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+      WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FracCanopyCinStalk)
+      !achor for seasonal storage is root, achor for stalkrsv is sap
+      NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT
+      XFRE(NE)                          = XFRY*AZMAX1(NonstElmGradt)
+      StalkRsrvElms_brch(ielmc,NB,NZ)   = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(NE)
+      SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRE(NE)
+    ENDDO
+  ENDIF
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine RepleteSeaStoreByStalk  
 
   ![tail]
 end module PlantNonstElmDynMod

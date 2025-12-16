@@ -52,7 +52,7 @@ module PlantBGCPars
   real(r8) :: ZPLFM                               !min N:C,P:C in leaves relative to max values from PFT file, [-]
 
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
-  real(r8) :: FSTK                                !fraction of stalk area contributing to water,heat flow
+  real(r8) :: FSTK                                !fraction of stalk radius as sapwood contributing to water,heat flow
   real(r8) :: ZSTX                                !maximum stalk inner radius for tranpsiration, [m]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
   real(r8) :: SpecStalkVolume                     !specific volume (m3 gC-1)
@@ -243,7 +243,7 @@ module PlantBGCPars
   Hours4ConiferSpringDeharden = 276.9_r8
   RootElonZoneLenz            =0.03_r8
 
-  FSTK                  = 0.05_r8
+  FSTK                  = 0.05_r8         !ratio of sapwood width to stalk radius
   ZSTX                  = 1.0E-03_r8
   StalkMassDensity      = 0.225_r8
   SpecStalkVolume       = 1.0E-06_r8/StalkMassDensity

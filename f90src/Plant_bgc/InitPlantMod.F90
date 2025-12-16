@@ -484,7 +484,7 @@ module InitPlantMod
     CNRTS_pft             => plt_allom%CNRTS_pft              ,& !output :root N:C ratio x root growth yield, [-]
     CPRTS_pft             => plt_allom%CPRTS_pft              ,& !output :root P:C ratio x root growth yield, [-]
     NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft     ,& !output :soil layer at planting depth, [-]
-    NMaxRootBotLayer_pft   => plt_morph%NMaxRootBotLayer_pft    ,& !output :maximum soil layer number for all root axes, [-]
+    NMaxRootBotLayer_pft  => plt_morph%NMaxRootBotLayer_pft   ,& !output :maximum soil layer number for all root axes, [-]
     NRoot1stTipLay_raxes  => plt_morph%NRoot1stTipLay_raxes   ,& !output :maximum soil layer number for root axes, [-]
     Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft     ,& !output :specific root length primary axes, [m g-1]
     Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft    ,& !output :root cross-sectional area primary axes, [m2]
@@ -536,8 +536,8 @@ module InitPlantMod
   ENDDO D9795
   CNRTS_pft(NZ)              = rNCRoot_pft(NZ)*RootBiomGrosYld_pft(NZ)
   CPRTS_pft(NZ)              = rPCRootr_pft(NZ)*RootBiomGrosYld_pft(NZ)
-  Root1stMaxRadius_pft(2,NZ) = 5.0E-06_r8
-  Root2ndMaxRadius_pft(2,NZ) = 5.0E-06_r8
+  Root1stMaxRadius_pft(2,NZ) = 5.0E-06_r8      !mycorrhizae
+  Root2ndMaxRadius_pft(2,NZ) = 5.0E-06_r8      !mycorrhizae
   RootPorosity_pft(2,NZ)     = RootPorosity_pft(1,NZ)
   VmaxNH4Root_pft(2,NZ)      = VmaxNH4Root_pft(1,NZ)
   KmNH4Root_pft(2,NZ)        = KmNH4Root_pft(1,NZ)
@@ -560,7 +560,7 @@ module InitPlantMod
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ)     = RootPorosity_pft(N,NZ)**1.33_r8
     RootRaidus_rpft(N,NZ)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
-    RootVolPerMassC_pft(N,NZ)   = ppmc/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
+    RootVolPerMassC_pft(N,NZ)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
     Root1stSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2._r8)
     Root2ndSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root2ndMaxRadius_pft(N,NZ)**2._r8)
     Root1stMaxRadius1_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ)
@@ -592,7 +592,7 @@ module InitPlantMod
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
     BranchNumerID_brch                => plt_morph%BranchNumerID_brch                 ,& !output :branch meric id, [-]
     BranchNumber_pft                  => plt_morph%BranchNumber_pft                   ,& !output :main branch numeric id,[-]
-    C4PhotosynDowreg_brch             => plt_photo%C4PhotosynDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch             => plt_photo%GrainFillDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
     CMassCO2BundleSheath_node         => plt_photo%CMassCO2BundleSheath_node          ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CMassHCO3BundleSheath_node        => plt_photo%CMassHCO3BundleSheath_node         ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CPOOL3_node                       => plt_photo%CPOOL3_node                        ,& !output :minimum sink strength for nonstructural C transfer, [g d-2]
@@ -678,7 +678,7 @@ module InitPlantMod
     Hours4LeafOff_brch(NB,NZ)                     = Hours4ShortenPhotoPeriod_brch(NB,NZ)
     Hours2LeafOut_brch(NB,NZ)                     = 0._r8
     RubiscoActivity_brch(NB,NZ)                   = 1.0_r8
-    C4PhotosynDowreg_brch(NB,NZ)                  = 1.0_r8
+    GrainFillDowreg_brch(NB,NZ)                  = 1.0_r8
     HourFailGrainFill_brch(NB,NZ)                 = 0
     HoursDoingRemob_brch(NB,NZ)                   = 0
     BranchNumerID_brch(NB,NZ)                      = 0

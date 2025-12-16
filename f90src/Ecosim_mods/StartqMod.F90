@@ -522,7 +522,7 @@ module StartqMod
     Hours4LeafOff_brch(NB,NZ,NY,NX)                = Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)
     Hours2LeafOut_brch(NB,NZ,NY,NX)                = 0._r8
     RubiscoActivity_brch(NB,NZ,NY,NX)              = 1.0_r8
-    C4PhotosynDowreg_brch(NB,NZ,NY,NX)             = 1.0_r8
+    GrainFillDowreg_brch(NB,NZ,NY,NX)             = 1.0_r8
     HourFailGrainFill_brch(NB,NZ,NY,NX)            = 0
     HoursDoingRemob_brch(NB,NZ,NY,NX)              = 0
     BranchNumerID_brch(NB,NZ,NY,NX)                 = 0

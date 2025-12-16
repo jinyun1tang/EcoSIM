@@ -442,7 +442,7 @@ module PlantBranchMod
     EarStrutElms_brch        => plt_biom%EarStrutElms_brch          ,& !input  :branch ear structural chemical element mass, [g d-2]
     HuskStrutElms_brch       => plt_biom%HuskStrutElms_brch         ,& !input  :branch husk structural element mass, [g d-2]
     LeafStrutElms_brch       => plt_biom%LeafStrutElms_brch         ,& !input  :branch leaf structural element mass, [g d-2]
-    SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch sapwood C, [gC d-2]
     RootBiomGrosYld_pft      => plt_allom%RootBiomGrosYld_pft        & !input  :root growth yield, [g g-1]
   )
 
@@ -537,7 +537,7 @@ module PlantBranchMod
   associate(                                                                           &
     TdegCCanopy_pft                   => plt_ew%TdegCCanopy_pft                       ,& !input  :canopy temperature, [oC]
     PSICanopy_pft                     => plt_ew%PSICanopy_pft                         ,& !input  :canopy total water potential, [Mpa]
-    SapwoodBiomassC_brch              => plt_biom%SapwoodBiomassC_brch                ,& !input  :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch              => plt_biom%SapwoodBiomassC_brch                ,& !input  :branch sapwood C, [gC d-2]
     StalkRsrvElms_brch                => plt_biom%StalkRsrvElms_brch                  ,& !input  :branch reserve element mass, [g d-2]
     ZERO                              => plt_site%ZERO                                ,& !input  :threshold zero for numerical stability, [-]
     NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]
@@ -1313,7 +1313,7 @@ module PlantBranchMod
     istalk                     => pltpar%istalk                         ,& !input  :group id of plant stalk litter group
     k_fine_comp                => pltpar%k_fine_comp                    ,& !input  :fine litter complex id
     k_woody_comp               => pltpar%k_woody_comp                   ,& !input  :woody litter complex id
-    SapwoodBiomassC_brch       => plt_biom%SapwoodBiomassC_brch         ,& !input  :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch       => plt_biom%SapwoodBiomassC_brch         ,& !input  :branch sapwood C, [gC d-2]
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft               ,& !input  :threshold zero for plang growth calculation, [-]
     FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
     PlantElmAllocMat4Litr      => plt_soilchem%PlantElmAllocMat4Litr    ,& !input  :litter kinetic fraction, [-]
@@ -1690,7 +1690,7 @@ module PlantBranchMod
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !inoput :canopy height, [m]
     HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft          ,& !inoput :cotyledon height, [m]
     CanopyLeafAreaZ_pft       => plt_morph%CanopyLeafAreaZ_pft        ,& !inoput :canopy layer leaf area, [m2 d-2]
-    SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch live stalk C, [gC d-2]
+    SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch sapwood C, [gC d-2]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !output :leaf growth stage counter, [-]
     TreeRingAveRadius_pft     => plt_morph%TreeRingAveRadius_pft      ,& !output :tree ring radius,[m]
     CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch       & !output :plant canopy layer branch stem area, [m2 d-2]
@@ -1861,7 +1861,8 @@ module PlantBranchMod
     !     WTSTKB,StalkSurfArea=branch stalk mass,surface area
     !     FSTK=fraction of stalk area contributing to water,heat flow
     !     StalkMassDensity,SpecStalkVolume=stalk density (Mg m-3),specific volume (m3 g-1)
-    !     SapwoodBiomassC_brch=stalk sapwood mass
+    !     SapwoodBiomassC_brch=stalk sapwood mass, the living, outermost portion of a tree trunk or branch. 
+    !          It lies just beneath the bark and cambium layer but surrounds the darker, inner "heartwood
     !     FRACL=stalk fraction in each layer
     !     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
     !
@@ -2656,12 +2657,6 @@ module PlantBranchMod
   real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: TurgEff4CanopyResp
   integer :: NE
-  real(r8) :: NonstElmGradt
-  real(r8) :: FracCanopyCinStalk
-  real(r8) :: ShootBiomC_brch
-  real(r8) :: WVSTBX
-  real(r8) :: WTRTTX,WTRSBX
-  real(r8) :: WTRVCX,CPOOLT
   real(r8) :: XFRE(1:NumPlantChemElms)
   logical :: PlantingChk,RemobChk,LeafOutChk,AnnualPlantChk,LeafMobil4OutChk
   ! begin_execution
@@ -2669,10 +2664,6 @@ module PlantBranchMod
     iDayPlanting_pft        => plt_distb%iDayPlanting_pft         ,& !input  :day of planting,[-]
     iYearPlanting_pft       => plt_distb%iYearPlanting_pft        ,& !input  :year of planting,[-]
     iYearCurrent            => plt_site%iYearCurrent              ,& !input  :current year,[-]
-    RootElms_pft            => plt_biom%RootElms_pft              ,& !input  :plant root element mass, [g d-2]
-    CanopySapwoodC_pft      => plt_biom%CanopySapwoodC_pft        ,& !input  :canopy active stalk C, [g d-2]
-    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
-    SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
     iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch      ,& !input  :plant growth stage, [-]
     fTCanopyGroth_pft       => plt_pheno%fTCanopyGroth_pft        ,& !input  :canopy temperature growth function, [-]
     HourReq4LeafOff_brch    => plt_pheno%HourReq4LeafOff_brch     ,& !input  :number of hours below set temperature required for autumn leafoff/hardening, [-]
@@ -2684,8 +2675,6 @@ module PlantBranchMod
     iPlantPhenolType_pft    => plt_pheno%iPlantPhenolType_pft     ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     MainBranchNum_pft       => plt_morph%MainBranchNum_pft        ,& !input  :number of main branch,[-]
     CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch      ,& !inoput :branch nonstructural element, [g d-2]
-    SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !inoput :plant stored nonstructural element at current step, [g d-2]
-    StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
     doInitLeafOut_brch      => plt_pheno%doInitLeafOut_brch       ,& !inoput :branch phenology flag, [-]
     Hours2LeafOut_brch      => plt_pheno%Hours2LeafOut_brch        & !inoput :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   )
@@ -2788,41 +2777,8 @@ module PlantBranchMod
   !   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
   !   SEASONAL STORAGE POOL 
   !
-  !   SapwoodBiomassC_brch,WVSTK=stalk,total stalk sapwood mass
-  !   WTRT=total root mass
-  !   WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
-  !   XFRX=maximum storage C content for remobiln from stalk,root reserves
-  !   XFRE(ielmc)=C transfer
-  !   Q: why are nitrogen and phosphorus not transferred?
-   
-  IF(SapwoodBiomassC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ)  &
-    .AND. CanopySapwoodC_pft(NZ).GT.ZERO4Groth_pft(NZ)  &
-    .AND. RootElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) &
-    .AND. StalkRsrvElms_brch(ielmc,NB,NZ).LE.XFRX*SapwoodBiomassC_brch(NB,NZ))THEN
+  call RepleteSeaStoreByStalk(I,J,NB,NZ)
 
-    FracCanopyCinStalk              = SapwoodBiomassC_brch(NB,NZ)/CanopySapwoodC_pft(NZ)
-    WVSTBX                          = SapwoodBiomassC_brch(NB,NZ)
-    WTRTTX                          = RootElms_pft(ielmc,NZ)*FracCanopyCinStalk
-    ShootBiomC_brch                 = WVSTBX+WTRTTX
-    WTRSBX                          = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
-    WTRVCX                          = AZMAX1(SeasonalNonstElms_pft(ielmc,NZ)*FracCanopyCinStalk)
-    NonstElmGradt                          = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/ShootBiomC_brch
-    !seasonal storage -> branch non-structrual
-    XFRE(ielmc)                     = XFRY*AZMAX1(NonstElmGradt)
-    StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-    SeasonalNonstElms_pft(ielmc,NZ) = SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
-
-    CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
-    DO NE=2,NumPlantChemElms
-      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
-      WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FracCanopyCinStalk)
-      !achor for seasonal storage is root, achor for stalkrsv is sap
-      NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT
-      XFRE(NE)                          = XFRY*AZMAX1(NonstElmGradt)
-      StalkRsrvElms_brch(ielmc,NB,NZ)   = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(NE)
-      SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRE(NE)
-    ENDDO
-  ENDIF
   end associate
   end subroutine BranchElmntTransfer
 
@@ -3073,7 +3029,7 @@ module PlantBranchMod
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft     ,& !input  :plant growth type (vascular, non-vascular),[-]
     fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft         ,& !input  :canopy temperature growth function, [-]
     iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft      ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
-    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch     ,& !input  :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch     => plt_photo%GrainFillDowreg_brch     ,& !input  :down-regulation of C4 photosynthesis, [-]
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft              ,& !inoput :canopy net CO2 exchange, [gC d-2 h-1]
     CanopyGrosRCO2_pft        => plt_bgcr%CanopyGrosRCO2_pft         ,& !inoput :canopy plant+nodule autotrophic respiraiton, [gC d-2]
     CanopyResp_brch           => plt_bgcr%CanopyResp_brch            ,& !inoput :canopy respiration for a branch, [gC d-2 h-1]
@@ -3115,10 +3071,10 @@ module PlantBranchMod
 ! fTCanopyGroth_pft=temperature function for canopy growth
 ! WaterStress4Groth=growth function of canopy water potential
 ! CNPG=N,P constraint on respiration
-! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
+! GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
 !
   RCO2NonstC_brch=AZMAX1(VMXC*CanopyNonstElms_brch(ielmc,NB,NZ) &
-    *fTCanopyGroth_pft(NZ))*CNPG*C4PhotosynDowreg_brch(NB,NZ)*WaterStress4Groth
+    *fTCanopyGroth_pft(NZ))*CNPG*GrainFillDowreg_brch(NB,NZ)*WaterStress4Groth
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
 !
@@ -3271,7 +3227,7 @@ module PlantBranchMod
     RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr           ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     ZERO                      => plt_site%ZERO                       ,& !input  :threshold zero for numerical stability, [-]
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !input  :soil layer at planting depth, [-]
-    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch      & !input  :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch     => plt_photo%GrainFillDowreg_brch      & !input  :down-regulation of C4 photosynthesis, [-]
   )
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
@@ -3300,11 +3256,11 @@ module PlantBranchMod
 ! fTgrowRootP_vr=temperature function for root growth
 ! WaterStress4Groth=growth function of canopy water potential
 ! CNPG=N,P constraint on respiration
-! C4PhotosynDowreg_brch=termination feedback inhibition on C3 CO2
+! GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
 ! RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
 !
   RCO2NonstC_O2ulm=AZMAX1(VMXC*CanopyNonstElms_brch(ielmc,NB,NZ) &
-    *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*WaterStress4Groth*CNPG*C4PhotosynDowreg_brch(NB,NZ)
+    *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*WaterStress4Groth*CNPG*GrainFillDowreg_brch(NB,NZ)
 
   RCO2NonstC_brch=RCO2NonstC_O2ulm*RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)  
 !

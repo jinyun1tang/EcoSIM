@@ -53,7 +53,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafProteinCperm2LA_pft(:,:,:)             !Protein C for the plant, [gC protein m-2 leaf area]
   real(r8),target,allocatable ::  RubiscoActivity_brch(:,:,:,:)              !branch down-regulation of CO2 fixation, [-]
   real(r8),target,allocatable ::  NutrientCtrlonC4Carboxy_node(:,:,:,:,:)    !down-regulation of C4 photosynthesis, [-]
-  real(r8),target,allocatable ::  C4PhotosynDowreg_brch(:,:,:,:)             !down-regulation of C4 photosynthesis, [-]
+  real(r8),target,allocatable ::  GrainFillDowreg_brch(:,:,:,:)             !down-regulation of C4 photosynthesis, [-]
   real(r8),target,allocatable ::  NetCO2Flx2Canopy_col(:,:)                  !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  VmaxSpecRubCarboxyRef_pft(:,:,:)               !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
   real(r8),target,allocatable ::  VmaxRubOxyRef_pft(:,:,:)                   !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
@@ -266,7 +266,7 @@ module CanopyDataType
   allocate(LeafProteinC_brch(MaxNumBranches,JP,JY,JX)); LeafProteinC_brch=0._r8
   allocate(LeafProteinCperm2LA_pft(JP,JY,JX)); LeafProteinCperm2LA_pft=0._r8
   allocate(NutrientCtrlonC4Carboxy_node(MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));NutrientCtrlonC4Carboxy_node=0._r8
-  allocate(C4PhotosynDowreg_brch(MaxNumBranches,JP,JY,JX)); C4PhotosynDowreg_brch=0._r8
+  allocate(GrainFillDowreg_brch(MaxNumBranches,JP,JY,JX)); GrainFillDowreg_brch=0._r8
   allocate(NetCO2Flx2Canopy_col(JY,JX));       NetCO2Flx2Canopy_col=0._r8
   allocate(VmaxSpecRubCarboxyRef_pft(JP,JY,JX));     VmaxSpecRubCarboxyRef_pft=0._r8
   allocate(VmaxRubOxyRef_pft(JP,JY,JX));     VmaxRubOxyRef_pft=0._r8
@@ -455,7 +455,7 @@ module CanopyDataType
   call destroy(CMassHCO3BundleSheath_node)
   call destroy(RubiscoActivity_brch)
   call destroy(NutrientCtrlonC4Carboxy_node)
-  call destroy(C4PhotosynDowreg_brch)
+  call destroy(GrainFillDowreg_brch)
   call destroy(NetCO2Flx2Canopy_col)
   call destroy(VmaxSpecRubCarboxyRef_pft)
   call destroy(VmaxRubOxyRef_pft)

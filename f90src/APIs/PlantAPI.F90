@@ -404,7 +404,7 @@ implicit none
 
       HourFailGrainFill_brch(NB,NZ,NY,NX)                         = plt_pheno%HourFailGrainFill_brch(NB,NZ)
       RubiscoActivity_brch(NB,NZ,NY,NX)                           = plt_photo%RubiscoActivity_brch(NB,NZ)
-      C4PhotosynDowreg_brch(NB,NZ,NY,NX)                          = plt_photo%C4PhotosynDowreg_brch(NB,NZ)
+      GrainFillDowreg_brch(NB,NZ,NY,NX)                          = plt_photo%GrainFillDowreg_brch(NB,NZ)
       HoursDoingRemob_brch(NB,NZ,NY,NX)                           = plt_pheno%HoursDoingRemob_brch(NB,NZ)
       MatureGroup_brch(NB,NZ,NY,NX)                               = plt_pheno%MatureGroup_brch(NB,NZ)
       NodeNumNormByMatgrp_brch(NB,NZ,NY,NX)                       = plt_pheno%NodeNumNormByMatgrp_brch(NB,NZ)
@@ -1260,7 +1260,7 @@ implicit none
       plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ) = SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_biom%SapwoodBiomassC_brch(NB,NZ)                        = SapwoodBiomassC_brch(NB,NZ,NY,NX)
 
-      plt_photo%C4PhotosynDowreg_brch(NB,NZ) = C4PhotosynDowreg_brch(NB,NZ,NY,NX)
+      plt_photo%GrainFillDowreg_brch(NB,NZ) = GrainFillDowreg_brch(NB,NZ,NY,NX)
       plt_pheno%Hours2LeafOut_brch(NB,NZ)    = Hours2LeafOut_brch(NB,NZ,NY,NX)
       plt_morph%LeafAreaDying_brch(NB,NZ)    = LeafAreaDying_brch(NB,NZ,NY,NX)
       plt_morph%LeafAreaLive_brch(NB,NZ)     = LeafAreaLive_brch(NB,NZ,NY,NX)
