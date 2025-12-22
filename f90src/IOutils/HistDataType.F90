@@ -400,13 +400,15 @@ implicit none
   real(r8),pointer   :: h2D_RootSurfAreaPP_pvr(:,:)
   real(r8),pointer   :: h2D_ROOTNLim_rpvr(:,:)
   real(r8),pointer   :: h2D_ROOTPLim_rpvr(:,:)  
+  real(r8),pointer   :: h2D_RootNonstC_rpvr(:,:)
+  real(r8),pointer   :: h2D_Root1stRadius_rpvr(:,:)
   real(r8),pointer   :: h1D_RootMaintDef_CO2_pft(:)
   real(r8),pointer   :: h1D_NumPrimeRootAxes_ptc(:)
   real(r8),pointer   :: h1D_BRANCH_NO_ptc(:)    
   real(r8),pointer   :: h1D_SHOOT_NONSTC_ptc(:) 
   real(r8),pointer   :: h1D_SHOOT_NONSTN_ptc(:)  
   real(r8),pointer   :: h1D_SHOOT_NONSTP_ptc(:) 
-  real(r8),pointer   :: h1D_LeafC3ChlCperm2LA_ptc(:) 
+  real(r8),pointer   :: h1D_LeafChlCperm2LA_ptc(:) 
   real(r8),pointer   :: h1D_LeafC4ChlCperm2LA_ptc(:) 
   real(r8),pointer   :: h1D_LeafRubiscoCperm2LA_ptc(:)
   real(r8),pointer   :: h1D_LeafPEPCperm2LA_ptc(:)    
@@ -932,7 +934,7 @@ implicit none
   allocate(this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_SHOOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_SHOOT_NONSTP_ptc(:)=spval
 
-  allocate(this%h1D_LeafC3ChlCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafC3ChlCperm2LA_ptc=spval
+  allocate(this%h1D_LeafChlCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafChlCperm2LA_ptc=spval
   allocate(this%h1D_LeafC4ChlCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafC4ChlCperm2LA_ptc=spval 
   allocate(this%h1D_LeafRubiscoCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafRubiscoCperm2LA_ptc=spval
   allocate(this%h1D_LeafPEPCperm2LA_ptc(beg_ptc:end_ptc));this%h1D_LeafPEPCperm2LA_ptc=spval    
@@ -1153,6 +1155,8 @@ implicit none
   allocate(this%h2D_RootSurfAreaPP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootSurfAreaPP_pvr(:,:)=spval
   allocate(this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTNLim_rpvr(:,:)=spval
   allocate(this%h2D_ROOTPLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTPLim_rpvr(:,:)=spval
+  allocate(this%h2D_RootNonstC_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootNonstC_rpvr(:,:)=spval
+  allocate(this%h2D_Root1stRadius_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_Root1stRadius_rpvr(:,:)=spval
   allocate(this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_ROOT_OSTRESS_pvr(:,:)=spval
   allocate(this%h2D_prtUP_NH4_pvr(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NH4_pvr(:,:)=spval                                                              
   allocate(this%h2D_prtUP_NO3_pvr(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_NO3_pvr(:,:)=spval                                                              
@@ -2190,9 +2194,9 @@ implicit none
   call hist_addfld1d(fname='SHOOT_NONSTP_pft',units='gP/m2',avgflag='A',&
     long_name='Plant leaf storage of nonstructural P',ptr_patch=data1d_ptr,default='inactive')                  
 
-  data1d_ptr => this%h1D_LeafC3ChlCperm2LA_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='LeafC3ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
-    long_name='Cholorophyll carbon in mesophyll for C3/bundle sheath for C4 plants',ptr_patch=data1d_ptr)
+  data1d_ptr => this%h1D_LeafChlCperm2LA_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='LeafChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
+    long_name='Total cholorophyll carbon in leaves',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_LeafC4ChlCperm2LA_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='LeafC4ChlC_pft',units='mgC chl m-2 leaf area',avgflag='A',&
@@ -3456,13 +3460,21 @@ implicit none
   call hist_addfld2d(fname='RootPlim_pvr',units='-',type2d='levsoi',avgflag='A',&
     long_name='Plant root phosphorus limitation for each pft',ptr_patch=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_RootNonstC_rpvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='RootNonstC_pvr',units='gC',type2d='levsoi',avgflag='A',&
+    long_name='Plant root nonstrucal C for each pft',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_Root1stRadius_rpvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='Root1stRadius_pvr',units='m',type2d='levsoi',avgflag='A',&
+    long_name='Plant corase root radius for each pft',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root_OXYSTRESS_pvr',units='None',type2d='levsoi',avgflag='A',&
     long_name='Root Oxygen stress profile [0->1 weaker stress]',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stStrutC_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootC_1st_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
-    long_name='Primary root structural biomass C density',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Primary root structural biomass C density',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_RootNonstBConc_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootNonstBConc_pvr',units='g/gC',type2d='levsoi',avgflag='A',&
@@ -4065,7 +4077,7 @@ implicit none
           this%h1D_dCAN_GPP_eLIM_ptc(nptc) = AZERO(CO2FixLL_pft(NZ,NY,NX)-GrossCO2Fix_pft(NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         endif
 
-        this%h1D_LeafC3ChlCperm2LA_ptc(nptc)   = LeafC3ChlCperm2LA_pft(NZ,NY,NX)*1.e3_r8
+        this%h1D_LeafChlCperm2LA_ptc(nptc)   = (LeafC3ChlCperm2LA_pft(NZ,NY,NX)+LeafC4ChlCperm2LA_pft(NZ,NY,NX))*1.e3_r8
         this%h1D_LeafC4ChlCperm2LA_ptc(nptc)   = LeafC4ChlCperm2LA_pft(NZ,NY,NX)*1.e3_r8
         this%h1D_LeafRubiscoCperm2LA_ptc(nptc) = LeafRubiscoCperm2LA_pft(NZ,NY,NX)
         this%h1D_LeafPEPCperm2LA_ptc(nptc)     = LeafPEPCperm2LA_pft(NZ,NY,NX)
@@ -4317,6 +4329,8 @@ implicit none
 
           this%h2D_ROOTNLim_rpvr(nptc,L) = ROOTNLim_rpvr(ipltroot,L,NZ,NY,NX)
           this%h2D_ROOTPLim_rpvr(nptc,L) = ROOTPLim_rpvr(ipltroot,L,NZ,NY,NX)
+          this%h2D_RootNonstC_rpvr(nptc,L)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ,NY,NX)
+          this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)
           this%h2D_Root1stStrutC_pvr(nptc,L) = 0._r8
           this%h2D_Root1stStrutN_pvr(nptc,L) = 0._r8
           this%h2D_Root1stStrutP_pvr(nptc,L) = 0._r8

@@ -116,29 +116,29 @@
 
           IF(ProteinCperm2LeafArea_node(K,NB,NZ).GT.ZERO)THEN
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        
-              BundlSheathRubiscoC = LeafRubisco2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
-              BundlSheathChlC     = LeafC3Chl2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
-              MesophyllPEPC       = LeafPEP2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
-              MesophyllChlC       = LeafC4Chl2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
+              BundlSheathRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
+              BundlSheathChlC     = LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              MesophyllPEPC       = LeafProteinC_node(K,NB,NZ)*LeafPEP2Protein_pft(NZ)
+              MesophyllChlC       = LeafProteinC_node(K,NB,NZ)*LeafC4Chl2Protein_pft(NZ)
 
               VcMaxPEPCarboxyRef_brch(NB,NZ) = VcMaxPEPCarboxyRef_brch(NB,NZ) +VmaxPEPCarboxyRef_pft(NZ)*MesophyllPEPC
               VcMaxRubiscoRef_brch(NB,NZ)    = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*BundlSheathRubiscoC
               VoMaxRubiscoRef_brch(NB,NZ)    = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*BundlSheathRubiscoC
 
-              LeafPEPC_brch(NB,NZ)     = LeafPEPC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafPEP2Protein_pft(NZ)
-              LeafC4ChlC_brch(NB,NZ)   = LeafC4ChlC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafC4Chl2Protein_pft(NZ)
-              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
-              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              LeafPEPC_brch(NB,NZ)     = LeafPEPC_brch(NB,NZ)+MesophyllPEPC
+              LeafC4ChlC_brch(NB,NZ)   = LeafC4ChlC_brch(NB,NZ)+MesophyllChlC
+              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+BundlSheathRubiscoC
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+BundlSheathChlC
 
             ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then    
-              MesophyllChlC     = LeafC3Chl2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
-              MesophyllRubiscoC = LeafRubisco2Protein_pft(NZ)*LeafProteinC_node(K,NB,NZ)
+              MesophyllChlC     = LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              MesophyllRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
               
               VcMaxRubiscoRef_brch(NB,NZ) = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoC
               VoMaxRubiscoRef_brch(NB,NZ) = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoC
 
-              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
-              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+MesophyllRubiscoC
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+MesophyllChlC
     
             ENDIF
             ElectronTransptJmaxRef_brch(NB,NZ) = ElectronTransptJmaxRef_brch(NB,NZ)+SpecLeafChlAct_pft(NZ)*MesophyllChlC
@@ -527,8 +527,9 @@
 !     FWCBundlSheath,FWCMesophyll=leaf water content in bundle sheath, mesophyll
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M                                  = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCMesophyll))
-  CCBS                                  = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCBundlSheath))
+  CC4M = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCMesophyll))
+  CCBS = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCBundlSheath))
+  
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI_pepcarboxy)
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !

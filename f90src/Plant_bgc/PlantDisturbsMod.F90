@@ -1871,7 +1871,7 @@ module PlantDisturbsMod
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr         ,& !inoput :root layer number axes, [d-2]
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr    ,& !inoput :root layer length per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !inoput :root layer length density, [m m-3]
-    RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr          ,& !inoput :root layer volume air, [m2 d-2]
+    RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr          ,& !inoput :root layer volume air, [m2 d-2]
     RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr      ,& !inoput :root layer area per plant, [m p-1]
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr         ,& !inoput :root layer C, [gC d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr              ,& !inoput :root layer volume water, [m2 d-2]
@@ -1897,7 +1897,7 @@ module PlantDisturbsMod
 !     RootProteinC_pvr=root protein C mass
 !     RTN1,Root2ndXNumL_rpvr=number of primary,secondary root axes
 !     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
-!     RootVH2O_pvr,RootPoreVol_rpvr=root or myco aqueous,gaseous volume
+!     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
 !     RootAreaPerPlant_pvr=root surface area per plant
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
@@ -1928,7 +1928,7 @@ module PlantDisturbsMod
     Root2ndXNumL_rpvr(N,L,NZ)         = Root2ndXNumL_rpvr(N,L,NZ)*FracLeftThin
     RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ)*FracLeftThin
     RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracLeftThin
-    RootPoreVol_rpvr(N,L,NZ)         = RootPoreVol_rpvr(N,L,NZ)*FracLeftThin
+    RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*FracLeftThin
     RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*FracLeftThin
     RootAreaPerPlant_pvr(N,L,NZ)    = RootAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
     RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*FracLeftThin

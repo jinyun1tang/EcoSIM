@@ -123,7 +123,7 @@ module RootGasMod
     RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft         ,& !input  :power function of root porosity used to calculate root gaseous diffusivity, [-]
     Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !input  :root layer diameter primary axes, [m]
     Root2ndEffLen4uptk_rpvr   => plt_morph%Root2ndEffLen4uptk_rpvr       ,& !input  :root layer average length, [m]
-    RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr              ,& !input  :root layer volume air, [m2 d-2]
+    RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr              ,& !input  :root layer volume air, [m2 d-2]
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr        ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
@@ -236,7 +236,7 @@ module RootGasMod
     ENDIF
 
     DO idg=idg_beg,idg_NH3
-      RootGasConductance_rpvr(idg,N,L,NZ) = AMIN1(DFAGas(idg),RootPoreVol_rpvr(N,L,NZ))
+      RootGasConductance_rpvr(idg,N,L,NZ) = AMIN1(DFAGas(idg),RootPoreVol_pvr(N,L,NZ))
     ENDDO
 
     DFGP                = AMIN1(1.0,XNPD*SQRT(RootPorosity_pft(N,NZ))*TScal4Difsvity_vr(L))
@@ -285,7 +285,7 @@ module RootGasMod
         !
         !     ROXYLX=soil net O2 aqueous flux > 0
         !     VLWatMicPMM=micropore water volume
-        !     RootVH2O_pvr,RootPoreVol_rpvr=root aqueous,gaseous volume
+        !     RootVH2O_pvr,RootPoreVol_pvr=root aqueous,gaseous volume
         !     RMF*=soil convective solute flux:COS=CO2,OXS=O2,CHS=CH4,
         !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
         !
@@ -301,9 +301,9 @@ module RootGasMod
             endif            
           enddo
 
-          IF(RootPoreVol_rpvr(N,L,NZ).GT.ZERO)THEN
+          IF(RootPoreVol_pvr(N,L,NZ).GT.ZERO)THEN
             DO idg=idg_beg,idg_NH3
-              trcg_gcon_loc(idg)=AZMAX1(trcg_rootml_loc(idg)/RootPoreVol_rpvr(N,L,NZ))
+              trcg_gcon_loc(idg)=AZMAX1(trcg_rootml_loc(idg)/RootPoreVol_pvr(N,L,NZ))
             ENDDO
           ELSE
             trcg_gcon_loc(idg_beg:idg_NH3)=0.0_r8
@@ -500,7 +500,7 @@ module RootGasMod
           !
           !     GAS TRANSFER THROUGH ROOTS
           !
-          IF(N.EQ.ipltroot .AND. RootPoreVol_rpvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+          IF(N.EQ.ipltroot .AND. RootPoreVol_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
             RUPNTX=RSoilSolute2Roots(idg_NH3)+RSoilSolute2Roots(idg_NH3B)
             !
             !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN ROOTS
@@ -516,7 +516,7 @@ module RootGasMod
               endif
               
               Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg))*DisolvedGasVolume(idg) &
-                -trcs_maxRootml_loc(idg)*RootPoreVol_rpvr(N,L,NZ))/(DisolvedGasVolume(idg)+RootPoreVol_rpvr(N,L,NZ)))
+                -trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ))/(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
 
               !>0._r8 atmosphere into roots, <0._r8 roots into atmosphere, assuming specific rate 1/hr
               trcg_air2root_flx_loc(idg)=RootGasConductance_rpvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))

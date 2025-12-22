@@ -1082,7 +1082,7 @@ implicit none
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)         = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L1,NZ,NY,NX)         = RootPoreVol_rpvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L1,NZ,NY,NX)         = RootPoreVol_pvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L1,NZ,NY,NX)            = RootVH2O_pvr(N,L1,NZ,NY,NX)+FX*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L1,NZ,NY,NX)       = Root1stRadius_pvr(N,L1,NZ,NY,NX)+FX*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX)       = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
@@ -1262,7 +1262,7 @@ implicit none
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = FY*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L0,NZ,NY,NX)            = FY*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
@@ -1468,9 +1468,9 @@ implicit none
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTDNP
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTDNP
 
-          FXRTVLP                        = FRO*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L1,NZ,NY,NX) = RootPoreVol_rpvr(N,L1,NZ,NY,NX)+FXRTVLP
-          RootPoreVol_rpvr(N,L0,NZ,NY,NX) = RootPoreVol_rpvr(N,L0,NZ,NY,NX)-FXRTVLP
+          FXRTVLP                        = FRO*RootPoreVol_pvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L1,NZ,NY,NX) = RootPoreVol_pvr(N,L1,NZ,NY,NX)+FXRTVLP
+          RootPoreVol_pvr(N,L0,NZ,NY,NX) = RootPoreVol_pvr(N,L0,NZ,NY,NX)-FXRTVLP
 
           FXRTVLW                     = FRO*RootVH2O_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L1,NZ,NY,NX) = RootVH2O_pvr(N,L1,NZ,NY,NX)+FXRTVLW

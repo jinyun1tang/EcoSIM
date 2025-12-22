@@ -458,16 +458,17 @@ module StartqMod
   !
   !     RootPoreTortu4Gas_pft=tortuosity for gas transport
   !     RootRaidus_rpft=path length for radial diffusion within root (m)
-  !     RootVolPerMassC_pft=volume:C ratio (m3 gC-1)
+  !     FineRootVolPerMassC_pft=volume:C ratio (m3 gC-1)
   !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
   !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
   !
+  CoarseRootVolPerMassC_pft(NZ,NY,NX) = 1.e-6_r8/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ,NY,NX)))
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ,NY,NX) = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
-    RootVolPerMassC_pft(N,NZ,NY,NX)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))  ![50 kgC m-3 root biomass]
-    Root1stSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
-    Root2ndSpecLen_pft(N,NZ,NY,NX)    = RootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
+    FineRootVolPerMassC_pft(N,NZ,NY,NX)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))  ![50 kgC m-3 root biomass]
+    Root1stSpecLen_pft(N,NZ,NY,NX)    = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
+    Root2ndSpecLen_pft(N,NZ,NY,NX)    = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
     Root1stMaxRadius1_pft(N,NZ,NY,NX) = Root1stMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
     Root2ndMaxRadius1_pft(N,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
@@ -753,7 +754,7 @@ module StartqMod
       Root2ndXNumL_rpvr(N,L,NZ,NY,NX)              = 0._r8
       RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)          = 0._r8
       RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)      = 0._r8
-      RootPoreVol_rpvr(N,L,NZ,NY,NX)              = 0._r8
+      RootPoreVol_pvr(N,L,NZ,NY,NX)              = 0._r8
       RootVH2O_pvr(N,L,NZ,NY,NX)                 = 0._r8
       Root1stRadius_pvr(N,L,NZ,NY,NX)            = Root1stMaxRadius_pft(N,NZ,NY,NX)
       Root2ndRadius_rpvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
@@ -778,7 +779,7 @@ module StartqMod
       RootH1PO4DmndBand_pvr(N,L,NZ,NY,NX)        = 0._r8
       CCO2A                                           = CCO2EI_gperm3_col(NY,NX)
       CCO2P                                           = 0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA_col(NY,NX))*CO2EI_col(NY,NX)
-      trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2A*RootPoreVol_rpvr(N,L,NZ,NY,NX)
+      trcg_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2A*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_CO2,N,L,NZ,NY,NX)           = CCO2P*RootVH2O_pvr(N,L,NZ,NY,NX)
       trcg_air2root_flx_pvr(idg_CO2,N,L,NZ,NY,NX)     = 0._r8
       trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ,NY,NX)  = 0._r8
@@ -788,7 +789,7 @@ module StartqMod
       COXYP                                           = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA_col(NY,NX))*OXYE_col(NY,NX)
       trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
       trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ,NY,NX) = 0._r8
-      trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYA*RootPoreVol_rpvr(N,L,NZ,NY,NX)
+      trcg_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYA*RootPoreVol_pvr(N,L,NZ,NY,NX)
       trcs_rootml_pvr(idg_O2,N,L,NZ,NY,NX)            = COXYP*RootVH2O_pvr(N,L,NZ,NY,NX)
       RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)            = 1.0_r8
 

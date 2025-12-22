@@ -18,8 +18,9 @@ module RootDataType
   real(sp),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(sp),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
   real(sp),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
-  real(sp),target,allocatable ::  RootProteinCMax_pft(:,:,:)               !reference root protein N, [gN g-1]
-  real(sp),target,allocatable ::  RootVolPerMassC_pft(:,:,:,:)                   !root volume:mass ratio, [m3 g-1]
+  real(sp),target,allocatable ::  RootProteinCMax_pft(:,:,:)                     !reference root protein N, [gN g-1]
+  real(sp),target,allocatable ::  FineRootVolPerMassC_pft(:,:,:,:)               !fine root volume:mass ratio, [m3 g-1]
+  real(r8),target,allocatable ::  CoarseRootVolPerMassC_pft(:,:,:)               !coarse root volume:mass ratio,[m3 g-1]
   real(sp),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                 !root diameter primary axes, [m]
   real(sp),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                 !root diameter secondary axes, [m]
   real(sp),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
@@ -66,7 +67,7 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stStructE_buf(:,:,:,:,:)                 !buffer structural element for root secondary growth calculation, [g d-2]
   real(sp),target,allocatable ::  RootVH2O_pvr(:,:,:,:,:)                        !root layer volume water, [m2 d-2]
   real(sp),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
-  real(sp),target,allocatable ::  RootPoreVol_rpvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
+  real(sp),target,allocatable ::  RootPoreVol_pvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
   real(sp),target,allocatable ::  Root1stDepz_raxes(:,:,:,:)                     !root layer depth, [m]
   real(sp),target,allocatable ::  Root2ndRadius_rpvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(sp),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
@@ -139,7 +140,8 @@ contains
   allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._sp
   allocate(MinNonstC2InitRoot_pft(JP,JY,JX));       MinNonstC2InitRoot_pft=0._sp
   allocate(RootProteinCMax_pft(JP,JY,JX));    RootProteinCMax_pft=0._sp
-  allocate(RootVolPerMassC_pft(jroots,JP,JY,JX));   RootVolPerMassC_pft=0._sp
+  allocate(FineRootVolPerMassC_pft(jroots,JP,JY,JX));   FineRootVolPerMassC_pft=0._sp
+  allocate(CoarseRootVolPerMassC_pft(JP,JY,JX)); CoarseRootVolPerMassC_pft = 0._sp
   allocate(Root1stMaxRadius1_pft(jroots,JP,JY,JX)); Root1stMaxRadius1_pft=0._sp
   allocate(Root2ndMaxRadius1_pft(jroots,JP,JY,JX)); Root2ndMaxRadius1_pft=0._sp
   allocate(Root1stXSecArea_pft(jroots,JP,JY,JX)); Root1stXSecArea_pft=0._sp
@@ -186,7 +188,7 @@ contains
   allocate(RootArea2ndPP_pvr(jroots,JZ,JP,JY,JX));RootArea2ndPP_pvr=0._sp
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._sp
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._sp
-  allocate(RootPoreVol_rpvr(jroots,JZ,JP,JY,JX));RootPoreVol_rpvr=0._sp
+  allocate(RootPoreVol_pvr(jroots,JZ,JP,JY,JX));RootPoreVol_pvr=0._sp
   allocate(Root1stDepz_raxes(MaxNumRootAxes,JP,JY,JX));Root1stDepz_raxes=0._sp
   allocate(Root2ndRadius_rpvr(jroots,JZ,JP,JY,JX));Root2ndRadius_rpvr=0._sp
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._sp
@@ -249,7 +251,8 @@ contains
   call destroy(RootBiomGrosYld_pft)
   call destroy(MinNonstC2InitRoot_pft)
   call destroy(RootProteinCMax_pft)
-  call destroy(RootVolPerMassC_pft)
+  call destroy(FineRootVolPerMassC_pft)
+  call destroy(CoarseRootVolPerMassC_pft)
   call destroy(Root1stMaxRadius1_pft)
   call destroy(Root2ndMaxRadius1_pft)
   call destroy(Root1stXSecArea_pft)
@@ -295,7 +298,7 @@ contains
   call destroy(RootArea1stPP_pvr)  
   call destroy(RootVH2O_pvr)
   call destroy(Root1stRadius_pvr)
-  call destroy(RootPoreVol_rpvr)
+  call destroy(RootPoreVol_pvr)
   call destroy(Root1stDepz_raxes)
   call destroy(Root2ndRadius_rpvr)
   call destroy(Root1stSpecLen_pft)

@@ -146,6 +146,7 @@ module grosubsMod
     iYearCurrent                   => plt_site%iYearCurrent                    ,& !input  :current year,[-]
     k_fine_comp                    => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     k_woody_comp                   => pltpar%k_woody_comp                      ,& !input  :woody litter complex id
+    SurfLitrfallElms_pft           => plt_bgcr%SurfLitrfallElms_pft            ,& !output :surface litterfall
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
     LitrfallElms_pft               => plt_bgcr%LitrfallElms_pft                ,& !inoput :plant element LitrFall, [g d-2 h-1]
     LitrfallElms_pvr               => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
@@ -196,9 +197,11 @@ module grosubsMod
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
 !   diagnose surface literfall 
+    SurfLitrfallElms_pft(:,NZ)=0._r8
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
+          SurfLitrfallElms_pft(NE,NZ)=SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
           SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
@@ -538,7 +541,7 @@ module grosubsMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft         ,& !input  :total root uptake of HPO4, [g d-2 h-1]
-    RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft       ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+    Soil2RootMycoExudE_pft      => plt_rbgc%Soil2RootMycoExudE_pft       ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft              ,& !input  :total root N2 fixation, [g d-2 h-1]
     RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft          ,& !input  :total root uptake of NH4, [g d-2 h-1]
     RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft          ,& !input  :total root uptake of NO3, [g d-2 h-1]
@@ -625,7 +628,7 @@ module grosubsMod
 !
 !     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
 !     PlantRootSoilElmNetX_pft= > 0 taking from soil 
-  PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
+  PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
   PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+&
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
@@ -633,12 +636,12 @@ module grosubsMod
     RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
 
   PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)=PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)+&
-    RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
+    Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
   RootUptk_N_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ) + &
-    RootMycoExudElms_pft(ielmn,NZ)
+    Soil2RootMycoExudE_pft(ielmn,NZ)
   RootUptk_P_CumYr_pft(NZ)=RootUptk_P_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
-    RootMycoExudElms_pft(ielmp,NZ)
+    Soil2RootMycoExudE_pft(ielmp,NZ)
 
   PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
   end associate

@@ -1894,6 +1894,8 @@ module PlantBranchMod
       ELSE        
         DTransportTube     = AMIN1(ZSTX,FSTK*StalkRadius)
         !the following is based on the observation that xylem and pholem are limited to a thicknees of DTranpTube on the outside of stalk.
+        !the definition of sapwood here is not exact. For a tree, from the core to bark, they are heartwood, sapwood, vascular cambium, 
+        !living phloem, cork cambium and cork. 
         StalkSectionArea            = PICON*(2._r8*StalkRadius*DTransportTube-DTransportTube**2)
         SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/SpecStalkVolume*StalkNodeHeight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
       ENDIF

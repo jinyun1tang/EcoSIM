@@ -309,7 +309,7 @@ module PlantNonstElmDynMod
   real(r8) :: ZPOOLS,ZPOOLT
   real(r8) :: ZPOOLB
   real(r8) :: ZPOOLD,EPOOLD
-  REAL(R8) :: RootSinkWeight_pft(JZ1),BranchSinkWeight_pft(JP1)
+  REAL(R8) :: RootSinkWeight_vr(JZ1),BranchSinkWeight_pft(JP1)
   real(r8) :: CPOOLT
   real(r8) :: NonstElmRootE,NonstElmBrchE
   real(r8) :: NonstElmGradt
@@ -422,9 +422,9 @@ module PlantNonstElmDynMod
   !     ENDIF
   D290: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN
-      RootSinkWeight_pft(L)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
+      RootSinkWeight_vr(L)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
     ELSE
-      RootSinkWeight_pft(L)=1.0_r8
+      RootSinkWeight_vr(L)=1.0_r8
     ENDIF
   ENDDO D290
   !     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
@@ -472,15 +472,17 @@ module PlantNonstElmDynMod
       ELSE
         PTSHTR=ShootRootNonstElmConduts_pft(NZ)
       ENDIF
+      !Roots at different depths are generally "wired" to the shoot (the source) like spokes 
+      !on a wheel or branches on a river. They do not typically exchange carbon directly with each other deep underground.
 
       D415: DO L=NU,MaxSoiL4Root_pft(NZ)
-        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pft(L)*FWTC
+        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_vr(L)*FWTC
         WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
         WTLSBB       = AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR       = AZMAX1(WTRTLX,FSNK*WTLSBX)
         TwoCompMassC = WTLSBB+WTRTLR
         IF(TwoCompMassC.GT.ZERO4Groth_pft(NZ))THEN
-          CPOOLB                                      = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*RootSinkWeight_pft(L))
+          CPOOLB                                      = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*RootSinkWeight_vr(L))
           CPOOLS                                      = AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
           CPOOLT                                      = CPOOLS+CPOOLB
           NonstElmGradt                               = (CPOOLB*WTRTLR-CPOOLS*WTLSBB)/TwoCompMassC
@@ -492,7 +494,7 @@ module PlantNonstElmDynMod
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
             DO NE=2,NumPlantChemElms
-              NonstElmBrchE = CanopyNonstElms_brch(NE,NB,NZ)*RootSinkWeight_pft(L)
+              NonstElmBrchE = CanopyNonstElms_brch(NE,NB,NZ)*RootSinkWeight_vr(L)
               NonstElmRootE = RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)*BranchSinkWeight_pft(NB)
               NonstElmGradt = (NonstElmBrchE*CPOOLS-NonstElmRootE*CPOOLB)/CPOOLT
               XFRE          = PTSHTR*NonstElmGradt
@@ -705,6 +707,7 @@ module PlantNonstElmDynMod
   )
   D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
+      !nonstructural chemical transport through sapwood/phloem
       WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_comp))
       WTPLTX = WTRTRX+SapwoodBiomassC_brch(NB,NZ)
       IF(WTPLTX.GT.ZERO4Groth_pft(NZ))THEN

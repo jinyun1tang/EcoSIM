@@ -441,7 +441,7 @@ implicit none
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr    ,& !output :root layer length per plant, [m p-1]
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs        ,& !output :root C primary axes, [g d-2]
     RootMycoActiveBiomC_pvr   => plt_biom%RootMycoActiveBiomC_pvr    ,& !output :root layer structural C, [gC d-2]
-    RootPoreVol_rpvr          => plt_morph%RootPoreVol_rpvr          ,& !output :root layer volume air, [m2 d-2]
+    RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr          ,& !output :root layer volume air, [m2 d-2]
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr           ,& !output :root layer protein C, [gC d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr               & !output :root layer volume water, [m2 d-2]
   )
@@ -545,7 +545,7 @@ implicit none
         Root2ndXNumL_rpvr(N,L,NZ)          = 0._r8
         RootTotLenPerPlant_pvr(N,L,NZ)      = 0._r8
         RootLenDensPerPlant_pvr(N,L,NZ)  = 0._r8
-        RootPoreVol_rpvr(N,L,NZ)          = 0._r8
+        RootPoreVol_pvr(N,L,NZ)          = 0._r8
         RootVH2O_pvr(N,L,NZ)             = 0._r8
         Root1stRadius_pvr(N,L,NZ)        = Root1stMaxRadius_pft(N,NZ)
         Root2ndRadius_rpvr(N,L,NZ)        = Root2ndMaxRadius_pft(N,NZ)

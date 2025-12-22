@@ -453,47 +453,48 @@ module InitPlantMod
   implicit none
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
-  associate(                                                   &
-    CumSoilThickness_vr   => plt_site%CumSoilThickness_vr     ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
-    NL                    => plt_site%NL                      ,& !input  :lowest soil layer number,[-]
-    NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
-    PlantinDepz_pft       => plt_morph%PlantinDepz_pft        ,& !input  :planting depth, [m]
-    RootBiomGrosYld_pft   => plt_allom%RootBiomGrosYld_pft    ,& !input  :root growth yield, [g g-1]
-    rNCRoot_pft           => plt_allom%rNCRoot_pft            ,& !input  :root N:C ratio, [gN gC-1]
-    rPCRootr_pft           => plt_allom%rPCRootr_pft            ,& !input  :root P:C ratio, [gP gC-1]
-    SeedAreaMean_pft      => plt_morph%SeedAreaMean_pft       ,& !input  :seed surface area, [m2]
-    SeedCMass_pft         => plt_morph%SeedCMass_pft          ,& !input  :grain size at seeding, [g]
-    SeedMeanLen_pft       => plt_morph%SeedMeanLen_pft        ,& !input  :seed length, [m]
-    SeedVolumeMean_pft    => plt_morph%SeedVolumeMean_pft     ,& !input  :seed volume, [m3 ]
-    CMinNH4Root_pft       => plt_rbgc%CMinNH4Root_pft         ,& !inoput :minimum NH4 concentration for root NH4 uptake, [g m-3]
-    CMinPO4Root_pft       => plt_rbgc%CMinPO4Root_pft         ,& !inoput :minimum PO4 concentration for root NH4 uptake, [g m-3]
-    CminNO3Root_pft       => plt_rbgc%CminNO3Root_pft         ,& !inoput :minimum NO3 concentration for root NH4 uptake, [g m-3]
-    KmNH4Root_pft         => plt_rbgc%KmNH4Root_pft           ,& !inoput :Km for root NH4 uptake, [g m-3]
-    KmNO3Root_pft         => plt_rbgc%KmNO3Root_pft           ,& !inoput :Km for root NO3 uptake, [g m-3]
-    KmPO4Root_pft         => plt_rbgc%KmPO4Root_pft           ,& !inoput :Km for root PO4 uptake, [g m-3]
-    RootPorosity_pft      => plt_morph%RootPorosity_pft       ,& !inoput :root porosity, [m3 m-3]
-    VmaxNH4Root_pft       => plt_rbgc%VmaxNH4Root_pft         ,& !inoput :maximum root NH4 uptake rate, [g m-2 h-1]
-    VmaxNO3Root_pft       => plt_rbgc%VmaxNO3Root_pft         ,& !inoput :maximum root NO3 uptake rate, [g m-2 h-1]
-    VmaxPO4Root_pft       => plt_rbgc%VmaxPO4Root_pft         ,& !inoput :maximum root PO4 uptake rate, [g m-2 h-1]
-    Root1stMaxRadius1_pft => plt_morph%Root1stMaxRadius1_pft  ,& !output :root diameter primary axes, [m]
-    Root1stMaxRadius_pft  => plt_morph%Root1stMaxRadius_pft   ,& !output :maximum radius of primary roots, [m]
-    Root2ndMaxRadius1_pft => plt_morph%Root2ndMaxRadius1_pft  ,& !output :root diameter secondary axes, [m]
-    Root2ndMaxRadius_pft  => plt_morph%Root2ndMaxRadius_pft   ,& !output :maximum radius of secondary roots, [m]
-    RootVolPerMassC_pft   => plt_morph%RootVolPerMassC_pft    ,& !output :root volume:mass ratio, [m3 g-1]
-    SeedDepth_pft         => plt_morph%SeedDepth_pft          ,& !output :seeding depth, [m]
-    CNRTS_pft             => plt_allom%CNRTS_pft              ,& !output :root N:C ratio x root growth yield, [-]
-    CPRTS_pft             => plt_allom%CPRTS_pft              ,& !output :root P:C ratio x root growth yield, [-]
-    NGTopRootLayer_pft    => plt_morph%NGTopRootLayer_pft     ,& !output :soil layer at planting depth, [-]
-    NMaxRootBotLayer_pft  => plt_morph%NMaxRootBotLayer_pft   ,& !output :maximum soil layer number for all root axes, [-]
-    NRoot1stTipLay_raxes  => plt_morph%NRoot1stTipLay_raxes   ,& !output :maximum soil layer number for root axes, [-]
-    Root1stSpecLen_pft    => plt_morph%Root1stSpecLen_pft     ,& !output :specific root length primary axes, [m g-1]
-    Root1stXSecArea_pft   => plt_morph%Root1stXSecArea_pft    ,& !output :root cross-sectional area primary axes, [m2]
-    Root2ndSpecLen_pft    => plt_morph%Root2ndSpecLen_pft     ,& !output :specific root length secondary axes, [m g-1]
-    Root2ndXSecArea_pft   => plt_morph%Root2ndXSecArea_pft    ,& !output :root cross-sectional area secondary axes, [m2]
-    RootAxialResist_pft   => plt_morph%RootAxialResist_pft    ,& !output :root axial resistivity, [MPa h m-4]
-    RootPoreTortu4Gas_pft => plt_morph%RootPoreTortu4Gas_pft  ,& !output :power function of root porosity used to calculate root gaseous diffusivity, [-]
-    RootRadialResist_pft  => plt_morph%RootRadialResist_pft   ,& !output :root radial resistivity, [MPa h m-2]
-    RootRaidus_rpft       => plt_morph%RootRaidus_rpft         & !output :root internal radius, [m]
+  associate(                                                          &
+    CumSoilThickness_vr       => plt_site%CumSoilThickness_vr        ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
+    NL                        => plt_site%NL                         ,& !input  :lowest soil layer number,[-]
+    NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
+    PlantinDepz_pft           => plt_morph%PlantinDepz_pft           ,& !input  :planting depth, [m]
+    RootBiomGrosYld_pft       => plt_allom%RootBiomGrosYld_pft       ,& !input  :root growth yield, [g g-1]
+    rNCRoot_pft               => plt_allom%rNCRoot_pft               ,& !input  :root N:C ratio, [gN gC-1]
+    rPCRootr_pft              => plt_allom%rPCRootr_pft              ,& !input  :root P:C ratio, [gP gC-1]
+    SeedAreaMean_pft          => plt_morph%SeedAreaMean_pft          ,& !input  :seed surface area, [m2]
+    SeedCMass_pft             => plt_morph%SeedCMass_pft             ,& !input  :grain size at seeding, [g]
+    SeedMeanLen_pft           => plt_morph%SeedMeanLen_pft           ,& !input  :seed length, [m]
+    SeedVolumeMean_pft        => plt_morph%SeedVolumeMean_pft        ,& !input  :seed volume, [m3 ]
+    CMinNH4Root_pft           => plt_rbgc%CMinNH4Root_pft            ,& !inoput :minimum NH4 concentration for root NH4 uptake, [g m-3]
+    CMinPO4Root_pft           => plt_rbgc%CMinPO4Root_pft            ,& !inoput :minimum PO4 concentration for root NH4 uptake, [g m-3]
+    CminNO3Root_pft           => plt_rbgc%CminNO3Root_pft            ,& !inoput :minimum NO3 concentration for root NH4 uptake, [g m-3]
+    KmNH4Root_pft             => plt_rbgc%KmNH4Root_pft              ,& !inoput :Km for root NH4 uptake, [g m-3]
+    KmNO3Root_pft             => plt_rbgc%KmNO3Root_pft              ,& !inoput :Km for root NO3 uptake, [g m-3]
+    KmPO4Root_pft             => plt_rbgc%KmPO4Root_pft              ,& !inoput :Km for root PO4 uptake, [g m-3]
+    RootPorosity_pft          => plt_morph%RootPorosity_pft          ,& !inoput :root porosity, [m3 m-3]
+    VmaxNH4Root_pft           => plt_rbgc%VmaxNH4Root_pft            ,& !inoput :maximum root NH4 uptake rate, [g m-2 h-1]
+    VmaxNO3Root_pft           => plt_rbgc%VmaxNO3Root_pft            ,& !inoput :maximum root NO3 uptake rate, [g m-2 h-1]
+    VmaxPO4Root_pft           => plt_rbgc%VmaxPO4Root_pft            ,& !inoput :maximum root PO4 uptake rate, [g m-2 h-1]
+    Root1stMaxRadius1_pft     => plt_morph%Root1stMaxRadius1_pft     ,& !output :root diameter primary axes, [m]
+    Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft      ,& !output :maximum radius of primary roots, [m]
+    Root2ndMaxRadius1_pft     => plt_morph%Root2ndMaxRadius1_pft     ,& !output :root diameter secondary axes, [m]
+    Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft      ,& !output :maximum radius of secondary roots, [m]
+    FineRootVolPerMassC_pft   => plt_morph%FineRootVolPerMassC_pft   ,& !output :fine root volume:mass ratio, [m3 g-1]
+    CoarseRootVolPerMassC_pft => plt_morph%CoarseRootVolPerMassC_pft ,& !output :coarse root volume:mass ratio, [m3 g-1]
+    SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !output :seeding depth, [m]
+    CNRTS_pft                 => plt_allom%CNRTS_pft                 ,& !output :root N:C ratio x root growth yield, [-]
+    CPRTS_pft                 => plt_allom%CPRTS_pft                 ,& !output :root P:C ratio x root growth yield, [-]
+    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !output :soil layer at planting depth, [-]
+    NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft      ,& !output :maximum soil layer number for all root axes, [-]
+    NRoot1stTipLay_raxes      => plt_morph%NRoot1stTipLay_raxes      ,& !output :maximum soil layer number for root axes, [-]
+    Root1stSpecLen_pft        => plt_morph%Root1stSpecLen_pft        ,& !output :specific root length primary axes, [m g-1]
+    Root1stXSecArea_pft       => plt_morph%Root1stXSecArea_pft       ,& !output :root cross-sectional area primary axes, [m2]
+    Root2ndSpecLen_pft        => plt_morph%Root2ndSpecLen_pft        ,& !output :specific root length secondary axes, [m g-1]
+    Root2ndXSecArea_pft       => plt_morph%Root2ndXSecArea_pft       ,& !output :root cross-sectional area secondary axes, [m2]
+    RootAxialResist_pft       => plt_morph%RootAxialResist_pft       ,& !output :root axial resistivity, [MPa h m-4]
+    RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft     ,& !output :power function of root porosity used to calculate root gaseous diffusivity, [-]
+    RootRadialResist_pft      => plt_morph%RootRadialResist_pft      ,& !output :root radial resistivity, [MPa h m-2]
+    RootRaidus_rpft           => plt_morph%RootRaidus_rpft            & !output :root internal radius, [m]
   )
 !
 !     SEED CHARACTERISTICS
@@ -538,32 +539,33 @@ module InitPlantMod
   CPRTS_pft(NZ)              = rPCRootr_pft(NZ)*RootBiomGrosYld_pft(NZ)
   Root1stMaxRadius_pft(2,NZ) = 5.0E-06_r8      !mycorrhizae
   Root2ndMaxRadius_pft(2,NZ) = 5.0E-06_r8      !mycorrhizae
-  RootPorosity_pft(2,NZ)     = RootPorosity_pft(1,NZ)
-  VmaxNH4Root_pft(2,NZ)      = VmaxNH4Root_pft(1,NZ)
-  KmNH4Root_pft(2,NZ)        = KmNH4Root_pft(1,NZ)
-  CMinNH4Root_pft(2,NZ)      = CMinNH4Root_pft(1,NZ)
-  VmaxNO3Root_pft(2,NZ)      = VmaxNO3Root_pft(1,NZ)
-  KmNO3Root_pft(2,NZ)        = KmNO3Root_pft(1,NZ)
-  CminNO3Root_pft(2,NZ)      = CminNO3Root_pft(1,NZ)
-  VmaxPO4Root_pft(2,NZ)      = VmaxPO4Root_pft(1,NZ)
-  KmPO4Root_pft(2,NZ)        = KmPO4Root_pft(1,NZ)
-  CMinPO4Root_pft(2,NZ)      = CMinPO4Root_pft(1,NZ)
+  RootPorosity_pft(2,NZ)     = RootPorosity_pft(ipltroot,NZ)
+  VmaxNH4Root_pft(2,NZ)      = VmaxNH4Root_pft(ipltroot,NZ)
+  KmNH4Root_pft(2,NZ)        = KmNH4Root_pft(ipltroot,NZ)
+  CMinNH4Root_pft(2,NZ)      = CMinNH4Root_pft(ipltroot,NZ)
+  VmaxNO3Root_pft(2,NZ)      = VmaxNO3Root_pft(ipltroot,NZ)
+  KmNO3Root_pft(2,NZ)        = KmNO3Root_pft(ipltroot,NZ)
+  CminNO3Root_pft(2,NZ)      = CminNO3Root_pft(ipltroot,NZ)
+  VmaxPO4Root_pft(2,NZ)      = VmaxPO4Root_pft(ipltroot,NZ)
+  KmPO4Root_pft(2,NZ)        = KmPO4Root_pft(ipltroot,NZ)
+  CMinPO4Root_pft(2,NZ)      = CMinPO4Root_pft(ipltroot,NZ)
   RootRadialResist_pft(2,NZ) = 1.0E+04_r8
   RootAxialResist_pft(2,NZ)  = 1.0E+12_r8
 !
 !     RootPoreTortu4Gas_pft=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
-!     RootVolPerMassC_pft=volume:C ratio (m3 g-1)
+!     FineRootVolPerMassC_pft=volume:C ratio (m3 g-1)
 !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
 !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
+  CoarseRootVolPerMassC_pft(NZ) = 1.e-6/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ)))
   D500: DO N=1,2
-    RootPoreTortu4Gas_pft(N,NZ)     = RootPorosity_pft(N,NZ)**1.33_r8
-    RootRaidus_rpft(N,NZ)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
-    RootVolPerMassC_pft(N,NZ)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ)))
-    Root1stSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2._r8)
-    Root2ndSpecLen_pft(N,NZ)    = RootVolPerMassC_pft(N,NZ)/(PICON*Root2ndMaxRadius_pft(N,NZ)**2._r8)
-    Root1stMaxRadius1_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ)
+    RootPoreTortu4Gas_pft(N,NZ)   = RootPorosity_pft(N,NZ)**1.33_r8
+    RootRaidus_rpft(N,NZ)         = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
+    FineRootVolPerMassC_pft(N,NZ) = 1.e-6_r8/(BlkDensFineRoots*(1.0_r8-RootPorosity_pft(N,NZ)))    !0.05gC cm-3, ~ 0.10g cm-3.
+    Root1stSpecLen_pft(N,NZ)      = FineRootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2)
+    Root2ndSpecLen_pft(N,NZ)      = FineRootVolPerMassC_pft(N,NZ)/(PICON*Root2ndMaxRadius_pft(N,NZ)**2)
+    Root1stMaxRadius1_pft(N,NZ)   = Root1stMaxRadius_pft(N,NZ)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
     Root2ndMaxRadius1_pft(N,NZ)=Root2ndMaxRadius_pft(N,NZ)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ)))
@@ -931,7 +933,7 @@ module InitPlantMod
     trcs_rootml_pvr               => plt_rbgc%trcs_rootml_pvr                 ,& !inoput :root aqueous content, [g d-2]
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !output :root osmotic water potential, [Mpa]
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !output :root total water potential, [Mpa]
-    RootPoreVol_rpvr               => plt_morph%RootPoreVol_rpvr              ,& !output :root layer volume air, [m2 d-2]
+    RootPoreVol_pvr               => plt_morph%RootPoreVol_pvr              ,& !output :root layer volume air, [m2 d-2]
     RootVH2O_pvr                  => plt_morph%RootVH2O_pvr                   ,& !output :root layer volume water, [m2 d-2]
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !output :root primary axis number,[-]
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !output :root turgor water potential, [Mpa]
@@ -977,7 +979,7 @@ module InitPlantMod
       plt_morph%Root2ndXNumL_rpvr(N,L,NZ)                      = 0._r8
       plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)                 = 0._r8
       plt_morph%RootLenDensPerPlant_pvr(N,L,NZ)                = 0._r8
-      RootPoreVol_rpvr(N,L,NZ)                                 = 0._r8
+      RootPoreVol_pvr(N,L,NZ)                                 = 0._r8
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_rpvr(N,L,NZ)                               = Root2ndMaxRadius_pft(N,NZ)
@@ -997,7 +999,7 @@ module InitPlantMod
       plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
       CCO2A                                             = CCO2EI_gperm3
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
-      trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_rpvr(N,L,NZ)
+      trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_pvr(N,L,NZ)
       trcs_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2P*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
@@ -1005,7 +1007,7 @@ module InitPlantMod
       plt_rbgc%RCO2Emis2Root_rpvr(N,L,NZ)                = 0._r8
       COXYA                                             = COXYE
       COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
-      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_rpvr(N,L,NZ)
+      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
       plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes

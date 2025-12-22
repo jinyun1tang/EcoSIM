@@ -1187,16 +1187,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
-    call restartvar(ncid, flag, varname='RootMycoExudElms_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='Soil2RootMycoExudE_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant root exudation', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMycoExudElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Soil2RootMycoExudE_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMycoExudElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Soil2RootMycoExudE_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
-    call restartvar(ncid, flag, varname='RootMycoExudElms_pft', dim1name='pft',dim2name='elmnts',&
+    call restartvar(ncid, flag, varname='Soil2RootMycoExudE_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant root exudation', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
   endif  
@@ -3361,17 +3361,17 @@ implicit none
   endif
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:pltpar%jroots)
-    call restartvar(ncid, flag, varname='RootVolPerMassC_pft', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='FineRootVolPerMassC_pft', dim1name='pft',dim2name='rootyps',&
      long_name='root volume per C mass', units='m3 g-1', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootVolPerMassC_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FineRootVolPerMassC_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
     !print*,'PSIRoot'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootVolPerMassC_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FineRootVolPerMassC_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr2 => datrp_2d(1:npfts,1:pltpar%jroots)
-    call restartvar(ncid, flag, varname='RootVolPerMassC_pft', dim1name='pft',dim2name='rootyps',&
+    call restartvar(ncid, flag, varname='FineRootVolPerMassC_pft', dim1name='pft',dim2name='rootyps',&
      long_name='root volume per C mass', units='m3 g-1', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
   endif  
@@ -3600,17 +3600,17 @@ implicit none
 
     if(flag=='read')then
       datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-      call restartvar(ncid, flag, varname='RootPoreVol_rpvr', dim1name='pft',dim2name='rootyps',&
+      call restartvar(ncid, flag, varname='RootPoreVol_pvr', dim1name='pft',dim2name='rootyps',&
       dim3name='levsoi',long_name='root layer volume air', units='m2 d-2', &
       interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
-      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootPoreVol_rpvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootPoreVol_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
         IsPlantActive_pft=IsPlantActive_pft) 
     else
-      !print*,'RootPoreVol_rpvr'
-      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootPoreVol_rpvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      !print*,'RootPoreVol_pvr'
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootPoreVol_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
         IsPlantActive_pft=IsPlantActive_pft)   
       datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-      call restartvar(ncid, flag, varname='RootPoreVol_rpvr', dim1name='pft',dim2name='rootyps',&
+      call restartvar(ncid, flag, varname='RootPoreVol_pvr', dim1name='pft',dim2name='rootyps',&
       dim3name='levsoi',long_name='root layer volume air', units='m2 d-2', &
       interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)   
     endif  

@@ -1012,7 +1012,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'RUBP','Carbon mass ratio of rubisco enzyme to total leaf protein  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity at 25oC [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX4','Saturated specific PEP carboxylation rate  at 25oC  [umol CO2 (g PEPC)-1 s-1]',VmaxPEPCarboxyRef_pft(NZ,NY,NX),110)  
     id=addone(id)

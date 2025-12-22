@@ -31,10 +31,10 @@ module NutUptakeMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: FDMP
-  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(jroots,JZ1,JP1)
+  real(r8), intent(in) :: PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius(pltpar%jroots,JZ1),FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
-  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(jroots,JZ1)    ! [m]
+  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)    ! [m]
   
   real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
 
@@ -137,12 +137,12 @@ module NutUptakeMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1)
-  real(r8), intent(in) :: FineRootRadius(jroots,JZ1)
-  real(r8), intent(in) :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(jroots,JZ1,JP1)   !minimum active fraction of roots for substance uptake from soil [none]
+  real(r8), intent(in) :: PathLen_pvr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: FineRootRadius(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)   !minimum active fraction of roots for substance uptake from soil [none]
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
-  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(jroots,JZ1)
+  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
   real(r8), intent(out) :: PopPlantO2Uptake
   real(r8), intent(out) :: PopPlantO2Demand
 
@@ -319,7 +319,7 @@ module NutUptakeMod
   plt_bgcr%RootO2_TotSink_pvr         = 0._r8
   plt_rbgc%RootCO2Ar2RootX_pvr        = 0._r8
   plt_rbgc%RCO2Emis2Root_rpvr         = 0.0_r8
-  plt_rbgc%RootMycoExudEUptk_pvr      = 0.0_r8
+  plt_rbgc%Soil2RootMycoExudE_pvr      = 0.0_r8
   plt_rbgc%RAutoRootO2Limter_rpvr     = 0.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr        = 0.0_r8
   plt_rbgc%RootNutUptake_pvr          = 0.0_r8
@@ -344,7 +344,7 @@ module NutUptakeMod
   plt_ew%HeatStorCanopy_pft     = 0.0_r8
   plt_ew%Transpiration_pft      = 0.0_r8
   plt_ew%VapXAir2Canopy_pft     = 0.0_r8
-  plt_rbgc%RootMycoExudElms_pft = 0.0_r8
+  plt_rbgc%Soil2RootMycoExudE_pft = 0.0_r8
   plt_rbgc%RootNH4Uptake_pft    = 0.0_r8
   plt_rbgc%RootNO3Uptake_pft    = 0.0_r8
   plt_rbgc%RootH2PO4Uptake_pft  = 0.0_r8
@@ -374,9 +374,9 @@ module NutUptakeMod
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  real(r8), intent(in):: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(jroots,JZ1,JP1)  !the minimum root fraction involved in substrate uptake
-  real(r8), intent(in):: RootLateralAreaDivRadius_pvr(jroots,JZ1)
+  real(r8), intent(in):: PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius(pltpar%jroots,JZ1),FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)  !the minimum root fraction involved in substrate uptake
+  real(r8), intent(in):: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
   real(r8), intent(in):: FCUP
   real(r8), intent(in):: FPUP
   real(r8), intent(in):: FWSRT
@@ -468,9 +468,9 @@ module NutUptakeMod
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
   real(r8), intent(in):: FNO3X,FNOBX
-  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1)
-  real(r8), intent(in) :: FineRootRadius(jroots,JZ1)
-  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(jroots,JZ1)
+  real(r8), intent(in) :: PathLen_pvr(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: FineRootRadius(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
   real(r8), intent(in):: FCUP
   real(r8), intent(in):: FZUP
   real(r8), intent(in):: FWSRT
@@ -658,8 +658,8 @@ module NutUptakeMod
   integer , intent(in) :: I,J
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: FNH4X,FNHBX,PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1)
-  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(jroots,JZ1)
+  real(r8), intent(in) :: FNH4X,FNHBX,PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius(pltpar%jroots,JZ1)
+  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: FCUP
   real(r8), intent(in) :: FZUP
   real(r8), intent(in) :: FWSRT
@@ -1171,9 +1171,9 @@ module NutUptakeMod
   integer , intent(in) :: I,J
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: PathLen_pvr(jroots,JZ1),FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(jroots,JZ1,JP1)
-  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(jroots,JZ1)
+  real(r8), intent(in) :: PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius(pltpar%jroots,JZ1),FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in) :: RootLateralAreaDivRadius_pvr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: FCUP
   real(r8), intent(in) :: FZUP
   real(r8), intent(in) :: FWSRT
@@ -1232,7 +1232,6 @@ module NutUptakeMod
     !     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NH4,NO3
     !     FROM SOIL TO ROOT
     !
-
     call UptakeNH4(I,J,N,L,NZ,FNH4X,FNHBX,PathLen_pvr,FineRootRadius,RootLateralAreaDivRadius_pvr,FCUP,FZUP,FWSRT,&
       PerPlantRootH2OUptake,RootMyMassC)
 
@@ -1253,8 +1252,8 @@ module NutUptakeMod
   integer, intent(in)   :: I,J  
   integer, intent(in)   :: N,L
   integer, intent(in)   :: NZ
-  REAL(R8), INTENT(IN)  :: FracPRoot4Uptake(jroots,JZ1,JP1)
-  real(r8), intent(in)  :: FracMinRoot4Uptake_rpvr(jroots,JZ1,JP1)
+  REAL(R8), INTENT(IN)  :: FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
+  real(r8), intent(in)  :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(out) :: FCUP   !carbon-limitation factor for nutrient uptake, [0-1], greater value weaker limitation
   real(r8), intent(out) :: FZUP   !nitrogen-limitation factor for nutrient uptake, [0-1], greater value stronger limitation
   real(r8), intent(out) :: FPUP   !nitrogen-limitation factor for nutrient uptake, [0-1], greater value stronger limitation
@@ -1326,9 +1325,9 @@ module NutUptakeMod
   !
   IF(RootNonstructElmConc_rpvr(ielmc,N,L,NZ).GT.ZERO)THEN
     FZUP=AMIN1(RootNonstructElmConc_rpvr(ielmc,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmc,N,L,NZ)+RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/ZCKI) &
-      ,RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmp,N,L,NZ)+RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/ZPKI))
+      ,safe_adb(RootNonstructElmConc_rpvr(ielmp,N,L,NZ),(RootNonstructElmConc_rpvr(ielmp,N,L,NZ)+RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/ZPKI)))
     FPUP=AMIN1(RootNonstructElmConc_rpvr(ielmc,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmc,N,L,NZ)+RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/PCKI) &
-      ,RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmn,N,L,NZ)+RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/PZKI))
+      ,safe_adb(RootNonstructElmConc_rpvr(ielmn,N,L,NZ),(RootNonstructElmConc_rpvr(ielmn,N,L,NZ)+RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/PZKI)))
   ELSE
     FZUP=0.0_r8
     FPUP=0.0_r8
@@ -1336,7 +1335,11 @@ module NutUptakeMod
   Nutruptk_fNlim_rpvr(N,L,NZ)=FZUP
   Nutruptk_fPlim_rpvr(N,L,NZ)=FPUP
   !NN=0
-  PerPlantRootH2OUptake   = AZMAX1(-RPlantRootH2OUptk_pvr(N,L,NZ)/PlantPopulation_pft(NZ))
+  if(PlantPopulation_pft(NZ).GT.ZERO)then
+    PerPlantRootH2OUptake  = AZMAX1(-RPlantRootH2OUptk_pvr(N,L,NZ))/PlantPopulation_pft(NZ)
+  else
+    PerPlantRootH2OUptake  = 0._r8
+  endif
   dtPerPlantRootH2OUptake = PerPlantRootH2OUptake*dts_gas
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG
@@ -1370,16 +1373,16 @@ module NutUptakeMod
   real(r8) :: RootExudE,scal
   integer :: K,NE
   !     begin_execution
-  associate(                                                    &
-    RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr  ,& !input  :root layer nonstructural element, [g d-2]
-    ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
-    ZEROS                  => plt_site%ZEROS                   ,& !input  :threshold zero for numerical stability,[-]
-    ZEROS2                 => plt_site%ZEROS2                  ,& !input  :threshold zero for numerical stability,[-]
-    VLWatMicPM_vr          => plt_site%VLWatMicPM_vr           ,& !input  :soil micropore water content, [m3 d-2]
-    RootVH2O_pvr           => plt_morph%RootVH2O_pvr           ,& !input  :root layer volume water, [m2 d-2]
-    FracBulkSOMC_vr        => plt_soilchem%FracBulkSOMC_vr     ,& !input  :fraction of total organic C in complex, [-]
-    DOM_MicP_vr            => plt_soilchem%DOM_MicP_vr         ,& !input  :dissolved organic C micropore, [gC d-2]
-    RootMycoExudEUptk_pvr  => plt_rbgc%RootMycoExudEUptk_pvr    & !inoput :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
+  associate(                                                     &
+    RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr  ,& !input  :root layer nonstructural element, [g d-2]
+    ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
+    ZEROS                   => plt_site%ZEROS                   ,& !input  :threshold zero for numerical stability,[-]
+    ZEROS2                  => plt_site%ZEROS2                  ,& !input  :threshold zero for numerical stability,[-]
+    VLWatMicPM_vr           => plt_site%VLWatMicPM_vr           ,& !input  :soil micropore water content, [m3 d-2]
+    RootVH2O_pvr            => plt_morph%RootVH2O_pvr           ,& !input  :root layer volume water, [m2 d-2]
+    FracBulkSOMC_vr         => plt_soilchem%FracBulkSOMC_vr     ,& !input  :fraction of total organic C in complex, [-]
+    DOM_MicP_vr             => plt_soilchem%DOM_MicP_vr         ,& !input  :dissolved organic C micropore, [gC d-2]
+    Soil2RootMycoExudE_pvr  => plt_rbgc%Soil2RootMycoExudE_pvr   & !inoput :soil to root/myco flux via exudation, (+) to plants, (-) to soil [g d-2 h-1]
   )
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
@@ -1407,35 +1410,35 @@ module NutUptakeMod
       XFRE(ielmc) = (DOM_MicP_vr(idom_doc,K,L)*RootVH2O_pvr(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
 
       !XFRC >0, plant absorbs dom 
-      RootMycoExudEUptk_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
+      Soil2RootMycoExudE_pvr(ielmc,N,K,L,NZ)=FEXUDE(ielmc)*XFRE(ielmc)
       IF(DOM_MicP_vr(idom_doc,K,L).GT.ZEROS .AND. RootMycoNonstElms_rpvr(ielmc,N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
         CPOOLT                                = DOM_MicP_vr(idom_doc,K,L)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
         ZPOOLX                                = 0.1_r8*RootMycoNonstElms_rpvr(ielmn,N,L,NZ)
         PPOOLX                                = 0.1_r8*RootMycoNonstElms_rpvr(ielmp,N,L,NZ)
         XFRE(ielmn)                           = (DOM_MicP_vr(idom_don,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-ZPOOLX*DOM_MicP_vr(idom_doc,K,L))/CPOOLT
         XFRE(ielmp)                           = (DOM_MicP_vr(idom_dop,K,L)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-PPOOLX*DOM_MicP_vr(idom_doc,K,L))/CPOOLT
-        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ) = FEXUDE(ielmn)*XFRE(ielmn)    !>0 into roots
-        RootMycoExudEUptk_pvr(ielmp,N,K,L,NZ) = FEXUDE(ielmp)*XFRE(ielmp)
+        Soil2RootMycoExudE_pvr(ielmn,N,K,L,NZ) = FEXUDE(ielmn)*XFRE(ielmn)    !>0 into roots
+        Soil2RootMycoExudE_pvr(ielmp,N,K,L,NZ) = FEXUDE(ielmp)*XFRE(ielmp)
       ELSE
-        RootMycoExudEUptk_pvr(ielmn,N,K,L,NZ)=0.0_r8
-        RootMycoExudEUptk_pvr(ielmp,N,K,L,NZ)=0.0_r8
+        Soil2RootMycoExudE_pvr(ielmn,N,K,L,NZ)=0.0_r8
+        Soil2RootMycoExudE_pvr(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RootMycoExudEUptk_pvr(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
+      Soil2RootMycoExudE_pvr(1:NumPlantChemElms,N,K,L,NZ)=0.0_r8
     ENDIF
   ENDDO D195
   
   DO NE=1,NumPlantChemElms
     RootExudE=0._r8
     DO K=1,jcplx
-      RootExudE=RootExudE+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+      RootExudE=RootExudE+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
     ENDDO
     !Avoid excessive exudation 
     if(RootExudE<0._r8)then
       if(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootExudE<0._r8)then
         scal=RootMycoNonstElms_rpvr(NE,N,L,NZ)/(-RootExudE)*0.999999_r8
         DO K=1,jcplx
-          RootMycoExudEUptk_pvr(NE,N,K,L,NZ)=RootMycoExudEUptk_pvr(NE,N,K,L,NZ)*scal
+          Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)=Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)*scal
         ENDDO
       endif
     endif    
@@ -1465,8 +1468,8 @@ module NutUptakeMod
     MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     REcoDOMProd_vr         => plt_bgcr%REcoDOMProd_vr          ,& !inoput :net microbial DOC flux, [gC d-2 h-1]
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr  ,& !inoput :root layer nonstructural element, [g d-2]
-    RootMycoExudEUptk_pvr  => plt_rbgc%RootMycoExudEUptk_pvr   ,& !inoput :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
-    RootMycoExudElms_pft   => plt_rbgc%RootMycoExudElms_pft    ,& !inoput :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+    Soil2RootMycoExudE_pvr => plt_rbgc%Soil2RootMycoExudE_pvr  ,& !inoput :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
+    Soil2RootMycoExudE_pft => plt_rbgc%Soil2RootMycoExudE_pft  ,& !inoput :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     RootHPO4Uptake_pft     => plt_rbgc%RootHPO4Uptake_pft      ,& !inoput :total root uptake of HPO4, [g d-2 h-1]
     RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft     ,& !inoput :total root uptake of PO4, [g d-2 h-1]
     RootNH4Uptake_pft      => plt_rbgc%RootNH4Uptake_pft       ,& !inoput :total root uptake of NH4, [g d-2 h-1]
@@ -1490,7 +1493,7 @@ module NutUptakeMod
         DO N=1,Myco_pft(NZ)
           !positve means uptake from soil
           DO NE=1,NumPlantChemElms
-            DOM_uptk(NE)=DOM_uptk(NE)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+            DOM_uptk(NE)=DOM_uptk(NE)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
           ENDDO
         ENDDO
         if(any(DOM_uptk/=0._r8))then
@@ -1504,8 +1507,8 @@ module NutUptakeMod
 
           DO N=1,Myco_pft(NZ)
             DO NE=1,NumPlantChemElms
-              RootMycoExudElms_pft(NE,NZ)       = RootMycoExudElms_pft(NE,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
-              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+              Soil2RootMycoExudE_pft(NE,NZ)     = Soil2RootMycoExudE_pft(NE,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
+              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
             ENDDO
           ENDDO
         endif

@@ -168,7 +168,7 @@ module ExtractsMod
     RootH2PO4DmndBand_pvr     => plt_rbgc%RootH2PO4DmndBand_pvr      ,& !input  :root uptake of H2PO4 band, [g d-2 h-1]
     RootH2PO4DmndSoil_pvr     => plt_rbgc%RootH2PO4DmndSoil_pvr      ,& !input  :root uptake of H2PO4 non-band, [g d-2 h-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !input  :root layer length density, [m m-3]
-    RootMycoExudEUptk_pvr     => plt_rbgc%RootMycoExudEUptk_pvr      ,& !input  :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
+    Soil2RootMycoExudE_pvr     => plt_rbgc%Soil2RootMycoExudE_pvr      ,& !input  :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
     RootNH4DmndBand_pvr       => plt_rbgc%RootNH4DmndBand_pvr        ,& !input  :root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
     RootNH4DmndSoil_pvr       => plt_rbgc%RootNH4DmndSoil_pvr        ,& !input  :root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
     RootNO3DmndBand_pvr       => plt_rbgc%RootNO3DmndBand_pvr        ,& !input  :root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
@@ -265,7 +265,7 @@ module ExtractsMod
 !
       DO K=1,jcplx
         DO NE=1,NumPlantChemElms
-          tRootMycoExud2Soil_vr(NE,K,L)=tRootMycoExud2Soil_vr(NE,K,L)-RootMycoExudEUptk_pvr(NE,N,K,L,NZ)
+          tRootMycoExud2Soil_vr(NE,K,L)=tRootMycoExud2Soil_vr(NE,K,L)-Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
         ENDDO
       ENDDO
 !

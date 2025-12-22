@@ -482,7 +482,7 @@ module UptakesMod
       ENDIF
       FracMinRoot4Uptake_rpvr(N,L,NZ)=FMN*FracPRoot4Uptake_pvr(N,L,NZ)
 
-      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and..not.ldo_sp_mode)THEN
+      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
           /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootTotLenPerPlant_pvr(N,L,NZ))))
 
@@ -1081,18 +1081,22 @@ module UptakesMod
   real(r8) :: FRADW 
   real(r8) :: FRAD1   !relative radius of the primary roots with respect to 
   real(r8) :: FRAD2
+  real(r8) :: DTransptTube, AreaTranspt
   real(r8) :: RSSL,Root2ndSurfArea
   real(r8) :: StalkAxialResist     ![kg H2O m-5 h-1] =[m-2 h-1 H2O]
   integer :: N, L
   associate(                                                                  &
     DLYR3                       => plt_site%DLYR3                            ,& !input  :vertical thickness of soil layer, [m]  
     CanopyHeight_pft            => plt_morph%CanopyHeight_pft                ,& !input  :canopy height, [m]
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft           ,& !input  :plant growth type (vascular, non-vascular),[-]    
     CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr              ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     HYCDMicP4RootUptake_vr      => plt_soilchem%HYCDMicP4RootUptake_vr       ,& !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
     MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft                ,& !input  :maximum soil layer number for all root axes,[-]
     Myco_pft                    => plt_morph%Myco_pft                        ,& !input  :mycorrhizal type (no or yes),[-]
     NU                          => plt_site%NU                               ,& !input  :current soil surface layer number, [-]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                      ,& !input  :canopy total water potential, [Mpa]
+    RootAge_rpvr                => plt_morph%RootAge_rpvr                    ,& !inoput :root age,[h]
+    RootMatureAge_pft           => plt_morph%RootMatureAge_pft               ,& !input : Root maturation age, [h]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft              ,& !input  :plant population, [d-2]
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
     Root1stXNumL_rpvr           => plt_morph%Root1stXNumL_rpvr               ,& !input  :root layer number primary axes, [d-2]
@@ -1188,7 +1192,13 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         !     Root1stXNumL_rpvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
-        FRAD1                       = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4        
+        if(N.eq.ipltroot .and. is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,1,NZ)>=RootMatureAge_pft(NZ))then
+          DTransptTube = AMIN1(ZSTX,FSTK*Root1stRadius_pvr(N,L,NZ))
+          AreaTranspt  = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
+          FRAD1        = AreaTranspt/Root2ndMaxRadius_pft(N,NZ)**2
+        else
+          FRAD1                       = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4        
+        endif        
         FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
         StalkAxialResist            = RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_rpvr(L,NZ))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_rpvr(L,NZ))                    
