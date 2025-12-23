@@ -255,7 +255,7 @@ module grosubsMod
   real(r8) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: tvegE_beg(NumPlantChemElms)
   real(r8) :: tvegE_end(NumPlantChemElms)
-  real(r8) :: err,arr(12),arr1(11),PTRTM
+  real(r8) :: err,arr(12),arr1(11),GrothPART2LeafPetole
 ! begin_execution
   associate(                                                 &
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft     ,& !input  :number of branches,[-]
@@ -278,8 +278,8 @@ module grosubsMod
 
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,PTRTM,BegRemoblize)
-      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=PTRTM
+        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
+      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
 
     call RootBGCModel(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)

@@ -294,9 +294,9 @@ implicit none
     !coarse roots, 45-60% volume as water 
 
     if(N.EQ.ipltroot .and. is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,1,NZ)>=RootMatureAge_pft(NZ))then
-      !TO damp off coarse root contribution to absorption
-      SCAL=exp(-Root1stRadiusEst/Root1stMaxRadius1_pft(N,NZ))
-      CoarseVol=Root1stPopuC*CoarseRootVolPerMassC_pft(NZ)
+      !Use scal to damp off coarse root contribution to absorption
+      SCAL      = exp(-Root1stRadiusEst/Root1stMaxRadius1_pft(N,NZ))
+      CoarseVol = Root1stPopuC*CoarseRootVolPerMassC_pft(NZ)
       TotRootVol=AMAX1(Root2ndXSecArea_pft(N,NZ)*TotPopuRoot2ndLlenAxes,Root2ndPopuC*FineRootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))+ &
         CoarseVol*PSIRootTurg_vr(N,L,NZ)*SCAL
       !assuming elongation zone is negligible in length, pi*r^2*l=vol/pop 
@@ -318,6 +318,7 @@ implicit none
     Root2ndSurfArea            = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*TotPopuRoot2ndLlenAxes
     RootArea1stPP_pvr(N,L,NZ)  = Root1stSurfArea/PlantPopulation_pft(NZ)
     RootArea2ndPP_pvr(N,L,NZ)  = Root2ndSurfArea/PlantPopulation_pft(NZ)
+
     IF(Root2ndXNumL_rpvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       Root2ndEffLen4uptk_rpvr(N,L,NZ)=AMAX1(Root2ndTipLen4uptk,TotPopuRoot2ndLlenAxes/Root2ndXNumL_rpvr(N,L,NZ))
     ELSE
@@ -1966,7 +1967,8 @@ implicit none
   !  only the non-woody part is contributing to the elongation
   ! elongation due to positive growth of non-woody part
   Root1stExtPot         = RootMycoNonstC4Grow_Oltd/PlantPopulation_pft(NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_comp)*Root1stSpecLen_pft(N,NZ)
-  Root1stPerPlantExtenz = Root1stExtPot*RootGrothWatSens/(1._r8+SoilResit4RootPentration*Root1stExtPot)
+
+  Root1stPerPlantExtenz = Root1stExtPot !*RootGrothWatSens/(1._r8+SoilResit4RootPentration*Root1stExtPot)
 
   IF(RootNetGrowthElms(ielmc).LT.0.0_r8 .AND. RootMyco1stElm_raxs(ielmc,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
     !primary roots withdraw, note that primary root depth was initialized at seedDepth
@@ -2398,17 +2400,17 @@ implicit none
             Root1stLocDepz_vr(NR,L) = AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L))-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
             RootEffDepz             = AMAX1(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L)+CanopyHeight4WatUptake_pft(NZ)
 
-            !root tip
+            
             IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN
-              DistCanopyPrimeRootTip = Root1stDepz_raxes(NR,NZ)+CanopyHeight4WatUptake_pft(NZ)              
-              DTransptTube     = AMIN1(ZSTX,FSTK*Root1stRadius_pvr(N,L,NZ))
-              AreaTranspt=2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
-
+              DistCanopyPrimeRootTip = Root1stDepz_raxes(NR,NZ)+CanopyHeight4WatUptake_pft(NZ)
+              DTransptTube           = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
+              AreaTranspt            = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
+              
               IF(Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L))THEN
                 !Root tip in layer L
                 Root1stSink_pvr(L,NR)  = RTSK(iPlantRootProfile_pft(NZ))*RootNumPrimeAxes_pft(NZ)*AreaTranspt/DistCanopyPrimeRootTip
               elseif(is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
-                !
+                !non-tip layer
                 Root1stSink_pvr(L,NR)  = RootNumPrimeAxes_pft(NZ)*AreaTranspt/RootEffDepz
               ENDIF
               RootSinkC(N)           = RootSinkC(N)+Root1stSink_pvr(L,NR)
@@ -2437,8 +2439,8 @@ implicit none
             !
 
             IF(RootEffDepz.GT.ZERO)THEN
-              !grant 1998 used **4, but here is **2, because Poiseuille flow is not a good approximation. Instead it is better approximated by the 
-              !Münch model.
+              !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um diameter), and the R**2 rule counts
+              !number of pores. 
               RTSKP = RootNumPrimeAxes_pft(NZ)*Root1stRadius_pvr(N,L,NZ)**2/RootEffDepz
               RTSKS = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
 

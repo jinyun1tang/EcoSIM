@@ -2589,18 +2589,18 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_ShootRootXferC_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='ShootRoot_XFER_C_pft',units='gC/m2/hr',avgflag='A',&
-    long_name='Shoot C transfered to root',ptr_patch=data1d_ptr,&
+  call hist_addfld1d(fname='ShootRoot_XFER_C_pft',units='gC/hr/plant',avgflag='A',&
+    long_name='Shoot C transfered to root via phloem',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_ShootRootXferN_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='ShootRoot_XFER_N_pft',units='gN/m2/hr',avgflag='A',&
-    long_name='Shoot N transfered to root',ptr_patch=data1d_ptr,&
+  call hist_addfld1d(fname='ShootRoot_XFER_N_pft',units='gN/hr/plant',avgflag='A',&
+    long_name='Shoot N transfered to root via phloem',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_ShootRootXferP_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='ShootRoot_XFER_P_pft',units='gP/m2/hr',avgflag='A',&
-    long_name='Shoot P transfered to root',ptr_patch=data1d_ptr,&
+  call hist_addfld1d(fname='ShootRoot_XFER_P_pft',units='gP/hr/plant',avgflag='A',&
+    long_name='Shoot P transfered to root via phloem',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc)            !NumOfBranches_pft(NZ,NY,NX)
@@ -4226,9 +4226,15 @@ implicit none
         this%h1D_STANDING_DEAD_P_ptc(nptc)  = StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_P_FLX_ptc(nptc)      = PO4byFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_SURF_LITRf_P_FLX_ptc(nptc) = SurfLitrfalStrutElms_CumYr_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_ShootRootXferC_ptc(nptc)   = ShootRootXferElm_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_ShootRootXferN_ptc(nptc)   = ShootRootXferElm_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_ShootRootXferP_ptc(nptc)   = ShootRootXferElm_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        if (PlantPopulation_pft(NZ,NY,NX) > 0._r8)then
+          this%h1D_ShootRootXferC_ptc(nptc)   = ShootRootXferElm_pft(ielmc,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
+          this%h1D_ShootRootXferN_ptc(nptc)   = ShootRootXferElm_pft(ielmn,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
+          this%h1D_ShootRootXferP_ptc(nptc)   = ShootRootXferElm_pft(ielmp,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
+        else
+          this%h1D_ShootRootXferC_ptc(nptc)   = 0._r8
+          this%h1D_ShootRootXferN_ptc(nptc)   = 0._r8
+          this%h1D_ShootRootXferP_ptc(nptc)   = 0._r8
+        endif
         this%h1D_BRANCH_NO_ptc(nptc)        = NumOfBranches_pft(NZ,NY,NX)
         this%h1D_MainBranchNO_ptc(nptc)     = MainBranchNum_pft(NZ,NY,NX)
         this%h1D_RCanMaintDef_CO2_pft(nptc) = RCanMaintDef_CO2_pft(NZ,NY,NX)

@@ -248,7 +248,7 @@ module PlantBGCPars
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDensCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
   FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius
-  ZSTX                  = 1.0E-03_r8
+  ZSTX                  = 1.0E-03_r8     !one mm
   StalkMassDensity      = 0.225_r8
   SpecStalkVolume       = 1.0E-06_r8/StalkMassDensity
   FRTX                  = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)

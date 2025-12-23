@@ -33,7 +33,7 @@ module PlantBranchMod
   ![header]
 !----------------------------------------------------------------------------------------------------
   subroutine GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,&
-    CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,PTRT,BegRemoblize)
+    CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ
   REAL(R8), INTENT(IN) :: TFN6_vr(JZ1)
@@ -44,7 +44,7 @@ module PlantBranchMod
   real(r8), intent(in) :: TFN5,WaterStress4Groth
   real(r8), intent(in) :: Stomata_Stress
   real(r8), intent(in) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
-  real(r8), intent(out) :: PTRT !new growth allocated to leaf and petiole
+  real(r8), intent(out) :: GrothPART2LeafPetole !new growth allocated to leaf and petiole
   integer, intent(out) :: BegRemoblize
   character(len=*), parameter :: subname='GrowOneBranch'
 
@@ -98,7 +98,7 @@ module PlantBranchMod
     call CalcPartitionCoeff(I,J,NB,NZ,PART,LRemob_brch,BegRemoblize)
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
-      PTRT=PART(ibrch_leaf)+PART(ibrch_petole)
+      GrothPART2LeafPetole=PART(ibrch_leaf)+PART(ibrch_petole)
     ENDIF
 
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
