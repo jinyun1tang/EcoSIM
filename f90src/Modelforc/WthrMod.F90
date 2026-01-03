@@ -462,7 +462,7 @@ module WthrMod
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
         !
-        IF(ICLM.EQ.2.AND.J.EQ.1)THEN
+        IF(ICLM.EQ.2 .AND. J.EQ.1)THEN
           DTS                   = 0.5_r8*DTA
           ATCA_col(NY,NX)       = ATCAI_col(NY,NX)+DTA
           ATCS_col(NY,NX)       = ATCAI_col(NY,NX)+DTS

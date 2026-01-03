@@ -10,6 +10,7 @@ module SnowPhysMod
   use abortutils,    only: endrun
   use EcoSIMCtrlMod, only: fixWaterLevel, mod_snow_albedo
   use DebugToolMod,  only: PrintInfo
+  use InitSOMBGCMod, only: gOC_to_m3_OM
   use SnowDataType
   use SurfLitterDataType
   use SOMDataType
@@ -1130,7 +1131,7 @@ contains
     IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN    
       VLWatMicP1_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)+FLWW
       VLiceMicP1_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)+FLWI+FLWS/DENSICE
-      VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+      VHeatCapacity1_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
       TKSoil1_vr(0,NY,NX)        = (ENGY1+HFLWS)/VHeatCapacity1_vr(0,NY,NX)
       QSnowH2Oloss_col(NY,NX)    = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
       QSnowHeatLoss_col(NY,NX)   = QSnowHeatLoss_col(NY,NX)+HFLWS
@@ -1142,7 +1143,7 @@ contains
         VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
         VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
         ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
-        VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
+        VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
           +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
         VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
           +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)

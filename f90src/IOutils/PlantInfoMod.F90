@@ -191,7 +191,7 @@ implicit none
       DO NZ=1,NP_col(NY,NX)
         DO M=1,366
           iHarvstType_pft(NZ,M,NY,NX)                                   = -1
-          jHarvstType_pft(NZ,M,NY,NX)                                       = 0
+          jHarvstType_pft(NZ,M,NY,NX)                                   = 0
           CanopyHeightCut_pft(NZ,M,NY,NX)                               = 1.0E+06_r8
           THIN_pft(NZ,M,NY,NX)                                          = -1.0_r8
           FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
@@ -517,8 +517,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRubisco2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, LeafPEP2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CHL', loc, LeafC3Chl2Protein_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CHL4', loc, LeafC4Chl2Protein_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL', loc, LeafChl2Protein_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'fCHLMESO', loc, fMesophyllChlProtein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
@@ -662,13 +662,13 @@ implicit none
   VmaxPEPCarboxyRef_pft(NZ,NY,NX)     = VmaxPEPCarboxyRef_tab(loc)
   XKCO2_pft(NZ,NY,NX)                 = XKCO2_tab(loc)
   XKO2_pft(NZ,NY,NX)                  = XKO2_tab(loc)
-  RootMatureAge_pft(NZ,NY,NX)     = RootMatureAge_tab(loc)
+  RootMatureAge_pft(NZ,NY,NX)         = RootMatureAge_tab(loc)
   Km4PEPCarboxy_pft(NZ,NY,NX)         = Km4PEPCarboxy_tab(loc)
   LeafRubisco2Protein_pft(NZ,NY,NX)   = LeafRubisco2Protein_tab(loc)
   LeafPEP2Protein_pft(NZ,NY,NX)       = LeafPEP2Protein_tab(loc)
   SpecLeafChlAct_pft(NZ,NY,NX)        = SpecChloryfilAct_tab(loc)
-  LeafC3Chl2Protein_pft(NZ,NY,NX)     = LeafC3Chl2Protein_tab(loc)
-  LeafC4Chl2Protein_pft(NZ,NY,NX)     = LeafC4Chl2Protein_tab(loc)
+  LeafChl2Protein_pft(NZ,NY,NX)       = LeafChl2Protein_tab(loc)
+  fMesophyllChlProtein_pft(NZ,NY,NX)  = fChlMesophyll_tab(loc)
   CanopyCi2CaRatio_pft(NZ,NY,NX)      = CanopyCi2CaRatio_pft_tab(loc)
 
   RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_tab(loc)
@@ -995,11 +995,11 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKO2','Reference Km for rubisco oxygenation  at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'RUBP','Carbon mass ratio of rubisco enzyme to total leaf protein  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein is Rubisco enzyme [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Carbon mass ratio of mesophyll chlorophyll to total leaf protein  [gC Chl /(gC protein)]',LeafC3Chl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafChl2Protein_pft(NZ,NY,NX),110)
   elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX','Saturated specific carboxylation rate by Rubisco  at 25oC  [umol CO2 (g rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
@@ -1010,7 +1010,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKO2','Reference Km for rubisco oxygenation at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'RUBP','Carbon mass ratio of rubisco enzyme to total leaf protein  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein is Rubisco enzyme  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity at 25oC [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
@@ -1018,11 +1018,11 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKCO24','Reference KM for PEP carboxylation  at 25oC  [uM]',Km4PEPCarboxy_pft(NZ,NY,NX),110)    
     id=addone(id)
-    call writefixl(nu_plt,id,'PEPC','Carbon mass ratio of PEPC enzyme to total leaf protein  [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'PEPC','Fraction of total leaf protein is PEPC enzyme [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Carbon mass ratio of bundle sheath chlorophyll to total leaf protein  [gC Chl  (gC protein)-1]',LeafC3Chl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafChl2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL4','Carbon mass ratio of mesophyll chlorophyll to total leaf protein  [gC Chl (gC protein)-1]',LeafC4Chl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'fCHLMESO','Fraction of chlorophyll-binded proteins in mesophyll cells [-]',fMesophyllChlProtein_pft(NZ,NY,NX),110)
   endif
   id=addone(id)
   call writefixl(nu_plt,id,'FCO2','Intercellular-to-atmospheric CO2 concentration ratio  [-]',CanopyCi2CaRatio_pft(NZ,NY,NX),110)
@@ -1556,8 +1556,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'RUBP', LeafRubisco2Protein_tab)
   call ncd_getvar(pft_nfid, 'PEPC', LeafPEP2Protein_tab)
   call ncd_getvar(pft_nfid, 'ETMX', SpecChloryfilAct_tab)
-  call ncd_getvar(pft_nfid, 'CHL',  LeafC3Chl2Protein_tab)
-  call ncd_getvar(pft_nfid, 'CHL4', LeafC4Chl2Protein_tab)
+  call ncd_getvar(pft_nfid, 'CHL',  LeafChl2Protein_tab)
+  call ncd_getvar(pft_nfid, 'fCHLMESO', fChlMesophyll_tab)
   call ncd_getvar(pft_nfid, 'FCO2', CanopyCi2CaRatio_pft_tab)
   call ncd_getvar(pft_nfid, 'ALBR', RadSWLeafAlbedo_tab)
   call ncd_getvar(pft_nfid, 'ALBP', CanopyPARalbedo_tab)

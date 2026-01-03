@@ -932,8 +932,8 @@ implicit none
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)
   ENGY1                           = ENGY1+FX*ENGY0
-  VHeatCapacitySoilM_vr(L1,NY,NX) = VHeatCapacitySoilM_vr(L1,NY,NX)+FX*VHeatCapacitySoilM_vr(L0,NY,NX)
-  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapacitySoilM_vr(L1,NY,NX) &
+  VHeatCapSolidSoil_vr(L1,NY,NX) = VHeatCapSolidSoil_vr(L1,NY,NX)+FX*VHeatCapSolidSoil_vr(L0,NY,NX)
+  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapSolidSoil_vr(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP_vr(L1,NY,NX)) &
     +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_vr(L1,NY,NX))
 
@@ -1086,7 +1086,7 @@ implicit none
           RootVH2O_pvr(N,L1,NZ,NY,NX)            = RootVH2O_pvr(N,L1,NZ,NY,NX)+FX*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L1,NZ,NY,NX)       = Root1stRadius_pvr(N,L1,NZ,NY,NX)+FX*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX)       = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
           Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)       = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
@@ -1117,14 +1117,14 @@ implicit none
   VLSoilMicP_vr(L0,NY,NX)         = FY*VLSoilMicP_vr(L0,NY,NX)
   VLWatMicPX_vr(L0,NY,NX)         = VLWatMicP_vr(L0,NY,NX)
   ENGY0                           = FY*ENGY0
-  VHeatCapacitySoilM_vr(L0,NY,NX) = FY*VHeatCapacitySoilM_vr(L0,NY,NX)
+  VHeatCapSolidSoil_vr(L0,NY,NX) = FY*VHeatCapSolidSoil_vr(L0,NY,NX)
 
   IF(L0.NE.0)THEN
-    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM_vr(L0,NY,NX) &
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapSolidSoil_vr(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP_vr(L0,NY,NX)) &
       +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_vr(L0,NY,NX))
   ELSE
-    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM_vr(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapSolidSoil_vr(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
   ENDIF
   IF(VHeatCapacity_vr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L0,NY,NX)=ENGY0/VHeatCapacity_vr(L0,NY,NX)
@@ -1266,7 +1266,7 @@ implicit none
           RootVH2O_pvr(N,L0,NZ,NY,NX)            = FY*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
           Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
@@ -1304,7 +1304,7 @@ implicit none
   real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
   real(r8) :: FXWTRTD,FXWSRTL,FRootNumPrimeAxes_pft,FXRTNL,FXRTLGP,FXRTDNP
-  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootAreaPerPlant_pvr,FXRTLGA
+  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootSAreaPerPlant_pvr,FXRTLGA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
   real(r8) :: FXOMC,FXOMN,FXOMP,FXORC,FXORN,FXORP,FXOQC
@@ -1484,9 +1484,9 @@ implicit none
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX) = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FXRRAD2
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX) = Root2ndRadius_rpvr(N,L0,NZ,NY,NX)-FXRRAD2
 
-          FXRootAreaPerPlant_pvr              = FRO*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_pvr
-          RootAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_pvr
+          FXRootSAreaPerPlant_pvr              = FRO*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootSAreaPerPlant_pvr
+          RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootSAreaPerPlant_pvr
 
           FXRTLGA                          = FRO*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
           Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX) = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FXRTLGA
@@ -1889,9 +1889,9 @@ implicit none
   FXVOLWX                         = FWO*VLWatMicPX_vr(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)         = VLWatMicPX_vr(L1,NY,NX)+FXVOLWX
   VLWatMicPX_vr(L0,NY,NX)         = VLWatMicPX_vr(L0,NY,NX)-FXVOLWX
-  FXVHCM                          = FWO*VHeatCapacitySoilM_vr(L0,NY,NX)
-  VHeatCapacitySoilM_vr(L1,NY,NX) = VHeatCapacitySoilM_vr(L1,NY,NX)+FXVHCM
-  VHeatCapacitySoilM_vr(L0,NY,NX) = VHeatCapacitySoilM_vr(L0,NY,NX)-FXVHCM
+  FXVHCM                          = FWO*VHeatCapSolidSoil_vr(L0,NY,NX)
+  VHeatCapSolidSoil_vr(L1,NY,NX) = VHeatCapSolidSoil_vr(L1,NY,NX)+FXVHCM
+  VHeatCapSolidSoil_vr(L0,NY,NX) = VHeatCapSolidSoil_vr(L0,NY,NX)-FXVHCM
   FXENGY                          = TKS_vr(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)+FXENGY
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)-FXENGY

@@ -6,9 +6,10 @@ module PlantMod
   use PlantDisturbMod,   only: PrepLandscapeGrazing
   use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: fixEXConsumpFlux
-  use EcoSIMCtrlMod,     only: lverb,ldo_sp_mode
+  use EcoSIMCtrlMod,     only: lverb, ldo_sp_mode
   use PlantDebugMod,     only: PrintRootTracer
   use LitterFallMod,     only: ReSeedPlants
+  use DebugToolMod,      only: PrintInfo
   use PlantAPI4Uptake
   use TracerIDMod
   use GridDataType
@@ -38,9 +39,10 @@ implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1,tvegE(NumPlantChemElms)
   integer :: NY,NX,NZ
-
+  character(len=*), parameter :: subname='PlantModel'
 333   FORMAT(A8)
 
+  call PrintInfo('beg '//subname)
   if(.not.ldo_sp_mode)then
     call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
     plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
@@ -86,8 +88,9 @@ implicit none
 
     ENDDO
   ENDDO
+  
   PlantElemntStoreLandscape(:)=plt_site%PlantElemntStoreLandscape(:)
-
+  call PrintInfo('end '//subname)
 
   end subroutine PlantModel
 !------------------------------------------------------------------------------------------

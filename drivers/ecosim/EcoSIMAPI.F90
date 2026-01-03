@@ -2,7 +2,7 @@ module EcoSIMAPI
   use timings,           only: start_timer,     end_timer
   use MicBGCAPI,         only: MicrobeModel,   MicAPI_Init,      MicAPI_cleanup
   use TracerIDMod,       only: ids_NO2B,           ids_NO2,          idg_O2
-  use EcosysWarmingMod,   only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
+  use EcosysWarmingMod,  only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
   use ErosionMod,        only: erosion
   use Hour1Mod,          only: hour1
   use RedistMod,         only: redist
@@ -14,6 +14,7 @@ module EcoSIMAPI
   use PlantMgmtDataType, only: NP_col
   use FireMod,           only: config_fire
   use EcoSIMSolverPar,   only: oscal_test
+  use DebugToolMod ,     only: PrintInfo
   USE EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcoSIMCtrlMod  
@@ -63,7 +64,7 @@ contains
   !
   !   UPDATE PLANT biogeochemistry
   !
-  if(lverb)WRITE(*,334)'PlantModel'
+
   if(plant_model .and. (.not.ldo_radiation_test))then
     if(do_timing)call start_timer(t1)  
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
@@ -426,7 +427,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
 
     DO J=1,24
-
+      call PrintInfo('beg step')
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -466,10 +467,11 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
       lnyr=etimer%its_a_new_year()
 
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
-
+      
       if(rstwr)then
         call restFile(flag='write')
       endif      
+      call PrintInfo("end step")
       if(nlend)exit
     END DO
 

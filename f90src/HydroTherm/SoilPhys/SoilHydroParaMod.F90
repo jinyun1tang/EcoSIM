@@ -88,25 +88,26 @@ contains
     PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(ALT_col(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
     ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
     !
-    !     SOIL RESISTANCE TO ROOT PENETRATION
-    !
-    !     SoilResist4RootPentrate_vr=soil resistance to root penetration [MPa]
+    !     SoilBulkModulus4RootPent_vr=bulk modulus of the undisturbed soil [MPa]
     !
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       !Eq.(8) in Grant (1993), Simulation model of soil compaction and root growth I. Model structure.
       !fitted using data from Rickman et al. (1992)
       if(THETW_vr(L,NY,NX)>0.01_r8)THEN
+        !a better algorithm may be developed.
         CCLAY_pct = CCLAY_vr(L,NY,NX)*1.0E+02_r8
         CORGCT    = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E-04_r8
         CC        = EXP(-3.6733_r8-0.1447_r8*CCLAY_pct+0.7653_r8*CORGCT)
         DD        = -0.4805_r8-0.1239_r8*CCLAY_pct+0.2080_r8*CORGCT
         EE        = 3.8521_r8+0.0963_r8*CCLAY_pct
-        SoilResist4RootPentrate_vr(L,NY,NX) = CC*THETW_vr(L,NY,NX)**DD*SoilBulkDensity_vr(L,NY,NX)**EE
+        SoilBulkModulus4RootPent_vr(L,NY,NX) = CC*THETW_vr(L,NY,NX)**DD*SoilBulkDensity_vr(L,NY,NX)**EE
       ELSE
-        SoilResist4RootPentrate_vr(L,NY,NX)=  300._r8
+        SoilBulkModulus4RootPent_vr(L,NY,NX)=  300._r8
       ENDIF
+      SoilBulkStress_vr(L,NY,NX)=SoilBulkDensity_vr(L,NY,NX)*mGravAccelerat*DLYR_3D(3,L,NY,NX) ![Mg m-3]*[km s-2]*[m]=[MPa]
     ELSE
-       SoilResist4RootPentrate_vr(L,NY,NX)=0.0_r8
+       SoilBulkModulus4RootPent_vr(L,NY,NX) = 0.0_r8
+       SoilBulkStress_vr(L,NY,NX)          = 0._r8
     ENDIF
     !
     !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
@@ -377,7 +378,7 @@ contains
     VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
     ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
     ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
-    VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
       +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
   ENDIF
   end subroutine SetColdRunSoilStates

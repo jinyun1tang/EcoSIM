@@ -958,7 +958,7 @@ module InitPlantMod
   plt_rbgc%RootN2Fix_pft(NZ)       = 0._r8
   DO NR=1,MaxNumRootAxes
     plt_morph%RootSegBaseDepth_raxes(NR,NZ)                = SeedDepth_pft(NZ)
-    plt_morph%Root1stDepz_raxes(NR,NZ)                       = SeedDepth_pft(NZ)
+    plt_morph%Root1stDepz_raxes(NR,NZ)                     = SeedDepth_pft(NZ)
     plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ) = 0._r8    
   ENDDO      
 
@@ -983,7 +983,7 @@ module InitPlantMod
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_rpvr(N,L,NZ)                               = Root2ndMaxRadius_pft(N,NZ)
-      plt_morph%RootAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
+      plt_morph%RootSAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
       plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)                = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8

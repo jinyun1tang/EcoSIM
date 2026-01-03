@@ -436,7 +436,7 @@ implicit none
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr        ,& !output :root layer diameter secondary axes, [m]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr         ,& !output :root layer number axes, [d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !output :root layer number secondary axes, [d-2]
-    RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr      ,& !output :root layer area per plant, [m p-1]
+    RootSAreaPerPlant_pvr      => plt_morph%RootSAreaPerPlant_pvr      ,& !output :root layer area per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !output :root layer length density, [m m-3]
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr    ,& !output :root layer length per plant, [m p-1]
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs        ,& !output :root C primary axes, [g d-2]
@@ -549,7 +549,7 @@ implicit none
         RootVH2O_pvr(N,L,NZ)             = 0._r8
         Root1stRadius_pvr(N,L,NZ)        = Root1stMaxRadius_pft(N,NZ)
         Root2ndRadius_rpvr(N,L,NZ)        = Root2ndMaxRadius_pft(N,NZ)
-        RootAreaPerPlant_pvr(N,L,NZ)     = 0._r8
+        RootSAreaPerPlant_pvr(N,L,NZ)     = 0._r8
         Root2ndEffLen4uptk_rpvr(N,L,NZ)        = Root2ndTipLen4uptk
       ENDDO
     ENDDO    

@@ -330,9 +330,15 @@ module PlantDisturbsMod
     iHarvstType_pft         => plt_distb%iHarvstType_pft          ,& !input  :type of harvest,[-]    
     jHarvstType_pft         => plt_distb%jHarvstType_pft          ,& !input  :flag for stand replacing disturbance,[-]
     MaxNumRootAxes          => pltpar%MaxNumRootAxes              ,& !input  : maximum number root axes,[-]
+    NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
+    MaxNumRootLays          => plt_site%MaxNumRootLays            ,& !input  :maximum root layer number,[-]
     NumPrimeRootAxes_pft    => plt_morph%NumPrimeRootAxes_pft     ,& !input: root primary axis number,[-]  
+    RootCRRadius0_rpvr      => plt_morph%RootCRRadius0_rpvr       ,& !inoput: initial radius of roots that may undergo secondary growth, [m]
+    RootAge_rpvr            => plt_morph%RootAge_rpvr             ,& !inoput :root age,[h]
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft  ,& !inoput :plant element harvest, [g d-2 ]
+    NMaxRootBotLayer_pft    => plt_morph%NMaxRootBotLayer_pft     ,& !inoput :maximum soil layer number for all root axes, [-]    
+    NGTopRootLayer_pft      => plt_morph%NGTopRootLayer_pft       ,& !inoput  :soil layer at planting depth, [-]    
     EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col  ,& !inoput :ecosystem harvest element, [gC d-2]
     PlantElmDistLoss_pft    => plt_distb%PlantElmDistLoss_pft     ,& !inoput :plant loss to disturbance,    [g d-2 h-1]   
     RootSegBaseDepth_raxes  => plt_morph%RootSegBaseDepth_raxes   ,& !inoput : base depth of different root axes, [m]
@@ -359,6 +365,7 @@ module PlantDisturbsMod
   ENDDO
 
   IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN
+  !not do harvest and reseed
     DO NE=1,NumPlantChemElms  
       PlantElmDistLoss_pft(NE,NZ) = PlantElmDistLoss_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
     ENDDO  
@@ -381,7 +388,6 @@ module PlantDisturbsMod
     ELSE
       
       IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed)THEN
-
         !terminate and reseed
 
         DO NE=1,NumPlantChemElms
@@ -402,10 +408,14 @@ module PlantDisturbsMod
               SeasonalNonstElms_pft(NE,NZ)=0._r8
             endif
           ENDDO
-          NumPrimeRootAxes_pft(NZ) =0 
+          NMaxRootBotLayer_pft(NZ) = 0
+          NGTopRootLayer_pft(NZ)   = 0
+          NumPrimeRootAxes_pft(NZ) = 0
           DO NR=1,MaxNumRootAxes
-            RootSegBaseDepth_raxes(NR,NZ) = 0._r8
-            Root1stDepz_raxes(NR,NZ)      = 0._r8
+            RootSegBaseDepth_raxes(NR,NZ)         = 0._r8
+            Root1stDepz_raxes(NR,NZ)              = 0._r8
+            RootAge_rpvr(NU:MaxNumRootLays,NR,NZ) = 0._r8
+            RootCRRadius0_rpvr(:,NR,NZ)           = 0._r8
           ENDDO            
         ENDIF
 
@@ -605,6 +615,7 @@ module PlantDisturbsMod
 !     ZL=height to bottom of each canopy layer
 !
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
+      !harvest and reseed
       IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN                
         PPX_pft(NZ)             = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
         PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
@@ -1098,6 +1109,7 @@ module PlantDisturbsMod
     PetioleElmntHarv2Litr(NE)=PetioleElmntHarv2Litr(NE)+(FracShethHuskNotHvsted-FracHuskNotHvsted)*HuskStrutElms_brch(NE,NB,NZ) &
       +(FracShethNotHvsted-FracEarNotHvsted)*EarStrutElms_brch(NE,NB,NZ) &
       +(FracShethGrainNotHvsted-FracGrainNotHvsted)*GrainStrutElms_brch(NE,NB,NZ)
+
     GrainHarvst(NE)=GrainHarvst(NE)+(1._r8-FracGrainNotHvsted)*GrainStrutElms_brch(NE,NB,NZ)
 
 !
@@ -1872,7 +1884,7 @@ module PlantDisturbsMod
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr    ,& !inoput :root layer length per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !inoput :root layer length density, [m m-3]
     RootPoreVol_pvr          => plt_morph%RootPoreVol_pvr          ,& !inoput :root layer volume air, [m2 d-2]
-    RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr      ,& !inoput :root layer area per plant, [m p-1]
+    RootSAreaPerPlant_pvr      => plt_morph%RootSAreaPerPlant_pvr      ,& !inoput :root layer area per plant, [m p-1]
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr         ,& !inoput :root layer C, [gC d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr              ,& !inoput :root layer volume water, [m2 d-2]
     RootCO2Autor_pvr          => plt_rbgc%RootCO2Autor_pvr           ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
@@ -1898,7 +1910,7 @@ module PlantDisturbsMod
 !     RTN1,Root2ndXNumL_rpvr=number of primary,secondary root axes
 !     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
-!     RootAreaPerPlant_pvr=root surface area per plant
+!     RootSAreaPerPlant_pvr=root surface area per plant
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
     if(N==ipltroot)then
@@ -1930,7 +1942,7 @@ module PlantDisturbsMod
     RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracLeftThin
     RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*FracLeftThin
     RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*FracLeftThin
-    RootAreaPerPlant_pvr(N,L,NZ)    = RootAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
+    RootSAreaPerPlant_pvr(N,L,NZ)    = RootSAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
     RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*FracLeftThin
     RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*FracLeftThin
     RootCO2Autor_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ)*FracLeftThin

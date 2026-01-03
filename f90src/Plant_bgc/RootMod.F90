@@ -59,7 +59,7 @@ implicit none
     SeedMeanLen_pft         => plt_morph%SeedMeanLen_pft          ,& !input  :seed length, [m]
     RootVH2O_pvr            => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
     RootCO2Autor_pvr        => plt_rbgc%RootCO2Autor_pvr          ,& !input  :root respiration constrained by O2, [g d-2 h-1]        
-    RootAreaPerPlant_pvr    => plt_morph%RootAreaPerPlant_pvr     ,& !input  :root layer area per plant, [m p-1]
+    RootSAreaPerPlant_pvr    => plt_morph%RootSAreaPerPlant_pvr     ,& !input  :root layer area per plant, [m p-1]
     RootPoreVol_pvr        => plt_morph%RootPoreVol_pvr         ,& !input  :root layer volume air, [m2 d-2]
     RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
     RootTotLenPerPlant_pvr  => plt_morph%RootTotLenPerPlant_pvr   ,& !input  :root layer length per plant, [m p-1]
@@ -74,12 +74,12 @@ implicit none
 !     ROOT GROWTH
 !
   call PrintInfo('beg '//subname)
-!  call RootCheck(I,J,NZ,'head')
-  
+  !  call RootCheck(I,J,NZ,'head')
+
+  !first add newly acquired nutrients
   call SummarizeRootSink(I,J,NZ,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
-  call RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,&
-    Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+  call RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
  
 !  call RootCheck(I,J,NZ,'rootbiochem')
     
@@ -102,7 +102,7 @@ implicit none
     SeedVolumeMean_pft(NZ)*PlantPopulation_pft(NZ)
   RootPoreVol_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)      = RootPorosity_pft(ipltroot,NZ)*TotRootVol
   RootVH2O_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)         = (1.0_r8-RootPorosity_pft(ipltroot,NZ))*TotRootVol
-  RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
+  RootSAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootSAreaPerPlant_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+&
     SeedAreaMean_pft(NZ)
 
   IF(NumRootAxes4DeadPlant.EQ.NumPrimeRootAxes_pft(NZ) .OR. (SeasonalNonstElms_pft(ielmc,NZ).LE.ZERO4LeafVar_pft(NZ).AND. &
@@ -110,7 +110,6 @@ implicit none
     iPlantRootState_pft(NZ)  = iDead
     iPlantShootState_pft(NZ) = iDead
   ENDIF
-
 !
 !     ROOT N2 FIXATION (RHIZOBIA)
   call RootNodulBiochemistry(I,J,NZ,TFN6_vr)
@@ -121,8 +120,7 @@ implicit none
   end subroutine RootBGCModel
 
 !----------------------------------------------------------------------------------------------------
-  subroutine RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,&
-    RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+  subroutine RootBiochemistry(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: TFN6_vr(JZ1)
@@ -145,19 +143,19 @@ implicit none
   character(len=*), parameter :: subname='RootBiochemistry'
 
 !     begin_execution
-  associate(                                                              &
-    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft         ,& !input  :plant growth type (vascular, non-vascular),[-]
-    PSIRoot_pvr               => plt_ew%PSIRoot_pvr                      ,& !input  :root total water potential, [Mpa]
-    PSIRootTurg_vr            => plt_ew%PSIRootTurg_vr                   ,& !input  :root turgor water potential, [Mpa]
-    VLSoilPoreMicP_vr         => plt_soilchem%VLSoilPoreMicP_vr          ,& !input  :volume of soil layer, [m3 d-2]
-    NU                        => plt_site%NU                             ,& !input  :current soil surface layer number, [-]
-    MaxNumRootLays            => plt_site%MaxNumRootLays                 ,& !input  :maximum root layer number,[-]
-    ZEROS2                    => plt_site%ZEROS2                         ,& !input  :threshold zero for numerical stability,[-]
-    NL                        => plt_site%NL                             ,& !input  :lowest soil layer number,[-]
-    Myco_pft                  => plt_morph%Myco_pft                      ,& !input  :mycorrhizal type (no or yes),[-]
-    NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
-    fRootGrowPSISense_pvr     => plt_pheno%fRootGrowPSISense_pvr         ,& !output :water stress to plant root growth, [-]
-    NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft           & !output :maximum soil layer number for all root axes, [-]
+  associate(                                                                &
+    iPlantRootProfile_pft        => plt_pheno%iPlantRootProfile_pft         ,& !input  :plant growth type (vascular, non-vascular),[-]
+    PSIRoot_pvr                  => plt_ew%PSIRoot_pvr                      ,& !input  :root total water potential, [Mpa]
+    PSIRootTurg_vr               => plt_ew%PSIRootTurg_vr                   ,& !input  :root turgor water potential, [Mpa]
+    VLSoilPoreMicP_vr            => plt_soilchem%VLSoilPoreMicP_vr          ,& !input  :volume of soil layer, [m3 d-2]
+    NU                           => plt_site%NU                             ,& !input  :current soil surface layer number, [-]
+    MaxNumRootLays               => plt_site%MaxNumRootLays                 ,& !input  :maximum root layer number,[-]
+    ZEROS2                       => plt_site%ZEROS2                         ,& !input  :threshold zero for numerical stability,[-]
+    NL                           => plt_site%NL                             ,& !input  :lowest soil layer number,[-]
+    Myco_pft                     => plt_morph%Myco_pft                      ,& !input  :mycorrhizal type (no or yes),[-]
+    NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
+    fRootGrowPSISense_pvr        => plt_pheno%fRootGrowPSISense_pvr         ,& !output :water stress to plant root growth, [-]
+    NMaxRootBotLayer_pft         => plt_morph%NMaxRootBotLayer_pft           & !output :maximum soil layer number for all root axes, [-]
   )
   call PrintInfo('beg '//subname)
   Root1stTipUpdateFlag     = .false. !initialize all primary roots as not updated
@@ -197,7 +195,7 @@ implicit none
         
         call GrowRootMycoAxes(I,J,N,L,Lnext,NZ,FoundRootAxesTip,Root1stTipUpdateFlag,TFN6_vr,&
           RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,&
-          fRootGrowPSISense_pvr(N,L,NZ),TotPopuRoot2ndLlenAxes,TotPerPlantRoot1stLlenAxes,Root2ndPopuC,Root1stPopuC,litrflxt,RCO2flxt)
+          fRootGrowPSISense_pvr(N,L,NZ),TotPopuRoot2ndLlenAxes,TotPerPlantRoot1stLlenAxes,Root1stPopuC,Root2ndPopuC,litrflxt,RCO2flxt)
         
       !   call SumRootBiome(NZ,masst_finale)
 !        litrflx = litrflx+litrflxt
@@ -214,7 +212,6 @@ implicit none
       ENDIF
     ENDDO D5000
   ENDDO D5010
-
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootBiochemistry
@@ -253,10 +250,11 @@ implicit none
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft         ,& !input  :plant growth type (vascular, non-vascular),[-]    
     RootMatureAge_pft         => plt_morph%RootMatureAge_pft             ,& !input : Root maturation age, [h]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr      ,& !input  :root layer element primary axes, [g d-2]    
     RootAge_rpvr              => plt_morph%RootAge_rpvr                  ,& !inoput :root age,[h]
     CoarseRootVolPerMassC_pft => plt_morph%CoarseRootVolPerMassC_pft     ,& !input  :coarse root volume:mass ratio, [m3 gC-1]
     FineRootVolPerMassC_pft   => plt_morph%FineRootVolPerMassC_pft       ,& !input  :fine root volume:mass ratio, [m3 gC-1]
-    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !output :root layer diameter primary axes, [m]
+    Root1stRadius_pvr         => plt_morph%Root1stRadius_pvr             ,& !output :root layer diameter primary axes, [m]    
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr                  ,& !output :root layer volume water, [m2 d-2]   
     Root2ndRadius_rpvr        => plt_morph%Root2ndRadius_rpvr            ,& !output :root layer diameter secondary axes, [m]     
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr       ,& !output :layer root length density, [m m-3]
@@ -265,7 +263,7 @@ implicit none
     RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr               ,& !output :layer root volume air, [m2 d-2]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr                ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr                ,& !inoput :root aqueous content, [g d-2]
-    RootAreaPerPlant_pvr      => plt_morph%RootAreaPerPlant_pvr          ,& !output :layer 1st+2nd root area per plant, [m2 plant-1]    
+    RootSAreaPerPlant_pvr     => plt_morph%RootSAreaPerPlant_pvr         ,& !output :layer 1st+2nd root area per plant, [m2 plant-1]    
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr        ,& !output :root length per plant in layer (including root hair), [m p-1]
     Root2ndEffLen4uptk_rpvr   => plt_morph%Root2ndEffLen4uptk_rpvr       ,& !output :root layer average length, [m]
     RootLenPerPlant_pvr       => plt_morph%RootLenPerPlant_pvr           ,& !output :root length per plant in layer (excluding root hair), [m p-1]    
@@ -292,24 +290,23 @@ implicit none
     !
     !total root volume [m3], with FineRootVolPerMassC_pft including contribution from water, fine roots volume > 80% as water
     !coarse roots, 45-60% volume as water 
-
     if(N.EQ.ipltroot .and. is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,1,NZ)>=RootMatureAge_pft(NZ))then
       !Use scal to damp off coarse root contribution to absorption
-      SCAL      = exp(-Root1stRadiusEst/Root1stMaxRadius1_pft(N,NZ))
-      CoarseVol = Root1stPopuC*CoarseRootVolPerMassC_pft(NZ)
-      TotRootVol=AMAX1(Root2ndXSecArea_pft(N,NZ)*TotPopuRoot2ndLlenAxes,Root2ndPopuC*FineRootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))+ &
-        CoarseVol*PSIRootTurg_vr(N,L,NZ)*SCAL
       !assuming elongation zone is negligible in length, pi*r^2*l=vol/pop 
-      Root1stRadiusEst          = sqrt(CoarseVol*PSIRootTurg_vr(N,L,NZ)/(PICON*TotPopuRoot1stLen))
+      CoarseVol        = Root1stPopuC*CoarseRootVolPerMassC_pft(NZ)
+      Root1stRadiusEst = sqrt(CoarseVol/(PICON*TotPopuRoot1stLen))
+      SCAL             = exp(-AMIN1(Root1stRadiusEst/5.e-4_r8,20._R8))
+      TotRootVol       = AMAX1(Root2ndXSecArea_pft(N,NZ)*TotPopuRoot2ndLlenAxes,Root2ndPopuC*FineRootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))+ &
+        CoarseVol*SCAL
+      
       Root1stRadius_pvr(N,L,NZ) = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ),Root1stRadiusEst)
-      Root1stSurfArea           = TwoPiCON*Root1stMaxRadius1_pft(N,NZ)*TotPopuRoot1stLen*SCAL
+      Root1stSurfArea           = TwoPiCON*Root1stRadius_pvr(N,L,NZ)*TotPopuRoot1stLen*SCAL
     else
       TotRootVol=AMAX1(Root1stXSecArea_pft(N,NZ)*TotPopuRoot1stLen+Root2ndXSecArea_pft(N,NZ)*TotPopuRoot2ndLlenAxes &
         ,TotRootC*FineRootVolPerMassC_pft(N,NZ)*PSIRootTurg_vr(N,L,NZ))    
       Root1stRadius_pvr(N,L,NZ)  = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
       Root1stSurfArea            = TwoPiCON*Root1stRadius_pvr(N,L,NZ)*TotPopuRoot1stLen
     endif  
-
     RootPoreVol_pvr(N,L,NZ) = RootPorosity_pft(N,NZ)*TotRootVol
     RootVH2O_pvr(N,L,NZ)    = (1.0_r8-RootPorosity_pft(N,NZ))*TotRootVol
 
@@ -324,7 +321,7 @@ implicit none
     ELSE
       Root2ndEffLen4uptk_rpvr(N,L,NZ)=Root2ndTipLen4uptk
     ENDIF
-    RootAreaPerPlant_pvr(N,L,NZ)=RootArea1stPP_pvr(N,L,NZ)+RootArea2ndPP_pvr(N,L,NZ)
+    RootSAreaPerPlant_pvr(N,L,NZ)=RootArea1stPP_pvr(N,L,NZ)+RootArea2ndPP_pvr(N,L,NZ)
   ELSE
     RootArea1stPP_pvr(N,L,NZ)       = 0._r8
     RootArea2ndPP_pvr(N,L,NZ)       = 0._r8
@@ -333,7 +330,7 @@ implicit none
     RootLenDensPerPlant_pvr(N,L,NZ) = 0._r8
     RootPoreVol_pvr(N,L,NZ)        = 0._r8
     RootVH2O_pvr(N,L,NZ)            = 0._r8
-    RootAreaPerPlant_pvr(N,L,NZ)    = 0._r8
+    RootSAreaPerPlant_pvr(N,L,NZ)    = 0._r8
     Root1stRadius_pvr(N,L,NZ)       = Root1stMaxRadius_pft(N,NZ)
     Root2ndRadius_rpvr(N,L,NZ)      = Root2ndMaxRadius_pft(N,NZ)
     Root2ndEffLen4uptk_rpvr(N,L,NZ) = Root2ndTipLen4uptk
@@ -347,8 +344,8 @@ implicit none
   end associate      
   end subroutine DiagRootGeometry
 !----------------------------------------------------------------------------------------------------
-  subroutine Grow2ndRootAxes(I,J,L,NZ,N,NR,CNPG,CNRTW,CPRTW,RootGrothWatSens,SoilResit4RootPentration,&
-    GroRespWatSens,DMRTD,fRootGrowPSISense,TFN6_vr,RootSinkC_vr,Root2ndSink_pvr,litrflx2,RCO2flx2,Root2ndStrutRemob)
+  subroutine Grow2ndRootAxes(I,J,L,NZ,N,NR,Nutstress4GrossResp,CNRTW,CPRTW,RootGrothWatSens,SoilResit4RootPentration,&
+    GroRespWatSens,DMRespEff,fRootGrowPSISense,TFN6_vr,RootSinkC_vr,Root2ndSink_pvr,RootNsink2nd,litrflx2,RCO2flx2,Root2ndStrutRemob)
   !
   !Description:
   !Grow secondary roots
@@ -357,16 +354,17 @@ implicit none
   integer, intent(in) :: I,J,L,NZ
   integer, intent(in) :: N                !root type id
   integer, intent(in) :: NR               !root axis id
-  real(r8), intent(in) :: CNPG
+  real(r8), intent(in) :: Nutstress4GrossResp
   real(r8), intent(in) :: CNRTW,CPRTW  
   real(r8), intent(in) :: RootGrothWatSens !water function for root extension
   real(r8), intent(in) :: SoilResit4RootPentration  !soil resistance for root penetration [h m-1]
   real(r8), intent(in) :: GroRespWatSens
-  real(r8), intent(in) :: DMRTD     !respiraiton quotient
+  real(r8), intent(in) :: DMRespEff     !respiraiton quotient
   real(r8), intent(in) :: fRootGrowPSISense  
   real(r8), intent(in) :: TFN6_vr(JZ1)  
   REAL(R8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)  
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
+  real(r8), intent(in) :: RootNsink2nd
   real(r8), intent(out) :: litrflx2(NumPlantChemElms),RCO2flx2
   real(r8), intent(out) :: Root2ndStrutRemob(NumPlantChemElms)    
   character(len=*), parameter :: subname='Grow2ndRootAxes'
@@ -399,7 +397,7 @@ implicit none
   real(r8) :: respscal,Root2ndExtPot  
   real(r8) :: RCCE(NumPlantChemElms)
   real(r8) :: FNP
-  real(r8) :: FracRoot2ndCSinkL  
+  real(r8) :: FracRoot2ndCSinkL,FracRoot2ndSinkN,FracRoot2ndSinkP  
   integer  :: M,NE
 
   associate(                                                          &
@@ -454,12 +452,13 @@ implicit none
   ELSE
     FracRoot2ndCSinkL=1.0_r8
   ENDIF
+  
   !
   !     N,P CONSTRAINT ON SECONDARY ROOT RESPIRATION FROM
   !     NON-STRUCTURAL C:N:P
   !
   !     CCPOLR,CZPOLR,CPPOLR=root non-structural C,N,P concentration
-  !     CNPG=N,P constraint on growth respiration
+  !     Nutstress4GrossResp=N,P constraint on growth respiration
   !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
   !
 
@@ -490,12 +489,12 @@ implicit none
 !     FracRoot2ndCSinkL=fraction of secondary root sink strength in axis
 !     CPOOL=non-structural C mass
 !     fTgrowRootP_vr=temperature function for root growth
-!     CNPG=N,P constraint on respiration
+!     Nutstress4GrossResp=N,P constraint on respiration
 !     GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
 !     fRootGrowPSISense=growth function of root water potential
 !
   respscal=VMXC*FracRoot2ndCSinkL*fTgrowRootP_vr(L,NZ)*fRootGrowPSISense &
-    *CNPG*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)
+    *Nutstress4GrossResp*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)
 
   RNonstCO2_OUltd=AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))*respscal
 
@@ -519,14 +518,12 @@ implicit none
   !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
   !
   !     FracRoot2ndCSinkL=fraction of secondary root sink strength in axis
-  !     ZPOOLR,PPOOLR=non-structural N,P mass in root
-  !     CNRTS_pft,CPRTS_pft=N,P root growth yield
   !     FNP=growth respiration limited by non-structural N,P
   !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
   !
-  DMRTR  = DMRTD*FracRoot2ndCSinkL
-  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
-  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
+  DMRTR  = DMRespEff
+  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))*FracRoot2ndCSinkL
+  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))*FracRoot2ndCSinkL
   FNP    = AMIN1(ZPOOLB/CNRTS_pft(NZ),PPOOLB/CPRTS_pft(NZ))*DMRTR
   IF(RGrowCO2_OUltd.GT.0.0_r8)THEN
     RGrowCO2_OUltd=AMIN1(RGrowCO2_OUltd,FNP)
@@ -547,11 +544,11 @@ implicit none
 !
 !     RootMycoNonst4GrowC_OUltd,RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn unltd,ltd by O2
 !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
-!     DMRTD=root C respiration vs nonstructural C consumption, i.e. respiration quotient
+!     DMRespEff=root C respiration vs nonstructural C consumption, i.e. respiration quotient
 !     RootBiomGrosYld_pft=root growth yield
 !
-  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRTD
-  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRTD
+  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRespEff
+  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRespEff
 
   RootMycoNonst4Grow_OUltd(ielmc) = RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
   RootMycoNonst4Grow_OUltd(ielmn) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
@@ -712,14 +709,15 @@ implicit none
   !     RootCO2Autor_pvr=total root respiration
   !     RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
   !
-  RCO2T2nd_OUltd                       = AMIN1(Rmaint2nd_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd+RCO2MaintDef2ndStruct_OUltd
-  RCO2T2nd_Oltd                        = AMIN1(Rmaint2nd_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd+RCO2Nonst4Nassim_Oltd+RCO2MaintDef2ndStruct_Oltd
-  RCO2T2nd_Oltd                        = AMIN1(RCO2T2nd_Oltd,AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)))
+  RCO2T2nd_OUltd = AMIN1(Rmaint2nd_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd+RCO2Nonst4Nassim_OUltd+RCO2MaintDef2ndStruct_OUltd
+  RCO2T2nd_Oltd  = AMIN1(Rmaint2nd_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd+RCO2Nonst4Nassim_Oltd+RCO2MaintDef2ndStruct_Oltd
+  RCO2T2nd_Oltd  = AMIN1(RCO2T2nd_Oltd,AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)))
 
-  RootRespPotent_pvr(N,L,NZ)           = RootRespPotent_pvr(N,L,NZ)+RCO2T2nd_OUltd
-  RootCO2EmisPot_pvr(N,L,NZ)           = RootCO2EmisPot_pvr(N,L,NZ)+RCO2T2nd_Oltd
-  RootCO2Autor_pvr(N,L,NZ)             = RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
-  RCO2flx2                             = -RCO2T2nd_Oltd
+  RootRespPotent_pvr(N,L,NZ) = RootRespPotent_pvr(N,L,NZ)+RCO2T2nd_OUltd
+  RootCO2EmisPot_pvr(N,L,NZ) = RootCO2EmisPot_pvr(N,L,NZ)+RCO2T2nd_Oltd
+  RootCO2Autor_pvr(N,L,NZ)   = RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
+  RCO2flx2                   = -RCO2T2nd_Oltd
+
   RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T2nd_Oltd
 
   !
@@ -780,7 +778,7 @@ implicit none
 !----------------------------------------------------------------------------------------------------
   subroutine GrowRootMycoAxes(I,J,N,L,Lnext,NZ,FoundRootAxesTip,Root1stTipUpdateFlag,TFN6_vr,&
     RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,CNRTW,CPRTW,fRootGrowPSISense,&
-    TotPopuRoot2ndLlenAxes,TotPerPlantRoot1stLlenAxes,Root2ndPopuC,Root1stPopuC,litrflx,RCO2flx)
+    TotPopuRoot2ndLlenAxes,TotPerPlantRoot1stLlenAxes,Root1stPopuC,Root2ndPopuC,litrflx,RCO2flx)
   !
   !Description
   !Grow root axes in laye L  
@@ -796,9 +794,10 @@ implicit none
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: fRootGrowPSISense
-  real(r8), intent(out) :: TotPopuRoot2ndLlenAxes,TotPerPlantRoot1stLlenAxes
-  real(r8), intent(out) :: Root2ndPopuC  !secondary root carbon
+  real(r8), intent(out) :: TotPopuRoot2ndLlenAxes
+  real(r8), intent(out) :: TotPerPlantRoot1stLlenAxes
   real(r8), intent(out) :: Root1stPopuC  !primary root carbon
+  real(r8), intent(out) :: Root2ndPopuC  !secondary root carbon
   logical , intent(inout) :: FoundRootAxesTip(pltpar%jroots,pltpar%MaxNumRootAxes)  
   logical , intent(inout) :: Root1stTipUpdateFlag(pltpar%MaxNumRootAxes)  
   real(r8), intent(out) :: litrflx(NumPlantChemElms)
@@ -806,14 +805,14 @@ implicit none
   character(len=*), parameter :: subname='GrowRootMycoAxes'
 
   real(r8) :: Root2ndStrutRemob(NumPlantChemElms)    
-  real(r8) :: DMRTD                          !respiraiton efficiency for new root growth
+  real(r8) :: DMRespEff                          !respiraiton efficiency for new root growth
   real(r8) :: RootGrothWatSens               !moisture dependent function for root extension, [-]
   real(r8) :: GroRespWatSens  
   real(r8) :: FRCO2
   real(r8) :: FSNCM
   real(r8) :: FSNCP
   real(r8) :: CNG,CPG
-  real(r8) :: CNPG              !nutrient stress on root mobilization of nonstrucal C.
+  real(r8) :: Nutstress4GrossResp                           !nutrient stress on root mobilization of nonstrucal C.
   integer  :: NR
   logical  :: FoundPrimaryRootsLayer
   real(r8) :: litrflxt(NumPlantChemElms),litrflx2(NumPlantChemElms)
@@ -825,12 +824,12 @@ implicit none
   real(r8) :: massnonst(NumPlantChemElms),massnonst1(NumPlantChemElms)
   real(r8) :: massnodul(NumPlantChemElms),massnodul1(NumPlantChemElms)
   real(r8) :: SoilResit4RootPentration
-
+  real(r8) :: RootNsink2nd
   !begin_execution
   associate(                                                                   &
     FracRootElmAlloc2Litr        => plt_allom%FracRootElmAlloc2Litr           ,& !input  :C woody fraction in root,[-]    
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]    
     ZERO                         => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]  
-    RootMyco1stStrutElms_rpvr    => plt_biom%RootMyco1stStrutElms_rpvr        ,& !input  :root layer element primary axes, [g d-2]
     Root1stLen_rpvr              => plt_morph%Root1stLen_rpvr                 ,& !input  :root layer length primary axes, [m d-2]
     Root2ndRadius_rpvr           => plt_morph%Root2ndRadius_rpvr              ,& !input  :root layer diameter secondary axes, [m]
     k_fine_comp                  => pltpar%k_fine_comp                        ,& !input  :fine litter complex id
@@ -840,10 +839,11 @@ implicit none
     RootBiomGrosYld_pft          => plt_allom%RootBiomGrosYld_pft             ,& !input  :root growth yield, [g g-1]
     RootNonstructElmConc_rpvr    => plt_biom%RootNonstructElmConc_rpvr        ,& !input  :root layer nonstructural C concentration, [g g-1]    
     Root2ndLen_rpvr              => plt_morph%Root2ndLen_rpvr                 ,& !input  :root layer length secondary axes, [m d-2]
-    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr        ,& !input  :root layer element secondary axes, [g d-2]
+    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr        ,& !input  :root layer element secondary axes, [g d-2]    
+    RootMyco1stStrutElms_rpvr    => plt_biom%RootMyco1stStrutElms_rpvr        ,& !input  :root layer element primary axes, [g d-2]    
     PSIRootTurg_vr               => plt_ew%PSIRootTurg_vr                     ,& !input  :root turgor water potential, [Mpa]
     NumPrimeRootAxes_pft         => plt_morph%NumPrimeRootAxes_pft            ,& !input  :root primary axis number,[-]
-    SoilResist4RootPentrate_vr   => plt_soilchem%SoilResist4RootPentrate_vr   ,& !input  :soil hydraulic resistance, [MPa h m-2]
+    SoilBulkModulus4RootPent_vr   => plt_soilchem%SoilBulkModulus4RootPent_vr   ,& !input  :soil hydraulic resistance, [MPa h m-2]
     NMaxRootBotLayer_pft         => plt_morph%NMaxRootBotLayer_pft            ,& !inoput :maximum soil layer number for all root axes, [-]
     Root1stAxesTipDepz2Surf_pft  => plt_morph%Root1stAxesTipDepz2Surf_pft     ,& !output :plant primary depth relative to column surface, [m]     
     ROOTNLim_rpvr                => plt_biom%ROOTNLim_rpvr                    ,& !output :root N-limitation, 0->1 weaker limitation, [-]     
@@ -853,7 +853,7 @@ implicit none
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
 !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
 !
-!     SoilResist4RootPentrate_vr,SoilRest4Root2ndPentrate=soil resistance to secondary root penetration (MPa)
+!     SoilBulkModulus4RootPent_vr,SoilRest4Root2ndPentrate=soil resistance to secondary root penetration (MPa)
 !     Root2ndRadius_rpvr=secondary root radius
 !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     fRootGrowPSISense,GroRespWatSens=growth,respiration function of root water potential
@@ -865,7 +865,7 @@ implicit none
   CALL RootGroWaterDependence(N,L,NZ,Root2ndRadius_rpvr(N,L,NZ),RootGrothWatSens,GroRespWatSens,SoilResit4RootPentration)
 
   !respiration fraction
-  DMRTD         = 1.0_r8-RootBiomGrosYld_pft(NZ)
+  DMRespEff         = 1.0_r8-RootBiomGrosYld_pft(NZ)     !1-[gC root/gC nonst] = [gC resp/gC nonst]
   TotPerPlantRoot1stLlenAxes = 0._r8;TotPopuRoot2ndLlenAxes = 0._r8
   Root1stPopuC      = 0._r8;Root2ndPopuC      = 0._r8
   litrflx       = 0._r8;RCO2flx       = 0._r8
@@ -874,11 +874,11 @@ implicit none
   IF(RootNonstructElmConc_rpvr(ielmc,N,L,NZ).GT.ZERO)THEN
     CNG  = RootNonstructElmConc_rpvr(ielmn,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmn,N,L,NZ)+RootNonstructElmConc_rpvr(ielmc,N,L,NZ)*CNKI)
     CPG  = RootNonstructElmConc_rpvr(ielmp,N,L,NZ)/(RootNonstructElmConc_rpvr(ielmp,N,L,NZ)+RootNonstructElmConc_rpvr(ielmc,N,L,NZ)*CPKI)
-    CNPG = AMIN1(CNG,CPG)
+    Nutstress4GrossResp = AMIN1(CNG,CPG)
   ELSE
     CNG =0._r8
     CPG =0._r8
-    CNPG=1.0_r8
+    Nutstress4GrossResp=1.0_r8
   ENDIF
   ROOTNLim_rpvr(N,L,NZ)=CNG
   ROOTPLim_rpvr(N,L,NZ)=CPG
@@ -888,13 +888,20 @@ implicit none
   !=================================================================================
   !loop through all root axes 
   D5050: DO NR=1,NumPrimeRootAxes_pft(NZ)
-      
+
     !     SECONDARY ROOT EXTENSION
     !   make sure current layer is no deeper than the lowest root layer
     IF(L.LE.NRoot1stTipLay_raxes(NR,NZ) .AND. .not.FoundRootAxesTip(N,NR))THEN
+      RootNsink2nd=1._r8    
+      if(N.eq.ipltroot)then
+        IF(RootSinkC_vr(N,L).GT.ZERO4Groth_pft(NZ))THEN
+          RootNsink2nd=Root1stSink_pvr(L,NR)/RootSinkC_vr(N,L)
+        endif  
+      endif
+
       !secondary roots can grow in any root layer that is not the deepest
-      call Grow2ndRootAxes(I,J,L,NZ,N,NR,CNPG,CNRTW,CPRTW,RootGrothWatSens,SoilResit4RootPentration,GroRespWatSens,&
-        DMRTD,fRootGrowPSISense,TFN6_vr,RootSinkC_vr,Root2ndSink_pvr,litrflx2,RCO2flx2,Root2ndStrutRemob)
+      call Grow2ndRootAxes(I,J,L,NZ,N,NR,Nutstress4GrossResp,CNRTW,CPRTW,RootGrothWatSens,SoilResit4RootPentration,GroRespWatSens,&
+        DMRespEff,fRootGrowPSISense,TFN6_vr,RootSinkC_vr,Root2ndSink_pvr,RootNsink2nd,litrflx2,RCO2flx2,Root2ndStrutRemob)
 
       TotPopuRoot2ndLlenAxes = TotPopuRoot2ndLlenAxes+Root2ndLen_rpvr(N,L,NR,NZ)
       Root2ndPopuC      = Root2ndPopuC+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
@@ -905,9 +912,9 @@ implicit none
 
       IF(FoundPrimaryRootsLayer)THEN 
         ! plant PRIMARY ROOT EXTENSION
-        call Grow1stRootAxes(I,J,N,NR,L,Lnext,NZ,CNPG,Root1stSink_pvr,&
+        call Grow1stRootAxes(I,J,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSink_pvr,&
           Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-          DMRTD,CNRTW,CPRTW,Root1stTipUpdateFlag,FoundRootAxesTip,litrflxt,RCO2flxt)
+          DMRespEff,CNRTW,CPRTW,RootNsink2nd,Root1stTipUpdateFlag,FoundRootAxesTip,litrflxt,RCO2flxt)
 
         litrflx = litrflx+litrflxt+litrflx2
         RCO2flx = RCO2flx+RCO2flxt+RCO2flx2
@@ -918,7 +925,7 @@ implicit none
       
       if(N==ipltroot)then
         TotPerPlantRoot1stLlenAxes = TotPerPlantRoot1stLlenAxes+Root1stLen_rpvr(L,NR,NZ)
-        Root1stPopuC  = Root1stPopuC+RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)
+        Root1stPopuC               = Root1stPopuC+RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)
       endif  
     ENDIF
     NMaxRootBotLayer_pft(NZ)=MAX(NMaxRootBotLayer_pft(NZ),NRoot1stTipLay_raxes(NR,NZ))
@@ -972,9 +979,9 @@ implicit none
   end associate
   end subroutine GetPlantRoot1stDepz
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowRootElongZone(I,J,N,NR,L,Lnext,NZ,CNPG,Root1stSink_pvr,&
+  subroutine GrowRootElongZone(I,J,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-    DMRTD,CNRTW,CPRTW,litrflxt,RCO2flxt)
+    DMRespEff,CNRTW,CPRTW,RootNsink2nd,litrflxt,RCO2flxt)
   implicit none
   integer,  intent(in) :: I,J,N,NR,NZ
   integer,  intent(in) :: L,Lnext       !current and next layer for root growth
@@ -985,8 +992,9 @@ implicit none
   real(r8), intent(in) :: Root1stSink_pvr(JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: CNRTW,CPRTW  
-  real(r8), intent(in) :: DMRTD                !respiraiton efficiency for new root growth
-  real(r8), intent(in) :: CNPG                 !N,P constraint on respiration
+  real(r8), intent(in) :: DMRespEff                !respiraiton efficiency for new dry root mass creation from nonstructural C
+  real(r8), intent(in) :: Nutstress4GrossResp                     !N,P constraint on respiration
+  real(r8), intent(in) :: RootNsink2nd
   real(r8), intent(inout) :: litrflxt(NumPlantChemElms)
   real(r8), intent(inout) :: RCO2flxt       !accumulator of CO2 flux
   real(r8) :: FracRoot1stCSinkL
@@ -1010,9 +1018,10 @@ implicit none
   real(r8) :: dRootMycoElms(NumPlantChemElms)  !nonstrucal biomass element used for metabolism
   real(r8) :: Root1stNetGrowthElms(NumPlantChemElms)
   real(r8) :: mass_inital(NumPlantChemElms)
-  real(r8) :: mass_finale(NumPlantChemElms),TipRadius,RLEN
+  real(r8) :: mass_finale(NumPlantChemElms),TipRadius,RLEN,RootNsink1st
   integer  :: NE,M,LL,LL1
-
+  real(r8) :: dRlenL,RRadius,respscal
+  real(r8), parameter :: RTDPX1=0.005_r8  !the apical growing zone length
   character(len=*), parameter :: subname='GrowRootElongZone'
 
   associate(                                                                &
@@ -1025,6 +1034,7 @@ implicit none
     CNRTS_pft                    => plt_allom%CNRTS_pft                    ,& !input  :root N:C ratio x root growth yield, [-]
     CPRTS_pft                    => plt_allom%CPRTS_pft                    ,& !input  :root P:C ratio x root growth yield, [-]
     RootBiomGrosYld_pft          => plt_allom%RootBiomGrosYld_pft          ,& !input  :root growth yield, [g g-1]
+    DLYR3                        => plt_site%DLYR3                         ,& !input  :vertical thickness of soil layer, [m]        
     Root1stRadius_pvr            => plt_morph%Root1stRadius_pvr            ,& !input  :root layer diameter primary axes, [m]  
     rPCStalk_pft                 => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
     rNCStalk_pft                 => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]          
@@ -1068,12 +1078,20 @@ implicit none
   ELSE
     FracRoot1stCSinkL=1.0_r8
   ENDIF
+  RootNsink1st=1._r8-RootNsink2nd
   !
   !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
   !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
   !
-  TipRadius=AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
-  CALL RootGroWaterDependence(N,L,NZ,TipRadius,RootGrothWatSens,GroRespWatSens,SoilResit4RootPentration)
+  TipRadius = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
+  dRlenL    = Root1stAxesTipDepz2Surf_pft(NR,NZ)-CumSoilThickness_vr(L-1)
+  if(dRlenL.LE.RTDPX1)then
+    RRadius=TipRadius
+  else
+    RRadius=Root1stRadius_pvr(N,L,NZ)*(dRlenL-RTDPX1)/dRlenL+TipRadius*RTDPX1/dRlenL
+  endif
+
+  CALL RootGroWaterDependence(N,L,NZ,RRadius,RootGrothWatSens,GroRespWatSens,SoilResit4RootPentration)
 
   !
   !     N,P CONSTRAINT ON PRIMARY ROOT RESPIRATION FROM
@@ -1094,6 +1112,7 @@ implicit none
   !     fRootGrowPSISense=growth function of root water potential
   !
   Rmaint1st_CO2 = AZMAX1(RmSpecPlant*RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ))*TFN6_vr(L)
+
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     Rmaint1st_CO2=Rmaint1st_CO2*fRootGrowPSISense
   ENDIF
@@ -1109,8 +1128,9 @@ implicit none
   !     GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
   !     fRootGrowPSISense=growth function of root water potential
   !
-  RNonstCO2_OUltd=AZMAX1(VMXC*FracRoot1stCSinkL*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)) &
-    *fTgrowRootP_vr(L,NZ)*CNPG*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)*fRootGrowPSISense
+  respscal=VMXC*FracRoot1stCSinkL*fTgrowRootP_vr(L,NZ)*Nutstress4GrossResp*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)*fRootGrowPSISense
+
+  RNonstCO2_OUltd=AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))*respscal 
 
   IF(Root1stAxesTipDepz2Surf_pft(NR,NZ).GE.CumSoilThickness_vr(MaxNumRootLays))THEN
     RNonstCO2_OUltd=AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)
@@ -1134,15 +1154,15 @@ implicit none
   !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
   !
   !     FracRoot1stCSinkL=fraction of secondary root sink strength in axis
-  !     ZPOOLR,PPOOLR=non-structural N,P mass in root
-  !     CNRTS_pft,CPRTS_pft=N,P root growth yield
+  !     ZPOOLR,PPOOLR=non-structural N,P mass in root 
+  !     CNRTS_pft,CPRTS_pft=N,P root growth yield = = [gN,P root/gC root]*[gC root /gC nonst]=[gN,P root/gC nonstC]
   !     FNP=growth respiration limited by non-structural N,P
   !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
   !
-  DMRTR  = DMRTD*FracRoot1stCSinkL
-  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
-  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
-  FNP    = AMIN1(ZPOOLB*DMRTR/CNRTS_pft(NZ),PPOOLB*DMRTR/CPRTS_pft(NZ))
+  DMRTR  = DMRespEff     ![gC CO2/gC nonstC]
+  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))*FracRoot1stCSinkL
+  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))*FracRoot1stCSinkL
+  FNP    = AMIN1(ZPOOLB/CNRTS_pft(NZ),PPOOLB/CPRTS_pft(NZ))*DMRTR
 
   IF(RGrowCO2_OUltd.GT.0.0_r8)THEN
     RGrowCO2_OUltd=AMIN1(RGrowCO2_OUltd,FNP)
@@ -1162,14 +1182,14 @@ implicit none
   !
   !     RootMycoNonst4GrowC_OUltd,RootMycoNonst4GrowC_Oltd=total non-structural C used in growth and respn unltd,ltd by O2
   !     RGrowCO2_OUltd,RGrowCO2_Oltd=growth respiration limited by N,P unltd,ltd by O2
-  !     DMRTD=root C respiration vs nonstructural C consumption
+  !     DMRespEff=root C respiration vs nonstructural C consumption
   !     RootMycoNonst4Grow_OUltd(ielmc),RootMycoNonst4Grow_Oltd(ielmc)=root C growth unltd,ltd by O2
   !     DMRT=root growth yield
   !     
   !     RCO2Nonst4Nassim_OUltd,RCO2Nonst4Nassim_Oltd=respiration for N assimilation unltd,ltd by O2
   !
-  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRTD
-  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRTD
+  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRespEff
+  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRespEff
   RootMycoNonst4Grow_OUltd(ielmc) = RootMycoNonst4GrowC_OUltd*RootBiomGrosYld_pft(NZ)
   RootMycoNonst4Grow_OUltd(ielmn) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CNRTW)
   RootMycoNonst4Grow_OUltd(ielmp) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc)*CPRTW)
@@ -1277,9 +1297,9 @@ implicit none
   end subroutine GrowRootElongZone
 
 !----------------------------------------------------------------------------------------------------
-  subroutine Grow1stRootAxes(I,J,N,NR,L,Lnext,NZ,CNPG,Root1stSink_pvr,&
+  subroutine Grow1stRootAxes(I,J,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSink_pvr,&
     Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-    DMRTD,CNRTW,CPRTW,Root1stTipUpdateFlag,FoundRootAxesTip,litrflxt,RCO2flxt)
+    DMRespEff,CNRTW,CPRTW,RootNsink2nd,Root1stTipUpdateFlag,FoundRootAxesTip,litrflxt,RCO2flxt)
   !
   !Description:
   !grow primary root axes
@@ -1293,8 +1313,9 @@ implicit none
   real(r8), intent(in) :: Root1stSink_pvr(JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)  
   real(r8), intent(in) :: CNRTW,CPRTW  
-  real(r8), intent(in) :: DMRTD              !respiraiton efficiency for new root growth
-  real(r8), intent(in) :: CNPG
+  real(r8), intent(in) :: DMRespEff              !respiraiton efficiency for fresh root growth
+  real(r8), intent(in) :: Nutstress4GrossResp
+  real(r8), intent(in) :: RootNsink2nd
   logical,  intent(inout) :: Root1stTipUpdateFlag(pltpar%MaxNumRootAxes)
   logical,  intent(inout) :: FoundRootAxesTip(pltpar%jroots,pltpar%MaxNumRootAxes)  
   real(r8), intent(out) :: litrflxt(NumPlantChemElms)
@@ -1326,8 +1347,8 @@ implicit none
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft           ,& !input  :soil layer at planting depth, [-]
     iPlantRootProfile_pft        => plt_pheno%iPlantRootProfile_pft        ,& !input  :plant growth type (vascular, non-vascular),[-]
     RootMatureAge_pft            => plt_morph%RootMatureAge_pft            ,& !input : Root maturation age, [h]
-    Root1stAxesTipDepz2Surf_pft  => plt_morph%Root1stAxesTipDepz2Surf_pft  ,& !output :plant primary depth relative to column surface, [m]     
     RootAge_rpvr                 => plt_morph%RootAge_rpvr                 ,& !inoput :root age,[h]
+    Root1stAxesTipDepz2Surf_pft  => plt_morph%Root1stAxesTipDepz2Surf_pft  ,& !output :plant primary depth relative to column surface, [m]     
     RootCO2Autor_pvr             => plt_rbgc%RootCO2Autor_pvr              ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr           => plt_rbgc%RootCO2EmisPot_pvr            ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootRespPotent_pvr           => plt_rbgc%RootRespPotent_pvr            ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
@@ -1356,13 +1377,13 @@ implicit none
     if(FoundRootTipLayer)THEN
       !check flat indicating that primary root elongation zone will be updated.
       Root1stTipUpdateFlag(NR)=.true.
-      call GrowRootElongZone(I,J,N,NR,L,Lnext,NZ,CNPG,Root1stSink_pvr,&
+      call GrowRootElongZone(I,J,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSink_pvr,&
         Root2ndSink_pvr,RootSinkC_vr,Root2ndStrutRemob,fRootGrowPSISense,TFN6_vr,&
-        DMRTD,CNRTW,CPRTW,litrflxt,RCO2flxt)
+        DMRespEff,CNRTW,CPRTW,RootNsink2nd,litrflxt,RCO2flxt)
 
-    elseif(is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,NR,NZ)>=RootMatureAge_pft(NZ))then
+    elseif(is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ))then
       !behind root tip layer    
-      call SecondaryGrowthZone(I,J,N,NR,L,NZ,CNPG,RootSinkC_vr,Root1stSink_pvr,fRootGrowPSISense,TFN6_vr,litrflxt)
+      call SecondaryGrowthZone(I,J,N,NR,L,NZ,Nutstress4GrossResp,RootSinkC_vr,Root1stSink_pvr,fRootGrowPSISense,TFN6_vr,RootNsink2nd,litrflxt)
     endif
 
     !consider root withraw at root tip
@@ -1395,7 +1416,7 @@ implicit none
   end subroutine Grow1stRootAxes
 !----------------------------------------------------------------------------------------------------
 
-  subroutine SecondaryGrowthZone(I,J,N,NR,L,NZ,CNPG,RootSinkC_vr,Root1stSink_pvr,fRootGrowPSISense,TFN6_vr,litrflxt)
+  subroutine SecondaryGrowthZone(I,J,N,NR,L,NZ,Nutstress4GrossResp,RootSinkC_vr,Root1stSink_pvr,fRootGrowPSISense,TFN6_vr,RootNsink2nd,litrflxt)
   !
   !Description:
   !Do secondary growth of roots
@@ -1405,9 +1426,10 @@ implicit none
   real(r8), intent(in) :: Root1stSink_pvr(JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: TFN6_vr(JZ1)  
   real(r8), intent(in) :: fRootGrowPSISense
-  real(r8), intent(in) :: CNPG
+  real(r8), intent(in) :: Nutstress4GrossResp
+  real(r8), intent(in) :: RootNsink2nd
   real(r8), intent(inout) :: litrflxt(NumPlantChemElms)
-  real(r8) :: DMRTD
+  real(r8) :: DMRespEff
   real(r8) :: FracRoot1stCSinkL
   real(r8) :: Rmaint1st_CO2
   real(r8) :: RNonstCO2_OUltd,RGrowCO2_Oltd,RGrowCO2_OUltd
@@ -1419,7 +1441,7 @@ implicit none
   real(r8) :: RootMycoNonst4Grow_OUltd(NumPlantChemElms)   !nonstrucal biomass converted into structrual biomass without O2 limitation
   real(r8) :: Root1stNetGrowthElms(NumPlantChemElms)
   real(r8) :: dRootMycoElms(NumPlantChemElms)              !nonstrucal biomass used for metabolic activity
-  real(r8) :: RCO2T1st_OUltd,RCO2T1st_Oltd
+  real(r8) :: RCO2T1st_OUltd,RCO2T1st_Oltd,RootNsink1st,respscal
   integer  :: NE
 
   character(len=*), parameter :: subname='SecondaryGrowthZone'
@@ -1430,6 +1452,7 @@ implicit none
     RootMyco1stStrutElms_rpvr    => plt_biom%RootMyco1stStrutElms_rpvr     ,& !input :root layer element primary axes, [g d-2]
     StalkBiomGrowthYld_pft       => plt_allom%StalkBiomGrowthYld_pft       ,& !input  :stalk growth yield, [gC gC-1]    
     Root1stRadius_pvr            => plt_morph%Root1stRadius_pvr            ,& !input  :root layer diameter primary axes, [m]  
+    rNCRoot_pft                  => plt_allom%rNCRoot_pft                  ,& !input  :root N:C ratio, [gN gC-1]
     rPCStalk_pft                 => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
     rNCStalk_pft                 => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]          
     GrainFillDowreg_brch         => plt_photo%GrainFillDowreg_brch         ,& !input  :grain fill down-regulation of annual plants, [-]
@@ -1441,6 +1464,7 @@ implicit none
     RootMaintDef_CO2_pvr         => plt_bgcr%RootMaintDef_CO2_pvr          ,& !inoput :plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]    
     RootCO2Autor_pvr             => plt_rbgc%RootCO2Autor_pvr              ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootMyco1stElm_raxs          => plt_biom%RootMyco1stElm_raxs           ,& !inoput :root C primary axes, [g d-2]
+    RootCRRadius0_rpvr           => plt_morph%RootCRRadius0_rpvr           ,& !inoput :initial radius of roots that may undergo secondary growth, [m]
     RootRespPotent_pvr           => plt_rbgc%RootRespPotent_pvr             & !inoput :root respiration unconstrained by O2, [g d-2 h-1]
   )
   call PrintInfo('beg '//subname)
@@ -1451,6 +1475,7 @@ implicit none
   ELSE
     FracRoot1stCSinkL=1.0_r8
   ENDIF
+  RootNsink1st=1._r8-RootNsink2nd
 
   !Do maintenance respiration 
   Rmaint1st_CO2 = AZMAX1(RmSpecPlant*RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ))*TFN6_vr(L)
@@ -1460,8 +1485,9 @@ implicit none
   endif
 
   !mobilize storage carbon and 
-  RNonstCO2_OUltd=AZMAX1(VMXC*FracRoot1stCSinkL*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)) &
-    *fTgrowRootP_vr(L,NZ)*CNPG*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)*fRootGrowPSISense
+  respscal=VMXC*FracRoot1stCSinkL*fTgrowRootP_vr(L,NZ)*Nutstress4GrossResp*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ) &
+    *fRootGrowPSISense*rNCStalk_pft(NZ)/rNCRoot_pft(NZ)
+  RNonstCO2_OUltd=AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ))*respscal 
 
   !apply oxygen dependence
   RNonstCO2_Oltd               = RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
@@ -1473,10 +1499,10 @@ implicit none
   RootMaintDef_CO2_pvr(N,L,NZ) = RootMaintDef_CO2_pvr(N,L,NZ)+AMIN1(RCO2XMaint1st_Oltd,0._r8)
 
   !apply nutrient limitation to growth respiraiton
-  DMRTD  = 1._r8-StalkBiomGrowthYld_pft(NZ)
-  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))*DMRTD*FracRoot1stCSinkL
-  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))*DMRTD*FracRoot1stCSinkL
-  FNP    = AMIN1(ZPOOLB/rNCStalk_pft(NZ),PPOOLB/rPCStalk_pft(NZ))
+  DMRespEff  = 1._r8-StalkBiomGrowthYld_pft(NZ)       ![gC CO2/gC nonst]
+  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))*FracRoot1stCSinkL
+  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))*FracRoot1stCSinkL
+  FNP    = AMIN1(ZPOOLB/rNCStalk_pft(NZ),PPOOLB/rPCStalk_pft(NZ))*DMRespEff/StalkBiomGrowthYld_pft(NZ)
   
   IF(RGrowCO2_OUltd.GT.0.0_r8)THEN
     RGrowCO2_OUltd=AMIN1(RGrowCO2_OUltd,FNP)
@@ -1492,8 +1518,8 @@ implicit none
   ENDIF
 
   !the biomass yield considered to be simlar for stalk 
-  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRTD
-  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRTD
+  RootMycoNonst4GrowC_OUltd       = RGrowCO2_OUltd/DMRespEff
+  RootMycoNonst4GrowC_Oltd        = RGrowCO2_Oltd/DMRespEff
   RootMycoNonst4Grow_OUltd(ielmc) = RootMycoNonst4GrowC_OUltd*StalkBiomGrowthYld_pft(NZ)
   RootMycoNonst4Grow_OUltd(ielmn) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc))*rNCStalk_pft(NZ)
   RootMycoNonst4Grow_OUltd(ielmp) = AZMAX1(RootMycoNonst4Grow_OUltd(ielmc))*rPCStalk_pft(NZ)
@@ -1545,22 +1571,22 @@ implicit none
   real(r8), intent(out) :: GroRespWatSens                 !respiration function of root water potential
   real(r8), intent(out) :: SoilResit4RootPentration       ![h m-1]
   real(r8) :: V0  !dispaceable soil volume due to root growth [m3]
-  real(r8), parameter :: phi_R = 1._r8  !root elastic modulus normalizer [MPa-1]
+  real(r8), parameter :: phi_R = 1._r8  !root elastic modulus normalizer [MPa-1], i.e. F' in Rickman et al. 1992
 
   associate(                                                                 &
     PSIRootTurg_vr              => plt_ew%PSIRootTurg_vr                    ,& !input  :root turgor water potential, [Mpa]
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]
-    SoilResist4RootPentrate_vr  => plt_soilchem%SoilResist4RootPentrate_vr   & !input  :soil resistance to root penetration, [MPa]
+    SoilBulkModulus4RootPent_vr  => plt_soilchem%SoilBulkModulus4RootPent_vr   & !input  :elastic modulus of the undisturbed soil, [MPa]
   )
-!     SoilResist4RootPentrate_vr,SoilResit4PrimRootPentration=soil resistance to primary root penetration (MPa)
+!     SoilBulkModulus4RootPent_vr,SoilResit4PrimRootPentration=soil resistance to primary root penetration (MPa)
 !     RRAD1=primary root radius
   !eq.(3) in Rickman et al (1992), Calculating daily root length density profiles by applying elastic theory to agricultural soils
   
   !eq. (10) in Rickman et al. (1992)
-  V0=SoilResist4RootPentrate_vr(L)*0.0055_r8+0.0327_r8
+  V0=0.0327_r8+0.0055_r8*SoilBulkModulus4RootPent_vr(L)
 
   !!aka SoilResit4RootPentration=E'*dt/V0 in eq. (4) of Rickman et al. (1992), [h m-1]
-  SoilResit4RootPentration = SoilResist4RootPentrate_vr(L)*PICON*RootRadius**2/V0*phi_R
+  SoilResit4RootPentration = phi_R*SoilBulkModulus4RootPent_vr(L)*PICON*RootRadius**2/V0
   !The lockhart equation
   RootGrothWatSens             = AMIN1(1.0_r8,AZMAX1(PSIRootTurg_vr(N,L,NZ)-TurgPSIMin4OrganExtens))*phi_R
   RootGrothWatSens             = real_truncate(RootGrothWatSens,1.e-5_r8)  
@@ -1935,6 +1961,10 @@ implicit none
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !input  :soil layer at planting depth, [-]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !input  :seeding depth, [m]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr              ,& !input  :root layer volume water, [m2 d-2]    
+    Root1stMaxRadius1_pft     => plt_morph%Root1stMaxRadius1_pft     ,& !input  :maximum radius of primary roots, [m]    
+    Root1stMaxRadius_pft      => plt_morph%Root1stMaxRadius_pft      ,& !input  :maximum radius of primary roots, [m]    
+    RootCRRadius0_rpvr        => plt_morph%RootCRRadius0_rpvr        ,& !inoput: initial radius of roots that may undergo secondary growth, [m]    
+    Root1stRadius_rpvr        => plt_morph%Root1stRadius_rpvr        ,& !inoput: root layer diameter for each primary axes,  [m]
     RootAge_rpvr              => plt_morph%RootAge_rpvr              ,& !inoput :root age,[h]    
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !inoput :root layer element primary axes, [g d-2]
     RootMyco1stElm_raxs       => plt_biom%RootMyco1stElm_raxs        ,& !inoput :root C primary axes, [g d-2]
@@ -1967,8 +1997,7 @@ implicit none
   !  only the non-woody part is contributing to the elongation
   ! elongation due to positive growth of non-woody part
   Root1stExtPot         = RootMycoNonstC4Grow_Oltd/PlantPopulation_pft(NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_comp)*Root1stSpecLen_pft(N,NZ)
-
-  Root1stPerPlantExtenz = Root1stExtPot !*RootGrothWatSens/(1._r8+SoilResit4RootPentration*Root1stExtPot)
+  Root1stPerPlantExtenz = Root1stExtPot*RootGrothWatSens/(1._r8+SoilResit4RootPentration*Root1stExtPot)
 
   IF(RootNetGrowthElms(ielmc).LT.0.0_r8 .AND. RootMyco1stElm_raxs(ielmc,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
     !primary roots withdraw, note that primary root depth was initialized at seedDepth
@@ -2016,13 +2045,15 @@ implicit none
   !
   Root1stDepz_raxes(NR,NZ) = Root1stDepz_raxes(NR,NZ)+Root1stPerPlantExtenz
   RootAge_rpvr(L,NR,NZ)    = RootAge_rpvr(L,NR,NZ)*(1._r8-FGROLA)+FGROLA
-!  call UpdateRootElongationZoneAge(I,J,NR,NZ,Root1stPerPlantExtenz)
+
   DO NE=1,NumPlantChemElms
     RootMyco1stElm_raxs(NE,NR,NZ)         = RootMyco1stElm_raxs(NE,NR,NZ)+RootNetGrowthElms(NE)
     RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)+RootNetGrowthElms(NE)*FGROL
   ENDDO
-
-  RootProteinC_pvr(N,L,NZ) = RootProteinC_pvr(N,L,NZ)+ &
+ 
+  RootCRRadius0_rpvr(L,NR,NZ) = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
+  Root1stRadius_rpvr(L,NR,NZ) = RootCRRadius0_rpvr(L,NR,NZ) 
+  RootProteinC_pvr(N,L,NZ)    = RootProteinC_pvr(N,L,NZ)+ &
     AMIN1(rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ),&
        rProteinC2RootP_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,L,NR,NZ))
          
@@ -2056,12 +2087,12 @@ implicit none
       AMIN1(rProteinC2RootN_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmn,Lnext,NR,NZ),&
          rProteinC2RootP_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmp,Lnext,NR,NZ))
             
-    PopuRootMycoC_pvr(N,Lnext,NZ) = PopuRootMycoC_pvr(N,Lnext,NZ)+RootMyco1stStrutElms_rpvr(ielmc,Lnext,NR,NZ)
-    Root1stLen_rpvr(Lnext,NR,NZ)  = Root1stLen_rpvr(Lnext,NR,NZ)+Root1stPerPlantExtenz*FGROZ
-    Root1stRadius_pvr(N,Lnext,NZ) = Root1stRadius_pvr(N,L,NZ)
-
+    PopuRootMycoC_pvr(N,Lnext,NZ)   = PopuRootMycoC_pvr(N,Lnext,NZ)+RootMyco1stStrutElms_rpvr(ielmc,Lnext,NR,NZ)
+    Root1stLen_rpvr(Lnext,NR,NZ)    = Root1stLen_rpvr(Lnext,NR,NZ)+Root1stPerPlantExtenz*FGROZ
+    Root1stRadius_pvr(N,Lnext,NZ)   = Root1stRadius_pvr(N,L,NZ)
+    RootCRRadius0_rpvr(Lnext,NR,NZ) = RootCRRadius0_rpvr(L,NR,NZ)
     DO NE=1,NumPlantChemElms
-      XFRE(NE)                              = FracRoot1stCSinkL* RootMycoNonstElms_rpvr(NE,N,L,NZ)
+      XFRE(NE)                              = FracRoot1stCSinkL*RootMycoNonstElms_rpvr(NE,N,L,NZ)
       RootMycoNonstElms_rpvr(NE,N,L,NZ)     = RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE)
       RootMycoNonstElms_rpvr(NE,N,Lnext,NZ) = RootMycoNonstElms_rpvr(NE,N,Lnext,NZ)+XFRE(NE)
     ENDDO
@@ -2086,6 +2117,7 @@ implicit none
   real(r8) :: XFRD,XFRW,FracRoot1stCSinkL
   real(r8) :: XFRE
   logical :: RootDepzChk
+  real(r8), parameter :: scalp=0.99999_r8
   character(len=*), parameter :: subname='PrimeRootsWithdraw'
 
 ! begin_execution
@@ -2164,17 +2196,22 @@ implicit none
         RootMyco2ndStrutElms_rpvr(NE,NN,LL-1,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,NN,LL-1,NR,NZ)+RootMyco2ndStrutElms_rpvr(NE,NN,LL,NR,NZ)
 
         RootMyco2ndStrutElms_rpvr(NE,NN,LL,NR,NZ) = 0._r8
-        XFRE                                      = FracRoot1stCSinkL*RootMycoNonstElms_rpvr(NE,NN,LL,NZ)
-        RootMycoNonstElms_rpvr(NE,NN,LL,NZ)       = AZMAX1(RootMycoNonstElms_rpvr(NE,NN,LL,NZ)-XFRE)
-        RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ)     = AZMAX1(RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ)+XFRE)
-      ENDDO
-      XFRW = FracRoot1stCSinkL*RootProteinC_pvr(NN,L,NZ)
-      XFRD = FracRoot1stCSinkL* PopuRootMycoC_pvr(NN,LL,NZ)
+        XFRE = FracRoot1stCSinkL*RootMycoNonstElms_rpvr(NE,NN,LL,NZ)
+        XFRE = AMAX1(AMIN1(RootMycoNonstElms_rpvr(NE,NN,LL,NZ),XFRE),-RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ))*scalp
 
-      RootProteinC_pvr(NN,LL,NZ)    = AZMAX1(RootProteinC_pvr(NN,LL,NZ)-XFRW)
-      RootProteinC_pvr(NN,LL-1,NZ)  = AZMAX1(RootProteinC_pvr(NN,LL-1,NZ)+XFRW)
-      PopuRootMycoC_pvr(NN,LL,NZ)   = AZMAX1(PopuRootMycoC_pvr(NN,LL,NZ)-XFRD)
-      PopuRootMycoC_pvr(NN,LL-1,NZ) = AZMAX1(PopuRootMycoC_pvr(NN,LL-1,NZ)+XFRD)
+        RootMycoNonstElms_rpvr(NE,NN,LL,NZ)   = RootMycoNonstElms_rpvr(NE,NN,LL,NZ)-XFRE
+        RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ) = RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ)+XFRE
+      ENDDO
+
+      XFRW = FracRoot1stCSinkL*RootProteinC_pvr(NN,L,NZ)
+      XFRW = AMAX1(AMIN1(RootProteinC_pvr(NN,LL,NZ),XFRW),-RootProteinC_pvr(NN,LL-1,NZ))*scalp
+      RootProteinC_pvr(NN,LL,NZ)    = RootProteinC_pvr(NN,LL,NZ)-XFRW
+      RootProteinC_pvr(NN,LL-1,NZ)  = RootProteinC_pvr(NN,LL-1,NZ)+XFRW
+
+      XFRD = FracRoot1stCSinkL*PopuRootMycoC_pvr(NN,LL,NZ)
+      XFRD = AMAX1(AMIN1(PopuRootMycoC_pvr(NN,LL,NZ),XFRD),-PopuRootMycoC_pvr(NN,LL-1,NZ))*scalp
+      PopuRootMycoC_pvr(NN,LL,NZ)   = PopuRootMycoC_pvr(NN,LL,NZ)-XFRD
+      PopuRootMycoC_pvr(NN,LL-1,NZ) = PopuRootMycoC_pvr(NN,LL-1,NZ)+XFRD
       !
       !     WITHDRAW GASES IN PRIMARY ROOTS
       !
@@ -2222,12 +2259,15 @@ implicit none
     !
     IF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
       DO NE=1,NumPlantChemElms
-        XFRE                                = FracRoot1stCSinkL*RootNodulStrutElms_rpvr(NE,LL,NZ)
-        RootNodulStrutElms_rpvr(NE,LL,NZ)   = AZMAX1(RootNodulStrutElms_rpvr(NE,LL,NZ)-XFRE)
-        RootNodulStrutElms_rpvr(NE,LL-1,NZ) = AZMAX1(RootNodulStrutElms_rpvr(NE,LL-1,NZ)+XFRE)
-        XFRE                                = FracRoot1stCSinkL*RootNodulNonstElms_rpvr(NE,LL,NZ)
-        RootNodulNonstElms_rpvr(NE,LL,NZ)   = AZMAX1(RootNodulNonstElms_rpvr(NE,LL,NZ)-XFRE)
-        RootNodulNonstElms_rpvr(NE,LL-1,NZ) = AZMAX1(RootNodulNonstElms_rpvr(NE,LL-1,NZ)+XFRE)
+        XFRE = FracRoot1stCSinkL*RootNodulStrutElms_rpvr(NE,LL,NZ)
+        XFRE = AMAX1(AMIN1(RootNodulStrutElms_rpvr(NE,LL,NZ),XFRE),-RootNodulStrutElms_rpvr(NE,LL-1,NZ))*scalp
+        RootNodulStrutElms_rpvr(NE,LL,NZ) = RootNodulStrutElms_rpvr(NE,LL,NZ)-XFRE
+        RootNodulStrutElms_rpvr(NE,LL-1,NZ) = RootNodulStrutElms_rpvr(NE,LL-1,NZ)+XFRE
+
+        XFRE = FracRoot1stCSinkL*RootNodulNonstElms_rpvr(NE,LL,NZ)
+        XFRE = AMAX1(AMIN1(RootNodulNonstElms_rpvr(NE,LL,NZ),XFRE),-RootNodulNonstElms_rpvr(NE,LL-1,NZ))*scalp
+        RootNodulNonstElms_rpvr(NE,LL,NZ)   = RootNodulNonstElms_rpvr(NE,LL,NZ)-XFRE
+        RootNodulNonstElms_rpvr(NE,LL-1,NZ) = RootNodulNonstElms_rpvr(NE,LL-1,NZ)+XFRE
       ENDDO
     ENDIF
     NRoot1stTipLay_raxes(NR,NZ) = MAX(NGTopRootLayer_pft(NZ),LL-1)
@@ -2244,7 +2284,7 @@ implicit none
   !summarize root sink strength for growth allocation and shoot-root coupling
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8),INTENT(OUT) :: RootSinkC_vr(pltpar%jroots,JZ1)
+  real(r8),INTENT(OUT) :: RootSinkC_vr(pltpar%jroots,JZ1)       !conductance for nonstrucal CNP allocation
   real(r8),intent(out) :: Root1stSink_pvr(JZ1,NumCanopyLayers1)
   real(r8),intent(out) :: Root2ndSink_pvr(pltpar%jroots,JZ1,NumCanopyLayers1)
   real(r8),INTENT(OUT) :: RootSinkC(pltpar%jroots)
@@ -2253,10 +2293,10 @@ implicit none
   real(r8) :: RecoRootMycoC4Nup,CUPRO,CUPRC
   real(r8) :: DistCanopyPrimeRootTip       !distance between primary root tip and canopy top, which characterizes source-sink distance
   real(r8) :: RootEffDepz,RTSKP
-  real(r8) :: RTSKS,rscal
+  real(r8) :: RTSKS,rscal,TipRadius
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
-  real(r8) :: RCO2flx,dUptakeN,dUptakeP,DTransptTube,AreaTranspt
+  real(r8) :: RCO2flx,dUptakeN,dUptakeP,DTransptTube,AreaTranspt,dist2Tip
   real(r8), parameter :: CMassCost4NiUptk=0.86_r8  !=12/14.
   character(len=*), parameter :: subname='SummarizeRootSink'
 
@@ -2268,14 +2308,19 @@ implicit none
     NU                         => plt_site%NU                           ,& !input  :current soil surface layer number, [-]
     CumSoilThickness_vr        => plt_site%CumSoilThickness_vr          ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     ZERO                       => plt_site%ZERO                         ,& !input  :threshold zero for numerical stability, [-]
+    Root1stMaxRadius1_pft      => plt_morph%Root1stMaxRadius1_pft       ,& !input  :root diameter primary axes, [m]        
     DLYR3                      => plt_site%DLYR3                        ,& !input  :vertical thickness of soil layer, [m]
     RootOUlmNutUptake_pvr      => plt_rbgc%RootOUlmNutUptake_pvr        ,& !input  :root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
     RootCUlmNutUptake_pvr      => plt_rbgc%RootCUlmNutUptake_pvr        ,& !input  :root uptake of NH4 band unconstrained by root nonstructural C, [g d-2 h-1]
     CanopyHeight4WatUptake_pft => plt_morph%CanopyHeight4WatUptake_pft  ,& !input  :canopy height, [m]
+    RootMatureAge_pft          => plt_morph%RootMatureAge_pft           ,& !input  : Root maturation age, [h]
+    RootAge_rpvr               => plt_morph%RootAge_rpvr                ,& !input  : root age,[h]
+    PSIRoot_pvr                => plt_ew%PSIRoot_pvr                    ,& !input  :root total water potential, [Mpa]    
     Myco_pft                   => plt_morph%Myco_pft                    ,& !input  :mycorrhizal type (no or yes),[-]
     Root1stRadius_pvr          => plt_morph%Root1stRadius_pvr           ,& !input  :root layer diameter primary axes, [m]
     Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes           ,& !input  :root layer depth, [m]
     HypoctoHeight_pft          => plt_morph%HypoctoHeight_pft           ,& !input  :cotyledon height, [m]
+    Root1stMaxRadius_pft       => plt_morph%Root1stMaxRadius_pft        ,& !input  :maximum radius of primary roots, [m]        
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr          ,& !input  :root layer diameter secondary axes, [m]
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]
     Root2ndEffLen4uptk_rpvr    => plt_morph%Root2ndEffLen4uptk_rpvr     ,& !input  :Layer effective root length four resource uptake, [m]
@@ -2304,20 +2349,14 @@ implicit none
 
   D4995: DO N=1,Myco_pft(NZ)
     D4990: DO L=NU,MaxSoiL4Root_pft(NZ)
-    !
-    !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
-    !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
-    !
-    !     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
-    !     RecoRootMycoC4Nup=C respiration for nutrient uptake
-    !     CUPRO,CUPRC=RecoRootMycoC4Nup unlimited by O2,root nonstructural C
-    !     RootNH4Uptake_pvr,RootNH4BUptake_pvr,RUPN03,RootNO3BUptake_pvr=uptake from non-band,band of NH4,NO3
-    !     RootH2PO4Uptake_pvr,RootH2PO4BUptake_pvr,RootHPO4Uptake_pvr,RootNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4
-    !     RootOUlmNutUptake_pvr,RootOUlmNutUptake_pvr,RUON03,RootOUlmNutUptake_pvr=uptake from non-band,band of NH4,NO3 unlimited by O2
-    !     RootOUlmNutUptake_pvr,RootOUlmNutUptake_pvr,RootOUlmNutUptake_pvr,RootOUlmNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4 unlimited by O2
-    !     RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RUCN03,RootCUlmNutUptake_pvr=uptake from non-band,band of NH4,NO3 unlimited by nonstructural C
-    !     RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr,RootCUlmNutUptake_pvr=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
-    !     why is 0.86? it refers to C cost for N asimilation
+      !
+      !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
+      !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
+      !
+      !     VLSoilPoreMicP_vr=soil layer volume excluding macropore, rocks
+      !     RecoRootMycoC4Nup=C respiration for nutrient uptake
+      !     CUPRO,CUPRC=RecoRootMycoC4Nup unlimited by O2,root nonstructural C
+      !     why is 0.86? it refers to C cost for N asimilation
 
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
         !accumulate C cost for nitrogen (NO3,NO3B,NH4,NH4B) and phosphorus (H1PO4,H2PO4,H1PO4B,H2PO4B) uptake
@@ -2395,21 +2434,22 @@ implicit none
           !     RootSinkC,RootSinkC_vr=total root sink strength
           !
           IF(N.EQ.ipltroot)THEN
-
             Root1stLocDepz_vr(NR,L) = AZMAX1(Root1stDepz_raxes(NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
             Root1stLocDepz_vr(NR,L) = AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L))-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
             RootEffDepz             = AMAX1(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1))+0.5_r8*Root1stLocDepz_vr(NR,L)+CanopyHeight4WatUptake_pft(NZ)
 
-            
-            IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN
-              DistCanopyPrimeRootTip = Root1stDepz_raxes(NR,NZ)+CanopyHeight4WatUptake_pft(NZ)
-              DTransptTube           = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
-              AreaTranspt            = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
-              
+            DistCanopyPrimeRootTip = Root1stDepz_raxes(NR,NZ)+CanopyHeight4WatUptake_pft(NZ)
+            DTransptTube           = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
+            AreaTranspt            = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
+
+            !pi*(R^2-(R-d)^2)=pi*(2*R*d-d^2)
+
+            IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN              
               IF(Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L))THEN
                 !Root tip in layer L
-                Root1stSink_pvr(L,NR)  = RTSK(iPlantRootProfile_pft(NZ))*RootNumPrimeAxes_pft(NZ)*AreaTranspt/DistCanopyPrimeRootTip
-              elseif(is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
+                TipRadius             = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
+                Root1stSink_pvr(L,NR) = RTSK(iPlantRootProfile_pft(NZ))*RootNumPrimeAxes_pft(NZ)*TipRadius**2/DistCanopyPrimeRootTip
+              elseif(is_plant_treelike(iPlantRootProfile_pft(NZ)).and.RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ))THEN
                 !non-tip layer
                 Root1stSink_pvr(L,NR)  = RootNumPrimeAxes_pft(NZ)*AreaTranspt/RootEffDepz
               ENDIF
@@ -2441,7 +2481,7 @@ implicit none
             IF(RootEffDepz.GT.ZERO)THEN
               !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um diameter), and the R**2 rule counts
               !number of pores. 
-              RTSKP = RootNumPrimeAxes_pft(NZ)*Root1stRadius_pvr(N,L,NZ)**2/RootEffDepz
+              RTSKP = RootNumPrimeAxes_pft(NZ)*AreaTranspt/RootEffDepz
               RTSKS = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
 
               IF(RTSKP+RTSKS.GT.ZERO4Groth_pft(NZ))THEN
@@ -2459,7 +2499,6 @@ implicit none
 
           RootSinkC(N)      = RootSinkC(N)+Root2ndSink_pvr(N,L,NR)
           RootSinkC_vr(N,L) = RootSinkC_vr(N,L)+Root2ndSink_pvr(N,L,NR)
-
         ENDDO D4985
       ENDIF
     ENDDO D4990
@@ -2731,5 +2770,31 @@ implicit none
   call PrintInfo('end '//subname)
   end associate
   end subroutine FindMatureRootSegs  
+!----------------------------------------------------------------------------------------------------
+  subroutine ComputeSoilStress(I,J,Pstress_vr)
+  implicit none
+  INTEGER, intent(in) :: I,J
+  real(r8), intent(out) :: Pstress_vr(JZ1)
+  integer :: L
+  character(len=*), parameter :: subname='ComputeSoilStress'
+  associate(                                                   &
+    NU                         => plt_site%NU                , & !input : current soil surface layer number, [-]
+    SoilBulkStress_vr          => plt_site%SoilBulkStress_vr , & !input : soil bulk stress on root thickening, [MPa]
+    SoilSuctStress_vr          => plt_site%SoilSuctStress_vr , & !input : soil suction stress on root thickening, [MPa]
+    rSat_vr                    => plt_site%rSat_vr             & !input : relative soil saturation, [-]            
+  )
+  call PrintInfo('beg '//subname)
+
+  Pstress_vr(1)=SoilBulkStress_vr(1)*0.5_r8+rSat_vr(1)*abs(SoilSuctStress_vr(1))
+
+  DO L=2,JZ1
+    Pstress_vr(L)=Pstress_vr(L-1)+(SoilBulkStress_vr(L-1)+SoilBulkStress_vr(L))*0.5_r8+rSat_vr(L)*abs(SoilSuctStress_vr(L))
+  enddo
+  call PrintInfo('end '//subname)
+
+  end associate
+  end subroutine ComputeSoilStress
+!----------------------------------------------------------------------------------------------------
+
   ![tail]
 end module RootMod

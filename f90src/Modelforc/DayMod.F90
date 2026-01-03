@@ -1,11 +1,12 @@
 
   module DayMod
   use data_kind_mod,      only: r8 => DAT_KIND_R8
-  use minimathmod,        only: isLeap, AZMAX1
-  use MiniFuncMod,        only: GetDayLength,calculate_equation_of_time
+  use minimathmod,        only: isLeap,  AZMAX1
+  use MiniFuncMod,        only: GetDayLength, calculate_equation_of_time
   use PrescribePhenolMod, only: PrescribePhenologyInterp
   use SurfLitterDataType, only: XTillCorp_col
   use fileUtil,           only: iulog
+  use DebugToolMod,       only: PrintInfo
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -52,6 +53,7 @@
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NN,N,M,NY,NX
   real(r8) :: eot,leapday
+  character(len=*), parameter :: subname='day'
 !     execution begins here
 !     begin_execution
 !
@@ -59,6 +61,7 @@
 !
 !     CDATE=DDMMYYYY
 !
+  call PrintInfo('beg '//subname)
   if(isLeap(iYearCurrent))then
     leapday=1._r8
   else
@@ -77,7 +80,7 @@
 
   if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
-  RETURN
+  call PrintInfo('end '//subname)
 
   END subroutine day
 
@@ -91,7 +94,9 @@
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
   integer :: NE,NX,NY,I2,I3,ITYPE,N
+  character(len=*), parameter :: subname='UpdateDailyAccumulators'
 
+  call PrintInfo('beg '//subname)
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
@@ -116,7 +121,6 @@
 !     ITYPE 1=daily,2=hourly
 !
       ITYPE=IWTHR
-
 
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
@@ -202,7 +206,7 @@
       ENDDO D600
     ENDDO D950
   ENDDO D955
-
+  call PrintInfo('end '//subname)
   END subroutine UpdateDailyAccumulators
 !-----------------------------------------------------------------------------------------
 
@@ -214,7 +218,9 @@
   integer :: NY,NX,J,L
   real(r8) :: TWP,TVW,TFZ
   real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ,RR
+  character(len=*), parameter :: subname='TillageandIrrigationEvents'
 
+  call PrintInfo('beg '//subname)
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
 !
@@ -291,5 +297,6 @@
       ENDIF
     ENDDO D9990
   ENDDO D9995
+  call PrintInfo('end '//subname)
   end subroutine TillageandIrrigationEvents
 END module DayMod

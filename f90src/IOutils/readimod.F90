@@ -554,7 +554,7 @@ module readiMod
             SatHydroCondVert_vr(L,NY,NX)  = SatHydroCondVert_vr(L,NV1,NH1)
             SatHydroCondHrzn_vr(L,NY,NX)  = SatHydroCondHrzn_vr(L,NV1,NH1)
             CSAND_vr(L,NY,NX)             = CSAND_vr(L,NV1,NH1)
-            CSILT_vr(L,NY,NX)                = CSILT_vr(L,NV1,NH1)
+            CSILT_vr(L,NY,NX)              = CSILT_vr(L,NV1,NH1)
             SoilFracAsMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)              = ROCK_vr(L,NV1,NH1)
             PH_vr(L,NY,NX)                = PH_vr(L,NV1,NH1)
@@ -730,10 +730,10 @@ module readiMod
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
           IF(isclose(SoilBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
-        !     fraction of soil as micropore
+          ! fraction of soil as micropore
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
-  !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
-  !  both macropores and micropores    
+        !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
+        !  both macropores and micropores    
   !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !     WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
@@ -749,6 +749,7 @@ module readiMod
           !volume of organic matter
           OrgVolFrac = CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden
           corrector  = 1.0E-03_r8*AZMAX1((1.0_r8-OrgVolFrac))
+          
           !convert soil texture into mass scale [0,1]
           CSAND_vr(L,NY,NX) = CSAND_vr(L,NY,NX)*corrector 
           CSILT_vr(L,NY,NX) = CSILT_vr(L,NY,NX)*corrector

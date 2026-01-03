@@ -118,9 +118,9 @@ module StartqMod
   
   H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
   CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
-  rProteinC2RootN_pft(NZ,NY,NX)  = 2.15_r8
-  rProteinC2LeafN_pft(NZ,NY,NX)  = 2.6_r8
-  rProteinC2LeafP_pft(NZ,NY,NX)  = 25.0_r8
+!  rProteinC2RootN_pft(NZ,NY,NX)  = 2.15_r8
+!  rProteinC2LeafN_pft(NZ,NY,NX)  = 2.6_r8
+!  rProteinC2LeafP_pft(NZ,NY,NX)  = 25.0_r8
   RootProteinCMax_pft(NZ,NY,NX) = rNCRoot_pft(NZ,NY,NX)*rProteinC2RootN_pft(NZ,NY,NX)    
   IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
@@ -758,7 +758,7 @@ module StartqMod
       RootVH2O_pvr(N,L,NZ,NY,NX)                 = 0._r8
       Root1stRadius_pvr(N,L,NZ,NY,NX)            = Root1stMaxRadius_pft(N,NZ,NY,NX)
       Root2ndRadius_rpvr(N,L,NZ,NY,NX)            = Root2ndMaxRadius_pft(N,NZ,NY,NX)
-      RootAreaPerPlant_pvr(N,L,NZ,NY,NX)         = 0._r8
+      RootSAreaPerPlant_pvr(N,L,NZ,NY,NX)         = 0._r8
       Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)            = 1.0E-03
       RootNutUptake_pvr(ids_NH4,N,L,NZ,NY,NX)    = 0._r8
       RootNutUptake_pvr(ids_NO3,N,L,NZ,NY,NX)    = 0._r8

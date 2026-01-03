@@ -259,7 +259,11 @@ module grosubsMod
 ! begin_execution
   associate(                                                 &
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft     ,& !input  :number of branches,[-]
+    PlantPopulation_pft  => plt_site%PlantPopulation_pft    ,& !input  :plant population, [d-2]
+    ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft         ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantRootState_pft  => plt_pheno%iPlantRootState_pft   ,& !input  :flag to detect root system death,[-]
+    NU                   => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
+    MaxSoiL4Root_pft     => plt_morph%MaxSoiL4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     MainBranchNum_pft    => plt_morph%MainBranchNum_pft     ,& !input  :number of main branch,[-]    
     iPlantShootState_pft => plt_pheno%iPlantShootState_pft   & !input  :flag to detect canopy death,[-]
 
@@ -267,14 +271,13 @@ module grosubsMod
 
   call PrintInfo('beg '//subname)
   
-  IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
+  IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive .and. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
     call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
-!
-!     CALCULATE GROWTH OF EACH BRANCH
-
+    !
+    !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
@@ -287,13 +290,14 @@ module grosubsMod
     call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 
     call ComputeTotalBiom(I,J,NZ)
+  else
+    plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
   ENDIF
 
   call RemoveBiomByMgmt(I,J,NZ)  
   !
   !   RESET DEAD BRANCHES
   call ResetDeadPlant(I,J,NZ)
-  
   call PrintInfo('end '//subname)  
   end associate
   end subroutine GrowOnePlant

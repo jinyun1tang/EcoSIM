@@ -47,8 +47,8 @@
     ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]    
     LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch            ,& !input  :branch leaf element, [g d-2]    
     LeafPEP2Protein_pft             => plt_photo%LeafPEP2Protein_pft          ,& !input  :leaf PEP carboxylase content, [gC gC-1]    
-    LeafC4Chl2Protein_pft           => plt_photo%LeafC4Chl2Protein_pft        ,& !input  :leaf C4 chlorophyll to protein C ratio, [gC gC-1]    
-    LeafC3Chl2Protein_pft           => plt_photo%LeafC3Chl2Protein_pft        ,& !input  :leaf C3 chlorophyll content, [gC gC-1]    
+    fMesophyllChlProtein_pft        => plt_photo%fMesophyllChlProtein_pft     ,& !input  :fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
+    LeafChl2Protein_pft             => plt_photo%LeafChl2Protein_pft          ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
     LeafRubisco2Protein_pft         => plt_photo%LeafRubisco2Protein_pft      ,& !input  :leaf rubisco content, [gC gC-1]    
     SpecLeafChlAct_pft              => plt_photo%SpecLeafChlAct_pft           ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]    
     LeafArea_node                   => plt_morph%LeafArea_node                ,& !input  :node leaf area, [m2 d-2]    
@@ -117,28 +117,31 @@
           IF(ProteinCperm2LeafArea_node(K,NB,NZ).GT.ZERO)THEN
             IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        
               BundlSheathRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
-              BundlSheathChlC     = LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              BundlSheathChlC     = LeafProteinC_node(K,NB,NZ)*LeafChl2Protein_pft(NZ)*(1._r8-fMesophyllChlProtein_pft(NZ))
               MesophyllPEPC       = LeafProteinC_node(K,NB,NZ)*LeafPEP2Protein_pft(NZ)
-              MesophyllChlC       = LeafProteinC_node(K,NB,NZ)*LeafC4Chl2Protein_pft(NZ)
+              MesophyllChlC       = LeafProteinC_node(K,NB,NZ)*LeafChl2Protein_pft(NZ)*fMesophyllChlProtein_pft(NZ)
 
               VcMaxPEPCarboxyRef_brch(NB,NZ) = VcMaxPEPCarboxyRef_brch(NB,NZ) +VmaxPEPCarboxyRef_pft(NZ)*MesophyllPEPC
               VcMaxRubiscoRef_brch(NB,NZ)    = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*BundlSheathRubiscoC
               VoMaxRubiscoRef_brch(NB,NZ)    = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*BundlSheathRubiscoC
 
               LeafPEPC_brch(NB,NZ)     = LeafPEPC_brch(NB,NZ)+MesophyllPEPC
-              LeafC4ChlC_brch(NB,NZ)   = LeafC4ChlC_brch(NB,NZ)+MesophyllChlC
+              !usually 0.35-0.45 g chl-C vs 1 protein-C
+              LeafC4ChlC_brch(NB,NZ)   = LeafC4ChlC_brch(NB,NZ)+MesophyllChlC*0.4_r8
               LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+BundlSheathRubiscoC
-              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+BundlSheathChlC
+              !usually 0.2-0.25 g chl-C vs 1 g protein-C
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+BundlSheathChlC*0.22_r8
 
             ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then    
-              MesophyllChlC     = LeafProteinC_node(K,NB,NZ)*LeafC3Chl2Protein_pft(NZ)
+              MesophyllChlC     = LeafProteinC_node(K,NB,NZ)*LeafChl2Protein_pft(NZ)
               MesophyllRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
               
               VcMaxRubiscoRef_brch(NB,NZ) = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoC
               VoMaxRubiscoRef_brch(NB,NZ) = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoC
 
               LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+MesophyllRubiscoC
-              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+MesophyllChlC
+              !usually 0.3-0.4 g chl-C vs 1g protein-C
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+MesophyllChlC*0.35_r8
     
             ENDIF
             ElectronTransptJmaxRef_brch(NB,NZ) = ElectronTransptJmaxRef_brch(NB,NZ)+SpecLeafChlAct_pft(NZ)*MesophyllChlC
@@ -372,7 +375,7 @@
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     O2L_pft                       => plt_photo%O2L_pft                        ,& !input  :leaf aqueous O2 concentration, [uM]
     aquCO2Intraleaf_pft           => plt_photo%aquCO2Intraleaf_pft            ,& !input  :leaf aqueous CO2 concentration, [uM]
-    LeafC3Chl2Protein_pft         => plt_photo%LeafC3Chl2Protein_pft          ,& !input  :leaf C3 chlorophyll content, [gC gC-1]
+    LeafChl2Protein_pft           => plt_photo%LeafChl2Protein_pft            ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
     Km4LeafaqCO2_pft              => plt_photo%Km4LeafaqCO2_pft               ,& !input  :leaf aqueous CO2 Km no O2, [uM]
     Km4RubiscoCarboxy_pft         => plt_photo%Km4RubiscoCarboxy_pft          ,& !input  :leaf aqueous CO2 Km ambient O2, [uM]
     SpecLeafChlAct_pft            => plt_photo%SpecLeafChlAct_pft             ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]
@@ -392,15 +395,15 @@
   )
   call PrintInfo('beg '//subname)
 !
-!     SURFICIAL DENSITY OF RUBISCO AND ITS LeafC3Chl2Protein_pftOROPHYLL
+!     SURFICIAL DENSITY OF RUBISCO AND ITS LeafChl2Protein_pftOROPHYLL
 !
 !     MesophyllRubiscoSurfDensity=surficial density of rubisco in mesophyll, [gC rubisco (gC protein)-1]*[gC protein m-2 leaf]
 !     MesophyllChlDensity=surficial density of chlorophyll in esophyll,[gC chol (gC protein)-1]*[gC protein m-2 leaf]
-!     LeafC3Chl2Protein_pft=mass ratio of mesophyll cholorophyll to leaf protein
+!     LeafChl2Protein_pft=mass ratio of mesophyll cholorophyll to leaf protein
 !     ProteinCLeafAreaDensity=leaf protein surficial density, [g protein (m2 LA)-1]
 !
   MesophyllRubiscoSurfDensity = LeafRubisco2Protein_pft(NZ)*ProteinCLeafAreaDensity
-  MesophyllChlDensity         = LeafC3Chl2Protein_pft(NZ)*ProteinCLeafAreaDensity
+  MesophyllChlDensity         = LeafChl2Protein_pft(NZ)*ProteinCLeafAreaDensity
 
 
 !
@@ -487,8 +490,8 @@
     LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch                ,& !input  :leaf element, [g d-2]
     ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft                    ,& !input  :threshold zero for plang growth calculation, [-]
     CanopyLeafArea_lnode            => plt_morph%CanopyLeafArea_lnode             ,& !input  :layer/node/branch leaf area, [m2 d-2]
-    GrainFillDowreg_brch           => plt_photo%GrainFillDowreg_brch            ,& !input  :down-regulation of C4 photosynthesis, [-]
-    LeafC4Chl2Protein_pft           => plt_photo%LeafC4Chl2Protein_pft            ,& !input  :leaf C4 chlorophyll content, [gC gC-1]
+    GrainFillDowreg_brch            => plt_photo%GrainFillDowreg_brch             ,& !input  :down-regulation of C4 photosynthesis, [-]
+    fMesophyllChlProtein_pft        => plt_photo%fMesophyllChlProtein_pft         ,& !input  :fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
     O2L_pft                         => plt_photo%O2L_pft                          ,& !input  :leaf aqueous O2 concentration, [uM]
     aquCO2Intraleaf_pft             => plt_photo%aquCO2Intraleaf_pft              ,& !input  :leaf aqueous CO2 concentration, [uM]
     SpecLeafChlAct_pft              => plt_photo%SpecLeafChlAct_pft               ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]
@@ -500,7 +503,7 @@
     CPOOL4_node                     => plt_photo%CPOOL4_node                      ,& !input  :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
     Km4LeafaqCO2_pft                => plt_photo%Km4LeafaqCO2_pft                 ,& !input  :leaf aqueous CO2 Km no O2, [uM]
     Km4RubiscoCarboxy_pft           => plt_photo%Km4RubiscoCarboxy_pft            ,& !input  :leaf aqueous CO2 Km ambient O2, [uM]
-    LeafC3Chl2Protein_pft           => plt_photo%LeafC3Chl2Protein_pft            ,& !input  :leaf C3 chlorophyll content, [gC gC-1]
+    LeafChl2Protein_pft             => plt_photo%LeafChl2Protein_pft              ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
     VmaxSpecRubCarboxyRef_pft       => plt_photo%VmaxSpecRubCarboxyRef_pft        ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1]
     VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft                ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]
     LeafPEP2Protein_pft             => plt_photo%LeafPEP2Protein_pft              ,& !input  :leaf PEP carboxylase content, [gC gC-1]
@@ -533,16 +536,16 @@
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI_pepcarboxy)
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !
-!     SURFICIAL DENSITY OF LeafPEP2Protein_pftAND ITS LeafC3Chl2Protein_pftOROPHYLL
+!     SURFICIAL DENSITY OF LeafPEP2Protein_pftAND ITS LeafChl2Protein_pftOROPHYLL
 !
 !     MesophyllPEPSurfDensity=surficial density of PEP carboxylase in mesophyll
 !     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
 !     LeafPEP2Protein_pft=C mass ratio of PEP enzyme to total leaf protein
-!     LeafC4Chl2Protein_pft=fraction of leaf protein in mesophyll chlorophyll
+!     fMesophyllChlProtein_pft=fraction of leaf protein in mesophyll chlorophyll
 !     ProteinCLeafAreaDensity=leaf protein surficial density, gC/m2 leaf
 !
-  MesophyllPEPSurfDensity = LeafPEP2Protein_pft(NZ)*ProteinCLeafAreaDensity
-  MesophyllChlDensity     = LeafC4Chl2Protein_pft(NZ)*ProteinCLeafAreaDensity
+  MesophyllPEPSurfDensity = ProteinCLeafAreaDensity*LeafPEP2Protein_pft(NZ)
+  MesophyllChlDensity     = ProteinCLeafAreaDensity*LeafChl2Protein_pft(NZ)*fMesophyllChlProtein_pft(NZ)
 
 !
 !     CO2-LIMITED C4 CARBOXYLATION RATES
@@ -594,11 +597,11 @@
 !     MesophyllRubiscoSurfDensity=surficial density of rubisco in bundle sheath, 
 !     BundlSheathChlDensity=surficial density of chlorophyll in bundle sheath
 !     LeafRubisco2Protein_pft=fraction of leaf protein in rubisco
-!     LeafC3Chl2Protein_pft=fraction of leaf protein in bundle sheath chlorophyll
+!     LeafChl2Protein_pft=fraction of leaf protein in bundle sheath chlorophyll
 !     ProteinCLeafAreaDensity=leaf protein surficial density
 !
-  BundlSheathRubiscoSurfDensity = LeafRubisco2Protein_pft(NZ)*ProteinCLeafAreaDensity
-  BundlSheathChlDensity         = LeafC3Chl2Protein_pft(NZ)*ProteinCLeafAreaDensity
+  BundlSheathRubiscoSurfDensity = ProteinCLeafAreaDensity*LeafRubisco2Protein_pft(NZ)
+  BundlSheathChlDensity         = ProteinCLeafAreaDensity*LeafChl2Protein_pft(NZ)*(1._r8-fMesophyllChlProtein_pft(NZ))
 
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES

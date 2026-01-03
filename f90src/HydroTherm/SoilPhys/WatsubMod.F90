@@ -8,12 +8,12 @@ module WatsubMod
 
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
-  use abortutils,        only: endrun,             print_info
-  use ElmIDMod,          only: iWestEastDirection, iNorthSouthDirection, iVerticalDirection
-  use SurfPhysData,      only: InitSurfPhysData,   DestructSurfPhysData
-  use EcosysWarmingMod,   only: check_warming_dates, is_warming_layerL,apply_soil_cable_warming
-  use PlantDataRateType, only: TWaterPlantRoot2SoilPrev_vr,THeatPlantRoot2SoilPrev_vr
-
+  use abortutils,        only: endrun,                      print_info
+  use ElmIDMod,          only: iWestEastDirection,          iNorthSouthDirection, iVerticalDirection
+  use SurfPhysData,      only: InitSurfPhysData,            DestructSurfPhysData
+  use EcosysWarmingMod,  only: check_warming_dates,         is_warming_layerL,    apply_soil_cable_warming
+  use PlantDataRateType, only: TWaterPlantRoot2SoilPrev_vr, THeatPlantRoot2SoilPrev_vr
+  use InitSOMBGCMod,     only: gOC_to_m3_OM
   use DebugToolMod
   use EcoSIMCtrlMod  
   use minimathmod      
@@ -318,7 +318,7 @@ module WatsubMod
   integer :: NY,NX
 
   integer :: L,LyrIrrig
-  real(r8) :: VLTSoiPore,rsatMacP
+  real(r8) :: VLTSoiPore,rsatMacP,rootC
 
   DX995: DO NX=NHW,NHE
     DX990: DO NY=NVN,NVS
@@ -417,9 +417,10 @@ module WatsubMod
         !VHeatCapacity1_vr=total heat capacity
         !VLHeatCapacityA=heat capcity without macropore water/ice
         !VLHeatCapacityB=heat capacity for macropore water/ice
-        VLHeatCapacityA_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
+        VLHeatCapacityA_vr(L,NY,NX)=VHeatCapSolidSoil_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
         if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
-          VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))      
+          rootC=sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))      
+          VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*gOC_to_m3_OM(rootC)
         endif  
         VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
         VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
@@ -1169,7 +1170,7 @@ module WatsubMod
   real(r8) :: ENGY1,VLTSoiPore,VHXX
   real(r8) :: TKXX,VLWMicPre,VLHeatCapacityPre,dHeat
   integer :: it   !current model step in the simulation year
-  real(r8) :: dwat,dwat1
+  real(r8) :: dwat,dwat1,rootC
   real(r8),parameter :: tau=100._r8
   it=(I-1)*24+J
 
@@ -1236,9 +1237,10 @@ module WatsubMod
           VHXX                       = VHeatCapacity1_vr(L,NY,NX)
           ENGY1                      = VHXX*TKXX
           
-          VLHeatCapacityA_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
+          VLHeatCapacityA_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+cpw*VLWatMicP1_vr(L,NY,NX)+cpi*VLiceMicP1_vr(L,NY,NX)
           if(plantOM4Heat .and. VLHeatCapacityA_vr(L,NY,NX)>0._r8)then
-            VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+            rootC=sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+            VLHeatCapacityA_vr(L,NY,NX)=VLHeatCapacityA_vr(L,NY,NX)+cpo*gOC_to_m3_OM(rootC)
           endif
           VLHeatCapacityB_vr(L,NY,NX) = cpw*VLWatMacP1_vr(L,NY,NX)+cpi*VLiceMacP1_vr(L,NY,NX)
           VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
@@ -2348,7 +2350,7 @@ module WatsubMod
   real(r8) :: MicPIceHeatFlxFrez   !actual latent heat from micropore freeze-thaw
   real(r8) :: MicPIceHeatFlxFrezPt !potential heat flux supporting micropore freeze-thaw
   real(r8) :: VLHeatCapacityX  !heat capacity before freeze/thaw
-  real(r8) :: dcpo             !heat capacity due to living root [MJ/K/d-2]
+  real(r8) :: dcpo,rootC             !heat capacity due to living root [MJ/K/d-2]
 !
 !     FREEZE-THAW IN SOIL LAYER MICROPORE FROM NET CHANGE IN SOIL
 !     LAYER HEAT STORAGE
@@ -2368,7 +2370,8 @@ module WatsubMod
 !     FIceThawedMacP_vr=soil water flux from macropore freeze-thaw
 !
   if(plantOM4Heat)then
-    dcpo = cpo*sum(RootMycoMassElm_vr(ielmc,:,N3,N2,N1))
+    rootC=sum(RootMycoMassElm_vr(ielmc,:,N3,N2,N1))
+    dcpo = cpo*gOC_to_m3_OM(rootC)
   else
     dcpo=0._r8
   endif
@@ -2380,7 +2383,7 @@ module WatsubMod
   VLWatMicP1X     = VLWatMicP1_vr(N3,N2,N1)+WatNetFlow2MicP_3DM_vr(N3,N2,N1)+FWatExMacP2MicPiM_vr(N3,N2,N1)+FWatIrrigate2MicP1_vr(N3,N2,N1)
   VLWatMacP1X     = VLWatMacP1_vr(N3,N2,N1)+WatNetFlow2Macpt_3DM_vr(N3,N2,N1)-FWatExMacP2MicPiM_vr(N3,N2,N1)
   ENGY1           = VHeatCapacity1_vr(N3,N2,N1)*TKSoil1_vr(N3,N2,N1)
-  VLHeatCapacityX = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X)+cpi*(VLiceMicP1_vr(N3,N2,N1)+VLiceMacP1_vr(N3,N2,N1))
+  VLHeatCapacityX = VHeatCapSolidSoil_vr(N3,N2,N1)+cpw*(VLWatMicP1X+VLWatMacP1X)+cpi*(VLiceMicP1_vr(N3,N2,N1)+VLiceMacP1_vr(N3,N2,N1))
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     VLHeatCapacityX=VLHeatCapacityX+dcpo
@@ -2417,7 +2420,7 @@ module WatsubMod
     IF((TK1App.LT.TFREEZ .AND. VLWatMicP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)) &
       .OR.(TK1App.GT.TFREEZ .AND. VLiceMicP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)))THEN
       
-      VLHeatCapacityAX     = VHeatCapacitySoilM_vr(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
+      VLHeatCapacityAX     = VHeatCapSolidSoil_vr(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
       if(VLHeatCapacityAX>0._r8)VLHeatCapacityAX=VLHeatCapacityAX+dcpo
       MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ))*dts_wat
 

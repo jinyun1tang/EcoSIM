@@ -3,8 +3,9 @@ module SurfPhysMod
 !Description
 ! code for doing surface physics
 !
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use abortutils,       only: endrun
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use InitSOMBGCMod, only: gOC_to_m3_OM
   use DebugToolMod
   use GridDataType
   use HydroThermData
@@ -190,9 +191,9 @@ contains
 ! ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
 !
-
+  m3OM_col(NY,NX) = gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))
   LWRadBySurf_col(NY,NX)        = 0.0_r8
-  VHeatCapacity1_vr(0,NY,NX)    = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VHeatCapacity1_vr(0,NY,NX)    = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   VLPoreLitR_col(NY,NX)         = VLMicP_vr(0,NY,NX)
   VLWatMicP1_vr(0,NY,NX)        = AZMAX1(VLWatMicP_vr(0,NY,NX))
   VLiceMicP1_vr(0,NY,NX)        = AZMAX1(VLiceMicP_vr(0,NY,NX))
@@ -973,7 +974,7 @@ contains
   TFREEZ          = get_Tfrez(PSISM1_vr(0,NY,NX))
   VLWatMicP1X     = AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX))
   ENGYR           = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)
-  VLHeatCapacityX = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(0,NY,NX)
+  VLHeatCapacityX = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(0,NY,NX)
 
   IF(VLHeatCapacityX.GT.ZEROS(NY,NX))THEN
     TK1X=(ENGYR+HeatFLoByWat2LitRM_col(NY,NX))/VLHeatCapacityX

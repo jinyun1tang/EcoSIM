@@ -32,6 +32,7 @@ module InitSOMBGCMOD
   public :: InitSOMBGC
   public :: DestructSOMBGC
   public :: MicrobeByLitterFall
+  public :: gOC_to_m3_OM
   contains
 !------------------------------------------------------------------------------------------
 
@@ -529,14 +530,14 @@ module InitSOMBGCMOD
   end associate
   end subroutine InitManureKinetiComponent
 !------------------------------------------------------------------------------------------
-  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
+  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,VORGCM)
   implicit none
   integer, intent(in)  :: L, NY, NX
   real(r8), intent(in) :: HCX
   real(r8), intent(in) :: TORGL
   real(r8), intent(in) :: LandScape1stSoiLayDepth
   real(r8), intent(out):: FCX
-  real(r8), intent(out):: CORGCM   !OM volume in one m3 consolidated soil (excluding pores)
+  real(r8), intent(out):: VORGCM      !volume of consolidated organic matter [cm3]=mass/density
   real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
@@ -584,12 +585,11 @@ module InitSOMBGCMOD
         ENDIF
         FCX=EXP(HCX*TORGL)
         !     WETLAND
-!
+        !
       ELSE
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
-          FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
-            10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
+          FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus),10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
         ELSE
           FC0=FCY
         ENDIF
@@ -631,9 +631,10 @@ module InitSOMBGCMOD
   IF(L.GT.0)THEN
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       !assume 0.55 of organic matter is carbon
-      CORGCM=AMIN1(orgcden,(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus)))/0.55_r8
+      VORGCM=AMIN1(orgcden,(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus))/DensitySolidOM)/OMCMassFrac      
+      SolidOMPercent_vr(L,NY,NX)=(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus))*1.e-4_r8/OMCMassFrac ![g Mg-1] -> [g /100g-1]
     else
-      CORGCM=0._r8
+      VORGCM=0._r8
     endif
   endif
   end associate
@@ -641,14 +642,14 @@ module InitSOMBGCMOD
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,CORGCM,FCX)
+  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,VORGCM,FCX)
 
   implicit none
   integer,  intent(in)  :: L,NY,NX
   real(r8), intent(in)  :: HCX
   real(r8), intent(in)  :: TORGL
   real(r8), intent(in)  :: LandScape1stSoiLayDepth
-  real(r8), intent(out) :: CORGCM
+  real(r8), intent(out) :: VORGCM !volume of consolidated organic matter [cm3]
   real(r8), intent(out) :: FCX
 
   call PrintInfo('beg InitSOMProfile')
@@ -662,7 +663,7 @@ module InitSOMBGCMOD
   call InitManureKinetiComponent(L,NY,NX)
   !
   !     POM
-  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
+  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,VORGCM)
   
   call PrintInfo('end InitSOMProfile')
   end subroutine InitSOMProfile
@@ -688,8 +689,8 @@ module InitSOMBGCMOD
   call PrintInfo('beg InitLitterProfile')
 
   IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    scal                      = AREA_3D(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)
-    CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
+    scal                      = AREA_3D(3,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX) ![m2 d-2] /[Mg soil d-2]=[m2/Mg soil]
+    CORGCX(1:NumOfLitrCmplxs) = RSC_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal ![gC m-2]*[m2/Mg soil]=[gC/Mg soil]
     CORGNX(1:NumOfLitrCmplxs) = RSN_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
     CORGPX(1:NumOfLitrCmplxs) = RSP_vr(1:NumOfLitrCmplxs,L,NY,NX)*scal
   ELSE
@@ -702,8 +703,8 @@ module InitSOMBGCMOD
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
   IF(L.GT.0)THEN
-    CORGCZ = CSoilOrgM_vr(ielmc,L,NY,NX)
-    CORGRZ = COMLitrC_vr(L,NY,NX)
+    CORGCZ = CSoilOrgM_vr(ielmc,L,NY,NX) !total SOC, [gC/Mg soil]
+    CORGRZ = COMLitrC_vr(L,NY,NX)        !POC, [gC/Mg soil]
     CORGNZ = CSoilOrgM_vr(ielmn,L,NY,NX)
     CORGPZ = CSoilOrgM_vr(ielmp,L,NY,NX)
     IF(CORGCZ.GT.ZERO)THEN
@@ -712,8 +713,7 @@ module InitSOMBGCMOD
       CORGNX(k_POM)   = AMIN1(CNRH(k_POM)*CORGCX(k_POM),CORGNZ)
       CORGNX(k_humus) = AZMAX1(CORGNZ-CORGNX(k_POM))
       CORGPX(k_POM)   = AMIN1(CPRH(k_POM)*CORGCX(k_POM),CORGPZ)
-      CORGPX(k_humus) = AZMAX1(CORGPZ-CORGPX(k_POM))
-
+      CORGPX(k_humus) = AZMAX1(CORGPZ-CORGPX(k_POM))      
     ELSE
       CORGCX(k_POM)   = 0.0_r8
       CORGCX(k_humus) = 0.0_r8
@@ -787,6 +787,20 @@ module InitSOMBGCMOD
   
   end associate
   end subroutine MicrobeByLitterFall
+!------------------------------------------------------------------------------------------
+
+  function gOC_to_m3_OM(gram_OC)result(ans)
+  !
+  !Description
+  !convert gram organic C into m3 OM
+  implicit none
+  real(r8), intent(in) :: gram_OC
+  real(r8) :: ans
+
+  !1.e-6*[gC]/([gC gOM-1]*[gOM cm-3])-> [cm3 OM]*1.e-6 -> [m3 OM]
+  ans = AZMAX1(gram_OC)/OMCMassFrac/DensitySolidOM
+
+  end function gOC_to_m3_OM
 !------------------------------------------------------------------------------------------
 
   subroutine DestructSOMBGC

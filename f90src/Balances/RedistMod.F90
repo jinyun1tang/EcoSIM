@@ -4,7 +4,7 @@ module RedistMod
   use minimathmod,       only: safe_adb, AZMAX1, AZERO, fixEXConsumpFlux, fixnegmass, isclose
   use EcoSiMParDataMod,  only: micpar
   use SurfLitterPhysMod, only: UpdateLitRPhys
-  use InitSOMBGCMOD,     only: MicrobeByLitterFall
+  use InitSOMBGCMOD,     only: MicrobeByLitterFall,gOC_to_m3_OM
   use TracerPropMod,     only: MolecularWeight
   use BalancesMod,       only: SummarizeTracers
   use DebugToolMod
@@ -692,7 +692,7 @@ module RedistMod
   SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM_vr(1:NumPlantChemElms,0,NY,NX)
 
   !update heat capacity for consistency
-  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VHeatCapacity_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   DO NE=1,NumPlantChemElms
     tSoilOrgM_col(NE,NY,NX)=tSoilOrgM_col(NE,NY,NX)+SoilOrgM_vr(NE,0,NY,NX)
   enddo
@@ -792,7 +792,7 @@ module RedistMod
   real(r8) :: twatmass0(JY,JX)
   real(r8) :: twatmass1(JY,JX)
   real(r8) :: tplantH2O,tPoreWat
-  real(r8) :: dWAT,fWMacP,fWMicP,dIceMicp,dIceMacp
+  real(r8) :: dWAT,fWMacP,fWMicP,dIceMicp,dIceMacp,rootC
 
   if(lverb)write(*,*)'UpdateTSoilVSMProfile'
   TVHeatCapacity      = 0.0_r8
@@ -816,11 +816,12 @@ module RedistMod
       TKSX                      = TKS_vr(L,NY,NX)
       VHeatCapacityX            = VHeatCapacity_vr(L,NY,NX)
       ENGY                      = VHeatCapacityX*TKSX
-      VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+      VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
         +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 
       if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
-        VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+        rootC=sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*gOC_to_m3_OM(rootC)
       endif
       !
       !the following handels soil layers with significant heat capacity/mass
@@ -854,11 +855,12 @@ module RedistMod
 
       TPlantRootH2OUptake_col(NY,NX) = TPlantRootH2OUptake_col(NY,NX)+TWaterPlantRoot2SoilPrev_vr(L,NY,NX)
 
-      VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+      VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
         +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
 
       if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
-        VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+        rootC=sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+        VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*gOC_to_m3_OM(rootC)
       endif
 
       !
@@ -881,7 +883,7 @@ module RedistMod
       ENDIF
 
       TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
-      TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapacitySoilM_vr(L,NY,NX)
+      TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapSolidSoil_vr(L,NY,NX)
       TVOLW               = TVOLW+VLWatMicP_vr(L,NY,NX)
       TVOLWH              = TVOLWH+VLWatMacP_vr(L,NY,NX)
       TVOLI               = TVOLI+VLiceMicP_vr(L,NY,NX)
@@ -1340,7 +1342,7 @@ module RedistMod
       
       SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
       RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
-      HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
+      HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+gOC_to_m3_OM(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
 
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR

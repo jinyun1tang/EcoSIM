@@ -45,7 +45,7 @@ module PlantBGCPars
   real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
   real(r8) :: FCMassCO2BundleSheath_node          !partition decarboxylation to CO2 in C4, [-]
   real(r8) :: FCMassHCO3BundleSheath_node         !partition leakage to HCO3 in C4, [-]
-  real(r8) :: COMP4                               !C4 CO2 compensation point, [uM] 
+  real(r8) :: COMP4                               !C4 photosynthesis CO2 compensation point, [uM] 
   real(r8) :: FWCLeaf                             !leaf water content, (g H2O (gC leaf)-1)
   real(r8) :: FWCBundlSheath                      !leaf water content in bundle sheath, in C4 CO2 fixiation, [m3 H2O (gC)-1]
   real(r8) :: FWCMesophyll                        !leaf water content in mesophyll in C4 CO2 fixation, [m3 H2O (gC)-1]
@@ -230,9 +230,9 @@ module PlantBGCPars
   FCMassCO2BundleSheath_node  = 0.02_r8
   FCMassHCO3BundleSheath_node = 1.0_r8-FCMassCO2BundleSheath_node
   COMP4                       = 0.5_r8
-  FWCLeaf                        = 6.0_r8
-  FWCBundlSheath                         = 0.2_r8*FWCLeaf
-  FWCMesophyll                         = 0.8_r8*FWCLeaf
+  FWCLeaf                     = 6.0_r8
+  FWCBundlSheath              = 0.2_r8*FWCLeaf
+  FWCMesophyll                = 0.8_r8*FWCLeaf
   ZPLFM                       = 0.33_r8
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
@@ -247,7 +247,7 @@ module PlantBGCPars
 
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDensCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
-  FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius
+  FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport
   ZSTX                  = 1.0E-03_r8     !one mm
   StalkMassDensity      = 0.225_r8
   SpecStalkVolume       = 1.0E-06_r8/StalkMassDensity

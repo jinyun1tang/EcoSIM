@@ -1,6 +1,7 @@
 module SurfLitterPhysMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod, only : etimer  
+  use InitSOMBGCMod, only : gOC_to_m3_OM
   use DebugToolMod
   use MiniMathMod
   use HydroThermData
@@ -495,53 +496,46 @@ implicit none
   real(r8), intent(in) :: dHeat  !heat added due to litter fall, MJ/d2/h
   real(r8), intent(inout) :: HEATIN_lnd
 
-  real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
-  real(r8) :: VHeatCapacityLitR   !current litr heat capacity
+  real(r8) :: VHeatCapacityLitrX  !previous litr heat capacity before change in litter OM and water
+  real(r8) :: VHeatCapacityLitR   !current litr heat capacity before change in water
   real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: tkspre,ENGYR,VLWatMicPr,VLiceMicPr
-  real(r8) :: ENGYZ,HeatByLitrMassChange,HS
+  real(r8) :: ENGYZ,HS,m3OM
 
   IF(FracSurfByLitR_col(NY,NX).LE.ZEROL)return
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
-  !
+  m3OM=gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))
   VHeatCapacityLitrX = VHeatCapacity_vr(0,NY,NX)
-  VHeatCapacityLitR  = cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*SoilOrgM_vr(ielmc,0,NY,NX)
   VLWatMicPr         = VLWatMicP_vr(0,NY,NX)
   VLiceMicPr         = VLiceMicP_vr(0,NY,NX)
 
-  !TairK: air temperature in kelvin, HeatByLitrMassChange represents increase heat in litr
-  dVHeatCapacityLitr   = VHeatCapacityLitR-VHeatCapacityLitrX
-  HeatByLitrMassChange = dVHeatCapacityLitr*TairK_col(NY,NX)
   ENGYZ                = VHeatCapacityLitrX*TKS_vr(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
-
   VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+dWat
-  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VHeatCapacity_vr(0,NY,NX) = cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*m3OM
 
   THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)
   
   IF(VHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre          = TKS_vr(0,NY,NX)
-    TKS_vr(0,NY,NX) = (ENGYZ+HeatByLitrMassChange +dHeat)/VHeatCapacity_vr(0,NY,NX)
+    TKS_vr(0,NY,NX) = (ENGYZ+dHeat)/VHeatCapacity_vr(0,NY,NX)
 
     if(TKS_vr(0,NY,NX)<100._r8 .or. (TKS_vr(0,NY,NX)>360._r8 .and. VHeatCapacity_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)))then
       write(*,*)I,J,NY,NX,TKS_vr(0,NY,NX),tkspre,TairK_col(NY,NX)
       write(*,*)'WatFLo2Litr =',WatFLo2LitR_col(NY,NX),VHeatCapacity_vr(0,NY,NX),5._r8*VHeatCapLitRMin_col(NY,NX)
       write(*,*)'wat flo2litr icethaw runoff',VLWatMicPr,VLWatMicP_vr(0,NY,NX),WatFLo2LitR_col(NY,NX),TLitrIceFlxThaw_col(NY,NX)
       write(*,*)'ice',VLiceMicPr,VLiceMicP_vr(0,NY,NX)
-      write(*,*)'engy',ENGYZ,HeatByLitrMassChange,dHeat                
-      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacityLitR,dVHeatCapacityLitR,VHeatCapacity_vr(0,NY,NX)-VHeatCapacityLitrX
-      write(*,*)'tengz',ENGYZ/VHeatCapacity_vr(0,NY,NX),HeatFLoByWat2LitR_col(NY,NX)/VHeatCapacity_vr(0,NY,NX),&
-        TLitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity_vr(0,NY,NX),HeatByLitrMassChange/VHeatCapacity_vr(0,NY,NX)
+      write(*,*)'engy',ENGYZ,dHeat                
+      write(*,*)'vhc',VHeatCapacityLitrX,VHeatCapacity_vr(0,NY,NX)-VHeatCapacityLitrX
+      write(*,*)'tengz',ENGYZ/VHeatCapacity_vr(0,NY,NX),TLitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity_vr(0,NY,NX)
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif  
-    HEATIN_lnd = HEATIN_lnd+HeatByLitrMassChange
 
   ELSE
-    HEATIN_lnd      = HEATIN_lnd+HeatByLitrMassChange+(TKS_vr(NUM_col(NY,NX),NY,NX)-TKS_vr(0,NY,NX))*VHeatCapacity_vr(0,NY,NX)
+    HEATIN_lnd      = HEATIN_lnd+(TKS_vr(NUM_col(NY,NX),NY,NX)-TKS_vr(0,NY,NX))*VHeatCapacity_vr(0,NY,NX)
     TKS_vr(0,NY,NX) = TKS_vr(NUM_col(NY,NX),NY,NX)
   ENDIF
 
@@ -611,7 +605,7 @@ implicit none
   VLHeatCapLitRPre                       = VHeatCapacity1_vr(0,NY,NX)                      !heat capacity
   TK0Prev                                = TKSoil1_vr(0,NY,NX)                             !residual temperature
   ENGYR                                  = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
-  VHeatCapacity1_vr(0,NY,NX)             = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+  VHeatCapacity1_vr(0,NY,NX)             = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
 
   deltaT=safe_adb(HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX)*cpw)  
   TMX=AMAX1(TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX))+1._r8
@@ -637,7 +631,7 @@ implicit none
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre,FracSurfByLitR_col(NY,NX)
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRM_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&
         LitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),XVLMobileWaterLitR_col(NY,NX)
-      write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitRMin_col(NY,NX) 
+      write(*,*)'cpo',cpo*m3OM_col(NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VLHeatCapLitRPre,VHeatCapLitRMin_col(NY,NX) 
       write(*,*)'cpw',cpw*VLWatMicP10,VLWatMicP10,VLiceMicP10,SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
       write(*,*)'watflw',ENGYR,WatFLo2LitrM_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX)/(WatFLo2LitrM_col(NY,NX)*cpw)
       write(*,*)'vlwat',VLWatMicP10,WatFLo2LitrM_col(NY,NX),cumWatFlx2LitRByRunoff_col(NY,NX),cumHeatFlx2LitRByRunoff_col(NY,NX)
@@ -666,11 +660,11 @@ implicit none
   integer, intent(in) :: I,J,M,NY,NX
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
-  real(r8) :: VLWatMicP10,VLiceMicP10
+  real(r8) :: VLWatMicP10,VLiceMicP10,m3OM
   integer :: K
 
   ! SURFACE RESIDUE WATER AND TEMPERATURE
-  
+
   VLWatMicP10 = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP10 = VLiceMicP1_vr(0,NY,NX)
 
@@ -715,7 +709,7 @@ implicit none
   VLHeatCapLitRPre           = VHeatCapacity1_vr(0,NY,NX)                !heat capacity
   TK0Prev                    = TKSoil1_vr(0,NY,NX)                                 !residual temperature
   ENGYR                      = VHeatCapacity1_vr(0,NY,NX)*TKSoil1_vr(0,NY,NX)  !initial energy content
-  VHeatCapacity1_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
+  VHeatCapacity1_vr(0,NY,NX) = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     TKSoil1_vr(0,NY,NX)=(ENGYR+cumHeatFlx2LitRByRunoff_col(NY,NX))/VHeatCapacity1_vr(0,NY,NX)
@@ -723,7 +717,7 @@ implicit none
 !    write(*,*)I,J,M,NY,NX
 !    write(*,*)'weird litter temp UpdateLitRAftRunoffM  =',TKSoil1_vr(0,NY,NX),TK0Prev,VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre
 !    write(*,*)'engyr',ENGYR/VHeatCapacity1_vr(0,NY,NX),cumHeatFlx2LitRByRunoff_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX)
-!    write(*,*)'cpo',cpo*SoilOrgM_vr(ielmc,0,NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX) 
+!    write(*,*)'cpo',cpo*m3OM_col(NY,NX),cpw*VLWatMicP1_vr(0,NY,NX),cpi*VLiceMicP1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX) 
 !    write(*,*)'cpw',SoilOrgM_vr(ielmc,0,NY,NX),VLWatMicP10,VLiceMicP10,VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
 !    write(*,*)'vlwat',VLWatMicP10,cumWatFlx2LitRByRunoff_col(NY,NX),cumHeatFlx2LitRByRunoff_col(NY,NX)
    
@@ -737,7 +731,7 @@ implicit none
   TKS_vr(0,NY,NX)           = TKSoil1_vr(0,NY,NX)
   VLWatMicP_vr(0,NY,NX)     = VLWatMicP1_vr(0,NY,NX)
   VLiceMicP_vr(0,NY,NX)     = VLiceMicP1_vr(0,NY,NX)
-  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VHeatCapacity_vr(0,NY,NX) = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   
   end subroutine UpdateLitRAftRunoffM
 

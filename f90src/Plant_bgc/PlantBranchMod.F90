@@ -252,8 +252,8 @@ module PlantBranchMod
   associate(                                                     &
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft           ,& !input  :threshold zero for plang growth calculation, [-]
     KHiestGroLeafNode_brch => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
-    rProteinC2LeafN_pft    => plt_allom%rProteinC2LeafN_pft     ,& !input  :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft    => plt_allom%rProteinC2LeafP_pft     ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2LeafN_pft    => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
+    rProteinC2LeafP_pft    => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch       ,& !inoput :leaf element, [g d-2]
     LeafStrutElms_brch     => plt_biom%LeafStrutElms_brch       ,& !inoput :branch leaf structural element mass, [g d-2]
     LeafProteinC_node      => plt_biom%LeafProteinC_node        ,& !inoput :layer leaf protein C, [g d-2]
@@ -563,22 +563,22 @@ module PlantBranchMod
   call PrintInfo('beg '//subname)
   PSILY=real((/-200.0_r8,-2.0,-2.0,-2.0/),r8)
 
-!     begin_execution
+  !     begin_execution
 
-!
-!     PARTITION GROWTH WITHIN EACH BRANCH FROM GROWTH STAGE
-!     1=LEAF,2=SHEATH OR PETIOLE,3=STALK,4=RESERVE,
-!     5,6=REPRODUCTIVE ORGANS,7=GRAIN
-!
-!     PART=organ partitioning fraction
-!
+  !
+  !     PARTITION GROWTH WITHIN EACH BRANCH FROM GROWTH STAGE
+  !     1=LEAF,2=SHEATH OR PETIOLE,3=STALK,4=RESERVE,
+  !     5,6=REPRODUCTIVE ORGANS,7=GRAIN
+  !
+  !     PART=organ partitioning fraction
+  !
 
   TOTAL=0._r8
   PART(1:NumOfPlantMorphUnits)=0._r8
-!
-!     IF BEFORE FLORAL INDUCTION
-!
-!     iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
+  !
+  !     IF BEFORE FLORAL INDUCTION
+  !
+  !     iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
 
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
     PART(ibrch_leaf)   = 0.725_r8
@@ -587,7 +587,6 @@ module PlantBranchMod
     !     IF BEFORE ANTHESIS
     !
     !  iPlantCalendar_brch(ipltcal_Anthesis,=start of anthesis and setting final seed number
-    !  TotalNodeNumNormByMatgrp_brch=total change in vegv node number normalized for maturity group
     !  greater maturity group, lower TotalNodeNumNormByMatgrp_brch, more allocation to leaf, later grain-filling
   ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
     PART(ibrch_leaf)   = AMAX1(PART2LEAF_MIN,0.725_r8-FPART1*TotalNodeNumNormByMatgrp_brch(NB,NZ))
@@ -598,13 +597,13 @@ module PlantBranchMod
     PARTX              = PARTS-PART(ibrch_stalk)-PART(ibrch_resrv)
     PART(ibrch_husk)   = 0.5_r8*PARTX
     PART(ibrch_ear)    = 0.5_r8*PARTX
-!
-!     IF BEFORE GRAIN FILLING, DETERMINATE OR INDETERMINATE
-!
-!     iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
-!     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate from PFT file
-!     TotReproNodeNumNormByMatrgrp_brch=total change in reprv node number normalized for maturity group
-!
+    !
+    !     IF BEFORE GRAIN FILLING, DETERMINATE OR INDETERMINATE
+    !
+    !     iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
+    !     iPlantDevelopPattern_pft=growth habit:0=determinate,1=indetermimate from PFT file
+    !     TotReproNodeNumNormByMatrgrp_brch=total change in reprv node number normalized for maturity group
+    !
   ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN
     IF(iPlantDevelopPattern_pft(NZ).EQ.ideterminate)THEN
       PART(ibrch_leaf)   = 0._r8
@@ -966,8 +965,8 @@ module PlantBranchMod
     FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !input  :woody element allocation, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
-    rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
+    rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     ZERO4LeafVar_pft            => plt_biom%ZERO4LeafVar_pft              ,& !input  :threshold zero for leaf calculation, [-]
@@ -3403,8 +3402,8 @@ module PlantBranchMod
     SLA1_pft               => plt_morph%SLA1_pft                ,& !input  :leaf area:mass during growth, [m2 gC-1]
     KHiestGroLeafNode_brch => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
     ZERO4LeafVar_pft       => plt_biom%ZERO4LeafVar_pft         ,& !input  :threshold zero for leaf calculation, [-]
-    rProteinC2LeafN_pft   => plt_allom%rProteinC2LeafN_pft    ,& !input  :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft   => plt_allom%rProteinC2LeafP_pft    ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2LeafN_pft    => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
+    rProteinC2LeafP_pft    => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft     => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
     PlantPopulation_pft    => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
     LeafArea_node          => plt_morph%LeafArea_node           ,& !inoput :leaf area, [m2 d-2]
@@ -3485,8 +3484,8 @@ module PlantBranchMod
     SinePetioleAngle_pft    => plt_morph%SinePetioleAngle_pft    ,& !input  :sheath angle, [degree from horizontal]
     LeafElmntNode_brch      => plt_biom%LeafElmntNode_brch       ,& !input  :leaf element, [g d-2]
     ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft         ,& !input  :threshold zero for leaf calculation, [-]
-    rProteinC2LeafN_pft     => plt_allom%rProteinC2LeafN_pft     ,& !input  :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft     => plt_allom%rProteinC2LeafP_pft     ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2LeafN_pft     => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
+    rProteinC2LeafP_pft     => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft      => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
     PlantPopulation_pft     => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
     KHiestGroLeafNode_brch  => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
@@ -3832,8 +3831,8 @@ module PlantBranchMod
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
     FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !input  :woody element allocation, [-]
-    rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
-    rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+    rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
+    rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
     doSenescence_brch           => plt_pheno%doSenescence_brch            ,& !input  :branch phenology flag, [-]
     doRemobilization_brch       => plt_pheno%doRemobilization_brch        ,& !input  :branch phenology flag, [-]

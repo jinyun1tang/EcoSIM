@@ -26,8 +26,8 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
   real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
-  real(r8), target, allocatable :: LeafC3Chl2Protein_tab(:)
-  real(r8), target, allocatable :: LeafC4Chl2Protein_tab(:)
+  real(r8), target, allocatable :: LeafChl2Protein_tab(:)
+  real(r8), target, allocatable :: fChlMesophyll_tab(:)           !fraction of cholorophyll in mesophyll cells
   real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
@@ -145,8 +145,8 @@ module PlantTraitTableMod
   allocate(LeafRubisco2Protein_tab(npfts));LeafRubisco2Protein_tab=0.0_r8
   allocate(LeafPEP2Protein_tab(npfts));LeafPEP2Protein_tab=0.0_r8
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
-  allocate(LeafC3Chl2Protein_tab(npfts));LeafC3Chl2Protein_tab=0._r8
-  allocate(LeafC4Chl2Protein_tab(npfts));LeafC4Chl2Protein_tab=0._r8
+  allocate(LeafChl2Protein_tab(npfts));LeafChl2Protein_tab=0._r8
+  allocate(fChlMesophyll_tab(npfts));fChlMesophyll_tab=0._r8
   allocate(CanopyCi2CaRatio_pft_tab(npfts));CanopyCi2CaRatio_pft_tab=0._r8
   allocate(RadSWLeafAlbedo_tab(npfts));RadSWLeafAlbedo_tab=0._r8
   allocate(CanopyPARalbedo_tab(npfts));CanopyPARalbedo_tab=0._r8
@@ -264,8 +264,8 @@ module PlantTraitTableMod
   call destroy(LeafRubisco2Protein_tab)
   call destroy(LeafPEP2Protein_tab)
   call destroy(SpecChloryfilAct_tab)
-  call destroy(LeafC3Chl2Protein_tab)
-  call destroy(LeafC4Chl2Protein_tab)
+  call destroy(LeafChl2Protein_tab)
+  call destroy(fChlMesophyll_tab)
   call destroy(CanopyCi2CaRatio_pft_tab)
   call destroy(RadSWLeafAlbedo_tab)
   call destroy(CanopyPARalbedo_tab)

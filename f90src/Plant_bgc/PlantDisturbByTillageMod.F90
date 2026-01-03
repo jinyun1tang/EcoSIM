@@ -370,7 +370,7 @@ contains
     RootCO2EmisPot_pvr         => plt_rbgc%RootCO2EmisPot_pvr           ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     Root1stLen_rpvr            => plt_morph%Root1stLen_rpvr             ,& !inoput :root layer length primary axes, [m d-2]
     RootVH2O_pvr               => plt_morph%RootVH2O_pvr                ,& !inoput :root layer volume water, [m2 d-2]
-    RootAreaPerPlant_pvr       => plt_morph%RootAreaPerPlant_pvr        ,& !inoput :root layer area per plant, [m p-1]
+    RootSAreaPerPlant_pvr       => plt_morph%RootSAreaPerPlant_pvr        ,& !inoput :root layer area per plant, [m p-1]
     RootPoreVol_pvr           => plt_morph%RootPoreVol_pvr            ,& !inoput :root layer volume air, [m2 d-2]
     RootLenDensPerPlant_pvr    => plt_morph%RootLenDensPerPlant_pvr     ,& !inoput :root layer length density, [m m-3]
     Root1stXNumL_rpvr          => plt_morph%Root1stXNumL_rpvr           ,& !inoput :root layer number primary axes, [d-2]
@@ -455,7 +455,7 @@ contains
 !     RTN1,Root2ndXNumL_rpvr=number of primary,secondary root axes
 !     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
 !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
-!     RootAreaPerPlant_pvr=root surface area per plant
+!     RootSAreaPerPlant_pvr=root surface area per plant
 !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
 !
       if(N==ipltroot)THEN
@@ -486,7 +486,7 @@ contains
       RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
       RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*XHVST
       RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*XHVST
-      RootAreaPerPlant_pvr(N,L,NZ)    = RootAreaPerPlant_pvr(N,L,NZ)*XHVST
+      RootSAreaPerPlant_pvr(N,L,NZ)    = RootSAreaPerPlant_pvr(N,L,NZ)*XHVST
       RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*XHVST
       RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*XHVST
       RootCO2Autor_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ)*XHVST

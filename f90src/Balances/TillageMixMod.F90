@@ -1,11 +1,12 @@
 module TillageMixMod
-  use data_kind_mod,    only : r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only : micpar
-  use EcoSIMConfig,     only : ndbiomcp => NumDeadMicrbCompts
-  use UnitMod,          only : units
-  use minimathmod,      only : AZMAX1
-  use SoilBGCNLayMod,   only : sumLitrOMLayL, sumORGMLayL
-  use EcoSIMCtrlMod,    only : salt_model
+  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod, only: micpar
+  use EcoSIMConfig,     only: ndbiomcp => NumDeadMicrbCompts
+  use UnitMod,          only: units
+  use minimathmod,      only: AZMAX1
+  use SoilBGCNLayMod,   only: sumLitrOMLayL, sumORGMLayL
+  use EcoSIMCtrlMod,    only: salt_model
+  use InitSOMBGCMod,    only: gOC_to_m3_OM
   use DebugToolMod
   use EcosimConst
   use SOMDataType
@@ -168,12 +169,12 @@ module TillageMixMod
   !build the energy profile
   !ENGYV: water
   !ENGYM: material
-  ENGYM(0) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)*TKS_vr(0,NY,NX)
+  ENGYM(0) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))*TKS_vr(0,NY,NX)
   ENGYV(0) = (cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX))*TKS_vr(0,NY,NX)
-  VHeatCapacitySoilM_vr(0,NY,NX)=cpo*SoilOrgM_vr(ielmc,0,NY,NX)
+  VHeatCapSolidSoil_vr(0,NY,NX)=cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))
   D3000: DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
-      ENGYM(L) = VHeatCapacitySoilM_vr(L,NY,NX)*TKS_vr(L,NY,NX)
+      ENGYM(L) = VHeatCapSolidSoil_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       ENGYV(L) = (cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)))*TKS_vr(L,NY,NX)
     ENDIF    
@@ -189,7 +190,7 @@ module TillageMixMod
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYM(0:JZ),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VHeatCapacitySoilM_vr(0:JZ,NY,NX),XCORP0)
+  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VHeatCapSolidSoil_vr(0:JZ,NY,NX),XCORP0)
 
   call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
 
@@ -202,7 +203,7 @@ module TillageMixMod
 
   OMLitrC_vr(0,NY,NX)=litrOM(ielmc)
 
-  VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+  VHeatCapacity_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
 
   VLitR_col(NY,NX)          = VLitR_col(NY,NX)*XCORP0
   VGeomLayer_vr(0,NY,NX)    = VGeomLayer_vr(0,NY,NX)*XCORP0
@@ -211,7 +212,7 @@ module TillageMixMod
   DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
-      VHeatCapacity_vr(L,NY,NX) = VHeatCapacitySoilM_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+      VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
           +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))          
       TKS_vr(L,NY,NX) = (ENGYM(L)+ENGYV(L))/VHeatCapacity_vr(L,NY,NX)
     ENDIF

@@ -716,17 +716,17 @@ module Hour1Mod
   call PrintInfo('beg '//subname)
   call SetPlantHourlyDiagnosis(I,J,NY,NX)
 
-  RootCO2AutorPrev_col(NY,NX)        = RootCO2Autor_col(NY,NX)
-  DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
-  trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
-  trcg_snowMassloss_col(:,NY,NX)     = 0._r8
-  trcn_SnowDrift_flx_col(:,NY,NX)    = 0._r8
-  trcg_SnowDrift_flx_col(:,NY,NX)    = 0._r8
-  DOM_draing_col(:,:,NY,NX)          = 0._r8
-  trcs_drainage_flx_col(:,NY,NX)     = 0._r8
-  DOM_SurfRunoff_flx_col(:,:,NY,NX)  = 0._r8
-  RootRadialKond2H2O_pvr(:,:,:,NY,NX)= 0._r8
-  RootAxialKond2H2O_pvr(:,:,:,NY,NX) =0._r8
+  RootCO2AutorPrev_col(NY,NX)         = RootCO2Autor_col(NY,NX)
+  DOM_transpFlx_2DH(:,:,NY,NX)        = 0._r8
+  trcs_SubsurTransp_flx_2DH(:,NY,NX)  = 0._r8
+  trcg_snowMassloss_col(:,NY,NX)      = 0._r8
+  trcn_SnowDrift_flx_col(:,NY,NX)     = 0._r8
+  trcg_SnowDrift_flx_col(:,NY,NX)     = 0._r8
+  DOM_draing_col(:,:,NY,NX)           = 0._r8
+  trcs_drainage_flx_col(:,NY,NX)      = 0._r8
+  DOM_SurfRunoff_flx_col(:,:,NY,NX)   = 0._r8
+  RootRadialKond2H2O_pvr(:,:,:,NY,NX) = 0._r8
+  RootAxialKond2H2O_pvr(:,:,:,NY,NX)  = 0._r8
   trcn_snowMassloss_col(:,NY,NX)                  = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)                   = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
@@ -948,9 +948,16 @@ module Hour1Mod
   !     begin_execution
   !
   DO L=0,NL_col(NY,NX)
-    call sumORGMLayL(L,NY,NX,ORGM,.true.)
-    ORGCX_vr(L,NY,NX)=ORGM(ielmc)
+    call sumORGMLayL(L,NY,NX,ORGM,conly=.true.)
+    ORGCX_vr(L,NY,NX)=ORGM(ielmc) !gC d-2
   ENDDO
+  DO L=1,NL_col(NY,NX)
+    !d'Oriano and Kontoe (2022), Dynamic Properties of Organic Soils.
+    !Hardin and Drnevich, 1972
+    HBAconst_vr(L,NY,NX)=HBAMin_vr(L,NY,NX)*exp(-5._r8*ORGCX_vr(L,NY,NX))
+    print*,L,HBAconst_vr(L,NY,NX)
+  ENDDO
+  stop
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
@@ -1534,7 +1541,7 @@ module Hour1Mod
 !     CORGC=SOC concentration
 !
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX))
+      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)) ![gC d-2]/[Mg soil d-2]=[gC/Mg soil]
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
@@ -1551,9 +1558,9 @@ module Hour1Mod
   character(len=*), parameter :: subname='ZeroHourlyArrays'
 !     begin_execution
   call PrintInfo('beg '//subname)
-  RootN2Fix_col(NY,NX)                      = 0._r8
-  RUptkRootO2_col(NY,NX)                    = 0._r8
-  RootCO2Emis2Root_col(NY,NX)               = 0._r8
+  RootN2Fix_col(NY,NX)        = 0._r8
+  RUptkRootO2_col(NY,NX)      = 0._r8
+  RootCO2Emis2Root_col(NY,NX) = 0._r8
 
   trcs_irrig_flx_col(ids_beg:ids_end,NY,NX) = 0._r8
   trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX)  = 0._r8

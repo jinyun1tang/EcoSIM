@@ -61,12 +61,14 @@ module RootDataType
   real(sp),target,allocatable ::  Root2ndXNumL_rpvr(:,:,:,:,:)                     !root layer number axes, [d-2]
   real(sp),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(sp),target,allocatable ::  Root2ndEffLen4uptk_rpvr(:,:,:,:,:)              !Layer effective root length four resource uptake, [m]
-  real(sp),target,allocatable ::  RootAreaPerPlant_pvr(:,:,:,:,:)                !root layer area per plant, [m p-1]
+  real(sp),target,allocatable ::  RootSAreaPerPlant_pvr(:,:,:,:,:)                !root layer area per plant, [m p-1]
   real(sp),target,allocatable  :: RootArea1stPP_pvr(:,:,:,:,:)                   !layer 1st root area per plant, [m2 plant-1]
   real(sp),target,allocatable  :: RootArea2ndPP_pvr(:,:,:,:,:)                  !layer 2nd root area per plant, [m2 plant-1]
   real(sp),target,allocatable ::  Root1stStructE_buf(:,:,:,:,:)                 !buffer structural element for root secondary growth calculation, [g d-2]
   real(sp),target,allocatable ::  RootVH2O_pvr(:,:,:,:,:)                        !root layer volume water, [m2 d-2]
-  real(sp),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m ]
+  real(sp),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m]
+  real(sp),target,allocatable ::  Root1stRadius_rpvr(:,:,:,:,:)                  !root layer diameter for each primary axes, [m]
+  real(sp),target,allocatable ::  RootCRRadius0_rpvr(:,:,:,:,:)                     !initial radius for root that may undergo secondary growth, [m]
   real(sp),target,allocatable ::  RootPoreVol_pvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
   real(sp),target,allocatable ::  Root1stDepz_raxes(:,:,:,:)                     !root layer depth, [m]
   real(sp),target,allocatable ::  Root2ndRadius_rpvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
@@ -77,6 +79,7 @@ module RootDataType
   real(sp),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                         !root total water potential , [Mpa]
   real(sp),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                      !root osmotic water potential , [Mpa]
   real(sp),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                      !root turgor water potential , [Mpa]
+  real(sp),target,allocatable ::  RootSinkWeight_pvr(:,:,:,:)                     !Root nonst element sink profile, [d-2]
   real(sp),target,allocatable ::  trcg_rootml_pvr(:,:,:,:,:,:)                   !root gaseous tracer content [g d-2]
   real(sp),target,allocatable ::  trcs_rootml_pvr(:,:,:,:,:,:)                   !root dissolved gaseous tracer content [g d-2]
   real(sp),target,allocatable ::  TRootGasLossDisturb_col(:,:,:)                 !total root gas content, [g d-2]
@@ -183,11 +186,13 @@ contains
   allocate(Root2ndXNumL_rpvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_rpvr=0._sp
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._sp
   allocate(Root2ndEffLen4uptk_rpvr(jroots,JZ,JP,JY,JX));Root2ndEffLen4uptk_rpvr=0._sp
-  allocate(RootAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootAreaPerPlant_pvr=0._sp
+  allocate(RootSAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootSAreaPerPlant_pvr=0._sp
   allocate(RootArea1stPP_pvr(jroots,JZ,JP,JY,JX));RootArea1stPP_pvr=0._sp
   allocate(RootArea2ndPP_pvr(jroots,JZ,JP,JY,JX));RootArea2ndPP_pvr=0._sp
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._sp
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._sp
+  allocate(Root1stRadius_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); Root1stRadius_rpvr=0._sp
+  allocate(RootCRRadius0_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootCRRadius0_rpvr=0._sp
   allocate(RootPoreVol_pvr(jroots,JZ,JP,JY,JX));RootPoreVol_pvr=0._sp
   allocate(Root1stDepz_raxes(MaxNumRootAxes,JP,JY,JX));Root1stDepz_raxes=0._sp
   allocate(Root2ndRadius_rpvr(jroots,JZ,JP,JY,JX));Root2ndRadius_rpvr=0._sp
@@ -198,6 +203,7 @@ contains
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._sp
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._sp
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._sp
+  allocate(RootSinkWeight_pvr(JZ,JP,JY,JX)); RootSinkWeight_pvr=0._sp
   allocate(trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._sp
   allocate(trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._sp
   allocate(TRootGasLossDisturb_col(idg_beg:idg_NH3,JY,JX));TRootGasLossDisturb_col=0._sp
@@ -293,11 +299,13 @@ contains
   call destroy(Root2ndXNumL_rpvr)
   call destroy(Root2ndXNum_rpvr)
   call destroy(Root2ndEffLen4uptk_rpvr)
-  call destroy(RootAreaPerPlant_pvr)
+  call destroy(RootSAreaPerPlant_pvr)
   call destroy(RootArea2ndPP_pvr)
   call destroy(RootArea1stPP_pvr)  
   call destroy(RootVH2O_pvr)
   call destroy(Root1stRadius_pvr)
+  call destroy(Root1stRadius_rpvr)
+  call destroy(RootCRRadius0_rpvr)
   call destroy(RootPoreVol_pvr)
   call destroy(Root1stDepz_raxes)
   call destroy(Root2ndRadius_rpvr)
@@ -308,6 +316,7 @@ contains
   call destroy(PSIRoot_pvr)
   call destroy(PSIRootOSMO_vr)
   call destroy(PSIRootTurg_vr)
+  call destroy(RootSinkWeight_pvr)
   call destroy(trcg_rootml_pvr)
   call destroy(trcs_rootml_pvr)
   call destroy(TRootGasLossDisturb_col)

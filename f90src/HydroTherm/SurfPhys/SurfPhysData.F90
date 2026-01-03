@@ -10,7 +10,7 @@ implicit none
   real(r8),allocatable ::  XVLMobileWatMicP(:,:)                         !
   real(r8),allocatable ::  XVLiceMicP_col(:,:)                           !
   real(r8),allocatable ::  VLPoreLitR_col(:,:)                        !
-
+  real(r8),allocatable ::  m3OM_col(:,:)                           !surface litter OM [m3 d-2]
   real(r8),allocatable ::  ResistAreodynOverLitr_col(:,:)          !aerodynamic resistance over litter [m]
   real(r8),allocatable ::  AScaledCdWOverSoil_col(:,:)             !area scaled conductance for latent heat flux over exposed soil [m^2 h]
   real(r8),allocatable ::  AScaledCdWOverLitr_col(:,:)             !area scaled conductance for latent heat flux over litter [m^2 h]
@@ -50,7 +50,7 @@ implicit none
 
   allocate(watflw(JY, JX))
   allocate(waticefl(JY,JX))
-
+  allocate(m3OM_col(JY,JX))
   allocate(XVLMobileWaterLitR_col(JY,JX));       XVLMobileWaterLitR_col=0._r8
   allocate(XVLMobileWatMicP(JY,JX));       XVLMobileWatMicP=0._r8
   allocate(XVLiceMicP_col(JY,JX));       XVLiceMicP_col=0._r8
@@ -89,6 +89,7 @@ allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
   use abortutils, only : destroy
   implicit none
 
+  call destroy(m3OM_col)
   call destroy(TEvapXAir2Toplay_col)
   call destroy(TEvapXAir2LitR_col) 
   call destroy(TEvapXAir2Snow_col) 

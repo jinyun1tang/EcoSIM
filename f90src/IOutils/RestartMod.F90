@@ -2353,6 +2353,23 @@ implicit none
   endif  
 
   if(flag=='read')then
+    datpr3 => datrp_3d(1:npfts,1:JZ,1:MaxNumRootAxes)
+    call restartvar(ncid, flag, varname='RootCRRadius0_rpvr', dim1name='pft',dim2name='levsoi',dim3name='rootaxs',&
+     long_name='Initial radius for root that may undergo secondary growth', units='m', &
+     interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootCRRadius0_rpvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)   
+
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootCRRadius0_rpvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)   
+    datpr3 => datrp_3d(1:npfts,1:JZ,1:MaxNumRootAxes)
+    call restartvar(ncid, flag, varname='RootCRRadius0_rpvr', dim1name='pft',dim2name='levsoi',dim3name='rootaxs',&
+     long_name='Initial radius for root that may undergo secondary growth', units='m', &
+     interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+  endif  
+
+  if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='GrainStrutElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='canopy grain element', units='g d-2', &
@@ -3668,17 +3685,17 @@ implicit none
 
     if(flag=='read')then
       datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-      call restartvar(ncid, flag, varname='RootAreaPerPlant_pvr', dim1name='pft',dim2name='rootyps',&
+      call restartvar(ncid, flag, varname='RootSAreaPerPlant_pvr', dim1name='pft',dim2name='rootyps',&
       dim3name='levsoi',long_name='root layer area per plant', units='m p-1', &
       interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
-      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootAreaPerPlant_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootSAreaPerPlant_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
         IsPlantActive_pft=IsPlantActive_pft) 
     else
-      !print*,'RootAreaPerPlant_pvr'
-      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootAreaPerPlant_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+      !print*,'RootSAreaPerPlant_pvr'
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootSAreaPerPlant_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
         IsPlantActive_pft=IsPlantActive_pft)   
       datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
-      call restartvar(ncid, flag, varname='RootAreaPerPlant_pvr', dim1name='pft',dim2name='rootyps',&
+      call restartvar(ncid, flag, varname='RootSAreaPerPlant_pvr', dim1name='pft',dim2name='rootyps',&
       dim3name='levsoi',long_name='root layer area per plant', units='m p-1', &
       interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
 
@@ -6765,16 +6782,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
-    call restartvar(ncid, flag, varname='VHeatCapacitySoilM_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VHeatCapSolidSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil solid heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
-    call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacitySoilM_vr,datrc_2d)     
+    call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapSolidSoil_vr,datrc_2d)     
   else
-    !print*,'VHeatCapacitySoilM_vr'
-    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapacitySoilM_vr,datrc_2d)       
+    !print*,'VHeatCapSolidSoil_vr'
+    if(flag=='write') call cpcol(flag,NHW,NHE,NVN,NVS,VHeatCapSolidSoil_vr,datrc_2d)       
     datpr2 => datrc_2d(1:ncols,1:JZ+1)            
-    call restartvar(ncid, flag, varname='VHeatCapacitySoilM_vr', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='VHeatCapSolidSoil_vr', dim1name='column',dim2name='levsoi1',&
        long_name='soil solid heat capacity', units='MJ m-3 K-1', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)  
