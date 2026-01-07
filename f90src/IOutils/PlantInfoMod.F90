@@ -576,7 +576,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'UPKMPO', loc,KmPO4Root_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'UPMNPO', loc,CMinPO4Root_pft(ipltroot,NZ,NY,NX))
 
-  call ncd_getvar(pft_nfid, 'OSMO', loc,CanOsmoPsi0pt_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'OSMO', loc,OrganOsmoPsi0pt_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RCS', loc,RCS_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSMX', loc,CuticleResist_pft(NZ,NY,NX))
 
@@ -717,6 +717,7 @@ implicit none
   KmNH4Root_pft(ipltroot,NZ,NY,NX)   = KmNH4Root_tab(loc)
   CMinNH4Root_pft(ipltroot,NZ,NY,NX) = CMinNH4Root_tab(loc)
 
+  MorphogenBase_pft(NZ,NY,NX) = MorphogenBase_tab(loc)*0.01_r8
   VmaxNO3Root_pft(ipltroot,NZ,NY,NX) = VmaxNO3Root_tab(loc)
   KmNO3Root_pft(ipltroot,NZ,NY,NX)   = KmNO3Root_tab(loc)
   CminNO3Root_pft(ipltroot,NZ,NY,NX) = CminNO3Root_tab(loc)
@@ -725,7 +726,7 @@ implicit none
   KmPO4Root_pft(ipltroot,NZ,NY,NX)   = KmPO4Root_tab(loc)
   CMinPO4Root_pft(ipltroot,NZ,NY,NX) = CMinPO4Root_tab(loc)
 
-  CanOsmoPsi0pt_pft(NZ,NY,NX) = CanOsmoPsi0pt_tab(loc)
+  OrganOsmoPsi0pt_pft(NZ,NY,NX) = CanOsmoPsi0pt_tab(loc)
   RCS_pft(NZ,NY,NX)           = RCS_tab(loc)
   CuticleResist_pft(NZ,NY,NX) = CuticleResist_tab(loc)
 
@@ -1119,6 +1120,8 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   id=addone(id)
+  call writefixl(nu_plt,id,'MOPHGEN', 'Baseline morephogen signal strength for secondary root growth [%]',MorphogenBase_pft(NZ,NY,NX)*100._r8,105)
+  id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
     id=addone(id)
@@ -1178,7 +1181,7 @@ implicit none
   write(nu_plt,*)('-',j=1,110)    
   write(nu_plt,*)'WATER RELATIONS'
   id=0;id=addone(id)
-  call writefixl(nu_plt,id,'OSMO','Leaf osmotic potential at zero leaf water potential [MPa]',CanOsmoPsi0pt_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'OSMO','Organ osmotic potential at zero water potential [MPa]',OrganOsmoPsi0pt_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'RCS','e-folding turgor pressure for stomatal resistance [MPa]',RCS_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1598,6 +1601,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'UPMXZH',VmaxNH4Root_tab)
   call ncd_getvar(pft_nfid, 'UPKMZH',KmNH4Root_tab)
   call ncd_getvar(pft_nfid, 'UPMNZH',CMinNH4Root_tab)
+  call ncd_getvar(pft_nfid, 'MOPHGEN',MorphogenBase_tab)
   call ncd_getvar(pft_nfid, 'UPMXZO', VmaxNO3Root_tab)
   call ncd_getvar(pft_nfid, 'UPKMZO', KmNO3Root_tab)
   call ncd_getvar(pft_nfid, 'UPMNZO', CminNO3Root_tab)

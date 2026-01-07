@@ -230,7 +230,7 @@ contains
   FracAirFilledSoilPoreM_vr(1,0,NY,NX)   = FracAirFilledSoilPore_vr(0,NY,NX)
   PSISM1_vr(0,NY,NX)  = PSISoilMatricP_vr(0,NY,NX)
   TKSoil1_vr(0,NY,NX) = TKS_vr(0,NY,NX)
-
+  
   call PrintInfo('end '//subname)
   end subroutine CopySurfaceVars
 

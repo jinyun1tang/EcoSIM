@@ -341,7 +341,7 @@ module StartsMod
   real(r8) :: VORGCM          !volume of conslidated organic matter [cm3]
   real(r8) :: HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
-  REAL(R8) :: PTDS
+  REAL(R8) :: PTDS  !particle density [g cm-3]=[Mg m-3]
   real(r8) :: TORGM
   real(r8) :: VSAND
   real(r8) :: TORGL(JZ)
@@ -507,9 +507,9 @@ module StartsMod
         ThetaICEZ_vr(L,NY,NX) = THETI_vr(L,NY,NX)
       ENDIF
       XS=XS+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
-      HBAmin_vr(L,NY,NX) = 0.70_r8 * CSAND_vr(L,NY,NX)+0.30_r8*CCLAY_vr(L,NY,NX)+0.45_r8*CSILT_vr(L,NY,NX)
+      HBAmin_vr(L,NY,NX) = 7._r8 * CSAND_vr(L,NY,NX)+3._r8*CCLAY_vr(L,NY,NX)+4.5_r8*CSILT_vr(L,NY,NX)
       !
-      HBAconst_vr(L,NY,NX)=HBAmin_vr(L,NY,NX)*exp(-0.05_r8*SolidOMPercent_vr(L,NY,NX))
+      HBAconst_vr(L,NY,NX)=AMAX1(HBAmin_vr(L,NY,NX)*exp(-0.035_r8*SolidOMPercent_vr(L,NY,NX)),0.5_r8)
       
     ELSEIF(L==0)THEN 
     

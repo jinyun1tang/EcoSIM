@@ -704,7 +704,7 @@ module StartqMod
   TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
   fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
   PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
-  PSICanopyOsmo_pft(NZ,NY,NX)     = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)     = 0._r8
   FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
@@ -743,7 +743,7 @@ module StartqMod
     D40: DO N=1,pltpar%jroots
       RPlantRootH2OUptk_pvr(N,L,NZ,NY,NX)                       = 0._r8
       PSIRoot_pvr(N,L,NZ,NY,NX)                                  = -0.01_r8
-      PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = CanOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
+      PSIRootOSMO_vr(N,L,NZ,NY,NX)                               = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSIRoot_pvr(N,L,NZ,NY,NX)
       PSIRootTurg_vr(N,L,NZ,NY,NX)                               = AZMAX1(PSIRoot_pvr(N,L,NZ,NY,NX)-PSIRootOSMO_vr(N,L,NZ,NY,NX))
       RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)    = 0._r8
       RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX) = 0._r8

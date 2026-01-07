@@ -76,7 +76,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rProteinC2RootP_pft(:,:,:)                 !Protein C to root P ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  rProteinC2LeafN_pft(:,:,:)                 !Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
   real(r8),target,allocatable ::  rProteinC2LeafP_pft(:,:,:)                 !Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8),target,allocatable ::  OrganOsmoPsi0pt_pft(:,:,:)                   !Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone_pft(:,:,:)            !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  rPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
@@ -91,6 +91,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)               !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                   !plant O2 stress indicator, []
+  real(r8),target,allocatable ::  MorphogenBase_pft(:,:,:)                   !base line morphogen concentration for secondary growth, [-]
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                   !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCGroth_pft(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKGroth_pft(:,:,:)                         !canopy growth temperature, [K]
@@ -247,7 +248,7 @@ contains
   allocate(rProteinC2RootP_pft(JP,JY,JX)); rProteinC2RootP_pft=0._r8  
   allocate(rProteinC2LeafN_pft(JP,JY,JX));     rProteinC2LeafN_pft=0._r8
   allocate(rProteinC2LeafP_pft(JP,JY,JX));     rProteinC2LeafP_pft=0._r8
-  allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
+  allocate(OrganOsmoPsi0pt_pft(JP,JY,JX));     OrganOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone_pft(JP,JY,JX));    PlantInitThermoAdaptZone_pft=0._r8
   allocate(rPlantThermoAdaptZone_pft(JP,JY,JX));     rPlantThermoAdaptZone_pft=0._r8
@@ -263,6 +264,7 @@ contains
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
+  allocate(MorphogenBase_pft(JP,JY,JX)); MorphogenBase_pft=0._r8
   allocate(TCGroth_pft(JP,JY,JX));      TCGroth_pft=0._r8
   allocate(TKGroth_pft(JP,JY,JX));      TKGroth_pft=0._r8
   allocate(PetioleBiomGrowthYld_pft(JP,JY,JX));    PetioleBiomGrowthYld_pft=0._r8
@@ -415,7 +417,7 @@ contains
   call destroy(rProteinC2RootN_pft)
   call destroy(rProteinC2LeafN_pft)
   call destroy(rProteinC2LeafP_pft)
-  call destroy(CanOsmoPsi0pt_pft)
+  call destroy(OrganOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone_pft)
   call destroy(rPlantThermoAdaptZone_pft)
@@ -431,6 +433,7 @@ contains
   call destroy(HoursTooLowPsiCan_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
+  call destroy(MorphogenBase_pft)
   call destroy(TCGroth_pft)
   call destroy(TKGroth_pft)
   call destroy(PetioleBiomGrowthYld_pft)

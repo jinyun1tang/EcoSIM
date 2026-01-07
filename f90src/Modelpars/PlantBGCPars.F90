@@ -26,7 +26,7 @@ module PlantBGCPars
   real(r8) :: CNKI                                !nonstructural N inhibition constant on growth, [g N, g-1 C]
   real(r8) :: CPKI                                !nonstructural P inhibition constant on growth, [g P g-1 C]
   real(r8) :: RmSpecPlant                         !specific maintenance respiration rate, [g C g-1 N h-1]
-  real(r8) :: TurgPSIMin4OrganExtens              !minimum tugor pressure for plant organ expansion,extension, [MPa]
+  real(r8) :: TurgPSIMin4OrganExtens              !minimum tugor pressure for plant organ expansion,extension, [0.05-0.1 MPa]
   real(r8) :: RCMN                                !minimum stomatal resistance to CO2, [s m-1]
   real(r8) :: RTDPX                               !distance behind growing point for secondary roots, [m]
   real(r8) :: Root2ndTipLen4uptk                  !effective root tip length four resource uptake, not whole root hair 4 uptake, [m]

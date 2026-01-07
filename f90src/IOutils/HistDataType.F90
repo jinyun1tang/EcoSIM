@@ -288,7 +288,7 @@ implicit none
   real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)      
   real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)   
   real(r8),pointer   :: h1D_TC_Groth_ptc(:)
-  real(r8),pointer   :: h2D_SoilRest4RootGroth_vr(:,:)
+  real(r8),pointer   :: h2D_SoilBulkStress_vr(:,:)
   real(r8),pointer   :: h2D_RootNonstBConc_pvr(:,:)   
   real(r8),pointer   :: h2D_Root1stStrutC_pvr(:,:) 
   real(r8),pointer   :: h2D_Root1stStrutN_pvr(:,:)
@@ -463,7 +463,6 @@ implicit none
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_pvr(:,:)
-  real(r8),pointer   :: h2D_RootSegBaseDepth_ptc(:,:)
   real(r8),pointer   :: h2D_Root1stDepz_ptc(:,:) 
   real(r8),pointer   :: h2D_RootPop_pvr(:,:)
   real(r8),pointer   :: h2D_MycoPop_pvr(:,:)
@@ -1008,7 +1007,6 @@ implicit none
   allocate(this%h2D_RootRadialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootRadialKond2H2O_pvr(:,:)=spval
   allocate(this%h2d_RootPop_pvr(beg_ptc:end_ptc,1:JZ)); this%h2d_RootPop_pvr(:,:)=spval
   allocate(this%h2D_MycoPop_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_MycoPop_pvr(:,:)=spval
-  allocate(this%h2D_RootSegBaseDepth_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes));this%h2D_RootSegBaseDepth_ptc(:,:)=spval
   allocate(this%h2D_Root1stDepz_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes)); this%h2D_Root1stDepz_ptc(:,:)=spval
   allocate(this%h2D_RootAxialKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootAxialKond2H2O_pvr(:,:)=spval
   allocate(this%h2D_VmaxNH4Root_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_VmaxNH4Root_pvr(:,:)=spval
@@ -1016,7 +1014,7 @@ implicit none
   allocate(this%h2D_DOC_vr(beg_col:end_col,1:JZ)); this%h2D_DOC_vr(:,:)=spval
   allocate(this%h2D_DON_vr(beg_col:end_col,1:JZ)); this%h2D_DON_vr(:,:)=spval
   allocate(this%h2D_DOP_vr(beg_col:end_col,1:JZ)); this%h2D_DOP_vr(:,:)=spval
-  allocate(this%h2D_SoilRest4RootGroth_vr(beg_col:end_col,1:JZ)); this%h2D_SoilRest4RootGroth_vr(:,:)=spval
+  allocate(this%h2D_SoilBulkStress_vr(beg_col:end_col,1:JZ)); this%h2D_SoilBulkStress_vr(:,:)=spval
   allocate(this%h2D_acetate_vr(beg_col:end_col,1:JZ)); this%h2D_acetate_vr(:,:)=spval
   allocate(this%h1D_tDOC_soil_col(beg_col:end_col)); this%h1D_tDOC_soil_col(:)=spval
   allocate(this%h1D_tDON_soil_col(beg_col:end_col)); this%h1D_tDON_soil_col(:)=spval
@@ -2854,10 +2852,6 @@ implicit none
   call hist_addfld2d(fname='MycoPop_pvr',units='#/m2',type2d='levsoi',avgflag='A',&
     long_name='Mycorrhizal population',ptr_patch=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_RootSegBaseDepth_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes)
-  call hist_addfld2d(fname='RootSegBaseDepz_pft',units='m',type2d='rootaxs',avgflag='A',&
-    long_name='Primary root base depth that are subject to secondary growth',ptr_patch=data2d_ptr)       
-
   data2d_ptr => this%h2D_Root1stDepz_ptc(beg_ptc:end_ptc,1:MaxNumRootAxes)
   call hist_addfld2d(fname='Root1stDepz_pft',units='m',type2d='rootaxs',avgflag='A',&
     long_name='Primary root tips depth',ptr_patch=data2d_ptr)       
@@ -2894,8 +2888,8 @@ implicit none
   call hist_addfld2d(fname='DOP_vr',units='gP/m3',type2d='levsoi',avgflag='A',&
     long_name='DOP profile',ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr =>  this%h2D_SoilRest4RootGroth_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='SoilRest4RootGroth_vr',units='MPa',type2d='levsoi',avgflag='A',&
+  data2d_ptr =>  this%h2D_SoilBulkStress_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='RootPenitStress_vr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='Soil resistance for root penetration',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_acetate_vr(beg_col:end_col,1:JZ)
@@ -3894,7 +3888,7 @@ implicit none
         
         this%h2D_Eco_HR_CO2_vr(ncol,L)    = ECO_HR_CO2_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_Gchem_CO2_prod_vr(ncol,L)= TProd_CO2_geochem_soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_SoilRest4RootGroth_vr(ncol,L) = SoilBulkModulus4RootPent_vr(L,NY,NX)
+        this%h2D_SoilBulkStress_vr(ncol,L) = SoilBulkModulus4RootPent_vr(L,NY,NX)
         if(DVOLL<=1.e-8_r8)cycle
 
         call sumDOML(L,NY,NX,DOM)
@@ -4316,12 +4310,10 @@ implicit none
         this%h1D_RootLenPerPlant_ptc(nptc) = 0._r8
         if(IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
-!            this%h2D_RootSegBaseDepth_ptc(nptc,NR) = RootSegBaseDepth_raxes(NR,NZ,NY,NX)
             this%h2D_Root1stDepz_ptc(nptc,NR)      = Root1stDepz_raxes(NR,NZ,NY,NX)
           ENDDO
         else
           DO NR=1,MaxNumRootAxes
-!            this%h2D_RootSegBaseDepth_ptc(nptc,NR) = 0._r8
             this%h2D_Root1stDepz_ptc(nptc,NR)      = 0._r8
           ENDDO
         endif
@@ -4600,7 +4592,6 @@ implicit none
   this%h2D_CanopyLAIZ_plyr(nptc,:)                  = 0._r8
   this%h1D_RootAR_ptc(nptc)                         = 0._r8
   this%h1D_RootLenPerPlant_ptc(nptc)                = 0._r8
-  this%h2D_RootSegBaseDepth_ptc(nptc,:)             = 0._r8
   this%h2D_Root1stDepz_ptc(nptc,:)                  = 0._r8
   this%h2D_Root1stStrutC_pvr(nptc,1:JZ)             = 0._r8
   this%h2D_Root1stStrutN_pvr(nptc,1:JZ)             = 0._r8

@@ -82,7 +82,7 @@ implicit none
   real (r8), pointer :: VLsoiAirPM_vr(:,:)           => null()    !soil air content,                                         [m3 d-2]
   real (r8), pointer :: TortMicPM_vr(:,:)            => null()    !micropore soil tortuosity,                                [m3 m-3]
   real (r8), pointer :: FILMM_vr(:,:)                => null()    !soil water film thickness,                                [m]
-  real (r8), pointer :: SoilBulkStress_vr(:)         => null()    !soil bulk stress on root thickening, [MPa]
+  real (r8), pointer :: SoilWeightStress_vr(:)         => null()    !soil bulk stress on root thickening, [MPa]
   real (r8), pointer :: SoilSuctStress_vr(:)         => null()    !soil suction stress on root thickening, [MPa]
   real (r8), pointer :: rSat_vr(:)                   => null()    !relative soil saturation, [-]
   contains
@@ -351,6 +351,7 @@ implicit none
   real(r8), pointer :: TC4LeafOff_pft(:)                  => null()     !threshold temperature for autumn leafoff/hardening,                  [oC]
   real(r8), pointer :: TKGroth_pft(:)                     => null()     !canopy growth temperature,                                           [K]
   real(r8), pointer :: fTCanopyGroth_pft(:)               => null()     !canopy temperature growth function,                                  [-]
+  real(r8), pointer :: MorphogenBase_pft(:)               => null()     !!baseline morphogen signal strength, [-]
   real(r8), pointer :: HoursTooLowPsiCan_pft(:)           => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
   real(r8), pointer :: TCChill4Seed_pft(:)           => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: rPlantThermoAdaptZone_pft(:)  => null()     !plant thermal adaptation zone,                          [-]
@@ -423,6 +424,7 @@ implicit none
   real(r8), pointer :: FracAirFilledSoilPoreM_vr(:,:) => null()  !soil air-filled porosity,                     [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEffM_vr(:,:)   => null()  !coefficient for dissolution - volatilization, [-]
   real(r8), pointer :: SoilBulkModulus4RootPent_vr(:)   => null()  !elastic modulus of the undisturbed soil, [MPa]
+  real(r8), pointer :: SoilModulus4RootRadialexp_vr(:) => null() ! soil modulus for root radial expansion, [MPa]    
   real(r8), pointer :: SoilBulkDensity_vr(:)          => null()  !soil bulk density,                            [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:)              => null()  !aqueous tracer concentration, [g m-3]
   real(r8), pointer :: trcg_gascl_vr(:,:)             => null()  !gaseous tracer concentration, [g m-3]
@@ -636,7 +638,7 @@ implicit none
   real(r8), pointer :: ENGYX_pft(:)                   => null()    !canopy heat storage from previous time step,                  [MJ d-2]
   real(r8), pointer :: TKC_pft(:)                     => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSICanopyOsmo_pft(:)           => null()    !canopy osmotic water potential,                               [Mpa]
-  real(r8), pointer :: CanOsmoPsi0pt_pft(:)           => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8), pointer :: OrganOsmoPsi0pt_pft(:)           => null()    !Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8), pointer :: HeatXAir2PCan_pft(:)           => null()    !canopy sensible heat flux,                                    [MJ d-2 h-1]
   real(r8), pointer :: TKCanopy_pft(:)                => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSIRoot_pvr(:,:,:)             => null()    !root total water potential,                                   [Mpa]
@@ -1074,7 +1076,7 @@ implicit none
   allocate(this%VLsoiAirPM_vr(60,0:JZ1));this%VLsoiAirPM_vr=spval
   allocate(this%TortMicPM_vr(60,0:JZ1));this%TortMicPM_vr=spval
   allocate(this%FILMM_vr(60,0:JZ1)); this%FILMM_vr=spval
-  allocate(this%SoilBulkStress_vr(JZ1));this%SoilBulkStress_vr=spval
+  allocate(this%SoilWeightStress_vr(JZ1));this%SoilWeightStress_vr=spval
   allocate(this%SoilSuctStress_vr(JZ1));this%SoilSuctStress_vr=spval
   allocate(this%rSat_vr(JZ1));this%rSat_vr=spval
   end subroutine plt_site_Init
@@ -1259,7 +1261,7 @@ implicit none
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
-  allocate(this%CanOsmoPsi0pt_pft(JP1));this%CanOsmoPsi0pt_pft=spval
+  allocate(this%OrganOsmoPsi0pt_pft(JP1));this%OrganOsmoPsi0pt_pft=spval
   allocate(this%CanopyIsothBndlResist_pft(JP1));this%CanopyIsothBndlResist_pft=spval
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval
   allocate(this%TKC_pft(JP1));this%TKC_pft=spval
@@ -1585,6 +1587,7 @@ implicit none
   allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
   allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
   allocate(this%SoilBulkModulus4RootPent_vr(JZ1));this%SoilBulkModulus4RootPent_vr=spval
+  allocate(this%SoilModulus4RootRadialexp_vr(JZ1)); this%SoilModulus4RootRadialexp_vr=spval
   allocate(this%SoilBulkDensity_vr(0:JZ1));this%SoilBulkDensity_vr=spval
   allocate(this%HYCDMicP4RootUptake_vr(JZ1));this%HYCDMicP4RootUptake_vr=spval
 
@@ -1867,6 +1870,7 @@ implicit none
   allocate(this%NonstCMinConc2InitBranch_pft(JP1));this%NonstCMinConc2InitBranch_pft=spval
   allocate(this%MinNonstC2InitRoot_pft(JP1));this%MinNonstC2InitRoot_pft=spval
   allocate(this%fTCanopyGroth_pft(JP1));this%fTCanopyGroth_pft=spval
+  allocate(this%MorphogenBase_pft(JP1));this%MorphogenBase_pft=spval
   allocate(this%TC4LeafOut_pft(JP1));this%TC4LeafOut_pft=spval
   allocate(this%TCGroth_pft(JP1));this%TCGroth_pft=spval
   allocate(this%TKGroth_pft(JP1));this%TKGroth_pft=spval

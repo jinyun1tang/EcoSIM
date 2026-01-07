@@ -206,7 +206,7 @@ implicit none
     plt_pheno%IsPlantActive_pft(NZ)         = IsPlantActive_pft(NZ,NY,NX)       !lai >0,                        active
     plt_ew%PSICanopy_pft(NZ)                = PSICanopy_pft(NZ,NY,NX)
     plt_pheno%TempOffset_pft(NZ)            = TempOffset_pft(NZ,NY,NX)             !set based on read in pft parameter
-    plt_ew%CanOsmoPsi0pt_pft(NZ)            = CanOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
+    plt_ew%OrganOsmoPsi0pt_pft(NZ)            = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
 
   ENDDO    
   end subroutine PlantUptakeAPISend

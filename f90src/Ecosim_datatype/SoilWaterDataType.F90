@@ -73,7 +73,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  TortMacPM_vr(:,:,:,:)                     !soil macropore tortuosity, [m3 m-3]
   real(r8),target,allocatable ::  DiffusivitySolutEffM_vr(:,:,:,:)          !coefficient for dissolution - volatilization, []
   real(r8),target,allocatable ::  SoilBulkModulus4RootPent_vr(:,:,:)         !elastic modulus of the undisturbed soil, [MPa]
-  real(r8),target,allocatable ::  SoilBulkStress_vr(:,:,:)                  !soil weight stress on root thickening, [MPa]
+  real(r8),target,allocatable ::  SoilModulus4RootRadialexp_vr(:,:,:)       !soil modulus for root radial expansion, [MPa]    
+  real(r8),target,allocatable ::  SoilWeightStress_vr(:,:,:)                  !soil weight stress on root thickening, [MPa]
   real(r8),target,allocatable ::  PSISE_vr(:,:,:)                           !soil water potential at saturation, [Mpa]
   real(r8),target,allocatable ::  PSISoilAirEntry_vr(:,:,:)                    !soil water potential at air entry, [Mpa]
   real(r8),target,allocatable ::  PSISoilOsmotic_vr(:,:,:)                  !osmotic soil water potential , [Mpa]
@@ -204,7 +205,8 @@ module SoilWaterDataType
   allocate(TortMacPM_vr(60,JZ,JY,JX)); TortMacPM_vr=0._r8
   allocate(DiffusivitySolutEffM_vr(60,0:JZ,JY,JX));DiffusivitySolutEffM_vr=0._r8
   allocate(SoilBulkModulus4RootPent_vr(JZ,JY,JX));     SoilBulkModulus4RootPent_vr=0._r8
-  allocate(SoilBulkStress_vr(JZ,JY,JX)); SoilBulkStress_vr=0._r8
+  allocate(SoilModulus4RootRadialexp_vr(JZ,JY,JX)); SoilModulus4RootRadialexp_vr=0._r8
+  allocate(SoilWeightStress_vr(JZ,JY,JX)); SoilWeightStress_vr=0._r8
   allocate(PSISE_vr(0:JZ,JY,JX));  PSISE_vr=0._r8
   allocate(PSISoilAirEntry_vr(0:JZ,JY,JX));  PSISoilAirEntry_vr=0._r8
   allocate(PSISoilOsmotic_vr(0:JZ,JY,JX));  PSISoilOsmotic_vr=0._r8
@@ -312,7 +314,8 @@ module SoilWaterDataType
   call destroy(TortMacPM_vr)
   call destroy(DiffusivitySolutEffM_vr)
   call destroy(SoilBulkModulus4RootPent_vr)
-  call destroy(SoilBulkStress_vr)
+  call destroy(SoilModulus4RootRadialexp_vr)
+  call destroy(SoilWeightStress_vr)
   call destroy(PSISE_vr)
   call destroy(PSISoilAirEntry_vr)
   call destroy(PSISoilOsmotic_vr)

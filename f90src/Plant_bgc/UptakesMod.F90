@@ -516,7 +516,7 @@ module UptakesMod
 ! begin_execution
   associate(                                                               &
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft           => plt_ew%CanOsmoPsi0pt_pft               ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft             ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft         ,& !input  :maximum stomatal resistance to vapor, [s h-1]
@@ -568,7 +568,7 @@ module UptakesMod
       else
         CCPOLT  = CanopyNonstElmConc_pft(ielmc,NZ)+CanopyNonstElmConc_pft(ielmn,NZ) +CanopyNonstElmConc_pft(ielmp,NZ)
       endif
-      CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ), &
+      CALL update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKC_pft(NZ), &
         PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
       CanopyBndlResist_pft(NZ)   = CanopyIsothBndlResist_pft(NZ)
@@ -587,7 +587,7 @@ module UptakesMod
           else
             CCPOLT   = sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
           endif
-          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
+          CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKS_vr(L),&
             PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
           RPlantRootH2OUptk_pvr(N,L,NZ)=0.0_r8
@@ -663,7 +663,7 @@ module UptakesMod
 
   associate(                                                               &
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft           => plt_ew%CanOsmoPsi0pt_pft               ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !input  :canopy water content, [m3 d-2]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -768,10 +768,10 @@ module UptakesMod
 !
 !     CANOPY WATER AND OSMOTIC POTENTIALS
 !
-!     CanOsmoPsi0pt_pft=osmotic potential at PSICanopy_pft=0 from PFT file
+!     OrganOsmoPsi0pt_pft=osmotic potential at PSICanopy_pft=0 from PFT file
 !     PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy osmotic,turgor water potential
 !
-     call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC1 &
+     call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKC1 &
        ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 !
 !     CANOPY STOMATAL RESISTANCE
@@ -1243,7 +1243,7 @@ module UptakesMod
 ! begin_execution
   associate(                                                           &
     AREA3                     => plt_site%AREA3                       ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft             ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft             ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
     CanopyNonstElmConc_pft    => plt_biom%CanopyNonstElmConc_pft      ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -1306,7 +1306,7 @@ module UptakesMod
   else
     CCPOLT  = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ))
   endif
-  call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKC_pft(NZ)&
+  call update_osmo_turg_pressure(PSICanopy_pft(NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKC_pft(NZ)&
     ,PSICanopyOsmo_pft(NZ),PSICanopyTurg_pft(NZ),FDMP)
 
   Stomata_Stress             = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
@@ -1326,7 +1326,7 @@ module UptakesMod
       endif
       RPlantRootH2OUptk_pvr(N,L,NZ) = 0.0_r8
       RootH2OUptkStress_pvr(N,L,NZ)   = 0._r8
-      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
+      call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
     enddo
@@ -1359,7 +1359,7 @@ module UptakesMod
   real(r8) :: OSWT
   integer :: N,L
   associate(                                                          &
-    CanOsmoPsi0pt_pft         => plt_ew%CanOsmoPsi0pt_pft            ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft            ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !input  :canopy active stalk C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
@@ -1408,7 +1408,7 @@ module UptakesMod
   !     TotalSoilPSIMPa_vr=total soil water potential PSIST adjusted for surf elevn
   !     SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,RootResist=soil,soil+root,root radial+axial resistance
   !     PSIRootOSMO_vr,PSIRootTurg_vr=root osmotic,turgor water potential
-  !     CanOsmoPsi0pt_pft=osmotic potential at PSIRoot_pvr=0 from PFT file
+  !     OrganOsmoPsi0pt_pft=osmotic potential at PSIRoot_pvr=0 from PFT file
 
   !compute root pressure assuming zero water storage capacity in root, cf. Eq. (36) Grant (1998), Ecological modelling.
   D4505: DO N=1,Myco_pft(NZ)
@@ -1428,7 +1428,7 @@ module UptakesMod
         CCPOLT=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ))
       endif  
 
-      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,CanOsmoPsi0pt_pft(NZ),TKS_vr(L),&
+      CALL update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
 
     ENDDO D4510

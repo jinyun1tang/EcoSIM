@@ -500,23 +500,21 @@ implicit none
   real(r8) :: VHeatCapacityLitR   !current litr heat capacity before change in water
   real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: tkspre,ENGYR,VLWatMicPr,VLiceMicPr
-  real(r8) :: ENGYZ,HS,m3OM
+  real(r8) :: ENGYZ,HS,m3OM,HeatByMassChange
 
   IF(FracSurfByLitR_col(NY,NX).LE.ZEROL)return
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
-  m3OM=gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))
+  m3OM               = gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))
+
+  !make a copy of old heat capacity, and energy
   VHeatCapacityLitrX = VHeatCapacity_vr(0,NY,NX)
-  VLWatMicPr         = VLWatMicP_vr(0,NY,NX)
-  VLiceMicPr         = VLiceMicP_vr(0,NY,NX)
+  ENGYZ              = VHeatCapacityLitrX*TKS_vr(0,NY,NX)
 
-  ENGYZ                = VHeatCapacityLitrX*TKS_vr(0,NY,NX)
-
-  !update water, ice content and heat capacity of residue
-  VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+dWat
+  !new heat capacity
   VHeatCapacity_vr(0,NY,NX) = cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*m3OM
 
-  THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)
+  THeatSoiThaw_col(NY,NX) = THeatSoiThaw_col(NY,NX)+TLitrIceHeatFlxFrez_col(NY,NX)
   
   IF(VHeatCapacity_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
@@ -627,7 +625,7 @@ implicit none
 !    if(I==70.and.J==10)write(994,*)(I*1000+J)*100+M,TK0Prev,TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX),FracSurfByLitR_col(NY,NX),&
 !      LWRad2LitR_col(NY,NX),LWRad2Snow_col(NY,NX),LWRad2Soil_col(NY,NX),HeatFLoByWat2LitRM_col(NY,NX),LitrIceHeatFlxFrez_col(NY,NX) 
     if(TKSoil1_vr(0,NY,NX)<200._r8 .or. (TKSoil1_vr(0,NY,NX)>360._r8 .and. VHeatCapacity1_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)) )then
-      write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+      write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,M,TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX)
       write(*,*)'VLHeatcap',VHeatCapacity1_vr(0,NY,NX),VLHeatCapLitRPre,FracSurfByLitR_col(NY,NX)
       write(*,*)'engy',ENGYR/VHeatCapacity1_vr(0,NY,NX),HeatFLoByWat2LitRM_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),&
         LitrIceHeatFlxFrez_col(NY,NX)/VHeatCapacity1_vr(0,NY,NX),XVLMobileWaterLitR_col(NY,NX)

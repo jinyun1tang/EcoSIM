@@ -24,33 +24,33 @@ implicit none
   end type PlantSoluteUptakeConfig_type
 contains
 
-  function get_FDM(PSICanopy,FDMP0)result(FDMP)
+  function get_FDM(PSIOrgan,FDMP0)result(FDMP)
   !
   !compute the Ratio of leaf+sheath dry mass to symplasmic water (g g–1)
   !as a function of absolute value of leaf water potential (MPa)
   
   implicit none
-  real(r8), intent(in) :: PSICanopy !canopy water potential, MPa
+  real(r8), intent(in) :: PSIOrgan !canopy water potential, MPa
   real(r8), optional, intent(out) ::  FDMP0
   
   real(r8) :: APSILT    !abosolute value of psi
   real(r8) :: FDMP      !=dry matter/water
 
-  APSILT = ABS(PSICanopy)
+  APSILT = ABS(PSIOrgan)
   FDMP   = 0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
   if(present(FDMP0))FDMP0=0.16_r8
 
   end function get_FDM
 
 !--------------------------------------------------------------------------------
-  subroutine update_osmo_turg_pressure(PSICanopy,CCPOLT,OSMO,TKP,PSIOsmo,PSITurg,FDMP1)
+  subroutine update_osmo_turg_pressure(PSIOrgan,CCPOLT,OSMO,TKP,PSIOsmo,PSITurg,FDMP1)
   !
   !DESCRIPTION
   !update the osmotic and turgor pressure of a plant organ
   implicit none
-  real(r8), intent(in) :: PSICanopy   !plant orgran pressure, MPa
-  real(r8), intent(in) :: CCPOLT      !total organ dry mass, C+N+P, g
-  real(r8), intent(in) :: OSMO        !canopy osmotic potential when canopy water potential = 0 MPa
+  real(r8), intent(in) :: PSIOrgan    !plant orgran pressure, [MPa]
+  real(r8), intent(in) :: CCPOLT      !total organ non-structrual elemental concentration, g/g
+  real(r8), intent(in) :: OSMO        !Organ osmotic potential when water potential = 0 MPa
   real(r8), intent(in) :: TKP         !organ temperature, Kelvin
   real(r8), intent(out) :: PSIOsmo    !osmotic pressure of the organ, MPa
   real(r8), intent(out) :: PSITurg    !turgor pressure of the organ, MPa
@@ -60,13 +60,31 @@ contains
   real(r8) :: FDMP   !Ratio of leaf+sheath dry mass to symplasmic water (g/g)
   real(r8) :: FDMP0  !FDMP at zero canopy water potential. 
   
-  FDMP    = get_FDM(PSICanopy,FDMP0)
+  FDMP    = get_FDM(PSIOrgan,FDMP0)
   OSWT    = 36.0_r8+840.0_r8*AZMAX1(CCPOLT)
   PSIOsmo = FDMP*(OSMO/FDMP0-RGASC*TKP*CCPOLT/OSWT)
-  PSITurg = AZMAX1(PSICanopy-PSIOsmo)
+  PSITurg = AZMAX1(PSIOrgan-PSIOsmo)
 
   if(present(fdmp1))FDMP1=FDMP
   end subroutine update_osmo_turg_pressure
+!--------------------------------------------------------------------------------
+
+  function get_zero_turg_ccpolt(PSIOrg,OSMO,TKP)result(CCPOLT)
+  implicit none
+  real(r8), intent(in) :: PSIOrg      !plant orgran pressure, [MPa]
+  real(r8), intent(in) :: OSMO        !Organ osmotic potential [MPa], when water potential = 0 MPa
+  real(r8), intent(in) :: TKP         !organ temperature, [Kelvin]
+
+  real(r8) :: CCPOLT      !total organ non-structrual elemental concentration, g/g
+  !--- local variables ---
+  real(r8) :: FDMP,FDMP0,ratio
+
+  FDMP  = get_FDM(PSIOrg,FDMP0)
+
+  ratio = RGASC*TKP/(OSMO/FDMP0-PSIOrg/FDMP)
+
+  CCPOLT = 36._r8/(ratio-840._r8)
+  end function get_zero_turg_ccpolt
 !--------------------------------------------------------------------------------
 
   subroutine calc_seed_geometry(SeedCMass,SeedVolumeMean,SeedLengthMean,SeedArea)
@@ -298,7 +316,7 @@ contains
   pure function fRespWatSens(WFN,iPlantRootProfile)result(ans)
 
   implicit none
-  real(r8), intent(in) :: WFN   !turgor based leaf/root expansion 
+  real(r8), intent(in) :: WFN               !turgor based leaf/root elongation
   integer, intent(in) :: iPlantRootProfile
   real(r8) :: ans
 

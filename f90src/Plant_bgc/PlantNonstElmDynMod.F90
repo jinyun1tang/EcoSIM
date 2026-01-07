@@ -300,6 +300,7 @@ module PlantNonstElmDynMod
   !1)sum up the strengths over all branches, and all roots LAYERS
   !2)compute weighting factor for each branch and each root layer
   !3)do exchange between one branch and all different root layers  
+  use PlantMathFuncMod, only : get_zero_turg_ccpolt,update_osmo_turg_pressure
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: GrothPART2LeafPetole
@@ -330,7 +331,8 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
-  real(r8) :: RootDepzMean
+  real(r8) :: RootDepzMean,PSIOsmo,PSITurg
+  real(r8) :: CPOLT(JZ1),CCPOLT
   associate(                                                                   &
     NU                            => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
     Myco_pft                      => plt_morph%Myco_pft                       ,& !input  :mycorrhizal type (no or yes),[-]
@@ -348,6 +350,11 @@ module PlantNonstElmDynMod
     iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft        ,& !input  :plant growth habit: annual or perennial,[-]
     ShootRootNonstElmConduts_pft  => plt_pheno%ShootRootNonstElmConduts_pft   ,& !input  :shoot-root rate constant for nonstructural C exchange, [h-1]
     RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
+    PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !input  :root total water potential, [Mpa]    
+    PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !input  :root turgor water potential, [Mpa]    
+    PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !input  :root osmotic water potential, [Mpa]    
+    TKS_vr                        => plt_ew%TKS_vr                            ,& !input  :mean annual soil temperature, [K]    
+    OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]    
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoiL4Root_pft              => plt_morph%MaxSoiL4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
@@ -389,13 +396,10 @@ module PlantNonstElmDynMod
     ENDDO D5450    
   ENDDO D5445
 
-  RootDepzMean=0._r8
   DO  NR=1,NumPrimeRootAxes_pft(NZ)
     L=NRoot1stTipLay_raxes(NR,NZ)
     RootMycoActiveBiomC_pvr(ipltroot,L,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+RootMyco1stElm_raxs(ielmc,NR,NZ)
-    RootDepzMean=RootDepzMean+Root1stDepz_raxes(NR,NZ)
   ENDDO
-  RootDepzMean=RootDepzMean/NumPrimeRootAxes_pft(NZ)
 
   DO L=NU,MaxSoiL4Root_pft(NZ)  
     DO NR=1,NumPrimeRootAxes_pft(NZ)
@@ -434,6 +438,7 @@ module PlantNonstElmDynMod
       RootSinkWeight_pvr(L,NZ)=1.0_r8/(NMaxRootBotLayer_pft(NZ)-NGTopRootLayer_pft(NZ)+1)
     ENDIF
   ENDDO D290
+
   !     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
   !     BUT IS NOT USED FOR ANNUALS DURING GRAIN FILL
   !
@@ -518,11 +523,13 @@ module PlantNonstElmDynMod
               CanopyNonstElms_brch(NE,NB,NZ)           = AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)-XFRE)
               RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE)
             ENDDO
-          ENDIF  
+          ENDIF
         ENDIF
       ENDDO D415
     ENDIF
   ENDDO D310
+
+
   DO NE=1,NumPlantChemElms
     mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ)) &
       +SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))

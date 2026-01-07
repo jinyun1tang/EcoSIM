@@ -773,6 +773,7 @@ implicit none
     plt_soilchem%HYCDMicP4RootUptake_vr(L) = HYCDMicP4RootUptake_vr(L,NY,NX)
     plt_soilchem%GasDifc_vr(idg_beg:idg_end,L)  = GasDifc_vr(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%SoilBulkModulus4RootPent_vr(L)   = SoilBulkModulus4RootPent_vr(L,NY,NX)
+    plt_soilchem%SoilModulus4RootRadialexp_vr(L) = SoilModulus4RootRadialexp_vr(L,NY,NX)
     plt_site%CumSoilThickMidL_vr(L)             = CumSoilThickMidL_vr(L,NY,NX)
   ENDDO
 
@@ -900,7 +901,7 @@ implicit none
     plt_pheno%MinNonstC2InitRoot_pft(NZ)        = MinNonstC2InitRoot_pft(NZ,NY,NX)
     plt_pheno%ShootRootNonstElmConduts_pft(NZ) = ShootRootNonstElmConduts_pft(NZ,NY,NX)
     plt_morph%RootBranchFreq_pft(NZ)            = RootBranchFreq_pft(NZ,NY,NX)
-    plt_ew%CanOsmoPsi0pt_pft(NZ)                = CanOsmoPsi0pt_pft(NZ,NY,NX)
+    plt_ew%OrganOsmoPsi0pt_pft(NZ)                = OrganOsmoPsi0pt_pft(NZ,NY,NX)
     plt_photo%RCS_pft(NZ)                           = RCS_pft(NZ,NY,NX)
     plt_photo%CuticleResist_pft(NZ)             = CuticleResist_pft(NZ,NY,NX)
 
@@ -964,7 +965,7 @@ implicit none
   ENDDO
 
   DO L=1,NK_col(NY,NX)
-    plt_site%SoilBulkStress_vr(L) = SoilBulkStress_vr(L,NY,NX)
+    plt_site%SoilWeightStress_vr(L) = SoilWeightStress_vr(L,NY,NX)
     plt_site%SoilSuctStress_vr(L) = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
     plt_site%rSat_vr(L)           = safe_adb(VLWatMicP_vr(L,NY,NX),VLSoilMicP_vr(L,NY,NX))
     DO M=1,NPH
@@ -1199,6 +1200,7 @@ implicit none
     plt_pheno%TC4LeafOff_pft(NZ)                          = TC4LeafOff_pft(NZ,NY,NX)
     plt_pheno%TKGroth_pft(NZ)                             = TKGroth_pft(NZ,NY,NX)
     plt_pheno%fTCanopyGroth_pft(NZ)                       = fTCanopyGroth_pft(NZ,NY,NX)
+    plt_pheno%MorphogenBase_pft(NZ)                       = MorphogenBase_pft(NZ,NY,NX)
     plt_photo%Km4LeafaqCO2_pft(NZ)                         = Km4LeafaqCO2_pft(NZ,NY,NX)
     plt_photo%Km4RubiscoCarboxy_pft(NZ)                    = Km4RubiscoCarboxy_pft(NZ,NY,NX)
     plt_bgcr%NH3Emis_CumYr_pft(NZ)                         = NH3Emis_CumYr_pft(NZ,NY,NX)

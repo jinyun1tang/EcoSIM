@@ -89,7 +89,7 @@ module RedistMod
   real(r8) :: DORGE_col(JY,JX)              !change of organic C due to surface erosion
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT,orgm(1:NumPlantChemElms)
-  real(r8) :: dWat,dHeat
+
 !     execution begins here
 
   call PrintInfo('beg '//subname)
@@ -108,13 +108,13 @@ module RedistMod
       Txchem_CO2_col(NY,NX) = 0.0_r8
       DORGE_col(NY,NX)      = 0.0_r8
 
-      call AddFlux2SurfaceResidue(I,J,NY,NX,dWat,dHeat)
+      call AddFlux2SurfaceResidue(I,J,NY,NX)
 !
       call SinkSediments(NY,NX)
 !
 !     RUNOFF AND SUBSURFACE BOUNDARY FLUXES, will be removed in the future as they are now integrated
 !     into the transport code
-!      call XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
+!      call XGridBoundSolutesRunoff(I,J,NY,NX,NHW,NHE,NVN,NVS)
 !
 !     CHANGE EXTERNAL WATER TABLE DEPTH THROUGH DISTURBANCE
 !
@@ -126,7 +126,7 @@ module RedistMod
 
       call SnowMassUpdate(I,J,NY,NX)
 
-      call HandleSurfaceBoundary(I,J,NY,NX,dWat,dHeat)
+      call HandleSurfaceBoundary(I,J,NY,NX)
 
 !     OVERLAND FLOW
 
@@ -371,12 +371,11 @@ module RedistMod
   end subroutine UpdateSurfaceTracers  
 !------------------------------------------------------------------------------------------
 
-  subroutine HandleSurfaceBoundary(I,J,NY,NX,dWat,dHeat)
+  subroutine HandleSurfaceBoundary(I,J,NY,NX)
 
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8), intent(in) :: dWat,dHeat
 
   character(len=*),parameter :: subname='HandleSurfaceBoundary'
   integer :: K,LS,idsp,idsalt,NE,idg,L
@@ -396,9 +395,6 @@ module RedistMod
   call PrintInfo('beg '//subname)
   QRunSurf_col(NY,NX)    = TXGridSurfRunoff_2DH(NY,NX)
   HeatRunSurf_col(NY,NX) = THeatXGridBySurfRunoff_2DH(NY,NX)
-
-  !update litter physical property
-  call UpdateLitRPhys(I,J,NY,NX,dWat,dHeat,HEATIN_lnd)
 
   call UpdateSurfaceTracers(I,J,NY,NX)
   !
@@ -1309,16 +1305,16 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AddFlux2SurfaceResidue(I,J,NY,NX,dWat,dHeat)
+  subroutine AddFlux2SurfaceResidue(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
-  real(r8), intent(out) :: dWat,dHeat
+  real(r8)  :: dWat,dHeat
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
 
   real(r8) :: VLWatMicP1X,ENGYR,TK1X
-  real(r8) :: OSCMK
+  real(r8) :: OSCMK,dOM
 !     begin_execution
 !     ADD ABOVE-GROUND LitrFall FROM EXTRACT.F TO SURFACE RESIDUE
 !
@@ -1334,15 +1330,16 @@ module RedistMod
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     OSCMK=0._r8
     DO  M=1,jsken
-      OSCMK                      = OSCMK+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      SolidOMAct_vr(M,K,0,NY,NX) = SolidOMAct_vr(M,K,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      dOM = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))
+      OSCMK                      = OSCMK+dOM
+      SolidOMAct_vr(M,K,0,NY,NX) = SolidOMAct_vr(M,K,0,NY,NX)+dOM*micpar%OMCI(1,K)
       DO NE=1,NumPlantChemElms
         SolidOM_vr(NE,M,K,0,NY,NX)=SolidOM_vr(NE,M,K,0,NY,NX)+LitrfalStrutElms_vr(NE,M,K,0,NY,NX)
       ENDDO
       
-      SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX)
-      RAINR                        = AZMAX1(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*ThetaCX(K)
-      HRAINR                       = RAINR*cpw*TairK_col(NY,NX)+gOC_to_m3_OM(LitrfalStrutElms_vr(ielmc,M,K,0,NY,NX))*cpo*TairK_col(NY,NX)
+      SoilOrgM_vr(ielmc,0,NY,NX)   = SoilOrgM_vr(ielmc,0,NY,NX)+dOM
+      RAINR                        = dOM*ThetaCX(K)
+      HRAINR                       = (RAINR*cpw+gOC_to_m3_OM(dOM)*cpo)*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
 
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
@@ -1362,6 +1359,9 @@ module RedistMod
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
+
+  !update litter physical property
+  call UpdateLitRPhys(I,J,NY,NX,dWat,dHeat,HEATIN_lnd)
 
   call PrintInfo('end AddFlux2SurfaceResidue')
   end subroutine AddFlux2SurfaceResidue

@@ -858,7 +858,7 @@ module InitPlantMod
 
   associate(                                                 &
     ATCA                  => plt_site%ATCA                  ,& !input  :mean annual air temperature, [oC]
-    CanOsmoPsi0pt_pft     => plt_ew%CanOsmoPsi0pt_pft       ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft     => plt_ew%OrganOsmoPsi0pt_pft       ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyLeafSheathC_pft  => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
     ShootElms_pft         => plt_biom%ShootElms_pft         ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     HeatCanopy2Dist_col   => plt_ew%HeatCanopy2Dist_col     ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
@@ -895,7 +895,7 @@ module InitPlantMod
   TKGroth_pft(NZ)           = units%Celcius2Kelvin(TCGroth_pft(NZ))
   fTCanopyGroth_pft(NZ)     = 1.0
   PSICanopy_pft(NZ)         = -1.0E-03
-  PSICanopyOsmo_pft(NZ)     = CanOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
+  PSICanopyOsmo_pft(NZ)     = OrganOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)     = AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))
   Transpiration_pft(NZ)     = 0._r8
   FracPARads2Canopy_pft(NZ) = 0._r8
@@ -922,7 +922,7 @@ module InitPlantMod
     CCO2EI_gperm3                 => plt_site%CCO2EI_gperm3                   ,& !input  :initial atmospheric CO2 concentration, [g m-3]
     CO2EI                         => plt_site%CO2EI                           ,& !input  :initial atmospheric CO2 concentration, [umol mol-1]
     COXYE                         => plt_site%COXYE                           ,& !input  :current atmospheric O2 concentration, [g m-3]
-    CanOsmoPsi0pt_pft             => plt_ew%CanOsmoPsi0pt_pft                 ,& !input  :canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft             => plt_ew%OrganOsmoPsi0pt_pft                 ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     NL                            => plt_site%NL                              ,& !input  :lowest soil layer number,[-]
     OXYE                          => plt_site%OXYE                            ,& !input  :atmospheric O2 concentration, [umol mol-1]
     Root1stMaxRadius_pft          => plt_morph%Root1stMaxRadius_pft           ,& !input  :maximum radius of primary roots, [m]
@@ -967,7 +967,7 @@ module InitPlantMod
       plt_ew%RootH2OUptkStress_pvr(N,L,NZ)                        = 0._r8
       plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)                        = 0._r8
       PSIRoot_pvr(N,L,NZ)                                          = -0.01_r8
-      PSIRootOSMO_vr(N,L,NZ)                                       = CanOsmoPsi0pt_pft(NZ)+PSIRoot_pvr(N,L,NZ)
+      PSIRootOSMO_vr(N,L,NZ)                                       = OrganOsmoPsi0pt_pft(NZ)+PSIRoot_pvr(N,L,NZ)
       PSIRootTurg_vr(N,L,NZ)                                       = AZMAX1(PSIRoot_pvr(N,L,NZ)-PSIRootOSMO_vr(N,L,NZ))
       plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ)   = 0._r8
       plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = 0._r8

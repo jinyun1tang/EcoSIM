@@ -28,6 +28,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
   real(r8), target, allocatable :: LeafChl2Protein_tab(:)
   real(r8), target, allocatable :: fChlMesophyll_tab(:)           !fraction of cholorophyll in mesophyll cells
+  real(r8), target, allocatable :: MorphogenBase_tab(:)           !baseline morphogen signal, [%]
   real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
@@ -155,6 +156,7 @@ module PlantTraitTableMod
   allocate(RefNodeInitRate_tab(npfts));RefNodeInitRate_tab=0._r8
   allocate(RefLeafAppearRate_tab(npfts));RefLeafAppearRate_tab=0._r8
   allocate(TCChill4Seed_tab(npfts));TCChill4Seed_tab=0._r8
+  allocate(MorphogenBase_tab(npfts)); MorphogenBase_tab=0._r8
   allocate(VRNLI_tab(npfts));VRNLI_tab=0._r8
   allocate(VRNXI_tab(npfts));VRNXI_tab=0._r8
   allocate(rLen2WidthLeaf_tab(npfts));rLen2WidthLeaf_tab=0._r8
@@ -243,6 +245,7 @@ module PlantTraitTableMod
   use abortutils, only : destroy
   implicit none
 
+  call destroy(MorphogenBase_tab)
   call destroy(iPlantPhotosynthesisType_tab)
   call destroy(iPlantRootProfile_tab)
   call destroy(iPlantPhenolPattern_tab)
