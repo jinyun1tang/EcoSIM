@@ -122,6 +122,9 @@ implicit none
   NK_col(NX,1) = 14
 
   do NY=1, NYS
+    !ET variable set in SetHourlyDiagnostics unclear if a clone is
+    !needed as with SetHourlyAccumulators
+    QVegET_col(NY,NX) = 0._r8
     call SetHourlyAccumulatorsATS(NY,NX)
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
