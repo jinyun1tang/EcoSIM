@@ -183,6 +183,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: dz
      type (BGCMatrixDouble) :: plant_wilting_factor
      type (BGCMatrixDouble) :: rooting_depth_fraction
+     type (BGCVectorDouble)  :: column_area
      type (BGCVectorDouble)  :: shortwave_radiation
      type (BGCVectorDouble) :: longwave_radiation
      type (BGCVectorDouble) :: air_temperature

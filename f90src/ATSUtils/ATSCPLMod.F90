@@ -90,6 +90,15 @@ contains
      a_AreaZ(i,1) = a_Volume(i,1)/a_dz(i,1)
   end do
 
+  call c_f_pointer(props%column_area%data, data, (/num_cols/))
+  column_area = data(:)
+
+  do j = 1, num_cols
+    do i = 1, size_col
+      write(*,*) "i,j: ", i,j, " a_Area3: ", a_Area3(i,j), " a_AreaZ: ", a_AreaZ(i,j), " column_area: ", column_area(j)
+    end do
+  end do
+
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP = data2D(:,:)
@@ -223,20 +232,20 @@ contains
   call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
   a_CanopyWat = data(:)
 
-  call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
-  a_ET = data(:)
+  !call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
+  !a_ET = data(:)
 
-  call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
-  a_EvapGrnd = data(:)
+  !call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
+  !a_EvapGrnd = data(:)
 
-  call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
-  a_EvapLitr  = data(:)
+  !call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
+  !a_EvapLitr  = data(:)
 
-  call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
-  a_EvapSnow = data(:)
+  !call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
+  !a_EvapSnow = data(:)
 
-  call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
-  a_Sublim = data(:)
+  !call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
+  !a_Sublim = data(:)
 
   !call c_f_pointer(state%canopy_height%data, data, (/num_cols/))
   !surf_canopy_height = data(:)
