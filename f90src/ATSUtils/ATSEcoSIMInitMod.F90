@@ -127,8 +127,8 @@ implicit none
       !AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
       AREA_3D(3,L,NY,NX)=column_area(NY)
       !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
-      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
-      SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)
+      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
+      SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
