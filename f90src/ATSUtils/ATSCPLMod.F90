@@ -123,9 +123,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_LSAT = data2D(:,:)
 
-  data_ptr = props%relative_permeability%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_RELPERM = data2D(:,:)
+  !Relative permeability is not needed
+  !data_ptr = props%relative_permeability%data
+  !call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  !a_RELPERM = data2D(:,:)
 
   data_ptr = state%hydraulic_conductivity%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])

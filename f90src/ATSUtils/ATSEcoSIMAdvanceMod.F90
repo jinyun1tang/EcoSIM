@@ -169,17 +169,17 @@ implicit none
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
-      SoiBulkDensityt0_vr(L,NY,NX) = a_BKDSI(L,NY)/1.0e3_r8
+      SoilBulkDensity_vr(L,NY,NX)  = a_BKDSI(L,NY)/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
       !Convert ATS units (mols) to EcoSIM units (mH2O)
       VLWatMicP1_vr(L,NY,NX)       = a_WC(L,NY)/(a_LDENS(L,NY)*AREA_3D(3,NU_col(NY,NX),NY,NX))
-      !VLWatMicP1_vr(L,NY,NX)      = a_WC(L,NY)/(a_LDENS(L,NY))
+
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
-      SoilFracAsMicP_vr(L,NY,NX)   = 1.0
+      SoilFracAsMicP_vr(L,NY,NX)   = 1.0 !This is percentage of Soil void that is micropores (100% for now)
       !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
       PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)/1.0e6
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
@@ -187,8 +187,9 @@ implicit none
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
 
       !Additional parameters for phenology
-      VLSoilPoreMicP_vr(L,NY,NX) = SoilFracAsMicP_vr(L,NY,NX) !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered
-      VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
+      !VLSoilPoreMicP_vr(L,NY,NX) = SoilFracAsMicP_vr(L,NY,NX) !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered
+      !VLSoilPoreMicP_vr(L,NY,NX) =
+      !VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX) !soil moisture
       !HYCDMicP4RootUptake_vr(L,NY,NX) = PSISM1_vr(L,NY,NX)!soil hydraulic conductivity for water uptake
       HYCDMicP4RootUptake_vr(L,NY,NX) = 0.000571
@@ -196,9 +197,10 @@ implicit none
 
       !Parameters needed for water balance after phenology is added:
       !Do I need to compute VGeom or is it already there
-      FracSoiAsMicP_vr(L,NY,NX)  = 0.1 !
+      FracSoiAsMicP_vr(L,NY,NX)  = POROS_vr(L,NY,NX)*SoilFracAsMicP_vr(L,NY,NX)
       VGeomLayer_vr(L,NY,NX)     = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
       VLSoilMicPMass_vr(L,NY,NX) = SoilBulkDensity_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
 
