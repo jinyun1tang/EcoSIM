@@ -260,6 +260,7 @@ module PlantPhenolMod
   integer :: NB
   character(len=*), parameter :: subname='root_shoot_branching'
   integer :: BranchNumber_new
+  logical :: checkRootInitializer
 ! begin_execution
   associate(                                                                 &
     CanopyNonstElmConc_pft       => plt_biom%CanopyNonstElmConc_pft         ,& !input  :canopy nonstructural element concentration, [g d-2]
@@ -268,7 +269,7 @@ module PlantPhenolMod
     doInitPlant_pft              => plt_pheno%doInitPlant_pft               ,& !input  :PFT initialization flag:0=no,1=yes,[-]
     iPlantPhenolPattern_pft      => plt_pheno%iPlantPhenolPattern_pft       ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantTurnoverPattern_pft    => plt_pheno%iPlantTurnoverPattern_pft     ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
-    MinNonstC2InitRoot_pft       => plt_pheno%MinNonstC2InitRoot_pft        ,& !input  :threshold root nonstructural C content for initiating new root axis, [gC gC-1]
+    NonstCMinCon2InitRoot_pft    => plt_pheno%NonstCMinCon2InitRoot_pft     ,& !input  :threshold root nonstructural C content for initiating new root axis, [gC gC-1]
     MatureGroup_pft              => plt_pheno%MatureGroup_pft               ,& !input  :acclimated plant maturity group, [-]
     NonstCMinConc2InitBranch_pft => plt_pheno%NonstCMinConc2InitBranch_pft  ,& !input  :branch nonstructural C content required for new branch, [gC gC-1]
     PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
@@ -355,17 +356,17 @@ module PlantPhenolMod
       !     CanopyNonstElmConc_pft: canopy nonstructural element concentration
       !     PSIRootTurg_vr: root turgor pressure
       !     SeasonalNonstElms_pft: non-structural carbon
-      !     root axis initialization
-      !   if(I>176)print*,'rootaxis'
-      IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
+      !     root axis initialization      
+      IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN !water condition met
         IF(NumPrimeRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumPrimeRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
 
-          IF((NumPrimeRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
-            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.MinNonstC2InitRoot_pft(NZ) & 
-            .AND. MinNonstC2InitRoot_pft(NZ).GT.0.0_r8))THEN
-            NumPrimeRootAxes_pft(NZ)=MIN(NumCanopyLayers1,NumPrimeRootAxes_pft(NZ)+1)
-            iPlantRootState_pft(NZ)=iLive
+          checkRootInitializer= (NumPrimeRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &                  !storage/seed 
+            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinCon2InitRoot_pft(NZ) .AND. NonstCMinCon2InitRoot_pft(NZ).GT.0.0_r8) !plant status
+
+          IF(checkRootInitializer)THEN
+            NumPrimeRootAxes_pft(NZ) = MIN(MaxNumRootAxes,NumPrimeRootAxes_pft(NZ)+1)
+            iPlantRootState_pft(NZ)  = iLive
           ENDIF
         ENDIF
       ENDIF

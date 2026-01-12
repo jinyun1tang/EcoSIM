@@ -61,7 +61,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: Root1stMaxRadius_tab(:)
   real(r8), target, allocatable :: Root2ndMaxRadius_tab(:)
   real(r8), target, allocatable :: RootPorosity_tab(:)
-  real(r8), target, allocatable :: MinNonstC2InitRoot_tab(:)
+  real(r8), target, allocatable :: NonstCMinCon2InitRoot_tab(:)
   real(r8), target, allocatable :: RootRadialResist_tab(:)
   real(r8), target, allocatable :: RootAxialResist_tab(:)
   real(r8), target, allocatable :: ShutRutNonstElmntConducts_tab(:)
@@ -181,7 +181,7 @@ module PlantTraitTableMod
   allocate(Root1stMaxRadius_tab(npfts));Root1stMaxRadius_tab=0._r8
   allocate(Root2ndMaxRadius_tab(npfts));Root2ndMaxRadius_tab=0._r8
   allocate(RootPorosity_tab(npfts));RootPorosity_tab=0._r8
-  allocate(MinNonstC2InitRoot_tab(npfts));MinNonstC2InitRoot_tab=0._r8
+  allocate(NonstCMinCon2InitRoot_tab(npfts));NonstCMinCon2InitRoot_tab=0._r8
   allocate(RootRadialResist_tab(npfts));RootRadialResist_tab=0._r8
   allocate(RootAxialResist_tab(npfts));RootAxialResist_tab=0._r8
   allocate(ShutRutNonstElmntConducts_tab(npfts));ShutRutNonstElmntConducts_tab=0._r8
@@ -301,7 +301,7 @@ module PlantTraitTableMod
   call destroy(Root1stMaxRadius_tab)
   call destroy(Root2ndMaxRadius_tab)
   call destroy(RootPorosity_tab)
-  call destroy(MinNonstC2InitRoot_tab)
+  call destroy(NonstCMinCon2InitRoot_tab)
   call destroy(RootRadialResist_tab)
   call destroy(RootAxialResist_tab)
   call destroy(ShutRutNonstElmntConducts_tab)

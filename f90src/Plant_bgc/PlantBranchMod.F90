@@ -962,7 +962,7 @@ module PlantBranchMod
     icarbhyro                   => pltpar%icarbhyro                       ,& !input  :kinetic id of litter component as carbonhydrate
     icwood                      => pltpar%icwood                          ,& !input  :group id of coarse woody litter
     ifoliar                     => pltpar%ifoliar                         ,& !input  :group id of plant foliar litter
-    FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm     => plt_allom%FracShootElmAllocm      ,& !input  :woody element allocation, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
     rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
@@ -1039,11 +1039,11 @@ module PlantBranchMod
       D6310: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           dleaf = AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ)-RemobledLeafElm(NE))*Frac2fall
-          dFall = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dleaf*FracShootLeafAlloc2Litr(NE,k_woody_comp)
+          dFall = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dleaf*FracShootElmAllocm(NE,k_woody_comp)
           LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)              = LitrFallElms_brch(NE,NB,NZ)+dFall
 
-          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*dleaf*FracShootLeafAlloc2Litr(NE,k_fine_comp)
+          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*dleaf*FracShootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) +dFall
           LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
         ENDDO
@@ -1117,11 +1117,11 @@ module PlantBranchMod
     ELSE        
       D6315: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          dFall=PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*FracShootLeafAlloc2Litr(NE,k_woody_comp)
+          dFall=PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*FracShootElmAllocm(NE,k_woody_comp)
           LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)  =LitrFallElms_brch(NE,NB,NZ)+dFall  
 
-          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*FracShootLeafAlloc2Litr(NE,k_fine_comp)
+          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*FracShootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)  =LitrFallElms_brch(NE,NB,NZ)+dFall  
             
@@ -1665,7 +1665,7 @@ module PlantBranchMod
   associate(                                                           &
     LeafElmntNode_brch        => plt_biom%LeafElmntNode_brch          ,& !input  :leaf element, [g d-2]
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch         ,& !input  :branch stalk structural element mass, [g d-2]
-    PetoleProteinC_node   => plt_biom%PetoleProteinC_node     ,& !input  :layer sheath protein C, [g d-2]
+    PetoleProteinC_node       => plt_biom%PetoleProteinC_node         ,& !input  :layer sheath protein C, [g d-2]
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft         ,& !input  :parameter for allocation of growth to nodes, [-]
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft    ,& !input  :plant growth habit: annual or perennial,[-]
@@ -1674,7 +1674,7 @@ module PlantBranchMod
     rLen2WidthLeaf_pft        => plt_morph%rLen2WidthLeaf_pft         ,& !input  :leaf length:width ratio, [-]
     SeedDepth_pft             => plt_morph%SeedDepth_pft              ,& !input  :seeding depth, [m]
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft          ,& !input  :id number of main branch,[-]
-    PetoleLength_node       => plt_morph%PetoleLength_node        ,& !input  :sheath height, [m]
+    PetoleLength_node         => plt_morph%PetoleLength_node          ,& !input  :sheath height, [m]
     BranchNumerID_brch        => plt_morph%BranchNumerID_brch         ,& !input  :branch meric id, [-]
     CanopyHeightZ_col         => plt_morph%CanopyHeightZ_col          ,& !input  :canopy layer height, [m]
     LeafAngleClass_pft        => plt_morph%LeafAngleClass_pft         ,& !input  :fractionction of leaves in different angle classes, [-]
@@ -1682,7 +1682,7 @@ module PlantBranchMod
     PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     SineLeafAngle             => plt_rad%SineLeafAngle                ,& !input  :sine of leaf angle,[-]
-    LeafLayerElms_node  => plt_biom%LeafLayerElms_node    ,& !inoput :layer leaf element, [g d-2]
+    LeafLayerElms_node        => plt_biom%LeafLayerElms_node          ,& !inoput :layer leaf element, [g d-2]
     CanopyLeafCLyr_pft        => plt_biom%CanopyLeafCLyr_pft          ,& !inoput :canopy layer leaf C, [g d-2]
     CanopyLeafArea_lnode      => plt_morph%CanopyLeafArea_lnode       ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     StalkNodeHeight_brch      => plt_morph%StalkNodeHeight_brch       ,& !inoput :internode height, [m]
@@ -2266,7 +2266,7 @@ module PlantBranchMod
     iPlantTurnoverPattern_pft         => plt_pheno%iPlantTurnoverPattern_pft          ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     PlantElmAllocMat4Litr             => plt_soilchem%PlantElmAllocMat4Litr           ,& !input  :litter kinetic fraction, [-]
     FracShootPetolAlloc2Litr          => plt_allom%FracShootPetolAlloc2Litr           ,& !input  :leaf element allocation,[-]
-    FracShootLeafAlloc2Litr           => plt_allom%FracShootLeafAlloc2Litr            ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm           => plt_allom%FracShootElmAllocm            ,& !input  :woody element allocation, [-]
     HourReq4LeafOut_brch              => plt_pheno%HourReq4LeafOut_brch               ,& !input  :hours above threshold temperature required for spring leafout/dehardening, [-]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft              ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -2371,13 +2371,13 @@ module PlantBranchMod
         HourFailGrainFill_brch(NB,NZ) = 0._r8
         D5330: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            dFall= PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracShootLeafAlloc2Litr(NE,k_woody_comp) &
+            dFall= PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracShootElmAllocm(NE,k_woody_comp) &
               +PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(PetoleStrutElms_brch(NE,NB,NZ))*FracShootPetolAlloc2Litr(NE,k_woody_comp)
 
             LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) +dFall
             LitrFallElms_brch(NE,NB,NZ)              = LitrFallElms_brch(NE,NB,NZ)+dFall
 
-            dFall= PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracShootLeafAlloc2Litr(NE,k_fine_comp) &
+            dFall= PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracShootElmAllocm(NE,k_fine_comp) &
               +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*AZMAX1(PetoleStrutElms_brch(NE,NB,NZ))*FracShootPetolAlloc2Litr(NE,k_fine_comp)
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) +dFall
             LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
@@ -3830,7 +3830,7 @@ module PlantBranchMod
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
-    FracShootLeafAlloc2Litr     => plt_allom%FracShootLeafAlloc2Litr      ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm     => plt_allom%FracShootElmAllocm      ,& !input  :woody element allocation, [-]
     rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
@@ -3912,12 +3912,12 @@ module PlantBranchMod
       D6300: DO M=1,jsken
         DO NE=1,NumPlantChemElms
           dRemoblE = AZMAX1(LeafEKill(NE)-LeafEcycl(NE))
-          dFall    = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dRemoblE*FracShootLeafAlloc2Litr(NE,k_woody_comp)
+          dFall    = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dRemoblE*FracShootElmAllocm(NE,k_woody_comp)
 
           LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) +dFall
           LitrFallElms_brch(NE,NB,NZ)              = LitrFallElms_brch(NE,NB,NZ)+dFall
 
-          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*dRemoblE*FracShootLeafAlloc2Litr(NE,k_fine_comp)
+          dFall=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*dRemoblE*FracShootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+dFall
           LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
         ENDDO

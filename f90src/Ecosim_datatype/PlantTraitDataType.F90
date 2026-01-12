@@ -14,9 +14,9 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootLeafAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracShootElmAllocm(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
   real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
@@ -187,8 +187,8 @@ contains
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
   allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
-  allocate(FracShootLeafAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafAlloc2Litr=0._r8
-  allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
+  allocate(FracShootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootElmAllocm=0._r8
+  allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
@@ -357,8 +357,8 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootLeafAlloc2Litr)
-  call destroy(FracRootElmAlloc2Litr)
+  call destroy(FracShootElmAllocm)
+  call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
   call destroy(CanopyLeafArea_pft)

@@ -188,7 +188,7 @@ module InitPlantMod
     iprotein                  => pltpar%iprotein                      ,& !input  :kinetic id of litter component as protein
     iroot                     => pltpar%iroot                         ,& !input  :group id of plant root litter
     istalk                    => pltpar%istalk                        ,& !input  :group id of plant stalk litter group
-    PlantElmAllocMat4Litr          => plt_soilchem%PlantElmAllocMat4Litr        ,& !inoput :litter kinetic fraction, [-]
+    PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr   ,& !inoput :litter kinetic fraction, [-]
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft         ,& !output :parameter for allocation of growth to nodes, [-]
     NumCogrowthNode_pft       => plt_morph%NumCogrowthNode_pft         & !output :number of concurrently growing nodes,[-]
   )
@@ -384,13 +384,13 @@ module InitPlantMod
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
     !Annual plant (e.g.crops) or grass or bryophyte
     !The following may be revised for maize or soybean, or crops in general
-    FracGroth2Node_pft(NZ)=1.0_r8
+    FracGroth2Node_pft(NZ) = 1.0_r8
     IF(MatureGroup_pft(NZ).LE.10)THEN
-      NumCogrowthNode_pft(NZ)=3
+      NumCogrowthNode_pft(NZ) = 3
     ELSEIF(MatureGroup_pft(NZ).LE.15)THEN
-      NumCogrowthNode_pft(NZ)=4
+      NumCogrowthNode_pft(NZ) = 4
     ELSE
-      NumCogrowthNode_pft(NZ)=5
+      NumCogrowthNode_pft(NZ) = 5
     ENDIF
   ELSE
     !perrenial tree-like
@@ -408,16 +408,16 @@ module InitPlantMod
   real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
   real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
 
-  associate(                                                           &
-    DATAP                     => plt_site%DATAP                       ,& !input  :parameter file name,[-]
+  associate(                                                                   &
+    DATAP                         => plt_site%DATAP                           ,& !input  :parameter file name,[-]
     PlantInitThermoAdaptZone_pft  => plt_pheno%PlantInitThermoAdaptZone_pft   ,& !input  :initial plant thermal adaptation zone, [-]
-    iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
-    TempOffset_pft            => plt_pheno%TempOffset_pft             ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-    rPlantThermoAdaptZone_pft => plt_pheno%rPlantThermoAdaptZone_pft  ,& !output :plant thermal adaptation zone, [-]
-    HighTempLimitSeed_pft     => plt_pheno%HighTempLimitSeed_pft      ,& !output :temperature above which seed set is adversely affected, [oC]
-    SeedTempSens_pft          => plt_pheno%SeedTempSens_pft           ,& !output :sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
-    TC4LeafOff_pft            => plt_pheno%TC4LeafOff_pft             ,& !output :threshold temperature for autumn leafoff/hardening, [oC]
-    TC4LeafOut_pft            => plt_pheno%TC4LeafOut_pft              & !output :threshold temperature for spring leafout/dehardening, [oC]
+    iPlantPhotosynthesisType      => plt_photo%iPlantPhotosynthesisType       ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    TempOffset_pft                => plt_pheno%TempOffset_pft                 ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+    rPlantThermoAdaptZone_pft     => plt_pheno%rPlantThermoAdaptZone_pft      ,& !output :plant thermal adaptation zone, [-]
+    HighTempLimitSeed_pft         => plt_pheno%HighTempLimitSeed_pft          ,& !output :temperature above which seed set is adversely affected, [oC]
+    SeedTempSens_pft              => plt_pheno%SeedTempSens_pft               ,& !output :sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
+    TC4LeafOff_pft                => plt_pheno%TC4LeafOff_pft                 ,& !output :threshold temperature for autumn leafoff/hardening, [oC]
+    TC4LeafOut_pft                => plt_pheno%TC4LeafOut_pft                  & !output :threshold temperature for spring leafout/dehardening, [oC]
   )
 !
 !     PFT THERMAL ACCLIMATION
@@ -561,6 +561,7 @@ module InitPlantMod
   CoarseRootVolPerMassC_pft(NZ) = 1.e-6/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ)))
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ)   = RootPorosity_pft(N,NZ)**1.33_r8
+    !Lemon, 1962, Soil Aeration and Plant Root Relations I. Theory, Figure 1.
     RootRaidus_rpft(N,NZ)         = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ))))
     FineRootVolPerMassC_pft(N,NZ) = 1.e-6_r8/(BlkDensFineRoots*(1.0_r8-RootPorosity_pft(N,NZ)))    !0.05gC cm-3, ~ 0.10g cm-3.
     Root1stSpecLen_pft(N,NZ)      = FineRootVolPerMassC_pft(N,NZ)/(PICON*Root1stMaxRadius_pft(N,NZ)**2)
@@ -767,12 +768,12 @@ module InitPlantMod
   ENDDO D35
   plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
   plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ) = 0._r8
-  plt_biom%CanopyNoduleNonstCConc_pft(NZ)                  = 0._r8
-  plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
+  plt_biom%CanopyNoduleNonstCConc_pft(NZ)                = 0._r8
+  plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)          = 0._r8
   plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%PetoleStrutElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
   plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  plt_biom%CanopySapwoodC_pft(NZ)                          = 0._r8
+  plt_biom%CanopySapwoodC_pft(NZ)                        = 0._r8
   plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
   plt_biom%EarStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
@@ -922,7 +923,7 @@ module InitPlantMod
     CCO2EI_gperm3                 => plt_site%CCO2EI_gperm3                   ,& !input  :initial atmospheric CO2 concentration, [g m-3]
     CO2EI                         => plt_site%CO2EI                           ,& !input  :initial atmospheric CO2 concentration, [umol mol-1]
     COXYE                         => plt_site%COXYE                           ,& !input  :current atmospheric O2 concentration, [g m-3]
-    OrganOsmoPsi0pt_pft             => plt_ew%OrganOsmoPsi0pt_pft                 ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     NL                            => plt_site%NL                              ,& !input  :lowest soil layer number,[-]
     OXYE                          => plt_site%OXYE                            ,& !input  :atmospheric O2 concentration, [umol mol-1]
     Root1stMaxRadius_pft          => plt_morph%Root1stMaxRadius_pft           ,& !input  :maximum radius of primary roots, [m]
@@ -933,10 +934,11 @@ module InitPlantMod
     trcs_rootml_pvr               => plt_rbgc%trcs_rootml_pvr                 ,& !inoput :root aqueous content, [g d-2]
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !output :root osmotic water potential, [Mpa]
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !output :root total water potential, [Mpa]
-    RootPoreVol_pvr               => plt_morph%RootPoreVol_pvr              ,& !output :root layer volume air, [m2 d-2]
-    RootVH2O_pvr                  => plt_morph%RootVH2O_pvr                   ,& !output :root layer volume water, [m2 d-2]
+    RootPoreVol_pvr               => plt_morph%RootPoreVol_pvr                ,& !output :root layer volume air, [m2 d-2]
+    RootVH2O_pvr                  => plt_morph%RootVH2O_pvr                   ,& !output :root space volume occupied by water in each layer, [m2 d-2]   
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !output :root primary axis number,[-]
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !output :root turgor water potential, [Mpa]
+    Root1stTransptArea_pvr        => plt_morph%Root1stTransptArea_pvr         ,& !output :transport area by 1st order root, [m2 d-2]         
     Root1stRadius_pvr             => plt_morph%Root1stRadius_pvr              ,& !output :root layer diameter primary axes, [m]
     Root2ndRadius_rpvr            => plt_morph%Root2ndRadius_rpvr             ,& !output :root layer diameter secondary axes, [m]
     RootN2Fix_pvr                 => plt_bgcr%RootN2Fix_pvr                   ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -983,6 +985,7 @@ module InitPlantMod
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_rpvr(N,L,NZ)                               = Root2ndMaxRadius_pft(N,NZ)
+      Root1stTransptArea_pvr(N,L,NZ)                           = PICON*Root1stMaxRadius_pft(N,NZ)**2      
       plt_morph%RootSAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
       plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)                = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
@@ -1017,10 +1020,10 @@ module InitPlantMod
       ENDDO D30
     ENDDO D40
 
-    plt_morph%Root1stXNumL_rpvr(L,NZ)                      = 0._r8  
+    plt_morph%Root1stXNumL_pvr(L,NZ)                      = 0._r8  
     DO NR=1,MaxNumRootAxes
       plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
-      plt_morph%Root1stLen_rpvr(L,NR,NZ)                             = 0._r8
+      plt_morph%Root1stLenPP_rpvr(L,NR,NZ)                             = 0._r8
       plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
 
@@ -1084,7 +1087,7 @@ module InitPlantMod
   IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed .and. SeasonalNonstElms_pft(ielmc,NZ)>1.e-10_r8)then
     SeedPlantedElm_pft(:,NZ)=0._r8
   else
-    SeedPlantedElm_pft(ielmc,NZ)      = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
+    SeedPlantedElm_pft(ielmc,NZ)    = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
     SeasonalNonstElms_pft(ielmc,NZ) = SeedPlantedElm_pft(ielmc,NZ)
     SeasonalNonstElms_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
     SeasonalNonstElms_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)

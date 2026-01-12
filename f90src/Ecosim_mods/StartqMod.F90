@@ -135,7 +135,7 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer :: N,M
-  real(r8) :: CNOPC(4),CPOPC(4)
+  real(r8) :: CNOPC(jskenc),CPOPC(jskenc)
   REAL(R8) :: CNOPCT,CPOPCT
 
   associate(                                   &
@@ -332,15 +332,14 @@ module StartqMod
       PlantElmAllocMat4Litr(ielmp,N,M,NZ,NY,NX)=PlantElmAllocMat4Litr(ielmc,N,M,NZ,NY,NX)*CPOPC(M)/CPOPCT
     ENDDO D105
   ENDDO D110
-!
-!     CONCURRENT NODE GROWTH
-!
-!     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-!     NumCogrowthNode_pft=number of concurrently growing nodes
-!
+  !
+  !     CONCURRENT NODE GROWTH
+  !
+  !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
+  !     NumCogrowthNode_pft=number of concurrently growing nodes
+  !
   ! deciduous (0) or shallow root (not tree)
-  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
@@ -350,7 +349,7 @@ module StartqMod
     ELSE
       NumCoGrowthNode_pft(NZ,NY,NX)=5
     ENDIF
-  !non-deciduous  
+    !non-deciduous  
   ELSE
     FracGroth2Node_pft(NZ,NY,NX) =AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
     NumCoGrowthNode_pft(NZ,NY,NX)=24
@@ -464,12 +463,12 @@ module StartqMod
   !
   CoarseRootVolPerMassC_pft(NZ,NY,NX) = 1.e-6_r8/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ,NY,NX)))
   D500: DO N=1,2
-    RootPoreTortu4Gas_pft(N,NZ,NY,NX) = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
-    RootRaidus_rpft(N,NZ,NY,NX)       = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
-    FineRootVolPerMassC_pft(N,NZ,NY,NX)   = 1.e-6_r8/(0.05_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))  ![50 kgC m-3 root biomass]
-    Root1stSpecLen_pft(N,NZ,NY,NX)    = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
-    Root2ndSpecLen_pft(N,NZ,NY,NX)    = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
-    Root1stMaxRadius1_pft(N,NZ,NY,NX) = Root1stMaxRadius_pft(N,NZ,NY,NX)
+    RootPoreTortu4Gas_pft(N,NZ,NY,NX)   = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
+    RootRaidus_rpft(N,NZ,NY,NX)         = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))
+    FineRootVolPerMassC_pft(N,NZ,NY,NX) = 1._r8/(50.e3_r8*(1.0_r8-RootPorosity_pft(N,NZ,NY,NX)))         ![50 kgC m-3 root biomass]
+    Root1stSpecLen_pft(N,NZ,NY,NX)      = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root1stMaxRadius_pft(N,NZ,NY,NX)**2)
+    Root2ndSpecLen_pft(N,NZ,NY,NX)      = FineRootVolPerMassC_pft(N,NZ,NY,NX)/(PICON*Root2ndMaxRadius_pft(N,NZ,NY,NX)**2)
+    Root1stMaxRadius1_pft(N,NZ,NY,NX)   = Root1stMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
     Root2ndMaxRadius1_pft(N,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
@@ -800,10 +799,10 @@ module StartqMod
       ENDDO D30
 
     ENDDO D40
-    Root1stXNumL_rpvr(L,NZ,NY,NX)             = 0._r8      
+    Root1stXNumL_pvr(L,NZ,NY,NX)             = 0._r8      
     DO NR=1,MaxNumRootAxes
       RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
-      Root1stLen_rpvr(L,NR,NZ,NY,NX)                              = 0._r8
+      Root1stLenPP_rpvr(L,NR,NZ,NY,NX)                              = 0._r8
       RootAge_rpvr(L,NR,NZ,NY,NX)                                 = 0._r8
     ENDDO
     D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs

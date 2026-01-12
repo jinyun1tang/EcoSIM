@@ -153,7 +153,7 @@ implicit none
     ENDDO
 
     DO L=1,NK_col(NY,NX)
-      plt_morph%Root1stXNumL_rpvr(L,NZ)  = Root1stXNumL_rpvr(L,NZ,NY,NX)    
+      plt_morph%Root1stXNumL_pvr(L,NZ)  = Root1stXNumL_pvr(L,NZ,NY,NX)    
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)

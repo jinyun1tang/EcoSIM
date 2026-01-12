@@ -1404,7 +1404,7 @@ module PlantDisturbsMod
     ZERO4LeafVar_pft            => plt_biom%ZERO4LeafVar_pft              ,& !input  :threshold zero for leaf calculation, [-]
     THIN_pft                    => plt_distb%THIN_pft                     ,& !input  :thinning of plant population, [-]
     LeafStrutElms_pft           => plt_biom%LeafStrutElms_pft             ,& !input  :canopy leaf structural element mass, [g d-2]
-    FracShootLeafAlloc2Litr => plt_allom%FracShootLeafAlloc2Litr    ,& !input  :leaf element allocation,[-]
+    FracShootElmAllocm => plt_allom%FracShootElmAllocm    ,& !input  :leaf element allocation,[-]
     iHarvstType_pft             => plt_distb%iHarvstType_pft              ,& !input  :type of harvest,[-]
     LeafLayerElms_node    => plt_biom%LeafLayerElms_node      ,& !inoput :layer leaf element, [g d-2]
     CanopyStalkArea_lbrch       => plt_morph%CanopyStalkArea_lbrch        ,& !inoput :plant canopy layer branch stem area, [m2 d-2]
@@ -1496,16 +1496,16 @@ module PlantDisturbsMod
           FracHvst2Litr          = FHVSH-FrcLeafMassLeft
           DO NE = 1, NumPlantChemElms
             LeafElmntRemoval(NE)=LeafElmntRemoval(NE) &
-              +FracHarvested*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_fine_comp)
+              +FracHarvested*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootElmAllocm(NE,k_fine_comp)
 
             LeafElmntHarv2Litr(NE)=LeafElmntHarv2Litr(NE) &
-              +FracHvst2Litr*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_fine_comp)
+              +FracHvst2Litr*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootElmAllocm(NE,k_fine_comp)
 
             WoodyElmntRemoval(NE)=WoodyElmntRemoval(NE) &
-              +FracHarvested*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_woody_comp)
+              +FracHarvested*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootElmAllocm(NE,k_woody_comp)
 
             WoodyElmntHarv2Litr(NE)=WoodyElmntHarv2Litr(NE) &
-              +FracHvst2Litr*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootLeafAlloc2Litr(NE,k_woody_comp)
+              +FracHvst2Litr*LeafLayerElms_node(NE,L,K,NB,NZ)*FracShootElmAllocm(NE,k_woody_comp)
             LeafLayerElms_node(NE,L,K,NB,NZ)=FrcLeafMassLeft*LeafLayerElms_node(NE,L,K,NB,NZ)
           ENDDO
 !
@@ -1768,7 +1768,7 @@ module PlantDisturbsMod
     THIN_pft                  => plt_distb%THIN_pft                  ,& !input  :thinning of plant population, [-]
     NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
     DCORP                     => plt_distb%DCORP                     ,& !input  :soil mixing fraction with tillage, [-]
-    FracRootElmAlloc2Litr     => plt_allom%FracRootElmAlloc2Litr     ,& !input  :C woody fraction in root,[-]
+    FracRootElmAllocm     => plt_allom%FracRootElmAllocm     ,& !input  :C woody fraction in root,[-]
     k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
     k_woody_comp              => pltpar%k_woody_comp                 ,& !input  :woody litter complex id
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !input  :root layer element secondary axes, [g d-2]
@@ -1806,7 +1806,7 @@ module PlantDisturbsMod
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
           FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
-            *FracRootElmAlloc2Litr(NE,k_woody_comp)
+            *FracRootElmAllocm(NE,k_woody_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
             (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
         ENDDO
@@ -1814,7 +1814,7 @@ module PlantDisturbsMod
 
       DO NE=1,NumPlantChemElms
         FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
-          *FracRootElmAlloc2Litr(NE,k_woody_comp)
+          *FracRootElmAllocm(NE,k_woody_comp)
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
           (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
       ENDDO
@@ -1824,7 +1824,7 @@ module PlantDisturbsMod
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
           FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
-            *FracRootElmAlloc2Litr(NE,k_fine_comp)
+            *FracRootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
             +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
         ENDDO
@@ -1832,7 +1832,7 @@ module PlantDisturbsMod
 
       DO NE=1,NumPlantChemElms
         FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
-          *FracRootElmAlloc2Litr(NE,k_fine_comp)
+          *FracRootElmAllocm(NE,k_fine_comp)
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
           +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
       ENDDO
@@ -1874,12 +1874,12 @@ module PlantDisturbsMod
     k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !inoput :root layer element primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !inoput :root layer element secondary axes, [g d-2]
-    Root1stLen_rpvr           => plt_morph%Root1stLen_rpvr           ,& !inoput :root layer length primary axes, [m d-2]
+    Root1stLenPP_rpvr           => plt_morph%Root1stLenPP_rpvr           ,& !inoput :root layer length primary axes, [m d-2]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !inoput :root layer length secondary axes, [m d-2]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !inoput :root layer nonstructural element, [g d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !inoput :root layer number secondary axes, [d-2]
     RootProteinC_pvr          => plt_biom%RootProteinC_pvr           ,& !inoput :root layer protein C, [gC d-2]
-    Root1stXNumL_rpvr         => plt_morph%Root1stXNumL_rpvr         ,& !inoput :root layer number primary axes, [d-2]
+    Root1stXNumL_pvr         => plt_morph%Root1stXNumL_pvr         ,& !inoput :root layer number primary axes, [d-2]
     Root2ndXNumL_rpvr         => plt_morph%Root2ndXNumL_rpvr         ,& !inoput :root layer number axes, [d-2]
     RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr    ,& !inoput :root layer length per plant, [m p-1]
     RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr   ,& !inoput :root layer length density, [m m-3]
@@ -1902,7 +1902,7 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     Root1stLen_rpvr,Root2ndLen_rpvr=primary,secondary root length
+!     Root1stLenPP_rpvr,Root2ndLen_rpvr=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=active,actual root C mass
@@ -1918,9 +1918,9 @@ module PlantDisturbsMod
         DO NE=1,NumPlantChemElms
           RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         ENDDO
-        Root1stLen_rpvr(L,NR,NZ)  = Root1stLen_rpvr(L,NR,NZ)*FracLeftThin        
+        Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracLeftThin        
       ENDDO
-      Root1stXNumL_rpvr(L,NZ)        = Root1stXNumL_rpvr(L,NZ)*FracLeftThin      
+      Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*FracLeftThin      
     ENDIF
 
     D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)

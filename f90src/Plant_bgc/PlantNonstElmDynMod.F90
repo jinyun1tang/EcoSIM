@@ -337,8 +337,8 @@ module PlantNonstElmDynMod
     NU                            => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
     Myco_pft                      => plt_morph%Myco_pft                       ,& !input  :mycorrhizal type (no or yes),[-]
     RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr       ,& !input  :root layer element secondary axes, [g d-2]
-    FracShootLeafAlloc2Litr       => plt_allom%FracShootLeafAlloc2Litr        ,& !input  :woody element allocation, [-]
-    FracRootElmAlloc2Litr         => plt_allom%FracRootElmAlloc2Litr          ,& !input  :C woody fraction in root,[-]
+    FracShootElmAllocm       => plt_allom%FracShootElmAllocm        ,& !input  :woody element allocation, [-]
+    FracRootElmAllocm         => plt_allom%FracRootElmAllocm          ,& !input  :C woody fraction in root,[-]
     RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs             ,& !input  :root C primary axes, [g d-2]
     Root1stDepz_raxes             => plt_morph%Root1stDepz_raxes              ,& !input  :root layer depth, [m]    
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
@@ -491,8 +491,8 @@ module PlantNonstElmDynMod
       !on a wheel or branches on a river. They do not typically exchange carbon directly with each other deep underground.
 
       D415: DO L=NU,MaxSoiL4Root_pft(NZ)
-        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootLeafAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC
-        WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
+        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracShootElmAllocm(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC
+        WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAllocm(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
         WTLSBB       = AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR       = AZMAX1(WTRTLX,FSNK*WTLSBX)
         TwoCompMassC = WTLSBB+WTRTLR
@@ -716,7 +716,7 @@ module PlantNonstElmDynMod
     SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
     VLSoilPoreMicP_vr       => plt_soilchem%VLSoilPoreMicP_vr     ,& !input  :volume of soil layer, [m3 d-2]
     RootMycoActiveBiomC_pvr => plt_biom%RootMycoActiveBiomC_pvr   ,& !input  :root layer structural C, [gC d-2]
-    FracRootElmAlloc2Litr   => plt_allom%FracRootElmAlloc2Litr    ,& !input  :C woody fraction in root,[-]
+    FracRootElmAllocm   => plt_allom%FracRootElmAllocm    ,& !input  :C woody fraction in root,[-]
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
     MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
@@ -726,7 +726,7 @@ module PlantNonstElmDynMod
   D2050: DO L=NU,MaxSoiL4Root_pft(NZ)
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
       !nonstructural chemical transport through sapwood/phloem
-      WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAlloc2Litr(ielmc,k_woody_comp))
+      WTRTRX = AMAX1(ZERO4Groth_pft(NZ),RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAllocm(ielmc,k_woody_comp))
       WTPLTX = WTRTRX+SapwoodBiomassC_brch(NB,NZ)
       IF(WTPLTX.GT.ZERO4Groth_pft(NZ))THEN
         CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*SapwoodBiomassC_brch(NB,NZ) &
