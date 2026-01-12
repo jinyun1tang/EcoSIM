@@ -174,7 +174,7 @@ module InitPlantMod
   associate(                                                           &
     MatureGroup_pft           => plt_pheno%MatureGroup_pft            ,& !input  :acclimated plant maturity group, [-]
     NumLitterGroups           => pltpar%NumLitterGroups               ,& !input  :number of litter groups nonstructural(0,*)
-    RefLeafAppearRate_pft     => plt_pheno%RefLeafAppearRate_pft      ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    RateRefLeafAppearance_pft     => plt_pheno%RateRefLeafAppearance_pft      ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft         ,& !input  :N2 fixation type,[-]
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
@@ -394,7 +394,7 @@ module InitPlantMod
     ENDIF
   ELSE
     !perrenial tree-like
-    FracGroth2Node_pft(NZ)  = AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ))
+    FracGroth2Node_pft(NZ)  = AMAX1(1.0_r8,0.04_r8/RateRefLeafAppearance_pft(NZ))
     NumCogrowthNode_pft(NZ) = MaxNodesPerBranch1-1
   ENDIF
   end associate

@@ -861,7 +861,7 @@ implicit none
     plt_photo%CanopyCi2CaRatio_pft(NZ)                  = CanopyCi2CaRatio_pft(NZ,NY,NX)
 
     plt_pheno%RefNodeInitRate_pft(NZ)        = RefNodeInitRate_pft(NZ,NY,NX)
-    plt_pheno%RefLeafAppearRate_pft(NZ)      = RefLeafAppearRate_pft(NZ,NY,NX)
+    plt_pheno%RateRefLeafAppearance_pft(NZ)      = RateRefLeafAppearance_pft(NZ,NY,NX)
     plt_pheno%TCChill4Seed_pft(NZ)           = TCChill4Seed_pft(NZ,NY,NX)
     plt_morph%rLen2WidthLeaf_pft(NZ)         = rLen2WidthLeaf_pft(NZ,NY,NX)
     plt_pheno%NonstCMinConc2InitBranch_pft(NZ)   = NonstCMinConc2InitBranch_pft(NZ,NY,NX)

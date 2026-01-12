@@ -113,7 +113,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  KLowestGroLeafNode_brch(:,:,:,:)            !leaf growth stage counter, [-]
   integer,target,allocatable ::  KMinNumLeaf4GroAlloc_brch(:,:,:,:)          !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)             !leaf growth stage counter, [-]
-  real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)               !rate of leaf initiation at 25 oC, [h-1]
+  real(r8),target,allocatable ::  RateRefLeafAppearance_pft(:,:,:)               !rate of leaf initiation at 25 oC, [h-1]
   real(r8),target,allocatable ::  rLen2WidthLeaf_pft(:,:,:)                  !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1_pft(:,:,:)                            !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                      !threshold temperature for spring leafout/dehardening, [oC]
@@ -285,7 +285,7 @@ contains
   allocate(KLowestGroLeafNode_brch(MaxNumBranches,JP,JY,JX));KLowestGroLeafNode_brch=0
   allocate(KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP,JY,JX));KMinNumLeaf4GroAlloc_brch=0
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
-  allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
+  allocate(RateRefLeafAppearance_pft(JP,JY,JX));     RateRefLeafAppearance_pft=0._r8
   allocate(rLen2WidthLeaf_pft(JP,JY,JX));     rLen2WidthLeaf_pft=0._r8
   allocate(SLA1_pft(JP,JY,JX));     SLA1_pft=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
@@ -454,7 +454,7 @@ contains
   call destroy(KLowestGroLeafNode_brch)
   call destroy(KMinNumLeaf4GroAlloc_brch)
   call destroy(KHiestGroLeafNode_brch)
-  call destroy(RefLeafAppearRate_pft)
+  call destroy(RateRefLeafAppearance_pft)
   call destroy(rLen2WidthLeaf_pft)
   call destroy(SLA1_pft)
   call destroy(TC4LeafOut_pft)

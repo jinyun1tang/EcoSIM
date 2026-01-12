@@ -900,7 +900,7 @@ module PlantPhenolMod
     DayLenthCurrent                   => plt_site%DayLenthCurrent                     ,& !input  :current daylength of the grid, [h]
     DayLenthPrev                      => plt_site%DayLenthPrev                        ,& !input  :daylength of previous day, [h]
     TKGroth_pft                       => plt_pheno%TKGroth_pft                        ,& !input  :canopy growth temperature, [K]
-    RefLeafAppearRate_pft             => plt_pheno%RefLeafAppearRate_pft              ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    RateRefLeafAppearance_pft             => plt_pheno%RateRefLeafAppearance_pft              ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
     TempOffset_pft                    => plt_pheno%TempOffset_pft                     ,& !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft            ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantPhenolType_pft              => plt_pheno%iPlantPhenolType_pft               ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
@@ -956,7 +956,7 @@ module PlantPhenolMod
     call DebugPrint('TFNP',TFNP)
 
     NodeInitRate   = AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
-    LeafAppearRate = AZMAX1(RefLeafAppearRate_pft(NZ)*TFNP)
+    LeafAppearRate = AZMAX1(RateRefLeafAppearance_pft(NZ)*TFNP)
 !
 !   NODE INITIATION AND LEAF APPEARANCE RATES SLOWED BY LOW TURGOR
 !

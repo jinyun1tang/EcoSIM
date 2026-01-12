@@ -1098,7 +1098,7 @@ module UptakesMod
     RootMatureAge_pft           => plt_morph%RootMatureAge_pft               ,& !input : Root maturation age, [h]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft              ,& !input  :plant population, [d-2]
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
-    Root1stXNumL_pvr           => plt_morph%Root1stXNumL_pvr               ,& !input  :root layer number primary axes, [d-2]
+    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr                ,& !input  :root layer number primary axes, [d-2]
     Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft            ,& !input  :maximum radius of secondary roots, [m]
     Root2ndEffLen4uptk_rpvr     => plt_morph%Root2ndEffLen4uptk_rpvr         ,& !input  :Layer effective root length four resource uptake, [m]
     Root2ndRadius_rpvr          => plt_morph%Root2ndRadius_rpvr              ,& !input  :root layer diameter secondary axes, [m]
@@ -1149,7 +1149,7 @@ module UptakesMod
         .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2                          &
         .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO                 &
         .AND. HYCDMicP4RootUptake_vr(L).GT.ZERO                       &
-        .AND. Root1stXNumL_pvr(L,NZ).GT.ZERO4Groth_pft(NZ)           &
+        .AND. Root1stXNumL_pvr(L,NZ).GT.ZERO4Groth_pft(NZ)            &
         .AND. Root2ndXNumL_rpvr(N,L,NZ).GT.ZERO4Groth_pft(NZ)         &
         .AND. THETW_vr(L).GT.ZERO
         
@@ -1192,10 +1192,11 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         !     Root1stXNumL_pvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
-        if(N.eq.ipltroot .and. is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. RootAge_rpvr(L,1,NZ)>=RootMatureAge_pft(NZ))then
+        if(Root1stRadius_pvr(N,L,NZ) > Root1stMaxRadius1_pft(N,NZ)*2)then
+          !coarse roots
           DTransptTube = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
           AreaTranspt  = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
-          FRAD1        = AreaTranspt/Root2ndMaxRadius_pft(N,NZ)**2
+          FRAD1        = (AreaTranspt/Root1stMaxRadius1_pft(N,NZ)**2)*(Root1stMaxRadius1_pft(N,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
         else
           FRAD1        = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4        
         endif      

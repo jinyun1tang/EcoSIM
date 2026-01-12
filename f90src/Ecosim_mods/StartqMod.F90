@@ -351,7 +351,7 @@ module StartqMod
     ENDIF
     !non-deciduous  
   ELSE
-    FracGroth2Node_pft(NZ,NY,NX) =AMAX1(1.0_r8,0.04_r8/RefLeafAppearRate_pft(NZ,NY,NX))
+    FracGroth2Node_pft(NZ,NY,NX) =AMAX1(1.0_r8,0.04_r8/RateRefLeafAppearance_pft(NZ,NY,NX))
     NumCoGrowthNode_pft(NZ,NY,NX)=24
   ENDIF
   end associate

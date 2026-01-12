@@ -198,7 +198,7 @@ module RootGasMod
     RGas_DisolvSoil_flx(idg_beg:idg_end) = 0.0_r8
     Root_gas2sol_flx(idg_beg:idg_NH3)    = 0.0_r8
     !
-    !     ROOT CONDUCTANCE TO GAS TRANSFER
+    !  ROOT CONDUCTANCE TO GAS TRANSFER
     !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar[m]

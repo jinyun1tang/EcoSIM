@@ -363,7 +363,7 @@ implicit none
   real(r8), pointer :: SeedTempSens_pft(:)           => null()     !sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
   real(r8), pointer :: NetCumElmntFlx2Plant_pft(:,:) => null()     !effect of canopy element status on seed set,            [-]
   real(r8), pointer :: RefNodeInitRate_pft(:)        => null()     !rate of node initiation,                                [h-1 at 25 oC]
-  real(r8), pointer :: RefLeafAppearRate_pft(:)      => null()     !rate of leaf initiation,                                [h-1 at 25 oC]
+  real(r8), pointer :: RateRefLeafAppearance_pft(:)      => null()     !rate of leaf initiation,                                [h-1 at 25 oC]
   real(r8), pointer :: CriticPhotoPeriod_pft(:)      => null()     !critical daylength for phenological progress,           [h]
   real(r8), pointer :: PhotoPeriodSens_pft(:)        => null()     !difference between current and critical daylengths used to calculate  phenological progress, [h]
 
@@ -1920,7 +1920,7 @@ implicit none
   allocate(this%TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP1));this%TotalNodeNumNormByMatgrp_brch=spval
   allocate(this%TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1));this%TotReproNodeNumNormByMatrgrp_brch=spval
   allocate(this%LeafNumberAtFloralInit_brch(MaxNumBranches,JP1));this%LeafNumberAtFloralInit_brch=spval
-  allocate(this%RefLeafAppearRate_pft(JP1));this%RefLeafAppearRate_pft=spval
+  allocate(this%RateRefLeafAppearance_pft(JP1));this%RateRefLeafAppearance_pft=spval
   allocate(this%RefNodeInitRate_pft(JP1));this%RefNodeInitRate_pft=spval
   allocate(this%CriticPhotoPeriod_pft(JP1));this%CriticPhotoPeriod_pft=spval
   allocate(this%PhotoPeriodSens_pft(JP1));this%PhotoPeriodSens_pft=spval

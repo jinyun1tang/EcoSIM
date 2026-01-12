@@ -1766,6 +1766,7 @@ module PlantBranchMod
 
       HeightStalk    = HeightBranchBase+StalkNodeHeight_brch(K,NB,NZ)
       HeightLeafNode = HeightStalk+PetoleLength_node(K,NB,NZ)
+      
       LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopulation_pft(NZ)*FracGroth2Node_pft(NZ))))
 
       !
@@ -3652,6 +3653,7 @@ module PlantBranchMod
   real(r8) :: RespPhenolSenes_brch  !respiration associated with senescence [gC h-1]
   integer :: NBY,NBX,NBL
   integer  :: NBK,NE
+  character(len=*), parameter :: subname='RemobilizeBranch'
 
   associate(                                                           &
     fTCanopyGroth_pft         => plt_pheno%fTCanopyGroth_pft          ,& !input  :canopy temperature growth function, [-]
@@ -3677,7 +3679,7 @@ module PlantBranchMod
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch           & !inoput :branch reserve element mass, [g d-2]
   )
   !     REMOBILIZATION OF STALK RESERVE C,N,P IF GROWTH RESPIRATION < 0
-
+  call PrintInfo('beg '//subname)
   !
   !     RMxess_brch=excess maintenance respiration
   !     WTRSVB=stalk reserve C mass
@@ -3805,6 +3807,7 @@ module PlantBranchMod
       Eco_AutoR_CumYr_col       = Eco_AutoR_CumYr_col-RCO2e
     endif      
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RemobilizeBranch
 
@@ -3836,7 +3839,7 @@ module PlantBranchMod
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
     doSenescence_brch           => plt_pheno%doSenescence_brch            ,& !input  :branch phenology flag, [-]
     doRemobilization_brch       => plt_pheno%doRemobilization_brch        ,& !input  :branch phenology flag, [-]
-    RefLeafAppearRate_pft       => plt_pheno%RefLeafAppearRate_pft        ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    RateRefLeafAppearance_pft       => plt_pheno%RateRefLeafAppearance_pft        ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch       ,& !input  :leaf growth stage counter, [-]
     fTCanopyGroth_pft           => plt_pheno%fTCanopyGroth_pft            ,& !input  :canopy temperature growth function, [-]
     LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
@@ -3865,7 +3868,7 @@ module PlantBranchMod
     KMinGroingLeafNodeNum=MAX(0,KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+1)
     IF(KMinGroingLeafNodeNum.GT.0)THEN
       K    = pMOD(KMinGroingLeafNodeNum,MaxNodesPerBranch1)
-      FSNC = fTCanopyGroth_pft(NZ)*RefLeafAppearRate_pft(NZ)
+      FSNC = fTCanopyGroth_pft(NZ)*RateRefLeafAppearance_pft(NZ)
       !
       !   REMOBILIZATION OF LEAF C,N,P ALSO DEPENDS ON STRUCTURAL C:N:P
       !

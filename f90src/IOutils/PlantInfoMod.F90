@@ -457,7 +457,7 @@ implicit none
 
     IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
       RefNodeInitRate_pft(NZ,NY,NX)        = RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
-      RefLeafAppearRate_pft(NZ,NY,NX)      = RefLeafAppearRate_pft(NZ,NY,NX)/MaxNodesPerBranch
+      RateRefLeafAppearance_pft(NZ,NY,NX)      = RateRefLeafAppearance_pft(NZ,NY,NX)/MaxNodesPerBranch
       MatureGroup_pft(NZ,NY,NX)            = MatureGroup_pft(NZ,NY,NX)/MaxNodesPerBranch
       ShootNodeNumAtPlanting_pft(NZ,NY,NX) = ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
@@ -527,7 +527,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmis_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'XRLA', loc, RefLeafAppearRate_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRLA', loc, RateRefLeafAppearance_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CTC', loc, TCChill4Seed_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
   call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
@@ -677,7 +677,7 @@ implicit none
   RadPARLeafTransmis_pft(NZ,NY,NX) = RadPARLeafTransmis_tab(loc)
 
   RefNodeInitRate_pft(NZ,NY,NX)          = RefNodeInitRate_tab(loc)
-  RefLeafAppearRate_pft(NZ,NY,NX)        = RefLeafAppearRate_tab(loc)
+  RateRefLeafAppearance_pft(NZ,NY,NX)        = RefLeafAppearRate_tab(loc)
   TCChill4Seed_pft(NZ,NY,NX)             = TCChill4Seed_tab(loc)
   VRNLI                                  = VRNLI_tab(loc)
   VRNXI                                  = VRNXI_tab(loc)
@@ -1045,7 +1045,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'XRNI','Rate of node initiation at 25oC [h-1]',RefNodeInitRate_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'XRLA','Rate of leaf appearance at 25oC [h-1]',RefLeafAppearRate_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'XRLA','Rate of leaf appearance at 25oC [h-1]',RateRefLeafAppearance_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CTC','Chilling temperature for CO2 fixation, seed loss [oC]',TCChill4Seed_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1120,10 +1120,10 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   id=addone(id)
-  call writefixl(nu_plt,id,'MOPHGEN', 'Baseline morephogen signal strength for secondary root growth [%]',MorphogenBase_pft(NZ,NY,NX)*100._r8,105)
-  id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
   if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
+    id=addone(id)
+    call writefixl(nu_plt,id,'MOPHGEN', 'Baseline morephogen signal strength for secondary root growth [%]',MorphogenBase_pft(NZ,NY,NX)*100._r8,105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
   endif
