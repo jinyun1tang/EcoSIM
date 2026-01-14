@@ -1,7 +1,7 @@
 module RootMod
   use data_kind_mod,       only: r8 => DAT_KIND_R8
   use minimathmod,         only: safe_adb, AZMAX1, AZMIN1, AZERO
-  use EcoSIMCtrlMod,       only: lverb
+  use EcoSIMCtrlMod,       only: lsoilCompaction
   use DebugToolMod,        only: PrintInfo
   use PlantNonstElmDynMod, only: RepleteLowSeaStorByRoot
   use PlantBalMod,         only: SumRootBiome
@@ -753,16 +753,18 @@ implicit none
   Root2ndExtPot    = RootMycoNonst4Grow_Oltd(ielmc)*FracRootElmAllocm(ielmc,k_fine_comp)*Root2ndSpecLen_pft(N,NZ)
   Root2ndPopExtenz = Root2ndExtPot
 
-  if(Root2ndExtPot>0._r8)then  
-    Root2ndPopExtenz = AMIN1(Root2ndExtPot,dLext2nd)
-    if(Root2ndPopExtenz <Root2ndExtPot)then    
-      ratio=Root2ndPopExtenz/Root2ndExtPot
-      DO NE=1,NumPlantChemElms
-        RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
-      ENDDO
+  if(lsoilCompaction)then
+    if(Root2ndExtPot>0._r8)then  
+      Root2ndPopExtenz = AMIN1(Root2ndExtPot,dLext2nd)
+      if(Root2ndPopExtenz <Root2ndExtPot)then    
+        ratio=Root2ndPopExtenz/Root2ndExtPot
+        DO NE=1,NumPlantChemElms
+          RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
+        ENDDO
+      endif
+    else
+      Root2ndPopExtenz=0._r8
     endif
-  else
-    Root2ndPopExtenz=0._r8
   endif
 
   DO NE=1,NumPlantChemElms
@@ -1287,16 +1289,18 @@ implicit none
   Root1stPotExtzPP = RootMycoNonst4Grow_Oltd(ielmc)/PlantPopulation_pft(NZ)*FracRootElmAllocm(ielmc,k_fine_comp)*Root1stSpecLen_pft(N,NZ)
   Root1stExtenzPP  = Root1stPotExtzPP
 
-  if(Root1stPotExtzPP>0._r8)then
-    Root1stExtenzPP  = AMIN1(Root1stPotExtzPP,dLext1st)
-    if(Root1stPotExtzPP>Root1stExtenzPP)then
-      DO NE=1,NumPlantChemElms
-        ratio=Root1stExtenzPP/Root1stPotExtzPP
-        RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
-      ENDDO
-    endif  
-  else
-    Root1stExtenzPP = 0._r8
+  if(lsoilCompaction)then
+    if(Root1stPotExtzPP>0._r8)then
+      Root1stExtenzPP  = AMIN1(Root1stPotExtzPP,dLext1st)
+      if(Root1stPotExtzPP>Root1stExtenzPP)then
+        DO NE=1,NumPlantChemElms
+          ratio=Root1stExtenzPP/Root1stPotExtzPP
+          RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
+        ENDDO
+      endif  
+    else
+      Root1stExtenzPP = 0._r8
+    endif
   endif
 
   !dealing with negative growth
@@ -1627,16 +1631,19 @@ implicit none
   RootMycoNonst4Grow_Oltd(ielmp) = AZMAX1(AMIN1(FracRoot1stCSinkL*RootMycoNonstElms_rpvr(ielmp,N,L,NZ),RootMycoNonst4Grow_Oltd(ielmc)*rPCStalk_pft(NZ)))  
 
   dRPotexp = RootMycoNonst4Grow_Oltd(ielmc)*CoarseRootVolPerMassC_pft(NZ)/(TwoPiCON*Root1stRadius_rpvr(L,NR,NZ)*Root1stLenPP_rpvr(L,NR,NZ))
-  if(dRPotexp>0._r8)then
-    dRExp    = AMIN1(dRPotexp,dR1stExp)
-    if(dRPotexp>dRExp)then
-      ratio=safe_adb(dRExp,dRPotexp)
-      DO NE=1,NumPlantChemElms
-        RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
-      ENDDO
-    endif  
-  else
-    dRExp=0._r8  
+  dRExp    = dRPotexp
+  if(lsoilCompaction)then
+    if(dRPotexp>0._r8)then
+      dRExp    = AMIN1(dRPotexp,dR1stExp)
+      if(dRPotexp>dRExp)then
+        ratio=safe_adb(dRExp,dRPotexp)
+        DO NE=1,NumPlantChemElms
+          RootMycoNonst4Grow_Oltd(NE)=RootMycoNonst4Grow_Oltd(NE)*ratio
+        ENDDO
+      endif  
+    else
+      dRExp=0._r8  
+    endif
   endif
   Root1stNetGrowthElms(:)  = RootMycoNonst4Grow_Oltd(:)
 

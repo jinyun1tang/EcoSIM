@@ -3,7 +3,7 @@ module grosubsMod
 ! Description:
 ! module for plant biological transformations
   use minimathmod,         only: safe_adb, AZMAX1,real_truncate
-  use data_kind_mod,       only: r8 => DAT_KIND_R8
+  use data_kind_mod,       only: r8 => DAT_KIND_R8,yearIJ_type
   use EcoSIMCtrlMod,       only: lverb
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
@@ -48,13 +48,13 @@ module grosubsMod
   ![header]
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowPlants(I,J)
+  subroutine GrowPlants(yearIJ)
 !
 !     THIS subroutine CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
 !
   use PlantDisturbsMod, only : RemoveBiomassByDisturbance,StageDisturbances
   implicit none
-  integer, intent(in) :: I, J
+  type(yearIJ_type), intent(in) :: yearIJ  
 
   real(r8) :: CanopyHeight_copy(JP1)
   integer :: L,K,M
@@ -80,36 +80,38 @@ module grosubsMod
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
 !
+
   D9985: DO NZ=1,NP
-    call StageDisturbances(I,J,NZ)
+    call StageDisturbances(yearIJ%I,yearIJ%J,NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
 
-      call GrowOnePlant(I,J,NZ,CanopyHeight_copy)
+      call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
+    
+      call RemoveBiomassByDisturbance(yearIJ,NZ)
 
+      !   RESET DEAD BRANCHES
+      call ResetDeadPlant(yearIJ,NZ)
     ENDIF  
 
-    call AccumulateStates(I,J,NZ)
 
-    call RemoveBiomassByDisturbance(I,J,NZ)
+    call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
 !
-  call LiveDeadTransformation(I,J)
-  
+  call LiveDeadTransformation(yearIJ)
+
   DO NZ=1,NP
-
-    call SumPlantBiome(I,J,NZ,'exgrosubs')
-
+    call SumPlantBiome(yearIJ,NZ,'exgrosubs')
   ENDDO
 
   end associate
   END subroutine GrowPlants
 
 !----------------------------------------------------------------------------------------------------
-  subroutine LiveDeadTransformation(I,J)
+  subroutine LiveDeadTransformation(yearIJ)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ  
 
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
@@ -165,7 +167,7 @@ module grosubsMod
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
-          iDayPlanting_pft(NZ)  = I
+          iDayPlanting_pft(NZ)  = yearIJ%I
           iYearPlanting_pft(NZ) = iYearCurrent
           PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
           doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
@@ -231,13 +233,14 @@ module grosubsMod
   end subroutine LiveDeadTransformation
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowOnePlant(I,J,NZ,CanopyHeight_copy)
+  subroutine GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
   !
   !Description
   !plant growth
   use PlantDisturbsMod, only : RemoveBiomByMgmt
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
   character(len=*), parameter :: subname='GrowOnePlant'
   real(r8)  :: CanopyN2Fix_pft(JP1)
@@ -274,30 +277,29 @@ module grosubsMod
   IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive .and. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
-    call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
+    call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
     !
     !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
-      call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
+      call GrowOneBranch(yearIJ%I,yearIJ%J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
 
-    call RootBGCModel(I,J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+    call RootBGCModel(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
-    call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
+    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
 
-    call ComputeTotalBiom(I,J,NZ)
+    call ComputeTotalBiom(yearIJ,NZ)
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
   ENDIF
 
-  call RemoveBiomByMgmt(I,J,NZ)  
+  call RemoveBiomByMgmt(yearIJ,NZ)  
   !
-  !   RESET DEAD BRANCHES
-  call ResetDeadPlant(I,J,NZ)
+
   call PrintInfo('end '//subname)  
   end associate
   end subroutine GrowOnePlant
@@ -500,9 +502,11 @@ module grosubsMod
   end subroutine StagePlantForGrowth
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeTotalBiom(I,J,NZ)
+  subroutine ComputeTotalBiom(yearIJ,NZ)
 
-  integer, intent(in) :: I,J,NZ
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   
   integer :: L,N
 !     begin_execution
@@ -514,7 +518,7 @@ module grosubsMod
     PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr       & !inoput :root layer C, [gC d-2]
   )
   !prepare for disturbance
-  CALL SumPlantBiomStates(I,J,NZ,'computotb')
+  CALL SumPlantBiomStates(yearIJ,NZ,'computotb')
 
   D3451: DO N=1,Myco_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
@@ -527,10 +531,11 @@ module grosubsMod
   end subroutine ComputeTotalBiom
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AccumulateStates(I,J,NZ)
+  subroutine AccumulateStates(yearIJ,NZ)
   
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type), intent(in) :: yearIJ  
+  integer, intent(in) :: NZ
   integer :: L,NR,N,NE,NB
 
 !     begin_execution
@@ -545,7 +550,7 @@ module grosubsMod
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft         ,& !input  :total root uptake of HPO4, [g d-2 h-1]
-    Soil2RootMycoExudE_pft      => plt_rbgc%Soil2RootMycoExudE_pft       ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+    Soil2RootMycoExudE_pft    => plt_rbgc%Soil2RootMycoExudE_pft     ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft              ,& !input  :total root N2 fixation, [g d-2 h-1]
     RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft          ,& !input  :total root uptake of NH4, [g d-2 h-1]
     RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft          ,& !input  :total root uptake of NO3, [g d-2 h-1]

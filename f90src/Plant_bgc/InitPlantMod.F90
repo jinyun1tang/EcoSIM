@@ -857,27 +857,27 @@ module InitPlantMod
   integer, intent(in) :: NZ
   REAL(R8) :: FDM
 
-  associate(                                                 &
-    ATCA                  => plt_site%ATCA                  ,& !input  :mean annual air temperature, [oC]
-    OrganOsmoPsi0pt_pft     => plt_ew%OrganOsmoPsi0pt_pft       ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyLeafSheathC_pft  => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
-    ShootElms_pft         => plt_biom%ShootElms_pft         ,& !input  :canopy shoot structural chemical element mass, [g d-2]
-    HeatCanopy2Dist_col   => plt_ew%HeatCanopy2Dist_col     ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
-    QCanopyWat2Dist_col   => plt_ew%QCanopyWat2Dist_col     ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
-    CanopyBiomWater_pft   => plt_ew%CanopyBiomWater_pft     ,& !output :canopy water content, [m3 d-2]
-    PSICanopyOsmo_pft     => plt_ew%PSICanopyOsmo_pft       ,& !output :canopy osmotic water potential, [Mpa]
-    PSICanopy_pft         => plt_ew%PSICanopy_pft           ,& !output :canopy total water potential, [Mpa]
-    TCGroth_pft           => plt_pheno%TCGroth_pft          ,& !output :canopy growth temperature, [oC]
-    TKC_pft               => plt_ew%TKC_pft                 ,& !output :canopy temperature, [K]
-    TdegCCanopy_pft       => plt_ew%TdegCCanopy_pft         ,& !output :canopy temperature, [oC]
-    VHeatCapCanopy_pft    => plt_ew%VHeatCapCanopy_pft      ,& !output :canopy heat capacity, [MJ d-2 K-1]
-    DeltaTKC_pft          => plt_ew%DeltaTKC_pft            ,& !output :change in canopy temperature, [K]
-    ENGYX_pft             => plt_ew%ENGYX_pft               ,& !output :canopy heat storage from previous time step, [MJ d-2]
-    FracPARads2Canopy_pft => plt_rad%FracPARads2Canopy_pft  ,& !output :fraction of incoming PAR absorbed by canopy, [-]
-    PSICanopyTurg_pft     => plt_ew%PSICanopyTurg_pft       ,& !output :plant canopy turgor water potential, [MPa]
-    TKGroth_pft           => plt_pheno%TKGroth_pft          ,& !output :canopy growth temperature, [K]
-    Transpiration_pft     => plt_ew%Transpiration_pft       ,& !output :canopy transpiration, [m2 d-2 h-1]
-    fTCanopyGroth_pft     => plt_pheno%fTCanopyGroth_pft     & !output :canopy temperature growth function, [-]
+  associate(                                                    &
+    ATCA                    => plt_site%ATCA                   ,& !input  :mean annual air temperature, [oC]
+    OrganOsmoPsi0pt_pft     => plt_ew%OrganOsmoPsi0pt_pft      ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
+    CanopyLeafSheathC_pft   => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
+    ShootElms_pft           => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    HeatCanopy2Dist_col     => plt_ew%HeatCanopy2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
+    QCanopyWat2Dist_col     => plt_ew%QCanopyWat2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
+    CanopyBiomWater_pft     => plt_ew%CanopyBiomWater_pft      ,& !output :canopy water content, [m3 d-2]
+    PSICanopyOsmo_pft       => plt_ew%PSICanopyOsmo_pft        ,& !output :canopy osmotic water potential, [Mpa]
+    PSICanopy_pft           => plt_ew%PSICanopy_pft            ,& !output :canopy total water potential, [Mpa]
+    TCGroth_pft             => plt_pheno%TCGroth_pft           ,& !output :canopy growth temperature, [oC]
+    TKC_pft                 => plt_ew%TKC_pft                  ,& !output :canopy temperature, [K]
+    TdegCCanopy_pft         => plt_ew%TdegCCanopy_pft          ,& !output :canopy temperature, [oC]
+    VHeatCapCanopy_pft      => plt_ew%VHeatCapCanopy_pft       ,& !output :canopy heat capacity, [MJ d-2 K-1]
+    DeltaTKC_pft            => plt_ew%DeltaTKC_pft             ,& !output :change in canopy temperature, [K]
+    ENGYX_pft               => plt_ew%ENGYX_pft                ,& !output :canopy heat storage from previous time step, [MJ d-2]
+    FracPARads2Canopy_pft   => plt_rad%FracPARads2Canopy_pft   ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    PSICanopyTurg_pft       => plt_ew%PSICanopyTurg_pft        ,& !output :plant canopy turgor water potential, [MPa]
+    TKGroth_pft             => plt_pheno%TKGroth_pft           ,& !output :canopy growth temperature, [K]
+    Transpiration_pft       => plt_ew%Transpiration_pft        ,& !output :canopy transpiration, [m2 d-2 h-1]
+    fTCanopyGroth_pft       => plt_pheno%fTCanopyGroth_pft      & !output :canopy temperature growth function, [-]
   )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS

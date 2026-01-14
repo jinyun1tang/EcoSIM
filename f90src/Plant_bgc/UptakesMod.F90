@@ -1192,7 +1192,7 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         !     Root1stXNumL_pvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
-        if(Root1stRadius_pvr(N,L,NZ) > Root1stMaxRadius1_pft(N,NZ)*2)then
+        if(Root1stRadius_pvr(N,L,NZ) > 2.e-3_r8)then !2mm as corase root criterion
           !coarse roots
           DTransptTube = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
           AreaTranspt  = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2

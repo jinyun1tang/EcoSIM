@@ -1,5 +1,5 @@
 module PlantMod
-  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use data_kind_mod,     only: r8 => DAT_KIND_R8,yearIJ_type
   use grosubsMod,        only: GrowPlants
   use PlantPhenolMod,    only: PhenologyUpdate
   use UptakesMod,        only: RootUptakes
@@ -30,12 +30,12 @@ implicit none
 
   contains
 
-  subroutine PlantModel(I,J,NHW,NHE,NVN,NVS)
+  subroutine PlantModel(yearIJ,NHW,NHE,NVN,NVS)
   !
   !run the plant biogeochemistry model
   !
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1,tvegE(NumPlantChemElms)
   integer :: NY,NX,NZ
@@ -44,7 +44,7 @@ implicit none
 
   call PrintInfo('beg '//subname)
   if(.not.ldo_sp_mode)then
-    call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
+    call PrepLandscapeGrazing(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
     plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   endif
 
@@ -53,37 +53,37 @@ implicit none
   
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
-        call PlantUptakeAPISend(I,J,NY,NX)        
-        CALL ROOTUPTAKES(I,J)
-        call extracts(I,J)
-        call PlantUPtakeAPIRecv(I,J,NY,NX)
+        call PlantUptakeAPISend(yearIJ%I,yearIJ%J,NY,NX)        
+        CALL ROOTUPTAKES(yearIJ%I,yearIJ%J)
+        call extracts(yearIJ%I,yearIJ%J)
+        call PlantUPtakeAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       else
       
-        call  PlantAPISend(I,J,NY,NX)
+        call  PlantAPISend(yearIJ%I,yearIJ%J,NY,NX)
 
-        call EnterPlantBalance(I,J,NP_col(NY,NX))
+        call EnterPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
 
         !Phenological update, determine living/active branches      
-        CALL PhenologyUpdate(I,J)
+        CALL PhenologyUpdate(yearIJ%I,yearIJ%J)
 
         !Predict uptake fluxes of nutrients and O2        
-        CALL ROOTUPTAKES(I,J)
+        CALL ROOTUPTAKES(yearIJ%I,yearIJ%J)
 
         !Do growth of active branches and roots
-        CALL GROWPLANTS(I,J)
+        CALL GROWPLANTS(yearIJ)
 
         !aggregate varaibles
-        CALL EXTRACTs(I,J)
+        CALL EXTRACTs(yearIJ%I,yearIJ%J)
 
         DO NZ=1,NP_col(NY,NX)
 
-          Call ReSeedPlants(I,J,NZ)
+          Call ReSeedPlants(yearIJ%I,yearIJ%J,NZ)
 
         ENDDO
 
-        call ExitPlantBalance(I,J,NP_col(NY,NX))
+        call ExitPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
 
-        call PlantAPIRecv(I,J,NY,NX)
+        call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       endif
 
     ENDDO

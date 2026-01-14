@@ -1,6 +1,6 @@
 module LitterFallMod
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8,yearIJ_type
   use DebugToolMod,  only: PrintInfo
   use EcosimConst
   use PlantBGCPars
@@ -15,9 +15,10 @@ implicit none
   contains
   ![header]  
 !----------------------------------------------------------------------------------------------------
-  subroutine ResetDeadPlant(I,J,NZ)
+  subroutine ResetDeadPlant(yearIJ,NZ)
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type), intent(in) :: yearIJ  
+  integer, intent(in) :: NZ
 
   integer :: NumDeadBranches
   logical :: emerge_check,harvst_check,reset_check
@@ -59,8 +60,8 @@ implicit none
 !     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of LitrFall
 !
   plt_pheno%doReSeed_pft(NZ)=.FALSE.
-  harvst_check = (I.GE.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ))
-  emerge_check = J.EQ.INT(SolarNoonHour_col) .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0
+  harvst_check = (yearIJ%I.GE.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ))
+  emerge_check = yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0
   reset_check  = emerge_check .AND. (iPlantPhenolPattern_pft(NZ).NE.iplt_annual .OR. harvst_check)
 
   IF(reset_check)THEN
@@ -70,17 +71,17 @@ implicit none
 !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
 !
 
-    call LiterFallDeadBranches(I,J,NZ,NumDeadBranches,C4PhotoShootNonstC_brch)
+    call LiterFallDeadBranches(yearIJ%I,yearIJ%J,NZ,NumDeadBranches,C4PhotoShootNonstC_brch)
 
-    call SetDeadPlant(I,J,NZ,NumDeadBranches)
+    call SetDeadPlant(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
 !
 !     DEAD ROOTS
 !
 !     LitrFall FROM DEAD ROOTS
 !
-    call LiterFallDeadRoots(I,J,NZ)
+    call LiterFallDeadRoots(yearIJ%I,yearIJ%J,NZ)
 
-    call LiterFallRootShootStorage(I,J,NZ,C4PhotoShootNonstC_brch)
+    call LiterFallRootShootStorage(yearIJ%I,yearIJ%J,NZ,C4PhotoShootNonstC_brch)
 
   ENDIF
 
@@ -208,9 +209,9 @@ implicit none
     DazCurrYear                 => plt_site%DazCurrYear                   ,& !input  :number of days in current year,[-]
     EarStrutElms_brch           => plt_biom%EarStrutElms_brch             ,& !input  :branch ear structural chemical element mass, [g d-2]
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
-    FracRootElmAllocm       => plt_allom%FracRootElmAllocm        ,& !input  :C woody fraction in root,[-]
+    FracRootElmAllocm           => plt_allom%FracRootElmAllocm            ,& !input  :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !input  :woody element allocation,[-]
-    FracShootElmAllocm     => plt_allom%FracShootElmAllocm      ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm          => plt_allom%FracShootElmAllocm           ,& !input  :woody element allocation, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
     GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch           ,& !input  :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch            ,& !input  :branch husk structural element mass, [g d-2]
@@ -243,7 +244,7 @@ implicit none
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !input  :flag for stand replacing disturbance,[-]
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
-    LitrfallElms_pvr        => plt_bgcr%LitrfallElms_pvr          ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft        ,& !inoput :standing dead element fraction, [g d-2]
     iDayPlanting_pft            => plt_distb%iDayPlanting_pft             ,& !output :day of planting,[-]
@@ -396,7 +397,7 @@ implicit none
 !     begin_execution
   associate(                                                          &
     PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr  ,& !input  :litter kinetic fraction, [-]
-    FracRootElmAllocm     => plt_allom%FracRootElmAllocm     ,& !input  :C woody fraction in root,[-]
+    FracRootElmAllocm         => plt_allom%FracRootElmAllocm         ,& !input  :C woody fraction in root,[-]
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !input  :soil layer at planting depth, [-]
@@ -608,7 +609,7 @@ implicit none
     CanopyNonstElms_brch              => plt_biom%CanopyNonstElms_brch                ,& !input  :branch nonstructural element, [g d-2]
     EarStrutElms_brch                 => plt_biom%EarStrutElms_brch                   ,& !input  :branch ear structural chemical element mass, [g d-2]
     PlantElmAllocMat4Litr             => plt_soilchem%PlantElmAllocMat4Litr           ,& !input  :litter kinetic fraction, [-]
-    FracShootElmAllocm           => plt_allom%FracShootElmAllocm            ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm                => plt_allom%FracShootElmAllocm                 ,& !input  :woody element allocation, [-]
     FracShootPetolAlloc2Litr          => plt_allom%FracShootPetolAlloc2Litr           ,& !input  :leaf element allocation,[-]
     GrainStrutElms_brch               => plt_biom%GrainStrutElms_brch                 ,& !input  :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch                => plt_biom%HuskStrutElms_brch                  ,& !input  :branch husk structural element mass, [g d-2]
@@ -632,12 +633,12 @@ implicit none
     istalk                            => pltpar%istalk                                ,& !input  :group id of plant stalk litter group
     k_fine_comp                       => pltpar%k_fine_comp                           ,& !input  :fine litter complex id
     k_woody_comp                      => pltpar%k_woody_comp                          ,& !input  :woody litter complex id
-    LitrfallElms_pvr              => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pvr                  => plt_bgcr%LitrfallElms_pvr                    ,& !inoput :plant LitrFall element, [g d-2 h-1]
     SeasonalNonstElms_pft             => plt_biom%SeasonalNonstElms_pft               ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     StandDeadKCompElms_pft            => plt_biom%StandDeadKCompElms_pft              ,& !inoput :standing dead element fraction, [g d-2]
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
     BranchNumerID_brch                => plt_morph%BranchNumerID_brch                 ,& !output :branch meric id, [-]
-    GrainFillDowreg_brch             => plt_photo%GrainFillDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch              => plt_photo%GrainFillDowreg_brch               ,& !output :down-regulation of C4 photosynthesis, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
     Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch                 ,& !output :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
     Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch                 ,& !output :cold requirement for autumn leafoff/hardening, [h]

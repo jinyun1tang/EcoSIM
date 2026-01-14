@@ -3,7 +3,7 @@ module PlantBalMod
 !Description
 !code to do mass balance calculation for plant bgc
 
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
   use EcoSiMParDataMod, only: pltpar
   use abortutils,       only: endrun
   use PlantMathFuncMod
@@ -24,10 +24,11 @@ implicit none
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
-  subroutine SumPlantBiome(I,J,NZ,header,vegE)
+  subroutine SumPlantBiome(yearIJ,NZ,header,vegE)
 
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   character(len=*), intent(in) :: header
   real(r8),optional, intent(out) :: vegE(NumPlantChemElms)
   integer :: L,K,N,NE,NB,M
@@ -54,9 +55,9 @@ implicit none
     GrossResp_pft            => plt_bgcr%GrossResp_pft               & !output :total plant respiration, [gC d-2 ]
   )
   if(present(vegE))then
-    call SumPlantBiomStates(I,J,NZ,header,vegE)
+    call SumPlantBiomStates(yearIJ,NZ,header,vegE)
   else
-    call SumPlantBiomStates(I,J,NZ,header)
+    call SumPlantBiomStates(yearIJ,NZ,header)
   endif  
 
   !sum fluxes
@@ -231,9 +232,9 @@ implicit none
   END associate
   end subroutine SumCanopyBiome
 !----------------------------------------------------------------------------------------------------
-  subroutine SumPlantBiomStates(I,J,NZ,header,tvegE)
+  subroutine SumPlantBiomStates(yearIJ,NZ,header,tvegE)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   character(len=*),intent(in) :: header
   real(r8), optional, intent(out) :: tvegE(NumPlantChemElms)
@@ -244,12 +245,12 @@ implicit none
   if(present(tvegE))then
     call SumCanopyBiome(NZ,canopyE)
 
-     call SumRootBiome(NZ,RootE)
+     call SumRootBiome(yearIJ,NZ,RootE)
      tvegE=canopyE+RootE+plt_biom%SeasonalNonstElms_pft(:,NZ)
   else
     call SumCanopyBiome(NZ)
 
-    call SumRootBiome(NZ)
+    call SumRootBiome(yearIJ,NZ)
   endif  
 
   END subroutine SumPlantBiomStates
@@ -403,9 +404,10 @@ implicit none
   end subroutine ZeroGrosub
 
 !----------------------------------------------------------------------------------------------------
-  subroutine SumRootBiome(NZ,massroot)
+  subroutine SumRootBiome(yearIJ,NZ,massroot)
 
   implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), optional, intent(out) :: massroot(NumPlantChemElms)  
 

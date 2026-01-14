@@ -1396,8 +1396,7 @@ implicit none
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,MaxNumRootAxes,JP1))
   this%RootMyco2ndStrutElms_rpvr=spval
   allocate(this%RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP1));this%RootMycoNonstElms_pft=spval
-  allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1))
-  this%RootMyco1stStrutElms_rpvr=spval
+  allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1));this%RootMyco1stStrutElms_rpvr=0._r8
   allocate(this%CanopyNonstElmConc_pft(NumPlantChemElms,JP1));this%CanopyNonstElmConc_pft=spval
   allocate(this%CanopyNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNonstElms_pft=spval
   allocate(this%CanopyNodulNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNodulNonstElms_pft=spval

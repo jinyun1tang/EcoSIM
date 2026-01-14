@@ -169,9 +169,9 @@ implicit none
             iDayPlanting_pft(NZ,NY,NX)  = IDY
             IYR                         = yearc
             iYearPlanting_pft(NZ,NY,NX) = MIN(IYR,iYearCurrent)
-            iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX) !planting day
+            iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX)    !planting day
             iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
-            PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)     !population density
+            PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)             !population density
           ENDIF          
         ENDDO
       ENDDO
