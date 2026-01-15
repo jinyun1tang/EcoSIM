@@ -233,24 +233,6 @@ contains
   call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
   a_CanopyWat = data(:)
 
-  !call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
-  !a_ET = data(:)
-
-  !call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
-  !a_EvapGrnd = data(:)
-
-  !call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
-  !a_EvapLitr  = data(:)
-
-  !call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
-  !a_EvapSnow = data(:)
-
-  !call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
-  !a_Sublim = data(:)
-
-  !call c_f_pointer(state%canopy_height%data, data, (/num_cols/))
-  !surf_canopy_height = data(:)
-
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
@@ -290,8 +272,11 @@ contains
   call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
   data(:) = a_CanopyWat
 
-  call c_f_pointer(state%evapotranspiration%data, data, (/num_cols/))
-  data(:) = a_ET
+  call c_f_pointer(state%transpiration%data, data, (/num_cols/))
+  data(:) = a_Transpiration
+
+  call c_f_pointer(state%evaporation_canopy%data, data, (/num_cols/))
+  data(:) = a_EvapCan
 
   call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
   data(:) = a_EvapGrnd

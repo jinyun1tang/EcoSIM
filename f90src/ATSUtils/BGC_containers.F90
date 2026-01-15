@@ -162,7 +162,8 @@ module BGCContainers_module
      type (BGCVectorDouble) :: boundary_latent_heat_flux
      type (BGCVectorDouble) :: boundary_sensible_heat_flux
      type (BGCVectorDouble) :: canopy_surface_water
-     type (BGCVectorDouble) :: evapotranspiration
+     type (BGCVectorDouble) :: transpiration
+     type (BGCVectorDouble) :: evaporation_canopy
      type (BGCVectorDouble) :: evaporation_bare_ground
      type (BGCVectorDouble) :: evaporation_litter
      type (BGCVectorDouble) :: evaporation_snow
