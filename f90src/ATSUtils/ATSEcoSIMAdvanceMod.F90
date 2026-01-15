@@ -57,7 +57,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS
+  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS, npfts, NP
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -76,9 +76,6 @@ implicit none
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
-  REAL(r8), DIMENSION(24) :: LWRadCanGPrev_daily
-  REAL(r8), DIMENSION(24) :: TLEX_daily
-  REAL(r8), DIMENSION(24) :: TSHX_daily
 
   associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
   )
@@ -91,24 +88,10 @@ implicit none
   I=1;J=1
   NPH_Test=1
   NX=1
+  npfts=1
   !ldo_sp_mode = .True.
   !LeafAreaZsec_lpft(:,:,:) = 0.2
   !StemAreaZsec_lpft(:,:,:) = 0.05
-
-  LWRadCanGPrev_daily = (/0.640_r8, 0.635_r8, 0.633_r8, 0.632_r8, 0.635_r8, 0.642_r8, &
-       0.655_r8, 0.675_r8, 0.695_r8, 0.715_r8, 0.735_r8, 0.750_r8, &
-       0.760_r8, 0.755_r8, 0.745_r8, 0.730_r8, 0.710_r8, 0.690_r8, &
-       0.670_r8, 0.660_r8, 0.655_r8, 0.650_r8, 0.645_r8, 0.642_r8/)
-
-  TLEX_daily = (/-0.0005_r8, -0.0004_r8, -0.0003_r8, -0.0003_r8, -0.0003_r8, -0.0004_r8, &
-       -0.0006_r8, -0.0008_r8, -0.0011_r8, -0.0013_r8, -0.0015_r8, -0.0016_r8, &
-       -0.0017_r8, -0.0016_r8, -0.0015_r8, -0.0013_r8, -0.0011_r8, -0.0009_r8, &
-       -0.0007_r8, -0.0006_r8, -0.0005_r8, -0.0005_r8, -0.0005_r8, -0.0005_r8/)
-
-  TSHX_daily = (/0.0015_r8, 0.0012_r8, 0.0010_r8, 0.0008_r8, 0.0010_r8, 0.0013_r8, &
-       0.0020_r8, 0.0028_r8, 0.0032_r8, 0.0035_r8, 0.0038_r8, 0.0040_r8, &
-       0.0041_r8, 0.0040_r8, 0.0038_r8, 0.0035_r8, 0.0030_r8, 0.0025_r8, &
-       0.0020_r8, 0.0018_r8, 0.0016_r8, 0.0015_r8, 0.0015_r8, 0.0015_r8/)
 
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
@@ -273,13 +256,6 @@ implicit none
   if(ldo_sp_mode)then
     do NY=1,NYS
         call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
-
-        !Saving varaibles for the next iteration
-        LWRadCanGPrev_col(NY,NX) = LWRadCanGPrev_daily(J)
-        TLEX_col(NY,NX) = TLEX_daily(J)
-        TSHX_col(NY,NX) = TSHX_daily(J)
-
-        !VHeatCapCanopyPrev_pft =
     enddo
   endif
 
@@ -332,6 +308,13 @@ implicit none
     a_CSHF(NY) = TSHX_col(NY,NX) !boundary sensible heat flux
     a_CanopyWat(NY) = WatHeldOnCanopy_col(NY,NX) !water held on canopy surface
     a_ET(NY) = QVegET_col(NY,NX) !canopy evapotranspiration
+
+    !Sum over PFTs for total transpiration and canopy evap
+    do NP=1,npfts
+      a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NP,NY,NX)
+      a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NP,NY,NX)
+    enddo
+
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
     a_EvapLitr(NY) = TEvapXAir2LitR_col(NY,NX) !litter evaporation
     a_EvapSnow(NY) = EVAPW(NY,NX) !water evapoartion from snow

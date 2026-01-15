@@ -55,6 +55,8 @@ Module SharedDataMod
   real(r8), allocatable :: a_CSHF(:)         !boundary sensible heat flux
   real(r8), allocatable :: a_CanopyWat(:)    !water held on canopy surface
   real(r8), allocatable :: a_ET(:)           !canopy evapotranspiration
+  real(r8), allocatable :: a_Transpiration(:)!canopy transpiration
+  real(r8), allocatable :: a_EvapCan(:)      !canopy evaporation
   real(r8), allocatable :: a_EvapGrnd(:)     !bare ground evaporation
   real(r8), allocatable :: a_EvapLitr(:)     !litter evaporation
   real(r8), allocatable :: a_EvapSnow(:)     !water evaporation from snow
@@ -109,6 +111,8 @@ Module SharedDataMod
     !allocate(a_AREA3(ncells_per_col_))
 
     allocate(a_ET(ncol))
+    allocate(a_EvapCan(ncol))
+    allocate(a_Transpiration(ncol))
     allocate(a_EvapGrnd(ncol))
     allocate(a_EvapLitr(ncol))
     allocate(a_EvapSnow(ncol))
