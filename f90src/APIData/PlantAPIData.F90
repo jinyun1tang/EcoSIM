@@ -93,7 +93,7 @@ implicit none
   type, public :: plant_photosyns_type
   integer,  pointer :: iPlantPhotosynthesisType(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
   real(r8), pointer :: SpecLeafChlAct_pft(:)                => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
-  real(r8), pointer :: LeafChl2Protein_pft(:)               => null()  !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
+  real(r8), pointer :: LeafProtein2Chl_pft(:)               => null()  !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
   real(r8), pointer :: LeafPEP2Protein_pft(:)               => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
   real(r8), pointer :: fMesophyllChlProtein_pft(:)          => null()  !fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
   real(r8), pointer :: LeafRubisco2Protein_pft(:)           => null()  !leaf rubisco content,                                                      [gC gC-1]
@@ -231,6 +231,7 @@ implicit none
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
   real(r8), pointer :: RootAge_rpvr(:,:,:)             => null() !root age, [h]
   real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
+  real(r8), pointer :: RootAbsorbLenPerPlant_pvr(:,:,:)=> null() !total absorptive root length per plant in layer, [m p-1]
   real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !fine root length per plant, [m p-1]
   real(r8), pointer :: Root2ndEffLen4uptk_rpvr(:,:,:)  => null() !Layer effective root length four resource uptake, [m]
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
@@ -241,7 +242,7 @@ implicit none
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
   real(r8), pointer :: RootBranchFreq_pft(:)           => null() !root brancing frequency,                                                    [m-1]
-  real(r8), pointer :: HypoctoHeight_pft(:)            => null() !cotyledon height,                                                           [m]
+  real(r8), pointer :: HypocotHeight_pft(:)            => null() !cotyledon height,                                                           [m]
   real(r8), pointer :: CanopyHeight4WatUptake_pft(:)   => null() !canopy height,                                                              [m]
   real(r8), pointer :: CanopyHeightZ_col(:)            => null() !canopy layer height,                                                        [m]
   real(r8), pointer :: CanopyStemArea_pft(:)           => null() !plant stem area,                                                            [m2 d-2]
@@ -531,7 +532,7 @@ implicit none
   real(r8), pointer :: LeafPetoNonstElmConc_brch(:,:,:)     => null()    !branch nonstructural C concentration,               [g d-2]
   real(r8), pointer :: StructInternodeElms_brch(:,:,:,:)    => null()    !internode C,                                        [g d-2]
   real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)          => null()    !leaf element,                                       [g d-2]
-  real(r8), pointer :: LeafProteinC_node(:,:,:)             => null()    !layer leaf protein C,                               [g d-2]
+  real(r8), pointer :: LeafProteinC_node(:,:,:)             => null()    !layer leaf protein N,                               [g d-2]
   real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)       => null()    !sheath chemical element,                            [g d-2]
   real(r8), pointer :: PetoleProteinC_node(:,:,:)       => null()    !layer sheath protein C,                             [g d-2]
   real(r8), pointer :: LeafLayerElms_node(:,:,:,:,:)        => null()    !layer leaf element,                                 [g d-2]
@@ -1830,7 +1831,7 @@ implicit none
   allocate(this%CanopyGasCO2_pft(JP1));this%CanopyGasCO2_pft=spval
   allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
   allocate(this%SpecLeafChlAct_pft(JP1));this%SpecLeafChlAct_pft=spval
-  allocate(this%LeafChl2Protein_pft(JP1));this%LeafChl2Protein_pft=spval
+  allocate(this%LeafProtein2Chl_pft(JP1));this%LeafProtein2Chl_pft=spval
   allocate(this%LeafPEP2Protein_pft(JP1));this%LeafPEP2Protein_pft=spval
   allocate(this%fMesophyllChlProtein_pft(JP1));this%fMesophyllChlProtein_pft=spval
   allocate(this%LeafRubisco2Protein_pft(JP1));this%LeafRubisco2Protein_pft=spval
@@ -1966,7 +1967,7 @@ implicit none
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
   allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
-  allocate(this%HypoctoHeight_pft(JP1));this%HypoctoHeight_pft=spval
+  allocate(this%HypocotHeight_pft(JP1));this%HypocotHeight_pft=spval
   allocate(this%RootPoreTortu4Gas_pft(jroots,JP1));this%RootPoreTortu4Gas_pft=spval
   allocate(this%rLen2WidthLeaf_pft(JP1));this%rLen2WidthLeaf_pft=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
@@ -1985,6 +1986,7 @@ implicit none
   allocate(this%Root1stDepz_raxes(MaxNumRootAxes,JP1));this%Root1stDepz_raxes=spval
   allocate(this%Root1stAxesTipDepz2Surf_pft(MaxNumRootAxes,JP1)); this%Root1stAxesTipDepz2Surf_pft=spval
   allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
+  allocate(this%RootAbsorbLenPerPlant_pvr(jroots,JZ1,JP1));this%RootAbsorbLenPerPlant_pvr=0._r8
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
   allocate(this%Root2ndEffLen4uptk_rpvr(jroots,JZ1,JP1));this%Root2ndEffLen4uptk_rpvr=spval
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval

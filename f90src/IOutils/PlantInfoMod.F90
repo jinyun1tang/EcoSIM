@@ -517,7 +517,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'RUBP', loc, LeafRubisco2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PEPC', loc, LeafPEP2Protein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ETMX', loc, SpecLeafChlAct_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'CHL', loc, LeafChl2Protein_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL', loc, LeafProtein2Chl_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'fCHLMESO', loc, fMesophyllChlProtein_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
@@ -667,7 +667,7 @@ implicit none
   LeafRubisco2Protein_pft(NZ,NY,NX)   = LeafRubisco2Protein_tab(loc)
   LeafPEP2Protein_pft(NZ,NY,NX)       = LeafPEP2Protein_tab(loc)
   SpecLeafChlAct_pft(NZ,NY,NX)        = SpecChloryfilAct_tab(loc)
-  LeafChl2Protein_pft(NZ,NY,NX)       = LeafChl2Protein_tab(loc)
+  LeafProtein2Chl_pft(NZ,NY,NX)       = LeafChl2Protein_tab(loc)
   fMesophyllChlProtein_pft(NZ,NY,NX)  = fChlMesophyll_tab(loc)
   CanopyCi2CaRatio_pft(NZ,NY,NX)      = CanopyCi2CaRatio_pft_tab(loc)
 
@@ -1000,7 +1000,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafChl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
   elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX','Saturated specific carboxylation rate by Rubisco  at 25oC  [umol CO2 (g rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
@@ -1021,7 +1021,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'PEPC','Fraction of total leaf protein is PEPC enzyme [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafChl2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'fCHLMESO','Fraction of chlorophyll-binded proteins in mesophyll cells [-]',fMesophyllChlProtein_pft(NZ,NY,NX),110)
   endif

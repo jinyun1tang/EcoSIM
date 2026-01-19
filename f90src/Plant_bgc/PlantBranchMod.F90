@@ -323,7 +323,7 @@ module PlantBranchMod
     ReserveBiomGrowthYld_pft  => plt_allom%ReserveBiomGrowthYld_pft  ,& !input  :reserve growth yield, [gC gC-1]
     GrainBiomGrowthYld_pft    => plt_allom%GrainBiomGrowthYld_pft    ,& !input  :grain growth yield, [gC gC-1]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !input  :seeding depth, [m]
-    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft         ,& !input  :cotyledon height, [m]
+    HypocotHeight_pft         => plt_morph%HypocotHeight_pft         ,& !input  :cotyledon height, [m]
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft         ,& !input  :number of main branch,[-]
     rNCReserve_pft            => plt_allom%rNCReserve_pft            ,& !input  :reserve N:C ratio, [gN gC-1]
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch        ,& !inoput :branch stalk structural element mass, [g d-2]
@@ -391,7 +391,7 @@ module PlantBranchMod
   !
   !   DISTRIBUTE LEAF GROWTH AMONG CURRENTLY GROWING NODES
   !
-  IF(NB.EQ.MainBranchNum_pft(NZ) .AND. HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ))THEN
+  IF(NB.EQ.MainBranchNum_pft(NZ) .AND. HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ))THEN
     MinNodeID=0
   ELSE
     MinNodeID=1
@@ -823,19 +823,18 @@ module PlantBranchMod
       WaterStress4Groth,TurgEff4CanopyResp,CanopyNonstElm4Gros,CNPG,RMxess_brch,dNonstCX,RNonstC4Groth_brch)
   ENDIF
 
-!   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
-!   FROM NON-STRUCTURAL POOLS
-!
-!   CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-!   CH2O=total CH2O production
-!   RCO2Maint_brch=maintenance respiration
-!   RCO2NonstC_brch=respiration from non-structural C
-!   RNonstC4Groth_brch=total non-structural C used in growth and respiration
-!   RCO2NonstC4Nassim_brch=respiration for N assimilation
-!   CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P used in growth
-!   NH3Dep2Can_brch=NH3 flux between atmosphere and branch from uptake.f
-!
-  if(.false. .and. I==246)write(919,*)I+J/24.,NB,'CH2O-dNonstCX',CH2O,dNonstCX,'RNonstC4Groth_brch',RNonstC4Groth_brch
+  !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
+  !   FROM NON-STRUCTURAL POOLS
+  !
+  !   CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
+  !   CH2O=total CH2O production
+  !   RCO2Maint_brch=maintenance respiration
+  !   RCO2NonstC_brch=respiration from non-structural C
+  !   RNonstC4Groth_brch=total non-structural C used in growth and respiration
+  !   RCO2NonstC4Nassim_brch=respiration for N assimilation
+  !   CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P used in growth
+  !   NH3Dep2Can_brch=NH3 flux between atmosphere and branch from uptake.f
+  !
   CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)+CH2O-dNonstCX
   CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
   CanopyNonstElms_brch(ielmp,NB,NZ) = CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
@@ -1687,7 +1686,7 @@ module PlantBranchMod
     CanopyLeafArea_lnode      => plt_morph%CanopyLeafArea_lnode       ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     StalkNodeHeight_brch      => plt_morph%StalkNodeHeight_brch       ,& !inoput :internode height, [m]
     CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !inoput :canopy height, [m]
-    HypoctoHeight_pft         => plt_morph%HypoctoHeight_pft          ,& !inoput :cotyledon height, [m]
+    HypocotHeight_pft         => plt_morph%HypocotHeight_pft          ,& !inoput :cotyledon height, [m]
     CanopyLeafAreaZ_pft       => plt_morph%CanopyLeafAreaZ_pft        ,& !inoput :canopy layer leaf area, [m2 d-2]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch sapwood C, [gC d-2]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !output :leaf growth stage counter, [-]
@@ -1696,22 +1695,22 @@ module PlantBranchMod
   )
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
-!   HypoctoHeight_pft=hypocotyledon height
+!   HypocotHeight_pft=hypocotyledon height
 !   SeedDepth_pft=seeding depth
 !   LeafArea_node=node leaf area
 !   PetoleLength_node=petiole length
 !
-  KLowestGroLeafNode_brch(NB,NZ)=0
+  KLowestGroLeafNode_brch(NB,NZ)=0;LeafLength=0._r8
 
-  IF(HypoctoHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
+  IF(HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     !plant not emerged yet
     LeafLength            = SQRT(1.0E+02_r8*LeafArea_node(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
-    HypoctoHeight_pft(NZ) = LeafLength+PetoleLength_node(0,MainBranchNum_pft(NZ),NZ)+StalkNodeHeight_brch(0,MainBranchNum_pft(NZ),NZ)
+    HypocotHeight_pft(NZ) = LeafLength+PetoleLength_node(0,MainBranchNum_pft(NZ),NZ)+StalkNodeHeight_brch(0,MainBranchNum_pft(NZ),NZ)
   ENDIF
   !
   ! IF CANOPY HAS EMERGED
-  !
-  IF(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
+  !  
+  IF(HypocotHeight_pft(NZ).GT.SeedDepth_pft(NZ))THEN
     D540: DO K=0,MaxNodesPerBranch1
       DO  L=1,NumCanopyLayers1
         CanopyLeafArea_lnode(L,K,NB,NZ)                         = 0._r8
@@ -1750,6 +1749,7 @@ module PlantBranchMod
     !
     !   FOR ALL LEAFED NODES
     !
+
     D560: DO KK=KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
       K=pMOD(KK,MaxNodesPerBranch1)
       !
@@ -1835,6 +1835,7 @@ module PlantBranchMod
         ENDDO D570
         TotLeafElevation     = TotLeafElevation+LeafElevation
         CanopyHeight_pft(NZ) = AMAX1(CanopyHeight_pft(NZ),HeightLeafTip)
+
       ENDDO D555
 
       IF(PetoleProteinC_node(K,NB,NZ).GT.0.0_r8)THEN
@@ -3199,7 +3200,7 @@ module PlantBranchMod
   real(r8), INTENT(OUT) :: CNPG
   real(r8), intent(out) :: dNonstCX
   real(r8), intent(out) :: RMxess_brch
-  real(r8), intent(out) :: RNonstC4Groth_brch    !nonstrucal C to drive biomass growth
+  real(r8), intent(out) :: RNonstC4Groth_brch    !nonstrucal C to drive structural biomass growth
   real(r8) :: RCO2NonstC_brch  
   real(r8) :: RCO2Maint_brch  
   real(r8) :: RCO2NonstC4Nassim_brch
@@ -3231,13 +3232,13 @@ module PlantBranchMod
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !input  :soil layer at planting depth, [-]
     GrainFillDowreg_brch     => plt_photo%GrainFillDowreg_brch      & !input  :down-regulation of C4 photosynthesis, [-]
   )
-!
-! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
-!
-! CNPG=N,P constraint on growth respiration
-! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
-! CNKI,CPKI=nonstructural N,P inhibition constant on growth
-!
+  !
+  ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
+  !
+  ! CNPG=N,P constraint on growth respiration
+  ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
+  ! CNKI,CPKI=nonstructural N,P inhibition constant on growth
+  !
   call PrintInfo('beg '//subname)
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO)THEN
     CNG=LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ) &
@@ -3248,47 +3249,47 @@ module PlantBranchMod
   ELSE
     CNPG=1.0_r8
   ENDIF
-!
-! RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
-! NON-STRUCTURAL C:N:P, O2 UPTAKE
-!
-! RCO2NonstC_O2ulm,RCO2NonstC_brch=respiration from non-structural C unlimited,limited by O2
-! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
-! CPOOL=non-structural C mass
-! fTgrowRootP_vr=temperature function for root growth
-! WaterStress4Groth=growth function of canopy water potential
-! CNPG=N,P constraint on respiration
-! GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
-! RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
-!
+  !
+  ! RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
+  ! NON-STRUCTURAL C:N:P, O2 UPTAKE
+  !
+  ! RCO2NonstC_O2ulm,RCO2NonstC_brch=respiration from non-structural C unlimited,limited by O2
+  ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
+  ! CPOOL=non-structural C mass
+  ! fTgrowRootP_vr=temperature function for root growth
+  ! WaterStress4Groth=growth function of canopy water potential
+  ! CNPG=N,P constraint on respiration
+  ! GrainFillDowreg_brch=termination feedback inhibition on C3 CO2
+  ! RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
+  !
   RCO2NonstC_O2ulm=AZMAX1(VMXC*CanopyNonstElms_brch(ielmc,NB,NZ) &
     *fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ))*WaterStress4Groth*CNPG*GrainFillDowreg_brch(NB,NZ)
 
   RCO2NonstC_brch=RCO2NonstC_O2ulm*RAutoRootO2Limter_rpvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)  
-!
-! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
-!
-! RCO2Maint_brch=maintenance respiration
-! TFN6_vr=temperature function for root maintenance respiration
-! ShootStructE_brch(ielmn)=shoot structural N mass
-! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
-! WaterStress4Groth=growth function of canopy water potential
-!
+  !
+  ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
+  !
+  ! RCO2Maint_brch=maintenance respiration
+  ! TFN6_vr=temperature function for root maintenance respiration
+  ! ShootStructE_brch(ielmn)=shoot structural N mass
+  ! iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+  ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
+  ! WaterStress4Groth=growth function of canopy water potential
+  !
   RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN)
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. &
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WaterStress4Groth
   ENDIF
-!
-! GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
-! IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
-!
-! RCO2X_O2ulm,RCO2X_O2ld=diff between C respn unltd,ltd by O2 and mntc respn
-! RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
-! TurgEff4CanopyResp=expansion,extension function of canopy water potential
-! RMxess_Ulm,RMxess_brch=excess maintenance respiration unltd,ltd by O2
-!
+  !
+  ! GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
+  ! IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
+  !
+  ! RCO2X_O2ulm,RCO2X_O2ld=diff between C respn unltd,ltd by O2 and mntc respn
+  ! RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
+  ! TurgEff4CanopyResp=expansion,extension function of canopy water potential
+  ! RMxess_Ulm,RMxess_brch=excess maintenance respiration unltd,ltd by O2
+  !
   RCO2X_O2ulm = RCO2NonstC_O2ulm-RCO2Maint_brch
   RCO2X_O2ld  = RCO2NonstC_brch-RCO2Maint_brch
   RCO2YM      = AZMAX1(RCO2X_O2ulm)*TurgEff4CanopyResp
@@ -3296,22 +3297,22 @@ module PlantBranchMod
   RMxess_Ulm  = AZMAX1(-RCO2X_O2ulm)
   RMxess_brch = AZMAX1(-RCO2X_O2ld)
 
-!
-! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
-! AVAILABLE FOR GROWTH
-!
-! RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
-! CNLFX=diff between min and max leaf N prodn vs nonstruct C consumption
-! CNSHX=N production vs nonstructural C consumption in rest of shoot
-! ZPOOL,PPOOL=nonstructural N,P mass
-! FNP=growth respiration limited by O2 and N,P
-! YCO2Gro_brch=branch C respiration vs nonstructural C consumption
-! CNLFM,CPLFM=min leaf N,P production vs nonstructural C consumption
-! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
-! CNPG=N,P constraint on growth respiration
-! RgroCO2_ulm,RgroCO2_ltd=growth respiration unltd,ltd by O2 and limited by N,P
-! RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
-!
+  !
+  ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
+  ! AVAILABLE FOR GROWTH
+  !
+  ! RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
+  ! CNLFX=diff between min and max leaf N prodn vs nonstruct C consumption
+  ! CNSHX=N production vs nonstructural C consumption in rest of shoot
+  ! ZPOOL,PPOOL=nonstructural N,P mass
+  ! FNP=growth respiration limited by O2 and N,P
+  ! YCO2Gro_brch=branch C respiration vs nonstructural C consumption
+  ! CNLFM,CPLFM=min leaf N,P production vs nonstructural C consumption
+  ! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
+  ! CNPG=N,P constraint on growth respiration
+  ! RgroCO2_ulm,RgroCO2_ltd=growth respiration unltd,ltd by O2 and limited by N,P
+  ! RAutoRootO2Limter_rpvr=constraint by O2 consumption on all root processes
+  !
   FNP=1._r8
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
     ZPOOLB = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
@@ -3335,22 +3336,22 @@ module PlantBranchMod
     RgroCO2_ulm=0._r8
     RgroCO2_ltd=0._r8
   ENDIF
-!
-! TOTAL NON-STRUCTURAL C,N,P USED IN GROWTH
-! AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELDS
-! ENTERED IN 'READQ'
-!
-! CGROSM,RNonstC4Groth_brch=total non-structural C used in growth and respn unltd,ltd by O2
-! RgroCO2_ulm,RgroCO2_ltd=growth respiration unltd,ltd by O2 and limited by N,P
-! YCO2Gro_brch=branch C respiration vs nonstructural C consumption
-! ZADDBM,CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P unltd,ltd by O2 used in growth
-! ZPOOL,PPOOL=nonstructural N,P mass
-! CNSHX,CPSHX=N,P production vs nonstructural C consumption in rest of shoot
-! CNLFM,CPLFM=min leaf N,P production vs nonstructural C consumption
-! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
-! CNPG=N,P constraint on growth respiration
-! RCO2NonstC4NassimOUltd,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
-!
+  !
+  ! TOTAL NON-STRUCTURAL C,N,P USED IN GROWTH
+  ! AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELDS
+  ! ENTERED IN 'READQ'
+  !
+  ! CGROSM,RNonstC4Groth_brch=total non-structural C used in growth and respn unltd,ltd by O2
+  ! RgroCO2_ulm,RgroCO2_ltd=growth respiration unltd,ltd by O2 and limited by N,P
+  ! YCO2Gro_brch=branch C respiration vs nonstructural C consumption
+  ! ZADDBM,CanopyNonstElm4Gros(ielmn),CanopyNonstElm4Gros(ielmp)=nonstructural N,P unltd,ltd by O2 used in growth
+  ! ZPOOL,PPOOL=nonstructural N,P mass
+  ! CNSHX,CPSHX=N,P production vs nonstructural C consumption in rest of shoot
+  ! CNLFM,CPLFM=min leaf N,P production vs nonstructural C consumption
+  ! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
+  ! CNPG=N,P constraint on growth respiration
+  ! RCO2NonstC4NassimOUltd,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
+  !
   CGROSM                     = RgroCO2_ulm/YCO2Gro_brch
   RNonstC4Groth_brch         = RgroCO2_ltd/YCO2Gro_brch
   ZADDBM                     = AZMAX1(CGROSM*(CNSHX+CNLFM+CNLFX*CNPG))
@@ -3358,18 +3359,18 @@ module PlantBranchMod
   CanopyNonstElm4Gros(ielmp) = AZMAX1(RNonstC4Groth_brch*(CPSHX+CPLFM+CPLFX*CNPG))
   RCO2NonstC4NassimOUltd     = AZMAX1(1.70_r8*ZADDBM)
   RCO2NonstC4Nassim_brch     = AZMAX1(1.70_r8*CanopyNonstElm4Gros(ielmn))
-!
-! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
-! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE
-!
-! RCO2TM,Rauto_brch=total C respiration unltd,ltd by O2
-! RCO2Maint_brch=maintenance respiration
-! RgroCO2_ulm,RgroCO2_ltd=growth respiration limited by N,P unltd,ltd by O2
-! RMxess_Ulm,RMxess_brch=excess maintenance respiration unltd,ltd by O2
-! RCO2NonstC4NassimOUltd,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
-! RootCO2Autor_pvr=total root respiration
-! RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
-!
+  !
+  ! TOTAL ABOVE-GROUND AUTOTROPHIC RESPIRATION BY BRANCH
+  ! ACCUMULATE GPP, SHOOT AUTOTROPHIC RESPIRATION, NET C EXCHANGE
+  !
+  ! RCO2TM,Rauto_brch=total C respiration unltd,ltd by O2
+  ! RCO2Maint_brch=maintenance respiration
+  ! RgroCO2_ulm,RgroCO2_ltd=growth respiration limited by N,P unltd,ltd by O2
+  ! RMxess_Ulm,RMxess_brch=excess maintenance respiration unltd,ltd by O2
+  ! RCO2NonstC4NassimOUltd,RCO2NonstC4Nassim_brch=respiration for N assimilation unltd,ltd by O2
+  ! RootCO2Autor_pvr=total root respiration
+  ! RootRespPotent_pvr,RootCO2EmisPot_pvr=RootCO2Autor_pvr unltd by O2,nonstructural C
+  !
   RCO2TM     = AMIN1(RCO2Maint_brch,RCO2NonstC_O2ulm)+RgroCO2_ulm+RCO2NonstC4NassimOUltd
   Rauto_brch = AMIN1(RCO2Maint_brch,RCO2NonstC_brch)+RgroCO2_ltd+RCO2NonstC4Nassim_brch
   dNonstCX   = AMIN1(RCO2Maint_brch,RCO2NonstC_brch)+RNonstC4Groth_brch+RCO2NonstC4Nassim_brch
@@ -3410,7 +3411,7 @@ module PlantBranchMod
     LeafArea_node          => plt_morph%LeafArea_node           ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch      => plt_morph%LeafAreaLive_brch       ,& !inoput :branch leaf area, [m2 d-2]
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch       ,& !inoput :leaf element, [g d-2]
-    LeafProteinC_node      => plt_biom%LeafProteinC_node         & !inoput :layer leaf protein C, [g d-2]
+    LeafProteinC_node      => plt_biom%LeafProteinC_node         & !inoput :leaf node protein C, [g d-2]
   )
   
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN

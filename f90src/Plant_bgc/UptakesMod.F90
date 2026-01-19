@@ -1,5 +1,5 @@
 module UptakesMod
-  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_kind_mod , only : r8 => DAT_KIND_R8,yearIJ_type
   use data_const_mod, only: GravAcceleration=>DAT_CONST_G
   use StomatesMod,    only: StomatalDynamics, PhotosynsDiag
   use EcoSIMCtrlMod,  only: etimer, ldo_sp_mode
@@ -39,7 +39,7 @@ module UptakesMod
 
 
 !----------------------------------------------------------------------------------------------------
-  subroutine RootUptakes(I,J)
+  subroutine RootUptakes(yearIJ)
 !  
 !  Description: MAIN_CALL
 !
@@ -47,7 +47,7 @@ module UptakesMod
 !     BETWEEN THE CANOPY AND THE ATMOSPHERE AND BETWEEN ROOTS AND THE SOIL
 !
   implicit none
-  integer, intent(in) :: I, J
+  type(yearIJ_type), intent(in) :: yearIJ
   
   character(len=*), parameter :: subname='RootUptakes'
   integer :: NN,N,NZ,K,L
@@ -55,7 +55,7 @@ module UptakesMod
   real(r8) :: VHeatCapCanopyAir
   real(r8) :: CanopyMassC                 !Canopy C mass, g/m2
   real(r8) :: TotalSoilPSIMPa_vr(JZ1)     !total soil matric pressure, removing elevation adjustment [MPa]
-  real(r8) :: PathLen_rvr(pltpar%jroots,JZ1)
+  real(r8) :: RadialMeanLen_rvr(pltpar%jroots,JZ1)
   real(r8) :: FineRootRadius_rvr(pltpar%jroots,JZ1)
   real(r8) :: SoilResist4H2O_rvr(pltpar%jroots,JZ1)
   real(r8) :: SoilRootResist4H2O_pvr(pltpar%jroots,JZ1)
@@ -112,7 +112,7 @@ module UptakesMod
 
   call PrintInfo('beg '//subname)
 
-  call PrepH2ONutrientUptake(I,J,TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
+  call PrepH2ONutrientUptake(yearIJ%I,yearIJ%J,TotalSoilPSIMPa_vr,AllRootC_vr,AirMicPore4Fill_vr,WatAvail4Uptake_vr)
   !
   !     IF PLANT SPECIES EXISTS
 
@@ -120,15 +120,15 @@ module UptakesMod
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
-      call PhotosynsDiag(I,J,NZ)  
+      call PhotosynsDiag(yearIJ%I,yearIJ%J,NZ)  
 
-      call UpdateCanopyProperty(I,J,NZ)
+      call UpdateCanopyProperty(yearIJ%I,yearIJ%J,NZ)
 
 !     STOMATE=solve for minimum canopy stomatal resistance
       
-      CALL StomatalDynamics(I,J,NZ)
+      CALL StomatalDynamics(yearIJ%I,yearIJ%J,NZ)
 !
-      call UpdateRootProperty(NZ,PathLen_rvr,FineRootRadius_rvr,AllRootC_vr,FracPRoot4Uptake_pvr,&
+      call UpdateRootProperty(yearIJ,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,AllRootC_vr,FracPRoot4Uptake_pvr,&
         FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
 !
 !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
@@ -148,7 +148,7 @@ module UptakesMod
 
       IF(HydroActivePlant)THEN  
       
-        call CalcResistance(I,J,NZ,PathLen_rvr,FineRootRadius_rvr,RootEffLen4Absorption_pvr,&
+        call CalcResistance(yearIJ%I,yearIJ%J,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,RootEffLen4Absorption_pvr,&
           SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
         ! 
         !       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
@@ -172,7 +172,7 @@ module UptakesMod
 !
 !     CONVERGENCE SOLUTION
 !
-        NN=CanopyEnergyH2OIter_func(I,J,NZ,FracGrndByPFT,CanopyMassC,&
+        NN=CanopyEnergyH2OIter_func(yearIJ%I,yearIJ%J,NZ,FracGrndByPFT,CanopyMassC,&
           TotalSoilPSIMPa_vr,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,&
           HeatEvapSens,FDMP,SoilRootResist4H2O_pvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,&
           WatAvail4Uptake_vr,TKCX,CNDT,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
@@ -180,7 +180,7 @@ module UptakesMod
         !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
         !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
         !
-        call HandlingDivergence(I,J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
+        call HandlingDivergence(yearIJ%I,yearIJ%J,NN,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP)
 
         call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,CanopyMassC,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
           TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
@@ -195,9 +195,9 @@ module UptakesMod
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*CanopyBndlResist_pft(NZ)
       TdegCCanopy_pft(NZ) = units%Kelvin2Celcius(TKC_pft(NZ))
       if(.not.ldo_sp_mode) then      
-        call SetCanopyGrowthFuncs(I,J,NZ)
+        call SetCanopyGrowthFuncs(yearIJ%I,yearIJ%J,NZ)
     
-        call PlantNutientO2Uptake(I,J,NZ,FDMP,PathLen_rvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
+        call PlantNutientO2Uptake(yearIJ%I,yearIJ%J,NZ,FDMP,RadialMeanLen_rvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
           FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
       endif    
     ENDIF
@@ -311,7 +311,7 @@ module UptakesMod
     KoppenClimZone            => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
     LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    LeafProteinC_node         => plt_biom%LeafProteinC_node           ,& !input  :layer leaf protein C, [g d-2]
+    LeafProteinC_node         => plt_biom%LeafProteinC_node           ,& !input  :layer leaf protein N, [g d-2]
     LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     NP                        => plt_site%NP                          ,& !input  :current number of plant species,[-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
@@ -399,47 +399,51 @@ module UptakesMod
   end subroutine UpdateCanopyProperty
 
 !----------------------------------------------------------------------------------------------------
-  subroutine UpdateRootProperty(NZ,PathLen_rvr,FineRootRadius_rvr,AllRootC_vr,&
+  subroutine UpdateRootProperty(yearIJ,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,AllRootC_vr,&
     FracPRoot4Uptake_pvr,FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
   !
   ! Description:
   ! Update root characterization for pft NZ
   !
   implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
   integer , intent(in) :: NZ
   real(r8), intent(in) :: AllRootC_vr(JZ1)
-  real(r8), intent(out) :: PathLen_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(out) :: RadialMeanLen_rvr(pltpar%jroots,JZ1)
   real(r8), intent(out) :: FineRootRadius_rvr(pltpar%jroots,JZ1)
   real(r8), intent(out) :: FracPRoot4Uptake_pvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(out) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(out) :: FracSoilLBy1stRoots_pvr(JZ1,JP1)                   !fraction of soil layer occupied by primary roots
   real(r8), intent(out) :: RootEffLen4Absorption_pvr(pltpar%jroots,JZ1)       !ratio of lateral root area to root radius, [m]
+
+  character(len=*), parameter :: subname='UpdateRootProperty'
   real(r8) :: RootDepZ     !primary root depth
   real(r8) :: RTDPX        !Root occupied thickness in current layer
   integer :: N,L,NR
-
-  associate(                                                       &
-    CumSoilThickness_vr     => plt_site%CumSoilThickness_vr       ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
-    DLYR3                   => plt_site%DLYR3                     ,& !input  :vertical thickness of soil layer, [m]
-    FracSoiAsMicP_vr        => plt_site%FracSoiAsMicP_vr          ,& !input  :micropore fraction, [-]
-    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft        ,& !input  :cotyledon height, [m]
-    MaxSoiL4Root_pft        => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
-    Myco_pft                => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
-    NU                      => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
-    NumPrimeRootAxes_pft    => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
-    PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
-    PopuRootMycoC_pvr       => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
-    Root1stDepz_raxes       => plt_morph%Root1stDepz_raxes        ,& !input  :root layer depth, [m]
-    Root2ndMaxRadius1_pft   => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
-    Root2ndMaxRadius_pft    => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
-    RootLenDensPerPlant_pvr => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
-    RootTotLenPerPlant_pvr  => plt_morph%RootTotLenPerPlant_pvr   ,& !input  :root layer length per plant, [m p-1]
-    RootPorosity_pft        => plt_morph%RootPorosity_pft         ,& !input  :root porosity, [m3 m-3]
-    RootVH2O_pvr            => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
-    SeedDepth_pft           => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
-    ZERO                    => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
-    ZEROS                   => plt_site%ZEROS                      & !input  :threshold zero for numerical stability,[-]
+  
+  associate(                                                          &
+    CumSoilThickness_vr        => plt_site%CumSoilThickness_vr       ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
+    DLYR3                      => plt_site%DLYR3                     ,& !input  :vertical thickness of soil layer, [m]
+    FracSoiAsMicP_vr           => plt_site%FracSoiAsMicP_vr          ,& !input  :micropore fraction, [-]
+    HypocotHeight_pft          => plt_morph%HypocotHeight_pft        ,& !input  :cotyledon height, [m]
+    MaxSoiL4Root_pft           => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    Myco_pft                   => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
+    NU                         => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
+    NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
+    PlantPopulation_pft        => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
+    PopuRootMycoC_pvr          => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
+    Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes        ,& !input  :root layer depth, [m]
+    Root2ndMaxRadius1_pft      => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
+    Root2ndMaxRadius_pft       => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
+    RootLenDensPerPlant_pvr    => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
+    RootAbsorbLenPerPlant_pvr  => plt_morph%RootAbsorbLenPerPlant_pvr,& !input  :total absorptive root length per plant in layer, [m p-1]
+    RootPorosity_pft           => plt_morph%RootPorosity_pft         ,& !input  :root porosity, [m3 m-3]
+    RootVH2O_pvr               => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
+    SeedDepth_pft              => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
+    ZERO                       => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
+    ZEROS                      => plt_site%ZEROS                      & !input  :threshold zero for numerical stability,[-]
   )
+  call PrintInfo('beg '//subname)
   if(ldo_sp_mode)then
     !no mycorrhizae considered for prescribed phenology mode
     N=ipltroot
@@ -460,7 +464,7 @@ module UptakesMod
       ELSE
         IF(DLYR3(L).GT.ZERO)THEN
           RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1)) !root covered depth
-          RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypoctoHeight_pft(NZ)))
+          RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))
           FracSoilLBy1stRoots_pvr(L,NZ) = RTDPX/DLYR3(L)
         ELSE
           FracSoilLBy1stRoots_pvr(L,NZ)=0.0_r8
@@ -480,21 +484,25 @@ module UptakesMod
       ENDIF
       FracMinRoot4Uptake_rpvr(N,L,NZ)=FMN*FracPRoot4Uptake_pvr(N,L,NZ)
 
-      IF(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
-        FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT((RootVH2O_pvr(N,L,NZ) &
-          /(1.0_r8-RootPorosity_pft(N,NZ)))/(PICON*PlantPopulation_pft(NZ)*RootTotLenPerPlant_pvr(N,L,NZ))))
+      IF(RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
+        FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT(RootVH2O_pvr(N,L,NZ) &
+          /((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))))
+!        if(N==ipltroot)write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,FineRootRadius_rvr(N,L),Root2ndMaxRadius1_pft(N,NZ),RootVH2O_pvr(N,L,NZ),&
+!          1.0_r8-RootPorosity_pft(N,NZ),RootAbsorbLenPerPlant_pvr(N,L,NZ),PlantPopulation_pft(NZ)
 
-        PathLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
-          1.0_r8/(SQRT(PICON*(RootLenDensPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ))/FracSoiAsMicP_vr(L))))
-        RootEffLen4Absorption_pvr(N,L)=TwoPiCON*RootTotLenPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ)
+        !cylynder, pi*r^2*L=vol
+        RadialMeanLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
+          SQRT(FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))))
+
+        RootEffLen4Absorption_pvr(N,L)=TwoPiCON*RootAbsorbLenPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ)
       ELSE
-        FineRootRadius_rvr(N,L)       = Root2ndMaxRadius_pft(N,NZ)
-        PathLen_rvr(N,L)              = 1.001_r8*FineRootRadius_rvr(N,L)
-        RootEffLen4Absorption_pvr(N,L) = TwoPiCON*RootTotLenPerPlant_pvr(N,L,NZ)       
+        FineRootRadius_rvr(N,L)        = Root2ndMaxRadius_pft(N,NZ)
+        RadialMeanLen_rvr(N,L)         = 1.001_r8*FineRootRadius_rvr(N,L)
+        RootEffLen4Absorption_pvr(N,L) = TwoPiCON*RootAbsorbLenPerPlant_pvr(N,L,NZ)
       ENDIF
     enddo
   ENDDO D2000
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine UpdateRootProperty
 
@@ -1058,12 +1066,12 @@ module UptakesMod
   end function CanopyEnergyH2OIter_func
 
 !----------------------------------------------------------------------------------------------------
-  subroutine CalcResistance(I,J,NZ,PathLen_rvr,FineRootRadius_rvr,RootEffLen4Absorption_pvr,&
+  subroutine CalcResistance(I,J,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,RootEffLen4Absorption_pvr,&
     SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CNDT,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
 
   implicit none
   integer, intent(in)   :: I,J,NZ
-  real(r8), intent(in)  :: PathLen_rvr(pltpar%jroots,JZ1)
+  real(r8), intent(in)  :: RadialMeanLen_rvr(pltpar%jroots,JZ1)   !Mean radial path length for water and nutrient uptake [m]
   real(r8), intent(in)  :: FineRootRadius_rvr(pltpar%jroots,JZ1)
   real(r8), intent(in)  :: RootEffLen4Absorption_pvr(pltpar%jroots,JZ1)
   real(r8), intent(out) :: SoilResist4H2O_rvr(pltpar%jroots,JZ1)         !soil resistance for water uptake
@@ -1106,7 +1114,7 @@ module UptakesMod
     RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
     RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-1]    
     RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr         ,& !input  :root layer length density, [m m-3]
-    RootTotLenPerPlant_pvr      => plt_morph%RootTotLenPerPlant_pvr          ,& !input  :root layer length per plant, [m p-1]
+    RootAbsorbLenPerPlant_pvr   => plt_morph%RootAbsorbLenPerPlant_pvr       ,& !input  :total absorptive root length per plant in layer, [m p-1]
     THETW_vr                    => plt_soilchem%THETW_vr                     ,& !input  :volumetric water content, [m3 m-3]
     VLMicP_vr                   => plt_soilchem%VLMicP_vr                    ,& !input  :total volume in micropores, [m3 d-2]
     VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr            ,& !input  :volume of soil layer, [m3 d-2]
@@ -1136,7 +1144,7 @@ module UptakesMod
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
   !      VLSoilPoreMicP_vr,VLWatMicPM,THETW=soil,water volume,content
-  !     RootLenDensPerPlant_pvr,RootTotLenPerPlant_pvr=root length density,root length per plant
+  !     RootLenDensPerPlant_pvr,RootAbsorbLenPerPlant_pvr=root length density,root length per plant
   !     HYCDMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
   !     Root1stXNumL_pvr,Root2ndXNumL_rpvr=number of root,myco primary,secondary axes
   !     SoiLayerHasRoot_rvr:1=rooted,0=not rooted
@@ -1147,7 +1155,7 @@ module UptakesMod
  
       SoiLayerHasRoot_rvr(N,L)=VLSoilPoreMicP_vr(L).GT.ZEROS2         &  
         .AND. VLWatMicPM_vr(NPH,L).GT.ZEROS2                          &
-        .AND. RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO                 &
+        .AND. RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO               &
         .AND. HYCDMicP4RootUptake_vr(L).GT.ZERO                       &
         .AND. Root1stXNumL_pvr(L,NZ).GT.ZERO4Groth_pft(NZ)            &
         .AND. Root2ndXNumL_rpvr(N,L,NZ).GT.ZERO4Groth_pft(NZ)         &
@@ -1161,10 +1169,10 @@ module UptakesMod
         !
         !     SoiH2OResist=soil hydraulic resistance
         !     PP=plant population
-        !     PathLen_rvr=path length of water and nutrient uptake
+        !     RadialMeanLen_rvr=mean radial path length of water and nutrient uptake
         !     FineRootRadius_rvr,RootEffLen4Absorption_pvr=root radius,surface/radius area
         
-        RSSL              = LOG(PathLen_rvr(N,L)/FineRootRadius_rvr(N,L))/(RootEffLen4Absorption_pvr(N,L)*PlantPopulation_pft(NZ))
+        RSSL                    = LOG(RadialMeanLen_rvr(N,L)/FineRootRadius_rvr(N,L))/(RootEffLen4Absorption_pvr(N,L)*PlantPopulation_pft(NZ))
         SoilResist4H2O_rvr(N,L) = RSSL/HYCDMicP4RootUptake_vr(L)
 
         !
@@ -1172,12 +1180,12 @@ module UptakesMod
         !     ENTERED IN 'READQ'
         !
         !     Root2ndRadius_rpvr=secondary root radius
-        !     RootTotLenPerPlant_pvr=root length per plant
+        !     RootAbsorbLenPerPlant_pvr=root length per plant
         !     RootRadialResist_rvr=radial resistance
         !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !eq. (31) in Grant, 1998
-        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootTotLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
         RootRadialResist_rvr(N,L) = RootRadialResist_pft(N,NZ)/Root2ndSurfArea*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)     ![MPa h m-1]/[m2]=[MPa h m-3]
         !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND

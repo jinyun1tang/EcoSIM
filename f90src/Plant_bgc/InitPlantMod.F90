@@ -615,7 +615,7 @@ module InitPlantMod
     Hours4Leafout_brch                => plt_pheno%Hours4Leafout_brch                 ,& !output :heat requirement for spring leafout/dehardening, [h]
     HoursDoingRemob_brch              => plt_pheno%HoursDoingRemob_brch               ,& !output :counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
     HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft              ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
-    HypoctoHeight_pft                 => plt_morph%HypoctoHeight_pft                  ,& !output :cotyledon height, [m]
+    HypocotHeight_pft                 => plt_morph%HypocotHeight_pft                  ,& !output :cotyledon height, [m]
     KHiestGroLeafNode_brch            => plt_pheno%KHiestGroLeafNode_brch             ,& !output :leaf growth stage counter, [-]
     KLeafNumber_brch                  => plt_morph%KLeafNumber_brch                   ,& !output :leaf number, [-]
     KLowestGroLeafNode_brch           => plt_pheno%KLowestGroLeafNode_brch            ,& !output :leaf growth stage counter, [-]
@@ -653,7 +653,7 @@ module InitPlantMod
   plt_pheno%iPlantRootState_pft(NZ)  = iLive
   BranchNumber_pft(NZ)               = 0
   NumOfBranches_pft(NZ)              = 0
-  HypoctoHeight_pft(NZ)              = 0._r8
+  HypocotHeight_pft(NZ)              = 0._r8
   CanopyHeight_pft(NZ)               = 0._r8
   D10: DO NB=1,MaxNumBranches
     plt_pheno%doInitLeafOut_brch(NB,NZ)           = iEnable

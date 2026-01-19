@@ -143,7 +143,7 @@ implicit none
     iPlantRootState_pft     => plt_pheno%iPlantRootState_pft      ,& !output :flag to detect root system death,[-]
     BranchNumber_pft        => plt_morph%BranchNumber_pft         ,& !output :main branch numeric id,[-]
     HoursTooLowPsiCan_pft   => plt_pheno%HoursTooLowPsiCan_pft    ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
-    HypoctoHeight_pft       => plt_morph%HypoctoHeight_pft        ,& !output :cotyledon height, [m]
+    HypocotHeight_pft       => plt_morph%HypocotHeight_pft        ,& !output :cotyledon height, [m]
     doReSeed_pft            => plt_pheno%doReSeed_pft             ,& !output :flag to do annual plant reseeding, [-]
     iPlantShootState_pft    => plt_pheno%iPlantShootState_pft      & !output :flag to detect canopy death,[-]
   )
@@ -158,7 +158,7 @@ implicit none
     ELSE
       NumOfBranches_pft(NZ)=0
     ENDIF
-    HypoctoHeight_pft(NZ)   = 0._r8
+    HypocotHeight_pft(NZ)   = 0._r8
     QH2OLoss_lnds           = QH2OLoss_lnds+CanopyBiomWater_pft(NZ)
     H2OLoss_CumYr_col       = H2OLoss_CumYr_col+CanopyBiomWater_pft(NZ)
     CanopyBiomWater_pft(NZ) = 0._r8

@@ -54,8 +54,11 @@ implicit none
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
         call PlantUptakeAPISend(yearIJ%I,yearIJ%J,NY,NX)        
-        CALL ROOTUPTAKES(yearIJ%I,yearIJ%J)
+
+        CALL ROOTUPTAKES(yearIJ)
+        
         call extracts(yearIJ%I,yearIJ%J)
+        
         call PlantUPtakeAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       else
       
@@ -67,7 +70,7 @@ implicit none
         CALL PhenologyUpdate(yearIJ%I,yearIJ%J)
 
         !Predict uptake fluxes of nutrients and O2        
-        CALL ROOTUPTAKES(yearIJ%I,yearIJ%J)
+        CALL ROOTUPTAKES(yearIJ)
 
         !Do growth of active branches and roots
         CALL GROWPLANTS(yearIJ)

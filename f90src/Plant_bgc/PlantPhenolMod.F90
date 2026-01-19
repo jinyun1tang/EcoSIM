@@ -517,7 +517,7 @@ module PlantPhenolMod
     MainBranchNum_pft   => plt_morph%MainBranchNum_pft    ,& !input  :number of main branch,[-]
     CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft   ,& !input  :plant canopy leaf area, [m2 d-2]
     ShootElms_pft       => plt_biom%ShootElms_pft         ,& !input  :canopy shoot structural chemical element mass, [g d-2]
-    HypoctoHeight_pft   => plt_morph%HypoctoHeight_pft    ,& !input  :cotyledon height, [m]
+    HypocotHeight_pft   => plt_morph%HypocotHeight_pft    ,& !input  :cotyledon height, [m]
     Root1stDepz_raxes   => plt_morph%Root1stDepz_raxes    ,& !input  :root layer depth, [m]
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft      ,& !input  :threshold zero for leaf calculation, [-]
     WatHeldOnCanopy_pft => plt_ew%WatHeldOnCanopy_pft     ,& !input  :canopy surface water content, [m3 d-2]
@@ -531,17 +531,16 @@ module PlantPhenolMod
 !
 ! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
 ! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
-! HypoctoHeight_pft=hypocotyledon height
+! HypocotHeight_pft=hypocotyledon height
 ! SeedDepth_pft=seeding depth
 ! Root1stDepz_raxes=primary root depth,avoid plant the seed at the grid interface
 ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
 !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    CanopyChk = (HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
+    CanopyChk = (HypocotHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_raxes(1,NZ).GT.(SeedDepth_pft(NZ)+ppmc)
-!    write(666,*)I+J/24.,NZ,(HypoctoHeight_pft(NZ).GT.SeedDepth_pft(NZ)),(ShootArea.GT.ZERO4LeafVar_pft(NZ)),&
-!      RootChk,CanopyLeafArea_pft(NZ),CanopyStemArea_pft(NZ),HypoctoHeight_pft(NZ),SeedDepth_pft(NZ),Root1stDepz_raxes(1,NZ)
+    
     IF(CanopyChk .AND. RootChk)THEN
       iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)=I
       VHeatCapCanopy_pft(NZ)=cpw*(ShootElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))

@@ -36,7 +36,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedVolumeMean_pft(:,:,:)                  !seed volume, [m3 ]
   real(r8),target,allocatable ::  SeedMeanLen_pft(:,:,:)                     !seed length, [m]
   real(r8),target,allocatable ::  SeedAreaMean_pft(:,:,:)                    !seed surface area, [m2]
-  real(r8),target,allocatable ::  HypoctoHeight_pft(:,:,:)                   !cotyledon height, [m]
+  real(r8),target,allocatable ::  HypocotHeight_pft(:,:,:)                   !cotyledon height, [m]
   real(r8),target,allocatable ::  CanopyHeight_col(:,:)                      !canopy height over grid, [m]
   real(r8),target,allocatable ::  CanopyHeightZ_col(:,:,:)                   !canopy layer height , [m]
   real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                     !branching angle, [degree from horizontal]
@@ -207,7 +207,7 @@ contains
   allocate(SeedVolumeMean_pft(JP,JY,JX));     SeedVolumeMean_pft=0._r8
   allocate(SeedMeanLen_pft(JP,JY,JX));     SeedMeanLen_pft=0._r8
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
-  allocate(HypoctoHeight_pft(JP,JY,JX));    HypoctoHeight_pft=0._r8
+  allocate(HypocotHeight_pft(JP,JY,JX));    HypocotHeight_pft=0._r8
   allocate(CanopyHeight_col(JY,JX));          CanopyHeight_col=0._r8
   allocate(CanopyHeightZ_col(0:NumCanopyLayers,JY,JX));     CanopyHeightZ_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
@@ -376,7 +376,7 @@ contains
   call destroy(SeedVolumeMean_pft)
   call destroy(SeedMeanLen_pft)
   call destroy(SeedAreaMean_pft)
-  call destroy(HypoctoHeight_pft)
+  call destroy(HypocotHeight_pft)
   call destroy(CanopyHeight_col)
   call destroy(CanopyHeightZ_col)
   call destroy(BranchAngle_pft)

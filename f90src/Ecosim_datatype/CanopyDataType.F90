@@ -64,7 +64,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafRubisco2Protein_pft(:,:,:)             !leaf rubisco content, [g g-1]
   real(r8),target,allocatable ::  LeafPEP2Protein_pft(:,:,:)                 !leaf PEP carboxylase content, [g g-1]
   real(r8),target,allocatable ::  SpecLeafChlAct_pft(:,:,:)                  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8),target,allocatable ::  LeafChl2Protein_pft(:,:,:)                 !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
+  real(r8),target,allocatable ::  LeafProtein2Chl_pft(:,:,:)                 !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
   real(r8),target,allocatable ::  fMesophyllChlProtein_pft(:,:,:)            !fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
   real(r8),target,allocatable ::  CanopyCi2CaRatio_pft(:,:,:)                !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2Canopy_pft(:,:,:)                   !canopy net radiation , [MJ d-2 h-1] >0
@@ -155,7 +155,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  StructInternodeElms_brch(:,:,:,:,:,:)       !internode chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafLayerElms_node(:,:,:,:,:,:,:)    !layer leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_lnode(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  LeafProteinC_node(:,:,:,:,:)           !layer leaf protein C, [g d-2]
+  real(r8),target,allocatable ::  LeafProteinC_node(:,:,:,:,:)                !layer leaf protein C, [g d-2]
   real(r8),target,allocatable ::  PetoleProteinC_node(:,:,:,:,:)         !layer sheath protein C, [g d-2]
   real(r8),target,allocatable ::  CanopyNoduleNonstCConc_pft(:,:,:)            !nodule nonstructural C, [g d-2]
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)           !maximum grain C during grain fill, [g d-2]
@@ -277,7 +277,7 @@ module CanopyDataType
   allocate(LeafRubisco2Protein_pft(JP,JY,JX));     LeafRubisco2Protein_pft=0._r8
   allocate(LeafPEP2Protein_pft(JP,JY,JX));     LeafPEP2Protein_pft=0._r8
   allocate(SpecLeafChlAct_pft(JP,JY,JX));     SpecLeafChlAct_pft=0._r8
-  allocate(LeafChl2Protein_pft(JP,JY,JX));      LeafChl2Protein_pft=0._r8
+  allocate(LeafProtein2Chl_pft(JP,JY,JX));      LeafProtein2Chl_pft=0._r8
   allocate(fMesophyllChlProtein_pft(JP,JY,JX));     fMesophyllChlProtein_pft=0._r8
   allocate(CanopyCi2CaRatio_pft(JP,JY,JX));     CanopyCi2CaRatio_pft=0._r8
   allocate(RadNet2Canopy_pft(JP,JY,JX));     RadNet2Canopy_pft=0._r8
@@ -466,7 +466,7 @@ module CanopyDataType
   call destroy(LeafRubisco2Protein_pft)
   call destroy(LeafPEP2Protein_pft)
   call destroy(SpecLeafChlAct_pft)
-  call destroy(LeafChl2Protein_pft)
+  call destroy(LeafProtein2Chl_pft)
   call destroy(fMesophyllChlProtein_pft)
   call destroy(CanopyCi2CaRatio_pft)
   call destroy(RadNet2Canopy_pft)

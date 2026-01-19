@@ -404,20 +404,20 @@ module StartqMod
   call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
     SeedMeanLen_pft(NZ,NY,NX),SeedAreaMean_pft(NZ,NY,NX))
 
-!
-!     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
-!
-!     SeedDepth_pft=seeding depth(m) from PFT management file
-!     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
-!     NG,NIX,NRoot1stTipLay_raxes=seeding,upper,lower rooting layer
-!     CNRTS_pft,CPRTS_pft=N,P root growth yield
-!     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
-!     PORT=mycorrhizal porosity
-!     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
-!     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
-!
+  !
+  !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
+  !
+  !     SeedDepth_pft=seeding depth(m) from PFT management file
+  !     CumSoilThickness_vr=depth to soil layer bottom from surface(m)
+  !     NG,NIX,NRoot1stTipLay_raxes=seeding,upper,lower rooting layer
+  !     CNRTS_pft,CPRTS_pft=N,P root growth yield
+  !     Root1stMaxRadius_pft,Root2ndMaxRadius_pft=maximum primary,secondary mycorrhizal radius (m)
+  !     PORT=mycorrhizal porosity
+  !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
+  !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
+  !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
+  !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
+  !
   SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
   DO L=NU_col(NY,NX),NL_col(NY,NX)
     IF(isclose(SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(L,NY,NX)))then
@@ -426,12 +426,12 @@ module StartqMod
     endif
   ENDDO
   PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
-!  write(9333,*)SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(1:3,NY,NX),'yyy'
+
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !find the seeding layer, i.e. the first root layer
     IF(SeedDepth_pft(NZ,NY,NX).GE.CumSoilThickness_vr(L-1,NY,NX) &
       .AND. SeedDepth_pft(NZ,NY,NX).LT.CumSoilThickness_vr(L,NY,NX))THEN
-      NGTopRootLayer_pft(NZ,NY,NX)  = L
+      NGTopRootLayer_pft(NZ,NY,NX)   = L
       NMaxRootBotLayer_pft(NZ,NY,NX) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
         NRoot1stTipLay_raxes(NR,NZ,NY,NX)=L
@@ -494,7 +494,7 @@ module StartqMod
   iPlantRootState_pft(NZ,NY,NX)  = iLive
   BranchNumber_pft(NZ,NY,NX)     = 0
   NumOfBranches_pft(NZ,NY,NX)    = 0
-  HypoctoHeight_pft(NZ,NY,NX)    = 0._r8
+  HypocotHeight_pft(NZ,NY,NX)    = 0._r8
   CanopyHeight_pft(NZ,NY,NX)     = 0._r8
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)                = iEnable

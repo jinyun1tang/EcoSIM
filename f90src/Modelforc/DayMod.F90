@@ -67,6 +67,7 @@
   else
     leapday=0._r8
   endif
+
   eot=calculate_equation_of_time(I,leapday)
   DO NX=NHW,NHE
     DO NY=NVN,NVS

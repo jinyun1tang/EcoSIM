@@ -52,6 +52,7 @@ module RootDataType
   real(sp),target,allocatable ::  RootPoreTortu4Gas_pft(:,:,:,:)                 !root tortuosity to calculate root gaseous diffusivity, [-]
   real(sp),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)             !root  layer nonstructural element, [g d-2]
   real(sp),target,allocatable ::  RootTotLenPerPlant_pvr(:,:,:,:,:)              !root layer length per plant, including root hair [m p-1]
+  real(sp),target,allocatable ::  RootAbsorbLenPerPlant_pvr(:,:,:,:,:)           !total absorptive root length per plant in layer, [m p-1]
   real(sp),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
   real(sp),target,allocatable ::  Root1stLenPP_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(sp),target,allocatable ::  RootAge_rpvr(:,:,:,:,:)                        !root age, [h]
@@ -180,6 +181,7 @@ contains
   allocate(RootPoreTortu4Gas_pft(jroots,JP,JY,JX));  RootPoreTortu4Gas_pft=0._sp
   allocate(RootNodulNonstElms_rpvr(NumPlantChemElms,JZ,JP,JY,JX));RootNodulNonstElms_rpvr=0._sp
   allocate(RootTotLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootTotLenPerPlant_pvr=0._sp
+  allocate(RootAbsorbLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootAbsorbLenPerPlant_pvr=0._sp
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._sp
   allocate(Root1stLenPP_rpvr(JZ,MaxNumRootAxes,JP,JY,JX));Root1stLenPP_rpvr=0._sp
   allocate(RootAge_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootAge_rpvr=0._sp
@@ -296,6 +298,7 @@ contains
   call destroy(RootPoreTortu4Gas_pft)
   call destroy(RootNodulNonstElms_rpvr)
   call destroy(RootTotLenPerPlant_pvr)
+  call destroy(RootAbsorbLenPerPlant_pvr)
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLenPP_rpvr)
   call destroy(RootAge_rpvr)

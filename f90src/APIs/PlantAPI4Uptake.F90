@@ -126,7 +126,7 @@ implicit none
     plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)  = 1
     plt_morph%LeafStalkArea_pft(NZ)        = LeafStalkArea_pft(NZ,NY,NX)      !pft leaf+stalk area
-    plt_morph%HypoctoHeight_pft(NZ)        = HypoctoHeight_pft(NZ,NY,NX)      !(approximately) plant height
+    plt_morph%HypocotHeight_pft(NZ)        = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
     plt_ew%CanopyIsothBndlResist_pft(NZ)          = CanopyIsothBndlResist_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
     plt_morph%CanopyHeight_pft(NZ)          = CanopyHeight_pft(NZ,NY,NX)       !canopy height, set as prescribed input

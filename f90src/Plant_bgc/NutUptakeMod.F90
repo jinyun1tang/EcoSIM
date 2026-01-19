@@ -170,7 +170,7 @@ module NutUptakeMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
     RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr    ,& !input  :O2 constraint to root respiration (0-1), [-]
     RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr        ,& !input  :root respiration unconstrained by O2, [g d-2 h-1]
-    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr      ,& !input  :root layer length per plant, [m p-1]
+    RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr   ,& !input  :root layer length per plant, [m p-1]
     trcs_solml_vr             => plt_soilchem%trcs_solml_vr         ,& !input  :aqueous tracer, [g d-2]
     trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr         ,& !input  :gas layer mass, [g d-2]
     Myco_pft                  => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
@@ -203,94 +203,94 @@ module NutUptakeMod
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=MaxSoiL4Root_pft(NZ)) then
       trc_solml_new  = 0._r8;trc_gasml_new = 0._r8
       
-      D955: DO N  = 1, Myco_pft(NZ)
+      D955: DO N  = 1, Myco_pft(NZ)      
         if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
           .AND. PopuRootMycoC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 
-            call GetUptakeCapcity(I,J,N,L,NZ,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,FCUP,FZUP,FPUP,&
-              FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
+          call GetUptakeCapcity(I,J,N,L,NZ,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,FCUP,FZUP,FPUP,&
+            FWSRT,PerPlantRootH2OUptake,dtPerPlantRootH2OUptake,FOXYX)
 
-            !
-            !     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
-            !
-            !     RootO2Dmnd4Resp_pvr=O2 demand, g O2
-            !     RootRespPotent_pvr=respiration unlimited by O2
-            !     RootVH2O_pvr=root or myco aqueous volume
-            !     FOXYX=fraction of total O2 demand from previous hour
-            !
-            RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
+          !
+          !     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
+          !
+          !     RootO2Dmnd4Resp_pvr=O2 demand, g O2
+          !     RootRespPotent_pvr=respiration unlimited by O2
+          !     RootVH2O_pvr=root or myco aqueous volume
+          !     FOXYX=fraction of total O2 demand from previous hour
+          !
+          RootO2Dmnd4Resp_pvr(N,L,NZ)=2.667_r8*RootRespPotent_pvr(N,L,NZ)
 
-            !partition the gas for local uptake 
-            DO idg=idg_beg,idg_end
-              if(idg/=idg_O2)then
-                trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
-              endif
-            enddo
-            trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2))
-            trc_solml_loc(idg_O2)  = trcs_solml_vr(idg_O2,L)*FOXYX
+          !partition the gas for local uptake 
+          DO idg=idg_beg,idg_end
+            if(idg/=idg_O2)then
+              trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
+            endif
+          enddo
+          trc_solml_loc(idg_CO2) = AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2))
+          trc_solml_loc(idg_O2)  = trcs_solml_vr(idg_O2,L)*FOXYX
 
-        !  the two lines below may be redundant
+          !  the two lines below may be redundant
 
-            DO idg=idg_beg,idg_NH3
-              if(idg/=idg_O2)then
-                trc_gasml_loc(idg)=AZMAX1(trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))     
-              endif          
-            enddo
-            trc_gasml_loc(idg_O2)  = AZMAX1(trcg_gasml_vr(idg_O2,L)*FOXYX)
-            trc_gasml_loc(idg_CO2) = AZMAX1(trc_gasml_loc(idg_CO2))
+          DO idg=idg_beg,idg_NH3
+            if(idg/=idg_O2)then
+              trc_gasml_loc(idg)=AZMAX1(trcg_gasml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ))     
+            endif          
+          enddo
+          trc_gasml_loc(idg_O2)  = AZMAX1(trcg_gasml_vr(idg_O2,L)*FOXYX)
+          trc_gasml_loc(idg_CO2) = AZMAX1(trc_gasml_loc(idg_CO2))
 
-            call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
-              RootEffLen4Absorption_pvr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
-          
-            PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
-            PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
+          call RootSoilGasExchange(I,J,N,L,NZ,FineRootRadius,FracPRoot4Uptake,FracSoiLayByPrimRoot,&
+            RootEffLen4Absorption_pvr,dtPerPlantRootH2OUptake,FOXYX,trc_gasml_loc,trc_solml_loc,PopPlantO2Uptake_vr)
+        
+          PopPlantO2Demand = PopPlantO2Demand+RootO2Dmnd4Resp_pvr(N,L,NZ)
+          PopPlantO2Uptake = PopPlantO2Uptake+PopPlantO2Uptake_vr
 
-            !update the soil gas
-            DO idg=idg_beg,idg_NH3
-              trc_gasml_new(idg)=trc_gasml_new(idg)+trc_gasml_loc(idg)
-              trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
-            ENDDO    
-
-            idg=idg_NH3B
+          !update the soil gas
+          DO idg=idg_beg,idg_NH3
+            trc_gasml_new(idg)=trc_gasml_new(idg)+trc_gasml_loc(idg)
             trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
+          ENDDO    
 
-            call RootExudates(I,J,N,L,NZ)
-            if(N==ipltroot)then
-              RootMyMassC=sum(RootMyco1stStrutElms_rpvr(ielmc,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-                RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-            else
-              RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
-                RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-            endif  
-  !
-  !     NUTRIENT UPTAKE
-  !
-  !     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
-  !     FCUP=limitation to active uptake respiration from CPOOLR
-  !     FWSRT=protein concentration relative to 5%
-  !     RootTotLenPerPlant_pvr=root,myco length per plant
-  !
-            IF(RAutoRootO2Limter_rpvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
-              .AND. RootTotLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-  !
-  !     FZUP=limitn to active uptake respiration from CZPOLR
-  !         
-              call UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,&
-                RootEffLen4Absorption_pvr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake,RootMyMassC)
-  !
-  !     FPUP=limitn to active uptake respiration from CPPOLR
-  !         
-              call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,&
-                RootEffLen4Absorption_pvr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake,RootMyMassC)
-            ENDIF
-!          elseif(RootVH2O_pvr(N,L,NZ).GT.1.e-15_r8)then
-!            RAutoRootO2Limter_rpvr(N,L,NZ)=1._r8
-!          endif  
-          RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)          
+          idg=idg_NH3B
+          trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
+
+          call RootExudates(I,J,N,L,NZ)
+          if(N==ipltroot)then
+            RootMyMassC=sum(RootMyco1stStrutElms_rpvr(ielmc,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+              RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+          else
+            RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &
+              RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+          endif  
+          !
+          !     NUTRIENT UPTAKE
+          !
+          !     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
+          !     FCUP=limitation to active uptake respiration from CPOOLR
+          !     FWSRT=protein concentration relative to 5%
+          !     RootTotLenPerPlant_pvr=root,myco length per plant
+          !
+          IF(RAutoRootO2Limter_rpvr(N,L,NZ).GT.ZERO .AND. FCUP.GT.ZERO .AND. FWSRT.GT.ZERO &
+            .AND. RootTotLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+            !
+            !     FZUP=limitn to active uptake respiration from CZPOLR
+            !         
+            call UptakeMineralNitrogen(I,J,N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,&
+              RootEffLen4Absorption_pvr,FCUP,FZUP,FWSRT,PerPlantRootH2OUptake,RootMyMassC)
+            !
+            !     FPUP=limitn to active uptake respiration from CPPOLR
+            !         
+            call UptakeMineralPhosporhus(N,L,NZ,PathLen_pvr,FineRootRadius,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,&
+              RootEffLen4Absorption_pvr,FCUP,FPUP,FWSRT,PerPlantRootH2OUptake,RootMyMassC)
+          ENDIF
+          RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)      
+        else
+          RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8                      
         ENDIF
       ENDDO D955      
     ELSE
       D956: DO N  = 1, Myco_pft(NZ)    
+        RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8                      
         RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3
