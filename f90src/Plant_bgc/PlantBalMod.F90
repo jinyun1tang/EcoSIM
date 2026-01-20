@@ -42,7 +42,7 @@ implicit none
     NumOfBranches_pft        => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     LitrfallElms_pvr         => plt_bgcr%LitrfallElms_pvr           ,& !input  :plant LitrFall element, [g d-2 h-1]
     Myco_pft                 => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
-    MaxSoiL4Root_pft         => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    NMaxRootBotLayer_pft     => plt_morph%NMaxRootBotLayer_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     MaxNumRootLays           => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     RootElms_pft             => plt_biom%RootElms_pft               ,& !input  :plant root element mass, [g d-2]
     RootCO2Autor_pvr         => plt_rbgc%RootCO2Autor_pvr           ,& !input  :root respiration constrained by O2, [g d-2 h-1]
@@ -95,7 +95,7 @@ implicit none
 
   RootAutoCO2_pft(NZ)=0._r8
   DO N=1,Myco_pft(NZ)
-    DO L=NU,MaxSoiL4Root_pft(NZ)
+    DO L=NU,NMaxRootBotLayer_pft(NZ)
       RootAutoCO2_pft(NZ)=RootAutoCO2_pft(NZ)+RootCO2Autor_pvr(N,L,NZ)
     ENDDO     
   ENDDO  
@@ -440,8 +440,8 @@ implicit none
   DO NE=1,NumPlantChemElms
     DO L=NU,MaxNumRootLays
       DO N=1,Myco_pft(NZ)
-        RootMycoMassElm_pvr(NE,N,L,NZ)= sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
-        RootMycoNonstElms_pft(NE,N,NZ)=RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
+        RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
+        RootMycoNonstElms_pft(NE,N,NZ) = RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
       ENDDO  
 
       RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))

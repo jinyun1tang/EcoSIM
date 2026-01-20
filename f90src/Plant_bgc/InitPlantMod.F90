@@ -147,12 +147,6 @@ module InitPlantMod
 
   H2OCuticleResist_pft(NZ)          = CuticleResist_pft(NZ)/3600.0_r8
   CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
-  !the typical C to N mass ratio for protein is 3.3, given 75%~80% leaf N is as protein, then proteinC to leafN ratio is about 3.3*0.8=2.6, g protein C/g leaf N
-!  rProteinC2LeafN_pft(NZ)               = 2.6_r8
-  !ribosome carbon to phosphorus mass ratio is roughly in the range of 10 to 20, meanwhile, about 30~40 proteins are in ribosome, so the range is 25 to 66. 
-!  rProteinC2LeafP_pft(NZ)               = 25.0_r8
-  !the typical C to N mass ratio for protein is 3.3, given 60%~70% ROOT N is as protein, then proteinC to rootN ratio is about 3.3*0.65=2.15  
-!  rProteinC2RootN_pft(NZ)           = 2.15_r8
 
   RootProteinCMax_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rProteinC2RootN_pft(NZ),rPCRootr_pft(NZ)*rProteinC2RootP_pft(NZ))  !groot N/g rootC * gprotein C/g root N = g protein C/g root C
   IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
@@ -171,26 +165,26 @@ module InitPlantMod
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                                                           &
-    MatureGroup_pft           => plt_pheno%MatureGroup_pft            ,& !input  :acclimated plant maturity group, [-]
-    NumLitterGroups           => pltpar%NumLitterGroups               ,& !input  :number of litter groups nonstructural(0,*)
-    RateRefLeafAppearance_pft     => plt_pheno%RateRefLeafAppearance_pft      ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
-    iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft         ,& !input  :N2 fixation type,[-]
-    iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
-    iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
-    icarbhyro                 => pltpar%icarbhyro                     ,& !input  :kinetic id of litter component as carbonhydrate
-    icellulos                 => pltpar%icellulos                     ,& !input  :kinetic id of litter component as cellulose
-    icwood                    => pltpar%icwood                        ,& !input  :group id of coarse woody litter
-    ifoliar                   => pltpar%ifoliar                       ,& !input  :group id of plant foliar litter
-    ilignin                   => pltpar%ilignin                       ,& !input  :kinetic id of litter component as lignin
-    inonfoliar                => pltpar%inonfoliar                    ,& !input  :group id of plant non-foliar litter group
-    inonstruct                => pltpar%inonstruct                    ,& !input  :group id of plant nonstructural litter
-    iprotein                  => pltpar%iprotein                      ,& !input  :kinetic id of litter component as protein
-    iroot                     => pltpar%iroot                         ,& !input  :group id of plant root litter
-    istalk                    => pltpar%istalk                        ,& !input  :group id of plant stalk litter group
-    PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr   ,& !inoput :litter kinetic fraction, [-]
-    FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft         ,& !output :parameter for allocation of growth to nodes, [-]
-    NumCogrowthNode_pft       => plt_morph%NumCogrowthNode_pft         & !output :number of concurrently growing nodes,[-]
+  associate(                                                             &
+    MatureGroup_pft             => plt_pheno%MatureGroup_pft            ,& !input  :acclimated plant maturity group, [-]
+    NumLitterGroups             => pltpar%NumLitterGroups               ,& !input  :number of litter groups nonstructural(0,*)
+    RateRefLeafAppearance_pft   => plt_pheno%RateRefLeafAppearance_pft  ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    iPlantNfixType_pft          => plt_morph%iPlantNfixType_pft         ,& !input  :N2 fixation type,[-]
+    iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
+    iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    icarbhyro                   => pltpar%icarbhyro                     ,& !input  :kinetic id of litter component as carbonhydrate
+    icellulos                   => pltpar%icellulos                     ,& !input  :kinetic id of litter component as cellulose
+    icwood                      => pltpar%icwood                        ,& !input  :group id of coarse woody litter
+    ifoliar                     => pltpar%ifoliar                       ,& !input  :group id of plant foliar litter
+    ilignin                     => pltpar%ilignin                       ,& !input  :kinetic id of litter component as lignin
+    inonfoliar                  => pltpar%inonfoliar                    ,& !input  :group id of plant non-foliar litter group
+    inonstruct                  => pltpar%inonstruct                    ,& !input  :group id of plant nonstructural litter
+    iprotein                    => pltpar%iprotein                      ,& !input  :kinetic id of litter component as protein
+    iroot                       => pltpar%iroot                         ,& !input  :group id of plant root litter
+    istalk                      => pltpar%istalk                        ,& !input  :group id of plant stalk litter group
+    PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr   ,& !inoput :litter kinetic fraction, [-]
+    FracGroth2Node_pft          => plt_allom%FracGroth2Node_pft         ,& !output :parameter for allocation of growth to nodes, [-]
+    NumCogrowthNode_pft         => plt_morph%NumCogrowthNode_pft         & !output :number of concurrently growing nodes,[-]
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
