@@ -86,7 +86,7 @@ module InitPlantMod
       DO NZ=NZ1Q,NZ2X
         ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
         ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-        ZERO4LeafVar_pft(NZ) = ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
+        ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
       ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS

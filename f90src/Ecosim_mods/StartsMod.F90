@@ -744,7 +744,7 @@ module StartsMod
   !     IF(NHE.GT.NHW)NDIM=NDIM+1
   !     IF(NVS.GT.NVN)NDIM=NDIM+1
   !     XDIM=1.0/NDIM
-  ZERO  = 1.0E-15_r8
+  ZERO  = 1.0E-16_r8
   ZERO2 = 1.0E-08_r8
   TAREA = 0.0_r8  !land scape area
   !

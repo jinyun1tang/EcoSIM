@@ -80,7 +80,7 @@ module StartqMod
         ENDIF
         ZERO4Groth_pft(NZ,NY,NX)   = ZERO*PlantPopulation_pft(NZ,NY,NX)
         ZERO4Uptk_pft(NZ,NY,NX)    = ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        ZERO4LeafVar_pft(NZ,NY,NX) = ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8
+        ZERO4LeafVar_pft(NZ,NY,NX) = AMIN1(ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8,1.e-8_r8)
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
