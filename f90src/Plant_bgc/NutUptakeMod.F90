@@ -290,7 +290,7 @@ module NutUptakeMod
       ENDDO D955      
     ELSE
       D956: DO N  = 1, Myco_pft(NZ)    
-        RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8                      
+        RAutoRootO2Limter_rpvr(N,L,NZ) = 0._r8                      
         RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3

@@ -329,6 +329,9 @@ variables:
 	float CPND(npfts) ;
 		CPND:long_name = "PC ratio in plant nodule" ;
 		CPND:units = "gP gC-1" ;
+   float ROOTMAGE(npfts) ;
+      ROOTMAGE:long_name="Root maturation age to trigger secondary growth" ;
+      ROOTMAGE:units ="h" ;
 	char pfts(npfts, nchars1) ;
 	char pfts_short(npft, nchars2) ;
 	char pfts_long(npft, nchars3) ;
@@ -443,7 +446,7 @@ data:
 
  WTSTDI = 5000 ;
 
- RRAD1M = 0.001 ;
+ RRAD1M = 0.0005 ;
 
  RRAD2M = 0.0002 ;
 
@@ -544,6 +547,8 @@ data:
  CPRT = 0.002 ;
 
  CPND = 0.01 ;
+
+ ROOTMAGE=4320.0 ;
 
  pfts =
   "ENF234    " ;
