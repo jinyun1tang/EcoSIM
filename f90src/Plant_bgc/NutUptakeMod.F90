@@ -174,13 +174,13 @@ module NutUptakeMod
     trcs_solml_vr             => plt_soilchem%trcs_solml_vr         ,& !input  :aqueous tracer, [g d-2]
     trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr         ,& !input  :gas layer mass, [g d-2]
     Myco_pft                  => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
-    RootLenDensPerPlant_pvr   => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
+    RootAbsorbLenPerPlant_pvr => plt_morph%RootAbsorbLenPerPlant_pvr,& !input  :root layer length density, [m m-3]
     PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
     RootVH2O_pvr              => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr ,& !input  :root layer element primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr ,& !input  :root layer element secondary axes, [g d-2]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft     ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
     trcs_deadroot2soil_pvr    => plt_rbgc%trcs_deadroot2soil_pvr    ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr           ,& !inoput :root gas content, [g d-2]
@@ -200,11 +200,11 @@ module NutUptakeMod
 !  dmass0=sum(trcs_solml_vr(idg_O2,NU:plt_site%NL))+sum(trcg_gasml_vr(idg_O2,NU:plt_site%NL))
   
   D950: DO L=NU,NK
-    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=MaxSoiL4Root_pft(NZ)) then
+    IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=NMaxRootBotLayer_pft(NZ)) then
       trc_solml_new  = 0._r8;trc_gasml_new = 0._r8
       
       D955: DO N  = 1, Myco_pft(NZ)      
-        if(RootLenDensPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
+        if(RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) &
           .AND. PopuRootMycoC_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
 
           call GetUptakeCapcity(I,J,N,L,NZ,FracPRoot4Uptake,FracMinRoot4Uptake_rpvr,FCUP,FZUP,FPUP,&
@@ -289,8 +289,12 @@ module NutUptakeMod
         ENDIF
       ENDDO D955      
     ELSE
-      D956: DO N  = 1, Myco_pft(NZ)    
-        RAutoRootO2Limter_rpvr(N,L,NZ) = 0._r8                      
+      D956: DO N  = 1, Myco_pft(NZ)          
+        IF(L==NMaxRootBotLayer_pft(NZ)+1)THEN  
+          RAutoRootO2Limter_rpvr(N,L,NZ) = RAutoRootO2Limter_rpvr(N,L-1,NZ)
+        ELSE
+          RAutoRootO2Limter_rpvr(N,L,NZ) = 0._r8
+        ENDIF                      
         RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3
@@ -300,6 +304,7 @@ module NutUptakeMod
           trcs_rootml_pvr(idg,N,L,NZ)      = 0._r8
         ENDDO
       ENDDO D956
+      
     ENDIF
   ENDDO D950
   

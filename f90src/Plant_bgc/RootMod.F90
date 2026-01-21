@@ -347,8 +347,8 @@ implicit none
   IF(checkRootExt)THEN  
     !there are roots
     RootAbsorbLenPerPlant_pvr(N,L,NZ) = TotFineRoot1stLlenAxesPP+TotPopuRoot2ndLlenAxes/PlantPopulation_pft(NZ)
-    RootTotLenPerPlant_pvr(N,L,NZ) = TotPopuRootLen/PlantPopulation_pft(NZ)
-    RootLenPerPlant_pvr(N,L,NZ)    = TotRoot1stLlenAxesPP        
+    RootTotLenPerPlant_pvr(N,L,NZ)    = TotPopuRootLen/PlantPopulation_pft(NZ)
+    RootLenPerPlant_pvr(N,L,NZ)       = TotRoot1stLlenAxesPP
     IF(DLYR3(L).GT.ZERO)THEN
       !per volume
       RootLenDensPerPlant_pvr(N,L,NZ) = RootTotLenPerPlant_pvr(N,L,NZ)/DLYR3(L)
