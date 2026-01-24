@@ -227,7 +227,8 @@ implicit none
   real(r8), pointer :: Root2ndMaxRadius1_pft(:,:)      => null() !root diameter secondary axes,                                               [m]
   real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [g]
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)          => null() !root layer length primary axes,                                             [m d-2]
+  logical,  pointer :: flag2ndGrowth_pvr(:,:,:)        => null() !flag for secondary growth of primary roots, [-]  
+  real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
   real(r8), pointer :: RootAge_rpvr(:,:,:)             => null() !root age, [h]
   real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
@@ -319,6 +320,7 @@ implicit none
   real(r8), pointer :: Root1stRadius_rpvr(:,:,:)       => null() !root layer diameter for each primary axes,  [m]  
   real(r8), pointer :: RootCRRadius0_rpvr(:,:,:)         => null() !initial radius of roots that may undergo secondary growth, [m]
   real(r8), pointer :: Root2ndRadius_rpvr(:,:,:)       => null() !root layer diameter secondary axes,   [m]
+  real(r8), pointer :: fRootTube_rpvr(:,:,:)           => null() !fraction of root for transport,[-]
   real(r8), pointer :: RootRaidus_rpft(:,:)           => null() !root internal radius,                 [m]
   real(r8), pointer :: Root1stMaxRadius_pft(:,:)      => null() !maximum radius of primary roots,      [m]
   real(r8), pointer :: Root2ndMaxRadius_pft(:,:)      => null() !maximum radius of secondary roots,    [m]
@@ -854,6 +856,7 @@ implicit none
   real(r8), pointer :: RootCO2Ar2RootX_pvr(:,:)          => null()  !root respiration released to root,                              [gC d-2 h-1]
   real(r8), pointer :: RootCO2Ar2RootX_rpvr(:,:,:)       => null()  !root/myco respiration released to root/myco,                    [gC d-2 h-1]  
   real(r8), pointer :: trcs_deadroot2soil_pvr(:,:,:)     => null()  !gases released to soil upong dying roots,                       [g d-2 h-1]
+  real(r8), pointer :: GroSrcRootStress_pvr(:,:)        => null()  !root growth stress due to nutrient and water, [-]
   contains
     procedure, public :: Init => plt_rootbgc_init
     procedure, public :: Destroy  => plt_rootbgc_destroy
@@ -915,6 +918,7 @@ implicit none
   allocate(this%GPP_brch(MaxNumBranches,JP1)); this%GPP_brch=spval
   allocate(this%CO2FixCL_pft(JP1)); this%CO2FixCL_pft=spval
   allocate(this%CO2FixLL_pft(JP1)); this%CO2FixLL_pft=spval
+  allocate(this%GroSrcRootStress_pvr(JZ1,JP1));this%GroSrcRootStress_pvr=1._R8
   allocate(this%RootNutUptakeN_pft(JP1));this%RootNutUptakeN_pft=spval
   allocate(this%RootNutUptakeP_pft(JP1));this%RootNutUptakeP_pft=spval
   allocate(this%trcg_air2root_flx_vr(idg_beg:idg_NH3,JZ1));this%trcg_air2root_flx_vr=spval
@@ -1980,6 +1984,7 @@ implicit none
   allocate(this%Root1stRadius_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stRadius_rpvr=0._r8
   allocate(this%RootCRRadius0_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootCRRadius0_rpvr=0._r8
   allocate(this%Root2ndRadius_rpvr(jroots,JZ1,JP1));this%Root2ndRadius_rpvr=spval
+  allocate(this%fRootTube_rpvr(JZ1,MaxNumRootAxes,JP1));this%fRootTube_rpvr=spval
   allocate(this%Root1stMaxRadius_pft(jroots,JP1));this%Root1stMaxRadius_pft=spval
   allocate(this%Root2ndMaxRadius_pft(jroots,JP1));this%Root2ndMaxRadius_pft=spval
 
@@ -1992,9 +1997,10 @@ implicit none
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval
   allocate(this%Root2ndSpecLen_pft(jroots,JP1));this%Root2ndSpecLen_pft=spval
   allocate(this%Root1stLenPP_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stLenPP_rpvr=spval
+  allocate(this%flag2ndGrowth_pvr(JZ1,MaxNumRootAxes,JP1));this%flag2ndGrowth_pvr=.false.
   allocate(this%RootAge_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootAge_rpvr=spval
   allocate(this%Root2ndLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndLen_rpvr=spval
-  allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=spval
+  allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
   allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval

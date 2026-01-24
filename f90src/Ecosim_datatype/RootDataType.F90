@@ -109,6 +109,7 @@ module RootDataType
   real(sp),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(sp),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
   real(sp),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
+  real(sp),target,allocatable :: GroSrcRootStress_pvr(:,:,:,:)                   !root growth stress due to nutrient and water, [-]
   real(sp),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
   real(sp),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
   real(sp),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]     
@@ -128,7 +129,7 @@ contains
 
   implicit none
   integer, intent(in) :: jroots
-
+  allocate(GroSrcRootStress_pvr(JZ,JP,JY,JX)); GroSrcRootStress_pvr=1._SP
   allocate(ROOTNLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTNLim_rpvr=0._sp
   allocate(ROOTPLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTPLim_rpvr=0._sp
   allocate(RootMaintDef_CO2_pvr(jroots,JZ,JP,JY,JX)); RootMaintDef_CO2_pvr=0._sp
@@ -251,6 +252,7 @@ contains
   call destroy(RootAxialKond2H2O_pvr)
   call destroy(RootResist4H2O_pvr)
   call destroy(ROOTNLim_rpvr)
+  call destroy(GroSrcRootStress_pvr)
   call destroy(ROOTPLim_rpvr)  
   call destroy(RootMaintDef_CO2_pvr)
   call destroy(RootAtmGasConductance_rpvr)

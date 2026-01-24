@@ -306,6 +306,8 @@ implicit none
   real(r8),pointer   :: h1D_HUSK_C_ptc(:)       
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)      
   real(r8),pointer   :: h1D_MycorrizhalBiomC_ptc(:)
+  real(r8),pointer   :: h1D_Root1stStrutC_ptc(:)
+  real(r8),pointer   :: h1D_Root2ndStrutC_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTC_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTN_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTP_ptc(:)
@@ -955,6 +957,9 @@ implicit none
   allocate(this%h1D_NumPrimeRootAxes_ptc(beg_ptc:end_ptc)) ;this%h1D_NumPrimeRootAxes_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_MycorrizhalBiomC_ptc(beg_ptc:end_ptc));        this%h1D_MycorrizhalBiomC_ptc(:) = spval
+  allocate(this%h1D_Root1stStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root1stStrutC_ptc(:)=spval
+  allocate(this%h1D_Root2ndStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root2ndStrutC_ptc(:)=spval
+
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
   allocate(this%h1D_ROOT_NONSTP_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTP_ptc(:)=spval
   allocate(this%h2D_tSOC_vr(beg_col:end_col,1:JZ))    ;this%h2D_tSOC_vr(:,:)=spval
@@ -2157,7 +2162,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOTST_C_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='RootST_C_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant root structural C',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant root structural C',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_ROOTST_N_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='RootST_N_pft',units='gN/m2',avgflag='A',&
@@ -2194,6 +2199,14 @@ implicit none
   data1d_ptr => this%h1D_MycorrizhalBiomC_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='MycoArbuBiomC_pft',units='gC/m2',avgflag='A',&
     long_name='arbuscular mycorrhizal structural C',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_Root1stStrutC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Root1stBiomC_pft',units='gC/m2',avgflag='A',&
+    long_name='Primary root structural C',ptr_patch=data1d_ptr)                  
+
+  data1d_ptr => this%h1D_Root2ndStrutC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Root2ndBiomC_pft',units='gC/m2',avgflag='A',&
+    long_name='Secondary root structural C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Root_NONSTN_pft',units='gN/m2',avgflag='A',&
@@ -4111,6 +4124,7 @@ implicit none
       this%h1D_RootCO2Relez_col(ncol) = RootCO2Emis2Root_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1d_fPAR_col(ncol) = 0._r8
       this%h1D_QTRANSP_col(ncol)=0._r8
+      
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
 
@@ -4334,6 +4348,7 @@ implicit none
             this%h1D_CanopyPLim_ptc(nptc)=this%h1D_CanopyPLim_ptc(nptc)/real(NB1,kind=r8)            
           endif
         endif
+
         DO L=1,NumCanopyLayers
           this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         ENDDO  
@@ -4350,6 +4365,8 @@ implicit none
         endif
         this%h1D_RootAbsorbAreaPP_pft(nptc)=0._r8
         this%h1D_MycorrizhalBiomC_ptc(nptc) = 0._r8
+        this%h1D_Root1stStrutC_ptc(nptc)=0._r8
+        this%h1D_Root2ndStrutC_ptc(nptc)=0._r8
         DO L=1,JZ
           this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)-RootCO2Autor_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4418,8 +4435,10 @@ implicit none
               this%h2D_Root2ndStrutC_pvr(nptc,L) = this%h2D_Root2ndStrutC_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
               this%h2D_Root2ndStrutN_pvr(nptc,L) = this%h2D_Root2ndStrutN_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)
               this%h2D_Root2ndStrutP_pvr(nptc,L) = this%h2D_Root2ndStrutP_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
-              this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
+              this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc) + RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
             ENDDO
+            this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)+this%h2D_Root1stStrutC_pvr(nptc,L)
+            this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)+this%h2D_Root2ndStrutC_pvr(nptc,L)
             this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutP_pvr(nptc,L) = this%h2D_Root1stStrutP_pvr(nptc,L)/DVOLL
@@ -4430,6 +4449,8 @@ implicit none
         ENDDO        
         this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       ENDDO 
       this%h1d_fPAR_col(ncol)=safe_adb(this%h1d_fPAR_col(ncol),RadPARSolarBeam_col(NY,NX))
     ENDDO 
@@ -4442,6 +4463,8 @@ implicit none
   class(histdata_type) :: this
   integer, intent(in) :: nptc
 
+  this%h1D_Root2ndStrutC_ptc(nptc)          = 0._r8
+  this%h1D_Root1stStrutC_ptc(nptc)          = 0._r8
   this%h1D_MycorrizhalBiomC_ptc(nptc)        = 0._r8
   this%h1D_ShootRootXferC_ptc(nptc)          = 0._r8
   this%h1D_ShootRootXferN_ptc(nptc)          = 0._r8

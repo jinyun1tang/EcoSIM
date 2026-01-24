@@ -104,7 +104,7 @@ module PlantBGCPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)      !number of hours required to initiate remobilization of storage C for leafout, [h]
   real(r8) :: GVMX(0:1)                           !specific oxidation rate of nonstructural C during leafout at 25 C, [h]
   real(r8) :: RTSK(0:3)                           !relative primary root sink strength 0.25=shallow,4.0=deep root profile,[-]
-
+  real(r8) :: resp_downreg                        !respiration rate down regulation for thickensing zone compared to tip, per unit nitrogen mass, roots undersecondary growth has lower respiration cost
   !terminate [label for varaible parsing]
   integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
   integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
@@ -237,7 +237,7 @@ module PlantBGCPars
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
-
+  resp_downreg                = 0.3_r8
   CNKI_rubisco                = 1.0E-02_r8
   CPKI_rubisco                = 1.0E-03_r8
   RSMY_stomaCO2               = 2.78E-03_r8

@@ -507,7 +507,7 @@ implicit none
     ENDDO
 
     DO  L=NUI_col(NY,NX),NK_col(NY,NX)
-
+      GroSrcRootStress_pvr(L,NZ,NY,NX) = plt_rbgc%GroSrcRootStress_pvr(L,NZ)
       DO K=1,jcplx      
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
         DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)
@@ -615,6 +615,7 @@ implicit none
         RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)                       = plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)
         RootCO2Autor_vr(L,NY,NX)                                   = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
+      
       RootCO2Ar2Soil_vr(L,NY,NX)                       = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)   
       RootCO2Ar2Root_vr(L,NY,NX)                       = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2RootX_pvr(L,NZ)
       do idg=idg_beg,idg_NH3
@@ -836,7 +837,7 @@ implicit none
   ENDDO
 
   DO NZ=1,NP0_col(NY,NX)
-!plant properties begin
+    !plant properties begin
     plt_photo%iPlantPhotosynthesisType(NZ)        = iPlantPhotosynthesisType(NZ,NY,NX)
     plt_pheno%iPlantRootProfile_pft(NZ)           = iPlantRootProfile_pft(NZ,NY,NX)
     plt_pheno%iPlantPhenolPattern_pft(NZ)         = iPlantPhenolPattern_pft(NZ,NY,NX)
@@ -937,7 +938,7 @@ implicit none
     plt_allom%rPCRootr_pft(NZ)            = rPCRootr_pft(NZ,NY,NX)
     plt_allom%rPCNoduler_pft(NZ)          = rPCNoduler_pft(NZ,NY,NX)
 
-!plant properties end
+    !plant properties end
 
     plt_morph%LeafStalkArea_pft(NZ)                     = LeafStalkArea_pft(NZ,NY,NX)
     plt_distb%iPlantingYear_pft(NZ)                     = iPlantingYear_pft(NZ,NY,NX)
@@ -968,7 +969,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO L=1,NK_col(NY,NX)
+  DO L=1,NK_col(NY,NX)  
     plt_site%SoilWeightStress_vr(L) = SoilWeightStress_vr(L,NY,NX)
     plt_site%SoilSuctStress_vr(L) = PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)
     plt_site%rSat_vr(L)           = safe_adb(VLWatMicP_vr(L,NY,NX),VLSoilMicP_vr(L,NY,NX))
@@ -1230,6 +1231,7 @@ implicit none
     plt_morph%CanopyHeight_pft(NZ)  = CanopyHeight_pft(NZ,NY,NX)
     
     DO L=1,NK_col(NY,NX)
+      plt_rbgc%GroSrcRootStress_pvr(L,NZ) = GroSrcRootStress_pvr(L,NZ,NY,NX) 
       DO K=1,jcplx
         DO N=1,Myco_pft(NZ,NY,NX)
           DO NE=1,NumPlantChemElms

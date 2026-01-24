@@ -72,9 +72,10 @@ module minimathmod
    real(r8) :: ans
 
    if(abs(b)<tiny_val)then
-     ans=tiny_val
+     !assume complete dissipation
+     ans=0._R8
    else
-     ans = a/b
+     ans = AZERO(a/b)
    endif
 
    return

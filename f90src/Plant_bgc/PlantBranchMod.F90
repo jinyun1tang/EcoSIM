@@ -61,7 +61,7 @@ module PlantBranchMod
   real(r8) :: Growth_brch(NumPlantChemElms,pltpar%NumOfPlantMorphUnits)
   real(r8) :: RCO2NonstC_brch
   REAL(R8) :: RCO2Maint_brch
-  real(r8) :: RMxess_brch
+  real(r8) :: RMxess_brch              !excess maintenance respiration, drives remobilization & senescence
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: SSL
   real(r8) :: CNLFM,CPLFM
@@ -655,6 +655,7 @@ module PlantBranchMod
       PART(ibrch_stalk) = 0._r8
       PART(ibrch_grain) = 0._r8
     ELSE
+      !keep the reserve for perrennial
       PART(ibrch_resrv) = PART(ibrch_resrv)+PART(ibrch_stalk)
       PART(ibrch_stalk) = 0._r8
       PART(ibrch_grain) = 0._r8
@@ -766,7 +767,7 @@ module PlantBranchMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine UpdatePhotosynthates(I,J,NB,NZ,TFN6_vr,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-    ShootStructN,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4CanopyResp,CH2O3,CH2O4,CNPG,&
+    ShootStructN_brch,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4CanopyResp,CH2O3,CH2O4,CNPG,&
     RMxess_brch,RNonstC4Groth_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
@@ -775,12 +776,13 @@ module PlantBranchMod
   real(r8), intent(in) :: CNLFM,CPLFM
   real(r8), intent(in) :: CNSHX,CPSHX
   real(r8), intent(in) :: CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN,TFN5,WaterStress4Groth
+  real(r8), intent(in) :: ShootStructN_brch
+  real(r8), intent(in) :: TFN5,WaterStress4Groth
   real(r8), intent(in) :: Stomata_Stress,TurgEff4CanopyResp
   real(r8), intent(out) :: CH2O3(pltpar%MaxNodesPerBranch1)
   real(r8), intent(out) :: CH2O4(pltpar%MaxNodesPerBranch1)
   REAL(R8), INTENT(OUT) :: CNPG
-  real(r8), intent(out) :: RMxess_brch
+  real(r8), intent(out) :: RMxess_brch                 !excess maintenance respiration, drives remobilization & senescence
   real(r8), intent(out) :: RNonstC4Groth_brch          !nonstructural C for growth, [gC d-2 h-1]
 
   character(len=*), parameter :: subname='UpdatePhotosynthates'
@@ -808,7 +810,7 @@ module PlantBranchMod
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !   
     call ComputRAutoAfEmergence(I,J,NB,NZ,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,&
-      CO2F,CH2O,TFN5,WaterStress4Groth,TurgEff4CanopyResp,ShootStructN,CanopyNonstElm4Gros,CNPG,&
+      CO2F,CH2O,TFN5,WaterStress4Groth,TurgEff4CanopyResp,ShootStructN_brch,CanopyNonstElm4Gros,CNPG,&
       RMxess_brch,dNonstCX,RNonstC4Groth_brch)
 
     CO2FixCL_pft(NZ) = CO2FixCL_pft(NZ)+CH2OClmt   !carbon-dependent photosynthesis
@@ -819,7 +821,7 @@ module PlantBranchMod
     CH2O  = 0._r8
     CH2O3 = 0._r8
     CH2O4 = 0._r8
-    call ComputRAutoB4Emergence(I,J,NB,NZ,TFN6_vr,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN,&
+    call ComputRAutoB4Emergence(I,J,NB,NZ,TFN6_vr,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,ShootStructN_brch,&
       WaterStress4Groth,TurgEff4CanopyResp,CanopyNonstElm4Gros,CNPG,RMxess_brch,dNonstCX,RNonstC4Groth_brch)
   ENDIF
 
@@ -2995,7 +2997,7 @@ module PlantBranchMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine ComputRAutoAfEmergence(I,J,NB,NZ,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX,CO2F,&
-    CH2O,TFN5,WaterStress4Groth,TurgEff4CanopyResp,ShootStructN,CanopyNonstElm4Gros,CNPG,RMxess_brch,&
+    CH2O,TFN5,WaterStress4Groth,TurgEff4CanopyResp,ShootStructN_brch,CanopyNonstElm4Gros,CNPG,RMxess_brch,&
     dNonstCX,RNonstC4Groth_brch)
 
   implicit none
@@ -3004,7 +3006,7 @@ module PlantBranchMod
   real(r8), intent(in) :: CNLFM,CPLFM
   real(r8), intent(in) :: CNSHX,CPSHX
   real(r8), intent(in) :: CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN
+  real(r8), intent(in) :: ShootStructN_brch
   real(r8), intent(in) :: CO2F      !CO2 fixation rate, [gC h-1 d-2]
   real(r8), intent(in) :: CH2O      !total CH2O production
   real(r8), intent(in) :: TFN5      !temperature function for canopy maintenance respiration
@@ -3012,7 +3014,7 @@ module PlantBranchMod
   real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
   real(r8), INTENT(OUT) :: CNPG
-  real(r8), intent(out) :: RMxess_brch
+  real(r8), intent(out) :: RMxess_brch          !excess maintenance respiration, drives remobilization & senescence
   real(r8), intent(out) :: dNonstCX
   real(r8), intent(out) :: RNonstC4Groth_brch  
   real(r8) :: RCO2NonstC_brch
@@ -3088,7 +3090,8 @@ module PlantBranchMod
 ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 ! WaterStress4Groth=growth function of canopy water potential
 !
-  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN5*ShootStructN)
+  !maintenance respiraiton is computed based on whole branch
+  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN5*ShootStructN_brch)     
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. &
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WaterStress4Groth
@@ -3101,12 +3104,12 @@ module PlantBranchMod
 ! RCO2X=difference between non-structural C respn and mntc respn
 ! RCO2Y=growth respiration unlimited by N,P
 ! TurgEff4CanopyResp=expansion,extension function of canopy water potential
-! RMxess_brch=excess maintenance respiration, drives remobilization & senescence
+
 !
   RCO2X       = RCO2NonstC_brch-RCO2Maint_brch
   RCO2Y       = AZMAX1(RCO2X)*TurgEff4CanopyResp  
   RMxess_brch = AZMAX1(-RCO2X)
-!  write(111,*)I+J/24.,RCO2NonstC_brch,RCO2Maint_brch,TFN5,ShootStructN,fTCanopyGroth_pft(NZ),WaterStress4Groth
+
 !
 ! GROWTH RESPIRATION MAY BE LIMITED BY NON-STRUCTURAL N,P
 ! AVAILABLE FOR GROWTH
@@ -3186,14 +3189,14 @@ module PlantBranchMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine ComputRAutoB4Emergence(I,J,NB,NZ,TFN6_vr,YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,&
-    CNLFX,CPLFX,ShootStructN,WaterStress4Groth,TurgEff4CanopyResp,CanopyNonstElm4Gros,CNPG,&
+    CNLFX,CPLFX,ShootStructN_brch,WaterStress4Groth,TurgEff4CanopyResp,CanopyNonstElm4Gros,CNPG,&
     RMxess_brch,dNonstCX,RNonstC4Groth_brch)
 
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
   real(r8), intent(in) :: YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
-  real(r8), intent(in) :: ShootStructN
+  real(r8), intent(in) :: ShootStructN_brch
   real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: CanopyNonstElm4Gros(NumPlantChemElms)
@@ -3276,7 +3279,7 @@ module PlantBranchMod
   ! iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
   ! WaterStress4Groth=growth function of canopy water potential
   !
-  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN)
+  RCO2Maint_brch=AZMAX1(RmSpecPlant*TFN6_vr(NGTopRootLayer_pft(NZ))*ShootStructN_brch)
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)) .OR. &
     iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
     RCO2Maint_brch=RCO2Maint_brch*WaterStress4Groth
@@ -3430,7 +3433,6 @@ module PlantBranchMod
 !     GROWTH AT EACH CURRENT NODE
 !
 !     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
-!     GRO,GrowthElms(ielmn),GrowthElms(ielmp)=leaf C,N,P growth at each node
 !     CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
 !
     D490: DO KK=MNNOD,MXNOD
@@ -3552,7 +3554,7 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ,NB
-  real(r8), INTENT(IN) :: GrowthStalk(NumPlantChemElms)
+  real(r8), INTENT(IN) :: GrowthStalk(NumPlantChemElms)    !gross growth rate on stalk, [g h-1]
   REAL(R8), INTENT(IN) :: ETOL
   
   character(len=*), parameter :: subname='GrowStalkOnBranch'  
