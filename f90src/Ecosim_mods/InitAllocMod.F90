@@ -174,7 +174,7 @@ implicit none
   pltpar%jsken                = micpar%jsken
   pltpar%NumLitterGroups      = 5     !number of liter groups
   pltpar%MaxNumBranches       = 10    !number of branches
-  pltpar%MaxNumRootAxes       = 16
+  pltpar%MaxNumRootAxes       = 10
   pltpar%NumGrowthStages      = 10
   pltpar%NumOfPlantMorphUnits = 7
   pltpar%NMaxRootSegs = 10    !

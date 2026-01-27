@@ -233,7 +233,7 @@ implicit none
   implicit none
   integer , intent(in)  :: I,J,N,L,NZ
   real(r8), intent(in)  :: TotRoot2ndPopuC                      !total secondary root C mass
-  real(r8), intent(inout)  :: TotPopuRoot2ndLlenAxes            !total secondary root length  
+  real(r8), intent(in)  :: TotPopuRoot2ndLlenAxes            !total secondary root length  
   real(r8) :: CoarseVol                    !coarse root volume, [m3]    
   real(r8) :: TotRoot1stPopuC              !total primary root C mass
   real(r8) :: TotRoot1stLlenAxesPP         !total primary root length  
@@ -600,7 +600,7 @@ implicit none
   ENDIF
 
   !O2-limited active growth
-  IF(RGrowCO2_Oltd.GT.0.0)THEN
+  IF(RGrowCO2_Oltd.GT.0.0_r8)THEN
     RGrowCO2_Oltd=AMIN1(RGrowCO2_Oltd,FNP*RAutoRootO2Limter_rpvr(N,L,NZ))
   ELSE
     RGrowCO2_Oltd=0._r8
@@ -717,20 +717,19 @@ implicit none
   DO NE=1,NumPlantChemElms
     RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
   ENDDO
+
+  !secondary/fine root axes (and root hair) addition is a quadratic function of branching frequency
+  RTN2X          = RootBranchFreq_pft(NZ)*NumAxesPerPrimRoot_pft(NZ)    !fine roots
+  RTN2Y          = RootBranchFreq_pft(NZ)*RTN2X                         !root hairs
+  NumGroFineAxes = (RTN2X+RTN2Y)*DLYR3(L)
+
+  Root2ndXNum_rpvr(N,L,NR,NZ) = NumGroFineAxes
+  Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
   
-  if(RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)>0._r8)then  
-    RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+&
-      AMIN1(rProteinC2RootN_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ),&
-        rProteinC2RootP_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
-
-    !secondary/fine root axes (and root hair) addition is a quadratic function of branching frequency
-    RTN2X          = RootBranchFreq_pft(NZ)*NumAxesPerPrimRoot_pft(NZ)    !fine roots
-    RTN2Y          = RootBranchFreq_pft(NZ)*RTN2X                       !root hairs
-    NumGroFineAxes = (RTN2X+RTN2Y)*DLYR3(L)
-
-    Root2ndXNum_rpvr(N,L,NR,NZ) = NumGroFineAxes
-    Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
-  endif
+  RootProteinC_pvr(N,L,NZ)=RootProteinC_pvr(N,L,NZ)+&
+    AMIN1(rProteinC2RootN_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ),&
+      rProteinC2RootP_pft(NZ)*RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ))
+  
 
   DO NE=1,NumPlantChemElms
     dmass(NE)=dmass(NE)-RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)-litrflx2(NE)
@@ -922,7 +921,7 @@ implicit none
   real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: CNRTW,CPRTW
   real(r8), intent(in) :: fRootGrowPSISense
-  real(r8), intent(out) :: TotPopuRoot2ndLlenAxes
+  real(r8), intent(out) :: TotPopuRoot2ndLlenAxes    !total length of secondary roots in layer L
   real(r8), intent(out) :: TotRoot2ndPopuC  !secondary root carbon
   logical , intent(inout) :: FoundRootAxesTip(pltpar%jroots,pltpar%MaxNumRootAxes)  
   logical , intent(inout) :: Root1stTipUpdateFlag(pltpar%MaxNumRootAxes)  
@@ -1022,7 +1021,7 @@ implicit none
     !10 mm for primary roots
     CALL RootElongationWaterFunc(N,L,NZ,10.e-3_r8,dLext1st)
     dLext1st=dLext1st*NumAxesPerPrimRoot_pft(NZ)/PlantPopulation_pft(NZ)
-    GroSrcRootStress_pvr(L,NZ) = Nutstress4GrossResp*RespElongWatSens
+    GroSrcRootStress_pvr(L,NZ) = Nutstress4GrossResp*RespElongWatSens/(Nutstress4GrossResp+RespElongWatSens)
   endif  
 
   !     FOR EACH ROOT AXIS
@@ -2559,6 +2558,7 @@ implicit none
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]
     GroSrcRootStress_pvr       => plt_rbgc%GroSrcRootStress_pvr         ,& !input  :root growth stress due to nutrient and water, [-]
     Root2ndEffLen4uptk_rpvr    => plt_morph%Root2ndEffLen4uptk_rpvr     ,& !input  :Layer effective root length four resource uptake, [m]
+    RootMyco2ndStrutElms_rpvr  => plt_biom%RootMyco2ndStrutElms_rpvr    ,& !inoput :root layer element secondary axes, [g d-2]    
     SeedDepth_pft              => plt_morph%SeedDepth_pft               ,& !input  :seeding depth, [m]
     MaxSoiL4Root_pft           => plt_morph%MaxSoiL4Root_pft            ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft        ,& !input  :root primary axis number,[-]
@@ -2695,7 +2695,7 @@ implicit none
             checkCoarseRootLay=iPlantTurnoverPattern_pft(NZ).NE.0 .and. is_plant_treelike(iPlantRootProfile_pft(NZ)) .and. &
                 RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ) .and. RootEffDepz<Root1stDepz_raxes(NR,NZ) .and. &
                 Root1stDepz_raxes(NR,NZ)>7.5_r8*TipRadius 
-            
+
             IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN              
               IF(Root1stDepz_raxes(NR,NZ).LT.CumSoilThickness_vr(L))THEN
                 !Root tip in layer L
@@ -2715,9 +2715,10 @@ implicit none
                   TipRadius = AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,Ltip,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
                   BaseSink  = Root1stSink_pvr(Ltip,NR)
                 endif
-                dist_scaled           = (Root1stDepz_raxes(NR,NZ)-RootEffDepz)/(2._r8*TipRadius)
-                Root1stSink_pvr(L,NR) = BaseSink*morphogen_signal(MorphogenBase_pft(NZ), dist_scaled)* &
-                  AreaTranspt/TipRadius**2*GroSrcRootStress_pvr(L,NZ)
+                Root1stSink_pvr(L,NR) = BaseSink
+!                dist_scaled           = (Root1stDepz_raxes(NR,NZ)-RootEffDepz)/(2._r8*TipRadius)
+!               Root1stSink_pvr(L,NR) = BaseSink*morphogen_signal(MorphogenBase_pft(NZ), dist_scaled)* &
+!                 AreaTranspt/TipRadius**2*sqrt(GroSrcRootStress_pvr(L,NZ))
                 RootSinkC_vr(N,L)     = RootSinkC_vr(N,L)+Root1stSink_pvr(L,NR)
               ENDIF
             ENDIF
@@ -2744,9 +2745,11 @@ implicit none
             !
 
             IF(DistRootEffDepz.GT.ZERO)THEN
-              !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um radius), and the R**2 rule counts
-              !number of pores. 
-              RTSKP = NumAxesPerPrimRoot_pft(NZ)*AreaTranspt/DistRootEffDepz
+              !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um radius), 
+              !and the R**2 rule counts the number of pores. 
+              TipRadius=AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
+!              RTSKP = NumAxesPerPrimRoot_pft(NZ)*TipRadius**2/DistRootEffDepz
+              RTSKP = NumAxesPerPrimRoot_pft(NZ)*sqrt(AreaTranspt)*TipRadius/DistRootEffDepz 
               RTSKS = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
                
               IF(RTSKP+RTSKS.GT.ZERO4Groth_pft(NZ))THEN
@@ -2754,13 +2757,16 @@ implicit none
               ELSE
                 Root2ndSink_pvr(N,L,NR)=0._r8
               ENDIF
+              if(I==227.and.(J>16 .and. J<=18))then
+!                write(942,*)I*1000+J/24.,L,'nr',Root2ndSink_pvr(N,L,NR),NR,NumAxesPerPrimRoot_pft(NZ),AreaTranspt,DistRootEffDepz,&
+!                  Root2ndXNum_rpvr(N,L,NR,NZ),RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ),Root2ndEffLen4uptk_rpvr(N,L,NZ)
+              endif
             ELSE
               Root2ndSink_pvr(N,L,NR)=0._r8
             ENDIF
           ELSE
             !mycorrhizae
             Root2ndSink_pvr(N,L,NR)=safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
-
           ENDIF
           
           RootSinkC_vr(N,L) = RootSinkC_vr(N,L)+Root2ndSink_pvr(N,L,NR)
@@ -2776,6 +2782,10 @@ implicit none
           Root2ndSinkWeight_pvr(L,N,NZ)=Root2ndSinkWeight_pvr(L,N,NZ)+Root2ndSink_pvr(N,L,NR)
         ENDDO
         Root2ndSinkWeight_pvr(L,N,NZ)=Root2ndSinkWeight_pvr(L,N,NZ)/RootSinkC(N)
+!        if(N==ipltroot.and.L==1)write(941,*)I*1000+J/24.,L,Root2ndSinkWeight_pvr(L,N,NZ),Root2ndSink_pvr(N,L,1:5)        
+        if(N==ipltroot.and.(J>16 .and. J<=18))then
+!          write(942,*)I*1000+J/24.,L,'fr',Root2ndSinkWeight_pvr(L,N,NZ),Root2ndSink_pvr(N,L,1:10)        
+        endif
       ENDDO
     endif
   ENDDO D4995

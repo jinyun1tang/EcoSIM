@@ -386,13 +386,13 @@ module readiMod
 !     SURFACE SLOPES AND ASPECTS
 !
         ASP_col(NY,NX)       = ASPX
-        SL_col(NY,NX)            = SL0
+        SL_col(NY,NX)        = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
-!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
-!     geometric format 0/360 is east, 90 north, 180 west, 270 south
+!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south, (clockwise)
+!     geometric format 0/360 is east, 90 north, 180 west, 270 south (counter-clockwise)
         ASP_col(NY,NX)=450.0_r8-ASP_col(NY,NX)
         IF(ASP_col(NY,NX).GE.360.0_r8)ASP_col(NY,NX)=ASP_col(NY,NX)-360.0_r8
       ENDDO

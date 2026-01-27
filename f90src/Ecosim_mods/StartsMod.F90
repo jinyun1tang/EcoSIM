@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: padr,   print_info, check_bool
-  use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate
+  use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate,AZERO
   use EcoSiMParDataMod, only: micpar
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars,gOC_to_m3_OM
@@ -615,10 +615,10 @@ module StartsMod
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
 ! XGridRunoffFlag_2DH=runoff boundary flags:0=not possible,1=possible
-! ASP_col=aspect angle in degree
+! ASP_col=geometric aspect angle in degree
   ALTY=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
-   'aspect(o)','SLOPE_col(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
+   'Geom-ASP(o)','SLOPE_col(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
 1112    FORMAT(2A4,4A6,25A12)
   D9985: DO NX=NHW,NHE
@@ -631,8 +631,8 @@ module StartsMod
       SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
       SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
-      SLOPE_col(iWestEastDirection,NY,NX)   = -SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX))   !west to east
-      SLOPE_col(iNorthSouthDirection,NY,NX) = SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX))    !north to south
+      SLOPE_col(iWestEastDirection,NY,NX)   = -AZERO(SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX)))   !elevation increases from west to east, if west facing
+      SLOPE_col(iNorthSouthDirection,NY,NX) = AZERO(SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX)))    !elevation increases from north to south, if north facing
 
       !aspect angle 
       IF(ASP_col(NY,NX).GE.0.0_r8 .AND. ASP_col(NY,NX).LT.90.0_r8)THEN
