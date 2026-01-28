@@ -27,7 +27,7 @@ module ATSEcoSIMAdvanceMod
   use MiniMathMod
   use ClimForcDataType
   use PrescribePhenolMod
-  !use RootDataType
+  use RootDataType
   use FlagDataType
   use ATSUtilsMod
   use PlantAPIData
@@ -254,8 +254,10 @@ implicit none
     !SnoFalPrec_col(NY,NX)=PrecAsSnow(NY,NX)*AREA(3,NU_col(NY,NX),NY,NX)
     POROS_vr(0,NY,NX) = 1.0
 
-    !testing canopy height
+    !Fill in column-wise values needed for prescribed phenology
     CanopyHeight_col(NY,NX) = 17.0
+    LAI_col(NX,NY) = a_LAI(NY)
+    irootType_col(NY,NX) = a_VEG(NY)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
 
   ENDDO

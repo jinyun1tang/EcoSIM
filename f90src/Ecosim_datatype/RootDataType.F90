@@ -15,6 +15,7 @@ module RootDataType
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
+  integer,target,allocatable ::  irootType_col(:,:)                              !Root type integer from ATS [-]
   real(r8),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(r8),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
   real(r8),target,allocatable ::  MinNonstC2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
@@ -67,7 +68,7 @@ module RootDataType
   real(r8),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
   real(r8),target,allocatable ::  RPlantRootH2OUptk_pvr(:,:,:,:,:)               !root water uptake, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  RootH2OUptkStress_pvr(:,:,:,:,:)               !root water uptake stress indicated by rate,  [m3 d-2 h-1] 
+  real(r8),target,allocatable ::  RootH2OUptkStress_pvr(:,:,:,:,:)               !root water uptake stress indicated by rate,  [m3 d-2 h-1]
   real(r8),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                         !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                      !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                      !root turgor water potential , [Mpa]
@@ -94,10 +95,10 @@ module RootDataType
   real(r8),target,allocatable :: Nutruptk_fClim_rpvr(:,:,:,:,:)                  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8),target,allocatable :: Nutruptk_fNlim_rpvr(:,:,:,:,:)                  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
-  real(r8),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
-  real(r8),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
-  real(r8),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
-  real(r8),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
+  real(r8),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-]
+  real(r8),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]
+  real(r8),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]
+  real(r8),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]
 
 !----------------------------------------------------------------------
 
@@ -119,6 +120,7 @@ contains
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
   allocate(NIXBotRootLayer_rpft(MaxNumRootAxes,JP,JY,JX));  NIXBotRootLayer_rpft=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
+  allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
   allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._r8
@@ -203,12 +205,13 @@ contains
   implicit none
 
   call destroy(ROOTNLim_rpvr)
-  call destroy(ROOTPLim_rpvr)  
+  call destroy(ROOTPLim_rpvr)
   call destroy(RootMaintDef_CO2_pvr)
   call destroy(RootGasConductance_rpvr)
   call destroy(RootMassElm_pvr)
   call destroy(RootMassElm_vr)
   call destroy(NumPrimeRootAxes_pft)
+  call destroy(irootType_col)
   call destroy(NIXBotRootLayer_rpft)
   call destroy(iPlantRootState_pft)
   call destroy(NMaxRootBotLayer_pft)
