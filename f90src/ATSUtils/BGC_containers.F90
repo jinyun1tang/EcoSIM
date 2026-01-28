@@ -147,6 +147,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: liquid_density
      type (BGCMatrixDouble) :: gas_density
      type (BGCMatrixDouble) :: ice_density
+     type (BGCMatrixDouble) :: rock_density
      type (BGCMatrixDouble) :: porosity
      type (BGCMatrixDouble) :: water_content
      type (BGCMatrixDouble) :: matric_pressure

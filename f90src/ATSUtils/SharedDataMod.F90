@@ -18,6 +18,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
   real(r8), allocatable :: a_LDENS(:,:)   !ATS liquid density (mols)
+  real(r8), allocatable :: a_RDENS(:,:)   !Rock density (kg m^3)
   real(r8), allocatable :: a_CumDepz2LayBottom_vr(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_Volume(:,:)   !volume
   real(r8), allocatable :: a_dz(:,:)      !distance between layers
