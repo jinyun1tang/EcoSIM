@@ -188,7 +188,7 @@ implicit none
   real(r8) :: t
   integer :: it(2)
   integer :: months(2)
-  integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L
+  integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L,irootType
   real(r8) :: timwt(2)
   real(r8) :: ZL1(0:NumCanopyLayers)
   real(r8) :: AreaInterval,AreaL
@@ -198,11 +198,12 @@ implicit none
   !example inputs
   real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
   real(r8) :: sai(12)=(/0.3190, 0.3058, 0.3058, 0.3032, 0.3058, 0.3117, 0.3433, 0.3032, 0.3084, 0.3292, 0.3656, 0.3249/)
-  integer  :: irootType=1
+  !integer  :: irootType=1
   REAL(R8) :: PerPlantRootC_vr(1:JZ)
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
   !==========================================
 
+  irootType=1
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       NP_col(NY,NX)=1
@@ -284,10 +285,11 @@ implicit none
       ENDIF
 
       !
-      call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
-<<<<<<< HEAD
-      DO NZ=1,NP_col(NY,NX)      
-        DO L=NU_col(NY,NX),NL_col(NY,NX)        
+      !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      !replacing with irootType from ATS
+      call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      DO NZ=1,NP_col(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
@@ -317,12 +319,8 @@ implicit none
   !|7. Tropical deciduous forest|0.57|0.28|3.5|6.3|0.982|
   !|8. Tropical evergreen forest|0.57|0.33|4.1|7.4|0.972|
   !|9. Tropical grassland/savanna|0.99|0.51|60.4|42.5|0.972|
-<<<<<<< HEAD
   !|10. Tundra|0.96|0.34|7.4|5.2|0.909|  
 
-=======
-  !|10. Tundra|0.96|0.34|7.4|5.2|0.909|
->>>>>>> 6bd80dec (added time and date integration)
   implicit none
   integer, intent(in) :: iRootType
   integer, intent(in) :: NL
