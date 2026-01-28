@@ -111,6 +111,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_LDENS = data2D(:,:)
 
+  data_ptr = state%rock_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_RDENS = data2D(:,:)
+
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_MATP = data2D(:,:)

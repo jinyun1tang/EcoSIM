@@ -76,6 +76,7 @@ implicit none
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
+  real(r8) :: THETF
 
   associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
   )
@@ -152,7 +153,8 @@ implicit none
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)
       !Convert Bulk Density from ATS (kg m^-3) to EcoSIM (Mg m^-3)
-      SoilBulkDensity_vr(L,NY,NX)  = a_BKDSI(L,NY)/1.0e3_r8
+      !SoilBulkDensity_vr(L,NY,NX)  = a_BKDSI(L,NY)/1.0e3_r8
+      SoilBulkDensity_vr = a_RDENS(L,NY)*(1.0_r8-a_PORO(L,NY))/1.0e3_r8
       CSoilOrgM_vr(ielmc,L,NY,NX)  = a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)  = a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)  = a_CORGP(L,NY)
@@ -175,6 +177,9 @@ implicit none
       !VLSoilMicP_vr(L,NY,NX)=VLSoilPoreMicP_vr(L,NY,NX)
       VLWatMicP_vr(L,NY,NX) = VLWatMicP1_vr(L,NY,NX) !soil moisture
       !HYCDMicP4RootUptake_vr(L,NY,NX) = PSISM1_vr(L,NY,NX)!soil hydraulic conductivity for water uptake
+
+      !Hydraulic conductivity is hard-coded for now this will be fixed pending a decision on how best to
+      ! get it out of the ATS WRM model
       HYCDMicP4RootUptake_vr(L,NY,NX) = 0.000571
       THETW_vr(L,NY,NX) = a_LSAT(L,NY) !relative Saturation of soil micropores in layerL
 
@@ -195,6 +200,14 @@ implicit none
       PSD_vr(L,NY,NX)               = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
       FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
       SRP_vr(L,NY,NX)               = 1.00_r8
+      LOGPSIAtSat(NY,NX)            = LOG(-PSIPS)
+      LOGPSIFLD_col(NY,NX)          = LOG(pressure_at_field_capacity)
+      LOGPSIMXD_col(NY,NX)          = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
+
+      !Adapting from SoilHydroParaMod.F90 for the no organic matter in soil case
+      !THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
+      !  *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L,NY,NX)))
+      !HYCDMicP4RootUptake_vr(L,NY,NX)=1.54_r8*((POROS_vr(L,NY,NX)-THETF)/THETF)**2
 
       !Root2ndMaxRadius_pft(1,L) = 0.0002_r8
       !Root2ndMaxRadius_pft(2,L) = 5.0e-06_r8
