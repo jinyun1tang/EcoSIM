@@ -7,6 +7,9 @@ module PlantTraitTableMod
 
   integer, target, allocatable :: iPlantPhotosynthesisType_tab(:)
   integer, target, allocatable :: iPlantRootProfile_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_mean_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_min_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_max_tab(:)
   integer, target, allocatable :: iPlantPhenolPattern_tab(:)
   integer, target, allocatable :: iPlantDevelopPattern_tab(:)
   integer, target, allocatable :: iPlantNfixType_tab(:)
@@ -125,6 +128,9 @@ module PlantTraitTableMod
   integer, intent(in) :: nkopenclms      !total koppen climate code
   integer, intent(in) :: npfts           !total pft records, pft_short name + numerical koppen climate code
 
+  allocate(xylemPhi_max_tab(npfts)); xylemPhi_max_tab=0._r8
+  allocate(xylemPhi_min_tab(npfts)); xylemPhi_min_tab=0._r8
+  allocate(xylemPhi_mean_tab(npfts)); xylemPhi_mean_tab=0._r8
   allocate(iPlantPhotosynthesisType_tab(npfts));iPlantPhotosynthesisType_tab=0
   allocate(iPlantRootProfile_tab(npfts));iPlantRootProfile_tab=0
   allocate(iPlantPhenolPattern_tab(npfts));iPlantPhenolPattern_tab=0
@@ -245,6 +251,9 @@ module PlantTraitTableMod
   use abortutils, only : destroy
   implicit none
 
+  call destroy(xylemPhi_max_tab)
+  call destroy(xylemPhi_min_tab)
+  call destroy(xylemPhi_mean_tab)
   call destroy(MorphogenBase_tab)
   call destroy(iPlantPhotosynthesisType_tab)
   call destroy(iPlantRootProfile_tab)

@@ -46,10 +46,10 @@ module readiMod
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,WTBLDepz_nat,WTBLDepz_tile
-  real(r8) :: DTBLGG,DEC,initSnowDepth,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DEC,initSnowDepth,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
-  real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
+  real(r8) :: SL0,SLX,SL1,SL2
 
   integer :: L,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
@@ -199,7 +199,7 @@ module readiMod
 ! :0=none
 ! :1,2=natural stationary,mobile
 ! :3,4=artificial stationary,mobile
-! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
+! CO2EIG,CH4EG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
 ! IETYPG,iErosionMode=Koppen climate zone,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
 ! WTBLDepz_nat,WTBLDepz_tile=depth of natural,artificial (tile) water table (iWaterTabelMode)
@@ -246,8 +246,6 @@ module readiMod
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
-    write(*,'(40A)')('-',ll=1,40)
-    write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
     write(*,'(40A)')('-',ll=1,40)

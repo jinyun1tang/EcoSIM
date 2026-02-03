@@ -30,6 +30,7 @@ module minimathmod
   public :: SubstrateLimit
   public :: real_truncate
   public :: pMod
+  public :: sfexp
   public :: Viscosity_H2O
   public :: SubstrateDribbling  
   interface SubstrateDribbling
@@ -618,4 +619,22 @@ module minimathmod
   VISCWL    = VISCW*EXP(0.533_r8-0.0267_r8*TEMPC)
 
   end function Viscosity_H2O
+!------------------------------------------------------------------------
+
+  pure function sfexp(a)result(ans)
+  !
+  !do filtered exponential function calculation
+  implicit none
+  real(r8), intent(in) :: a
+  real(r8) :: ans
+
+  if(a>30._r8)then
+    ans=1.e14_r8 !return a large number
+  elseif(a<-30)then
+    ans=1.e-15_r8
+  else
+    ans=exp(a)
+  endif
+  end function sfexp
+
 end module minimathmod

@@ -908,8 +908,9 @@ module UptakesMod
         D4201: DO L=NU,MaxSoiL4Root_pft(NZ)
           !only update layers with roots
           IF(SoiLayerHasRoot_rvr(N,L))THEN
-            !psi_H2O_flx<0 plant doing active H2O uptake
+            !psi_H2O_flx<0 plant doing active H2O uptake            
             psi_H2O_flx=(PSILC-TotalSoilPSIMPa_vr(L))/SoilRootResist4H2O_pvr(N,L)
+
             RootH2OUptkStress_pvr(N,L,NZ) = AZMAX1(psi_H2O_flx)
             
             !if psi_H2O_flx >0, AMIN1 ensures it cannot fill more than available air-space
@@ -937,13 +938,14 @@ module UptakesMod
           ENDIF
         enddo D4201
       ENDDO D4200
+
       !check for water availability
       dCanopyAvailWater=CanopyAvailWater-CumWaterSoil2Plant+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-      if(dCanopyAvailWater>=CumWaterPlant2Soil)then
+      if(dCanopyAvailWater.GE.CumWaterPlant2Soil)then
         !sufficient water
         cumPRootH2OUptake     = CumWaterPlant2Soil+CumWaterSoil2Plant
         CumPlantHeatLoss2Soil = CumHeatPlant2Soil+CumHeatSoil2Plant
-      elseif(CumWaterPlant2Soil>1.e-12_r8)then
+      elseif(CumWaterPlant2Soil.GT.1.e-12_r8)then
         !insufficient water, downscale water release to soil
         scal=dCanopyAvailWater/CumWaterPlant2Soil*0.9999_r8
         D4202: DO N=1,Myco_pft(NZ)
@@ -1131,7 +1133,8 @@ module UptakesMod
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
   !
   !     CanopyHeight4WatUptake_pft=canopy height for water uptake
-  !     FRADW=conducting elements of stalk relative to those of primary root
+  !     FRADW=conducting elements of stalk relative to those of primary root, using the water poential to 
+  !      mimic the stalk area expansion.
   !     PSICanopy_pft=canopy total water potential
   !     EMODW=wood modulus of elasticity (MPa)
   call PrintInfo('beg '//subname)
@@ -1146,7 +1149,6 @@ module UptakesMod
   !      VLSoilPoreMicP_vr,VLWatMicPM,THETW=soil,water volume,content
   !     RootLenDensPerPlant_pvr,RootAbsorbLenPerPlant_pvr=root length density,root length per plant
   !     HYCDMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
-  !     Root1stXNumL_pvr,Root2ndXNumL_rpvr=number of root,myco primary,secondary axes
   !     SoiLayerHasRoot_rvr:1=rooted,0=not rooted
   !     N:1=root,2=mycorrhizae
 !
@@ -1179,14 +1181,12 @@ module UptakesMod
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
         !     ENTERED IN 'READQ'
         !
-        !     Root2ndRadius_rpvr=secondary root radius
-        !     RootAbsorbLenPerPlant_pvr=root length per plant
         !     RootRadialResist_rvr=radial resistance
         !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !eq. (31) in Grant, 1998
         Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
-        RootRadialResist_rvr(N,L) = RootRadialResist_pft(N,NZ)/Root2ndSurfArea*VLMicP_vr(L)/VLWatMicPM_vr(NPH,L)     ![MPa h m-1]/[m2]=[MPa h m-3]
+        RootRadialResist_rvr(N,L) = RootRadialResist_pft(N,NZ)*VLMicP_vr(L)/(Root2ndSurfArea*VLWatMicPM_vr(NPH,L))     ![MPa h m-1]/[m2]=[MPa h m-3]
         !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
@@ -1194,11 +1194,10 @@ module UptakesMod
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum, poisuelle flow conductance scalar
         !     secondary radius from PFT file Root2ndMaxRadius_pft at which RootAxialResist_pft is defined
         !     Root1stRadius_pvr,Root2ndRadius_rpvr=primary,secondary root radius
-        !     RootAxialResist_pft=axial resistivity from PFT file, [MPa h m-4]
+        !     RootAxialResist_pft=axial resistivity from PFT file, [MPa h m-4], consistent with the Hagen-Poiseuille equation, N_vessel r_vessel^4 of vessels
         !     DPTHZ=depth of primary root from surface
         !     Root1stAxialResist_rvr,Root2ndAxialResist_rvr=axial resistance of primary,secondary roots,[MPa h d2 m-3] =[MPa h m-1]=[]*m
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
-        !     Root1stXNumL_pvr,Root2ndXNumL_rpvr=number of primary,secondary axes
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
         if(Root1stRadius_pvr(N,L,NZ) > 2.e-3_r8)then !2mm as corase root criterion
           !coarse roots
@@ -1225,7 +1224,6 @@ module UptakesMod
         RootResist4H2O_pvr(N,L,NZ)     = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)
         SoilRootResist4H2O_pvr(N,L)    = SoilResist4H2O_rvr(N,L)+RootResist4H2O_pvr(N,L,NZ)
         CNDT                           = CNDT+1.0_r8/SoilRootResist4H2O_pvr(N,L)
-
       ENDIF
     enddo
   ENDDO D3880

@@ -648,9 +648,8 @@ implicit none
       write(888,*)'disturbP         =',PlantElmDistLoss_pft(NE,NZ)    
       write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
       write(888,*)'seed planted     =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
-      write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)
-      if(I/=plt_distb%iDayPlantHarvest_pft(NZ))&    
-        call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+      write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)      
+      call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
     endif
     
     DO NE=1,NumPlantChemElms

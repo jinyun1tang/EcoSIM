@@ -589,7 +589,7 @@ module InitPlantMod
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
     BranchNumerID_brch                => plt_morph%BranchNumerID_brch                 ,& !output :branch meric id, [-]
     BranchNumber_pft                  => plt_morph%BranchNumber_pft                   ,& !output :main branch numeric id,[-]
-    GrainFillDowreg_brch             => plt_photo%GrainFillDowreg_brch              ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch              => plt_photo%GrainFillDowreg_brch               ,& !output :down-regulation of C4 photosynthesis, [-]
     CMassCO2BundleSheath_node         => plt_photo%CMassCO2BundleSheath_node          ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CMassHCO3BundleSheath_node        => plt_photo%CMassHCO3BundleSheath_node         ,& !output :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CPOOL3_node                       => plt_photo%CPOOL3_node                        ,& !output :minimum sink strength for nonstructural C transfer, [g d-2]
@@ -634,6 +634,7 @@ module InitPlantMod
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
+    Cytokinin2ndConc_rpvr             => plt_rbgc%Cytokinin2ndConc_rpvr               ,& !output :cytokinin concentration in fine roots, [gC m-3 H2O]    
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
   )
 !
@@ -649,6 +650,7 @@ module InitPlantMod
   NumOfBranches_pft(NZ)              = 0
   HypocotHeight_pft(NZ)              = 0._r8
   CanopyHeight_pft(NZ)               = 0._r8
+  Cytokinin2ndConc_rpvr(:,:,:,NZ)    = 0._r8
   D10: DO NB=1,MaxNumBranches
     plt_pheno%doInitLeafOut_brch(NB,NZ)           = iEnable
     plt_pheno%doPlantLeafOut_brch(NB,NZ)          = iEnable

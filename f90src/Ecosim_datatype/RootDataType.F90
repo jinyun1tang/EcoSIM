@@ -44,6 +44,9 @@ module RootDataType
   real(sp),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                       !root internal radius, [m]
   real(sp),target,allocatable ::  CNRTS_pft(:,:,:)                               !root N:C ratio x root growth yield, [-]
   real(sp),target,allocatable ::  CPRTS_pft(:,:,:)                               !root P:C ratio x root growth yield, [-]
+  real(sp),target,allocatable ::  xylemPhi_min_pft(:,:,:)                         !the fraction found in the youngest xylem that as lumen for tree, [m2/m2]
+  real(sp),target,allocatable ::  xylemPhi_max_pft(:,:,:)                         !asymptotic limit fraction of the xyxlem area as lumen for tree, [m2/m2]
+  real(sp),target,allocatable ::  xylemPhi_mean_pft(:,:,:)                        !the mean fraction found in the root as lumen for non-tree roots, [m2/m2]
   real(sp),target,allocatable ::  RootMycoNonstElms_pft(:,:,:,:,:)               !non-structural chemical element in roots,[g d-2]
   real(sp),target,allocatable ::  Root1stMaxRadius_pft(:,:,:,:)                  !maximum radius of primary roots, [m]
   real(sp),target,allocatable ::  RootMatureAge_pft(:,:,:)                       !Root age to trigger secondary growth, [h]
@@ -60,7 +63,11 @@ module RootDataType
   real(sp),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(sp),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:)                    !root layer number primary axes, [d-2]
   real(sp),target,allocatable ::  Root2ndXNumL_rpvr(:,:,:,:,:)                     !root layer number axes, [d-2]
+  real(sp),target,allocatable ::  Cytokinin2ndConc_rpvr(:,:,:,:,:,:)             !cytokinin concentration in fine roots, [gC m-3 H2O]
+  real(sp),target,allocatable ::  Cytokinin1stConc_rpvr(:,:,:,:,:)               !cytokinin concentration in primary roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
+  real(sp),target,allocatable ::  RootMyco1stSinkC_rpvr(:,:,:,:,:)               !primary root C sink, [gC d-2 h-1]
+  real(sp),target,allocatable ::  RootMyco2ndSinkC_rpvr(:,:,:,:,:,:)             !fine root/myco carbon sink, [gC d-2 h-1]
   real(sp),target,allocatable ::  Root2ndEffLen4uptk_rpvr(:,:,:,:,:)              !Layer effective root length four resource uptake, [m]
   real(sp),target,allocatable ::  RootSAreaPerPlant_pvr(:,:,:,:,:)                !root layer area per plant, [m p-1]
   real(sp),target,allocatable  :: RootArea1stPP_pvr(:,:,:,:,:)                   !layer 1st root area per plant, [m2 plant-1]
@@ -76,6 +83,8 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(sp),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
   real(sp),target,allocatable ::  RPlantRootH2OUptk_pvr(:,:,:,:,:)               !root water uptake, [m3 d-2 h-1]
+  real(sp),target,allocatable ::  SapFlowVlinear_pvr(:,:,:,:)                    !Sap flow mean linear velocity, [m h-1]  
+  real(sp),target,allocatable ::  SapFlowVLinear_rpvr(:,:,:,:,:)                 !linear sap flow for primary root axis, [m h-1]
   real(sp),target,allocatable ::  RootH2OUptkStress_pvr(:,:,:,:,:)               !root water uptake stress indicated by rate,  [m3 d-2 h-1] 
   real(sp),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                         !root total water potential , [Mpa]
   real(sp),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                      !root osmotic water potential , [Mpa]
@@ -174,6 +183,9 @@ contains
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._sp
   allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._sp
   allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._sp
+  allocate(xylemPhi_min_pft(JP,JY,JX)); xylemPhi_min_pft=0._sp
+  allocate(xylemPhi_mean_pft(JP,JY,JX)); xylemPhi_mean_pft=0._sp
+  allocate(xylemPhi_max_pft(JP,JY,JX)); xylemPhi_max_pft=0._sp
   allocate(RootMatureAge_pft(JP,JY,JX)); RootMatureAge_pft=0._sp
   allocate(RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP,JY,JX));RootMycoNonstElms_pft=0._sp
   allocate(Root1stMaxRadius_pft(jroots,JP,JY,JX)); Root1stMaxRadius_pft=0._sp
@@ -191,6 +203,10 @@ contains
   allocate(Root1stXNumL_pvr(JZ,JP,JY,JX));Root1stXNumL_pvr=0._sp
   allocate(Root2ndXNumL_rpvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_rpvr=0._sp
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._sp
+  allocate(Cytokinin1stConc_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); Cytokinin1stConc_rpvr=0._sp
+  allocate(Cytokinin2ndConc_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Cytokinin2ndConc_rpvr=0._sp
+  allocate(RootMyco2ndSinkC_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndSinkC_rpvr=0._sp
+  allocate(RootMyco1stSinkC_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootMyco1stSinkC_rpvr=0._r8
   allocate(Root2ndEffLen4uptk_rpvr(jroots,JZ,JP,JY,JX));Root2ndEffLen4uptk_rpvr=0._sp
   allocate(RootSAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootSAreaPerPlant_pvr=0._sp
   allocate(RootArea1stPP_pvr(jroots,JZ,JP,JY,JX));RootArea1stPP_pvr=0._sp
@@ -205,6 +221,8 @@ contains
   allocate(Root1stSpecLen_pft(jroots,JP,JY,JX)); Root1stSpecLen_pft=0._sp
   allocate(Root2ndSpecLen_pft(jroots,JP,JY,JX)); Root2ndSpecLen_pft=0._sp
   allocate(RPlantRootH2OUptk_pvr(jroots,JZ,JP,JY,JX));RPlantRootH2OUptk_pvr=0._sp
+  allocate(SapFlowVlinear_pvr(JZ,JP,JY,JX));SapFlowVlinear_pvr=0._sp
+  allocate(SapFlowVLinear_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); SapFlowVLinear_rpvr=0._SP
   allocate(RootH2OUptkStress_pvr(jroots,JZ,JP,JY,JX)); RootH2OUptkStress_pvr=0._sp
   allocate(PSIRoot_pvr(jroots,JZ,JP,JY,JX));PSIRoot_pvr=0._sp
   allocate(PSIRootOSMO_vr(jroots,JZ,JP,JY,JX));PSIRootOSMO_vr=0._sp
@@ -292,6 +310,9 @@ contains
   call destroy(RootRaidus_rpft)
   call destroy(CNRTS_pft)
   call destroy(CPRTS_pft)
+  call destroy(xylemPhi_max_pft)
+  call destroy(xylemPhi_mean_pft)
+  call destroy(xylemPhi_min_pft)    
   call destroy(RootMatureAge_pft)
   call destroy(RootMycoNonstElms_pft)
   call destroy(Root1stMaxRadius_pft)
@@ -309,6 +330,10 @@ contains
   call destroy(Root1stXNumL_pvr)
   call destroy(Root2ndXNumL_rpvr)
   call destroy(Root2ndXNum_rpvr)
+  call destroy(Cytokinin1stConc_rpvr)
+  call destroy(Cytokinin2ndConc_rpvr)
+  call destroy(RootMyco2ndSinkC_rpvr)
+  call destroy(RootMyco1stSinkC_rpvr)
   call destroy(Root2ndEffLen4uptk_rpvr)
   call destroy(RootSAreaPerPlant_pvr)
   call destroy(RootArea2ndPP_pvr)
@@ -322,6 +347,8 @@ contains
   call destroy(Root2ndRadius_rpvr)
   call destroy(Root1stSpecLen_pft)
   call destroy(Root2ndSpecLen_pft)
+  call destroy(SapFlowVlinear_pvr)
+  call destroy(SapFlowVLinear_rpvr)
   call destroy(RPlantRootH2OUptk_pvr)
   call destroy(RootH2OUptkStress_pvr)
   call destroy(PSIRoot_pvr)

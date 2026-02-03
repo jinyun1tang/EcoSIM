@@ -376,6 +376,7 @@ implicit none
     ENDDO
 
     DO NR=1,pltpar%MaxNumRootAxes
+      SapFlowVLinear_rpvr(:,NR,NZ,NY,NX) = plt_ew%SapFlowVLinear_rpvr(:,NR,NZ)    
       RootSegAges_raxes(:,NR,NZ,NY,NX)      = plt_morph%RootSegAges_raxes(:,NR,NZ)   
       RootSeglengths_raxes(:,NR,NZ,NY,NX)   = plt_morph%RootSeglengths_raxes(:,NR,NZ)  
       NActiveRootSegs_raxes(NR,NZ,NY,NX)  = plt_morph%NActiveRootSegs_raxes(NR,NZ) 
@@ -615,9 +616,9 @@ implicit none
         RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)                       = plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)
         RootCO2Autor_vr(L,NY,NX)                                   = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
-      
-      RootCO2Ar2Soil_vr(L,NY,NX)                       = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)   
-      RootCO2Ar2Root_vr(L,NY,NX)                       = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2RootX_pvr(L,NZ)
+      SapFlowVlinear_pvr(L,NZ,NY,NX) = plt_ew%SapFlowVlinear_pvr(L,NZ)
+      RootCO2Ar2Soil_vr(L,NY,NX)     = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)
+      RootCO2Ar2Root_vr(L,NY,NX)     = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2RootX_pvr(L,NZ)
       do idg=idg_beg,idg_NH3
         trcs_deadroot2soil_vr(idg,L,NY,NX)    = trcs_deadroot2soil_vr(idg,L,NY,NX) + plt_rbgc%trcs_deadroot2soil_pvr(idg,L,NZ)
       ENDDO
@@ -629,15 +630,20 @@ implicit none
       RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ)
       
       DO L=1,NK_col(NY,NX)
+
         RootCRRadius0_rpvr(L,NR,NZ,NY,NX) = plt_morph%RootCRRadius0_rpvr(L,NR,NZ)
         Root1stRadius_rpvr(L,NR,NZ,NY,NX) = plt_morph%Root1stRadius_rpvr(L,NR,NZ)
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ)
-        Root1stLenPP_rpvr(L,NR,NZ,NY,NX)                              = plt_morph%Root1stLenPP_rpvr(L,NR,NZ)
-        RootAge_rpvr(L,NR,NZ,NY,NX)                                 = plt_morph%RootAge_rpvr(L,NR,NZ)
+        Root1stLenPP_rpvr(L,NR,NZ,NY,NX)     = plt_morph%Root1stLenPP_rpvr(L,NR,NZ)
+        RootAge_rpvr(L,NR,NZ,NY,NX)          = plt_morph%RootAge_rpvr(L,NR,NZ)
+        RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ)
+        Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ) 
         DO N=1,Myco_pft(NZ,NY,NX)
+          RootMyco2ndSinkC_rpvr(N,L,NR,NZ,NY,NX)  = plt_rbgc%RootMyco2ndSinkC_rpvr(N,L,NR,NZ)           
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
-          Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                               = plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)
+          Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                              = plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)
           Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)                             = plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)
+          Cytokinin2ndConc_rpvr(N,L,NR,NZ,NY,NX) = plt_rbgc%Cytokinin2ndConc_rpvr(N,L,NR,NZ)
         ENDDO
       ENDDO
     ENDDO
@@ -840,6 +846,9 @@ implicit none
     !plant properties begin
     plt_photo%iPlantPhotosynthesisType(NZ)        = iPlantPhotosynthesisType(NZ,NY,NX)
     plt_pheno%iPlantRootProfile_pft(NZ)           = iPlantRootProfile_pft(NZ,NY,NX)
+    plt_morph%xylemPhi_min_pft(NZ)                = xylemPhi_min_pft(NZ,NY,NX)
+    plt_morph%xylemPhi_mean_pft(NZ)                = xylemPhi_mean_pft(NZ,NY,NX)
+    plt_morph%xylemPhi_max_pft(NZ)                = xylemPhi_max_pft(NZ,NY,NX)
     plt_pheno%iPlantPhenolPattern_pft(NZ)         = iPlantPhenolPattern_pft(NZ,NY,NX)
     plt_pheno%iPlantDevelopPattern_pft(NZ)        = iPlantDevelopPattern_pft(NZ,NY,NX)
     plt_pheno%iPlantPhenolType_pft(NZ)            = iPlantPhenolType_pft(NZ,NY,NX)
@@ -1242,6 +1251,7 @@ implicit none
     ENDDO
     DO NR=1,pltpar%MaxNumRootAxes
       plt_morph%RootSegAges_raxes(:,NR,NZ)   =RootSegAges_raxes(:,NR,NZ,NY,NX)     
+      plt_ew%SapFlowVLinear_rpvr(:,NR,NZ) =SapFlowVLinear_rpvr(:,NR,NZ,NY,NX) 
       plt_morph%RootSeglengths_raxes(:,NR,NZ)  = RootSeglengths_raxes(:,NR,NZ,NY,NX) 
       plt_morph%NActiveRootSegs_raxes(NR,NZ) = NActiveRootSegs_raxes(NR,NZ,NY,NX)
       plt_morph%RootSegBaseDepth_raxes(NR,NZ) = RootSegBaseDepth_raxes(NR,NZ,NY,NX)
@@ -1433,11 +1443,15 @@ implicit none
         plt_morph%RootCRRadius0_rpvr(L,NR,NZ) = RootCRRadius0_rpvr(L,NR,NZ,NY,NX)
         plt_morph%Root1stRadius_rpvr(L,NR,NZ) = Root1stRadius_rpvr(L,NR,NZ,NY,NX)
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX)      
-        plt_morph%Root1stLenPP_rpvr(L,NR,NZ)       = Root1stLenPP_rpvr(L,NR,NZ,NY,NX)      
-        plt_morph%RootAge_rpvr(L,NR,NZ) = RootAge_rpvr(L,NR,NZ,NY,NX)    
+        plt_morph%Root1stLenPP_rpvr(L,NR,NZ)    = Root1stLenPP_rpvr(L,NR,NZ,NY,NX)
+        plt_morph%RootAge_rpvr(L,NR,NZ)         = RootAge_rpvr(L,NR,NZ,NY,NX)
+        plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ) = RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX)
+        plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX))
         DO N=1,Myco_pft(NZ,NY,NX)
-          plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)                              = Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)
-          plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)                            = Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)
+          plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)      = Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)
+          plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)     = Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)
+          plt_rbgc%Cytokinin2ndConc_rpvr(N,L,NR,NZ)= Cytokinin2ndConc_rpvr(N,L,NR,NZ,NY,NX)
+          plt_rbgc%RootMyco2ndSinkC_rpvr(N,L,NR,NZ) = RootMyco2ndSinkC_rpvr(N,L,NR,NZ,NY,NX)
           plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ) = &
             RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX)
         enddo

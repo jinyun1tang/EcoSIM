@@ -59,7 +59,7 @@ module WthrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  character(len=*), parameter :: subname='WTHR'
+  character(len=*), parameter :: subname='PrepHourlyWeather'
   integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain_col(JY,JX)
   real(r8) :: PrecAsSnow_col(JY,JX)

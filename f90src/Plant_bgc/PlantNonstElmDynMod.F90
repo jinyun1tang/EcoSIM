@@ -168,6 +168,8 @@ module PlantNonstElmDynMod
   real(r8) :: XFRE
   real(r8) :: WTRTD1,WTRTD2,CPOOLT
   real(r8) :: TwoCompMassC,NonstElmGradt
+  character(len=*), parameter :: subname='RootMycoNonstTransfer'
+
   real(r8), parameter :: scalp=0.9999_r8
   associate(                                                    &
     NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
@@ -178,7 +180,7 @@ module PlantNonstElmDynMod
     Myco_pft               => plt_morph%Myco_pft               ,& !input  :mycorrhizal type (no or yes),[-]
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr   & !inoput :root layer nonstructural element, [g d-2]
   )
-
+  call PrintInfo('beg '//subname)
 !     TRANSFER NON-STRUCTURAL C,N,P BWTWEEN ROOT AND MYCORRHIZAE
 !     IN EACH ROOTED SOIL LAYER FROM NON-STRUCTURAL C,N,P
 !     CONCENTRATION DIFFERENCES
@@ -232,6 +234,7 @@ module PlantNonstElmDynMod
   DO NE=1,NumPlantChemElms
     mass_finale(NE)=sum(RootMycoNonstElms_rpvr(NE,1:Myco_pft(NZ),NU:NMaxRootBotLayer_pft(NZ),NZ))
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoNonstTransfer
 
@@ -293,8 +296,7 @@ module PlantNonstElmDynMod
   end subroutine SeasonStoreRootNonstTransfer  
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,Root1stSink_pvr,&
-    Root2ndSink_pvr,RootSinkC)
+  subroutine ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC)
   !
   !The shoot-root exchange of nonstrucal element is done as follows:
   !1)sum up the strengths over all branches, and all roots LAYERS
@@ -305,8 +307,6 @@ module PlantNonstElmDynMod
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in):: GrothPART2LeafPetole
   real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: RootSinkC(pltpar%jroots)
   character(len=*), parameter :: subname='ShootRootElmTransfer'
   integer :: L,NB,N,NR,NE,L1
@@ -328,6 +328,7 @@ module PlantNonstElmDynMod
   real(r8) :: WTLSBX,WTLSBB
   real(r8) :: WTRTLR
   real(r8) :: XFRE
+  real(r8) :: ZTOL
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: RootDepzMean,PSIOsmo,PSITurg
@@ -342,6 +343,7 @@ module PlantNonstElmDynMod
     Root1stDepz_raxes             => plt_morph%Root1stDepz_raxes              ,& !input  :root layer depth, [m]    
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
     CanopyLeafSheathC_brch        => plt_biom%CanopyLeafSheathC_brch          ,& !input  :plant branch leaf + sheath C, [g d-2]
+    CumSoilThickness_vr           => plt_site%CumSoilThickness_vr             ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]    
     RootElms_pft                  => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
     PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]    
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
@@ -353,6 +355,7 @@ module PlantNonstElmDynMod
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !input  :root turgor water potential, [Mpa]    
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !input  :root osmotic water potential, [Mpa]    
     TKS_vr                        => plt_ew%TKS_vr                            ,& !input  :mean annual soil temperature, [K]    
+    DLYR3                         => plt_site%DLYR3                           ,& !input  :vertical thickness of soil layer, [m]    
     OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]    
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     flag2ndGrowth_pvr             => plt_morph%flag2ndGrowth_pvr              ,& !input  :flag for secondary growth of primary roots, [-]        
@@ -441,14 +444,17 @@ module PlantNonstElmDynMod
   ELSE
     FWTS=1.0_r8
   ENDIF
-  
-  D290: DO L=NU,MaxSoiL4Root_pft(NZ)
-    IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN
-      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
-    ELSE
-      RootSinkWeight_pvr(L,NZ)=1.0_r8/(NMaxRootBotLayer_pft(NZ)-NGTopRootLayer_pft(NZ)+1)
-    ENDIF
-  ENDDO D290
+
+  IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN  
+    DO L=NU,MaxSoiL4Root_pft(NZ)  
+      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))*DLYR3(L)
+    ENDDO    
+  ELSE
+    ZTOL=CumSoilThickness_vr(MaxSoiL4Root_pft(NZ))-CumSoilThickness_vr(NU-1)  
+    DO L=NU,MaxSoiL4Root_pft(NZ)  
+      RootSinkWeight_pvr(L,NZ)=DLYR3(L)/ZTOL
+    ENDDO
+  ENDIF
 
   !     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
   !     BUT IS NOT USED FOR ANNUALS DURING GRAIN FILL
@@ -548,8 +554,7 @@ module PlantNonstElmDynMod
   end subroutine ShootRootElmTransfer  
 
 !----------------------------------------------------------------------------------------------------
-  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,Root1stSink_pvr,&
-    Root2ndSink_pvr,RootSinkC,BegRemoblize)
+  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC,BegRemoblize)
   !
   !DESCRIPTION
   !transfer of nonstructural C/N/P 
@@ -559,8 +564,6 @@ module PlantNonstElmDynMod
   integer,  intent(in) :: BegRemoblize
   real(r8), intent(in):: GrothPART2LeafPetole  !rate modifier for root-shoot nonstrucal material exchange 
   real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
-  real(r8), intent(in) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
-  real(r8), intent(in) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8), intent(in) :: RootSinkC(pltpar%jroots)
   real(r8) :: massE_beg(NumPlantChemElms)
   real(r8) :: massE_end(NumPlantChemElms)
@@ -590,7 +593,7 @@ module PlantNonstElmDynMod
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
 
-  call ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+  call ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC)
 
 !  call SumReserveBiomass(I,J,NZ,massE_end)
   call PrintInfo('end '//subname)

@@ -656,6 +656,9 @@ implicit none
   iPlantGrainType_pft(NZ,NY,NX)       = iPlantGrainType_tab(loc)
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
   PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
+  xylemPhi_min_pft(NZ,NY,NX)          = xylemPhi_min_tab(loc)
+  xylemPhi_max_pft(NZ,NY,NX)          = xylemPhi_max_tab(loc)
+  xylemPhi_mean_pft(NZ,NY,NX)         = xylemPhi_mean_tab(loc)
 
   VmaxSpecRubCarboxyRef_pft(NZ,NY,NX) = VmaxRubCarboxyRef_tab(loc)
   VmaxRubOxyRef_pft(NZ,NY,NX)         = VmaxRubOxyRef_tab(loc)
@@ -1116,16 +1119,24 @@ implicit none
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ROOT CHARACTERISTICS'
   id=0;id=addone(id)
-  call writefixl(nu_plt,id,'RRAD1M','Radius of primary root tip [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,id,'RRAD1M','Maximum radius of young primary roots [m]',Root1stMaxRadius_pft(1,NZ,NY,NX),105)
   id=addone(id)
-  call writefixl(nu_plt,id,'RRAD2M','Radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,id,'RRAD2M','Maximum radius of fine roots [m]',Root2ndMaxRadius_pft(1,NZ,NY,NX),105)
   id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
+
   if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
     id=addone(id)
     call writefixl(nu_plt,id,'MOPHGEN', 'Baseline morephogen signal strength for secondary root growth [%]',MorphogenBase_pft(NZ,NY,NX)*100._r8,105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
+    id=addone(id)
+    call writefixl(nu_plt,id,'PhiMIN','The fraction found in the youngest coarse root xylem that as lumen for trees [m2/m2]',xylemPhi_min_pft(NZ,NY,NX),105)
+    id=addone(id)
+    call writefixl(nu_plt,id,'PhiMAX','Asymptotic limit fraction of the coarse root xyxlem area as lumen for tree [m2/m2]', xylemPhi_max_pft(NZ,NY,NX),105)
+  else
+    id=addone(id)
+    call writefixl(nu_plt,id,'PhiMean','The mean fraction found in the seminal root as lumen for non-tree roots, [m2/m2]', xylemPhi_mean_pft(NZ,NY,NX),105)      
   endif
   id=addone(id)  
   call writefixl(nu_plt,id,'PR','Nonstructural C concentration needed for root'// &
@@ -1133,7 +1144,7 @@ implicit none
   id=addone(id)  
   call writefixl(nu_plt,id,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)
-  call writefixl(nu_plt,id,'RSRA','Axial resistance per m root length for water uptake [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
+  call writefixl(nu_plt,id,'RSRA','Axial resistance per m root length for water uptake defined at RRAD2M [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)
   call writefixl(nu_plt,id,'PTSHT','Rate constant for equilibrating shoot-root '// &
     'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
@@ -1539,7 +1550,7 @@ implicit none
   call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short_tab)
   call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long_tab)
   call ncd_getvar(pft_nfid, 'ICTYP', iPlantPhotosynthesisType_tab)
-  call ncd_getvar(pft_nfid, 'IGTYP', iPlantRootProfile_tab)
+  call ncd_getvar(pft_nfid, 'IGTYP', iPlantRootProfile_tab)  
   call ncd_getvar(pft_nfid, 'ISTYP', iPlantPhenolPattern_tab)
   call ncd_getvar(pft_nfid, 'IDTYP', iPlantDevelopPattern_tab)
   call ncd_getvar(pft_nfid, 'INTYP', iPlantNfixType_tab)
@@ -1571,6 +1582,9 @@ implicit none
   call ncd_getvar(pft_nfid, 'CTC',  TCChill4Seed_tab)
   call ncd_getvar(pft_nfid, 'VRNLI', VRNLI_tab)
   call ncd_getvar(pft_nfid, 'VRNXI', VRNXI_tab)
+  call ncd_getvar(pft_nfid,'PhiMEAN',xylemPhi_mean_tab)
+  call ncd_getvar(pft_nfid,'PhiMIN',xylemPhi_min_tab)
+  call ncd_getvar(pft_nfid,'PhiMAX',xylemPhi_max_tab)
   call ncd_getvar(pft_nfid, 'WDLF', rLen2WidthLeaf_tab)
   call ncd_getvar(pft_nfid, 'PB', NonstCMinConc2InitBranch_tab)
   call ncd_getvar(pft_nfid, 'GROUPX', GROUPX_tab)

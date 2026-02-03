@@ -170,7 +170,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                !plant growth type (vascular, non-vascular),[-]
   integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)              !plant growth habit (annual or perennial),[-]
-  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]
+  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]  
   integer,target,allocatable ::  iPlantNfixType_pft(:,:,:)                   !N2 fixation type,[-]
   integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                 !climate signal for phenological progress none, temperature, water stress,[-]
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)            !photoperiod type (neutral, long day, short day),[-]

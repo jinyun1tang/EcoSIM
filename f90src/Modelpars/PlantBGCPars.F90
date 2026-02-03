@@ -39,7 +39,9 @@ module PlantBGCPars
   real(r8) :: RSMY_stomaCO2                       !minimum stomatal resistance for CO2 uptake (h m-1)
   real(r8) :: C4KI_pepcarboxy                     !nonstructural C inhibition constant on PEP carboxylase (uM)
   real(r8) :: Hours4ConiferSpringDeharden         !hours to full dehardening of conifers in spring (h)
-
+  real(r8) :: RCytoK(2)                           !cytokinin production efficiency, [1.e-4 gC CK gC-CO2]
+  real(r8) :: kDCytof(2)                          !cytoknin decay rates during production in fine roots and mycorrhizae [h-1]
+  real(r8) :: kDCytoC                             !cytoknin decay rates during transport and at thickening sites in coarse roots [h-1]
   real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
   real(r8) :: ELEC4                               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
   real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
@@ -53,7 +55,7 @@ module PlantBGCPars
 
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
   real(r8) :: FSTK                                !fraction of stalk radius as sapwood contributing to water,heat flow
-  real(r8) :: ZSTX                                !maximum stalk inner radius for tranpsiration, [m]
+  real(r8) :: ZSTX                                !maximum stalk tube thickness for tranpsiration, [m]
   real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3] 
   real(r8) :: BlkDensCoarseRoots                  !Coarse root bulk density, [gC m-3]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
@@ -244,7 +246,9 @@ module PlantBGCPars
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
   RootElonZoneLenz            =0.03_r8
-
+  kDCytof = (/0.69_r8,0.3_r8/)
+  kDCytoC = 0.175_r8
+  RCytoK = (/1.e-4_r8,1.e-3_r8/) !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDensCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
   FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
