@@ -440,6 +440,7 @@ implicit none
   DO NE=1,NumPlantChemElms
     DO L=NU,MaxNumRootLays
       DO N=1,Myco_pft(NZ)
+
         RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
         RootMycoNonstElms_pft(NE,N,NZ) = RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
       ENDDO  
@@ -479,7 +480,11 @@ implicit none
       plt_biom%TotEndVegE_pft(NE,NZ) = plt_biom%RootElms_pft(NE,NZ)+plt_biom%ShootElms_pft(NE,NZ)+&
         plt_biom%SeasonalNonstElms_pft(NE,NZ)+plt_biom%StandDeadStrutElms_pft(NE,NZ)+ plt_biom%ShootNoduleElms_pft(NE,NZ)  + &
         plt_biom%RootNoduleElms_pft(NE,NZ) 
-
+      if(plt_biom%RootElms_pft(NE,NZ)<0._r8)then
+        write(944,*)I*1000+J/24.,NE,plt_biom%RootElms_pft(NE,NZ),plt_biom%ShootElms_pft(NE,NZ),&
+        plt_biom%SeasonalNonstElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ), plt_biom%ShootNoduleElms_pft(NE,NZ), &
+        plt_biom%RootNoduleElms_pft(NE,NZ) 
+      endif
       plt_biom%RootElmsBeg_pft(NE,NZ)           = plt_biom%RootElms_pft(NE,NZ)
       plt_biom%StandDeadStrutElmsBeg_pft(NE,NZ) = plt_biom%StandDeadStrutElms_pft(NE,NZ)
       plt_biom%ShootElmsBeg_pft(NE,NZ)          = plt_biom%ShootElms_pft(NE,NZ)

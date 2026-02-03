@@ -94,7 +94,6 @@ module grosubsMod
       call ResetDeadPlant(yearIJ,NZ)
     ENDIF  
 
-
     call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
@@ -298,6 +297,7 @@ module grosubsMod
   ENDIF
 
   call RemoveBiomByMgmt(yearIJ,NZ)  
+
   !
 
   call PrintInfo('end '//subname)  
