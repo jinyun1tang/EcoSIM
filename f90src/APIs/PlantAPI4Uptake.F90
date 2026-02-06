@@ -90,7 +90,7 @@ implicit none
   plt_ew%HeatFlx2Canopy_col        = HeatFlx2Canopy_col(NY,NX)         !heat flux to canopy, reset to zero in hour1.F90
   plt_ew%LWRadCanG                 = LWRadCanG_col(NY,NX)              !longwave radiation onto groud, reset to zero in hour1.F90
   DO L=1,NK_col(NY,NX)
-   plt_soilchem%VLSoilPoreMicP_vr(L)      = VLSoilPoreMicP_vr(L,NY,NX)             !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered 
+   plt_soilchem%VLSoilPoreMicP_vr(L)      = VLSoilPoreMicP_vr(L,NY,NX)             !total soil volume (associated with micropores) in layer L, which is soil volume when no macropore is considered
    plt_ew%ElvAdjstedSoilH2OPSIMPa_vr(L)   = ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX)    !elevation adjusted soil matric water potential, MPa
    plt_soilchem%SoilBulkDensity_vr(L)     = SoilBulkDensity_vr(L,NY,NX)            !soil bulk density
    plt_site%CumSoilThickness_vr(L)        = CumSoilThickness_vr(L,NY,NX)           !cumulative soil thickness starting from the soil surface (which is zero)
@@ -98,13 +98,13 @@ implicit none
    plt_ew%TKS_vr(L)                       = TKS_vr(L,NY,NX)                        !soil temperature
    plt_soilchem%THETW_vr(L)               = THETW_vr(L,NY,NX)                      !relative saturation of soil micropores in layer L
    plt_soilchem%SoilWatAirDry_vr(L)       = SoilWatAirDry_vr(L,NY,NX)              !relative moisture content when considered as air-dry
-   plt_soilchem%VLSoilMicP_vr(L)          = VLSoilMicP_vr(L,NY,NX)                 !volume of soil micropore, 
+   plt_soilchem%VLSoilMicP_vr(L)          = VLSoilMicP_vr(L,NY,NX)                 !volume of soil micropore,
    plt_soilchem%VLiceMicP_vr(L)           = VLiceMicP_vr(L,NY,NX)                  !volume of ice in soil layer
    plt_soilchem%VLWatMicP_vr(L)           = VLWatMicP_vr(L,NY,NX)                  !volume of water in soil layer
    plt_soilchem%VLMicP_vr(L)              = VLMicP_vr(L,NY,NX)                     !total micropore volume
    plt_site%FracSoiAsMicP_vr(L)           = FracSoiAsMicP_vr(L,NY,NX)              !fraction of soil as micropore
    plt_site%DLYR3(L)                      = DLYR_3D(3,L,NY,NX)                     !layer thickness
-   plt_soilchem%HYCDMicP4RootUptake_vr(L) = HYCDMicP4RootUptake_vr(L,NY,NX)        !soil hydraulic conductivity for water uptake, 
+   plt_soilchem%HYCDMicP4RootUptake_vr(L) = HYCDMicP4RootUptake_vr(L,NY,NX)        !soil hydraulic conductivity for water uptake,
    plt_site%CumSoilThickMidL_vr(L)        = CumSoilThickMidL_vr(L,NY,NX)           !layer middle soil depth
    DO M=1,NPH
      plt_site%VLWatMicPM_vr(M,L)           = VLWatMicP_vr(L,NY,NX)                 !intermediate iteration soil moisture
@@ -139,12 +139,12 @@ implicit none
     plt_biom%ZERO4Groth_pft(NZ)             = ZERO4Groth_pft(NZ,NY,NX)
     plt_photo%RCS_pft(NZ)                   = RCS_pft(NZ,NY,NX)                    !read in pft parameter
     plt_photo%CuticleResist_pft(NZ)         = CuticleResist_pft(NZ,NY,NX)          !read in pft parameter
-    plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)       !set based on read in pft parameter    
+    plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)       !set based on read in pft parameter
     DO N=1,Myco_pft(NZ,NY,NX)
       plt_morph%Root1stMaxRadius_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%Root2ndMaxRadius_pft(N,NZ) = Root2ndMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%RootAxialResist_pft(N,NZ)  = RootAxialResist_pft(N,NZ,NY,NX)
-      plt_morph%RootPorosity_pft(N,NZ)     = RootPorosity_pft(N,NZ,NY,NX)      
+      plt_morph%RootPorosity_pft(N,NZ)     = RootPorosity_pft(N,NZ,NY,NX)
       plt_morph%RootRadialResist_pft(N,NZ) = RootRadialResist_pft(N,NZ,NY,NX)
       plt_morph%Root1stMaxRadius1_pft(N,NZ) = Root1stMaxRadius1_pft(N,NZ,NY,NX)
       plt_morph%Root2ndMaxRadius1_pft(N,NZ) = Root2ndMaxRadius1_pft(N,NZ,NY,NX)
@@ -179,15 +179,15 @@ implicit none
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
           DO N=1,NumLeafZenithSectors
-             plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)  
+             plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
-      ENDDO  
+      ENDDO
 
       DO K=0,MaxNodesPerBranch
         plt_morph%LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ,NY,NX)
-      ENDDO          
-    ENDDO  
+      ENDDO
+    ENDDO
     !variables updated iteratively
     plt_ew%CanopyBiomWater_pft(NZ)          = CanopyBiomWater_pft(NZ,NY,NX)    !canopy biom water, updated iteratively
     plt_morph%ClumpFactorNow_pft(NZ)        = ClumpFactorNow_pft(NZ,NY,NX)
@@ -206,7 +206,7 @@ implicit none
     plt_pheno%TempOffset_pft(NZ)            = TempOffset_pft(NZ,NY,NX)             !set based on read in pft parameter
     plt_ew%OrganOsmoPsi0pt_pft(NZ)            = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
 
-  ENDDO    
+  ENDDO
   end subroutine PlantUptakeAPISend
 !------------------------------------------------------------------------------------------
 
@@ -230,8 +230,8 @@ implicit none
   HeatFlx2Canopy_col(NY,NX)        = plt_ew%HeatFlx2Canopy_col
   LWRadCanG_col(NY,NX)             = plt_ew%LWRadCanG
   DO NZ=1,NP0_col(NY,NX)
-    ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)  
-    ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)  
+    ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)
+    ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)
     DeltaTKC_pft(NZ,NY,NX)           = plt_ew%DeltaTKC_pft(NZ)
     EvapTransLHeat_pft(NZ,NY,NX)     = plt_ew%EvapTransLHeat_pft(NZ)
     HeatXAir2PCan_pft(NZ,NY,NX)      = plt_ew%HeatXAir2PCan_pft(NZ)
@@ -245,14 +245,14 @@ implicit none
     PSICanopyOsmo_pft(NZ,NY,NX)      = plt_ew%PSICanopyOsmo_pft(NZ)
     PSICanopyTurg_pft(NZ,NY,NX)      = plt_ew%PSICanopyTurg_pft(NZ)
     CanPStomaResistH2O_pft(NZ,NY,NX) = plt_photo%CanPStomaResistH2O_pft(NZ)
-    TdegCCanopy_pft(NZ,NY,NX)        = plt_ew%TdegCCanopy_pft(NZ)    
+    TdegCCanopy_pft(NZ,NY,NX)        = plt_ew%TdegCCanopy_pft(NZ)
     DO L=1,NK_col(NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
         PSIRootOSMO_vr(N,L,NZ,NY,NX)        = plt_ew%PSIRootOSMO_vr(N,L,NZ)
         PSIRootTurg_vr(N,L,NZ,NY,NX)        = plt_ew%PSIRootTurg_vr(N,L,NZ)
         RPlantRootH2OUptk_pvr(N,L,NZ,NY,NX) = plt_ew%RPlantRootH2OUptk_pvr(N,L,NZ)
       ENDDO
-    ENDDO    
+    ENDDO
   ENDDO
 
   end subroutine PlantUPtakeAPIRecv

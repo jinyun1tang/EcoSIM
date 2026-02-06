@@ -12,6 +12,7 @@ module ATSEcoSIMAdvanceMod
   use SnowDataType
   use LandSurfDataType
   use PlantTraitDataType
+  use PlantMgmtDataType
   use CanopyDataType
   !use PlantAPIData, only: CO2E, CH4E, OXYE, Z2GE, Z2OE, ZNH3E, &
   !    H2GE
@@ -259,6 +260,12 @@ implicit none
     LAI_col(NX,NY) = a_LAI(NY)
     irootType_col(NY,NX) = a_VEG(NY)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+    !Fill number of plants from npfts
+    if(irootType_col(NY,NX).EQ.0.0)then
+      NP0_col(NY,NX) = 0
+    else
+      NP0_col(NY,NX) = 1
+    endif
 
   ENDDO
 
