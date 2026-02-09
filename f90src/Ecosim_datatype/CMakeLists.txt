@@ -45,7 +45,7 @@ target_include_directories(ecosim_datatype PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/)
 
-target_include_directories(ecosim_datatype PUBLIC ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype)
+target_include_directories(ecosim_datatype PUBLIC ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_datatype PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_datatype)
