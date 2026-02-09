@@ -451,7 +451,7 @@ implicit none
 ! begin_execution
   associate(                                                         &
     CanopyGasCO2_pft         => plt_photo%CanopyGasCO2_pft          ,& !input  :canopy gaesous CO2 concentration, [umol mol-1]
-    iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType  ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft => plt_photo%iPlantPhotosynsType_pft  ,& !input  :plant photosynthetic type (C3 or C4),[-]
     Vmax4PEPCarboxy_node     => plt_photo%Vmax4PEPCarboxy_node      ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     Vmax4RubiscoCarboxy_node => plt_photo%Vmax4RubiscoCarboxy_node  ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     iPlantRootProfile_pft    => plt_pheno%iPlantRootProfile_pft     ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -482,10 +482,10 @@ implicit none
 !             C4 PHOTOSYNTHESIS
 !
 !             LeafArea_node,CanopyLeafArea_lnode=leaf area
-!             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+!             iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
 !             Vmax4PEPCarboxy_node=PEP carboxylation rate unlimited by CO2
 !
-            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
+            IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CH2OClmt,CH2OLlmt)
               CO2F    = CO2F+CH2O4(K)     !carbon fixation in mesophyll cells
@@ -496,7 +496,7 @@ implicit none
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
+            ELSEIF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 
               call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2OClmt,CH2OLlmt)
               CO2F    = CO2F+CH2O3(K)
@@ -523,7 +523,7 @@ implicit none
         CH2OLlm = CH2OLlm*umol2gC_hr
       ELSE
 
-        IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+        IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
           D155: DO K=1,MaxNodesPerBranch1
             CH2O3(K) = 0._r8
             CH2O4(K) = 0._r8
@@ -533,7 +533,7 @@ implicit none
     ELSE
 
       !C4
-      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+      IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
         D160: DO K=1,MaxNodesPerBranch1
           CH2O3(K) = 0._r8
           CH2O4(K) = 0._r8
@@ -541,7 +541,7 @@ implicit none
       ENDIF
     ENDIF
   ELSE
-    IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+    IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
       D165: DO K=1,MaxNodesPerBranch1
         CH2O3(K) = 0._r8
         CH2O4(K) = 0._r8

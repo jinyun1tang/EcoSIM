@@ -844,7 +844,8 @@ implicit none
 
   DO NZ=1,NP0_col(NY,NX)
     !plant properties begin
-    plt_photo%iPlantPhotosynthesisType(NZ)        = iPlantPhotosynthesisType(NZ,NY,NX)
+    plt_morph%Radius95pctMature_pft(NZ)          = Radius95pctMature_pft(NZ,NY,NX)
+    plt_photo%iPlantPhotosynsType_pft(NZ)        = iPlantPhotosynsType_pft(NZ,NY,NX)
     plt_pheno%iPlantRootProfile_pft(NZ)           = iPlantRootProfile_pft(NZ,NY,NX)
     plt_morph%xylemPhi_min_pft(NZ)                = xylemPhi_min_pft(NZ,NY,NX)
     plt_morph%xylemPhi_mean_pft(NZ)                = xylemPhi_mean_pft(NZ,NY,NX)

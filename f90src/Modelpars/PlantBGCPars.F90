@@ -239,7 +239,7 @@ module PlantBGCPars
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
-  resp_downreg                = 0.3_r8
+  resp_downreg                = 1._r8
   CNKI_rubisco                = 1.0E-02_r8
   CPKI_rubisco                = 1.0E-03_r8
   RSMY_stomaCO2               = 2.78E-03_r8

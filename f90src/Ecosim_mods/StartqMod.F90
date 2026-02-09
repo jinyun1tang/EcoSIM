@@ -122,7 +122,7 @@ module StartqMod
 !  rProteinC2LeafN_pft(NZ,NY,NX)  = 2.6_r8
 !  rProteinC2LeafP_pft(NZ,NY,NX)  = 25.0_r8
   RootProteinCMax_pft(NZ,NY,NX) = rNCRoot_pft(NZ,NY,NX)*rProteinC2RootN_pft(NZ,NY,NX)    
-  IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.ic3_photo)THEN
+  IF(iPlantPhotosynsType_pft(NZ,NY,NX).EQ.ic3_photo)THEN
     O2I_pft(NZ,NY,NX)=2.10E+05_r8
   ELSE
     O2I_pft(NZ,NY,NX)=3.96E+05_r8
@@ -194,7 +194,7 @@ module StartqMod
   !     ANNUALS, GRASSES, SHRUBS
   !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)  = 0.08_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX) = 0.36_r8
@@ -246,7 +246,7 @@ module StartqMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)  = 0.03_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ,NY,NX) = 0.57_r8
@@ -275,7 +275,7 @@ module StartqMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)  = 0.057_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX) = 0.263_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ,NY,NX) = 0.542_r8
@@ -339,7 +339,7 @@ module StartqMod
   !     NumCogrowthNode_pft=number of concurrently growing nodes
   !
   ! deciduous (0) or shallow root (not tree)
-  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
@@ -378,7 +378,7 @@ module StartqMod
   TempOffset_pft(NZ,NY,NX)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ,NY,NX))
   TC4LeafOut_pft(NZ,NY,NX)            = TCZD-TempOffset_pft(NZ,NY,NX)
   TC4LeafOff_pft(NZ,NY,NX)            = AMIN1(15.0,TCXD-TempOffset_pft(NZ,NY,NX))
-  IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
+  IF(iPlantPhotosynsType_pft(NZ,NY,NX).EQ.3)THEN
     IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
       HighTempLimitSeed_pft(NZ,NY,NX) = 30.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ,NY,NX)
       SeedTempSens_pft(NZ,NY,NX)      = 0.002_r8

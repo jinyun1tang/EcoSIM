@@ -118,7 +118,7 @@ module InitPlantMod
     rPCRootr_pft                  => plt_allom%rPCRootr_pft                   ,& !input  :root P:C ratio, [gP gC-1]
     iHarvestDay_pft               => plt_distb%iHarvestDay_pft                ,& !input  :day of harvest, [-]
     iHarvestYear_pft              => plt_distb%iHarvestYear_pft               ,& !input  :year of harvest,[-]
-    iPlantPhotosynthesisType      => plt_photo%iPlantPhotosynthesisType       ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft      => plt_photo%iPlantPhotosynsType_pft       ,& !input  :plant photosynthetic type (C3 or C4),[-]
     iPlantingDay_pft              => plt_distb%iPlantingDay_pft               ,& !input  :day of planting,[-]
     iPlantingYear_pft             => plt_distb%iPlantingYear_pft              ,& !input  :year of planting,[-]
     PPI_pft                       => plt_site%PPI_pft                         ,& !output :initial plant population, [plants d-2]
@@ -149,7 +149,7 @@ module InitPlantMod
   CO2CuticleResist_pft(NZ)          = CuticleResist_pft(NZ)*1.56_r8    !1.56 = sqrt(44./18.)
 
   RootProteinCMax_pft(NZ) = AMIN1(rNCRoot_pft(NZ)*rProteinC2RootN_pft(NZ),rPCRootr_pft(NZ)*rProteinC2RootP_pft(NZ))  !groot N/g rootC * gprotein C/g root N = g protein C/g root C
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
+  IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)THEN
     O2I_pft(NZ)=2.10E+05_r8
   ELSE
     O2I_pft(NZ)=3.96E+05_r8
@@ -229,7 +229,7 @@ module InitPlantMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.08_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.36_r8
@@ -282,7 +282,7 @@ module InitPlantMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ)  = 0.03_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ) = 0.57_r8
@@ -311,7 +311,7 @@ module InitPlantMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ)  = 0.057_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ) = 0.263_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ) = 0.542_r8
@@ -375,7 +375,7 @@ module InitPlantMod
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowthNode_pft=number of concurrently growing nodes
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2!
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     !Annual plant (e.g.crops) or grass or bryophyte
     !The following may be revised for maize or soybean, or crops in general
     FracGroth2Node_pft(NZ) = 1.0_r8
@@ -405,7 +405,7 @@ module InitPlantMod
   associate(                                                                   &
     DATAP                         => plt_site%DATAP                           ,& !input  :parameter file name,[-]
     PlantInitThermoAdaptZone_pft  => plt_pheno%PlantInitThermoAdaptZone_pft   ,& !input  :initial plant thermal adaptation zone, [-]
-    iPlantPhotosynthesisType      => plt_photo%iPlantPhotosynthesisType       ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft      => plt_photo%iPlantPhotosynsType_pft       ,& !input  :plant photosynthetic type (C3 or C4),[-]
     TempOffset_pft                => plt_pheno%TempOffset_pft                 ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
     rPlantThermoAdaptZone_pft     => plt_pheno%rPlantThermoAdaptZone_pft      ,& !output :plant thermal adaptation zone, [-]
     HighTempLimitSeed_pft         => plt_pheno%HighTempLimitSeed_pft          ,& !output :temperature above which seed set is adversely affected, [oC]
@@ -426,7 +426,7 @@ module InitPlantMod
   TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)            = TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)            = AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)THEN
+  IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
       HighTempLimitSeed_pft(NZ)=30.0_r8+3.0_r8*rPlantThermoAdaptZone_pft(NZ)
       SeedTempSens_pft(NZ)=0.002_r8

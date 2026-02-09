@@ -37,7 +37,7 @@
     VmaxSpecRubCarboxyRef_pft       => plt_photo%VmaxSpecRubCarboxyRef_pft    ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1 m-2]    
     VmaxPEPCarboxyRef_pft           => plt_photo%VmaxPEPCarboxyRef_pft        ,& !input  :PEP carboxylase activity at 25 oC [umol g-1 h-1]    
     ProteinCperm2LeafArea_node      => plt_photo%ProteinCperm2LeafArea_node   ,& !output :Protein C per m2 of leaf aera, [gC (leaf area m-2)]        
-    iPlantPhotosynthesisType        => plt_photo%iPlantPhotosynthesisType     ,& !input  :plant photosynthetic type (C3 or C4),[-]      
+    iPlantPhotosynsType_pft        => plt_photo%iPlantPhotosynsType_pft     ,& !input  :plant photosynthetic type (C3 or C4),[-]      
     VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft            ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]    
     iPlantPhenolType_pft            => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]  
     Hours4Leafout_brch              => plt_pheno%Hours4Leafout_brch           ,& !input  :heat requirement for spring leafout/dehardening, [h]    
@@ -115,7 +115,7 @@
           ProteinCperm2LeafArea_node(K,NB,NZ) = LeafProteinC_node(K,NB,NZ)/LeafArea_node(K,NB,NZ)
 
           IF(ProteinCperm2LeafArea_node(K,NB,NZ).GT.ZERO)THEN
-            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        
+            IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN        
               BundlSheathRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
               BundlSheathChlC     = LeafProteinC_node(K,NB,NZ)*LeafProtein2Chl_pft(NZ)*(1._r8-fMesophyllChlProtein_pft(NZ))/5.5_r8        !1 gC chl for 5.5 gC protein
               MesophyllPEPC       = LeafProteinC_node(K,NB,NZ)*LeafPEP2Protein_pft(NZ)
@@ -132,7 +132,7 @@
               
               LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+BundlSheathChlC
 
-            ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then    
+            ELSE IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)then    
               MesophyllChlC     = LeafProteinC_node(K,NB,NZ)*LeafProtein2Chl_pft(NZ)/3.5_r8        ! 1 gC chl for 3.5 gC protein
               MesophyllRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
               
@@ -757,7 +757,7 @@
   real(r8) :: ProteinCLeafAreaDensity   !protein area density, [gC protein m-2 LA]
 !     begin_execution
   associate(                                                              &
-    iPlantPhotosynthesisType    => plt_photo%iPlantPhotosynthesisType    ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft    => plt_photo%iPlantPhotosynsType_pft    ,& !input  :plant photosynthetic type (C3 or C4),[-]
     ZERO                        => plt_site%ZERO                         ,& !input  :threshold zero for numerical stability, [-]
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch           ,& !input  :leaf element, [g d-2]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft               ,& !input  :threshold zero for plang growth calculation, [-]
@@ -777,11 +777,11 @@
 
     IF(ProteinCLeafAreaDensity.GT.ZERO)THEN
       !
-      !     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+      !     iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
       !
-      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        
+      IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN        
         call C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
-      ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then        
+      ELSE IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)then        
 
         call C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
       ENDIF

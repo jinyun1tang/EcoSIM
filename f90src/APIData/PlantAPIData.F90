@@ -91,7 +91,7 @@ implicit none
   end type plant_siteinfo_type
 
   type, public :: plant_photosyns_type
-  integer,  pointer :: iPlantPhotosynthesisType(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
+  integer,  pointer :: iPlantPhotosynsType_pft(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
   real(r8), pointer :: SpecLeafChlAct_pft(:)                => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
   real(r8), pointer :: LeafProtein2Chl_pft(:)               => null()  !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
   real(r8), pointer :: LeafPEP2Protein_pft(:)               => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
@@ -329,6 +329,7 @@ implicit none
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
   REAL(R8), POINTER :: NumAxesPerPrimRoot_pft(:)      => null() !primary root axes number, [d-2]
+  real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)       => null() !root layer number axes,               [d-2]
   real(r8), pointer :: Root2ndVH2O_rpvr(:,:,:,:)      => null()  !water-occupied 2nd root volume, [m3 m-3]    
   real(r8), pointer :: Root1stVH2O_rpvr(:,:,:)        => null()  !water-occupied xylem volume in corase roots, [m3 m-3]
@@ -1848,7 +1849,7 @@ implicit none
   allocate(this%CO2lmtRubiscoCarboxyRate_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2lmtRubiscoCarboxyRate_node=spval
   allocate(this%Vmax4PEPCarboxy_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%Vmax4PEPCarboxy_node=spval
   allocate(this%CO2lmtPEPCarboxyRate_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2lmtPEPCarboxyRate_node=spval
-  allocate(this%iPlantPhotosynthesisType(JP1));this%iPlantPhotosynthesisType=0
+  allocate(this%iPlantPhotosynsType_pft(JP1));this%iPlantPhotosynsType_pft=0
   allocate(this%Km4PEPCarboxy_pft(JP1));this%Km4PEPCarboxy_pft=spval
   allocate(this%O2L_pft(JP1));this%O2L_pft=spval
   allocate(this%CO2Solubility_pft(JP1));this%CO2Solubility_pft=spval
@@ -2036,6 +2037,7 @@ implicit none
   allocate(this%Root2ndSinkWeight_pvr(JZ1,jroots,JP1));this%Root2ndSinkWeight_pvr=0._r8
   allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
   allocate(this%NumAxesPerPrimRoot_pft(JP1)); this%NumAxesPerPrimRoot_pft=0._r8
+  allocate(this%Radius95pctMature_pft(JP1)); this%Radius95pctMature_pft=0._r8
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval

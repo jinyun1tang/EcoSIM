@@ -184,7 +184,7 @@ module grosubsMod
       DO NE=1,NumPlantChemElms
         XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
         
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
           !grass/bryophyte
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XFRE
         ELSE
@@ -257,6 +257,7 @@ module grosubsMod
   real(r8) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: tvegE_beg(NumPlantChemElms)
   real(r8) :: tvegE_end(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: err,arr(12),arr1(11),GrothPART2LeafPetole
 ! begin_execution
   associate(                                                 &
@@ -290,6 +291,8 @@ module grosubsMod
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
+
+    call SumRootBiome(yearIJ,NZ,mass_finale)
 
     call ComputeTotalBiom(yearIJ,NZ)
   else
@@ -399,7 +402,7 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0                      & !'Rapid, like deciduous tree '
-    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))) &
+    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))) &
     .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
     FracShootElmAllocm(ielmc,k_fine_comp)    = 1.0_r8

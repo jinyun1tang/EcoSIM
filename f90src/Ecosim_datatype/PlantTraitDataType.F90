@@ -167,7 +167,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                 !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)              !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                      !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-  integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
+  integer,target,allocatable ::  iPlantPhotosynsType_pft(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                !plant growth type (vascular, non-vascular),[-]
   integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)              !plant growth habit (annual or perennial),[-]
   integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]  
@@ -339,7 +339,7 @@ contains
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
   allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
-  allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
+  allocate(iPlantPhotosynsType_pft(JP,JY,JX));    iPlantPhotosynsType_pft=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
   allocate(iPlantPhenolPattern_pft(JP,JY,JX));    iPlantPhenolPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
@@ -508,7 +508,7 @@ contains
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)
   call destroy(TempOffset_pft)
-  call destroy(iPlantPhotosynthesisType)
+  call destroy(iPlantPhotosynsType_pft)
   call destroy(iPlantRootProfile_pft)
   call destroy(iPlantPhenolPattern_pft)
   call destroy(iPlantDevelopPattern_pft)

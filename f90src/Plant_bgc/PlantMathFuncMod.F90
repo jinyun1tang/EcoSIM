@@ -2,7 +2,8 @@ module PlantMathFuncMod
 !
 !DESCRIPTION
   ! code for small functions used by plant processes
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
   use EcoSimConst
   use MiniMathMod
   use ElmIDMod
@@ -251,7 +252,7 @@ contains
   end subroutine SoluteUptakeByPlantRoots
 !--------------------------------------------------------------------------------
 
-  pure function is_plant_treelike(iPlantRootProfile_pft)result(ans)
+  pure function is_plant_woody_vascular(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -263,7 +264,7 @@ contains
   logical :: ans
 
   ans=iPlantRootProfile_pft > 1
-  end function is_plant_treelike
+  end function is_plant_woody_vascular
 
 !--------------------------------------------------------------------------------
 
@@ -327,5 +328,227 @@ contains
   ENDIF
 
   end function fRespWatSens
-  
+
+!----------------------------------------------------------------------------------------------------
+
+  subroutine ExchFluxLimiter(fromState,toState,XFRE)
+  implicit none
+  real(r8),intent(in) :: fromState
+  real(r8),intent(in) :: toState
+  real(r8), intent(inout) :: XFRE
+
+  IF(XFRE>0._r8)then
+    XFRE=AMIN1(fromState*0.9999_r8,XFRE)
+  ELSE  
+    XFRE=AMAX1(-toState*0.9999_r8,XFRE)
+  ENDIF
+  end subroutine ExchFluxLimiter
+!----------------------------------------------------------------------------------------------------
+
+  subroutine advect_remap_mass_loss(n, xr, c, ur, dt, c_new, xL, lost_mass)
+    !--------------------------------------------------------------------
+    ! Conservative 1D advect-remap with proportional mass loss at right boundary
+    ! Workspace arrays must be preallocated by the caller (no allocate/deallocate here).
+    !
+    ! Inputs:
+    !   n   - number of cells
+    !   xr  - right-edge locations of each cell (size n), strictly increasing
+    !   c   - cell-average concentration in each cell (size n)
+    !   ur  - velocities at right-edge of each cell (size n), nonnegative
+    !   dt  - time step (positive)
+    !   xL  - left boundary (default 0.0 in caller)
+    !
+    ! Outputs:
+    !   c_new    - updated cell-average concentration (size n)
+    !   lost_mass- total mass lost this step
+    !
+    ! Workspace (caller provides arrays):
+    !   xE, xE_star : real(r8), size n+1
+    !   dx, m, m_kept, frac_kept : real(r8), size n
+    !   M_star, M_on_fixed : real(r8), size n+1
+    !--------------------------------------------------------------------
+    implicit none
+
+    integer, intent(in) :: n
+    real(r8), intent(in) :: xr(n), c(n), ur(n), dt 
+    real(r8), optional, intent(in):: xL
+    real(r8), intent(out) :: c_new(n)
+    real(r8), optional, intent(out) :: lost_mass
+
+    ! workspace arrays provided by caller (no allocate/deallocate here)
+    real(r8)  :: xE(n+1), xE_star(n+1)
+    real(r8)  :: dx(n), m(n), m_kept(n), frac_kept(n)
+    real(r8)  :: M_star(n+1), M_on_fixed(n+1)
+    
+    ! local scalars
+    integer :: i
+    real(r8) :: xR_most
+    real(r8) :: total_initial, total_kept
+    real(r8) :: a, b, w_star, inside_left, inside_right, overlap, frac
+    real(r8) :: dt_res,dt_loc
+    logical :: lhalf
+    real(r8), parameter :: tiny = 1.0d-14
+
+    ! Basic checks (lightweight)
+    if (n <= 0) then
+       if(present(lost_mass))lost_mass = 0._r8
+       return
+    end if
+    if (dt <= 0._r8) then
+       call endrun('Error: dt must be positive.  in '//trim(mod_filename)//' at line',__LINE__)                    
+    end if
+
+    do i = 2, n
+       if (xr(i) <= xr(i-1)) then
+          call endrun('Error: xr must be strictly increasing.  in '//trim(mod_filename)//' at line',__LINE__)                              
+       end if
+    end do
+    do i = 1, n
+       if (ur(i) < 0._r8) then
+          call endrun('Error: ur must be nonnegative.  in '//trim(mod_filename)//' at line',__LINE__)                    
+       end if
+    end do
+
+    ! rightmost fixed boundary
+    xR_most = xr(n)
+
+    ! fixed edges: xE(1) = xL, xE(2:n+1) = xr(1:n)
+    if(present(xL))then
+      xE(1) = xL
+    else
+      xE(1) = 0._r8
+    endif
+    do i = 1, n
+       xE(i+1) = xr(i)
+    end do
+
+    ! compute dx and masses
+    total_initial = 0._r8
+    do i = 1, n
+       dx(i) = xE(i+1) - xE(i)
+       if (dx(i) <= 0._r8) then
+          call endrun('Error: non-positive cell width encountered.  in '//trim(mod_filename)//' at line',__LINE__)                    
+       end if
+    end do
+    m = c * dx
+    total_initial = total_initial + sum(m)
+
+  dt_res=dt; dt_loc=dt  
+  DO
+    ! compute moved edges (left edge fixed velocity = 0)
+
+    do
+      lhalf=.false.    
+      xE_star(1) = xE(1) + 0._r8 * dt_loc      
+      do i = 1, n
+        xE_star(i+1) = xE(i+1) + ur(i) * dt_loc
+        if (xE_star(i+1) + tiny < xE_star(i) .and. xE_star(i+1)<xR_most) then
+          dt_loc=dt_loc*0.5_r8
+          lhalf=.true.
+          exit
+        endif
+      end do
+      if(.not.lhalf)exit 
+    enddo
+
+    ! monotonicity check (advected edges should be increasing)
+    do i = 2, n+1
+      if (xE_star(i) + tiny < xE_star(i-1) .and. xE_star(i)<xR_most) then
+        write(*,*)'ur',ur
+        write(*,*)'xR_most',xR_most,dt_loc
+        write(*,*)'xE_star',xE_star(2:n+1) 
+        call endrun('Error: advected edges are not monotone increasing. Reduce dt.  in '//trim(mod_filename)//' at line',__LINE__)                    
+      end if
+    end do
+
+    ! compute kept mass per moved cell via overlap with [xL, xR_most]
+    total_kept = 0._r8
+    do i = 1, n
+       a = xE_star(i)
+       b = xE_star(i+1)
+       w_star = b - a
+       if (w_star <= 0._r8) then
+          frac_kept(i) = 0._r8
+          m_kept(i) = 0._r8
+       else
+          inside_left = max(a, xL)
+          inside_right = min(b, xR_most)
+          overlap = inside_right - inside_left
+          if (overlap < 0._r8) overlap = 0._r8
+          frac = overlap / w_star
+          if (frac < 0._r8) frac = 0._r8
+          if (frac > 1.0d0) frac = 1.0d0
+          frac_kept(i) = frac
+          m_kept(i) = m(i) * frac
+       end if
+       total_kept = total_kept + m_kept(i)
+    end do
+    if(present(lost_mass))lost_mass = total_initial - total_kept
+
+    ! build cumulative M_star on moved mesh edges
+    M_star(1) = 0._r8
+    do i = 1, n
+       M_star(i+1) = M_star(i) + m_kept(i)
+    end do
+
+    ! interpolate M_star back to fixed edges xE -> M_on_fixed
+    call interp_linear_clamped(n+1, xE_star, M_star, n+1, xE, M_on_fixed, 0._r8, total_kept)
+
+    ! new cell masses and concentrations
+    do i = 1, n
+       m(i) = M_on_fixed(i+1) - M_on_fixed(i)    ! reuse m for new masses
+       c_new(i) = m(i) / dx(i)
+    end do
+    dt_res=dt_res-dt_loc
+    if(dt_res<dt*1.e-2_r8)exit
+    dt_loc=dt_res
+  enddo  
+
+  end subroutine advect_remap_mass_loss
+
+  !--------------------------------------------------------------------
+  ! Simple piecewise-linear interpolation with clamped extrapolation:
+  !   Inputs:
+  !     nx  - length of x array
+  !     x   - array of x nodes, length nx (must be nondecreasing)
+  !     y   - array of y nodes, length nx
+  !     nq  - number of query points (size of xq)
+  !     xq  - query points (length nq)
+  !   Outputs:
+  !     yq  - interpolated values at xq (length nq)
+  !   Extrapolation:
+  !     xq <= x(1) -> y_left
+  !     xq >= x(nx) -> y_right
+  !--------------------------------------------------------------------
+  subroutine interp_linear_clamped(nx, x, y, nq, xq, yq, y_left, y_right)
+    implicit none
+    integer, intent(in) :: nx, nq
+    real(r8), intent(in) :: x(nx), y(nx), xq(nq)
+    real(r8), intent(out) :: yq(nq)
+    real(r8), intent(in) :: y_left, y_right
+
+    integer :: iq, k
+    real(r8) :: t
+
+    do iq = 1, nq
+       if (xq(iq) <= x(1)) then
+          yq(iq) = y_left
+       else if (xq(iq) >= x(nx)) then
+          yq(iq) = y_right
+       else
+          ! find k s.t. x(k) <= xq < x(k+1)
+          k = 1
+          do while (k < nx - 1 .and. xq(iq) >= x(k+1))
+             k = k + 1
+          end do
+          if (x(k+1) == x(k)) then
+             yq(iq) = y(k)
+          else
+             t = (xq(iq) - x(k)) / (x(k+1) - x(k))
+             yq(iq) = (1.0d0 - t) * y(k) + t * y(k+1)
+          end if
+       end if
+    end do
+  end subroutine interp_linear_clamped
+
 end module PlantMathFuncMod

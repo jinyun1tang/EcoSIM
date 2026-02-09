@@ -50,8 +50,6 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: M,L,NZ,N,NB,K
 
-  NP0_col(NY,NX)=1
-
   !sent variables also modified
   plt_site%NumActivePlants         = NumActivePlants_col(NY,NX)        !number of active plants in the column
   plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column

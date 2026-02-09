@@ -269,7 +269,7 @@ module PlantDisturbsMod
             +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
             +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE))
 
-          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
               +PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(WoodyElmnt2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmnt2Litr(NE)&
               +StandeadElmntHarv2Litr(NE))
@@ -1154,7 +1154,7 @@ module PlantDisturbsMod
   
   associate(                                                             &
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft               ,& !input  :threshold zero for plang growth calculation, [-]
-    iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType    ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft   => plt_photo%iPlantPhotosynsType_pft    ,& !input  :plant photosynthetic type (C3 or C4),[-]
     iHarvstType_pft            => plt_distb%iHarvstType_pft             ,& !input  :type of harvest,[-]
     CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch         ,& !inoput :branch nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch  => plt_biom%CanopyNodulStrutElms_brch    ,& !inoput :branch nodule structural element, [g d-2]
@@ -1227,14 +1227,14 @@ module PlantDisturbsMod
 !
 !     REMOVE C4 NON-STRUCTURAL C
 !
-!     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+!     iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
 !     FracNonstLeft=fraction of nonstructural mass not harvested
 !     CanopyNonstElmAfhvst_brch(ielmc)=branch non-structural C mass after harvest
 !     NonstructElmntRemoval()=nonstructural C,N,P removed
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !
-  IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo .AND. CanopyNonstElmCopy_brch(ielmc).GT.ZERO4Groth_pft(NZ))THEN
+  IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo .AND. CanopyNonstElmCopy_brch(ielmc).GT.ZERO4Groth_pft(NZ))THEN
     FracNonstLeft    = CanopyNonstElmAfhvst_brch(ielmc)/CanopyNonstElmCopy_brch(ielmc)
     FracNonstRemoved = 1._r8-FracNonstLeft
     D9810: DO K   = 1, MaxNodesPerBranch1
@@ -1371,7 +1371,7 @@ module PlantDisturbsMod
 !     IF(StalkNodeHeight_brch(K,NB,NZ).GT.CanopyHeightCut_pft(NZ)
 !    2.OR.iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
 !     IF(isclose(FracIntnodeNotHvsted(K),0._r8).AND.K.GT.0)THEN
-!     IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
+!     IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
 !     NumOfLeaves_brch(NB,NZ)=AZMAX1(NumOfLeaves_brch(NB,NZ)-1.0)
 !     ELSE
 !     NumOfLeaves_brch(NB,NZ)=AZMAX1(NumOfLeaves_brch(NB,NZ)-0.04)
@@ -1733,7 +1733,7 @@ module PlantDisturbsMod
     !          iHarvstType_pft=3:reduction of clumping factor
     !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
 
-    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
+    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) &
       .AND. (iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
       .AND. CanopyHeight_pft(NZ).GT.CanopyHeightCut_pft(NZ))THEN
       call ResetCutBranch(I,J,NZ,NB)

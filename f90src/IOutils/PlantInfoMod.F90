@@ -495,7 +495,7 @@ implicit none
 
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
   DATAPI(NZ,NY,NX)=loc
-  call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynthesisType(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ICTYP', loc, iPlantPhotosynsType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, iPlantRootProfile_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ISTYP', loc, iPlantPhenolPattern_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IDTYP', loc, iPlantDevelopPattern_pft(NZ,NY,NX))
@@ -645,7 +645,7 @@ implicit none
   
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
 
-  iPlantPhotosynthesisType(NZ,NY,NX)  = iPlantPhotosynthesisType_tab(loc)
+  iPlantPhotosynsType_pft(NZ,NY,NX)  = iPlantPhotosynsType_pft_tab(loc)
   iPlantRootProfile_pft(NZ,NY,NX)     = iPlantRootProfile_tab(loc)
   iPlantPhenolPattern_pft(NZ,NY,NX)   = iPlantPhenolPattern_tab(loc)
   iPlantDevelopPattern_pft(NZ,NY,NX)  = iPlantDevelopPattern_tab(loc)
@@ -657,6 +657,7 @@ implicit none
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
   PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
   xylemPhi_min_pft(NZ,NY,NX)          = xylemPhi_min_tab(loc)
+  Radius95pctMature_pft(NZ,NY,NX)     = Radius95pctMature_tab(loc)
   xylemPhi_max_pft(NZ,NY,NX)          = xylemPhi_max_tab(loc)
   xylemPhi_mean_pft(NZ,NY,NX)         = xylemPhi_mean_tab(loc)
 
@@ -793,7 +794,7 @@ implicit none
   integer :: j,id
   character(len=60) :: strval
 
-!   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
+!   iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4
 !   iPlantRootProfile_pft=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
 !   iPlantDevelopPattern_pft=growth habit:0=determinate,1=indeterminate
@@ -815,7 +816,7 @@ implicit none
   call writefixsl(nu_plt,'Koppen climate info',strval,60)
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'PLANT CLASS INFORMATION'
-  select CASE (iPlantPhotosynthesisType(NZ,NY,NX))
+  select CASE (iPlantPhotosynsType_pft(NZ,NY,NX))
   case (3)
     strval='C3'
   case (4)
@@ -912,7 +913,7 @@ implicit none
   id=addone(id)
   call writefixsl(nu_plt,'IPTYP: Photoperiod',strval,60,id)
 
-  if(is_plant_treelike(iPlantRootProfile_pft(NZ,NY,NX)))then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
       write(strval,'(A,I2)')'Rapid, like deciduous tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
@@ -989,7 +990,7 @@ implicit none
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'PHOTOSYNTHETIC PROPERTIES'
   id=0;
-  if(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic3_photo)then
+  if(iPlantPhotosynsType_pft(NZ,NY,NX).eq.ic3_photo)then
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX','Saturated specific carboxylation rate by Rubisco at 25oC  [umol CO2 (gC rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
     id=addone(id)
@@ -1004,7 +1005,7 @@ implicit none
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
-  elseif(iPlantPhotosynthesisType(NZ,NY,NX).eq.ic4_photo)then
+  elseif(iPlantPhotosynsType_pft(NZ,NY,NX).eq.ic4_photo)then
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX','Saturated specific carboxylation rate by Rubisco  at 25oC  [umol CO2 (g rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
     id=addone(id)
@@ -1127,13 +1128,13 @@ implicit none
 
   if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
     id=addone(id)
-    call writefixl(nu_plt,id,'MOPHGEN', 'Baseline morephogen signal strength for secondary root growth [%]',MorphogenBase_pft(NZ,NY,NX)*100._r8,105)
-    id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'PhiMIN','The fraction found in the youngest coarse root xylem that as lumen for trees [m2/m2]',xylemPhi_min_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'PhiMAX','Asymptotic limit fraction of the coarse root xyxlem area as lumen for tree [m2/m2]', xylemPhi_max_pft(NZ,NY,NX),105)
+    id=addone(id)
+    call writefixl(nu_plt,id,'R95MAT','Critical radius where the woody root is considered 95% mature [m]', Radius95pctMature_pft(NZ,NY,NX),105)
   else
     id=addone(id)
     call writefixl(nu_plt,id,'PhiMean','The mean fraction found in the seminal root as lumen for non-tree roots, [m2/m2]', xylemPhi_mean_pft(NZ,NY,NX),105)      
@@ -1146,7 +1147,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'RSRA','Axial resistance per m root length for water uptake defined at RRAD2M [MPa h m-4]',RootAxialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)
-  call writefixl(nu_plt,id,'PTSHT','Rate constant for equilibrating shoot-root '// &
+  call writefixl(nu_plt,id,'PTSHT','Rate scalar (<1) for equilibrating shoot-root '// &
     'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
   !as a rule of thumb, RTFQ often takes the value of .  
   id=addone(id)
@@ -1549,7 +1550,7 @@ implicit none
   call ncd_getvar(pft_nfid,'koppen_clim_no',koppen_clim_ncode_tab)
   call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short_tab)
   call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long_tab)
-  call ncd_getvar(pft_nfid, 'ICTYP', iPlantPhotosynthesisType_tab)
+  call ncd_getvar(pft_nfid, 'ICTYP', iPlantPhotosynsType_pft_tab)
   call ncd_getvar(pft_nfid, 'IGTYP', iPlantRootProfile_tab)  
   call ncd_getvar(pft_nfid, 'ISTYP', iPlantPhenolPattern_tab)
   call ncd_getvar(pft_nfid, 'IDTYP', iPlantDevelopPattern_tab)
@@ -1584,6 +1585,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'VRNXI', VRNXI_tab)
   call ncd_getvar(pft_nfid,'PhiMEAN',xylemPhi_mean_tab)
   call ncd_getvar(pft_nfid,'PhiMIN',xylemPhi_min_tab)
+  call ncd_getvar(pft_nfid,'R95MAT',Radius95pctMature_tab)
   call ncd_getvar(pft_nfid,'PhiMAX',xylemPhi_max_tab)
   call ncd_getvar(pft_nfid, 'WDLF', rLen2WidthLeaf_tab)
   call ncd_getvar(pft_nfid, 'PB', NonstCMinConc2InitBranch_tab)

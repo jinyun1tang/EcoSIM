@@ -44,6 +44,7 @@ module RootDataType
   real(sp),target,allocatable ::  RootRaidus_rpft(:,:,:,:)                       !root internal radius, [m]
   real(sp),target,allocatable ::  CNRTS_pft(:,:,:)                               !root N:C ratio x root growth yield, [-]
   real(sp),target,allocatable ::  CPRTS_pft(:,:,:)                               !root P:C ratio x root growth yield, [-]
+  real(sp),target,allocatable ::  Radius95pctMature_pft(:,:,:)                   !Critical radius where the woody radius is considered 95% mature, [m]
   real(sp),target,allocatable ::  xylemPhi_min_pft(:,:,:)                         !the fraction found in the youngest xylem that as lumen for tree, [m2/m2]
   real(sp),target,allocatable ::  xylemPhi_max_pft(:,:,:)                         !asymptotic limit fraction of the xyxlem area as lumen for tree, [m2/m2]
   real(sp),target,allocatable ::  xylemPhi_mean_pft(:,:,:)                        !the mean fraction found in the root as lumen for non-tree roots, [m2/m2]
@@ -183,7 +184,8 @@ contains
   allocate(RootRaidus_rpft(jroots,JP,JY,JX));  RootRaidus_rpft=0._sp
   allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._sp
   allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._sp
-  allocate(xylemPhi_min_pft(JP,JY,JX)); xylemPhi_min_pft=0._sp
+  allocate(Radius95pctMature_pft(JP,JY,JX)); Radius95pctMature_pft=0._sp
+  allocate(xylemPhi_min_pft(JP,JY,JX)); xylemPhi_min_pft=0._sp  
   allocate(xylemPhi_mean_pft(JP,JY,JX)); xylemPhi_mean_pft=0._sp
   allocate(xylemPhi_max_pft(JP,JY,JX)); xylemPhi_max_pft=0._sp
   allocate(RootMatureAge_pft(JP,JY,JX)); RootMatureAge_pft=0._sp
@@ -312,7 +314,8 @@ contains
   call destroy(CPRTS_pft)
   call destroy(xylemPhi_max_pft)
   call destroy(xylemPhi_mean_pft)
-  call destroy(xylemPhi_min_pft)    
+  call destroy(xylemPhi_min_pft) 
+  call destroy(Radius95pctMature_pft)   
   call destroy(RootMatureAge_pft)
   call destroy(RootMycoNonstElms_pft)
   call destroy(Root1stMaxRadius_pft)

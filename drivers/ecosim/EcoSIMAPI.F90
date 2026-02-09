@@ -37,8 +37,9 @@ contains
   type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1
+  character(len=*), parameter :: subname='Run_EcoSIM_one_step'
 
-  if(lverb)WRITE(*,334)'HOUR1'
+  call PrintInfo('beg '//subname)
   if(do_timing)call start_timer(t1)
   
   !do surface energy and water processes
@@ -114,7 +115,6 @@ contains
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
-  if(lverb)WRITE(*,334)'REDIST'
   if(do_timing)call start_timer(t1)    
   CALL REDIST(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('REDIST',t1)
@@ -124,6 +124,7 @@ contains
 
   call EndCheckBalances(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
 
+  call PrintInfo('end '//subname)
   end subroutine Run_EcoSIM_one_step
 ! ----------------------------------------------------------------------
  subroutine readnamelist(nml_buffer, case_name, prefix,LYRG,nmicbguilds)
@@ -437,7 +438,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       yearIJ%J=J
-      call PrintInfo('beg step')
+      call DebugPrint("beg step",I*1000+J)
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -461,7 +462,6 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
       call PrepHourlyWeather(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
       if(do_timing)call end_timer('WTHR',t1)
 
-      if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(yearIJ,NHW,NHE,NVN,NVS)
 
       if(do_timing)call end_timer_loop()

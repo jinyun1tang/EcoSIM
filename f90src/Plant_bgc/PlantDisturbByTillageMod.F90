@@ -306,7 +306,7 @@ contains
 !     XHVST=fraction of PFT remaining after disturbance
 !
   IF(J.EQ.INT(SolarNoonHour_col) .AND. (iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
+    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) &
     .AND. (I.NE.iDayPlanting_pft(NZ) .OR. iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
 
     IF(iSoilDisturbType_col.LE.10 .OR. NZ.NE.1)THEN

@@ -80,7 +80,7 @@ module PlantBranchMod
     LeafPetoNonstElmConc_brch  => plt_biom%LeafPetoNonstElmConc_brch   ,& !input  :branch nonstructural C concentration, [g d-2]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
-    iPlantPhotosynthesisType   => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft   => plt_photo%iPlantPhotosynsType_pft   ,& !input  :plant photosynthetic type (C3 or C4),[-]
     iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
@@ -116,9 +116,9 @@ module PlantBranchMod
 !   OF C4 FIXATION PRODUCTS IN BUNDLE SHEATH, LEAKAGE OF DECARBOXYLATION
 !   PRODUCTS BACK TO MESOPHYLL IN C4 PLANTS
 !
-!   iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4
+!   iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4
 !
-    IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+    IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
       call C4PhotoProductTransfer(I,J,NZ,NB,CH2O3,CH2O4)
     ENDIF
 
@@ -195,13 +195,13 @@ module PlantBranchMod
     !   KMinGroingLeafNodeNum,KHiestGroLeafNode_brch=integer of lowest,highest leaf number currently growing
 
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)) &
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) &
       .AND. iPlantBranchState_brch(MainBranchNum_pft(NZ),NZ).EQ.iDead)then
       iPlantBranchState_brch(NB,NZ)=iDead
     endif
 
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
-    call WithdrawBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
+    call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
 
     call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
 
@@ -239,7 +239,10 @@ module PlantBranchMod
   end subroutine GrowOneBranch
 
 !----------------------------------------------------------------------------------------------------
-  subroutine WithdrawBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
+  subroutine WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
+  !
+  !Description:
+  !withdraw excessive nutrients from leaves
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in):: CNLFB,CPLFB
@@ -249,6 +252,8 @@ module PlantBranchMod
   real(r8) :: CPOOLT
   real(r8) :: XFRE(1:NumPlantChemElms)
   real(r8) :: PPOOLD
+  character(len=*), parameter :: subname='WithdrawNutBranchLeaves'
+
   associate(                                                     &
     ZERO4Groth_pft         => plt_biom%ZERO4Groth_pft           ,& !input  :threshold zero for plang growth calculation, [-]
     KHiestGroLeafNode_brch => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
@@ -259,6 +264,7 @@ module PlantBranchMod
     LeafProteinC_node      => plt_biom%LeafProteinC_node        ,& !inoput :layer leaf protein C, [g d-2]
     CanopyNonstElms_brch   => plt_biom%CanopyNonstElms_brch      & !inoput :branch nonstructural element, [g d-2]
   )
+  call PrintInfo('beg '//subname)
 
   KMinGroingLeafNodeNum=MAX(0,KHiestGroLeafNode_brch(NB,NZ)-MaxNodesPerBranch1+1)
   D495: DO KK=KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
@@ -279,6 +285,7 @@ module PlantBranchMod
         XFRE(ielmn)=AMAX1(XFRN1,10.0_r8*XFRP1)
         XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
         DO NE=2,NumPlantChemElms
+          call ExchFluxLimiter(LeafStrutElms_brch(NE,NB,NZ),CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
           LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
           LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
           CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -288,8 +295,9 @@ module PlantBranchMod
       ENDIF
     ENDIF
   ENDDO D495
+  call PrintInfo('end '//subname)
   end associate
-  end subroutine WithdrawBranchLeaves
+  end subroutine WithdrawNutBranchLeaves
 
 !----------------------------------------------------------------------------------------------------
   subroutine BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
@@ -1732,7 +1740,7 @@ module PlantBranchMod
     !   StalkNodeHeight_brch=internode length
     !   HeightBranchBase=branch base height
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)))THEN
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
       IF(NB.NE.MainBranchNum_pft(NZ))THEN
         KLeafNumHighestGrowing=MAX(1,KHiestGroLeafNode_brch(MainBranchNum_pft(NZ),NZ)-MaxNodesPerBranch1+1)
         IF(BranchNumerID_brch(NB,NZ).GE.KLeafNumHighestGrowing)THEN
@@ -1887,7 +1895,7 @@ module PlantBranchMod
       StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
         /(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
 
-      if(NB.EQ.MainBranchNum_pft(NZ) .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
+      if(NB.EQ.MainBranchNum_pft(NZ) .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
 
       !assume stalk is cylindrical
       StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopulation_pft(NZ)
@@ -2425,7 +2433,7 @@ module PlantBranchMod
       PotentialSeedSites_brch(NB,NZ) = 0._r8
       SeedSitesSet_brch(NB,NZ)       = 0._r8
       GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
-      IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+      IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
         D6345: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dFall=PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
@@ -2580,7 +2588,7 @@ module PlantBranchMod
     !
     !     STALKS BECOME LitrFall IN GRASSES AT END OF SEASON
     !
-    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))) &
+    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) &
       .AND.iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
 
       D6335: DO M=1,jsken
@@ -2664,6 +2672,8 @@ module PlantBranchMod
   integer :: NE
   real(r8) :: XFRE(1:NumPlantChemElms)
   logical :: PlantingChk,RemobChk,LeafOutChk,AnnualPlantChk,LeafMobil4OutChk
+  character(len=*), parameter :: subname='BranchElmntTransfer'
+
   ! begin_execution
   associate(                                                       &
     iDayPlanting_pft        => plt_distb%iDayPlanting_pft         ,& !input  :day of planting,[-]
@@ -2683,6 +2693,7 @@ module PlantBranchMod
     doInitLeafOut_brch      => plt_pheno%doInitLeafOut_brch       ,& !inoput :branch phenology flag, [-]
     Hours2LeafOut_brch      => plt_pheno%Hours2LeafOut_brch        & !inoput :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
   )
+  call PrintInfo('beg '//subname)
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
 !
@@ -2725,8 +2736,6 @@ module PlantBranchMod
     ! fTCanopyGroth_pft=temperature function for canopy growth
     ! HourReq2InitSStor4LeafOut=number of hours required for remobilization of storage C during leafout
     ! WaterStress4Groth=growth function of canopy water potential
-    ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
-    ! XFRE(ielmc),XFRE(ielmn),XFRE(ielmc)=nonstructural C,N,P transfer
     ! 
     LeafMobil4OutChk=Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ))
     !not main branch
@@ -2737,6 +2746,7 @@ module PlantBranchMod
         XFRE(NE)=AZMAX1(0.05_r8*fTCanopyGroth_pft(NZ) &
           *(0.5_r8*(CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)+CanopyNonstElms_brch(NE,NB,NZ)) &
           -CanopyNonstElms_brch(NE,NB,NZ)))
+        call ExchFluxLimiter(CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ),CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))  
         CanopyNonstElms_brch(NE,NB,NZ)                    = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
         CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ) = CanopyNonstElms_brch(NE,MainBranchNum_pft(NZ),NZ)-XFRE(NE)
       ENDDO
@@ -2783,7 +2793,7 @@ module PlantBranchMod
   !   SEASONAL STORAGE POOL 
   !
   call RepleteSeaStoreByStalk(I,J,NB,NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine BranchElmntTransfer
 
@@ -2806,6 +2816,7 @@ module PlantBranchMod
   real(r8) :: dTimeIncLeafout
   integer :: L,NE
   logical ::  PlantChk
+  character(len=*), parameter :: subname='DevelopMainBranch'
 
   associate(                                                           &
     PhotoPeriodSens_pft       => plt_pheno%PhotoPeriodSens_pft        ,& !input  :difference between current and critical daylengths used to calculate phenological progress, [h]
@@ -2827,7 +2838,7 @@ module PlantBranchMod
     SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch         & !inoput :branch nonstructural element, [g d-2]
   )
-
+  call PrintInfo('beg '//subname)
   TotPopuPlantRootC         = 0._r8
   TotalRootNonstElms(ielmc) = 0._r8
   D4: DO L=NU,MaxSoiL4Root_pft(NZ)
@@ -2992,6 +3003,7 @@ module PlantBranchMod
         RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)   
     ENDDO            
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine DevelopMainBranch
 
@@ -3026,6 +3038,7 @@ module PlantBranchMod
   real(r8) :: RgroCO2_ltd  !Nutient limited growth respiration
   real(r8) :: Rauto_brch   !branch autotrophic respiraiton
   real(r8) :: CNG,CPG,RFN1,RFP1
+  character(len=*), parameter :: subname='ComputRAutoAfEmergence'
 ! begin_execution
   associate(                                                          &
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
@@ -3046,6 +3059,7 @@ module PlantBranchMod
     CanopyNLimFactor_brch     => plt_bgcr%CanopyNLimFactor_brch      ,& !output :Canopy N-limitation factor, [0->1] stronger limitation
     CanopyPLimFactor_brch     => plt_bgcr%CanopyPLimFactor_brch       & !output :Canopy P-limitation factor, [0->1] stronger limitation    
   )
+  call PrintInfo('beg '//subname)
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
 ! CNPG=N,P constraint on growth respiration
@@ -3183,7 +3197,7 @@ module PlantBranchMod
   Eco_AutoR_CumYr_col       = Eco_AutoR_CumYr_col-Rauto_brch
   RCanMaintDef_CO2_pft(NZ)  = RCanMaintDef_CO2_pft(NZ)-RMxess_brch
   dNonstCX                  = AMIN1(RCO2Maint_brch,RCO2NonstC_brch)+RNonstC4Groth_brch+RCO2NonstC4Nassim_brch
-  if(.false. .and. I==246)write(919,*)'CanopyResp_brch(NB,NZ)-Rauto_brch',CanopyResp_brch(NB,NZ),Rauto_brch,'RMxess_brch',RMxess_brch
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ComputRAutoAfEmergence
 
@@ -3401,6 +3415,7 @@ module PlantBranchMod
   real(r8) :: GNOD,dMC
   REAL(R8) :: GrozNodesPerPlant,LeafAreaGrowth,SpecAreaLeafGrowth
   REAL(R8) :: GrowthElms(NumPlantChemElms)
+  character(len=*), parameter :: subname='GrowLeavesOnBranch'
 
   associate(                                                     &
     NumCogrowthNode_pft    => plt_morph%NumCogrowthNode_pft     ,& !input  :number of concurrently growing nodes,[-]
@@ -3416,7 +3431,7 @@ module PlantBranchMod
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch       ,& !inoput :leaf element, [g d-2]
     LeafProteinC_node      => plt_biom%LeafProteinC_node         & !inoput :leaf node protein C, [g d-2]
   )
-  
+  call PrintInfo('beg '//subname)
   IF(GrowthLeaf(ielmc).GT.0.0_r8)THEN
     MXNOD  = KHiestGroLeafNode_brch(NB,NZ)
     MNNOD  = MAX(MinNodeID,MXNOD-NumCogrowthNode_pft(NZ)+1)
@@ -3466,6 +3481,7 @@ module PlantBranchMod
       LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ)+LeafAreaGrowth
     ENDDO D490
   ENDIF
+  call PrintInfo('end '//subname)
   end associate  
   END subroutine GrowLeavesOnBranch
 
@@ -3481,7 +3497,8 @@ module PlantBranchMod
   real(r8) :: GNOD,ALLOCS,GSSL,GROS
   REAL(R8) :: GrowthElms(NumPlantChemElms)
   REAL(R8) :: SSL,dMC
-  
+  character(len=*), parameter :: subname='GrowPetioleOnBranch'
+
   associate(                                                      &
     NumCogrowthNode_pft     => plt_morph%NumCogrowthNode_pft     ,& !input  :number of concurrently growing nodes,[-]
     PetoLen2Mass_pft        => plt_morph%PetoLen2Mass_pft        ,& !input  :petiole length:mass during growth, [m gC-1]
@@ -3497,7 +3514,7 @@ module PlantBranchMod
     PetioleElmntNode_brch   => plt_biom%PetioleElmntNode_brch    ,& !inoput :sheath chemical element, [g d-2]
     PetoleProteinC_node     => plt_biom%PetoleProteinC_node       & !inoput :layer sheath protein C, [g d-2]
   )
-
+  call PrintInfo('beg '//subname)
   IF(GrowthPetiole(ielmc).GT.0.0_r8)THEN
     MXNOD=KHiestGroLeafNode_brch(NB,NZ)
     MNNOD=MAX(MinNodeID,MXNOD-NumCogrowthNode_pft(NZ)+1)
@@ -3546,6 +3563,7 @@ module PlantBranchMod
       ENDIF
     ENDDO D505
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine GrowPetioleOnBranch  
 
@@ -3649,7 +3667,7 @@ module PlantBranchMod
   real(r8), intent(inout) :: RMxess_brch
   integer :: NumRemobLeafNodes  
   real(r8) :: RespSenesTot_brch
-  real(r8) :: FracRecyled  
+  real(r8) :: FracRecyled  !ratio of phenologically-driven vs total senescence respiration
   integer  :: NBZ(MaxNumBranches)
   real(r8) :: XFRE(1:NumPlantChemElms)
   REAL(R8) :: RCO2V,RCO2e
@@ -3720,7 +3738,6 @@ module PlantBranchMod
 !       RespSenesTot_brch=total senescence respiration
 !       KHiestGroLeafNode_brch,KLowestGroLeafNode_brch=integer of highest,lowest leaf number currently growing
 !       KSNC=number of nodes undergoing remobilization
-!       FracRecyled=ratio of phenologically-driven vs total senescence respiration
 !
   IF(BegRemoblize.EQ.itrue .AND. LRemob_brch.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
     RespPhenolSenes_brch=RateK4ShootSeaStoreNonstEXfer(iPlantTurnoverPattern_pft(NZ))*CanopyLeafSheathC_brch(NB,NZ) &
@@ -3741,10 +3758,8 @@ module PlantBranchMod
     !
     !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2
     !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-    !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
-    !     XFRE(:)=nonstructural C,N,P transfer
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_treelike(iPlantRootProfile_pft(NZ)) &
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) &
       .AND. NB.EQ.MainBranchNum_pft(NZ) .AND. isclose(FracRecyled,0._r8))THEN
       NBY=0
       D584: DO NBL=1,NumOfBranches_pft(NZ)
@@ -3836,13 +3851,13 @@ module PlantBranchMod
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
-    FracShootElmAllocm     => plt_allom%FracShootElmAllocm      ,& !input  :woody element allocation, [-]
+    FracShootElmAllocm          => plt_allom%FracShootElmAllocm           ,& !input  :woody element allocation, [-]
     rProteinC2LeafN_pft         => plt_allom%rProteinC2LeafN_pft          ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft         => plt_allom%rProteinC2LeafP_pft          ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
     doSenescence_brch           => plt_pheno%doSenescence_brch            ,& !input  :branch phenology flag, [-]
     doRemobilization_brch       => plt_pheno%doRemobilization_brch        ,& !input  :branch phenology flag, [-]
-    RateRefLeafAppearance_pft       => plt_pheno%RateRefLeafAppearance_pft        ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
+    RateRefLeafAppearance_pft   => plt_pheno%RateRefLeafAppearance_pft    ,& !input  :rate of leaf initiation, [h-1 at 25 oC]
     KHiestGroLeafNode_brch      => plt_pheno%KHiestGroLeafNode_brch       ,& !input  :leaf growth stage counter, [-]
     fTCanopyGroth_pft           => plt_pheno%fTCanopyGroth_pft            ,& !input  :canopy temperature growth function, [-]
     LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
