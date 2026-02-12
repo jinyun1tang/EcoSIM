@@ -286,8 +286,11 @@ implicit none
 
       !
       !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
-      !replacing with irootType from ATS
-      call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      !replacing with irootType from ATS, place behind if so it doesn't trigger on bare ground
+      if(irootType_col(NY,NX).GT.0.0)then
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      endif
+      !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       DO NZ=1,NP_col(NY,NX)
         DO L=NU_col(NY,NX),NL_col(NY,NX)
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
