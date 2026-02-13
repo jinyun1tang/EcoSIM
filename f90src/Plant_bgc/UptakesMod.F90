@@ -465,14 +465,14 @@ module UptakesMod
         IF(DLYR3(L).GT.ZERO)THEN
           RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1)) !root covered depth
           RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))
-          FracSoilLBy1stRoots_pvr(L,NZ) = RTDPX/DLYR3(L)
+          FracSoilLBy1stRoots_pvr(L,NZ) = AZMIN1(RTDPX/DLYR3(L),1._r8)
         ELSE
           FracSoilLBy1stRoots_pvr(L,NZ)=0.0_r8
         ENDIF
       ENDIF
     ENDDO
   endif
-
+  call PrintInfo('beg D200')
   D2000: DO N=1,Myco_pft(NZ)
 
     DO  L=NU,MaxSoiL4Root_pft(NZ)
@@ -484,12 +484,21 @@ module UptakesMod
       ENDIF
       FracMinRoot4Uptake_rpvr(N,L,NZ)=FMN*FracPRoot4Uptake_pvr(N,L,NZ)
 
+
+      call PrintInfo('beg IF')
+      if(N==ipltroot .and. yearIJ%I==268)write(330,*)'beg IF'
       IF(RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
+        if(N==ipltroot .and. yearIJ%I==268)write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,Root2ndMaxRadius1_pft(N,NZ),RootVH2O_pvr(N,L,NZ),&
+          1.0_r8-RootPorosity_pft(N,NZ),RootAbsorbLenPerPlant_pvr(N,L,NZ),PlantPopulation_pft(NZ),FracSoilLBy1stRoots_pvr(L,NZ),FracSoiAsMicP_vr(L),&
+          'IF',RootVH2O_pvr(N,L,NZ),((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))
+
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT(RootVH2O_pvr(N,L,NZ) &
           /((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))))
-!        if(N==ipltroot)write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,FineRootRadius_rvr(N,L),Root2ndMaxRadius1_pft(N,NZ),RootVH2O_pvr(N,L,NZ),&
-!          1.0_r8-RootPorosity_pft(N,NZ),RootAbsorbLenPerPlant_pvr(N,L,NZ),PlantPopulation_pft(NZ)
 
+        if(N==ipltroot .and. yearIJ%I==268)then
+          write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,FineRootRadius_rvr(N,L),'rad',FracSoilLBy1stRoots_pvr(L,NZ),FracSoiAsMicP_vr(L),RootAbsorbLenPerPlant_pvr(N,L,NZ)
+          write(330,*)yearIJ%I*1000+yearIJ%J/24.,FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))
+        endif
         !cylynder, pi*r^2*L=vol
         RadialMeanLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
           SQRT(FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))))
@@ -500,6 +509,7 @@ module UptakesMod
         RadialMeanLen_rvr(N,L)         = 1.001_r8*FineRootRadius_rvr(N,L)
         RootEffLen4Absorption_pvr(N,L) = TwoPiCON*RootAbsorbLenPerPlant_pvr(N,L,NZ)
       ENDIF
+      call PrintInfo('end IF')
     enddo
   ENDDO D2000
   call PrintInfo('end '//subname)
@@ -549,7 +559,7 @@ module UptakesMod
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !output :canopy total water potential, [Mpa]
     PSIRoot_pvr                 => plt_ew%PSIRoot_pvr                     ,& !output :root total water potential, [Mpa]
     TKC_pft                     => plt_ew%TKC_pft                         ,& !output :canopy temperature, [K]
-    RPlantRootH2OUptk_pvr       => plt_ew%RPlantRootH2OUptk_pvr           ,& !output :root water uptake, [m3 d-2 h-1]
+    RPlantRootH2OUptk_pvr       => plt_ew%RPlantRootH2OUptk_pvr           ,& !output :whole population root water uptake, [m3 d-2 h-1]
     RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr           ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
     CanPStomaResistH2O_pft      => plt_photo%CanPStomaResistH2O_pft       ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft        => plt_photo%CanopyBndlResist_pft         ,& !output :canopy boundary layer resistance, [h m-1]
@@ -810,7 +820,7 @@ module UptakesMod
 !     EvapConductCanopy=aerodynamic conductance, [m/h]
 
     VPC = vapsat(tkc1)*EXP(18.0_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8)/(RGASC*TKC1))  !ton H2O/m3
-    EX  = EvapConductCanopy*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3] = [ton H2O/(h*m2)]
+    EX  = EvapConductCanopy*(VPA-VPC)   !air to canopy water vap flux, [m/h]*[ton/m3] = [ton H2O/(h*m2)] < 0, transpire into air
     
     !Dew condensation to canopy >0 to canopy
     IF(EX.GT.0.0_r8)THEN     
@@ -1277,7 +1287,7 @@ module UptakesMod
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !output :canopy total water potential, [Mpa]
     PSIRoot_pvr               => plt_ew%PSIRoot_pvr                   ,& !output :root total water potential, [Mpa]
     TKC_pft                   => plt_ew%TKC_pft                       ,& !output :canopy temperature, [K]
-    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !output :root water uptake, [m3 d-2 h-1]
+    RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         ,& !output :whole population root water uptake, [m3 d-2 h-1]
     RootH2OUptkStress_pvr     => plt_ew%RootH2OUptkStress_pvr         ,& !output :pontential root water uptake rate, [m3 d-2 h-1]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft     ,& !output :canopy stomatal resistance, [h m-1]
     CanopyBndlResist_pft      => plt_photo%CanopyBndlResist_pft       ,& !output :canopy boundary layer resistance, [h m-1]

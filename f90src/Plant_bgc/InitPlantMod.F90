@@ -518,7 +518,7 @@ module InitPlantMod
       exit
     endif
   ENDDO
-!  write(9333,*)SeedDepth_pft(NZ),CumSoilThickness_vr(1:3),'xxx'
+
   D9795: DO L=NU,NL
     IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
       .AND. SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
