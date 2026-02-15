@@ -484,21 +484,11 @@ module UptakesMod
       ENDIF
       FracMinRoot4Uptake_rpvr(N,L,NZ)=FMN*FracPRoot4Uptake_pvr(N,L,NZ)
 
-
-      call PrintInfo('beg IF')
-      if(N==ipltroot .and. yearIJ%I==268)write(330,*)'beg IF'
       IF(RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
-        if(N==ipltroot .and. yearIJ%I==268)write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,Root2ndMaxRadius1_pft(N,NZ),RootVH2O_pvr(N,L,NZ),&
-          1.0_r8-RootPorosity_pft(N,NZ),RootAbsorbLenPerPlant_pvr(N,L,NZ),PlantPopulation_pft(NZ),FracSoilLBy1stRoots_pvr(L,NZ),FracSoiAsMicP_vr(L),&
-          'IF',RootVH2O_pvr(N,L,NZ),((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))
 
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT(RootVH2O_pvr(N,L,NZ) &
           /((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))))
 
-        if(N==ipltroot .and. yearIJ%I==268)then
-          write(330,*)yearIJ%I*1000+yearIJ%J/24.,L,FineRootRadius_rvr(N,L),'rad',FracSoilLBy1stRoots_pvr(L,NZ),FracSoiAsMicP_vr(L),RootAbsorbLenPerPlant_pvr(N,L,NZ)
-          write(330,*)yearIJ%I*1000+yearIJ%J/24.,FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))
-        endif
         !cylynder, pi*r^2*L=vol
         RadialMeanLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
           SQRT(FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))))
@@ -509,7 +499,7 @@ module UptakesMod
         RadialMeanLen_rvr(N,L)         = 1.001_r8*FineRootRadius_rvr(N,L)
         RootEffLen4Absorption_pvr(N,L) = TwoPiCON*RootAbsorbLenPerPlant_pvr(N,L,NZ)
       ENDIF
-      call PrintInfo('end IF')
+
     enddo
   ENDDO D2000
   call PrintInfo('end '//subname)
@@ -1152,6 +1142,7 @@ module UptakesMod
   CNDT                           = 0.0_r8
   CanopyHeight4WatUptake_pft(NZ) = 0.80_r8*CanopyHeight_pft(NZ)
   PSIGravCanopyHeight            = mGravAccelerat*CanopyHeight4WatUptake_pft(NZ)
+  !Hagen-Poiseuille law of stalk xylem vessels
   FRADW                          = 1.0E+04_r8*(AMAX1(0.5_r8,1.0_r8+PSICanopy_pft(NZ)/EMODW))**4
   !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
@@ -1213,9 +1204,9 @@ module UptakesMod
           !coarse roots
           DTransptTube = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
           AreaTranspt  = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
-          FRAD1        = (AreaTranspt/Root1stMaxRadius1_pft(N,NZ)**2)*(Root1stMaxRadius1_pft(N,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
+          FRAD1        = (AreaTranspt/Root1stRadius_pvr(N,L,NZ))**2*(Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
         else
-          FRAD1        = (Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4        
+          FRAD1        = AMAX1((Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4,1.e-12_r8)
         endif      
 
         FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4

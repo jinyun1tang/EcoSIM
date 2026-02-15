@@ -491,7 +491,7 @@ implicit none
       RootNoduleElms_pft(NE,NZ) = RootNoduleElms_pft(NE,NZ)+sum(RootNodulStrutElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))+sum(RootNodulNonstElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))
     endif      
   ENDDO
-  if(yearIJ%I>=143)write(423,*)'root',massr1st1,massr2nd1,massnonst1
+!  if(yearIJ%I>=143)write(423,*)'root',massr1st1,massr2nd1,massnonst1
 
   if(present(massroot))massroot=RootElms_pft(:,NZ)+RootNoduleElms_pft(:,NZ)
 

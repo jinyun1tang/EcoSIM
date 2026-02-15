@@ -2636,12 +2636,12 @@ implicit none
 
   data1d_ptr => this%h1D_ShootRootXferN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='ShootRoot_XFER_N_pft',units='gN/hr/plant',avgflag='A',&
-    long_name='Shoot N transfered to root via phloem (>0 to roots)',ptr_patch=data1d_ptr,&
+    long_name='Shoot N transfered to root via phloem and xylem (>0 to roots)',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_ShootRootXferP_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='ShootRoot_XFER_P_pft',units='gP/hr/plant',avgflag='A',&
-    long_name='Shoot P transfered to root via phloem (>0 to roots)',ptr_patch=data1d_ptr,&
+    long_name='Shoot P transfered to root via phloem and xylem (>0 to roots)',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_BRANCH_NO_ptc(beg_ptc:end_ptc)            !NumOfBranches_pft(NZ,NY,NX)

@@ -1130,14 +1130,14 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)
-    call writefixl(nu_plt,id,'PhiMIN','The fraction found in the youngest coarse root xylem that as lumen for trees [m2/m2]',xylemPhi_min_pft(NZ,NY,NX),105)
+    call writefixl(nu_plt,id,'PhiMIN','The lumen fraction found in the youngest coarse root xylem of woody vascular [m2/m2]',xylemPhi_min_pft(NZ,NY,NX),105)
     id=addone(id)
-    call writefixl(nu_plt,id,'PhiMAX','Asymptotic limit fraction of the coarse root xyxlem area as lumen for tree [m2/m2]', xylemPhi_max_pft(NZ,NY,NX),105)
+    call writefixl(nu_plt,id,'PhiMAX','Asymptotic limit lumen fraction of the coarse root xyxlem area of woody vascular [m2/m2]', xylemPhi_max_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'R95MAT','Critical radius where the woody root is considered 95% mature [m]', Radius95pctMature_pft(NZ,NY,NX),105)
   else
     id=addone(id)
-    call writefixl(nu_plt,id,'PhiMean','The mean fraction found in the seminal root as lumen for non-tree roots, [m2/m2]', xylemPhi_mean_pft(NZ,NY,NX),105)      
+    call writefixl(nu_plt,id,'PhiMean','The mean lumen area fraction found in the seminal roots of non-tree roots, [m2/m2]', xylemPhi_mean_pft(NZ,NY,NX),105)      
   endif
   id=addone(id)  
   call writefixl(nu_plt,id,'PR','Nonstructural C concentration needed for root'// &

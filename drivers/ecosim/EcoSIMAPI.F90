@@ -49,8 +49,6 @@ contains
   !
   !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
   !
-  !print*,'watsub'
-  if(lverb)WRITE(*,334)'WAT'
   if(do_timing)call start_timer(t1)
   CALL WATSUB(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('WAT',t1)
@@ -58,12 +56,10 @@ contains
   !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
   !     
   if(microbial_model)then
-    if(lverb)WRITE(*,334)'NIT'
     if(do_timing)call start_timer(t1)
     CALL MicrobeModel(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('NIT',t1)
   endif
-!  print*,'plant model'
   !
   !   UPDATE PLANT biogeochemistry
   !
@@ -78,7 +74,6 @@ contains
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
   !
   if(soichem_model)then
-    if(lverb)WRITE(*,334)'SOL'
     if(do_timing)call start_timer(t1)
     CALL soluteModel(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('soluteModel',t1)
@@ -87,7 +82,7 @@ contains
   !
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TranspNoSalt'
   !
-  if(lverb)WRITE(*,334)'TRN'
+
   if(do_timing)call start_timer(t1)
   CALL TranspNoSalt(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
   if(do_timing)call end_timer('TranspNoSalt',t1)
@@ -95,7 +90,6 @@ contains
   !
   !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TranspSalt' IF SALT OPTION SELECTED
   !
-  if(lverb)WRITE(*,334)'TRNS'
 
   if(salt_model)then
     if(do_timing)call start_timer(t1)

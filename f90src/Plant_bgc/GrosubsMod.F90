@@ -338,6 +338,7 @@ module grosubsMod
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
+    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]    
     RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RootElms_pft                => plt_biom%RootElms_pft                  ,& !input  :plant root element mass, [g d-2]
     rNCRoot_pft                 => plt_allom%rNCRoot_pft                  ,& !input  :root N:C ratio, [gN gC-1]
@@ -471,13 +472,14 @@ module grosubsMod
   !     WTRT,PP=root mass,PFT population
   !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
   RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-    
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
-    !for woody vascular, **(2/3)
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopulation_pft(NZ)   
+  elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
+    !for woody vascular, **(1/1.4)
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)
   else
-    !for herbaceous plant, **(1) 
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ))*PlantPopulation_pft(NZ)
+    !for herbaceous plant, **(1./0.95) 
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopulation_pft(NZ)
   endif
 
   !
