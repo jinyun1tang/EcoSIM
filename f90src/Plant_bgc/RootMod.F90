@@ -492,7 +492,8 @@ implicit none
   real(r8) :: respscal,Root2ndExtPot  
   real(r8) :: FNP,ratio
   real(r8) :: FracRoot2ndCSinkL,FracRoot2ndSinkN,FracRoot2ndSinkP  
-  integer  :: M,NE,NumGroFineAxes
+  integer  :: M,NE
+  real(r8) :: NumGroFineAxes
 
   associate(                                                          &
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft             ,& !input  :threshold zero for plang growth calculation, [-]
@@ -535,7 +536,6 @@ implicit none
   !
   call PrintInfo('beg '//subname)
   !return when the root has no structural nitrogen
-  if(isclose(RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ),0._r8))return
 
   DO NE=1,NumPlantChemElms
     dmass(NE)=RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)
@@ -579,7 +579,7 @@ implicit none
   !     CONSTRAINED BY TEMPERATURE AND NON-STRUCTURAL C:N:P
   !
   !     VMXC=rate constant for nonstructural C oxidation in respiration C     
-  !
+  !  
   respscal=VMXC*FracRoot2ndCSinkL*fTgrowRootP_vr(L,NZ)*fRootGrowPSISense &
     *Nutstress4GrossResp*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ)
 
@@ -603,7 +603,7 @@ implicit none
   ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))*FracRoot2ndCSinkL
   PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))*FracRoot2ndCSinkL
   FNP    = AMIN1(ZPOOLB/CNRTS_pft(NZ),PPOOLB/CPRTS_pft(NZ))*DMRespEff
-
+  
   IF(RGrowCO2_OUltd.GT.0.0_r8)THEN
     RGrowCO2_OUltd=AMIN1(RGrowCO2_OUltd,FNP)
   ELSE
@@ -661,7 +661,7 @@ implicit none
   RCO2T2nd_Oltd  = AMIN1(RCO2T2nd_Oltd,AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)))
   !take CO2 respiration from nonst C
   RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T2nd_Oltd
-
+  
   !Consume nonstrucal elements for growth
   DO NE=1,NumPlantChemElms  
     RootMycoNonst4Grow_Oltd(NE)       = AMIN1(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonst4Grow_Oltd(NE))
@@ -676,9 +676,10 @@ implicit none
   !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
   !     SECONDARY ROOT C LOSS FROM REMOBILIZATION AND CONSEQUENT LitrFall
   !
+  
   call DiagSenes2ndRootAxes(I,J,N,NR,L,NZ,RPotCO2Groth2nd_OUltd,RPotCO2Groth2nd_Oltd,Root2ndPopExtenz,Root2ndNetGrowthElms,&
     litrflx2,RCO2MaintDef2ndStruct_OUltd,RCO2MaintDef2ndStruct_Oltd)
-
+  
   !
   !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY SECONDARY ROOT
   !
@@ -702,7 +703,7 @@ implicit none
   RootCO2EmisPot_pvr(N,L,NZ) = RootCO2EmisPot_pvr(N,L,NZ)+RCO2T2nd_Oltd
   RootCO2Autor_pvr(N,L,NZ)   = RootCO2Autor_pvr(N,L,NZ)-RCO2T2nd_Oltd
   RCO2flx2                   = -RCO2T2nd_Oltd
-
+  
   !
   !     SECONDARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
   !
@@ -724,12 +725,11 @@ implicit none
   DO NE=1,NumPlantChemElms
     RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)=RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)+Root2ndNetGrowthElms(NE)
   ENDDO
-
+  
   !secondary/fine root axes (and root hair) addition is a quadratic function of branching frequency
-  RTN2X          = RootBranchFreq_pft(NZ)*NumAxesPerPrimRoot_pft(NZ)    !fine roots
-  RTN2Y          = RootBranchFreq_pft(NZ)*RTN2X                         !root hairs
-  NumGroFineAxes = (RTN2X+RTN2Y)*DLYR3(L)
-
+  RTN2X          = RootBranchFreq_pft(NZ)*NumAxesPerPrimRoot_pft(NZ)    !fine roots  
+  RTN2Y          = RootBranchFreq_pft(NZ)*RTN2X                         !root hairs    
+  NumGroFineAxes = (RTN2X+RTN2Y)*DLYR3(L)  
   Root2ndXNum_rpvr(N,L,NR,NZ) = NumGroFineAxes
   Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ)+Root2ndXNum_rpvr(N,L,NR,NZ)
   

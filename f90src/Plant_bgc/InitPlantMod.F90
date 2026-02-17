@@ -1021,7 +1021,7 @@ module InitPlantMod
       plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
       plt_biom%Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
       plt_biom%Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
-      plt_morph%Root1stLenPP_rpvr(L,NR,NZ)                             = 0._r8
+      plt_morph%Root1stLenPP_rpvr(L,NR,NZ)                           = 0._r8
       plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
 
