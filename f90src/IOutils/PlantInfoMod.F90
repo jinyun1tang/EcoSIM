@@ -812,7 +812,7 @@ implicit none
   write(nu_plt,*)'PLANT traits for FUNCTIONAL TYPE (NZ,NY,NX)=',NZ,NY,NX,trim(DATAP(NZ,NY,NX)(1:6))
   id=0
   call writefixsl(nu_plt,'Plant name ',pft_lname,60)
-  strval=koppen_clims//','//koppen_climl  
+  strval=koppen_clims//','//koppen_climl
   call writefixsl(nu_plt,'Koppen climate info',strval,60)
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'PLANT CLASS INFORMATION'

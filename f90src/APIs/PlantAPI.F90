@@ -634,6 +634,8 @@ implicit none
         RootCRRadius0_rpvr(L,NR,NZ,NY,NX) = plt_morph%RootCRRadius0_rpvr(L,NR,NZ)
         Root1stRadius_rpvr(L,NR,NZ,NY,NX) = plt_morph%Root1stRadius_rpvr(L,NR,NZ)
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ)
+        Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ)
+        Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = plt_biom%Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ)
         Root1stLenPP_rpvr(L,NR,NZ,NY,NX)     = plt_morph%Root1stLenPP_rpvr(L,NR,NZ)
         RootAge_rpvr(L,NR,NZ,NY,NX)          = plt_morph%RootAge_rpvr(L,NR,NZ)
         RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ)
@@ -1444,6 +1446,9 @@ implicit none
         plt_morph%RootCRRadius0_rpvr(L,NR,NZ) = RootCRRadius0_rpvr(L,NR,NZ,NY,NX)
         plt_morph%Root1stRadius_rpvr(L,NR,NZ) = Root1stRadius_rpvr(L,NR,NZ,NY,NX)
         plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX)      
+        plt_biom%Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) 
+        plt_biom%Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX)  
+
         plt_morph%Root1stLenPP_rpvr(L,NR,NZ)    = Root1stLenPP_rpvr(L,NR,NZ,NY,NX)
         plt_morph%RootAge_rpvr(L,NR,NZ)         = RootAge_rpvr(L,NR,NZ,NY,NX)
         plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ) = RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX)

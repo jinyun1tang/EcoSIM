@@ -803,6 +803,8 @@ module StartqMod
     Root1stXNumL_pvr(L,NZ,NY,NX)             = 0._r8      
     DO NR=1,MaxNumRootAxes
       RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
+      Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
+      Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
       Root1stLenPP_rpvr(L,NR,NZ,NY,NX)                              = 0._r8
       RootAge_rpvr(L,NR,NZ,NY,NX)                                 = 0._r8
     ENDDO
@@ -861,6 +863,7 @@ module StartqMod
     rNCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
   RootMyco1stStrutElms_rpvr(ielmp,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)= &
     rPCGrain_pft(NZ,NY,NX)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)
+  Root1stActStructElms_rpvr(:,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(:,NGTopRootLayer_pft(NZ,NY,NX),1,NZ,NY,NX)   
   RootMyco1stElm_raxs(ielmn,1,NZ,NY,NX)=rNCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,1,NZ,NY,NX)
   RootMyco1stElm_raxs(ielmp,1,NZ,NY,NX)=rPCGrain_pft(NZ,NY,NX)*RootMyco1stElm_raxs(ielmc,1,NZ,NY,NX)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ,NY,NX),NZ,NY,NX)= &

@@ -4421,6 +4421,38 @@ implicit none
     endif  
 
     if(flag=='read')then
+      datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms, 1:JZ,1:MaxNumRootAxes)
+      call restartvar(ncid, flag, varname='Root1stActStructElms_rpvr', dim1name='pft',dim2name='elmnts',&
+      dim3name='levsoi',dim4name='rootaxs',long_name='root layer primary axes active zone element', units='g d-2', &
+      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Root1stActStructElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft) 
+    else
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Root1stActStructElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft)   
+      datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms,1:JZ,1:MaxNumRootAxes)
+      call restartvar(ncid, flag, varname='Root1stActStructElms_rpvr', dim1name='pft',dim2name='elmnts',&
+      dim3name='levsoi',dim4name='rootaxs',long_name='root layer primary axes active zone element', units='g d-2', &
+      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
+    endif  
+
+    if(flag=='read')then
+      datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms, 1:JZ,1:MaxNumRootAxes)
+      call restartvar(ncid, flag, varname='Root1stLigStructElms_rpvr', dim1name='pft',dim2name='elmnts',&
+      dim3name='levsoi',dim4name='rootaxs',long_name='root layer primary axes lignified zone element', units='g d-2', &
+      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Root1stLigStructElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft) 
+    else
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Root1stLigStructElms_rpvr,datrp_4d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft)   
+      datpr4 => datrp_4d(1:npfts, 1:NumPlantChemElms,1:JZ,1:MaxNumRootAxes)
+      call restartvar(ncid, flag, varname='Root1stLigStructElms_rpvr', dim1name='pft',dim2name='elmnts',&
+      dim3name='levsoi',dim4name='rootaxs',long_name='root layer primary axes lignified zone element', units='g d-2', &
+      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)
+    endif  
+
+    if(flag=='read')then
       datpr5 => datrp_5d(1:npfts, 1:NumPlantChemElms, 1:pltpar%jroots,1:JZ,1:MaxNumRootAxes)
       call restartvar(ncid, flag, varname='RootMyco2ndStrutElms_rpvr', dim1name='pft',dim2name='elmnts',&
       dim3name='rootyps',dim4name='levsoi',dim5name='rootaxs',long_name='root layer secondary axes element', units='g d-2', &

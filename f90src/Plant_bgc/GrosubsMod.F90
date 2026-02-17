@@ -320,7 +320,7 @@ module grosubsMod
   real(r8), intent(out) :: Stomata_Stress
   real(r8), intent(out) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
   integer :: L,NR,N,NE
-  real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
+  real(r8) :: ACTVM,RTK,STK,TKCM,TKSM,RadiusBulk,RadiusMean
   real(r8), parameter :: dscal=0.99999_r8
   character(len=*), parameter :: subname='StagePlantForGrowth'
 !     begin_execution
@@ -354,6 +354,7 @@ module grosubsMod
     rPCStalk_pft                => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
+    Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr            ,& !input  :root layer radius primary axes, [m]      
     FracRootElmAllocm           => plt_allom%FracRootElmAllocm            ,& !inoput :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !inoput :woody element allocation,[-]
     FracShootElmAllocm          => plt_allom%FracShootElmAllocm           ,& !inoput :woody element allocation, [-]
@@ -472,11 +473,12 @@ module grosubsMod
   !     WTRT,PP=root mass,PFT population
   !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
   RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
     NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopulation_pft(NZ)   
   elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
     !for woody vascular, **(1/1.4)
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)   
   else
     !for herbaceous plant, **(1./0.95) 
     NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopulation_pft(NZ)

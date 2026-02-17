@@ -101,6 +101,8 @@ module RootDataType
   real(sp),target,allocatable ::  RootNoduleElms_pft(:,:,:,:)                    !plant root nodule element mass,                     [g d-2]
   real(sp),target,allocatable ::  RootStrutElms_pft(:,:,:,:)                     !plant root structural element, [g d-2]
   real(sp),target,allocatable ::  RootProteinC_pvr(:,:,:,:,:)                    !root layer protein C, [g d-2]
+  real(sp),target,allocatable ::  Root1stActStructElms_rpvr(:,:,:,:,:,:)         !root layer active zone element in primary axes, [g d-2]
+  real(sp),target,allocatable ::  Root1stLigStructElms_rpvr(:,:,:,:,:,:)         !root layer lignified zone element in primary axes, [g d-2]
   real(sp),target,allocatable ::  RootMyco1stStrutElms_rpvr(:,:,:,:,:,:)       !root layer element primary axes, [g d-2]
   real(sp),target,allocatable ::  RootMyco2ndStrutElms_rpvr(:,:,:,:,:,:,:)       !root layer element secondary axes, [g d-2]
   real(sp),target,allocatable ::   PopuRootMycoC_pvr(:,:,:,:,:)                  !root layer C, [g d-2]
@@ -240,6 +242,8 @@ contains
   allocate(RootNoduleElms_pft(NumPlantChemElms,JP,JY,JX)); RootNoduleElms_pft=0._sp
   allocate(RootStrutElms_pft(NumPlantChemElms,JP,JY,JX));   RootStrutElms_pft=0._sp
   allocate(RootProteinC_pvr(jroots,JZ,JP,JY,JX));RootProteinC_pvr=0._sp
+  allocate(Root1stLigStructElms_rpvr(NumPlantChemElms,JZ,MaxNumRootAxes,JP,JY,JX)); Root1stLigStructElms_rpvr=0._sp
+  allocate(Root1stActStructElms_rpvr(NumPlantChemElms,JZ,MaxNumRootAxes,JP,JY,JX)); Root1stActStructElms_rpvr=0._sp
   allocate(RootMyco1stStrutElms_rpvr(NumPlantChemElms,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco1stStrutElms_rpvr=0._sp
   allocate(Root1stStructE_buf(NumPlantChemElms,MaxNumRootAxes,JP,JY,JX)); Root1stStructE_buf=0._sp
   allocate(RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndStrutElms_rpvr=0._sp
@@ -370,6 +374,8 @@ contains
   call destroy(RootProteinC_pvr)
   call destroy(Root1stStructE_buf)
   call destroy(RootMyco1stStrutElms_rpvr)
+  call destroy(Root1stActStructElms_rpvr)
+  call destroy(Root1stLigStructElms_rpvr)
   call destroy(RootMyco2ndStrutElms_rpvr)
   call destroy( PopuRootMycoC_pvr)
   call destroy(RootNodulStrutElms_rpvr)

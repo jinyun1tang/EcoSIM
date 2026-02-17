@@ -358,6 +358,8 @@ contains
     PopuRootMycoC_pvr          => plt_biom% PopuRootMycoC_pvr           ,& !inoput :root layer C, [gC d-2]
     RootMycoActiveBiomC_pvr    => plt_biom%RootMycoActiveBiomC_pvr      ,& !inoput :root layer structural C, [gC d-2]
     RootMyco1stStrutElms_rpvr  => plt_biom%RootMyco1stStrutElms_rpvr    ,& !inoput :root layer element primary axes, [g d-2]
+    Root1stActStructElms_rpvr  => plt_biom%Root1stActStructElms_rpvr    ,& !inoput :root layer active zone element in primary axes, [g d-2]
+    Root1stLigStructElms_rpvr  => plt_biom%Root1stLigStructElms_rpvr    ,& !inoput :root layer lignified zone element in primary axes, [g d-2]
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs          ,& !inoput :root C primary axes, [g d-2]
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft        ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     RootMyco2ndStrutElms_rpvr  => plt_biom%RootMyco2ndStrutElms_rpvr    ,& !inoput :root layer element secondary axes, [g d-2]
@@ -463,6 +465,8 @@ contains
           Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
           DO NE=1,NumPlantChemElms
             RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*XHVST
+            Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*XHVST
+            Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*XHVST            
           ENDDO
         ENDDO  
       Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*XHVST        

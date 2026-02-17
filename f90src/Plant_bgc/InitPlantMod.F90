@@ -1019,6 +1019,8 @@ module InitPlantMod
     plt_morph%Root1stXNumL_pvr(L,NZ)                      = 0._r8  
     DO NR=1,MaxNumRootAxes
       plt_biom%RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
+      plt_biom%Root1stActStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
+      plt_biom%Root1stLigStructElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
       plt_morph%Root1stLenPP_rpvr(L,NR,NZ)                             = 0._r8
       plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
@@ -1052,6 +1054,7 @@ module InitPlantMod
     PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !input  :root layer C, [gC d-2]
     RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !input  :reference root protein N, [gN g-1]
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
+    Root1stActStructElms_rpvr     => plt_biom%Root1stActStructElms_rpvr       ,& !inoput :root layer active zone element in primary axes, [g d-2]
     RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !input  :root layer structural C, [gC d-2]
     RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !input  :root layer nonstructural element, [g d-2]
     RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !input  :root layer protein C, [gC d-2]
@@ -1099,6 +1102,7 @@ module InitPlantMod
   CanopyNonstElms_brch(ielmp,1,NZ)                             = rPCGrain_pft(NZ)*CanopyNonstElms_brch(ielmc,1,NZ)
   RootMyco1stStrutElms_rpvr(ielmn,NGTopRootLayer_pft(NZ),1,NZ) = rNCGrain_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ),1,NZ)
   RootMyco1stStrutElms_rpvr(ielmp,NGTopRootLayer_pft(NZ),1,NZ) = rPCGrain_pft(NZ)*RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ),1,NZ)
+  Root1stActStructElms_rpvr(:,NGTopRootLayer_pft(NZ),1,NZ)     = RootMyco1stStrutElms_rpvr(:,NGTopRootLayer_pft(NZ),1,NZ)
   RootMyco1stElm_raxs(ielmn,1,NZ)                              = rNCGrain_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,NZ)
   RootMyco1stElm_raxs(ielmp,1,NZ)                              = rPCGrain_pft(NZ)*RootMyco1stElm_raxs(ielmc,1,NZ)
   RootMycoActiveBiomC_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)  = RootMyco1stStrutElms_rpvr(ielmc,NGTopRootLayer_pft(NZ),1,NZ)
