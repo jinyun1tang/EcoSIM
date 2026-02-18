@@ -4,6 +4,7 @@ module ATSEcoSIMAdvanceMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SoilWaterDataType
+  use SoilHeatDataType
   use SharedDataMod
   use GridDataType
   use GridConsts
@@ -64,9 +65,10 @@ implicit none
   real(r8) :: ResistanceLitRLay(JY,JX)
   real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
   real(r8) :: HeatFluxAir2Soi(JY,JX)
-  real(r8) :: TopLayWatVol(JY,JX)
-  real(r8) :: Qinfl2MicP(JY,JX)
-  real(r8) :: HInfl2Soil(JY,JX)
+  real(r8) :: TopLayWatVol_col(JY,JX)
+  real(r8) :: Qinfl2MicP_col(JY,JX)
+  real(r8) :: HeatInfl2Soil(JY,JX)
+  real(r8) :: Qinfl2MacP_col(JY,JX)
   !real(r8) :: SnowDepth_col(JY,JX)
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
@@ -205,6 +207,9 @@ implicit none
       LOGPSIFLD_col(NY,NX)          = LOG(pressure_at_field_capacity)
       LOGPSIMXD_col(NY,NX)          = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
 
+      !Top layer water volume:
+      TopLayWatVol_col(NY,NX) = VLWatMicP1_vr(NU_col(NY,NX),NY,NX)
+
       !Adapting from SoilHydroParaMod.F90 for the no organic matter in soil case
       !THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
       !  *(LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX))/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L,NY,NX)))
@@ -291,21 +296,28 @@ implicit none
   !These arrays sometimes have junk in them when initialized so we have to zero
   !them out before iteration
   do NY=1, NYS
-    Qinfl2MicPM(NY,NX)=0.0
-    Hinfl2SoilM(NY,NX)=0.0
-    Qinfl2MicP(NY,NX)=0.0
-    Hinfl2Soil(NY,NX)=0.0
+    Qinfl2MicP_col(NY,NX)=0.0
+    HeatInfl2Soil(NY,NX)=0.0
+    Qinflx2Soil_col(NY,NX)=0.0
+    HeatFlx2Grnd_col(NY,NX)=0.0
   enddo
 
   !This does the subcycling of the land surface model
   DO M=1,NPH
 
-    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
-      KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
+    !call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
+    !  KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
+    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay, &
+    KSatReductByRainKineticEnergy,TopLayWatVol_col,HeatFluxAir2Soi, &
+    Qinfl2MicP_col,Qinfl2MacP_col)
 
-    Qinfl2MicP = Qinfl2MicP+Qinfl2MicPM
-    Hinfl2Soil = Hinfl2Soil+Hinfl2SoilM
+    !sum fluxes over iterations in each column
+    do NY=1, NYS
+      HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX)+HeatInfl2Soil(NY,NX)
+      Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP_col(NY,NX)
+    enddo
+
     !also update state variables for iteration M
     call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
@@ -320,9 +332,9 @@ implicit none
     !for every column send the top layer to the transfer var
     !Convert heat and water flux flux from the subcycled value
     !to ATS units (flux / s)
-    write(*,*) "NY: ", NY, " Hinfl2Soil: ", Hinfl2Soil(NY,1), " Qinfl2MicP: ", Qinfl2MicP(NY,1)
-    surf_e_source(NY) = Hinfl2Soil(NY,1) / (dts_HeatWatTP)
-    surf_w_source(NY) = Qinfl2MicP(NY,1) / (dts_HeatWatTP)
+    write(*,*) "NY: ", NY, " Hinfl2Soil: ", HeatFlx2Grnd_col(NY,1), " Qinfl2MicP: ", Qinflx2Soil_col(NY,1)
+    surf_e_source(NY) = HeatFlx2Grnd_col(NY,1) / (dts_HeatWatTP)
+    surf_w_source(NY) = Qinflx2Soil_col(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
     a_LWCan(NY) = LWRadCanGPrev_col(NY,NX)

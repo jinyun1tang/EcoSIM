@@ -201,6 +201,9 @@ implicit none
   !integer  :: irootType=1
   REAL(R8) :: PerPlantRootC_vr(1:JZ)
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
+  REAL(R8) :: tmp_cdepz(1:JZ)
+  REAL(R8) :: tmp_rootc(1:JZ)
+  REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
   irootType=1
@@ -287,9 +290,14 @@ implicit none
       !
       !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       !replacing with irootType from ATS, place behind if so it doesn't trigger on bare ground
+      tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
+      tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
+      tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
       if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),tmp_cdepz,tmp_rootc,tmp_rootl)
       endif
+      PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
+      PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
       !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       DO NZ=1,NP_col(NY,NX)
         DO L=NU_col(NY,NX),NL_col(NY,NX)
@@ -307,7 +315,7 @@ implicit none
 
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------
-  subroutine SetRootProfileZ(irootType,NL,cdepthz,PerPlantRootC_vr,PerPlantRootLen_vr)
+  subroutine SetRootProfileZ(irootType,NL,tmp_cdepthz,tmp_rootc,tmp_rootl)
   !
   !Description:
   !Reference: Jackson et al. (1997), A global budget for fine root biomass, surface area, and nutrient contents, PNAS.
@@ -327,32 +335,28 @@ implicit none
   implicit none
   integer, intent(in) :: iRootType
   integer, intent(in) :: NL
-  real(r8),intent(in) :: cdepthz(1:NL)        !cumulative depth [m]
-  real(r8),intent(out) :: PerPlantRootC_vr(1:NL)   !fine root C in each layer [gC m-2]
-  real(r8),intent(out) :: PerPlantRootLen_vr(1:NL)    !root length in each layer [gC m-2]
+  real(r8),intent(in) :: tmp_cdepthz(JZ)        !cumulative depth [m]
+  real(r8),intent(out) :: tmp_rootc(JZ)   !fine root C in each layer [gC m-2]
+  real(r8),intent(out) :: tmp_rootl(JZ)    !root length in each layer [gC m-2]
   real(r8), parameter :: beta(10)=real((/0.943,0.970,0.950,0.980,0.967,0.943,0.982,0.972,0.972,0.909/),kind=r8)
   real(r8), parameter :: totfrootC(10)=(/0.6,0.27,0.52,0.82,0.78,1.51,0.57,0.57,0.99,0.96/)*0.488_r8 !total fine root C
   real(r8), parameter :: frootLen(10)=(/2.6,4.0,8.4,6.1,5.4,112.,3.5,4.1,60.4,7.4/)*1.e3_r8  !total fine root length
   real(r8), parameter :: PltPopDef(10)=(/0.6,1.,1.0,0.6,0.6,40.,0.6,0.6,40.,40./) !default plant population [1/m2]
   integer :: L
-  real(r8) :: CumRootFrac_vr(1:NL)  !Cumfraction of root in soil layers
-  real(r8) :: RootFrac_vr(1:NL)     !fraction of root in soil layers
+  real(r8) :: CumRootFrac_vr(JZ)  !Cumfraction of root in soil layers
+  real(r8) :: RootFrac_vr(JZ)     !fraction of root in soil layers
 
-  CumRootFrac_vr(1)=1._r8-beta(irootType)**(cdepthz(1)*100._r8)
+  CumRootFrac_vr(1)=1._r8-beta(irootType)**(tmp_cdepthz(1)*100._r8)
   RootFrac_vr(1)=CumRootFrac_vr(1)
-  DO L=2,NL
-    CumRootFrac_vr(L)=1._r8-beta(irootType)**(cdepthz(L)*100._r8)
-!    if(CumRootFrac_vr(L-1)<0.99_r8)
-      RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
-!    else
-!      RootFrac_vr(L) = 1._r8-CumRootFrac_vr(L-1)
-!    endif
-  enddo
+  tmp_rootl(1)=frootLen(irootType)*RootFrac_vr(1)/PltPopDef(irootType)
+  tmp_rootc(1)=RootFrac_vr(1)*totfrootC(irootType)/PltPopDef(irootType)
 
-  DO L=1,NL
-    PerPlantRootLen_vr(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
-    PerPlantRootC_vr(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
-  ENDDO
+  DO L=2,NL
+    CumRootFrac_vr(L)=1._r8-beta(irootType)**(tmp_cdepthz(L)*100._r8)
+    RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
+    tmp_rootl(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
+    tmp_rootc(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
+  enddo
 
   end subroutine SetRootProfileZ
 end module PrescribePhenolMod
