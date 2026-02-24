@@ -32,7 +32,7 @@ module ATSEcoSIMAdvanceMod
   use RootDataType
   use FlagDataType
   use ATSUtilsMod
-  use PlantAPIData
+  !use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
 
 
@@ -81,8 +81,8 @@ implicit none
   real(r8) :: VLWat_test(JZ,JY,JX)
   real(r8) :: THETF
 
-  associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
-  )
+  !associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
+  !)
 
   !All the necessary sizes are taken from GridConsts
   !real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
@@ -106,13 +106,16 @@ implicit none
   call SetMeshATS(NHW,NVN,NHE,NVS)
   !call InitModules()
   !load NK_col here?
-  NK_col(NX,1) = 14
+  !NK_col(NX,1) = 14
 
   do NY=1, NYS
     !ET variable set in SetHourlyDiagnostics unclear if a clone is
     !needed as with SetHourlyAccumulators
     QVegET_col(NY,NX) = 0._r8
     call SetHourlyAccumulatorsATS(NY,NX)
+    NK_col(NY,NX) = a_NL(NY)
+    Myco_pft(1,NY,NX) = 1
+    NP0_col(NY,NX) = 1
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
@@ -312,6 +315,9 @@ implicit none
     KSatReductByRainKineticEnergy,TopLayWatVol_col,HeatFluxAir2Soi, &
     Qinfl2MicP_col,Qinfl2MacP_col)
 
+    !call subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
+    !  TopLayWatVol_col,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
+
     !sum fluxes over iterations in each column
     do NY=1, NYS
       HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX)+HeatInfl2Soil(NY,NX)
@@ -357,10 +363,10 @@ implicit none
     !  a_TS(LS,L) = TKSnow1_snvr(LS,NY,NX)
     !ENDDO
     DO L=NU_col(NY,NX),NL_col(NY,NX)
-        a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,NY)
+        a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,1,NY,NX)
     ENDDO
   ENDDO
-  end associate
+  !end associate
   end subroutine RunEcoSIMSurfaceBalance
 
 end module ATSEcoSIMAdvanceMod
