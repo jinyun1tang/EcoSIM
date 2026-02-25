@@ -313,7 +313,7 @@ implicit none
 
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay, &
     KSatReductByRainKineticEnergy,TopLayWatVol_col,HeatFluxAir2Soi, &
-    Qinfl2MicP_col,Qinfl2MacP_col)
+    Qinfl2MicP_col,HeatInfl2Soil)
 
     !call subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
     !  TopLayWatVol_col,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
