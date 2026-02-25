@@ -93,11 +93,11 @@ contains
   call c_f_pointer(props%column_area%data, data, (/num_cols/))
   column_area = data(:)
 
-  do j = 1, num_cols
-    do i = 1, size_col
-      write(*,*) "i,j: ", i,j, " a_Area3: ", a_Area3(i,j), " a_AreaZ: ", a_AreaZ(i,j), " column_area: ", column_area(j)
-    end do
-  end do
+  !do j = 1, num_cols
+  !  do i = 1, size_col
+  !    write(*,*) "i,j: ", i,j, " a_Area3: ", a_Area3(i,j), " a_AreaZ: ", a_AreaZ(i,j), " column_area: ", column_area(j)
+  !  end do
+  !end do
 
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
