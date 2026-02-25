@@ -21,6 +21,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CO2CuticleResist_pft(:,:,:)                !maximum stomatal resistance to CO2, [s h-1]
   real(r8),target,allocatable ::  H2OCuticleResist_pft(:,:,:)                !maximum stomatal resistance to vapor, [s h-1]
   real(r8),target,allocatable ::  RCS_pft(:,:,:)                             !e-folding turgor pressure for stomatal resistance, [MPa]
+  real(r8),target,allocatable ::  TurgEff4CanopyResp_pft(:,:,:)              !Turgor pressure effect on canopy respiration, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)              !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyMinStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
   real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                  !canopy boundary layer resistance, [m h-1]
@@ -234,6 +235,7 @@ module CanopyDataType
   allocate(CO2CuticleResist_pft(JP,JY,JX));     CO2CuticleResist_pft=0._r8
   allocate(H2OCuticleResist_pft(JP,JY,JX));     H2OCuticleResist_pft=0._r8
   allocate(RCS_pft(JP,JY,JX));      RCS_pft=0._r8
+  allocate(TurgEff4CanopyResp_pft(JP,JY,JX)); TurgEff4CanopyResp_pft=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(CanopyMinStomaResistH2O_pft(JP,JY,JX));     CanopyMinStomaResistH2O_pft=0._r8
   allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
@@ -425,6 +427,7 @@ module CanopyDataType
   call destroy(CO2CuticleResist_pft)
   call destroy(H2OCuticleResist_pft)
   call destroy(RCS_pft)
+  call destroy(TurgEff4CanopyResp_pft)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(CanopyMinStomaResistH2O_pft)
   call destroy(CanopyBndlResist_col)

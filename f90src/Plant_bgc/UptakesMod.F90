@@ -494,6 +494,7 @@ module UptakesMod
           SQRT(FracSoilLBy1stRoots_pvr(L,NZ)*FracSoiAsMicP_vr(L)/(PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ))))
 
         RootEffLen4Absorption_pvr(N,L)=TwoPiCON*RootAbsorbLenPerPlant_pvr(N,L,NZ)/FracSoilLBy1stRoots_pvr(L,NZ)
+        !write(913,*)yearIJ%I*1000+yearIJ%J/24.,N,L,RootAbsorbLenPerPlant_pvr(N,L,NZ),FracSoilLBy1stRoots_pvr(L,NZ),'efflen'
       ELSE
         FineRootRadius_rvr(N,L)        = Root2ndMaxRadius_pft(N,NZ)
         RadialMeanLen_rvr(N,L)         = 1.001_r8*FineRootRadius_rvr(N,L)

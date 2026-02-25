@@ -263,7 +263,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_cumGPP_ptc(:)       
   real(r8),pointer   :: h1D_dCAN_GPP_CLIM_ptc(:)
   real(r8),pointer   :: h1D_dCAN_GPP_eLIM_ptc(:)  
-  real(r8),pointer   :: h1D_CAN_RA_ptc(:)      
+  real(r8),pointer   :: h1D_CAN_RA_ptc(:)    
+  real(r8),pointer   :: h1D_TurgEff4CanopyResp_ptc(:)  
   real(r8),pointer   :: h1D_CAN_GROWTH_ptc(:)
   real(r8),pointer   :: h1D_cTNC_ptc(:)        
   real(r8),pointer   :: h1D_cTNN_ptc(:)       
@@ -336,7 +337,7 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
   real(r8),pointer   :: h1D_cNPP_ptc(:)        
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)     
-  real(r8),pointer   :: h1D_HypocotHeight_ptc(:)
+  real(r8),pointer   :: h1D_EmergeHeight_ptc(:)
   real(r8),pointer   :: h1D_POPN_ptc(:)       
   real(r8),pointer   :: h1D_tTRANSPN_ptc(:)   
   real(r8),pointer   :: h1D_WTR_STRESS_ptc(:) 
@@ -807,6 +808,7 @@ implicit none
   allocate(this%h1D_dCAN_GPP_CLIM_ptc(beg_ptc:end_ptc))    ;this%h1D_dCAN_GPP_CLIM_ptc(:)=spval
   allocate(this%h1D_dCAN_GPP_eLIM_ptc(beg_ptc:end_ptc))    ;this%h1D_dCAN_GPP_eLIM_ptc(:)=spval
   allocate(this%h1D_CAN_RA_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RA_ptc(:)=spval
+  allocate(this%h1D_TurgEff4CanopyResp_ptc(beg_ptc:end_ptc)); this%h1D_TurgEff4CanopyResp_ptc(:)=spval
   allocate(this%h1D_LEAF_PC_ptc(beg_ptc:end_ptc))         ;this%h1D_LEAF_PC_ptc(:)=spval
   allocate(this%h1D_CAN_RN_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_RN_ptc(:)=spval
   allocate(this%h1D_CAN_LE_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_LE_ptc(:)=spval
@@ -871,7 +873,7 @@ implicit none
   allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
   allocate(this%h1D_cNPP_ptc(beg_ptc:end_ptc))             ;this%h1D_cNPP_ptc(:)=spval
   allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_HT_ptc(:)=spval
-  allocate(this%h1D_HypocotHeight_ptc(beg_ptc:end_ptc)); this%h1D_HypocotHeight_ptc(:)=spval
+  allocate(this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)); this%h1D_EmergeHeight_ptc(:)=spval
   allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))            ;this%h1D_POPN_ptc(:)=spval
   allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))        ;this%h1D_tTRANSPN_ptc(:)=spval
   allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
@@ -1994,6 +1996,11 @@ implicit none
     long_name='total aboveground autotrophic respiration',ptr_patch=data1d_ptr,&
     default='inactive')            
 
+  data1d_ptr => this%h1D_TurgEff4CanopyResp_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='TurgEff4CanopyResp_pft',units='gC/m2/hr',avgflag='A',&
+    long_name='Turgor pressure effect on canopy autotrophic respiration',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
   data1d_ptr => this%h1D_CAN_GROWTH_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_GROWTH_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Canopy structural growth rate',ptr_patch=data1d_ptr,&
@@ -2300,9 +2307,9 @@ implicit none
   call hist_addfld1d(fname='CAN_HT_pft',units='m',avgflag='A',&
     long_name='Canopy height',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%h1D_HypocotHeight_ptc(beg_ptc:end_ptc)    
-  call hist_addfld1d(fname='HypocotylEffHT_pft',units='m',avgflag='A',&
-    long_name='Hypocotyl height exceeds seeding depth',ptr_patch=data1d_ptr,default='inactive')      
+  data1d_ptr => this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='EmergHeight_pft',units='m',avgflag='A',&
+    long_name='Hypocotyl height exceeds seeding depth for emergence (>0 yes)',ptr_patch=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_POPN_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='POPN_pft',units='1/m2',avgflag='A',&
@@ -3535,7 +3542,7 @@ implicit none
 
   data2d_ptr => this%h2D_ROOT_OSTRESS_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root_OXYSTRESS_pvr',units='None',type2d='levsoi',avgflag='A',&
-    long_name='Root Oxygen stress profile [0->1 weaker stress]',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root Oxygen stress profile [0->1 weaker stress]',ptr_patch=data2d_ptr) 
 
   data2d_ptr => this%h2D_Root1stStrutC_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootC_1st_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
@@ -4207,6 +4214,7 @@ implicit none
         this%h1D_CAN_CO2_FLX_ptc(nptc)   = CO2NetFix_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
         this%h1D_CAN_GPP_ptc(nptc)       = GrossCO2Fix_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_RA_ptc(nptc)        = CanopyGrosRCO2_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_TurgEff4CanopyResp_ptc(nptc) = TurgEff4CanopyResp_pft(NZ,NY,NX)
         this%h1D_CAN_GROWTH_ptc(nptc)    = canopy_growth_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_cTNC_ptc(nptc)          = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
         this%h1D_cTNN_ptc(nptc)          = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
@@ -4260,7 +4268,7 @@ implicit none
         this%h1D_AUTO_RESP_FLX_ptc(nptc)    = GrossResp_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         this%h1D_CAN_HT_ptc(nptc)            = CanopyHeight_pft(NZ,NY,NX)
-        this%h1D_HypocotHeight_ptc(nptc)     = HypocotHeight_pft(NZ,NY,NX)-SeedDepth_pft(NZ,NY,NX) 
+        this%h1D_EmergeHeight_ptc(nptc)     = HypocotHeight_pft(NZ,NY,NX)-SeedDepth_pft(NZ,NY,NX) 
         this%h1D_WTR_STRESS_ptc(nptc)        = HoursTooLowPsiCan_pft(NZ,NY,NX)
         this%h1D_LeafProteinNperm2_ptc(nptc) = LeafProteinCperm2LA_pft(NZ,NY,NX)/3.3_r8
         this%h1D_VcMaxRubisco_ptc(nptc)      = CanopyVcMaxRubisco25C_pft(NZ,NY,NX)
@@ -4408,11 +4416,11 @@ implicit none
             this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)
             this%h2D_fRootGrowPSISense_pvr(nptc,L) = fRootGrowPSISense_pvr(ipltroot,L,NZ,NY,NX)
 
-            this%h2D_RootAbsorbAreaPP_pvr(nptc,L) = RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)  
-            this%h1D_RootAbsorbAreaPP_pft(nptc) = this%h1D_RootAbsorbAreaPP_pft(nptc)+RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)  
-            this%h2D_ROOT_OSTRESS_pvr(nptc,L) = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
-            this%h2D_PSI_RT_pvr(nptc,L)       = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
-            this%h2D_RootH2OUptkStress_pvr(nptc,L)=RootH2OUptkStress_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+            this%h2D_RootAbsorbAreaPP_pvr(nptc,L)  = RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)
+            this%h1D_RootAbsorbAreaPP_pft(nptc)    = this%h1D_RootAbsorbAreaPP_pft(nptc)+RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)
+            this%h2D_ROOT_OSTRESS_pvr(nptc,L)      = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
+            this%h2D_PSI_RT_pvr(nptc,L)            = PSIRoot_pvr(ipltroot,L,NZ,NY,NX)
+            this%h2D_RootH2OUptkStress_pvr(nptc,L) = RootH2OUptkStress_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
             this%h2D_SapFlowVlinear_pvr(nptc,L) = SapFlowVlinear_pvr(L,NZ,NY,NX)
             this%h2D_RootH2OUptk_pvr(nptc,L) = AZERO(1.e3*RPlantRootH2OUptk_pvr(ipltroot,L,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
             this%h2D_RootMaintDef_CO2_pvr(nptc,L)=RootMaintDef_CO2_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4554,6 +4562,7 @@ implicit none
   this%h1D_CAN_CO2_FLX_ptc(nptc)   = 0._r8
   this%h1D_CAN_GPP_ptc(nptc)       = 0._r8
   this%h1D_CAN_RA_ptc(nptc)        = 0._r8
+  this%h1D_TurgEff4CanopyResp_ptc(nptc) = 0._r8
   this%h1D_CAN_GROWTH_ptc(nptc)    = 0._r8
   this%h1D_cTNC_ptc(nptc)          = 0._r8
   this%h1D_cTNN_ptc(nptc)          = 0._r8
@@ -4607,7 +4616,7 @@ implicit none
   this%h1D_HVST_N_FLX_ptc(nptc)       = 0._r8
   this%h1D_HVST_P_FLX_ptc(nptc)       = 0._r8
   this%h1D_CAN_HT_ptc(nptc)           = 0._r8
-  this%h1D_HypocotHeight_ptc(nptc)        = 0._r8
+  this%h1D_EmergeHeight_ptc(nptc)        = 0._r8
   this%h1D_WTR_STRESS_ptc(nptc)       = 0._r8
   this%h1D_LeafProteinNperm2_ptc(nptc)= 0._r8
   this%h1D_VcMaxRubisco_ptc(nptc) =  0._r8

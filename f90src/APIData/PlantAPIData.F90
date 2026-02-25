@@ -219,13 +219,15 @@ implicit none
   real(r8), pointer :: tsai_day_pft(:)                 => null() !prescribed stem area, [m2 m-2]
   real(r8), pointer :: PARTS_brch(:,:,:)               => null() !fraction of C allocated to each morph unit,                                 [-]
   real(r8), pointer :: FineRootVolPerMassC_pft(:,:)    => null() !Fine root volume:mass ratio,                                                     [m3 g-1]
-  real(r8), pointer :: CoarseRootVolPerMassC_pft(:)    => null() !Coarse root volume:mass ratio,  [m3 g-1]
+  real(r8), pointer :: CRootActVolPerMassC_pft(:)    => null()   !Coarse root active zone volume:mass ratio,  [m3 g-1]
+  real(r8), pointer :: CRootLigVolPerMassC_pft(:)     => null()  !Coarse root inactive zone volume:mass ratio,  [m3 g-1]
   real(r8), pointer :: RootPorosity_pft(:,:)           => null() !root porosity,                                                              [m3 m-3]
   real(r8), pointer :: Root2ndXSecArea_pft(:,:)        => null() !root  cross-sectional area  secondary axes,                                 [m2]
   real(r8), pointer :: Root1stXSecArea_pft(:,:)        => null() !root cross-sectional area primary axes,                                     [m2]
   real(r8), pointer :: Root1stMaxRadius1_pft(:,:)      => null() !root diameter primary axes,                                                 [m]
   real(r8), pointer :: Root2ndMaxRadius1_pft(:,:)      => null() !root diameter secondary axes,                                               [m]
-  real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [g]
+  real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [gC/seed]
+  real(r8), pointer :: SeedWidth2LenRatio_pft(:)       => null() !Seed width to length ratio, assuming prolate spheroid  
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   logical,  pointer :: flag2ndGrowth_pvr(:,:,:)        => null() !flag for secondary growth of primary roots, [-]  
   real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
@@ -444,8 +446,8 @@ implicit none
   real(r8), pointer :: trcg_gascl_vr(:,:)             => null()  !gaseous tracer concentration, [g m-3]
   real(r8), pointer :: CSoilOrgM_vr(:,:)              => null()  !soil organic C content, [gC kg soil-1]
   real(r8), pointer :: HYCDMicP4RootUptake_vr(:) => null()  !soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
-  real(r8), pointer :: GasDifc_vr(:,:)                => null()  !gaseous diffusivity, [m2 h-1]
-  real(r8), pointer :: SoluteDifusvty_vr(:,:)         => null()  !aqueous diffusivity, [m2 h-1]
+  real(r8), pointer :: GasDifcT_vr(:,:)                => null()  !gaseous diffusivity, [m2 h-1]
+  real(r8), pointer :: SoluteDifusvtyT_vr(:,:)         => null()  !aqueous diffusivity, [m2 h-1]
   real(r8), pointer :: trcg_gasml_vr(:,:)             => null()  !gas layer mass, [g d-2]
   real(r8), pointer :: GasSolbility_vr(:,:)           => null()  !gas solubility,                                [m3 m-3]
   real(r8), pointer :: THETW_vr(:)                    => null()  !volumetric water content, [m3 m-3]
@@ -491,6 +493,8 @@ implicit none
   real(r8), pointer :: rPCReserve_pft(:)                => null()  !reserve P:C ratio,                                       [gP gC-1]
   real(r8), pointer :: rPCGrain_pft(:)                      => null()  !grain P:C ratio,                                         [gP gP-1]
   real(r8), pointer :: rNCStalk_pft(:)                  => null()  !stalk N:C ratio,                                         [gN gC-1]
+  real(r8), pointer :: rNCLigRoot_pft(:)               => null()  !NC ratio of lignified root, [gN gC-1]
+  real(r8), pointer :: rPCLigRoot_pft(:)               => null()  !PC ratio of lignified root, [gP gC-1]    
   real(r8), pointer :: FracShootElmAllocm(:,:)  => null()  !woody element allocation, [-]
   real(r8), pointer :: FracShootPetolAlloc2Litr(:,:) => null()  !leaf element allocation,[-]
   real(r8), pointer :: FracRootElmAllocm(:,:)       => null()  !C woody fraction in root,[-]
@@ -859,6 +863,7 @@ implicit none
   real(r8), pointer :: RootMyco1stSinkC_rpvr(:,:,:)      => null()  !primary root C sink, [gC d-2 h-1]
   real(r8), pointer :: RootCO2EmisPot_pvr(:,:,:)         => null()  !root CO2 efflux unconstrained by root nonstructural C,          [g d-2 h-1]
   real(r8), pointer :: RootCO2Autor_pvr(:,:,:)           => null()  !root respiration constrained by O2,                             [g d-2 h-1]
+  real(r8), pointer :: TurgEff4CanopyResp_pft(:)         => null()  !Turgor pressure effect on canopy respiration, [-]
   real(r8), pointer :: RootCO2AutorX_pvr(:,:,:)          => null()  !root respiration from previous time step,                       [g d-2 h-1]
   real(r8), pointer :: PlantExudElm_CumYr_pft(:,:)       => null()  !total net root element uptake (+ve) - exudation (-ve),          [gC d-2 ]
   real(r8), pointer :: trcg_root_vr(:,:)                 => null()   !total root internal gas flux,                                  [g d-2 h-1]
@@ -923,6 +928,7 @@ implicit none
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RootCO2EmisPot_pvr(jroots,JZ1,JP1)); this%RootCO2EmisPot_pvr=spval
   allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=0._r8
+  allocate(this%TurgEff4CanopyResp_pft(JP1)); this%TurgEff4CanopyResp_pft=0._r8
   allocate(this%trcs_deadroot2soil_pvr(idg_beg:idg_NH3,JZ1,JP1));this%trcs_deadroot2soil_pvr=0._r8
   allocate(this%RootCO2Ar2Soil_pvr(JZ1,JP1)); this%RootCO2Ar2Soil_pvr=0._r8
   allocate(this%RootCO2Ar2RootX_pvr(JZ1,JP1)); this%RootCO2Ar2RootX_pvr=0._r8
@@ -1341,6 +1347,8 @@ implicit none
   allocate(this%rNCGrain_pft(JP1));this%rNCGrain_pft=spval
   allocate(this%rPCStalk_pft(JP1));this%rPCStalk_pft=spval
   allocate(this%rNCStalk_pft(JP1));this%rNCStalk_pft=spval
+  allocate(this%rNCLigRoot_pft(JP1));this%rNCLigRoot_pft=spval
+  allocate(this%rPCLigRoot_pft(JP1)); this%rPCLigRoot_pft=spval
   allocate(this%rPCGrain_pft(JP1));this%rPCGrain_pft=spval
   allocate(this%rPCEar_pft(JP1));this%rPCEar_pft=spval
   allocate(this%rPCReserve_pft(JP1));this%rPCReserve_pft=spval
@@ -1618,8 +1626,8 @@ implicit none
   allocate(this%SoilWatAirDry_vr(0:JZ1));this%SoilWatAirDry_vr=spval
 
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
-  allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
-  allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
+  allocate(this%GasDifcT_vr(idg_beg:idg_end,0:JZ1));this%GasDifcT_vr=spval
+  allocate(this%SoluteDifusvtyT_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvtyT_vr=spval
   allocate(this%SoilBulkModulus4RootPent_vr(JZ1));this%SoilBulkModulus4RootPent_vr=spval
   allocate(this%SoilModulus4RootRadialexp_vr(JZ1)); this%SoilModulus4RootRadialexp_vr=spval
   allocate(this%SoilBulkDensity_vr(0:JZ1));this%SoilBulkDensity_vr=spval
@@ -1999,6 +2007,7 @@ implicit none
   allocate(this%xylemPhi_max_pft(JP1)); this%xylemPhi_max_pft=0._r8
   allocate(this%xylemPhi_mean_pft(JP1)); this%xylemPhi_mean_pft=0._r8
   allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
+  allocate(this%SeedWidth2LenRatio_pft(JP1));this%SeedWidth2LenRatio_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
@@ -2107,7 +2116,8 @@ implicit none
   allocate(this%SeedSitesSet_brch(MaxNumBranches,JP1));this%SeedSitesSet_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
   allocate(this%FineRootVolPerMassC_pft(jroots,JP1));this%FineRootVolPerMassC_pft=spval
-  allocate(this%CoarseRootVolPerMassC_pft(JP1)); this%CoarseRootVolPerMassC_pft=spval
+  allocate(this%CRootActVolPerMassC_pft(JP1)); this%CRootActVolPerMassC_pft=spval
+  allocate(this%CRootLigVolPerMassC_pft(JP1)); this%CRootLigVolPerMassC_pft=spval
   allocate(this%RootPorosity_pft(jroots,JP1));this%RootPorosity_pft=spval
   allocate(this%Root2ndXSecArea_pft(jroots,JP1));this%Root2ndXSecArea_pft=spval
   allocate(this%Root1stXSecArea_pft(jroots,JP1));this%Root1stXSecArea_pft=spval

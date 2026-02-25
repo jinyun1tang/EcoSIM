@@ -57,7 +57,8 @@ module PlantBGCPars
   real(r8) :: FSTK                                !fraction of stalk radius as sapwood contributing to water,heat flow
   real(r8) :: ZSTX                                !maximum stalk tube thickness for tranpsiration, [m]
   real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3] 
-  real(r8) :: BlkDensCoarseRoots                  !Coarse root bulk density, [gC m-3]
+  real(r8) :: BlkDActCoarseRoots                  !Coarse root active zone bulk density, [gC m-3]
+  real(r8) :: BlkDLigCoarseRoots                  !Coarse root inactive zone bulk density, [gC m-3]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
   real(r8) :: SpecStalkVolume                     !specific volume (m3 gC-1)
   real(r8) :: FRTX                                !Fraction used to calculate woody faction of stalk,root,[-]
@@ -106,7 +107,10 @@ module PlantBGCPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)      !number of hours required to initiate remobilization of storage C for leafout, [h]
   real(r8) :: GVMX(0:1)                           !specific oxidation rate of nonstructural C during leafout at 25 C, [h]
   real(r8) :: RTSK(0:3)                           !relative primary root sink strength 0.25=shallow,4.0=deep root profile,[-]
-  real(r8) :: resp_downreg                        !respiration rate down regulation for thickensing zone compared to tip, per unit nitrogen mass, roots undersecondary growth has lower respiration cost
+  real(r8) :: resp_downreg                        !respiration rate down regulation for the lignified zone of coarse roots
+  real(r8) :: Yld_lignif                          !lignification rate in converting active coarse root into nonactive coarse root, [gC lig/gC]
+  real(r8) :: k_ligmax                            !maxinum lignification rate when converting active coarse root into nonactive coarse root, [h-1]
+  real(r8) :: k_ligMM                             !half saturation constant for lignification MM kinetics, [gC h-1]
   !terminate [label for varaible parsing]
   integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
   integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
@@ -239,7 +243,10 @@ module PlantBGCPars
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
-  resp_downreg                = 0.3_r8
+  resp_downreg                = 0.05_r8
+  k_ligMM                     = 0.1_r8*VMXC
+  k_ligmax                    = 0.005_r8
+  Yld_lignif                  = 0.62_r8
   CNKI_rubisco                = 1.0E-02_r8
   CPKI_rubisco                = 1.0E-03_r8
   RSMY_stomaCO2               = 2.78E-03_r8
@@ -250,7 +257,8 @@ module PlantBGCPars
   kDCytoC = 0.175_r8
   RCytoK = (/1.e-4_r8,1.e-3_r8/) !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
-  BlkDensCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
+  BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
+  BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3
   FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
   ZSTX                  = 1.0E-03_r8     !one mm
   StalkMassDensity      = 0.225_r8
@@ -292,7 +300,7 @@ module PlantBGCPars
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)
   RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
 
-  RTSK=real((/0.25,1.25,5.0,6.0/),r8)
+  RTSK=real((/0.25,1.,4.0,4.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)

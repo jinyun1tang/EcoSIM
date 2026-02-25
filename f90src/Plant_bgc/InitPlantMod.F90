@@ -1,7 +1,7 @@
 module InitPlantMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use UnitMod,          only: units
-  use minimathmod,      only: AZMAX1,isclose
+  use minimathmod,      only: AZMAX1,isclose,isALeftinBC
   use EcoSiMParDataMod, only: pltpar
   use EcosimConst
   use EcoSIMConfig
@@ -456,7 +456,8 @@ module InitPlantMod
     rNCRoot_pft               => plt_allom%rNCRoot_pft               ,& !input  :root N:C ratio, [gN gC-1]
     rPCRootr_pft              => plt_allom%rPCRootr_pft              ,& !input  :root P:C ratio, [gP gC-1]
     SeedAreaMean_pft          => plt_morph%SeedAreaMean_pft          ,& !input  :seed surface area, [m2]
-    SeedCMass_pft             => plt_morph%SeedCMass_pft             ,& !input  :grain size at seeding, [g]
+    SeedCMass_pft             => plt_morph%SeedCMass_pft             ,& !input  :grain size at seeding, [gC/per seed]
+    SeedWidth2LenRatio_pft    => plt_morph%SeedWidth2LenRatio_pft    ,& !input  :Seed width to length ratio, assuming prolate spheroid
     SeedMeanLen_pft           => plt_morph%SeedMeanLen_pft           ,& !input  :seed length, [m]
     SeedVolumeMean_pft        => plt_morph%SeedVolumeMean_pft        ,& !input  :seed volume, [m3 ]
     CMinNH4Root_pft           => plt_rbgc%CMinNH4Root_pft            ,& !inoput :minimum NH4 concentration for root NH4 uptake, [g m-3]
@@ -474,7 +475,6 @@ module InitPlantMod
     Root2ndMaxRadius1_pft     => plt_morph%Root2ndMaxRadius1_pft     ,& !output :root diameter secondary axes, [m]
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft      ,& !output :maximum radius of secondary roots, [m]
     FineRootVolPerMassC_pft   => plt_morph%FineRootVolPerMassC_pft   ,& !output :fine root volume:mass ratio, [m3 g-1]
-    CoarseRootVolPerMassC_pft => plt_morph%CoarseRootVolPerMassC_pft ,& !output :coarse root volume:mass ratio, [m3 g-1]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !output :seeding depth, [m]
     CNRTS_pft                 => plt_allom%CNRTS_pft                 ,& !output :root N:C ratio x root growth yield, [-]
     CPRTS_pft                 => plt_allom%CPRTS_pft                 ,& !output :root P:C ratio x root growth yield, [-]
@@ -496,7 +496,7 @@ module InitPlantMod
 !     SeedVolumeMean_pft,SeedMeanLen_pft,SeedAreaMean_pft=seed volume(m3),length(m),AREA3(NU)(m2)
 !     SeedCMass=seed C mass (g) from PFT file
 !
-  call calc_seed_geometry(SeedCMass_pft(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ))
+  call calc_seed_geometry(SeedCMass_pft(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ),SeedWidth2LenRatio_pft(NZ))
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -520,8 +520,7 @@ module InitPlantMod
   ENDDO
 
   D9795: DO L=NU,NL
-    IF(SeedDepth_pft(NZ).GE.CumSoilThickness_vr(L-1) &
-      .AND. SeedDepth_pft(NZ).LT.CumSoilThickness_vr(L))THEN
+    IF(isALeftinBC(SeedDepth_pft(NZ),CumSoilThickness_vr(L-1),CumSoilThickness_vr(L)))THEN
       NGTopRootLayer_pft(NZ)   = L
       NMaxRootBotLayer_pft(NZ) = L
       D9790: DO NR=1,pltpar%MaxNumRootAxes
@@ -552,7 +551,7 @@ module InitPlantMod
 !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
 !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
 !
-  CoarseRootVolPerMassC_pft(NZ) = 1.e-6/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ)))
+
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ)   = RootPorosity_pft(N,NZ)**1.33_r8
     !Lemon, 1962, Soil Aeration and Plant Root Relations I. Theory, Figure 1.

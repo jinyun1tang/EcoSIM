@@ -222,7 +222,7 @@ implicit none
     micfor%PSISoilMatricP  = LtHeatIceMelt*(micfor%TKS-Tref)/micfor%TKS
   endif
   
-  micfor%O2AquaDiffusvity         = SoluteDifusvty_vr(idg_O2,L,NY,NX)
+  micfor%O2AquaDiffusvity         = SoluteDifusvtyT_vr(idg_O2,L,NY,NX)
   micfor%ORGC                     = SoilOrgM_vr(ielmc,L,NY,NX)
   micfor%RNO2EcoUptkSoilPrev      = RNO2EcoUptkSoilPrev_vr(L,NY,NX)
   micfor%RN2OEcoUptkSoilPrev      = RN2OEcoUptkSoilPrev_vr(L,NY,NX)

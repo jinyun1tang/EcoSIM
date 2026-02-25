@@ -401,7 +401,7 @@ module StartqMod
 !
 !     SEED CHARACTERISTICS
 !
-  call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
+  call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedWidth2LenRatio_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
     SeedMeanLen_pft(NZ,NY,NX),SeedAreaMean_pft(NZ,NY,NX))
 
   !
@@ -461,7 +461,8 @@ module StartqMod
   !     Root1stSpecLen_pft,Root2ndSpecLen_pft=specific primary,secondary root length (m g-1)
   !     Root1stXSecArea_pft,Root2ndXSecArea_pft=specific primary,secondary root area (m2 g-1)
   !
-  CoarseRootVolPerMassC_pft(NZ,NY,NX) = 1.e-6_r8/(BlkDensCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ,NY,NX)))
+  CRootActVolPerMassC_pft(NZ,NY,NX) = 1.e-6_r8/(BlkDActCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ,NY,NX)))
+  CRootLigVolPerMassC_pft(NZ,NY,NX) = 1.e-6_r8/(BlkDLigCoarseRoots*(1._r8-RootPorosity_pft(ipltroot,NZ,NY,NX)))
   D500: DO N=1,2
     RootPoreTortu4Gas_pft(N,NZ,NY,NX)   = RootPorosity_pft(N,NZ,NY,NX)**1.33_r8
     RootRaidus_rpft(N,NZ,NY,NX)         = LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity_pft(N,NZ,NY,NX))))

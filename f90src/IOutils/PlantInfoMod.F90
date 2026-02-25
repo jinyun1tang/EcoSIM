@@ -552,6 +552,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SDMX', loc,MaxSeedNumPerSite_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRMX', loc,SeedCMassMax_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GRDM', loc,SeedCMass_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRW2L',loc,SeedWidth2LenRatio_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'GFILL', loc,GrainFillRate25C_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'WTSTDI', loc,StandingDeadInitC_pft(NZ,NY,NX))
 
@@ -596,6 +597,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPWR', loc,rProteinC2RootP_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNLF', loc,rNCLeaf_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSHE', loc,rNCSheath_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid,'CNRTLIG', loc,rNCLigRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNSTK', loc,rNCStalk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNRSV', loc,rNCReserve_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CNHSK', loc,rNCHusk_pft(NZ,NY,NX))
@@ -607,6 +609,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPLF', loc,rPCLeaf_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPSHE', loc,rPCSheath_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPSTK', loc,rPCStalk_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid,'CPRTLIG', loc,rPCLigRoot_pft(NZ,NY,NX))  
   call ncd_getvar(pft_nfid, 'CPRSV', loc,rPCReserve_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPHSK', loc,rPCHusk_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CPEAR', loc,rPCEar_pft(NZ,NY,NX))
@@ -705,6 +708,7 @@ implicit none
   MaxSeedNumPerSite_pft(NZ,NY,NX)                     = MaxSeedNumPerSite_tab(loc)
   SeedCMassMax_pft(NZ,NY,NX)                          = SeedCMassMax_tab(loc)
   SeedCMass_pft(NZ,NY,NX)                             = SeedCMass_tab(loc)
+  SeedWidth2LenRatio_pft(NZ,NY,NX)                    = SeedWidth2LenRatio_tab(loc)
   GrainFillRate25C_pft(NZ,NY,NX)                      = GrainFillRate25C_tab(loc)
   StandingDeadInitC_pft(NZ,NY,NX)                     = StandingDeadInitC_tab(loc)
 
@@ -748,6 +752,7 @@ implicit none
   rNCLeaf_pft(NZ,NY,NX)    = rNCLeaf_tab(loc)
   rNCSheath_pft(NZ,NY,NX)  = rNCSheath_tab(loc)
   rNCStalk_pft(NZ,NY,NX)   = rNCStalk_tab(loc)
+  rNCLigRoot_pft(NZ,NY,NX) = rNCLigRoot_tab(loc)
   rNCReserve_pft(NZ,NY,NX) = rNCReserve_tab(loc)
   rNCHusk_pft(NZ,NY,NX)    = rNCHusk_tab(loc)
   rNCEar_pft(NZ,NY,NX)     = rNCEar_tab(loc)
@@ -755,6 +760,7 @@ implicit none
   rNCRoot_pft(NZ,NY,NX)    = rNCRoot_tab(loc)
   rNCNodule_pft(NZ,NY,NX)  = rNCNodule_tab(loc)
 
+  rPCLigRoot_pft(NZ,NY,NX) = rPCLigRoot_tab(loc)  
   rProteinC2LeafP_pft(NZ,NY,NX) = rProteinC2LeafP_tab(loc)
   rProteinC2RootP_pft(NZ,NY,NX) = rProteinC2RootP_tab(loc)
   rPCLeaf_pft(NZ,NY,NX)    = rPCLeaf_tab(loc)
@@ -829,13 +835,13 @@ implicit none
 
   select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
-    strval='Shallow root profile, like bryophytes'
+    strval='Shallow root profile, like bryophytes (0)'
   case (1)
-    strval='Intermediate root profile, like herbs'
+    strval='Intermediate root profile, like herbs (1)'
   case (2)
-    strval='Deep root profile, like trees'
+    strval='Deep root profile, like trees (2)'
   case (3)
-    strval='Very deep tap root profile'  
+    strval='Very deep tap root profile (3)'  
   case default
     strval='Not defined'
   end select
@@ -1103,7 +1109,9 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'GRMX','Maximum seed size per seed [gC seed-1]',SeedCMassMax_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'GRDM','Seed size at planting [gC seed-1]',SeedCMass_pft(NZ,NY,NX),100)    !could be greater than SeedCMassMax, accouting for seedling
+  call writefixl(nu_plt,id,'GRW2L','Seed width to length ratio at planting (assuming prolate spheroid)',SeedWidth2LenRatio_pft(NZ,NY,NX),100)   
+  id=addone(id)
+  call writefixl(nu_plt,id,'GRDM','Seed carbon mass at planting [gC seed-1]',SeedCMass_pft(NZ,NY,NX),100)    !could be greater than SeedCMassMax, accouting for seedling
   id=addone(id)
   call writefixl(nu_plt,id,'GFILL','Grain filling rate at 25 oC [gC seed-1 h-1]',GrainFillRate25C_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1250,7 +1258,11 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'CNSHE','Plant petiole NC ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'CNSTK','Plant stalk NC ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'CNSTK','Plant stalk NC ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+    id=addone(id)
+    call writefixl(nu_plt,id,'CNRTLIG','Plant lignified root NC ratio [gN (gC)-1]',rNCLigRoot_pft(NZ,NY,NX),100)
+  endif
   id=addone(id)
   call writefixl(nu_plt,id,'CNRSV','Plant stalk reserve NC ratio [gN (gC)-1]',rNCReserve_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1273,6 +1285,10 @@ implicit none
   call writefixl(nu_plt,id,'CPSHE','Plant petiole PC ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CPSTK','Plant stalk PC ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+    id=addone(id)
+    call writefixl(nu_plt,id,'CPRTLIG','Plant lignified root PC ratio [gP (gC)-1]',rPCLigRoot_pft(NZ,NY,NX),100)
+  endif
   id=addone(id)
   call writefixl(nu_plt,id,'CPRSV','Plant stalk reserve PC ratio [gP (gC)-1]',rPCReserve_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1604,6 +1620,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SDMX', MaxSeedNumPerSite_tab)
   call ncd_getvar(pft_nfid, 'GRMX', SeedCMassMax_tab)
   call ncd_getvar(pft_nfid, 'GRDM', SeedCMass_tab)
+  call ncd_getvar(pft_nfid, 'GRW2L',SeedWidth2LenRatio_tab)
   call ncd_getvar(pft_nfid, 'GFILL',GrainFillRate25C_tab)
   call ncd_getvar(pft_nfid, 'WTSTDI',StandingDeadInitC_tab)
   call ncd_getvar(pft_nfid, 'RRAD1M',Root1stMaxRadius_tab)
@@ -1641,12 +1658,14 @@ implicit none
   call ncd_getvar(pft_nfid, 'CNLF', rNCLeaf_tab)
   call ncd_getvar(pft_nfid, 'CNSHE', rNCSheath_tab)
   call ncd_getvar(pft_nfid, 'CNSTK', rNCStalk_tab)
+  call ncd_getvar(pft_nfid,'CNRTLIG',rNCLigRoot_tab)
   call ncd_getvar(pft_nfid, 'CNRSV', rNCReserve_tab)
   call ncd_getvar(pft_nfid, 'CNHSK', rNCHusk_tab)
   call ncd_getvar(pft_nfid, 'CNEAR', rNCEar_tab)
   call ncd_getvar(pft_nfid, 'CNGR', rNCGrain_tab)
   call ncd_getvar(pft_nfid, 'CNRT', rNCRoot_tab)
   call ncd_getvar(pft_nfid, 'CNND', rNCNodule_tab)
+  call ncd_getvar(pft_nfid,'CPRTLIG',rPCLigRoot_tab)
   call ncd_getvar(pft_nfid, 'CPWR', rProteinC2RootP_tab)  
   call ncd_getvar(pft_nfid, 'CPWL', rProteinC2LeafP_tab)    
   call ncd_getvar(pft_nfid, 'CPLF', rPCLeaf_tab)
@@ -1678,7 +1697,7 @@ implicit none
   integer :: loc,loc1,len,k
 
   len=len_trim(pft_name)
-
+  if(koppen_def==0)write(iulog,*)'Koppen climate not defined for the selected pft ',trim(pft_name)
   do 
     if(ichar(pft_name(len:len))==0 .or. pft_name(len:len)==' ')then
       len=len-1

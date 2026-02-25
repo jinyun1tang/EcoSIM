@@ -191,7 +191,7 @@ module InitNoSaltTransportMod
       !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
       !
       DO ids=ids_beg,ids_end
-        SoluteDifusivitytscaledM_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
+        SoluteDifusivitytscaledM_vr(ids,0,NY,NX)=SoluteDifusvtyT_vr(ids,0,NY,NX)*dts_HeatWatTP
       ENDDO
 
       DO idom=idom_beg,idom_end
@@ -500,11 +500,11 @@ module InitNoSaltTransportMod
         enddo
 
         DO ids=ids_beg,ids_end
-          SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
+          SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvtyT_vr(ids,L,NY,NX)*dts_HeatWatTP
         ENDDO
 
         DO idg=idg_beg,idg_NH3
-          GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
+          GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifcT_vr(idg,L,NY,NX)*dts_gas
         ENDDO
       ENDDO
     ENDDO

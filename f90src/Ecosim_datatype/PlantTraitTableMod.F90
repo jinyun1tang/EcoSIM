@@ -60,6 +60,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: MaxSeedNumPerSite_tab(:)
   real(r8), target, allocatable :: SeedCMassMax_tab(:)
   real(r8), target, allocatable :: SeedCMass_tab(:)
+  real(r8), target, allocatable :: SeedWidth2LenRatio_tab(:)
   real(r8), target, allocatable :: GrainFillRate25C_tab(:)
   real(r8), target, allocatable :: StandingDeadInitC_tab(:)
   real(r8), target, allocatable :: Root1stMaxRadius_tab(:)
@@ -94,6 +95,8 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: rNCLeaf_tab(:)
   real(r8), target, allocatable :: rNCSheath_tab(:)
   real(r8), target, allocatable :: rNCStalk_tab(:)
+  real(r8), target, allocatable :: rNCLigRoot_tab(:)
+  real(r8), target, allocatable :: rPCLigRoot_tab(:)
   real(r8), target, allocatable :: rNCReserve_tab(:)
   real(r8), target, allocatable :: rNCHusk_tab(:)
   real(r8), target, allocatable :: rNCEar_tab(:)
@@ -184,6 +187,7 @@ module PlantTraitTableMod
   allocate(MaxSeedNumPerSite_tab(npfts));MaxSeedNumPerSite_tab=0._r8
   allocate(SeedCMassMax_tab(npfts));SeedCMassMax_tab=0._r8
   allocate(SeedCMass_tab(npfts));SeedCMass_tab=0._r8
+  allocate(SeedWidth2LenRatio_tab(npfts)); SeedWidth2LenRatio_tab=0._r8
   allocate(GrainFillRate25C_tab(npfts));GrainFillRate25C_tab=0._r8
   allocate(StandingDeadInitC_tab(npfts));StandingDeadInitC_tab=0._r8
   allocate(Root1stMaxRadius_tab(npfts));Root1stMaxRadius_tab=0._r8
@@ -218,6 +222,8 @@ module PlantTraitTableMod
   allocate(rNCLeaf_tab(npfts));rNCLeaf_tab=0._r8
   allocate(rNCSheath_tab(npfts));rNCSheath_tab=0._r8
   allocate(rNCStalk_tab(npfts));rNCStalk_tab=0._r8
+  allocate(rNCLigRoot_tab(npfts)); rNCLigRoot_tab=0._r8
+  allocate(rPCLigRoot_tab(npfts)); rPCLigRoot_tab=0._r8
   allocate(rNCReserve_tab(npfts));rNCReserve_tab=0._r8
   allocate(rNCHusk_tab(npfts));rNCHusk_tab=0._r8
   allocate(rNCEar_tab(npfts));rNCEar_tab=0._r8
@@ -308,6 +314,7 @@ module PlantTraitTableMod
   call destroy(MaxSeedNumPerSite_tab)
   call destroy(SeedCMassMax_tab)
   call destroy(SeedCMass_tab)
+  call destroy(SeedWidth2LenRatio_tab)
   call destroy(GrainFillRate25C_tab)
   call destroy(StandingDeadInitC_tab) 
   call destroy(Root1stMaxRadius_tab)
@@ -342,6 +349,8 @@ module PlantTraitTableMod
   call destroy(rNCLeaf_tab)
   call destroy(rNCSheath_tab)
   call destroy(rNCStalk_tab)
+  call destroy(rNCLigRoot_tab)
+  call destroy(rPCLigRoot_tab)  
   call destroy(rNCReserve_tab)
   call destroy(rNCHusk_tab)
   call destroy(rNCEar_tab)

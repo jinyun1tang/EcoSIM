@@ -532,7 +532,7 @@ module SoluteMod
 !     ZNSGL=NH4 diffusivity
 !     TortMicPM_vr=tortuosity
 !
-      DWNH4                    = 0.5*SQRT(SoluteDifusvty_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
+      DWNH4                    = 0.5*SQRT(SoluteDifusvtyT_vr(idg_NH3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       BandWidthNH4_vr(L,NY,NX) = AMIN1(ROWSpaceNH4_col(NY,NX),AMAX1(0.025,BandWidthNH4_vr(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
@@ -636,7 +636,7 @@ module SoluteMod
 !     POSGL=H2PO4 diffusivity
 !     TortMicPM_vr=tortuosity
 !
-      DWPO4=0.5_r8*SQRT(SoluteDifusvty_vr(ids_H1PO4,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
+      DWPO4=0.5_r8*SQRT(SoluteDifusvtyT_vr(ids_H1PO4,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       BandWidthPO4_vr(L,NY,NX)=AMIN1(ROWSpacePO4_col(NY,NX),BandWidthPO4_vr(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
@@ -865,7 +865,7 @@ module SoluteMod
 !     ZOSGL=NO3 diffusivity
 !     TortMicPM_vr=tortuosity
 !
-      DWNO3=0.5_r8*SQRT(SoluteDifusvty_vr(ids_NO3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
+      DWNO3=0.5_r8*SQRT(SoluteDifusvtyT_vr(ids_NO3,L,NY,NX))*TortMicPM_vr(NPH,L,NY,NX)
       BandWidthNO3_vr(L,NY,NX)=AMIN1(ROWSpaceNO3Band_col(NY,NX),BandWidthNO3_vr(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH

@@ -88,7 +88,7 @@ contains
   end function get_zero_turg_ccpolt
 !--------------------------------------------------------------------------------
 
-  subroutine calc_seed_geometry(SeedCMass,SeedVolumeMean,SeedLengthMean,SeedArea)
+  subroutine calc_seed_geometry(SeedCMass,rwidth2lenSeed,SeedVolumeMean,SeedLengthMean,SeedArea)
   !
   !DESCRIPTION
   !assuming the seed is spherical, compute its volume, diameter(=length), and surface area
@@ -97,12 +97,16 @@ contains
   !
 
   implicit none
-  real(r8), intent(in)  :: SeedCMass   !carbon mass per seed
+  real(r8), intent(in)  :: SeedCMass        !carbon mass per seed, gC/seed
+  real(r8), intent(in)  :: rwidth2lenSeed   !seed width to length ratio
   real(r8), intent(out) :: SeedVolumeMean,SeedLengthMean,SeedArea
+  real(r8) :: seedHalfLength
+  real(r8), parameter :: pp=1.6075_r8
 
   SeedVolumeMean = SeedCMass*5.0E-06_r8
-  SeedLengthMean = 2.0_r8*(0.75_r8*SeedVolumeMean/PICON)**0.33_r8
-  SeedArea       = 4.0_r8*PICON*(SeedLengthMean/2.0_r8)**2
+  seedHalfLength=(0.75_r8*SeedVolumeMean/PICON)**0.33_r8*rwidth2lenSeed**(-0.667_r8) !assume prolate
+  SeedLengthMean = 2.0_r8*seedHalfLength  
+  SeedArea       = 4.0_r8*PICON*seedHalfLength**2*((2._r8*rwidth2lenSeed**pp+rwidth2lenSeed**(2._r8*pp))/3._r8)**(1._r8/pp)
 
   end subroutine calc_seed_geometry
 !--------------------------------------------------------------------------------

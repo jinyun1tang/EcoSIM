@@ -12,8 +12,8 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  TScal4Difsvity_vr(:,:,:)                   !temperature effect on diffusivity [-]
   real(r8),target,allocatable ::  DISP_3D(:,:,:,:)                           !aqueous dispersivity scalar, [m]
 
-  real(r8),target,allocatable ::  GasDifc_vr(:,:,:,:)                        !gaseous diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  SoluteDifusvty_vr(:,:,:,:)                 !solute diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  GasDifcT_vr(:,:,:,:)                        !temperature scaled gaseous diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  SoluteDifusvtyT_vr(:,:,:,:)                 !temperature scaled solute diffusivity, [m2 h-1]
 
   real(r8),target,allocatable ::  O2AquaDiffusvity(:,:,:)                    !aqueous CO2 diffusivity,	[m2 h-1]
 
@@ -54,8 +54,8 @@ module ChemTranspDataType
   
   allocate(TScal4Difsvity_vr(0:JZ,JY,JX));   TScal4Difsvity_vr=0._r8
   allocate(DISP_3D(3,JD,JV,JH));   DISP_3D=0._r8
-  allocate(GasDifc_vr(idg_beg:idg_end,JZ,JY,JX));GasDifc_vr=0._r8
-  allocate(SoluteDifusvty_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvty_vr=0._r8
+  allocate(GasDifcT_vr(idg_beg:idg_end,JZ,JY,JX));GasDifcT_vr=0._r8
+  allocate(SoluteDifusvtyT_vr(ids_beg:ids_end,0:JZ,JY,JX));SoluteDifusvtyT_vr=0._r8
 
   allocate(O2AquaDiffusvity(0:JZ,JY,JX));  O2AquaDiffusvity=0._r8
 
@@ -90,8 +90,8 @@ module ChemTranspDataType
   implicit none
 
   call destroy(trcSalt_FloXSurRunoff_2D)
-  call destroy(GasDifc_vr)
-  call destroy(SoluteDifusvty_vr)
+  call destroy(GasDifcT_vr)
+  call destroy(SoluteDifusvtyT_vr)
   call destroy(TScal4Difsvity_vr)
   call destroy(DISP_3D)
 

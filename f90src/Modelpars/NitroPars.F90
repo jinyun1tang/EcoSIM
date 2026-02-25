@@ -124,7 +124,7 @@ module NitroPars
   ORAD = 1.e-6_r8     !
   BIOS = 1.e-6_r8/(4._r8/3._r8*PICON*ORAD**3)
   BIOA = BIOS*4.0_r8*PICON*ORAD**2
-  FMN  = 1.0E-03_r8
+  FMN  = 5.0E-03_r8
   H2KI = 1.0_r8
   OAKI = 12._r8
   

@@ -59,6 +59,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCSheath_pft(:,:,:)                           !sheath N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rNCLigRoot_pft(:,:,:)         !Root lignified zone N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rPCLigRoot_pft(:,:,:)         !Root lignified zone P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCStalk_pft(:,:,:)                        !stalk N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCReserve_pft(:,:,:)                      !reserve N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCHusk_pft(:,:,:)                         !husk N:C ratio, [g g-1]
@@ -153,7 +155,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)               !maximum grain number per node , [-]
   real(r8),target,allocatable ::  SeedCMassMax_pft(:,:,:)                    !maximum grain size   , [g]
   real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)          !number of nodes in seed, [-]
-  real(r8),target,allocatable ::  SeedCMass_pft(:,:,:)                       !grain size at seeding, [g]
+  real(r8),target,allocatable ::  SeedCMass_pft(:,:,:)                       !grain size at seeding, [gC/seed]
+  real(r8),target,allocatable ::  SeedWidth2LenRatio_pft(:,:,:)               !Seed width to length ratio, assuming prolate spheroid  
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)            !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  Hours2LeafOut_brch(:,:,:,:)                !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -232,6 +235,8 @@ contains
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
   allocate(rNCSheath_pft(JP,JY,JX));    rNCSheath_pft=0._r8
   allocate(rNCStalk_pft(JP,JY,JX));    rNCStalk_pft=0._r8
+  allocate(rNCLigRoot_pft(JP,JY,JX)); rNCLigRoot_pft=0._r8
+  allocate(rPCLigRoot_pft(JP,JY,JX)); rPCLigRoot_pft=0._r8
   allocate(rNCReserve_pft(JP,JY,JX));    rNCReserve_pft=0._r8
   allocate(rNCHusk_pft(JP,JY,JX));    rNCHusk_pft=0._r8
   allocate(rNCEar_pft(JP,JY,JX));    rNCEar_pft=0._r8
@@ -326,6 +331,7 @@ contains
   allocate(SeedCMassMax_pft(JP,JY,JX));     SeedCMassMax_pft=0._r8
   allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
   allocate(SeedCMass_pft(JP,JY,JX));     SeedCMass_pft=0._r8
+  allocate(SeedWidth2LenRatio_pft(JP,JY,JX)); SeedWidth2LenRatio_pft=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(Hours2LeafOut_brch(MaxNumBranches,JP,JY,JX));  Hours2LeafOut_brch=0._r8
@@ -401,6 +407,8 @@ contains
   call destroy(rPCLeaf_pft)
   call destroy(rNCSheath_pft)
   call destroy(rNCStalk_pft)
+  call destroy(rNCLigRoot_pft)
+  call destroy(rPCLigRoot_pft)
   call destroy(rNCReserve_pft)
   call destroy(rNCHusk_pft)
   call destroy(rNCEar_pft)
@@ -495,6 +503,7 @@ contains
   call destroy(SeedCMassMax_pft)
   call destroy(ShootNodeNumAtPlanting_pft)
   call destroy(SeedCMass_pft)
+  call destroy(SeedWidth2LenRatio_pft)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
   call destroy(Hours2LeafOut_brch)

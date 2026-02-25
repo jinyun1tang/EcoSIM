@@ -312,13 +312,14 @@ module grosubsMod
     TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
   REAL(R8), INTENT(OUT) :: TFN6_vr(JZ1)
-  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW               !NC, PC mass ratio of leaf growth
-  real(r8), intent(out) :: CNSHW,CPSHW               !NC, PC mass ratio of shoot growth
-  real(r8), intent(out) :: CNRTW,CPRTW               !NC, PC mass ratio of root growth
+  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW                 !NC, PC mass ratio of leaf growth
+  real(r8), intent(out) :: CNSHW,CPSHW                 !NC, PC mass ratio of shoot growth
+  real(r8), intent(out) :: CNRTW,CPRTW                 !NC, PC mass ratio of root growth
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
-  real(r8), intent(out) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
+  real(r8), intent(out) :: TurgEff4LeafPetolExpansion  !turgor expansion,extension function
+  real(r8), intent(out) :: TurgEff4CanopyResp          !expansion,extension function of canopy water potential on respiraiton
   integer :: L,NR,N,NE
   real(r8) :: ACTVM,RTK,STK,TKCM,TKSM,RadiusBulk,RadiusMean
   real(r8), parameter :: dscal=0.99999_r8
@@ -360,6 +361,7 @@ module grosubsMod
     FracShootElmAllocm          => plt_allom%FracShootElmAllocm           ,& !inoput :woody element allocation, [-]
     FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !inoput :leaf element allocation,[-]
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft         ,& !inoput :root C biomass per plant, [g p-1]
+    TurgEff4CanopyResp_pft      => plt_rbgc%TurgEff4CanopyResp_pft        ,& !output :Turg pressure effect on canopy respiration, [-]
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
@@ -488,14 +490,13 @@ module grosubsMod
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
   !     FROM CANOPY TURGOR
   !
-  !     TurgEff4LeafPetolExpansion=turgor expansion,extension function
   !     PSICanopyTurg_pft,TurgPSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
   !     Stomata_Stress=stomatal resistance function of canopy turgor
   !     PSICanopy_pft=canopy water potential
   !     WaterStress4Groth=growth function of canopy water potential
-  !     TurgEff4CanopyResp=expansion,extension function of canopy water potential
+  
   !
-  TurgEff4LeafPetolExpansion=real_truncate(AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-TurgPSIMin4OrganExtens)),1.e-3_r8)
+  TurgEff4LeafPetolExpansion=real_truncate(AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-TurgPSIMin4OrganExtens)),1.e-4_r8)
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
@@ -506,10 +507,10 @@ module grosubsMod
     Stomata_Stress    = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
-  WaterStress4Groth               = real_truncate(WaterStress4Groth,1.e-3_r8)
+  WaterStress4Groth               = real_truncate(WaterStress4Groth,1.e-4_r8)
   TurgEff4CanopyResp              = fRespWatSens(TurgEff4LeafPetolExpansion,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
-
+  TurgEff4CanopyResp_pft(NZ)      = TurgEff4CanopyResp
   call PrintInfo('end '//subname)
   end associate
   end subroutine StagePlantForGrowth

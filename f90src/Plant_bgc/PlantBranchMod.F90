@@ -43,7 +43,8 @@ module PlantBranchMod
   real(r8), intent(in) :: CNRTW,CPRTW   !root/stalk
   real(r8), intent(in) :: TFN5,WaterStress4Groth
   real(r8), intent(in) :: Stomata_Stress
-  real(r8), intent(in) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
+  real(r8), intent(in) :: TurgEff4LeafPetolExpansion
+  real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: GrothPART2LeafPetole !new growth allocated to leaf and petiole
   integer, intent(out) :: BegRemoblize
   character(len=*), parameter :: subname='GrowOneBranch'
@@ -786,7 +787,8 @@ module PlantBranchMod
   real(r8), intent(in) :: CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN_brch
   real(r8), intent(in) :: TFN5,WaterStress4Groth
-  real(r8), intent(in) :: Stomata_Stress,TurgEff4CanopyResp
+  real(r8), intent(in) :: Stomata_Stress
+  real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: CH2O3(pltpar%MaxNodesPerBranch1)
   real(r8), intent(out) :: CH2O4(pltpar%MaxNodesPerBranch1)
   REAL(R8), INTENT(OUT) :: CNPG
@@ -1717,6 +1719,7 @@ module PlantBranchMod
     LeafLength            = SQRT(1.0E+02_r8*LeafArea_node(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
     !pushed upward, 
     HypocotHeight_pft(NZ) = LeafLength+PetoleLength_node(0,MainBranchNum_pft(NZ),NZ)+StalkNodeHeight_brch(0,MainBranchNum_pft(NZ),NZ)
+    
   ENDIF
   !
   ! IF CANOPY HAS EMERGED
@@ -2402,11 +2405,11 @@ module PlantBranchMod
         PetoleStrutElms_brch(1:NumPlantChemElms,NB,NZ) = 0._r8
         D5335: DO K=0,MaxNodesPerBranch1
           LeafArea_node(K,NB,NZ)                            = 0._r8
-          PetoleLength_node(K,NB,NZ)                      = 0._r8
+          PetoleLength_node(K,NB,NZ)                        = 0._r8
           LeafProteinC_node(K,NB,NZ)                        = 0._r8
           LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = 0._r8
           PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
-          PetoleProteinC_node(K,NB,NZ)                  = 0._r8
+          PetoleProteinC_node(K,NB,NZ)                      = 0._r8
         ENDDO D5335
       ENDIF
     ENDIF

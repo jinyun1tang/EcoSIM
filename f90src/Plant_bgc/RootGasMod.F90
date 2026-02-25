@@ -114,8 +114,8 @@ module RootGasMod
     RootCO2AutorX_pvr            => plt_rbgc%RootCO2AutorX_pvr              ,& !input  :root respiration from previous time step, [g d-2 h-1]
     TScal4Difsvity_vr            => plt_soilchem%TScal4Difsvity_vr          ,& !input  :temperature effect on diffusivity,[-]
     trcs_VLN_vr                  => plt_soilchem%trcs_VLN_vr                ,& !input  :effective relative tracer volume, [-]
-    GasDifc_vr                   => plt_soilchem%GasDifc_vr                 ,& !input  :gaseous diffusivity, [m2 h-1]
-    SoluteDifusvty_vr            => plt_soilchem%SoluteDifusvty_vr          ,& !input  :aqueous diffusivity, [m2 h-1]
+    GasDifcT_vr                   => plt_soilchem%GasDifcT_vr               ,& !input  :temperature-scaled gaseous diffusivity, [m2 h-1]
+    SoluteDifusvtyT_vr            => plt_soilchem%SoluteDifusvtyT_vr        ,& !input  :temperature-scaled aqueous diffusivity, [m2 h-1]
     GasSolbility_vr              => plt_soilchem%GasSolbility_vr            ,& !input  :gas solubility, [m3 m-3]
     SoilWatAirDry_vr             => plt_soilchem%SoilWatAirDry_vr           ,& !input  :air-dry water content, [m3 m-3]
     VLSoilMicP_vr                => plt_soilchem%VLSoilMicP_vr              ,& !input  :total micropore volume in layer, [m3 d-2]
@@ -198,11 +198,21 @@ module RootGasMod
     !
     !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
     !
+    IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)then
+      do idg=idg_beg,idg_NH3    
+        GasDifc_tscaled(idg) = GasDifcT_vr(idg,L)*dts_gas
+      ENDDO
+    else  
+      do idg=idg_beg,idg_NH3
+        GasDifc_tscaled(idg) = GasDifcT_vr(idg,L)*dts_gas*RootPoreTortu4Gas_pft(N,NZ)
+      ENDDO
+    endif
+
     do idg=idg_beg,idg_NH3
-      GasDifc_tscaled(idg) = GasDifc_vr(idg,L)*dts_gas*RootPoreTortu4Gas_pft(N,NZ)
-      SolDifc_tscaled(idg) = SoluteDifusvty_vr(idg,L)*dts_gas*FOXYX
+      SolDifc_tscaled(idg) = SoluteDifusvtyT_vr(idg,L)*dts_gas*FOXYX         !assuming oxygen stress affects uptake of other solutes
     enddo
-    O2AquaDiffusvityP = SoluteDifusvty_vr(idg_O2,L)*dts_gas
+    
+    O2AquaDiffusvityP = SoluteDifusvtyT_vr(idg_O2,L)*dts_gas
 
     RGas_DisolvSoil_flx(idg_beg:idg_end) = 0.0_r8
     Root_gas2sol_flx(idg_beg:idg_NH3)    = 0.0_r8
@@ -228,17 +238,16 @@ module RootGasMod
     !     VARIABLES USED TO CALCULATE ROOT GAS TRANSFER
     !     BETWEEN AQUEOUS AND GASEOUS PHASES
     !
-
     IF(N.EQ.ipltroot .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0 &
       .AND. RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
       RTARRX = RootEffLen4Absorption_pvr(N,L)/RootRaidus_rpft(N,NZ)       !length to radius ratio~tortuosity
       DIFOP  = O2AquaDiffusvityP*RTARRX
-!      if(N==ipltroot)write(350,*)I*1000+J/24.,O2AquaDiffusvityP,RTARRX
       DO idg  = idg_beg, idg_NH3
         DisolvedGasVolume(idg) = RootVH2O_pvr(N,L,NZ)*GasSolbility_vr(idg,L)
         DFAGas(idg)            = GasDifc_tscaled(idg)*RTCRA
       ENDDO
     ELSE
+      !it is in the seed phase
       RTARRX                             = 0.0_r8
       DIFOP                              = 0.0_r8
       DisolvedGasVolume(idg_beg:idg_NH3) = 0.0_r8
@@ -277,18 +286,19 @@ module RootGasMod
         RRADS  = LOG((FILMM_vr(M,L)+FineRootRadius(N,L))/FineRootRadius(N,L))
         RTARRX = RootEffLen4Absorption_pvr(N,L)/RRADS
 
-        do idg = idg_beg, idg_NH3
-          DifAqueVolatile(idg)=THETM*SolDifc_tscaled(idg)*RTARRX
-        enddo
-!        if(N==ipltroot)write(330,*)I*1000+J/24.,N*100+L,THETM,SolDifc_tscaled(idg_O2),RTARRX,RootEffLen4Absorption_pvr(N,L),FineRootRadius(N,L)
-        DifAqueVolatile(idg_NH3)  = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
-        DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
-
         DO idg=idg_beg,idg_end
           VOLWAqueous(idg)=VLWatMicPMM*GasSolbility_vr(idg,L)
         ENDDO
         VOLWAqueous(idg_NH3)  = VOLWAqueous(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
         VOLWAqueous(idg_NH3B) = VOLWAqueous(idg_NH3B)*trcs_VLN_vr(ids_NH4B,L)
+
+        do idg = idg_beg, idg_NH3
+          DifAqueVolatile(idg)=(THETM*SolDifc_tscaled(idg)+GasDifc_tscaled(idg)*POROQ*FracAirFilledSoilPoreM_vr(M,L)**2/(VLSoilMicP_vr(L)*GasSolbility_vr(idg,L)))*RTARRX
+        enddo
+!        write(913,*)I*1000+J/24.,M,'DifAqueVolatile(idg)',DifAqueVolatile(idg_O2),RTARRX,N,L,RootEffLen4Absorption_pvr(N,L),RRADS,RootOxyDemandPerPlant
+        
+        DifAqueVolatile(idg_NH3)  = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
+        DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
 
         VOLPNH3  = VLsoiAirPMM*trcs_VLN_vr(ids_NH4,L)
         VOLPNH3B = VLsoiAirPMM*trcs_VLN_vr(ids_NH4B,L)
@@ -369,6 +379,7 @@ module RootGasMod
               ROxyRoot2UptkPerPlant = 0.0_r8
             ENDIF
           ENDIF
+!          write(913,*)I*1000+J/24.,MX,N,L,X,'ROxySoil2UptkPerPlant',ROxySoil2UptkPerPlant,RootOxyDemandPerPlant,DifAqueVolatile(idg_O2),trcaqu_conc_soi_loc(idg_O2)-COXYR
           !
           !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
           !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
@@ -623,7 +634,7 @@ module RootGasMod
     !to be used in next iteration
     RAutoRootO2Limter_rpvr(N,L,NZ) = AMAX1(AMIN1(1.0_r8,AZMAX1(PopPlantO2Uptake_vr/RootO2Dmnd4Resp_pvr(N,L,NZ))),oscal_test)
   ENDIF
-!  if(N==ipltroot)write(346,*)I*1000+J/24.,L*100+NZ,PopPlantO2Uptake_vr,RootO2Dmnd4Resp_pvr(N,L,NZ),'scal=',RAutoRootO2Limter_rpvr(N,L,NZ),RootStrutElms_pft(ielmc,NZ),trc_solml_loc(idg_O2)
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootSoilGasExchange

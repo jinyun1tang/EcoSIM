@@ -402,7 +402,7 @@ module NutUptakeMod
     RootH1PO4DmndSoilPrev_pvr    => plt_rbgc%RootH1PO4DmndSoilPrev_pvr ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
     RootH2PO4DmndSoilPrev_pvr    => plt_rbgc%RootH2PO4DmndSoilPrev_pvr ,& !input  :root uptake of H2PO4 non-band, [g d-2 h-1]
     RootH2PO4DmndBandPrev_pvr    => plt_rbgc%RootH2PO4DmndBandPrev_pvr ,& !input  :root uptake of H2PO4 band, [g d-2 h-1]
-    SoluteDifusvty_vr            => plt_soilchem%SoluteDifusvty_vr     ,& !input  :aqueous diffusivity, [m2 h-1]
+    SoluteDifusvtyT_vr            => plt_soilchem%SoluteDifusvtyT_vr     ,& !input  :aqueous diffusivity, [m2 h-1]
     RH1PO4EcoDmndBandPrev_vr     => plt_bgcr%RH1PO4EcoDmndBandPrev_vr  ,& !input  :HPO4 demand in band by all microbial, root, myco populations, [gP d-2 h-1]
     RH2PO4EcoDmndBandPrev_vr     => plt_bgcr%RH2PO4EcoDmndBandPrev_vr  ,& !input  :total root + microbial PO4 uptake band, [gP d-2 h-1]
     RH1PO4EcoDmndSoilPrev_vr     => plt_bgcr%RH1PO4EcoDmndSoilPrev_vr  ,& !input  :HPO4 demand in non-band by all microbial, root, myco populations, [gP d-2 h-1]
@@ -452,7 +452,7 @@ module NutUptakeMod
     !     FineRootRadius=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=SoluteDifusvty_vr(ids_H1PO4,L)*TortMicPM_vr(NPH,L)
+    POSGX=SoluteDifusvtyT_vr(ids_H1PO4,L)*TortMicPM_vr(NPH,L)
     PATHL=AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RootEffLen4Absorption_pvr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 
@@ -506,7 +506,7 @@ module NutUptakeMod
     RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr       ,& !input  :root uptake of Nutrient band, [g d-2 h-1]
     RootNO3DmndBand_pvr    => plt_rbgc%RootNO3DmndBand_pvr     ,& !input  :root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
     RootOUlmNutUptake_pvr  => plt_rbgc%RootOUlmNutUptake_pvr   ,& !input  :root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
-    SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr   ,& !input  :aqueous diffusivity, [m2 h-1]
+    SoluteDifusvtyT_vr      => plt_soilchem%SoluteDifusvtyT_vr   ,& !input  :aqueous diffusivity, [m2 h-1]
     trcs_solml_vr          => plt_soilchem%trcs_solml_vr       ,& !input  :aqueous tracer, [g d-2]
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr         ,& !input  :effective relative tracer volume, [-]
     trc_solcl_vr           => plt_soilchem%trc_solcl_vr        ,& !input  :aqueous tracer concentration, [g m-3]
@@ -524,7 +524,7 @@ module NutUptakeMod
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=SoluteDifusvty_vr(ids_NO3,L)*TortMicPM_vr(NPH,L)
+  ZOSGX=SoluteDifusvtyT_vr(ids_NO3,L)*TortMicPM_vr(NPH,L)
   PATHL=AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0_r8*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RootEffLen4Absorption_pvr(N,L),LOG(PATHL/FineRootRadius(N,L)))
   !
@@ -693,7 +693,7 @@ module NutUptakeMod
     RootNH4DmndSoil_pvr    => plt_rbgc%RootNH4DmndSoil_pvr     ,& !input  :root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
     RootNH4DmndBand_pvr    => plt_rbgc%RootNH4DmndBand_pvr     ,& !input  :root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
     RootSAreaPerPlant_pvr   => plt_morph%RootSAreaPerPlant_pvr   ,& !input  :root layer area per plant, [m p-1]
-    SoluteDifusvty_vr      => plt_soilchem%SoluteDifusvty_vr   ,& !input  :aqueous diffusivity, [m2 h-1]
+    SoluteDifusvtyT_vr      => plt_soilchem%SoluteDifusvtyT_vr   ,& !input  :aqueous diffusivity, [m2 h-1]
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        ,& !input  :soil micropore water content, [m3 d-2]
     trcs_VLN_vr            => plt_soilchem%trcs_VLN_vr         ,& !input  :effective relative tracer volume, [-]
     trcs_solml_vr          => plt_soilchem%trcs_solml_vr       ,& !input  :aqueous tracer, [g d-2]
@@ -706,7 +706,7 @@ module NutUptakeMod
 ! FineRootRadius=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX = SoluteDifusvty_vr(idg_NH3,L)*TortMicPM_vr(NPH,L)
+  ZNSGX = SoluteDifusvtyT_vr(idg_NH3,L)*TortMicPM_vr(NPH,L)
   PATHL = AMIN1(PathLen_pvr(N,L),FineRootRadius(N,L)+SQRT(2.0*ZNSGX))
   DIFFL = ZNSGX*safe_adb(RootEffLen4Absorption_pvr(N,L),LOG(PATHL/FineRootRadius(N,L)))
 !

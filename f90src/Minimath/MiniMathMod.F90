@@ -30,6 +30,7 @@ module minimathmod
   public :: SubstrateLimit
   public :: real_truncate
   public :: pMod
+  public :: isAinsideBC,isABetweenBC,isALeftinBC,isARightinBC
   public :: sfexp
   public :: Viscosity_H2O
   public :: SubstrateDribbling  
@@ -107,6 +108,38 @@ module minimathmod
     ans=1._r8
   endif
   end function dssign
+!------------------------------------------------------------------------------------------
+  pure function isAinsideBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a < c
+  end function isAinsideBC
+!------------------------------------------------------------------------------------------
+  pure function isALeftinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a < c
+  end function isALeftinBC
+!------------------------------------------------------------------------------------------
+  pure function isARightinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a <= c
+  end function isARightinBC
+!------------------------------------------------------------------------------------------
+  pure function isABetweenBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a <= c
+  end function isABetweenBC
 
 !------------------------------------------------------------------------------------------
 

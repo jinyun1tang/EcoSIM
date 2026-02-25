@@ -20,7 +20,8 @@ module RootDataType
   real(sp),target,allocatable ::  NonstCMinCon2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
   real(sp),target,allocatable ::  RootProteinCMax_pft(:,:,:)                     !reference root protein N, [gN g-1]
   real(sp),target,allocatable ::  FineRootVolPerMassC_pft(:,:,:,:)               !fine root volume:mass ratio, [m3 g-1]
-  real(r8),target,allocatable ::  CoarseRootVolPerMassC_pft(:,:,:)               !coarse root volume:mass ratio,[m3 g-1]
+  real(sp),target,allocatable ::  CRootActVolPerMassC_pft(:,:,:)                 !coarse root active zone volume:mass ratio,[m3 gC-1]
+  real(sp),target,allocatable ::  CRootLigVolPerMassC_pft(:,:,:)                 !coarse root inactive zone volume:mass ratio, [m3 gC-1]
   real(sp),target,allocatable ::  Root1stMaxRadius1_pft(:,:,:,:)                 !root diameter primary axes, [m]
   real(sp),target,allocatable ::  Root2ndMaxRadius1_pft(:,:,:,:)                 !root diameter secondary axes, [m]
   real(sp),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
@@ -161,7 +162,8 @@ contains
   allocate(NonstCMinCon2InitRoot_pft(JP,JY,JX));       NonstCMinCon2InitRoot_pft=0._sp
   allocate(RootProteinCMax_pft(JP,JY,JX));    RootProteinCMax_pft=0._sp
   allocate(FineRootVolPerMassC_pft(jroots,JP,JY,JX));   FineRootVolPerMassC_pft=0._sp
-  allocate(CoarseRootVolPerMassC_pft(JP,JY,JX)); CoarseRootVolPerMassC_pft = 0._sp
+  allocate(CRootActVolPerMassC_pft(JP,JY,JX)); CRootActVolPerMassC_pft = 0._sp
+  allocate(CRootLigVolPerMassC_pft(JP,JY,JX));  CRootLigVolPerMassC_pft=0._sp
   allocate(Root1stMaxRadius1_pft(jroots,JP,JY,JX)); Root1stMaxRadius1_pft=0._sp
   allocate(Root2ndMaxRadius1_pft(jroots,JP,JY,JX)); Root2ndMaxRadius1_pft=0._sp
   allocate(Root1stXSecArea_pft(jroots,JP,JY,JX)); Root1stXSecArea_pft=0._sp
@@ -292,7 +294,8 @@ contains
   call destroy(NonstCMinCon2InitRoot_pft)
   call destroy(RootProteinCMax_pft)
   call destroy(FineRootVolPerMassC_pft)
-  call destroy(CoarseRootVolPerMassC_pft)
+  call destroy(CRootActVolPerMassC_pft)
+  call destroy(CRootLigVolPerMassC_pft)
   call destroy(Root1stMaxRadius1_pft)
   call destroy(Root2ndMaxRadius1_pft)
   call destroy(Root1stXSecArea_pft)
