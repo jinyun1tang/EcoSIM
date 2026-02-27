@@ -87,6 +87,14 @@ module InitPlantMod
         ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
         ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
         ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
+        
+        plt_biom%RootElmsBeg_pft(:,NZ)           = 0._r8
+        plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = 0._r8
+        plt_biom%ShootElmsBeg_pft(:,NZ)          = 0._r8
+        plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = 0._r8
+        plt_biom%ShootNoduleElmsBeg_pft(:,NZ)    = 0._r8
+        plt_biom%TotBegVegE_pft(:,NZ)            = 0._r8
+        plt_biom%RootNoduleElmsBeg_pft(:,NZ)     = 0._r8
       ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
