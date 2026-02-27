@@ -365,7 +365,11 @@ implicit none
     PlantElmDistLoss_pft   => plt_distb%PlantElmDistLoss_pft  ,& !ouput  :plant element loss due to disturbance, [g d-2 h-1]
     LitrfallElms_pvr       => plt_bgcr%LitrfallElms_pvr       ,& !output :plant LitrFall element, [g d-2 h-1]
     LitrFallElms_brch      => plt_bgcr%LitrFallElms_brch      ,& !inoput :litterfall from the branch, [g d-2 h-1]        
-    GPP_brch               => plt_rbgc%GPP_brch               ,& !inoput :GPP over branch, [gC d-2 h-1]    
+    GPP_brch               => plt_rbgc%GPP_brch               ,& !output :GPP over branch, [gC d-2 h-1]    
+    RootHPO4Uptake_pft     => plt_rbgc%RootHPO4Uptake_pft     ,& !output :total root uptake of HPO4, [g d-2 h-1]
+    RootH2PO4Uptake_pft    => plt_rbgc%RootH2PO4Uptake_pft    ,& !output :total root uptake of PO4, [g d-2 h-1]
+    RootNH4Uptake_pft      => plt_rbgc%RootNH4Uptake_pft      ,& !output :total root uptake of NH4, [g d-2 h-1]
+    RootNO3Uptake_pft      => plt_rbgc%RootNO3Uptake_pft      ,& !output :total root uptake of NO3, [g d-2 h-1]
     PARSunlit_pft          => plt_photo%PARSunlit_pft         ,& !output :PAR absorbed by sunlit leaf, [umol m-2 s-1]
     PARSunsha_pft          => plt_photo%PARSunsha_pft         ,& !output :PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
     CH2OSunlit_pft         => plt_photo%CH2OSunlit_pft        ,& !output :carbon fixation by sun-lit leaf, [gC d-2 h-1]
@@ -422,7 +426,7 @@ implicit none
     CanopyGrosRCO2_pft(NZ)                                      = 0._r8
     CanopyResp_brch(:,NZ)                                       = 0._r8
     PlantElmDistLoss_pft(1:NumPlantChemElms,NZ)                 = 0._r8
-    Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)                 = 0._r8
+    Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)               = 0._r8
     NodulInfectElms_pft(1:NumPlantChemElms,NZ)                  = 0._r8
     CO2FixCL_pft(NZ)                                            = 0._r8
     CO2FixLL_pft(NZ)                                            = 0._r8
@@ -431,6 +435,10 @@ implicit none
     RootN2Fix_pft(NZ)                                           = 0._r8
     CanopyN2Fix_pft(NZ)                                         = 0._R8
     GPP_brch(:,NZ)                                              = 0._R8
+    RootNH4Uptake_pft(NZ)                                       = 0._r8
+    RootNO3Uptake_pft(NZ)                                       = 0._r8
+    RootH2PO4Uptake_pft(NZ)                                     = 0._r8
+    RootHPO4Uptake_pft(NZ)                                      = 0._r8
   ENDDO D9980
   end associate
   end subroutine ZeroGrosub

@@ -355,7 +355,9 @@ implicit none
   real(r8),pointer   :: h1D_ROOT_N_ptc(:)     
   real(r8),pointer   :: h1D_RootNodule_N_ptc(:)   
   real(r8),pointer   :: h1D_STORED_N_ptc(:)   
-  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)     
+  real(r8),pointer   :: h1D_EXUD_N_FLX_ptc(:)
+  real(r8),pointer   :: h1D_Uptk_NMIN_Flx_ptc(:)
+  real(r8),pointer   :: h1D_Uptk_PMIN_Flx_ptc(:)
   real(r8),pointer   :: h1D_Uptk_N_Flx_ptc(:)
   real(r8),pointer   :: h1D_Uptk_P_Flx_ptc(:)
   real(r8),pointer   :: h1D_LITRf_N_FLX_ptc(:)    
@@ -908,6 +910,8 @@ implicit none
   allocate(this%h1D_RootNodule_N_ptc(beg_ptc:end_ptc))        ;this%h1D_RootNodule_N_ptc(:)=spval
   allocate(this%h1D_STORED_N_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_N_ptc(:)=spval
   allocate(this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_N_FLX_ptc(:)=spval
+  allocate(this%h1D_Uptk_NMIN_Flx_ptc(beg_ptc:end_ptc))   ;this%h1D_Uptk_NMIN_Flx_ptc(:)=spval
+  allocate(this%h1D_Uptk_PMIN_Flx_ptc(beg_ptc:end_ptc))   ;this%h1D_Uptk_PMIN_Flx_ptc(:)=spval
   allocate(this%h1D_Uptk_N_Flx_ptc(beg_ptc:end_ptc))      ;this%h1D_Uptk_N_Flx_ptc(:)=spval
   allocate(this%h1D_Uptk_P_Flx_ptc(beg_ptc:end_ptc))      ;this%h1D_Uptk_P_Flx_ptc(:)=spval
   allocate(this%h1D_LITRf_N_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_LITRf_N_FLX_ptc(:)=spval
@@ -2442,7 +2446,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOT_N_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='Root_N_pft',units='gN/m2',avgflag='A',&
-    long_name='Root nitrogen',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Root nitrogen',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_RootNodule_N_ptc(beg_ptc:end_ptc)        
   call hist_addfld1d(fname='RootNodule_N_pft',units='gN/m2',avgflag='A',&
@@ -2462,6 +2466,14 @@ implicit none
   call hist_addfld1d(fname='Uptk_N_CumYr_FLX_pft',units='gN/m2',avgflag='I',&
     long_name='Cumulative Root N uptake (including <0 exudation to soil)',ptr_patch=data1d_ptr,&
     default='inactive')      
+
+  data1d_ptr => this%h1D_Uptk_NMIN_Flx_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Uptk_NMin_CumYr_FLX_pft',units='gN/m2',avgflag='I',&
+    long_name='Cumulative Root mineral N uptake',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Uptk_PMIN_Flx_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Uptk_PMin_CumYr_FLX_pft',units='gP/m2',avgflag='I',&
+    long_name='Cumulative Root mineral P uptake',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_Uptk_P_Flx_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Uptk_P_CumYr_FLX_pft',units='gP/m2',avgflag='I',&
@@ -2564,8 +2576,7 @@ implicit none
 
   data1d_ptr => this%h1D_ROOT_P_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='Root_P_pft',units='gP/m2',avgflag='A',&
-    long_name='Plant root P',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Plant root P',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_RootNodule_P_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='RootNodule_P_pft',units='gP/m2',avgflag='A',&
@@ -3618,7 +3629,8 @@ implicit none
 
   data2d_ptr => this%h2D_RootNutupk_fProtC_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootNutUptk_fProtC_pvr',units='-',type2d='levsoi',avgflag='A',&
-    long_name='Protein-limitation for root nutrient uptake capacity, 0->1 weaker limitation',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Transporter-limitation for root nutrient uptake capacity, 0->1 weaker limitation',&
+    ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootProteinC_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootProteinC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
@@ -4163,6 +4175,8 @@ implicit none
         this%h1D_cNPP_ptc(nptc)              = cumNPP_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)         = -ETCanopy_CumYr_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Uptk_NMIN_Flx_ptc(nptc)    = RootUptk_Nmin_cumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Uptk_PMIN_Flx_ptc(nptc)    = RootUptk_Pmin_cumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Uptk_N_Flx_ptc(nptc)       = RootUptk_N_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Uptk_P_Flx_ptc(nptc)       = RootUptk_P_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_LITRf_N_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)

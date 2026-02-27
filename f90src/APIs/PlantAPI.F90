@@ -160,6 +160,8 @@ implicit none
     QdewCanopy_CumYr_pft(NZ,NY,NX)                              = QdewCanopy_CumYr_pft(NZ,NY,NX)+plt_ew%QdewCanopy_pft(NZ)  
     RootUptk_N_CumYr_pft(NZ,NY,NX)                              = plt_rbgc%RootUptk_N_CumYr_pft(NZ)
     RootUptk_P_CumYr_pft(NZ,NY,NX)                              = plt_rbgc%RootUptk_P_CumYr_pft(NZ)
+    RootUptk_Nmin_cumYr_pft(NZ,NY,NX) = RootUptk_Nmin_cumYr_pft(NZ,NY,NX)+plt_rbgc%RootNutUptakeN_pft(NZ)
+    RootUptk_Pmin_cumYr_pft(NZ,NY,NX) = RootUptk_Pmin_cumYr_pft(NZ,NY,NX)+plt_rbgc%RootNutUptakeP_pft(NZ)
     RootNoduleElms_pft(1:NumPlantChemElms,NZ,NY,NX)             = plt_biom%RootNoduleElms_pft(1:NumPlantChemElms,NZ)
     RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)                   = plt_biom%RootElms_pft(1:NumPlantChemElms,NZ)
     PlantElmBalCum_pft(1:NumPlantChemElms,NZ,NY,NX)              = plt_site%PlantElmBalCum_pft(1:NumPlantChemElms,NZ)

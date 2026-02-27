@@ -75,8 +75,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RAutoRootO2Limter_rpvr(:,:,:,:,:)              !O2 constraint to root respiration, [-]
   real(r8),target,allocatable ::  PlantRootSoilElmNetX_pft(:,:,:,:)              !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudElm_CumYr_pft(:,:,:,:)                !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
-  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake, [g d-2]
-  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake, [g d-2]
+  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake, [gN d-2]
+  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake, [gP d-2]
+  real(r8),target,allocatable ::  RootUptk_Nmin_cumYr_pft(:,:,:)                 !pft cumulative mineral N uptake, [gN d-2]
+  real(r8),target,allocatable ::  RootUptk_Pmin_cumYr_pft(:,:,:)                 !pft cumulative mineral P uptake, [gP d-2]
   real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                   !total root H2O uptake, [m3 d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2Soil_vr(:,:,:)                 !current step vertical root water uptake profile, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2SoilPrev_vr(:,:,:)             !previous step vertical root water uptake profile, [m3 H2O d-2 h-1]
@@ -232,6 +234,8 @@ module PlantDataRateType
   allocate(PlantExudElm_CumYr_pft(NumPlantChemElms,JP,JY,JX));   PlantExudElm_CumYr_pft=0._r8
   allocate(RootUptk_N_CumYr_pft(JP,JY,JX)); RootUptk_N_CumYr_pft=0._r8
   allocate(RootUptk_P_CumYr_pft(JP,JY,JX)); RootUptk_P_CumYr_pft=0._r8
+  allocate(RootUptk_Nmin_cumYr_pft(JP,JY,JX)); RootUptk_Nmin_cumYr_pft=0._r8
+  allocate(RootUptk_Pmin_cumYr_pft(JP,JY,JX)); RootUptk_Pmin_cumYr_pft=0._r8
   allocate(TWaterPlantRoot2Soil_vr(JZ,JY,JX)); TWaterPlantRoot2Soil_vr=0._r8
   allocate(TWaterPlantRoot2SoilPrev_vr(JZ,JY,JX)); TWaterPlantRoot2SoilPrev_vr=0._r8  
   allocate(THeatPlantRoot2SoilPrev_vr(JZ,JY,JX)); THeatPlantRoot2SoilPrev_vr=0._r8
@@ -368,6 +372,8 @@ module PlantDataRateType
   call destroy(PlantExudElm_CumYr_pft)
   call destroy(RootUptk_N_CumYr_pft)
   call destroy(RootUptk_P_CumYr_pft)
+  call destroy(RootUptk_Nmin_cumYr_pft)
+  call destroy(RootUptk_Pmin_cumYr_pft)
   call destroy(TWaterPlantRoot2Soil_vr)
   call destroy(TWaterPlantRoot2SoilPrev_vr)  
   call destroy(THeatPlantRoot2SoilPrev_vr)
