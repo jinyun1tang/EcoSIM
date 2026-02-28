@@ -152,7 +152,7 @@ implicit none
     MaxSoiL4Root_pft => plt_morph%MaxSoiL4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
     trcg_root_vr     => plt_rbgc%trcg_root_vr        & !inoput :total root internal gas flux, [g d-2 h-1]
   )
-  trcg_root_vr(idg_beg:idg_NH3,:)         = 0._r8
+  trcg_root_vr(idg_beg:idg_NH3,:)   = 0._r8
 
   trcg(:)=0._r8
   IF(present(NZ1))THEN
@@ -669,7 +669,7 @@ implicit none
       write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
       write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)      
       if(I/=plt_distb%iDayPlantHarvest_pft(NZ))&  
-      call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+        call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
     endif
 
     NE=ielmp
@@ -694,7 +694,8 @@ implicit none
       write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
       write(888,*)'seed planted     =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
       write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)      
-      call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+      if(I/=plt_distb%iDayPlantHarvest_pft(NZ))&        
+        call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
     endif
     
     DO NE=1,NumPlantChemElms

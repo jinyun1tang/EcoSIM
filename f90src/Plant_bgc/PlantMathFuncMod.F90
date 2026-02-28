@@ -4,6 +4,7 @@ module PlantMathFuncMod
   ! code for small functions used by plant processes
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun
+  use DebugToolMod
   use EcoSimConst
   use MiniMathMod
   use ElmIDMod
@@ -378,7 +379,7 @@ contains
     real(r8), optional, intent(in):: xL
     real(r8), intent(out) :: c_new(n)
     real(r8), optional, intent(out) :: lost_mass
-
+    character(len=*), parameter :: subname='advect_remap_mass_loss'
     ! workspace arrays provided by caller (no allocate/deallocate here)
     real(r8)  :: xE(n+1), xE_star(n+1)
     real(r8)  :: dx(n), m(n), m_kept(n), frac_kept(n)
@@ -391,8 +392,9 @@ contains
     real(r8) :: a, b, w_star, inside_left, inside_right, overlap, frac
     real(r8) :: dt_res,dt_loc
     logical :: lhalf
-    real(r8), parameter :: tiny = 1.0d-14
+    real(r8), parameter :: tiny = 1.0e-14_r8
 
+    call PrintInfo('beg '//subname)
     ! Basic checks (lightweight)
     if (n <= 0) then
        if(present(lost_mass))lost_mass = 0._r8
@@ -501,13 +503,14 @@ contains
     ! new cell masses and concentrations
     do i = 1, n
        m(i) = M_on_fixed(i+1) - M_on_fixed(i)    ! reuse m for new masses
+       call DebugPrint('dx',dx(i))
        c_new(i) = m(i) / dx(i)
     end do
     dt_res=dt_res-dt_loc
     if(dt_res<dt*1.e-2_r8)exit
     dt_loc=dt_res
   enddo  
-
+  call PrintInfo('end '//subname)
   end subroutine advect_remap_mass_loss
 
   !--------------------------------------------------------------------
@@ -545,11 +548,12 @@ contains
           do while (k < nx - 1 .and. xq(iq) >= x(k+1))
              k = k + 1
           end do
+
           if (x(k+1) == x(k)) then
              yq(iq) = y(k)
           else
-             t = (xq(iq) - x(k)) / (x(k+1) - x(k))
-             yq(iq) = (1.0d0 - t) * y(k) + t * y(k+1)
+             t = safe_adb(xq(iq) - x(k), x(k+1) - x(k))             
+             yq(iq) = (1.0_r8 - t) * AZERO(y(k)) + t * AZERO(y(k+1))
           end if
        end if
     end do

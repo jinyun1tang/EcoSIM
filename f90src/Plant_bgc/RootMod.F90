@@ -2991,14 +2991,16 @@ implicit none
     Root2ndXNumL_rpvr          => plt_morph%Root2ndXNumL_rpvr            & !input  :within soil layer number of whole population 2nd root axes, [d-2]        
   )
   call PrintInfo('beg '//subname)
+  
   !fine roots and mycorrhizae are assumed to functioning in parallel
   if(NumPrimeRootAxes_pft(NZ).EQ.0)return
   !1. compute the water flux and linear sapflow for each NR, assuming no compressibility
   !2. compute fine root cytokinin net production 
   !3. compute the xylem cross section area
+
   SapFlowVlinear_pvr(:,NZ)=0._r8
   tlumenArea(:)=0._r8
-  DO NR=1,NumPrimeRootAxes_pft(NZ)
+  DNR100: DO NR=1,NumPrimeRootAxes_pft(NZ)
     Root1stVH2O_rpvr(MIN(MaxSoiL4Root_pft(NZ)+1,NK),NR,NZ)    = 0._r8
     SapFlowVLinear_rpvr(MIN(MaxSoiL4Root_pft(NZ)+1,NK),NR,NZ) = 0._r8
     DO L=MaxSoiL4Root_pft(NZ),NU,-1
@@ -3041,7 +3043,7 @@ implicit none
       tlumenArea(L)                = tlumenArea(L)+lumenArea(L,NR)
       SapFlowVlinear_pvr(L,NZ)     = SapFlowVlinear_pvr(L,NZ)+Root1stVH2O_rpvr(L,NR,NZ)
     ENDDO  
-  ENDDO
+  ENDDO DNR100
 
   DO L=MaxSoiL4Root_pft(NZ),NU,-1
     IF(.not.isclose(tlumenArea(L),0._r8))then
@@ -3054,7 +3056,7 @@ implicit none
   
   !3. export, because of the no compressibility assumption, the initial cytokinin concentration is due to 
   !advection from lower layers
-  DO NR=1,NumPrimeRootAxes_pft(NZ)    
+  DNR200: DO NR=1,NumPrimeRootAxes_pft(NZ)    
     !make a copy
 
     DO L=MaxSoiL4Root_pft(NZ),NU,-1
@@ -3070,6 +3072,7 @@ implicit none
         Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ))
       endif
     ENDDO
+
     Cytokinin1stConc_copy(:) = Cytokinin1stConc_rpvr(:,NR,NZ)    
     !counter number of grids    
     L1=MaxSoiL4Root_pft(NZ)-NU+1
@@ -3077,9 +3080,12 @@ implicit none
     DO L=MaxSoiL4Root_pft(NZ),NU,-1
       Xe(L)=CumSoilThickness_vr(MaxSoiL4Root_pft(NZ))-CumSoilThickness_vr(L-1)
     ENDDO
+
     call advect_remap_mass_loss(L1, Xe(MaxSoiL4Root_pft(NZ):NU:-1), Cytokinin1stConc_copy(MaxSoiL4Root_pft(NZ):NU:-1), &
-      SapFlowVLinear_rpvr(MaxSoiL4Root_pft(NZ):NU:-1,NR,NZ), dt=1._r8, c_new=Cytokinin1stConc_rpvr(MaxSoiL4Root_pft(NZ):NU:-1,NR,NZ))        
-  ENDDO
+      SapFlowVLinear_rpvr(MaxSoiL4Root_pft(NZ):NU:-1,NR,NZ), dt=1._r8, c_new=Cytokinin1stConc_rpvr(MaxSoiL4Root_pft(NZ):NU:-1,NR,NZ))       
+    
+  ENDDO DNR200
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine CytoKininDynamics
