@@ -195,7 +195,6 @@ module NutUptakeMod
   PopPlantO2Demand = 0._r8
   RootCO2Ar        = 0._r8
   RootCO2ArB       = 0._r8
-  trcs_deadroot2soil_pvr(:,:,NZ) = 0._r8  
 
 !  dmass0=sum(trcs_solml_vr(idg_O2,NU:plt_site%NL))+sum(trcg_gasml_vr(idg_O2,NU:plt_site%NL))
   

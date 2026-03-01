@@ -87,6 +87,7 @@ implicit none
         call ExitPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
 
         call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
+
       endif
 
     ENDDO
@@ -96,6 +97,23 @@ implicit none
   call PrintInfo('end '//subname)
 
   end subroutine PlantModel
+!------------------------------------------------------------------------------------------
+!  function test_active_plant(NY,NX)result(activeroot)
+  !
+  !Description:
+  !Check the existence of active plants
+!  implicit none
+!  integer, intent(in) :: NY,NX
+!  logical :: activeroot
+!  integer :: NZ
+
+!  activeroot=.false.
+!  DO NZ=1,NP_col(NY,NX)
+!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
+!    if(activeroot)return
+!  ENDDO
+!  end function test_active_plant
+
 !------------------------------------------------------------------------------------------
 
   subroutine PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)

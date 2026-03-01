@@ -1695,7 +1695,7 @@ implicit none
   character(len=64),intent(out):: koppen_climl !koppen climate Description
   character(len=3), intent(out):: koppen_clims !koppen climate short code
   integer :: loc,loc1,len,k
-
+  write(*,*)pft_name
   len=len_trim(pft_name)
   if(koppen_def==0)write(iulog,*)'Koppen climate not defined for the selected pft ',trim(pft_name)
   do 

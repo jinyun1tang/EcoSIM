@@ -29,6 +29,7 @@ module InitPlantMod
   integer, intent(in) :: NZ1Q,NZ2Q
 
   integer :: K,L,M,NZ,NZ2X
+  character(len=*), parameter :: subname='StartPlants'
 !     begin_execution
 
   associate(                                              &
@@ -43,6 +44,8 @@ module InitPlantMod
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft     ,& !output :threshold zero for leaf calculation, [-]
     ZERO4Uptk_pft       => plt_rbgc%ZERO4Uptk_pft         & !output :threshold zero for uptake calculation, [-]
   )
+
+  call PrintInfo('beg '//subname)
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
@@ -57,58 +60,59 @@ module InitPlantMod
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
-      NZ2X=MIN(NZ2Q,NP)
-      D9985: DO NZ=NZ1Q,NZ2X
+  NZ2X=MIN(NZ2Q,NP)
+  D9985: DO NZ=NZ1Q,NZ2X
 
-        IF(IsPlantActive_pft(NZ).EQ.iDormant)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iDormant)THEN
 
-          call InitShootGrowth(NZ)
+      call InitShootGrowth(NZ)
 
-          call PlantLitterFraction(NZ)
+      call PlantLitterFraction(NZ)
 
-          call PFTThermalAcclimation(NZ)
+      call PFTThermalAcclimation(NZ)
 
-          call InitDimensionsandUptake(NZ)
+      call InitDimensionsandUptake(NZ)
 
-          call InitPlantPhenoMorphoBio(NZ)
+      call InitPlantPhenoMorphoBio(NZ)
 
-          call InitMassBalance(NZ)
+      call InitMassBalance(NZ)
 
-          call InitRootMychorMorphoBio(NZ)
+      call InitRootMychorMorphoBio(NZ)
 
-          call InitSeedMorphoBio(NZ)
+      call InitSeedMorphoBio(NZ)
 
-          call InitPlantHeatWater(NZ)
+      call InitPlantHeatWater(NZ)
 
-        ENDIF
-      ENDDO D9985
+    ENDIF
+  ENDDO D9985
 
-      DO NZ=NZ1Q,NZ2X
-        ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
-        ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-        ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
-        
-        plt_biom%RootElmsBeg_pft(:,NZ)           = 0._r8
-        plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = 0._r8
-        plt_biom%ShootElmsBeg_pft(:,NZ)          = 0._r8
-        plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = 0._r8
-        plt_biom%ShootNoduleElmsBeg_pft(:,NZ)    = 0._r8
-        plt_biom%TotBegVegE_pft(:,NZ)            = 0._r8
-        plt_biom%RootNoduleElmsBeg_pft(:,NZ)     = 0._r8
-      ENDDO  
+  DO NZ=NZ1Q,NZ2X
+    ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
+    ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
+    ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
+    
+    plt_biom%RootElmsBeg_pft(:,NZ)           = 0._r8
+    plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = 0._r8
+    plt_biom%ShootElmsBeg_pft(:,NZ)          = 0._r8
+    plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = 0._r8
+    plt_biom%ShootNoduleElmsBeg_pft(:,NZ)    = 0._r8
+    plt_biom%TotBegVegE_pft(:,NZ)            = 0._r8
+    plt_biom%RootNoduleElmsBeg_pft(:,NZ)     = 0._r8
+  ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
 !
-      D9986: DO NZ=NP+1,JP1
-        plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
-        plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)     = 0._r8
-        plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)         = 0._r8
-        D6401: DO L=1,NL
-          DO  K=1,pltpar%NumOfPlantLitrCmplxs
-            plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
-          enddo
-        ENDDO D6401
-      ENDDO D9986
+  D9986: DO NZ=NP+1,JP1
+    plt_bgcr%SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
+    plt_bgcr%LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ)     = 0._r8
+    plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)         = 0._r8
+    D6401: DO L=1,NL
+      DO  K=1,pltpar%NumOfPlantLitrCmplxs
+        plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+      enddo
+    ENDDO D6401
+  ENDDO D9986
+  call PrintInfo('end '//subname)    
   RETURN
   end associate
   END subroutine StartPlants
@@ -916,7 +920,7 @@ module InitPlantMod
   subroutine InitRootMychorMorphoBio(NZ)
   implicit none
   integer, intent(in) :: NZ
-  integer :: K,L,M,N,NR
+  integer :: K,L,M,N,NR,idg
   REAL(R8) :: CCO2A
   REAL(R8) :: CCO2P
   REAL(R8) :: COXYA
@@ -934,6 +938,7 @@ module InitPlantMod
     RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !input  :reference root protein N, [gN g-1]
     SeedDepth_pft                 => plt_morph%SeedDepth_pft                  ,& !input  :seeding depth, [m]
     trcg_rootml_pvr               => plt_rbgc%trcg_rootml_pvr                 ,& !inoput :root gas content, [g d-2]
+    trcs_deadroot2soil_pvr        => plt_rbgc%trcs_deadroot2soil_pvr          ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]    
     trcs_rootml_pvr               => plt_rbgc%trcs_rootml_pvr                 ,& !inoput :root aqueous content, [g d-2]
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !output :root osmotic water potential, [Mpa]
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !output :root total water potential, [Mpa]
@@ -1001,20 +1006,20 @@ module InitPlantMod
       plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
-      plt_rbgc%trcg_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
-      plt_rbgc%trcs_rootml_pvr(idg_beg:idg_NH3,N,L,NZ)         = 0._r8
+      DO idg=idg_beg,idg_NH3
+        trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
+        trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcs_rootml_pvr(idg,N,L,NZ)
+        plt_rbgc%trcg_rootml_pvr(idg,N,L,NZ)         = 0._r8
+        plt_rbgc%trcs_rootml_pvr(idg,N,L,NZ)         = 0._r8
+      ENDDO
       CCO2A                                             = CCO2EI_gperm3
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
-      trcg_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2A*RootPoreVol_pvr(N,L,NZ)
-      trcs_rootml_pvr(idg_CO2,N,L,NZ)                   = CCO2P*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
       plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)       = 0._r8
       plt_rbgc%RCO2Emis2Root_rpvr(N,L,NZ)                = 0._r8
       COXYA                                             = COXYE
       COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
-      plt_rbgc%trcg_rootml_pvr(idg_O2,N,L,NZ)=COXYA*RootPoreVol_pvr(N,L,NZ)
-      plt_rbgc%trcs_rootml_pvr(idg_O2,N,L,NZ)=COXYP*RootVH2O_pvr(N,L,NZ)
       plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
       D30: DO NR=1,MaxNumRootAxes
         plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)                            = 0._r8

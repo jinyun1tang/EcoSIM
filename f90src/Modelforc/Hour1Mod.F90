@@ -95,7 +95,7 @@ module Hour1Mod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   character(len=*), parameter :: subname='hour1'
-  integer :: L,NX,NY
+  integer :: L,NX,NY,idg
   real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
@@ -135,6 +135,7 @@ module Hour1Mod
           PSICanPDailyMin_pft(NZ,NY,NX)=0._r8
         ENDDO
       ENDIF
+
     ENDDO  
   ENDDO
 
