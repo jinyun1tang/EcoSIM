@@ -803,46 +803,11 @@ module NoduleBGCMod
       ENDIF
     ENDDO D5400
   ENDIF
+
   call PrintInfo('end '//subname)
   return
   call SumRootNoduleBiome(I,J,NZ,RootNoduleElms_end)
 
-  if(I==225)then
-    NE=ielmc
-    resp = sum(RCO2Nodule_pvr(NU:NMaxRootBotLayer_pft(NZ),NZ))
-    err  = RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)+resp-NodulInfectElms_pft(NE,NZ)+NoduleLitrfall(NE)
-    write(1000,*)I+J/24.
-    write(1000,*)'C err',err
-    write(1000,*)'C end, beg =',RootNoduleElms_end(NE),RootNoduleElms_beg(NE),RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)
-    WRITE(1000,*)'nodule resp=',resp
-    write(1000,*)'infectionC =',NodulInfectElms_pft(NE,NZ)
-    write(1000,*)'litrfall.  =',+NoduleLitrfall(NE)
-    if(abs(err)>1.e-4_r8)then
-      call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
-    endif
-    NE=ielmn
-    resp=sum(RootN2Fix_pvr(NU:NMaxRootBotLayer_pft(NZ),NZ))
-    err  = RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)-NodulInfectElms_pft(NE,NZ)-resp+NoduleLitrfall(NE)
-    write(1000,*)'N err',err    
-    write(1000,*)'N end, beg =',RootNoduleElms_end(NE),RootNoduleElms_beg(NE),RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)
-    write(1000,*)'N fix      =',resp
-    write(1000,*)'infectionN =',NodulInfectElms_pft(NE,NZ)    
-    write(1000,*)'litrfall.  =',NoduleLitrfall(NE)
-    if(abs(err)>1.e-5_r8)then
-      call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
-    endif
-
-    NE=ielmp
-    err  = RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)-NodulInfectElms_pft(NE,NZ)+NoduleLitrfall(NE)
-    write(1000,*)'P err',err    
-    write(1000,*)'P end, beg =',RootNoduleElms_end(NE),RootNoduleElms_beg(NE),RootNoduleElms_end(NE)-RootNoduleElms_beg(NE)
-    write(1000,*)'infectionP =',NodulInfectElms_pft(NE,NZ)    
-    write(1000,*)'litrfall.  =',NoduleLitrfall(NE)
-    if(abs(err)>1.e-6_r8)then
-      call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
-    endif
-
-  endif
   end associate
   end subroutine RootNodulBiochemistry
 !----------------------------------------------------------------------------------------------------

@@ -30,6 +30,8 @@ module minimathmod
   public :: SubstrateLimit
   public :: real_truncate
   public :: pMod
+  public :: isAinsideBC,isABetweenBC,isALeftinBC,isARightinBC
+  public :: sfexp
   public :: Viscosity_H2O
   public :: SubstrateDribbling  
   interface SubstrateDribbling
@@ -49,7 +51,7 @@ module minimathmod
   public :: get_flux_scalar
   public :: addone
   public :: RichardsonNumber
-  real(r8), parameter :: tiny_val=1.e-14_r8
+  real(r8), parameter :: tiny_val=1.e-12_r8
 
   contains
 
@@ -72,9 +74,10 @@ module minimathmod
    real(r8) :: ans
 
    if(abs(b)<tiny_val)then
-     ans=tiny_val
+     !assume complete dissipation
+     ans=0._R8
    else
-     ans = a/b
+     ans = AZERO(a/b)
    endif
 
    return
@@ -105,6 +108,38 @@ module minimathmod
     ans=1._r8
   endif
   end function dssign
+!------------------------------------------------------------------------------------------
+  pure function isAinsideBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a < c
+  end function isAinsideBC
+!------------------------------------------------------------------------------------------
+  pure function isALeftinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a < c
+  end function isALeftinBC
+!------------------------------------------------------------------------------------------
+  pure function isARightinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a <= c
+  end function isARightinBC
+!------------------------------------------------------------------------------------------
+  pure function isABetweenBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a <= c
+  end function isABetweenBC
 
 !------------------------------------------------------------------------------------------
 
@@ -202,7 +237,12 @@ module minimathmod
   integer, intent(in) :: a,B
   integer :: C
   
-  c=mod(a,b)
+  if(a<0)then
+    c=mod(a+b,b)
+  else
+    c=mod(a,b)
+  endif
+
   if(c==0 .and. a/=0)c=b
   end function pMOD
 !------------------------------------------------------------------------------------------
@@ -227,7 +267,7 @@ module minimathmod
   real(r8), intent(in) :: val
   real(r8), optional, intent(in) :: tiny1
   real(r8) :: ans
-  real(r8), parameter :: tiny_val1=1.e-11_r8
+  real(r8), parameter :: tiny_val1=1.e-10_r8
   real(r8) :: tiny  
   if(present(tiny1))then
     tiny=tiny1
@@ -612,4 +652,22 @@ module minimathmod
   VISCWL    = VISCW*EXP(0.533_r8-0.0267_r8*TEMPC)
 
   end function Viscosity_H2O
+!------------------------------------------------------------------------
+
+  pure function sfexp(a)result(ans)
+  !
+  !do filtered exponential function calculation
+  implicit none
+  real(r8), intent(in) :: a
+  real(r8) :: ans
+
+  if(a>30._r8)then
+    ans=1.e14_r8 !return a large number
+  elseif(a<-30)then
+    ans=1.e-15_r8
+  else
+    ans=exp(a)
+  endif
+  end function sfexp
+
 end module minimathmod

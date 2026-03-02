@@ -1,4 +1,4 @@
-netcdf FenStordIsland_grid_20241203 {
+netcdf FenStordIsland_grid_20250820 {
 dimensions:
 	ncol = 1 ;
 	nrow = 1 ;
@@ -429,7 +429,7 @@ data:
 
  IETYPG = 0 ;
 
- DTBLIG = 0.02 ;
+ DTBLIG = 0.0 ;
 
  DTBLDIG = 5 ;
 

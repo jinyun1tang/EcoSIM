@@ -95,7 +95,7 @@ module Hour1Mod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   character(len=*), parameter :: subname='hour1'
-  integer :: L,NX,NY
+  integer :: L,NX,NY,idg
   real(r8) :: DepthSurfWatIce           !water+ice thickness in litter
 
   integer :: NZ,NR,K
@@ -135,6 +135,7 @@ module Hour1Mod
           PSICanPDailyMin_pft(NZ,NY,NX)=0._r8
         ENDDO
       ENDIF
+
     ENDDO  
   ENDDO
 
@@ -716,17 +717,17 @@ module Hour1Mod
   call PrintInfo('beg '//subname)
   call SetPlantHourlyDiagnosis(I,J,NY,NX)
 
-  RootCO2AutorPrev_col(NY,NX)        = RootCO2Autor_col(NY,NX)
-  DOM_transpFlx_2DH(:,:,NY,NX)       = 0._r8
-  trcs_SubsurTransp_flx_2DH(:,NY,NX) = 0._r8
-  trcg_snowMassloss_col(:,NY,NX)     = 0._r8
-  trcn_SnowDrift_flx_col(:,NY,NX)    = 0._r8
-  trcg_SnowDrift_flx_col(:,NY,NX)    = 0._r8
-  DOM_draing_col(:,:,NY,NX)          = 0._r8
-  trcs_drainage_flx_col(:,NY,NX)     = 0._r8
-  DOM_SurfRunoff_flx_col(:,:,NY,NX)  = 0._r8
-  RootRadialKond2H2O_pvr(:,:,:,NY,NX)= 0._r8
-  RootAxialKond2H2O_pvr(:,:,:,NY,NX) =0._r8
+  RootCO2AutorPrev_col(NY,NX)         = RootCO2Autor_col(NY,NX)
+  DOM_transpFlx_2DH(:,:,NY,NX)        = 0._r8
+  trcs_SubsurTransp_flx_2DH(:,NY,NX)  = 0._r8
+  trcg_snowMassloss_col(:,NY,NX)      = 0._r8
+  trcn_SnowDrift_flx_col(:,NY,NX)     = 0._r8
+  trcg_SnowDrift_flx_col(:,NY,NX)     = 0._r8
+  DOM_draing_col(:,:,NY,NX)           = 0._r8
+  trcs_drainage_flx_col(:,NY,NX)      = 0._r8
+  DOM_SurfRunoff_flx_col(:,:,NY,NX)   = 0._r8
+  RootRadialKond2H2O_pvr(:,:,:,NY,NX) = 0._r8
+  RootAxialKond2H2O_pvr(:,:,:,NY,NX)  = 0._r8
   trcn_snowMassloss_col(:,NY,NX)                  = 0._r8
   trcs_RMicbUptake_col(:,NY,NX)                   = 0._r8
   RGasNetProd_col(idg_beg:idg_NH3,NY,NX)          = 0._r8
@@ -948,9 +949,16 @@ module Hour1Mod
   !     begin_execution
   !
   DO L=0,NL_col(NY,NX)
-    call sumORGMLayL(L,NY,NX,ORGM,.true.)
-    ORGCX_vr(L,NY,NX)=ORGM(ielmc)
+    call sumORGMLayL(L,NY,NX,ORGM,conly=.true.)
+    ORGCX_vr(L,NY,NX)=ORGM(ielmc) !gC d-2
   ENDDO
+  DO L=1,NL_col(NY,NX)
+    !d'Oriano and Kontoe (2022), Dynamic Properties of Organic Soils.
+    !Hardin and Drnevich, 1972
+    HBAconst_vr(L,NY,NX)=HBAMin_vr(L,NY,NX)*exp(-5._r8*ORGCX_vr(L,NY,NX))
+    print*,L,HBAconst_vr(L,NY,NX)
+  ENDDO
+  stop
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
@@ -1055,25 +1063,25 @@ module Hour1Mod
   TFACL                      = TEFAQUDIF(TKS_vr(0,NY,NX))
   TScal4Difsvity_vr(0,NY,NX) = TFACL
 
-  SoluteDifusvty_vr(idg_CO2,0,NY,NX)   = CLSG*TFACL
-  SoluteDifusvty_vr(idg_CH4,0,NY,NX)   = CQSG*TFACL
-  SoluteDifusvty_vr(idg_O2,0,NY,NX)    = OLSG*TFACL
-  SoluteDifusvty_vr(idg_N2,0,NY,NX)    = ZLSG*TFACL
-  SoluteDifusvty_vr(idg_NH3,0,NY,NX)   = ZNSG*TFACL
-  SoluteDifusvty_vr(idg_H2,0,NY,NX)    = HLSG*TFACL
-  SoluteDifusvty_vr(idg_N2O,0,NY,NX)   = ZVSG*TFACL
-  SoluteDifusvty_vr(ids_NO3,0,NY,NX)   = ZOSG*TFACL
-  SoluteDifusvty_vr(ids_H1PO4,0,NY,NX) = POSG*TFACL
+  SoluteDifusvtyT_vr(idg_CO2,0,NY,NX)   = CLSG*TFACL
+  SoluteDifusvtyT_vr(idg_CH4,0,NY,NX)   = CQSG*TFACL
+  SoluteDifusvtyT_vr(idg_O2,0,NY,NX)    = OLSG*TFACL
+  SoluteDifusvtyT_vr(idg_N2,0,NY,NX)    = ZLSG*TFACL
+  SoluteDifusvtyT_vr(idg_NH3,0,NY,NX)   = ZNSG*TFACL
+  SoluteDifusvtyT_vr(idg_H2,0,NY,NX)    = HLSG*TFACL
+  SoluteDifusvtyT_vr(idg_N2O,0,NY,NX)   = ZVSG*TFACL
+  SoluteDifusvtyT_vr(ids_NO3,0,NY,NX)   = ZOSG*TFACL
+  SoluteDifusvtyT_vr(ids_H1PO4,0,NY,NX) = POSG*TFACL
   
-  SoluteDifusvty_vr(ids_NH4,0,NY,NX)   =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
-  SoluteDifusvty_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvty_vr(ids_NH4,0,NY,NX)
-  SoluteDifusvty_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvty_vr(idg_NH3,0,NY,NX)
-  SoluteDifusvty_vr(ids_NO3B,0,NY,NX)  =SoluteDifusvty_vr(ids_NO3,0,NY,NX)
-  SoluteDifusvty_vr(ids_NO2,0,NY,NX)   =SoluteDifusvty_vr(ids_NO3,0,NY,NX)
-  SoluteDifusvty_vr(ids_NO2B,0,NY,NX)  =SoluteDifusvty_vr(ids_NO2,0,NY,NX)
-  SoluteDifusvty_vr(ids_H2PO4,0,NY,NX) =SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)
-  SoluteDifusvty_vr(ids_H1PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,0,NY,NX)
-  SoluteDifusvty_vr(ids_H2PO4B,0,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_NH4,0,NY,NX)   =SoluteDifusvtyT_vr(idg_NH3,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_NH4B,0,NY,NX)  =SoluteDifusvtyT_vr(ids_NH4,0,NY,NX)
+  SoluteDifusvtyT_vr(idg_NH3B,0,NY,NX)  =SoluteDifusvtyT_vr(idg_NH3,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_NO3B,0,NY,NX)  =SoluteDifusvtyT_vr(ids_NO3,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_NO2,0,NY,NX)   =SoluteDifusvtyT_vr(ids_NO3,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_NO2B,0,NY,NX)  =SoluteDifusvtyT_vr(ids_NO2,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_H2PO4,0,NY,NX) =SoluteDifusvtyT_vr(ids_H1PO4,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_H1PO4B,0,NY,NX)=SoluteDifusvtyT_vr(ids_H1PO4,0,NY,NX)
+  SoluteDifusvtyT_vr(ids_H2PO4B,0,NY,NX)=SoluteDifusvtyT_vr(ids_H2PO4,0,NY,NX)
 
   DOMdiffusivity_vr(idom_doc,0,NY,NX)     = OCSG*TFACL
   DOMdiffusivity_vr(idom_don,0,NY,NX)     = ONSG*TFACL
@@ -1280,36 +1288,36 @@ module Hour1Mod
     TFACL                      = TEFAQUDIF(TKS_vr(L,NY,NX))
     TScal4Difsvity_vr(L,NY,NX) = TFACL
 
-    GasDifc_vr(idg_CO2,L,NY,NX)  = CGSG*TFACG
-    GasDifc_vr(idg_CH4,L,NY,NX)  = CHSG*TFACG
-    GasDifc_vr(idg_O2,L,NY,NX)   = OGSG*TFACG
-    GasDifc_vr(idg_N2,L,NY,NX)   = ZGSG*TFACG
-    GasDifc_vr(idg_N2O,L,NY,NX)  = Z2SG*TFACG
-    GasDifc_vr(idg_NH3,L,NY,NX)  = ZHSG*TFACG
-    GasDifc_vr(idg_H2,L,NY,NX)   = HGSG*TFACG
-    GasDifc_vr(idg_NH3B,L,NY,NX) = ZHSG*TFACG
-    GasDifc_vr(idg_AR,L,NY,NX)   = ARSG*TFACG
+    GasDifcT_vr(idg_CO2,L,NY,NX)  = CGSG*TFACG
+    GasDifcT_vr(idg_CH4,L,NY,NX)  = CHSG*TFACG
+    GasDifcT_vr(idg_O2,L,NY,NX)   = OGSG*TFACG
+    GasDifcT_vr(idg_N2,L,NY,NX)   = ZGSG*TFACG
+    GasDifcT_vr(idg_N2O,L,NY,NX)  = Z2SG*TFACG
+    GasDifcT_vr(idg_NH3,L,NY,NX)  = ZHSG*TFACG
+    GasDifcT_vr(idg_H2,L,NY,NX)   = HGSG*TFACG
+    GasDifcT_vr(idg_NH3B,L,NY,NX) = ZHSG*TFACG
+    GasDifcT_vr(idg_AR,L,NY,NX)   = ARSG*TFACG
 
-    SoluteDifusvty_vr(idg_CO2,L,NY,NX)   = CLSG*TFACL
-    SoluteDifusvty_vr(idg_CH4,L,NY,NX)   = CQSG*TFACL
-    SoluteDifusvty_vr(idg_O2,L,NY,NX)    = OLSG*TFACL
-    SoluteDifusvty_vr(idg_N2,L,NY,NX)    = ZLSG*TFACL
-    SoluteDifusvty_vr(idg_NH3,L,NY,NX)   = ZNSG*TFACL
-    SoluteDifusvty_vr(idg_H2,L,NY,NX)    = HLSG*TFACL
-    SoluteDifusvty_vr(idg_N2O,L,NY,NX)   = ZVSG*TFACL
-    SoluteDifusvty_vr(idg_AR,L,NY,NX)    = ARSL*TFACL
-    SoluteDifusvty_vr(idg_NH3B,L,NY,NX)  = SoluteDifusvty_vr(idg_NH3,L,NY,NX)
-    SoluteDifusvty_vr(ids_NO3,L,NY,NX)   = ZOSG*TFACL
-    SoluteDifusvty_vr(ids_H1PO4,L,NY,NX) = POSG*TFACL
+    SoluteDifusvtyT_vr(idg_CO2,L,NY,NX)   = CLSG*TFACL
+    SoluteDifusvtyT_vr(idg_CH4,L,NY,NX)   = CQSG*TFACL
+    SoluteDifusvtyT_vr(idg_O2,L,NY,NX)    = OLSG*TFACL
+    SoluteDifusvtyT_vr(idg_N2,L,NY,NX)    = ZLSG*TFACL
+    SoluteDifusvtyT_vr(idg_NH3,L,NY,NX)   = ZNSG*TFACL
+    SoluteDifusvtyT_vr(idg_H2,L,NY,NX)    = HLSG*TFACL
+    SoluteDifusvtyT_vr(idg_N2O,L,NY,NX)   = ZVSG*TFACL
+    SoluteDifusvtyT_vr(idg_AR,L,NY,NX)    = ARSL*TFACL
+    SoluteDifusvtyT_vr(idg_NH3B,L,NY,NX)  = SoluteDifusvtyT_vr(idg_NH3,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NO3,L,NY,NX)   = ZOSG*TFACL
+    SoluteDifusvtyT_vr(ids_H1PO4,L,NY,NX) = POSG*TFACL
 
-    SoluteDifusvty_vr(ids_NH4,L,NY,NX)   =SoluteDifusvty_vr(idg_NH3,L,NY,NX)
-    SoluteDifusvty_vr(ids_NH4B,L,NY,NX)  =SoluteDifusvty_vr(ids_NH4,L,NY,NX)
-    SoluteDifusvty_vr(ids_NO3B,L,NY,NX)  =SoluteDifusvty_vr(ids_NO3,L,NY,NX)
-    SoluteDifusvty_vr(ids_NO2,L,NY,NX)   =SoluteDifusvty_vr(ids_NO3,L,NY,NX)
-    SoluteDifusvty_vr(ids_NO2B,L,NY,NX)  =SoluteDifusvty_vr(ids_NO2,L,NY,NX)
-    SoluteDifusvty_vr(ids_H2PO4,L,NY,NX) =SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)
-    SoluteDifusvty_vr(ids_H1PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)
-    SoluteDifusvty_vr(ids_H2PO4B,L,NY,NX)=SoluteDifusvty_vr(ids_H2PO4,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NH4,L,NY,NX)   =SoluteDifusvtyT_vr(idg_NH3,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NH4B,L,NY,NX)  =SoluteDifusvtyT_vr(ids_NH4,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NO3B,L,NY,NX)  =SoluteDifusvtyT_vr(ids_NO3,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NO2,L,NY,NX)   =SoluteDifusvtyT_vr(ids_NO3,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_NO2B,L,NY,NX)  =SoluteDifusvtyT_vr(ids_NO2,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_H2PO4,L,NY,NX) =SoluteDifusvtyT_vr(ids_H1PO4,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_H1PO4B,L,NY,NX)=SoluteDifusvtyT_vr(ids_H1PO4,L,NY,NX)
+    SoluteDifusvtyT_vr(ids_H2PO4B,L,NY,NX)=SoluteDifusvtyT_vr(ids_H2PO4,L,NY,NX)
 
     DOMdiffusivity_vr(idom_doc,L,NY,NX)     = OCSG*TFACL
     DOMdiffusivity_vr(idom_don,L,NY,NX)     = ONSG*TFACL
@@ -1534,7 +1542,7 @@ module Hour1Mod
 !     CORGC=SOC concentration
 !
     IF(VLSoilMicPMass_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX))
+      CSoilOrgM_vr(ielmc,L,NY,NX)=AMIN1(orgcden,SoilOrgM_vr(ielmc,L,NY,NX)/VLSoilMicPMass_vr(L,NY,NX)) ![gC d-2]/[Mg soil d-2]=[gC/Mg soil]
     ELSE
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
@@ -1551,9 +1559,9 @@ module Hour1Mod
   character(len=*), parameter :: subname='ZeroHourlyArrays'
 !     begin_execution
   call PrintInfo('beg '//subname)
-  RootN2Fix_col(NY,NX)                      = 0._r8
-  RUptkRootO2_col(NY,NX)                    = 0._r8
-  RootCO2Emis2Root_col(NY,NX)               = 0._r8
+  RootN2Fix_col(NY,NX)        = 0._r8
+  RUptkRootO2_col(NY,NX)      = 0._r8
+  RootCO2Emis2Root_col(NY,NX) = 0._r8
 
   trcs_irrig_flx_col(ids_beg:ids_end,NY,NX) = 0._r8
   trcs_Soil2plant_uptake_col(ids_beg:ids_end,NY,NX)  = 0._r8

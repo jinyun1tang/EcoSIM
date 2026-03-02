@@ -16,4 +16,11 @@ MODULE data_kind_mod
    integer,parameter :: DAT_KIND_CL = 256                    ! long char
    integer,parameter :: DAT_KIND_CX = 512                    ! extra-long char
    integer,parameter :: DAT_KIND_CXX= 4096                   ! extra-extra-long char
+
+   type, public :: yearIJ_type
+   integer :: year
+   integer :: i
+   integer :: J
+   end type yearIJ_type
+
 end module data_kind_mod 

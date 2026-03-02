@@ -7,14 +7,15 @@ case_name='riceUStwt'
 iVerbLevel=0
 prefix='../../inputs/RiceUSTWT/'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pftpar_20251018.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20260225.nc'
 grid_file_in='../../../examples/inputs/RiceUSTWT/RiceUSTWT_grid_20251017.nc'
 pft_mgmt_in='../../../examples/inputs/RiceUSTWT/RiceUSTWT_pft_20251017.nc'
 soil_mgmt_in='../../../examples/inputs/RiceUSTWT/RiceUSTWT_soilmgmt_20251017.nc'
 clm_hour_file_in='../../../examples/inputs/RiceUSTWT/riceUSTWT.clim.hour.2008-2016.nc'
+micpar_file_in='../../../input_data/MicrobePars.20260211.nc'
 clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
-!idebug_day=266
+!idebug_day=108
 lverbose        = .false.
 grid_mode       = 1
 plant_model     = .true.
@@ -31,9 +32,9 @@ hist_fincl1='dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','VSPore_vr','Root_N_FIX_col'
   'NH4_vr','NO3_vr','Root_C_pft','GRAIN_C_pft','SHOOT_C_pft','VmaxNH4Root_pvr','VmaxNO3Root_pvr',
   'VcMax25C_RUBISCO_pft','VcMax25C_PEP_pft','VoMax25C_RUBISCO_pft','JMax25C_photo_pft','cumN_FIXED_pft',
   'RootLDS_pvr','RootKond2H2O_pvr','Uptk_N_CumYr_FLX_pft','Growth_Stage_pft','UPTK_NH4_FLX_pft','UPTK_NO3_FLX_pft',
-  'EXUD_CumYr_N_FLX_pft','CH2OSunlit_pft','CH2OSunsha_pft','PARSunlit_pft','PARSunsha_pft','RUB_ACTVN_pft','LeafProteinC_pft',
-  'LeafC3ChlC_pft','LeafC4ChlC_pft','LeafRubisco_pft','LeafPEPC_pft','SLA_pft','RootSurfAreaPP_pvr','CAN_GPP_pft',
-  'TFN_Carboxy_pft','TFN_eTranspt_pft','LeafC3ChlC_pft','Canopy_PAR_pft','LAIstk_pft'
+  'EXUD_CumYr_N_FLX_pft','CH2OSunlit_pft','CH2OSunsha_pft','PARSunlit_pft','PARSunsha_pft','RUB_ACTVN_pft',
+  'SLA_pft','RootSurfAreaPP_pvr','CAN_GPP_pft',
+  'TFN_Carboxy_pft','TFN_eTranspt_pft','Canopy_PAR_pft','LAIstk_pft'
 hist_nhtfrq=-24 !, -1
 hist_mfilt=4380 !, 8520
 !hist_mfilt=8760 !, 8520

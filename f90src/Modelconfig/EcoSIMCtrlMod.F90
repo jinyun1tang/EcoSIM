@@ -21,6 +21,7 @@ implicit none
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.
+  logical :: lsoilCompaction   =.false.
   logical :: ldo_sp_mode       =.false.   !do satellite phenology mode
   logical :: mod_snow_albedo   =.false.
   logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy 
@@ -73,7 +74,7 @@ implicit none
   logical :: disp_modelconfig=.true.
   logical :: do_rgres        !logical switch for regression tests
   integer :: grid_mode = 3  !vertical only
-
+  
   type, public :: forc_data_rec_type
   integer :: pft_rec
   integer :: yearclm

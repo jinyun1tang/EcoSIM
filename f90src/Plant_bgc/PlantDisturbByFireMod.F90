@@ -1,5 +1,5 @@
 module PlantDisturbByFireMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8,yearIJ_type
   use ElmIDMod
   use PlantAPIData
   use PlantBGCPars
@@ -30,9 +30,9 @@ contains
 
 
 !----------------------------------------------------------------------------------------------------
-  subroutine StageRootRemovalByFire(I,J,NZ,L,FFIRE,DCORP,FracLeftThin)
+  subroutine StageRootRemovalByFire(yearIJ,NZ,L,FFIRE,DCORP,FracLeftThin)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   integer, intent(in) :: L
   real(r8), intent(in):: DCORP
@@ -60,15 +60,15 @@ contains
   end subroutine StageRootRemovalByFire
 
 !----------------------------------------------------------------------------------------------------
-  subroutine RemoveRootByFire(I,J,NZ,FrcMassNotHarvst,FFIRE)
+  subroutine RemoveRootByFire(yearIJ,NZ,FrcMassNotHarvst,FFIRE)
   !
   !upon combustion:
   !plant C is turned into CO2, or CH4
   !plant N is turned into NH3, or N2O (which is set to zero)
   !plant P is turned in PO4.
   implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
 
-  integer, intent(in) :: I,J
   integer, intent(in) :: NZ
   real(r8), INTENT(IN) :: FrcMassNotHarvst(NumPlantChemElms)
   real(r8), intent(in) :: FFIRE(NumPlantChemElms)
@@ -166,7 +166,7 @@ contains
     ENDDO
 
     !all above ground is subject to fire
-    IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_treelike(iPlantRootProfile_pft(NZ))))THEN
+    IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
       LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)+&
         PlantElmAllocMat4Litr(ielmc,istalk,M,NZ)*(WoodyElmnt2Litr(ielmc)+WoodyElmntHarv2Litr(ielmc) &
         +StandeadElmnt2Litr(ielmc)+StandeadElmntHarv2Litr(ielmc))

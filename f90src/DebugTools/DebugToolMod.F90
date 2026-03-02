@@ -13,6 +13,7 @@ implicit none
   interface DebugPrint
     module procedure DebugPrint_real_arr
     module procedure DebugPrint_real_sp
+    module procedure DebugPrint_real_arrs
     module procedure DebugPrint_int
   end interface DebugPrint
 
@@ -43,6 +44,19 @@ contains
    write(*,fmt)vnames,'=',vals
 
    end subroutine DebugPrint_real_arr
+  !-----------------------------------------------------------------------
+
+   subroutine DebugPrint_real_arrs(vals)
+   implicit none
+   real(r8), intent(in) :: vals(:)
+   integer :: nvars
+   character(len=256) :: fmt
+   nvars=size(vals)
+   
+   if(.not.lverb)return
+   write(*,*)vals
+
+   end subroutine DebugPrint_real_arrs
 
   !-----------------------------------------------------------------------
 

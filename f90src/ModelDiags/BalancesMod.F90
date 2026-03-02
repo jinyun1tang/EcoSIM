@@ -70,10 +70,6 @@ contains
         trcg_rootMass_beg_col(idg,NY,NX)  = trcg_rootMass_col(idg,NY,NX)  
         trcg_snowMass_beg_col(idg,NY,NX)  = trcg_snowMass_col(idg,NY,NX)
       enddo  
-!      if(I==140 .and. J>=20)then
-!        write(116,*)'==============================================='
-!        write(116,*)trcg_rootMass_beg_col(idg_N2,NY,NX),I*1000+J,'beg'
-!      endif
     ENDDO
   ENDDO  
   end subroutine BegCheckBalances
@@ -197,9 +193,7 @@ contains
   integer  :: ii,idg,ids,L
   real(r8) :: trcs_solml_drib_col(ids_beg:ids_end)
 
-  call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
-
-  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
+  call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -462,7 +456,7 @@ contains
       DO L=NUI_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)
-          trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)                  
+          trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)
         ENDDO
 
         DO idg=idg_beg,idg_end  
@@ -512,7 +506,6 @@ contains
 
   implicit none 
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  integer :: NY,NX
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 

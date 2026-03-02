@@ -26,13 +26,15 @@ implicit none
   real(r8),target,allocatable ::  FSLOPE_2DH(:,:,:)                            !fraction of slope in 1 and 2,[-]
   REAL(R8),target,allocatable ::  VLMicPt0_col(:,:,:)                          !initial total soil micropore porosity,	[m3 d-2]
   REAL(R8),target,allocatable ::  LOGPSIAtSat(:,:)                             !log water potential at saturation,	[MPa]
-  REAL(R8),target,allocatable ::  LOGPSIFLD_col(:,:)                               !log water potential at field capacity,	[-]
-  REAL(R8),target,allocatable ::  LOGPSIMN_col(:,:)                                !log water potential at wilting point,[-]
-  REAL(R8),target,allocatable ::  LOGPSIMXD_col(:,:)                               !log water potential at field capacity ,[-]
-  REAL(R8),target,allocatable ::  LOGPSIMND_col(:,:)                               !log water potential at saturation - log water potential at field capacity,[-]
-  real(r8),target,allocatable ::  VHeatCapacitySoilM_vr(:,:,:)                 !soil solid heat capacity, [MPa m-3 K-1]
+  REAL(R8),target,allocatable ::  LOGPSIFLD_col(:,:)                           !log water potential at field capacity,	[-]
+  REAL(R8),target,allocatable ::  LOGPSIMN_col(:,:)                            !log water potential at wilting point,[-]
+  REAL(R8),target,allocatable ::  LOGPSIMXD_col(:,:)                           !log water potential at field capacity ,[-]
+  REAL(R8),target,allocatable ::  LOGPSIMND_col(:,:)                           !log water potential at saturation - log water potential at field capacity,[-]
+  real(r8),target,allocatable ::  VHeatCapSolidSoil_vr(:,:,:)                 !soil solid heat capacity, [MPa m-3 K-1]
   real(r8),target,allocatable ::  ActiveLayDepZ_col(:,:)                       !active layer depth of a permafrost soil, [m]
-  real(r8),target,allocatable :: CondGasXSurf_col(:,:)                         !gas conductance for soil-atmosphere exchange, [m/h]
+  real(r8),target,allocatable ::  CondGasXSurf_col(:,:)                        !gas conductance for soil-atmosphere exchange, [m/h]
+  real(r8),target,allocatable ::  HBAconst_vr(:,:,:)                           !A factor degraded root stress, for the the Hardin & Black method with OM, [sqrt(MPa)]
+  real(r8),target,allocatable ::  HBAMin_vr(:,:,:)                             !A factor of mineral soil for the Hardin & Black method without OM, [sqrt(MPa)] 
 !----------------------------------------------------------------------
 
 contains
@@ -62,15 +64,19 @@ contains
   allocate(LOGPSIMN_col(JY,JX));       LOGPSIMN_col=0._r8
   allocate(LOGPSIMXD_col(JY,JX));       LOGPSIMXD_col=0._r8
   allocate(LOGPSIMND_col(JY,JX));       LOGPSIMND_col=0._r8
-  allocate(VHeatCapacitySoilM_vr(0:JZ,JY,JX));   VHeatCapacitySoilM_vr=0._r8
+  allocate(VHeatCapSolidSoil_vr(0:JZ,JY,JX));   VHeatCapSolidSoil_vr=0._r8
   allocate(ActiveLayDepZ_col(JY,JX));       ActiveLayDepZ_col=0._r8
   allocate(CondGasXSurf_col(JY,JX)); CondGasXSurf_col=0._r8
+  allocate(HBAconst_vr(JZ,JY,JX)); HBAconst_vr=0._r8
+  allocate(HBAMin_vr(JZ,JY,JX)); HBAMin_vr=0._r8
   end subroutine InitSoilPhysData
 
 !----------------------------------------------------------------------
   subroutine DestructSoilPhysData
   use abortutils, only : destroy
   implicit none
+  call destroy(HBAMin_vr)
+  call destroy(HBAconst_vr)
   call destroy(CondGasXSurf_col)
   call destroy(SLOPE_col)
   call destroy(FieldCapacity_vr)
@@ -95,7 +101,7 @@ contains
   call destroy(LOGPSIMN_col)
   call destroy(LOGPSIMXD_col)
   call destroy(LOGPSIMND_col)
-  call destroy(VHeatCapacitySoilM_vr)
+  call destroy(VHeatCapSolidSoil_vr)
   call destroy(ActiveLayDepZ_col)
   end subroutine DestructSoilPhysData
 

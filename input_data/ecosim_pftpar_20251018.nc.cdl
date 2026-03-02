@@ -329,6 +329,9 @@ variables:
 	float CPND(npfts) ;
 		CPND:long_name = "PC ratio in plant nodule" ;
 		CPND:units = "gP gC-1" ;
+   float ROOTMAGE(npfts) ;
+      ROOTMAGE:long_name="Root maturation age to trigger secondary growth" ;
+      ROOTMAGE:units ="h" ;
 	char pfts(npfts, nchars1) ;
 	char pfts_short(npft, nchars2) ;
 	char pfts_long(npft, nchars3) ;
@@ -1167,6 +1170,12 @@ data:
     0.00833, 0.01, 0.01, 0.01, 0.0125, 0.0125, 0.01, 0.0125, 0.01, 0.01, 
     0.01, 0.01, 0.01, 0.01, 0.0125, 0.0125, 0.01, 0.0125, 0.0125, 0.0125, 
     0.01, 0.0125, 0.01, 0.0125, 0.01, 0.01 ;
+
+ ROOTMAGE = 60, 360, 240, 40, 240, 60, 120, 48, 1500, 240, 60, 240, 60, 240, 
+    360, 48, 2400, 480, 180, 24, 480, 240, 240, 480, 48, 2160, 2160, 240, 48, 
+    0, 90, 2160, 2160, 240, 240, 120, 120, 72, 240, 72, 24, 240, 240, 60, 
+    120, 240, 72, 120, 2160, 24, 2160, 90, 72, 24, 24, 240, 240, 240, 0, 72, 
+    0, 2160, 60, 2400, 90, 240, 480, 90, 240, 72, 24, 120, -1, 2160, 480, 0 ;
 
  pfts =
   "gr3s32",

@@ -3,8 +3,9 @@ module SnowBalanceMod
   use data_const_mod,   only: spval => DAT_CONST_SPVAL
   use abortutils,       only: endrun
   use SnowTransportMod, only: SoluteTransportThruSnow
-  use EcoSIMCtrlMod,    only: lverb,snowRedist_model,fixWaterLevel
-  use minimathmod,      only: AZMAX1, isclose, AZMIN1,AZMAX1d ,AZERO
+  use EcoSIMCtrlMod,    only: lverb,  snowRedist_model, fixWaterLevel
+  use minimathmod,      only: AZMAX1, isclose,          AZMIN1, AZMAX1d, AZERO
+  use InitSOMBGCMod,    only: gOC_to_m3_OM
   use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType
@@ -177,11 +178,10 @@ implicit none
     ENDDO D9770
 
     IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN
-      write(110,*)I*1000+J,'SnowpackDisapper1',FLWW+FLWI*DENSICE+FLWS
       ENGY                      = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
       VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+FLWW
       VLiceMicP_vr(0,NY,NX)     = VLiceMicP_vr(0,NY,NX)+FLWI+FLWS/DENSICE
-      VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+      VHeatCapacity_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
       IF(abs(HeatFlo2Surface)>ZEROS(NY,NX))THEN
         TKS_vr(0,NY,NX)           = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(0,NY,NX)
       ENDIF
@@ -206,7 +206,7 @@ implicit none
 
           ENGY  = VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)*TKS_vr(NUM_col(NY,NX),NY,NX)
 
-          VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
+          VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
             +cpw*(VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+VLWatMacP_vr(NUM_col(NY,NX),NY,NX)) &
             +cpi*(VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+VLiceMacP_vr(NUM_col(NY,NX),NY,NX))
 

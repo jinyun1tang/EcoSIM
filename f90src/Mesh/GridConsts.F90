@@ -13,6 +13,7 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
+  integer :: NMaxRootSegs
   integer :: MaxNumBranches=10      !number of plant branches
   integer :: NumGrowthStages     !number of plant growth states
   integer :: NumOfPlantMorphUnits !

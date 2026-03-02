@@ -10,7 +10,9 @@ module EcosimConst
   real(r8), parameter :: secspyear            = 86400._r8*365._r8          !seconds in a normal earth year
   real(r8), parameter :: cpw                  = 4.186_r8                   !volumetric heat capacity for water,                                         [J/g/K]~[MJ/m3/K]
   real(r8), parameter :: cpi                  = 1.9274_r8                  !volumetric heat capacity for ice,                                           [MJ/m3/K]
-  real(r8), parameter :: cpo                  = 2.496E-06_r8               !heat capacity for organic matter,                                           [MJ/K/gC]
+  real(r8), parameter :: cpo                  = 2.496_r8                   !volumetric heat capacity for consolidated organic matter,  [MJ m-3 K-1]
+  real(r8), parameter :: cpsand               = 2.128_r8                   !volumetric heat capacity for sand and rock,  [MJ m-3 K-1]
+  real(r8), parameter :: cpmins               = 2.385_r8                   !volumetric heat capacity for silt and clay, [MJ m-3 K-1]
   real(r8), parameter :: cps                  = 2.095_r8                   !volumetric heat capacity for fresh snow,                                    [MJ/m3/K]
   real(r8), parameter :: TFice                = 273.15_r8                  !frozen temperature,                                                         [K]
   real(r8), parameter :: TC2K                 = 273.15_r8                  !temperature for converting celcius to Kelvin,                               [K]
@@ -29,7 +31,9 @@ module EcosimConst
   real(r8), parameter :: TCNDG                = 8.1E-03_r8                  !assumed thermal conductivity below lower soil boundary,                    [MJ m-1 h-1 K-1]
   real(r8), parameter :: RGASC                = 8.3143_r8                   !universal gas constant,                                                    [J (mole K)^-1]
   real(r8), parameter :: OMCMassFrac          = 0.55_r8                     !C fraction in organic matter,                                              [gC /g OM] 
-  real(r8), parameter :: orgcden              = OMCMassFrac*1.E+06_r8       !volume density of organic carbon,                                          [cm3 C m-3 OM]
+  real(r8), parameter :: DensitySolidOM       = 1.30_r8                     !Consolidated dry organic matter density, [g cm-3]~[Mg m-3]
+  real(r8), parameter :: DensitySolidMineral  = 2.66_r8                     !mass density of mineral solids, [g cm-3]
+  real(r8), parameter :: orgcden              = OMCMassFrac*1.E+06_r8       !volume density of organic carbon,   [cm3 C m-3 OM]
   real(r8), parameter :: hpresc               = 8.4334E+03_r8               !elapsing height for atmospheric pressure,                                  [m]
   real(r8), parameter :: POROQ                = 0.66_r8                     !soil porosity ^ 2/3,                                                       [-]
   real(r8), parameter :: FORGC                = 1.E+05_r8                   !minimum SOC for organic soil,                                              [gC Mg-1 soil]
@@ -51,6 +55,6 @@ module EcosimConst
   real(r8), parameter :: ppmc=1.0E-06_r8                                    !part per million,[-]
   real(r8), parameter :: stefboltz_const=5.670374419e-8_r8*3600e-6          !stefan boltzman constant, [MJ/(hr m^2 K^4)]
   integer , parameter :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)  
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration           !gravitational constant devided by 1000 
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration           !gravitational constant devided by 1000, [km/s2] 
 
 end module EcosimConst
