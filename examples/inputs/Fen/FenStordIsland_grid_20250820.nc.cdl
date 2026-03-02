@@ -429,7 +429,7 @@ data:
 
  IETYPG = 0 ;
 
- DTBLIG = 0.05 ;
+ DTBLIG = 0.0 ;
 
  DTBLDIG = 5 ;
 
