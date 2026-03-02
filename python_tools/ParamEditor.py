@@ -6,6 +6,7 @@ from pathlib import Path
 import json
 import os
 import stringTools as strtool
+import netCDF4 as nc
 
 class ParEditor:
     # contruct the parameter editor ParEditor
@@ -120,16 +121,21 @@ class ParEditor:
         if pft_from_loc ==-1:
             print(f"Parameters for {pft_from} not found")
             return
-        
-        with Dataset(self.pftparfile, 'a') as nc_file:
-            new_index = nc_file.dimensions['npfts'].size
-            variable = nc_file.variables['pfts']
-            variable[new_index]=strtool.string2arr(pft_to,10)
-            for key in pft_from_keys:
-                var = nc_file.variables[key]
-                shape=list(var.shape)
-                shape[0]=1
-                var[new_index]=var[pft_from_loc]
+
+        pft_to_keys,pft_to_loc=self.__ExtractPftKeys(pft_to)
+        if pft_to_loc== -1:
+            with Dataset(self.pftparfile, 'a') as nc_file:
+                new_index = nc_file.dimensions['npfts'].size
+                variable = nc_file.variables['pfts']
+                variable[new_index]=strtool.string2arr(pft_to,10)
+                for key in pft_from_keys:
+                    var = nc_file.variables[key]
+                    shape=list(var.shape)
+                    shape[0]=1
+                    var[new_index]=var[pft_from_loc]
+        else:
+            with Dataset(self.pftparfile, 'r+') as nc_file:
+                pft_to_keys.update(pft_from_keys)
         
     
     def PlantParCompare(self,pft1,pft2):
@@ -240,4 +246,60 @@ class ParEditor:
         with open(RecordFileName+'.jsonl', 'a') as file:
             # Convert dict to a JSON string and write it, followed by a newline
             file.write(json.dumps(new_dict) + '\n')
+
+
+
+    def delete_pft_records(self,input_file, output_file, names_to_delete):
+        """
+        names_to_delete: list of strings, e.g., ["gr3s32", "maiz31"]
+        """
+        with nc.Dataset(input_file, 'r') as src, nc.Dataset(output_file, 'w') as dst:
+            # 1. Convert the character array 'pfts' into a list of strings for matching
+            # Variable pfts has dimensions (npfts, nchars1) [cite: 107]            
+            raw_pfts = src.variables['pfts'][:].filled(" ")
+            pft_list = ["".join([c.decode('utf-8') if isinstance(c, bytes) else c for c in row]).strip() 
+                    for row in raw_pfts]
+        
+            # 2. Identify indices for all requested names
+            indices_to_delete = [i for i, name in enumerate(pft_list) if name in names_to_delete]
+        
+            if not indices_to_delete:
+                print("No matching PFT names found to delete.")
+                return
+
+            print(f"Deleting {len(indices_to_delete)} records: {names_to_delete}")
+
+            # 3. Copy Global Attributes (e.g., description, history) [cite: 108, 109]
+            dst.setncatts({k: src.getncattr(k) for k in src.ncattrs()})
+
+            # 4. Copy Dimensions, adjusting 'npfts' (UNLIMITED) 
+            for name, dimension in src.dimensions.items():
+                if name == 'npfts':
+                    new_size = len(dimension) - len(indices_to_delete)
+                    dst.createDimension(name, new_size if not dimension.isunlimited() else None)
+                else:
+                    dst.createDimension(name, len(dimension) if not dimension.isunlimited() else None)
+
+            # 5. Copy and Filter Variables
+            for name, variable in src.variables.items():
+                # Create the variable with same datatype and dimensions (e.g., float, byte) [cite: 3, 14]
+                dst_var = dst.createVariable(name, variable.datatype, variable.dimensions)
+            
+                # Copy variable attributes (e.g., long_name, units, flags) [cite: 4, 5, 15]
+                dst_var.setncatts({k: variable.getncattr(k) for k in variable.ncattrs()})
+            
+                data = variable[:]
+            
+                # If the variable depends on the 'npfts' dimension, delete indices
+                if 'npfts' in variable.dimensions:
+                    pft_dim_axis = variable.dimensions.index('npfts')
+                    # np.delete handles a list of indices efficiently
+                    filtered_data = np.delete(data, indices_to_delete, axis=pft_dim_axis)
+                    dst_var[:] = filtered_data
+                else:
+                    # Copy other variables (like pfts_short or pfts_long) as-is [cite: 107]
+                    # Note: if those also relate to pft count, you may need to filter them similarly.
+                    dst_var[:] = data
+
+        print(f"Successfully created '{output_file}'. New record count: {len(pft_list) - len(indices_to_delete)}")
 

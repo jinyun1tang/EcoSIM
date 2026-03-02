@@ -7,7 +7,7 @@ module HistFileMod
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
-  use GridConsts        , only : NumCanopyLayers,JP,NumGrowthStages,MaxNodesPerBranch  
+  use GridConsts        , only : NumCanopyLayers,JP,NumGrowthStages,MaxNodesPerBranch,MaxNumRootAxes  
   use ElmIDMod          , only : NumPlantChemElms  
   use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
@@ -253,6 +253,7 @@ implicit none
   call ncd_defdim(lnfid, 'nbranches',MaxNumBranches,dimid)
   call ncd_defdim(lnfid, 'ngrstages',NumGrowthStages,dimid)
   call ncd_defdim(lnfid, 'elements',NumPlantChemElms,dimid)
+  call ncd_defdim(lnfid,'rootaxs',MaxNumRootAxes,dimid)
   call ncd_defdim(lnfid, 'nkinecomp',jsken,dimid)
   call ncd_defdim(lnfid, 'nomcomplx',jcplx,dimid)
   call ncd_defdim(lnfid, 'pmorphunits',NumOfPlantMorphUnits,dimid)
@@ -562,6 +563,8 @@ implicit none
       num2d = JZ
   case ('nbranches')
       num2d = MaxNumBranches
+  case ('rootaxs')    
+      num2d=MaxNumRootAxes
   case ('pmorphunits')
       num2d=NumOfPlantMorphUnits    
   case ('elements')    

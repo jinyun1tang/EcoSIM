@@ -5,12 +5,11 @@
 &ecosim
 case_name='FenStordIsland'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pftpar_20251018.nc'
-!pft_file_in='FenStordIsland_pftpar_20250626.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20260225.nc'
 grid_file_in='../../inputs/Fen/FenStordIsland_grid_20250820.nc'
 pft_mgmt_in='../../inputs/Fen/FenStordIsland_pft_20240208.nc'
 clm_hour_file_in='../../inputs/Fen/FenStordIsland.clim.1960-2017.nc'
-micpar_file_in='../../../input_data/MicrobePars.20251015.nc'
+micpar_file_in='../../../input_data/MicrobePars.20260211.nc'
 clm_factor_in='NO'
 soil_mgmt_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2023.nc'

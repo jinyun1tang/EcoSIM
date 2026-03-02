@@ -59,7 +59,7 @@ module WthrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  character(len=*), parameter :: subname='WTHR'
+  character(len=*), parameter :: subname='PrepHourlyWeather'
   integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain_col(JY,JX)
   real(r8) :: PrecAsSnow_col(JY,JX)
@@ -462,7 +462,7 @@ module WthrMod
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
         !
-        IF(ICLM.EQ.2.AND.J.EQ.1)THEN
+        IF(ICLM.EQ.2 .AND. J.EQ.1)THEN
           DTS                   = 0.5_r8*DTA
           ATCA_col(NY,NX)       = ATCAI_col(NY,NX)+DTA
           ATCS_col(NY,NX)       = ATCAI_col(NY,NX)+DTS
@@ -472,7 +472,7 @@ module WthrMod
             TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
-            IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
+            IF(iPlantPhotosynsType_pft(NZ,NY,NX).EQ.3)THEN
               HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ELSE
               HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)

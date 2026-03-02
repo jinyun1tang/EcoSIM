@@ -82,25 +82,28 @@ implicit none
   real (r8), pointer :: VLsoiAirPM_vr(:,:)           => null()    !soil air content,                                         [m3 d-2]
   real (r8), pointer :: TortMicPM_vr(:,:)            => null()    !micropore soil tortuosity,                                [m3 m-3]
   real (r8), pointer :: FILMM_vr(:,:)                => null()    !soil water film thickness,                                [m]
+  real (r8), pointer :: SoilWeightStress_vr(:)         => null()    !soil bulk stress on root thickening, [MPa]
+  real (r8), pointer :: SoilSuctStress_vr(:)         => null()    !soil suction stress on root thickening, [MPa]
+  real (r8), pointer :: rSat_vr(:)                   => null()    !relative soil saturation, [-]
   contains
     procedure, public :: Init =>  plt_site_Init
     procedure, public :: Destroy => plt_site_destroy
   end type plant_siteinfo_type
 
   type, public :: plant_photosyns_type
-  integer,  pointer :: iPlantPhotosynthesisType(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
-  real(r8), pointer :: SpecLeafChlAct_pft(:)              => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
-  real(r8), pointer :: LeafC3Chl2Protein_pft(:)           => null()  !leaf C3 chlorophyll content,                                               [gC gC-1]
-  real(r8), pointer :: LeafPEP2Protein_pft(:)   => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
-  real(r8), pointer :: LeafC4Chl2Protein_pft(:)           => null()  !leaf C4 chlorophyll content,                                               [gC gC-1]
-  real(r8), pointer :: LeafRubisco2Protein_pft(:)                  => null()  !leaf rubisco content,                                                      [gC gC-1]
+  integer,  pointer :: iPlantPhotosynsType_pft(:)          => null()  !plant photosynthetic type (C3 or C4),[-]  
+  real(r8), pointer :: SpecLeafChlAct_pft(:)                => null()  !cholorophyll activity  at 25 oC,                                           [umol g-1 h-1]
+  real(r8), pointer :: LeafProtein2Chl_pft(:)               => null()  !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
+  real(r8), pointer :: LeafPEP2Protein_pft(:)               => null()  !leaf PEP carboxylase content,                                              [gC gC-1]
+  real(r8), pointer :: fMesophyllChlProtein_pft(:)          => null()  !fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
+  real(r8), pointer :: LeafRubisco2Protein_pft(:)           => null()  !leaf rubisco content,                                                      [gC gC-1]
   real(r8), pointer :: VmaxPEPCarboxyRef_pft(:)             => null()  !PEP carboxylase activity at 25 oC                                          [umol g-1 h-1]
   real(r8), pointer :: VmaxRubOxyRef_pft(:)                 => null()  !rubisco oxygenase activity  at 25 oC,                                      [umol g-1 h-1]
   real(r8), pointer :: VmaxSpecRubCarboxyRef_pft(:)             => null()  !rubisco carboxylase activity  at 25 oC,                                    [umol g-1 h-1]
   real(r8), pointer :: XKCO2_pft(:)                         => null()  !Km for rubisco carboxylase activity,                                       [uM]
   real(r8), pointer :: XKO2_pft(:)                          => null()  !Km for rubisco oxygenase activity,                                         [uM]
   real(r8), pointer :: RubiscoActivity_brch(:,:)            => null()   !branch down-regulation of CO2 fixation,                                   [-]
-  real(r8), pointer :: C4PhotosynDowreg_brch(:,:)           => null()   !down-regulation of C4 photosynthesis,                                     [-]
+  real(r8), pointer :: GrainFillDowreg_brch(:,:)           => null()   !down-regulation of C4 photosynthesis,                                     [-]
   real(r8), pointer :: aquCO2Intraleaf_pft(:)               => null()   !leaf aqueous CO2 concentration,                                           [uM]
   real(r8), pointer :: O2I_pft(:)                           => null()   !leaf gaseous O2 concentration,                                            [umol m-3]
   real(r8), pointer :: LeafIntracellularCO2_pft(:)          => null()   !leaf gaseous CO2 concentration,                                           [umol m-3]
@@ -215,28 +218,35 @@ implicit none
   real(r8), pointer :: tlai_day_pft(:)                 => null() !prescribed leaf area, [m2 m-2]
   real(r8), pointer :: tsai_day_pft(:)                 => null() !prescribed stem area, [m2 m-2]
   real(r8), pointer :: PARTS_brch(:,:,:)               => null() !fraction of C allocated to each morph unit,                                 [-]
-  real(r8), pointer :: RootVolPerMassC_pft(:,:)        => null() !root volume:mass ratio,                                                     [m3 g-1]
+  real(r8), pointer :: FineRootVolPerMassC_pft(:,:)    => null() !Fine root volume:mass ratio,                                                     [m3 g-1]
+  real(r8), pointer :: CRootActVolPerMassC_pft(:)    => null()   !Coarse root active zone volume:mass ratio,  [m3 g-1]
+  real(r8), pointer :: CRootLigVolPerMassC_pft(:)     => null()  !Coarse root inactive zone volume:mass ratio,  [m3 g-1]
   real(r8), pointer :: RootPorosity_pft(:,:)           => null() !root porosity,                                                              [m3 m-3]
   real(r8), pointer :: Root2ndXSecArea_pft(:,:)        => null() !root  cross-sectional area  secondary axes,                                 [m2]
   real(r8), pointer :: Root1stXSecArea_pft(:,:)        => null() !root cross-sectional area primary axes,                                     [m2]
   real(r8), pointer :: Root1stMaxRadius1_pft(:,:)      => null() !root diameter primary axes,                                                 [m]
   real(r8), pointer :: Root2ndMaxRadius1_pft(:,:)      => null() !root diameter secondary axes,                                               [m]
-  real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [g]
+  real(r8), pointer :: SeedCMass_pft(:)                => null() !grain size at seeding,                                                      [gC/seed]
+  real(r8), pointer :: SeedWidth2LenRatio_pft(:)       => null() !Seed width to length ratio, assuming prolate spheroid  
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8), pointer :: Root1stLen_rpvr(:,:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
+  logical,  pointer :: flag2ndGrowth_pvr(:,:,:)        => null() !flag for secondary growth of primary roots, [-]  
+  real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
+  real(r8), pointer :: RootAge_rpvr(:,:,:)             => null() !root age, [h]
   real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
+  real(r8), pointer :: RootAbsorbLenPerPlant_pvr(:,:,:)=> null() !total absorptive root length per plant in layer, [m p-1]
   real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !fine root length per plant, [m p-1]
   real(r8), pointer :: Root2ndEffLen4uptk_rpvr(:,:,:)  => null() !Layer effective root length four resource uptake, [m]
+  real(r8), pointer :: DistRootEffDepz_pvr(:,:)        => null() !Effective shoot-root transport depth, [m]
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
-  real(r8), pointer :: Root1stDepz_pft(:,:,:)          => null() !root layer depth,                                                           [m]
+  real(r8), pointer :: Root1stDepz_raxes(:,:)          => null() !root layer depth,                                                           [m]
   real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
   real(r8), pointer :: RootBranchFreq_pft(:)           => null() !root brancing frequency,                                                    [m-1]
-  real(r8), pointer :: HypoctoHeight_pft(:)            => null() !cotyledon height,                                                           [m]
+  real(r8), pointer :: HypocotHeight_pft(:)            => null() !cotyledon height,                                                           [m]
   real(r8), pointer :: CanopyHeight4WatUptake_pft(:)   => null() !canopy height,                                                              [m]
   real(r8), pointer :: CanopyHeightZ_col(:)            => null() !canopy layer height,                                                        [m]
   real(r8), pointer :: CanopyStemArea_pft(:)           => null() !plant stem area,                                                            [m2 d-2]
@@ -285,6 +295,7 @@ implicit none
   integer,  pointer :: MaxSoiL4Root_pft(:)            => null() !maximum soil layer number for all root axes,[-]
   integer,  pointer :: NMaxRootBotLayer_pft(:)         => null() !maximum soil layer number for all root axes, [-]
   integer,  pointer :: NumPrimeRootAxes_pft(:)             => null() !root primary axis number,[-]
+  real(r8), pointer :: RootMatureAge_pft(:)           => null() !Root age to trigger secondary growth, [h]
   integer,  pointer :: NumCogrowthNode_pft(:)         => null() !number of concurrently growing nodes,[-]
   integer,  pointer :: BranchNumber_pft(:)            => null() !main branch numeric id,[-]
   integer,  pointer :: NumOfBranches_pft(:)           => null() !number of branches,[-]
@@ -292,28 +303,47 @@ implicit none
   integer,  pointer :: KMinNumLeaf4GroAlloc_brch(:,:) => null() !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
   integer,  pointer :: BranchNumerID_brch(:,:)         => null() !branch meric id,                             [-]
   integer,  pointer :: NGTopRootLayer_pft(:)          => null() !soil layer at planting depth,                [-]
+  real(r8), pointer :: RootSinkWeight_pvr(:,:)        => null() !Root nonst element sink profile, [d-2]
+  real(r8), pointer :: Root2ndSinkWeight_pvr(:,:,:)   => null() !Secondary root nonst element sink profile, [d-2]
+  real(r8), pointer :: Root1stSinkWeight_pvr(:,:)     => null() !primary root nonst element sink profile, [d-2]
+  real(r8), pointer :: Root1stTransptArea_pvr(:,:,:)        => null()    !root cross section area for water/gas transport,    [g d-2]  
   integer,  pointer :: KLeafNumber_brch(:,:)          => null() !leaf number,                                 [-]
-  
+  real(r8), pointer :: RootSegAges_raxes(:,:,:)        => null()   !age of different active root segments, [h]
+  integer , pointer :: NActiveRootSegs_raxes(:,:)       => null()   !number of active root segments, [-]
+  real(r8), pointer :: RootSegBaseDepth_raxes(:,:)      => null()   !base depth of different root axes, [m]
+  real(r8), pointer :: RootSeglengths_raxes(:,:,:)      => null()   !root length in each segment, [m]
+  integer , pointer :: IndRootSegBase_raxes(:,:)        => null()   !Index for base segment under tracking, [-]
+  integer , pointer :: IndRootSegTip_raxes(:,:)       => null()   !Index for tip segment under tracking, [-]  
   real(r8), pointer :: NumOfLeaves_brch(:,:)          => null() !leaf number,                          [-]
-  real(r8), pointer :: GrothStalkMaxSeedSites_pft(:)     => null() !maximum grain node number per branch, [-]
+  real(r8), pointer :: GrothStalkMaxSeedSites_pft(:)  => null() !maximum grain node number per branch, [-]
   real(r8), pointer :: MaxSeedNumPerSite_pft(:)       => null() !maximum grain number per node,        [-]
   real(r8), pointer :: rLen2WidthLeaf_pft(:)          => null() !leaf length:width ratio,              [-]
   real(r8), pointer :: SeedCMassMax_pft(:)            => null() !maximum grain size,                   [g]
   real(r8), pointer :: Root1stRadius_pvr(:,:,:)       => null() !root layer diameter primary axes,     [m]
-  real(r8), pointer :: Root2ndRadius_rpvr(:,:,:)       => null() !root layer diameter secondary axes,   [m]
+  real(r8), pointer :: Root1stRadius_rpvr(:,:,:)      => null() !root layer diameter for each primary axes,  [m]  
+  real(r8), pointer :: RootCRRadius0_rpvr(:,:,:)      => null() !initial radius of roots that may undergo secondary growth, [m]
+  real(r8), pointer :: Root2ndRadius_rpvr(:,:,:)      => null() !root layer diameter secondary axes,   [m]
+  real(r8), pointer :: fRootTube_rpvr(:,:,:)          => null() !fraction of root for transport,[-]
   real(r8), pointer :: RootRaidus_rpft(:,:)           => null() !root internal radius,                 [m]
   real(r8), pointer :: Root1stMaxRadius_pft(:,:)      => null() !maximum radius of primary roots,      [m]
   real(r8), pointer :: Root2ndMaxRadius_pft(:,:)      => null() !maximum radius of secondary roots,    [m]
   real(r8), pointer :: RootRadialResist_pft(:,:)      => null() !root radial resistivity,              [MPa h m-2]
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
-  real(r8), pointer :: Root1stXNumL_rpvr(:,:,:)        => null() !root layer number primary axes,       [d-2]
-  REAL(R8), POINTER :: RootPrimeAxsNum_pft(:)              => null() !primary root axes number, [d-2]
-  real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)         => null() !root layer number axes,               [d-2]
+  real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
+  REAL(R8), POINTER :: NumAxesPerPrimRoot_pft(:)      => null() !primary root axes number, [d-2]
+  real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
+  real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)       => null() !root layer number axes,               [d-2]
+  real(r8), pointer :: Root2ndVH2O_rpvr(:,:,:,:)      => null()  !water-occupied 2nd root volume, [m3 m-3]    
+  real(r8), pointer :: Root1stVH2O_rpvr(:,:,:)        => null()  !water-occupied xylem volume in corase roots, [m3 m-3]
+  real(r8), pointer :: xylemPhi_min_pft(:)            => null()  !the fraction found in the youngest xylem that as lumen for tree, [m2/m2]
+  real(r8), pointer :: xylemPhi_max_pft(:)            => null()  !asymptotic limit fraction of the xyxlem area as lumen for tree, [m2/m2]
+  real(r8), pointer :: xylemPhi_mean_pft(:)           => null()  !the mean fraction found in the seminal root as lumen for non-tree roots, [m2/m2]
+
   real(r8), pointer :: RootLenDensPerPlant_pvr(:,:,:) => null() !layer root length density,            [m m-3]
-  real(r8), pointer :: RootPoreVol_rpvr(:,:,:)        => null() !root layer volume air,                [m2 d-2]
+  real(r8), pointer :: RootPoreVol_pvr(:,:,:)        => null() !root layer volume air,                [m2 d-2]
   real(r8), pointer :: RootVH2O_pvr(:,:,:)            => null() !root layer volume water,              [m2 d-2]
-  real(r8), pointer :: RootAreaPerPlant_pvr(:,:,:)    => null() !layer root area per plant,            [m2 p-1]
+  real(r8), pointer :: RootSAreaPerPlant_pvr(:,:,:)    => null() !layer root area per plant,            [m2 p-1]
   real(r8), pointer :: RootArea1stPP_pvr(:,:,:)       => null() !layer 1st root area per plant, [m2 plant-1]
   real(r8), pointer :: RootArea2ndPP_pvr(:,:,:)       => null() !layer 2nd root area per plant, [m2 plant-1]
 
@@ -329,7 +359,7 @@ implicit none
   real(r8), pointer :: TempOffset_pft(:)                  => null()     !adjustment of Arhhenius curves for plant thermal acclimation,        [oC]
   real(r8), pointer :: PlantO2Stress_pft(:)               => null()     !plant O2 stress indicator,                                           [-]
   real(r8), pointer :: NonstCMinConc2InitBranch_pft(:)    => null()     !branch nonstructural C content required for new branch,              [gC gC-1]
-  real(r8), pointer :: MinNonstC2InitRoot_pft(:)          => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
+  real(r8), pointer :: NonstCMinCon2InitRoot_pft(:)          => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:)      => null()    !element translocated from leaf during senescence,                     [g d-2 h-1]
   real(r8), pointer :: PetioleChemElmRemobFlx_brch(:,:,:) => null()    !element translocated from sheath during senescence,                   [g d-2 h-1]
   real(r8), pointer :: TC4LeafOut_pft(:)                  => null()     !threshold temperature for spring leafout/dehardening,                [oC]
@@ -337,6 +367,7 @@ implicit none
   real(r8), pointer :: TC4LeafOff_pft(:)                  => null()     !threshold temperature for autumn leafoff/hardening,                  [oC]
   real(r8), pointer :: TKGroth_pft(:)                     => null()     !canopy growth temperature,                                           [K]
   real(r8), pointer :: fTCanopyGroth_pft(:)               => null()     !canopy temperature growth function,                                  [-]
+  real(r8), pointer :: MorphogenBase_pft(:)               => null()     !!baseline morphogen signal strength, [-]
   real(r8), pointer :: HoursTooLowPsiCan_pft(:)           => null()     !canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
   real(r8), pointer :: TCChill4Seed_pft(:)           => null()     !temperature below which seed set is adversely affected, [oC]
   real(r8), pointer :: rPlantThermoAdaptZone_pft(:)  => null()     !plant thermal adaptation zone,                          [-]
@@ -345,7 +376,7 @@ implicit none
   real(r8), pointer :: SeedTempSens_pft(:)           => null()     !sensitivity to HTC (seeds oC-1 above HTC),[oC-1]
   real(r8), pointer :: NetCumElmntFlx2Plant_pft(:,:) => null()     !effect of canopy element status on seed set,            [-]
   real(r8), pointer :: RefNodeInitRate_pft(:)        => null()     !rate of node initiation,                                [h-1 at 25 oC]
-  real(r8), pointer :: RefLeafAppearRate_pft(:)      => null()     !rate of leaf initiation,                                [h-1 at 25 oC]
+  real(r8), pointer :: RateRefLeafAppearance_pft(:)      => null()     !rate of leaf initiation,                                [h-1 at 25 oC]
   real(r8), pointer :: CriticPhotoPeriod_pft(:)      => null()     !critical daylength for phenological progress,           [h]
   real(r8), pointer :: PhotoPeriodSens_pft(:)        => null()     !difference between current and critical daylengths used to calculate  phenological progress, [h]
 
@@ -408,14 +439,15 @@ implicit none
   real(r8), pointer :: TScal4Difsvity_vr(:)           => null()  !temperature effect on diffusivity,[-]
   real(r8), pointer :: FracAirFilledSoilPoreM_vr(:,:) => null()  !soil air-filled porosity,                     [m3 m-3]
   real(r8), pointer :: DiffusivitySolutEffM_vr(:,:)   => null()  !coefficient for dissolution - volatilization, [-]
-  real(r8), pointer :: SoilResist4RootPentrate_vr(:)   => null()  !soil resistance to root penetration, [MPa]
+  real(r8), pointer :: SoilBulkModulus4RootPent_vr(:)   => null()  !elastic modulus of the undisturbed soil, [MPa]
+  real(r8), pointer :: SoilModulus4RootRadialexp_vr(:) => null() ! soil modulus for root radial expansion, [MPa]    
   real(r8), pointer :: SoilBulkDensity_vr(:)          => null()  !soil bulk density,                            [Mg m-3]
   real(r8), pointer :: trc_solcl_vr(:,:)              => null()  !aqueous tracer concentration, [g m-3]
   real(r8), pointer :: trcg_gascl_vr(:,:)             => null()  !gaseous tracer concentration, [g m-3]
   real(r8), pointer :: CSoilOrgM_vr(:,:)              => null()  !soil organic C content, [gC kg soil-1]
   real(r8), pointer :: HYCDMicP4RootUptake_vr(:) => null()  !soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
-  real(r8), pointer :: GasDifc_vr(:,:)                => null()  !gaseous diffusivity, [m2 h-1]
-  real(r8), pointer :: SoluteDifusvty_vr(:,:)         => null()  !aqueous diffusivity, [m2 h-1]
+  real(r8), pointer :: GasDifcT_vr(:,:)                => null()  !gaseous diffusivity, [m2 h-1]
+  real(r8), pointer :: SoluteDifusvtyT_vr(:,:)         => null()  !aqueous diffusivity, [m2 h-1]
   real(r8), pointer :: trcg_gasml_vr(:,:)             => null()  !gas layer mass, [g d-2]
   real(r8), pointer :: GasSolbility_vr(:,:)           => null()  !gas solubility,                                [m3 m-3]
   real(r8), pointer :: THETW_vr(:)                    => null()  !volumetric water content, [m3 m-3]
@@ -461,9 +493,11 @@ implicit none
   real(r8), pointer :: rPCReserve_pft(:)                => null()  !reserve P:C ratio,                                       [gP gC-1]
   real(r8), pointer :: rPCGrain_pft(:)                      => null()  !grain P:C ratio,                                         [gP gP-1]
   real(r8), pointer :: rNCStalk_pft(:)                  => null()  !stalk N:C ratio,                                         [gN gC-1]
-  real(r8), pointer :: FracShootLeafAlloc2Litr(:,:)  => null()  !woody element allocation, [-]
+  real(r8), pointer :: rNCLigRoot_pft(:)               => null()  !NC ratio of lignified root, [gN gC-1]
+  real(r8), pointer :: rPCLigRoot_pft(:)               => null()  !PC ratio of lignified root, [gP gC-1]    
+  real(r8), pointer :: FracShootElmAllocm(:,:)  => null()  !woody element allocation, [-]
   real(r8), pointer :: FracShootPetolAlloc2Litr(:,:) => null()  !leaf element allocation,[-]
-  real(r8), pointer :: FracRootElmAlloc2Litr(:,:)       => null()  !C woody fraction in root,[-]
+  real(r8), pointer :: FracRootElmAllocm(:,:)       => null()  !C woody fraction in root,[-]
   real(r8), pointer :: FracWoodStalkElmAlloc2Litr(:,:)  => null()  !woody element allocation,[-]
   real(r8), pointer :: LeafBiomGrowthYld_pft(:)         => null()  !leaf growth yield,                                       [g g-1]
   real(r8), pointer :: rNCGrain_pft(:)                      => null()  !grain N:C ratio,                                         [g g-1]
@@ -496,8 +530,10 @@ implicit none
   real(r8), pointer :: CanopyLeafCLyr_pft(:,:)              => null()    !canopy layer leaf C,                                [g d-2]
   real(r8), pointer :: RootMycoNonstElms_pft(:,:,:)         => null()    !nonstructural root-myco chemical element,           [g d-2]
   real(r8), pointer :: RootMyco2ndStrutElms_rpvr(:,:,:,:,:) => null()    !root layer element secondary axes,                  [g d-2]
-  real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:,:) => null()    !root layer element primary axes,                    [g d-2]
-  real(r8), pointer :: RootMyco1stElm_raxs(:,:,:,:)         => null()    !root C primary axes,                                [g d-2]
+  real(r8), pointer :: RootMyco1stStrutElms_rpvr(:,:,:,:)   => null()    !root layer element primary axes,                    [g d-2]
+  real(r8), pointer :: Root1stActStructElms_rpvr(:,:,:,:)   => null()    !root layer active zone element in primary axes, [g d-2]
+  real(r8), pointer :: Root1stLigStructElms_rpvr(:,:,:,:)   => null()    !root layer lignified zone element in primary axes, [g d-2]
+  real(r8), pointer :: RootMyco1stElm_raxs(:,:,:)           => null()    !root C primary axes,                                [g d-2]
   real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)        => null()    !standing dead element fraction,                     [g d-2]
   real(r8), pointer :: CanopyNonstElmConc_pft(:,:)          => null()    !canopy nonstructural element concentration,         [g d-2]
   real(r8), pointer :: CanopyNonstElms_pft(:,:)             => null()    !canopy nonstructural element concentration,         [g d-2]
@@ -512,7 +548,7 @@ implicit none
   real(r8), pointer :: LeafPetoNonstElmConc_brch(:,:,:)     => null()    !branch nonstructural C concentration,               [g d-2]
   real(r8), pointer :: StructInternodeElms_brch(:,:,:,:)    => null()    !internode C,                                        [g d-2]
   real(r8), pointer :: LeafElmntNode_brch(:,:,:,:)          => null()    !leaf element,                                       [g d-2]
-  real(r8), pointer :: LeafProteinC_node(:,:,:)             => null()    !layer leaf protein C,                               [g d-2]
+  real(r8), pointer :: LeafProteinC_node(:,:,:)             => null()    !layer leaf protein N,                               [g d-2]
   real(r8), pointer :: PetioleElmntNode_brch(:,:,:,:)       => null()    !sheath chemical element,                            [g d-2]
   real(r8), pointer :: PetoleProteinC_node(:,:,:)       => null()    !layer sheath protein C,                             [g d-2]
   real(r8), pointer :: LeafLayerElms_node(:,:,:,:,:)        => null()    !layer leaf element,                                 [g d-2]
@@ -543,8 +579,6 @@ implicit none
   real(r8), pointer :: GrainStrutElms_brch(:,:,:)           => null()   !branch grain structural element mass,                [g d-2]
   real(r8), pointer :: StalkStrutElms_brch(:,:,:)           => null()   !branch stalk structural element mass,                [g d-2]
   real(r8), pointer :: ShootElms_brch(:,:,:)                => null()   !branch shoot structural element mass,                [g d-2]
-  real(r8), pointer :: LeafChemElmRemob_brch(:,:,:)         => null()   !branch leaf structural element,                      [g d-2]
-  real(r8), pointer :: PetioleChemElmRemob_brch(:,:,:)      => null()   !branch sheath structural element,                    [g d-2]
   real(r8), pointer :: SenecStalkStrutElms_brch(:,:,:)      => null()   !branch stalk structural element,                     [g d-2]
   real(r8), pointer :: SapwoodBiomassC_brch(:,:)            => null()   !branch live stalk C,                                 [gC d-2]
   real(r8), pointer :: StalkStrutElms_pft(:,:)              => null()   !canopy stalk structural element mass,                [g d-2]
@@ -624,13 +658,15 @@ implicit none
   real(r8), pointer :: ENGYX_pft(:)                   => null()    !canopy heat storage from previous time step,                  [MJ d-2]
   real(r8), pointer :: TKC_pft(:)                     => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSICanopyOsmo_pft(:)           => null()    !canopy osmotic water potential,                               [Mpa]
-  real(r8), pointer :: CanOsmoPsi0pt_pft(:)           => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8), pointer :: OrganOsmoPsi0pt_pft(:)           => null()    !Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8), pointer :: HeatXAir2PCan_pft(:)           => null()    !canopy sensible heat flux,                                    [MJ d-2 h-1]
   real(r8), pointer :: TKCanopy_pft(:)                => null()    !canopy temperature,                                           [K]
   real(r8), pointer :: PSIRoot_pvr(:,:,:)             => null()    !root total water potential,                                   [Mpa]
   real(r8), pointer :: PSIRootOSMO_vr(:,:,:)          => null()    !root osmotic water potential,                                 [Mpa]
   real(r8), pointer :: PSIRootTurg_vr(:,:,:)          => null()    !root turgor water potential,                                  [Mpa]
   real(r8), pointer :: RPlantRootH2OUptk_pvr(:,:,:)   => null()    !root water uptake,                                            [m3 d-2 h-1]
+  real(r8), pointer :: SapFlowVlinear_pvr(:,:)        => null()    !Sap flow mean linear velocity, [m h-1]  
+  real(r8), pointer :: SapFlowVLinear_rpvr(:,:,:)     => null()    !linear sap flow for primary root axis, [m h-1]
   real(r8), pointer :: RootH2OUptkStress_pvr(:,:,:)   => null()    !root water uptake stress indicated by rate,                   [m3 d-2 h-1] 
   real(r8), pointer :: THeatLossRoot2Soil_vr(:)       => null()    !total root heat uptake,                                       [MJ d-2]
   real(r8), pointer :: TWaterPlantRoot2Soil_vr(:)     => null()    !total root water uptake,                                      [m3 d-2]
@@ -741,6 +777,7 @@ implicit none
   real(r8), pointer :: GrossCO2Fix_pft(:)                  => null()   !total gross CO2 fixation,                    [gC d-2 ]
   real(r8), pointer :: LitrfallElms_pft(:,:)               => null()   !plant element Litrfall,                      [g d-2 h-1]
   real(r8), pointer :: LitrfallAbvgElms_pft(:,:)           => null()   !aboveground litterfall, [g d-2 h-1]
+  real(r8), pointer :: SurfLitrfallElms_pft(:,:)           => null()   !surface litterfall, [g d-2 h-1]
   real(r8), pointer :: LitrfallBlgrElms_pft(:,:)           => null()   !belwground litterfall, [g d-2 h-1]
   real(r8), pointer :: RootGasLossDisturb_pft(:,:)         => null()   !gaseous flux fron root disturbance,           [g d-2 h-1]
   real(r8), pointer :: SurfLitrfalStrutElms_CumYr_pft(:,:) => null()   !total surface LitrFall element,              [g d-2]
@@ -763,14 +800,14 @@ implicit none
   real(r8), pointer :: TRootGasLossDisturb_col(:)        => null()  !total root gas content,                                         [g d-2]
   real(r8), pointer :: trcs_Soil2plant_uptake_vr(:,:)    => null()  !total root-soil solute flux non-band,                           [g d-2 h-1]
   real(r8), pointer :: trcs_Soil2plant_uptake_pvr(:,:,:) => null()  !plant root-soil solute flux non-band,                           [g d-2 h-1]  
-  real(r8), pointer :: RootMycoExudElms_pft(:,:)         => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+  real(r8), pointer :: Soil2RootMycoExudE_pft(:,:)         => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: CanopyN2Fix_pft(:)                => null()  !total canopy N2 fixation, [g d-2 h-1]
   real(r8), pointer :: RootN2Fix_pft(:)                  => null()  !total root N2 fixation,                                         [g d-2 h-1]
   real(r8), pointer :: RootNO3Uptake_pft(:)              => null()  !total root uptake of NO3,                                       [g d-2 h-1]
   real(r8), pointer :: RootNH4Uptake_pft(:)              => null()  !total root uptake of NH4,                                       [g d-2 h-1]
   real(r8), pointer :: RootHPO4Uptake_pft(:)             => null()  !total root uptake of HPO4,                                      [g d-2 h-1]
   real(r8), pointer :: RootH2PO4Uptake_pft(:)            => null()  !total root uptake of PO4,                                       [g d-2 h-1]
-  real(r8), pointer :: RootMycoExudEUptk_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE,                     [g d-2 h-1]
+  real(r8), pointer :: Soil2RootMycoExudE_pvr(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE,                     [g d-2 h-1]
   real(r8), pointer :: PlantRootSoilElmNetX_pft(:,:)     => null()  !net root element uptake (+ve) - exudation (-ve),                [gC d-2 h-1]
   real(r8), pointer :: REcoUptkSoilO2M_vr(:,:)              => null()  !total O2 sink,                                                  [g d-2 t-1]
   real(r8), pointer :: ZERO4Uptk_pft(:)                  => null()  !threshold zero for uptake calculation,                          [-]
@@ -812,15 +849,21 @@ implicit none
   real(r8), pointer :: RAutoRootO2Limter_rpvr(:,:,:)     => null()  !O2 constraint to root respiration (0-1),                        [-]
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)          => null() !root gas content,                                                [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)          => null() !root aqueous content,                                            [g d-2]
-  real(r8), pointer :: RootGasConductance_rpvr(:,:,:,:)   => null()  !Conductance for gas diffusion                                   [m3 d-2 h-1]
+  real(r8), pointer :: RootAtmGasConductance_rpvr(:,:,:,:)   => null()  !Conductance for gas diffusion                                   [m3 d-2 h-1]
   real(r8), pointer :: NH3Dep2Can_brch(:,:)              => null()  !gaseous NH3 flux fron root disturbance band,                    [g d-2 h-1]
   real(r8), pointer :: GPP_brch(:,:)                    => null()  !dGPP (C4-C3 product) over branch, [gC d-2 h-1]
+  real(r8), pointer :: Cytokinin1stConc_rpvr(:,:,:)     => null()   !cytokinin concentration in primary roots, [gC m-3 H2O]
+  real(r8), pointer :: Cytokinin2ndConc_rpvr(:,:,:,:)    => null()  !cytokinin concentration in fine roots, [gC m-3 H2O]
   real(r8), pointer :: RootNutUptake_pvr(:,:,:,:)        => null()  !root uptake of Nutrient band,                                   [g d-2 h-1]
   real(r8), pointer :: RootOUlmNutUptake_pvr(:,:,:,:)    => null()  !root uptake of NH4 band unconstrained by O2,                    [g d-2 h-1]
   real(r8), pointer :: RootCUlmNutUptake_pvr(:,:,:,:)    => null()  !root uptake of NH4 band unconstrained by root nonstructural C,  [g d-2 h-1]
   real(r8), pointer :: RootRespPotent_pvr(:,:,:)         => null()  !root respiration unconstrained by O2,                           [g d-2 h-1]
+  real(r8), pointer :: Root2ndProdCytok_rpvr(:,:,:,:)    => null()  !cytokinin production rate due to fine root/myco elongation, []
+  real(r8), pointer :: RootMyco2ndSinkC_rpvr(:,:,:,:)    => null()  !fine root/myco carbon sink, [gC d-2 h-1]
+  real(r8), pointer :: RootMyco1stSinkC_rpvr(:,:,:)      => null()  !primary root C sink, [gC d-2 h-1]
   real(r8), pointer :: RootCO2EmisPot_pvr(:,:,:)         => null()  !root CO2 efflux unconstrained by root nonstructural C,          [g d-2 h-1]
   real(r8), pointer :: RootCO2Autor_pvr(:,:,:)           => null()  !root respiration constrained by O2,                             [g d-2 h-1]
+  real(r8), pointer :: TurgEff4CanopyResp_pft(:)         => null()  !Turgor pressure effect on canopy respiration, [-]
   real(r8), pointer :: RootCO2AutorX_pvr(:,:,:)          => null()  !root respiration from previous time step,                       [g d-2 h-1]
   real(r8), pointer :: PlantExudElm_CumYr_pft(:,:)       => null()  !total net root element uptake (+ve) - exudation (-ve),          [gC d-2 ]
   real(r8), pointer :: trcg_root_vr(:,:)                 => null()   !total root internal gas flux,                                  [g d-2 h-1]
@@ -835,6 +878,7 @@ implicit none
   real(r8), pointer :: RootCO2Ar2RootX_pvr(:,:)          => null()  !root respiration released to root,                              [gC d-2 h-1]
   real(r8), pointer :: RootCO2Ar2RootX_rpvr(:,:,:)       => null()  !root/myco respiration released to root/myco,                    [gC d-2 h-1]  
   real(r8), pointer :: trcs_deadroot2soil_pvr(:,:,:)     => null()  !gases released to soil upong dying roots,                       [g d-2 h-1]
+  real(r8), pointer :: GroSrcRootStress_pvr(:,:)        => null()  !root growth stress due to nutrient and water, [-]
   contains
     procedure, public :: Init => plt_rootbgc_init
     procedure, public :: Destroy  => plt_rootbgc_destroy
@@ -863,15 +907,15 @@ implicit none
   allocate(this%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,JZ1)); this%trcs_Soil2plant_uptake_vr=0._r8  
   allocate(this%trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
   allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
-  allocate(this%RootGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootGasConductance_rpvr=0._r8
+  allocate(this%RootAtmGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootAtmGasConductance_rpvr=0._r8
   allocate(this%TRootGasLossDisturb_col(idg_beg:idg_NH3));this%TRootGasLossDisturb_col=spval
   allocate(this%REcoUptkSoilO2M_vr(60,0:JZ1)); this%REcoUptkSoilO2M_vr=spval
-  allocate(this%RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%RootMycoExudEUptk_pvr=spval
+  allocate(this%Soil2RootMycoExudE_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%Soil2RootMycoExudE_pvr=spval
   allocate(this%PlantRootSoilElmNetX_pft(NumPlantChemElms,JP1)); this%PlantRootSoilElmNetX_pft=spval
   allocate(this%PlantExudElm_CumYr_pft(NumPlantChemElms,JP1));this%PlantExudElm_CumYr_pft=spval
   allocate(this%RootUptk_N_CumYr_pft(JP1)); this%RootUptk_N_CumYr_pft=spval
   allocate(this%RootUptk_P_CumYr_pft(JP1)); this%RootUptk_P_CumYr_pft=spval  
-  allocate(this%RootMycoExudElms_pft(NumPlantChemElms,JP1));this%RootMycoExudElms_pft=spval
+  allocate(this%Soil2RootMycoExudE_pft(NumPlantChemElms,JP1));this%Soil2RootMycoExudE_pft=spval
   allocate(this%RootN2Fix_pft(JP1)); this%RootN2Fix_pft=spval
   allocate(this%CanopyN2Fix_pft(JP1));this%CanopyN2Fix_pft=spval
   allocate(this%canopy_growth_pft(JP1)); this%canopy_growth_pft=spval
@@ -884,18 +928,25 @@ implicit none
   allocate(this%RootRespPotent_pvr(jroots,JZ1,JP1)); this%RootRespPotent_pvr=spval
   allocate(this%RootCO2EmisPot_pvr(jroots,JZ1,JP1)); this%RootCO2EmisPot_pvr=spval
   allocate(this%RootCO2Autor_pvr(jroots,JZ1,JP1)); this%RootCO2Autor_pvr=0._r8
+  allocate(this%TurgEff4CanopyResp_pft(JP1)); this%TurgEff4CanopyResp_pft=0._r8
   allocate(this%trcs_deadroot2soil_pvr(idg_beg:idg_NH3,JZ1,JP1));this%trcs_deadroot2soil_pvr=0._r8
   allocate(this%RootCO2Ar2Soil_pvr(JZ1,JP1)); this%RootCO2Ar2Soil_pvr=0._r8
   allocate(this%RootCO2Ar2RootX_pvr(JZ1,JP1)); this%RootCO2Ar2RootX_pvr=0._r8
   allocate(this%RootCO2Ar2RootX_rpvr(jroots,JZ1,JP1));this%RootCO2Ar2RootX_rpvr=0._r8
   allocate(this%RootCO2AutorX_pvr(jroots,JZ1,JP1)); this%RootCO2AutorX_pvr=spval
+  allocate(this%RootMyco2ndSinkC_rpvr(jroots,JZ1,MaxNumRootAxes,JP1)); this%RootMyco2ndSinkC_rpvr=0._r8
+  allocate(this%RootMyco1stSinkC_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootMyco1stSinkC_rpvr=0._r8
+  allocate(this%Root2ndProdCytok_rpvr(jroots,JZ1,MaxNumRootAxes,JP1)); this%Root2ndProdCytok_rpvr=0._r8
   allocate(this%RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1)); this%RootNutUptake_pvr=0._r8
+  allocate(this%Cytokinin2ndConc_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Cytokinin2ndConc_rpvr=0._r8
+  allocate(this%Cytokinin1stConc_rpvr(JZ1,MaxNumRootAxes,JP1)); this%Cytokinin1stConc_rpvr=0._r8
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
   allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=spval
   allocate(this%GPP_brch(MaxNumBranches,JP1)); this%GPP_brch=spval
   allocate(this%CO2FixCL_pft(JP1)); this%CO2FixCL_pft=spval
   allocate(this%CO2FixLL_pft(JP1)); this%CO2FixLL_pft=spval
+  allocate(this%GroSrcRootStress_pvr(JZ1,JP1));this%GroSrcRootStress_pvr=1._R8
   allocate(this%RootNutUptakeN_pft(JP1));this%RootNutUptakeN_pft=spval
   allocate(this%RootNutUptakeP_pft(JP1));this%RootNutUptakeP_pft=spval
   allocate(this%trcg_air2root_flx_vr(idg_beg:idg_NH3,JZ1));this%trcg_air2root_flx_vr=spval
@@ -955,10 +1006,10 @@ implicit none
 !  if(allocated(OXYA))deallocate(OXYA)
 !  if(allocated(TRootN2Fix_pft))deallocate(TRootN2Fix_pft)
 !  if(allocated(REcoUptkSoilO2M_vr))deallocate(REcoUptkSoilO2M_vr)
-!  if(allocated(RootMycoExudEUptk_pvr))deallocate(RootMycoExudEUptk_pvr)
+!  if(allocated(Soil2RootMycoExudE_pvr))deallocate(Soil2RootMycoExudE_pvr)
 !  if(allocated(PlantRootSoilElmNetX_pft))deallocate(PlantRootSoilElmNetX_pft)
 !  if(allocated(PlantExudElm_CumYr_pft))deallocate(PlantExudElm_CumYr_pft)
-!  if(allocated(RootMycoExudElms_pft))deallocate(RootMycoExudElms_pft)
+!  if(allocated(Soil2RootMycoExudE_pft))deallocate(Soil2RootMycoExudE_pft)
 !  if(allocated(RootN2Fix_pft))deallocate(RootN2Fix_pft)
 !  if(allocated(RootNO3Uptake_pft))deallocate(RootNO3Uptake_pft)
 !  if(allocated(RootNH4Uptake_pft))deallocate(RootNH4Uptake_pft)
@@ -1061,7 +1112,9 @@ implicit none
   allocate(this%VLsoiAirPM_vr(60,0:JZ1));this%VLsoiAirPM_vr=spval
   allocate(this%TortMicPM_vr(60,0:JZ1));this%TortMicPM_vr=spval
   allocate(this%FILMM_vr(60,0:JZ1)); this%FILMM_vr=spval
-
+  allocate(this%SoilWeightStress_vr(JZ1));this%SoilWeightStress_vr=spval
+  allocate(this%SoilSuctStress_vr(JZ1));this%SoilSuctStress_vr=spval
+  allocate(this%rSat_vr(JZ1));this%rSat_vr=spval
   end subroutine plt_site_Init
 !----------------------------------------------------------------------
   subroutine plt_site_destroy(this)
@@ -1134,6 +1187,7 @@ implicit none
   allocate(this%LitrfallElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1));this%LitrfallElms_pvr=spval
   allocate(this%LitrFallElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LitrFallElms_brch=spval
   allocate(this%LitrfallAbvgElms_pft(NumPlantChemElms,JP1)); this%LitrfallAbvgElms_pft=spval
+  allocate(this%SurfLitrfallElms_pft(NumPlantChemElms,JP1)); this%SurfLitrfallElms_pft=spval
   allocate(this%LitrfallBlgrElms_pft(NumPlantChemElms,JP1)); this%LitrfallBlgrElms_pft=spval
   allocate(this%RootMaintDef_CO2_pvr(jroots,JZ1,JP1));this%RootMaintDef_CO2_pvr=0._r8  
   allocate(this%ShootRootXferElm_pft(NumPlantChemElms,JP1)); this%ShootRootXferElm_pft=spval
@@ -1238,12 +1292,14 @@ implicit none
   allocate(this%PSIRootOSMO_vr(jroots,JZ1,JP1));this%PSIRootOSMO_vr=spval
   allocate(this%PSIRootTurg_vr(jroots,JZ1,JP1));this%PSIRootTurg_vr=spval
   allocate(this%RPlantRootH2OUptk_pvr(jroots,JZ1,JP1));this%RPlantRootH2OUptk_pvr=spval
+  allocate(this%SapFlowVlinear_pvr(JZ1,JP1)); this%SapFlowVlinear_pvr=0._r8
+  allocate(this%SapFlowVLinear_rpvr(JZ1,MaxNumRootAxes,JP1)); this%SapFlowVLinear_rpvr=0._r8
   allocate(this%RootH2OUptkStress_pvr(jroots,JZ1,JP1)); this%RootH2OUptkStress_pvr=spval
   allocate(this%TWaterPlantRoot2Soil_vr(0:JZ1));this%TWaterPlantRoot2Soil_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
-  allocate(this%CanOsmoPsi0pt_pft(JP1));this%CanOsmoPsi0pt_pft=spval
+  allocate(this%OrganOsmoPsi0pt_pft(JP1));this%OrganOsmoPsi0pt_pft=spval
   allocate(this%CanopyIsothBndlResist_pft(JP1));this%CanopyIsothBndlResist_pft=spval
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval
   allocate(this%TKC_pft(JP1));this%TKC_pft=spval
@@ -1291,6 +1347,8 @@ implicit none
   allocate(this%rNCGrain_pft(JP1));this%rNCGrain_pft=spval
   allocate(this%rPCStalk_pft(JP1));this%rPCStalk_pft=spval
   allocate(this%rNCStalk_pft(JP1));this%rNCStalk_pft=spval
+  allocate(this%rNCLigRoot_pft(JP1));this%rNCLigRoot_pft=spval
+  allocate(this%rPCLigRoot_pft(JP1)); this%rPCLigRoot_pft=spval
   allocate(this%rPCGrain_pft(JP1));this%rPCGrain_pft=spval
   allocate(this%rPCEar_pft(JP1));this%rPCEar_pft=spval
   allocate(this%rPCReserve_pft(JP1));this%rPCReserve_pft=spval
@@ -1298,8 +1356,8 @@ implicit none
   allocate(this%rPCHusk_pft(JP1));this%rPCHusk_pft=spval
   allocate(this%FracWoodStalkElmAlloc2Litr(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracWoodStalkElmAlloc2Litr=spval
   allocate(this%FracShootPetolAlloc2Litr(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracShootPetolAlloc2Litr=spval
-  allocate(this%FracRootElmAlloc2Litr(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracRootElmAlloc2Litr=spval
-  allocate(this%FracShootLeafAlloc2Litr(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracShootLeafAlloc2Litr=spval
+  allocate(this%FracRootElmAllocm(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracRootElmAllocm=spval
+  allocate(this%FracShootElmAllocm(NumPlantChemElms,NumOfPlantLitrCmplxs));this%FracShootElmAllocm=spval
 
   allocate(this%PetioleBiomGrowthYld_pft(JP1));this%PetioleBiomGrowthYld_pft=spval
   allocate(this%HuskBiomGrowthYld_pft(JP1));this%HuskBiomGrowthYld_pft=spval
@@ -1349,8 +1407,8 @@ implicit none
 !  if(allocated(HuskBiomGrowthYld_pft))deallocate(HuskBiomGrowthYld_pft)
 !  if(allocated(FracShootPetolAlloc2Litr))deallocate(FracShootPetolAlloc2Litr)
 !  if(allocated(FracWoodStalkElmAlloc2Litr))deallocate(FracWoodStalkElmAlloc2Litr)
-!  if(allocated(FracRootElmAlloc2Litr))deallocate(FracRootElmAlloc2Litr)
-!  if(allocated(FracShootLeafAlloc2Litr))deallocate(FracShootLeafAlloc2Litr)
+!  if(allocated(FracRootElmAllocm))deallocate(FracRootElmAllocm)
+!  if(allocated(FracShootElmAllocm))deallocate(FracShootElmAllocm)
 !  if(allocated(rPCEar_pft))deallocate(rPCEar_pft)
 !  if(allocated(rPCHusk_pft))deallocate(rPCHusk_pft)
 !  if(allocated(rNCHusk_pft))deallocate(rNCHusk_pft)
@@ -1375,14 +1433,15 @@ implicit none
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,MaxNumRootAxes,JP1))
   this%RootMyco2ndStrutElms_rpvr=spval
   allocate(this%RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP1));this%RootMycoNonstElms_pft=spval
-  allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,MaxNumRootAxes,JP1))
-  this%RootMyco1stStrutElms_rpvr=spval
+  allocate(this%RootMyco1stStrutElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1));this%RootMyco1stStrutElms_rpvr=0._r8
+  allocate(this%Root1stActStructElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1)); this%Root1stActStructElms_rpvr=0._r8
+  allocate(this%Root1stLigStructElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1)); this%Root1stLigStructElms_rpvr=0._r8
   allocate(this%CanopyNonstElmConc_pft(NumPlantChemElms,JP1));this%CanopyNonstElmConc_pft=spval
   allocate(this%CanopyNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNonstElms_pft=spval
   allocate(this%CanopyNodulNonstElms_pft(NumPlantChemElms,JP1));this%CanopyNodulNonstElms_pft=spval
   allocate(this%CanopyNoduleNonstCConc_pft(JP1));this%CanopyNoduleNonstCConc_pft=spval
   allocate(this%RootProteinConc_rpvr(jroots,JZ1,JP1));this%RootProteinConc_rpvr=spval
-  allocate(this%RootProteinC_pvr(jroots,JZ1,JP1));this%RootProteinC_pvr=spval
+  allocate(this%RootProteinC_pvr(jroots,JZ1,JP1));this%RootProteinC_pvr=0._r8
   allocate(this%RootMycoActiveBiomC_pvr(jroots,JZ1,JP1));this%RootMycoActiveBiomC_pvr=spval
   allocate(this%RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ1,JP1)); this%RootMycoMassElm_pvr = 0._r8
   allocate(this%PopuRootMycoC_pvr(jroots,JZ1,JP1));this%PopuRootMycoC_pvr=spval
@@ -1424,16 +1483,15 @@ implicit none
   allocate(this%TotEndVegE_pft(NumPlantChemElms,JP1)); this%TotEndVegE_pft=spval
   allocate(this%CanopyLeafSheathC_pft(JP1));this%CanopyLeafSheathC_pft=spval
   allocate(this%StandDeadStrutElms_pft(NumPlantChemElms,JP1));this%StandDeadStrutElms_pft=spval
-  allocate(this%RootBiomCPerPlant_pft(JP1));this%RootBiomCPerPlant_pft=spval
+  
   allocate(this%PetoleStrutElms_pft(NumPlantChemElms,JP1));this%PetoleStrutElms_pft=spval
   allocate(this%StalkStrutElms_pft(NumPlantChemElms,JP1));this%StalkStrutElms_pft=spval
   allocate(this%StalkRsrvElms_pft(NumPlantChemElms,JP1));this%StalkRsrvElms_pft=spval
   allocate(this%GrainStrutElms_pft(NumPlantChemElms,JP1));this%GrainStrutElms_pft=0._r8
   allocate(this%HuskStrutElms_pft(NumPlantChemElms,JP1));this%HuskStrutElms_pft=spval
+  allocate(this%RootBiomCPerPlant_pft(JP1));this%RootBiomCPerPlant_pft=spval
   allocate(this%EarStrutElms_pft(NumPlantChemElms,JP1));this%EarStrutElms_pft=spval
   allocate(this%CanopyMassC_pft(JP1)); this%CanopyMassC_pft=0._r8
-  allocate(this%LeafChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafChemElmRemob_brch=spval
-  allocate(this%PetioleChemElmRemob_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetioleChemElmRemob_brch=spval
   allocate(this%ShootElms_pft(NumPlantChemElms,JP1));this%ShootElms_pft=spval
   allocate(this%AvgCanopyBiomC2Graze_pft(JP1));this%AvgCanopyBiomC2Graze_pft=spval
   allocate(this%LeafStrutElms_pft(NumPlantChemElms,JP1));this%LeafStrutElms_pft=spval
@@ -1449,7 +1507,7 @@ implicit none
   allocate(this%StalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%StalkStrutElms_brch=spval
   allocate(this%ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%ShootElms_brch=spval
   allocate(this%SenecStalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%SenecStalkStrutElms_brch=spval
-  allocate(this%RootMyco1stElm_raxs(NumPlantChemElms,jroots,MaxNumRootAxes,JP1));this%RootMyco1stElm_raxs=spval
+  allocate(this%RootMyco1stElm_raxs(NumPlantChemElms,MaxNumRootAxes,JP1));this%RootMyco1stElm_raxs=spval
 
   allocate(this%LeafC3ChlC_brch(MaxNumBranches,JP1));this%LeafC3ChlC_brch=0._r8             
   allocate(this%LeafC4ChlC_brch(MaxNumBranches,JP1));this%LeafC4ChlC_brch=0._r8             
@@ -1568,9 +1626,10 @@ implicit none
   allocate(this%SoilWatAirDry_vr(0:JZ1));this%SoilWatAirDry_vr=spval
 
   allocate(this%GasSolbility_vr(idg_beg:idg_end,0:JZ1));this%GasSolbility_vr=spval
-  allocate(this%GasDifc_vr(idg_beg:idg_end,0:JZ1));this%GasDifc_vr=spval
-  allocate(this%SoluteDifusvty_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvty_vr=spval
-  allocate(this%SoilResist4RootPentrate_vr(JZ1));this%SoilResist4RootPentrate_vr=spval
+  allocate(this%GasDifcT_vr(idg_beg:idg_end,0:JZ1));this%GasDifcT_vr=spval
+  allocate(this%SoluteDifusvtyT_vr(ids_beg:ids_end,0:JZ1));this%SoluteDifusvtyT_vr=spval
+  allocate(this%SoilBulkModulus4RootPent_vr(JZ1));this%SoilBulkModulus4RootPent_vr=spval
+  allocate(this%SoilModulus4RootRadialexp_vr(JZ1)); this%SoilModulus4RootRadialexp_vr=spval
   allocate(this%SoilBulkDensity_vr(0:JZ1));this%SoilBulkDensity_vr=spval
   allocate(this%HYCDMicP4RootUptake_vr(JZ1));this%HYCDMicP4RootUptake_vr=spval
 
@@ -1595,7 +1654,7 @@ implicit none
 !  if(allocated(CHSGL))deallocate(CHSGL)
 !  if(allocated(HGSGL))deallocate(HGSGL)
 !  if(allocated(OGSGL))deallocate(OGSGL)
-!  if(allocated(SoilResist4RootPentrate_vr))deallocate(SoilResist4RootPentrate_vr)
+!  if(allocated(SoilBulkModulus4RootPent_vr))deallocate(SoilBulkModulus4RootPent_vr)
 
 !   call destroy(this%GasSolbility_vr)
 !  if(allocated(THETW))deallocate(THETW)
@@ -1646,6 +1705,7 @@ implicit none
   NumOfSkyAzimuthSects1    => pltpar%NumOfSkyAzimuthSects1
   NumLeafZenithSectors1    => pltpar%NumLeafZenithSectors1
   MaxNodesPerBranch1       => pltpar%MaxNodesPerBranch1
+
   !the following variable should be consistent with the soil bgc model
   jcplx                => pltpar%jcplx
   jsken                => pltpar%jsken
@@ -1803,16 +1863,16 @@ implicit none
   allocate(this%CO2lmtRubiscoCarboxyRate_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2lmtRubiscoCarboxyRate_node=spval
   allocate(this%Vmax4PEPCarboxy_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%Vmax4PEPCarboxy_node=spval
   allocate(this%CO2lmtPEPCarboxyRate_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CO2lmtPEPCarboxyRate_node=spval
-  allocate(this%iPlantPhotosynthesisType(JP1));this%iPlantPhotosynthesisType=0
+  allocate(this%iPlantPhotosynsType_pft(JP1));this%iPlantPhotosynsType_pft=0
   allocate(this%Km4PEPCarboxy_pft(JP1));this%Km4PEPCarboxy_pft=spval
   allocate(this%O2L_pft(JP1));this%O2L_pft=spval
   allocate(this%CO2Solubility_pft(JP1));this%CO2Solubility_pft=spval
   allocate(this%CanopyGasCO2_pft(JP1));this%CanopyGasCO2_pft=spval
   allocate(this%ChillHours_pft(JP1));this%ChillHours_pft=spval
   allocate(this%SpecLeafChlAct_pft(JP1));this%SpecLeafChlAct_pft=spval
-  allocate(this%LeafC3Chl2Protein_pft(JP1));this%LeafC3Chl2Protein_pft=spval
+  allocate(this%LeafProtein2Chl_pft(JP1));this%LeafProtein2Chl_pft=spval
   allocate(this%LeafPEP2Protein_pft(JP1));this%LeafPEP2Protein_pft=spval
-  allocate(this%LeafC4Chl2Protein_pft(JP1));this%LeafC4Chl2Protein_pft=spval
+  allocate(this%fMesophyllChlProtein_pft(JP1));this%fMesophyllChlProtein_pft=spval
   allocate(this%LeafRubisco2Protein_pft(JP1));this%LeafRubisco2Protein_pft=spval
   allocate(this%VmaxPEPCarboxyRef_pft(JP1));this%VmaxPEPCarboxyRef_pft=spval
   allocate(this%VmaxRubOxyRef_pft(JP1));this%VmaxRubOxyRef_pft=spval
@@ -1820,7 +1880,7 @@ implicit none
   allocate(this%XKCO2_pft(JP1));this%XKCO2_pft=spval
   allocate(this%XKO2_pft(JP1));this%XKO2_pft=spval
   allocate(this%RubiscoActivity_brch(MaxNumBranches,JP1));this%RubiscoActivity_brch=1._r8
-  allocate(this%C4PhotosynDowreg_brch(MaxNumBranches,JP1));this%C4PhotosynDowreg_brch=spval
+  allocate(this%GrainFillDowreg_brch(MaxNumBranches,JP1));this%GrainFillDowreg_brch=spval
   allocate(this%aquCO2Intraleaf_pft(JP1));this%aquCO2Intraleaf_pft=spval
   allocate(this%Km4LeafaqCO2_pft(JP1));this%Km4LeafaqCO2_pft=spval
   allocate(this%Km4RubiscoCarboxy_pft(JP1));this%Km4RubiscoCarboxy_pft=spval
@@ -1850,8 +1910,9 @@ implicit none
   allocate(this%MatureGroup_pft(JP1));this%MatureGroup_pft=spval
   allocate(this%PlantO2Stress_pft(JP1));this%PlantO2Stress_pft=spval
   allocate(this%NonstCMinConc2InitBranch_pft(JP1));this%NonstCMinConc2InitBranch_pft=spval
-  allocate(this%MinNonstC2InitRoot_pft(JP1));this%MinNonstC2InitRoot_pft=spval
+  allocate(this%NonstCMinCon2InitRoot_pft(JP1));this%NonstCMinCon2InitRoot_pft=spval
   allocate(this%fTCanopyGroth_pft(JP1));this%fTCanopyGroth_pft=spval
+  allocate(this%MorphogenBase_pft(JP1));this%MorphogenBase_pft=spval
   allocate(this%TC4LeafOut_pft(JP1));this%TC4LeafOut_pft=spval
   allocate(this%TCGroth_pft(JP1));this%TCGroth_pft=spval
   allocate(this%TKGroth_pft(JP1));this%TKGroth_pft=spval
@@ -1898,7 +1959,7 @@ implicit none
   allocate(this%TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP1));this%TotalNodeNumNormByMatgrp_brch=spval
   allocate(this%TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP1));this%TotReproNodeNumNormByMatrgrp_brch=spval
   allocate(this%LeafNumberAtFloralInit_brch(MaxNumBranches,JP1));this%LeafNumberAtFloralInit_brch=spval
-  allocate(this%RefLeafAppearRate_pft(JP1));this%RefLeafAppearRate_pft=spval
+  allocate(this%RateRefLeafAppearance_pft(JP1));this%RateRefLeafAppearance_pft=spval
   allocate(this%RefNodeInitRate_pft(JP1));this%RefNodeInitRate_pft=spval
   allocate(this%CriticPhotoPeriod_pft(JP1));this%CriticPhotoPeriod_pft=spval
   allocate(this%PhotoPeriodSens_pft(JP1));this%PhotoPeriodSens_pft=spval
@@ -1931,21 +1992,27 @@ implicit none
   subroutine plt_morph_init(this)
   implicit none
   class(plant_morph_type) :: this
-
-  allocate(this%RootAreaPerPlant_pvr(jroots,JZ1,JP1));this%RootAreaPerPlant_pvr=spval
+  allocate(this%Root1stTransptArea_pvr(jroots,JZ1,JP1)); this%Root1stTransptArea_pvr=spval
+  allocate(this%RootSAreaPerPlant_pvr(jroots,JZ1,JP1));this%RootSAreaPerPlant_pvr=0._r8
   allocate(this%RootLenDensPerPlant_pvr(jroots,JZ1,JP1));this%RootLenDensPerPlant_pvr=spval
   allocate(this%RootArea1stPP_pvr(jroots,JZ1,JP1)); this%RootArea1stPP_pvr=0._r8
   allocate(this%RootArea2ndPP_pvr(jroots,JZ1,JP1)); this%RootArea2ndPP_pvr=0._r8
-  allocate(this%RootPoreVol_rpvr(jroots,JZ1,JP1));this%RootPoreVol_rpvr=spval
+  allocate(this%RootPoreVol_pvr(jroots,JZ1,JP1));this%RootPoreVol_pvr=spval
   allocate(this%RootVH2O_pvr(jroots,JZ1,JP1));this%RootVH2O_pvr=spval
-  allocate(this%Root1stXNumL_rpvr(jroots,JZ1,JP1));this%Root1stXNumL_rpvr=spval
+  allocate(this%Root1stXNumL_pvr(JZ1,JP1));this%Root1stXNumL_pvr=spval
   allocate(this%Root2ndXNumL_rpvr(jroots,JZ1,JP1));this%Root2ndXNumL_rpvr=spval
+  allocate(this%Root2ndVH2O_rpvr(jroots,JZ1,MaxNumRootAxes,JP1)); this%Root2ndVH2O_rpvr=0._r8
+  allocate(this%Root1stVH2O_rpvr(JZ1,MaxNumRootAxes,JP1)); this%Root1stVH2O_rpvr=0._r8
+  allocate(this%xylemPhi_min_pft(JP1)); this%xylemPhi_min_pft=0._r8
+  allocate(this%xylemPhi_max_pft(JP1)); this%xylemPhi_max_pft=0._r8
+  allocate(this%xylemPhi_mean_pft(JP1)); this%xylemPhi_mean_pft=0._r8
   allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
+  allocate(this%SeedWidth2LenRatio_pft(JP1));this%SeedWidth2LenRatio_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval
   allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
   allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
-  allocate(this%HypoctoHeight_pft(JP1));this%HypoctoHeight_pft=spval
+  allocate(this%HypocotHeight_pft(JP1));this%HypocotHeight_pft=spval
   allocate(this%RootPoreTortu4Gas_pft(jroots,JP1));this%RootPoreTortu4Gas_pft=spval
   allocate(this%rLen2WidthLeaf_pft(JP1));this%rLen2WidthLeaf_pft=spval
   allocate(this%MaxSeedNumPerSite_pft(JP1));this%MaxSeedNumPerSite_pft=spval
@@ -1954,28 +2021,39 @@ implicit none
   allocate(this%Root1stMaxRadius1_pft(jroots,JP1));this%Root1stMaxRadius1_pft=spval
   allocate(this%Root2ndMaxRadius1_pft(jroots,JP1));this%Root2ndMaxRadius1_pft=spval
   allocate(this%RootRaidus_rpft(jroots,JP1));this%RootRaidus_rpft=spval
-  allocate(this%Root1stRadius_pvr(jroots,JZ1,JP1));this%Root1stRadius_pvr=spval
+  allocate(this%Root1stRadius_pvr(jroots,JZ1,JP1));this%Root1stRadius_pvr=0._r8
+  allocate(this%Root1stRadius_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stRadius_rpvr=0._r8
+  allocate(this%RootCRRadius0_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootCRRadius0_rpvr=0._r8
   allocate(this%Root2ndRadius_rpvr(jroots,JZ1,JP1));this%Root2ndRadius_rpvr=spval
+  allocate(this%fRootTube_rpvr(JZ1,MaxNumRootAxes,JP1));this%fRootTube_rpvr=spval
   allocate(this%Root1stMaxRadius_pft(jroots,JP1));this%Root1stMaxRadius_pft=spval
   allocate(this%Root2ndMaxRadius_pft(jroots,JP1));this%Root2ndMaxRadius_pft=spval
 
-  allocate(this%Root1stDepz_pft(jroots,MaxNumRootAxes,JP1));this%Root1stDepz_pft=spval
+  allocate(this%Root1stDepz_raxes(MaxNumRootAxes,JP1));this%Root1stDepz_raxes=spval
   allocate(this%Root1stAxesTipDepz2Surf_pft(MaxNumRootAxes,JP1)); this%Root1stAxesTipDepz2Surf_pft=spval
   allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
+  allocate(this%RootAbsorbLenPerPlant_pvr(jroots,JZ1,JP1));this%RootAbsorbLenPerPlant_pvr=0._r8
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
   allocate(this%Root2ndEffLen4uptk_rpvr(jroots,JZ1,JP1));this%Root2ndEffLen4uptk_rpvr=spval
+  allocate(this%DistRootEffDepz_pvr(JZ1,JP1)); this%DistRootEffDepz_pvr=spval
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval
   allocate(this%Root2ndSpecLen_pft(jroots,JP1));this%Root2ndSpecLen_pft=spval
-  allocate(this%Root1stLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root1stLen_rpvr=spval
+  allocate(this%Root1stLenPP_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stLenPP_rpvr=spval
+  allocate(this%flag2ndGrowth_pvr(JZ1,MaxNumRootAxes,JP1));this%flag2ndGrowth_pvr=.false.
+  allocate(this%RootAge_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootAge_rpvr=spval
   allocate(this%Root2ndLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndLen_rpvr=spval
-  allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=spval
+  allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
   allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval
   allocate(this%KLeafNumber_brch(MaxNumBranches,JP1));this%KLeafNumber_brch=0
   allocate(this%NumOfLeaves_brch(MaxNumBranches,JP1));this%NumOfLeaves_brch=spval
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
-  allocate(this%RootPrimeAxsNum_pft(JP1)); this%RootPrimeAxsNum_pft=0._r8
+  allocate(this%RootSinkWeight_pvr(JZ1,JP1)); this%RootSinkWeight_pvr=0._r8
+  allocate(this%Root2ndSinkWeight_pvr(JZ1,jroots,JP1));this%Root2ndSinkWeight_pvr=0._r8
+  allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
+  allocate(this%NumAxesPerPrimRoot_pft(JP1)); this%NumAxesPerPrimRoot_pft=0._r8
+  allocate(this%Radius95pctMature_pft(JP1)); this%Radius95pctMature_pft=0._r8
   allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
@@ -1984,6 +2062,13 @@ implicit none
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
   allocate(this%NMaxRootBotLayer_pft(JP1));this%NMaxRootBotLayer_pft=0
   allocate(this%NumPrimeRootAxes_pft(JP1));this%NumPrimeRootAxes_pft=0
+  allocate(this%RootMatureAge_pft(JP1)); this%RootMatureAge_pft=0._r8
+  allocate(this%RootSegAges_raxes(1:pltpar%NMaxRootSegs,1:MaxNumRootAxes,JP1));this%RootSegAges_raxes=0._r8     
+  allocate(this%NActiveRootSegs_raxes(1:MaxNumRootAxes,JP1));this%NActiveRootSegs_raxes=0
+  allocate(this%RootSegBaseDepth_raxes(1:MaxNumRootAxes,JP1));this%RootSegBaseDepth_raxes=0._r8     
+  allocate(this%RootSeglengths_raxes(1:pltpar%NMaxRootSegs,1:MaxNumRootAxes,JP1));this%RootSeglengths_raxes=0._r8       
+  allocate(this%IndRootSegBase_raxes(1:MaxNumRootAxes,JP1));this%IndRootSegBase_raxes=0
+  allocate(this%IndRootSegTip_raxes(1:MaxNumRootAxes,JP1));this%IndRootSegTip_raxes=0             
   allocate(this%NumCogrowthNode_pft(JP1));this%NumCogrowthNode_pft=0
   allocate(this%BranchNumber_pft(JP1));this%BranchNumber_pft=0
   allocate(this%NumOfBranches_pft(JP1));this%NumOfBranches_pft=0
@@ -2030,7 +2115,9 @@ implicit none
   allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
   allocate(this%SeedSitesSet_brch(MaxNumBranches,JP1));this%SeedSitesSet_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
-  allocate(this%RootVolPerMassC_pft(jroots,JP1));this%RootVolPerMassC_pft=spval
+  allocate(this%FineRootVolPerMassC_pft(jroots,JP1));this%FineRootVolPerMassC_pft=spval
+  allocate(this%CRootActVolPerMassC_pft(JP1)); this%CRootActVolPerMassC_pft=spval
+  allocate(this%CRootLigVolPerMassC_pft(JP1)); this%CRootLigVolPerMassC_pft=spval
   allocate(this%RootPorosity_pft(jroots,JP1));this%RootPorosity_pft=spval
   allocate(this%Root2ndXSecArea_pft(jroots,JP1));this%Root2ndXSecArea_pft=spval
   allocate(this%Root1stXSecArea_pft(jroots,JP1));this%Root1stXSecArea_pft=spval

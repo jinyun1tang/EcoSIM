@@ -106,6 +106,8 @@
           NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX) &
             -PO4byFire_CumYr_pft(NZ,NY,NX)+RootUptk_P_CumYr_pft(NZ,NY,NX)
 
+          RootUptk_Nmin_cumYr_pft(NZ,NY,NX)          = 0._r8
+          RootUptk_Pmin_cumYr_pft(NZ,NY,NX)          = 0._r8
           RootUptk_N_CumYr_pft(NZ,NY,NX)             = 0._r8
           RootUptk_P_CumYr_pft(NZ,NY,NX)             = 0._r8
           GrossCO2Fix_CumYr_pft(NZ,NY,NX)            = 0._r8

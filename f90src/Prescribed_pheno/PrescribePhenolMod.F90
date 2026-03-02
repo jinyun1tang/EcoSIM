@@ -282,7 +282,7 @@ implicit none
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
 
           !the following two are fillers, which will be updated later
-          Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 2._r8
+          Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8
           Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
         ENDDO
       ENDDO
@@ -292,10 +292,13 @@ implicit none
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------     
   subroutine SetRootProfileZ(irootType,NL,cdepthz,PerPlantRootC_vr,PerPlantRootLen_vr)
+  !
+  !Description:
+  !Reference: Jackson et al. (1997), A global budget for fine root biomass, surface area, and nutrient contents, PNAS.
   !|Biome | Total fine root biomass (kg m$^{-2}$) | Live fine root biomass (kg m$^{-2}$) | Live fine root length (km m$^{-2}$) | Live fine root area index (m2 m$^{-2}$) |$\beta$|
   !|----------|----------|----------|----------|----------|----------|
   !|1. Boreal forest|0.60 | 0.23 | 2.6 | 4.6 | 0.943|
-  !|2. Desert | 0.27|0.13|4.0 | 5.5 | 0.970|
+  !|2. Desert bushes | 0.27|0.13|4.0 | 5.5 | 0.970|
   !|3. Sclerophyllous shrubs and tress |0.52|0.28|8.4|11.6|0.950|
   !|4. Temperate confierous forest|0.82|0.50|6.1|11.0|0.980|
   !|5. Temperature deciduous forest|0.78|0.44|5.4|9.8|0.967|
@@ -304,6 +307,7 @@ implicit none
   !|8. Tropical evergreen forest|0.57|0.33|4.1|7.4|0.972|
   !|9. Tropical grassland/savanna|0.99|0.51|60.4|42.5|0.972|
   !|10. Tundra|0.96|0.34|7.4|5.2|0.909|  
+
   implicit none
   integer, intent(in) :: iRootType
   integer, intent(in) :: NL

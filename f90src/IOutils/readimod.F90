@@ -46,10 +46,10 @@ module readiMod
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,WTBLDepz_nat,WTBLDepz_tile
-  real(r8) :: DTBLGG,DEC,initSnowDepth,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DEC,initSnowDepth,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
-  real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
+  real(r8) :: SL0,SLX,SL1,SL2
 
   integer :: L,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
@@ -199,7 +199,7 @@ module readiMod
 ! :0=none
 ! :1,2=natural stationary,mobile
 ! :3,4=artificial stationary,mobile
-! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
+! CO2EIG,CH4EG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
 ! IETYPG,iErosionMode=Koppen climate zone,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
 ! WTBLDepz_nat,WTBLDepz_tile=depth of natural,artificial (tile) water table (iWaterTabelMode)
@@ -246,8 +246,6 @@ module readiMod
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
-    write(*,'(40A)')('-',ll=1,40)
-    write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
     write(*,'(40A)')('-',ll=1,40)
@@ -386,13 +384,13 @@ module readiMod
 !     SURFACE SLOPES AND ASPECTS
 !
         ASP_col(NY,NX)       = ASPX
-        SL_col(NY,NX)            = SL0
+        SL_col(NY,NX)        = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
-!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
-!     geometric format 0/360 is east, 90 north, 180 west, 270 south
+!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south, (clockwise)
+!     geometric format 0/360 is east, 90 north, 180 west, 270 south (counter-clockwise)
         ASP_col(NY,NX)=450.0_r8-ASP_col(NY,NX)
         IF(ASP_col(NY,NX).GE.360.0_r8)ASP_col(NY,NX)=ASP_col(NY,NX)-360.0_r8
       ENDDO
@@ -554,7 +552,7 @@ module readiMod
             SatHydroCondVert_vr(L,NY,NX)  = SatHydroCondVert_vr(L,NV1,NH1)
             SatHydroCondHrzn_vr(L,NY,NX)  = SatHydroCondHrzn_vr(L,NV1,NH1)
             CSAND_vr(L,NY,NX)             = CSAND_vr(L,NV1,NH1)
-            CSILT_vr(L,NY,NX)                = CSILT_vr(L,NV1,NH1)
+            CSILT_vr(L,NY,NX)              = CSILT_vr(L,NV1,NH1)
             SoilFracAsMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NV1,NH1)
             ROCK_vr(L,NY,NX)              = ROCK_vr(L,NV1,NH1)
             PH_vr(L,NY,NX)                = PH_vr(L,NV1,NH1)
@@ -730,10 +728,10 @@ module readiMod
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
           IF(isclose(SoilBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
-        !     fraction of soil as micropore
+          ! fraction of soil as micropore
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
-  !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
-  !  both macropores and micropores    
+        !  Macropore correction is off, when reporting from measurements, FieldCapacity includes contribution from
+        !  both macropores and micropores    
   !     FieldCapacity_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !     WiltPoint_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)/(1.0-SoilFracAsMacP_vr(L,NY,NX))
   !
@@ -749,6 +747,7 @@ module readiMod
           !volume of organic matter
           OrgVolFrac = CSoilOrgM_vr(ielmc,L,NY,NX)/orgcden
           corrector  = 1.0E-03_r8*AZMAX1((1.0_r8-OrgVolFrac))
+          
           !convert soil texture into mass scale [0,1]
           CSAND_vr(L,NY,NX) = CSAND_vr(L,NY,NX)*corrector 
           CSILT_vr(L,NY,NX) = CSILT_vr(L,NY,NX)*corrector

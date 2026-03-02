@@ -24,13 +24,13 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: XGridBoundRunoffs
+  public :: XGridBoundSolutesRunoff
 
   contains
 
-  subroutine XGridBoundRunoffs(I,J,NY,NX,NHW,NHE,NVN,NVS)
+  subroutine XGridBoundSolutesRunoff(I,J,NY,NX,NHW,NHE,NVN,NVS)
   !
-  !Diagnose fluxes across the landscape boundariers 
+  !Diagnose solute fluxes across the landscape boundariers 
   !N-W-S-E, and bottom
   implicit none
   integer, intent(in) :: I,J, NY,NX,NHW,NHE,NVN,NVS
@@ -114,7 +114,7 @@ implicit none
     ENDDO D9980
   ENDDO D9985
 
-  end subroutine XGridBoundRunoffs
+  end subroutine XGridBoundSolutesRunoff
 
 !------------------------------------------------------------------------------------------
 

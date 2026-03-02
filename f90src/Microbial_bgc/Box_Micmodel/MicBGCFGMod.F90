@@ -1204,7 +1204,7 @@ module MicBGCMod
         do NGL=JGniH(N),JGnfH(N)
           MID=micpar%get_micb_id(M,NGL)        
           DO NE=1,NumPlantChemElms
-            mBiomeHeter(NE,MID,K)=mBiomeHeter(NE,MID,K)+XferBiomeHeterK(NE,M,NGL,K)
+            mBiomeHeter(NE,MID,K)=AZERO(mBiomeHeter(NE,MID,K)+XferBiomeHeterK(NE,M,NGL,K))
           ENDDO
         enddo
       enddo
@@ -1919,7 +1919,7 @@ module MicBGCMod
             RCO2ProdHeter(NGL,K)=RCO2ProdHeter(NGL,K)+RMaintDefcitRecycOMHeter(ielmc,M,NGL,K)
           ENDDO D555
 
-          mBiomeHeter(ielmc,MID3,K)=mBiomeHeter(ielmc,MID3,K)+CGROMC
+          mBiomeHeter(ielmc,MID3,K)=AZERO(mBiomeHeter(ielmc,MID3,K)+CGROMC)
           mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+DOMuptk4GrothHeter(ielmn,NGL,K) &
             +RNH4imobilSoilHeter(NGL,K)+RNH4imobilBandHeter(NGL,K)+RNO3imobilSoilHeter(NGL,K) &
             +RNO3imobilBandHeter(NGL,K)+RN2FixHeter(NGL,K)
@@ -1932,7 +1932,8 @@ module MicBGCMod
             RNH4imobilSoilHeter(NGL,K) = RNH4imobilSoilHeter(NGL,K)-mBiomeHeter(ielmn,MID3,K)
             NetNH4Mineralize           = NetNH4Mineralize-mBiomeHeter(ielmn,MID3,K)
             mBiomeHeter(ielmn,MID3,K)  = 0._r8
-          endif            
+          endif        
+
           !fix negative P biomass by immobilization
           if(mBiomeHeter(ielmp,MID3,K)<0._r8)then
             RH2PO4imobilSoilHeter(NGL,K) = RH2PO4imobilSoilHeter(NGL,K)-mBiomeHeter(ielmp,MID3,K)

@@ -15,7 +15,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)                   !pft nodule infection [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
-  real(r8),target,allocatable ::  RootMycoExudEUptk_pvr(:,:,:,:,:,:,:)           !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8),target,allocatable ::  Soil2RootMycoExudE_pvr(:,:,:,:,:,:,:)           !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNutUptake_pvr(:,:,:,:,:,:)                 !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_pvr(:,:,:,:)                         !root N2 fixation, [gN d-2 h-1]
   real(r8),target,allocatable ::  RootN2Fix_vr(:,:,:)                            !vertical profile of root N2 fixation, [gN d-2 h-1]
@@ -55,7 +55,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootO2Uptk_pvr(:,:,:,:,:)                      !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),target,allocatable ::  RootRespPotent_pvr(:,:,:,:,:)                  !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RootCO2Autor_pvr(:,:,:,:,:)                    !root respiration constrained by O2, [g d-2 h-1]
-  real(r8),target,allocatable ::  RootMycoExudElms_pft(:,:,:,:)                  !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
+  real(r8),target,allocatable ::  Soil2RootMycoExudE_pft(:,:,:,:)                  !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNH4Uptake_pft(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),target,allocatable ::  RootNO3Uptake_pft(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH2PO4Uptake_pft(:,:,:)                     !total root uptake of PO4, [g d-2 h-1]
@@ -75,8 +75,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RAutoRootO2Limter_rpvr(:,:,:,:,:)              !O2 constraint to root respiration, [-]
   real(r8),target,allocatable ::  PlantRootSoilElmNetX_pft(:,:,:,:)              !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  PlantExudElm_CumYr_pft(:,:,:,:)                !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
-  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake, [g d-2]
-  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake, [g d-2]
+  real(r8),target,allocatable ::  RootUptk_N_CumYr_pft(:,:,:)                    !pft cumulative N uptake, [gN d-2]
+  real(r8),target,allocatable ::  RootUptk_P_CumYr_pft(:,:,:)                    !pft cumulative P uptake, [gP d-2]
+  real(r8),target,allocatable ::  RootUptk_Nmin_cumYr_pft(:,:,:)                 !pft cumulative mineral N uptake, [gN d-2]
+  real(r8),target,allocatable ::  RootUptk_Pmin_cumYr_pft(:,:,:)                 !pft cumulative mineral P uptake, [gP d-2]
   real(r8),target,allocatable ::  TPlantRootH2OUptake_col(:,:)                   !total root H2O uptake, [m3 d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2Soil_vr(:,:,:)                 !current step vertical root water uptake profile, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  TWaterPlantRoot2SoilPrev_vr(:,:,:)             !previous step vertical root water uptake profile, [m3 H2O d-2 h-1]
@@ -168,7 +170,7 @@ module PlantDataRateType
   allocate(NH3Emis_CumYr_pft(JP,JY,JX));    NH3Emis_CumYr_pft=0._r8  
   allocate(NodulInfectElms_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElms_pft=0._r8
   allocate(SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElms_CumYr_pft=0._r8
-  allocate(RootMycoExudEUptk_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));RootMycoExudEUptk_pvr=0._r8
+  allocate(Soil2RootMycoExudE_pvr(NumPlantChemElms,jroots,1:jcplx,JZ,JP,JY,JX));Soil2RootMycoExudE_pvr=0._r8
   allocate(RootNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ,JP,JY,JX));RootNutUptake_pvr=0._r8
   allocate(RootN2Fix_pvr(JZ,JP,JY,JX)); RootN2Fix_pvr=0._r8
   allocate(RootN2Fix_vr(JZ,JY,JX)); RootN2Fix_vr=0._r8
@@ -208,7 +210,7 @@ module PlantDataRateType
   allocate(RootO2Uptk_pvr(jroots,JZ,JP,JY,JX));RootO2Uptk_pvr=0._r8
   allocate(RootRespPotent_pvr(jroots,JZ,JP,JY,JX));RootRespPotent_pvr=0._r8
   allocate(RootCO2Autor_pvr(jroots,JZ,JP,JY,JX));RootCO2Autor_pvr=0._r8
-  allocate(RootMycoExudElms_pft(1:NumPlantChemElms,JP,JY,JX));    RootMycoExudElms_pft=0._r8
+  allocate(Soil2RootMycoExudE_pft(1:NumPlantChemElms,JP,JY,JX));    Soil2RootMycoExudE_pft=0._r8
   allocate(RootNH4Uptake_pft(JP,JY,JX));    RootNH4Uptake_pft=0._r8
   allocate(RootNO3Uptake_pft(JP,JY,JX));    RootNO3Uptake_pft=0._r8
   allocate(RootH2PO4Uptake_pft(JP,JY,JX));    RootH2PO4Uptake_pft=0._r8
@@ -232,6 +234,8 @@ module PlantDataRateType
   allocate(PlantExudElm_CumYr_pft(NumPlantChemElms,JP,JY,JX));   PlantExudElm_CumYr_pft=0._r8
   allocate(RootUptk_N_CumYr_pft(JP,JY,JX)); RootUptk_N_CumYr_pft=0._r8
   allocate(RootUptk_P_CumYr_pft(JP,JY,JX)); RootUptk_P_CumYr_pft=0._r8
+  allocate(RootUptk_Nmin_cumYr_pft(JP,JY,JX)); RootUptk_Nmin_cumYr_pft=0._r8
+  allocate(RootUptk_Pmin_cumYr_pft(JP,JY,JX)); RootUptk_Pmin_cumYr_pft=0._r8
   allocate(TWaterPlantRoot2Soil_vr(JZ,JY,JX)); TWaterPlantRoot2Soil_vr=0._r8
   allocate(TWaterPlantRoot2SoilPrev_vr(JZ,JY,JX)); TWaterPlantRoot2SoilPrev_vr=0._r8  
   allocate(THeatPlantRoot2SoilPrev_vr(JZ,JY,JX)); THeatPlantRoot2SoilPrev_vr=0._r8
@@ -306,7 +310,7 @@ module PlantDataRateType
   call destroy(NH3Dep2Can_pft)
   call destroy(NH3Emis_CumYr_pft)
   call destroy(SurfLitrfalStrutElms_CumYr_pft)
-  call destroy(RootMycoExudEUptk_pvr)
+  call destroy(Soil2RootMycoExudE_pvr)
   call destroy(RootNutUptake_pvr)
   call destroy(RootUptkSoiSol_pvr)
   call destroy(RootN2Fix_pvr)
@@ -345,7 +349,7 @@ module PlantDataRateType
   call destroy(RootO2Uptk_pvr)
   call destroy(RootRespPotent_pvr)
   call destroy(RootCO2Autor_pvr)
-  call destroy(RootMycoExudElms_pft)
+  call destroy(Soil2RootMycoExudE_pft)
   call destroy(RootNH4Uptake_pft)
   call destroy(RootNO3Uptake_pft)
   call destroy(RootH2PO4Uptake_pft)
@@ -368,6 +372,8 @@ module PlantDataRateType
   call destroy(PlantExudElm_CumYr_pft)
   call destroy(RootUptk_N_CumYr_pft)
   call destroy(RootUptk_P_CumYr_pft)
+  call destroy(RootUptk_Nmin_cumYr_pft)
+  call destroy(RootUptk_Pmin_cumYr_pft)
   call destroy(TWaterPlantRoot2Soil_vr)
   call destroy(TWaterPlantRoot2SoilPrev_vr)  
   call destroy(THeatPlantRoot2SoilPrev_vr)

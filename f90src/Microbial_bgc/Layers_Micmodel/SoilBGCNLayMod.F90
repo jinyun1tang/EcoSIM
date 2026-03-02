@@ -300,7 +300,7 @@ module SoilBGCNLayMod
       DO NE=1,nelms
         ORGM(NE)=AZERO(ORGM(NE)+OMBioResdu_vr(NE,M,K,L,NY,NX))
         if(ORGM(NE)<0._r8)then
-        print*,'orgm3',ORGM
+        print*,'orgm3',ORGM(NE),OMBioResdu_vr(NE,M,K,L,NY,NX),L
         stop
         endif
       ENDDO    
