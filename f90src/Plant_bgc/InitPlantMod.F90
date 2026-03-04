@@ -91,13 +91,6 @@ module InitPlantMod
     ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
     ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
     
-    plt_biom%RootElmsBeg_pft(:,NZ)           = 0._r8
-    plt_biom%StandDeadStrutElmsBeg_pft(:,NZ) = 0._r8
-    plt_biom%ShootElmsBeg_pft(:,NZ)          = 0._r8
-    plt_biom%SeasonalNonstElmsbeg_pft(:,NZ)  = 0._r8
-    plt_biom%ShootNoduleElmsBeg_pft(:,NZ)    = 0._r8
-    plt_biom%TotBegVegE_pft(:,NZ)            = 0._r8
-    plt_biom%RootNoduleElmsBeg_pft(:,NZ)     = 0._r8
   ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
@@ -417,7 +410,7 @@ module InitPlantMod
   associate(                                                                   &
     DATAP                         => plt_site%DATAP                           ,& !input  :parameter file name,[-]
     PlantInitThermoAdaptZone_pft  => plt_pheno%PlantInitThermoAdaptZone_pft   ,& !input  :initial plant thermal adaptation zone, [-]
-    iPlantPhotosynsType_pft      => plt_photo%iPlantPhotosynsType_pft       ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft       => plt_photo%iPlantPhotosynsType_pft        ,& !input  :plant photosynthetic type (C3 or C4),[-]
     TempOffset_pft                => plt_pheno%TempOffset_pft                 ,& !output :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
     rPlantThermoAdaptZone_pft     => plt_pheno%rPlantThermoAdaptZone_pft      ,& !output :plant thermal adaptation zone, [-]
     HighTempLimitSeed_pft         => plt_pheno%HighTempLimitSeed_pft          ,& !output :temperature above which seed set is adversely affected, [oC]

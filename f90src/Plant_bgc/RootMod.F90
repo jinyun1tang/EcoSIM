@@ -1754,6 +1754,8 @@ implicit none
     Cytokinin1stConc_rpvr        => plt_rbgc%Cytokinin1stConc_rpvr         ,& !output :cytokinin concentration in corase roots, [gC m-3 H2O]    
     Root1stRadius_rpvr           => plt_morph%Root1stRadius_rpvr           ,& !input: root layer radius for each primary axes,  [m]    
     rPCStalk_pft                 => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
+    KLigMax_pft                  => plt_biom%KLigMax_pft                   ,& !input  :Maximum lignification rate [h-1]
+    KLigMM_pft                   => plt_biom%KLigMM_pft                    ,& !input  :Half saturation parameter for coarse root lignification [h-1]
     CRootActVolPerMassC_pft      => plt_morph%CRootActVolPerMassC_pft      ,& !input  :coarse root active zone volume:mass ratio, [m3 gC-1]    
     CRootLigVolPerMassC_pft      => plt_morph%CRootLigVolPerMassC_pft      ,& !input  :coarse root inactive zone volume:mass ratio, [m3 gC-1]     
     rNCLigRoot_pft               => plt_allom%rNCLigRoot_pft               ,& !input  :NC ratio of lignified coarse root, [gN gC-1]
@@ -1827,7 +1829,7 @@ implicit none
   !respiration quotient of lignification, gC-CO2 per gC lignified
   CO2Qt_lig = (1._r8-Yld_lignif)/Yld_lignif
   !carry-over C mass from active zone for biomass
-  Rlignif_OUltd = k_ligmax*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+k_ligMM*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
+  Rlignif_OUltd = KLigMax_pft(NZ)*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
   alpha_fill    = (CRootActVolPerMassC_pft(NZ)-CRootLigVolPerMassC_pft(NZ))/CRootLigVolPerMassC_pft(NZ)
   RligCO2_OUltd = Rlignif_OUltd*alpha_fill*CO2Qt_lig
 
@@ -1836,7 +1838,7 @@ implicit none
     Rlignif_OUltd = RligCO2_OUltd/(CO2Qt_lig*alpha_fill)
   endif
   !amount of active zone C to be lignified
-  Rlignif_Oltd = k_ligmax*safe_adb(RGrowCO2_Oltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_Oltd+k_ligMM*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
+  Rlignif_Oltd = KLigMax_pft(NZ)*safe_adb(RGrowCO2_Oltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_Oltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
   !lignification is a compression and filling process that does not change the bulk volume
   RligCO2_Oltd = Rlignif_Oltd*alpha_fill*CO2Qt_lig
 

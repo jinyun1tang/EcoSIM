@@ -947,6 +947,8 @@ implicit none
     plt_allom%rPCLeaf_pft(NZ)              = rPCLeaf_pft(NZ,NY,NX)
     plt_allom%rPCSheath_pft(NZ)            = rPCSheath_pft(NZ,NY,NX)
     plt_allom%rPCStalk_pft(NZ)             = rPCStalk_pft(NZ,NY,NX)
+    plt_biom%KLigMax_pft(NZ)               = KLigMax_pft(NZ,NY,NX)
+    plt_biom%KLigMM_pft(NZ)                = KLigMM_pft(NZ,NY,NX)
     plt_allom%rPCReserve_pft(NZ)           = rPCReserve_pft(NZ,NY,NX)
     plt_allom%rPCHusk_pft(NZ)              = rPCHusk_pft(NZ,NY,NX)
     plt_allom%rPCEar_pft(NZ)               = rPCEar_pft(NZ,NY,NX)

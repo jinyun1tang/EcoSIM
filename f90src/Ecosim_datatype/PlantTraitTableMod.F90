@@ -110,6 +110,8 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: rPCLeaf_tab(:)
   real(r8), target, allocatable :: rPCSheath_tab(:)
   real(r8), target, allocatable :: rPCStalk_tab(:)
+  real(r8), target, allocatable :: KLigMax_tab(:)
+  real(r8), target, allocatable :: KLigMM_tab(:)
   real(r8), target, allocatable :: rPCReserve_tab(:)
   real(r8), target, allocatable :: rPCHusk_tab(:)
   real(r8), target, allocatable :: rPCEar_tab(:)
@@ -237,6 +239,8 @@ module PlantTraitTableMod
   allocate(rProteinC2LeafN_tab(npfts));rProteinC2LeafN_tab=0._r8
   allocate(rPCSheath_tab(npfts));rPCSheath_tab=0._r8
   allocate(rPCStalk_tab(npfts));rPCStalk_tab=0._r8
+  allocate(KLigMax_tab(npfts)); KLigMax_tab=0._r8
+  allocate(KLigMM_tab(npfts)); KLigMM_tab=0._r8
   allocate(rPCReserve_tab(npfts));rPCReserve_tab=0._r8
   allocate(rPCHusk_tab(npfts));rPCHusk_tab=0._r8
   allocate(rPCEar_tab(npfts));rPCEar_tab=0._r8
@@ -364,6 +368,8 @@ module PlantTraitTableMod
   call destroy(rProteinC2LeafP_tab)
   call destroy(rPCSheath_tab)
   call destroy(rPCStalk_tab)
+  call destroy(KLigMax_tab)
+  call destroy(KLigMM_tab)
   call destroy(rPCReserve_tab)
   call destroy(rPCHusk_tab)
   call destroy(rPCEar_tab)
@@ -373,3 +379,5 @@ module PlantTraitTableMod
   end Subroutine DestructPlantTraitTable
     
   end module PlantTraitTableMod
+
+
