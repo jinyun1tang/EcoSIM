@@ -69,6 +69,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rNCNodule_pft(:,:,:)                       !nodule N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCSheath_pft(:,:,:)                           !sheath P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCStalk_pft(:,:,:)                        !stalk P:C ratio, [g g-1]
+  real(r8),target,allocatable ::  KLigMax_pft(:,:,:)                         !Maximum lignification rate [h-1]
+  real(r8),target,allocatable ::  KLigMM_pft(:,:,:)                          !Half saturation parameter for coarse root lignification, [h-1]
   real(r8),target,allocatable ::  rPCReserve_pft(:,:,:)                      !reserve P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCHusk_pft(:,:,:)                         !husk P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
@@ -244,6 +246,8 @@ contains
   allocate(rNCNodule_pft(JP,JY,JX));     rNCNodule_pft=0._r8
   allocate(rPCSheath_pft(JP,JY,JX));    rPCSheath_pft=0._r8
   allocate(rPCStalk_pft(JP,JY,JX));    rPCStalk_pft=0._r8
+  allocate(KLigMax_pft(JP,JY,JX)); KLigMax_pft=0._r8
+  allocate(KLigMM_pft(JP,JY,JX)); KLigMM_pft=0._r8
   allocate(rPCReserve_pft(JP,JY,JX));    rPCReserve_pft=0._r8
   allocate(rPCHusk_pft(JP,JY,JX));    rPCHusk_pft=0._r8
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
@@ -416,6 +420,8 @@ contains
   call destroy(rNCNodule_pft)
   call destroy(rPCSheath_pft)
   call destroy(rPCStalk_pft)
+  call destroy(KLigMax_pft)
+  call destroy(KLigMM_pft)
   call destroy(rPCReserve_pft)
   call destroy(rPCHusk_pft)
   call destroy(rPCEar_pft)
