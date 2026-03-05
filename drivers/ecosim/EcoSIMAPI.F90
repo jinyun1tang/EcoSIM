@@ -1,11 +1,12 @@
 module EcoSIMAPI
-  use timings,           only: start_timer, end_timer
-  use data_kind_mod,     only: yearIJ_type  
-  use MicBGCAPI,         only: MicrobeModel, MicAPI_Init,  MicAPI_cleanup
-  use TracerIDMod,       only: ids_NO2B, ids_NO2, idg_O2
-  use EcosysWarmingMod,  only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
-  use ErosionMod,        only: erosion
-  use Hour1Mod,          only: hour1
+  use timings,          only: start_timer,         end_timer
+  use data_kind_mod,    only: yearIJ_type
+  use MicBGCAPI,        only: MicrobeModel,        MicAPI_Init,              MicAPI_cleanup
+  use TracerIDMod,      only: ids_NO2B,            ids_NO2,                  idg_O2
+  use EcosysWarmingMod, only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
+  use ErosionMod,       only: erosion
+  use Hour1Mod,         only: hour1
+  use abortutils,       only: iulog
   use RedistMod,         only: redist
   use GeochemAPI,        only: soluteModel
   use PlantMod,          only: PlantModel
@@ -129,7 +130,7 @@ contains
   use EcoSIMConfig   , only : transport_on,column_mode, do_instequil,ref_date
   use EcoSIMConfig   , only : finidat,restartFileFullPath,brnch_retain_casename,start_date
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
-  use fileUtil       , only : iulog,ecosim_namelist_buffer_size
+  use fileUtil       , only : ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
   use readsmod       , only : clim_var  
   use MicrobeConfigMod,only : ReadMicrobeNamelist

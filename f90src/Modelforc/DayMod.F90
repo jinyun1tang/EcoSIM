@@ -5,7 +5,7 @@
   use MiniFuncMod,        only: GetDayLength, calculate_equation_of_time
   use PrescribePhenolMod, only: PrescribePhenologyInterp
   use SurfLitterDataType, only: XTillCorp_col
-  use fileUtil,           only: iulog
+  use abortutils,         only: iulog
   use DebugToolMod,       only: PrintInfo
   use CanopyRadDataType
   use EcosimConst  

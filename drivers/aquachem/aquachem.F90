@@ -1,5 +1,5 @@
 program main
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use fileUtil
 implicit none
   character(len=*), parameter :: mod_filename = &
@@ -48,7 +48,7 @@ subroutine RunModel(namelist_buffer)
   use ModelStatusType  , only : model_status_type
   use data_kind_mod    , only : r8 => DAT_KIND_R8
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
-  use abortutils       , only : endrun
+  use abortutils       , only : endrun,iulog
   use AquachemMod
   use bhistMod
   use fileUtil

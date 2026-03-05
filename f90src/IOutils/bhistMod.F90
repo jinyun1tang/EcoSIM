@@ -1,11 +1,12 @@
 module bhistMod
 
 !#include "shr_assert.h"
-  use data_kind_mod  , only : r8 => DAT_Kind_r8, i4 => DAT_Kind_i4
-  use ecosim_log_mod , only : errMsg => shr_log_errMsg
-  use ncdio_pio      , only : file_desc_t
-  use data_const_mod , only : spval => DAT_CONST_SPVAL
-  use fileUtil       , only : var_flux_type, var_state_type
+  use data_kind_mod,  only: r8 => DAT_Kind_r8, i4 => DAT_Kind_i4
+  use ecosim_log_mod, only: errMsg => shr_log_errMsg
+  use ncdio_pio,      only: file_desc_t
+  use data_const_mod, only: spval => DAT_CONST_SPVAL
+  use abortutils,     only: iulog
+  use fileUtil,       only: var_flux_type,     var_state_type
 implicit none
  private
 
@@ -334,7 +335,7 @@ contains
   !DESCRIPTION
   ! create history file for writting
   use ncdio_pio, only : ncd_pio_createfile, get_dim_len
-  use fileUtil  , only : continue_run, iulog
+  use fileUtil  , only : continue_run
   use ncdio_pio, only : ncd_defvar
   use ncdio_pio, only : ncd_defdim, ncd_unlimited, ncd_float
   implicit none

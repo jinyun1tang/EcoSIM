@@ -1,7 +1,7 @@
 module SoilPhysParaMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only: micpar
-  use DebugToolMod,     only: PrintInfo
+  use DebugToolMod,     only: PrintInfo,DebugPrint
   USE SoilWaterDataType
   use SoilPropertyDataType
   USE SoilPhysDataType
@@ -95,7 +95,7 @@ implicit none
     PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
     FCDX = FCLX-WPLX
     PSI=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+(FCLX-LOG(ThetafW))*LOGPSIMND_col(NY,NX)/FCDX))
-  ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW)THEN  
+  ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW .and. FCX > 0._r8 .and. WPX >0._r8)THEN  
     !more than field capacity
     FCLX = LOG(FCX)
     WPLX = LOG(WPX)

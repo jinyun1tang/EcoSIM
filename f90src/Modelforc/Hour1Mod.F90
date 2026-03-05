@@ -2,8 +2,7 @@ module Hour1Mod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
   use minimathmod,       only: isclose, AZMAX1, AZMIN1,Viscosity_H2O
-  use abortutils,        only: endrun, print_info
-  use fileUtil,          only: iulog
+  use abortutils,        only: endrun, print_info, iulog
   use PlantMod,          only: PlantCanopyRadsModel
   use FertilizerMod,     only: ApplyFertilizerAtNoon
   use EcoSIMConfig,      only: jcplx=>jcplxc, nlbiomcp=>NumLiveMicrbCompts

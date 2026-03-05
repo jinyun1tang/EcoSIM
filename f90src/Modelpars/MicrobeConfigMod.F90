@@ -1,6 +1,6 @@
 module MicrobeConfigMod
   use MicBGCPars
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use fileUtil
 implicit none
   private

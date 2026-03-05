@@ -2952,7 +2952,7 @@ implicit none
   real(r8) :: QH2Oroots_rpvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)   !water flux along root axes
   integer  :: L,N,NR,L1
 
-  character, parameter :: subname='CytoKininDynamics'
+  character(len=*), parameter :: subname='CytoKininDynamics'
   real(r8) :: dmax = 0.01_r8              !Sapwood Depth, or the radius when heartwood start to form [m]
   real(r8), parameter :: phi_min =0.4_r8  
   real(r8), parameter :: phi_max =0.7_r8  !asymptotic limit of the conductive area fraction, [m2/m2]
@@ -2992,6 +2992,7 @@ implicit none
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]        
     Root2ndXNumL_rpvr          => plt_morph%Root2ndXNumL_rpvr            & !input  :within soil layer number of whole population 2nd root axes, [d-2]        
   )
+  if(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))return
   call PrintInfo('beg '//subname)
   
   !fine roots and mycorrhizae are assumed to functioning in parallel

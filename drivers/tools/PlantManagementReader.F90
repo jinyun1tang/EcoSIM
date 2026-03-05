@@ -5,8 +5,8 @@ program PlantManagementReader
   use PlantMgmtDataType
   use PlantInfoMod
   use EcoSIMCtrlMod, only: pft_mgmt_in, lverb
-  use abortutils,    only: endrun
-  USE fileUtil,      ONLY: iulog, ecosim_namelist_buffer_size, namelist_to_buffer
+  use abortutils,    only: iulog, endrun
+  USE fileUtil,      ONLY: ecosim_namelist_buffer_size, namelist_to_buffer
 
   implicit none
   character(len=*), parameter :: mod_filename = &

@@ -3,9 +3,9 @@ module PlantInfoMod
 ! DESCRIPTION
 ! code to read plant information
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil, iulog
+  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil
   use minimathmod,   only: isLeap
-  use abortutils,    only: endrun
+  use abortutils,    only: endrun, iulog
   use DebugToolMod,  only: PrintInfo
   use PlantTraitTableMod  
   use netcdf

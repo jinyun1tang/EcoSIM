@@ -4,7 +4,7 @@ module minimathmod
 ! Some small subroutines/function to do safe math.
 
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use fileUtil,      only: iulog
+  use abortutils,    only: iulog
   use EcoSimConst
 
   implicit none

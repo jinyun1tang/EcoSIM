@@ -50,7 +50,10 @@ implicit none
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-  
+      if(yearIJ%I>=157)then
+        print*,'NY=',NY,NX
+        print*,'NUM_col(NY,NX)=',NUM_col(NY,NX)
+      endif
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
         call PlantUptakeAPISend(yearIJ%I,yearIJ%J,NY,NX)        
