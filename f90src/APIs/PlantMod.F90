@@ -50,10 +50,7 @@ implicit none
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      if(yearIJ%I>=157)then
-        print*,'NY=',NY,NX
-        print*,'NUM_col(NY,NX)=',NUM_col(NY,NX)
-      endif
+
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
         call PlantUptakeAPISend(yearIJ%I,yearIJ%J,NY,NX)        
@@ -67,7 +64,7 @@ implicit none
       
         call  PlantAPISend(yearIJ%I,yearIJ%J,NY,NX)
 
-        call EnterPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
+        call EnterPlantBalance(yearIJ,NP_col(NY,NX))
 
         !Phenological update, determine living/active branches      
         CALL PhenologyUpdate(yearIJ%I,yearIJ%J)

@@ -479,7 +479,7 @@ module Hour1Mod
     ENDIF
     AREA_3D(1,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(2,L,NY,NX)
     AREA_3D(2,L,NY,NX)        = DLYR_3D(3,L,NY,NX)*DLYR_3D(1,L,NY,NX)
-    VGeomLayer_vr(L,NY,NX) = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
+    VGeomLayer_vr(L,NY,NX)    = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)
 
     VLSoilPoreMicP_vr(L,NY,NX) = AMAX1(VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX),1.e-8_r8)
     IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO)THEN
@@ -955,7 +955,7 @@ module Hour1Mod
     !d'Oriano and Kontoe (2022), Dynamic Properties of Organic Soils.
     !Hardin and Drnevich, 1972
     HBAconst_vr(L,NY,NX)=HBAMin_vr(L,NY,NX)*exp(-5._r8*ORGCX_vr(L,NY,NX))
-    print*,L,HBAconst_vr(L,NY,NX)
+    
   ENDDO
   stop
   end subroutine UpdateTotalSOC

@@ -121,7 +121,7 @@ implicit none
   integer, parameter :: iharvtyp_grazing = 4
   integer, parameter :: iharvtyp_fire    = 5
   integer, parameter :: iharvtyp_herbivo = 6
-
+  
   integer, parameter :: iplt_annual    = 0
   integer, parameter :: iplt_perennial = 1
 
@@ -173,5 +173,44 @@ implicit none
   integer, parameter :: itill_fire   = 22
   integer, parameter :: iHarvst_pft  = 1    !indicator for pft specific harvest
   integer, parameter :: iHarvst_col  = 2    !indicator for col mean harvest
+  public :: StriHarvtype,StrjHarvtype
+contains
+  
+  function StrjHarvtype(jhavtype)result(ans)
+  implicit none
+  integer, intent(in) :: jhavtype
+  character(len=48) :: ans
 
+  select case (jhavtype)
+  case (1)
+    ans='terminate plant'
+  case (2)
+    ans= 'terminate&seed'
+  case default
+    ans='no touch'
+  end select  
+  end function StrjHarvtype
+!------------------------------------------------------------------------------------------
+  function StriHarvtype(iharvtyp)result(ans)
+  implicit none
+  integer, intent(in) :: iharvtyp
+  character(len=48) :: ans
+
+  select case (iharvtyp)
+  case (1)
+    ans='harvest grain'
+  case (2)
+    ans='harvest shoot'
+  case(3)
+    ans='shoot pruning'
+  case (4)
+    ans='shoot grazing'
+  case (5)
+    ans='fire burning'
+  case (6)
+    ans='animal grazing'
+  case default
+    ans= 'no touch'
+  end select  
+  end function StriHarvtype
 end module ElmIDMod

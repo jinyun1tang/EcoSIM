@@ -2313,7 +2313,7 @@ implicit none
 
   data1d_ptr => this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='EmergHeight_pft',units='m',avgflag='A',&
-    long_name='Hypocotyl height exceeds seeding depth for emergence (>0 yes)',ptr_patch=data1d_ptr,default='inactive')      
+    long_name='Hypocotyl height exceeds seeding depth for emergence (>0 yes)',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_POPN_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='POPN_pft',units='1/m2',avgflag='A',&

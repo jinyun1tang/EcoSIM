@@ -3,7 +3,7 @@ module PlantAPI
 ! interface to integrate the plant model
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
+  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
   use MiniMathMod,      only: AZMAX1,safe_adb
   use DebugToolMod,     only: PrintInfo
   use NumericalAuxMod
@@ -725,8 +725,10 @@ implicit none
   character(len=*), parameter :: subname='PlantAPISend'
 
   call PrintInfo('beg '//subname)
+  plt_site%NY=NY;plt_site%NX=NX
   plt_site%DazCurrYear=DazCurrYear
   I1=I+1;if(I1>DazCurrYear)I1=1  
+  plt_site%SoilSurfDepZ_col           = SoilSurfDepZ_col(NY,NX)
   plt_site%ZERO                       = ZERO
   plt_site%ZERO2                      = ZERO2
   plt_site%ALAT                       = ALAT_col(NY,NX)

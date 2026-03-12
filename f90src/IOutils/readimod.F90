@@ -276,7 +276,6 @@ module readiMod
   write(iulog,*)'W distance to water table (m): RCHGWTG',RCHGWTG
   write(iulog,*)'Lower boundary scaling rate for water flow:RCHGDG', RCHGDG
   
-
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
       ALAT_col(NY,NX)             = ALATG
@@ -606,7 +605,7 @@ module readiMod
             RSP_vr(k_manure,L,NY,NX)     = RSP_vr(k_manure,L,NV1,NH1)
           ENDDO
         ENDIF
-        
+                
         DO L=1,NL_col(NY,NX)
 
           if(CSoilOrgM_vr(ielmc,L,NY,NX) > 0._r8)then 
@@ -643,11 +642,14 @@ module readiMod
         !
         IF(NU_col(NY,NX).GT.1)THEN
           DO  L=NU_col(NY,NX)-1,0,-1
-            IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN
+            IF(SoiBulkDensityt0_vr(L+1,NY,NX).GT.0.025_r8)THEN 
+              !next layer is not water
               CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.01_r8
+              !next layer is Likely water
             ELSE
-              CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.02_r8
+              CumDepz2LayBottom_vr(L,NY,NX)=CumDepz2LayBottom_vr(L+1,NY,NX)-0.02_r8     !place holder for water
             ENDIF
+
             IF(L.GT.0)THEN
               SoiBulkDensityt0_vr(L,NY,NX) = SoiBulkDensityt0_vr(L+1,NY,NX)
               FieldCapacity_vr(L,NY,NX)    = FieldCapacity_vr(L+1,NY,NX)
@@ -655,7 +657,7 @@ module readiMod
               SatHydroCondVert_vr(L,NY,NX) = SatHydroCondVert_vr(L+1,NY,NX)
               SatHydroCondHrzn_vr(L,NY,NX) = SatHydroCondHrzn_vr(L+1,NY,NX)
               CSAND_vr(L,NY,NX)            = CSAND_vr(L+1,NY,NX)
-              CSILT_vr(L,NY,NX)               = CSILT_vr(L+1,NY,NX)
+              CSILT_vr(L,NY,NX)            = CSILT_vr(L+1,NY,NX)
               CCLAY_vr(L,NY,NX)            = CCLAY_vr(L+1,NY,NX)
               SoilFracAsMacP_vr(L,NY,NX)   = SoilFracAsMacP_vr(L+1,NY,NX)
               ROCK_vr(L,NY,NX)             = ROCK_vr(L+1,NY,NX)
@@ -727,6 +729,7 @@ module readiMod
         !   SoilFracAsMacP: macropore fraction
   !     SoiBulkDensityt0_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)/(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))
           SoilBulkDensity_vr(L,NY,NX)=SoiBulkDensityt0_vr(L,NY,NX)
+          
           IF(isclose(SoilBulkDensity_vr(L,NY,NX),0.0_r8))SoilFracAsMacP_vr(L,NY,NX)=0.0_r8
           ! fraction of soil as micropore
           FracSoiAsMicP_vr(L,NY,NX)=(1.0_r8-ROCK_vr(L,NY,NX))*(1.0_r8-SoilFracAsMacP_vr(L,NY,NX))

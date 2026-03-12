@@ -117,7 +117,7 @@ module UptakesMod
   !     IF PLANT SPECIES EXISTS
 
   DO NZ=1,NP
-
+    
     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
       call PhotosynsDiag(yearIJ%I,yearIJ%J,NZ)  

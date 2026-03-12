@@ -30,6 +30,9 @@ implicit none
 
   !begin_derived_data_type
   type, public :: plant_siteinfo_type
+  integer  :: NY = 0
+  integer  :: NX = 0
+  real(r8) :: SoilSurfDepZ_col                     !soil surface depth, [m]
   real(r8) :: ALAT                                 !latitude,	[degrees north]
   real(r8) :: ATCA                                 !mean annual air temperature, [oC]
   real(r8) :: ALT                                  !altitude of the grid cell, [m]

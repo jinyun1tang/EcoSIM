@@ -27,6 +27,7 @@ implicit none
   public :: ComputePsiMCM  
   public :: ComputePSIPond
   public :: getMoistK
+  public :: IsPondLayer
 
   contains
 !------------------------------------------------------------------------------------------
@@ -280,5 +281,15 @@ implicit none
 
   K=MAX(1,MIN(100,101-INT(100.0_r8*thetawl/pores)))
   end function getMoistK
+
+!------------------------------------------------------------------------------------------
+  pure function IsPondLayer(bulkDS)result(ans)
+  implicit none
+  real(r8), intent(in) :: bulkDS
+  logical :: ans
+
+  ans =bulkDS.LE.ZERO
+
+  end function IsPondLayer
 
 end  module SoilPhysParaMod

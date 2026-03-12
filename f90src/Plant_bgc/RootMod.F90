@@ -2821,7 +2821,7 @@ implicit none
     RootDepzChk=Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.CumSoilThickness_vr(LL-1) .OR. Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.SeedDepth_pft(NZ)
     !EXIT if LL-1 is not active soil or has root, no withdraw
 
-    IF(VLSoilPoreMicP_vr(LL-1)<=ZEROS2 .OR. .not. RootDepzChk)EXIT
+    IF(VLSoilPoreMicP_vr(LL-1)<=ZEROS2 .OR. .not. RootDepzChk)CYCLE
     IF(RootSinkC_vr(N,LL).GT.ZERO4Groth_pft(NZ))THEN
       FracRootSinkL=(Root1stSink_pvr(LL,NR)+Root2ndSink_pvr(N,LL,NR))/RootSinkC_vr(N,LL)
     ELSE

@@ -190,6 +190,8 @@ module WatsubMod
           found_frozen=.true.
           NLF_col(NY,NX)=L
         endif
+        !micropore water change due to freeze-thaw:=final-initial
+        DVLiceMicP_vr(L,NY,NX)       = VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
         TKS_vr(L,NY,NX)        = TKSoil1_vr(L,NY,NX)
         VLWatMicP_vr(L,NY,NX)  = VLWatMicP1_vr(L,NY,NX)
@@ -198,6 +200,10 @@ module WatsubMod
         VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
         VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
       ENDDO  
+
+      DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
+        DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
+      ENDDO
     ENDDO  
   ENDDO
 

@@ -353,11 +353,11 @@ contains
               trcg_soilMass_beg_col(idg,NY,NX)-trcg_soilMass_col(idg,NY,NX)
             write(111,*)'soil2atm         =',trcg_ebu_flx_col(idg,NY,NX)+GasDiff2Surf_flx_col(idg,NY,NX)+Gas_WetDeposit_flx_col(idg,NY,NX)  
             if(idg==idg_O2)then
-              write(111,*)'netpro soil.   =',RGasNetProd_col(idg_O2,NY,NX)+RootO2_TotSink_col(NY,NX)
+              write(111,*)'netpro soil.   =',RGasNetProd_col(idg_O2,NY,NX),RootO2_TotSink_col(NY,NX)
               write(111,*)'tflx.          =',SurfGasEmiss_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
                 +RGasNetProd_col(idg_O2,NY,NX)+RootO2_TotSink_col(NY,NX)+trcs_solml_drib_col(idg)-trcs_Soil2plant_uptake_col(idg,NY,NX),&
                 SurfGasEmiss_flx_col(idg,NY,NX),GasHydroLoss_flx_col(idg,NY,NX), &
-                RGasNetProd_col(idg_O2,NY,NX)+RootO2_TotSink_col(NY,NX),trcs_solml_drib_col(idg),trcs_Soil2plant_uptake_col(idg,NY,NX)
+                RGasNetProd_col(idg_O2,NY,NX),'drib',trcs_solml_drib_col(idg),trcs_Soil2plant_uptake_col(idg,NY,NX),RootO2_TotSink_col(NY,NX)
             endif
             if(idg==idg_CO2)then
               write(111,*)'ar2soil          =',RootCO2Ar2Soil_col(NY,NX)
@@ -453,7 +453,7 @@ contains
       !note NL may change due to soil relayering, which can be tested using
       !by comparing the values of NL and NLI      
 
-      DO L=NUI_col(NY,NX),NL_col(NY,NX)
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)
           trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)
