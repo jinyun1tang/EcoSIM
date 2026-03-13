@@ -47,7 +47,7 @@ module EcoSIMDesctruct
   use SnowPhysData        , only : DestructSnowPhysData
   use HydroThermData      , only : DestructHydroThermData
   use BalanceCheckDataType, only : DestructBalanceCheckData
-  use PerturbationMod     , only : destructSoilWarming
+  use EcosysWarmingMod     , only : destructSoilWarming
   use TracerIDMod         , only : CleanUpTracerIDs
   use NumericalAuxMod     , only : DestructNumericAux
   use PlantTraitTableMod  , only : DestructPlantTraitTable

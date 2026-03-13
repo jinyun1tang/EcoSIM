@@ -99,7 +99,7 @@ implicit none
   integer :: idsp_beg,idsp_end
   integer :: idsp_beg_band
   integer :: idsp_CaHPO4 !
-  integer :: idsp_HA     !hydroxyapatite
+  integer :: idsp_Apatite     !hydroxyapatite
   integer :: idsp_AlOH3  !
   integer :: idsp_FeOH3  !
   integer :: idsp_CaCO3  !
@@ -108,7 +108,7 @@ implicit none
   integer :: idsp_FePO4
   integer :: idsp_CaH4P2O8
   integer :: idsp_CaHPO4B
-  integer :: idsp_HAB
+  integer :: idsp_ApatiteBand
   integer :: idsp_AlPO4B
   integer :: idsp_FePO4B
   integer :: idsp_CaH4P2O8B
@@ -172,8 +172,8 @@ implicit none
   logical, intent(in) :: lsalt_model
 
 
-  ifertn_beg=ifert_nh4;ifertn_end=ifert_no3
-  ifertnb_beg=ifert_nh4_band;ifertnb_end=ifert_no3_band
+  ifertn_beg=ifert_N_nh4;ifertn_end=ifert_N_no3
+  ifertnb_beg=ifert_N_nh4_band;ifertnb_end=ifert_N_no3_band
 
   ids_beg=idg_beg
 ! for better array manipulation of land-atmosphere exchange,
@@ -310,21 +310,21 @@ implicit none
   idsp_CaSO4=addone(idsp_end)     !Ca(2+)+SO4(2-)
 
   !precipitate
-  idsp_HA   =addone(idsp_end)     !hydroxyapatite
+  idsp_Apatite   =addone(idsp_end)     !hydroxyapatite
   idsp_AlPO4=addone(idsp_end)     !Al(3+)+PO4(3-)
   idsp_FePO4=addone(idsp_end)     !Fe(3+)+PO4(3-)
   idsp_CaHPO4=addone(idsp_end)    !Ca(2+)+H(+)+PO4(3-)
   idsp_CaH4P2O8=addone(idsp_end)  !Ca(2+)+4H(+)+2PO4(3-)
-  idsp_psoi_beg=idsp_HA;idsp_psoi_end=idsp_CaH4P2O8
+  idsp_psoi_beg=idsp_Apatite;idsp_psoi_end=idsp_CaH4P2O8
 
-  idsp_HAB  =addone(idsp_end)
+  idsp_ApatiteBand  =addone(idsp_end)
   idsp_AlPO4B=addone(idsp_end)
   idsp_FePO4B=addone(idsp_end)
   idsp_CaHPO4B=addone(idsp_end)
   idsp_CaH4P2O8B=addone(idsp_end)
   idsp_end=idsp_CaH4P2O8B
-  idsp_beg_band=idsp_HAB
-  idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH4P2O8B
+  idsp_beg_band=idsp_ApatiteBand
+  idsp_p_beg=idsp_Apatite;idsp_p_end=idsp_CaH4P2O8B
 
   idx_beg=1
   idx_end=0

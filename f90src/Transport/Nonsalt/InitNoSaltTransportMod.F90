@@ -191,7 +191,7 @@ module InitNoSaltTransportMod
       !     dt_GasCyc=1/number of cycles NPH-1 for gas flux calculations
       !
       DO ids=ids_beg,ids_end
-        SoluteDifusivitytscaledM_vr(ids,0,NY,NX)=SoluteDifusvty_vr(ids,0,NY,NX)*dts_HeatWatTP
+        SoluteDifusivitytscaledM_vr(ids,0,NY,NX)=SoluteDifusvtyT_vr(ids,0,NY,NX)*dts_HeatWatTP
       ENDDO
 
       DO idom=idom_beg,idom_end
@@ -285,8 +285,8 @@ module InitNoSaltTransportMod
 
         DO  K=1,jcplx
           DO idom=idom_beg,idom_end
-            DOM_MicP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MicP_vr(idom,K,L,NY,NX))
-            DOM_MacP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MacP_vr(idom,K,L,NY,NX))
+            DOM_MicP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MicP_vr(idom,K,L,NY,NX),1.e-10_r8)
+            DOM_MacP2_vr(idom,K,L,NY,NX) = AZERO(DOM_MacP_vr(idom,K,L,NY,NX),1.e-10_r8)
             if(DOM_MicP2_vr(idom,K,L,NY,NX)<0._r8 .or. DOM_MacP2_vr(idom,K,L,NY,NX)<0._r8)then
               write(*,*)'prep',idom,K,L,NY,NX,DOM_MicP2_vr(idom,K,L,NY,NX),DOM_MacP2_vr(idom,K,L,NY,NX)
               stop
@@ -500,11 +500,11 @@ module InitNoSaltTransportMod
         enddo
 
         DO ids=ids_beg,ids_end
-          SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvty_vr(ids,L,NY,NX)*dts_HeatWatTP
+          SoluteDifusivitytscaledM_vr(ids,L,NY,NX)=SoluteDifusvtyT_vr(ids,L,NY,NX)*dts_HeatWatTP
         ENDDO
 
         DO idg=idg_beg,idg_NH3
-          GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifc_vr(idg,L,NY,NX)*dts_gas
+          GasDifctScaledMM_vr(idg,L,NY,NX)=GasDifcT_vr(idg,L,NY,NX)*dts_gas
         ENDDO
       ENDDO
     ENDDO

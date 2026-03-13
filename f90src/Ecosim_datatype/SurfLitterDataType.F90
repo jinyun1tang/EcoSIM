@@ -25,7 +25,7 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   Rain2LitRSurf_col(:,:)            !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   Irrig2LitRSurf_col(:,:)               !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0_col(:,:)                   !litter porosity, [m3 pore m-3 litr]
-  real(r8) ,target,allocatable ::   RC0_col(:,:,:)                        !surface litter OM in each complex,	[g d-2]
+  real(r8) ,target,allocatable ::   SurfLitterC_col(:,:,:)                        !surface litter OM in each complex,	[g d-2]
   real(r8) ,target,allocatable ::   RC0ff_col(:,:)                        !surface litter OM in the autotrophic complex,[g d-2]
   real(r8) ,target,allocatable ::   LitWatMassBeg_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
   real(r8) ,target,allocatable ::   LitWatMassEnd_col(:,:)            !total inital water mass in litter layer, [m3 H2O d-2]
@@ -68,7 +68,7 @@ module SurfLitterDataType
   allocate(Rain2LitRSurf_col(JY,JX));        Rain2LitRSurf_col=0._r8
   allocate(Irrig2LitRSurf_col(JY,JX));        Irrig2LitRSurf_col=0._r8
   allocate(POROS0_col(JY,JX));       POROS0_col=0._r8
-  allocate(RC0_col(1:NumOfLitrCmplxs,JY,JX));      RC0_col=0._r8
+  allocate(SurfLitterC_col(1:NumOfLitrCmplxs,JY,JX));      SurfLitterC_col=0._r8
   allocate(RC0ff_col(JY,JX)); RC0ff_col=0._r8
   end subroutine InitAllocate
 
@@ -97,7 +97,7 @@ module SurfLitterDataType
   call destroy(Rain2LitRSurf_col)
   call destroy(Irrig2LitRSurf_col)
   call destroy(POROS0_col)
-  call destroy(RC0_col)
+  call destroy(SurfLitterC_col)
   call destroy(RC0ff_col)
 
   end subroutine DestructSurfLitter

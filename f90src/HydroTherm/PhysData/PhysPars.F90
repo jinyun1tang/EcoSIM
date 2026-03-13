@@ -12,8 +12,6 @@ implicit none
 ! RAM=minimum boundary layer resistance (h m-1)
 ! MinSnowDepth=minimum snowpack depth for full cover (m)
 ! RZ=minimum resistance to evaporation of surface water (h m-1)
-! TRBA=threshold air-filled porosity for convective effects on heat transfer	m3 m-3  
-! TRBW=threshold water-filled porosity for convective effects on heat transfer	m3 m-3
 ! RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)
 
 ! Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
@@ -26,13 +24,13 @@ implicit none
 ! FVOLAH=parameter for clay effect on macropore volume
 ! DTHETW=difference between saturation and effective saturation
 
+  real(r8), parameter :: TRBA=0.000_r8 !threshold air-filled porosity for convective effects on heat transfer,	[m3 m-3]
+  real(r8), parameter :: TRBW=0.375_r8 !threshold water-filled porosity for convective effects on heat transfer,	[m3 m-3]
   real(r8), parameter :: FCI=0.05_r8                      !field capacity of ice
   real(r8), parameter :: WPI=0.025_r8                     !wilting point of ice
   real(r8), parameter :: MinSnowDepth=0.075_r8
   real(r8), parameter :: RAM=1.39E-03_r8   
   real(r8), parameter :: RZ=0.0139_r8  
-  real(r8), parameter :: TRBA=0.000_r8
-  real(r8), parameter :: TRBW=0.375_r8
   real(r8), parameter :: EXPNW=2.07E-04_r8      !parameter used to calculate Nusselt number for water
   real(r8), parameter :: DIFFA=2.01E-05_r8
   real(r8), parameter :: DIFFW=1.45E-07_r8

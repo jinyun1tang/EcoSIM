@@ -3,8 +3,9 @@ module SnowBalanceMod
   use data_const_mod,   only: spval => DAT_CONST_SPVAL
   use abortutils,       only: endrun
   use SnowTransportMod, only: SoluteTransportThruSnow
-  use EcoSIMCtrlMod,    only: lverb,snowRedist_model,fixWaterLevel
-  use minimathmod,      only: AZMAX1, isclose, AZMIN1,AZMAX1d ,AZERO
+  use EcoSIMCtrlMod,    only: lverb,  snowRedist_model, fixWaterLevel
+  use minimathmod,      only: AZMAX1, isclose,          AZMIN1, AZMAX1d, AZERO
+  use InitSOMBGCMod,    only: gOC_to_m3_OM
   use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType
@@ -109,13 +110,6 @@ implicit none
 
   ENDDO D9780
 
-  !if(NY.EQ.1)then
-  !  do L=1,JS
-  !    write(*,*) "In L = ", L, " SnowThickL_snvr: ", SnowThickL_snvr(1:JS,NY,NX) , " m, VLSnoDWIprev_snvr: ",&
-  !            VLSnoDWIprev_snvr(L,NY,NX) , " mH2O"
-  !  enddo
-  !endif
-
   VcumDrySnoWE_col(NY,NX) = sum(VLDrySnoWE_snvr(1:JS,NY,NX))
   VcumWatSnow_col(NY,NX)  = sum(VLWatSnow_snvr(1:JS,NY,NX))
   VcumIceSnow_col(NY,NX)  = sum(VLIceSnow_snvr(1:JS,NY,NX))
@@ -125,26 +119,6 @@ implicit none
 
 !
 ! IF SNOWPACK DISAPPEARS
-
-! intermediate disappearance
-  IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).LE.ZERO .or. SoilOrgM_vr(ielmc,0,NY,NX)<=1.e-2_r8)THEN
-    VLWatMicP_vr(NUM_col(NY,NX),NY,NX) = VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoWatXfer2Soil_col(NY,NX)
-    VLiceMicP_vr(NUM_col(NY,NX),NY,NX) = VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+QSnoIceXfer2Soil_col(NY,NX)
-
-    TKSX = TKS_vr(NUM_col(NY,NX),NY,NX)
-    ENGY = VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)*TKSX
-
-    VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
-      +cpw*(VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+VLWatMacP_vr(NUM_col(NY,NX),NY,NX)) &
-      +cpi*(VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+VLiceMacP_vr(NUM_col(NY,NX),NY,NX))
-
-    IF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX) .and. abs(QSnoHeatXfer2Soil_col(NY,NX))>ZEROS(NY,NX))THEN
-      TKS_vr(NUM_col(NY,NX),NY,NX) = (ENGY+QSnoHeatXfer2Soil_col(NY,NX))/VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)
-    ELSEIF(VHeatCapacity_vr(NUM_col(NY,NX),NY,NX).LE.ZEROS(NY,NX))then
-      TKS_vr(NUM_col(NY,NX),NY,NX)=TairK_col(NY,NX)
-    ENDIF
-
-  endif
 
   call SnowpackDisapper(I,J,NY,NX,test_exist,QWatinfl2Mic_loc,QHeatInfl2Soil_loc)
 
@@ -204,11 +178,10 @@ implicit none
     ENDDO D9770
 
     IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO .and. SoilOrgM_vr(ielmc,0,NY,NX)>1.e-2_r8)THEN
-      write(110,*)I*1000+J,'SnowpackDisapper1',FLWW+FLWI*DENSICE+FLWS
       ENGY                      = TKS_vr(0,NY,NX)*VHeatCapacity_vr(0,NY,NX)
       VLWatMicP_vr(0,NY,NX)     = VLWatMicP_vr(0,NY,NX)+FLWW
       VLiceMicP_vr(0,NY,NX)     = VLiceMicP_vr(0,NY,NX)+FLWI+FLWS/DENSICE
-      VHeatCapacity_vr(0,NY,NX) = cpo*SoilOrgM_vr(ielmc,0,NY,NX)+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
+      VHeatCapacity_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
       IF(abs(HeatFlo2Surface)>ZEROS(NY,NX))THEN
         TKS_vr(0,NY,NX)           = (ENGY+HeatFlo2Surface)/VHeatCapacity_vr(0,NY,NX)
       ENDIF
@@ -233,7 +206,7 @@ implicit none
 
           ENGY  = VHeatCapacity_vr(NUM_col(NY,NX),NY,NX)*TKS_vr(NUM_col(NY,NX),NY,NX)
 
-          VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapacitySoilM_vr(NUM_col(NY,NX),NY,NX) &
+          VHeatCapacity_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
             +cpw*(VLWatMicP_vr(NUM_col(NY,NX),NY,NX)+VLWatMacP_vr(NUM_col(NY,NX),NY,NX)) &
             +cpi*(VLiceMicP_vr(NUM_col(NY,NX),NY,NX)+VLiceMacP_vr(NUM_col(NY,NX),NY,NX))
 

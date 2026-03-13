@@ -9,6 +9,7 @@ module WthrMod
   use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: AZMAX1
   use UnitMod,           only: units
+  use EcosysWarmingMod
   use DebugToolMod
   use EcosimConst
   use CanopyRadDataType
@@ -30,24 +31,24 @@ module WthrMod
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 
-  real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
+  real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADZ,VPX,XJ
 
   !
   !     CDIR,CDIF=fraction of solar SW,sky diffuse radiation in visible
   !     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
   !     TSNOW=temperature below which precipitation is snow (oC)
   !
-  real(r8), parameter :: SolConst=4.896_r8 !MJ/m2/hour, solar constant
+  real(r8), parameter :: SolConst=4.896_r8 !MJ/m2/hour, solar constant ~ 1360 W/m2
   real(r8), PARAMETER :: CDIR=0.42_r8   !
   real(r8), parameter :: CDIF=0.58_r8
   real(r8), parameter :: PDIR=1269.4_r8
   real(r8), parameter :: PDIF=1269.4_r8
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
-  public :: wthr
+  public :: PrepHourlyWeather
   contains
 
-  SUBROUTINE wthr(I,J,NHW,NHE,NVN,NVS)
+  SUBROUTINe PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
   !
   !     Description:
   !
@@ -58,7 +59,7 @@ module WthrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  character(len=*), parameter :: subname='WTHR'
+  character(len=*), parameter :: subname='PrepHourlyWeather'
   integer :: ITYPE,NX,NY,N,NZ,mon
   real(r8) :: PrecAsRain_col(JY,JX)
   real(r8) :: PrecAsSnow_col(JY,JX)
@@ -98,7 +99,13 @@ module WthrMod
   ELSE
     call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   ENDIF
-!
+
+  if(check_warming_dates(iYearCurrent,I,J))then
+    !do this before radiation calculation
+    call apply_OTC_warming(I,J,NHW,NHE,NVN,NVS)
+    call apply_IR_warming(I,J,NHW,NHE,NVN,NVS)
+  endif
+
   call CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
 !
 
@@ -119,7 +126,7 @@ module WthrMod
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
   call PrintInfo('end '//subname)
-  END subroutine wthr
+  END subroutine PrepHourlyWeather
 !------------------------------------------------------------------------------------------
 
   subroutine DailyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
@@ -223,7 +230,8 @@ module WthrMod
 !     Description:
 !
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  real(r8), intent(out) :: RADN_col(JY,JX),PrecAsRain_col(JY,JX),PrecAsSnow_col(JY,JX)
+  real(r8), intent(out) :: RADN_col(JY,JX)
+  real(r8), intent(out) :: PrecAsRain_col(JY,JX),PrecAsSnow_col(JY,JX)
   real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
@@ -255,8 +263,11 @@ module WthrMod
         PrecAsRain_col(NY,NX) = 0.0_r8
         PrecAsSnow_col(NY,NX) = RAINH(J,I)
       ENDIF
+      EMS_scalar_col(NY,NX) = 1._r8
+      srad_scalar_col(NY,NX)= 1._r8
     enddo
   enddo
+
   end subroutine HourlyWeather
 !------------------------------------------------------------------------------------------
 
@@ -266,13 +277,14 @@ module WthrMod
 !
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  real(r8), intent(inout) :: RADN_col(JY,JX)
+  real(r8), intent(inout) :: RADN_col(JY,JX)   !Incident shortwave radiation at surface horizontal plane, [MJ/hr/m2]
   real(r8), intent(out) :: PRECUI_col(JY,JX)
   real(r8), intent(out) :: PRECII_col(JY,JX)
   integer :: NY,NX
   real(r8) :: AZI  !solar azimuth contribution
   REAL(R8) :: DEC  !solar declination contribution
   real(r8) :: DECLIN
+  real(r8) :: RADX    !solar constant at horizontal surface
   real(r8), PARAMETER :: PICON12=PICON/12._r8
   !     begin_execution
   !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
@@ -287,8 +299,7 @@ module WthrMod
 !     IF OUTDOORS
 !
 !     SineSunInclAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
-!     RADX=solar constant at horizontal surface
-!     RADN_col=SW radiation at horizontal surface, MJ/
+!
 !     IETYP: koppen climate zone
       IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT_col(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
@@ -306,24 +317,24 @@ module WthrMod
         !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
         IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
         IF(SineSunInclAngle_col(NY,NX).LE.-TWILGT)RADN_col(NY,NX)=0.0_r8
+
         RADX            = SolConst*AZMAX1(SineSunInclAngle_col(NY,NX))
         RADN_col(NY,NX) = AMIN1(RADX,RADN_col(NY,NX))
-!
+        !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
         !
         !     RADZ=diffuse radiation at horizontal surface
         !     RADS,RADY,RAPS,RadPARDiffus_col=direct,diffuse SW,PAR in solar beam
-!       !
-
+        !
         RADZ                    = AMIN1(RADN_col(NY,NX),0.5_r8*(RADX-RADN_col(NY,NX)))
         RadSWDirect_col(NY,NX)  = safe_adb(RADN_col(NY,NX)-RADZ,SineSunInclAngle_col(NY,NX))
-        RadSWDirect_col(NY,NX)  = AMIN1(4.167_r8,RadSWDirect_col(NY,NX))
-        RadSWDiffus_col(NY,NX)  = RADZ/TotSineSkyAngles_grd
+        RadSWDirect_col(NY,NX)  = AMIN1(4.167_r8,RadSWDirect_col(NY,NX))*srad_scalar_col(NY,NX)
+        RadSWDiffus_col(NY,NX)  = RADZ/TotSineSkyAngles_grd*srad_scalar_col(NY,NX)
         RadDirectPAR_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
         RadPARDiffus_col(NY,NX) = RadSWDiffus_col(NY,NX)*CDIF*PDIF  !MJ/m2/hr
         !
         !     ATMOSPHERIC RADIATIVE PROPERTIES
-        !  Duarte et al., 2006, AFM 139:171
+        !  Duarte et al., 2006, AFM 139:171, Assessing daytime downward longwave radiation estimates for clear and cloudy skies in Southern Brazil
         !     CLD=cloudiness factor for EMM
         !     EMM=sky emissivity
         !     VPK,TairK=vapor pressure,temperature
@@ -355,12 +366,12 @@ module WthrMod
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
 
-        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
+        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4
 
       IF(RadLWClm(J,I).GT.0.0_r8)THEN
         SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
       ENDIF
-!      if(I<=1 .or. I>=365)print*,'EMM',EMM,stefboltz_const,TairK_col(NY,NX),TCA_col(NY,NX)
+
 !
       !     INSERT CESM WEATHER HERE
       !
@@ -454,7 +465,7 @@ module WthrMod
         !     HTC=high temperature threshold for grain number loss (oC)
         !     GROUPI,ShootNodeNumAtPlanting_pft=node number at floral initiation,planting (maturity group)
         !
-        IF(ICLM.EQ.2.AND.J.EQ.1)THEN
+        IF(ICLM.EQ.2 .AND. J.EQ.1)THEN
           DTS                   = 0.5_r8*DTA
           ATCA_col(NY,NX)       = ATCAI_col(NY,NX)+DTA
           ATCS_col(NY,NX)       = ATCAI_col(NY,NX)+DTS
@@ -464,7 +475,7 @@ module WthrMod
             TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
             !     TC4LeafOut_pft(NZ,NY,NX)=TCZD-TempOffset_pft(NZ,NY,NX)
             !     TC4LeafOff_pft(NZ,NY,NX)=AMIN1(15.0,TC4LeafOut_pft(NZ,NY,NX)+TCXD)
-            IF(iPlantPhotosynthesisType(NZ,NY,NX).EQ.3)THEN
+            IF(iPlantPhotosynsType_pft(NZ,NY,NX).EQ.3)THEN
               HighTempLimitSeed_pft(NZ,NY,NX)=27.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)
             ELSE
               HighTempLimitSeed_pft(NZ,NY,NX)=30.0+3.0*rPlantThermoAdaptZone_pft(NZ,NY,NX)

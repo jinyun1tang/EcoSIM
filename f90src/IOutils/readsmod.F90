@@ -57,7 +57,7 @@ module readsmod
   PBOT_hrly(:,:)  = clim_var%Atm_kPa
 
   WindMesureHeight_col(:,:) = 0.5_r8
-  SolarNoonHour_col(:,:)    = 12._r8
+  SolarNoonHourYM_col(:,:)    = 12._r8
   pH_rain_col(:,:)          = 7._r8
   CN4RI_col(:,:)                = 0._r8
   CNORI_col(:,:)                = 0._r8
@@ -185,7 +185,7 @@ module readsmod
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
       ROWSpaceNH4_col(NY,NX) = 0.0_r8
-      ROWSpaceNO3_col(NY,NX) = 0.0_r8
+      ROWSpaceNO3Band_col(NY,NX) = 0.0_r8
       ROWSpacePO4_col(NY,NX) = 0.0_r8
       D325: DO I=1,366
         iSoilDisturbType_col(I,NY,NX) = 0
@@ -195,7 +195,7 @@ module readsmod
         D45: DO N=1,20
           FERT(N,I,NY,NX)=0.0_r8
         ENDDO D45
-        D35: DO N=0,2
+        D35: DO N=1,3
           IYTYP(N,I,NY,NX)=0
         ENDDO D35
         FDPTH(I,NY,NX)=0.0_r8
@@ -347,10 +347,10 @@ module readsmod
   D8970: DO NX=NHW,NHE
     D8975: DO NY=NVN,NVS
       WindMesureHeight_col(NY,NX) = Z0G         !windspeed meast height
-      SolarNoonHour_col(NY,NX)    = ZNOONG
-      pH_rain_col(NY,NX)           = PHRG
-      CN4RI_col(NY,NX)                = CN4RIG
-      CNORI_col(NY,NX)                = CNORIG
+      SolarNoonHourYM_col(NY,NX)    = ZNOONG
+      pH_rain_col(NY,NX)          = PHRG
+      CN4RI_col(NY,NX)            = CN4RIG
+      CNORI_col(NY,NX)            = CNORIG
       NH4_rain_mole_conc(NY,NX)   = CN4RIG
       NO3_rain_mole_conc(NY,NX)   = CNORIG
       H2PO4_rain_mole_conc(NY,NX) = CPORG

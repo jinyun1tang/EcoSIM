@@ -1025,7 +1025,7 @@ implicit none
   !Description
   !read soil warming file
   use abortutils,      only: destroy
-  use PerturbationMod, only: get_warming_fname
+  use EcosysWarmingMod, only: get_warming_fname
   use GridMod,         only: get_col
   implicit none
   integer, intent(in) :: year
@@ -1039,8 +1039,8 @@ implicit none
   integer           :: kk, icol, ny,nx, ll
   real(r8), allocatable    :: data(:,:)  
   
-  call get_warming_fname(year,fname)
-  !write(*,*)fname
+  if(.not.get_warming_fname(year,fname))return
+  
   call ncd_pio_openfile (ncid, trim(fname), ncd_nowrite)
   call check_var(ncid, 'TEMP_vr', vardesc, readvar, print_err=.true.)
   nsteps = get_dim_len(ncid,'time')

@@ -1,14 +1,15 @@
 set(IOUTILS_SOURCES
     ReadManagementMod.F90
     ForcWriterMod.F90
-	ClimReadMod.F90
+  	ClimReadMod.F90
     PlantInfoMod.F90
-	HistDataType.F90
+	  HistDataType.F90
+    MicrobeInfoMod.F90
     HistFileMod.F90
     restUtilMod.F90
     RestartMod.F90
-	readimod.F90
-	readsmod.F90
+  	readimod.F90
+	  readsmod.F90
     bhistMod.F90
 )
 include(add_ecosim_library)

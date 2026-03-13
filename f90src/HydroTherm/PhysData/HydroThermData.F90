@@ -13,8 +13,8 @@ implicit none
   real(r8),allocatable ::  LWEmscefSnow_col(:,:)                 !  
   real(r8),allocatable ::  LWRad2Snow_col(:,:)                   !    
   real(r8),allocatable ::  FracSoiPAsWat_vr(:,:,:)               !
-  real(r8),allocatable ::  PSISM1_vr(:,:,:)                      !  
-  real(r8),allocatable ::  TKSoil1_vr(:,:,:)                      !  
+  real(r8),allocatable ::  PSISM1_vr(:,:,:)                      !intermediate time step soil matric pressure, [MPa]  
+  real(r8),allocatable ::  TKSoil1_vr(:,:,:)                     !intermeediate time step soil temeprature, [K]  
   real(r8),allocatable ::  DLYRR_COL(:,:)                        !  
   real(r8),allocatable ::  FracSoiPAsIce_vr(:,:,:)               !  
   real(r8),allocatable ::  FracAirFilledSoilPore_vr(:,:,:)               !  

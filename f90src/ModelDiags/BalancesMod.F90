@@ -70,10 +70,6 @@ contains
         trcg_rootMass_beg_col(idg,NY,NX)  = trcg_rootMass_col(idg,NY,NX)  
         trcg_snowMass_beg_col(idg,NY,NX)  = trcg_snowMass_col(idg,NY,NX)
       enddo  
-!      if(I==140 .and. J>=20)then
-!        write(116,*)'==============================================='
-!        write(116,*)trcg_rootMass_beg_col(idg_N2,NY,NX),I*1000+J,'beg'
-!      endif
     ENDDO
   ENDDO  
   end subroutine BegCheckBalances
@@ -197,9 +193,7 @@ contains
   integer  :: ii,idg,ids,L
   real(r8) :: trcs_solml_drib_col(ids_beg:ids_end)
 
-  call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
-
-  call SummarizeTracers(I,J,NHW,NHE,NVN,NVS)
+  call SummarizeTracerMass(I,J,NHW,NHE,NVN,NVS)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -234,7 +228,7 @@ contains
         -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o .and. etimer%get_nstep()>1)then
-        if(iVerbLevel==1)then
+        if(iVerbLevel==1 .or. abs(SoilWatErr_test)>err_h2o)then
           write(110,*)('=',ii=1,50)
           write(110,*)I*1000+J,'NY,NX ',NY,NX
           write(110,*)'init H2O         =',WaterErr_col(NY,NX)
@@ -273,7 +267,7 @@ contains
           write(110,*)'SoilWatErr_test  =',SoilWatErr_test
           write(110,*)'col WaterErr_test=',WaterErr_test
         endif
-        if(abs(SoilWatErr_test)>1.e-4_r8 ) & ! .or. abs(SnowMassErr_test)>1.e-3_r8*SnowMassBeg_col(NY,NX)) &
+        if(abs(SoilWatErr_test)>err_h2o ) & ! .or. abs(SnowMassErr_test)>1.e-3_r8*SnowMassBeg_col(NY,NX)) &
           call endrun('H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
         
       endif
@@ -294,8 +288,8 @@ contains
       DO idg=idg_beg,idg_NH3        
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX) &
-          +SurfGasEmiss_all_flx_col(idg,NY,NX)+RGasNetProd_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
-          +trcs_solml_drib_col(idg) 
+          +SurfGasEmiss_all_flx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX) &
+          +trcs_solml_drib_col(idg)+RGasNetProd_col(idg,NY,NX)-trcs_deadroot2soil_col(idg,NY,NX) 
 
         GasHydroLoss_cumflx_col(idg,NY,NX)=GasHydroLoss_cumflx_col(idg,NY,NX)+GasHydroLoss_flx_col(idg,NY,NX)
 
@@ -303,9 +297,11 @@ contains
           +trcs_Soil2plant_uptake_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)+TRootGasLossDisturb_col(idg,NY,NX)
 
         if(idg==idg_NH3)then           
-          tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX) &
-             +trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)  
+          tracer_mass_err = tracer_mass_err+trcg_TotalMass_beg_col(idg_NH3B,NY,NX)-trcg_TotalMass_col(idg_NH3B,NY,NX) 
+                       
           tracer_mass_err=tracer_mass_err+trcs_solml_drib_col(idg_NH3B) 
+
+          tracer_rootmass_err=tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
 
         if(idg==idg_O2)then
@@ -323,7 +319,7 @@ contains
             write(111,*)('-',ii=1,50)
             write(111,*)'NU   =',NU_col(NY,NX)
             write(111,*)I*1000+J,'NY NX=',NY,NX,trcs_names(idg),iDayPlantHarvest_pft(1,NY,NX),iDayPlanting_pft(1,NY,NX),'Final'
-            write(111,*)'beg end trc mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
+            write(111,*)'beg end delta mass=',trcg_TotalMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX),&
               trcg_TotalMass_beg_col(idg,NY,NX)-trcg_TotalMass_col(idg,NY,NX)
             write(111,*)'mass_err         =',tracer_mass_err
             write(111,*)'gasdif,ebu       =',GasDiff2Surf_flx_col(idg,NY,NX),trcg_ebu_flx_col(idg,NY,NX)
@@ -349,7 +345,7 @@ contains
             write(111,*)'tracersnowfall   =',trcg_AquaAdv_flx_snvr(idg,1,NY,NX)
             write(111,*)'snowmass err     =',tracer_snowmass_err
             write(111,*)'------------------'
-            write(111,*)'xroot beg_end_delta mass.    =',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),&
+            write(111,*)'xroot beg_end_delta mass     =',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),&
               trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX),trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX) &
               -(trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX))  
 !            write(194,*)'balmas',trcg_TotalMass_beg_col(idg,NY,NX)-trcg_rootMass_beg_col(idg,NY,NX),trcg_TotalMass_col(idg,NY,NX)-trcg_rootMass_col(idg,NY,NX)  
@@ -377,19 +373,22 @@ contains
             if(idg==idg_O2)then
               write(111,*)'total O2Sink      =',RootO2_TotSink_col(NY,NX)
             endif  
+            
             if(idg==idg_CO2)then
               dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)
               write(111,*)'tplt2root,soi2root =',RootCO2Emis2Root_col(NY,NX),trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)
               write(111,*)'ar2root, deltaErr  =',RootCO2Ar2Root_col(NY,NX),dCO2err
             else
               dgaserr=trcs_Soil2plant_uptake_col(idg,NY,NX)-trcs_Soil2plant_uptakep_col(idg,NY,NX)
-              write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX),dgaserr
+              if(idg==idg_NH3)then
+                dgaserr=dgaserr+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)-trcs_Soil2plant_uptakep_col(idg_NH3B,NY,NX)
+                write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX)+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX),&
+                  trcs_Soil2plant_uptakep_col(idg,NY,NX)+trcs_Soil2plant_uptakep_col(idg_NH3B,NY,NX),dgaserr
+              else
+                write(111,*)'plt_soiluptake     =',trcs_Soil2plant_uptake_col(idg,NY,NX),trcs_Soil2plant_uptakep_col(idg,NY,NX),dgaserr
+              endif
             endif
             write(111,*)'deadroot2soil    =',trcs_deadroot2soil_col(idg,NY,NX)
-          endif
-
-          if(idg==idg_CO2)then
-            dCO2err=RootCO2Emis2Root_col(NY,NX)-trcs_Soil2plant_uptake_col(idg_CO2,NY,NX)-RootCO2Ar2Root_col(NY,NX)          
           endif
 
           if(abs(tracer_mass_err)>1.e-1_r8) &
@@ -457,7 +456,7 @@ contains
       DO L=NUI_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
           trcg_soil(idg)=trcg_soil(idg) + trcg_gasml_vr(idg,L,NY,NX)
-          trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)                  
+          trcg_root(idg)=trcg_root(idg) + trcg_root_vr(idg,L,NY,NX)
         ENDDO
 
         DO idg=idg_beg,idg_end  
@@ -507,7 +506,6 @@ contains
 
   implicit none 
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  integer :: NY,NX
 
   call SummarizeStorage(I,J,NHW,NHE,NVN,NVS)
 

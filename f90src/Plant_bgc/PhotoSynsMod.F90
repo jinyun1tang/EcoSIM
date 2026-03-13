@@ -14,16 +14,17 @@ implicit none
   real(r8), parameter :: umol2gC_hr=0.0432_r8 !=3600*12.e-6_r8
   contains
   ![header]
+
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CO2FCL,CO2FLL)
+  subroutine ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2OClmt,CH2OLlmt)
 
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in) :: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress   !stomatal resistance function of canopy turgor
   real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CO2FCL          !carbon-dependent photosynthesis rate
-  real(r8), intent(out) :: CO2FLL          !light-dependent photosynthesis rate
+  real(r8), intent(out) :: CH2OClmt          !carbon-dependent photosynthesis rate
+  real(r8), intent(out) :: CH2OLlmt          !light-dependent photosynthesis rate
   integer :: L,NN,M,N,LP
   real(r8) :: WFNB,cfscal,clscal
   real(r8) :: CO2X,CO2C,CO2Y
@@ -68,8 +69,9 @@ implicit none
     
   CH2O3K=0._r8
 ! FOR EACH CANOPY LAYER
-  CO2FCL=0._r8;CO2FLL=0._r8
+  CH2OClmt=0._r8;CH2OLlmt=0._r8
   D210: DO L=NumCanopyLayers1,1,-1
+
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
@@ -181,9 +183,8 @@ implicit none
                     ENDIF
                   ENDDO D225
                   clscal=LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
-                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
-                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
-!                  WRITE(123,*)((((I*100+J)*100+L)*10+N)*10+M)*10+LP,VL,VGROX,EGROX,WFNB,EGROX/PAR_zsec
+                  CH2OClmt = CH2OClmt+VGROX*cfscal*clscal
+                  CH2OLlmt = CH2OLlmt+EGROX*cfscal*clscal
                   
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -209,15 +210,15 @@ implicit none
   end subroutine ComputeGPP_C3
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K,CO2FCL,CO2FLL)
+  subroutine ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3K,CH2O4K,CH2OClmt,CH2OLlmt)
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(in):: PsiCan4Photosyns
   real(r8), intent(in) :: Stomata_Stress
-  real(r8), intent(out) :: CH2O3K
-  real(r8), intent(out) :: CH2O4K
-  real(r8), intent(out) :: CO2FCL
-  real(r8), intent(out) :: CO2FLL
+  real(r8), intent(out) :: CH2O3K      !C3 product in bundle sheath
+  real(r8), intent(out) :: CH2O4K      !C4 product in mesophyll
+  real(r8), intent(out) :: CH2OClmt
+  real(r8), intent(out) :: CH2OLlmt
   integer :: L,NN,M,N,LP
   real(r8) :: WFN4
   real(r8) :: WFNB
@@ -267,7 +268,7 @@ implicit none
   )
 
   CH2O3K=0._r8;CH2O4K=0._r8
-  CO2FCL=0._r8;CO2FLL=0._r8
+  CH2OClmt=0._r8;CH2OLlmt=0._r8
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=NumCanopyLayers1,1,-1
@@ -379,15 +380,15 @@ implicit none
                     ENDIF
                   ENDDO D125
                   clscal=LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
-                  CO2FCL = CO2FCL+VGROX*cfscal*clscal
-                  CO2FLL = CO2FLL+EGROX*cfscal*clscal
-!
-!               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
-!
-!               CH2O4=total C4 CO2 fixation
-!               LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
-!
+                  CH2OClmt = CH2OClmt+VGROX*cfscal*clscal
+                  CH2OLlmt = CH2OLlmt+EGROX*cfscal*clscal
+                  !
+                  !  ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
+                  !
+                  !  CH2O4=total C4 CO2 fixation
+                  !  LeafAreaSunlit_zsec=unself-shaded leaf surface area
+                  !  TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+                  !
                   CH2O4K=CH2O4K+VL*clscal
                   if(LP==1)then
                     CH2OSunlit_pft(NZ)=CH2OSunlit_pft(NZ)+VL*clscal*umol2gC_hr
@@ -444,13 +445,13 @@ implicit none
   real(r8), intent(out) :: CH2OClm  !Carbon-dependent C fix, [gC h-1 d-2]
   real(r8), intent(out) :: CH2OLlm  !Light-dependent C fix,  [gC h-1 d-2]
   real(r8) :: ZADDB,PADDB
-  real(r8) :: CO2FCL,CO2FLL
+  real(r8) :: CH2OClmt,CH2OLlmt
   integer  :: K
 
 ! begin_execution
   associate(                                                         &
     CanopyGasCO2_pft         => plt_photo%CanopyGasCO2_pft          ,& !input  :canopy gaesous CO2 concentration, [umol mol-1]
-    iPlantPhotosynthesisType => plt_photo%iPlantPhotosynthesisType  ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft => plt_photo%iPlantPhotosynsType_pft  ,& !input  :plant photosynthetic type (C3 or C4),[-]
     Vmax4PEPCarboxy_node     => plt_photo%Vmax4PEPCarboxy_node      ,& !input  :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     Vmax4RubiscoCarboxy_node => plt_photo%Vmax4RubiscoCarboxy_node  ,& !input  :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     iPlantRootProfile_pft    => plt_pheno%iPlantRootProfile_pft     ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -481,34 +482,34 @@ implicit none
 !             C4 PHOTOSYNTHESIS
 !
 !             LeafArea_node,CanopyLeafArea_lnode=leaf area
-!             iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+!             iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
 !             Vmax4PEPCarboxy_node=PEP carboxylation rate unlimited by CO2
 !
-            IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
+            IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo.AND.Vmax4PEPCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 !
-              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CO2FCL,CO2FLL)
-              CO2F    = CO2F+CH2O4(K)
-              CH2O    = CH2O+CH2O3(K)
-              CH2OClm = CH2OClm+CO2FCL
-              CH2OLlm = CH2OLlm+CO2FLL
+              CALL ComputeGPP_C4(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2O4(K),CH2OClmt,CH2OLlmt)
+              CO2F    = CO2F+CH2O4(K)     !carbon fixation in mesophyll cells
+              CH2O    = CH2O+CH2O3(K)     !carbon fixation in bundle sheath cells
+              CH2OClm = CH2OClm+CH2OClmt
+              CH2OLlm = CH2OLlm+CH2OLlmt
 
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
+            ELSEIF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo.AND.Vmax4RubiscoCarboxy_node(K,NB,NZ).GT.0.0_r8)THEN
 
-              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CO2FCL,CO2FLL)
+              call ComputeGPP_C3(I,J,K,NB,NZ,PsiCan4Photosyns,Stomata_Stress,CH2O3(K),CH2OClmt,CH2OLlmt)
               CO2F    = CO2F+CH2O3(K)
               CH2O    = CH2O+CH2O3(K)
-              CH2OClm = CH2OClm+CO2FCL
-              CH2OLlm = CH2OLlm+CO2FLL
+              CH2OClm = CH2OClm+CH2OClmt
+              CH2OLlm = CH2OLlm+CH2OLlmt
 
             ENDIF
           ENDIF
         ENDDO D100
-!
-!         CO2F,CH2O=total CO2 fixation,CH2O production
-!
+        !
+        !         CO2F,CH2O=total CO2 fixation,CH2O production
+        !
         CO2F = CO2F*umol2gC_hr
         CH2O = CH2O*umol2gC_hr
 !
@@ -522,7 +523,7 @@ implicit none
         CH2OLlm = CH2OLlm*umol2gC_hr
       ELSE
 
-        IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+        IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
           D155: DO K=1,MaxNodesPerBranch1
             CH2O3(K) = 0._r8
             CH2O4(K) = 0._r8
@@ -532,7 +533,7 @@ implicit none
     ELSE
 
       !C4
-      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+      IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
         D160: DO K=1,MaxNodesPerBranch1
           CH2O3(K) = 0._r8
           CH2O4(K) = 0._r8
@@ -540,7 +541,7 @@ implicit none
       ENDIF
     ENDIF
   ELSE
-    IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN
+    IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
       D165: DO K=1,MaxNodesPerBranch1
         CH2O3(K) = 0._r8
         CH2O4(K) = 0._r8

@@ -37,7 +37,7 @@ module PlantDisturbMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ,nn,nx1,NY1
-  real(r8) :: WTSHTZ
+  real(r8) :: WTSHTZ  !total canopy C that is subject to grazing/herbivory
 !     begin_execution
 
   D2995: DO NX=NHW,NHE
@@ -48,24 +48,26 @@ module PlantDisturbMod
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     LSG=landscape grazing section number
 !     WTSHTZ,AvgCanopyBiomC2Graze_pft=total,average biomass in landscape grazing section
-!
-        IF(iHarvstType_pft(NZ,I,NY,NX).EQ.4.OR.iHarvstType_pft(NZ,I,NY,NX).EQ.6)THEN
-          WTSHTZ=0
-          NN=0
+!       different pft can undergo different treatment/disturbance
+        IF(iHarvstType_pft(NZ,I,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,I,NY,NX).EQ.iharvtyp_herbivo)THEN
+          WTSHTZ = 0
+          NN     = 0
           D1995: DO NX1=NHW,NHE
             D1990: DO NY1=NVN,NVS
+              !when grazing occurs, it occurs to the same plant species over all grids of the landscape
               IF(LSG_pft(NZ,NY1,NX1).EQ.LSG_pft(NZ,NY,NX))THEN
                 IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iActive)THEN
-                  WTSHTZ=WTSHTZ+ShootStrutElms_pft(ielmc,NZ,NY1,NX1)
-                  NN=NN+1
+                  WTSHTZ = WTSHTZ+ShootElms_pft(ielmc,NZ,NY1,NX1)
+                  NN     = NN+1
                 ENDIF
               ENDIF
             ENDDO D1990
           ENDDO D1995
+
           IF(NN.GT.0)THEN
             AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootStrutElms_pft(ielmc,NZ,NY,NX)
+            AvgCanopyBiomC2Graze_pft(NZ,NY,NX)=ShootElms_pft(ielmc,NZ,NY,NX)
           ENDIF
         ENDIF
       ENDDO D2985

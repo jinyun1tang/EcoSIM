@@ -54,15 +54,16 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
     real(r8) :: TReduxNO3Band         !NO3 reduction in banded soil by denitrifiers
     real(r8) :: TReduxNO2Soil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
-    real(r8) :: TReduxNO2Band         !NO2 reduction in banded soil, by ammonia oxidizers, and denitrifiers
+    real(r8) :: TReduxNO2toN2OBand         !NO2 reduction in banded soil, by ammonia oxidizers, and denitrifiers
     real(r8) :: TDeniReduxNO2Band
     real(r8) :: TDeniReduxNO2Soil
-    real(r8) :: TNitReduxNO2Band
-    real(r8) :: TNitReduxNO2Soil
+    real(r8) :: TNitNO2Redux2N2OBand
+    real(r8) :: TNitNO2Redux2N2OSoil
 
     real(r8) :: TReduxN2O             !N2O reduction by detnitrifiers
     real(r8) :: TFixN2                !N2 fixation by aerobic and anaerobic N2 fixers
     real(r8) :: tCH4OxiAero           !aerobic CH4 oxidation
+    real(r8) :: tCH4OxiANMO           !anaerobic CH4 oxidation
     real(r8) :: tRNH3Oxi              !NH3 oxidation by nitrifiers, soil+band
 
     real(r8) :: RNO2ReduxSoilChemo
@@ -74,7 +75,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: RNO2ReduxChemo
 
   contains
-    procedure, public :: ZeroOut => nit_aqmf_diag
+    procedure, public :: ZeroOut => nit_aqmf_diag    
   end type Cumlate_Flux_Diag_type
 
   type, public :: Microbe_State_type
@@ -98,17 +99,21 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: rCNBiomeActAutor(:,:)   !nutrient to carbon ratio for active autotrophs
   real(r8),allocatable :: OMActAutor(:)
   real(r8),allocatable :: FracOMActAutor(:)
-  real(r8),allocatable :: FracNO2ReduxAutor(:)
+  real(r8),allocatable :: FracNO2XupAutor(:)
   real(r8),allocatable :: FracAutorBiomOfActK(:)
   real(r8),allocatable :: OMC2Autor(:)
   real(r8),allocatable :: GrowthEnvScalAutor(:)
   real(r8),allocatable :: TSensMaintRAutor(:)
+  real(r8),allocatable :: TSensGroAutor(:)          !temperature sensitivity of autotrophic microbes
+  real(r8),allocatable :: WSensGroAutor(:)          !moisture sensitivity of autotrophic microbes
+  real(r8),allocatable :: TSensGroHeter(:,:)        !temperature sensitivity of microbial growth
+  real(r8),allocatable :: WSensGroHeter(:,:)        !moisture sensitivity of microbial growth
   real(r8),allocatable :: OMN2Autor(:)
   real(r8),allocatable :: FOM2Autor(:)
   real(r8),allocatable :: fLimO2Autor(:)
   real(r8),allocatable :: FCNAutor(:)
   real(r8),allocatable :: FCPAutor(:)
-  real(r8),allocatable :: FBiomStoiScalarAutor(:)
+  real(r8),allocatable :: FBiomNutStoiScalAutor(:)
 
   contains
    procedure, public :: Init => nit_mics_init
@@ -119,11 +124,6 @@ type, public :: Cumlate_Flux_Diag_type
   !fluxes
   real(r8) :: RTotNH3OxidSoilAutor
   real(r8) :: RTotNH3OxidBandAutor  
-! allocatable flux ratios
-  real(r8),allocatable :: AttenfNH4Heter(:,:)
-  real(r8),allocatable :: AttenfNO3Heter(:,:)
-  real(r8),allocatable :: AttenfH2PO4Heter(:,:)
-  real(r8),allocatable :: AttenfH1PO4Heter(:,:)
 ! allocatable fluxes
   real(r8),allocatable :: DOMuptk4GrothHeter(:,:,:)
   real(r8),allocatable :: RMetabDOCUptkHeter(:,:)
@@ -142,7 +142,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RNO2ReduxHeterSoil(:,:)
   real(r8),allocatable :: RNO2ReduxHeterBand(:,:)
   real(r8),allocatable :: RN2OReduxHeter(:,:)
-  real(r8),allocatable :: RNOxReduxRespDenitLim(:,:)
+  real(r8),allocatable :: RNOxDOCReduxRespDenitLim(:,:) !DOC respiration for denitrifcation
+  real(r8),allocatable :: RNOxAcetReduxRespDenitLim(:,:) !Acetate respiration for denitrifcation  
   real(r8),allocatable :: RMaintDmndHeter(:,:,:)
   real(r8),allocatable :: RNH4imobilSoilHeter(:,:)
   real(r8),allocatable :: RNO3imobilSoilHeter(:,:)
@@ -155,9 +156,10 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillLitrfal2ResduOMHeter(:,:,:,:)
   real(r8),allocatable :: RH2ProdHeter(:,:)
   real(r8),allocatable :: RMaintDefcitLitrfalOMHeter(:,:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2HumOMHeter(:,:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMHeter(:,:,:,:)
-  real(r8),allocatable :: RCCMEheter(:,:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2HumOMHeter(:,:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2ResduOMHeter(:,:,:,:)
+  real(r8),allocatable :: RCCMEheter(:,:,:)
+  real(r8),allocatable :: RCCMEAutor(:,:,:)
   real(r8),allocatable :: RN2FixHeter(:,:)
   real(r8),allocatable :: RKillOMHeter(:,:,:,:)
   real(r8),allocatable :: RkillRecycOMHeter(:,:,:,:)
@@ -171,12 +173,14 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RCO2ProdHeter(:,:)
   real(r8),allocatable :: RAcettProdHeter(:,:)
   real(r8),allocatable :: RCH4ProdHeter(:,:)
-  real(r8),allocatable :: RSOxidSoilAutor(:)
-  real(r8),allocatable :: RSOxidBandAutor(:)
+  real(r8),allocatable :: RSMetaOxidSoilAutor(:)
+  real(r8),allocatable :: RSMetaOxidBandAutor(:)
   real(r8),allocatable :: ECHZAutor(:)
   real(r8),allocatable :: ECHZHeter(:,:)
   real(r8),allocatable :: RGOCP(:,:)
+  real(r8),allocatable :: RGOAP(:,:)
   real(r8),allocatable :: FOQC(:,:)
+  real(r8),allocatable :: FOQA(:,:)
   REAL(R8),allocatable :: FGOCP(:,:)
   REAL(R8),allocatable :: FGOAP(:,:)  
   real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
@@ -187,12 +191,11 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RO2UptkAutor(:)
   real(r8),allocatable :: Resp4NFixAutor(:)
   real(r8),allocatable :: RespGrossAutor(:)
-  real(r8),allocatable :: RO2Dmnd4RespAutor(:)
-  real(r8),allocatable :: RO2DmndAutor(:)
+  real(r8),allocatable :: RO2Dmnd4GrossRespAutor(:)
   real(r8),allocatable :: RO2Uptk4RespAutor(:)
   real(r8),allocatable :: RNO3UptkAutor(:)
-  real(r8),allocatable :: RNO2ReduxAutorSoil(:)
-  real(r8),allocatable :: RNO2ReduxAutorBand(:)
+  real(r8),allocatable :: RNOxReduxAutorSoil(:)
+  real(r8),allocatable :: RNOxReduxAutorBand(:)
   real(r8),allocatable :: RNOxReduxRespAutorLim(:)
   real(r8),allocatable :: RMaintDmndAutor(:,:)
   real(r8),allocatable :: RNH4TransfSoilAutor(:)
@@ -206,8 +209,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RkillLitrfal2ResduOMAutor(:,:,:)
   real(r8),allocatable :: DOMuptk4GrothAutor(:,:)            !C-uptake (CH4 or CO2) flux uptake by autotrophs, [g d-2 h-1]  
   real(r8),allocatable :: RMaintDefcitLitrfalOMAutor(:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2HumOMAutor(:,:,:)
-  real(r8),allocatable :: RMaintDefcitLitrfal2ResduOMAutor(:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2HumOMAutor(:,:,:)
+  real(r8),allocatable :: RMaintDefLitrfal2ResduOMAutor(:,:,:)
   real(r8),allocatable :: RN2FixAutor(:)
   real(r8),allocatable :: RKillOMAutor(:,:,:)
   real(r8),allocatable :: RkillRecycOMAutor(:,:,:)
@@ -216,13 +219,12 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RNH4TransfLitrAutor(:)
   real(r8),allocatable :: RNO3TransfLitrAutor(:)
   real(r8),allocatable :: RH2PO4TransfLitrAutor(:)
-  real(r8),allocatable :: AttenfNH4Autor(:)
-  real(r8),allocatable :: AttenfNO3Autor(:)
-  real(r8),allocatable :: AttenfH2PO4Autor(:)
   real(r8),allocatable :: NonstX2stBiomAutor(:,:,:)
-  real(r8),allocatable :: AttenfH1PO4Autor(:)
-  real(r8),allocatable :: RCO2ProdAutor(:)
-  real(r8),allocatable :: RCH4ProdAutor(:)
+  real(r8),allocatable :: RCO2ProdAutor(:)    !gross CO2 production from autotrophs
+  real(r8),allocatable :: RCO2XumpAutor(:)    !gross CO2 consumption from autotrophs
+  real(r8),allocatable :: ROMProdCO2Autor(:)  !CO2 production from biomass C from autotrophs
+  real(r8),allocatable :: RGrowthCAutor(:)    !gross C biomss growth flux from substrate uptake
+  real(r8),allocatable :: RCH4ProdAutor(:)    !gross CH4 production
   real(r8),allocatable :: RH1PO4TransfSoilAutor(:)
   real(r8),allocatable :: RH1PO4TransfBandAutor(:)
   real(r8),allocatable :: RH1PO4TransfLitrAutor(:)
@@ -256,8 +258,6 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8),allocatable :: FOAA(:)
     real(r8),allocatable :: rCNDOM(:)
     real(r8),allocatable :: rCPDOM(:)
-    real(r8),allocatable :: rCNSorbOM(:)
-    real(r8),allocatable :: rCPSorbOM(:)
     real(r8),allocatable :: OMBioResduK(:)
     real(r8),allocatable :: SolidOMCK(:)
     real(r8),allocatable :: SolidOMActK(:)
@@ -306,22 +306,22 @@ type, public :: Cumlate_Flux_Diag_type
   implicit none
   class(Cumlate_Flux_Diag_type) :: this
 
-  this%TFNH4B = 0._r8
-  this%TFNO3B = 0._r8
-  this%TFNO2B = 0._r8
-  this%TFP14B = 0._r8
-  this%TFPO4B = 0._r8
-  this%tCH4ProdAceto = 0._r8
-  this%tCH4ProdH2 = 0._r8
-  this%TFOQC = 0._r8
-  this%TFOQA = 0._r8
-  this%TFOXYX = 0._r8
-  this%TFNH4X = 0._r8
-  this%TFNO3X = 0._r8
-  this%TFNO2X = 0._r8
-  this%TFN2OX = 0._r8
-  this%TFP14X = 0._r8
-  this%TFPO4X = 0._r8
+  this%TFNH4B                 = 0._r8
+  this%TFNO3B                 = 0._r8
+  this%TFNO2B                 = 0._r8
+  this%TFP14B                 = 0._r8
+  this%TFPO4B                 = 0._r8
+  this%tCH4ProdAceto          = 0._r8
+  this%tCH4ProdH2             = 0._r8
+  this%TFOQC                  = 0._r8
+  this%TFOQA                  = 0._r8
+  this%TFOXYX                 = 0._r8
+  this%TFNH4X                 = 0._r8
+  this%TFNO3X                 = 0._r8
+  this%TFNO2X                 = 0._r8
+  this%TFN2OX                 = 0._r8
+  this%TFP14X                 = 0._r8
+  this%TFPO4X                 = 0._r8
   this%tRespGrossHeterUlm     = 0._r8
   this%tCResp4H2Prod          = 0._r8
   this%tRNH4MicrbImobilSoil   = 0._r8
@@ -341,27 +341,28 @@ type, public :: Cumlate_Flux_Diag_type
   this%TReduxNO3Soil          = 0.0_r8
   this%TReduxNO3Band          = 0.0_r8
   this%TReduxNO2Soil          = 0.0_r8
-  this%TReduxNO2Band          = 0.0_r8
+  this%TReduxNO2toN2OBand     = 0.0_r8
   this%TReduxN2O              = 0.0_r8
   this%TFixN2                 = 0.0_r8
   this%tCH4OxiAero            = 0.0_r8
-
-  this%tRO2UptkHeterG     = 0._r8
-  this%tRO2DmndHeterG     = 0._r8
-  this%TDeniReduxNO2Band  = 0._r8
-  this%TDeniReduxNO2Soil  = 0._r8
-  this%TNitReduxNO2Band   = 0._r8
-  this%TNitReduxNO2Soil   = 0._r8
-  this%tRNH3Oxi           = 0._r8
-  this%RNO2ReduxSoilChemo = 0._r8
-  this%RNO2ReduxBandChemo = 0._r8
-  this%RN2OProdSoilChemo  = 0._r8
-  this%RN2OProdBandChemo  = 0._r8
-  this%RNO3ProdSoilChemo  = 0._r8
-  this%RNO3ProdBandChemo  = 0._r8
-  this%RNO2ReduxChemo     = 0._r8
+  this%tCH4OxiANMO            = 0._r8
+  this%tRO2UptkHeterG         = 0._r8
+  this%tRO2DmndHeterG         = 0._r8
+  this%TDeniReduxNO2Band      = 0._r8
+  this%TDeniReduxNO2Soil      = 0._r8
+  this%TNitNO2Redux2N2OBand   = 0._r8
+  this%TNitNO2Redux2N2OSoil   = 0._r8
+  this%tRNH3Oxi               = 0._r8
+  this%RNO2ReduxSoilChemo     = 0._r8
+  this%RNO2ReduxBandChemo     = 0._r8
+  this%RN2OProdSoilChemo      = 0._r8
+  this%RN2OProdBandChemo      = 0._r8
+  this%RNO3ProdSoilChemo      = 0._r8
+  this%RNO3ProdBandChemo      = 0._r8
+  this%RNO2ReduxChemo         = 0._r8
 
   end subroutine nit_aqmf_diag
+
 !------------------------------------------------------------------------------------------
 
   subroutine nit_micf_init(this,jcplx,NumMicbFunGrupsPerCmplx)
@@ -389,7 +390,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNO2ReduxHeterSoil(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterSoil=spval
   allocate(this%RNO2ReduxHeterBand(NumHetetr1MicCmplx,1:jcplx));this%RNO2ReduxHeterBand=spval
   allocate(this%RN2OReduxHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2OReduxHeter=spval
-  allocate(this%RNOxReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitLim=spval
+  allocate(this%RNOxDOCReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxDOCReduxRespDenitLim=spval
+  allocate(this%RNOxAcetReduxRespDenitLim(NumHetetr1MicCmplx,1:jcplx));this%RNOxAcetReduxRespDenitLim=spval
   allocate(this%RMaintDmndHeter(2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDmndHeter=spval
   allocate(this%RNH4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilSoilHeter=spval
   allocate(this%RNO3imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilSoilHeter=spval
@@ -403,8 +405,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
   allocate(this%RH2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2HumOMHeter=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfal2ResduOMHeter=spval
+  allocate(this%RMaintDefLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefLitrfal2HumOMHeter=spval
+  allocate(this%RMaintDefLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefLitrfal2ResduOMHeter=spval
   allocate(this%RN2FixHeter(NumHetetr1MicCmplx,1:jcplx));this%RN2FixHeter=spval
   allocate(this%RKillOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RKillOMHeter=spval
   allocate(this%RkillRecycOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillRecycOMHeter=spval
@@ -415,12 +417,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNH4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNH4imobilLitrHeter=spval
   allocate(this%RNO3imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RNO3imobilLitrHeter=spval
   allocate(this%RH2PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2PO4imobilLitrHeter=spval
-  allocate(this%AttenfNH4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNH4Heter=spval
-  allocate(this%AttenfNO3Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfNO3Heter=spval
-  allocate(this%AttenfH2PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH2PO4Heter=spval
   allocate(this%RNOxReduxRespDenitUlm(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitUlm=spval
   allocate(this%NonstX2stBiomHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%NonstX2stBiomHeter=spval
-  allocate(this%AttenfH1PO4Heter(NumHetetr1MicCmplx,1:jcplx));this%AttenfH1PO4Heter=spval
   allocate(this%RCO2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCO2ProdHeter=spval
   allocate(this%RAcettProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcettProdHeter=spval
   allocate(this%RCH4ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCH4ProdHeter=spval
@@ -428,26 +426,28 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RH1PO4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilBandHeter=spval
   allocate(this%RH1PO4imobilLitrHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilLitrHeter=spval
 
-  allocate(this%RSOxidSoilAutor(NumMicrobAutoTrophCmplx));this%RSOxidSoilAutor=spval
-  allocate(this%RSOxidBandAutor(NumMicrobAutoTrophCmplx));this%RSOxidBandAutor=spval
+  allocate(this%RSMetaOxidSoilAutor(NumMicrobAutoTrophCmplx));this%RSMetaOxidSoilAutor=spval
+  allocate(this%RSMetaOxidBandAutor(NumMicrobAutoTrophCmplx));this%RSMetaOxidBandAutor=spval
   allocate(this%XferBiomeHeterK(1:NumPlantChemElms,3,NumHetetr1MicCmplx,1:jcplx));this%XferBiomeHeterK=spval
   allocate(this%ROQC4HeterMicrobAct(NumHetetr1MicCmplx,1:jcplx));this%ROQC4HeterMicrobAct=spval
-  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,NumHetetr1MicCmplx,1:jcplx));this%RCCMEheter=spval
+  allocate(this%RCCMEheter(NumPlantChemElms,ndbiomcp,1:jcplx));this%RCCMEheter=spval
+  allocate(this%RCCMEAutor(NumPlantChemElms,ndbiomcp,1:jcplx));this%RCCMEAutor=spval
   allocate(this%ECHZAutor(1:NumMicrobAutoTrophCmplx));this%ECHZAutor=spval
   allocate(this%ECHZHeter(1:NumHetetr1MicCmplx,1:jcplx));this%ECHZHeter=spval
   allocate(this%FOQC(1:NumHetetr1MicCmplx,1:jcplx));this%FOQC=spval
+  allocate(this%FOQA(1:NumHetetr1MicCmplx,1:jcplx));this%FOQA=spval  
   allocate(this%RGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOCP=spval
+  allocate(this%RGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOAP=spval
   allocate(this%FGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOCP=spval
   allocate(this%FGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOAP=spval  
   allocate(this%RO2UptkAutor(NumMicrobAutoTrophCmplx));this%RO2UptkAutor=spval
   allocate(this%Resp4NFixAutor(NumMicrobAutoTrophCmplx));this%Resp4NFixAutor=spval
   allocate(this%RespGrossAutor(NumMicrobAutoTrophCmplx));this%RespGrossAutor=spval
-  allocate(this%RO2Dmnd4RespAutor(NumMicrobAutoTrophCmplx));this%RO2Dmnd4RespAutor=spval
-  allocate(this%RO2DmndAutor(NumMicrobAutoTrophCmplx));this%RO2DmndAutor=spval
+  allocate(this%RO2Dmnd4GrossRespAutor(NumMicrobAutoTrophCmplx));this%RO2Dmnd4GrossRespAutor=spval
   allocate(this%RO2Uptk4RespAutor(NumMicrobAutoTrophCmplx));this%RO2Uptk4RespAutor=spval
   allocate(this%RNO3UptkAutor(NumMicrobAutoTrophCmplx));this%RNO3UptkAutor=spval
-  allocate(this%RNO2ReduxAutorSoil(NumMicrobAutoTrophCmplx));this%RNO2ReduxAutorSoil=spval
-  allocate(this%RNO2ReduxAutorBand(NumMicrobAutoTrophCmplx));this%RNO2ReduxAutorBand=spval
+  allocate(this%RNOxReduxAutorSoil(NumMicrobAutoTrophCmplx));this%RNOxReduxAutorSoil=spval
+  allocate(this%RNOxReduxAutorBand(NumMicrobAutoTrophCmplx));this%RNOxReduxAutorBand=spval
   allocate(this%RNOxReduxRespAutorLim(NumMicrobAutoTrophCmplx));this%RNOxReduxRespAutorLim=spval
   allocate(this%RMaintDmndAutor(2,NumMicrobAutoTrophCmplx));this%RMaintDmndAutor=spval
   allocate(this%RNH4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfSoilAutor=spval
@@ -461,8 +461,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RkillLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillLitrfal2ResduOMAutor=spval
   allocate(this%DOMuptk4GrothAutor(idom_beg:idom_end,NumMicrobAutoTrophCmplx));this%DOMuptk4GrothAutor=spval
   allocate(this%RMaintDefcitLitrfalOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfalOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2HumOMAutor=spval
-  allocate(this%RMaintDefcitLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefcitLitrfal2ResduOMAutor=spval
+  allocate(this%RMaintDefLitrfal2HumOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefLitrfal2HumOMAutor=spval
+  allocate(this%RMaintDefLitrfal2ResduOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RMaintDefLitrfal2ResduOMAutor=spval
   allocate(this%RN2FixAutor(NumMicrobAutoTrophCmplx));this%RN2FixAutor=spval
   allocate(this%RKillOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RKillOMAutor=spval
   allocate(this%RkillRecycOMAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%RkillRecycOMAutor=spval
@@ -471,12 +471,12 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNH4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNH4TransfLitrAutor=spval
   allocate(this%RNO3TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RNO3TransfLitrAutor=spval
   allocate(this%RH2PO4TransfLitrAutor(NumMicrobAutoTrophCmplx));this%RH2PO4TransfLitrAutor=spval
-  allocate(this%AttenfNH4Autor(NumMicrobAutoTrophCmplx));this%AttenfNH4Autor=spval
-  allocate(this%AttenfNO3Autor(NumMicrobAutoTrophCmplx));this%AttenfNO3Autor=spval
-  allocate(this%AttenfH2PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH2PO4Autor=spval
+
   allocate(this%NonstX2stBiomAutor(NumPlantChemElms,2,NumMicrobAutoTrophCmplx));this%NonstX2stBiomAutor=spval
-  allocate(this%AttenfH1PO4Autor(NumMicrobAutoTrophCmplx));this%AttenfH1PO4Autor=spval
   allocate(this%RCO2ProdAutor(NumMicrobAutoTrophCmplx));this%RCO2ProdAutor=spval
+  allocate(this%RCO2XumpAutor(NumMicrobAutoTrophCmplx));this%RCO2XumpAutor=spval
+  allocate(this%ROMProdCO2Autor(NumMicrobAutoTrophCmplx));this%ROMProdCO2Autor=spval
+  allocate(this%RGrowthCAutor(NumMicrobAutoTrophCmplx));this%RGrowthCAutor=spval
   allocate(this%RCH4ProdAutor(NumMicrobAutoTrophCmplx));this%RCH4ProdAutor=spval
   allocate(this%RH1PO4TransfSoilAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfSoilAutor=spval
   allocate(this%RH1PO4TransfBandAutor(NumMicrobAutoTrophCmplx));this%RH1PO4TransfBandAutor=spval
@@ -514,17 +514,21 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%rCNBiomeActAutor(NumPlantChemElms,NumMicrobAutoTrophCmplx));this%rCNBiomeActAutor=1.0_r8
   allocate(this%OMActAutor(NumMicrobAutoTrophCmplx));this%OMActAutor=spval
   allocate(this%FracOMActAutor(NumMicrobAutoTrophCmplx));this%FracOMActAutor=spval
-  allocate(this%FracNO2ReduxAutor(NumMicrobAutoTrophCmplx));this%FracNO2ReduxAutor=spval
+  allocate(this%FracNO2XupAutor(NumMicrobAutoTrophCmplx));this%FracNO2XupAutor=spval
   allocate(this%FracAutorBiomOfActK(NumMicrobAutoTrophCmplx));this%FracAutorBiomOfActK=spval
   allocate(this%OMC2Autor(NumMicrobAutoTrophCmplx));this%OMC2Autor=spval
   allocate(this%GrowthEnvScalAutor(NumMicrobAutoTrophCmplx));this%GrowthEnvScalAutor=spval
   allocate(this%TSensMaintRAutor(NumMicrobAutoTrophCmplx));this%TSensMaintRAutor=spval
+  allocate(this%TSensGroAutor(NumMicrobAutoTrophCmplx));this%TSensGroAutor=spval
+  allocate(this%WSensGroAutor(NumMicrobAutoTrophCmplx));this%WSensGroAutor=spval
+  allocate(this%WSensGroHeter(NumHetetr1MicCmplx,1:jcplx));this%WSensGroHeter=spval
+  allocate(this%TSensGroHeter(NumHetetr1MicCmplx,1:jcplx));this%TSensGroHeter=spval
   allocate(this%OMN2Autor(NumMicrobAutoTrophCmplx));this%OMN2Autor=spval
   allocate(this%FOM2Autor(NumMicrobAutoTrophCmplx));this%FOM2Autor=spval
   allocate(this%fLimO2Autor(NumMicrobAutoTrophCmplx));this%fLimO2Autor=spval
   allocate(this%FCNAutor(NumMicrobAutoTrophCmplx));this%FCNAutor=spval
   allocate(this%FCPAutor(NumMicrobAutoTrophCmplx));this%FCPAutor=spval
-  allocate(this%FBiomStoiScalarAutor(NumMicrobAutoTrophCmplx));this%FBiomStoiScalarAutor=spval
+  allocate(this%FBiomNutStoiScalAutor(NumMicrobAutoTrophCmplx));this%FBiomNutStoiScalAutor=spval
   end subroutine nit_mics_init
 !------------------------------------------------------------------------------------------
 
@@ -545,7 +549,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RNO2ReduxHeterSoil               = 0._r8
   this%RNO2ReduxHeterBand               = 0._r8
   this%RN2OReduxHeter                   = 0._r8
-  this%RNOxReduxRespDenitLim            = 0._r8
+  this%RNOxDOCReduxRespDenitLim         = 0._r8
+  this%RNOxAcetReduxRespDenitLim        = 0._r8
   this%RMaintDmndHeter                  = 0._r8
   this%RNH4imobilSoilHeter              = 0._r8
   this%RNO3imobilSoilHeter              = 0._r8
@@ -558,10 +563,11 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillLitrfal2ResduOMHeter        = 0._r8
   this%DOMuptk4GrothHeter               = 0._r8
   this%RH2ProdHeter                     = 0._r8
-  this%RMaintDefcitLitrfal2HumOMHeter   = 0._r8
-  this%RMaintDefcitLitrfal2ResduOMHeter = 0._r8
+  this%RMaintDefLitrfal2HumOMHeter   = 0._r8
+  this%RMaintDefLitrfal2ResduOMHeter = 0._r8
   this%RMaintDefcitLitrfalOMHeter       = 0._r8
   this%RCCMEheter                       = 0._r8
+  this%RCCMEAutor                       = 0._r8
   this%RN2FixHeter                      = 0._r8
 
   this%RKillOMHeter             = 0._r8
@@ -573,18 +579,14 @@ type, public :: Cumlate_Flux_Diag_type
   this%RNH4imobilLitrHeter      = 0._r8
   this%RNO3imobilLitrHeter      = 0._r8
   this%RH2PO4imobilLitrHeter    = 0._r8
-  this%AttenfNH4Heter           = 0._r8
-  this%AttenfNO3Heter           = 0._r8
-  this%AttenfH2PO4Heter         = 0._r8
   this%RNOxReduxRespDenitUlm    = 0._r8
   this%ROQC4HeterMicrobAct      = 0._r8
   this%NonstX2stBiomHeter       = 0._r8
-  this%AttenfH1PO4Heter         = 0._r8
   this%RCO2ProdHeter            = 0._r8
   this%RAcettProdHeter          = 0._r8
   this%RCH4ProdHeter            = 0._r8
-  this%RSOxidSoilAutor          = 0._r8
-  this%RSOxidBandAutor          = 0._r8
+  this%RSMetaOxidSoilAutor          = 0._r8
+  this%RSMetaOxidBandAutor          = 0._r8
   this%XferBiomeHeterK          = 0._r8
   this%RH1PO4imobilSoilHeter    = 0._r8
   this%RH1PO4imobilBandHeter    = 0._r8
@@ -592,18 +594,19 @@ type, public :: Cumlate_Flux_Diag_type
   this%ECHZAutor                = 0._r8
   this%ECHZHeter                = 0._r8
   this%FOQC                     = 0._r8
+  this%FOQA                     = 0._r8  
   this%FGOCP                    = 0._r8
   this%RGOCP                    = 0._r8
+  this%RGOAP                    = 0._r8
   this%FGOAP                    = 0._r8
   this%RO2UptkAutor                     = 0._r8
   this%Resp4NFixAutor                   = 0._r8
   this%RespGrossAutor                   = 0._r8
-  this%RO2Dmnd4RespAutor                = 0._r8
-  this%RO2DmndAutor                     = 0._r8
+  this%RO2Dmnd4GrossRespAutor                = 0._r8
   this%RO2Uptk4RespAutor                = 0._r8
   this%RNO3UptkAutor                    = 0._r8
-  this%RNO2ReduxAutorSoil               = 0._r8
-  this%RNO2ReduxAutorBand               = 0._r8
+  this%RNOxReduxAutorSoil               = 0._r8
+  this%RNOxReduxAutorBand               = 0._r8
   this%RNOxReduxRespAutorLim            = 0._r8
   this%RMaintDmndAutor                  = 0._r8
   this%RNH4TransfSoilAutor              = 0._r8
@@ -617,8 +620,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillLitrfal2ResduOMAutor        = 0._r8
   this%DOMuptk4GrothAutor               = 0._r8
   this%RMaintDefcitLitrfalOMAutor       = 0._r8
-  this%RMaintDefcitLitrfal2HumOMAutor   = 0._r8
-  this%RMaintDefcitLitrfal2ResduOMAutor = 0._r8
+  this%RMaintDefLitrfal2HumOMAutor   = 0._r8
+  this%RMaintDefLitrfal2ResduOMAutor = 0._r8
   this%RN2FixAutor                      = 0._r8
 
   this%RKillOMAutor             = 0._r8
@@ -627,13 +630,12 @@ type, public :: Cumlate_Flux_Diag_type
   this%RMaintDefcitRecycOMAutor = 0._r8
   this%RNH4TransfLitrAutor      = 0._r8
   this%RNO3TransfLitrAutor      = 0._r8
-  this%RH2PO4TransfLitrAutor    = 0._r8
-  this%AttenfNH4Autor           = 0._r8
-  this%AttenfNO3Autor           = 0._r8
-  this%AttenfH2PO4Autor         = 0._r8
+  this%RH2PO4TransfLitrAutor    = 0._r8  
   this%NonstX2stBiomAutor       = 0._r8
-  this%AttenfH1PO4Autor         = 0._r8
   this%RCO2ProdAutor            = 0._r8
+  this%RCO2XumpAutor            = 0._r8
+  this%ROMProdCO2Autor          = 0._r8
+  this%RGrowthCAutor            = 0._r8 
   this%RCH4ProdAutor            = 0._r8
   this%RH1PO4TransfSoilAutor    = 0._r8
   this%RH1PO4TransfBandAutor    = 0._r8
@@ -661,7 +663,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNO2ReduxHeterSoil)
   call destroy(this%RNO2ReduxHeterBand)
   call destroy(this%RN2OReduxHeter)
-  call destroy(this%RNOxReduxRespDenitLim)
+  call destroy(this%RNOxDOCReduxRespDenitLim)
+  call destroy(this%RNOxAcetReduxRespDenitLim)
   call destroy(this%RMaintDmndHeter)
   call destroy(this%RNH4imobilSoilHeter)
   call destroy(this%RNO3imobilSoilHeter)
@@ -674,8 +677,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillLitrfal2ResduOMHeter)
   call destroy(this%DOMuptk4GrothHeter)
   call destroy(this%RH2ProdHeter)
-  call destroy(this%RMaintDefcitLitrfal2HumOMHeter)
-  call destroy(this%RMaintDefcitLitrfal2ResduOMHeter)
+  call destroy(this%RMaintDefLitrfal2HumOMHeter)
+  call destroy(this%RMaintDefLitrfal2ResduOMHeter)
   call destroy(this%RMaintDefcitLitrfalOMHeter)
   call destroy(this%RCCMEheter)
   call destroy(this%RN2FixHeter)
@@ -688,18 +691,14 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNH4imobilLitrHeter)
   call destroy(this%RNO3imobilLitrHeter)
   call destroy(this%RH2PO4imobilLitrHeter)
-  call destroy(this%AttenfNH4Heter)
-  call destroy(this%AttenfNO3Heter)
-  call destroy(this%AttenfH2PO4Heter)
   call destroy(this%RNOxReduxRespDenitUlm)
   call destroy(this%ROQC4HeterMicrobAct)
   call destroy(this%NonstX2stBiomHeter)
-  call destroy(this%AttenfH1PO4Heter)
   call destroy(this%RCO2ProdHeter)
   call destroy(this%RAcettProdHeter)
   call destroy(this%RCH4ProdHeter)
-  call destroy(this%RSOxidSoilAutor)
-  call destroy(this%RSOxidBandAutor)
+  call destroy(this%RSMetaOxidSoilAutor)
+  call destroy(this%RSMetaOxidBandAutor)
   call destroy(this%XferBiomeHeterK)
   call destroy(this%RH1PO4imobilSoilHeter)
   call destroy(this%RH1PO4imobilBandHeter)
@@ -708,12 +707,11 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RO2UptkAutor)
   call destroy(this%Resp4NFixAutor)
   call destroy(this%RespGrossAutor)
-  call destroy(this%RO2Dmnd4RespAutor)
-  call destroy(this%RO2DmndAutor)
+  call destroy(this%RO2Dmnd4GrossRespAutor)
   call destroy(this%RO2Uptk4RespAutor)
   call destroy(this%RNO3UptkAutor)
-  call destroy(this%RNO2ReduxAutorSoil)
-  call destroy(this%RNO2ReduxAutorBand)
+  call destroy(this%RNOxReduxAutorSoil)
+  call destroy(this%RNOxReduxAutorBand)
   call destroy(this%RNOxReduxRespAutorLim)
   call destroy(this%RMaintDmndAutor)
   call destroy(this%RNH4TransfSoilAutor)
@@ -727,8 +725,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillLitrfal2ResduOMAutor)
   call destroy(this%DOMuptk4GrothAutor)
   call destroy(this%RMaintDefcitLitrfalOMAutor)
-  call destroy(this%RMaintDefcitLitrfal2HumOMAutor)
-  call destroy(this%RMaintDefcitLitrfal2ResduOMAutor)
+  call destroy(this%RMaintDefLitrfal2HumOMAutor)
+  call destroy(this%RMaintDefLitrfal2ResduOMAutor)
   call destroy(this%RN2FixAutor)
   call destroy(this%RKillOMAutor)
   call destroy(this%RkillRecycOMAutor)
@@ -737,12 +735,11 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RNH4TransfLitrAutor)
   call destroy(this%RNO3TransfLitrAutor)
   call destroy(this%RH2PO4TransfLitrAutor)
-  call destroy(this%AttenfNH4Autor)
-  call destroy(this%AttenfNO3Autor)
-  call destroy(this%AttenfH2PO4Autor)
+  call destroy(this%ROMProdCO2Autor)
   call destroy(this%NonstX2stBiomAutor)
-  call destroy(this%AttenfH1PO4Autor)
   call destroy(this%RCO2ProdAutor)
+  call destroy(this%RCO2XumpAutor)
+  call destroy(this%RGrowthCAutor)
   call destroy(this%RCH4ProdAutor)
   call destroy(this%RH1PO4TransfSoilAutor)
   call destroy(this%RH1PO4TransfBandAutor)
@@ -760,7 +757,7 @@ type, public :: Cumlate_Flux_Diag_type
 
   FSubs_limiter=0._r8
 
-  if(groupid==micpar%mid_Aerob_HeteroBacter)then
+  if(groupid==micpar%mid_HeterAerobBacter)then
   
     DO K=1,micpar%jcplx
       DO NGL=micpar%JGniH(groupid),micpar%JGnfH(groupid)
@@ -810,21 +807,24 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%FCN)
   call destroy(this%FCP)
   call destroy(this%FBiomStoiScalarHeter)
-
   call destroy(this%rCNBiomeActAutor)
   call destroy(this%OMActAutor)
   call destroy(this%FracOMActAutor)
-  call destroy(this%FracNO2ReduxAutor)
+  call destroy(this%FracNO2XupAutor)
   call destroy(this%FracAutorBiomOfActK)
   call destroy(this%OMC2Autor)
   call destroy(this%GrowthEnvScalAutor)
   call destroy(this%TSensMaintRAutor)
+  call destroy(this%TSensGroAutor)
+  call destroy(this%WSensGroAutor)  
+  call destroy(this%TSensGroHeter)
+  call destroy(this%WSensGroHeter)
   call destroy(this%OMN2Autor)
   call destroy(this%FOM2Autor)
   call destroy(this%fLimO2Autor)
   call destroy(this%FCNAutor)
   call destroy(this%FCPAutor)
-  call destroy(this%FBiomStoiScalarAutor)
+  call destroy(this%FBiomNutStoiScalAutor)
   end subroutine nit_mics_destroy
 !------------------------------------------------------------------------------------------
   subroutine nit_omcplxf_init(this)
@@ -911,8 +911,6 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%FOAA(1:ncplx));this%FOAA=spval
   allocate(this%rCNDOM(1:ncplx));this%rCNDOM=spval
   allocate(this%rCPDOM(1:ncplx));this%rCPDOM=spval
-  allocate(this%rCNSorbOM(1:ncplx));this%rCNSorbOM=spval
-  allocate(this%rCPSorbOM(1:ncplx));this%rCPSorbOM=spval
   allocate(this%OMBioResduK(1:ncplx));this%OMBioResduK=spval
   allocate(this%SolidOMCK(1:ncplx));this%SolidOMCK=spval
   allocate(this%SolidOMActK(1:ncplx));this%SolidOMActK=spval
@@ -959,8 +957,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%FOAA=0._r8
   this%rCNDOM=0._r8
   this%rCPDOM=0._r8
-  this%rCNSorbOM=0._r8
-  this%rCPSorbOM=0._r8
+
   this%OMBioResduK=0._r8
   this%SolidOMCK=0._r8
   this%SolidOMActK=0._r8
@@ -980,8 +977,6 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%FOAA)
   call destroy(this%rCNDOM)
   call destroy(this%rCPDOM)
-  call destroy(this%rCNSorbOM)
-  call destroy(this%rCPSorbOM)
   call destroy(this%OMBioResduK)
   call destroy(this%SolidOMCK)
   call destroy(this%SolidOMActK)

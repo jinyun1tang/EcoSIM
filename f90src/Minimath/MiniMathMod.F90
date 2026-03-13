@@ -16,7 +16,7 @@ module minimathmod
   public :: p_adb
   public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
-  public :: isLeap
+  public :: isLeap,iisleap
   public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d,AZMIN1d
   public :: GetMolAirPerm3
@@ -28,7 +28,12 @@ module minimathmod
   public :: flux_mass_limiter
   public :: AZERO,AZERO1  
   public :: SubstrateLimit
-  public :: SubstrateDribbling
+  public :: real_truncate
+  public :: pMod
+  public :: isAinsideBC,isABetweenBC,isALeftinBC,isARightinBC
+  public :: sfexp
+  public :: Viscosity_H2O
+  public :: SubstrateDribbling  
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
     module procedure SubstrateDribbling_scal
@@ -46,7 +51,7 @@ module minimathmod
   public :: get_flux_scalar
   public :: addone
   public :: RichardsonNumber
-  real(r8), parameter :: tiny_val=1.e-14_r8
+  real(r8), parameter :: tiny_val=1.e-12_r8
 
   contains
 
@@ -69,9 +74,10 @@ module minimathmod
    real(r8) :: ans
 
    if(abs(b)<tiny_val)then
-     ans=tiny_val
+     !assume complete dissipation
+     ans=0._R8
    else
-     ans = a/b
+     ans = AZERO(a/b)
    endif
 
    return
@@ -102,6 +108,38 @@ module minimathmod
     ans=1._r8
   endif
   end function dssign
+!------------------------------------------------------------------------------------------
+  pure function isAinsideBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a < c
+  end function isAinsideBC
+!------------------------------------------------------------------------------------------
+  pure function isALeftinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a < c
+  end function isALeftinBC
+!------------------------------------------------------------------------------------------
+  pure function isARightinBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>b .and. a <= c
+  end function isARightinBC
+!------------------------------------------------------------------------------------------
+  pure function isABetweenBC(a,b,c)result(ans)
+  implicit none
+  real(r8), intent(in) :: a,b,C
+  logical :: ans
+
+  ans = a>=b .and. a <= c
+  end function isABetweenBC
 
 !------------------------------------------------------------------------------------------
 
@@ -190,6 +228,23 @@ module minimathmod
   endif
   end function AZMAX1d
 
+!--------------------------------------------------------------------------------
+  pure function pMOD(a,b)result(c)
+  !
+  ! compute c=MOD(A,B)
+  ! if C==0 and A/=0 then C=B
+  implicit none
+  integer, intent(in) :: a,B
+  integer :: C
+  
+  if(a<0)then
+    c=mod(a+b,b)
+  else
+    c=mod(a,b)
+  endif
+
+  if(c==0 .and. a/=0)c=b
+  end function pMOD
 !------------------------------------------------------------------------------------------
 
   pure function AZMIN1d(val,tiny_val2)result(ans)
@@ -207,13 +262,20 @@ module minimathmod
   end function AZMIN1d
 
 !------------------------------------------------------------------------------------------
-  pure function AZERO(val)result(ans)
+  pure function AZERO(val,tiny1)result(ans)
   implicit none
   real(r8), intent(in) :: val
-
+  real(r8), optional, intent(in) :: tiny1
   real(r8) :: ans
-  real(r8), parameter :: tiny_val1=1.e-13_r8
-  if(abs(val)>=tiny_val1)then
+  real(r8), parameter :: tiny_val1=1.e-10_r8
+  real(r8) :: tiny  
+  if(present(tiny1))then
+    tiny=tiny1
+  else
+    tiny=tiny_val1
+  endif  
+
+  if(abs(val)>=tiny)then
     ans=val
   else  
     ans=0._r8
@@ -395,7 +457,7 @@ module minimathmod
   implicit none
   real(r8), intent(inout) :: mass
   real(r8), intent(inout) :: consum_flux
-  integer, optional, intent(in) :: dsgn
+  integer, optional, intent(in) :: dsgn  !sign of consumption flux
   integer :: dsgnl
 
   dsgnl=1
@@ -407,16 +469,18 @@ module minimathmod
   !return for zero flux
   if(isclose(consum_flux,0._r8))return
 
-  !udpate as mass=mass-flux
+  
   if(dsgnl>0)then  
+    !udpate as mass=mass-flux
     if(mass<consum_flux)then
       consum_flux = mass
       mass        = 0._r8
     else
       mass=mass-consum_flux  
     endif
-  !update as mass=mass+flux
+    
   else  
+    !update as mass=mass+flux
     if(mass<-consum_flux)then  
       consum_flux = -mass
       mass        = 0._r8
@@ -563,5 +627,47 @@ module minimathmod
   endif
   
   end subroutine SubstrateDribbling_vec
+!------------------------------------------------------------------------
+
+  pure function real_truncate(val,precision)result(ans)
+  !
+  !truncate val to precision
+  implicit none
+  real(r8), intent(in) :: val
+  real(r8), intent(in) :: precision
+  real(r8) :: ans
+
+  ans=aint(val/precision)*precision
+
+  end function real_truncate
+
+!------------------------------------------------------------------------
+  pure function Viscosity_H2O(TEMPC)result(viscwl)
+  implicit none
+  real(r8), intent(in) :: TEMPC  !temperautre [oC]
+  real(r8), parameter :: VISCW=1.0E-06_r8    !water viscosity at oC, [Mg m-1 s]
+  
+  real(r8) :: viscwl
+  
+  VISCWL    = VISCW*EXP(0.533_r8-0.0267_r8*TEMPC)
+
+  end function Viscosity_H2O
+!------------------------------------------------------------------------
+
+  pure function sfexp(a)result(ans)
+  !
+  !do filtered exponential function calculation
+  implicit none
+  real(r8), intent(in) :: a
+  real(r8) :: ans
+
+  if(a>30._r8)then
+    ans=1.e14_r8 !return a large number
+  elseif(a<-30)then
+    ans=1.e-15_r8
+  else
+    ans=exp(a)
+  endif
+  end function sfexp
 
 end module minimathmod

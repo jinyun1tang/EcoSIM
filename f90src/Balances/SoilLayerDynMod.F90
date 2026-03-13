@@ -121,9 +121,6 @@ implicit none
     twat=twat+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
   ENDDO
 
-!  if(I==312 .and. J==22)write(211,*)twat,(L,VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE,&
-!    L=NU_col(NY,NX),NL_col(NY,NX))
-
   ICHKL=0
   D245: DO L=NU_col(NY,NX),NL_col(NY,NX)-1
     !up -> down
@@ -268,9 +265,9 @@ implicit none
   IF((iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros) &
     .AND. ABS(DORGC_vr(LX)).GT.ZEROS(NY,NX))THEN
 
-!    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
+!    DDLEqv_OrgC = gC2MgOM*DORGC_vr(LX)/((1.0_r8-SoilFracAsMacP_vr(LX,NY,NX))*SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
     !use the new definition, dVol/area
-    DDLEqv_OrgC = MWC2Soil*DORGC_vr(LX)/(SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
+    DDLEqv_OrgC = gC2MgOM*DORGC_vr(LX)/(SoiBulkDensityt0_vr(LX,NY,NX))/AREA_3D(3,LX,NY,NX)
 
     ! LX is bottom layer, or is litter layer
     IF(LX.EQ.NL_col(NY,NX) .OR. SoilBulkDensity_vr(LX+1,NY,NX).LE.ZERO)THEN 
@@ -935,8 +932,8 @@ implicit none
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)
   ENGY1                           = ENGY1+FX*ENGY0
-  VHeatCapacitySoilM_vr(L1,NY,NX) = VHeatCapacitySoilM_vr(L1,NY,NX)+FX*VHeatCapacitySoilM_vr(L0,NY,NX)
-  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapacitySoilM_vr(L1,NY,NX) &
+  VHeatCapSolidSoil_vr(L1,NY,NX) = VHeatCapSolidSoil_vr(L1,NY,NX)+FX*VHeatCapSolidSoil_vr(L0,NY,NX)
+  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapSolidSoil_vr(L1,NY,NX) &
     +cpw*(VLWatMicP_vr(L1,NY,NX)+VLWatMacP_vr(L1,NY,NX)) &
     +cpi*(VLiceMicP_vr(L1,NY,NX)+VLiceMacP_vr(L1,NY,NX))
 
@@ -950,10 +947,12 @@ implicit none
   DO NTF=ifertn_beg,ifertn_end
     FertN_mole_soil_vr(NTF,L1,NY,NX)=FertN_mole_soil_vr(NTF,L1,NY,NX)+FX*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_soil_vr(L1,NY,NX)=FertP_mole_soil_vr(L1,NY,NX) + FX*FertP_mole_soil_vr(L0,NY,NX)
 
   DO NTF=ifertnb_beg,ifertnb_end
     FertN_mole_Band_vr(NTF,L1,NY,NX)=FertN_mole_Band_vr(NTF,L1,NY,NX)+FX*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_band_vr(L1,NY,NX)=FertP_mole_band_vr(L1,NY,NX)+FX*FertP_mole_band_vr(L0,NY,NX)
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H2PO4B .and. NTU/=ids_H1PO4B)THEN
@@ -1049,6 +1048,16 @@ implicit none
     DO  NZ=1,NP_col(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
+
+        DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+          DO NE=1,NumPlantChemElms
+            RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX) &
+              +FX*RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)
+          ENDDO
+          Root1stLenPP_rpvr(L1,NR,NZ,NY,NX)  = Root1stLenPP_rpvr(L1,NR,NZ,NY,NX)+FX*Root1stLenPP_rpvr(L0,NR,NZ,NY,NX)          
+        ENDDO      
+        Root1stXNumL_pvr(L1,NZ,NY,NX)        = Root1stXNumL_pvr(L1,NZ,NY,NX)+FX*Root1stXNumL_pvr(L0,NZ,NY,NX)        
+
         DO N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L1,NZ,NY,NX) = trcg_rootml_pvr(idg,N,L1,NZ,NY,NX)+FX*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1057,12 +1066,9 @@ implicit none
 
           DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) &
-                +FX*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
               RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)=RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) &
                 +FX*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
-            Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)  = Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_rpvr(N,L1,NR,NZ,NY,NX)   = Root2ndLen_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX) = Root2ndXNum_rpvr(N,L1,NR,NZ,NY,NX)+FX*Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
@@ -1073,16 +1079,15 @@ implicit none
           RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX) = RootMycoActiveBiomC_pvr(N,L1,NZ,NY,NX)+FX*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           PopuRootMycoC_pvr(N,L1,NZ,NY,NX)       = PopuRootMycoC_pvr(N,L1,NZ,NY,NX)+FX* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L1,NZ,NY,NX)        = RootProteinC_pvr(N,L1,NZ,NY,NX)+FX*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L1,NZ,NY,NX)        = Root1stXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)         = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)     = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L1,NZ,NY,NX)         = RootPoreVol_rpvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L1,NZ,NY,NX)         = RootPoreVol_pvr(N,L1,NZ,NY,NX)+FX*RootPoreVol_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L1,NZ,NY,NX)            = RootVH2O_pvr(N,L1,NZ,NY,NX)+FX*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L1,NZ,NY,NX)       = Root1stRadius_pvr(N,L1,NZ,NY,NX)+FX*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX)       = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)       = Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)    = RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FX*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)       = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FX*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX) = RootNodulStrutElms_rpvr(NE,L1,NZ,NY,NX)+FX*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1112,14 +1117,14 @@ implicit none
   VLSoilMicP_vr(L0,NY,NX)         = FY*VLSoilMicP_vr(L0,NY,NX)
   VLWatMicPX_vr(L0,NY,NX)         = VLWatMicP_vr(L0,NY,NX)
   ENGY0                           = FY*ENGY0
-  VHeatCapacitySoilM_vr(L0,NY,NX) = FY*VHeatCapacitySoilM_vr(L0,NY,NX)
+  VHeatCapSolidSoil_vr(L0,NY,NX) = FY*VHeatCapSolidSoil_vr(L0,NY,NX)
 
   IF(L0.NE.0)THEN
-    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM_vr(L0,NY,NX) &
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapSolidSoil_vr(L0,NY,NX) &
       +cpw*(VLWatMicP_vr(L0,NY,NX)+VLWatMacP_vr(L0,NY,NX)) &
       +cpi*(VLiceMicP_vr(L0,NY,NX)+VLiceMacP_vr(L0,NY,NX))
   ELSE
-    VHeatCapacity_vr(L0,NY,NX)=VHeatCapacitySoilM_vr(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
+    VHeatCapacity_vr(L0,NY,NX)=VHeatCapSolidSoil_vr(L0,NY,NX)+cpw*VLWatMicP_vr(L0,NY,NX)+cpi*VLiceMicP_vr(L0,NY,NX)
   ENDIF
   IF(VHeatCapacity_vr(L0,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L0,NY,NX)=ENGY0/VHeatCapacity_vr(L0,NY,NX)
@@ -1131,10 +1136,12 @@ implicit none
   DO NTF=ifertn_beg,ifertn_end
     FertN_mole_soil_vr(NTF,L0,NY,NX)=FY*FertN_mole_soil_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_soil_vr(L0,NY,NX)=FY*FertP_mole_soil_vr(L0,NY,NX)
 
   DO NTF=ifertnb_beg,ifertnb_end
     FertN_mole_Band_vr(NTF,L0,NY,NX)=FY*FertN_mole_Band_vr(NTF,L0,NY,NX)
   ENDDO
+  FertP_mole_band_vr(L0,NY,NX)=FY*FertP_mole_band_vr(L0,NY,NX)
 
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H1PO4B .and. NTU/=ids_H2PO4B)THEN
@@ -1227,6 +1234,13 @@ implicit none
     DO  NZ=1,NP_col(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND. RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
+        DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+          DO NE=1,NumPlantChemElms
+            RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX) = FY*RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)
+          ENDDO
+          Root1stLenPP_rpvr(L0,NR,NZ,NY,NX)  = FY*Root1stLenPP_rpvr(L0,NR,NZ,NY,NX)          
+        ENDDO    
+        Root1stXNumL_pvr(L0,NZ,NY,NX)        = FY*Root1stXNumL_pvr(L0,NZ,NY,NX)
         DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             trcg_rootml_pvr(idg,N,L0,NZ,NY,NX) = FY*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1234,10 +1248,8 @@ implicit none
           ENDDO
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = FY*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
               RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = FY*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
-            Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)  = FY*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_rpvr(N,L0,NR,NZ,NY,NX)  = FY*Root2ndLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX) = FY*Root2ndXNum_rpvr(N,L0,NR,NZ,NY,NX)
           ENDDO
@@ -1247,16 +1259,15 @@ implicit none
           RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX) = FY*RootMycoActiveBiomC_pvr(N,L0,NZ,NY,NX)
           PopuRootMycoC_pvr(N,L0,NZ,NY,NX)       = FY* PopuRootMycoC_pvr(N,L0,NZ,NY,NX)
           RootProteinC_pvr(N,L0,NZ,NY,NX)        = FY*RootProteinC_pvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L0,NZ,NY,NX)        = FY*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)         = FY*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)     = FY*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = FY*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L0,NZ,NY,NX)         = FY*RootPoreVol_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L0,NZ,NY,NX)            = FY*RootVH2O_pvr(N,L0,NZ,NY,NX)
           Root1stRadius_pvr(N,L0,NZ,NY,NX)       = FY*Root1stRadius_pvr(N,L0,NZ,NY,NX)
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndRadius_rpvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)    = FY*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)       = FY*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,NumPlantChemElms
           RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)=FY*RootNodulStrutElms_rpvr(NE,L0,NZ,NY,NX)
@@ -1292,8 +1303,8 @@ implicit none
   real(r8) :: WTNDLE,FXEPOOLN
   real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
-  real(r8) :: FXWTRTD,FXWSRTL,FRootPrimeAxsNum,FXRTNL,FXRTLGP,FXRTDNP
-  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootAreaPerPlant_pvr,FXRTLGA
+  real(r8) :: FXWTRTD,FXWSRTL,FNumAxesPerPrimRoot_pft,FXRTNL,FXRTLGP,FXRTDNP
+  real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRootSAreaPerPlant_pvr,FXRTLGA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
   real(r8) :: FXOMC,FXOMN,FXOMP,FXORC,FXORN,FXORP,FXOQC
@@ -1386,6 +1397,21 @@ implicit none
           FRO=AMIN1(0.5,FO*CumSoilThickMidL_vr(L0,NY,NX)/CumSoilThickMidL_vr(L1,NY,NX))
         ENDIF
 
+        DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+          DO NE=1,NumPlantChemElms
+            FXWTRT1E                                       = FRO*RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)
+            RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX)+FXWTRT1E
+            RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)-FXWTRT1E
+          ENDDO  
+          FXRTLG1                         = FRO*Root1stLenPP_rpvr(L0,NR,NZ,NY,NX)
+          Root1stLenPP_rpvr(L1,NR,NZ,NY,NX) = Root1stLenPP_rpvr(L1,NR,NZ,NY,NX)+FXRTLG1
+          Root1stLenPP_rpvr(L0,NR,NZ,NY,NX) = Root1stLenPP_rpvr(L0,NR,NZ,NY,NX)-FXRTLG1
+        ENDDO
+
+        FNumAxesPerPrimRoot_pft           = FRO*Root1stXNumL_pvr(L0,NZ,NY,NX)
+        Root1stXNumL_pvr(L1,NZ,NY,NX) = Root1stXNumL_pvr(L1,NZ,NY,NX)+FNumAxesPerPrimRoot_pft
+        Root1stXNumL_pvr(L0,NZ,NY,NX) = Root1stXNumL_pvr(L0,NZ,NY,NX)-FNumAxesPerPrimRoot_pft
+
         DO  N=1,Myco_pft(NZ,NY,NX)
           DO idg=idg_beg,idg_NH3
             FXGA                               = FRO*trcg_rootml_pvr(idg,N,L0,NZ,NY,NX)
@@ -1399,17 +1425,10 @@ implicit none
 
           DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             DO NE=1,NumPlantChemElms
-              FXWTRT1E                                       = FRO*RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
-              RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
-              RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
-
               FXWTRT2E                                       = FRO*RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)
               RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX) = RootMyco2ndStrutElms_rpvr(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
               RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX) = RootMyco2ndStrutElms_rpvr(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
             ENDDO
-            FXRTLG1                           = FRO*Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)
-            Root1stLen_rpvr(N,L1,NR,NZ,NY,NX) = Root1stLen_rpvr(N,L1,NR,NZ,NY,NX)+FXRTLG1
-            Root1stLen_rpvr(N,L0,NR,NZ,NY,NX) = Root1stLen_rpvr(N,L0,NR,NZ,NY,NX)-FXRTLG1
 
             FXRTLG2                          = FRO*Root2ndLen_rpvr(N,L0,NR,NZ,NY,NX)
             Root2ndLen_rpvr(N,L1,NR,NZ,NY,NX) = Root2ndLen_rpvr(N,L1,NR,NZ,NY,NX)+FXRTLG2
@@ -1437,25 +1456,21 @@ implicit none
           RootProteinC_pvr(N,L1,NZ,NY,NX) = RootProteinC_pvr(N,L1,NZ,NY,NX)+FXWSRTL
           RootProteinC_pvr(N,L0,NZ,NY,NX) = RootProteinC_pvr(N,L0,NZ,NY,NX)-FXWSRTL
 
-          FRootPrimeAxsNum                = FRO*Root1stXNumL_rpvr(N,L0,NZ,NY,NX)
-          Root1stXNumL_rpvr(N,L1,NZ,NY,NX) = Root1stXNumL_rpvr(N,L1,NZ,NY,NX)+FRootPrimeAxsNum
-          Root1stXNumL_rpvr(N,L0,NZ,NY,NX) = Root1stXNumL_rpvr(N,L0,NZ,NY,NX)-FRootPrimeAxsNum
-
           FXRTNL                         = FRO*Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)
           Root2ndXNumL_rpvr(N,L1,NZ,NY,NX) = Root2ndXNumL_rpvr(N,L1,NZ,NY,NX)+FXRTNL
           Root2ndXNumL_rpvr(N,L0,NZ,NY,NX) = Root2ndXNumL_rpvr(N,L0,NZ,NY,NX)-FXRTNL
 
-          FXRTLGP                            = FRO*RootLenPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootLenPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTLGP
-          RootLenPerPlant_pvr(N,L0,NZ,NY,NX) = RootLenPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTLGP
+          FXRTLGP                            = FRO*RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX) = RootTotLenPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTLGP
+          RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX) = RootTotLenPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTLGP
 
           FXRTDNP                                = FRO*RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)
           RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L1,NZ,NY,NX)+FXRTDNP
           RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX) = RootLenDensPerPlant_pvr(N,L0,NZ,NY,NX)-FXRTDNP
 
-          FXRTVLP                        = FRO*RootPoreVol_rpvr(N,L0,NZ,NY,NX)
-          RootPoreVol_rpvr(N,L1,NZ,NY,NX) = RootPoreVol_rpvr(N,L1,NZ,NY,NX)+FXRTVLP
-          RootPoreVol_rpvr(N,L0,NZ,NY,NX) = RootPoreVol_rpvr(N,L0,NZ,NY,NX)-FXRTVLP
+          FXRTVLP                        = FRO*RootPoreVol_pvr(N,L0,NZ,NY,NX)
+          RootPoreVol_pvr(N,L1,NZ,NY,NX) = RootPoreVol_pvr(N,L1,NZ,NY,NX)+FXRTVLP
+          RootPoreVol_pvr(N,L0,NZ,NY,NX) = RootPoreVol_pvr(N,L0,NZ,NY,NX)-FXRTVLP
 
           FXRTVLW                     = FRO*RootVH2O_pvr(N,L0,NZ,NY,NX)
           RootVH2O_pvr(N,L1,NZ,NY,NX) = RootVH2O_pvr(N,L1,NZ,NY,NX)+FXRTVLW
@@ -1469,13 +1484,13 @@ implicit none
           Root2ndRadius_rpvr(N,L1,NZ,NY,NX) = Root2ndRadius_rpvr(N,L1,NZ,NY,NX)+FXRRAD2
           Root2ndRadius_rpvr(N,L0,NZ,NY,NX) = Root2ndRadius_rpvr(N,L0,NZ,NY,NX)-FXRRAD2
 
-          FXRootAreaPerPlant_pvr              = FRO*RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)
-          RootAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootAreaPerPlant_pvr
-          RootAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootAreaPerPlant_pvr
+          FXRootSAreaPerPlant_pvr              = FRO*RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)
+          RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX) = RootSAreaPerPlant_pvr(N,L1,NZ,NY,NX)+FXRootSAreaPerPlant_pvr
+          RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX) = RootSAreaPerPlant_pvr(N,L0,NZ,NY,NX)-FXRootSAreaPerPlant_pvr
 
-          FXRTLGA                          = FRO*Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)
-          Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX) = Root2ndMeanLens_rpvr(N,L1,NZ,NY,NX)+FXRTLGA
-          Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX) = Root2ndMeanLens_rpvr(N,L0,NZ,NY,NX)-FXRTLGA
+          FXRTLGA                          = FRO*Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)
+          Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX) = Root2ndEffLen4uptk_rpvr(N,L1,NZ,NY,NX)+FXRTLGA
+          Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX) = Root2ndEffLen4uptk_rpvr(N,L0,NZ,NY,NX)-FXRTLGA
         ENDDO
 !
 !     ROOT NODULES
@@ -1632,10 +1647,13 @@ implicit none
 
 ! begin_execution
   DO NTF=ifertn_beg,ifertn_end
-    FXZN                        = AMIN1(FX*FertN_mole_soil_vr(NTF,L,NY,NX),FertN_mole_soil_vr(NTF,L0,NY,NX))
+    FXZN                             = AMIN1(FX*FertN_mole_soil_vr(NTF,L,NY,NX),FertN_mole_soil_vr(NTF,L0,NY,NX))
     FertN_mole_soil_vr(NTF,L1,NY,NX) = FertN_mole_soil_vr(NTF,L1,NY,NX)+FXZN
     FertN_mole_soil_vr(NTF,L0,NY,NX) = FertN_mole_soil_vr(NTF,L0,NY,NX)-FXZN
   ENDDO
+  FXZN = AMIN1(FX*FertP_mole_soil_vr(L,NY,NX),FertP_mole_soil_vr(L0,NY,NX))
+  FertP_mole_soil_vr(L1,NY,NX) = FertP_mole_soil_vr(L1,NY,NX)+FXZN
+  FertP_mole_soil_vr(L0,NY,NX) = FertP_mole_soil_vr(L0,NY,NX)-FXZN
 
   IF (L0>0) then
     DO NTF=ifertnb_beg,ifertnb_end
@@ -1643,7 +1661,11 @@ implicit none
       FertN_mole_Band_vr(NTF,L1,NY,NX) = FertN_mole_Band_vr(NTF,L1,NY,NX)+FXZN
       FertN_mole_Band_vr(NTF,L0,NY,NX) = FertN_mole_Band_vr(NTF,L0,NY,NX)-FXZN
     ENDDO
+    FXZN = AMIN1(FX*FertP_mole_band_vr(L,NY,NX),FertP_mole_band_vr(L0,NY,NX))    
+    FertP_mole_band_vr(L1,NY,NX) = FertP_mole_band_vr(L1,NY,NX)+FXZN
+    FertP_mole_band_vr(L0,NY,NX) = FertP_mole_band_vr(L0,NY,NX)-FXZN
   endif
+
 !
 !     SOIL N,P SOLUTES IN BAND, NON-BAND
 !
@@ -1683,7 +1705,7 @@ implicit none
 !
 !     SOIL FERTILIZER BANDS
 !
-    IF(IFNHB_col(NY,NX).EQ.1.AND.ROWSpaceNH4_col(NY,NX).GT.0.0)THEN
+    IF(iFertNH4Band_col(NY,NX).EQ.ifert_on .AND. ROWSpaceNH4_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNH4_col(NY,NX))THEN
         WDNHBDL                   = BandWidthNH4_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDNHBD0                   = BandWidthNH4_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1711,7 +1733,7 @@ implicit none
         trcs_VLN_vr(idg_NH3,L0,NY,NX)  = trcs_VLN_vr(ids_NH4,L0,NY,NX)
       ENDIF
     ENDIF
-    IF(IFNOB_col(NY,NX).EQ.1.AND.ROWSpaceNO3_col(NY,NX).GT.0.0)THEN
+    IF(iFertNO3Band_col(NY,NX).EQ.ifert_off .AND. ROWSpaceNO3Band_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthNO3_col(NY,NX))THEN
         WDNOBDL                   = BandWidthNO3_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDNOBD0                   = BandWidthNO3_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1727,9 +1749,9 @@ implicit none
           BandThicknessNO3_vr(L0,NY,NX) = BandThicknessNO3_vr(L0,NY,NX)-FXDPNOB
         ENDIF
         trcs_VLN_vr(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L1,NY,NX) &
-          /ROWSpaceNO3_col(NY,NX)*BandThicknessNO3_vr(L1,NY,NX)/DLYR_3D(3,L1,NY,NX)))
+          /ROWSpaceNO3Band_col(NY,NX)*BandThicknessNO3_vr(L1,NY,NX)/DLYR_3D(3,L1,NY,NX)))
         trcs_VLN_vr(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,BandWidthNO3_vr(L0,NY,NX) &
-          /ROWSpaceNO3_col(NY,NX)*BandThicknessNO3_vr(L0,NY,NX)/DLYR_3D(3,L0,NY,NX)))
+          /ROWSpaceNO3Band_col(NY,NX)*BandThicknessNO3_vr(L0,NY,NX)/DLYR_3D(3,L0,NY,NX)))
         trcs_VLN_vr(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L1,NY,NX)
         trcs_VLN_vr(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN_vr(ids_NO3B,L0,NY,NX)
 
@@ -1739,7 +1761,7 @@ implicit none
         trcs_VLN_vr(ids_NO2B,L0,NY,NX) = trcs_VLN_vr(ids_NO3B,L0,NY,NX)
       ENDIF
     ENDIF
-    IF(IFPOB_col(NY,NX).EQ.1 .AND. ROWSpacePO4_col(NY,NX).GT.0.0)THEN
+    IF(iFertPO4Band_col(NY,NX).EQ.ifert_on .AND. ROWSpacePO4_col(NY,NX).GT.0.0_r8)THEN
       IF(L.EQ.NU_col(NY,NX) .OR. CumDepz2LayBottom_vr(L-1,NY,NX).LT.BandDepthPO4_col(NY,NX))THEN
         WDPOBDL                   = BandWidthPO4_vr(L,NY,NX)*DLYR_3D(3,L,NY,NX)
         WDPOBD0                   = BandWidthPO4_vr(L0,NY,NX)*DLYR_3D(3,L0,NY,NX)
@@ -1777,16 +1799,16 @@ implicit none
     FBO=AMIN1(0.1,FX*SoiBulkDensityt0_vr(L1,NY,NX)/SoiBulkDensityt0_vr(L0,NY,NX))
   ENDIF
 !     SoilBulkDensity_vr(L1,NY,NX)=(1.0-FO)*SoilBulkDensity_vr(L1,NY,NX)+FO*SoiBulkDensityt0_vr(L0,NY,NX)
-  PH_vr(L1,NY,NX)      = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
+  PH_vr(L1,NY,NX)   = (1.0_r8-FO)*PH_vr(L1,NY,NX)+FO*PH_vr(L0,NY,NX)
   FXSAND            = FBO*SAND_vr(L0,NY,NX)
-  SAND_vr(L1,NY,NX)    = SAND_vr(L1,NY,NX)+FXSAND
-  SAND_vr(L0,NY,NX)    = SAND_vr(L0,NY,NX)-FXSAND
+  SAND_vr(L1,NY,NX) = SAND_vr(L1,NY,NX)+FXSAND
+  SAND_vr(L0,NY,NX) = SAND_vr(L0,NY,NX)-FXSAND
   FXSILT            = FBO*SILT_vr(L0,NY,NX)
-  SILT_vr(L1,NY,NX)    = SILT_vr(L1,NY,NX)+FXSILT
-  SILT_vr(L0,NY,NX)    = SILT_vr(L0,NY,NX)-FXSILT
+  SILT_vr(L1,NY,NX) = SILT_vr(L1,NY,NX)+FXSILT
+  SILT_vr(L0,NY,NX) = SILT_vr(L0,NY,NX)-FXSILT
   FXCLAY            = FBO*CLAY_vr(L0,NY,NX)
-  CLAY_vr(L1,NY,NX)    = CLAY_vr(L1,NY,NX)+FXCLAY
-  CLAY_vr(L0,NY,NX)    = CLAY_vr(L0,NY,NX)-FXCLAY
+  CLAY_vr(L1,NY,NX) = CLAY_vr(L1,NY,NX)+FXCLAY
+  CLAY_vr(L0,NY,NX) = CLAY_vr(L0,NY,NX)-FXCLAY
   FXROCK            = FBO*ROCK_vr(L0,NY,NX)
   ROCK_vr(L1,NY,NX) = ROCK_vr(L1,NY,NX)+FXROCK
   ROCK_vr(L0,NY,NX) = ROCK_vr(L0,NY,NX)-FXROCK
@@ -1867,9 +1889,9 @@ implicit none
   FXVOLWX                         = FWO*VLWatMicPX_vr(L0,NY,NX)
   VLWatMicPX_vr(L1,NY,NX)         = VLWatMicPX_vr(L1,NY,NX)+FXVOLWX
   VLWatMicPX_vr(L0,NY,NX)         = VLWatMicPX_vr(L0,NY,NX)-FXVOLWX
-  FXVHCM                          = FWO*VHeatCapacitySoilM_vr(L0,NY,NX)
-  VHeatCapacitySoilM_vr(L1,NY,NX) = VHeatCapacitySoilM_vr(L1,NY,NX)+FXVHCM
-  VHeatCapacitySoilM_vr(L0,NY,NX) = VHeatCapacitySoilM_vr(L0,NY,NX)-FXVHCM
+  FXVHCM                          = FWO*VHeatCapSolidSoil_vr(L0,NY,NX)
+  VHeatCapSolidSoil_vr(L1,NY,NX) = VHeatCapSolidSoil_vr(L1,NY,NX)+FXVHCM
+  VHeatCapSolidSoil_vr(L0,NY,NX) = VHeatCapSolidSoil_vr(L0,NY,NX)-FXVHCM
   FXENGY                          = TKS_vr(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)+FXENGY
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)-FXENGY

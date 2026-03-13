@@ -1,0 +1,37 @@
+What is the typical saturated specific carboxylation rate by Rubisco at 25oC [umol CO2 (g rubisco)-1 s-1] VCMX        
+What is the typical saturated specific oxygenation rate  at 25oC by Rubisco [umol O2 (g rubisco)-1 s-1] VOMX          
+What is the typical reference Km for rubisco carboxylation of CO2  at 25oC [uM] XKCO2                                 
+What is the typical reference Km for rubisco oxygenation  at 25oC [uM] XKO2                                           
+What is the typical carbon mass ratio of rubisco enzyme to total leaf protein [gC rubisco/(gC protein)] RUBP          
+What is the typical specific chlorophyll activity [umol e- (gC chl)-1 s-1] ETMX                                       
+What is the typical carbon mass ratio of mesophyll chlorophyll to total leaf protein [gC Chl /(gC protein)] CHL       
+What is the typical intercellular-to-atmospheric CO2 concentration ratio for C4 plant [-]FCO2                          
+what is the typical rate of node initiation at 25oC [h-1] XRNI      
+what is the typical rate of leaf appearance at 25oC [h-1] XRLA                          
+what is the chilling temperature for CO2 fixation, seed loss [oC] CTC          
+what is the typical leaf length:width ratio WDLF [-]                       
+what is the Embryonic node number at planting [-] XTLI         
+what is the fraction of leaf area in 0-22.5,45,67.5,90o inclination classes CLASS    
+what is the typical clumping factor CFI  
+what is the Stem angle from horizontal ANGBR     
+what is the Petiole angle from horizontal ANGSH             
+what is the Maximum potential seed mumber from pre-anthesis stalk growth STMX     
+what is the Maximum seed number per stalk
+what is the Maximum seed size per SDMX (gC) 
+what is the Seed size at planting (gC) 
+what is the grain filling rate at 25 oC (gC seed-1 h-1) 
+what is the typical Radius of fine roots [m] RRAD1M                    
+what is the typical Radius of root hairs [m] RRAD2M                    
+what is the typical primary/fine root porosity [m3 m-3] PORT           
+what is the typical Maximum rate for NH4 uptake [gN m-2 absorption area h-1] UPMXZH               
+what is the typical Km for NH4 uptake [uM] UPKMZH                                                 
+what is the typical Minimum concentration required for NH4 uptake [uM] UPMNZH                     
+what is the typical Maximum rate for NO3 uptake [gN m-2 absorption area h-1] UPMXZO               
+what is the typical Km for NO3 uptake [uM] UPKMZO                                                 
+what is the typical Minimum concentration for NO3 uptake [uM] UPMNZO                              
+what is the typical Maximum rate for H2PO4 or H1PO4 uptake [gP m-2 absorption area h-1] UPMXPO    
+what is the typical Km for H2PO4 or H1PO4 uptake [uM] UPKMPO                                      
+what is the typical Minimum concentration required for H2PO4 or H1PO4 uptake [uM] UPMNPO           
+what is the typical Leaf osmotic potential at zero leaf water potential [MPa] OSMO                                
+what is the typical Cuticular resistance for H2O [s m-1] RSMX                                                     
+

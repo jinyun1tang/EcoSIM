@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 from netCDF4 import Dataset
 import os,time,sys,argparse
 from datetime import datetime

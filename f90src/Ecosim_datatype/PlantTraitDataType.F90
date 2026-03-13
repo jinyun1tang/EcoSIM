@@ -14,9 +14,9 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootLeafElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootPetolElmAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracRootElmAlloc2Litr(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracShootElmAllocm(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
   real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
@@ -24,6 +24,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                    !pft canopy height, [m]
+  real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
@@ -35,7 +36,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedVolumeMean_pft(:,:,:)                  !seed volume, [m3 ]
   real(r8),target,allocatable ::  SeedMeanLen_pft(:,:,:)                     !seed length, [m]
   real(r8),target,allocatable ::  SeedAreaMean_pft(:,:,:)                    !seed surface area, [m2]
-  real(r8),target,allocatable ::  HypoctoHeight_pft(:,:,:)                   !cotyledon height, [m]
+  real(r8),target,allocatable ::  HypocotHeight_pft(:,:,:)                   !cotyledon height, [m]
   real(r8),target,allocatable ::  CanopyHeight_col(:,:)                      !canopy height over grid, [m]
   real(r8),target,allocatable ::  CanopyHeightZ_col(:,:,:)                   !canopy layer height , [m]
   real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                     !branching angle, [degree from horizontal]
@@ -45,19 +46,21 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
   real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  PetoleLensNode_brch(:,:,:,:,:)             !sheath height, [m]
-  real(r8),target,allocatable ::  LiveInterNodeHight_brch(:,:,:,:,:)         !Live internode height, [m]
+  real(r8),target,allocatable ::  PetoleLength_node(:,:,:,:,:)             !sheath height, [m]
+  real(r8),target,allocatable ::  StalkNodeHeight_brch(:,:,:,:,:)         !Live internode height, [m]
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                  !branch height, [m]
-  real(r8),target,allocatable ::  SeedNumSet_brch(:,:,:,:)                   !branch grain number, [d-2]
+  real(r8),target,allocatable ::  SeedSitesSet_brch(:,:,:,:)                   !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
-  real(r8),target,allocatable ::  InternodeHeightDead_brch(:,:,:,:,:)        !Dead internode height, [m]
+  real(r8),target,allocatable ::  StalkNodeVertLength_brch(:,:,:,:,:)        !Dead internode height, [m]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCSheath_pft(:,:,:)                           !sheath N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rNCLigRoot_pft(:,:,:)         !Root lignified zone N:C ratio, [g g-1]
+  real(r8),target,allocatable ::  rPCLigRoot_pft(:,:,:)         !Root lignified zone P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCStalk_pft(:,:,:)                        !stalk N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCReserve_pft(:,:,:)                      !reserve N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCHusk_pft(:,:,:)                         !husk N:C ratio, [g g-1]
@@ -71,23 +74,26 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
-  real(r8),target,allocatable ::  rProteinC2N_pft(:,:,:)                   !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  rProteinC2P_pft(:,:,:)                   !C:P ratio in remobilizable nonstructural biomass, [-]
-  real(r8),target,allocatable ::  CanOsmoPsi0pt_pft(:,:,:)                   !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8),target,allocatable ::  rProteinC2RootN_pft(:,:,:)                 !Protein C to root N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2RootP_pft(:,:,:)                 !Protein C to root P ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2LeafN_pft(:,:,:)                 !Protein C to leaf N ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  rProteinC2LeafP_pft(:,:,:)                 !Protein C to leaf P ratio in remobilizable nonstructural biomass, [-]
+  real(r8),target,allocatable ::  OrganOsmoPsi0pt_pft(:,:,:)                   !Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
   real(r8),target,allocatable ::  TC4LeafOff_pft(:,:,:)                      !threshold temperature for autumn leafoff/hardening, [oC]
   real(r8),target,allocatable ::  PlantInitThermoAdaptZone_pft(:,:,:)            !initial plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  rPlantThermoAdaptZone_pft(:,:,:)           !plant thermal adaptation zone, [-]
   real(r8),target,allocatable ::  MatureGroup_brch(:,:,:,:)                  !plant maturity group, [-]
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
-  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [m-2]
+  real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [# m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
-  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [m-2]
+  real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [# m-2]
   integer,target,allocatable ::   NumActivePlants_col(:,:)                        !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)               !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                   !plant O2 stress indicator, []
+  real(r8),target,allocatable ::  MorphogenBase_pft(:,:,:)                   !base line morphogen concentration for secondary growth, [-]
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                   !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCGroth_pft(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKGroth_pft(:,:,:)                         !canopy growth temperature, [K]
@@ -109,7 +115,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  KLowestGroLeafNode_brch(:,:,:,:)            !leaf growth stage counter, [-]
   integer,target,allocatable ::  KMinNumLeaf4GroAlloc_brch(:,:,:,:)          !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION,[-]
   integer,target,allocatable ::  KHiestGroLeafNode_brch(:,:,:,:)             !leaf growth stage counter, [-]
-  real(r8),target,allocatable ::  RefLeafAppearRate_pft(:,:,:)               !rate of leaf initiation at 25 oC, [h-1]
+  real(r8),target,allocatable ::  RateRefLeafAppearance_pft(:,:,:)               !rate of leaf initiation at 25 oC, [h-1]
   real(r8),target,allocatable ::  rLen2WidthLeaf_pft(:,:,:)                  !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1_pft(:,:,:)                            !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                      !threshold temperature for spring leafout/dehardening, [oC]
@@ -117,7 +123,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)              !hours above threshold temperature required for spring leafout/dehardening, [h]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                    !number of branches of the plant, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                     !main branch number, [-]
-  integer,target,allocatable ::  BranchNumber_brch(:,:,:,:)                  !branch number id, [-]
+  integer,target,allocatable ::  BranchNumerID_brch(:,:,:,:)                  !branch number id, [-]
   integer,target,allocatable ::  MainBranchNum_pft(:,:,:)                    !number of main branch, [-]
   integer,target,allocatable ::  Prep4Literfall_brch(:,:,:,:)                !branch phenology flag for senescence, [-]
   integer,target,allocatable ::  Hours4LiterfalAftMature_brch(:,:,:,:)       !hour counter for phenological senescence of a branch , [h]
@@ -145,11 +151,12 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                  !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                     !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                 !flag to detect canopy death , [-]
-  real(r8),target,allocatable ::  MaxPotentSeedNumber_pft(:,:,:)             !maximum grain node number per branch, [-]
+  real(r8),target,allocatable ::  GrothStalkMaxSeedSites_pft(:,:,:)             !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)               !maximum grain number per node , [-]
   real(r8),target,allocatable ::  SeedCMassMax_pft(:,:,:)                    !maximum grain size   , [g]
   real(r8),target,allocatable ::  ShootNodeNumAtPlanting_pft(:,:,:)          !number of nodes in seed, [-]
-  real(r8),target,allocatable ::  SeedCMass_pft(:,:,:)                       !grain size at seeding, [g]
+  real(r8),target,allocatable ::  SeedCMass_pft(:,:,:)                       !grain size at seeding, [gC/seed]
+  real(r8),target,allocatable ::  SeedWidth2LenRatio_pft(:,:,:)               !Seed width to length ratio, assuming prolate spheroid  
   real(r8),target,allocatable ::  GrainFillRate25C_pft(:,:,:)                !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  HourFailGrainFill_brch(:,:,:,:)            !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  Hours2LeafOut_brch(:,:,:,:)                !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -163,10 +170,10 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                 !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)              !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                      !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-  integer,target,allocatable ::  iPlantPhotosynthesisType(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
+  integer,target,allocatable ::  iPlantPhotosynsType_pft(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                !plant growth type (vascular, non-vascular),[-]
   integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)              !plant growth habit (annual or perennial),[-]
-  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]
+  integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]  
   integer,target,allocatable ::  iPlantNfixType_pft(:,:,:)                   !N2 fixation type,[-]
   integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                 !climate signal for phenological progress none, temperature, water stress,[-]
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)            !photoperiod type (neutral, long day, short day),[-]
@@ -182,15 +189,16 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootPetolElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolElmAlloc2Litr=0._r8
-  allocate(FracShootLeafElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootLeafElmAlloc2Litr=0._r8
-  allocate(FracRootElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAlloc2Litr=0._r8         !
+  allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
+  allocate(FracShootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootElmAllocm=0._r8
+  allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
   allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
+  allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
@@ -202,7 +210,7 @@ contains
   allocate(SeedVolumeMean_pft(JP,JY,JX));     SeedVolumeMean_pft=0._r8
   allocate(SeedMeanLen_pft(JP,JY,JX));     SeedMeanLen_pft=0._r8
   allocate(SeedAreaMean_pft(JP,JY,JX));     SeedAreaMean_pft=0._r8
-  allocate(HypoctoHeight_pft(JP,JY,JX));    HypoctoHeight_pft=0._r8
+  allocate(HypocotHeight_pft(JP,JY,JX));    HypocotHeight_pft=0._r8
   allocate(CanopyHeight_col(JY,JX));          CanopyHeight_col=0._r8
   allocate(CanopyHeightZ_col(0:NumCanopyLayers,JY,JX));     CanopyHeightZ_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
@@ -213,20 +221,22 @@ contains
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
-  allocate(PetoleLensNode_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLensNode_brch=0._r8
-  allocate(LiveInterNodeHight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LiveInterNodeHight_brch=0._r8
+  allocate(PetoleLength_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleLength_node=0._r8
+  allocate(StalkNodeHeight_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeHeight_brch=0._r8
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
-  allocate(SeedNumSet_brch(MaxNumBranches,JP,JY,JX)); SeedNumSet_brch=0._r8
+  allocate(SeedSitesSet_brch(MaxNumBranches,JP,JY,JX)); SeedSitesSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
-  allocate(InternodeHeightDead_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));InternodeHeightDead_brch=0._r8
+  allocate(StalkNodeVertLength_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeVertLength_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
   allocate(rNCSheath_pft(JP,JY,JX));    rNCSheath_pft=0._r8
   allocate(rNCStalk_pft(JP,JY,JX));    rNCStalk_pft=0._r8
+  allocate(rNCLigRoot_pft(JP,JY,JX)); rNCLigRoot_pft=0._r8
+  allocate(rPCLigRoot_pft(JP,JY,JX)); rPCLigRoot_pft=0._r8
   allocate(rNCReserve_pft(JP,JY,JX));    rNCReserve_pft=0._r8
   allocate(rNCHusk_pft(JP,JY,JX));    rNCHusk_pft=0._r8
   allocate(rNCEar_pft(JP,JY,JX));    rNCEar_pft=0._r8
@@ -239,9 +249,11 @@ contains
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
-  allocate(rProteinC2N_pft(JP,JY,JX));     rProteinC2N_pft=0._r8
-  allocate(rProteinC2P_pft(JP,JY,JX));     rProteinC2P_pft=0._r8
-  allocate(CanOsmoPsi0pt_pft(JP,JY,JX));     CanOsmoPsi0pt_pft=0._r8
+  allocate(rProteinC2RootN_pft(JP,JY,JX)); rProteinC2RootN_pft=0._r8
+  allocate(rProteinC2RootP_pft(JP,JY,JX)); rProteinC2RootP_pft=0._r8  
+  allocate(rProteinC2LeafN_pft(JP,JY,JX));     rProteinC2LeafN_pft=0._r8
+  allocate(rProteinC2LeafP_pft(JP,JY,JX));     rProteinC2LeafP_pft=0._r8
+  allocate(OrganOsmoPsi0pt_pft(JP,JY,JX));     OrganOsmoPsi0pt_pft=0._r8
   allocate(TC4LeafOff_pft(JP,JY,JX));      TC4LeafOff_pft=0._r8
   allocate(PlantInitThermoAdaptZone_pft(JP,JY,JX));    PlantInitThermoAdaptZone_pft=0._r8
   allocate(rPlantThermoAdaptZone_pft(JP,JY,JX));     rPlantThermoAdaptZone_pft=0._r8
@@ -257,6 +269,7 @@ contains
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
+  allocate(MorphogenBase_pft(JP,JY,JX)); MorphogenBase_pft=0._r8
   allocate(TCGroth_pft(JP,JY,JX));      TCGroth_pft=0._r8
   allocate(TKGroth_pft(JP,JY,JX));      TKGroth_pft=0._r8
   allocate(PetioleBiomGrowthYld_pft(JP,JY,JX));    PetioleBiomGrowthYld_pft=0._r8
@@ -277,7 +290,7 @@ contains
   allocate(KLowestGroLeafNode_brch(MaxNumBranches,JP,JY,JX));KLowestGroLeafNode_brch=0
   allocate(KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP,JY,JX));KMinNumLeaf4GroAlloc_brch=0
   allocate(KHiestGroLeafNode_brch(MaxNumBranches,JP,JY,JX)); KHiestGroLeafNode_brch=0
-  allocate(RefLeafAppearRate_pft(JP,JY,JX));     RefLeafAppearRate_pft=0._r8
+  allocate(RateRefLeafAppearance_pft(JP,JY,JX));     RateRefLeafAppearance_pft=0._r8
   allocate(rLen2WidthLeaf_pft(JP,JY,JX));     rLen2WidthLeaf_pft=0._r8
   allocate(SLA1_pft(JP,JY,JX));     SLA1_pft=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
@@ -285,7 +298,7 @@ contains
   allocate(HourReq4LeafOut_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
-  allocate(BranchNumber_brch(MaxNumBranches,JP,JY,JX));  BranchNumber_brch=0
+  allocate(BranchNumerID_brch(MaxNumBranches,JP,JY,JX));  BranchNumerID_brch=0
   allocate(MainBranchNum_pft(JP,JY,JX));      MainBranchNum_pft=0
   allocate(Prep4Literfall_brch(MaxNumBranches,JP,JY,JX)); Prep4Literfall_brch=ifalse
   allocate(Hours4LiterfalAftMature_brch(MaxNumBranches,JP,JY,JX)); Hours4LiterfalAftMature_brch=0
@@ -313,11 +326,12 @@ contains
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
   allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
-  allocate(MaxPotentSeedNumber_pft(JP,JY,JX));     MaxPotentSeedNumber_pft=0._r8
+  allocate(GrothStalkMaxSeedSites_pft(JP,JY,JX));     GrothStalkMaxSeedSites_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(SeedCMassMax_pft(JP,JY,JX));     SeedCMassMax_pft=0._r8
   allocate(ShootNodeNumAtPlanting_pft(JP,JY,JX));     ShootNodeNumAtPlanting_pft=0._r8
   allocate(SeedCMass_pft(JP,JY,JX));     SeedCMass_pft=0._r8
+  allocate(SeedWidth2LenRatio_pft(JP,JY,JX)); SeedWidth2LenRatio_pft=0._r8
   allocate(GrainFillRate25C_pft(JP,JY,JX));    GrainFillRate25C_pft=0._r8
   allocate(HourFailGrainFill_brch(MaxNumBranches,JP,JY,JX));  HourFailGrainFill_brch=0._r8
   allocate(Hours2LeafOut_brch(MaxNumBranches,JP,JY,JX));  Hours2LeafOut_brch=0._r8
@@ -331,7 +345,7 @@ contains
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
   allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
-  allocate(iPlantPhotosynthesisType(JP,JY,JX));    iPlantPhotosynthesisType=0
+  allocate(iPlantPhotosynsType_pft(JP,JY,JX));    iPlantPhotosynsType_pft=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
   allocate(iPlantPhenolPattern_pft(JP,JY,JX));    iPlantPhenolPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
@@ -349,8 +363,8 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootLeafElmAlloc2Litr)
-  call destroy(FracRootElmAlloc2Litr)
+  call destroy(FracShootElmAllocm)
+  call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
   call destroy(CanopyLeafArea_pft)
@@ -368,7 +382,7 @@ contains
   call destroy(SeedVolumeMean_pft)
   call destroy(SeedMeanLen_pft)
   call destroy(SeedAreaMean_pft)
-  call destroy(HypoctoHeight_pft)
+  call destroy(HypocotHeight_pft)
   call destroy(CanopyHeight_col)
   call destroy(CanopyHeightZ_col)
   call destroy(BranchAngle_pft)
@@ -378,21 +392,23 @@ contains
   call destroy(CanopyIsothBndlResist_pft)
   call destroy(CanopyHeight4WatUptake_pft)
   call destroy(LeafArea_node)
-  call destroy(PetoleLensNode_brch)
-  call destroy(LiveInterNodeHight_brch)
+  call destroy(PetoleLength_node)
+  call destroy(StalkNodeHeight_brch)
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
-  call destroy(SeedNumSet_brch)
+  call destroy(SeedSitesSet_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(PlantPopulation_pft)
-  call destroy(InternodeHeightDead_brch)
+  call destroy(StalkNodeVertLength_brch)
   call destroy(PARTS_brch)
   call destroy(rNCLeaf_pft)
   call destroy(rPCLeaf_pft)
   call destroy(rNCSheath_pft)
   call destroy(rNCStalk_pft)
+  call destroy(rNCLigRoot_pft)
+  call destroy(rPCLigRoot_pft)
   call destroy(rNCReserve_pft)
   call destroy(rNCHusk_pft)
   call destroy(rNCEar_pft)
@@ -405,9 +421,11 @@ contains
   call destroy(rPCEar_pft)
   call destroy(rPCGrain_pft)
   call destroy(rPCNoduler_pft)
-  call destroy(rProteinC2N_pft)
-  call destroy(rProteinC2P_pft)
-  call destroy(CanOsmoPsi0pt_pft)
+  call destroy(rProteinC2RootP_pft)  
+  call destroy(rProteinC2RootN_pft)
+  call destroy(rProteinC2LeafN_pft)
+  call destroy(rProteinC2LeafP_pft)
+  call destroy(OrganOsmoPsi0pt_pft)
   call destroy(TC4LeafOff_pft)
   call destroy(PlantInitThermoAdaptZone_pft)
   call destroy(rPlantThermoAdaptZone_pft)
@@ -423,6 +441,7 @@ contains
   call destroy(HoursTooLowPsiCan_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
+  call destroy(MorphogenBase_pft)
   call destroy(TCGroth_pft)
   call destroy(TKGroth_pft)
   call destroy(PetioleBiomGrowthYld_pft)
@@ -443,7 +462,7 @@ contains
   call destroy(KLowestGroLeafNode_brch)
   call destroy(KMinNumLeaf4GroAlloc_brch)
   call destroy(KHiestGroLeafNode_brch)
-  call destroy(RefLeafAppearRate_pft)
+  call destroy(RateRefLeafAppearance_pft)
   call destroy(rLen2WidthLeaf_pft)
   call destroy(SLA1_pft)
   call destroy(TC4LeafOut_pft)
@@ -451,7 +470,7 @@ contains
   call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
-  call destroy(BranchNumber_brch)
+  call destroy(BranchNumerID_brch)
   call destroy(MainBranchNum_pft)
   call destroy(Prep4Literfall_brch)
   call destroy(Hours4LiterfalAftMature_brch)
@@ -479,11 +498,12 @@ contains
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)
   call destroy(iPlantShootState_pft)
-  call destroy(MaxPotentSeedNumber_pft)
+  call destroy(GrothStalkMaxSeedSites_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(SeedCMassMax_pft)
   call destroy(ShootNodeNumAtPlanting_pft)
   call destroy(SeedCMass_pft)
+  call destroy(SeedWidth2LenRatio_pft)
   call destroy(GrainFillRate25C_pft)
   call destroy(HourFailGrainFill_brch)
   call destroy(Hours2LeafOut_brch)
@@ -497,7 +517,7 @@ contains
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)
   call destroy(TempOffset_pft)
-  call destroy(iPlantPhotosynthesisType)
+  call destroy(iPlantPhotosynsType_pft)
   call destroy(iPlantRootProfile_pft)
   call destroy(iPlantPhenolPattern_pft)
   call destroy(iPlantDevelopPattern_pft)

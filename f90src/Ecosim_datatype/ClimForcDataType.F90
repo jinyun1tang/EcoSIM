@@ -49,6 +49,8 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
+  real(r8),target,allocatable ::  srad_scalar_col(:,:)     !solar radiation scalar due to open top chamber
+  real(r8),target,allocatable ::  EMS_scalar_col(:,:)      !emissivity scalar due to open top chamber
   real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
   real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
@@ -92,7 +94,8 @@ implicit none
   real(r8),target,allocatable ::  H2GE_col(:,:)                      !atmospheric H2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  CO2E_col(:,:)                      !atmospheric CO2 concentration, [umol mol-1]
   real(r8),target,allocatable ::  ARGE_col(:,:)                      !atmospheric AR concentration, [umol mol-1]
-  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon, [h]
+  real(r8),target,allocatable ::  SolarNoonHourYM_col(:,:)           !year mean time of solar noon, [h]
+  real(r8),target,allocatable ::  SolarNoonHour_col(:,:)             !time of solar noon each day, [h]
   real(r8),target,allocatable ::  RadSWDirect_col(:,:)               !direct shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadDirectPAR_col(:,:)              !direct PAR, [umol m-2 s-1]
@@ -154,7 +157,9 @@ implicit none
   allocate(height_top_mon_pft(12,JP,JY,JX)); height_top_mon_pft=0._r8
   allocate(height_bot_mon_pft(12,JP,JY,JX)); height_bot_mon_pft=0._r8
 
-  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX));
+  allocate(EMS_scalar_col(JY,JX)); EMS_scalar_col = 1._r8
+  allocate(srad_scalar_col(JY,JX));srad_scalar_col=1._r8
+  allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX)); trcs_solcoef_col=0._r8
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
@@ -201,7 +206,8 @@ implicit none
   allocate(H2GE_col(JY,JX));        H2GE_col=0._r8
   allocate(CO2E_col(JY,JX));        CO2E_col=0._r8
   allocate(ARGE_col(JY,JX));        ARGE_col=0._r8
-  allocate(SolarNoonHour_col(JY,JX));       SolarNoonHour_col=0._r8
+  allocate(SolarNoonHourYM_col(JY,JX));       SolarNoonHourYM_col=0._r8
+  allocate(SolarNoonHour_col(JY,JX)); SolarNoonHour_col=0._r8
   allocate(RadSWDirect_col(JY,JX));        RadSWDirect_col=0._r8
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
   allocate(RadDirectPAR_col(JY,JX));        RadDirectPAR_col=0._r8
@@ -282,7 +288,8 @@ implicit none
   call destroy(PrecIndirect2Grnd_col)
   call destroy(CO2EI_col)
   call destroy(CCO2EI_gperm3_col)
-
+  call destroy(srad_scalar_col)
+  call destroy(EMS_scalar_col)
   call destroy(AtmGasCgperm3_col)
   call destroy(AtmGmms_col)
   call destroy(TKS_ref_vr)
@@ -294,6 +301,7 @@ implicit none
   call destroy(CH4E_col)
   call destroy(H2GE_col)
   call destroy(trcs_solcoef_col)
+  call destroy(SolarNoonHourYM_col)
   call destroy(SolarNoonHour_col)
   call destroy(CO2E_col)
   call destroy(RadSWDirect_col)

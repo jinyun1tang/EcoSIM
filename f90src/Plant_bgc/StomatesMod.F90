@@ -16,8 +16,177 @@
   real(r8), parameter :: Hours2KillAnuals(0:5)=real((/336.0,672.0,672.0,672.0,672.0,672.0/),r8)  !number of hours with no grain fill to terminate annuals
 
   public :: StomatalDynamics
+  public :: PhotosynsDiag
   contains
   ![header]
+!----------------------------------------------------------------------------------------------------
+  subroutine PhotosynsDiag(I,J,NZ)  
+  !
+  !Description:
+  !Diagnose photosynthesis related variables
+  implicit none
+  integer, intent(in) :: I, J
+  integer, intent(in) :: NZ
+  real(r8) :: BundlSheathRubiscoC, BundlSheathChlC,MesophyllChlC, MesophyllPEPC, MesophyllRubiscoC
+  real(r8) :: tLeafArea,tLeafC
+  integer :: K,NB
+
+  associate(                                                                   &
+    ZERO                            => plt_site%ZERO                          ,& !input  :threshold zero for numerical stability, [-]  
+    NumOfBranches_pft               => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
+    VmaxSpecRubCarboxyRef_pft       => plt_photo%VmaxSpecRubCarboxyRef_pft    ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1 m-2]    
+    VmaxPEPCarboxyRef_pft           => plt_photo%VmaxPEPCarboxyRef_pft        ,& !input  :PEP carboxylase activity at 25 oC [umol g-1 h-1]    
+    ProteinCperm2LeafArea_node      => plt_photo%ProteinCperm2LeafArea_node   ,& !output :Protein C per m2 of leaf aera, [gC (leaf area m-2)]        
+    iPlantPhotosynsType_pft        => plt_photo%iPlantPhotosynsType_pft     ,& !input  :plant photosynthetic type (C3 or C4),[-]      
+    VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft            ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]    
+    iPlantPhenolType_pft            => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]  
+    Hours4Leafout_brch              => plt_pheno%Hours4Leafout_brch           ,& !input  :heat requirement for spring leafout/dehardening, [h]    
+    Hours4LeafOff_brch              => plt_pheno%Hours4LeafOff_brch           ,& !input  :cold requirement for autumn leafoff/hardening, [h]    
+    HourReq4LeafOff_brch            => plt_pheno%HourReq4LeafOff_brch         ,& !input  :number of hours below set temperature required for autumn leafoff/hardening, [-]    
+    HourReq4LeafOut_brch            => plt_pheno%HourReq4LeafOut_brch         ,& !input  :hours above threshold temperature required for spring leafout/dehardening, [-]
+    ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]    
+    LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch            ,& !input  :branch leaf element, [g d-2]    
+    LeafPEP2Protein_pft             => plt_photo%LeafPEP2Protein_pft          ,& !input  :leaf PEP carboxylase content, [gC gC-1]    
+    fMesophyllChlProtein_pft        => plt_photo%fMesophyllChlProtein_pft     ,& !input  :fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
+    LeafProtein2Chl_pft             => plt_photo%LeafProtein2Chl_pft          ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
+    LeafRubisco2Protein_pft         => plt_photo%LeafRubisco2Protein_pft      ,& !input  :leaf rubisco content, [gC gC-1]    
+    SpecLeafChlAct_pft              => plt_photo%SpecLeafChlAct_pft           ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]    
+    LeafArea_node                   => plt_morph%LeafArea_node                ,& !input  :node leaf area, [m2 d-2]    
+    LeafProteinC_node               => plt_biom%LeafProteinC_node             ,& !input  :node leaf protein N, [g d-2]    
+    VcMaxPEPCarboxyRef_brch         => plt_photo%VcMaxPEPCarboxyRef_brch      ,& !output :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]          
+    VoMaxRubiscoRef_brch            => plt_photo%VoMaxRubiscoRef_brch         ,& !output :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]
+    VcMaxRubiscoRef_brch            => plt_photo%VcMaxRubiscoRef_brch         ,& !output :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]
+    CanopyVcMaxRubisco25C_pft       => plt_photo%CanopyVcMaxRubisco25C_pft    ,& !output :Canopy VcMax for rubisco carboxylation, [umol s-1 m-2]
+    CanopyVoMaxRubisco25C_pft       => plt_photo%CanopyVoMaxRubisco25C_pft    ,& !output :Canopy VoMax for rubisco oxygenation, [umol s-1 m-2]
+    CanopyVcMaxPEP25C_pft           => plt_photo%CanopyVcMaxPEP25C_pft        ,& !output :Canopy VcMax in PEP C4 fixation, [umol s-1 m-2]
+    ElectronTransptJmax25C_pft      => plt_photo%ElectronTransptJmax25C_pft   ,& !output :Canopy Jmax at reference temperature, [umol e- s-1 m-2]
+    LeafProteinC_brch               => plt_biom%LeafProteinC_brch             ,& !output :Protein C for the branches, [gC protein d-2]
+    LeafProteinCperm2LA_pft         => plt_biom%LeafProteinCperm2LA_pft       ,& !output :Protein C for the plant, [gC protein m-2 leaf area]
+    LeafC3ChlC_brch                 => plt_biom%LeafC3ChlC_brch               ,& !output :Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
+    LeafC4ChlC_brch                 => plt_biom%LeafC4ChlC_brch               ,& !output :Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+    LeafRubiscoC_brch               => plt_biom%LeafRubiscoC_brch             ,& !output :Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
+    LeafPEPC_brch                   => plt_biom%LeafPEPC_brch                 ,& !output :PEP C for the branches, [gC PEP d-2]
+    LeafC3ChlCperm2LA_pft           => plt_biom%LeafC3ChlCperm2LA_pft         ,& !output :Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
+    LeafC4ChlCperm2LA_pft           => plt_biom%LeafC4ChlCperm2LA_pft         ,& !output :Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+    LeafRubiscoCperm2LA_pft         => plt_biom%LeafRubiscoCperm2LA_pft       ,& !output :Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
+    LeafPEPCperm2LA_pft             => plt_biom%LeafPEPCperm2LA_pft           ,& !output :PEP C for the branches, [gC PEP d-2]
+    SpecificLeafArea_pft            => plt_biom%SpecificLeafArea_pft          ,& !ouptut :specifc leaf area per g C of leaf mass, [m2 leaf area (gC leaf C)-1]
+    ElectronTransptJmaxRef_brch     => plt_photo%ElectronTransptJmaxRef_brch   & !output :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]    
+  )
+
+  tLeafArea=0._r8;tLeafC=0._r8
+  LeafProteinCperm2LA_pft(NZ)    = 0._r8
+  CanopyVcMaxRubisco25C_pft(NZ)  = 0._r8
+  CanopyVoMaxRubisco25C_pft(NZ)  = 0._r8
+  CanopyVcMaxPEP25C_pft(NZ)      = 0._r8
+  ElectronTransptJmax25C_pft(NZ) = 0._r8
+  LeafRubiscoCperm2LA_pft(NZ)    = 0._r8
+  LeafPEPCperm2LA_pft(NZ)        = 0._r8
+  LeafC3ChlCperm2LA_pft(NZ)      = 0._r8
+  LeafC4ChlCperm2LA_pft(NZ)      = 0._r8
+
+  DO NB=1,NumOfBranches_pft(NZ)
+!
+!     FEEDBACK ON CO2 FIXATION
+!
+!     iPlantPhenolType_pft=phenology type from PFT file
+!     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
+!     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
+!
+    VcMaxRubiscoRef_brch(NB,NZ)        = 0._r8
+    VoMaxRubiscoRef_brch(NB,NZ)        = 0._r8
+    VcMaxPEPCarboxyRef_brch(NB,NZ)     = 0._r8
+    ElectronTransptJmaxRef_brch(NB,NZ) = 0._r8
+    LeafProteinC_brch(NB,NZ)           = 0._r8
+    LeafRubiscoC_brch(NB,NZ)           = 0._r8
+    LeafPEPC_brch(NB,NZ)               = 0._r8
+    LeafC3ChlC_brch(NB,NZ)             = 0._r8
+    LeafC4ChlC_brch(NB,NZ)             = 0._r8
+
+    IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
+      .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
+      .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
+
+      DO K=1,MaxNodesPerBranch1          
+        IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+          LeafProteinC_brch(NB,NZ)            = LeafProteinC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)
+          tLeafArea                           = tLeafArea+LeafArea_node(K,NB,NZ)
+          tLeafC                              = tLeafC+LeafElmntNode_brch(ielmc,K,NB,NZ)
+          ProteinCperm2LeafArea_node(K,NB,NZ) = LeafProteinC_node(K,NB,NZ)/LeafArea_node(K,NB,NZ)
+
+          IF(ProteinCperm2LeafArea_node(K,NB,NZ).GT.ZERO)THEN
+            IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN        
+              BundlSheathRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
+              BundlSheathChlC     = LeafProteinC_node(K,NB,NZ)*LeafProtein2Chl_pft(NZ)*(1._r8-fMesophyllChlProtein_pft(NZ))/5.5_r8        !1 gC chl for 5.5 gC protein
+              MesophyllPEPC       = LeafProteinC_node(K,NB,NZ)*LeafPEP2Protein_pft(NZ)
+              MesophyllChlC       = LeafProteinC_node(K,NB,NZ)*LeafProtein2Chl_pft(NZ)*fMesophyllChlProtein_pft(NZ)/3.7_r8                !1 gC chl for 3.7 gC protein
+
+              VcMaxPEPCarboxyRef_brch(NB,NZ) = VcMaxPEPCarboxyRef_brch(NB,NZ) +VmaxPEPCarboxyRef_pft(NZ)*MesophyllPEPC
+              VcMaxRubiscoRef_brch(NB,NZ)    = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*BundlSheathRubiscoC
+              VoMaxRubiscoRef_brch(NB,NZ)    = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*BundlSheathRubiscoC
+
+              LeafPEPC_brch(NB,NZ)     = LeafPEPC_brch(NB,NZ)+MesophyllPEPC
+              
+              LeafC4ChlC_brch(NB,NZ)   = LeafC4ChlC_brch(NB,NZ)+MesophyllChlC              
+              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+BundlSheathRubiscoC
+              
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+BundlSheathChlC
+
+            ELSE IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)then    
+              MesophyllChlC     = LeafProteinC_node(K,NB,NZ)*LeafProtein2Chl_pft(NZ)/3.5_r8        ! 1 gC chl for 3.5 gC protein
+              MesophyllRubiscoC = LeafProteinC_node(K,NB,NZ)*LeafRubisco2Protein_pft(NZ)
+              
+              VcMaxRubiscoRef_brch(NB,NZ) = VcMaxRubiscoRef_brch(NB,NZ)+VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoC
+              VoMaxRubiscoRef_brch(NB,NZ) = VoMaxRubiscoRef_brch(NB,NZ)+VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoC
+
+              LeafRubiscoC_brch(NB,NZ) = LeafRubiscoC_brch(NB,NZ)+MesophyllRubiscoC
+              
+              LeafC3ChlC_brch(NB,NZ)   = LeafC3ChlC_brch(NB,NZ)+MesophyllChlC
+    
+            ENDIF
+            ElectronTransptJmaxRef_brch(NB,NZ) = ElectronTransptJmaxRef_brch(NB,NZ)+SpecLeafChlAct_pft(NZ)*MesophyllChlC
+          ENDIF
+        ENDIF  
+      ENDDO
+
+      CanopyVcMaxRubisco25C_pft(NZ)  = CanopyVcMaxRubisco25C_pft(NZ)+VcMaxRubiscoRef_brch(NB,NZ)
+      CanopyVoMaxRubisco25C_pft(NZ)  = CanopyVoMaxRubisco25C_pft(NZ)+VoMaxRubiscoRef_brch(NB,NZ)
+      CanopyVcMaxPEP25C_pft(NZ)      = CanopyVcMaxPEP25C_pft(NZ) +VcMaxPEPCarboxyRef_brch(NB,NZ)
+      ElectronTransptJmax25C_pft(NZ) = ElectronTransptJmax25C_pft(NZ)+ElectronTransptJmaxRef_brch(NB,NZ)
+
+      LeafProteinCperm2LA_pft(NZ) = LeafProteinCperm2LA_pft(NZ)+LeafProteinC_brch(NB,NZ)
+      LeafRubiscoCperm2LA_pft(NZ) = LeafRubiscoCperm2LA_pft(NZ)+LeafRubiscoC_brch(NB,NZ)
+      LeafPEPCperm2LA_pft(NZ)     = LeafPEPCperm2LA_pft(NZ)+LeafPEPC_brch(NB,NZ)
+      LeafC3ChlCperm2LA_pft(NZ)   = LeafC3ChlCperm2LA_pft(NZ)+LeafC3ChlC_brch(NB,NZ)
+      LeafC4ChlCperm2LA_pft(NZ)   = LeafC4ChlCperm2LA_pft(NZ)+LeafC4ChlC_brch(NB,NZ)
+    endif
+  ENDDO
+  if(tLeafArea>5.e-3_r8)then
+    LeafProteinCperm2LA_pft(NZ) = LeafProteinCperm2LA_pft(NZ)/tLeafArea
+    LeafRubiscoCperm2LA_pft(NZ) = LeafRubiscoCperm2LA_pft(NZ)/tLeafArea
+    LeafPEPCperm2LA_pft(NZ)     = LeafPEPCperm2LA_pft(NZ)/tLeafArea
+    LeafC3ChlCperm2LA_pft(NZ)   = LeafC3ChlCperm2LA_pft(NZ)/tLeafArea
+    LeafC4ChlCperm2LA_pft(NZ)   = LeafC4ChlCperm2LA_pft(NZ)/tLeafArea
+
+    CanopyVcMaxRubisco25C_pft(NZ)  = CanopyVcMaxRubisco25C_pft(NZ)/tLeafArea
+    CanopyVoMaxRubisco25C_pft(NZ)  = CanopyVoMaxRubisco25C_pft(NZ)/tLeafArea
+    CanopyVcMaxPEP25C_pft(NZ)      = CanopyVcMaxPEP25C_pft(NZ) /tLeafArea
+    ElectronTransptJmax25C_pft(NZ) = ElectronTransptJmax25C_pft(NZ)/tLeafArea
+    SpecificLeafArea_pft(NZ)       = tLeafArea/tLeafC
+  else 
+    LeafProteinCperm2LA_pft(NZ)    = 0._r8
+    CanopyVcMaxRubisco25C_pft(NZ)  = 0._r8
+    CanopyVoMaxRubisco25C_pft(NZ)  = 0._r8
+    CanopyVcMaxPEP25C_pft(NZ)      = 0._r8
+    ElectronTransptJmax25C_pft(NZ) = 0._r8
+    LeafRubiscoCperm2LA_pft(NZ)    = 0._r8
+    LeafPEPCperm2LA_pft(NZ)        = 0._r8
+    LeafC3ChlCperm2LA_pft(NZ)      = 0._r8
+    LeafC4ChlCperm2LA_pft(NZ)      = 0._r8
+    SpecificLeafArea_pft(NZ)       = 0._r8
+  endif
+  end associate
+  end subroutine PhotosynsDiag
 !----------------------------------------------------------------------------------------------------
   subroutine StomatalDynamics(I,J,NZ)
 !
@@ -28,6 +197,7 @@
   integer, intent(in) :: I, J
   integer, intent(in) :: NZ
 
+  character(len=*), parameter :: subname='StomatalDynamics'
   integer :: K,L,M,NB,N
   REAL(R8):: CanopyCO2BndlResist_pft
   real(r8):: RI
@@ -49,7 +219,7 @@
     CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft,& !output :canopy minimum stomatal resistance, [s m-1]
     LeafIntracellularCO2_pft    => plt_photo%LeafIntracellularCO2_pft    & !output :leaf gaseous CO2 concentration, [umol m-3]
   )
-
+  call PrintInfo('beg '//subname)
 !
 !     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
 !
@@ -62,12 +232,6 @@
 !     CanopyCO2BndlResist_pft=canopy boundary layer resistance to CO2, h/m
 !     AirConc_pft=number of moles of air per m3
 !
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'IJ stomate',I,J
-  write(4444,*)'RIB,TairK,TKCanopy_pft(NZ)',RIB,TairK,TKCanopy_pft(NZ),CanopyIsothBndlResist_pft(NZ)
-  write(4444,*)'NetCO2Flx2Canopy_col,CO2E',NetCO2Flx2Canopy_col,CO2E
-  write(4444,*)'Ci2Ca',CanopyCi2CaRatio_pft(NZ)
-  endif
   RI                       = RichardsonNumber(RIB,TairK,TKCanopy_pft(NZ))
   CanopyCO2BndlResist_pft  = 1.34_r8*AMAX1(5.56E-03_r8,CanopyIsothBndlResist_pft(NZ)/(1.0_r8-10.0_r8*RI))
   AirConc_pft(NZ)          = GetMolAirPerm3(TKCanopy_pft(NZ))    !assuming pressure is one atmosphere
@@ -92,23 +256,14 @@
   !
   LeafIntracellularCO2_pft(NZ)=CanopyCi2CaRatio_pft(NZ)*CanopyGasCO2_pft(NZ)
 
-  if(I==10.and.J==16.and..false.)then  
-  write(4444,*)'FCO2',CanopyCi2CaRatio_pft(NZ),CanopyGasCO2_pft(NZ),AirConc_pft(NZ)
-  write(4444,*)'LeafIntracellularCO2_pft',LeafIntracellularCO2_pft(NZ)
-  write(4444,*)'SineSunInclAngle_col',SineSunInclAngle_col,CanopyLeafArea_pft(NZ)
-  endif
   IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
-    if(lverb)write(*,*)'PhotoActivePFT'
     call PhotoActivePFT(I,J,NZ)
   ELSE
 !
     CanopyMinStomaResistH2O_pft(NZ)=H2OCuticleResist_pft(NZ)
   ENDIF
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'======================================================='
-  stop
-  endif
+  call PrintInfo('end '//subname) 
   RETURN
   end associate
   END subroutine StomatalDynamics
@@ -158,11 +313,6 @@
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
   CH2O = CH2O+VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
 
-!  if(LP==1.and.PAR_zsec>0._r8)then
-!  IF(I==10.and.J==16.and..false..and.LP==1)then
-!  write(4445,*)M,N,L,K,CH2O,VL,LeafAreaSunlit_zsec(N,L,K,NB,NZ),TAU_Rad
-!  endif
-!  endif
   call PrintInfo('end '//subname)
   end associate
   end subroutine C3FixCO2
@@ -178,8 +328,8 @@
   associate(                                                &
     ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft        ,& !input  :threshold zero for plang growth calculation, [-]
     LeafAreaSunlit_zsec  => plt_photo%LeafAreaSunlit_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
-    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :direct incoming PAR, [umol m-2 s-1]
-    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
+    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :sunlit incoming PAR, [umol m-2 s-1]
+    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :shade incoming PAR, [umol m-2 s-1]
     LeafAreaZsec_brch    => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
     TAU_DirectRTransmit  => plt_rad%TAU_DirectRTransmit    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     TAU_RadThru          => plt_rad%TAU_RadThru             & !input  :fraction of radiation transmitted by canopy layer, [-]
@@ -187,9 +337,7 @@
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,NumLeafZenithSectors1
-    if(I==10.and.J==16.and..false.)then
-    write(4446,*)'NLKLB',N,L,K,NB,NZ,LeafAreaSunlit_zsec(N,L,K,NB,NZ)
-    endif
+
     DO M=1,NumOfSkyAzimuthSects1
       IF(LeafAreaSunlit_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
@@ -214,18 +362,18 @@
   end subroutine C3PhotosynsCanopyLayerL
 
 !----------------------------------------------------------------------------------------------------
-  subroutine C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinLeafAreaDensity)
+  subroutine C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
   implicit none
   integer, intent(in) :: I,J,K,NB,NZ
   real(r8), intent(inout) :: CH2O
-  real(r8), intent(in) :: TFN_Carboxy  !temperature sensitivity of carboyxlase
+  real(r8), intent(in) :: TFN_Carboxy     !temperature sensitivity of carboyxlase
   real(r8), intent(in) :: TFN_Oxygen      !temperature sensitivity of oxygenase
-  real(r8), intent(in) :: TFN_eTranspt  !temperature sensitivity of electron transport
-  real(r8), intent(in) :: ProteinLeafAreaDensity
+  real(r8), intent(in) :: TFN_eTranspt    !temperature sensitivity of electron transport
+  real(r8), intent(in) :: ProteinCLeafAreaDensity
   real(r8), intent(in) :: Km4RubOxy
   integer :: L
   real(r8) :: MesophyllChlDensity,MesophyllRubiscoSurfDensity
-  real(r8) :: VOGRO,VoMaxRubiscoRef_node,VcMaxRubiscoRef_node
+  real(r8) :: VOGRO,VoMaxRubiscoRef_node,VcMaxRubiscoRef_node,ElectronTransptJmaxRef_node
   character(len=*), parameter :: subname='C3Photosynthesis'
 !     begin_execution
   associate(                                                                   &
@@ -233,39 +381,37 @@
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     O2L_pft                       => plt_photo%O2L_pft                        ,& !input  :leaf aqueous O2 concentration, [uM]
     aquCO2Intraleaf_pft           => plt_photo%aquCO2Intraleaf_pft            ,& !input  :leaf aqueous CO2 concentration, [uM]
-    LeafC3ChlorofilConc_pft       => plt_photo%LeafC3ChlorofilConc_pft        ,& !input  :leaf C3 chlorophyll content, [gC gC-1]
+    LeafProtein2Chl_pft           => plt_photo%LeafProtein2Chl_pft            ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
     Km4LeafaqCO2_pft              => plt_photo%Km4LeafaqCO2_pft               ,& !input  :leaf aqueous CO2 Km no O2, [uM]
     Km4RubiscoCarboxy_pft         => plt_photo%Km4RubiscoCarboxy_pft          ,& !input  :leaf aqueous CO2 Km ambient O2, [uM]
     SpecLeafChlAct_pft            => plt_photo%SpecLeafChlAct_pft             ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]
     VmaxSpecRubCarboxyRef_pft     => plt_photo%VmaxSpecRubCarboxyRef_pft      ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1 m-2]
     VmaxRubOxyRef_pft             => plt_photo%VmaxRubOxyRef_pft              ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]
-    LeafArea_node                 => plt_morph%LeafArea_node                  ,& !input  :leaf area, [m2 d-2]    
-    LeafRuBPConc_pft              => plt_photo%LeafRuBPConc_pft               ,& !input  :leaf rubisco content, [gC gC-1]
+    LeafProteinC_node             => plt_biom%LeafProteinC_node               ,& !input  :node leaf protein C, [g d-2]    
+    LeafArea_node                 => plt_morph%LeafArea_node                  ,& !input  :node leaf area, [m2 d-2]    
+    LeafRubisco2Protein_pft       => plt_photo%LeafRubisco2Protein_pft        ,& !input  :leaf rubisco content, [gC gC-1]
     TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
+    ElectronTransptJmaxRef_brch   => plt_photo%ElectronTransptJmaxRef_brch    ,& !inoput :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]
     Vmax4RubiscoCarboxy_node      => plt_photo%Vmax4RubiscoCarboxy_node       ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     LigthSatCarboxyRate_node      => plt_photo%LigthSatCarboxyRate_node       ,& !output :maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
     CO2lmtRubiscoCarboxyRate_node => plt_photo%CO2lmtRubiscoCarboxyRate_node  ,& !output :carboxylation rate, [umol m-2 s-1]
     RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node         ,& !output :carboxylation efficiency, [umol umol-1]
-    VoMaxRubiscoRef_brch          => plt_photo%VoMaxRubiscoRef_brch           ,& !output :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]
-    VcMaxRubiscoRef_brch          => plt_photo%VcMaxRubiscoRef_brch           ,& !output :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]
-    CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node             & !output :CO2 compensation point, [uM]
+    CO2CompenPoint_node           => plt_photo%CO2CompenPoint_node             & !output :leaf node CO2 compensation point, [uM]
   )
   call PrintInfo('beg '//subname)
 !
-!     SURFICIAL DENSITY OF RUBISCO AND ITS LeafC3ChlorofilConc_pftOROPHYLL
+!     SURFICIAL DENSITY OF RUBISCO AND ITS LeafProtein2Chl_pftOROPHYLL
 !
-!     MesophyllRubiscoSurfDensity=surficial density of rubisco in mesophyll
-!     MesophyllChlDensity=surficial density of chlorophyll in esophyll
-!     LeafRuBPConc_pft=fraction of leaf protein in rubisco
-!     LeafC3ChlorofilConc_pft=fraction of leaf protein in mesophyll chlorophyll
-!     ProteinLeafAreaDensity=leaf protein surficial density
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in mesophyll, [gC rubisco (gC protein)-1]*[gC protein m-2 leaf]
+!     MesophyllChlDensity=surficial density of chlorophyll in esophyll,[gC chol (gC protein)-1]*[gC protein m-2 leaf]
+!     LeafProtein2Chl_pft=mass ratio of mesophyll cholorophyll to leaf protein
+!     ProteinCLeafAreaDensity=leaf protein surficial density, [g protein (m2 LA)-1]
 !
-  MesophyllRubiscoSurfDensity = LeafRuBPConc_pft(NZ)*ProteinLeafAreaDensity
-  MesophyllChlDensity         = LeafC3ChlorofilConc_pft(NZ)*ProteinLeafAreaDensity
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'K1,NB',K,NB,LeafRuBPConc_pft(NZ),LeafC3ChlorofilConc_pft(NZ),ProteinLeafAreaDensity
-  endif
+  MesophyllRubiscoSurfDensity = LeafRubisco2Protein_pft(NZ)*ProteinCLeafAreaDensity
+  MesophyllChlDensity         = LeafProtein2Chl_pft(NZ)*ProteinCLeafAreaDensity/3.5_r8          !1gC chl for 3.5 gC protein
+
+
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
@@ -281,13 +427,12 @@
 !     Km4RubOxy=Km for rubisco oxygenation
 !     CO2lmtRubiscoCarboxyRate_node=rubisco carboxylation rate limited by CO2
 !
-  VcMaxRubiscoRef_node          = VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoSurfDensity  
-  VoMaxRubiscoRef_node          = VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoSurfDensity
-  VcMaxRubiscoRef_brch(NB,NZ)   = VcMaxRubiscoRef_brch(NB,NZ)+VcMaxRubiscoRef_node*LeafArea_node(K,NB,NZ)
-  VoMaxRubiscoRef_brch(NB,NZ)   = VoMaxRubiscoRef_brch(NB,NZ)+VoMaxRubiscoRef_node*LeafArea_node(K,NB,NZ)
+  VcMaxRubiscoRef_node                   = VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoSurfDensity
+  VoMaxRubiscoRef_node                   = VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoSurfDensity
   Vmax4RubiscoCarboxy_node(K,NB,NZ)      = VcMaxRubiscoRef_node*TFN_Carboxy
   VOGRO                                  = VoMaxRubiscoRef_node*TFN_Oxygen
   CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L_pft(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_node(K,NB,NZ)*Km4RubOxy)
+  ! Eq. (1) of Grant, 1989
   CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_node(K,NB,NZ)&
     *(aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ))/(aquCO2Intraleaf_pft(NZ)+Km4RubiscoCarboxy_pft(NZ)))
 !
@@ -302,13 +447,10 @@
 !     CO2CompenPoint_node=C3 CO2 compensation point (uM)
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
-  LigthSatCarboxyRate_node(K,NB,NZ) = SpecLeafChlAct_pft(NZ)*TFN_eTranspt*MesophyllChlDensity
-  RubiscoCarboxyEff_node(K,NB,NZ)   = AZMAX1((aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ)) &
+  ElectronTransptJmaxRef_node          = SpecLeafChlAct_pft(NZ)*MesophyllChlDensity
+  LigthSatCarboxyRate_node(K,NB,NZ)    = ElectronTransptJmaxRef_node*TFN_eTranspt
+  RubiscoCarboxyEff_node(K,NB,NZ)      = AZMAX1((aquCO2Intraleaf_pft(NZ)-CO2CompenPoint_node(K,NB,NZ)) &
     /(ELEC3*aquCO2IntraLeaf_pft(NZ)+10.5_r8*CO2CompenPoint_node(K,NB,NZ)))
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'K2,NB',K,NB,CO2CompenPoint_node(K,NB,NZ),Vmax4RubiscoCarboxy_node(K,NB,NZ),&
-  CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),LigthSatCarboxyRate_node(K,NB,NZ),RubiscoCarboxyEff_node(K,NB,NZ)
-  endif  
 
 !
 !     FOR EACH CANOPY LAYER
@@ -316,15 +458,9 @@
 !     CanopyLeafArea_lnode=leaf area
 !     LeafAreaSunlit_zsec=unself-shaded leaf surface area
 !
-  IF(I==10.and.J==16.and..false.)then
-  write(4559,*)'TAUS',TAU_DirectRTransmit(1:NumCanopyLayers1+1)
-  write(4559,*)'TAUS',TAU_RadThru(1:NumCanopyLayers1+1)
-  endif
+
   DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      if(I==10.and.J==16.and..false.)then
-      write(4441,*)'LK=',L,K,CanopyLeafArea_lnode(L,K,NB,NZ),TAU_DirectRTransmit(L+1),TAU_RadThru(L+1)
-      endif
       call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -334,7 +470,7 @@
   end subroutine C3Photosynthesis
 
 !----------------------------------------------------------------------------------------------------
-  subroutine C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinLeafAreaDensity)
+  subroutine C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: K       !leaf node id
@@ -345,12 +481,13 @@
   real(r8), intent(in) :: TFN_Oxygen         !temperature sensitivity of oxygenation
   real(r8), intent(in) :: TFN_eTranspt       !temperature sensitivity of electron transport 
   real(r8), intent(in) :: Km4RubOxy
-  real(r8), intent(in) :: ProteinLeafAreaDensity
+  real(r8), intent(in) :: ProteinCLeafAreaDensity
   integer :: L
   real(r8) :: CC4M
   real(r8) :: CCBS,MesophyllChlDensity
   real(r8) :: BundlSheathChlDensity
-  real(r8) :: MesophyllPEPSurfDensity,MesophyllRubiscoSurfDensity
+  real(r8) :: MesophyllPEPSurfDensity,BundlSheathRubiscoSurfDensity
+  real(r8) :: ElectronTransptJmaxRef_node
   real(r8) :: VcMaxPEPCarboxyRef_node,VoMaxRubiscoRef_node,VcMaxRubiscoRef_node
   real(r8) :: VOGRO   !vmax 4 oxygenation in mesophyll
   character(len=*), parameter :: subname='C4Photosynthesis'
@@ -359,35 +496,33 @@
     LeafElmntNode_brch              => plt_biom%LeafElmntNode_brch                ,& !input  :leaf element, [g d-2]
     ZERO4Groth_pft                  => plt_biom%ZERO4Groth_pft                    ,& !input  :threshold zero for plang growth calculation, [-]
     CanopyLeafArea_lnode            => plt_morph%CanopyLeafArea_lnode             ,& !input  :layer/node/branch leaf area, [m2 d-2]
-    C4PhotosynDowreg_brch           => plt_photo%C4PhotosynDowreg_brch            ,& !input  :down-regulation of C4 photosynthesis, [-]
-    LeafC4ChlorofilConc_pft         => plt_photo%LeafC4ChlorofilConc_pft          ,& !input  :leaf C4 chlorophyll content, [gC gC-1]
+    GrainFillDowreg_brch            => plt_photo%GrainFillDowreg_brch             ,& !input  :down-regulation of C4 photosynthesis, [-]
+    fMesophyllChlProtein_pft        => plt_photo%fMesophyllChlProtein_pft         ,& !input  :fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
     O2L_pft                         => plt_photo%O2L_pft                          ,& !input  :leaf aqueous O2 concentration, [uM]
     aquCO2Intraleaf_pft             => plt_photo%aquCO2Intraleaf_pft              ,& !input  :leaf aqueous CO2 concentration, [uM]
     SpecLeafChlAct_pft              => plt_photo%SpecLeafChlAct_pft               ,& !input  :cholorophyll activity at 25 oC, [umol g-1 h-1]
     VmaxPEPCarboxyRef_pft           => plt_photo%VmaxPEPCarboxyRef_pft            ,& !input  :PEP carboxylase activity at 25 oC [umol g-1 h-1]
-    LeafRuBPConc_pft                => plt_photo%LeafRuBPConc_pft                 ,& !input  :leaf rubisco content, [gC gC-1]
+    LeafRubisco2Protein_pft         => plt_photo%LeafRubisco2Protein_pft          ,& !input  :leaf rubisco content, [gC gC-1]
     Km4PEPCarboxy_pft               => plt_photo%Km4PEPCarboxy_pft                ,& !input  :Km for PEP carboxylase activity, [uM]
     CMassCO2BundleSheath_node       => plt_photo%CMassCO2BundleSheath_node        ,& !input  :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CPOOL4_node                     => plt_photo%CPOOL4_node                      ,& !input  :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
     Km4LeafaqCO2_pft                => plt_photo%Km4LeafaqCO2_pft                 ,& !input  :leaf aqueous CO2 Km no O2, [uM]
     Km4RubiscoCarboxy_pft           => plt_photo%Km4RubiscoCarboxy_pft            ,& !input  :leaf aqueous CO2 Km ambient O2, [uM]
-    LeafC3ChlorofilConc_pft         => plt_photo%LeafC3ChlorofilConc_pft          ,& !input  :leaf C3 chlorophyll content, [gC gC-1]
+    LeafProtein2Chl_pft             => plt_photo%LeafProtein2Chl_pft              ,& !input  :fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
     VmaxSpecRubCarboxyRef_pft       => plt_photo%VmaxSpecRubCarboxyRef_pft        ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1]
     VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft                ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]
-    FracLeafProtAsPEPCarboxyl_pft   => plt_photo%FracLeafProtAsPEPCarboxyl_pft    ,& !input  :leaf PEP carboxylase content, [gC gC-1]
+    LeafPEP2Protein_pft             => plt_photo%LeafPEP2Protein_pft              ,& !input  :leaf PEP carboxylase content, [gC gC-1]
     LeafArea_node                   => plt_morph%LeafArea_node                    ,& !input  :leaf area on node, [m2 d-2]        
     NutrientCtrlonC4Carboxy_node    => plt_photo%NutrientCtrlonC4Carboxy_node     ,& !inoput :down-regulation of C4 photosynthesis, [-]
+    ElectronTransptJmaxRef_brch     => plt_photo%ElectronTransptJmaxRef_brch      ,& !inoput :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]
     RubiscoCarboxyEff_node          => plt_photo%RubiscoCarboxyEff_node           ,& !output :carboxylation efficiency, [umol umol-1]
     LigthSatCarboxyRate_node        => plt_photo%LigthSatCarboxyRate_node         ,& !output :maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
-    VcMaxPEPCarboxyRef_brch         => plt_photo%VcMaxPEPCarboxyRef_brch          ,& !output :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     CO2lmtRubiscoCarboxyRate_node   => plt_photo%CO2lmtRubiscoCarboxyRate_node    ,& !output :carboxylation rate, [umol m-2 s-1]
     Vmax4RubiscoCarboxy_node        => plt_photo%Vmax4RubiscoCarboxy_node         ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     CO2CompenPoint_node             => plt_photo%CO2CompenPoint_node              ,& !output :CO2 compensation point, [uM]
     Vmax4PEPCarboxy_node            => plt_photo%Vmax4PEPCarboxy_node             ,& !output :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
     CO2lmtPEPCarboxyRate_node       => plt_photo%CO2lmtPEPCarboxyRate_node        ,& !output :C4 carboxylation rate, [umol m-2 s-1]
     C4CarboxyEff_node               => plt_photo%C4CarboxyEff_node                ,& !output :C4 carboxylation efficiency, [umol umol-1]
-    VoMaxRubiscoRef_brch            => plt_photo%VoMaxRubiscoRef_brch             ,& !output :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]
-    VcMaxRubiscoRef_brch            => plt_photo%VcMaxRubiscoRef_brch             ,& !output :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]
     LigthSatC4CarboxyRate_node      => plt_photo%LigthSatC4CarboxyRate_node        & !output :maximum light C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
   )
   call PrintInfo('beg '//subname)
@@ -397,24 +532,26 @@
 !     CC4M,CCBS=C4 nonstruct C concn in mesophyll,bundle sheath (uM)
 !     CPOOL4_node,CMassCO2BundleSheath_node=C4 nonstructural C mass in mesophyll,bundle sheath
 !     WGLF=leaf C mass
-!     FBS,FMP=leaf water content in bundle sheath, mesophyll
+!     FWCBundlSheath,FWCMesophyll=leaf water content in bundle sheath, mesophyll
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M                                  = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FMP))
-  CCBS                                  = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FBS))
+  CC4M = AZMAX1(0.021E+09_r8*CPOOL4_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCMesophyll))
+  CCBS = AZMAX1(0.083E+09_r8*CMassCO2BundleSheath_node(K,NB,NZ)/(LeafElmntNode_brch(ielmc,K,NB,NZ)*FWCBundlSheath))
+  
   NutrientCtrlonC4Carboxy_node(K,NB,NZ) = 1.0_r8/(1.0_r8+CC4M/C4KI_pepcarboxy)
-  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
+  NutrientCtrlonC4Carboxy_node(K,NB,NZ) = NutrientCtrlonC4Carboxy_node(K,NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !
-!     SURFICIAL DENSITY OF FracLeafProtAsPEPCarboxyl_pftAND ITS LeafC3ChlorofilConc_pftOROPHYLL
+!     SURFICIAL DENSITY OF LeafPEP2Protein_pftAND ITS LeafProtein2Chl_pftOROPHYLL
 !
 !     MesophyllPEPSurfDensity=surficial density of PEP carboxylase in mesophyll
 !     MesophyllChlDensity=surficial density of chlorophyll in mesophyll
-!     FracLeafProtAsPEPCarboxyl_pft=fraction of leaf protein in PEP carboxylase
-!     LeafC4ChlorofilConc_pft=fraction of leaf protein in mesophyll chlorophyll
-!     ProteinLeafAreaDensity=leaf protein surficial density, gC/m2 leaf
+!     LeafPEP2Protein_pft=C mass ratio of PEP enzyme to total leaf protein
+!     fMesophyllChlProtein_pft=fraction of leaf protein in mesophyll chlorophyll
+!     ProteinCLeafAreaDensity=leaf protein surficial density, gC/m2 leaf
 !
-  MesophyllPEPSurfDensity = FracLeafProtAsPEPCarboxyl_pft(NZ)*ProteinLeafAreaDensity
-  MesophyllChlDensity     = LeafC4ChlorofilConc_pft(NZ)*ProteinLeafAreaDensity
+  MesophyllPEPSurfDensity = ProteinCLeafAreaDensity*LeafPEP2Protein_pft(NZ)
+  MesophyllChlDensity     = ProteinCLeafAreaDensity*LeafProtein2Chl_pft(NZ)*fMesophyllChlProtein_pft(NZ)/3.7_r8   !1gC chl for 3.7 gC protein in mesophyll 
+
 !
 !     CO2-LIMITED C4 CARBOXYLATION RATES
 !
@@ -427,10 +564,10 @@
 !     Km4PEPCarboxy_pft=Km for VmaxPEPCarboxyRef_pft from PFT file (uM)
 !
   VcMaxPEPCarboxyRef_node            = VmaxPEPCarboxyRef_pft(NZ)*MesophyllPEPSurfDensity
-  VcMaxPEPCarboxyRef_brch(NB,NZ)     = VcMaxPEPCarboxyRef_brch(NB,NZ) +VcMaxPEPCarboxyRef_node*LeafArea_node(K,NB,NZ)
   Vmax4PEPCarboxy_node(K,NB,NZ)      = VcMaxPEPCarboxyRef_node*TFN_Carboxy
   CO2lmtPEPCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4PEPCarboxy_node(K,NB,NZ) &
     *(aquCO2Intraleaf_pft(NZ)-COMP4)/(aquCO2Intraleaf_pft(NZ)+Km4PEPCarboxy_pft(NZ)))
+
 !
 !     C4 ELECTRON TRANSFER RATES
 !
@@ -443,8 +580,11 @@
 !     COMP4=C4 CO2 compensation point (uM)
 !     ELEC4=e- requirement for CO2 fixn by PEP carboxylase
 !
-  LigthSatC4CarboxyRate_node(K,NB,NZ) = SpecLeafChlAct_pft(NZ)*TFN_eTranspt*MesophyllChlDensity
+  ElectronTransptJmaxRef_node         = SpecLeafChlAct_pft(NZ)*MesophyllChlDensity  
+  LigthSatC4CarboxyRate_node(K,NB,NZ) = ElectronTransptJmaxRef_node*TFN_eTranspt
   C4CarboxyEff_node(K,NB,NZ)          = AZMAX1((aquCO2Intraleaf_pft(NZ)-COMP4)/(ELEC4*aquCO2Intraleaf_pft(NZ)+10.5_r8*COMP4))
+
+
 !
 !     FOR EACH CANOPY LAYER
 !
@@ -459,14 +599,15 @@
 !
 !     VARIABLES FOR C3 PHOTOSYNTHESIS DRIVEN BY C4
 !
-!     MesophyllRubiscoSurfDensity=surficial density of rubisco in bundle sheath
+!     MesophyllRubiscoSurfDensity=surficial density of rubisco in bundle sheath, 
 !     BundlSheathChlDensity=surficial density of chlorophyll in bundle sheath
-!     LeafRuBPConc_pft=fraction of leaf protein in rubisco
-!     LeafC3ChlorofilConc_pft=fraction of leaf protein in bundle sheath chlorophyll
-!     ProteinLeafAreaDensity=leaf protein surficial density
+!     LeafRubisco2Protein_pft=fraction of leaf protein in rubisco
+!     LeafProtein2Chl_pft=fraction of leaf protein in bundle sheath chlorophyll
+!     ProteinCLeafAreaDensity=leaf protein surficial density
 !
-  MesophyllRubiscoSurfDensity = LeafRuBPConc_pft(NZ)*ProteinLeafAreaDensity
-  BundlSheathChlDensity       = LeafC3ChlorofilConc_pft(NZ)*ProteinLeafAreaDensity
+  BundlSheathRubiscoSurfDensity = ProteinCLeafAreaDensity*LeafRubisco2Protein_pft(NZ)
+  BundlSheathChlDensity         = ProteinCLeafAreaDensity*LeafProtein2Chl_pft(NZ)*(1._r8-fMesophyllChlProtein_pft(NZ))/5.5_r8  !1gC chl for 5.5 gC protein
+
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
@@ -484,11 +625,9 @@
 !     CCBS=C4 nonstruct C concn in bundle sheath (uM)
 !
 
-  VcMaxRubiscoRef_node                   = VmaxSpecRubCarboxyRef_pft(NZ)*MesophyllRubiscoSurfDensity
-  VcMaxRubiscoRef_brch(NB,NZ)            = VcMaxRubiscoRef_brch(NB,NZ)+VcMaxRubiscoRef_node*LeafArea_node(K,NB,NZ)
+  VcMaxRubiscoRef_node                   = VmaxSpecRubCarboxyRef_pft(NZ)*BundlSheathRubiscoSurfDensity
   Vmax4RubiscoCarboxy_node(K,NB,NZ)      = VcMaxRubiscoRef_node*TFN_Carboxy
-  VoMaxRubiscoRef_node                   = VmaxRubOxyRef_pft(NZ)*MesophyllRubiscoSurfDensity
-  VoMaxRubiscoRef_brch(NB,NZ)            = VoMaxRubiscoRef_brch(NB,NZ)+VoMaxRubiscoRef_node*LeafArea_node(K,NB,NZ)
+  VoMaxRubiscoRef_node                   = VmaxRubOxyRef_pft(NZ)*BundlSheathRubiscoSurfDensity
   VOGRO                                  = VoMaxRubiscoRef_node*TFN_Oxygen
   CO2CompenPoint_node(K,NB,NZ)           = 0.5_r8*O2L_pft(NZ)*VOGRO*Km4LeafaqCO2_pft(NZ)/(Vmax4RubiscoCarboxy_node(K,NB,NZ)*Km4RubOxy)
   CO2lmtRubiscoCarboxyRate_node(K,NB,NZ) = AZMAX1(Vmax4RubiscoCarboxy_node(K,NB,NZ)* &
@@ -612,38 +751,39 @@
   real(r8), intent(in) :: TFN_eTranspt
   real(r8), intent(in) :: Km4RubOxy  
   real(r8),intent(inout) :: CH2O
+
+  character(len=*), parameter :: subname='LiveBranchPhotosynthesis'
   integer :: K  !leaf node id
-  real(r8) :: ProteinLeafAreaDensity   !protein area density, [gC protein m-2 LA]
+  real(r8) :: ProteinCLeafAreaDensity   !protein area density, [gC protein m-2 LA]
 !     begin_execution
-  associate(                                                           &
-    iPlantPhotosynthesisType  => plt_photo%iPlantPhotosynthesisType   ,& !input  :plant photosynthetic type (C3 or C4),[-]
-    ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
-    LeafElmntNode_brch        => plt_biom%LeafElmntNode_brch          ,& !input  :leaf element, [g d-2]
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
-    LeafProteinCNode_brch     => plt_biom%LeafProteinCNode_brch       ,& !input  :layer leaf protein C, [g d-2]
-    LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    Vmax4PEPCarboxy_node      => plt_photo%Vmax4PEPCarboxy_node       ,& !output :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
-    Vmax4RubiscoCarboxy_node  => plt_photo%Vmax4RubiscoCarboxy_node    & !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
+  associate(                                                              &
+    iPlantPhotosynsType_pft    => plt_photo%iPlantPhotosynsType_pft    ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    ZERO                        => plt_site%ZERO                         ,& !input  :threshold zero for numerical stability, [-]
+    LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch           ,& !input  :leaf element, [g d-2]
+    ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft               ,& !input  :threshold zero for plang growth calculation, [-]
+    LeafProteinC_node           => plt_biom%LeafProteinC_node            ,& !input  :layer leaf protein C, [g d-2]
+    LeafArea_node               => plt_morph%LeafArea_node               ,& !input  :leaf area, [m2 d-2]
+    Vmax4PEPCarboxy_node        => plt_photo%Vmax4PEPCarboxy_node        ,& !output :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
+    Vmax4RubiscoCarboxy_node    => plt_photo%Vmax4RubiscoCarboxy_node    ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
+    LeafProteinC_brch           => plt_biom%LeafProteinC_brch             & !output :Protein C for the branches, [gC protein d-2]
   )
+  call PrintInfo('beg '//subname)
   DO K=1,MaxNodesPerBranch1
     IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
-      ProteinLeafAreaDensity=LeafProteinCNode_brch(K,NB,NZ)/LeafArea_node(K,NB,NZ)
+      ProteinCLeafAreaDensity   = LeafProteinC_node(K,NB,NZ)/LeafArea_node(K,NB,NZ)      
     ELSE
-      ProteinLeafAreaDensity=0.0_r8
+      ProteinCLeafAreaDensity=0.0_r8
     ENDIF
-    if(I==10.and.J==16.and..false.)then
-    write(4443,*)'ProteinLeafAreaDensity',K,ProteinLeafAreaDensity,LeafProteinCNode_brch(K,NB,NZ),LeafArea_node(K,NB,NZ),LeafElmntNode_brch(ielmc,K,NB,NZ)
-    endif
 
-    IF(ProteinLeafAreaDensity.GT.ZERO)THEN
+    IF(ProteinCLeafAreaDensity.GT.ZERO)THEN
       !
-      !     iPlantPhotosynthesisType=photosynthesis type:3=C3,4=C4 from PFT file
+      !     iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
       !
-      IF(iPlantPhotosynthesisType(NZ).EQ.ic4_photo)THEN        
-        call C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinLeafAreaDensity)
-      ELSE IF(iPlantPhotosynthesisType(NZ).EQ.ic3_photo)then        
+      IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN        
+        call C4Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
+      ELSE IF(iPlantPhotosynsType_pft(NZ).EQ.ic3_photo)then        
 
-        call C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinLeafAreaDensity)
+        call C3Photosynthesis(I,J,K,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy,ProteinCLeafAreaDensity)
       ENDIF
      !
     ELSE
@@ -651,6 +791,7 @@
       Vmax4RubiscoCarboxy_node(K,NB,NZ) = 0.0_r8
     ENDIF
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine LiveBranchPhotosynthesis
 
@@ -663,6 +804,8 @@
   real(r8), intent(in) :: TFN_eTranspt
   real(r8), intent(in) :: Km4RubOxy
   real(r8), intent(inout) :: CH2O  
+
+  character(len=*), parameter :: subname='PhenoActiveBranch'
   integer :: NE
   real(r8) :: CNS,CPS
 !     begin_execution
@@ -676,8 +819,10 @@
     iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch     ,& !input  :flag to detect branch death, [-]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     RubiscoActivity_brch      => plt_photo%RubiscoActivity_brch       ,& !inoput :branch down-regulation of CO2 fixation, [-]
-    C4PhotosynDowreg_brch     => plt_photo%C4PhotosynDowreg_brch       & !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch      => plt_photo%GrainFillDowreg_brch        & !output :grain fill down-regulation of annual plants, [-]
   )
+
+  call PrintInfo('beg '//subname)
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
 !
@@ -717,23 +862,24 @@
 !     HourFailGrainFill_brch=number of hours with no grain fill after start of grain fill
 !     Hours2KillAnuals=number of hours with no grain fill to terminate annuals
 !
-  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
-    C4PhotosynDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. HourFailGrainFill_brch(NB,NZ).GT.0.0_r8)THEN
+    GrainFillDowreg_brch(NB,NZ)=AZMAX1(1.0_r8-HourFailGrainFill_brch(NB,NZ)/Hours2KillAnuals(iPlantPhenolType_pft(NZ)))
   ELSE
-    C4PhotosynDowreg_brch(NB,NZ)=1.0_r8
+    GrainFillDowreg_brch(NB,NZ)=1.0_r8
   ENDIF
-  RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*C4PhotosynDowreg_brch(NB,NZ)
+  RubiscoActivity_brch(NB,NZ)=RubiscoActivity_brch(NB,NZ)*GrainFillDowreg_brch(NB,NZ)
 !
 !     FOR EACH NODE
 !
 !     iPlantBranchState_brch=branch life flag:0=living,1=dead
-!     LeafArea_node,WGLF,LeafProteinCNode_brch=leaf area,C mass,protein mass
-!     ProteinLeafAreaDensity=leaf protein surficial density
+!     LeafArea_node,WGLF,LeafProteinC_node=leaf area,C mass,protein mass
+!     ProteinCLeafAreaDensity=leaf protein C surficial density (gC protein m-2 leaf)
 !
 
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
     call LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine PhenoActiveBranch
 
@@ -741,7 +887,7 @@
   subroutine PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
   implicit none
   integer, intent(in) :: I,J,NZ
-  real(r8), intent(out) :: CH2O
+  real(r8), intent(out) :: CH2O                !carboxylation rate
   real(r8), intent(out) :: TFN_Carboxy
   real(r8), intent(out) :: TFN_Oxygen
   real(r8), intent(out) :: TFN_eTranspt
@@ -816,13 +962,9 @@
 !
   Km4LeafaqCO2_pft(NZ)      = XKCO2_pft(NZ)*EXP(16.136_r8-40000._r8/RTK)
   Km4RubOxy                 = XKO2_pft(NZ)*EXP(8.067_r8-20000._r8/RTK)
+  !Eq.(1) of Grant, 1989
   Km4RubiscoCarboxy_pft(NZ) = Km4LeafaqCO2_pft(NZ)*(1.0_r8+O2L_pft(NZ)/Km4RubOxy)
 
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'O2L,dif',O2L_pft(NZ),DiffCO2Atmos2Intracel_pft(NZ)
-  write(4444,*)'TFN',TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,TempOffset_pft(NZ)
-  write(4444,*)'KM',Km4RubiscoCarboxy_pft(NZ)
-  endif
   end associate
   end subroutine PrepPhotosynthesis
 
@@ -834,9 +976,10 @@
 
   integer :: NB,K
   real(r8) :: CH2O
-  real(r8) :: RSX
+  real(r8) :: RSX              !minimum canopy stomatal resistance to CO2
   real(r8) :: TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy
   real(r8), parameter :: secsperhour=3600.0_r8
+  character(len=*), parameter :: subname='PhotoActivePFT'
 
 !     begin_execution
   associate(                                                               &
@@ -854,14 +997,11 @@
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     Vmax4RubiscoCarboxy_node    => plt_photo%Vmax4RubiscoCarboxy_node     ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     RubiscoActivity_brch        => plt_photo%RubiscoActivity_brch         ,& !output :branch down-regulation of CO2 fixation, [-]
-    C4PhotosynDowreg_brch       => plt_photo%C4PhotosynDowreg_brch        ,& !output :down-regulation of C4 photosynthesis, [-]
+    GrainFillDowreg_brch       => plt_photo%GrainFillDowreg_brch        ,& !output :down-regulation of C4 photosynthesis, [-]
     Vmax4PEPCarboxy_node        => plt_photo%Vmax4PEPCarboxy_node         ,& !output :maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
-    VoMaxRubiscoRef_brch        => plt_photo%VoMaxRubiscoRef_brch         ,& !output :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]
-    VcMaxRubiscoRef_brch        => plt_photo%VcMaxRubiscoRef_brch         ,& !output :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]    
-    VcMaxPEPCarboxyRef_brch     => plt_photo%VcMaxPEPCarboxyRef_brch      ,& !output :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]    
     CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft   & !output :canopy minimum stomatal resistance, [s m-1]
   )
-  if(lverb)write(*,*)'PrepPhotosynthesis'
+  call PrintInfo('beg '//subname)
   call PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
 !
 !     FOR EACH BRANCH
@@ -874,9 +1014,6 @@
 !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
 !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
 !
-    VcMaxRubiscoRef_brch(NB,NZ)    = 0._r8
-    VoMaxRubiscoRef_brch(NB,NZ)    = 0._r8
-    VcMaxPEPCarboxyRef_brch(NB,NZ) = 0._r8
 
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
       .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
@@ -884,15 +1021,17 @@
 
       !there are photosynthetically active leaves       
       call PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
+
     ELSE
       RubiscoActivity_brch(NB,NZ)  = 0.0_r8
-      C4PhotosynDowreg_brch(NB,NZ) = 1.0_r8
+      GrainFillDowreg_brch(NB,NZ) = 1.0_r8
       DO K=1,MaxNodesPerBranch1
         Vmax4PEPCarboxy_node(K,NB,NZ)     = 0.0_r8
         Vmax4RubiscoCarboxy_node(K,NB,NZ) = 0.0_r8
       ENDDO
     ENDIF
   ENDDO
+
 !
 !     MINIMUM CANOPY STOMATAL RESISTANCE FROM CO2 CONCENTRATION
 !     DIFFERENCE DIVIDED BY TOTAL CO2 FIXATION
@@ -904,12 +1043,16 @@
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
+! determine minimum canopy stomatal resistance to CO2 based on CO2 gradient
   IF(CH2O.GT.ZERO4Groth_pft(NZ))THEN
     RSX=FracPARads2Canopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=H2OCuticleResist_pft(NZ)*1.56_r8
   ENDIF
-  CanopyMinStomaResistH2O_pft(NZ)=AMIN1(H2OCuticleResist_pft(NZ),AMAX1(RSMY_stomaCO2,RSX*0.641_r8))
+
+  CanopyMinStomaResistH2O_pft(NZ)=AMIN1(H2OCuticleResist_pft(NZ),AMAX1(RSMY_stomaCO2,RSX/1.56_r8))
+
+  call PrintInfo('end '//subname)
   end associate
   end subroutine PhotoActivePFT
   ![tail]

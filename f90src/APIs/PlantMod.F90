@@ -1,14 +1,15 @@
 module PlantMod
-  use data_kind_mod,     only: r8 => DAT_KIND_R8
+  use data_kind_mod,     only: r8 => DAT_KIND_R8,yearIJ_type
   use grosubsMod,        only: GrowPlants
   use PlantPhenolMod,    only: PhenologyUpdate
   use UptakesMod,        only: RootUptakes
   use PlantDisturbMod,   only: PrepLandscapeGrazing
   use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: fixEXConsumpFlux
-  use EcoSIMCtrlMod,     only: lverb,ldo_sp_mode
+  use EcoSIMCtrlMod,     only: lverb, ldo_sp_mode
   use PlantDebugMod,     only: PrintRootTracer
   use LitterFallMod,     only: ReSeedPlants
+  use DebugToolMod,      only: PrintInfo
   use PlantAPI4Uptake
   use TracerIDMod
   use GridDataType
@@ -29,20 +30,21 @@ implicit none
 
   contains
 
-  subroutine PlantModel(I,J,NHW,NHE,NVN,NVS)
+  subroutine PlantModel(yearIJ,NHW,NHE,NVN,NVS)
   !
   !run the plant biogeochemistry model
   !
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8) :: t1
+  real(r8) :: t1,tvegE(NumPlantChemElms)
   integer :: NY,NX,NZ
-
+  character(len=*), parameter :: subname='PlantModel'
 333   FORMAT(A8)
 
+  call PrintInfo('beg '//subname)
   if(.not.ldo_sp_mode)then
-    call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
+    call PrepLandscapeGrazing(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
     plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   endif
 
@@ -51,71 +53,67 @@ implicit none
   
       if(ldo_sp_mode)then
         !do prescribed phenolgoy
-        call PlantUptakeAPISend(I,J,NY,NX)        
-        CALL ROOTUPTAKES(I,J)
-        call extracts(I,J)
-        call PlantUPtakeAPIRecv(I,J,NY,NX)
+        call PlantUptakeAPISend(yearIJ%I,yearIJ%J,NY,NX)        
+
+        CALL ROOTUPTAKES(yearIJ)
+        
+        call extracts(yearIJ%I,yearIJ%J)
+        
+        call PlantUPtakeAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       else
-        call  PlantAPISend(I,J,NY,NX)
+      
+        call  PlantAPISend(yearIJ%I,yearIJ%J,NY,NX)
 
-        call EnterPlantBalance(I,J,NP_col(NY,NX))
-
-        !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
-        !     zero out plant hourly fluxes
-        call ZeroGrosub()  
-
-        if(lverb)WRITE(*,333)'HFUNC'
-
-        DO NZ=1,NP_col(NY,NX)
-          call PrintRootTracer(I,J,NZ,'BEEfhfunc')
-  !       call SumPlantBiom(I,J,NZ,'bfHFUNCS')
-        ENDDO
+        call EnterPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
 
         !Phenological update, determine living/active branches      
-        CALL PhenologyUpdate(I,J)
+        CALL PhenologyUpdate(yearIJ%I,yearIJ%J)
 
-        DO NZ=1,NP_col(NY,NX)
-          call PrintRootTracer(I,J,NZ,'afhfunc')
-  !        call SumPlantBiom(I,J,NZ,'bfUPTAKES')
-        ENDDO
-
-  !      call SumPlantRootGas(I,J)
-
-        !Predict uptake fluxes of nutrients and O2
-        if(lverb)write(*,*)'uptake'
-        CALL ROOTUPTAKES(I,J)
-
-  !      call SumPlantRootGas(I,J)
-
-  !      DO NZ=1,NP_col(NY,NX)
-  !        call SumPlantBiom(I,J,NZ,'bfGROSUBS')
-  !      ENDDO
+        !Predict uptake fluxes of nutrients and O2        
+        CALL ROOTUPTAKES(yearIJ)
 
         !Do growth of active branches and roots
-        if(lverb)write(*,*)'grosub'
-        CALL GROWPLANTS(I,J)
-
-        if(lverb)write(*,*)'EXTRACT'
+        CALL GROWPLANTS(yearIJ)
 
         !aggregate varaibles
-        CALL EXTRACTs(I,J)
-  !      if(I==140 .and. J>=20)write(116,*)'afextract'        
+        CALL EXTRACTs(yearIJ%I,yearIJ%J)
 
         DO NZ=1,NP_col(NY,NX)
-          Call ReSeedPlants(I,J,NZ)
+
+          Call ReSeedPlants(yearIJ%I,yearIJ%J,NZ)
+
         ENDDO
 
-        call ExitPlantBalance(I,J,NP_col(NY,NX))
+        call ExitPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
 
-        call PlantAPIRecv(I,J,NY,NX)
+        call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
+
       endif
 
     ENDDO
   ENDDO
+  
   PlantElemntStoreLandscape(:)=plt_site%PlantElemntStoreLandscape(:)
-
+  call PrintInfo('end '//subname)
 
   end subroutine PlantModel
+!------------------------------------------------------------------------------------------
+!  function test_active_plant(NY,NX)result(activeroot)
+  !
+  !Description:
+  !Check the existence of active plants
+!  implicit none
+!  integer, intent(in) :: NY,NX
+!  logical :: activeroot
+!  integer :: NZ
+
+!  activeroot=.false.
+!  DO NZ=1,NP_col(NY,NX)
+!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
+!    if(activeroot)return
+!  ENDDO
+!  end function test_active_plant
+
 !------------------------------------------------------------------------------------------
 
   subroutine PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)

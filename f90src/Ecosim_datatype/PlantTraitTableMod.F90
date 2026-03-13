@@ -5,8 +5,12 @@ module PlantTraitTableMod
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
-  integer, target, allocatable :: iPlantPhotosynthesisType_tab(:)
+  integer, target, allocatable :: iPlantPhotosynsType_pft_tab(:)
   integer, target, allocatable :: iPlantRootProfile_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_mean_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_min_tab(:)
+  real(r8),target,allocatable  :: Radius95pctMature_tab(:)
+  real(r8), target,allocatable  :: xylemPhi_max_tab(:)
   integer, target, allocatable :: iPlantPhenolPattern_tab(:)
   integer, target, allocatable :: iPlantDevelopPattern_tab(:)
   integer, target, allocatable :: iPlantNfixType_tab(:)
@@ -21,12 +25,14 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: VmaxPEPCarboxyRef_tab(:)
   real(r8), target, allocatable :: XKCO2_tab(:)
   real(r8), target, allocatable :: XKO2_tab(:)
+  real(r8), target, allocatable :: RootMatureAge_tab(:)
   real(r8), target, allocatable :: Km4PEPCarboxy_tab(:)
-  real(r8), target, allocatable :: LeafRuBPConc_tab(:)
-  real(r8), target, allocatable :: FracLeafProtAsPEPCarboxyl_tab(:)
+  real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
+  real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
-  real(r8), target, allocatable :: LeafC3ChlorofilConc_tab(:)
-  real(r8), target, allocatable :: LeafC4ChlorofilConc_tab(:)
+  real(r8), target, allocatable :: LeafChl2Protein_tab(:)
+  real(r8), target, allocatable :: fChlMesophyll_tab(:)           !fraction of cholorophyll in mesophyll cells
+  real(r8), target, allocatable :: MorphogenBase_tab(:)           !baseline morphogen signal, [%]
   real(r8), target, allocatable :: CanopyCi2CaRatio_pft_tab(:)
   real(r8), target, allocatable :: RadSWLeafAlbedo_tab(:)
   real(r8), target, allocatable :: CanopyPARalbedo_tab(:)
@@ -54,12 +60,13 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: MaxSeedNumPerSite_tab(:)
   real(r8), target, allocatable :: SeedCMassMax_tab(:)
   real(r8), target, allocatable :: SeedCMass_tab(:)
+  real(r8), target, allocatable :: SeedWidth2LenRatio_tab(:)
   real(r8), target, allocatable :: GrainFillRate25C_tab(:)
   real(r8), target, allocatable :: StandingDeadInitC_tab(:)
   real(r8), target, allocatable :: Root1stMaxRadius_tab(:)
   real(r8), target, allocatable :: Root2ndMaxRadius_tab(:)
   real(r8), target, allocatable :: RootPorosity_tab(:)
-  real(r8), target, allocatable :: MinNonstC2InitRoot_tab(:)
+  real(r8), target, allocatable :: NonstCMinCon2InitRoot_tab(:)
   real(r8), target, allocatable :: RootRadialResist_tab(:)
   real(r8), target, allocatable :: RootAxialResist_tab(:)
   real(r8), target, allocatable :: ShutRutNonstElmntConducts_tab(:)
@@ -88,12 +95,18 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: rNCLeaf_tab(:)
   real(r8), target, allocatable :: rNCSheath_tab(:)
   real(r8), target, allocatable :: rNCStalk_tab(:)
+  real(r8), target, allocatable :: rNCLigRoot_tab(:)
+  real(r8), target, allocatable :: rPCLigRoot_tab(:)
   real(r8), target, allocatable :: rNCReserve_tab(:)
   real(r8), target, allocatable :: rNCHusk_tab(:)
   real(r8), target, allocatable :: rNCEar_tab(:)
   real(r8), target, allocatable :: rNCGrain_tab(:)
   real(r8), target, allocatable :: rNCRoot_tab(:)
   real(r8), target, allocatable :: rNCNodule_tab(:)
+  real(r8), target, allocatable :: rProteinC2LeafN_tab(:)
+  real(r8), target, allocatable :: rProteinC2RootN_tab(:)
+  real(r8), target, allocatable :: rProteinC2LeafP_tab(:)
+  real(r8), target, allocatable :: rProteinC2RootP_tab(:)
   real(r8), target, allocatable :: rPCLeaf_tab(:)
   real(r8), target, allocatable :: rPCSheath_tab(:)
   real(r8), target, allocatable :: rPCStalk_tab(:)
@@ -119,7 +132,11 @@ module PlantTraitTableMod
   integer, intent(in) :: nkopenclms      !total koppen climate code
   integer, intent(in) :: npfts           !total pft records, pft_short name + numerical koppen climate code
 
-  allocate(iPlantPhotosynthesisType_tab(npfts));iPlantPhotosynthesisType_tab=0
+  allocate(xylemPhi_max_tab(npfts)); xylemPhi_max_tab=0._r8
+  allocate(xylemPhi_min_tab(npfts)); xylemPhi_min_tab=0._r8
+  allocate(Radius95pctMature_tab(npfts)); Radius95pctMature_tab=0._r8
+  allocate(xylemPhi_mean_tab(npfts)); xylemPhi_mean_tab=0._r8
+  allocate(iPlantPhotosynsType_pft_tab(npfts));iPlantPhotosynsType_pft_tab=0
   allocate(iPlantRootProfile_tab(npfts));iPlantRootProfile_tab=0
   allocate(iPlantPhenolPattern_tab(npfts));iPlantPhenolPattern_tab=0
   allocate(iPlantDevelopPattern_tab(npfts));iPlantDevelopPattern_tab=0
@@ -135,12 +152,13 @@ module PlantTraitTableMod
   allocate(VmaxPEPCarboxyRef_tab(npfts));VmaxPEPCarboxyRef_tab=0.0_r8
   allocate(XKCO2_tab(npfts));XKCO2_tab=0.0_r8
   allocate(XKO2_tab(npfts));XKO2_tab=0.0_r8
+  allocate(RootMatureAge_tab(npfts)); RootMatureAge_tab=0._r8
   allocate(Km4PEPCarboxy_tab(npfts));Km4PEPCarboxy_tab=0.0_r8
-  allocate(LeafRuBPConc_tab(npfts));LeafRuBPConc_tab=0.0_r8
-  allocate(FracLeafProtAsPEPCarboxyl_tab(npfts));FracLeafProtAsPEPCarboxyl_tab=0.0_r8
+  allocate(LeafRubisco2Protein_tab(npfts));LeafRubisco2Protein_tab=0.0_r8
+  allocate(LeafPEP2Protein_tab(npfts));LeafPEP2Protein_tab=0.0_r8
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
-  allocate(LeafC3ChlorofilConc_tab(npfts));LeafC3ChlorofilConc_tab=0._r8
-  allocate(LeafC4ChlorofilConc_tab(npfts));LeafC4ChlorofilConc_tab=0._r8
+  allocate(LeafChl2Protein_tab(npfts));LeafChl2Protein_tab=0._r8
+  allocate(fChlMesophyll_tab(npfts));fChlMesophyll_tab=0._r8
   allocate(CanopyCi2CaRatio_pft_tab(npfts));CanopyCi2CaRatio_pft_tab=0._r8
   allocate(RadSWLeafAlbedo_tab(npfts));RadSWLeafAlbedo_tab=0._r8
   allocate(CanopyPARalbedo_tab(npfts));CanopyPARalbedo_tab=0._r8
@@ -149,6 +167,7 @@ module PlantTraitTableMod
   allocate(RefNodeInitRate_tab(npfts));RefNodeInitRate_tab=0._r8
   allocate(RefLeafAppearRate_tab(npfts));RefLeafAppearRate_tab=0._r8
   allocate(TCChill4Seed_tab(npfts));TCChill4Seed_tab=0._r8
+  allocate(MorphogenBase_tab(npfts)); MorphogenBase_tab=0._r8
   allocate(VRNLI_tab(npfts));VRNLI_tab=0._r8
   allocate(VRNXI_tab(npfts));VRNXI_tab=0._r8
   allocate(rLen2WidthLeaf_tab(npfts));rLen2WidthLeaf_tab=0._r8
@@ -168,12 +187,13 @@ module PlantTraitTableMod
   allocate(MaxSeedNumPerSite_tab(npfts));MaxSeedNumPerSite_tab=0._r8
   allocate(SeedCMassMax_tab(npfts));SeedCMassMax_tab=0._r8
   allocate(SeedCMass_tab(npfts));SeedCMass_tab=0._r8
+  allocate(SeedWidth2LenRatio_tab(npfts)); SeedWidth2LenRatio_tab=0._r8
   allocate(GrainFillRate25C_tab(npfts));GrainFillRate25C_tab=0._r8
   allocate(StandingDeadInitC_tab(npfts));StandingDeadInitC_tab=0._r8
   allocate(Root1stMaxRadius_tab(npfts));Root1stMaxRadius_tab=0._r8
   allocate(Root2ndMaxRadius_tab(npfts));Root2ndMaxRadius_tab=0._r8
   allocate(RootPorosity_tab(npfts));RootPorosity_tab=0._r8
-  allocate(MinNonstC2InitRoot_tab(npfts));MinNonstC2InitRoot_tab=0._r8
+  allocate(NonstCMinCon2InitRoot_tab(npfts));NonstCMinCon2InitRoot_tab=0._r8
   allocate(RootRadialResist_tab(npfts));RootRadialResist_tab=0._r8
   allocate(RootAxialResist_tab(npfts));RootAxialResist_tab=0._r8
   allocate(ShutRutNonstElmntConducts_tab(npfts));ShutRutNonstElmntConducts_tab=0._r8
@@ -202,6 +222,8 @@ module PlantTraitTableMod
   allocate(rNCLeaf_tab(npfts));rNCLeaf_tab=0._r8
   allocate(rNCSheath_tab(npfts));rNCSheath_tab=0._r8
   allocate(rNCStalk_tab(npfts));rNCStalk_tab=0._r8
+  allocate(rNCLigRoot_tab(npfts)); rNCLigRoot_tab=0._r8
+  allocate(rPCLigRoot_tab(npfts)); rPCLigRoot_tab=0._r8
   allocate(rNCReserve_tab(npfts));rNCReserve_tab=0._r8
   allocate(rNCHusk_tab(npfts));rNCHusk_tab=0._r8
   allocate(rNCEar_tab(npfts));rNCEar_tab=0._r8
@@ -209,6 +231,10 @@ module PlantTraitTableMod
   allocate(rNCRoot_tab(npfts));rNCRoot_tab=0._r8
   allocate(rNCNodule_tab(npfts));rNCNodule_tab=0._r8
   allocate(rPCLeaf_tab(npfts));rPCLeaf_tab=0._r8
+  allocate(rProteinC2RootP_tab(npfts)); rProteinC2RootP_tab=0._r8
+  allocate(rProteinC2RootN_tab(npfts));rProteinC2RootN_tab=0._r8  
+  allocate(rProteinC2LeafP_tab(npfts)); rProteinC2LeafP_tab=0._r8
+  allocate(rProteinC2LeafN_tab(npfts));rProteinC2LeafN_tab=0._r8
   allocate(rPCSheath_tab(npfts));rPCSheath_tab=0._r8
   allocate(rPCStalk_tab(npfts));rPCStalk_tab=0._r8
   allocate(rPCReserve_tab(npfts));rPCReserve_tab=0._r8
@@ -233,7 +259,12 @@ module PlantTraitTableMod
   use abortutils, only : destroy
   implicit none
 
-  call destroy(iPlantPhotosynthesisType_tab)
+  call destroy(xylemPhi_max_tab)
+  call destroy(xylemPhi_min_tab)
+  call destroy(Radius95pctMature_tab)
+  call destroy(xylemPhi_mean_tab)
+  call destroy(MorphogenBase_tab)
+  call destroy(iPlantPhotosynsType_pft_tab)
   call destroy(iPlantRootProfile_tab)
   call destroy(iPlantPhenolPattern_tab)
   call destroy(iPlantDevelopPattern_tab)
@@ -249,12 +280,13 @@ module PlantTraitTableMod
   call destroy(VmaxPEPCarboxyRef_tab)
   call destroy(XKCO2_tab)
   call destroy(XKO2_tab)
+  call destroy(RootMatureAge_tab)
   call destroy(Km4PEPCarboxy_tab)
-  call destroy(LeafRuBPConc_tab)
-  call destroy(FracLeafProtAsPEPCarboxyl_tab)
+  call destroy(LeafRubisco2Protein_tab)
+  call destroy(LeafPEP2Protein_tab)
   call destroy(SpecChloryfilAct_tab)
-  call destroy(LeafC3ChlorofilConc_tab)
-  call destroy(LeafC4ChlorofilConc_tab)
+  call destroy(LeafChl2Protein_tab)
+  call destroy(fChlMesophyll_tab)
   call destroy(CanopyCi2CaRatio_pft_tab)
   call destroy(RadSWLeafAlbedo_tab)
   call destroy(CanopyPARalbedo_tab)
@@ -282,12 +314,13 @@ module PlantTraitTableMod
   call destroy(MaxSeedNumPerSite_tab)
   call destroy(SeedCMassMax_tab)
   call destroy(SeedCMass_tab)
+  call destroy(SeedWidth2LenRatio_tab)
   call destroy(GrainFillRate25C_tab)
   call destroy(StandingDeadInitC_tab)
   call destroy(Root1stMaxRadius_tab)
   call destroy(Root2ndMaxRadius_tab)
   call destroy(RootPorosity_tab)
-  call destroy(MinNonstC2InitRoot_tab)
+  call destroy(NonstCMinCon2InitRoot_tab)
   call destroy(RootRadialResist_tab)
   call destroy(RootAxialResist_tab)
   call destroy(ShutRutNonstElmntConducts_tab)
@@ -316,6 +349,8 @@ module PlantTraitTableMod
   call destroy(rNCLeaf_tab)
   call destroy(rNCSheath_tab)
   call destroy(rNCStalk_tab)
+  call destroy(rNCLigRoot_tab)
+  call destroy(rPCLigRoot_tab)  
   call destroy(rNCReserve_tab)
   call destroy(rNCHusk_tab)
   call destroy(rNCEar_tab)
@@ -323,6 +358,10 @@ module PlantTraitTableMod
   call destroy(rNCRoot_tab)
   call destroy(rNCNodule_tab)
   call destroy(rPCLeaf_tab)
+  call destroy(rProteinC2RootN_tab)  
+  call destroy(rProteinC2RootP_tab)
+  call destroy(rProteinC2LeafN_tab)  
+  call destroy(rProteinC2LeafP_tab)
   call destroy(rPCSheath_tab)
   call destroy(rPCStalk_tab)
   call destroy(rPCReserve_tab)

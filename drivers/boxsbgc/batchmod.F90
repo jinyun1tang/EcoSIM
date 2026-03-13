@@ -1,7 +1,7 @@
 module batchmod
 !j6aG$1bZcd5xgo1eAroLF36nN^
   use abortutils     , only : endrun
-  use minimathMod    , only : addone
+  use minimathMod    , only : addone,pmod
   use data_kind_mod  , only : r8 => DAT_KIND_R8
   use ModelStatusType, only : model_status_type
   use EcoSiMParDataMod  , only : micpar
@@ -392,21 +392,21 @@ contains
   fid_TRChem_CaH4P2O8_precip_band_soil = addone(itemp)
   fid_TRChem_Al_3p_soil                = addone(itemp)
 
-  cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx;itemp=cid_oqc_e
-  cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx;itemp=cid_oqn_e
-  cid_oqp_b=addone(itemp);cid_oqp_e=cid_oqp_b+jcplx;itemp=cid_oqp_e
-  cid_oqa_b=addone(itemp);cid_oqa_e=cid_oqa_b+jcplx;itemp=cid_oqa_e
-  cid_ohc_b=addone(itemp);cid_ohc_e=cid_ohc_b+jcplx;itemp=cid_ohc_e
-  cid_ohn_b=addone(itemp);cid_ohn_e=cid_ohn_b+jcplx;itemp=cid_ohn_e
-  cid_ohp_b=addone(itemp);cid_ohp_e=cid_ohp_b+jcplx;itemp=cid_ohp_e
-  cid_oha_b=addone(itemp);cid_oha_e=cid_oha_b+jcplx;itemp=cid_oha_e
-  cid_osc_b=addone(itemp);cid_osc_e=cid_osc_b+jsken*jcplx;itemp=cid_osc_e
-  cid_osa_b=addone(itemp);cid_osa_e=cid_osa_b+jsken*jcplx;itemp=cid_osa_e
-  cid_osn_b=addone(itemp);cid_osn_e=cid_osn_b+jsken*jcplx;itemp=cid_osn_e
-  cid_osp_b=addone(itemp);cid_osp_e=cid_osp_b+jsken*jcplx;itemp=cid_osp_e
-  cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx;itemp=cid_orc_e
-  cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx;itemp=cid_orn_e
-  cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx;itemp=cid_orp_e
+  cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx-1;itemp=cid_oqc_e
+  cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx-1;itemp=cid_oqn_e
+  cid_oqp_b=addone(itemp);cid_oqp_e=cid_oqp_b+jcplx-1;itemp=cid_oqp_e
+  cid_oqa_b=addone(itemp);cid_oqa_e=cid_oqa_b+jcplx-1;itemp=cid_oqa_e
+  cid_ohc_b=addone(itemp);cid_ohc_e=cid_ohc_b+jcplx-1;itemp=cid_ohc_e
+  cid_ohn_b=addone(itemp);cid_ohn_e=cid_ohn_b+jcplx-1;itemp=cid_ohn_e
+  cid_ohp_b=addone(itemp);cid_ohp_e=cid_ohp_b+jcplx-1;itemp=cid_ohp_e
+  cid_oha_b=addone(itemp);cid_oha_e=cid_oha_b+jcplx-1;itemp=cid_oha_e
+  cid_osc_b=addone(itemp);cid_osc_e=cid_osc_b+jsken*jcplx-1;itemp=cid_osc_e
+  cid_osa_b=addone(itemp);cid_osa_e=cid_osa_b+jsken*jcplx-1;itemp=cid_osa_e
+  cid_osn_b=addone(itemp);cid_osn_e=cid_osn_b+jsken*jcplx-1;itemp=cid_osn_e
+  cid_osp_b=addone(itemp);cid_osp_e=cid_osp_b+jsken*jcplx-1;itemp=cid_osp_e
+  cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx-1;itemp=cid_orc_e
+  cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx-1;itemp=cid_orn_e
+  cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx-1;itemp=cid_orp_e
 
   cid_mBiomeHeter_b=addone(itemp);cid_mBiomeHeter_e=cid_mBiomeHeter_b+NumPlantChemElms*NumLiveHeterBioms*jcplx
   itemp=cid_mBiomeHeter_e
@@ -634,15 +634,15 @@ contains
 
   DO  N=1,NumMicbFunGrupsPerCmplx
     DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
-      ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2DmndAutort(NGL)
+      ystatesfl(fid_RO2EcoDmndPrev)=ystatesfl(fid_RO2EcoDmndPrev)+micflx%RO2MetaDmndAutor(NGL)
       ystatesfl(fid_RNH4EcoDmndSoilPrev)=ystatesfl(fid_RNH4EcoDmndSoilPrev)+micflx%RNH3OxidAutor(NGL)+micflx%RNH4UptkSoilAutor(NGL)
       ystatesfl(fid_RNO3EcoDmndSoilPrev)=ystatesfl(fid_RNO3EcoDmndSoilPrev)+micflx%RNO3UptkSoilAutor(NGL)
-      ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2OxidAutor(NGL)
+      ystatesfl(fid_RNO2EcoUptkSoilPrev)=ystatesfl(fid_RNO2EcoUptkSoilPrev)+micflx%RNO2XupAutor(NGL)
       ystatesfl(fid_RH2PO4EcoDmndSoilPrev)=ystatesfl(fid_RH2PO4EcoDmndSoilPrev)+micflx%RH2PO4UptkSoilAutor(NGL)
       ystatesfl(fid_RH1PO4EcoDmndSoilPrev)=ystatesfl(fid_RH1PO4EcoDmndSoilPrev)+micflx%RH1PO4UptkSoilAutor(NGL)
       ystatesfl(fid_RNH4EcoDmndBandPrev)=ystatesfl(fid_RNH4EcoDmndBandPrev)+micflx%RNH3OxidAutorBand(NGL)+micflx%RNH4UptkBandAutor(NGL)
       ystatesfl(fid_RNO3EcoDmndBandPrev)=ystatesfl(fid_RNO3EcoDmndBandPrev)+micflx%RNO3UptkBandAutor(NGL)
-      ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2OxidAutorBand(NGL)
+      ystatesfl(fid_RNO2EcoUptkBandPrev)=ystatesfl(fid_RNO2EcoUptkBandPrev)+micflx%RNO2XupAutorBand(NGL)
       ystatesfl(fid_RH2PO4EcoDmndBandPrev)=ystatesfl(fid_RH2PO4EcoDmndBandPrev)+micflx%RH2PO4UptkBandAutor(NGL)
       ystatesfl(fid_RH1PO4EcoDmndBandPrev)=ystatesfl(fid_RH1PO4EcoDmndBandPrev)+micflx%RH1PO4UptkBandAutor(NGL)
     enddo
@@ -859,10 +859,11 @@ contains
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
+
   do jj=cid_osn_b,cid_osn_e
     iknen=jj-cid_osn_b
     icplx=floor((iknen+1-1.e-3_r8)/jsken)
-    iknen=mod(iknen,jsken)
+    iknen=pmod(iknen,jsken);
     write(varl(jj),'(A,I1,I1)')'OSN',iknen+1,icplx
     varlnml(jj)='humus soil N as '//trim(micpar%kiname(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gN d-2'
@@ -872,7 +873,7 @@ contains
   do jj=cid_osp_b,cid_osp_e
     iknen=jj-cid_osp_b
     icplx=floor((iknen+1-1.e-3_r8)/jsken)
-    iknen=mod(iknen,jsken)
+    iknen=pmod(iknen,jsken)
     write(varl(jj),'(A,I1,I1)')'OSP',iknen+1,icplx
     varlnml(jj)='humus soil P as '//trim(micpar%kiname(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gP d-2'
@@ -882,7 +883,7 @@ contains
   do jj=cid_osa_b,cid_osa_e
     iknen=jj-cid_osa_b
     icplx=floor((iknen+1-1.e-3_r8)/jsken)
-    iknen=mod(iknen,jsken)
+    iknen=pmod(iknen,jsken)
     write(varl(jj),'(A,I1,I1)')'OSA',iknen+1,icplx
     varlnml(jj)='colonized humus soil C as '//trim(micpar%kiname(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gC d-2'
@@ -892,7 +893,7 @@ contains
   do jj=cid_orc_b,cid_orc_e
     iknen=jj-cid_orc_b
     icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
-    iknen=mod(iknen,ndbiomcp)
+    iknen=pmod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORC',iknen+1,icplx
     varlnml(jj)='microbial residue C as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gC d-2'
@@ -902,7 +903,7 @@ contains
   do jj=cid_orn_b,cid_orn_e
     iknen=jj-cid_orn_b
     icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
-    iknen=mod(iknen,ndbiomcp)
+    iknen=pmod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORN',iknen+1,icplx
     varlnml(jj)='microbial residue N as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gN d-2'
@@ -912,7 +913,7 @@ contains
   do jj=cid_orp_b,cid_orp_e
     iknen=jj-cid_orp_b
     icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
-    iknen=mod(iknen,ndbiomcp)
+    iknen=pmod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORP',iknen+1,icplx
     varlnml(jj)='microbial residue P as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
     unitl(jj)='gP d-2'

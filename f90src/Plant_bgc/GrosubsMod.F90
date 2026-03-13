@@ -2,8 +2,8 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod,         only: safe_adb, AZMAX1
-  use data_kind_mod,       only: r8 => DAT_KIND_R8
+  use minimathmod,         only: safe_adb, AZMAX1,real_truncate
+  use data_kind_mod,       only: r8 => DAT_KIND_R8,yearIJ_type
   use EcoSIMCtrlMod,       only: lverb
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
@@ -48,73 +48,73 @@ module grosubsMod
   ![header]
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowPlants(I,J)
+  subroutine GrowPlants(yearIJ)
 !
 !     THIS subroutine CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
 !
-  use PlantDisturbsMod, only : RemoveBiomassByDisturbance
+  use PlantDisturbsMod, only : RemoveBiomassByDisturbance,StageDisturbances
   implicit none
-  integer, intent(in) :: I, J
+  type(yearIJ_type), intent(in) :: yearIJ  
 
   real(r8) :: CanopyHeight_copy(JP1)
   integer :: L,K,M
   integer :: NZ,NE
+  real(r8) :: tvegE(NumPlantChemElms),tvegE1(NumPlantChemElms)
 ! begin_execution
-  associate(                                           &
-    IsPlantActive_pft => plt_pheno%IsPlantActive_pft  ,& !input  :flag for living pft, [-]
-    NP                => plt_site%NP                  ,& !input  :current number of plant species,[-]
-    NP0               => plt_site%NP0                 ,& !input  :intitial number of plant species,[-]
-    CanopyHeight_pft  => plt_morph%CanopyHeight_pft    & !inoput :canopy height, [m]
+  associate(                                                               &
+    IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
+    NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
+    NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
 !
 !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)            = CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)             = 0._r8
-    plt_biom%RootMassElm_pvr(:,:,NZ) = 0._r8
-    plt_rbgc%canopy_growth_pft(NZ)   = 0._r8
+    CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
+    CanopyHeight_pft(NZ)                   = 0._r8
+    plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
+    plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
 !
+
   D9985: DO NZ=1,NP
+    call StageDisturbances(yearIJ%I,yearIJ%J,NZ)
 
-    ! IsPlantActive_pft= flag for living pft
-    IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
-      if(lverb)write(*,*)'GrowPlant'
-      call GrowOnePlant(I,J,NZ,CanopyHeight_copy)
-    else
-      call AccumulateStates(I,J,NZ)
-    ENDIF
+    IF(IsPlantActive_pft(NZ).EQ.iActive .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
 
-    if(lverb)write(*,*)'HARVEST STANDING DEAD'
-    call RemoveBiomassByDisturbance(I,J,NZ)
+      call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
+    
+      call RemoveBiomassByDisturbance(yearIJ,NZ)
 
-    call PrintRootTracer(I,J,NZ,'afdist')
+      !   RESET DEAD BRANCHES
+      call ResetDeadPlant(yearIJ,NZ)
+    ENDIF  
+
+    call AccumulateStates(yearIJ,NZ)
+
   ENDDO D9985
 !
-  if(lverb)write(*,*)'TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS'
-  call LiveDeadTransformation(I,J)
-  
+  call LiveDeadTransformation(yearIJ)
+
   DO NZ=1,NP
-    call SumPlantBiom(I,J,NZ,'exgrosubs')
-    call PrintRootTracer(I,J,NZ,'afddeadt')    
+    call SumPlantBiome(yearIJ,NZ,'exgrosubs')
   ENDDO
-!  IF(I>=266 .and. I<=278)then
-!  write(5544,*)('-',K=1,50)
-!  endif
+
   end associate
   END subroutine GrowPlants
 
 !----------------------------------------------------------------------------------------------------
-  subroutine LiveDeadTransformation(I,J)
+  subroutine LiveDeadTransformation(yearIJ)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ  
 
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
+  real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
 !     begin_execution
 
   associate(                                                                    &
@@ -133,26 +133,24 @@ module grosubsMod
     NH3byFire_CumYr_pft            => plt_distb%NH3byFire_CumYr_pft            ,& !input  :plant NH3 emission from fire, [g d-2 ]
     NP0                            => plt_site%NP0                             ,& !input  :intitial number of plant species,[-]
     NetCumElmntFlx2Plant_pft       => plt_pheno%NetCumElmntFlx2Plant_pft       ,& !input  :effect of canopy element status on seed set, [-]
-    NodulStrutElms_pft             => plt_biom%NodulStrutElms_pft              ,& !input  :root total nodule mass, element [g d-2]
     NumOfBranches_pft              => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     PO4byFire_CumYr_pft            => plt_distb%PO4byFire_CumYr_pft            ,& !input  :plant PO4 emission from fire, [g d-2 ]
     PlantExudElm_CumYr_pft         => plt_rbgc%PlantExudElm_CumYr_pft          ,& !input  :total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
     PlantN2Fix_CumYr_pft           => plt_bgcr%PlantN2Fix_CumYr_pft            ,& !input  :total plant N2 fixation, [g d-2 ]
     RootElms_pft                   => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft           ,& !input  :plant stored nonstructural element at current step, [g d-2]
-    ShootStrutElms_pft             => plt_biom%ShootStrutElms_pft              ,& !input  :canopy shoot structural chemical element mass, [g d-2]
-    StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft          ,& !input  :standing dead element, [g d-2]
+    ShootElms_pft                  => plt_biom%ShootElms_pft                   ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     doPlantLeafOut_brch            => plt_pheno%doPlantLeafOut_brch            ,& !input  :branch phenology flag, [-]
     fTCanopyGroth_pft              => plt_pheno%fTCanopyGroth_pft              ,& !input  :canopy temperature growth function, [-]
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft      ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iYearCurrent                   => plt_site%iYearCurrent                    ,& !input  :current year,[-]
-    k_fine_litr                    => pltpar%k_fine_litr                       ,& !input  :fine litter complex id
-    k_woody_litr                   => pltpar%k_woody_litr                      ,& !input  :woody litter complex id
-    ElmBalanceCum_pft              => plt_site%ElmBalanceCum_pft               ,& !inoput :cumulative plant element balance, [g d-2]
+    k_fine_comp                    => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
+    k_woody_comp                   => pltpar%k_woody_comp                      ,& !input  :woody litter complex id
+    SurfLitrfallElms_pft           => plt_bgcr%SurfLitrfallElms_pft            ,& !output :surface litterfall
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
-    LitrfalStrutElms_pft           => plt_bgcr%LitrfalStrutElms_pft            ,& !inoput :plant element LitrFall, [g d-2 h-1]
-    LitrfalStrutElms_pvr           => plt_bgcr%LitrfalStrutElms_pvr            ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pft               => plt_bgcr%LitrfallElms_pft                ,& !inoput :plant element LitrFall, [g d-2 h-1]
+    LitrfallElms_pvr               => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
     StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft          ,& !inoput :standing dead element fraction, [g d-2]
     SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft  ,& !inoput :total surface LitrFall element, [g d-2]
     doInitPlant_pft                => plt_pheno%doInitPlant_pft                ,& !inoput :PFT initialization flag:0=no,1=yes,[-]
@@ -162,13 +160,13 @@ module grosubsMod
     iYearPlanting_pft              => plt_distb%iYearPlanting_pft               & !output :year of planting,[-]
   )
   D9975: DO NZ=1,NP0
-!
-!     ACTIVATE DORMANT SEEDS
-!
+    !
+    !     ACTIVATE DORMANT SEEDS
+    !
     D205: DO NB=1,NumOfBranches_pft(NZ)
       IF(doInitPlant_pft(NZ).EQ.itrue)THEN
         IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
-          iDayPlanting_pft(NZ)  = I
+          iDayPlanting_pft(NZ)  = yearIJ%I
           iYearPlanting_pft(NZ) = iYearCurrent
           PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
           doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
@@ -176,22 +174,22 @@ module grosubsMod
         ENDIF
       ENDIF
     ENDDO D205
-!
-!     LitrFall FROM STANDING DEAD
-!
-!     XFRC,XFRN,XFRP=LitrFall from standing dead
-!     fTCanopyGroth_pft=temperature function for canopy growth
-!     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
-!     CSNC,ZSNC,PSNC=C,N,P LitrFall
-!
-    
+    !
+    !     LitrFall FROM STANDING DEAD (i.e. loss of standing dead)
+    !
+    !     XFRC,XFRN,XFRP=LitrFall from standing dead
+    !     fTCanopyGroth_pft=temperature function for canopy growth
+    !    
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=1.5814E-05_r8*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0.OR.iPlantRootProfile_pft(NZ).LE.1)THEN
-          LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_fine_litr,0,NZ)+XFRE
+        XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
+          !grass/bryophyte
+          LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XFRE
         ELSE
-          LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)=LitrfalStrutElms_pvr(NE,M,k_woody_litr,0,NZ)+XFRE
+          !trees
+          LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XFRE
         ENDIF
         StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
       ENDDO
@@ -200,186 +198,131 @@ module grosubsMod
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
 !
 !   diagnose surface literfall 
+    SurfLitrfallElms_pft(:,NZ)=0._r8
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfallElms_pft(NE,NZ)=SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
     ENDDO
+
 !   the following purposely starts from layer 0.
-    LitrfalStrutElms_pft(1:NumPlantChemElms,NZ)=0._r8
+    LitrfallElms_pft(1:NumPlantChemElms,NZ)=0._r8
     D8955: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs      
         D6430: DO M=1,jsken
           DO NE=1,NumPlantChemElms
-            LitrfalStrutElms_pft(NE,NZ)=LitrfalStrutElms_pft(NE,NZ)+LitrfalStrutElms_pvr(NE,M,K,L,NZ)
+            LitrfallElms_pft(NE,NZ)=LitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,L,NZ)
           enddo         
         ENDDO D6430      
       ENDDO
     ENDDO D8955    
 
     DO NE=1,NumPlantChemElms
-      LitrfalStrutElms_CumYr_pft(NE,NZ)=LitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfalStrutElms_pft(NE,NZ)
+      LitrfalStrutElms_CumYr_pft(NE,NZ)=LitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pft(NE,NZ)
     ENDDO
 
-!
-!     PLANT C BALANCE = TOTAL C STATE VARIABLES + TOTAL
-!     AUTOTROPHIC RESPIRATION + TOTAL LitrFall - TOTAL EXUDATION
-!     - TOTAL CO2 FIXATION
-!
-!     BALC=PFT C balance, dplant/dt=input-output
-!     starting from time zero, plant(t)-plant(t0)=input-output
-!     input: net carbon fixation, 
-!     output: litterfal, exudation, harvest, mortality
-!
-!     WTSHT,WTRT,WTND,WTRVC,WTSTG=PFT shoot,root,bacteria,storage,standing dead C
-!     NetPrimProduct_pft=cumulative PFT NPP
-!     TCSNC=cumulative PFT C LitrFall
-!     TCUPTK=cumulative PFT root-soil C exchange
-!     RSETC=cumulative C balance from previous year
-!     THVSTC=cumulative PFT C removed from ecosystem from previous year
-!     HVSTC=total PFT C removed from ecosystem in current year
-!     CO2ByFire_CumYr_pft,CH4ByFire_CumYr_pft=CO2,CH4 emission from disturbance
-!     LitrfalStrutElms_CumYr_pft= >0 to the environment (soil + surface)
-!   GrossResp_pft < 0 respired into atmosphere
+    !   GrossResp_pft < 0 respired into atmosphere
     NetPrimProduct_pft(NZ) = GrossCO2Fix_pft(NZ)+GrossResp_pft(NZ)
 
-    IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
-      !check for living plant
-      DO NE=1,NumPlantChemElms
-        ElmBalanceCum_pft(NE,NZ)=ShootStrutElms_pft(NE,NZ)+RootElms_pft(NE,NZ)+NodulStrutElms_pft(NE,NZ) &
-          +SeasonalNonstElms_pft(NE,NZ) +StandDeadStrutElms_pft(NE,NZ)     &   !add biomass by components  
-          -LitrfalStrutElms_CumYr_pft(NE,NZ)-PlantExudElm_CumYr_pft(NE,NZ) &   !add fluxes
-          -NetCumElmntFlx2Plant_pft(NE,NZ)+EcoHavstElmntCum_pft(NE,NZ)
-      ENDDO
-      !add more fluxes
-      ElmBalanceCum_pft(ielmc,NZ) = ElmBalanceCum_pft(ielmc,NZ)-NetPrimProduct_pft(NZ) &
-        -CO2ByFire_CumYr_pft(NZ)-CH4ByFire_CumYr_pft(NZ)
-!
-!     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LitrFall
-!     - TOTAL N UPTAKE FROM SOIL - TOTAL N ABSORPTION FROM ATMOSPHERE
-!
-!     BALN=PFT N balance
-!     WTSHN,WTRTN,WTNDN,WTRVN,WTSTGN=PFT shoot,root,bacteria,storage,standing dead N
-!     TZSNC=cumulative PFT N LitrFall
-!     TZUPTK=cumulative PFT root-soil N exchange
-!     NH3Emis_CumYr_pft=cumulative NH3 exchange
-!     RSETN=cumulative N balance from previous year
-!     THVSTN=cumulative PFT N removed from ecosystem from previous year
-!     HVSTN=total PFT N removed from ecosystem in current year
-!     NH3byFire_CumYr_pft,N2ObyFire_CumYr_pft=NH3,N2O emission from disturbance
-!     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
-!
-      ElmBalanceCum_pft(ielmn,NZ)=ElmBalanceCum_pft(ielmn,NZ)-NH3Emis_CumYr_pft(NZ) &
-        -NH3byFire_CumYr_pft(NZ)-N2ObyFire_CumYr_pft(NZ)-PlantN2Fix_CumYr_pft(NZ)
-!
-!     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LitrFall
-!     - TOTAL P UPTAKE FROM SOIL
-!
-!     BALP=PFT N balance
-!     WTSHP,WTRTP,WTNDP,WTRVP,WTSTGP=PFT shoot,root,bacteria,storage,standing dead P
-!     TPSNC=cumulative PFT P LitrFall
-!     TPUPTK=cumulative PFT root-soil P exchange
-!     RSETP=cumulative P balance from previous year
-!     THVSTP=cumulative PFT P removed from ecosystem from previous year
-!     HVSTP=total PFT P removed from ecosystem in current year
-!     PO4byFire_CumYr_pft=PO4 emission from disturbance
-!
-      ElmBalanceCum_pft(ielmp,NZ)=ElmBalanceCum_pft(ielmp,NZ)-PO4byFire_CumYr_pft(NZ)
-    ENDIF
   ENDDO D9975
   end associate
   end subroutine LiveDeadTransformation
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowOnePlant(I,J,NZ,CanopyHeight_copy)
+  subroutine GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
   !
   !Description
   !plant growth
   use PlantDisturbsMod, only : RemoveBiomByMgmt
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
-
+  character(len=*), parameter :: subname='GrowOnePlant'
   real(r8)  :: CanopyN2Fix_pft(JP1)
-  integer  :: NB
+  integer  :: NB,NE,KK
   integer  :: BegRemoblize
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8) :: PTRT
-  real(r8) :: RootPrimeAxsNum
+  real(r8) :: PTRT    !main branch growth allocated to leaf and petiole
   real(r8) :: TFN5
   real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
-  real(r8) :: WFNS,CanTurgPSIFun4Expans
+  real(r8) :: TurgEff4LeafPetolExpansion,TurgEff4CanopyResp
   real(r8) :: RootSinkC_vr(pltpar%jroots,JZ1),RootSinkC(pltpar%jroots)
   real(r8) :: Root1stSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
   real(r8) :: Root2ndSink_pvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)
-  
+  real(r8) :: tvegE_beg(NumPlantChemElms)
+  real(r8) :: tvegE_end(NumPlantChemElms)
+  real(r8) :: mass_finale(NumPlantChemElms)
+  real(r8) :: err,arr(12),arr1(11),GrothPART2LeafPetole
 ! begin_execution
   associate(                                                 &
     NumOfBranches_pft    => plt_morph%NumOfBranches_pft     ,& !input  :number of branches,[-]
+    PlantPopulation_pft  => plt_site%PlantPopulation_pft    ,& !input  :plant population, [d-2]
+    ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft         ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantRootState_pft  => plt_pheno%iPlantRootState_pft   ,& !input  :flag to detect root system death,[-]
+    NU                   => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
+    MaxSoiL4Root_pft     => plt_morph%MaxSoiL4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
+    MainBranchNum_pft    => plt_morph%MainBranchNum_pft     ,& !input  :number of main branch,[-]    
     iPlantShootState_pft => plt_pheno%iPlantShootState_pft   & !input  :flag to detect canopy death,[-]
+
   )
 
-  IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive)THEN
-    CanopyN2Fix_pft(NZ) = 0._r8
+  call PrintInfo('beg '//subname)
+  
+  IF(iPlantShootState_pft(NZ).EQ.iLive .OR. iPlantRootState_pft(NZ).EQ.iLive .and. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
-    call StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,&
-      CNSHW,CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
-!
-!     CALCULATE GROWTH OF EACH BRANCH
+    call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
+      CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
+    !
+    !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
-      if(lverb)write(*,*)'GrowOneBranch'
-      call GrowOneBranch(I,J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans,PTRT,CanopyN2Fix_pft,BegRemoblize)
+      call GrowOneBranch(yearIJ%I,yearIJ%J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
+        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
+      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
 
-    call PrintRootTracer(I,J,NZ,'afgrowbranch')
-    if(lverb)write(*,*)'RootBGCModel'
-    call RootBGCModel(I,J,NZ,BegRemoblize,PTRT,TFN6_vr,CNRTW,CPRTW,RootPrimeAxsNum, &
-      RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
+    call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
-    call PrintRootTracer(I,J,NZ,'afroot')
-    if(lverb)write(*,*)'PlantNonstElmTransfer'
-    call PlantNonstElmTransfer(I,J,NZ,PTRT,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC,BegRemoblize)
+    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
 
-    if(lverb)write(*,*)'ComputeTotalBiom'
-    call ComputeTotalBiom(I,J,NZ)
+    call SumRootBiome(yearIJ,NZ,mass_finale)
+
+    call ComputeTotalBiom(yearIJ,NZ)
+  else
+    plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
   ENDIF
-!
-  if(lverb)write(*,*)'RemoveBiomByMgmt'
-  call RemoveBiomByMgmt(I,J,NZ)
 
-  call PrintRootTracer(I,J,NZ,'afbiomrm')
-!
-!     RESET DEAD BRANCHES
-  call ResetDeadPlant(I,J,NZ)
+  call RemoveBiomByMgmt(yearIJ,NZ)  
 
-  call AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
+  !
 
-  call PrintRootTracer(I,J,NZ,'afaccum')
+  call PrintInfo('end '//subname)  
   end associate
   end subroutine GrowOnePlant
 
 !----------------------------------------------------------------------------------------------------
-  subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,&
-    CPSHW,CNRTW,CPRTW,RootPrimeAxsNum,TFN5,WaterStress4Groth,Stomata_Stress,WFNS,CanTurgPSIFun4Expans)
+  subroutine StagePlantForGrowth(I,J,NZ,TFN6_vr,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
+    TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
   integer, intent(in) :: I,J,NZ
-  REAL(R8), INTENT(OUT):: TFN6_vr(JZ1)
-  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8), intent(out) :: RootPrimeAxsNum
+  REAL(R8), INTENT(OUT) :: TFN6_vr(JZ1)
+  REAL(R8), INTENT(OUT) :: CNLFW,CPLFW                 !NC, PC mass ratio of leaf growth
+  real(r8), intent(out) :: CNSHW,CPSHW                 !NC, PC mass ratio of shoot growth
+  real(r8), intent(out) :: CNRTW,CPRTW                 !NC, PC mass ratio of root growth
   real(r8), intent(out) :: TFN5
   real(r8), intent(out) :: WaterStress4Groth
   real(r8), intent(out) :: Stomata_Stress
-  real(r8), intent(out) :: WFNS,CanTurgPSIFun4Expans
+  real(r8), intent(out) :: TurgEff4LeafPetolExpansion  !turgor expansion,extension function
+  real(r8), intent(out) :: TurgEff4CanopyResp          !expansion,extension function of canopy water potential on respiraiton
   integer :: L,NR,N,NE
-  real(r8) :: ACTVM,RTK,STK,TKCM,TKSM
-  real(r8), parameter :: dscal=0.999992087_r8
+  real(r8) :: ACTVM,RTK,STK,TKCM,TKSM,RadiusBulk,RadiusMean
+  real(r8), parameter :: dscal=0.99999_r8
   character(len=*), parameter :: subname='StagePlantForGrowth'
 !     begin_execution
 
@@ -396,7 +339,8 @@ module grosubsMod
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
     PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
-    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :shape parameter for calculating stomatal resistance from turgor pressure, [-]
+    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]    
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RootElms_pft                => plt_biom%RootElms_pft                  ,& !input  :plant root element mass, [g d-2]
     rNCRoot_pft                 => plt_allom%rNCRoot_pft                  ,& !input  :root N:C ratio, [gN gC-1]
     rPCRootr_pft                => plt_allom%rPCRootr_pft                 ,& !input  :root P:C ratio, [gP gC-1]
@@ -409,18 +353,21 @@ module grosubsMod
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft    ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     rNCStalk_pft                => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]
     rPCStalk_pft                => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
-    k_fine_litr                 => pltpar%k_fine_litr                     ,& !input  :fine litter complex id
-    k_woody_litr                => pltpar%k_woody_litr                    ,& !input  :woody litter complex id
-    FracRootElmAlloc2Litr       => plt_allom%FracRootElmAlloc2Litr        ,& !inoput :C woody fraction in root,[-]
+    k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
+    k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
+    Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr            ,& !input  :root layer radius primary axes, [m]      
+    FracRootElmAllocm           => plt_allom%FracRootElmAllocm            ,& !inoput :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !inoput :woody element allocation,[-]
-    FracShootLeafElmAlloc2Litr  => plt_allom%FracShootLeafElmAlloc2Litr   ,& !inoput :woody element allocation, [-]
-    FracShootPetolElmAlloc2Litr => plt_allom%FracShootPetolElmAlloc2Litr  ,& !inoput :leaf element allocation,[-]
+    FracShootElmAllocm          => plt_allom%FracShootElmAllocm           ,& !inoput :woody element allocation, [-]
+    FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !inoput :leaf element allocation,[-]
     RootBiomCPerPlant_pft       => plt_biom%RootBiomCPerPlant_pft         ,& !inoput :root C biomass per plant, [g p-1]
+    TurgEff4CanopyResp_pft      => plt_rbgc%TurgEff4CanopyResp_pft        ,& !output :Turg pressure effect on canopy respiration, [-]
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
-    Root1stXNumL_rpvr            => plt_morph%Root1stXNumL_rpvr             ,& !output :root layer number primary axes, [d-2]
-    Root2ndXNumL_rpvr             => plt_morph%Root2ndXNumL_rpvr              ,& !output :root layer number axes, [d-2]
+    Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr             ,& !output :root layer number primary axes, [d-2]
+    NumAxesPerPrimRoot_pft      => plt_morph%NumAxesPerPrimRoot_pft       ,& !output :primary root axes number, [d-2]
+    Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr          => plt_rbgc%RootCO2EmisPot_pvr            ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootN2Fix_pvr               => plt_bgcr%RootN2Fix_pvr                 ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -429,17 +376,17 @@ module grosubsMod
   )
   call PrintInfo('beg '//subname)
   D2: DO L=1,NumCanopyLayers1
-    CanopyLeafAreaZ_pft(L,NZ)=0._r8
-    CanopyLeafCLyr_pft(L,NZ)=0._r8
-    CanopyStemAreaZ_pft(L,NZ)=0._r8
+    CanopyLeafAreaZ_pft(L,NZ) = 0._r8
+    CanopyLeafCLyr_pft(L,NZ)  = 0._r8
+    CanopyStemAreaZ_pft(L,NZ) = 0._r8
   ENDDO D2
 
 
   D6: DO L=1,NK
+    Root1stXNumL_pvr(L,NZ)      = 0._r8  
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
-      Root1stXNumL_rpvr(N,L,NZ)   = 0._r8
-      Root2ndXNumL_rpvr(N,L,NZ)    = 0._r8
+      Root2ndXNumL_rpvr(N,L,NZ)  = 0._r8
       RootRespPotent_pvr(N,L,NZ) = 0._r8
       RootCO2EmisPot_pvr(N,L,NZ) = 0._r8
       RootCO2Autor_pvr(N,L,NZ)   = 0._r8
@@ -458,91 +405,98 @@ module grosubsMod
 !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_treelike(iPlantRootProfile_pft(NZ)))&
-    .OR.StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0                      & !'Rapid, like deciduous tree '
+    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))) &
+    .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
-    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = 1.0_r8    
+    FracShootElmAllocm(ielmc,k_fine_comp)    = 1.0_r8
+    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8
+    FracRootElmAllocm(ielmc,k_fine_comp)      = 1.0_r8
   ELSE
     !tree
-    FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr) = 1.0_r8
-    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr) = AMIN1(SQRT(CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._r8)
-    FracRootElmAlloc2Litr(ielmc,k_fine_litr)      = AMIN1(SQRT(FRTX*CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._R8)
+    FracShootElmAllocm(ielmc,k_fine_comp)         = 1.0_r8
+    FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp) = AMIN1(SQRT(CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._r8)
+    FracRootElmAllocm(ielmc,k_fine_comp)          = AMIN1((CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))**(1._r8/6),1._R8)
   ENDIF
 
-  FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr) = AZMAX1(1.0_r8-FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr))
-  FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_litr))
-  FracRootElmAlloc2Litr(ielmc,k_woody_litr)      = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(ielmc,k_fine_litr))
+  FracShootElmAllocm(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracShootElmAllocm(ielmc,k_fine_comp))
+  FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp))
+  FracRootElmAllocm(ielmc,k_woody_comp)      = AZMAX1(1.0_r8-FracRootElmAllocm(ielmc,k_fine_comp))
 
-  CNLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*rNCLeaf_pft(NZ)
-  CPLFW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*rPCLeaf_pft(NZ)
-  CNSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*rNCSheath_pft(NZ)
-  CPSHW=FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracShootLeafElmAlloc2Litr(ielmc,k_fine_litr)*rPCSheath_pft(NZ)
-  CNRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*rNCRoot_pft(NZ)
-  CPRTW=FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)+FracRootElmAlloc2Litr(ielmc,k_fine_litr)*rPCRootr_pft(NZ)
+  CNLFW=FracShootElmAllocm(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracShootElmAllocm(ielmc,k_fine_comp)*rNCLeaf_pft(NZ)
+  CPLFW=FracShootElmAllocm(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracShootElmAllocm(ielmc,k_fine_comp)*rPCLeaf_pft(NZ)
+  CNSHW=FracShootElmAllocm(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracShootElmAllocm(ielmc,k_fine_comp)*rNCSheath_pft(NZ)
+  CPSHW=FracShootElmAllocm(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracShootElmAllocm(ielmc,k_fine_comp)*rPCSheath_pft(NZ)
+  CNRTW=FracRootElmAllocm(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracRootElmAllocm(ielmc,k_fine_comp)*rNCRoot_pft(NZ)
+  CPRTW=FracRootElmAllocm(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracRootElmAllocm(ielmc,k_fine_comp)*rPCRootr_pft(NZ)
 
-  FracShootPetolElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)=FracShootLeafElmAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs)
+  FracShootPetolAlloc2Litr(ielmc,1:NumOfPlantLitrCmplxs) = FracShootElmAllocm(ielmc,1:NumOfPlantLitrCmplxs)
 
-  FracShootLeafElmAlloc2Litr(ielmn,k_woody_litr) = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNLFW,1._r8)
-  FracShootLeafElmAlloc2Litr(ielmp,k_woody_litr) = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPLFW,1._r8)
+  FracShootElmAllocm(ielmn,k_woody_comp) = AMIN1(FracShootElmAllocm(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNLFW,1._r8)
+  FracShootElmAllocm(ielmp,k_woody_comp) = AMIN1(FracShootElmAllocm(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPLFW,1._r8)
   
-  FracShootPetolElmAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNSHW,1._r8)
-  FracShootPetolElmAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracShootLeafElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPSHW,1._r8)
+  FracShootPetolAlloc2Litr(ielmn,k_woody_comp) = AMIN1(FracShootElmAllocm(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNSHW,1._r8)
+  FracShootPetolAlloc2Litr(ielmp,k_woody_comp) = AMIN1(FracShootElmAllocm(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPSHW,1._r8)
   
-  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rNCStalk_pft(NZ)/CNRTW,1._r8)
-  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_litr)  = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_litr)*rPCStalk_pft(NZ)/CPRTW,1._r8)
+  FracWoodStalkElmAlloc2Litr(ielmn,k_woody_comp) = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)/CNRTW,1._r8)
+  FracWoodStalkElmAlloc2Litr(ielmp,k_woody_comp) = AMIN1(FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)/CPRTW,1._r8)
 
-  FracRootElmAlloc2Litr(ielmn,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rNCRoot_pft(NZ)/CNRTW,1._r8)
-  FracRootElmAlloc2Litr(ielmp,k_woody_litr)       = AMIN1(FracRootElmAlloc2Litr(ielmc,k_woody_litr)*rPCRootr_pft(NZ)/CPRTW,1._r8)
+  FracRootElmAllocm(ielmn,k_woody_comp) = AMIN1(FracRootElmAllocm(ielmc,k_woody_comp)*rNCRoot_pft(NZ)/CNRTW,1._r8)
+  FracRootElmAllocm(ielmp,k_woody_comp) = AMIN1(FracRootElmAllocm(ielmc,k_woody_comp)*rPCRootr_pft(NZ)/CPRTW,1._r8)
 
   DO NE=2,NumPlantChemElms
-    FracShootPetolElmAlloc2Litr(NE,k_fine_litr) = AZMAX1(1.0_r8-FracShootPetolElmAlloc2Litr(NE,k_woody_litr))
-    FracShootLeafElmAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracShootLeafElmAlloc2Litr(NE,k_woody_litr))
-    FracWoodStalkElmAlloc2Litr(NE,k_fine_litr)  = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_litr))
-    FracRootElmAlloc2Litr(NE,k_fine_litr)       = AZMAX1(1.0_r8-FracRootElmAlloc2Litr(NE,k_woody_litr))
+    FracShootPetolAlloc2Litr(NE,k_fine_comp)   = AZMAX1(1.0_r8-FracShootPetolAlloc2Litr(NE,k_woody_comp))
+    FracWoodStalkElmAlloc2Litr(NE,k_fine_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(NE,k_woody_comp))
+    FracShootElmAllocm(NE,k_fine_comp)         = AZMAX1(1.0_r8-FracShootElmAllocm(NE,k_woody_comp))
+    FracRootElmAllocm(NE,k_fine_comp)          = AZMAX1(1.0_r8-FracRootElmAllocm(NE,k_woody_comp))
   ENDDO
+  !
+  !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
+  !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
+  !
+  !     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
+  !     TKS_vr,TKSM=soil temperature,soil temp used in Arrhenius eqn
+  !     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
+  !     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
+  !     8.3143,710.0=gas constant,enthalpy
+  !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
+  !
+  TKCM = real_truncate(TKC_pft(NZ)+TempOffset_pft(NZ),1.e-3_r8)
+  TFN5 = calc_plant_maint_tempf(TKCM)
   
-!
-!     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
-!     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
-!
-!     TKC,TKCM=canopy temperature,canopy temp used in Arrhenius eqn
-!     TKS_vr,TKSM=soil temperature,soil temp used in Arrhenius eqn
-!     TempOffset_pft=shift in Arrhenius curve for thermal adaptation
-!     TFN5,TFN6_vr=temperature function for canopy,root mntc respn (25 oC =1)
-!     8.3143,710.0=gas constant,enthalpy
-!     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
-!
-  TKCM=TKC_pft(NZ)+TempOffset_pft(NZ)
-
-  TFN5=calc_plant_maint_tempf(TKCM)  
   D7: DO L=NU,MaxNumRootLays
-    TKSM=TKS_vr(L)+TempOffset_pft(NZ)
-    TFN6_vr(L)=calc_plant_maint_tempf(TKSM)  
+    TKSM       = real_truncate(TKS_vr(L)+TempOffset_pft(NZ),1.e-3_r8)
+    TFN6_vr(L) = calc_plant_maint_tempf(TKSM)
   ENDDO D7
-!
-!     PRIMARY ROOT NUMBER
-!
-!     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
-!     WTRT,PP=root mass,PFT population
-!     RootPrimeAxsNum=multiplier for number of primary root axes
-!
-  RootBiomCPerPlant_pft(NZ) = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
-  RootPrimeAxsNum           = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.667_r8)*PlantPopulation_pft(NZ)
+  !
+  !     PRIMARY ROOT NUMBER
+  !
+  !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
+  !     WTRT,PP=root mass,PFT population
+  !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
+  RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopulation_pft(NZ)   
+  elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
+    !for woody vascular, **(1/1.4)
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)   
+  else
+    !for herbaceous plant, **(1./0.95) 
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopulation_pft(NZ)
+  endif
+
   !
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
   !     FROM CANOPY TURGOR
   !
-  !     WFNS=turgor expansion,extension function
-  !     PSICanopyTurg_pft,PSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
+  !     PSICanopyTurg_pft,TurgPSIMin4OrganExtens=current,minimum canopy turgor potl for expansion,extension
   !     Stomata_Stress=stomatal resistance function of canopy turgor
   !     PSICanopy_pft=canopy water potential
   !     WaterStress4Groth=growth function of canopy water potential
-  !     CanTurgPSIFun4Expans=expansion,extension function of canopy water potential
+  
   !
-  WFNS=AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-PSIMin4OrganExtens))
+  TurgEff4LeafPetolExpansion=real_truncate(AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-TurgPSIMin4OrganExtens)),1.e-4_r8)
 
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
@@ -550,35 +504,36 @@ module grosubsMod
     WaterStress4Groth = EXP(0.05_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ELSE
     !others
-    Stomata_Stress    = EXP(RCS_pft(NZ)*PSICanopyTurg_pft(NZ))
+    Stomata_Stress    = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
     WaterStress4Groth = EXP(0.10_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))
   ENDIF
-
-  CanTurgPSIFun4Expans            = fRespWatSens(WFNS,iPlantRootProfile_pft(NZ))
+  WaterStress4Groth               = real_truncate(WaterStress4Groth,1.e-4_r8)
+  TurgEff4CanopyResp              = fRespWatSens(TurgEff4LeafPetolExpansion,iPlantRootProfile_pft(NZ))
   plt_biom%StomatalStress_pft(NZ) = Stomata_Stress
-
+  TurgEff4CanopyResp_pft(NZ)      = TurgEff4CanopyResp
   call PrintInfo('end '//subname)
   end associate
   end subroutine StagePlantForGrowth
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ComputeTotalBiom(I,J,NZ)
+  subroutine ComputeTotalBiom(yearIJ,NZ)
 
-  integer, intent(in) :: I,J,NZ
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   
   integer :: L,N
 !     begin_execution
-  associate(                                                      &
+  associate(                                                    &
     Myco_pft               => plt_morph%Myco_pft               ,& !input  :mycorrhizal type (no or yes),[-]
     MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr  ,& !input  :root layer nonstructural element, [g d-2]
     PopuRootMycoC_pvr      => plt_biom% PopuRootMycoC_pvr       & !inoput :root layer C, [gC d-2]
   )
+  !prepare for disturbance
+  CALL SumPlantBiomStates(yearIJ,NZ,'computotb')
 
-  call SumPlantBiom(I,J,NZ,'computotb')
-
-  if(lverb)write(*,*)'add the nonstrucal components'
   D3451: DO N=1,Myco_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
       PopuRootMycoC_pvr(N,L,NZ)=PopuRootMycoC_pvr(N,L,NZ)+RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
@@ -590,11 +545,11 @@ module grosubsMod
   end subroutine ComputeTotalBiom
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AccumulateStates(I,J,NZ,CanopyN2Fix_pft)
+  subroutine AccumulateStates(yearIJ,NZ)
   
   implicit none
-  integer, intent(in) :: I,J,NZ
-  real(r8), optional, intent(in) :: CanopyN2Fix_pft(JP1)
+  type(yearIJ_type), intent(in) :: yearIJ  
+  integer, intent(in) :: NZ
   integer :: L,NR,N,NE,NB
 
 !     begin_execution
@@ -602,28 +557,22 @@ module grosubsMod
     ZEROS                     => plt_site%ZEROS                      ,& !input  :threshold zero for numerical stability,[-]  
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
-    CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
     CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch     ,& !input  :plant canopy layer branch stem area, [m2 d-2]
-    EarStrutElms_brch         => plt_biom%EarStrutElms_brch          ,& !input  :branch ear structural chemical element mass, [g d-2]
-    GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch        ,& !input  :branch grain structural element mass, [g d-2]
-    HuskStrutElms_brch        => plt_biom%HuskStrutElms_brch         ,& !input  :branch husk structural element mass, [g d-2]
-    LeafPetolBiomassC_brch    => plt_biom%LeafPetolBiomassC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
+    CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]
     RootHPO4Uptake_pft        => plt_rbgc%RootHPO4Uptake_pft         ,& !input  :total root uptake of HPO4, [g d-2 h-1]
-    RootMycoExudElms_pft      => plt_rbgc%RootMycoExudElms_pft       ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
+    Soil2RootMycoExudE_pft    => plt_rbgc%Soil2RootMycoExudE_pft     ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft              ,& !input  :total root N2 fixation, [g d-2 h-1]
     RootNH4Uptake_pft         => plt_rbgc%RootNH4Uptake_pft          ,& !input  :total root uptake of NH4, [g d-2 h-1]
     RootNO3Uptake_pft         => plt_rbgc%RootNO3Uptake_pft          ,& !input  :total root uptake of NO3, [g d-2 h-1]
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
-    SeedNumSet_brch           => plt_morph%SeedNumSet_brch           ,& !input  :branch grain number, [d-2]
-    ShootStrutElms_brch       => plt_biom%ShootStrutElms_brch        ,& !input  :branch shoot structural element mass, [g d-2]
+    CanopyN2Fix_pft           => plt_rbgc%CanopyN2Fix_pft            ,& !input :total canopy N2 fixation, [g d-2 h-1]                    
+    SeedSitesSet_brch         => plt_morph%SeedSitesSet_brch         ,& !input  :branch grain number, [d-2]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
-    StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch         ,& !input  :branch reserve element mass, [g d-2]
-    StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch        ,& !input  :branch stalk structural element mass, [g d-2]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft   ,& !inoput :canopy nodule nonstructural element, [g d-2]
     CanopyStemAreaZ_pft       => plt_morph%CanopyStemAreaZ_pft       ,& !inoput :plant canopy layer stem area, [m2 d-2]
@@ -635,13 +584,13 @@ module grosubsMod
     VcMaxRubiscoRef_brch      => plt_photo%VcMaxRubiscoRef_brch      ,& !input  :maximum rubisco carboxylation rate at reference temperature, [umol g-1 h-1]    
     VoMaxRubiscoRef_brch      => plt_photo%VoMaxRubiscoRef_brch      ,& !input  :maximum rubisco oxygenation rate at reference temperature, [umol g-1 h-1]    
     VcMaxPEPCarboxyRef_brch   => plt_photo%VcMaxPEPCarboxyRef_brch   ,& !input  :reference maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]        
+    fNCLFW_brch               => plt_pheno%fNCLFW_brch               ,& !input : NC ratio of growing leaf on branch, [gN/gC]
+    fPCLFW_brch               => plt_pheno%fPCLFW_brch               ,& !input : PC ratio of growing leaf on branch, [gP/gC]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !output :branch leaf area, [m2 d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !output :branch leaf structural element mass, [g d-2]
     PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch       ,& !output :branch sheath structural element, [g d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !output :plant canopy leaf area, [m2 d-2]
-    CanopyLeafShethC_pft      => plt_biom%CanopyLeafShethC_pft       ,& !output :canopy leaf + sheath C, [g d-2]
-    CanopyNodulElms_pft       => plt_biom%CanopyNodulElms_pft        ,& !output :canopy nodule chemical element mass, [g d-2]
-    CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft        ,& !output :canopy nonstructural element concentration, [g d-2]
+    CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft      ,& !output :canopy leaf + sheath C, [g d-2]
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !output :plant stem area, [m2 d-2]
@@ -650,67 +599,44 @@ module grosubsMod
     HuskStrutElms_pft         => plt_biom%HuskStrutElms_pft          ,& !output :canopy husk structural element mass, [g d-2]
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft          ,& !output :canopy leaf structural element mass, [g d-2]
     PetoleStrutElms_pft       => plt_biom%PetoleStrutElms_pft        ,& !output :canopy sheath structural element mass, [g d-2]
-    RootNodulElms_pft         => plt_biom%RootNodulElms_pft          ,& !output :root nodule chemical element mass, [g d-2]
-    ShootStrutElms_pft        => plt_biom%ShootStrutElms_pft         ,& !output :canopy shoot structural chemical element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
     StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
-    CanopyVcMaxRubisco_pft    => plt_photo%CanopyVcMaxRubisco_pft    ,& !output :Canopy VcMax for rubisco carboxylation, [umol h-1 m-2]
-    CanopyVoMaxRubisco_pft    => plt_photo%CanopyVoMaxRubisco_pft    ,& !output :Canopy VoMax for rubisco oxygenation, [umol h-1 m-2]
-    CanopyVcMaxPEP_pft        => plt_photo%CanopyVcMaxPEP_pft         & !output :Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
+    fNCLFW_pft                => plt_pheno%fNCLFW_pft                ,& !output : NC ratio of growing leaf, [gN/gC]
+    fPCLFW_pft                => plt_pheno%fPCLFW_pft                 & !output : PC ratio of growing leaf, [gP/gC]
+
   )
 !
 !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
 !
 !
-  call SumPlantBiom(I,J,NZ,'Accumstates')
-
   DO NB=1,NumOfBranches_pft(NZ)    
-    if(isclose(LeafPetolBiomassC_brch(NB,NZ),0._r8))then
+    if(isclose(CanopyLeafSheathC_brch(NB,NZ),0._r8))then
       LeafStrutElms_brch(1:NumPlantChemElms,NB,NZ) = 0._r8
       PetoleStrutElms_brch(1:NumPlantChemElms,NB,NZ)=0._r8
       LeafAreaLive_brch(NB,NZ)                     = 0._r8
     endif
  ENDDO  
-  DO NE=1,NumPlantChemElms
-    CanopyNonstElms_pft(NE,NZ) = AZMAX1(sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    StalkRsrvElms_pft(NE,NZ)   = AZMAX1(sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    ShootStrutElms_pft(NE,NZ)  = AZMAX1(sum(ShootStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    PetoleStrutElms_pft(NE,NZ) = AZMAX1(sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    StalkStrutElms_pft(NE,NZ)  = AZMAX1(sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    LeafStrutElms_pft(NE,NZ)   = AZMAX1(sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    HuskStrutElms_pft(NE,NZ)   = AZMAX1(sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    GrainStrutElms_pft(NE,NZ)  = AZMAX1(sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    EarStrutElms_pft(NE,NZ)    = AZMAX1(sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    !root state variables
-    !sum structural biomass
-  ENDDO
 
   CanopySapwoodC_pft(NZ)   = 0._r8
-  CanopyLeafShethC_pft(NZ) = 0._r8
+  CanopyLeafSheathC_pft(NZ) = 0._r8
   CanopySeedNum_pft(NZ)    = 0._r8
   CanopyLeafArea_pft(NZ)   = 0._r8
   CanopyStemArea_pft(NZ)   = 0._r8
-  CanopyVcMaxRubisco_pft(NZ)=0._r8
-  CanopyVoMaxRubisco_pft(NZ)=0._r8
-  CanopyVcMaxPEP_pft(NZ)    =0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
-    CanopyLeafShethC_pft(NZ)   = CanopyLeafShethC_pft(NZ) +LeafPetolBiomassC_brch(NB,NZ)
-    CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedNumSet_brch(NB,NZ)
+    CanopyLeafSheathC_pft(NZ)   = CanopyLeafSheathC_pft(NZ) +CanopyLeafSheathC_brch(NB,NZ)
+    CanopySeedNum_pft(NZ)      = CanopySeedNum_pft(NZ)+SeedSitesSet_brch(NB,NZ)
     CanopyLeafArea_pft(NZ)     = CanopyLeafArea_pft(NZ)+LeafAreaLive_brch(NB,NZ)
-    CanopyVcMaxRubisco_pft(NZ) = CanopyVcMaxRubisco_pft(NZ)+VcMaxRubiscoRef_brch(NB,NZ)
-    CanopyVoMaxRubisco_pft(NZ) = CanopyVoMaxRubisco_pft(NZ)+VoMaxRubiscoRef_brch(NB,NZ)
-    CanopyVcMaxPEP_pft(NZ)     = CanopyVcMaxPEP_pft(NZ) +VcMaxPEPCarboxyRef_brch(NB,NZ)
-
+    fNCLFW_pft(NZ)             = fNCLFW_pft(NZ)+fNCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
+    fPCLFW_pft(NZ)             = fPCLFW_pft(NZ)+fPCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
     DO L=1,NumCanopyLayers1
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
-  if(CanopyLeafArea_pft(NZ)>ZEROS)then
-    CanopyVcMaxRubisco_pft(NZ)=CanopyVcMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVoMaxRubisco_pft(NZ)=CanopyVoMaxRubisco_pft(NZ)/CanopyLeafArea_pft(NZ)
-    CanopyVcMaxPEP_pft(NZ)    =CanopyVcMaxPEP_pft(NZ)/CanopyLeafArea_pft(NZ)
+  if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
+    fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
+    fPCLFW_pft(NZ)=fPCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
   endif
 
 !
@@ -720,28 +646,12 @@ module grosubsMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !
-  IF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
-    IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
-      DO NE=1,NumPlantChemElms
-        D7950: DO NB=1,NumOfBranches_pft(NZ)
-          CanopyNodulNonstElms_pft(NE,NZ)=CanopyNodulNonstElms_pft(NE,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)
-        ENDDO D7950
-        CanopyNodulElms_pft(NE,NZ)=sum(CanopyNodulStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))+ &
-          sum(CanopyNodulNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
-      ENDDO
-    ELSEIF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
-      DO NE=1,NumPlantChemElms
-        RootNodulElms_pft(NE,NZ)=sum(RootNodulStrutElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))+&
-          sum(RootNodulNonstElms_rpvr(NE,NU:MaxSoiL4Root_pft(NZ),NZ))
-      ENDDO
-    ENDIF
-  ENDIF
 !
 !     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
 !
 !     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
 !     PlantRootSoilElmNetX_pft= > 0 taking from soil 
-  PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
+  PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
   PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+&
     RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ)+RootN2Fix_pft(NZ)
@@ -749,14 +659,14 @@ module grosubsMod
     RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ)
 
   PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)=PlantExudElm_CumYr_pft(1:NumPlantChemElms,NZ)+&
-    RootMycoExudElms_pft(1:NumPlantChemElms,NZ)
-  RootUptk_N_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ) + &
-    RootMycoExudElms_pft(ielmn,NZ)
-  RootUptk_P_CumYr_pft(NZ)=RootUptk_P_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
-    RootMycoExudElms_pft(ielmp,NZ)
+    Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
-  PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)
-  if(present(CanopyN2Fix_pft))PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+CanopyN2Fix_pft(NZ)
+  RootUptk_N_CumYr_pft(NZ)=RootUptk_N_CumYr_pft(NZ)+RootNH4Uptake_pft(NZ)+RootNO3Uptake_pft(NZ) + &
+    Soil2RootMycoExudE_pft(ielmn,NZ)
+  RootUptk_P_CumYr_pft(NZ)=RootUptk_P_CumYr_pft(NZ)+RootH2PO4Uptake_pft(NZ)+RootHPO4Uptake_pft(NZ) + &
+    Soil2RootMycoExudE_pft(ielmp,NZ)
+
+  PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
   end associate
   end subroutine AccumulateStates
 
@@ -771,20 +681,20 @@ module grosubsMod
   DO NE=1,NumPlantChemElms
     plt_biom%CanopyNonstElms_pft(NE,NZ)=0._r8
     plt_biom%StalkRsrvElms_pft(NE,NZ)=0._r8
-    plt_biom%ShootStrutElms_pft(NE,NZ)=0._r8
+    plt_biom%ShootElms_pft(NE,NZ)=0._r8
     plt_biom%PetoleStrutElms_pft(NE,NZ)=0._r8
     plt_biom%StalkStrutElms_pft(NE,NZ)=0._r8
     plt_biom%LeafStrutElms_pft(NE,NZ)=0._r8
     plt_biom%HuskStrutElms_pft(NE,NZ)=0._r8
     plt_biom%GrainStrutElms_pft(NE,NZ)=0._r8
     plt_biom%EarStrutElms_pft(NE,NZ)=0._r8
-    plt_biom%CanopyNodulElms_pft(NE,NZ)=0._r8
-    plt_biom%RootNodulElms_pft(NE,NZ)=0._r8
+    plt_biom%ShootNoduleElms_pft(NE,NZ)=0._r8
+    plt_biom%RootNoduleElms_pft(NE,NZ)=0._r8
     plt_rbgc%PlantRootSoilElmNetX_pft(NE,NZ)=0._r8
   ENDDO
 
   plt_biom%CanopySapwoodC_pft(NZ)=0._r8
-  plt_biom%CanopyLeafShethC_pft(NZ) =0._r8
+  plt_biom%CanopyLeafSheathC_pft(NZ) =0._r8
   plt_morph%CanopySeedNum_pft(NZ) =0._r8
   plt_morph%CanopyLeafArea_pft(NZ)=0._r8
   plt_morph%CanopyStemArea_pft(NZ)=0._r8

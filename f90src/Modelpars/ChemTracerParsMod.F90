@@ -23,9 +23,9 @@ module ChemTracerParsMod
   real(r8), parameter :: ZNSG=4.00E-06_r8  !aqueous NH3 diffusivity,[m2 h-1]
   real(r8), parameter :: ZOSG=6.00E-06_r8  !aqueous NO3 diffusivity,[m2 h-1]
   real(r8), parameter :: POSG=3.00E-06_r8  !aqueous PO4 diffusivity,[m2 h-1]
-  real(r8), parameter :: OCSG=1.0E-08_r8   !aqueous DOC diffusivity,[m2 h-1]
-  real(r8), parameter :: ONSG=1.0E-08_r8   !aqueous DON diffusivity,[m2 h-1]
-  real(r8), parameter :: OPSG=1.0E-08_r8   !aqueous DOP diffusivity,[m2 h-1]
+  real(r8), parameter :: OCSG=1.0E-06_r8   !aqueous DOC diffusivity,[m2 h-1]
+  real(r8), parameter :: ONSG=1.0E-06_r8   !aqueous DON diffusivity,[m2 h-1]
+  real(r8), parameter :: OPSG=1.0E-06_r8   !aqueous DOP diffusivity,[m2 h-1]
   real(r8), parameter :: OASG=3.64E-06_r8  !aqueous acetate diffusivity,[m2 h-1]
   real(r8), parameter :: WGSG=7.70E-02_r8 !water vapor diffusivity,[m2 h-1]
   real(r8), parameter :: ALSG=5.0E-06_r8  !aqueous Al diffusivity,[m2 h-1]
@@ -51,7 +51,6 @@ module ChemTracerParsMod
   real(r8), parameter :: SN2OX=5.241E-01_r8  !N2O solubility coeficient  at 25oC, [g solute /g gas]
   real(r8), parameter :: SNH3X=2.852E+02_r8  !NH3 solubility coeficient at 25oC, [g solute /g gas]
   real(r8), parameter :: SH2GX=3.156E-02_r8  !H2 solubility coeficient at 25oC, [g solute /g gas]
-  real(r8), parameter :: VISCW=1.0E-06_r8    !water viscosity, [Mg m-1 s]
 
   !terminate [label for variable parsing]
 end module ChemTracerParsMod

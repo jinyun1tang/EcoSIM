@@ -35,6 +35,9 @@ implicit none
   pure function TranspBasedsubstrateUptake(S_conc,diffusc, KM, V_max, zeros)result(uptake)
   !
   !transport based substrate uptake
+  !assuming balance between MM-based uptake and supply by diffusion
+  !q=V_max*s/(KM+s)=D(S_ext-S)
+  !solve for q.
   implicit none
   real(r8), intent(in) :: S_conc   !substrate concentration
   real(r8), intent(in) :: diffusc !diffusion coefficient

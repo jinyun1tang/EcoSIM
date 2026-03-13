@@ -1,5 +1,8 @@
 module StarteMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod,      only: r8 => DAT_KIND_R8
+  use SoluteChemDataType, only: solutedtype
+  use EcoSiMParDataMod,   only: micpar
+  use DebugToolMod,       only: PrintInfo
   use SOMDataType
   use TracerPropMod
   use TracerIDMod
@@ -23,8 +26,6 @@ module StarteMod
   use EcoSIMConfig
   use InitSoluteMod
   use SoluteParMod
-  use SoluteChemDataType, only : solutedtype
-  use EcoSiMParDataMod, only : micpar
   use ChemTracerParsMod
   implicit none
 
@@ -45,15 +46,18 @@ module StarteMod
 
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  character(len=*), parameter :: subname='starte'
   type(solutedtype)  :: solutevar
   REAL(R8) :: BulkSoilMass
   integer :: NY,NX,L,I,K
-!     begin_execution
-!
-!     INITIALIZE CATION AND ANION CONCENTRATIONS
-!     IN PRECIPITATION (K=1), IRRIGATION (K=2) AND SOIL (K=3)
-!     FROM WEATHER, IRRIGATION AND SOIL FILES IN 'READS'
-!
+
+  !     begin_execution
+  !
+  !     INITIALIZE CATION AND ANION CONCENTRATIONS
+  !     IN PRECIPITATION (K=1), IRRIGATION (K=2) AND SOIL (K=3)
+  !     FROM WEATHER, IRRIGATION AND SOIL FILES IN 'READS'
+  !
+  call PrintInfo('beg '//subname)
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
       solutevar%CCO2M = CCO2EI_gperm3_col(NY,NX)/catomw
@@ -66,7 +70,7 @@ module StarteMod
 
       DO I=1,366
         DO  L=NU_col(NY,NX),NL_col(NY,NX)
-          D2000: DO K=micpar%k_fine_litr,micpar%k_POM
+          D2000: DO K=micpar%k_fine_comp,micpar%k_POM
             BulkSoilMass=0._r8
 
             !maure applied at the soil surface
@@ -90,7 +94,7 @@ module StarteMod
               solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
+                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1)THEN
                   !     INITIALIZE RAINFALL, top layer
                   solutevar%H_1p_aque_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
@@ -181,7 +185,7 @@ module StarteMod
 
     ENDDO
   ENDDO
-
+  call PrintInfo('end '//subname)
   END subroutine starte
 !------------------------------------------------------------------------------------------
 
@@ -198,7 +202,7 @@ module StarteMod
     iprotein  => micpar%iprotein,  &
     k_manure  => micpar%k_manure   &
   )
-  IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
+  IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1.AND.I.EQ.1)THEN
     !litter pool, top soil layer
     trcg_rain_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aque_mole_conc
     trcg_rain_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aque_mole_conc
@@ -477,12 +481,12 @@ module StarteMod
     trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)     = solutevar%Precp_AlPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_FePO4,L,NY,NX)     = solutevar%Precp_FePO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)    = solutevar%Precp_CaHPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-    trcp_saltpml_vr(idsp_HA,L,NY,NX)        = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+    trcp_saltpml_vr(idsp_Apatite,L,NY,NX)        = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)  = 0._r8
     trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)    = solutevar%Precp_AlPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)    = solutevar%Precp_FePO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)   = solutevar%Precp_CaHPO4_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    trcp_saltpml_vr(idsp_HAB,L,NY,NX)       = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
+    trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX)       = solutevar%Precp_Ca5P3O12O3H3_mole_conc*VLSoilMicPMass_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX) = 0._r8
     ElectricConductivity_vr(L,NY,NX)        = 0._r8
     SolutesIonStrenth_vr(L,NY,NX)           = 0._r8
@@ -525,12 +529,12 @@ module StarteMod
     trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)     = 0._r8
     trcp_saltpml_vr(idsp_FePO4,0,NY,NX)     = 0._r8
     trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX)    = 0._r8
-    trcp_saltpml_vr(idsp_HA,0,NY,NX)        = 0._r8
+    trcp_saltpml_vr(idsp_Apatite,0,NY,NX)        = 0._r8
     trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX)  = 0._r8
     trcp_saltpml_vr(idsp_AlPO4B,0,NY,NX)    = 0._r8
     trcp_saltpml_vr(idsp_FePO4B,0,NY,NX)    = 0._r8
     trcp_saltpml_vr(idsp_CaHPO4B,0,NY,NX)   = 0._r8
-    trcp_saltpml_vr(idsp_HAB,0,NY,NX)       = 0._r8
+    trcp_saltpml_vr(idsp_ApatiteBand,0,NY,NX)       = 0._r8
     trcp_saltpml_vr(idsp_CaH4P2O8B,0,NY,NX) = 0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK

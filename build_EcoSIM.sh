@@ -1,4 +1,3 @@
-#!/bin/bash
 
 # ############################################################################ #
 #
@@ -8,7 +7,7 @@
 
 # A couple of helper functions:
 
-function status_message()
+status_message()
 {
   #Printing status messages in a nice format
   local GREEN='32m'
@@ -87,6 +86,7 @@ do
     --clean)
       echo "Cleaning build directory..."
       rm -rf ./build
+      rm -rf ./local
       exit 0
       ;;
   esac

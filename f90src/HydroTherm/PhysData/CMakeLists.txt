@@ -8,6 +8,7 @@ add_ecosim_library(PhysData ${PHYSDATA_SOURCES})
 
 target_include_directories(PhysData  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/  
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/

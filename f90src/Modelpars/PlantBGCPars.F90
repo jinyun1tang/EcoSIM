@@ -12,10 +12,10 @@ module PlantBGCPars
 !
 !
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]
-  real(r8) :: PART1X                              !minimum fraction of growth allocated to leaf, [-]
-  real(r8) :: PART2X                              !minimum fraction of growth allocated to petiole, [-]
+  real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
+  real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to petiole, [-]
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
-  real(r8) :: FSNR                                !rate constant for LitrFall at end of growing season, [h-1]
+  real(r8) :: RSpecLiterFall                      !rate constant for LitrFall at end of growing season, [h-1]
   real(r8) :: Hours4PhyslMature                   !number of hours with no grain filling required for physilogical maturity, [h]
   real(r8) :: Hours4FullSenes                     !number of hours until full senescence after physl maturity, [h]
   real(r8) :: XFRX                                !maximum storage C content for remobiln from stalk,root reserves, [gC]
@@ -26,10 +26,10 @@ module PlantBGCPars
   real(r8) :: CNKI                                !nonstructural N inhibition constant on growth, [g N, g-1 C]
   real(r8) :: CPKI                                !nonstructural P inhibition constant on growth, [g P g-1 C]
   real(r8) :: RmSpecPlant                         !specific maintenance respiration rate, [g C g-1 N h-1]
-  real(r8) :: PSIMin4OrganExtens                  !minimum water potential for organ expansion,extension, [MPa]
+  real(r8) :: TurgPSIMin4OrganExtens              !minimum tugor pressure for plant organ expansion,extension, [0.05-0.1 MPa]
   real(r8) :: RCMN                                !minimum stomatal resistance to CO2, [s m-1]
   real(r8) :: RTDPX                               !distance behind growing point for secondary roots, [m]
-  real(r8) :: Root2ndMeanLensMin                  !minimum average secondary root length, [m]
+  real(r8) :: Root2ndTipLen4uptk                  !effective root tip length four resource uptake, not whole root hair 4 uptake, [m]
   real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
   real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
   real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
@@ -39,21 +39,26 @@ module PlantBGCPars
   real(r8) :: RSMY_stomaCO2                       !minimum stomatal resistance for CO2 uptake (h m-1)
   real(r8) :: C4KI_pepcarboxy                     !nonstructural C inhibition constant on PEP carboxylase (uM)
   real(r8) :: Hours4ConiferSpringDeharden         !hours to full dehardening of conifers in spring (h)
-
+  real(r8) :: RCytoK(2)                           !cytokinin production efficiency, [1.e-4 gC CK gC-CO2]
+  real(r8) :: kDCytof(2)                          !cytoknin decay rates during production in fine roots and mycorrhizae [h-1]
+  real(r8) :: kDCytoC                             !cytoknin decay rates during transport and at thickening sites in coarse roots [h-1]
   real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
   real(r8) :: ELEC4                               !e- requirement for CO2 fixn by PEP carboxylase,[umol e- umol CO2]
   real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
   real(r8) :: FCMassCO2BundleSheath_node          !partition decarboxylation to CO2 in C4, [-]
   real(r8) :: FCMassHCO3BundleSheath_node         !partition leakage to HCO3 in C4, [-]
-  real(r8) :: COMP4                               !C4 CO2 compensation point, [uM]
-  real(r8) :: FDML                                !leaf water content, (g H2O g-1 C)
-  real(r8) :: FBS                                 !leaf water content in bundle sheath, in C4 CO2 fixn, [m3 H2O (gC)-1]
-  real(r8) :: FMP                                 !leaf water content in mesophyll in C4 CO2 fixn, [m3 H2O (gC)-1]
+  real(r8) :: COMP4                               !C4 photosynthesis CO2 compensation point, [uM]
+  real(r8) :: FWCLeaf                             !leaf water content, (g H2O (gC leaf)-1)
+  real(r8) :: FWCBundlSheath                      !leaf water content in bundle sheath, in C4 CO2 fixiation, [m3 H2O (gC)-1]
+  real(r8) :: FWCMesophyll                        !leaf water content in mesophyll in C4 CO2 fixation, [m3 H2O (gC)-1]
   real(r8) :: ZPLFM                               !min N:C,P:C in leaves relative to max values from PFT file, [-]
 
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
-  real(r8) :: FSTK                                !fraction of stalk area contributing to water,heat flow
-  real(r8) :: ZSTX                                !maximum stalk inner radius for tranpsiration, [m]
+  real(r8) :: FSTK                                !fraction of stalk radius as sapwood contributing to water,heat flow
+  real(r8) :: ZSTX                                !maximum stalk tube thickness for tranpsiration, [m]
+  real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3]
+  real(r8) :: BlkDActCoarseRoots                  !Coarse root active zone bulk density, [gC m-3]
+  real(r8) :: BlkDLigCoarseRoots                  !Coarse root inactive zone bulk density, [gC m-3]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
   real(r8) :: SpecStalkVolume                     !specific volume (m3 gC-1)
   real(r8) :: FRTX                                !Fraction used to calculate woody faction of stalk,root,[-]
@@ -84,7 +89,7 @@ module PlantBGCPars
   real(r8) :: RCCYN                               !maximum fractions for bacteria C recycling,[-]
   real(r8) :: RCCXN                               !maximum fractions for bacteria N recycling,[-]
   real(r8) :: RCCQN                               !maximum fractions for bacteria P recycling,[-]
-
+  real(r8) :: RootElonZoneLenz                    !length of root elongation zone, [m]
   integer :: HoursReq4LiterfalAftMature           !required hours after physl maturity until start of LitrFall, [h]
   REAL(R8) :: FRSV(0:3)                           !rate constant for remobiln of storage chemical element during leafout, [h-1]
   real(r8) :: FXFY(0:1)                           !rate constant for leaf-reserve nonstructural C exchange, [h-1]
@@ -93,7 +98,7 @@ module PlantBGCPars
   real(r8) :: RateK4RootSeaStorNonstEXfer(0:3)    !rate constant for root-storage nonstructural chemical element exchange, [h-1]
   real(r8) :: FXRT(0:1)                           !root partitioning of storage C during leafout,[-]
   real(r8) :: FXSH(0:1)                           !shoot partitioning of storage C during leafout,[-]
-  real(r8) :: FXRN(6)                             !rate constant for plant-bacteria nonstructl C,N,P exchange,[h-1]
+  real(r8) :: FXRN(6)                             !rate constant for plant-nodule bacteria nonstructl C,N,P exchange,[h-1]
   REAL(R8) :: RCCX(0:3)                           !maximum fractions for shoot N recycling,[-]
   real(r8) :: RCCQ(0:3)                           !maximum fractions for shoot P recycling,[-]
   REAL(R8) :: RCCZ(0:3)                           !minimum fractions for shoot C recycling,[-]
@@ -102,7 +107,10 @@ module PlantBGCPars
   real(r8) :: HourReq2InitSStor4LeafOut(0:1)      !number of hours required to initiate remobilization of storage C for leafout, [h]
   real(r8) :: GVMX(0:1)                           !specific oxidation rate of nonstructural C during leafout at 25 C, [h]
   real(r8) :: RTSK(0:3)                           !relative primary root sink strength 0.25=shallow,4.0=deep root profile,[-]
-
+  real(r8) :: resp_downreg                        !respiration rate down regulation for the lignified zone of coarse roots
+  real(r8) :: Yld_lignif                          !lignification rate in converting active coarse root into nonactive coarse root, [gC lig/gC]
+  real(r8) :: k_ligmax                            !maxinum lignification rate when converting active coarse root into nonactive coarse root, [h-1]
+  real(r8) :: k_ligMM                             !half saturation constant for lignification MM kinetics, [gC h-1]
   !terminate [label for varaible parsing]
   integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
   integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
@@ -138,9 +146,10 @@ module PlantBGCPars
   integer :: icarbhyro                   !kinetic id of litter component as carbonhydrate
   integer :: icellulos                   !kinetic id of litter component as cellulose
   integer :: ilignin                     !kinetic id of litter component as lignin
-  integer :: k_woody_litr                !woody litter complex id
-  integer :: k_fine_litr                 !fine litter complex id
+  integer :: k_woody_comp                !woody litter complex id
+  integer :: k_fine_comp                 !fine litter complex id
   integer :: jroots                      !number of root groups, plant root + myco types
+  integer :: NMaxRootSegs                !maximum number of root segments used for maturation tracking
   end type plant_bgc_par_type
 
   contains
@@ -195,12 +204,13 @@ module PlantBGCPars
   pltpar%iroot      = 4
   pltpar%icwood     = 5
   pltpar%jcplx      = jcplxc
-  pltpar%jroots=jroots
+  pltpar%jroots     = jroots
+
   FracHour4LeafoffRemob =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  PART1X                      = 0.05_r8
-  PART2X                      = 0.02_r8
+  PART2LEAF_MIN               = 0.05_r8
+  PART2PETOL_MIN              = 0.02_r8
   VMXC                        = 0.015_r8
-  FSNR                        = 2.884E-03_r8
+  RSpecLiterFall              = 2.884E-03_r8
   Hours4PhyslMature           = 168.0_r8
   Hours4FullSenes             = 240.0_r8
   XFRX                        = 2.5E-02_r8
@@ -211,10 +221,10 @@ module PlantBGCPars
   CNKI                        = 1.0E-01_r8
   CPKI                        = 1.0E-02_r8
   RmSpecPlant                 = 0.010_r8
-  PSIMin4OrganExtens          = 0.1_r8
+  TurgPSIMin4OrganExtens      = 0.1_r8
   RCMN                        = 1.560E+01_r8
   RTDPX                       = 0.00_r8
-  Root2ndMeanLensMin            = 1.0E-03_r8
+  Root2ndTipLen4uptk          = 2.0E-03_r8
   EMODR                       = 5.0_r8
   QNTM                        = 0.45_r8
   CURV                        = 0.70_r8
@@ -226,23 +236,31 @@ module PlantBGCPars
   FCMassCO2BundleSheath_node  = 0.02_r8
   FCMassHCO3BundleSheath_node = 1.0_r8-FCMassCO2BundleSheath_node
   COMP4                       = 0.5_r8
-  FDML                        = 6.0_r8
-  FBS                         = 0.2_r8*FDML
-  FMP                         = 0.8_r8*FDML
+  FWCLeaf                     = 6.0_r8
+  FWCBundlSheath              = 0.2_r8*FWCLeaf
+  FWCMesophyll                = 0.8_r8*FWCLeaf
   ZPLFM                       = 0.33_r8
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
-
+  resp_downreg                = 0.05_r8
+  k_ligMM                     = 0.1_r8*VMXC
+  k_ligmax                    = 0.005_r8
+  Yld_lignif                  = 0.62_r8
   CNKI_rubisco                = 1.0E-02_r8
   CPKI_rubisco                = 1.0E-03_r8
   RSMY_stomaCO2               = 2.78E-03_r8
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
-
-
-  FSTK                  = 0.05_r8
-  ZSTX                  = 1.0E-03_r8
+  RootElonZoneLenz            =0.03_r8
+  kDCytof = (/0.69_r8,0.3_r8/)
+  kDCytoC = 0.175_r8
+  RCytoK = (/1.e-4_r8,1.e-3_r8/) !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
+  BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
+  BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3
+  BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3
+  FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
+  ZSTX                  = 1.0E-03_r8     !one mm
   StalkMassDensity      = 0.225_r8
   SpecStalkVolume       = 1.0E-06_r8/StalkMassDensity
   FRTX                  = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
@@ -282,7 +300,7 @@ module PlantBGCPars
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)
   RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
 
-  RTSK=real((/0.25,1.0,4.0,4.0/),r8)
+  RTSK=real((/0.25,1.,4.0,4.0/),r8)
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)

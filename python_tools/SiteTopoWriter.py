@@ -192,6 +192,7 @@ def write_site_topo_data(config_dict):
 
     line=sife_file.readline()
     arr=strtool.strpack(line.strip().split(' '))
+
     for j in range(ncol):
       DHI[j]=float(arr[j])
 

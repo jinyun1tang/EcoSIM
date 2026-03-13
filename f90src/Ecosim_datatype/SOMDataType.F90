@@ -16,19 +16,20 @@ module SOMDataType
   real(r8),target,allocatable :: CFOSC_vr(:,:,:,:,:)                   !fraction of SOC in kinetic components,[-]
   real(r8),target,allocatable :: CNOSC_vr(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components,[-]
   real(r8),target,allocatable :: CPOSC_vr(:,:,:,:,:)                   !P:C ratios of SOC kinetic components,[-]
-  real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)            !humus soil OM chemical element,	[g d-2]
-  real(r8),target,allocatable :: TSolidOMActC_vr(:,:,:)              !total active solid organic C, [gC d-2]
-  real(r8),target,allocatable :: TSolidOMC_vr(:,:,:)                 !total solid organic C, [gC d-2]
-  real(r8),target,allocatable :: tOMActC_vr(:,:,:)                   !active heterotrophic microbial C in layer, [gC d-2]
-  real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)              !adsorbed soil OM chemical element,	[g d-2]
-  real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)          !microbial residue chemical element, [C	g d-2]
-  real(r8),target,allocatable :: DOM_MicP_vr(:,:,:,:,:)              !dissolved organic matter in micropore,	[g d-2]
-  real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)              !dissolved organic matter in macropore,	[g d-2]
-  real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                !total soil organic matter, [g d-2]
-  real(r8),target,allocatable :: ORGCX_vr(:,:,:)                      !SOC concentration,	[g Mg-1]
+  real(r8),target,allocatable :: SolidOM_vr(:,:,:,:,:,:)               !humus soil OM chemical element,	[g d-2]
+  real(r8),target,allocatable :: TSolidOMActC_vr(:,:,:)                !total active solid organic C, [gC d-2]
+  real(r8),target,allocatable :: TSolidOMC_vr(:,:,:)                  !total solid organic C, [gC d-2]
+  real(r8),target,allocatable :: tOMActC_vr(:,:,:)                    !active heterotrophic microbial C in layer, [gC d-2]
+  real(r8),target,allocatable :: SorbedOM_vr(:,:,:,:,:)               !adsorbed soil OM chemical element,	[g d-2]
+  real(r8),target,allocatable :: OMBioResdu_vr(:,:,:,:,:,:)           !microbial residue chemical element, [C	g d-2]
+  real(r8),target,allocatable :: DOM_MicP_vr(:,:,:,:,:)               !dissolved organic matter in micropore,	[g d-2]
+  real(r8),target,allocatable :: DOM_MacP_vr(:,:,:,:,:)               !dissolved organic matter in macropore,	[g d-2]
+  real(r8),target,allocatable :: SoilOrgM_vr(:,:,:,:)                 !total soil organic matter, [g d-2]
+  real(r8),target,allocatable :: ORGCX_vr(:,:,:)                      !SOC concentration,	[gC Mg soil-1]
   real(r8),target,allocatable :: SolidOMAct_vr(:,:,:,:,:)             !colonized humus C in each complex, [g d-2]
   real(r8),target,allocatable :: OMLitrC_vr(:,:,:)                    !total particulate organic C, [g d-2]
-  real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                 !soil organic matter content, [g kg-1]
+  real(r8),target,allocatable :: CSoilOrgM_vr(:,:,:,:)                 !soil organic matter content, input as [kg Mg soil-1], used as [g Mg soil -1]
+  real(r8),target,allocatable :: SolidOMPercent_vr(:,:,:)             !percentage of OM as soil mass, [%]
   real(r8),target,allocatable :: COMLitrC_vr(:,:,:)                    !soil litter particulate C content, [g kg-1]
   real(r8),target,allocatable :: ElmAllocmatMicrblitr2POM_vr(:,:,:,:)    !allocation coefficient to humus fractions,[-]
   real(r8),target,allocatable :: tMicBiome_col(:,:,:)                         !total micriobial biomass chemical element, [g d-2]
@@ -82,6 +83,7 @@ module SOMDataType
   allocate(SolidOMAct_vr(jsken,1:jcplx,0:JZ,JY,JX));SolidOMAct_vr=0._r8
   allocate(OMLitrC_vr(0:JZ,JY,JX));OMLitrC_vr=0._r8
   allocate(CSoilOrgM_vr(1:NumPlantChemElms,0:JZ,JY,JX));CSoilOrgM_vr=0._r8
+  allocate(SolidOMPercent_vr(JZ,JY,JX)); SolidOMPercent_vr=0._r8
   allocate(COMLitrC_vr(JZ,JY,JX));COMLitrC_vr=0._r8
   allocate(ElmAllocmatMicrblitr2POM_vr(2,JZ,JY,JX));; ElmAllocmatMicrblitr2POM_vr=0._r8
   allocate(tMicBiome_col(NumPlantChemElms,JY,JX));        tMicBiome_col=0._r8
@@ -128,6 +130,7 @@ module SOMDataType
   call destroy(SolidOMAct_vr)
   call destroy(OMLitrC_vr)
   call destroy(CSoilOrgM_vr)
+  call destroy(SolidOMPercent_vr)
   call destroy(COMLitrC_vr)
   call destroy(ElmAllocmatMicrblitr2POM_vr)
   call destroy(tMicBiome_col)

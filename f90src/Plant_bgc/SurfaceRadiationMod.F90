@@ -36,7 +36,6 @@ module SurfaceRadiationMod
   real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)
 
   iyrc=etimer%get_curr_yearAD()
-  dowrite=I==197.and.J==17.and.IYRC==1981.and..false.
 
   if(ldo_sp_mode)then
     !do prescribed phenolgoy mode
@@ -92,7 +91,8 @@ module SurfaceRadiationMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
-  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
+!  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
+  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO)then
     ARLSG                  = ARLSC/AREA3(NU)
     ZX                     = EXP(-0.5_r8*ARLSG)
     ZY                     = 1.0_r8-ZX
@@ -121,8 +121,8 @@ module SurfaceRadiationMod
 !     WindSpeedAtm_col=wind speed
 !     RIB=canopy isothermal Richardson number
 !   here 0.168 = cvonkarman**2
-    AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2._r8/(0.168_r8*WindSpeedAtm_col))
-    RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2._r8*TairK)
+    AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2/(0.168_r8*WindSpeedAtm_col))
+    RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2*TairK)
 
   ELSE
     AbvCanopyBndlResist_col = RAM
@@ -167,14 +167,7 @@ module SurfaceRadiationMod
   D9685: DO NZ=1,NP
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
   ENDDO D9685
-  if(dowrite)then
-  NZ=1
-  WRITE(4444,*)'IJ',I,J
-  write(4444,*)'CanopyHeight_col',CanopyHeight_col,CanopyHeight_pft(NZ),CanopyLeafArea_col,StemArea_col
-  WRITE(4444,*)'CanopyLeafAareZ_col',(CanopyLeafAareZ_col(L),L=1,NumCanopyLayers1)
-  WRITE(4444,*)'CanopyStemAareZ_col',(CanopyStemAareZ_col(L),L=1,NumCanopyLayers1)
-  write(4444,*)'CanopyHT0',(CanopyHeightZ_col(L),L=0,NumCanopyLayers1)
-  endif
+
   CanopyHeightZ_col(NumCanopyLayers1) = CanopyHeight_col+0.01_r8
   ZL1(NumCanopyLayers1)               = CanopyHeightZ_col(NumCanopyLayers1)
   ZL1(0)                                = 0.0_r8
@@ -210,10 +203,6 @@ module SurfaceRadiationMod
       CanopyHeightZ_col(L-1)=ZL1(L-1)
     ENDDO D2770
   ENDIF
-  if(dowrite)then
-    write(4444,*)'CanopyHT',AreaInterval
-    write(4444,*)(CanopyHeightZ_col(L),L=0,NumCanopyLayers1)
-  endif
 
   end associate
   end subroutine DivideCanopyAreaByHeight
@@ -244,9 +233,6 @@ module SurfaceRadiationMod
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col       & !output :stalk area of combined, each PFT canopy,[m^2 d-2]
   )
 
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'snwdepth',SnowDepth,DepthSurfWatIce
-  endif
   LeafStalkArea_col=0.0_r8
   D1135: DO NZ=1,NP
 
@@ -254,7 +240,8 @@ module SurfaceRadiationMod
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumCanopyLayers1
         !above snow and water
-        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!        IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+         IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)then
           !above snow depth and above water/ice surface
           !add all nodes over a branch
           D1130: DO K=1,MaxNodesPerBranch1
@@ -283,7 +270,8 @@ module SurfaceRadiationMod
   D1200: DO NZ=1,NP
     DO  NB=1,NumOfBranches_pft(NZ)
       DO  L=1,NumCanopyLayers1
-        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
+!        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GT.DepthSurfWatIce-ZERO)THEN
+        IF(CanopyHeightZ_col(L-1).GT.SnowDepth-ZERO)then
           D1205: DO N=1,NumLeafZenithSectors1
             D1210: DO K=1,MaxNodesPerBranch1
               LeafAreaZsec_lpft(N,L,NZ)=LeafAreaZsec_lpft(N,L,NZ)+LeafAreaZsec_brch(N,L,K,NB,NZ)
@@ -356,12 +344,7 @@ module SurfaceRadiationMod
   !     RadSWbyCanopy_pft,RADP=total SW,PAR absorbed by canopy
   !     ClumpFactorNow_pft=clumping factor for self-shading
   !
-  if(I==10.and.J==16.and..false.)then
-  write(4444,*)'IJ',I,J
-  write(4444,*)'SineSunInclAngle_col',SineSunInclAngle_col,TotSineSkyAngles_grd,SolarNoonHour_col
-  write(4444,*)'swdir/dif',RadSWDirect_col,RadSWDiffus_col
-  write(4444,*)'pardir/dif',RadDirectPAR_col,RadPARDiffus_col
-  endif
+
   IF(SineSunInclAngle_col.GT.ZERO)THEN
     RadSWSolarBeam_col =RadSWDirect_col*SineSunInclAngle_col+RadSWDiffus_col*TotSineSkyAngles_grd
     RadPARSolarBeam_col=RadDirectPAR_col*SineSunInclAngle_col+RadPARDiffus_col*TotSineSkyAngles_grd
@@ -599,15 +582,6 @@ module SurfaceRadiationMod
     RadPARbyLeafSurf_pft(NZ)  = RadDirectPAR_col*LeafPARabsorpty_pft(NZ)
     RadPARbyStalkSurf_pft(NZ) = RadDirectPAR_col*StalkPARAbsorpty
   ENDDO D1050
-  if(dowrite)then
-  nz=1
-  WRITE(4444,*)'SW',I,J,RadSWDirect_col,RadDirectPAR_col
-  WRITE(4444,*)'ABS',LeafSWabsorpty_pft(NZ),LeafPARabsorpty_pft(NZ)
-  write(4444,*)'SineSunInclAngle_col',SolarAngle,SineSunInclAngle_col
-  write(4444,*)'SolarAzimuthAngle',SolarAzimuthAngle
-  write(4444,*)'GrndIncidSolarAngle',GrndIncidSolarAngle
-  write(4444,*)'LeafStalkArea_col',plt_morph%LeafStalkArea_col
-  ENDIF
 
   !distribute radiation into different leaf/canopy sector
   !     ANGLES BETWEEN SUN OR SKY ZONES AND FOLIAR SURFACES
@@ -667,20 +641,7 @@ module SurfaceRadiationMod
       enddo
     enddo
   ENDDO D1100
-  if(dowrite)then
-    NZ=1
-    write(4444,*)I,J,'clmpf',ClumpFactorNow_pft(NZ)
-    write(4444,*)'SW,PAR',RadSWbyLeafSurf_pft(NZ),RadSWbyStalkSurf_pft(NZ),RadPARbyLeafSurf_pft(NZ),RadPARbyStalkSurf_pft(NZ)
-    WRITE(4444,*)'BETA',((BETA(N,M),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1)
-    write(4444,*)'leafA'
-    DO L=NumCanopyLayers1,1,-1
-    write(4444,*)L,(LeafAreaZsec_lpft(N,L,NZ),N=1,NumLeafZenithSectors1)
-    ENDDO
-    write(4444,*)'canht',(CanopyHeightZ_col(L-1),L=NumCanopyLayers1,1,-1)
-    write(4444,*)'snw',SnowDepth,DepthSurfWatIce
-    write(4444,*)'radfl',RadSWDiffus_col,RadPARDiffus_col
-    write(4444,*)'BETX',((BETX(N,M),N=1, NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1)
-  endif
+
   XAREA = 1.0_r8/AREA3(NU)                      !average over the grid
   YAREA = XAREA/REAL(NumOfSkyAzimuthSects1,R8)  !area for one azimuthal zone
   !incoming SW and PAR
@@ -709,7 +670,9 @@ module SurfaceRadiationMod
   !direct radiation only applies to sunlit leaf/stalk, diffusive radiation applies to all.
   D1800: DO L=NumCanopyLayers1,1,-1
     !only compute radiation for canopy layers above snow and ponding water
-    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)THEN
+
       !incoming radiation, shortwave /par, due to transmission and downward scattering from L+1 to L
       RadSWDiffusL           = RadSWDiffusL *TAU_DifuseRTransmit(L+1)+RadSWFwdScat2NextL(L+1)
       RadPARDiffusL          = RadPARDiffusL*TAU_DifuseRTransmit(L+1)+RadPARFwdScat2NextL(L+1)
@@ -780,9 +743,6 @@ module SurfaceRadiationMod
           SunlitStalkAreaAzclass = SunlitStalkArea*YAREA
           TSurfStalk             = SunlitStalkArea*TAU_DirectRTransmit(L+1)
           StalkIntceptArea       = TSurfStalk*XAREA
-          if(dowrite)then
-          write(4444,*)'area',L,N,LeafIntceptArea,StalkIntceptArea,LeafAreaZsec_lpft(N,L,NZ),ClumpFactorNow_pft(NZ)
-          endif
           !
           !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
           !
@@ -862,14 +822,9 @@ module SurfaceRadiationMod
               ENDIF
             ENDDO D1750
           ENDDO D1700
-          if(dowrite)then
-          write(4444,*)'abss',L,N,FracDirRadAbsorbtL
-          endif
+
         ENDDO D1600
       ENDDO D1500
-      if(dowrite)then
-      write(4444,*)'abs0',L,FracDirRadAbsorbtCum,FracDirRadAbsorbtL,FracDifRadAbsorbtCum
-      endif
       !
       !     ACCUMULATED INTERCEPTION BY CANOPY LAYER
       !
@@ -909,9 +864,6 @@ module SurfaceRadiationMod
       !     FracDifRadAbsorbt=accumulated interception of diffuse radiation from topmost layer
       !     TAU_DifuseRTransmit=transmission of diffuse radiation to next lower layer
       !
-      if(dowrite)then
-      write(4444,*)'abs1',L,FracDifRadAbsorbtCum,FracDifRadAbsorbtL
-      endif
 
       IF(FracDifRadAbsorbtCum+FracDifRadAbsorbtL.GT.1.0_r8)THEN
         XTAUY=(1.0_r8-FracDifRadAbsorbtCum)/((1.0_r8-FracDifRadAbsorbtCum)-&
@@ -988,9 +940,7 @@ module SurfaceRadiationMod
       TAU_DirectRTransmit(L) = 1.0_r8-FracDirRadAbsorbtCum
       TAU_RadThru(L)         = 1.0_r8-TAU_DirectRTransmit(L)
       TAU_DifuseRTransmit(L) = 1.0_r8-FracDifRadAbsorbtCum
-      if(I==10.and.J==16.and..false.)then
-      write(4444,*)'FracDifRadAbsorbtCum',L,FracDifRadAbsorbtCum,FracDifRadAbsorbtL
-      endif
+
     ELSE
       !layer L is not in active canopy, so just make a copy from layer L+1
       RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L+1)
@@ -999,9 +949,7 @@ module SurfaceRadiationMod
       TAU_RadThru(L)         = 1.0_r8-TAU_DirectRTransmit(L)
       TAU_DifuseRTransmit(L) = TAU_DifuseRTransmit(L+1)
     ENDIF
-    if(dowrite)then
-    write(4444,*)'tauL',L,TAU_DifuseRTransmit(L)
-    endif
+
   ENDDO D1800
 
   !
@@ -1019,16 +967,10 @@ module SurfaceRadiationMod
   RADYG = RadSWDiffusL*TAU_DifuseRTransmit(1)+RadSWFwdScat2NextL(1)
   RAPSG = RadDirectPAR_col*TAU_DirectRTransmit(1)
   RAPYG = RadPARDiffusL*TAU_DifuseRTransmit(1)+RadPARFwdScat2NextL(1)
-  if(dowrite)then
-  write(4444,*)'rads0'
-  write(4444,*)RadSWDiffusL,TAU_DifuseRTransmit(1),RadSWFwdScat2NextL(1)
-  write(4444,*)RadPARDiffusL,TAU_DifuseRTransmit(1),RadPARFwdScat2NextL(1)
-  endif
+
   RadSW_Grnd  = ABS(GrndIncidSolarAngle)*RADSG
   RadPAR_Grnd = ABS(GrndIncidSolarAngle)*RAPSG
-  if(dowrite)then
-  write(4444,*)'rads',RadSW_Grnd,RadPAR_Grnd,RADYG,RAPYG
-  endif
+
   D20: DO N=1,NumOfSkyAzimuthSects1
     RadSW_Grnd  = RadSW_Grnd+ABS(OMEGAG(N))*RADYG
     RadPAR_Grnd = RadPAR_Grnd+ABS(OMEGAG(N))*RAPYG
@@ -1060,10 +1002,6 @@ module SurfaceRadiationMod
   ENDIF
   RadSWBakScat2NextL(0)  = RadSW_Grnd*GrndAlbedo/real(NumOfSkyAzimuthSects1,r8)
   RadPARBakScat2NextL(0) = RadPAR_Grnd*GrndAlbedo/real(NumOfSkyAzimuthSects1,r8)
-  if(dowrite)then
-  write(4444,*)'grnd'
-  write(4444,*)RadSW_Grnd,RadPAR_Grnd,GrndAlbedo
-  endif
   !
   !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
   !
@@ -1078,21 +1016,16 @@ module SurfaceRadiationMod
   TAU_DifuseRTransmit(0) = 1.0_r8
   RadSWFwdScat2NextL(0)  = 0.0_r8
   RadPARFwdScat2NextL(0) = 0.0_r8
-  if(dowrite)then
-  WRITE(4444,*)'OMEGA',(((OMEGA(M,N,NN),M=1,NumOfSkyAzimuthSects1),N=1,NumLeafZenithSectors1),NN=1,NumOfLeafAzimuthSectors1)
-  write(4444,*)'TAU_DifuseRTransmit',(TAU_DifuseRTransmit(L),L=0,NumCanopyLayers1)
-  ENDIF
+
   D2800: DO L=1,NumCanopyLayers1
     !the following line shuts off radiation when it is below water
-    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+!    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
+    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)THEN
       RadSWDiffusL           = RadSWDiffusL*TAU_DifuseRTransmit(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
       RadPARDiffusL          = RadPARDiffusL*TAU_DifuseRTransmit(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
       RadSWFwdScat2NextL(L)  = 0.0
       RadPARFwdScat2NextL(L) = 0.0_r8
-      if(dowrite)then
-      NZ=1
-      write(4444,*)'DIFL',L,RadPARDiffusL,TAU_DifuseRTransmit(L-1),RadPARFwdScat2NextL(L-1),RadPARBakScat2NextL(L-1)
-      endif
+
       D2500: DO NZ=1,NP
         RadDifSWbyLeaf_pft(NZ)   = 0.0_r8
         RadDifSWbyStalk_pft(NZ)  = 0.0_r8
@@ -1134,7 +1067,6 @@ module SurfaceRadiationMod
     ENDIF
   ENDDO D2800
 
-  IF(dowrite)write(4444,*)'LeafAreaZsec_brch'
   DO NZ=1,NP
     LeafAreaSunlit_pft(NZ) = 0._r8
     PARSunlit_pft(NZ)      = 0._r8
@@ -1144,11 +1076,7 @@ module SurfaceRadiationMod
       D550: DO K=1,MaxNodesPerBranch1
         D600: DO L=NumCanopyLayers1,1,-1
           D650: DO N=1,NumLeafZenithSectors1
-            if(dowrite)then
-            if(LeafAreaZsec_brch(N,L,K,NB,NZ)>0.)then
-            write(4444,*)'SURF(',N,L,K,NB,NZ,',NY,NX)',LeafAreaZsec_brch(N,L,K,NB,NZ)
-            endif
-            endif
+
             LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
             LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
             DO M=1,NumOfSkyAzimuthSects1
@@ -1160,21 +1088,6 @@ module SurfaceRadiationMod
       ENDDO D550
     ENDDO D500
   ENDDO
-
-  if(dowrite)then
-  NZ=1
-  write(4444,*)'par',NumOfBranches_pft(NZ)
-  write(4444,*)(((RadTotPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1),L=1,NumCanopyLayers1)
-  write(4444,*)(((RadDifPAR_zsec(N,M,L,1),N=1,NumLeafZenithSectors1),M=1,NumOfSkyAzimuthSects1),L=1,NumCanopyLayers1)
-  write(4444,*)LeafAreaSunlit_pft(NZ),PARSunlit_pft(NZ)/LeafAreaSunlit_pft(NZ),ParSunsha_pft(NZ)/LeafAreaSunlit_pft(NZ)
-  write(4444,*)'------------------------------------'
-
-  write(4559,*)'IJ',I,J
-  write(4559,*)'TAUS',TAU_DirectRTransmit(1:NumCanopyLayers1+1)
-  write(4559,*)'TAU0',TAU_RadThru(1:NumCanopyLayers1+1)
-
-  stop
-  endif
 
   end associate
   end subroutine MultiCanLayerRadiation

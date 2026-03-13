@@ -50,8 +50,6 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: M,L,NZ,N,NB,K
 
-  !NP0_col(NY,NX)=1
-
   !sent variables also modified
   plt_site%NumActivePlants         = NumActivePlants_col(NY,NX)        !number of active plants in the column
   plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column
@@ -126,7 +124,7 @@ implicit none
     plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)  = 1
     plt_morph%LeafStalkArea_pft(NZ)        = LeafStalkArea_pft(NZ,NY,NX)      !pft leaf+stalk area
-    plt_morph%HypoctoHeight_pft(NZ)        = HypoctoHeight_pft(NZ,NY,NX)      !(approximately) plant height
+    plt_morph%HypocotHeight_pft(NZ)        = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
     plt_ew%CanopyIsothBndlResist_pft(NZ)          = CanopyIsothBndlResist_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
     plt_morph%CanopyHeight_pft(NZ)          = CanopyHeight_pft(NZ,NY,NX)       !canopy height, set as prescribed input
@@ -134,7 +132,7 @@ implicit none
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
     plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
-    plt_biom%CanopyLeafShethC_pft(NZ)       = CanopyLeafShethC_pft(NZ,NY,NX)    !need to convert from leaf area
+    plt_biom%CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
     plt_biom%CanopySapwoodC_pft(NZ)           = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
     plt_site%PlantPopulation_pft(NZ)        = PlantPopulation_pft(NZ,NY,NX)
     plt_biom%ZERO4LeafVar_pft(NZ)           = ZERO4LeafVar_pft(NZ,NY,NX)
@@ -153,14 +151,14 @@ implicit none
     ENDDO
 
     DO L=1,NK_col(NY,NX)
+      plt_morph%Root1stXNumL_pvr(L,NZ)  = Root1stXNumL_pvr(L,NZ,NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndRadius_rpvr(N,L,NZ) = Root2ndRadius_rpvr(N,L,NZ,NY,NX)
-        plt_morph%Root1stXNumL_rpvr(N,L,NZ)  = Root1stXNumL_rpvr(N,L,NZ,NY,NX)
-        plt_morph%Root2ndMeanLens_rpvr(N,L,NZ) = Root2ndMeanLens_rpvr(N,L,NZ,NY,NX)
+        plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ) = Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)
-        plt_morph%RootLenPerPlant_pvr(N,L,NZ)     = RootLenPerPlant_pvr(N,L,NZ,NY,NX)
+        plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO
     ENDDO
     !variables updated from surface energy calculation
@@ -206,7 +204,7 @@ implicit none
     plt_pheno%IsPlantActive_pft(NZ)         = IsPlantActive_pft(NZ,NY,NX)       !lai >0,                        active
     plt_ew%PSICanopy_pft(NZ)                = PSICanopy_pft(NZ,NY,NX)
     plt_pheno%TempOffset_pft(NZ)            = TempOffset_pft(NZ,NY,NX)             !set based on read in pft parameter
-    plt_ew%CanOsmoPsi0pt_pft(NZ)            = CanOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
+    plt_ew%OrganOsmoPsi0pt_pft(NZ)            = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
 
   ENDDO
   end subroutine PlantUptakeAPISend

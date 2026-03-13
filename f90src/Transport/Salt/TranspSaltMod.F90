@@ -231,7 +231,7 @@ module TranspSaltMod
     !
     !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
     !
-    SoluteDifusivitytscaledM_vr(L,NY,NX)                 = SoluteDifusvty_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+    SoluteDifusivitytscaledM_vr(L,NY,NX)                 = SoluteDifusvtyT_vr(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
     AquaIonDifusivty2_vr(idsalt_beg:idsalt_mend,L,NY,NX) = AquaIonDifusivty_vr(idsalt_beg:idsalt_mend,L,NY,NX)*dts_HeatWatTP
 
   ENDDO D10

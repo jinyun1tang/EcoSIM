@@ -69,7 +69,7 @@
         HydroIonFlx_CumYr_col(NY,NX)      = 0._r8
         FertN_Flx_CumYr_col(NY,NX)         = 0._r8
         HydroSufDINFlx_CumYr_col(NY,NX)   = 0._r8
-        FerPFlx_CumYr_col(NY,NX)          = 0._r8
+        FerP_Flx_CumYr_col(NY,NX)          = 0._r8
         HydroSufDIPFlx_CumYr_col(NY,NX)   = 0._r8
         CO2byFire_CumYr_col(NY,NX)        = 0._r8
         CH4byFire_CumYr_col(NY,NX)        = 0._r8
@@ -85,8 +85,10 @@
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8
+        PlantElmBalCum_pft(:,:,NY,NX)      = 0._r8
         QDrain_cum_col(NY,NX) = 0._r8        
         D960: DO NZ=1,NP0_col(NY,NX)
+          cumNPP_pft(NZ,NY,NX)=0._r8
           !NetCumElmntFlx2Plant_pft: effect of canopy element status on seed set
           DO NE=1,NumPlantChemElms
             NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(NE,NZ,NY,NX) &
@@ -104,6 +106,8 @@
           NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX)=NetCumElmntFlx2Plant_pft(ielmp,NZ,NY,NX) &
             -PO4byFire_CumYr_pft(NZ,NY,NX)+RootUptk_P_CumYr_pft(NZ,NY,NX)
 
+          RootUptk_Nmin_cumYr_pft(NZ,NY,NX)          = 0._r8
+          RootUptk_Pmin_cumYr_pft(NZ,NY,NX)          = 0._r8
           RootUptk_N_CumYr_pft(NZ,NY,NX)             = 0._r8
           RootUptk_P_CumYr_pft(NZ,NY,NX)             = 0._r8
           GrossCO2Fix_CumYr_pft(NZ,NY,NX)            = 0._r8

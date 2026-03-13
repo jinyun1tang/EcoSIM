@@ -175,5 +175,34 @@ implicit none
   DECLIN=SIN((DECDAY*0.9863_r8)*RadianPerDegree)*(-23.47_r8)
 
   end function get_sun_declin
-!------------------------------------------------------------------------------------------
+
+! -------------------------------------------------------------------------
+! Function: calculate_equation_of_time
+! 
+! Approximation of the Equation of Time (EOT) in minutes.
+! Formula: B = (360/365) * (d - 81) in degrees
+!          EOT = 9.87 * sin(2B) - 7.53 * cos(B) - 1.5 * sin(B)
+! -------------------------------------------------------------------------
+  pure FUNCTION calculate_equation_of_time(day_of_year,leapday) RESULT(eot)
+  implicit none
+
+  INTEGER, INTENT(IN) :: day_of_year
+  real(r8), intent(in) :: leapday
+
+  REAL(r8) :: eot  ![h]
+  REAL(r8) :: b, b_rad
+
+  ! B calculation (convert to radians for trig functions)
+  ! Ensure floating point division is used
+  b = (360.0_r8 / (365.0_r8+leapday)) * REAL(day_of_year - 81, r8)
+  
+  ! Convert degrees to radians
+  b_rad = b * (PICON / 180.0_r8)
+
+  ! EOT calculation
+  eot = 9.87_r8 * SIN(2.0_r8 * b_rad) - &
+        7.53_r8 * COS(b_rad) - &
+        1.50_r8 * SIN(b_rad)
+  eot = eot/60._r8 
+  END FUNCTION calculate_equation_of_time
 end module MiniFuncMod

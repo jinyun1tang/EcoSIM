@@ -9,9 +9,9 @@ module PlantMgmtDataType
   logical, target,allocatable ::  flag_active_pft(:,:,:)                       !flag for plant presence,[-]
   real(r8),target,allocatable ::  THIN_pft(:,:,:,:)                            !thinning of plant population, [-]
   real(r8),target,allocatable ::  FracBiomHarvsted(:,:,:,:,:,:)                !harvest efficiency, [-]
-  real(r8),target,allocatable ::  FracCanopyHeightCut_pft(:,:,:,:)             !harvest cutting height (+ve) or fractional LAI removal (-ve), [m] or [-]
+  real(r8),target,allocatable ::  CanopyHeightCut_pft(:,:,:,:)             !harvest cutting height (+ve) or fractional LAI removal (-ve), [m] or [-]
   integer ,target,allocatable ::  iHarvstType_pft(:,:,:,:)                     !type of harvest, [-]
-  integer ,target,allocatable ::  jHarvst_pft(:,:,:,:)                         !flag for stand replacing disturbance, [-]
+  integer ,target,allocatable ::  jHarvstType_pft(:,:,:,:)                         !flag for stand replacing disturbance, [-]
   integer ,target,allocatable ::  iYearPlanting_pft(:,:,:)                     !year of planting, [-]
   integer ,target,allocatable ::  iYearPlantHarvest_pft(:,:,:)                 !year of harvest, [-]
   integer ,target,allocatable ::  iDayPlanting_pft(:,:,:)                      !day of planting, [-]
@@ -49,9 +49,9 @@ module PlantMgmtDataType
   allocate(flag_active_pft(JP,JY,JX));  flag_active_pft                    = .false.
   allocate(THIN_pft(JP,366,JY,JX)); THIN_pft                               = 0._r8
   allocate(FracBiomHarvsted(2,4,JP,366,JY,JX));FracBiomHarvsted            = 0._r8
-  allocate(FracCanopyHeightCut_pft(JP,366,JY,JX)); FracCanopyHeightCut_pft = 0._r8
+  allocate(CanopyHeightCut_pft(JP,366,JY,JX)); CanopyHeightCut_pft = 0._r8
   allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft                  = -1
-  allocate(jHarvst_pft(JP,366,JY,JX));jHarvst_pft                          = 0
+  allocate(jHarvstType_pft(JP,366,JY,JX));jHarvstType_pft                          = 0
 
   allocate(iYearPlanting_pft(JP,JY,JX));     iYearPlanting_pft         = 0
   allocate(iYearPlantHarvest_pft(JP,JY,JX));     iYearPlantHarvest_pft = 0
@@ -82,9 +82,9 @@ module PlantMgmtDataType
   call destroy(flag_active_pft)
   call destroy(THIN_pft)
   call destroy(FracBiomHarvsted)
-  call destroy(FracCanopyHeightCut_pft)
+  call destroy(CanopyHeightCut_pft)
   call destroy(iHarvstType_pft)
-  call destroy(jHarvst_pft)
+  call destroy(jHarvstType_pft)
 
   call destroy(iYearPlanting_pft)
   call destroy(iYearPlantHarvest_pft)

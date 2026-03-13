@@ -330,7 +330,7 @@ module SoilDisturbMod
           trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_AlPO4,L,NY,NX)
           trcp_saltpml_vr(idsp_FePO4,L,NY,NX)    = DCORPC1*trcp_saltpml_vr(idsp_FePO4,L,NY,NX)
           trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)   = DCORPC1*trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)
-          trcp_saltpml_vr(idsp_HA,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_HA,L,NY,NX)
+          trcp_saltpml_vr(idsp_Apatite,L,NY,NX)       = DCORPC1*trcp_saltpml_vr(idsp_Apatite,L,NY,NX)
           trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX) = DCORPC1*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)
 
           DO NTF=ifertn_beg,ifertn_end
@@ -346,7 +346,7 @@ module SoilDisturbMod
         !     VHeatCapacity_vr(0,NY,NX)=2.496E-06*SoilOrgM_vr(ielmc,0,NY,NX)+4.19*VLWatMicP_vr(0,NY,NX)
         !    2+1.9274*VLiceMicP_vr(0,NY,NX)
         !     ELSE
-        !     VHeatCapacity_vr(L,NY,NX)=VHeatCapacitySoilM_vr(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
+        !     VHeatCapacity_vr(L,NY,NX)=VHeatCapSolidSoil_vr(L,NY,NX)+4.19*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))
         !    2+1.9274*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         !     ENDIF
 

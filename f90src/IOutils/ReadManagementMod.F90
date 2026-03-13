@@ -3,10 +3,11 @@ module ReadManagementMod
   ! Description
   ! code to read Soil management info
   !
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use abortutils , only : endrun
-  use fileUtil   , only : open_safe,int2str
-  use minimathmod, only : isLeap
+  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use abortutils,    only: endrun
+  use fileUtil,      only: open_safe, int2str
+  use minimathmod,   only: isLeap
+  use DebugToolMod,  only: PrintInfo
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -47,19 +48,19 @@ implicit none
   integer :: kk
   logical :: readvar
   type(Var_desc_t) :: vardesc
-  character(len=24) :: tillf(12)
+  character(len=24) :: tillf(367)
   integer :: ntill
 
   ntill=get_dim_len(soilmgmt_nfid,'ntill')
-  if(ntill>12)then
+  if(ntill>367)then
     call endrun('Not enough memory size for array tillf in '//trim(mod_filename),__LINE__)
   endif
   call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
   if(.not. readvar)then
     call endrun('fail to find tillage file '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
   endif
-
-  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf),&
+  
+  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf(1:ntill)),&
       trim(mod_filename))
 
 !
@@ -90,7 +91,8 @@ implicit none
         DepzCorp_col(IDY,NY,NX)         = DPLOW
       ENDDO D8990
     ENDDO D8995
-    kk=kk+1
+    if(kk==ntill)exit
+    kk=kk+1    
   enddo
   end subroutine ReadTillageFile
 !------------------------------------------------------------------------------------------
@@ -104,7 +106,7 @@ implicit none
 
   integer :: NY,NX,LPY,J,JEN
   integer :: IDY1,IDY2,IDY3,I,IDY
-  integer :: IDYS,IHRS,IFLGV_colX,JST,IDYE,IHRE
+  integer :: IDYS,IHRS,iIrrigOptX,JST,IDYE,IHRE
   real(r8):: DY
   real(r8) :: DST,DEN,CIRRX,RR,FIRRX
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
@@ -133,9 +135,9 @@ implicit none
 !       AUTOMATED IRRIGATION
 !
 !       DST,DEN=start,end dates,hours DDMMHHHH
-!       IFLGV_colX=flag for irrigation criterion,0=SWC,1=canopy water potl
-!       FIRRX=depletion of SWC from CIRRX to WP(IFLGV_col=0),or minimum canopy
-!       water potential(IFLGV_col=1), to trigger irrigation
+!       iIrrigOptX=flag for irrigation criterion,0=SWC,1=canopy water potl
+!       FIRRX=depletion of SWC from CIRRX to WP(iIrrigOpt_col=0),or minimum canopy
+!       water potential(iIrrigOpt_col=1), to trigger irrigation
 !       CIRRX= fraction of FC to which irrigation will raise SWC
 !       DIRRX= depth to which water depletion and rewatering is calculated
 !       WDPTHI=depth at which irrigation is applied
@@ -147,14 +149,14 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1)),&
       trim(mod_filename))
 
-    READ(irrigf(1),*)DST,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
+    READ(irrigf(1),*)DST,DEN,iIrrigOptX,FIRRX,CIRRX,DIRRX,WDPTHI &
       ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
       ,CSOQX,CCLQX
     READ(irrigf(1),'(I2,I2,I4)')IDY1,IDY2,IDY3
 
     IF(lverb)then
       print*,irrigf(1)
-      print*,IDY1,IDY2,IDY3,DEN,IFLGV_colX,FIRRX,CIRRX,DIRRX,WDPTHI &
+      print*,IDY1,IDY2,IDY3,DEN,iIrrigOptX,FIRRX,CIRRX,DIRRX,WDPTHI &
         ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
         ,CSOQX,CCLQX
     endif
@@ -185,16 +187,16 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
-        IFLGV_col(NY,NX)   = IFLGV_colX
-        IIRRA(1,NY,NX) = IDYS
-        IIRRA(2,NY,NX) = IDYE
-        IIRRA(3,NY,NX) = INT(IHRS/100)
+        iIrrigOpt_col(NY,NX) = iIrrigOptX
+        IIRRA(1,NY,NX)       = IDYS
+        IIRRA(2,NY,NX)       = IDYE
+        IIRRA(3,NY,NX)       = INT(IHRS/100)
         IIRRA(4,NY,NX) = INT(IHRE/100)
         FIRRA_col(NY,NX)   = FIRRX
         CIRRA_col(NY,NX)   = CIRRX
         DIRRA(1,NY,NX) = DIRRX    !depth
         DIRRA(2,NY,NX) = WDPTHI   !width
-        D220: DO I     = 1, 366
+        D220: DO I = 1, 366
           PHQ(IDY,NY,NX)                                    = PHQX
           NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
           NO3_irrig_mole_conc(IDY,NY,NX)                    = CNOQX/14.0_r8
@@ -280,11 +282,11 @@ implicit none
 
   integer :: NY,NX,LPY
   integer :: IDY1,IDY2,IDY3,IDY
-  real(r8) :: FDPTHI,DY
-  real(r8) :: Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB,Z4A
-  real(r8) :: PMA,PMB,PHA,CAS,CAC
-  real(r8) :: RSC1,RSN1,RSP1,RSC2,RSN2,RSP2
-  real(r8) :: ROWX
+  real(r8) :: AppDepth,DDMMYYYY
+  real(r8) :: NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band,NH4Soil
+  real(r8) :: MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,Gypsum,LimeStone
+  real(r8) :: PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP
+  real(r8) :: BandWidth,PO4Soil,PO4Band
   integer  :: IR0,IR1,IR2
   integer  :: kk
   logical :: readvar
@@ -298,14 +300,14 @@ implicit none
   endif
 !
 !     DY=date DDMMYYYY
-!     *A,*B=broadcast,banded fertilizer application
+!     *A,*B=broadGypsumt,banded fertilizer application
 !     Z4,Z3,ZU,ZO=NH4,NH3,urea,NO3
 !     PM*,PH*=Ca(H2PO4)2,apatite
-!     CAC,CAS=CaCO3,CaSO4
+!     LimeStone,Gypsum=CaCO3,CaSO4
 !     *1,*2=litter,manure amendments
 !     RSC,RSN,RSC=amendment C,N,P content
-!     FDPTHI=application depth
-!     ROWX=band row width
+!     AppDepth=application depth
+!     BandWidth=band row width
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
 
@@ -319,24 +321,27 @@ implicit none
 
   do kk=1,12
     if(len_trim(fertf(kk))==0)exit
-
-    READ(fertf(kk),*)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
-      ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
-      ,ROWX,IR0,IR1,IR2
+    !all nutrients are in g/m2
+    READ(fertf(kk),*)DDMMYYYY,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
+      ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
+      ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,AppDepth &
+      ,BandWidth,PO4Soil,PO4Band,IR0,IR1,IR2
 
     LPY=0
-    IDY1=INT(DY/1.0E+06_r8)
+    IDY1=INT(DDMMYYYY/1.0E+06_r8)
     !return for bad fertilization data
     if(IDY1==0)return
-    IDY2=INT(DY/1.0E+04_r8-IDY1*1.0E+02_r8)
-    IDY3=INT(DY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
+    IDY2=INT(DDMMYYYY/1.0E+04_r8-IDY1*1.0E+02_r8)
+    IDY3=INT(DDMMYYYY-(IDY1*1.0E+06_r8+IDY2*1.0E+04_r8))       
      
     IF(LVERB)then
       print*,fertf(kk)
-      PRINT*,IDY1,IDY2,IDY3,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
-        ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
-        ,ROWX,IR0,IR1,IR2
+      PRINT*,IDY1,IDY2,IDY3,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
+        ,MonocalciumPhosphateSoil,MonocalciumPhosphateBand,hydroxyapatite,LimeStone,Gypsum &
+        ,PlantResC,PlantResN,PlantResP,ManureC,ManureN,ManureP,AppDepth &
+        ,BandWidth,PO4Soil,PO4Band,IR0,IR1,IR2
     endif
+
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
       IDY=IDY1
@@ -351,46 +356,48 @@ implicit none
 !
 !         NH4,NH3,UREA,NO3 BROADCAST (A) AND BANDED (B)
 !
-        FERT(ifert_nh4,IDY,NY,NX)       = Z4A        !NH4 broadcast
-        FERT(ifert_nh3,IDY,NY,NX)       = Z3A        !NH3 broadcast
-        FERT(ifert_urea,IDY,NY,NX)      = ZUA        !Urea broadcast
-        FERT(ifert_no3,IDY,NY,NX)       = ZOA        !NO3 broadcast
-        FERT(ifert_nh4_band,IDY,NY,NX)  = Z4B        !NH4 band
-        FERT(ifert_nh3_band,IDY,NY,NX)  = Z3B        !NH3 band
-        FERT(ifert_urea_band,IDY,NY,NX) = ZUB        !Urea band
-        FERT(ifert_no3_band,IDY,NY,NX)  = ZOB        !NO3 band
+        FERT(ifert_N_nh4,IDY,NY,NX)       = NH4Soil        !NH4 broadcast
+        FERT(ifert_N_nh3,IDY,NY,NX)       = NH3Soil        !NH3 broadcast
+        FERT(ifert_N_urea,IDY,NY,NX)      = UreaSoil       !Urea broadcast
+        FERT(ifert_N_no3,IDY,NY,NX)       = NO3Soil        !NO3 broadcast
+        FERT(ifert_N_nh4_band,IDY,NY,NX)  = NH4Band        !NH4 band
+        FERT(ifert_N_nh3_band,IDY,NY,NX)  = NH3Band        !NH3 band
+        FERT(ifert_N_urea_band,IDY,NY,NX) = UreaBand       !Urea band
+        FERT(ifert_N_no3_band,IDY,NY,NX)  = NO3Band        !NO3 band
 !
 !         MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE BROADCAST (A)
 !         AND BANDED (B)
 !
-        FERT(ifert_P_Ca_H2PO4_2,IDY,NY,NX)      = PMA        !PM broadcast
-        FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = PMB        !PM band
-        FERT(ifert_P_apatite,IDY,NY,NX)         = PHA        !
+        FERT(ifert_P_Ca_H2PO4_2_soil,IDY,NY,NX) = MonocalciumPhosphateSoil        !PM broadcast
+        FERT(ifert_P_Ca_H2PO4_2_band,IDY,NY,NX) = MonocalciumPhosphateBand        !PM band
+        FERT(ifert_P_apatite,IDY,NY,NX)         = hydroxyapatite                  !(Ca5(PO4)3OH)
 !
 !         LIME AND GYPSUM
 !
-        FERT(ifert_Ca_lime,IDY,NY,NX)   = CAC
-        FERT(ifert_Ca_gypsum,IDY,NY,NX) = CAS
+        FERT(ifert_Ca_lime,IDY,NY,NX)   = LimeStone
+        FERT(ifert_Ca_gypsum,IDY,NY,NX) = Gypsum
 !
 !         PLANT AND ANIMAL RESIDUE C, N AND P
 !
-        FERT(ifert_plant_resC,IDY,NY,NX)  = RSC1
-        FERT(ifert_plant_resN,IDY,NY,NX)  = RSN1
-        FERT(ifert_plant_resP,IDY,NY,NX)  = RSP1
-        FERT(ifert_plant_manuC,IDY,NY,NX) = RSC2
-        FERT(ifert_plant_manuN,IDY,NY,NX) = RSN2
-        FERT(ifert_plant_manuP,IDY,NY,NX) = RSP2
+        FERT(ifert_plant_resC,IDY,NY,NX)  = PlantResC
+        FERT(ifert_plant_resN,IDY,NY,NX)  = PlantResN
+        FERT(ifert_plant_resP,IDY,NY,NX)  = PlantResP
+        FERT(ifert_plant_manuC,IDY,NY,NX) = ManureC
+        FERT(ifert_plant_manuN,IDY,NY,NX) = ManureN
+        FERT(ifert_plant_manuP,IDY,NY,NX) = ManureP
+        FERT(ifert_PO4_soil,IDY,NY,NX)    = PO4Soil
+        FERT(ifert_PO4_band,IDY,NY,NX)    = PO4Band
 !
 !         DEPTH AND WIDTH OF APPLICATION
 !
-        FDPTH(IDY,NY,NX) = FDPTHI    !depth
-        ROWI(IDY,NY,NX)  = ROWX       !width
+        FDPTH(IDY,NY,NX) = AppDepth    !depth
+        ROWI(IDY,NY,NX)  = BandWidth       !width
 !
 !         TYPE OF FERTILIZER,PLANT OR ANIMAL RESIDUE
 !
-        IYTYP(0,IDY,NY,NX)=IR0
-        IYTYP(1,IDY,NY,NX)=IR1
-        IYTYP(2,IDY,NY,NX)=IR2
+        IYTYP(iamendtyp_fert,IDY,NY,NX)     = IR0
+        IYTYP(iAmendtyp_plantRes,IDY,NY,NX) = IR1
+        IYTYP(iAmendtyp_Manure,IDY,NY,NX)   = IR2
       ENDDO D8980
     ENDDO D8985
   enddo
@@ -406,7 +413,7 @@ implicit none
   use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
   integer, intent(in) :: yeari
-
+  character(len=*), parameter :: subname='ReadManagementFiles'
   integer :: NH1,NV1,NH2,NV2
   type(file_desc_t) :: soilmgmt_nfid
   type(Var_desc_t) :: vardesc
@@ -421,7 +428,7 @@ implicit none
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
-
+  call PrintInfo('beg '//subname)
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
   nyears=get_dim_len(soilmgmt_nfid, 'year')
   if(nyears==0)then
@@ -500,7 +507,7 @@ implicit none
     ENDIF
   ENDDO
   call ncd_pio_closefile(soilmgmt_nfid)
-
+  call PrintInfo('end '//subname)
   end subroutine ReadManagementFiles
 
 !------------------------------------------------------------------------------------------

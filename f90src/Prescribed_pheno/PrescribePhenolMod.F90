@@ -206,7 +206,7 @@ implicit none
   REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
-  irootType=1
+  !irootType=1
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       NP_col(NY,NX)=1
@@ -287,26 +287,39 @@ implicit none
          ENDDO
       ENDIF
 
-      !
+      !=============================================================================
+      ! Pre-merge function calls, delete if working!
       !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       !replacing with irootType from ATS, place behind if so it doesn't trigger on bare ground
-      tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
-      tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
-      tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
-      if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),tmp_cdepz,tmp_rootc,tmp_rootl)
-      endif
-      PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
-      PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
+      !tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
+      !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
+      !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
+      !if(irootType_col(NY,NX).GT.0.0)then
+      !  call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),tmp_cdepz,tmp_rootc,tmp_rootl)
+      !endif
+      !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
+      !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
       !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      !DO NZ=1,NP_col(NY,NX)
+      !  DO L=NU_col(NY,NX),NL_col(NY,NX)
+      !    RootLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
+      !==============================================================================
+
+      if(irootType_col(NY,NX).GT.0.0)then
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      else
+        PerPlantRootC_vr(1:NL_col(NY,NX))   = 0.0_r8
+        PerPlantRootLen_vr(1:NL_col(NY,NX)) = 0.0_r8
+      endif
+
       DO NZ=1,NP_col(NY,NX)
         DO L=NU_col(NY,NX),NL_col(NY,NX)
-          RootLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
+          RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
 
           !the following two are fillers, which will be updated later
-          Root1stXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 2._r8
+          Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8
           Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
         ENDDO
       ENDDO
@@ -315,11 +328,14 @@ implicit none
 
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------
-  subroutine SetRootProfileZ(irootType,NL,tmp_cdepthz,tmp_rootc,tmp_rootl)
+  subroutine SetRootProfileZ(irootType,NL,cdepthz,PerPlantRootC_vr,PerPlantRootLen_vr)
+  !
+  !Description:
+  !Reference: Jackson et al. (1997), A global budget for fine root biomass, surface area, and nutrient contents, PNAS.
   !|Biome | Total fine root biomass (kg m$^{-2}$) | Live fine root biomass (kg m$^{-2}$) | Live fine root length (km m$^{-2}$) | Live fine root area index (m2 m$^{-2}$) |$\beta$|
   !|----------|----------|----------|----------|----------|----------|
   !|1. Boreal forest|0.60 | 0.23 | 2.6 | 4.6 | 0.943|
-  !|2. Desert | 0.27|0.13|4.0 | 5.5 | 0.970|
+  !|2. Desert bushes | 0.27|0.13|4.0 | 5.5 | 0.970|
   !|3. Sclerophyllous shrubs and tress |0.52|0.28|8.4|11.6|0.950|
   !|4. Temperate confierous forest|0.82|0.50|6.1|11.0|0.980|
   !|5. Temperature deciduous forest|0.78|0.44|5.4|9.8|0.967|
@@ -328,12 +344,10 @@ implicit none
   !|8. Tropical evergreen forest|0.57|0.33|4.1|7.4|0.972|
   !|9. Tropical grassland/savanna|0.99|0.51|60.4|42.5|0.972|
   !|10. Tundra|0.96|0.34|7.4|5.2|0.909|
+
   implicit none
-  integer, intent(in) :: iRootType
+  integer, intent(in) :: irootType
   integer, intent(in) :: NL
-  real(r8),intent(in) :: tmp_cdepthz(JZ)        !cumulative depth [m]
-  real(r8),intent(out) :: tmp_rootc(JZ)   !fine root C in each layer [gC m-2]
-  real(r8),intent(out) :: tmp_rootl(JZ)    !root length in each layer [gC m-2]
   real(r8), parameter :: beta(10)=real((/0.943,0.970,0.950,0.980,0.967,0.943,0.982,0.972,0.972,0.909/),kind=r8)
   real(r8), parameter :: totfrootC(10)=(/0.6,0.27,0.52,0.82,0.78,1.51,0.57,0.57,0.99,0.96/)*0.488_r8 !total fine root C
   real(r8), parameter :: frootLen(10)=(/2.6,4.0,8.4,6.1,5.4,112.,3.5,4.1,60.4,7.4/)*1.e3_r8  !total fine root length
@@ -341,17 +355,20 @@ implicit none
   integer :: L
   real(r8) :: CumRootFrac_vr(JZ)  !Cumfraction of root in soil layers
   real(r8) :: RootFrac_vr(JZ)     !fraction of root in soil layers
+  real(r8) :: cdepthz(JZ)         !Cumulative depth
+  real(r8),intent(out) :: PerPlantRootC_vr(JZ)      !fine root C in each layer [gC m-2]
+  real(r8),intent(out) :: PerPlantRootLen_vr(JZ)    !root length in each layer [m-1]
 
-  CumRootFrac_vr(1)=1._r8-beta(irootType)**(tmp_cdepthz(1)*100._r8)
+  CumRootFrac_vr(1)=1._r8-beta(irootType)**(cdepthz(1)*100._r8)
   RootFrac_vr(1)=CumRootFrac_vr(1)
-  tmp_rootl(1)=frootLen(irootType)*RootFrac_vr(1)/PltPopDef(irootType)
-  tmp_rootc(1)=RootFrac_vr(1)*totfrootC(irootType)/PltPopDef(irootType)
+  PerPlantRootLen_vr(1)=frootLen(irootType)*RootFrac_vr(1)/PltPopDef(irootType)
+  PerPlantRootC_vr(1)=RootFrac_vr(1)*totfrootC(irootType)/PltPopDef(irootType)
 
   DO L=2,NL
-    CumRootFrac_vr(L)=1._r8-beta(irootType)**(tmp_cdepthz(L)*100._r8)
+    CumRootFrac_vr(L)=1._r8-beta(irootType)**(cdepthz(L)*100._r8)
     RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
-    tmp_rootl(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
-    tmp_rootc(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
+    PerPlantRootLen_vr(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
+    PerPlantRootC_vr(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
   enddo
 
   end subroutine SetRootProfileZ

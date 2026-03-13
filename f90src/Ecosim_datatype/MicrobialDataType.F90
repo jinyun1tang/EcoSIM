@@ -33,7 +33,8 @@ implicit none
   real(r8),target,allocatable :: RH1PO4DmndLitrHeter_col(:,:,:,:)     !heterotrophic substrate-unlimited HPO4 immobilization in surface litter, [g d-2 h-1]
   real(r8),target,allocatable :: OMEERhetr_2D(:,:,:,:,:,:,:)           !heterotrophic microbial C loss through erosion 	[g d-2 h-1]
   real(r8),target,allocatable :: mBiomeAutor_vr(:,:,:,:,:)            !autotrophic microbial biomass chemical element,[g d-2]
-  real(r8),target,allocatable :: RO2DmndAutort_vr(:,:,:,:)            !aqueous O2 demand by autotrophic microbes, [g d-2 h-1]
+  real(r8),target,allocatable :: RO2MetaDmndAutor_vr(:,:,:,:)          !aqueous O2 demand by metabolism of autotrophic microbes, [g d-2 h-1]
+  real(r8),target,allocatable :: RCH4MetaDmndAutor_vr(:,:,:,:)           !aqueous CH4 demand by metabolism of autotrophic microbes, [g d-2 h-1]
   real(r8),target,allocatable :: RNH4UptkSoilAutor_vr(:,:,:,:)        !autotrophic microbial NH4 demand in soil, [g d-2 h-1]
   real(r8),target,allocatable :: RNO3UptkSoilAutor_vr(:,:,:,:)         !autotrophic microbial NO3 demand in soil, [g d-2 h-1]
   real(r8),target,allocatable :: RH2PO4UptkSoilAutor_vr(:,:,:,:)       !autotrophic microbes H2PO4 demand in soil, [g d-2 h-1]
@@ -41,9 +42,11 @@ implicit none
   real(r8),target,allocatable :: RH2PO4UptkLitrAutor_col(:,:,:)      !autotrophic microbial H2PO4 demand in surface litter, [g d-2 h-1]
   real(r8),target,allocatable :: RNO3UptkLitrAutor_col(:,:,:)        !autotrophic microbial NO3 demand in surface litter, [g d-2 h-1]
   real(r8),target,allocatable :: RNH3OxidAutor_vr(:,:,:,:)             !autotrophic NH3 oxidation in non-band soil, [g d-2 h-1]
-  real(r8),target,allocatable :: RNO2OxidAutor_vr(:,:,:,:)            !autotrophic NO2 oxidation in non-band soil, [g d-2 h-1]
+  real(r8),target,allocatable :: RNO2XupAutor_vr(:,:,:,:)            !autotrophic NO2 consumption in non-band soil, [g d-2 h-1]
+  real(r8),target,allocatable :: RNO2XupAutorBand_vr(:,:,:,:)        !autotrophic NO2 consumption in band soil, [g d-2 h-1]
+  real(r8),target,allocatable :: RNO3XupAutor_vr(:,:,:,:)            !autotrophic NO3 consumption in non-band soil, [g d-2 h-1]
+  real(r8),target,allocatable :: RNO3XupAutorBand_vr(:,:,:,:)      !autotrophic NO3 consumption in band soil, [g d-2 h-1]  
   real(r8),target,allocatable :: RNH3OxidAutorBand_vr(:,:,:,:)       !autotrophic NH3 oxidation in band soil, [g d-2 h-1]
-  real(r8),target,allocatable :: RNO2OxidAutorBand_vr(:,:,:,:)      !autotrophic NO2 oxidation in band soil, [g d-2 h-1]
   real(r8),target,allocatable :: RN2ODmndReduxAutor_vr(:,:,:,:)     !autotrophic microbial N2O Demand for reduction, [g d-2 h-1]
   real(r8),target,allocatable :: RNH4UptkBandAutor_vr(:,:,:,:)      !autotrophic microbial NH4 demand in band soil, [g d-2 h-1]
   real(r8),target,allocatable :: RNO3UptkBandAutor_vr(:,:,:,:)      !autotrophic microbial NO3 demand in band soil, [g d-2 h-1]
@@ -94,7 +97,8 @@ implicit none
   allocate(RH1PO4DmndLitrHeter_col(NumHetetr1MicCmplx,1:jcplx,JY,JX));RH1PO4DmndLitrHeter_col=0._r8
   allocate(OMEERhetr_2D(NumPlantChemElms,NumLiveHeterBioms,1:jcplx,2,2,JV,JH));OMEERhetr_2D=0._r8
   allocate(mBiomeAutor_vr(NumPlantChemElms,NumLiveAutoBioms,0:JZ,JY,JX));mBiomeAutor_vr=0._r8
-  allocate(RO2DmndAutort_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RO2DmndAutort_vr=0._r8
+  allocate(RO2MetaDmndAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RO2MetaDmndAutor_vr=0._r8
+  allocate(RCH4MetaDmndAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RCH4MetaDmndAutor_vr=0._r8
   allocate(RNH4UptkSoilAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNH4UptkSoilAutor_vr=0._r8
   allocate(RNO3UptkSoilAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO3UptkSoilAutor_vr=0._r8
   allocate(RH2PO4UptkSoilAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RH2PO4UptkSoilAutor_vr=0._r8
@@ -102,9 +106,11 @@ implicit none
   allocate(RH2PO4UptkLitrAutor_col(NumMicrobAutoTrophCmplx,JY,JX));RH2PO4UptkLitrAutor_col=0._r8
   allocate(RNO3UptkLitrAutor_col(NumMicrobAutoTrophCmplx,JY,JX));RNO3UptkLitrAutor_col=0._r8
   allocate(RNH3OxidAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNH3OxidAutor_vr=0._r8
-  allocate(RNO2OxidAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO2OxidAutor_vr=0._r8
+  allocate(RNO2XupAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO2XupAutor_vr=0._r8  
+  allocate(RNO2XupAutorBand_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO2XupAutorBand_vr=0._r8  
+  allocate(RNO3XupAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO3XupAutor_vr=0._r8
+  allocate(RNO3XupAutorBand_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO3XupAutorBand_vr=0._r8  
   allocate(RNH3OxidAutorBand_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNH3OxidAutorBand_vr=0._r8
-  allocate(RNO2OxidAutorBand_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO2OxidAutorBand_vr=0._r8
   allocate(RN2ODmndReduxAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RN2ODmndReduxAutor_vr=0._r8
   allocate(RNH4UptkBandAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNH4UptkBandAutor_vr=0._r8
   allocate(RNO3UptkBandAutor_vr(NumMicrobAutoTrophCmplx,0:JZ,JY,JX));RNO3UptkBandAutor_vr=0._r8
@@ -147,7 +153,8 @@ implicit none
   call destroy(RH1PO4DmndLitrHeter_col)
   call destroy(OMEERhetr_2D)
   call destroy(mBiomeAutor_vr)
-  call destroy(RO2DmndAutort_vr)
+  call destroy(RO2MetaDmndAutor_vr)
+  call destroy(RCH4MetaDmndAutor_vr)
   call destroy(RNH4UptkSoilAutor_vr)
   call destroy(RNO3UptkSoilAutor_vr)
   call destroy(RH2PO4UptkSoilAutor_vr)
@@ -155,9 +162,11 @@ implicit none
   call destroy(RH2PO4UptkLitrAutor_col)
   call destroy(RNO3UptkLitrAutor_col)
   call destroy(RNH3OxidAutor_vr)
-  call destroy(RNO2OxidAutor_vr)
+  call destroy(RNO2XupAutor_vr)
+  call destroy(RNO2XupAutorBand_vr)  
+  call destroy(RNO3XupAutor_vr)
+  call destroy(RNO3XupAutorBand_vr)  
   call destroy(RNH3OxidAutorBand_vr)
-  call destroy(RNO2OxidAutorBand_vr)
   call destroy(RN2ODmndReduxAutor_vr)
   call destroy(RNH4UptkBandAutor_vr)
   call destroy(RNO3UptkBandAutor_vr)

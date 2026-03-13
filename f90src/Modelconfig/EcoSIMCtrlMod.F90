@@ -21,6 +21,7 @@ implicit none
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.
+  logical :: lsoilCompaction   =.false.
   logical :: ldo_sp_mode       =.false.   !do satellite phenology mode
   logical :: mod_snow_albedo   =.false.
   logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy
@@ -43,11 +44,12 @@ implicit none
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
-  character(len=300) :: clm_hour_file_in =''     !file for hourly climate forcing
+  character(len=300) :: clm_hour_file_in =''    !file for hourly climate forcing
   character(len=300) :: clm_day_file_in  =''    !file for daily climate forcing
-  character(len=300) :: soil_mgmt_in     !file for soil management information
-  character(len=300) :: clm_factor_in    !file for climate change factors
-  character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
+  character(len=300) :: soil_mgmt_in            !file for soil management information
+  character(len=300) :: clm_factor_in           !file for climate change factors
+  character(len=300) :: atm_ghg_in              !file for atmospheric GHG concentrations
+  character(len=300) :: micpar_file_in=''       !file of microbial parameters
   integer :: iVerbLevel = 0
   logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid

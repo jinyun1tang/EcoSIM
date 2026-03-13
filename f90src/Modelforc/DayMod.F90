@@ -1,10 +1,12 @@
 
   module DayMod
   use data_kind_mod,      only: r8 => DAT_KIND_R8
-  use minimathmod,        only: isLeap, AZMAX1
-  use MiniFuncMod,        only: GetDayLength
+  use minimathmod,        only: isLeap,  AZMAX1
+  use MiniFuncMod,        only: GetDayLength, calculate_equation_of_time
   use PrescribePhenolMod, only: PrescribePhenologyInterp
-  use SurfLitterDataType, only : XTillCorp_col
+  use SurfLitterDataType, only: XTillCorp_col
+  use fileUtil,           only: iulog
+  use DebugToolMod,       only: PrintInfo
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -18,7 +20,6 @@
   use ClimForcDataType
   use FertilizerDataType
   use PlantTraitDataType
-
   use PlantDataRateType
   use CanopyDataType
   use RootDataType
@@ -38,14 +39,6 @@
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  CHARACTER(len=3) :: CHARN1,CHARN2
-  CHARACTER(len=4) :: CHARN3
-
-  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ
-  real(r8) :: RR,TFZ,TWP,TVW,XI
-
-  integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
-
   public :: day
   contains
 
@@ -58,6 +51,9 @@
 
   integer, intent(in) :: I
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NN,N,M,NY,NX
+  real(r8) :: eot,leapday
+  character(len=*), parameter :: subname='day'
 !     execution begins here
 !     begin_execution
 !
@@ -65,28 +61,27 @@
 !
 !     CDATE=DDMMYYYY
 !
-  N=0
-  NN=0
-  D500: DO M=1,12
-    N=30*M+ICOR(M)
+  call PrintInfo('beg '//subname)
+  if(isLeap(iYearCurrent))then
+    leapday=1._r8
+  else
+    leapday=0._r8
+  endif
 
-!  leap year February.
-    IF(isLeap(iYearCurrent) .and. M.GE.2)N=N+1
-    IF(I.LE.N)THEN
-      N1=I-NN
-      N2=M
-      N3=iYearCurrent
-      call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
-      exit
-    ENDIF
-    NN=N
-  ENDDO D500
+  eot=calculate_equation_of_time(I,leapday)
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      SolarNoonHour_col(NY,NX) = SolarNoonHourYM_col(NY,NX)+ eot
+    ENDDO
+  ENDDO    
+
+  call UpdateDailyAccumulators(I, NHW, NHE, NVN, NVS)
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
 
   if(ldo_sp_mode)call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
-  RETURN
+  call PrintInfo('end '//subname)
 
   END subroutine day
 
@@ -99,8 +94,10 @@
 
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
-  integer :: NE
+  integer :: NE,NX,NY,I2,I3,ITYPE,N
+  character(len=*), parameter :: subname='UpdateDailyAccumulators'
 
+  call PrintInfo('beg '//subname)
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
@@ -125,7 +122,6 @@
 !     ITYPE 1=daily,2=hourly
 !
       ITYPE=IWTHR
-
 
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
@@ -211,7 +207,7 @@
       ENDDO D600
     ENDDO D950
   ENDDO D955
-
+  call PrintInfo('end '//subname)
   END subroutine UpdateDailyAccumulators
 !-----------------------------------------------------------------------------------------
 
@@ -220,7 +216,12 @@
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
+  integer :: NY,NX,J,L
+  real(r8) :: TWP,TVW,TFZ
+  real(r8) :: CORP,DIRRA1,DIRRA2,FW,FZ,RR
+  character(len=*), parameter :: subname='TillageandIrrigationEvents'
 
+  call PrintInfo('beg '//subname)
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
 !
@@ -253,9 +254,9 @@
 !     FW=fraction of soil layer in irrigation zone
 !     FZ=SWC at which irrigation is triggered
 !     VLSoilPoreMicP_vr,VOLW,VOLI=total,water,ice volume
-!     IFLGV_col=flag for irrigation criterion,0=SWC,1=canopy water potential
-!     FIRRA_col=depletion of SWC from CIRRA_col to WP(IFLGV_col=0),or minimum canopy
-!     water potential(IFLGV_col=1), to trigger irrigation
+!     iIrrigOpt_col=flag for irrigation criterion,0=SWC,1=canopy water potential
+!     FIRRA_col=depletion of SWC from CIRRA_col to WP(iIrrigOpt_col=0),or minimum canopy
+!     water potential(iIrrigOpt_col=1), to trigger irrigation
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
@@ -278,16 +279,16 @@
             ENDIF
           ENDDO D165
 
-          IF((IFLGV_col(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA_col(NY,NX)*(TFZ-TWP)) &
-            .OR.(IFLGV_col(NY,NX).EQ.1.AND.PSICanPDailyMin_pft(1,NY,NX).LT.FIRRA_col(NY,NX)))THEN
+          IF((iIrrigOpt_col(NY,NX).EQ.iIrrig_swc .AND. TVW.LT.TWP+FIRRA_col(NY,NX)*(TFZ-TWP)) &
+            .OR. (iIrrigOpt_col(NY,NX).EQ.iIrrig_cwp .AND. PSICanPDailyMin_pft(1,NY,NX).LT.FIRRA_col(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
-              WRITE(*,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
-                ,IFLGV_col(NY,NX),RR,TFZ,TVW,TWP,FIRRA_col(NY,NX),PSICanPDailyMin_pft(1,NY,NX) &
+              WRITE(iulog,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
+                ,iIrrigOpt_col(NY,NX),RR,TFZ,TVW,TWP,FIRRA_col(NY,NX),PSICanPDailyMin_pft(1,NY,NX) &
                 ,CIRRA_col(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 
 2222  FORMAT(A8,5I6,40E12.4)
@@ -297,5 +298,6 @@
       ENDIF
     ENDDO D9990
   ENDDO D9995
+  call PrintInfo('end '//subname)
   end subroutine TillageandIrrigationEvents
 END module DayMod

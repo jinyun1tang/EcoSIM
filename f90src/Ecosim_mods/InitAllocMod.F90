@@ -52,7 +52,7 @@ implicit none
   use TracerIDMod         , only : InitTracerIDs
   use SnowPhysData        , only : InitSnowPhysData
   use HydroThermData      , only : InitHydroThermData
-  use PerturbationMod     , only : InitSoilWarming
+  use EcosysWarmingMod     , only : InitSoilWarming
   use NumericalAuxMod     , only : InitNumericAux
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
@@ -154,33 +154,35 @@ implicit none
   use GridConsts
   implicit none
 
-  pltpar%JZ1    = JZ
-  pltpar%NumCanopyLayers1    = NumCanopyLayers
-  pltpar%JP1    = JP
-  pltpar%NumOfLeafAzimuthSectors   = NumOfLeafAzimuthSectors
+  pltpar%JZ1                     = JZ
+  pltpar%NumCanopyLayers1        = NumCanopyLayers
+  pltpar%JP1                     = JP
+  pltpar%NumOfLeafAzimuthSectors = NumOfLeafAzimuthSectors
   pltpar%NumOfSkyAzimuthSects1   = NumOfSkyAzimuthSects
   pltpar%NumLeafZenithSectors1   = NumLeafZenithSectors
-  pltpar%MaxNodesPerBranch1 = MaxNodesPerBranch
-  pltpar%iprotein =micpar%iprotein
-  pltpar%icarbhyro=micpar%icarbhyro
-  pltpar%icellulos=micpar%icellulos
-  pltpar%ilignin  =micpar%ilignin
-  pltpar%k_woody_litr=micpar%k_woody_litr
-  pltpar%k_fine_litr=micpar%k_fine_litr
+  pltpar%MaxNodesPerBranch1      = MaxNodesPerBranch
+  pltpar%iprotein                = micpar%iprotein
+  pltpar%icarbhyro               = micpar%icarbhyro
+  pltpar%icellulos               = micpar%icellulos
+  pltpar%ilignin                 = micpar%ilignin
+  pltpar%k_woody_comp            = micpar%k_woody_comp
+  pltpar%k_fine_comp             = micpar%k_fine_comp
+  
   !the following variable should be consistent with the soil bgc model
-  pltpar%jcplx= micpar%jcplx
-  pltpar%NumOfPlantLitrCmplxs=micpar%NumOfPlantLitrCmplxs
-  pltpar%jsken  = micpar%jsken
-  pltpar%NumLitterGroups= 5     !number of liter groups
-  pltpar%MaxNumBranches    = 10    !number of branches
-  pltpar%MaxNumRootAxes=10
-  pltpar%NumGrowthStages=10
-  pltpar%NumOfPlantMorphUnits=7
-
-  MaxNumBranches=pltpar%MaxNumBranches
-  NumLitterGroups=pltpar%NumLitterGroups
-  MaxNumRootAxes=pltpar%MaxNumRootAxes
-  NumOfPlantMorphUnits=pltpar%NumOfPlantMorphUnits
-  NumGrowthStages=pltpar%NumGrowthStages
+  pltpar%jcplx                = micpar%jcplx
+  pltpar%NumOfPlantLitrCmplxs = micpar%NumOfPlantLitrCmplxs
+  pltpar%jsken                = micpar%jsken
+  pltpar%NumLitterGroups      = 5     !number of liter groups
+  pltpar%MaxNumBranches       = 10    !number of branches
+  pltpar%MaxNumRootAxes       = 10
+  pltpar%NumGrowthStages      = 10
+  pltpar%NumOfPlantMorphUnits = 7
+  pltpar%NMaxRootSegs = 10    !
+  NMaxRootSegs = pltpar%NMaxRootSegs
+  MaxNumBranches       = pltpar%MaxNumBranches
+  NumLitterGroups      = pltpar%NumLitterGroups
+  MaxNumRootAxes       = pltpar%MaxNumRootAxes
+  NumOfPlantMorphUnits = pltpar%NumOfPlantMorphUnits
+  NumGrowthStages      = pltpar%NumGrowthStages
   end subroutine InitPlantMorphSize
 end module InitAllocMod

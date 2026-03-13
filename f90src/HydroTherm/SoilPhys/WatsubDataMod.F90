@@ -14,7 +14,8 @@ implicit none
   real(r8),allocatable ::  TLPhaseChangeHeat2Soi1_vr(:,:,:)         !total soil layer latent heat release from melting
   real(r8),allocatable ::  QWatIntLaterFlowM_col(:,:)              !lateral water flow from neighbor grid
   real(r8),allocatable ::  FWatExMacP2MicPiM_vr(:,:,:)             !pressure-driven water flow from macpore to micpore
-
+  real(r8),allocatable ::  dWaterPlantRoot2SoilPrev_vr(:,:,:)      !water flux taken/release by plant roots [m3 H2O d-2]
+  real(r8),allocatable ::  dHeatPlantRoot2SoilPrev_vr(:,:,:)       !heat flux taken/released by plant roots [MJ d-2]
   real(r8),allocatable ::  WatNetFlow2MicP_3DM_vr(:,:,:)           !total water charge to micropore in iteration M
   real(r8),allocatable ::  WatNetFlow2Macpt_3DM_vr(:,:,:)          !total water charge to macropore in iteration M
   real(r8),allocatable ::  THeatFlow2Soil_3DM_vr(:,:,:)            !total heat flux add to soil layer in iteration M
@@ -75,7 +76,8 @@ contains
   allocate(HeatIrrigation1_vr(JZ,JY,JX));   HeatIrrigation1_vr=0._r8
 
   allocate(FIceThawedMacP_vr(JZ,JY,JX));   FIceThawedMacP_vr=0._r8
-
+  allocate(dWaterPlantRoot2SoilPrev_vr(JZ,JY,JX)); dWaterPlantRoot2SoilPrev_vr=0._r8
+  allocate(dHeatPlantRoot2SoilPrev_vr(JZ,JY,JX)); dHeatPlantRoot2SoilPrev_vr=0._r8
   allocate(HydroCondMacP1_vr(JZ,JY,JX));    HydroCondMacP1_vr=0._r8
   allocate(VLMicP1_vr(0:JZ,JY,JX));  VLMicP1_vr=0._r8
   allocate(VLMacP1_vr(JZ,JY,JX));   VLMacP1_vr=0._r8
@@ -97,6 +99,8 @@ contains
   call destroy(TWaterPlantRoot2SoilX_vr)
   call destroy(QWatIntLaterFlowM_col)
   call destroy(N6X)
+  call destroy(dWaterPlantRoot2SoilPrev_vr)
+  call destroy(dHeatPlantRoot2SoilPrev_vr)
   call destroy(TMLiceThawedMicP_vr)
   call destroy(TMLiceThawedMacP_vr)
   call destroy(FracLayVolBelowExtWTBL_vr)

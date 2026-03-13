@@ -15,7 +15,8 @@ target_include_directories(SurfPhys  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
-  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/)
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
+  ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Layers_Micmodel)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SurfPhys PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SurfPhys)
