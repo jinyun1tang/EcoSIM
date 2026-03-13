@@ -2,7 +2,7 @@ module ATSEcoSIMAdvanceMod
   !
   !Description
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8, yearIJ_type
   use SoilWaterDataType
   use SoilHeatDataType
   use SharedDataMod
@@ -52,7 +52,7 @@ implicit none
   use StartsMod         , only : set_ecosim_solver
   use SnowBalanceMod    , only : SnowMassUpdate, SnowpackLayering
   use SurfaceRadiationMod
-  use SoilHydroParaMod  , only : SetColdRunSoilStates
+  !use SoilHydroParaMod  , only : SetColdRunSoilStates
   use PlantMod
   use WthrMod
   !use InitEcoSIM
@@ -80,6 +80,7 @@ implicit none
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
   real(r8) :: THETF
+  type(yearIJ_type) :: yearIJ
 
   !associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
   !)
@@ -100,8 +101,12 @@ implicit none
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
   write(*,*) "(ATSEcoSIMAdvance) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
-  I = current_day+1
-  J = 12
+  !I = current_day+1
+  !J = 12
+
+  yearIJ%year=current_year
+  yearIJ%J=12
+  yearIJ%I=current_day+1
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
   !call InitModules()
@@ -207,7 +212,7 @@ implicit none
       FCD_vr(L,NY,NX)               = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
       SRP_vr(L,NY,NX)               = 1.00_r8
       LOGPSIAtSat(NY,NX)            = LOG(-PSIPS)
-      LOGPSIFLD_col(NY,NX)          = LOG(pressure_at_field_capacity)
+      LOGPSIFLD_col(NY,NX)          = LOG(-pressure_at_field_capacity)
       LOGPSIMXD_col(NY,NX)          = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
 
       !Top layer water volume:
@@ -280,8 +285,8 @@ implicit none
   if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
   !Need submodules of wthr to compute precipitation variables
   !And Canopy Radiation variables
-  IWTHR = -999 !runs Hourly weather
-  call wthr(I,J,NHW,NHE,NVN,NVS)
+  !IWTHR = -999 !runs Hourly weather
+  call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
 
   if(ldo_sp_mode)then
     do NY=1,NYS
@@ -332,7 +337,7 @@ implicit none
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
 
-  if(ldo_sp_mode) call PlantModel(I,J,NHW,NHE,NVN,NVS)
+  if(ldo_sp_mode) call PlantModel(yearIJ,NHW,NHE,NVN,NVS)
 
   DO NY=1,NYS
     !for every column send the top layer to the transfer var

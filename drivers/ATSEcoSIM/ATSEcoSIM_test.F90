@@ -52,6 +52,7 @@ subroutine Init_ATSEcoSIM_driver()
   use BGCContainers_module
   use SharedDataMod
   use GridDataType
+  use CanopyDataType
   implicit none
 
   ! Declare variables
@@ -114,6 +115,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_snow_depth(1:ncells_per_col_))
   allocate(a_LAI(1:ncells_per_col_))
   allocate(a_SAI(1:ncells_per_col_))
+  allocate(column_area(ncol))
 
   !subsurface vars
   allocate(a_TEMP(ncells_per_col_, ncol))
@@ -126,6 +128,15 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_LDENS(ncells_per_col_, ncol))
   allocate(a_LSAT(ncells_per_col_, ncol))
   allocate(a_SSWS(ncells_per_col_,ncol))
+  allocate(a_rdens(ncells_per_col_,ncol))
+
+  !Pheno vars
+  allocate(LAI_col(ncells_per_col_,ncol))
+  allocate(a_VEG(ncol))
+  allocate(a_lwcan(ncol))
+  allocate(a_clhf(ncol))
+  allocate(a_cshf(ncol))
+  allocate(a_canopywat(ncol))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
@@ -144,7 +155,9 @@ subroutine Init_ATSEcoSIM_driver()
       a_PORO(L,NY) = 0.5
       a_LDENS(L,NY) = 1.0
       a_LSAT(L,NY) = 0.5
+      a_rdens(L,NY) = 0.1
     enddo
+    column_area(NY) = 1.0
     a_ASP(NY) = 0.0
     a_SALB(NY) = 0.5
     tairc(NY) = 242.13003959655759
