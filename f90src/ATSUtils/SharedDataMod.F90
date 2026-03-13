@@ -163,6 +163,9 @@ Module SharedDataMod
 
     a_NU=1
     a_NL=ncells_per_col_
+    !Set these to zero to prevent truncation errors in the summations later
+    a_Transpiration=0.0
+    a_EvapCan=0.0
 
   end subroutine InitSharedData
 
