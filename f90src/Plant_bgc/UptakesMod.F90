@@ -674,7 +674,7 @@ module UptakesMod
   real(r8) :: CanopyAvailWater      !available canopy water for canopy ET and hydraulic redistribution
   real(r8) :: CumHeatPlant2Soil,CumHeatSoil2Plant
   real(r8) :: CumWaterPlant2Soil,CumWaterSoil2Plant
-
+  character(len=*), parameter :: subname='CanopyEnergyH2OIter_func'
   integer  :: IC
   logical :: LIterationExit
   real(r8) :: DPSI_old
@@ -728,7 +728,7 @@ module UptakesMod
     QdewCanopy_pft              => plt_ew%QdewCanopy_pft                  ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
     RootH2OUptkStress_pvr       => plt_ew%RootH2OUptkStress_pvr            & !output :root water uptake stress indicated by rate, [m3 d-2 h-1]
   )
-
+  call PrintInfo('beg '//subname)
   !CCPOLT: total nonstructural canopy C,N,P concentration
   !FTHRM:coefficient for LW emitted by canopy
   !LWRad2Canopy:long-wave absorbed by canopy
@@ -996,14 +996,17 @@ module UptakesMod
       DIFFZ         = SymplasmicWat-CanopyBiomWater_pft(NZ)    !biomass water deficit
       DIFFU         = Transpiration_pft(NZ)-cumPRootH2OUptake  !root water uptake excess
 
-      !ideally, the difference between DIFFZ and DIFFU should be as small as possible
+      !ideally, the difference between DIFFZ and DIFFU should be as small as possible '
+      
       IF(.not.isclose(cumPRootH2OUptake,0.0_r8))THEN
         DIFF=ABS((DIFFU-DIFFZ)/cumPRootH2OUptake)
-      ELSE
+      ELSEIF(SymplasmicWat>0._r8)THEN
         DIFF=ABS(DIFFU-DIFFZ)/SymplasmicWat
+      ELSE
+        DIFF=0._r8  
       ENDIF
 
-      !the relative difference is small enough
+      !the relative difference is small enough'
       IF(DIFF.LT.5.0E-03_r8)THEN
         IF(LIterationExit)EXIT
         LIterationExit=.true.
@@ -1079,7 +1082,7 @@ module UptakesMod
 !
   TKC_pft(NZ)         = TKCanopy_pft(NZ)
   DeltaTKC_pft(NZ)    = TKC_pft(NZ)-TairK
-
+  call PrintInfo('end '//subname)
   end associate
   end function CanopyEnergyH2OIter_func
 
