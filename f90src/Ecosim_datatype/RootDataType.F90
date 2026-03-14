@@ -10,6 +10,7 @@ module RootDataType
   implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
+  integer,target,allocatable ::  irootType_col(:,:)                              !Root type integer from ATS [-]
   integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                          !root primary axis number, [-]
   integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
@@ -58,7 +59,7 @@ module RootDataType
   real(sp),target,allocatable ::  RootNodulNonstElms_rpvr(:,:,:,:,:)             !root  layer nonstructural element, [g d-2]
   real(sp),target,allocatable ::  RootTotLenPerPlant_pvr(:,:,:,:,:)              !root layer length per plant, including root hair [m p-1]
   real(sp),target,allocatable ::  RootAbsorbLenPerPlant_pvr(:,:,:,:,:)           !total absorptive root length per plant in layer, [m p-1]
-  real(sp),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
+  real(sp),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]
   real(sp),target,allocatable ::  Root1stLenPP_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(sp),target,allocatable ::  RootAge_rpvr(:,:,:,:,:)                        !root age, [h]
   real(sp),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
@@ -85,9 +86,9 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stSpecLen_pft(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(sp),target,allocatable ::  Root2ndSpecLen_pft(:,:,:,:)                    !specific root length secondary axes, [m g-1]
   real(sp),target,allocatable ::  RPlantRootH2OUptk_pvr(:,:,:,:,:)               !root water uptake, [m3 d-2 h-1]
-  real(sp),target,allocatable ::  SapFlowVlinear_pvr(:,:,:,:)                    !Sap flow mean linear velocity, [m h-1]  
+  real(sp),target,allocatable ::  SapFlowVlinear_pvr(:,:,:,:)                    !Sap flow mean linear velocity, [m h-1]
   real(sp),target,allocatable ::  SapFlowVLinear_rpvr(:,:,:,:,:)                 !linear sap flow for primary root axis, [m h-1]
-  real(sp),target,allocatable ::  RootH2OUptkStress_pvr(:,:,:,:,:)               !root water uptake stress indicated by rate,  [m3 d-2 h-1] 
+  real(sp),target,allocatable ::  RootH2OUptkStress_pvr(:,:,:,:,:)               !root water uptake stress indicated by rate,  [m3 d-2 h-1]
   real(sp),target,allocatable ::  PSIRoot_pvr(:,:,:,:,:)                         !root total water potential , [Mpa]
   real(sp),target,allocatable ::  PSIRootOSMO_vr(:,:,:,:,:)                      !root osmotic water potential , [Mpa]
   real(sp),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                      !root turgor water potential , [Mpa]
@@ -120,12 +121,12 @@ module RootDataType
   real(sp),target,allocatable :: Nutruptk_fClim_rpvr(:,:,:,:,:)                  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(sp),target,allocatable :: Nutruptk_fNlim_rpvr(:,:,:,:,:)                  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(sp),target,allocatable :: Nutruptk_fPlim_rpvr(:,:,:,:,:)                  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
-  real(sp),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-] 
-  real(sp),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
+  real(sp),target,allocatable :: Nutruptk_fProtC_rpvr(:,:,:,:,:)                 !transporter scalar indicated by protein for root nutrient uptake, greater value greater capacity, [-]
+  real(sp),target,allocatable :: RootMaintDef_CO2_pvr(:,:,:,:,:)                 !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]
   real(sp),target,allocatable :: GroSrcRootStress_pvr(:,:,:,:)                   !root growth stress due to nutrient and water, [-]
-  real(sp),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]     
-  real(sp),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]         
-  real(sp),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]     
+  real(sp),target,allocatable :: ROOTNLim_rpvr(:,:,:,:,:)                        !root N-limitation, 0->1 weaker limitation, [-]
+  real(sp),target,allocatable :: ROOTPLim_rpvr(:,:,:,:,:)                        !root P-limitation, 0->1 weaker limitation, [-]
+  real(sp),target,allocatable :: RootResist4H2O_pvr(:,:,:,:,:)                   !total root (axial+radial) resistance for water uptake, [MPa-1 h-1]
   real(sp),target,allocatable :: RootRadialKond2H2O_pvr(:,:,:,:,:)               !radial root conductance for water uptake, [m3 H2O h-1 MPa-1]
   real(sp),target,allocatable :: RootAxialKond2H2O_pvr(:,:,:,:,:)                !axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
   real(sp),target, allocatable :: RootSegAges_raxes(:,:,:,:,:)                   !age of different active root segments, [h]
@@ -133,7 +134,7 @@ module RootDataType
   real(sp),target, allocatable :: RootSegBaseDepth_raxes(:,:,:,:)                !base depth of different root axes, [m]
   real(sp),target, allocatable :: RootSeglengths_raxes(:,:,:,:,:)                !root length in each segment, [m]
   integer ,target, allocatable :: IndRootSegBase_raxes(:,:,:,:)                  !Index for base segment under tracking, [-]
-  integer ,target, allocatable :: IndRootSegTip_raxes(:,:,:,:)                   !Index for tip segment under tracking, [-]  
+  integer ,target, allocatable :: IndRootSegTip_raxes(:,:,:,:)                   !Index for tip segment under tracking, [-]
 
 !----------------------------------------------------------------------
 
@@ -155,6 +156,7 @@ contains
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
   allocate(NRoot1stTipLay_raxes(MaxNumRootAxes,JP,JY,JX));  NRoot1stTipLay_raxes=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
+  allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
   allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._sp
@@ -189,7 +191,7 @@ contains
   allocate(CNRTS_pft(JP,JY,JX));    CNRTS_pft=0._sp
   allocate(CPRTS_pft(JP,JY,JX));    CPRTS_pft=0._sp
   allocate(Radius95pctMature_pft(JP,JY,JX)); Radius95pctMature_pft=0._sp
-  allocate(xylemPhi_min_pft(JP,JY,JX)); xylemPhi_min_pft=0._sp  
+  allocate(xylemPhi_min_pft(JP,JY,JX)); xylemPhi_min_pft=0._sp
   allocate(xylemPhi_mean_pft(JP,JY,JX)); xylemPhi_mean_pft=0._sp
   allocate(xylemPhi_max_pft(JP,JY,JX)); xylemPhi_max_pft=0._sp
   allocate(RootMatureAge_pft(JP,JY,JX)); RootMatureAge_pft=0._sp
@@ -263,10 +265,10 @@ contains
 
   allocate(RootSegAges_raxes(1:NMaxRootSegs,1:MaxNumRootAxes,JP,JY,JX));RootSegAges_raxes=0._sp
   allocate(NActiveRootSegs_raxes(1:MaxNumRootAxes,JP,JY,JX));NActiveRootSegs_raxes=0
-  allocate(RootSegBaseDepth_raxes(1:MaxNumRootAxes,JP,JY,JX));RootSegBaseDepth_raxes=0._sp     
-  allocate(RootSeglengths_raxes(1:NMaxRootSegs,1:MaxNumRootAxes,JP,JY,JX));RootSeglengths_raxes=0._sp       
+  allocate(RootSegBaseDepth_raxes(1:MaxNumRootAxes,JP,JY,JX));RootSegBaseDepth_raxes=0._sp
+  allocate(RootSeglengths_raxes(1:NMaxRootSegs,1:MaxNumRootAxes,JP,JY,JX));RootSeglengths_raxes=0._sp
   allocate(IndRootSegBase_raxes(1:MaxNumRootAxes,JP,JY,JX));IndRootSegBase_raxes=0
-  allocate(IndRootSegTip_raxes(1:MaxNumRootAxes,JP,JY,JX));IndRootSegTip_raxes=0             
+  allocate(IndRootSegTip_raxes(1:MaxNumRootAxes,JP,JY,JX));IndRootSegTip_raxes=0
 
   end subroutine InitRootData
 
@@ -279,12 +281,13 @@ contains
   call destroy(RootResist4H2O_pvr)
   call destroy(ROOTNLim_rpvr)
   call destroy(GroSrcRootStress_pvr)
-  call destroy(ROOTPLim_rpvr)  
+  call destroy(ROOTPLim_rpvr)
   call destroy(RootMaintDef_CO2_pvr)
   call destroy(RootAtmGasConductance_rpvr)
   call destroy(RootMycoMassElm_pvr)
   call destroy(RootMycoMassElm_vr)
   call destroy(NumPrimeRootAxes_pft)
+  call destroy(irootType_col)
   call destroy(NRoot1stTipLay_raxes)
   call destroy(iPlantRootState_pft)
   call destroy(NMaxRootBotLayer_pft)
@@ -321,8 +324,8 @@ contains
   call destroy(CPRTS_pft)
   call destroy(xylemPhi_max_pft)
   call destroy(xylemPhi_mean_pft)
-  call destroy(xylemPhi_min_pft) 
-  call destroy(Radius95pctMature_pft)   
+  call destroy(xylemPhi_min_pft)
+  call destroy(Radius95pctMature_pft)
   call destroy(RootMatureAge_pft)
   call destroy(RootMycoNonstElms_pft)
   call destroy(Root1stMaxRadius_pft)
@@ -347,7 +350,7 @@ contains
   call destroy(Root2ndEffLen4uptk_rpvr)
   call destroy(RootSAreaPerPlant_pvr)
   call destroy(RootArea2ndPP_pvr)
-  call destroy(RootArea1stPP_pvr)  
+  call destroy(RootArea1stPP_pvr)
   call destroy(RootVH2O_pvr)
   call destroy(Root1stRadius_pvr)
   call destroy(Root1stRadius_rpvr)

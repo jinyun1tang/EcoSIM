@@ -1,7 +1,7 @@
 module CanopyDataType
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use data_const_mod, only : spval => DAT_CONST_SPVAL     
+  use data_const_mod, only : spval => DAT_CONST_SPVAL
   use GridConsts
   use ElmIDMod
   use EcoSIMConfig, only : jsken => jskenc
@@ -11,6 +11,7 @@ module CanopyDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  real(r8),target,allocatable ::  LAI_col(:,:)                   !Canopy LAI from ATS [-]
   real(r8),target,allocatable ::  canopy_growth_pft(:,:,:)                   !canopy structural growth rate, [gC/h]
   real(r8),target,allocatable ::  StomatalStress_pft(:,:,:)                  !stomatal stress from water/turgor,(0,1), [-]
   real(r8),target,allocatable ::  CanopyPARalbedo_pft(:,:,:)                 !canopy PAR albedo , [-]
@@ -65,8 +66,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  LeafRubisco2Protein_pft(:,:,:)             !leaf rubisco content, [g g-1]
   real(r8),target,allocatable ::  LeafPEP2Protein_pft(:,:,:)                 !leaf PEP carboxylase content, [g g-1]
   real(r8),target,allocatable ::  SpecLeafChlAct_pft(:,:,:)                  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8),target,allocatable ::  LeafProtein2Chl_pft(:,:,:)                 !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]    
-  real(r8),target,allocatable ::  fMesophyllChlProtein_pft(:,:,:)            !fraction of Chl-bound protein in mesophyll cell, [gC gC-1]    
+  real(r8),target,allocatable ::  LeafProtein2Chl_pft(:,:,:)                 !fraction of leaf protein that is chlorophyll-binded, [gC gC-1]
+  real(r8),target,allocatable ::  fMesophyllChlProtein_pft(:,:,:)            !fraction of Chl-bound protein in mesophyll cell, [gC gC-1]
   real(r8),target,allocatable ::  CanopyCi2CaRatio_pft(:,:,:)                !Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  RadNet2Canopy_pft(:,:,:)                   !canopy net radiation , [MJ d-2 h-1] >0
   real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                     !canopy longwave radiation , [MJ d-2 h-1]
@@ -129,7 +130,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyLeafSheathC_pft(:,:,:)                !plant canopy leaf + sheath C, [gC d-2]
   real(r8),target,allocatable ::  CanopyLeafAreaZ_pft(:,:,:,:)               !canopy layer-distributed leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                       !canopy net CO2 exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCanMaintDef_CO2_pft(:,:,:)                !canopy maintenance respiraiton deficit as CO2,  [gC d-2 h-1]  
+  real(r8),target,allocatable ::  RCanMaintDef_CO2_pft(:,:,:)                !canopy maintenance respiraiton deficit as CO2,  [gC d-2 h-1]
   real(r8),target,allocatable ::  CanopyLeafCLyr_pft(:,:,:,:)                !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_pft(:,:,:,:)               !canopy nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElmConc_pft(:,:,:,:)            !canopy nonstructural chemical element concentration, [g d-2]
@@ -167,7 +168,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  SeedPlantedElm_pft(:,:,:,:)              !plant stored nonstructural chemical elements at planting, [g d-2]
   REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)            !landscape average canopy shoot C, [g d-2]
-  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1] 
+  real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1]
   real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate,[gC d2 h-1]
   real(r8),target,allocatable :: CanopyMassC_pft(:,:,:)                      !Canopy biomass, [gC d-2]
   real(r8),target,allocatable :: fNCLFW_pft(:,:,:)                            !NC ratio of growing leaf, [gN/gC]
@@ -177,19 +178,19 @@ module CanopyDataType
   real(r8),target,allocatable :: CanopyVcMaxPEP25C_pft(:,:,:)                   !Canopy VcMax in PEP C4 fixation, [umol h-1 m-2]
   real(r8),target,allocatable :: ElectronTransptJmax25C_pft(:,:,:)           !Canopy Jmax at reference temperature, [umol e- s-1 m-2]
   real(r8),target,allocatable :: TFN_Carboxy_pft(:,:,:)                      ! temperature dependence of carboxylation, [-]
-  real(r8),target,allocatable :: TFN_Oxygen_pft(:,:,:)                       !temperature dependence of oxygenation, [-] 
+  real(r8),target,allocatable :: TFN_Oxygen_pft(:,:,:)                       !temperature dependence of oxygenation, [-]
   real(r8),target,allocatable :: TFN_eTranspt_pft(:,:,:)                     !temperature dependence of electron transport, [-]
-  real(r8),target,allocatable :: LeafAreaSunlit_pft(:,:,:)                   !leaf irradiated surface area, [m2 d-2]    
+  real(r8),target,allocatable :: LeafAreaSunlit_pft(:,:,:)                   !leaf irradiated surface area, [m2 d-2]
   real(r8),target,allocatable :: PARSunlit_pft(:,:,:)                        !PAR absorbed by sunlit leaf, [umol m-2 s-1]
   real(r8),target,allocatable :: PARSunsha_pft(:,:,:)                        !PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
   real(r8),target,allocatable :: CH2OSunlit_pft(:,:,:)                       !carbon fixation by sun-lit leaf, [gC d-2 h-1]
-  real(r8),target,allocatable :: CH2OSunsha_pft(:,:,:)                       !carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
-!  real(r8),target,allocatable :: LeafC3ChlC_brch(:,:,:,:)                    !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
-!  real(r8),target,allocatable :: LeafC4ChlC_brch(:,:,:,:)                    !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+  real(r8),target,allocatable :: CH2OSunsha_pft(:,:,:)                       !carbon fixation by sun-shaded leaf, [gC d-2 h-1]
+!  real(r8),target,allocatable :: LeafC3ChlC_brch(:,:,:,:)                    !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]
+!  real(r8),target,allocatable :: LeafC4ChlC_brch(:,:,:,:)                    !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]
 !  real(r8),target,allocatable :: LeafRubiscoC_brch(:,:,:,:)                  !Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
 !  real(r8),target,allocatable :: LeafPEPC_brch(:,:,:,:)                      !PEP C for the branches, [gC PEP d-2]
-  real(r8),target,allocatable :: LeafC3ChlCperm2LA_pft(:,:,:)                       !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]     
-  real(r8),target,allocatable :: LeafC4ChlCperm2LA_pft(:,:,:)                       !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]     
+  real(r8),target,allocatable :: LeafC3ChlCperm2LA_pft(:,:,:)                       !Bundle sheath C4/mesophyll C3 chlorophyll C for the branches, [gC chlorophyll d-2]
+  real(r8),target,allocatable :: LeafC4ChlCperm2LA_pft(:,:,:)                       !Mesophyll chlorophyll C for the branches, [gC chlorophyll d-2]
   real(r8),target,allocatable :: LeafRubiscoCperm2LA_pft(:,:,:)                     !Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
   real(r8),target,allocatable :: LeafPEPCperm2LA_pft(:,:,:)                         !PEP C for the branches, [gC PEP d-2]
   real(r8),target,allocatable :: SpecificLeafArea_pft(:,:,:)                   !specifc leaf area per g C of leaf mass, [m2 leaf area (gC leaf C)-1]
@@ -211,7 +212,7 @@ module CanopyDataType
   allocate(TFN_Oxygen_pft(JP,JY,JX)); TFN_Oxygen_pft=0._r8
   allocate(TFN_eTranspt_pft(JP,JY,JX)); TFN_eTranspt_pft=0._r8
   allocate(CanopyVcMaxRubisco25C_pft(JP,JY,JX));CanopyVcMaxRubisco25C_pft=0._r8
-  allocate(CanopyVoMaxRubisco25C_pft(JP,JY,JX));CanopyVoMaxRubisco25C_pft=0._r8  
+  allocate(CanopyVoMaxRubisco25C_pft(JP,JY,JX));CanopyVoMaxRubisco25C_pft=0._r8
   allocate(CanopyVcMaxPEP25C_pft(JP,JY,JX)); CanopyVcMaxPEP25C_pft=0._r8
   allocate(ElectronTransptJmax25C_pft(JP,JY,JX));ElectronTransptJmax25C_pft=0._r8
   allocate(CanopyNLimFactor_brch(MaxNumBranches,JP,JY,JX));CanopyNLimFactor_brch=1._r8
@@ -346,14 +347,14 @@ module CanopyDataType
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
   allocate(SapwoodBiomassC_brch(MaxNumBranches,JP,JY,JX));SapwoodBiomassC_brch=0._r8
   allocate(ShootElms_pft(NumPlantChemElms,JP,JY,JX));ShootElms_pft=0._r8
-!  allocate(LeafC3ChlC_brch(MaxNumBranches,JP,JY,JX)); LeafC3ChlC_brch=0._r8             
+!  allocate(LeafC3ChlC_brch(MaxNumBranches,JP,JY,JX)); LeafC3ChlC_brch=0._r8
 !  allocate(LeafC4ChlC_brch(MaxNumBranches,JP,JY,JX)); LeafC4ChlC_brch=0._r8
-!  allocate(LeafRubiscoC_brch(MaxNumBranches,JP,JY,JX)); LeafRubiscoC_brch=0._r8           
-!  allocate(LeafPEPC_brch(MaxNumBranches,JP,JY,JX));LeafPEPC_brch=0._r8               
-  allocate(LeafC3ChlCperm2LA_pft(JP,JY,JX));LeafC3ChlCperm2LA_pft=0._r8                
+!  allocate(LeafRubiscoC_brch(MaxNumBranches,JP,JY,JX)); LeafRubiscoC_brch=0._r8
+!  allocate(LeafPEPC_brch(MaxNumBranches,JP,JY,JX));LeafPEPC_brch=0._r8
+  allocate(LeafC3ChlCperm2LA_pft(JP,JY,JX));LeafC3ChlCperm2LA_pft=0._r8
   allocate(LeafC4ChlCperm2LA_pft(JP,JY,JX));LeafC4ChlCperm2LA_pft=0._r8
-  allocate(LeafRubiscoCperm2LA_pft(JP,JY,JX));LeafRubiscoCperm2LA_pft=0._r8             
-  allocate(LeafPEPCperm2LA_pft(JP,JY,JX));LeafPEPCperm2LA_pft=0._r8                  
+  allocate(LeafRubiscoCperm2LA_pft(JP,JY,JX));LeafRubiscoCperm2LA_pft=0._r8
+  allocate(LeafPEPCperm2LA_pft(JP,JY,JX));LeafPEPCperm2LA_pft=0._r8
   allocate(C4PhotoShootNonstC_brch(MaxNumBranches,JP,JY,JX));C4PhotoShootNonstC_brch=0._r8
   allocate(CanopyNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNonstElms_brch=0._r8
   allocate(CanopyLeafSheathC_brch(MaxNumBranches,JP,JY,JX)); CanopyLeafSheathC_brch=0._r8

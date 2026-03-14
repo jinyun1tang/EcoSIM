@@ -90,6 +90,15 @@ contains
      a_AreaZ(i,1) = a_Volume(i,1)/a_dz(i,1)
   end do
 
+  call c_f_pointer(props%column_area%data, data, (/num_cols/))
+  column_area = data(:)
+
+  !do j = 1, num_cols
+  !  do i = 1, size_col
+  !    write(*,*) "i,j: ", i,j, " a_Area3: ", a_Area3(i,j), " a_AreaZ: ", a_AreaZ(i,j), " column_area: ", column_area(j)
+  !  end do
+  !end do
+
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP = data2D(:,:)
@@ -100,7 +109,11 @@ contains
 
   data_ptr = state%liquid_density%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_LDENS = data2D(:,:)  
+  a_LDENS = data2D(:,:)
+
+  data_ptr = state%rock_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_RDENS = data2D(:,:)
 
   data_ptr = state%matric_pressure%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -114,9 +127,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_LSAT = data2D(:,:)
 
-  data_ptr = props%relative_permeability%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_RELPERM = data2D(:,:)
+  !Relative permeability is not needed
+  !data_ptr = props%relative_permeability%data
+  !call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  !a_RELPERM = data2D(:,:)
 
   data_ptr = state%hydraulic_conductivity%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -159,7 +173,7 @@ contains
   a_ASP = data(:)
 
   call c_f_pointer(props%LAI%data, data, (/num_cols/))
-  a_LAI = data(:)  
+  a_LAI = data(:)
 
   call c_f_pointer(props%SAI%data, data, (/num_cols/))
   a_SAI = data(:)
@@ -186,6 +200,10 @@ contains
   pressure_at_field_capacity = props%field_capacity
   pressure_at_wilting_point = props%wilting_point
   p_bool = props%p_bool
+  a_bool = props%a_bool
+  pheno_bool = props%pheno_bool
+  current_day = props%current_day
+  current_year = props%current_year
 
   if(p_bool)THEN
     call c_f_pointer(props%precipitation%data, data, (/num_cols/))
@@ -206,6 +224,18 @@ contains
 
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   surf_snow_depth = data(:)
+
+  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
+  a_LWCan = data(:)
+
+  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
+  a_CLHF = data(:)
+
+  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
+  a_CSHF = data(:)
+
+  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
+  a_CanopyWat = data(:)
 
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
@@ -230,6 +260,39 @@ contains
 
   call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSES
+
+  !call c_f_pointer(state%snow_temperature%data, data2D, [(/size_col/),(/num_cols/)])
+  !data2D(:,:)=a_TS
+
+  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
+  data(:) = a_LWCan
+
+  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
+  data(:) = a_CLHF
+
+  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
+  data(:) = a_CSHF
+
+  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
+  data(:) = a_CanopyWat
+
+  call c_f_pointer(state%transpiration%data, data, (/num_cols/))
+  data(:) = a_Transpiration
+
+  call c_f_pointer(state%evaporation_canopy%data, data, (/num_cols/))
+  data(:) = a_EvapCan
+
+  call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
+  data(:) = a_EvapGrnd
+
+  call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
+  data(:) = a_EvapLitr
+
+  call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
+  data(:) = a_EvapSnow
+
+  call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
+  data(:) = a_Sublim
 
   call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source

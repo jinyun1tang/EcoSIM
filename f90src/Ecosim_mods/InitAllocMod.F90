@@ -119,7 +119,7 @@ implicit none
 
   call InitEcoSimSum
 
-  call InitRootData(pltpar%jroots)
+  call InitRootData(2)
 
   call InitClimForcData
 

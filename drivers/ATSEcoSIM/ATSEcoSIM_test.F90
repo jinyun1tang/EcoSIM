@@ -3,8 +3,11 @@ program EcoATSTest
   use BGCContainers_module
   use SharedDataMod
   use GridDataType
+  use RootDataType
+  use EcoSIMCtrlMod, only: etimer
+  !use ecosim_Time_Mod  , only : ecosim_time_type
   implicit none
-  
+
   ! Declare variables
   type (BGCState) :: state
   type (BGCProperties) :: props
@@ -15,17 +18,17 @@ program EcoATSTest
   real, dimension(6) :: rain_array = (/1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3, 1.0e-3/)
 
   !rain_array = 1.6e-5
-
   NX = 1
   NYS = 1
   ncells_per_col_ = 100
   ncol = 1
-  
+
   ! Initialize sizes structure
   sizes%num_components = 1
   sizes%ncells_per_col_ = 100
   sizes%num_columns = 1
-
+  a_bool = .false.
+  pheno_bool = .true.
   call Init_ATSEcoSIM_driver()
 
   call Init_EcoSIM(sizes)
@@ -49,15 +52,18 @@ subroutine Init_ATSEcoSIM_driver()
   use BGCContainers_module
   use SharedDataMod
   use GridDataType
+  use CanopyDataType
   implicit none
-  
+
   ! Declare variables
   type (BGCState) :: state
   type (BGCProperties) :: props
   type (BGCSizes) :: sizes
   integer :: NY, NX, L
   integer :: ncells_per_col_, ncol
+  integer :: kmo,dofmon,ndaysmon
   real(r8) :: dist_step, dist_tot
+  !type(ecosim_time_type) :: etimer
 
   NX = 1
   NYS = 1
@@ -70,6 +76,19 @@ subroutine Init_ATSEcoSIM_driver()
   sizes%num_components = 1
   sizes%ncells_per_col_ = 100
   sizes%num_columns = 1
+  write(*,*) "setting time"
+  !
+  !call etimer%Init(year0=1804,nyears=12)
+  !call etimer%setClock(dtime=3600._r8,nelapstep=0)
+  !ndaysmon = etimer%get_curr_mon_days()  ! Would return 31 (days in March)
+  !dofmon = etimer%get_curr_dom()         ! Would return 15 (15th day of month)
+  !kmo = etimer%get_curr_mon()            ! Would return 3 (March)
+  !or set by hand
+  ndaysmon = 31
+  dofmon = 15
+  kmo = 3
+
+  write(*,*) "Initalized timer with Month: ", kmo, " day: ", dofmon, " of ", ndaysmon
 
   ! needed in starts
   !pressure_at_field_capacity = 0.001
@@ -81,6 +100,7 @@ subroutine Init_ATSEcoSIM_driver()
   heat_capacity = 2.0e-2
 
   !need to allocate these because c_f_pointer sets them in the actual coupler
+  !surface vars
   allocate(a_ASP(ncells_per_col_))
   allocate(tairc(1:ncells_per_col_))
   allocate(vpair(1:ncells_per_col_))
@@ -93,6 +113,11 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
+  allocate(a_LAI(1:ncells_per_col_))
+  allocate(a_SAI(1:ncells_per_col_))
+  allocate(column_area(ncol))
+
+  !subsurface vars
   allocate(a_TEMP(ncells_per_col_, ncol))
   allocate(a_CumDepz2LayBottom_vr(ncells_per_col_, ncol))
   allocate(a_AREA3(ncells_per_col_, ncol))
@@ -102,6 +127,16 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_PORO(ncells_per_col_, ncol))
   allocate(a_LDENS(ncells_per_col_, ncol))
   allocate(a_LSAT(ncells_per_col_, ncol))
+  allocate(a_SSWS(ncells_per_col_,ncol))
+  allocate(a_rdens(ncells_per_col_,ncol))
+
+  !Pheno vars
+  allocate(LAI_col(ncells_per_col_,ncol))
+  allocate(a_VEG(ncol))
+  allocate(a_lwcan(ncol))
+  allocate(a_clhf(ncol))
+  allocate(a_cshf(ncol))
+  allocate(a_canopywat(ncol))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
@@ -120,7 +155,9 @@ subroutine Init_ATSEcoSIM_driver()
       a_PORO(L,NY) = 0.5
       a_LDENS(L,NY) = 1.0
       a_LSAT(L,NY) = 0.5
+      a_rdens(L,NY) = 0.1
     enddo
+    column_area(NY) = 1.0
     a_ASP(NY) = 0.0
     a_SALB(NY) = 0.5
     tairc(NY) = 242.13003959655759
@@ -132,23 +169,13 @@ subroutine Init_ATSEcoSIM_driver()
     p_rain(NY) = 0.0
     p_snow(NY) = 0.0
     !p_rain(NY) = 3.e-8*1000.0_r8*3600.0_r8
-    
+
     vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
-    
-    !swrad(NY) = 0.8
-    !sunrad(NY) =  4.63
-    
-    !swrad(NY) = 0.8
-    !sunrad(NY) =  1.63
 
-    !swrad(NY) = 400.0
-    !sunrad(NY) =  219.0
-
-    !swrad(NY) = 0.0
-    !sunrad(NY) =  0.0
+    a_LAI(NY) = 0.2
+    a_SAI(NY) = 0.05
 
   enddo
 
 end subroutine Init_ATSEcoSIM_driver
-
