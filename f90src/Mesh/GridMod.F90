@@ -16,8 +16,7 @@ contains
   use EcoSIMCtrlMod,only : grid_file_in,lverb,first_topou
   use ncdio_pio
   use netcdf
-  USE fileUtil  , ONLY : iulog
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)
@@ -136,8 +135,7 @@ contains
   use EcoSIMCtrlMod,only : grid_file_in
   use ncdio_pio
   use netcdf
-  USE fileUtil, ONLY : iulog
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)

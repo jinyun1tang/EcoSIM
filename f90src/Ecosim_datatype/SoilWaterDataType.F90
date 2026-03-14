@@ -11,6 +11,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  THeatXGridBySurfRunoff_2DH(:,:)           !heat flux into the grid due to runoff,[MJ d-2 h-1]
   logical, target,allocatable ::  iPondFlag_col(:,:)                        !flag for the col if it is a pond,[-]
   integer, target,allocatable ::  iPondBotLev_col(:,:)                      !Bottom level ID, [-]
+  real(r8),target,allocatable ::  DVLiceMicP_vr(:,:,:)                      !change of water+ice volume, [m3 d-2]
   real(r8),target,allocatable ::  ThetaAir_vr(:,:,:)                        !air concentration ,[m3 m-3]
   real(r8),target,allocatable ::  VLsoiAirP_vr(:,:,:)                       !soil air content ,[m3 d-2]
   real(r8),target,allocatable ::  THETW_vr(:,:,:)                           !volumetric water content ,[m3 m-3]
@@ -126,6 +127,7 @@ module SoilWaterDataType
 
   implicit none
 
+  allocate(DVLiceMicP_vr(JZ,JY,JX)); DVLiceMicP_vr=0._r8
   allocate(TWatFlowCellMicP_vr(JZ,JY,JX));     TWatFlowCellMicP_vr=0._r8
   allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
   allocate(iPondBotLev_col(JY,JX)); iPondBotLev_col=0
@@ -237,6 +239,7 @@ module SoilWaterDataType
   use abortutils, only : destroy
   implicit none
 
+  CALL destroy(DVLiceMicP_vr)
   call destroy(iPondBotLev_col)
   call destroy(iPondFlag_col)
   call destroy(QWatIntLaterFlow_col)

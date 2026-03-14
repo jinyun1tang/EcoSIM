@@ -106,7 +106,7 @@
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
       .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
       .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-
+      
       DO K=1,MaxNodesPerBranch1          
         IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           LeafProteinC_brch(NB,NZ)            = LeafProteinC_brch(NB,NZ)+LeafProteinC_node(K,NB,NZ)
@@ -161,6 +161,7 @@
       LeafC4ChlCperm2LA_pft(NZ)   = LeafC4ChlCperm2LA_pft(NZ)+LeafC4ChlC_brch(NB,NZ)
     endif
   ENDDO
+
   if(tLeafArea>5.e-3_r8)then
     LeafProteinCperm2LA_pft(NZ) = LeafProteinCperm2LA_pft(NZ)/tLeafArea
     LeafRubiscoCperm2LA_pft(NZ) = LeafRubiscoCperm2LA_pft(NZ)/tLeafArea
@@ -343,11 +344,11 @@
 !
         DO LP=1,2
           IF(LP==1)THEN
-!     SUNLIT LEAVES
+            ! SUNLIT LEAVES
             PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
             Tau_rad  = TAU_DirectRTransmit(L+1)
           else
-!     shade          
+            ! shade          
             PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
             Tau_rad  = TAU_RadThru(L+1)
           ENDIF
@@ -459,7 +460,7 @@
 !     LeafAreaSunlit_zsec=unself-shaded leaf surface area
 !
 
-  DO L=NumCanopyLayers1,1,-1
+  DO L=NumCanopyLayers1,1,-1    
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       call C3PhotosynsCanopyLayerL(I,J,L,K,NB,NZ,CH2O)
     ENDIF
@@ -767,6 +768,7 @@
     Vmax4RubiscoCarboxy_node    => plt_photo%Vmax4RubiscoCarboxy_node    ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     LeafProteinC_brch           => plt_biom%LeafProteinC_brch             & !output :Protein C for the branches, [gC protein d-2]
   )
+  
   call PrintInfo('beg '//subname)
   DO K=1,MaxNodesPerBranch1
     IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -774,7 +776,7 @@
     ELSE
       ProteinCLeafAreaDensity=0.0_r8
     ENDIF
-
+    
     IF(ProteinCLeafAreaDensity.GT.ZERO)THEN
       !
       !     iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
@@ -1002,6 +1004,7 @@
     CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft   & !output :canopy minimum stomatal resistance, [s m-1]
   )
   call PrintInfo('beg '//subname)
+  
   call PrepPhotosynthesis(I,J,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
 !
 !     FOR EACH BRANCH
@@ -1018,7 +1021,7 @@
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen &
       .OR. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ) &
       .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-
+      
       !there are photosynthetically active leaves       
       call PhenoActiveBranch(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
 

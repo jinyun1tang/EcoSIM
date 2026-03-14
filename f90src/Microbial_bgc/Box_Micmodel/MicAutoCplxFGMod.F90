@@ -785,13 +785,14 @@ module MicAutoCPLXMod
     !     RCO2X,RAcettProdHeter,RCH4ProdHeter,RH2ProdHeter=CO2,acetate,CH4,H2 production from RespGrossHeter
     !     RO2Uptk4RespHeter=O2-limited O2 uptake
     !     RSMetaOxidSoilAutor,RSMetaOxidBandAutor=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
+
     !NH3 oxidizer assimilate CO2, CH4 oxidizer produces CO2, nitrite oxidizer assimilates CO2
-    RespGrossAutor(NGL)    = RespGrossAutor(NGL)*fLimO2Autor(NGL)
-    RCO2ProdAutor(NGL)     = RespGrossAutor(NGL)
-    RCH4ProdAutor(NGL)     = 0.0_r8
-    RO2Uptk4RespAutor(NGL) = RO2Dmnd4GrossRespAutor(NGL)*fLimO2Autor(NGL)
-    RSMetaOxidSoilAutor(NGL)   = RSMetaOxidSoilAutor(NGL)*fLimO2Autor(NGL)
-    RSMetaOxidBandAutor(NGL)   = RSMetaOxidBandAutor(NGL)*fLimO2Autor(NGL)
+    RespGrossAutor(NGL)      = RespGrossAutor(NGL)*fLimO2Autor(NGL)
+    RCO2ProdAutor(NGL)       = RespGrossAutor(NGL)
+    RCH4ProdAutor(NGL)       = 0.0_r8
+    RO2Uptk4RespAutor(NGL)   = RO2Dmnd4GrossRespAutor(NGL)*fLimO2Autor(NGL)
+    RSMetaOxidSoilAutor(NGL) = RSMetaOxidSoilAutor(NGL)*fLimO2Autor(NGL)
+    RSMetaOxidBandAutor(NGL) = RSMetaOxidBandAutor(NGL)*fLimO2Autor(NGL)
   ENDDO
   end associate
   end subroutine AerobicAutorO2Uptake
@@ -832,8 +833,8 @@ module MicAutoCPLXMod
     OMActAutor             => nmics%OMActAutor,             &
     RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      &
     RNO3UptkAutor          => nmicf%RNO3UptkAutor,          &
-    RNOxReduxAutorSoil     => nmicf%RNOxReduxAutorSoil,     & !NO2 reduction by NH3
-    RNOxReduxAutorBand     => nmicf%RNOxReduxAutorBand,     &
+    RNOxReduxAutorSoil     => nmicf%RNOxReduxAutorSoil,     & !NO2 reduction by NH3 in non-band soil
+    RNOxReduxAutorBand     => nmicf%RNOxReduxAutorBand,     & !NO2 reduction by NH3 in banded soil
     RNOxReduxRespAutorLim  => nmicf%RNOxReduxRespAutorLim,  & !respiration due to NO2
     RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &
     RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &
@@ -904,10 +905,12 @@ module MicAutoCPLXMod
     !     ECHZ=growth respiration efficiency
     !     RSMetaOxidSoilAutor,RSMetaOxidBandAutor=total O2-limited (1)NH4,(2)NO2,(3)CH4 oxidation
     !one O2 accepts 4e, one NO2(-) accepts 2e
+
     FNO2S  = VLNO3
     FNO2B  = VLNOB
     ROXYD  = AZMAX1(RO2Dmnd4GrossRespAutor(NGL)-RO2Uptk4RespAutor(NGL))
-    !why is 0.875?
+
+    !why is 0.875? 2NO2(-) + NH3 -> 1.5N2O+ 2OH(-)+0.5H2O, 0.875=14/16, N(+3)->N(+), O->O(2-), 
     VMXD4  = 0.875_r8*ROXYD*XCO2
     VMXDXS = FNO2S*VMXD4*CNO2S/(CNO2S+Z2KM)
     VMXDXB = FNO2B*VMXD4*CNO2B/(CNO2B+Z2KM)
@@ -918,13 +921,15 @@ module MicAutoCPLXMod
     ELSE
       FVMXDX=0.0_r8
     ENDIF
-    VMXD4S                     = VMXDXS*FVMXDX
-    VMXD4B                     = VMXDXB*FVMXDX
+    VMXD4S = VMXDXS*FVMXDX
+    VMXD4B = VMXDXB*FVMXDX
+
     !update NO2 production due to NH3 oxidation by O2
-    ZNO2SX                      = ZNO2S+RTotNH3OxidSoilAutor
-    ZNO2BX                      = ZNO2B+RTotNH3OxidBandAutor
-    RNOxReduxAutorSoil(NGL) = AZMAX1(AMIN1(VMXD4S,ZNO2SX))
+    ZNO2SX                  = ZNO2S+RTotNH3OxidSoilAutor
+    ZNO2BX                  = ZNO2B+RTotNH3OxidBandAutor
+    RNOxReduxAutorSoil(NGL) = AZMAX1(AMIN1(VMXD4S,ZNO2SX)) !NO2-> N2O
     RNOxReduxAutorBand(NGL) = AZMAX1(AMIN1(VMXD4B,ZNO2BX))
+
     !total NO2 reduced 
     RDNOT                      = RNOxReduxAutorSoil(NGL)+RNOxReduxAutorBand(NGL)
 
@@ -936,9 +941,10 @@ module MicAutoCPLXMod
     !NO2(-) reduction is used to synthesize CH2O, and 
     !2NO2(-) + CH2O -> N2O(aq) + CO2 + 2OH(-)  
     RNOxReduxRespAutorLim(NGL) = RDNOT*ECNO*ENOX
-    RNO3UptkAutor(NGL)         = 0.0_r8
+    RNO3UptkAutor(NGL)         = 0.0_r8              !currently no NO3 reduction by nitrifiers
     RNO2XupAutor(NGL)          = VMXD4S
     RNO2XupAutorBand(NGL)      = VMXD4B
+
     !NH4 oxidation by NO2(-), NH3+2NO2(-) -> 1.5N2O+2OH(-)+0.5H2O
     !NH4 -> N2O, 2NO2-> N2O
     RSMetaOxidSoilAutor(NGL)=RSMetaOxidSoilAutor(NGL)+RNOxReduxAutorSoil(NGL)/2._r8
@@ -1431,8 +1437,8 @@ module MicAutoCPLXMod
     RO2Dmnd4GrossRespAutor(NGL) = 2.667_r8*RGOMP
     RO2MetaDmndAutor(NGL)       = RO2Dmnd4GrossRespAutor(NGL)+3.429_r8*RVOXP
     RespGrossAutor(NGL)         = RGOMP     !this is CO2 production before O2 limitation
-    RSMetaOxidSoilAutor(NGL)    = RVOXPA
-    RSMetaOxidBandAutor(NGL)    = RVOXPB
+    RSMetaOxidSoilAutor(NGL)    = RVOXPA    !NH3 oxidation in non-band soil
+    RSMetaOxidBandAutor(NGL)    = RVOXPB    !NH3 oxidation in band soil
   ENDDO
   call PrintInfo('end '//subname)
   end associate
@@ -1553,17 +1559,18 @@ module MicAutoCPLXMod
     !
 
     VMAX=GrowthEnvScalAutor(NGL)*FBiomNutStoiScalAutor(NGL)*XCO2*OMActAutor(NGL)*VMXNO2Oxi
-    ECHZAutor(NGL)         = EO2X
-    FCN2S                  = FNH4S*CNO2S/(CNO2S+ZNKM)
-    FCN2B                  = FNHBS*CNO2B/(CNO2B+ZNKM)
-    FSBSTAutor(NGL)        = FCN2S+FCN2B
-    VMX2S                  = VMAX*FCN2S
-    VMX2B                  = VMAX*FCN2B
-    RNNO2                  = AZMAX1(AMIN1(VMX2S,FNO2*ZNO2S))
-    RNNOB                  = AZMAX1(AMIN1(VMX2B,FNB2*ZNO2B))
-    RVOXP                  = RNNO2+RNNOB   !total NO2(-) to be oxidized, including those used for creating CH2O from CO2?
-    RVOXPA                 = RNNO2
-    RVOXPB                 = RNNOB
+    ECHZAutor(NGL)  = EO2X
+    FCN2S           = FNH4S*CNO2S/(CNO2S+ZNKM)
+    FCN2B           = FNHBS*CNO2B/(CNO2B+ZNKM)
+    FSBSTAutor(NGL) = FCN2S+FCN2B
+    VMX2S           = VMAX*FCN2S
+    VMX2B           = VMAX*FCN2B
+    RNNO2           = AZMAX1(AMIN1(VMX2S,FNO2*ZNO2S))
+    RNNOB           = AZMAX1(AMIN1(VMX2B,FNB2*ZNO2B))
+    RVOXP           = RNNO2+RNNOB   !total NO2(-) to be oxidized, including those used for creating CH2O from CO2?
+    RVOXPA          = RNNO2
+    RVOXPB          = RNNOB
+
     !CO2 uptake due to NO2 uptake, and a fraction of ECNO becomes CH2O. RVOXP*ECNO is carbon fixed using the energy from NO2(-) oxidation by O2.
     !2NO2(-)+CO2 + H2O -> CH2O + 2NO3(-)
     !ECNO is about 0.1, BELSER et al. (1984) reported the ratio is about 0.02
@@ -1581,8 +1588,8 @@ module MicAutoCPLXMod
     RO2Dmnd4GrossRespAutor(NGL) = 2.667_r8*RGOMP
     RO2MetaDmndAutor(NGL)       = RO2Dmnd4GrossRespAutor(NGL)+1.143_r8*RVOXP
     RespGrossAutor(NGL)         = RGOMP     !CO2 production before O2 limitation
-    RSMetaOxidSoilAutor(NGL)    = RVOXPA
-    RSMetaOxidBandAutor(NGL)    = RVOXPB
+    RSMetaOxidSoilAutor(NGL)    = RVOXPA    !NO2(-)+0.5O2 -> NO3(-)
+    RSMetaOxidBandAutor(NGL)    = RVOXPB    !NO2(-)+0.5O2 -> NO3(-)
   ENDDO
   call PrintInfo('end '//subname)
   end associate
@@ -1868,6 +1875,7 @@ module MicAutoCPLXMod
         ENDDO D325
       ENDIF
     ENDDO D320
+
     RVOXPA = AZMAX1(RVOXP) !CH4 oxidized to support production for RGOMP, which is used to compute growth + (growth/maint resp)
     RVOXPB = 0.0_r8
     !

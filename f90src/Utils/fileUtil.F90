@@ -1,7 +1,7 @@
 module fileUtil
 !!
 ! subroutines for file open with error check
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use data_kind_mod
   implicit none
   private
@@ -18,7 +18,6 @@ module fileUtil
   public :: opnfil,relavu
   integer, public, parameter :: ecosim_filename_length=128
   integer, public, parameter :: stdout=6
-  integer, public, parameter :: iulog=6
   integer, public, parameter :: error_errmsg_len=256
   integer, public, parameter :: ecosim_string_length_long=256
   integer, public, parameter :: var_flux_type =1

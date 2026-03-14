@@ -8,6 +8,7 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable ::  SLOPE_col(:,:,:)                             !slope	in four directions, [o]
+  real(r8),target,allocatable ::  SoilSurfDepZ_col(:,:)                        !depth of soil surface, [m]
   real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity,[m3 d-2]
   real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point,[m3 d-2]
   real(r8),target,allocatable ::  SatHydroCondVert_vr(:,:,:)                   !soil vertical saturated hydraulic conductivity, [mm h-1]
@@ -41,6 +42,7 @@ contains
   subroutine InitSoilPhysData
 
   implicit none
+  allocate(SoilSurfDepZ_col(JY,JX)); SoilSurfDepZ_col=0._r8
   allocate(SLOPE_col(0:3,JY,JX));   SLOPE_col=0._r8
   allocate(FieldCapacity_vr(0:JZ,JY,JX));     FieldCapacity_vr=0._r8
   allocate(WiltPoint_vr(0:JZ,JY,JX));     WiltPoint_vr=0._r8
@@ -98,6 +100,7 @@ contains
   call destroy(VLMicPt0_col)
   call destroy(LOGPSIAtSat)
   call destroy(LOGPSIFLD_col)
+  call destroy(SoilSurfDepZ_col)
   call destroy(LOGPSIMN_col)
   call destroy(LOGPSIMXD_col)
   call destroy(LOGPSIMND_col)

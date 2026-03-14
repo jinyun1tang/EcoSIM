@@ -13,6 +13,7 @@ module abortutils
   save
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
+  integer, public, parameter :: iulog =6   
   public :: endrun
   public :: check_bool
   interface endrun
@@ -73,7 +74,6 @@ module abortutils
     module procedure print_info_arr
     module procedure print_info_msg
   end interface
-  integer  :: iulog = 6        ! "stdout" log file unit number, default is 6
 
 CONTAINS
   !-----------------------------------------------------------------------

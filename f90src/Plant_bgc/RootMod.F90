@@ -2821,7 +2821,7 @@ implicit none
     RootDepzChk=Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.CumSoilThickness_vr(LL-1) .OR. Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.SeedDepth_pft(NZ)
     !EXIT if LL-1 is not active soil or has root, no withdraw
 
-    IF(VLSoilPoreMicP_vr(LL-1)<=ZEROS2 .OR. .not. RootDepzChk)EXIT
+    IF(VLSoilPoreMicP_vr(LL-1)<=ZEROS2 .OR. .not. RootDepzChk)CYCLE
     IF(RootSinkC_vr(N,LL).GT.ZERO4Groth_pft(NZ))THEN
       FracRootSinkL=(Root1stSink_pvr(LL,NR)+Root2ndSink_pvr(N,LL,NR))/RootSinkC_vr(N,LL)
     ELSE
@@ -2952,7 +2952,7 @@ implicit none
   real(r8) :: QH2Oroots_rpvr(pltpar%jroots,JZ1,pltpar%MaxNumRootAxes)   !water flux along root axes
   integer  :: L,N,NR,L1
 
-  character, parameter :: subname='CytoKininDynamics'
+  character(len=*), parameter :: subname='CytoKininDynamics'
   real(r8) :: dmax = 0.01_r8              !Sapwood Depth, or the radius when heartwood start to form [m]
   real(r8), parameter :: phi_min =0.4_r8  
   real(r8), parameter :: phi_max =0.7_r8  !asymptotic limit of the conductive area fraction, [m2/m2]
@@ -2992,6 +2992,7 @@ implicit none
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]        
     Root2ndXNumL_rpvr          => plt_morph%Root2ndXNumL_rpvr            & !input  :within soil layer number of whole population 2nd root axes, [d-2]        
   )
+  if(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))return
   call PrintInfo('beg '//subname)
   
   !fine roots and mycorrhizae are assumed to functioning in parallel

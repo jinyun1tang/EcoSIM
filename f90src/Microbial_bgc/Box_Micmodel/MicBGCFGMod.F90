@@ -2139,23 +2139,23 @@ module MicBGCMod
             micflx%tRH1PO4MicrbImobilSoil = micflx%tRH1PO4MicrbImobilSoil+RH1PO4imobilLitrHeter(NGL,K)
           ENDIF
       !
-          naqfdiag%tRCO2MicrbProd    = naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
-          naqfdiag%tRCH4MicrbProd    = naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
-          naqfdiag%tRNOxMicrbRedux   = naqfdiag%tRNOxMicrbRedux+RNOxDOCReduxRespDenitLim(NGL,K)+RNOxAcetReduxRespDenitLim(NGL,K)
-          naqfdiag%tRO2MicrbUptk     = naqfdiag%tRO2MicrbUptk+RO2UptkHeter(NGL,K)
-          naqfdiag%TReduxNO3Soil     = naqfdiag%TReduxNO3Soil+RNO3ReduxHeterSoil(NGL,K)
-          naqfdiag%TReduxNO3Band     = naqfdiag%TReduxNO3Band+RNO3ReduxHeterBand(NGL,K)
-          naqfdiag%TDeniReduxNO2Soil = naqfdiag%TDeniReduxNO2Soil+RNO2ReduxHeterSoil(NGL,K)
-          naqfdiag%TDeniReduxNO2Band = naqfdiag%TDeniReduxNO2Band+RNO2ReduxHeterBand(NGL,K)
-          naqfdiag%TReduxNO2Soil     = naqfdiag%TReduxNO2Soil+RNO2ReduxHeterSoil(NGL,K)
-          naqfdiag%TReduxNO2toN2OBand     = naqfdiag%TReduxNO2toN2OBand+RNO2ReduxHeterBand(NGL,K)
-          naqfdiag%TReduxN2O         = naqfdiag%TReduxN2O+RN2OReduxHeter(NGL,K)
-          naqfdiag%TProdH2           = naqfdiag%TProdH2+RH2ProdHeter(NGL,K)
-          naqfdiag%tRO2UptkHeterG    = naqfdiag%tRO2UptkHeterG+RO2UptkHeter(NGL,K)
-          naqfdiag%tRO2DmndHeterG    = naqfdiag%tRO2DmndHeterG + RO2DmndHeter(NGL,K)
-          nmicf%RO2UptkHeterG(NGL)   = nmicf%RO2UptkHeterG(NGL)+RO2UptkHeter(NGL,K)
-          nmicf%RO2DmndHeterG(NGL)   = nmicf%RO2DmndHeterG(NGL)+RO2DmndHeter(NGL,K)
-          TRDOM2DIE(ielmc)           = TRDOM2DIE(ielmc)+RCO2ProdHeter(NGL,K)+RCH4ProdHeter(NGL,K)
+          naqfdiag%tRCO2MicrbProd     = naqfdiag%tRCO2MicrbProd+RCO2ProdHeter(NGL,K)
+          naqfdiag%tRCH4MicrbProd     = naqfdiag%tRCH4MicrbProd+RCH4ProdHeter(NGL,K)
+          naqfdiag%tRNOxMicrbRedux    = naqfdiag%tRNOxMicrbRedux+RNOxDOCReduxRespDenitLim(NGL,K)+RNOxAcetReduxRespDenitLim(NGL,K)
+          naqfdiag%tRO2MicrbUptk      = naqfdiag%tRO2MicrbUptk+RO2UptkHeter(NGL,K)
+          naqfdiag%TReduxNO3Soil      = naqfdiag%TReduxNO3Soil+RNO3ReduxHeterSoil(NGL,K)       !NO3->NO2
+          naqfdiag%TReduxNO3Band      = naqfdiag%TReduxNO3Band+RNO3ReduxHeterBand(NGL,K)       !NO3->NO2
+          naqfdiag%TDeniReduxNO2Soil  = naqfdiag%TDeniReduxNO2Soil+RNO2ReduxHeterSoil(NGL,K)   !NO2->N2O
+          naqfdiag%TDeniReduxNO2Band  = naqfdiag%TDeniReduxNO2Band+RNO2ReduxHeterBand(NGL,K)   !NO2->N2O
+          naqfdiag%TReduxNO2toN2OSoil = naqfdiag%TReduxNO2toN2OSoil+RNO2ReduxHeterSoil(NGL,K)
+          naqfdiag%TReduxNO2toN2OBand = naqfdiag%TReduxNO2toN2OBand+RNO2ReduxHeterBand(NGL,K)
+          naqfdiag%TReduxN2OtoN2      = naqfdiag%TReduxN2OtoN2+RN2OReduxHeter(NGL,K)               !N2O -> N2
+          naqfdiag%TProdH2            = naqfdiag%TProdH2+RH2ProdHeter(NGL,K)
+          naqfdiag%tRO2UptkHeterG     = naqfdiag%tRO2UptkHeterG+RO2UptkHeter(NGL,K)
+          naqfdiag%tRO2DmndHeterG     = naqfdiag%tRO2DmndHeterG + RO2DmndHeter(NGL,K)
+          nmicf%RO2UptkHeterG(NGL)    = nmicf%RO2UptkHeterG(NGL)+RO2UptkHeter(NGL,K)
+          nmicf%RO2DmndHeterG(NGL)    = nmicf%RO2DmndHeterG(NGL)+RO2DmndHeter(NGL,K)
+          TRDOM2DIE(ielmc)            = TRDOM2DIE(ielmc)+RCO2ProdHeter(NGL,K)+RCH4ProdHeter(NGL,K)
         ENDDO
       ENDDO
     ENDIF
@@ -2186,9 +2186,9 @@ module MicBGCMod
         naqfdiag%tRNOxMicrbRedux      = naqfdiag%tRNOxMicrbRedux+RNOxReduxRespAutorLim(NGL)
         naqfdiag%tRO2MicrbUptk        = naqfdiag%tRO2MicrbUptk+RO2UptkAutor(NGL)
         naqfdiag%TReduxNO3Soil        = naqfdiag%TReduxNO3Soil+RNO3UptkAutor(NGL)
-        naqfdiag%TNitNO2Redux2N2OSoil = naqfdiag%TNitNO2Redux2N2OSoil+RNOxReduxAutorSoil(NGL)*1.5_r8
-        naqfdiag%TNitNO2Redux2N2OBand = naqfdiag%TNitNO2Redux2N2OBand+RNOxReduxAutorBand(NGL)*1.5_r8
-        naqfdiag%TReduxNO2Soil        = naqfdiag%TReduxNO2Soil+RNOxReduxAutorSoil(NGL)*1.5_r8
+        naqfdiag%TNitNO2Redux2N2OSoil = naqfdiag%TNitNO2Redux2N2OSoil+RNOxReduxAutorSoil(NGL)*1.5_r8 !NO2(-) -> N2O from aerobic denitrification
+        naqfdiag%TNitNO2Redux2N2OBand = naqfdiag%TNitNO2Redux2N2OBand+RNOxReduxAutorBand(NGL)*1.5_r8 !NO2(-) -> N2O from aerobic denitrification
+        naqfdiag%TReduxNO2toN2OSoil        = naqfdiag%TReduxNO2toN2OSoil+RNOxReduxAutorSoil(NGL)*1.5_r8
         naqfdiag%TReduxNO2toN2OBand   = naqfdiag%TReduxNO2toN2OBand+RNOxReduxAutorBand(NGL)*1.5_r8
 
       ENDDO
@@ -2227,10 +2227,10 @@ module MicBGCMod
 !     RH2UptkAutor,TProdH2=total H2 uptake, emission
 !     RO2UptkMicb,tRO2MicrbUptk=total O2 uptake
 !     RN2NetUptkMicb=total N2 production
-!     TReduxN2O=total N2O reduction
+!     TReduxN2OtoN2=total N2O reduction
 !     RN2ONetUptkMicb=total N2O uptake
 !     NO2(-) -> N2O
-!     TReduxNO2Soil,TReduxNO2toN2OBand=total NO2 reduction in non-band,band
+!     TReduxNO2toN2OSoil,TReduxNO2toN2OBand=total NO2 reduction in non-band,band
 !     RN2OProdSoilChemo,RN2OProdBandChemo=nitrous acid reduction in non-band,band
 !
   RCO2NetUptkMicb = naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
@@ -2265,9 +2265,9 @@ module MicBGCMod
   !>0. microbial uptake
   RH2NetUptkMicb  = RH2UptkAutor-naqfdiag%TProdH2
   RO2UptkMicb     = naqfdiag%tRO2MicrbUptk
-  RN2NetUptkMicb  = -naqfdiag%TReduxN2O
-  RN2ONetUptkMicb = -naqfdiag%TReduxNO2Soil-naqfdiag%TReduxNO2toN2OBand-RN2OProdSoilChemo &
-    -RN2OProdBandChemo+naqfdiag%TReduxN2O
+  RN2NetUptkMicb  = -naqfdiag%TReduxN2OtoN2
+  RN2ONetUptkMicb = -naqfdiag%TReduxNO2toN2OSoil-naqfdiag%TReduxNO2toN2OBand-RN2OProdSoilChemo &
+    -RN2OProdBandChemo+naqfdiag%TReduxN2OtoN2
 !
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
@@ -2307,7 +2307,7 @@ module MicBGCMod
 !     TReduxNO3Soil,TReduxNO3Band=total NO3 reduction in non-band,band
 !     RNO3ProdSoilChemo,RNO3ProdBandChemo=NO3 production from nitrous acid reduction in non-band,band
 !     RNO2MicbReliz2Soil,RNO2MicbReliz2Band=net change in NO3 in band,non-band
-!     TReduxNO2Soil,TReduxNO2toN2OBand=total NO2 reduction in non-band,band
+!     TReduxNO2toN2OSoil,TReduxNO2toN2OBand=total NO2 reduction in non-band,band
 !     RNO2ReduxSoilChemo,RNO2ReduxBandChemo=substrate-limited nitrous acid reduction in non-band,band
 !     RH2PO4MicbReliz2Soil,RH2PO4MicbReliz2Band=net change in H2PO4 in band,non-band
 !     tRH2PO4MicrbImobilSoil,tRH2PO4MicrbImobilBand=total H2PO4 mineraln-immobn in non-band,band
@@ -2328,7 +2328,7 @@ module MicBGCMod
 
   RNH4MicbReliz2Soil=-naqfdiag%tRNH4MicrbImobilSoil
   RNO3MicbReliz2Soil=-naqfdiag%tRNO3MicrbImobilSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
-  RNO2MicbReliz2Soil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2Soil-RNO2ReduxSoilChemo
+  RNO2MicbReliz2Soil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2toN2OSoil-RNO2ReduxSoilChemo
   RH2PO4MicbReliz2Soil=-naqfdiag%tRH2PO4MicrbImobilSoil
   RH1PO4MicbReliz2Soil=-naqfdiag%tRH1PO4MicrbImobilSoil     !< 0 uptake
   RNH4MicbReliz2Band=-naqfdiag%tRNH4MicrbImobilBand
@@ -2339,12 +2339,14 @@ module MicBGCMod
   DO NGL=JGniA(mid_AutoAmmoniaOxidBacter),JGnfA(mid_AutoAmmoniaOxidBacter)
     RNH4MicbReliz2Soil=RNH4MicbReliz2Soil-RSMetaOxidSoilAutor(NGL)   !some NH3 -> NO2, some NH3-> N2O
     RNH4MicbReliz2Band=RNH4MicbReliz2Band-RSMetaOxidBandAutor(NGL)
+
     !on mole-basis 2NO2(-) + NH3 -> 1.5N2O + 2OH(-) + 0.5H2O, RNOxReduxAutorSoil(NGL)/2._r8 goes to N2O
     RNO2MicbReliz2Soil=RNO2MicbReliz2Soil+RSMetaOxidSoilAutor(NGL)-RNOxReduxAutorSoil(NGL)/2._r8
     RNO2MicbReliz2Band=RNO2MicbReliz2Band+RSMetaOxidBandAutor(NGL)-RNOxReduxAutorBand(NGL)/2._r8
   ENDDO
 
   DO NGL=JGniA(mid_AutoNitriteOxidBacter),JGnfA(mid_AutoNitriteOxidBacter)
+    naqfdiag%tNO2OxiAuto=naqfdiag%tNO2OxiAuto+RSMetaOxidSoilAutor(NGL)+RSMetaOxidBandAutor(NGL)
     RNO3MicbReliz2Soil=RNO3MicbReliz2Soil+RSMetaOxidSoilAutor(NGL)
     RNO2MicbReliz2Soil=RNO2MicbReliz2Soil-RSMetaOxidSoilAutor(NGL)
     RNO3MicbReliz2Band=RNO3MicbReliz2Band+RSMetaOxidBandAutor(NGL)
@@ -3289,7 +3291,7 @@ module MicBGCMod
     RNO3UptkSoil                  = AZMAX1(AMIN1(ZNO3SX,VMXD3S))     !substrate-limited uptake in soil
     RNO3UptkBand                  = AZMAX1(AMIN1(ZNO3BX,VMXD3B))     !substrate-limited uptake in band
     !apply oxidation-demand limitation
-    RNO3ReduxHeterSoil(NGL,K)     = AZMAX1(AMIN1(RNO3UptkSoil,OQCD3S))   !NO3-N-soil demand for DOC oxidation
+    RNO3ReduxHeterSoil(NGL,K)     = AZMAX1(AMIN1(RNO3UptkSoil,OQCD3S))   !NO3-N-soil demand for DOC oxidation, NO3-NO2
     RNO3ReduxHeterBand(NGL,K)     = AZMAX1(AMIN1(RNO3UptkBand,OQCD3B))   !NO3-N-band demand for DOC oxidation
     RDNOX                         = RNO3UptkSoil+RNO3UptkBand
     RDNOT                         = RNO3ReduxHeterSoil(NGL,K)+RNO3ReduxHeterBand(NGL,K)

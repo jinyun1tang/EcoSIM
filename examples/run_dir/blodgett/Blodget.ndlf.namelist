@@ -44,7 +44,7 @@ hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_c
   'CO2_PLTROOT_FLX_col','TreeRingRadius_pft','RootLDS_pvr','RootKond2H2O_pvr','Growth_Stage_pft','PSI_vr','MycoArbuBiomC_pft',
   'VcMax25C_RUBISCO_pft','VoMax25C_RUBISCO_pft','JMax25C_photo_pft','ShootRoot_XFER_C_pft','ShootRoot_XFER_N_pft',
   'MicPFlo_vr','MacPFlo_vr','dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','RootNonstC_pvr','Root1stRadius_pvr','ShootRoot_XFER_C_pft',
-  'Root2nd_AxesNumL_pvr','Root1st_AxesNumL_pvr'
+  'Root2nd_AxesNumL_pvr','Root1st_AxesNumL_pvr','RootShootCX_pvr'
 !hist_fincl2='TEMP_vr' !,'CO2_SEMIS_FLX_col','Root_AR_col','ECO_HR_CO2_col','ECO_RADSW_col'
 !hist_fincl2='ECO_GPP_col','ECO_NPP_col'
 hist_nhtfrq=-24 !, 0

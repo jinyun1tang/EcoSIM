@@ -481,6 +481,7 @@ module InitPlantMod
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft      ,& !output :maximum radius of secondary roots, [m]
     FineRootVolPerMassC_pft   => plt_morph%FineRootVolPerMassC_pft   ,& !output :fine root volume:mass ratio, [m3 g-1]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !output :seeding depth, [m]
+    SoilSurfDepZ_col          => plt_site%SoilSurfDepZ_col           ,& !input  :soil surface depth, [m]
     CNRTS_pft                 => plt_allom%CNRTS_pft                 ,& !output :root N:C ratio x root growth yield, [-]
     CPRTS_pft                 => plt_allom%CPRTS_pft                 ,& !output :root P:C ratio x root growth yield, [-]
     NGTopRootLayer_pft        => plt_morph%NGTopRootLayer_pft        ,& !output :soil layer at planting depth, [-]
@@ -516,7 +517,7 @@ module InitPlantMod
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RootRadialResist_pft,RootAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-  SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)
+  SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)+SoilSurfDepZ_col
   DO L=NU,NL
     if(isclose(SeedDepth_pft(NZ),CumSoilThickness_vr(L)))then
       SeedDepth_pft(NZ)=AMAX1(CumSoilThickness_vr(L)-ppmc,ppmc)
