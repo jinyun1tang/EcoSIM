@@ -734,6 +734,7 @@ implicit none
   real(r8) :: Eco_AutoR_CumYr_col      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: TRootH2Flx_col           !total root H2 flux, [g d-2]
   real(r8) :: Canopy_NEE_col           !total net CO2 fixation, [gC d-2]
+  real(r8), pointer :: RootShootExch_pvr(:,:,:)            => null()  !Root-shoot nonstrucal element exchange, [g d-2 h-1]
   real(r8), pointer :: Nutruptk_fClim_rpvr(:,:,:)          => null()  !Carbon limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8), pointer :: Nutruptk_fNlim_rpvr(:,:,:)          => null()  !Nitrogen limitation for root nutrient uptake,(0->1),stronger limitation, [-]
   real(r8), pointer :: Nutruptk_fPlim_rpvr(:,:,:)          => null()  !Phosphorus limitation for root nutrient uptake,(0->1),stronger limitation, [-]
@@ -1165,6 +1166,7 @@ implicit none
   allocate(this%SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP1));this%SurfLitrfalStrutElms_CumYr_pft=0._r8
   allocate(this%LitrFallStrutElms_col(NumPlantChemElms));this%LitrFallStrutElms_col=0._r8
   allocate(this%NetPrimProduct_pft(JP1));this%NetPrimProduct_pft=spval
+  allocate(this%RootShootExch_pvr(NumPlantChemElms,JZ1,JP1)); this%RootShootExch_pvr=0._r8
   allocate(this%Nutruptk_fClim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fClim_rpvr=0._r8
   allocate(this%Nutruptk_fNlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fNlim_rpvr=0._r8
   allocate(this%Nutruptk_fPlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fPlim_rpvr=0._r8

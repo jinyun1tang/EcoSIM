@@ -520,6 +520,7 @@ implicit none
   DO NZ=1,NP
     
     DO NE=1,NumPlantChemElms
+      plt_bgcr%RootShootExch_pvr(NE,:,NZ)=0._r8
       plt_biom%TotEndVegE_pft(NE,NZ) = plt_biom%RootElms_pft(NE,NZ)+plt_biom%ShootElms_pft(NE,NZ)+&
         plt_biom%SeasonalNonstElms_pft(NE,NZ)+plt_biom%StandDeadStrutElms_pft(NE,NZ)+ plt_biom%ShootNoduleElms_pft(NE,NZ)  + &
         plt_biom%RootNoduleElms_pft(NE,NZ) 

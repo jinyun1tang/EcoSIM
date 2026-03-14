@@ -515,11 +515,14 @@ implicit none
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
         DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)
       ENDDO
-      Root1stXNumL_pvr(L,NZ,NY,NX) = plt_morph%Root1stXNumL_pvr(L,NZ)
+      Root1stXNumL_pvr(L,NZ,NY,NX)    = plt_morph%Root1stXNumL_pvr(L,NZ)
+      DO NE=1,NumPlantChemElms
+        RootShootExch_pvr(NE,L,NZ,NY,NX) = plt_bgcr%RootShootExch_pvr(NE,L,NZ)
+      ENDDO
       DO N = 1, Myco_pft(NZ,NY,NX)
         ROOTNLim_rpvr(N,L,NZ,NY,NX)                                = plt_biom%ROOTNLim_rpvr(N,L,NZ)
         ROOTPLim_rpvr(N,L,NZ,NY,NX)                                = plt_biom%ROOTPLim_rpvr(N,L,NZ)        
-        RootMaintDef_CO2_pvr(N,L,NZ,NY,NX)                         = plt_bgcr%RootMaintDef_CO2_pvr(N,L,NZ)
+        RootMaintDef_CO2_pvr(N,L,NZ,NY,NX)                         = plt_bgcr%RootMaintDef_CO2_pvr(N,L,NZ)        
         Nutruptk_fClim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fClim_rpvr(N,L,NZ)
         Nutruptk_fNlim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fNlim_rpvr(N,L,NZ)
         Nutruptk_fPlim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fPlim_rpvr(N,L,NZ)

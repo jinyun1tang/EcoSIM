@@ -471,6 +471,8 @@ implicit none
   real(r8),pointer   :: h1D_RCH4Oxi_anmo_col(:)
   real(r8),pointer   :: h2D_RFerment_vr(:,:)
   real(r8),pointer   :: h2D_nh3oxi_vr(:,:)
+  real(r8),pointer   :: h2D_RNit_NO2toNO3_vr(:,:)
+  real(r8),pointer   :: h2D_RDen_NO3toNO2_vr(:,:)
   real(r8),pointer   :: h2D_n2oprod_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_vr(:,:)
   real(r8),pointer   :: h2D_RootMassC_pvr(:,:)
@@ -491,6 +493,8 @@ implicit none
   real(r8),pointer   :: h1D_RCH4Oxi_anmo_litr_col(:)  
   real(r8),pointer   :: h1D_RFermen_litr_col(:)
   real(r8),pointer   :: h1D_NH3oxi_litr_col(:)
+  real(r8),pointer   :: h1D_RDen_NO3toNO2_col(:)
+  real(r8),pointer   :: h1D_NO2Oxi_litr_col(:)
   real(r8),pointer   :: h1D_N2oprod_litr_col(:)
   real(r8),pointer   :: h1D_RDECOMPC_SOM_litr_col(:)
   real(r8),pointer   :: h1D_MicrobAct_litr_col(:)
@@ -593,6 +597,9 @@ implicit none
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
   real(r8),pointer   :: h2D_RootH2OUptkStress_pvr(:,:)
   real(r8),pointer   :: h2D_RootH2OUptk_pvr(:,:)
+  real(r8),pointer   :: h2D_RootShootExchC_pvr(:,:)
+  real(r8),pointer   :: h2D_RootShootExchN_pvr(:,:)
+  real(r8),pointer   :: h2D_RootShootExchP_pvr(:,:)
   real(r8),pointer   :: h2D_SapFlowVlinear_pvr(:,:)
   real(r8),pointer   :: h2D_ROOT_OSTRESS_pvr(:,:)
   real(r8),pointer   :: h2D_prtUP_NH4_pvr(:,:)                                                                     
@@ -1082,6 +1089,8 @@ implicit none
   allocate(this%h2D_RCH4Oxi_anmo_vr(beg_col:end_col,1:JZ)); this%h2D_RCH4Oxi_anmo_vr(:,:)=spval  
   allocate(this%h2D_RFerment_vr(beg_col:end_col,1:JZ)); this%h2D_RFerment_vr(:,:)=spval
   allocate(this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ));  this%h2D_nh3oxi_vr(:,:)=spval
+  allocate(this%h2D_RNit_NO2toNO3_vr(beg_col:end_col,1:JZ));this%h2D_RNit_NO2toNO3_vr(:,:)=spval
+  allocate(this%h2D_RDen_NO3toNO2_vr(beg_col:end_col,1:JZ)); this%h2D_RDen_NO3toNO2_vr(:,:)=spval
   allocate(this%h2D_n2oprod_vr(beg_col:end_col,1:JZ));  this%h2D_n2oprod_vr(:,:)=spval
   allocate(this%h2D_RootAR_vr(beg_col:end_col,1:JZ)); this%h2D_RootAR_vr(:,:)=spval
   allocate(this%h2D_RootAR2soil_vr(beg_col:end_col,1:JZ)); this%h2D_RootAR2soil_vr(:,:)=spval
@@ -1094,6 +1103,8 @@ implicit none
   allocate(this%h1D_RCH4Oxi_anmo_col(beg_col:end_col));this%h1D_RCH4Oxi_anmo_col(:)=spval  
   allocate(this%h1D_RFermen_litr_col(beg_col:end_col));  this%h1D_RFermen_litr_col(:)=spval
   allocate(this%h1D_nh3oxi_litr_col(beg_col:end_col)); this%h1D_nh3oxi_litr_col(:)=spval
+  allocate(this%h1D_RDen_NO3toNO2_col(beg_col:end_col));this%h1D_RDen_NO3toNO2_col(:)=spval
+  allocate(this%h1D_NO2Oxi_litr_col(beg_col:end_col)); this%h1D_NO2Oxi_litr_col(:)=spval
   allocate(this%h1D_n2oprod_litr_col(beg_col:end_col));  this%h1D_n2oprod_litr_col(:)=spval
   allocate(this%h2D_Gchem_CO2_prod_vr(beg_col:end_col,1:JZ)); this%h2D_Gchem_CO2_prod_vr(:,:)=spval
   allocate(this%h2D_Eco_HR_CO2_vr(beg_col:end_col,1:JZ)); this%h2D_Eco_HR_CO2_vr(:,:)=spval
@@ -1177,6 +1188,9 @@ implicit none
   allocate(this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_PSI_RT_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptk_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootH2OUptk_pvr(:,:)=spval
+  allocate(this%h2D_RootShootExchC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchC_pvr(:,:)=spval
+  allocate(this%h2D_RootShootExchN_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchN_pvr(:,:)=spval
+  allocate(this%h2D_RootShootExchP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchP_pvr(:,:)=spval
   allocate(this%h2D_SapFlowVlinear_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_SapFlowVlinear_pvr(:,:)=spval
   allocate(this%h2D_RootMaintDef_CO2_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMaintDef_CO2_pvr(:,:)=spval
   allocate(this%h2D_RootAbsorbAreaPP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootAbsorbAreaPP_pvr(:,:)=spval
@@ -2964,6 +2978,22 @@ implicit none
   call hist_addfld1d(fname='RCH4_ANMO_litr_col',units='gC/m2/h',avgflag='A',&
     long_name='Anaerobic CH4 oxidation in litter layer',ptr_col=data1d_ptr)      
 
+  data1d_ptr => this%h1D_RFermen_litr_col(beg_col:end_col)
+  call hist_addfld1d(fname='RFerment_litr_col',units='gC/m2/h',avgflag='A',&
+    long_name='Anaerobic C fermentation in litter layer',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_NH3oxi_litr_col(beg_col:end_col)
+  call hist_addfld1d(fname='NH3Oxi_litr_col',units='gN/m2/h',avgflag='A',&
+    long_name='Nitrifier NH3 to NO2(-) oxidation in litter layer',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_NO2Oxi_litr_col(beg_col:end_col)
+  call hist_addfld1d(fname='NO2Oxi_litr_col',units='gN/m2/h',avgflag='A',&
+    long_name='Nitrifier NO2(-) to NO3(-) oxidation rate in litter layer',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_RDen_NO3toNO2_col(beg_col:end_col)
+  call hist_addfld1d(fname='NO3redux_litr_col',units='gN/m2/h',avgflag='A',&
+    long_name='Denitrifier NO3(-) to NO2(-) reduction rate in litter layer',ptr_col=data1d_ptr)      
+
   data1d_ptr => this%h1D_RCH4Oxi_aero_col(beg_col:end_col)
   call hist_addfld1d(fname='RCH4Oxi_aero_col',units='gC/m2/h',avgflag='A',&
     long_name='Aerobic CH4 oxidation integrated over all layers',ptr_col=data1d_ptr)      
@@ -3142,12 +3172,21 @@ implicit none
     long_name='Vertically resolved root respiratory CO2 rate to roots',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_nh3oxi_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='NH3Oxid_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Vertically resolved NH3 oxidation rate',ptr_col=data2d_ptr,default='inactive')       
+  call hist_addfld2d(fname='Nit_NH3Oxid_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved NH3 to NO2(-) oxidation rate',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_RNit_NO2toNO3_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Nit_NO2Oxid_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved NO2(-) to NO3(-) oxidation rate',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_RDen_NO3toNO2_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='Den_NO3toNO2_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved NO3(-) to NO2(-) reduction rate by denitrifcation',&
+    ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_n2oprod_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='N2OProd_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Vertically resolved total N2O production rate',ptr_col=data2d_ptr,default='inactive')       
+    long_name='Vertically resolved total N2O production rate by nitrification and (chemo)denitrifcation',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr =>  this%h2D_Eco_HR_CO2_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='HR_CO2_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
@@ -3495,6 +3534,18 @@ implicit none
   call hist_addfld2d(fname='HydCondSoil_vr',units='m MPa-1 h-1',type2d='levsoi',avgflag='A',&
     long_name='Vertical hydraulic conductivity',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr => this%h2D_RootShootExchC_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootShootCX_pvr',units='gC m-2 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved pft root shoot C exchange (>0 to root)',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootShootExchN_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootShootNX_pvr',units='gN m-2 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved pft root shoot N exchange (>0 to root)',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootShootExchP_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootShootPX_pvr',units='gP m-2 h-1',type2d='levsoi',avgflag='A',&
+    long_name='Vertically resolved pft root shoot P exchange (>0 to root)',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_PSI_RT_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='PSI_RT_pvr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='Root total water potential of each pft',ptr_patch=data2d_ptr,default='inactive')       
@@ -3673,10 +3724,7 @@ implicit none
   real(r8),parameter :: m2mm=1000._r8
   real(r8),parameter :: million=1.e6_r8
   character(len=*), parameter :: subname='hist_update'
-  character(len=15) :: grow_stage_str(11)=(/'Planting      ','Emergence     ','Floral_init   ', &
-                                            'Jointing      ','Elongation    ','Heading       ', &
-                                            'Anthesis      ','Seed_fill     ','See_no_set    ', &
-                                            'Seed_mass_set ','End_seed_fill '/)
+
   real(r8) :: DVOLL,SOMC(jcplx)                                            
   integer :: jj
   call PrintInfo('beg '//subname)
@@ -3907,13 +3955,15 @@ implicit none
       this%h1D_RCH4ProdHydrog_litr_col(ncol) = RCH4ProdHydrog_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4ProdAcetcl_litr_col(ncol) = RCH4ProdAcetcl_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_aero_litr_col(ncol)   = RCH4Oxi_aero_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)   
-      this%h1D_RCH4Oxi_aero_col(ncol) =    RCH4Oxi_aero_vr(0,NY,NX)
+      this%h1D_RCH4Oxi_aero_col(ncol) =    RCH4Oxi_aero_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_ANMO_litr_col(ncol)   = RCH4Oxi_anmo_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)   
-      this%h1D_RCH4Oxi_ANMO_col(ncol) =    RCH4Oxi_anmo_vr(0,NY,NX)
+      this%h1D_RCH4Oxi_ANMO_col(ncol) =    RCH4Oxi_anmo_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_RDen_NO3toNO2_col(ncol) = RDen_NO3toNO2_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_NH3oxi_litr_col(ncol)         = RNH3oxi_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_N2Oprod_litr_col(ncol)        = (RN2ODeniProd_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
-                               +RN2OChemoProd_vr(0,NY,NX)-RN2ORedux_vr(0,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_NH3oxi_litr_col(ncol)         = RNit_NH3toNO2_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_NO2Oxi_litr_col(ncol)         = RNit_NO2toNO3_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_N2Oprod_litr_col(ncol)        = (RDen_NO2toN2O_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
+                               +RN2OChemoProd_vr(0,NY,NX)-RDen_N2OtoN2_vr(0,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
       
       this%h1D_decomp_OStress_litr_col(ncol)   = OxyDecompLimiter_vr(0,NY,NX)
       this%h1D_MicrobAct_litr_col(ncol)        = TMicHeterActivity_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4136,9 +4186,11 @@ implicit none
         this%h1D_RCH4Oxi_anmo_col(ncol)  = this%h1D_RCH4Oxi_anmo_col(ncol) + RCH4Oxi_anmo_vr(L,NY,NX)
 
         this%h2D_RFerment_vr(ncol,L) = RFerment_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_nh3oxi_vr(ncol,L)   = RNH3oxi_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h2D_n2oprod_vr(ncol,L)  = (RN2ODeniProd_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
-                               +RN2OChemoProd_vr(L,NY,NX)-RN2ORedux_vr(L,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_RDen_NO3toNO2_vr(ncol,L) = RDen_NO3toNO2_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_RNit_NO2toNO3_vr(ncol,L)   = RNit_NO2toNO3_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_nh3oxi_vr(ncol,L)   = RNit_NH3toNO2_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h2D_N2Oprod_vr(ncol,L)  = (RDen_NO2toN2O_vr(L,NY,NX)+RN2ONitProd_vr(L,NY,NX) &
+                               +RN2OChemoProd_vr(L,NY,NX)-RDen_N2OtoN2_vr(L,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RootAR_vr(ncol,L) = -RootCO2Autor_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RootAR2soil_vr(ncol,L)=-RootCO2Ar2Soil_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h2D_RootAR2Root_vr(ncol,L)=-RootCO2Ar2Root_vr(L,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4385,6 +4437,9 @@ implicit none
         endif
 
         DO L=1,NumCanopyLayers
+          this%h2D_RootShootExchC_pvr(nptc,L)=RootShootExch_pvr(ielmc,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          this%h2D_RootShootExchN_pvr(nptc,L)=RootShootExch_pvr(ielmn,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+          this%h2D_RootShootExchP_pvr(nptc,L)=RootShootExch_pvr(ielmp,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_CanopyLAIZ_plyr(nptc,L)=CanopyLeafAreaZ_pft(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         ENDDO  
         this%h1D_RootAR_ptc(nptc)          = 0._r8
@@ -4689,6 +4744,9 @@ implicit none
   this%h1D_CanopyNLim_ptc(nptc)                     = 0._r8
   this%h1D_CanopyPLim_ptc(nptc)                     = 0._r8
   this%h3D_PARTS_ptc(nptc,1:NumOfPlantMorphUnits,:) = 0._r8
+  this%h2D_RootShootExchC_pvr(nptc,:)               = 0._r8
+  this%h2D_RootShootExchN_pvr(nptc,:)               = 0._r8
+  this%h2D_RootShootExchP_pvr(nptc,:)               = 0._r8
   this%h2D_CanopyLAIZ_plyr(nptc,:)                  = 0._r8
   this%h1D_RootAR_ptc(nptc)                         = 0._r8
   this%h1D_RootLenPerPlant_ptc(nptc)                = 0._r8

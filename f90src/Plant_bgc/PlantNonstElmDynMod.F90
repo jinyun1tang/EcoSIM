@@ -382,6 +382,7 @@ module PlantNonstElmDynMod
     CanopyLeafSheathC_pft         => plt_biom%CanopyLeafSheathC_pft           ,& !inoput :canopy leaf + sheath C, [g d-2]
     RootSinkWeight_pvr            => plt_morph%RootSinkWeight_pvr             ,& !output :Root nonst element sink profile, [d-2]
     ECO_ER_col                    => plt_bgcr%ECO_ER_col                      ,& !inoput :ecosystem respiration, [g d-2 h-1]
+    RootShootExch_pvr             => plt_bgcr%RootShootExch_pvr               ,& !inoput :Root-shoot nonstrucal element exchange, [g d-2 h-1]
     ShootRootXferElm_pft          => plt_bgcr%ShootRootXferElm_pft            ,& !inoput :shoot-root nonstructural element transfer, [ g d-2 h-1]
     Eco_AutoR_CumYr_col           => plt_bgcr%Eco_AutoR_CumYr_col              & !inoput :ecosystem autotrophic respiration, [g d-2 h-1]
   )
@@ -397,7 +398,7 @@ module PlantNonstElmDynMod
   !     Eco_AutoR_CumYr_col=total autotrophic respiration
   !
   D5445: DO N=1,Myco_pft(NZ)
-    D5450: DO L=1,MaxSoiL4Root_pft(NZ)
+    D5450: DO L=NU,MaxSoiL4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ) = 0._r8
       PopuRootMycoC_pvr(N,L,NZ)       = 0._r8
       D5460: DO NR=1,NumPrimeRootAxes_pft(NZ)
@@ -412,12 +413,12 @@ module PlantNonstElmDynMod
   !recognizing that non-elongation zone mostly serves as strorage and highway for resource transport to the tip.
   DO  NR=1,NumPrimeRootAxes_pft(NZ)
     L1=NRoot1stTipLay_raxes(NR,NZ)    
-    DO L=1,MaxSoiL4Root_pft(NZ)    
+    DO L=NU,MaxSoiL4Root_pft(NZ)    
       RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)  
     ENDDO
   ENDDO
 
-  DO L=1,MaxSoiL4Root_pft(NZ)
+  DO L=NU,MaxSoiL4Root_pft(NZ)
     DO NR=1,NumPrimeRootAxes_pft(NZ)
       PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
     ENDDO
@@ -527,10 +528,10 @@ module PlantNonstElmDynMod
           XFRE          = PTSHTR*NonstElmGradt
           call ExchFluxLimiter(CanopyNonstElms_brch(ielmc,NB,NZ),RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ),XFRE)
 
-          ShootRootXferElm_pft(ielmc,NZ) = ShootRootXferElm_pft(ielmc,NZ)+XFRE          
+          ShootRootXferElm_pft(ielmc,NZ)              = ShootRootXferElm_pft(ielmc,NZ)+XFRE
           CanopyNonstElms_brch(ielmc,NB,NZ)           = CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE
-
+          RootShootExch_pvr(ielmc,L,NZ)               = RootShootExch_pvr(ielmc,L,NZ)+XFRE
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
             DO NE=2,NumPlantChemElms
@@ -548,8 +549,9 @@ module PlantNonstElmDynMod
               call ExchFluxLimiter(CanopyNonstElms_brch(NE,NB,NZ),RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ),XFRE)
 
               CanopyNonstElms_brch(NE,NB,NZ)           = CanopyNonstElms_brch(NE,NB,NZ)-XFRE
+              RootShootExch_pvr(NE,L,NZ)               = RootShootExch_pvr(NE,L,NZ)+XFRE
               RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+XFRE
-              ShootRootXferElm_pft(NE,NZ)              = ShootRootXferElm_pft(NE,NZ)+XFRE              
+              ShootRootXferElm_pft(NE,NZ)              = ShootRootXferElm_pft(NE,NZ)+XFRE
             ENDDO
           ENDIF
         ENDIF
