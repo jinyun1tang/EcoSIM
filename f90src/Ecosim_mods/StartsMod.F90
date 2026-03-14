@@ -909,6 +909,7 @@ module StartsMod
       ! surface litter residue layer
       TAREA                        = TAREA+AREA_3D(3,L,NY,NX)
       CumSoilThickness_vr(L,NY,NX) = 0.0_r8
+      SoilSurfDepZ_col(NY,NX)      = 0._r8
       SoilOrgM_vr(ielmc,L,NY,NX)   = SUM(RSC_vr(1:NumOfLitrCmplxs,L,NY,NX))*AREA_3D(3,L,NY,NX)
       ORGCX_vr(L,NY,NX)            = SoilOrgM_vr(ielmc,L,NY,NX)
       VLitR0                       = 0._r8
@@ -930,7 +931,7 @@ module StartsMod
 
       ! if it is a standing water, no macropore fraction
       ! DPTH=depth of layer middle
-      ! CumSoilThickness_vr=soil thickness from surface to bottom of layer L, [m]
+      ! CumSoilThickness_vr=soil thickness from the bottom of surface litter layer to to bottom of layer L, [m]
       ! FracSoiAsMicP_vr=micropore fraction
       ! DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
       ! VOLT=total volume
@@ -945,6 +946,9 @@ module StartsMod
       SoilDepthMidLay_vr(L,NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
       CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)+DLYR_3D(3,NU_col(NY,NX),NY,NX)
       CumSoilThickness_vr(L,NY,NX) = real_truncate(CumSoilThickness_vr(L,NY,NX),1.e-6_r8)
+      !identify the first soil layer
+      IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilSurfDepZ_col(NY,NX)=CumSoilThickness_vr(L,NY,NX)
+      
       CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)     ![m3]
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)

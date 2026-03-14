@@ -84,7 +84,7 @@ module RedistMod
   character(len=*), parameter :: subname='redist'
   integer :: NY,NX,L
   integer :: LG,ids        !the ebullition layer id
-  real(r8) :: DORGC(JZ),DVLiceMicP_vr(JZ)
+  real(r8) :: DORGC(JZ)
   real(r8) :: Txchem_CO2_col(JY,JX)
   real(r8) :: DORGE_col(JY,JX)              !change of organic C due to surface erosion
   real(r8) :: VOLISO,VOLPT,VOLTT
@@ -120,8 +120,6 @@ module RedistMod
 !
       call ModifyExWTBLByDisturbance(I,J,NY,NX)
 
-      call CopyLocalSoilWaterStates(NY,NX)
-
       call XGridTranspt(I,J,NY,NX,LG)
 
       call SnowMassUpdate(I,J,NY,NX)
@@ -136,7 +134,7 @@ module RedistMod
 !
       call LitterLayerSummary(I,J,NY,NX)
 
-      call UpdateTSoilVSMProfile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
+      call UpdateTSoilVSMProfile(I,J,NY,NX,VOLISO)    
 
       call UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,Txchem_CO2_col,DORGE_col)
 !
@@ -144,7 +142,7 @@ module RedistMod
 
       call SnowpackLayering(I,J,NY,NX)
 
-      call UpdateSoilGrids(I,J,NY,NX,DORGC,DVLiceMicP_vr)
+      call UpdateSoilGrids(I,J,NY,NX,DORGC,DVLiceMicP_vr(:,NY,NX))
 
       call UpdateOutputVars(I,J,NY,NX,Txchem_CO2_col)
 
@@ -234,6 +232,7 @@ module RedistMod
   Eco_HR_CumYr_col(NY,NX)        = Eco_HR_CumYr_col(NY,NX) + ECO_HR_CO2_col(NY,NX)+ECO_HR_CH4_col(NY,NX)
   
   !NOTE: O2 is different, as O2 consumption is supported partially by uptake from soil 
+  
   RGasNetProd_col(idg_O2,NY,NX)  = RGasNetProd_col(idg_O2,NY,NX)-RootO2_TotSink_col(NY,NX)
   RGasNetProd_col(idg_CO2,NY,NX) = RGasNetProd_col(idg_CO2,NY,NX)+RootCO2Ar2Root_col(NY,NX)
 
@@ -768,7 +767,7 @@ module RedistMod
   UION_col(NY,NX)=UION_col(NY,NX)+SSS
   end subroutine DiagSurfLitRLayerSalt
 !------------------------------------------------------------------------------------------
-  subroutine UpdateTSoilVSMProfile(I,J,NY,NX,VOLISO,DVLiceMicP_vr)    
+  subroutine UpdateTSoilVSMProfile(I,J,NY,NX,VOLISO)    
   !
   ! Description
   ! Update profiles of WATER, ICE, HEAT, TEMPERATUR
@@ -777,13 +776,11 @@ module RedistMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
-  REAL(R8),INTENT(OUT) :: DVLiceMicP_vr(JZ)  !change in ice volume
   real(r8) :: TKS00,TKSX,TKSpre
   real(r8) :: ENGY,EngyF
   real(r8) :: TVHeatCapacity
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
   real(r8) :: VHeatCapacityX,HS
-  real(r8) :: DVLWatMicP_vr(JZ,JY,JX)   !change in water volume
   integer :: L,it
   real(r8) :: twatmass0(JY,JX)
   real(r8) :: twatmass1(JY,JX)
@@ -798,7 +795,6 @@ module RedistMod
   TVOLI               = 0.0_r8
   TVOLIH              = 0.0_r8
   TENGY               = 0.0_r8
-  DVLiceMicP_vr       = 0._r8
   THeatFlow2Soil_col  = 0._r8
   twatmass0(NY,NX)    = 0._r8
   twatmass1(NY,NX)    = 0._r8
@@ -838,8 +834,6 @@ module RedistMod
       VLWatMacP_vr(L,NY,NX)  = 0._r8
       VLiceMicP_vr(L,NY,NX)  = 0._r8
       VLiceMacP_vr(L,NY,NX)  = 0._r8
-      DVLWatMicP_vr(L,NY,NX) = VLWatMicP2_vr(L,NY,NX)+VLWatMacP2_vr(L,NY,NX)
-      DVLiceMicP_vr(L)       = VLiceMicP2_vr(L,NY,NX)+VLiceMacP2_vr(L,NY,NX)
       TKS_vr(L,NY,NX)        = TairK_col(NY,NX)
       TCS_vr(L,NY,NX)         = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     ENDDO
@@ -865,10 +859,6 @@ module RedistMod
       THeatSoiThaw_col(NY,NX)   = THeatSoiThaw_col(NY,NX) + THeatSoiThaw_vr(L,NY,NX)
       HeatSource_col(NY,NX)     = HeatSource_col(NY,NX)+HeatSource_vr(L,NY,NX)
       THeatFlow2Soil_col(NY,NX) = THeatFlow2Soil_col(NY,NX) + THeatFlowCellSoil_vr(L,NY,NX)
-
-      !volume change=initial-final
-      DVLWatMicP_vr(L,NY,NX) = VLWatMicP2_vr(L,NY,NX)+VLWatMacP2_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)
-      DVLiceMicP_vr(L)       = VLiceMicP2_vr(L,NY,NX)+VLiceMacP2_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
 
       !update water/ice-unfilled pores
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
@@ -904,7 +894,7 @@ module RedistMod
   integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE_col(JY,JX)   !carbon change due to ersion
   real(r8), intent(inout) :: Txchem_CO2_col(JY,JX)
-  real(r8), intent(out) :: DORGC(JZ)
+  real(r8), intent(out) :: DORGC(JZ)                !final-initial 
   character(len=*), parameter :: subname='UpdateChemInSoilLays'//': '//trim(mod_filename)
 
   integer  :: L,K,M,N,LL,NGL,idx,idsp
@@ -1248,7 +1238,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in):: DORGEC
-  real(r8), intent(out):: DORGCL   !change of organic matter in layer L
+  real(r8), intent(out):: DORGCL   !change of organic matter in layer L, final-initial
 
   real(r8) :: ORGM(NumPlantChemElms)
   real(r8) :: HumOM(NumPlantChemElms)
@@ -1269,6 +1259,7 @@ module RedistMod
   DO NE=1,NumPlantChemElms
     tMicBiome_col(NE,NY,NX)=tMicBiome_col(NE,NY,NX)+ORGM(NE)
   ENDDO
+
   !total organic matter, litter + POM/humus, exclude living microbial biomass  
   call sumORGMLayL(L,NY,NX,SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX),info='redist')
   
@@ -1283,7 +1274,7 @@ module RedistMod
 
 ! change in organic C
   IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
-    DORGCL=ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX)
+    DORGCL=SoilOrgM_vr(ielmc,L,NY,NX)-ORGCX_vr(L,NY,NX)
     IF(L.EQ.NU_col(NY,NX))THEN
       DORGCL=DORGCL+DORGEC
     ENDIF

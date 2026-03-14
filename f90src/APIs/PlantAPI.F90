@@ -3,7 +3,7 @@ module PlantAPI
 ! interface to integrate the plant model
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
+  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
   use MiniMathMod,      only: AZMAX1,safe_adb
   use DebugToolMod,     only: PrintInfo
   use NumericalAuxMod
@@ -515,11 +515,14 @@ implicit none
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
         DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)
       ENDDO
-      Root1stXNumL_pvr(L,NZ,NY,NX) = plt_morph%Root1stXNumL_pvr(L,NZ)
+      Root1stXNumL_pvr(L,NZ,NY,NX)    = plt_morph%Root1stXNumL_pvr(L,NZ)
+      DO NE=1,NumPlantChemElms
+        RootShootExch_pvr(NE,L,NZ,NY,NX) = plt_bgcr%RootShootExch_pvr(NE,L,NZ)
+      ENDDO
       DO N = 1, Myco_pft(NZ,NY,NX)
         ROOTNLim_rpvr(N,L,NZ,NY,NX)                                = plt_biom%ROOTNLim_rpvr(N,L,NZ)
         ROOTPLim_rpvr(N,L,NZ,NY,NX)                                = plt_biom%ROOTPLim_rpvr(N,L,NZ)        
-        RootMaintDef_CO2_pvr(N,L,NZ,NY,NX)                         = plt_bgcr%RootMaintDef_CO2_pvr(N,L,NZ)
+        RootMaintDef_CO2_pvr(N,L,NZ,NY,NX)                         = plt_bgcr%RootMaintDef_CO2_pvr(N,L,NZ)        
         Nutruptk_fClim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fClim_rpvr(N,L,NZ)
         Nutruptk_fNlim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fNlim_rpvr(N,L,NZ)
         Nutruptk_fPlim_rpvr(N,L,NZ,NY,NX)                          = plt_bgcr%Nutruptk_fPlim_rpvr(N,L,NZ)
@@ -725,8 +728,10 @@ implicit none
   character(len=*), parameter :: subname='PlantAPISend'
 
   call PrintInfo('beg '//subname)
+  plt_site%NY=NY;plt_site%NX=NX
   plt_site%DazCurrYear=DazCurrYear
   I1=I+1;if(I1>DazCurrYear)I1=1  
+  plt_site%SoilSurfDepZ_col           = SoilSurfDepZ_col(NY,NX)
   plt_site%ZERO                       = ZERO
   plt_site%ZERO2                      = ZERO2
   plt_site%ALAT                       = ALAT_col(NY,NX)
@@ -947,6 +952,8 @@ implicit none
     plt_allom%rPCLeaf_pft(NZ)              = rPCLeaf_pft(NZ,NY,NX)
     plt_allom%rPCSheath_pft(NZ)            = rPCSheath_pft(NZ,NY,NX)
     plt_allom%rPCStalk_pft(NZ)             = rPCStalk_pft(NZ,NY,NX)
+    plt_biom%KLigMax_pft(NZ)               = KLigMax_pft(NZ,NY,NX)
+    plt_biom%KLigMM_pft(NZ)                = KLigMM_pft(NZ,NY,NX)
     plt_allom%rPCReserve_pft(NZ)           = rPCReserve_pft(NZ,NY,NX)
     plt_allom%rPCHusk_pft(NZ)              = rPCHusk_pft(NZ,NY,NX)
     plt_allom%rPCEar_pft(NZ)               = rPCEar_pft(NZ,NY,NX)

@@ -48,8 +48,8 @@ implicit none
 ! FSINK=hourly rate for sediment sinking
 !
   call PrintInfo('beg '//subname)
-  D9885: DO L=NL_col(NY,NX)-1,1,-1
-    IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO.AND.DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
+  D9885: DO L=NL_col(NY,NX)-1,1,-1     !should this include litter layer? JYT, 2026 Mar 6th.
+    IF(SoilBulkDensity_vr(L,NY,NX).LE.ZERO .AND. DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
       D9880: DO LL=L+1,NL_col(NY,NX)
         IF(DLYR_3D(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
@@ -62,21 +62,23 @@ implicit none
 !     *ER=sediment flux from erosion.f
 !     sediment code:XSED=total,XSAN=sand,XSIL=silt,XCLA=clay
 !
+      
       FSAN           = FSINK*SAND_vr(L,NY,NX)
       FSIL           = FSINK*SILT_vr(L,NY,NX)
       FCLA           = FSINK*CLAY_vr(L,NY,NX)
       SAND_vr(L,NY,NX)  = SAND_vr(L,NY,NX)-FSAN
       SILT_vr(L,NY,NX)  = SILT_vr(L,NY,NX)-FSIL
       CLAY_vr(L,NY,NX)  = CLAY_vr(L,NY,NX)-FCLA
+
       SAND_vr(LL,NY,NX) = SAND_vr(LL,NY,NX)+FSAN
       SILT_vr(LL,NY,NX) = SILT_vr(LL,NY,NX)+FSIL
       CLAY_vr(LL,NY,NX) = CLAY_vr(LL,NY,NX)+FCLA
-!
-!     FERTILIZER POOLS
-!
-!     *ER=sediment flux from erosion.f
-!     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3
-!
+      !
+      !     FERTILIZER POOLS
+      !
+      !     *ER=sediment flux from erosion.f
+      !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3
+      !
       DO NTF=ifertn_beg,ifertn_end
         FNX                         = FSINK*FertN_mole_soil_vr(NTF,L,NY,NX)
         FertN_mole_soil_vr(NTF,L,NY,NX)  = FertN_mole_soil_vr(NTF,L,NY,NX)-FNX

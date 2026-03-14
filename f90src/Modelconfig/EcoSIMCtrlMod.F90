@@ -2,8 +2,8 @@ module EcoSIMCtrlMod
   use ncdio_pio,       only: file_desc_t
   use data_kind_mod,   only: r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only: ecosim_time_type
-  use fileUtil,        only: datestrlen, iulog
-  use abortutils,      only: endrun
+  use fileUtil,        only: datestrlen
+  use abortutils,      only: endrun, iulog
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&

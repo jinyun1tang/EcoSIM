@@ -4,6 +4,7 @@ module StartqMod
   use DebugToolMod,     only: PrintInfo
   use UnitMod,          only: units
   use EcoSiMParDataMod, only: pltpar
+  use SoilPhysDataType
   use GridConsts
   use FlagDataType
   use EcosimConst
@@ -418,7 +419,7 @@ module StartqMod
   !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
   !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
   !
-  SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)
+  SeedDepth_pft(NZ,NY,NX)=PlantinDepz_pft(NZ,NY,NX)+SoilSurfDepZ_col(NY,NX)
   DO L=NU_col(NY,NX),NL_col(NY,NX)
     IF(isclose(SeedDepth_pft(NZ,NY,NX),CumSoilThickness_vr(L,NY,NX)))then
       SeedDepth_pft(NZ,NY,NX)=AMAX1(CumSoilThickness_vr(L,NY,NX)-ppmc,ppmc)

@@ -3,7 +3,8 @@ PROGRAM etimerTest
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
   use ecosim_time_mod   , only : getdow,ecosim_time_dat_type,get_steps_from_ymdhs
-  USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
+  use abortutils        , only : iulog
+  USE fileUtil          , ONLY : ecosim_namelist_buffer_size,namelist_to_buffer
   implicit none
 
   character(len=*), parameter :: mod_filename = &

@@ -1,7 +1,7 @@
 module SoilPhysParaMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only: micpar
-  use DebugToolMod,     only: PrintInfo
+  use DebugToolMod,     only: PrintInfo,DebugPrint
   USE SoilWaterDataType
   use SoilPropertyDataType
   USE SoilPhysDataType
@@ -27,6 +27,7 @@ implicit none
   public :: ComputePsiMCM  
   public :: ComputePSIPond
   public :: getMoistK
+  public :: IsPondLayer
 
   contains
 !------------------------------------------------------------------------------------------
@@ -87,15 +88,20 @@ implicit none
   call PrintInfo('beg '//subname)
   FCX  = FCI*ThetafI
   WPX  = WPI*ThetafI
-  FCLX = LOG(FCX)
-  WPLX = LOG(WPX)
-  PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
-  FCDX = FCLX-WPLX
+
   IF(ThetafW.LT.FCX)THEN
     !less than field capacity
+    FCLX = LOG(FCX)
+    WPLX = LOG(WPX)
+    PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
+    FCDX = FCLX-WPLX
     PSI=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+(FCLX-LOG(ThetafW))*LOGPSIMND_col(NY,NX)/FCDX))
-  ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW)THEN
+  ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW .and. FCX > 0._r8 .and. WPX >0._r8)THEN  
     !more than field capacity
+    FCLX = LOG(FCX)
+    WPLX = LOG(WPX)
+    PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
+    FCDX = FCLX-WPLX
     PSI=-EXP(LOGPSIAtSat(NY,NX)+(LOGPOROS_vr(L,NY,NX)-LOG(ThetafW))*LOGPSIMXD_col(NY,NX)/PSDX)
   ELSE
     ThetaW = POROS_vr(L,NY,NX)
@@ -275,5 +281,15 @@ implicit none
 
   K=MAX(1,MIN(100,101-INT(100.0_r8*thetawl/pores)))
   end function getMoistK
+
+!------------------------------------------------------------------------------------------
+  pure function IsPondLayer(bulkDS)result(ans)
+  implicit none
+  real(r8), intent(in) :: bulkDS
+  logical :: ans
+
+  ans =bulkDS.LE.ZERO
+
+  end function IsPondLayer
 
 end  module SoilPhysParaMod

@@ -10,7 +10,8 @@ module RootDataType
   implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                          !root primary axis number, [-]
+  integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                     !root primary axis number, [-]
+  real(sp),target,allocatable::  RootShootExch_pvr(:,:,:,:,:)                    !Root-shoot nonstrucal element exchange, [g d-2 h-1]
   integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
@@ -145,6 +146,7 @@ contains
   allocate(GroSrcRootStress_pvr(JZ,JP,JY,JX)); GroSrcRootStress_pvr=1._SP
   allocate(ROOTNLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTNLim_rpvr=0._sp
   allocate(ROOTPLim_rpvr(jroots,JZ,JP,JY,JX)); ROOTPLim_rpvr=0._sp
+  allocate(RootShootExch_pvr(NumPlantChemElms,JZ,JP,JY,JX));RootShootExch_pvr=0._sp
   allocate(RootMaintDef_CO2_pvr(jroots,JZ,JP,JY,JX)); RootMaintDef_CO2_pvr=0._sp
   allocate(Nutruptk_fClim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fClim_rpvr=0._sp
   allocate(Nutruptk_fNlim_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fNlim_rpvr=0._sp
@@ -394,6 +396,7 @@ contains
   call destroy(RootSeglengths_raxes)
   call destroy(IndRootSegBase_raxes)
   call destroy(IndRootSegTip_raxes)
+  call destroy(RootShootExch_pvr)
   call destroy(Nutruptk_fClim_rpvr)
   call destroy(Nutruptk_fNlim_rpvr)
   call destroy(Nutruptk_fPlim_rpvr)

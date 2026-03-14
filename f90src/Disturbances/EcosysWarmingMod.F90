@@ -13,8 +13,7 @@ module EcosysWarmingMod
   use ClimForcDataType, only: TKS_ref_vr
   use GridConsts,       only: JY, JX
   use GridDataType,     only: CumDepz2LayBottom_vr, NU_col, NL_col
-  use fileUtil,         only: iulog  
-  use abortutils,       only : endrun  
+  use abortutils,       only : endrun,iulog  
   use DebugToolMod,     only : PrintInfo
   use StrToolsMod  
   use EcoSimConst  

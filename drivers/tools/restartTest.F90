@@ -1,8 +1,7 @@
 program restartTest
   use HistFileMod
   use RestartMod
-  use abortutils        , only : endrun
-  use fileUtil          , only : iulog
+  use abortutils        , only : endrun, iulog
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,JP

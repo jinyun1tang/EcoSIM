@@ -42,7 +42,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRNO3MicrbImobilBand
     real(r8) :: tRH2PO4MicrbImobilBand
     real(r8) :: tRH1PO4MicrbImobilBand
-
+    real(r8) :: tNO2OxiAuto      !total NO2 oxidation into NO3 by nitrifiers
     real(r8) :: tRO2UptkHeterG   !total oxygen uptake by heterotrophs
     real(r8) :: tRO2DmndHeterG   !total oxygen demand by heterotrophs
     real(r8) :: tRCO2MicrbProd
@@ -53,14 +53,14 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: tRO2MicrbUptk         !O2 uptake by microbes
     real(r8) :: TReduxNO3Soil         !NO3 reduction in non-band soil by denitrifiers
     real(r8) :: TReduxNO3Band         !NO3 reduction in banded soil by denitrifiers
-    real(r8) :: TReduxNO2Soil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
+    real(r8) :: TReduxNO2toN2OSoil         !NO2 reduction in non-band soil, by ammonia oxidizers, and denitrifiers
     real(r8) :: TReduxNO2toN2OBand         !NO2 reduction in banded soil, by ammonia oxidizers, and denitrifiers
     real(r8) :: TDeniReduxNO2Band
     real(r8) :: TDeniReduxNO2Soil
     real(r8) :: TNitNO2Redux2N2OBand
     real(r8) :: TNitNO2Redux2N2OSoil
 
-    real(r8) :: TReduxN2O             !N2O reduction by detnitrifiers
+    real(r8) :: TReduxN2OtoN2             !N2O reduction by detnitrifiers
     real(r8) :: TFixN2                !N2 fixation by aerobic and anaerobic N2 fixers
     real(r8) :: tCH4OxiAero           !aerobic CH4 oxidation
     real(r8) :: tCH4OxiANMO           !anaerobic CH4 oxidation
@@ -340,13 +340,14 @@ type, public :: Cumlate_Flux_Diag_type
   this%tRO2MicrbUptk          = 0.0_r8
   this%TReduxNO3Soil          = 0.0_r8
   this%TReduxNO3Band          = 0.0_r8
-  this%TReduxNO2Soil          = 0.0_r8
+  this%TReduxNO2toN2OSoil          = 0.0_r8
   this%TReduxNO2toN2OBand     = 0.0_r8
-  this%TReduxN2O              = 0.0_r8
+  this%TReduxN2OtoN2              = 0.0_r8
   this%TFixN2                 = 0.0_r8
   this%tCH4OxiAero            = 0.0_r8
   this%tCH4OxiANMO            = 0._r8
   this%tRO2UptkHeterG         = 0._r8
+  this%tNO2OxiAuto            = 0._r8
   this%tRO2DmndHeterG         = 0._r8
   this%TDeniReduxNO2Band      = 0._r8
   this%TDeniReduxNO2Soil      = 0._r8
