@@ -248,8 +248,8 @@ module PlantTraitTableMod
   allocate(rPCRootr_tab(npfts));rPCRootr_tab=0._r8
   allocate(rPCNoduler_tab(npfts));rPCNoduler_tab=0._r8
   allocate(pftss_tab(npfts))
-  allocate(pft_long_tab(npfts))
-  allocate(pft_short_tab(npfts))
+  allocate(pft_long_tab(npft))
+  allocate(pft_short_tab(npft))
   allocate(koppen_clim_ncode_tab(nkopenclms))
   allocate(koppen_clim_short_tab(nkopenclms))
   allocate(koppen_clim_long_tab(nkopenclms))

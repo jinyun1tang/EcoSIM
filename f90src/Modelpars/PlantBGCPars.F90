@@ -4,6 +4,7 @@ module PlantBGCPars
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts, only : jroots
   use EcoSIMConfig, only : jcplxc
+  use DebugToolMod, only : PrintInfo
   implicit none
   public
   save
@@ -165,7 +166,7 @@ module PlantBGCPars
   integer :: npft,nkopenclms,npfts_tab
 
   call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-
+  
   NumGrowthStages = pltpar%NumGrowthStages
   MaxNumRootAxes  = pltpar%MaxNumRootAxes
 
@@ -175,7 +176,7 @@ module PlantBGCPars
 
 !----------------------------------------------------------------------------------------------------
   subroutine InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid,ats_cpl_mode
+  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid,ats_cpl_mode, plant_model  
   use abortutils, only : endrun
   use fileUtil, only : file_exists
   use ncdio_pio
@@ -184,10 +185,12 @@ module PlantBGCPars
   integer, intent(out) :: npft        !total pft types, exclude koppen climate code
   integer, intent(out) :: nkopenclms  !
   integer, intent(out) :: npfts_tab   !total pft records, pft_short name + numerical koppen climate code
+  character(len=*), parameter :: subname='InitVegPars'
 
-  if (len_trim(pft_file_in) == 0 .or. ats_cpl_mode)then
+  call PrintInfo('beg '//subname)
+  if (len_trim(pft_file_in) == 0 .or. (ats_cpl_mode .and. .not.plant_model))then
     write(*,*) "Setting PFTs to one"
-    npfts_tab=1
+    npfts_tab  = 1
   else
     if(.not. file_exists(trim(pft_file_in)))then
       call endrun(msg='Fail to locate plant trait file '//trim(pft_file_in)//' in ' &
@@ -310,7 +313,7 @@ module PlantBGCPars
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
   Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
   HourReq2InitSStor4LeafOut=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
-
+  call PrintInfo('end '//subname)
   end subroutine InitVegPars
 
 end module PlantBGCPars
