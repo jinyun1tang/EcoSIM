@@ -554,7 +554,6 @@ implicit none
   real(r8),pointer   :: h2D_O2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_CO2_rootconduct_pvr(:,:)
   real(r8),pointer   :: h2D_ProteinNperm2LeafArea_pnd(:,:) !by node
-  real(r8),pointer   :: h2D_RNITRIF_vr(:,:)
   real(r8),pointer   :: h2D_Root_CO2_vr(:,:)
   real(r8),pointer   :: h2D_Aqua_CO2_vr(:,:)     
   real(r8),pointer   :: h2D_Aqua_CH4_vr(:,:)     
@@ -998,7 +997,6 @@ implicit none
   allocate(this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc));  this%h1D_RUB_ACTVN_ptc(:)=spval
   allocate(this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyNLim_ptc(:)=spval
   allocate(this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyPLim_ptc(:)=spval  
-  allocate(this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ))    ;this%h2D_RNITRIF_vr(:,:)=spval
   allocate(this%h2D_Aqua_N2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_N2_vr(:,:)=spval  
   allocate(this%h2D_Aqua_H2_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_H2_vr(:,:)=spval  
   allocate(this%h2D_Aqua_Ar_vr(beg_col:end_col,1:JZ))        ;this%h2D_Aqua_Ar_vr(:,:)=spval  
@@ -2816,11 +2814,6 @@ implicit none
   data1d_ptr => this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='CanopyPLim_pft',units='none',avgflag='A',&
     long_name='mean canopy phosphorus limitation across branches, 0->1 weaker limitation',ptr_patch=data1d_ptr,default='inactive')       
-
-  data2d_ptr => this%h2D_RNITRIF_vr(beg_col:end_col,1:JZ)
-  call hist_addfld2d(fname='RNITRIF_vr',units='gN/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Nitrification rate from NH3 oxidation in each soil layer',ptr_col=data2d_ptr,&
-    default='inactive')       
 
   data2d_ptr => this%h2D_Root_CO2_vr(beg_col:end_col,1:JZ)          !trc_solcl_vr(idg_CO2,1:JZ,NY,NX)
   call hist_addfld2d(fname='Root_CO2_mass_vr',units='gC/m2',type2d='levsoi',avgflag='A',&
