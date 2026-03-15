@@ -2,7 +2,7 @@ program main
 !
 ! Single layer model
   use batchmod
-  use abortutils, only : endrun
+  use abortutils, only : endrun,iulog
   use fileUtil
   use data_kind_mod, only : r8 => DAT_KIND_R8
 implicit none
@@ -54,6 +54,7 @@ end program main
   use MicForcTypeMod      , only : micforctype
   use ecosim_Time_Mod     , only : ecosim_time_type
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
+  use abortutils          , only : iulog
   use batchmod
   use ForcTypeMod         , only : forc_type,ReadForc,UpdateForc
   use abortutils          , only : endrun

@@ -3,9 +3,9 @@ module PlantInfoMod
 ! DESCRIPTION
 ! code to read plant information
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil, iulog
+  use fileUtil,      only: open_safe, check_read, int2str, getavu, relavu, opnfil
   use minimathmod,   only: isLeap
-  use abortutils,    only: endrun
+  use abortutils,    only: endrun, iulog
   use DebugToolMod,  only: PrintInfo
   use PlantTraitTableMod  
   use netcdf
@@ -265,6 +265,7 @@ implicit none
     DO NX=NH1,NH2
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP_col(NY,NX))
+          write(iulog,*)'NZ,pft_nmgnt=',NZ,pft_nmgnt(NZ)
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)
@@ -275,6 +276,7 @@ implicit none
               
               READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+              !"17050000,2,0,0.06,0.0,0.9,0.3,0.0,0.1,0.9,0.9,0.0,0.5       
               LPY=0
               if(isLeap(iyr) .and. IMO.GT.2)LPY=1
               !obtain the ordinal day
@@ -303,7 +305,7 @@ implicit none
               FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
               FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
-
+              write(iulog,*)'NZ,IDY=',NZ,IDY,StriHarvtype(ICUT),StrjHarvtype(JCUT),'Cut height:',HCUT,'cut fraction:',PCUT
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass
                 NN=NN+1
@@ -314,10 +316,12 @@ implicit none
                     jHarvstType_pft(NZ,IDYG,NY,NX)                            = JCUT
                     CanopyHeightCut_pft(NZ,IDYG,NY,NX)                        = HCUT
                     THIN_pft(NZ,IDYG,NY,NX)                                   = PCUT
-                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX) = ECUT11
+                    
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
                     FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
                     FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
                     FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
+
                     FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT21
                     FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT22
                     FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT23
@@ -559,6 +563,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'RRAD1M', loc,Root1stMaxRadius_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RRAD2M', loc,Root2ndMaxRadius_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PORT', loc,RootPorosity_pft(ipltroot,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'KLGMAX',loc,KLigMax_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'KLGMM',loc,KLigMM_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'PR', loc,NonstCMinCon2InitRoot_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRR', loc,RootRadialResist_pft(ipltroot,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'RSRA', loc,RootAxialResist_pft(ipltroot,NZ,NY,NX))
@@ -715,6 +721,8 @@ implicit none
   Root1stMaxRadius_pft(1,NZ,NY,NX)        = Root1stMaxRadius_tab(loc)
   Root2ndMaxRadius_pft(1,NZ,NY,NX)        = Root2ndMaxRadius_tab(loc)
   RootPorosity_pft(1,NZ,NY,NX)            = RootPorosity_tab(loc)
+  KLigMax_pft(NZ,NY,NX)                   = KLigMax_tab(loc)
+  KLigMM_pft(NZ,NY,NX)                    = KLigMM_tab(loc)
   NonstCMinCon2InitRoot_pft(NZ,NY,NX)        = NonstCMinCon2InitRoot_tab(loc)
   RootRadialResist_pft(1,NZ,NY,NX)        = RootRadialResist_tab(loc)
   RootAxialResist_pft(1,NZ,NY,NX)         = RootAxialResist_tab(loc)
@@ -1135,6 +1143,10 @@ implicit none
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
 
   if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
+    id=addone(id)
+    call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
+    id=addone(id)
+    call writefixl(nu_plt,id,'KLGMAX','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)
@@ -1626,6 +1638,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'RRAD1M',Root1stMaxRadius_tab)
   call ncd_getvar(pft_nfid, 'RRAD2M',Root2ndMaxRadius_tab)
   call ncd_getvar(pft_nfid, 'PORT', RootPorosity_tab)
+  call ncd_getvar(pft_nfid,'KLGMAX',KLigMax_tab)
+  call ncd_getvar(pft_nfid,'KLGMM',KLigMM_tab)
   call ncd_getvar(pft_nfid, 'PR', NonstCMinCon2InitRoot_tab)
   call ncd_getvar(pft_nfid, 'RSRR', RootRadialResist_tab)
   call ncd_getvar(pft_nfid, 'RSRA', RootAxialResist_tab)

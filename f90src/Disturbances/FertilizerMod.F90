@@ -2,6 +2,7 @@ module FertilizerMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use EcoSIMCtrlMod, only: lverb
   use DebugToolMod,  only: PrintInfo
+  use abortutils,    only: iulog
   use SurfLitterDataType
   use EcoSimSumDataType
   use FertilizerDataType

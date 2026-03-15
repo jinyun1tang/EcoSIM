@@ -18,6 +18,7 @@ target_include_directories(balances  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/  
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/
   ${CMAKE_BINARY_DIR}/f90src/Disturbances/  

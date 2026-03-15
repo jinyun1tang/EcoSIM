@@ -94,7 +94,11 @@ variables:
 		RCHGDG:units = "none" ;
 		RCHGDG:flags = "varying between 0 and 1" ;
 	float DHI(ngrid, ncol) ;
+		DHI:long_name="grid size in the W-E direction";
+		DHI:units="m";
 	float DVI(ngrid, nrow) ;
+		DVI:long_name="grid size in the N-S direction";
+		DVI:units="m";
 	int topo_grid(ntopou) ;
 		topo_grid:long_name = "grid ID of the topo unit" ;
 		topo_grid:units = "none" ;

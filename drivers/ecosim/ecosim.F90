@@ -11,7 +11,8 @@ PROGRAM main
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use GridMod           , only : SetMesh
   use readiMod          , only : readi
-  USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
+  use abortutils        , only : iulog
+  USE fileUtil          , ONLY : ecosim_namelist_buffer_size,namelist_to_buffer
   use HistFileMod       , only : hist_htapes_build
   use EcoSIMConfig      , only : case_name,set_sim_type,start_date,is_restart,datestrlen
   use StartsMod         , only : set_ecosim_solver

@@ -120,11 +120,13 @@ implicit none
   real(r8),target,allocatable :: RCH4Oxi_aero_vr(:,:,:)               !Aerobic CH4 oxidation rate, [gC d-2 h-1]
   real(r8),target,allocatable :: RCH4Oxi_ANMO_vr(:,:,:)               !Anaerobic CH4 oxidation rate,[gC d-2 h-1]
   real(r8),target,allocatable :: RFerment_vr(:,:,:)                   !Fermentation rate, [gC d-2 h-1]
-  real(r8),target,allocatable :: RNH3oxi_vr(:,:,:)                    !NH3 oxidation rate, [gN d-2 h-1]
-  real(r8),target,allocatable :: RN2ODeniProd_vr(:,:,:)              !denitrification N2O production, [gN d-2 h-1]
-  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)               !Nitrification N2O produciton rate, [gN d-2 h-1]
+  real(r8),target,allocatable :: RNit_NO2toNO3_vr(:,:,:)              !Rate of NO2 oxidation to NO3, [gN d-2 h-1]
+  real(r8),target,allocatable :: RDen_NO3toNO2_vr(:,:,:)              !Rate of NO3 reduction to NO2 by denitrifcation, [gN d-2 h-1]
+  real(r8),target,allocatable :: RNit_NH3toNO2_vr(:,:,:)              !Rate of NH3 oxidation to NO2(-), [gN d-2 h-1]
+  real(r8),target,allocatable :: RDen_NO2toN2O_vr(:,:,:)              !denitrification N2O production, [gN d-2 h-1]
+  real(r8),target,allocatable :: RN2ONitProd_vr(:,:,:)                !Nitrification N2O produciton rate, [gN d-2 h-1]
   real(r8),target,allocatable :: RN2OChemoProd_vr(:,:,:)             !chemo N2O production, [gN d-2 h-1]
-  real(r8),target,allocatable :: RN2ORedux_vr(:,:,:)                 !N2O reduction into N2,  [gN d-2 h-1]
+  real(r8),target,allocatable :: RDen_N2OtoN2_vr(:,:,:)                 !N2O reduction into N2,  [gN d-2 h-1]
   real(r8),target,allocatable :: DOM_draing_col(:,:,:,:)             !DOM loss through subsurface drainage, [g d-2 h-1]
   real(r8),target,allocatable :: trcs_drainage_flx_col(:,:,:)        !solute loss through subsurface drainage, [g d-2 h-1]
   real(r8),target,allocatable :: DOM_SurfRunoff_flx_col(:,:,:,:)     !DOM loss through surface runoff, [g d-2 h-1]
@@ -192,11 +194,14 @@ implicit none
   allocate(RCH4Oxi_aero_vr(0:JZ,JY,JX)); RCH4Oxi_aero_vr=0._r8
   allocate(RCH4Oxi_ANMO_vr(0:JZ,JY,JX)); RCH4Oxi_ANMO_vr=0._r8
   allocate(RFerment_vr(0:JZ,JY,JX)); RFerment_vr=0._r8
-  allocate(RNH3oxi_vr(0:JZ,JY,JX)); RNH3oxi_vr=0._r8
-  allocate(RN2ODeniProd_vr(0:JZ,JY,JX)); RN2ODeniProd_vr=0._r8
+  allocate(RNit_NH3toNO2_vr(0:JZ,JY,JX)); RNit_NH3toNO2_vr=0._r8
+  allocate(RDen_NO2toN2O_vr(0:JZ,JY,JX)); RDen_NO2toN2O_vr=0._r8
+  allocate(RNit_NO2toNO3_vr(0:JZ,JY,JX)); RNit_NO2toNO3_vr=0._r8         
+  allocate(RDen_NO3toNO2_vr(0:JZ,JY,JX)); RDen_NO3toNO2_vr=0._r8        
+
   allocate(RN2ONitProd_vr(0:JZ,JY,JX)); RN2ONitProd_vr=0._r8
   allocate(RN2OChemoProd_vr(0:JZ,JY,JX)); RN2OChemoProd_vr=0._r8
-  allocate(RN2ORedux_vr(0:JZ,JY,JX));RN2ORedux_vr=0._r8
+  allocate(RDen_N2OtoN2_vr(0:JZ,JY,JX));RDen_N2OtoN2_vr=0._r8
   allocate(PH_vr(0:JZ,JY,JX));PH_vr(0:JZ,JY,JX)=0._r8
   allocate(CEC_vr(JZ,JY,JX));CEC_vr(JZ,JY,JX)=0._r8
   allocate(AEC_vr(JZ,JY,JX));AEC_vr(JZ,JY,JX)=0._r8
@@ -317,11 +322,13 @@ implicit none
   call destroy(RCH4Oxi_aero_vr)
   CALL destroy(RCH4Oxi_ANMO_vr)
   call destroy(RFerment_vr)
-  call destroy(RNH3oxi_vr)
+  call destroy(RNit_NH3toNO2_vr)
   call destroy(RN2ONitProd_vr)  
-  call destroy(RN2ODeniProd_vr)
+  call destroy(RNit_NO2toNO3_vr)
+  call destroy(RDen_NO3toNO2_vr)
+  call destroy(RDen_NO2toN2O_vr)
   call destroy(RN2OChemoProd_vr)
-  call destroy(RN2ORedux_vr)
+  call destroy(RDen_N2OtoN2_vr)
   call destroy(trcg_gasml_vr)
   call destroy(CPO4B_vr)
   call destroy(OxyDecompLimiter_vr)

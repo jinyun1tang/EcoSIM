@@ -3,7 +3,7 @@ module PlantMathFuncMod
 !DESCRIPTION
   ! code for small functions used by plant processes
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use abortutils,    only: endrun
+  use abortutils,    only: endrun, iulog
   use DebugToolMod
   use EcoSimConst
   use MiniMathMod
@@ -433,6 +433,7 @@ contains
     do i = 1, n
        dx(i) = xE(i+1) - xE(i)
        if (dx(i) <= 0._r8) then
+          write(iulog,*)xE(i+1), xE(i), i
           call endrun('Error: non-positive cell width encountered.  in '//trim(mod_filename)//' at line',__LINE__)                    
        end if
     end do
@@ -460,9 +461,9 @@ contains
     ! monotonicity check (advected edges should be increasing)
     do i = 2, n+1
       if (xE_star(i) + tiny < xE_star(i-1) .and. xE_star(i)<xR_most) then
-        write(*,*)'ur',ur
-        write(*,*)'xR_most',xR_most,dt_loc
-        write(*,*)'xE_star',xE_star(2:n+1) 
+        write(iulog,*)'ur',ur
+        write(iulog,*)'xR_most',xR_most,dt_loc
+        write(iulog,*)'xE_star',xE_star(2:n+1) 
         call endrun('Error: advected edges are not monotone increasing. Reduce dt.  in '//trim(mod_filename)//' at line',__LINE__)                    
       end if
     end do

@@ -432,9 +432,9 @@ implicit none
   NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
   NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
   jcplx=micpar%jcplx
+
   if(litrM)then
     KL=micpar%NumOfLitrCmplxs
-
     micfor%AttenfNH4HeterR(:,1:KL)   = micflx%AttenfNH4Heter(:,1:KL)
     micfor%AttenfNO3HeterR(:,1:KL)   = micflx%AttenfNO3Heter(:,1:KL)
     micfor%AttenfH2PO4HeterR(:,1:KL) = micflx%AttenfH2PO4Heter(:,1:KL)
@@ -447,20 +447,23 @@ implicit none
     micfor%tRNO3MicrbImobilSoil      = micflx%tRNO3MicrbImobilSoil
     micfor%tRH2PO4MicrbImobilSoil    = micflx%tRH2PO4MicrbImobilSoil
     micfor%tRH1PO4MicrbImobilSoil    = micflx%tRH1PO4MicrbImobilSoil
-
   else
     KL=jcplx
   endif
+
+  RNit_NO2toNO3_vr(L,NY,NX) = naqfdiag%tNO2OxiAuto
+  RDen_NO3toNO2_vr(L,NY,NX) = naqfdiag%TReduxNO3Soil+naqfdiag%TReduxNO3Band
+
   RCH4ProdAcetcl_vr(L,NY,NX)                     = naqfdiag%tCH4ProdAceto
   RCH4ProdHydrog_vr(L,NY,NX)                     = naqfdiag%tCH4ProdH2
   RCH4Oxi_aero_vr(L,NY,NX)                       = naqfdiag%tCH4OxiAero
   RCH4Oxi_ANMO_vr(L,NY,NX)                       = naqfdiag%tCH4OxiANMO
   RFerment_vr(L,NY,NX)                           = naqfdiag%tCResp4H2Prod
-  RNH3oxi_vr(L,NY,NX)                            = naqfdiag%tRNH3Oxi
-  RN2ODeniProd_vr(L,NY,NX)                       = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
+  RNit_NH3toNO2_vr(L,NY,NX)                      = naqfdiag%tRNH3Oxi
+  RDen_NO2toN2O_vr(L,NY,NX)                      = naqfdiag%TDeniReduxNO2Soil+naqfdiag%TDeniReduxNO2Band
   RN2OChemoProd_vr(L,NY,NX)                      = naqfdiag%RN2OProdSoilChemo+naqfdiag%RN2OProdBandChemo
   RN2ONitProd_vr(L,NY,NX)                        = naqfdiag%TNitNO2Redux2N2OSoil+naqfdiag%TNitNO2Redux2N2OBand
-  RN2ORedux_vr(L,NY,NX)                          = naqfdiag%TReduxN2O
+  RDen_N2OtoN2_vr(L,NY,NX)                       = naqfdiag%TReduxN2OtoN2
   OxyDecompLimiter_vr(L,NY,NX)                   = safe_adb(naqfdiag%tRO2UptkHeterG,naqfdiag%tRO2DmndHeterG)
   RO2DecompUptk_vr(L,NY,NX)                      = naqfdiag%tRO2UptkHeterG
   tRHydlySOM_vr(1:NumPlantChemElms,L,NY,NX)      = micflx%tRHydlySOM

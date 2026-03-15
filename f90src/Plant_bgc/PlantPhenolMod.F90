@@ -291,23 +291,23 @@ module PlantPhenolMod
     BranchNumerID_brch            => plt_morph%BranchNumerID_brch              & !output :branch meric id, [-]
   )
   call PrintInfo('beg '//subname)
-!
-! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
-! CONCENTRATION PERMIT
-!
-! doInitPlant_pft=PFT initialization flag:0=no,1=yes
-! PSIRootTurg_vr=root turgor potential
-! iPlantPhenolPattern_pft=growth habit from PFT file
-! iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
-! NumOfBranches_pft=primary root axis number
-! WTRVC=nonstructural C storage
-! PB=nonstructural C concentration needed for branching
-! iPlantBranchState_brch=branch life flag:0=living,1=dead
-! PSTG=node number
-! FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
-! NumCogrowthNode_pft=number of concurrently growing nodes
-! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
-! IBTYP: setup for phenologically-driven above-ground turnover
+  !
+  ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
+  ! CONCENTRATION PERMIT
+  !
+  ! doInitPlant_pft=PFT initialization flag:0=no,1=yes
+  ! PSIRootTurg_vr=root turgor potential
+  ! iPlantPhenolPattern_pft=growth habit from PFT file
+  ! iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
+  ! NumOfBranches_pft=primary root axis number
+  ! WTRVC=nonstructural C storage
+  ! PB=nonstructural C concentration needed for branching
+  ! iPlantBranchState_brch=branch life flag:0=living,1=dead
+  ! PSTG=node number
+  ! FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
+  ! NumCogrowthNode_pft=number of concurrently growing nodes
+  ! ShootNodeNumAtPlanting_pft,GROUP=node number at planting,floral initiation
+  ! IBTYP: setup for phenologically-driven above-ground turnover
 
   IF(doInitPlant_pft(NZ).EQ.ifalse)THEN
     !plant initialized
@@ -385,7 +385,7 @@ module PlantPhenolMod
   associate(                                                     &
     iPlantBranchState_brch => plt_pheno%iPlantBranchState_brch  ,& !input  :flag to detect branch death, [-]
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft       ,& !input  :number of branches,[-]
-    BranchNumerID_brch      => plt_morph%BranchNumerID_brch       ,& !input  :branch meric id, [-]
+    BranchNumerID_brch     => plt_morph%BranchNumerID_brch      ,& !input  :branch meric id, [-]
     MainBranchNum_pft      => plt_morph%MainBranchNum_pft        & !output :id number of main branch,[-]
   )
   call PrintInfo('beg '//subname)
@@ -441,13 +441,13 @@ module PlantPhenolMod
   MaxSoiL4Root_pft(NZ)   = NMaxRootBotLayer_pft(NZ)
   NGTopRootLayer_pft(NZ) = MIN(MaxSoiL4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
   
-!
-! TOTAL PLANT NON-STRUCTURAL C, N, P
-!
-! CPOOL*,ZPOOL*,PPOOL*=non-structl C,N,P in branch(NB),canopy(g)
-! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
-! MainBranchNum_pft=main branch number
-!
+  !
+  ! TOTAL PLANT NON-STRUCTURAL C, N, P
+  !
+  ! CPOOL*,ZPOOL*,PPOOL*=non-structl C,N,P in branch(NB),canopy(g)
+  ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
+  ! MainBranchNum_pft=main branch number
+  !
   D140: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
       DO NE=1,NumPlantChemElms      
@@ -593,15 +593,15 @@ module PlantPhenolMod
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen)THEN
 
       call CropEvergreenPhenology(I,J,NB,NZ)
-  !
+    !
     ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid)THEN
 
       call ColdDeciduousBranchPhenology(I,J,NB,NZ)
 
-  !
-  !     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayer_pftHOURS
-  !     ABOVE SPECIFIED WATER POTENTIAL DURINGTopRootLayer_pftDORMANCY
-  !
+    !
+    !     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayer_pftHOURS
+    !     ABOVE SPECIFIED WATER POTENTIAL DURINGTopRootLayer_pftDORMANCY
+    !
     ELSEIF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu &
       .OR. iPlantPhenolType_pft(NZ).EQ.4 &
       .OR. iPlantPhenolType_pft(NZ).EQ.5)THEN
@@ -809,6 +809,8 @@ module PlantPhenolMod
   integer, intent(in) :: J   !hour
   integer, intent(in) :: NB  !branch id
   integer, intent(in) :: NZ  !pft id
+  character(len=*), parameter :: subname='ColdDeciduousBranchPhenology'
+
   associate(                                                 &
     DayLenthPrev         => plt_site%DayLenthPrev           ,& !input  :daylength of previous day, [h]
     DayLenthCurrent      => plt_site%DayLenthCurrent        ,& !input  :current daylength of the grid, [h]
@@ -826,9 +828,12 @@ module PlantPhenolMod
     doPlantLeaveOff_brch => plt_pheno%doPlantLeaveOff_brch   & !output :branch phenology flag, [-]
   )
 
+  call PrintInfo('beg '//subname)
+  
   IF((DayLenthCurrent.GE.DayLenthPrev .OR. (DayLenthCurrent.LT.DayLenthPrev .AND. &
     Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))) &
     .AND.doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
+
     !favorable temperature for leafout
     IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ))THEN
       Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
@@ -875,6 +880,7 @@ module PlantPhenolMod
       doPlantLeafOut_brch(NB,NZ) = iEnable
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ColdDeciduousBranchPhenology
 

@@ -13,7 +13,7 @@ module RestartMod
   use TracerIDMod       , only : trc_confs
   use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
-  use abortutils        , only : endrun,destroy
+  use abortutils        , only : endrun,destroy,iulog
   use HistFileMod       , only : hist_restart_ncd  
   use NumericalAuxMod
   use EcoSIMCtrlDataType  

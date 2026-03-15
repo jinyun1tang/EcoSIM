@@ -3,8 +3,8 @@ module HistFileMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ncdio_pio
   use netcdf
-  use fileUtil          , only : iulog,strip_null
-  use abortutils        , only : endrun
+  use fileUtil          , only : strip_null
+  use abortutils        , only : endrun,iulog
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,MaxNumBranches,bounds,bounds_type,NumOfPlantMorphUnits
   use GridConsts        , only : NumCanopyLayers,JP,NumGrowthStages,MaxNodesPerBranch,MaxNumRootAxes  
