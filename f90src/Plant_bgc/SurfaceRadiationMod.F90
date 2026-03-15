@@ -166,18 +166,6 @@ module SurfaceRadiationMod
   CanopyHeight_col=0.0_r8
   D9685: DO NZ=1,NP
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
-  ENDDO D9685  
-
-  if(I==6.and.J==22.and..false.)then
-    !set up input
-    CanopyHeight_pft(1)=0.2
-    plt_morph%CanopyLeafArea_pft(1)=0.1
-    CanopyLeafAareZ_col(1)=0.1
-    CanopyStemAareZ_col(1)=0.05
-  endif
-  CanopyHeight_col=0.0_r8
-  D9685: DO NZ=1,NP
-    CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
   ENDDO D9685
 
   CanopyHeightZ_col(NumCanopyLayers1) = CanopyHeight_col+0.01_r8

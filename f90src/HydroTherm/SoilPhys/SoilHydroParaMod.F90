@@ -149,7 +149,6 @@ contains
   ELSE
     SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
-<<<<<<< HEAD
   
   ! double check cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
