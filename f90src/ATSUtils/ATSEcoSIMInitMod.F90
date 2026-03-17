@@ -53,7 +53,7 @@ implicit none
   !with ATS and to turn off features unsupported in the coupler
   ATS_cpl_mode     = .true.
   column_mode      = .true.
-  plant_model      = pheno_bool
+  plant_model      = .false.
   ldo_sp_mode      = pheno_bool
   microbial_model  = .false.
   soichem_model    = .false.

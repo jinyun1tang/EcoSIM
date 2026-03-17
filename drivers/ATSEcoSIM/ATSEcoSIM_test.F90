@@ -131,7 +131,7 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_rdens(ncells_per_col_,ncol))
 
   !Pheno vars
-  allocate(LAI_col(ncells_per_col_,ncol))
+  !allocate(LAI_col(ncells_per_col_,ncol))
   allocate(a_VEG(ncol))
   allocate(a_lwcan(ncol))
   allocate(a_clhf(ncol))

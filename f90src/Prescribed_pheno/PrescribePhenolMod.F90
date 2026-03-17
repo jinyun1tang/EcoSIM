@@ -201,12 +201,14 @@ implicit none
   !integer  :: irootType=1
   REAL(R8) :: PerPlantRootC_vr(1:JZ)
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
-  REAL(R8) :: tmp_cdepz(1:JZ)
-  REAL(R8) :: tmp_rootc(1:JZ)
-  REAL(R8) :: tmp_rootl(1:JZ)
+  !REAL(R8) :: tmp_cdepz(1:JZ)
+  !REAL(R8) :: tmp_rootc(1:JZ)
+  !REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
   irootType=1
+  PerPlantRootC_vr = 0.0_r8
+  PerPlantRootLen_vr = 0.0_r8
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       NP_col(NY,NX)=1
@@ -290,14 +292,14 @@ implicit none
       !
       !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       !replacing with irootType from ATS, place behind if so it doesn't trigger on bare ground
-      tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
-      tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
-      tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
+      !tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
+      !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
+      !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
       if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),tmp_cdepz,tmp_rootc,tmp_rootl)
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr,PerPlantRootC_vr,PerPlantRootLen_vr)
       endif
-      PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
-      PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
+      !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
+      !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
       !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       DO NZ=1,NP_col(NY,NX)
         DO L=NU_col(NY,NX),NL_col(NY,NX)
@@ -330,7 +332,7 @@ implicit none
   !|7. Tropical deciduous forest|0.57|0.28|3.5|6.3|0.982|
   !|8. Tropical evergreen forest|0.57|0.33|4.1|7.4|0.972|
   !|9. Tropical grassland/savanna|0.99|0.51|60.4|42.5|0.972|
-  !|10. Tundra|0.96|0.34|7.4|5.2|0.909|  
+  !|10. Tundra|0.96|0.34|7.4|5.2|0.909|
 
   implicit none
   integer, intent(in) :: iRootType
