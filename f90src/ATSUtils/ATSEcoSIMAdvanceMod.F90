@@ -124,6 +124,7 @@ implicit none
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
+  call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
   do NY=1,NYS
     NU_col(NY,NX)               = a_NU(NY)
     NL_col(NY,NX)               = a_NL(NY)
@@ -286,7 +287,9 @@ implicit none
   !Need submodules of wthr to compute precipitation variables
   !And Canopy Radiation variables
   !IWTHR = -999 !runs Hourly weather
-  call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
+  !PrepHourlyWeather was moved as it overwrites some variables set in the loop before
+  ! How should this be handled?
+  !call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
 
   if(ldo_sp_mode)then
     do NY=1,NYS

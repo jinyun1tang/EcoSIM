@@ -11,8 +11,8 @@ module PlantBGCPars
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
 !
-! 
-  real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]  
+!
+  real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]
   real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to petiole, [-]
 !
@@ -49,7 +49,7 @@ module PlantBGCPars
   real(r8) :: CO2KI                               ! Ki for C3 leakage from bundle sheath to mesophyll in C4, [uM]
   real(r8) :: FCMassCO2BundleSheath_node          !partition decarboxylation to CO2 in C4, [-]
   real(r8) :: FCMassHCO3BundleSheath_node         !partition leakage to HCO3 in C4, [-]
-  real(r8) :: COMP4                               !C4 photosynthesis CO2 compensation point, [uM] 
+  real(r8) :: COMP4                               !C4 photosynthesis CO2 compensation point, [uM]
   real(r8) :: FWCLeaf                             !leaf water content, (g H2O (gC leaf)-1)
   real(r8) :: FWCBundlSheath                      !leaf water content in bundle sheath, in C4 CO2 fixiation, [m3 H2O (gC)-1]
   real(r8) :: FWCMesophyll                        !leaf water content in mesophyll in C4 CO2 fixation, [m3 H2O (gC)-1]
@@ -58,7 +58,7 @@ module PlantBGCPars
   real(r8) :: ZPGRM                               !min N:C,P:C in grain relative to max values from PFT file,[-]
   real(r8) :: FSTK                                !fraction of stalk radius as sapwood contributing to water,heat flow
   real(r8) :: ZSTX                                !maximum stalk tube thickness for tranpsiration, [m]
-  real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3] 
+  real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3]
   real(r8) :: BlkDActCoarseRoots                  !Coarse root active zone bulk density, [gC m-3]
   real(r8) :: BlkDLigCoarseRoots                  !Coarse root inactive zone bulk density, [gC m-3]
   real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
@@ -166,7 +166,7 @@ module PlantBGCPars
   integer :: npft,nkopenclms,npfts_tab
 
   call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  
+
   NumGrowthStages = pltpar%NumGrowthStages
   MaxNumRootAxes  = pltpar%MaxNumRootAxes
 
@@ -176,7 +176,7 @@ module PlantBGCPars
 
 !----------------------------------------------------------------------------------------------------
   subroutine InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
-  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid,ats_cpl_mode, plant_model  
+  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid,ats_cpl_mode, plant_model
   use abortutils, only : endrun
   use fileUtil, only : file_exists
   use ncdio_pio
@@ -188,7 +188,7 @@ module PlantBGCPars
   character(len=*), parameter :: subname='InitVegPars'
 
   call PrintInfo('beg '//subname)
-  if (len_trim(pft_file_in) == 0 .or. (ats_cpl_mode .and. .not.plant_model))then
+  if (len_trim(pft_file_in) == 0 .or. (ats_cpl_mode .and. plant_model))then
     write(*,*) "Setting PFTs to one"
     npfts_tab  = 1
   else
@@ -206,7 +206,7 @@ module PlantBGCPars
   pltpar%inonfoliar = 2
   pltpar%istalk     = 3
   pltpar%iroot      = 4
-  pltpar%icwood     = 5  
+  pltpar%icwood     = 5
   pltpar%jcplx      = jcplxc
   pltpar%jroots     = jroots
 
@@ -261,7 +261,7 @@ module PlantBGCPars
   kDCytoC = 0.175_r8
   RCytoK = (/1.e-4_r8,1.e-3_r8/) !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
-  BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3 
+  BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3
   BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3
   FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
   ZSTX                  = 1.0E-03_r8     !one mm
