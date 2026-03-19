@@ -289,7 +289,7 @@ contains
   endif
   if(.not.plant_model)plantOM4Heat=.false.
   
-  call config_soil_warming(warming_exp)
+  if (len_trim(warming_exp) > 10)call config_soil_warming(warming_exp)
   call config_fire(FireEvents)
   if(fixClime)then
 

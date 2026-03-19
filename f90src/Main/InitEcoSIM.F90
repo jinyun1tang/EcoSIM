@@ -4,7 +4,7 @@ module InitEcoSIM
 ! initialize the data structure for EcoSIM
   use EcoSiMParDataMod, only: micpar, pltpar
   use abortutils,       only: endrun
-  use EcoSIMCtrlMod  
+  use EcoSIMCtrlMod
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = &
@@ -34,7 +34,7 @@ module InitEcoSIM
   call InitAlloc()
 
   !load plant trait table
-  if(plant_model)call ReadPlantTraitTable()
+  if(plant_model .and. .not. ats_cpl_mode) call ReadPlantTraitTable()
 
   call units%Initailize()
 

@@ -7,13 +7,13 @@ module EcoSIMCtrlMod
 implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
-   __FILE__  
+   __FILE__
   integer :: idebug_day  = -1         !specify the day being debugged
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: first_topou   = .false.  !only simulate first topo unit
   logical :: first_pft     = .false.  !only simulate first pft
-  integer :: iErosionMode =-1         !erosion option  
+  integer :: iErosionMode =-1         !erosion option
   logical :: plant_model       =.true.
   logical :: microbial_model   =.true.
   logical :: soichem_model     =.true.
@@ -34,7 +34,7 @@ implicit none
   real(r8) :: an2o_ppm  = 0.270_r8
   real(r8) :: ao2_ppm   = 0.209e6_r8
   real(r8) :: arg_ppm   = 0.00934e6_r8
-  real(r8) :: an2_ppm   = 0.78e6_r8  
+  real(r8) :: an2_ppm   = 0.78e6_r8
   real(r8) :: anh3_ppm  = 5.e-3_r8
   real(r8) :: ah2_ppm   = 0.55_r8
   real(r8) :: atm_co2_fix=-100._r8
@@ -52,7 +52,7 @@ implicit none
   character(len=300) :: micpar_file_in=''       !file of microbial parameters 
   integer :: iVerbLevel = 0        
   logical :: do_budgets = .false.
-  type(file_desc_t)  :: pft_nfid 
+  type(file_desc_t)  :: pft_nfid
   type(ecosim_time_type) :: etimer
   logical :: Lirri_auto=.false.
 
@@ -79,7 +79,7 @@ implicit none
   integer :: pft_rec
   integer :: yearclm
   integer :: yearacc      !year passed
-  integer :: yearcur      !current year 
+  integer :: yearcur      !current year
   integer :: yearpre      !previous year
   integer :: yearrst      !restart year
   logical :: lskip_loop   !logical switch to skip a loop
@@ -124,7 +124,7 @@ implicit none
   if(get_sim_len<0)then
   call endrun('Negative simulation length, check forc_periods set up in '//mod_filename,__LINE__)
   endif
-  end function get_sim_len  
+  end function get_sim_len
 
 
 end module EcoSIMCtrlMod

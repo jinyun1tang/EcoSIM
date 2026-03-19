@@ -1570,6 +1570,9 @@ implicit none
   Subroutine ReadPlantTraitTable()
 
   implicit none
+  character(len=*), parameter :: subname='ReadPlantTraitTable'
+
+  call PrintInfo('beg '//subname)
 
   call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
   call ncd_getvar(pft_nfid, 'pfts', pftss_tab)
@@ -1692,7 +1695,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPRT', rPCRootr_tab)
   call ncd_getvar(pft_nfid, 'CPND', rPCNoduler_tab)
   call ncd_pio_closefile(pft_nfid)
-  
+  call PrintInfo('end '//subname)
   end Subroutine ReadPlantTraitTable
 
 !------------------------------------------------------------------------------------------

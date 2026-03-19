@@ -16,7 +16,8 @@ target_include_directories(modelpars  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/  
-  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/)
+  ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/)
 
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelpars PARENT_SCOPE)

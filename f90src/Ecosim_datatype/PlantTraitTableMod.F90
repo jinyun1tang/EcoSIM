@@ -121,14 +121,14 @@ module PlantTraitTableMod
   character(len=10),allocatable :: pftss_tab(:)               !pft trait record name, including short pft-type name and koppen climate zone code
   character(len=40),allocatable :: pft_long_tab(:)            !long pft-type name
   character(len=4), allocatable :: pft_short_tab(:)           !short pft-type name
-  character(len=2), allocatable :: koppen_clim_ncode_tab(:)   !numerical koppen climate code 
+  character(len=2), allocatable :: koppen_clim_ncode_tab(:)   !numerical koppen climate code
   character(len=3), allocatable :: koppen_clim_short_tab(:)   !short 3-letter of koppen climate zone code
   character(len=64),allocatable :: koppen_clim_long_tab(:)    !long Description of koppen climate zones
 
   contains
 
   Subroutine AllocPlantTraitTable(jroots,npft,nkopenclms,npfts)
-  implicit none  
+  implicit none
   integer, intent(in) :: jroots          !total root types
   integer, intent(in) :: npft            !total pft types, exclude koppen climate code
   integer, intent(in) :: nkopenclms      !total koppen climate code
@@ -253,7 +253,7 @@ module PlantTraitTableMod
   allocate(koppen_clim_ncode_tab(nkopenclms))
   allocate(koppen_clim_short_tab(nkopenclms))
   allocate(koppen_clim_long_tab(nkopenclms))
-  
+
   end Subroutine AllocPlantTraitTable
 
 
@@ -309,7 +309,7 @@ module PlantTraitTableMod
   call destroy(PhotoPeriodSens_tab)
   call destroy(SLA1_tab)
   call destroy(PetoLen2Mass_tab)
-  call destroy(NodeLenPergC_tab)  
+  call destroy(NodeLenPergC_tab)
   call destroy(LeafAngleClass_tab)
   call destroy(ClumpFactorInit_tab)
   call destroy(BranchAngle_tab)
@@ -320,7 +320,7 @@ module PlantTraitTableMod
   call destroy(SeedCMass_tab)
   call destroy(SeedWidth2LenRatio_tab)
   call destroy(GrainFillRate25C_tab)
-  call destroy(StandingDeadInitC_tab) 
+  call destroy(StandingDeadInitC_tab)
   call destroy(Root1stMaxRadius_tab)
   call destroy(Root2ndMaxRadius_tab)
   call destroy(RootPorosity_tab)
@@ -328,10 +328,10 @@ module PlantTraitTableMod
   call destroy(RootRadialResist_tab)
   call destroy(RootAxialResist_tab)
   call destroy(ShutRutNonstElmntConducts_tab)
-  call destroy(RootBranchFreq_tab)  
+  call destroy(RootBranchFreq_tab)
   call destroy(VmaxNH4Root_tab)
   call destroy(KmNH4Root_tab)
-  call destroy(CMinNH4Root_tab) 
+  call destroy(CMinNH4Root_tab)
   call destroy(VmaxNO3Root_tab)
   call destroy(KmNO3Root_tab)
   call destroy(CminNO3Root_tab)
@@ -340,7 +340,7 @@ module PlantTraitTableMod
   call destroy(CMinPO4Root_tab)
   call destroy(CanOsmoPsi0pt_tab)
   call destroy(RCS_tab)
-  call destroy(CuticleResist_tab) 
+  call destroy(CuticleResist_tab)
   call destroy(LeafBiomGrowthYld_tab)
   call destroy(PetioleBiomGrowthYld_tab)
   call destroy(StalkBiomGrowthYld_tab)
@@ -377,7 +377,7 @@ module PlantTraitTableMod
   call destroy(rPCRootr_tab)
   call destroy(rPCNoduler_tab)
   end Subroutine DestructPlantTraitTable
-    
+
   end module PlantTraitTableMod
 
 
