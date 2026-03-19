@@ -116,7 +116,7 @@ implicit none
 
   integer, parameter :: iharvtyp_none    = 0
   integer, parameter :: iharvtyp_grain   = 1
-  integer, parameter :: iharvtyp_allabv  = 2
+  integer, parameter :: iharvtyp_allabvg = 2
   integer, parameter :: iharvtyp_pruning = 3
   integer, parameter :: iharvtyp_grazing = 4
   integer, parameter :: iharvtyp_fire    = 5

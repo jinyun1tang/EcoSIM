@@ -296,15 +296,21 @@ implicit none
               jHarvstType_pft(NZ,IDY,NY,NX)                         = JCUT
               CanopyHeightCut_pft(NZ,IDY,NY,NX)                     = HCUT
               THIN_pft(NZ,IDY,NY,NX)                                = PCUT
+              
+              !Note: pft-level-harvest minus ecosystem-level-harvest = litter to soil 
+              !pft-level harvest
               FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
               FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
               FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
               FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
-              
+
+              !ecosystem-level harvest
               FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
               FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
               FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
+
+
               write(iulog,*)'NZ,IDY=',NZ,IDY,StriHarvtype(ICUT),StrjHarvtype(JCUT),'Cut height:',HCUT,'cut fraction:',PCUT
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass

@@ -491,8 +491,8 @@ implicit none
     massr1st1(NE)=sum(RootMyco1stStrutElms_rpvr(NE,1:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
     massr2nd1(NE)=sum(RootMyco2ndStrutElms_rpvr(NE,1:Myco_pft(NZ),1:MaxNumRootLays,1:NumPrimeRootAxes_pft(NZ),NZ))
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
-
     massnonst1(NE)      = sum(RootMycoNonstElms_pft(NE,1:Myco_pft(NZ),NZ))
+    
     RootElms_pft(NE,NZ) = massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
 
     !add reserve to struct
@@ -524,6 +524,7 @@ implicit none
       plt_biom%TotEndVegE_pft(NE,NZ) = plt_biom%RootElms_pft(NE,NZ)+plt_biom%ShootElms_pft(NE,NZ)+&
         plt_biom%SeasonalNonstElms_pft(NE,NZ)+plt_biom%StandDeadStrutElms_pft(NE,NZ)+ plt_biom%ShootNoduleElms_pft(NE,NZ)  + &
         plt_biom%RootNoduleElms_pft(NE,NZ) 
+
       if(plt_biom%RootElms_pft(NE,NZ)<0._r8)then
         write(944,*)yearIJ%I*1000+yearIJ%J/24.,NE,plt_biom%RootElms_pft(NE,NZ),plt_biom%ShootElms_pft(NE,NZ),&
         plt_biom%SeasonalNonstElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ), plt_biom%ShootNoduleElms_pft(NE,NZ), &
