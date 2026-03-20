@@ -16,6 +16,7 @@ module RootDataType
   integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
+  integer,target,allocatable ::  irootType_col(:,:)                              !Root type integer from ATS [-]
   real(sp),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(sp),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
   real(sp),target,allocatable ::  NonstCMinCon2InitRoot_pft(:,:,:)                  !threshold root nonstructural C content for initiating new root axis, [g g-1]
@@ -157,6 +158,7 @@ contains
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
   allocate(NRoot1stTipLay_raxes(MaxNumRootAxes,JP,JY,JX));  NRoot1stTipLay_raxes=1  !set to one to avoid numerical failure
   allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
+  allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
   allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._sp
@@ -288,6 +290,7 @@ contains
   call destroy(RootMycoMassElm_vr)
   call destroy(NumPrimeRootAxes_pft)
   call destroy(NRoot1stTipLay_raxes)
+  call destroy(irootType_col)
   call destroy(iPlantRootState_pft)
   call destroy(NMaxRootBotLayer_pft)
   call destroy(MaxSoiL4Root_pft)

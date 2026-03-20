@@ -147,6 +147,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: liquid_density
      type (BGCMatrixDouble) :: gas_density
      type (BGCMatrixDouble) :: ice_density
+     type (BGCMatrixDouble) :: rock_density
      type (BGCMatrixDouble) :: porosity
      type (BGCMatrixDouble) :: water_content
      type (BGCMatrixDouble) :: matric_pressure
@@ -158,6 +159,17 @@ module BGCContainers_module
      type (BGCVectorDouble) :: surface_energy_source
      type (BGCVectorDouble) :: surface_water_source
      type (BGCVectorDouble) :: snow_depth
+     type (BGCVectorDouble) :: canopy_longwave_radiation
+     type (BGCVectorDouble) :: boundary_latent_heat_flux
+     type (BGCVectorDouble) :: boundary_sensible_heat_flux
+     type (BGCVectorDouble) :: canopy_surface_water
+     type (BGCVectorDouble) :: transpiration
+     type (BGCVectorDouble) :: evaporation_canopy
+     type (BGCVectorDouble) :: evaporation_bare_ground
+     type (BGCVectorDouble) :: evaporation_litter
+     type (BGCVectorDouble) :: evaporation_snow
+     type (BGCVectorDouble) :: sublimation_snow
+     type (BGCMatrixDouble) :: snow_temperature
      type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
@@ -173,6 +185,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: dz
      type (BGCMatrixDouble) :: plant_wilting_factor
      type (BGCMatrixDouble) :: rooting_depth_fraction
+     type (BGCVectorDouble)  :: column_area
      type (BGCVectorDouble)  :: shortwave_radiation
      type (BGCVectorDouble) :: longwave_radiation
      type (BGCVectorDouble) :: air_temperature
@@ -197,7 +210,11 @@ module BGCContainers_module
      real (c_double) :: heat_capacity
      real (c_double) :: field_capacity
      real (c_double) :: wilting_point
+     integer (c_int) :: current_day
+     integer (c_int) :: current_year
      logical (c_bool) :: p_bool
+     logical (c_bool) :: a_bool
+     logical (c_bool) :: pheno_bool
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData

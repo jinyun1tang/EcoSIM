@@ -1,8 +1,8 @@
 module PrescribePhenolMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use EcoSimConst,   only: PICON2h
-  use EcoSIMCtrlMod, only: etimer
-  use EcoSIMCtrlDataType, only : ZEROS
+  use EcoSIMCtrlMod, only: etimer, ats_cpl_mode
+  use EcoSIMCtrlDataType, only : ZEROS, current_month, day_of_month, total_days_in_month
   use ElmIDMod
   use GridDataType
   use RootDataType
@@ -75,7 +75,7 @@ implicit none
   subroutine get_LAI_profile(zc,NZ)
   !Description:
   !Distribute leaf area in through the canopy
-  !  
+  !
   implicit none
   real(r8), intent(in) :: ZC  !plant height
   integer, intent(in) :: NZ   !plant index
@@ -98,10 +98,10 @@ implicit none
 !------------------------------------------------------------------------
 
   function TreeStem_diameter_taperEq(h,p_stump_rate,p_stemp_rate,top_ht_rate,h_dbh,dbh,h_cb,h_top)result(d)
- 
+
   ! Estimate diameter at height h using segment-specific taper rates as in Larsen (2017)
   implicit none
- 
+
   real(r8), intent(in) :: h             ! - height at which to estimate diameter
   real(r8), intent(in) :: p_stump_rate  ! - stump taper rate [unitless]
   real(r8), intent(in) :: p_stemp_rate  ! - stem taper rate  [uitless]
@@ -112,13 +112,13 @@ implicit none
   real(r8), intent(in) :: h_top    ! - total tree height (real)
   !Output
   real(r8) ::   d                  ! - estimated diameter at height h [m]
-  
+
   if(h<=h_dbh)then
     !below breast height
     d=dbh+p_stump_rate*(h-h_dbh)
   elseif(h<=h_cb)then
-    !below crown base 
-    d=dbh+p_stemp_rate*(h-h_dbh)  
+    !below crown base
+    d=dbh+p_stemp_rate*(h-h_dbh)
   else
     !above crown base
     d=(h_top-h)*top_ht_rate
@@ -146,40 +146,40 @@ implicit none
     LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft    ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col    ,& !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
     StemArea_col          => plt_morph%StemArea_col         ,& !input  :grid canopy stem area, [m2 d-2]
-    LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft   ,& !input  :fractionction of leaves in different angle classes, [-]    
+    LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft   ,& !input  :fractionction of leaves in different angle classes, [-]
     CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col   ,& !input  :grid canopy leaf area, [m2 d-2]
-    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
+    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]
     NP                    => plt_site%NP                     & !input  :current number of plant species,[-]
   )
 
-  
+
   StemAreaZsec_lpft  = 0._r8
   LeafAreaZsec_lpft  = 0._r8
   dangle            = PICON2h/real(NumLeafZenithSectors1,r8)         !the angle section width
   LeafStalkArea_col = StemArea_col+CanopyLeafArea_col
   DO NZ=1,NP
     LeafStalkArea_pft(NZ)=0._r8
-    NB=1    
+    NB=1
     DO L=1,NumCanopyLayers1
       DO N=1,NumLeafZenithSectors1
-        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)        
-      ENDDO      
+        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
+      ENDDO
       StemAreaZsec_lpft(:,L,NZ)=0._r8
-      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)      
-      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)         
+      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)
+      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)
 
-      !Assuming uniform azimuth desitribution for leaves  
+      !Assuming uniform azimuth desitribution for leaves
       DO N=1,NumLeafZenithSectors1
         LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)
-      ENDDO  
+      ENDDO
     ENDDO
 
   ENDDO
-  
+
   end associate
   end subroutine SetCanopyProfile
 
-!------------------------------------------------------------------------------------------     
+!------------------------------------------------------------------------------------------
   subroutine PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
 
   implicit none
@@ -188,24 +188,30 @@ implicit none
   real(r8) :: t
   integer :: it(2)
   integer :: months(2)
-  integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L
+  integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L,irootType
   real(r8) :: timwt(2)
   real(r8) :: ZL1(0:NumCanopyLayers)
   real(r8) :: AreaInterval,AreaL
   real(r8) :: ARX  !interval canopy area: leaf+stem
-  real(r8) :: DZL  !canopy interval height 
+  real(r8) :: DZL  !canopy interval height
   !==========================================
   !example inputs
   real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
   real(r8) :: sai(12)=(/0.3190, 0.3058, 0.3058, 0.3032, 0.3058, 0.3117, 0.3433, 0.3032, 0.3084, 0.3292, 0.3656, 0.3249/)
-  integer  :: irootType=1
+  !integer  :: irootType=1
   REAL(R8) :: PerPlantRootC_vr(1:JZ)
   REAL(R8) :: PerPlantRootLen_vr(1:JZ)
+  !REAL(R8) :: tmp_cdepz(1:JZ)
+  !REAL(R8) :: tmp_rootc(1:JZ)
+  !REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
+  irootType=1
+  PerPlantRootC_vr = 0.0_r8
+  PerPlantRootLen_vr = 0.0_r8
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      NP_col(NY,NX)=1    
+      NP_col(NY,NX)=1
       DO NZ=1,NP_col(NY,NX)
         !FOR test only
         tlai_mon_pft(:,NZ,NY,NX)       = LAI
@@ -214,11 +220,21 @@ implicit none
         LeafAngleClass_pft(:,NZ,NY,NX) = 1._r8/real(NumLeafZenithSectors,kind=r8)
       ENDDO
     ENDDO
-  ENDDO    
+  ENDDO
 
-  ndaysmon = etimer%get_curr_mon_days()
-  dofmon   = etimer%get_curr_dom()
-  kmo      = etimer%get_curr_mon()
+  if(ats_cpl_mode)then
+    dofmon = day_of_month
+    kmo = current_month
+    ndaysmon = total_days_in_month
+  else
+    !ndaysmon = etimer%get_curr_mon_days()
+    !dofmon   = etimer%get_curr_dom()
+    !kmo      = etimer%get_curr_mon()
+    ndaysmon = 31
+    kmo = 1
+    dofmon = 1
+  end if
+
   t = (dofmon-0.5_r8) / ndaysmon
   it(1) = t + 0.5_r8
   it(2) = it(1) + 1
@@ -229,11 +245,11 @@ implicit none
 
   timwt(1) = (it(1)+0.5_r8) - t
   timwt(2) = 1._r8-timwt(1)
-  
+
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       !==========================================
-      !temporary set TEST values, assuming trees      
+      !temporary set TEST values, assuming trees
       NZ=1
       PlantPopulation_pft(NZ,NY,NX)=0.6_r8
       !==========================================
@@ -253,15 +269,15 @@ implicit none
         CanopyStemAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
       ENDDO
 
-      !set vertical desitribution of LAI and             
+      !set vertical desitribution of LAI and
       CanopyLeafAareZ_col(1:NumCanopyLayers,NY,NX)=CanopyLeafArea_col(NY,NX)/real(NumCanopyLayers,kind=r8)
       CanopyStemAareZ_col(1:NumCanopyLayers,NY,NX)=StemArea_col(NY,NX)/real(NumCanopyLayers,kind=r8)
 
-      !divide canopy height      
+      !divide canopy height
       CanopyHeightZ_col(NumCanopyLayers,NY,NX) = CanopyHeight_col(NY,NX)+0.01_r8
       ZL1(NumCanopyLayers)                     = CanopyHeightZ_col(NumCanopyLayers,NY,NX)
       ZL1(0)                                   = 0.0_r8
-      
+
       !for simplicity, right now unifrom division is used
       !divide total are into NumCanopyLayers1, from top to bottom
       AreaInterval = (CanopyLeafArea_col(NY,NX)+StemArea_col(NY,NX))/NumCanopyLayers
@@ -274,9 +290,19 @@ implicit none
       ENDIF
 
       !
-      call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
-      DO NZ=1,NP_col(NY,NX)      
-        DO L=NU_col(NY,NX),NL_col(NY,NX)        
+      !call SetRootProfileZ(irootType,NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      !replacing with irootType from ATS, place behind if so it doesn't trigger on bare ground
+      !tmp_cdepz = CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX)
+      !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
+      !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
+      if(irootType_col(NY,NX).GT.0.0)then
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr,PerPlantRootC_vr,PerPlantRootLen_vr)
+      endif
+      !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
+      !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
+      !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
+      DO NZ=1,NP_col(NY,NX)
+        DO L=NU_col(NY,NX),NL_col(NY,NX)
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopulation_pft(NZ,NY,NX)
@@ -287,11 +313,11 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-  ENDDO  
+  ENDDO
 
   end subroutine PrescribePhenologyInterp
-!------------------------------------------------------------------------------------------     
-  subroutine SetRootProfileZ(irootType,NL,cdepthz,PerPlantRootC_vr,PerPlantRootLen_vr)
+!------------------------------------------------------------------------------------------
+  subroutine SetRootProfileZ(irootType,NL,tmp_cdepthz,tmp_rootc,tmp_rootl)
   !
   !Description:
   !Reference: Jackson et al. (1997), A global budget for fine root biomass, surface area, and nutrient contents, PNAS.
@@ -306,37 +332,33 @@ implicit none
   !|7. Tropical deciduous forest|0.57|0.28|3.5|6.3|0.982|
   !|8. Tropical evergreen forest|0.57|0.33|4.1|7.4|0.972|
   !|9. Tropical grassland/savanna|0.99|0.51|60.4|42.5|0.972|
-  !|10. Tundra|0.96|0.34|7.4|5.2|0.909|  
+  !|10. Tundra|0.96|0.34|7.4|5.2|0.909|
 
   implicit none
   integer, intent(in) :: iRootType
   integer, intent(in) :: NL
-  real(r8),intent(in) :: cdepthz(1:NL)        !cumulative depth [m]
-  real(r8),intent(out) :: PerPlantRootC_vr(1:NL)   !fine root C in each layer [gC m-2]
-  real(r8),intent(out) :: PerPlantRootLen_vr(1:NL)    !root length in each layer [gC m-2]
+  real(r8),intent(in) :: tmp_cdepthz(JZ)        !cumulative depth [m]
+  real(r8),intent(out) :: tmp_rootc(JZ)   !fine root C in each layer [gC m-2]
+  real(r8),intent(out) :: tmp_rootl(JZ)    !root length in each layer [gC m-2]
   real(r8), parameter :: beta(10)=real((/0.943,0.970,0.950,0.980,0.967,0.943,0.982,0.972,0.972,0.909/),kind=r8)
   real(r8), parameter :: totfrootC(10)=(/0.6,0.27,0.52,0.82,0.78,1.51,0.57,0.57,0.99,0.96/)*0.488_r8 !total fine root C
   real(r8), parameter :: frootLen(10)=(/2.6,4.0,8.4,6.1,5.4,112.,3.5,4.1,60.4,7.4/)*1.e3_r8  !total fine root length
   real(r8), parameter :: PltPopDef(10)=(/0.6,1.,1.0,0.6,0.6,40.,0.6,0.6,40.,40./) !default plant population [1/m2]
-  integer :: L 
-  real(r8) :: CumRootFrac_vr(1:NL)  !Cumfraction of root in soil layers 
-  real(r8) :: RootFrac_vr(1:NL)     !fraction of root in soil layers 
+  integer :: L
+  real(r8) :: CumRootFrac_vr(JZ)  !Cumfraction of root in soil layers
+  real(r8) :: RootFrac_vr(JZ)     !fraction of root in soil layers
 
-  CumRootFrac_vr(1)=1._r8-beta(irootType)**(cdepthz(1)*100._r8)
+  CumRootFrac_vr(1)=1._r8-beta(irootType)**(tmp_cdepthz(1)*100._r8)
   RootFrac_vr(1)=CumRootFrac_vr(1)
+  tmp_rootl(1)=frootLen(irootType)*RootFrac_vr(1)/PltPopDef(irootType)
+  tmp_rootc(1)=RootFrac_vr(1)*totfrootC(irootType)/PltPopDef(irootType)
+
   DO L=2,NL
-    CumRootFrac_vr(L)=1._r8-beta(irootType)**(cdepthz(L)*100._r8)
-!    if(CumRootFrac_vr(L-1)<0.99_r8)
-      RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
-!    else
-!      RootFrac_vr(L) = 1._r8-CumRootFrac_vr(L-1)
-!    endif
+    CumRootFrac_vr(L)=1._r8-beta(irootType)**(tmp_cdepthz(L)*100._r8)
+    RootFrac_vr(L) = CumRootFrac_vr(L)-CumRootFrac_vr(L-1)
+    tmp_rootl(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
+    tmp_rootc(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
   enddo
-  
-  DO L=1,NL
-    PerPlantRootLen_vr(L)=frootLen(irootType)*RootFrac_vr(L)/PltPopDef(irootType)
-    PerPlantRootC_vr(L)=RootFrac_vr(L)*totfrootC(irootType)/PltPopDef(irootType)
-  ENDDO
 
   end subroutine SetRootProfileZ
 end module PrescribePhenolMod

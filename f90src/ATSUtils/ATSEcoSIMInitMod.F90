@@ -17,9 +17,14 @@ module ATSEcoSIMInitMod
   use SurfLitterDataType
   use EcoSIMConfig
   use MiniMathMod
+  use EcoSiMParDataMod, only : micpar
 implicit none
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
+
+  public :: THETRX
+  real(r8), pointer :: THETRX(:)
+
   public :: Init_EcoSIM_Soil
   contains
 
@@ -27,6 +32,10 @@ implicit none
   use EcoSimConst
   use GridMod           , only : SetMeshATS
   use InitAllocMod
+  !use InitEcoSIM
+  use UptakesMod
+  !use Hour1Mod,         only: InitHour1
+  use PlantBGCPars
   use StartsMod, only : startsim, set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
@@ -43,21 +52,31 @@ implicit none
   !That ecosim needs to recognize that it is running in coupled mode
   !with ATS and to turn off features unsupported in the coupler
   ATS_cpl_mode     = .true.
-  plant_model      = .false.
+  column_mode      = .true.
+  plant_model      = pheno_bool
+  ldo_sp_mode      = pheno_bool
   microbial_model  = .false.
   soichem_model    = .false.
   snowRedist_model = .false.
   disp_planttrait  = .false.
   disp_modelconfig = .false.
-  column_mode      = .true.
-  mod_snow_albedo  = .true.
+  mod_snow_albedo  = a_bool
 
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(30, 10, 20, 20)
-  call InitAlloc()
 
-  !setting a few variables 
+  !call InitModules()
+  call InitAlloc()
+  call InitUptake
+  allocate(THETRX(1:micpar%NumOfLitrCmplxs))
+  THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
+  !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
+
+  open(unit=99, file='snow_debug.txt', status='replace')
+  write(99,*) 'TKSnow1_snvr    ENGY0   NetHeat2LayL    HeatByFrezThaw'
+  write(99,*) '------------------------------------------------------'
+  !setting a few variables
   FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays_col   = 1 !Is the number of layers down the roots go
   NX               = 1
@@ -66,7 +85,7 @@ implicit none
   TFLWT  = 0.0_r8
   VOLPT  = 0.0_r8
   VOLTT  = 0.0_r8
- 
+
   do NY=1,NYS
     TXCO2(NY,NX)            = 0.0_r8
     DORGE(NY,NX)            = 0.0_r8
@@ -92,7 +111,7 @@ implicit none
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
-    
+
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
 
     !Need to check if litter area is set or not
@@ -100,21 +119,22 @@ implicit none
       VGeomLayer_vr(0,NY,NX) = 0.1
     endif
     POROS0_col(NY,NX) = 0.5
-    
+
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
       CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
-      AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
+      !AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
+      AREA_3D(3,L,NY,NX)=column_area(NY)
       !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
-      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)
-      SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)
+      SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
+      SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
-      
+
       DH_col(NY,NX) = 1.0
       DV_col(NY,NX) = 1.0
 
