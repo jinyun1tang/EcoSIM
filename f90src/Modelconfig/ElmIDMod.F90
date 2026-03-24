@@ -39,7 +39,7 @@ implicit none
 ! plant harvest
   integer, parameter :: iplthvst_leaf       =1 !leaf
   integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
-  integer, parameter :: iplthvst_woody      =3 !woody
+  integer, parameter :: iplthvst_stalk      =3 !woody
   integer, parameter :: iplthvst_stdead     =4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4

@@ -327,7 +327,7 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
     rPlantThermoAdaptZone_pft(NZ,NY,NX)        = plt_pheno%rPlantThermoAdaptZone_pft(NZ)
-    CanopyHeightCut_pft(NZ,I,NY,NX)            = plt_distb%CanopyHeightCut_pft(NZ)
+    CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)
     iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
     jHarvstType_pft(NZ,I,NY,NX)                = plt_distb%jHarvstType_pft(NZ)
     THIN_pft(NZ,I,NY,NX)                       = plt_distb%THIN_pft(NZ)
@@ -1177,7 +1177,7 @@ implicit none
     plt_distb%iDayPlantHarvest_pft(NZ)  = iDayPlantHarvest_pft(NZ,NY,NX)
     plt_distb%iYearPlantHarvest_pft(NZ) = iYearPlantHarvest_pft(NZ,NY,NX)
 
-    plt_distb%CanopyHeightCut_pft(NZ) = CanopyHeightCut_pft(NZ,I,NY,NX)
+    plt_distb%CanopyCutProxy_pft(NZ) = CanopyCutProxy_pft(NZ,I,NY,NX)
     plt_distb%iHarvstType_pft(NZ)         = iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvstType_pft(NZ)         = jHarvstType_pft(NZ,I,NY,NX)
     plt_distb%THIN_pft(NZ)                = THIN_pft(NZ,I,NY,NX)

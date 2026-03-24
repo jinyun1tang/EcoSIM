@@ -1580,11 +1580,11 @@ implicit none
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_C_col',units='gC/m2',avgflag='A',&
-    long_name='total standing dead C',ptr_col=data1d_ptr,default='inactive')            
+    long_name='total standing dead C',ptr_col=data1d_ptr) 
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_N_col',units='gN/m2',avgflag='A',&
-    long_name='total standing dead N',ptr_col=data1d_ptr)      
+    long_name='total standing dead N',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_P_col',units='gP/m2',avgflag='A',&
@@ -2245,7 +2245,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOT_NONSTC_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant leaf storage of nonstructural C',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant leaf storage of nonstructural C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOT_NONSTN_pft',units='gN/m2',avgflag='A',&

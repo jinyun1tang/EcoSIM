@@ -1657,6 +1657,8 @@ module PlantBranchMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
+  character(len=*), parameter :: subname='AllocateLeaf2CanopyLayers'
+
   integer  :: LL,LU,L,K,k1,k2,KK,NE
   integer  :: KMinGroingLeafNodeNum,KLeafNumHighestGrowing
   integer  :: LNumHeightLeafTip,LNumHeightLeafBase
@@ -1705,13 +1707,14 @@ module PlantBranchMod
     TreeRingAveRadius_pft     => plt_morph%TreeRingAveRadius_pft      ,& !output :tree ring radius,[m]
     CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch       & !output :plant canopy layer branch stem area, [m2 d-2]
   )
-!   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
-!
-!   HypocotHeight_pft=hypocotyledon height
-!   SeedDepth_pft=seeding depth
-!   LeafArea_node=node leaf area
-!   PetoleLength_node=petiole length
-!
+  call PrintInfo('beg '//subname)
+  !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
+  !
+  !   HypocotHeight_pft=hypocotyledon height
+  !   SeedDepth_pft=seeding depth
+  !   LeafArea_node=node leaf area
+  !   PetoleLength_node=petiole length
+  !
   KLowestGroLeafNode_brch(NB,NZ)=0;LeafLength=0._r8
 
   IF(HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
@@ -1831,13 +1834,13 @@ module PlantBranchMod
             YLeafElmntNode_brch(NE)=FRACL*LeafElmntNode_brch(NE,K,NB,NZ)
           ENDDO
 
-    !     ACCUMULATE LAYER LEAF AREAS, C, N AND P CONTENTS
-    !
-    !     CanopyLeafArea_lnode=leaf node area in canopy layer
-    !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
-    !     CanopyLeafAreaZ_pft,CanopyLeafCLyr_pft=total leaf area,C in canopy layer
-    !     StalkNodeHeight_brch=internode length
-    !
+          !     ACCUMULATE LAYER LEAF AREAS, C, N AND P CONTENTS
+          !
+          !     CanopyLeafArea_lnode=leaf node area in canopy layer
+          !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
+          !     CanopyLeafAreaZ_pft,CanopyLeafCLyr_pft=total leaf area,C in canopy layer
+          !     StalkNodeHeight_brch=internode length
+          !
           CanopyLeafArea_lnode(L,K,NB,NZ)=CanopyLeafArea_lnode(L,K,NB,NZ)+YLeafArea_node
           
           if(abs(LeafArea_node(K,NB,NZ))>1.e10)stop
@@ -1938,6 +1941,7 @@ module PlantBranchMod
     SapwoodBiomassC_brch(NB,NZ)                     = 0._r8
     CanopyStalkArea_lbrch(1:NumCanopyLayers1,NB,NZ) = 0._r8
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AllocateLeaf2CanopyLayers
 
@@ -1945,6 +1949,7 @@ module PlantBranchMod
   subroutine LeafClassAllocation(NB,NZ)
   implicit none
   integer, intent(in) :: NB,NZ
+  character(len=*), parameter :: subname='LeafClassAllocation'
   real(r8) :: dangle
   integer :: L,K,N
   ! begin_execution
@@ -1958,6 +1963,7 @@ module PlantBranchMod
     StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch      ,& !output :stem surface area, [m2 d-2]
     LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch       & !output :leaf surface area, [m2 d-2]
   )
+  call PrintInfo('beg '//subname)
   D900: DO K=1,MaxNodesPerBranch1
     DO  L=1,NumCanopyLayers1
       DO  N=1,NumLeafZenithSectors1
@@ -2005,6 +2011,7 @@ module PlantBranchMod
   D710: DO L=NumCanopyLayers1,1,-1
     StemAreaZsec_brch(N,L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ)/real(NumOfLeafAzimuthSectors1,r8)
   ENDDO D710
+  call PrintInfo('end '//subname)
   end associate
   end subroutine LeafClassAllocation
 
@@ -2014,6 +2021,7 @@ module PlantBranchMod
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: GrainGroth(NumPlantChemElms)
   real(r8), intent(in) :: GROSTKC                       !stalk growth rate, [gC/hr]
+  character(len=*), parameter :: subname='GrainFillOnBranch'
   real(r8) :: ZPGRP,ZPGRN,ZNPGP,ZNPGN
   real(r8) :: Reserve2GrainCMax,Reserve2GrainE(NumPlantChemElms)
   real(r8) :: FGRNX
@@ -2054,6 +2062,7 @@ module PlantBranchMod
     Hours4LeafOff_brch           => plt_pheno%Hours4LeafOff_brch            ,& !output :cold requirement for autumn leafoff/hardening, [h]
     SeedSitesSet_brch              => plt_morph%SeedSitesSet_brch            & !output :branch grain sites number, [d-2]
   )
+  call PrintInfo('beg '//subname)
 !
 !   SET MAXIMUM GRAIN NUMBER FROM SHOOT MASS BEFORE ANTHESIS
 !
@@ -2255,6 +2264,7 @@ module PlantBranchMod
       ENDIF
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine GrainFillOnBranch
 
@@ -2525,7 +2535,7 @@ module PlantBranchMod
     FracBiomHarvsted             => plt_distb%FracBiomHarvsted              ,& !output :harvest efficiency, [-]
     iYearPlantHarvest_pft        => plt_distb%iYearPlantHarvest_pft         ,& !output :year of harvest,[-]
     THIN_pft                     => plt_distb%THIN_pft                      ,& !output :thinning of plant population, [-]
-    CanopyHeightCut_pft          => plt_distb%CanopyHeightCut_pft           ,& !output :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+    CanopyCutProxy_pft          => plt_distb%CanopyCutProxy_pft           ,& !output :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     iHarvstType_pft              => plt_distb%iHarvstType_pft               ,& !output :type of harvest,[-]
     jHarvstType_pft              => plt_distb%jHarvstType_pft               ,& !output :flag for stand replacing disturbance,[-]
     iDayPlanting_pft             => plt_distb%iDayPlanting_pft              ,& !output :day of planting,[-]
@@ -2645,15 +2655,15 @@ module PlantBranchMod
         iYearPlantHarvest_pft(NZ)                             = iYearCurrent
         iHarvstType_pft(NZ)                                   = iharvtyp_grain
         jHarvstType_pft(NZ)                                   = jharvtyp_tmareseed
-        CanopyHeightCut_pft(NZ)                               = 0._r8
+        CanopyCutProxy_pft(NZ)                               = 0._r8
         THIN_pft(NZ)                                          = 0._r8
         FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ)        = 1.0_r8
         FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ) = 1.0_r8
-        FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ)       = 1.0_r8
+        FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ)       = 1.0_r8
         FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ)      = 1.0_r8
         FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ)        = 0._r8
         FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ) = 1.0_r8
-        FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ)       = 0._r8
+        FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ)       = 0._r8
         FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ)      = 0._r8
         iDayPlanting_pft(NZ)                                  = -1E+06
         iYearPlanting_pft(NZ)                                 = -1E+06

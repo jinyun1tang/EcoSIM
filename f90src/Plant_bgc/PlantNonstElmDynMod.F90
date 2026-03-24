@@ -28,6 +28,7 @@ module PlantNonstElmDynMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
+  character(len=*), parameter :: subname='WithinBranchElmTransfer'
   real(r8) :: TotNonstElm_loc(NumPlantChemElms)
   real(r8) :: NonstElm_loc(NumPlantChemElms,NumCanopyLayers1)  
   real(r8) :: TwoCompMassC,NonstElmGradt
@@ -40,6 +41,7 @@ module PlantNonstElmDynMod
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: LeafPetoMassC_brch(NumCanopyLayers1)
+
   associate(                                                       &
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch      ,& !input  :plant growth stage, [-]
@@ -62,6 +64,7 @@ module PlantNonstElmDynMod
     !     CanopyLeafSheathC_brch=leaf+petiole mass
     !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
     !
+  call PrintInfo('beg '//subname)  
   TwoCompMassC=0._r8
   TotNonstElm_loc(1:NumPlantChemElms)=0._r8
   D300: DO NB=1,NumOfBranches_pft(NZ)
@@ -155,6 +158,7 @@ module PlantNonstElmDynMod
   DO NE=1,NumPlantChemElms
     mass_finale(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
+  call PrintInfo('end '//subname)
   end associate   
   end subroutine WithinBranchElmTransfer    
 

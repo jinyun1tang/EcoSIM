@@ -192,15 +192,15 @@ implicit none
         DO M=1,366
           iHarvstType_pft(NZ,M,NY,NX)                                   = -1
           jHarvstType_pft(NZ,M,NY,NX)                                   = 0
-          CanopyHeightCut_pft(NZ,M,NY,NX)                               = 1.0E+06_r8
+          CanopyCutProxy_pft(NZ,M,NY,NX)                               = 1.0E+06_r8
           THIN_pft(NZ,M,NY,NX)                                          = -1.0_r8
           FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
           FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ,M,NY,NX)       = 1.0_r8
           FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
           FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
           FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,M,NY,NX) = 1.0_r8
-          FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,M,NY,NX)       = 1.0_r8
+          FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,M,NY,NX)       = 1.0_r8
           FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,M,NY,NX)      = 1.0_r8
         ENDDO
       ENDDO
@@ -291,23 +291,30 @@ implicit none
                 IYR=yearc
                 iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
               ENDIF
+              !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
+              !          iHarvstType_pft=3:reduction of clumping factor, pruning
+              !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),
+              !          iHarvstType_pft=5:fire
+              !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
+              !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
+              !
               !harvest is specified with two type numbers, first is large categroy, second is pft-specific operation
-              iHarvstType_pft(NZ,IDY,NY,NX)                         = ICUT
-              jHarvstType_pft(NZ,IDY,NY,NX)                         = JCUT
-              CanopyHeightCut_pft(NZ,IDY,NY,NX)                     = HCUT
-              THIN_pft(NZ,IDY,NY,NX)                                = PCUT
+              iHarvstType_pft(NZ,IDY,NY,NX)    = ICUT
+              jHarvstType_pft(NZ,IDY,NY,NX)    = JCUT
+              CanopyCutProxy_pft(NZ,IDY,NY,NX) = HCUT
+              THIN_pft(NZ,IDY,NY,NX)           = PCUT  
               
               !Note: pft-level-harvest minus ecosystem-level-harvest = litter to soil 
               !pft-level harvest
               FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
               FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
-              FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT13
+              FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT13
               FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
 
               !ecosystem-level harvest
               FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
               FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
-              FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDY,NY,NX)       = ECUT23
+              FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
 
@@ -318,19 +325,19 @@ implicit none
                 if(mod(nn,2)==0)then
                   IDYE=IDY
                   D580: DO IDYG=IDYS+1,IDYE-1
-                    iHarvstType_pft(NZ,IDYG,NY,NX)                            = ICUT
-                    jHarvstType_pft(NZ,IDYG,NY,NX)                            = JCUT
-                    CanopyHeightCut_pft(NZ,IDYG,NY,NX)                        = HCUT
-                    THIN_pft(NZ,IDYG,NY,NX)                                   = PCUT
+                    iHarvstType_pft(NZ,IDYG,NY,NX)    = ICUT
+                    jHarvstType_pft(NZ,IDYG,NY,NX)    = JCUT
+                    CanopyCutProxy_pft(NZ,IDYG,NY,NX) = HCUT
+                    THIN_pft(NZ,IDYG,NY,NX)           = PCUT
                     
                     FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11
                     FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT12
-                    FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT13
+                    FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ,IDYG,NY,NX)       = ECUT13
                     FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT14
 
                     FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT21
                     FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDYG,NY,NX) = ECUT22
-                    FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ,IDYG,NY,NX)       = ECUT23
+                    FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDYG,NY,NX)       = ECUT23
                     FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDYG,NY,NX)      = ECUT24
                   ENDDO D580
                 endif
