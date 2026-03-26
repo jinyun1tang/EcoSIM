@@ -71,11 +71,7 @@ implicit none
   call InitUptake
   allocate(THETRX(1:micpar%NumOfLitrCmplxs))
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
-  !call InitVegPars(pltpar,npft,nkopenclms,npfts_tab)
 
-  open(unit=99, file='snow_debug.txt', status='replace')
-  write(99,*) 'TKSnow1_snvr    ENGY0   NetHeat2LayL    HeatByFrezThaw'
-  write(99,*) '------------------------------------------------------'
   !setting a few variables
   FlowDirIndicator_col = 3 !Basically a switch, setting to 3 removes lateral flow
   MaxNumRootLays_col   = 1 !Is the number of layers down the roots go
@@ -86,30 +82,29 @@ implicit none
   VOLPT  = 0.0_r8
   VOLTT  = 0.0_r8
 
+  !This fixes some issues with the initialization of the mesh
+  !After this module startsim is run, which runs InitHGrid and
+  !InitSoilLayerDepths. These draw their inital conditions from
+  !DH_col, DV_col, and CumDepz2LayBottom_vr
+  do NY = 1,NYS
+    DH_col(NY,NX) = sqrt(column_area(NY))
+    DV_col(NY,NX) = sqrt(column_area(NY))
+    NU_col(NY,NX)               = a_NU(NY)
+    NL_col(NY,NX)               = a_NL(NY)
+
+    do L=NU_col(NY,NX),NL_col(NY,NX)
+      CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
+    enddo
+  end do
+
   do NY=1,NYS
     TXCO2(NY,NX)            = 0.0_r8
     DORGE(NY,NX)            = 0.0_r8
     QRunSurf_col(NY,NX)     = 0.0_r8
-    NU_col(NY,NX)               = a_NU(NY)
-    NL_col(NY,NX)               = a_NL(NY)
-    !AREA_3D(3,0,NY,NX)         = a_AREA3(0,NY)
-    !AREA_3D(3,NU_col(NY,NX),NY,NX) = a_AREA3(0,NY)
     ASP_col(NY,NX)          = a_ASP(NY)
-    !TairKClimMean_col(NY,NX)   = a_ATKA(NY)
-    !CO2E_col(NY,NX)=atm_co2
-    !CH4E_col(NY,NX)=atm_ch4
-    !OXYE_col(NY,NX)=atm_o2
-    !Z2GE_col(NY,NX)=atm_n2
-    !Z2OE_col(NY,NX)=atm_n2o
-    !ZNH3E_col(NY,NX)=atm_nh3
-    !H2GE_col(NY,NX)=atm_H2
     TairK_col(NY,NX)=tairc(NY) !it's already in K??
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
-    !VPA(NY,NX) = vpair(NY)/1.0e6_r8
-    !convert WindSpeedAtm from ATS units (m s^-1) to EcoSIM (m h^-1)
-    !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
-    !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
 
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
@@ -123,20 +118,13 @@ implicit none
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
-      CumDepz2LayBottom_vr(L,NY,NX)=a_CumDepz2LayBottom_vr(L,NY)
       POROS_vr(L,NY,NX)=a_PORO(L,NY)
-      !AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
-      AREA_3D(3,L,NY,NX)=column_area(NY)
-      !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX), ", a_AREA3(L,NY) = ", a_AREA3(L,NY)
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
       CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
       CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
       CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
-
-      DH_col(NY,NX) = 1.0
-      DV_col(NY,NX) = 1.0
 
     ENDDO
   ENDDO
@@ -145,12 +133,6 @@ implicit none
   PSIAtWiltPoint_col = pressure_at_wilting_point
 
   call startsim(NHW,NHE,NVN,NVS)
-
-  do NY=1,NYS
-    DO L=NU_col(NY,NX),NL_col(NY,NX)
-      AREA_3D(3,L,NY,NX)=a_AREA3(L,NY)
-    ENDDO
-  ENDDO
 
   end subroutine Init_EcoSIM_Soil
 

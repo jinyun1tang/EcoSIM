@@ -74,30 +74,12 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_Volume = data2D(:,:)
 
-  data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_AREA3 = data2D(:,:)
-
   data_ptr = state%water_content%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_WC = data2D(:,:)
 
-  data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_AreaZ = data2D(:,:)
-
-  do i = 1, size_col
-     a_AreaZ(i,1) = a_Volume(i,1)/a_dz(i,1)
-  end do
-
   call c_f_pointer(props%column_area%data, data, (/num_cols/))
   column_area = data(:)
-
-  !do j = 1, num_cols
-  !  do i = 1, size_col
-  !    write(*,*) "i,j: ", i,j, " a_Area3: ", a_Area3(i,j), " a_AreaZ: ", a_AreaZ(i,j), " column_area: ", column_area(j)
-  !  end do
-  !end do
 
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -126,11 +108,6 @@ contains
   data_ptr = props%liquid_saturation%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_LSAT = data2D(:,:)
-
-  !Relative permeability is not needed
-  !data_ptr = props%relative_permeability%data
-  !call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  !a_RELPERM = data2D(:,:)
 
   data_ptr = state%hydraulic_conductivity%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -183,11 +160,6 @@ contains
 
   call c_f_pointer(props%snow_albedo%data, data, (/num_cols/))
   a_SALB = data(:)
-
-  !a_MATP(:,:) = -6.9
-  !do i = 1, size_col
-  !  a_MATP(i, 1) = 100.0
-  !end do
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
