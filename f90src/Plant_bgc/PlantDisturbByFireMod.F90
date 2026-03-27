@@ -50,9 +50,9 @@ contains
     FracLeftThin              = 1.0_r8
     FFIRE(1:NumPlantChemElms) = 0._r8
   ELSE
-    FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(iHarvst_pft,iplthvst_woody,NZ) &
+    FracLeftThin=1.0_r8-DCORP*FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ) &
       *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
-    FFIRE(ielmc) = FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ)
+    FFIRE(ielmc) = FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ)
     FFIRE(ielmn) = FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
     FFIRE(ielmp) = FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
   ENDIF
@@ -312,8 +312,8 @@ contains
   FineNonleafElmOffEcosystem(ielmp)=FineNonleafElmntRemoval(ielmp)*EHVST22
 
   WoodyElmnt2Litr(ielmc)        = WoodyElmntRemoval(ielmc)*EHVST23
-  WoodyElmnt2Litr(ielmn)        = WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ))
-  WoodyElmnt2Litr(ielmp)        = WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_woody,NZ))
+  WoodyElmnt2Litr(ielmn)        = WoodyElmntRemoval(ielmn)*(1._r8-EFIRE(1,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ))
+  WoodyElmnt2Litr(ielmp)        = WoodyElmntRemoval(ielmp)*(1._r8-EFIRE(2,iHarvstType_pft(NZ))*FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ))
 
   WoodyElmntOffEcosystem(ielmn) = WoodyElmntRemoval(ielmn)*EHVST23
   WoodyElmntOffEcosystem(ielmp) = WoodyElmntRemoval(ielmp)*EHVST23

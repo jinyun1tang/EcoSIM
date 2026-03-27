@@ -693,7 +693,7 @@ module UptakesMod
 
   associate(                                                               &
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
+    OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft             ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !input  :canopy water content, [m3 d-2]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]

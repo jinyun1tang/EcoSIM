@@ -179,7 +179,7 @@ contains
   do_timing    = .false.
   continue_run = .false.
   NPXS         = 30   !number of cycles per hour for water, heat, solute flux calcns
-  NPYS         = 20   !number of cycles per NPX for gas flux calculations
+  NPYS         = 10   !number of cycles per NPX for gas flux calculations
 
   lsoilCompaction=.false.
   idebug_day  =-1

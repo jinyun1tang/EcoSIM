@@ -9,7 +9,7 @@ module PlantMgmtDataType
   logical, target,allocatable ::  flag_active_pft(:,:,:)                       !flag for plant presence,[-]
   real(r8),target,allocatable ::  THIN_pft(:,:,:,:)                            !thinning of plant population, [-]
   real(r8),target,allocatable ::  FracBiomHarvsted(:,:,:,:,:,:)                !harvest efficiency, [-]
-  real(r8),target,allocatable ::  CanopyHeightCut_pft(:,:,:,:)             !harvest cutting height (+ve) or fractional LAI removal (-ve), [m] or [-]
+  real(r8),target,allocatable ::  CanopyCutProxy_pft(:,:,:,:)             !harvest cutting height (+ve) or fractional LAI removal (-ve), [m] or [-]
   integer ,target,allocatable ::  iHarvstType_pft(:,:,:,:)                     !type of harvest, [-]
   integer ,target,allocatable ::  jHarvstType_pft(:,:,:,:)                         !flag for stand replacing disturbance, [-]
   integer ,target,allocatable ::  iYearPlanting_pft(:,:,:)                     !year of planting, [-]
@@ -49,7 +49,7 @@ module PlantMgmtDataType
   allocate(flag_active_pft(JP,JY,JX));  flag_active_pft                    = .false.
   allocate(THIN_pft(JP,366,JY,JX)); THIN_pft                               = 0._r8
   allocate(FracBiomHarvsted(2,4,JP,366,JY,JX));FracBiomHarvsted            = 0._r8
-  allocate(CanopyHeightCut_pft(JP,366,JY,JX)); CanopyHeightCut_pft = 0._r8
+  allocate(CanopyCutProxy_pft(JP,366,JY,JX)); CanopyCutProxy_pft = 0._r8
   allocate(iHarvstType_pft(JP,366,JY,JX));iHarvstType_pft                  = -1
   allocate(jHarvstType_pft(JP,366,JY,JX));jHarvstType_pft                          = 0
 
@@ -82,7 +82,7 @@ module PlantMgmtDataType
   call destroy(flag_active_pft)
   call destroy(THIN_pft)
   call destroy(FracBiomHarvsted)
-  call destroy(CanopyHeightCut_pft)
+  call destroy(CanopyCutProxy_pft)
   call destroy(iHarvstType_pft)
   call destroy(jHarvstType_pft)
 
