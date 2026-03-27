@@ -121,6 +121,7 @@ implicit none
     NK_col(NY,NX) = a_NL(NY)
     Myco_pft(1,NY,NX) = 1
     NP0_col(NY,NX) = 1
+
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
@@ -283,6 +284,8 @@ implicit none
 
   ENDDO
 
+  !Run precribe phenology interpolation which sets necessary variables
+  !To do the phenology
   if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
   !Need submodules of wthr to compute precipitation variables
   !And Canopy Radiation variables
@@ -291,6 +294,8 @@ implicit none
   ! How should this be handled?
   !call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
 
+  !PlantCanopyRadsModel processes the input radiation
+  ! into radiation to ground and to canopy
   if(ldo_sp_mode)then
     do NY=1,NYS
         call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
@@ -299,7 +304,9 @@ implicit none
 
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
-
+  !This does the surface energy and water balance. In the case of plants
+  ! it processes the precipitation and radiation already separated out in
+  ! PlantCanopyRadsModel
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 
   VHeatCapacity1_vr(0,1,1) = 0.0
@@ -313,7 +320,9 @@ implicit none
     HeatFlx2Grnd_col(NY,NX)=0.0
   enddo
 
-  !This does the subcycling of the land surface model
+  !Runs the main subcycling for the surface energy and water balance in
+  !addition to snow.
+  !
   DO M=1,NPH
 
     !call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
@@ -336,10 +345,14 @@ implicit none
     call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
+
+  !Does final update of the snow masses after the surface model is run
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
   ENDDO
 
+  !Does energy and water exchange in the plant roots and canopy
+  ! Specifically runs the CanopyEnergyH2Oiter_func
   if(ldo_sp_mode) call PlantModel(yearIJ,NHW,NHE,NVN,NVS)
 
   DO NY=1,NYS
@@ -351,11 +364,20 @@ implicit none
     surf_w_source(NY) = Qinflx2Soil_col(NY,1) / (dts_HeatWatTP)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
+    LWRadCanGPrev_col(NY,NX) = LWRadCanG_col(NY,NX)
+    TLEX_col(NY,NX)             = Air_Heat_Latent_store_col(NY,NX)
+    TSHX_col(NY,NX)             = Air_Heat_Sens_store_col(NY,NX)
     a_LWCan(NY) = LWRadCanGPrev_col(NY,NX)
     a_CLHF(NY) = TLEX_col(NY,NX) !Boundary latent heat flux
     a_CSHF(NY) = TSHX_col(NY,NX) !boundary sensible heat flux
     a_CanopyWat(NY) = WatHeldOnCanopy_col(NY,NX) !water held on canopy surface
     a_ET(NY) = QVegET_col(NY,NX) !canopy evapotranspiration
+
+    !Now that the heat carryover variables are set to the coupler versions
+    !They need to be cleared for the next iteration
+    LWRadCanG_col(NY,NX) = 0.0
+    Air_Heat_Latent_store_col(NY,NX) = 0.0
+    Air_Heat_Sens_store_col(NY,NX) = 0.0
 
     !Sum over PFTs for total transpiration and canopy evap
     do NP=1,npfts
