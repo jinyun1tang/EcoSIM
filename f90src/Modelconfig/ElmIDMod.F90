@@ -39,7 +39,7 @@ implicit none
 ! plant harvest
   integer, parameter :: iplthvst_leaf       =1 !leaf
   integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
-  integer, parameter :: iplthvst_woody      =3 !woody
+  integer, parameter :: iplthvst_stalk      =3 !woody
   integer, parameter :: iplthvst_stdead     =4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4
@@ -116,7 +116,7 @@ implicit none
 
   integer, parameter :: iharvtyp_none    = 0
   integer, parameter :: iharvtyp_grain   = 1
-  integer, parameter :: iharvtyp_allabv  = 2
+  integer, parameter :: iharvtyp_allabvg = 2
   integer, parameter :: iharvtyp_pruning = 3
   integer, parameter :: iharvtyp_grazing = 4
   integer, parameter :: iharvtyp_fire    = 5
@@ -139,7 +139,7 @@ implicit none
   integer, parameter :: ipltcal_InitFloral    = 2
   integer, parameter :: ipltcal_Jointing      = 3
   integer, parameter :: ipltcal_Elongation    = 4
-  integer, parameter :: ipltcal_Heading       = 5
+  integer, parameter :: ipltcal_FlowerHead    = 5
   integer, parameter :: ipltcal_Anthesis      = 6
   integer, parameter :: ipltcal_BeginSeedFill = 7
   integer, parameter :: ipltcal_SetSeedNumber = 8

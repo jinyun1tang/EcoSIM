@@ -338,6 +338,7 @@ implicit none
   real(r8),pointer   :: h1D_cNPP_ptc(:)        
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)     
   real(r8),pointer   :: h1D_EmergeHeight_ptc(:)
+  real(r8),pointer   :: h1D_CanopyCutProxy_ptc(:)
   real(r8),pointer   :: h1D_POPN_ptc(:)       
   real(r8),pointer   :: h1D_tTRANSPN_ptc(:)   
   real(r8),pointer   :: h1D_WTR_STRESS_ptc(:) 
@@ -883,6 +884,7 @@ implicit none
   allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_HT_ptc(:)=spval
   allocate(this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)); this%h1D_EmergeHeight_ptc(:)=spval
   allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))            ;this%h1D_POPN_ptc(:)=spval
+  allocate(this%h1D_CanopyCutProxy_ptc(beg_ptc:end_ptc))  ;this%h1D_CanopyCutProxy_ptc(:)=spval
   allocate(this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc))        ;this%h1D_tTRANSPN_ptc(:)=spval
   allocate(this%h1D_WTR_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_WTR_STRESS_ptc(:)=spval
   allocate(this%h1D_OXY_STRESS_ptc(beg_ptc:end_ptc))      ;this%h1D_OXY_STRESS_ptc(:)=spval
@@ -1580,11 +1582,11 @@ implicit none
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_C_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_C_col',units='gC/m2',avgflag='A',&
-    long_name='total standing dead C',ptr_col=data1d_ptr,default='inactive')            
+    long_name='total standing dead C',ptr_col=data1d_ptr) 
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_N_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_N_col',units='gN/m2',avgflag='A',&
-    long_name='total standing dead N',ptr_col=data1d_ptr)      
+    long_name='total standing dead N',ptr_col=data1d_ptr,default='inactive')      
 
   data1d_ptr => this%h1D_tSTANDING_DEAD_P_col(beg_col:end_col)     
   call hist_addfld1d(fname='tSTANDING_DEAD_P_col',units='gP/m2',avgflag='A',&
@@ -2245,7 +2247,7 @@ implicit none
 
   data1d_ptr => this%h1D_SHOOT_NONSTC_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOT_NONSTC_pft',units='gC/m2',avgflag='A',&
-    long_name='Plant leaf storage of nonstructural C',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant leaf storage of nonstructural C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_SHOOT_NONSTN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='SHOOT_NONSTN_pft',units='gN/m2',avgflag='A',&
@@ -2330,6 +2332,10 @@ implicit none
   data1d_ptr => this%h1D_POPN_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='POPN_pft',units='1/m2',avgflag='A',&
     long_name='Plant population',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_CanopyCutProxy_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='CutProxy_pft',units='-',avgflag='A',&
+    long_name='Plant cut proxy',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%h1D_tTRANSPN_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='tTRANSPN_pft',units='mmH2O/m2',avgflag='I',&
@@ -3674,7 +3680,7 @@ implicit none
   data2d_ptr => this%h2D_RootNutupk_fProtC_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootNutUptk_fProtC_pvr',units='-',type2d='levsoi',avgflag='A',&
     long_name='Transporter-limitation for root nutrient uptake capacity, 0->1 weaker limitation',&
-    ptr_patch=data2d_ptr,default='inactive')       
+    ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_RootProteinC_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootProteinC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
@@ -4203,7 +4209,7 @@ implicit none
 
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
-
+        this%h1D_CanopyCutProxy_ptc(nptc)   = CanopyCutProxy_pft(NZ,I,NY,NX)
         this%h1D_POPN_ptc(nptc)             = PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_CumYr_C_FLX_ptc(nptc) = PlantExudElm_CumYr_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_cumGPP_ptc(nptc)       = GrossCO2Fix_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)

@@ -166,6 +166,7 @@ module InitPlantMod
   subroutine PlantLitterFraction(NZ)
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='PlantLitterFraction'
   integer :: N,M
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
@@ -191,22 +192,23 @@ module InitPlantMod
     FracGroth2Node_pft          => plt_allom%FracGroth2Node_pft         ,& !output :parameter for allocation of growth to nodes, [-]
     NumCogrowthNode_pft         => plt_morph%NumCogrowthNode_pft         & !output :number of concurrently growing nodes,[-]
   )
-!
-!     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
-!     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-!
-!     CFOPC=fraction of plant litter allocated in nonstructural(0,*),
-!     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-!
-!     NONSTRUCTURAL
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
+  !     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
+  !
+  !     CFOPC=fraction of plant litter allocated in nonstructural(0,*),
+  !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+  !
+  !     NONSTRUCTURAL
+  !
   PlantElmAllocMat4Litr(ielmc,inonstruct,iprotein,NZ)  = 0.0_r8
   PlantElmAllocMat4Litr(ielmc,inonstruct,icarbhyro,NZ) = 0.67_r8
   PlantElmAllocMat4Litr(ielmc,inonstruct,icellulos,NZ) = 0.33_r8
   PlantElmAllocMat4Litr(ielmc,inonstruct,ilignin,NZ)   = 0.0_r8
-!
-!     NON-VASCULAR (E.G. MOSSES)
-!
+  !
+  !     NON-VASCULAR (E.G. MOSSES)
+  !
   IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.25_r8
@@ -217,9 +219,9 @@ module InitPlantMod
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.30_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.38_r8
-!
-!     LEGUMES
-!
+    !
+    !     LEGUMES
+    !
   ELSEIF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.16_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.38_r8
@@ -230,9 +232,9 @@ module InitPlantMod
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.37_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.15_r8
-!
-!     ANNUALS, GRASSES, SHRUBS
-!
+    !
+    !     ANNUALS, GRASSES, SHRUBS
+    !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
     .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.08_r8
@@ -244,9 +246,9 @@ module InitPlantMod
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.36_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.16_r8
-!
-!     DECIDUOUS TREES
-!
+    !
+    !     DECIDUOUS TREES
+    !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.1 &
     .OR.iPlantTurnoverPattern_pft(NZ).GE.3)THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
@@ -258,9 +260,9 @@ module InitPlantMod
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icarbhyro,NZ) = 0.045_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,icellulos,NZ) = 0.660_r8
     PlantElmAllocMat4Litr(ielmc,inonfoliar,ilignin,NZ)   = 0.295_r8
-!
-!     CONIFEROUS TREES
-!
+    !
+    !     CONIFEROUS TREES
+    !
   ELSE
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.25_r8
@@ -339,19 +341,19 @@ module InitPlantMod
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ) = 0.464_r8
     PlantElmAllocMat4Litr(ielmc,iroot,ilignin,NZ)   = 0.169_r8
   ENDIF
-!
-!     COARSE WOODY LITTER FROM BOLES AND ROOTS
-!
+  !
+  !     COARSE WOODY LITTER FROM BOLES AND ROOTS
+  !
   PlantElmAllocMat4Litr(ielmc,icwood,iprotein,NZ)  = 0.00_r8
   PlantElmAllocMat4Litr(ielmc,icwood,icarbhyro,NZ) = 0.045_r8
   PlantElmAllocMat4Litr(ielmc,icwood,icellulos,NZ) = 0.660_r8
   PlantElmAllocMat4Litr(ielmc,icwood,ilignin,NZ)   = 0.295_r8
-!
-!     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
-!
-!     CNOPC,CPOPC=fractions to allocate N,P to kinetic components
-!     CFOPN,CFOPP=distribution of litter N,P to kinetic components
-!
+  !
+  !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
+  !
+  !     CNOPC,CPOPC=fractions to allocate N,P to kinetic components
+  !     CFOPN,CFOPP=distribution of litter N,P to kinetic components
+  !
   CNOPC(iprotein)  = 0.020_r8
   CNOPC(icarbhyro) = 0.010_r8
   CNOPC(icellulos) = 0.010_r8
@@ -428,6 +430,7 @@ module InitPlantMod
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
   rPlantThermoAdaptZone_pft(NZ) = PlantInitThermoAdaptZone_pft(NZ)
+  !greater thermal adaptation zone, greater TC4LeafOut_pft and TC4LeafOff_pft values
   TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)            = TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)            = AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))
