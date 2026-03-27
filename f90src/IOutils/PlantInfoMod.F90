@@ -102,6 +102,7 @@ implicit none
 
   if(disp_planttrait .and. pft_changed)call relavu(nu_plt)
   call PrintInfo('end '//subname)
+  
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -318,7 +319,7 @@ implicit none
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
 
-              write(iulog,*)'NZ,IDY=',NZ,IDY,StriHarvtype(ICUT),StrjHarvtype(JCUT),'Cut height:',HCUT,'cut fraction:',PCUT
+              !write(iulog,*)'NZ,IDY=',NZ,IDY,StriHarvtype(ICUT),StrjHarvtype(JCUT),'Cut height:',HCUT,'cut fraction:',PCUT
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass
                 NN=NN+1
@@ -442,6 +443,7 @@ implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
   logical, intent(in) :: pft_changed
+  character(len=*), parameter :: subname='ReadPlantProperties'
   integer :: N, NB
   real(r8) :: VRNXI,VRNLI
 
@@ -660,6 +662,7 @@ implicit none
   logical, intent(in) :: pft_changed
   real(r8), intent(out) :: VRNLI,VRNXI
 
+  character(len=*), parameter :: subname='SetPlantTraits'
   character(len=40) :: pft_lname
   character(len=64):: koppen_climl
   character(len=3) :: koppen_clims
@@ -703,7 +706,7 @@ implicit none
   RadPARLeafTransmis_pft(NZ,NY,NX) = RadPARLeafTransmis_tab(loc)
 
   RefNodeInitRate_pft(NZ,NY,NX)          = RefNodeInitRate_tab(loc)
-  RateRefLeafAppearance_pft(NZ,NY,NX)        = RefLeafAppearRate_tab(loc)
+  RateRefLeafAppearance_pft(NZ,NY,NX)    = RefLeafAppearRate_tab(loc)
   TCChill4Seed_pft(NZ,NY,NX)             = TCChill4Seed_tab(loc)
   VRNLI                                  = VRNLI_tab(loc)
   VRNXI                                  = VRNXI_tab(loc)
@@ -1076,7 +1079,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'XRNI','Rate of node initiation at 25oC [h-1]',RefNodeInitRate_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'XRLA','Rate of leaf appearance at 25oC [h-1]',RateRefLeafAppearance_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'XRLA','Rate of leaf (dis)appearance at 25oC [h-1]',RateRefLeafAppearance_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CTC','Chilling temperature for CO2 fixation, seed loss [oC]',TCChill4Seed_pft(NZ,NY,NX),100)
   id=addone(id)

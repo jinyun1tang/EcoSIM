@@ -539,6 +539,7 @@ module PlantBranchMod
   real(r8) :: PARTS
   real(r8) :: PARTX
   real(r8) :: TOTAL
+  logical :: check_perennial,check_annual,check_decidous
   real(r8) :: PSILY(0:3)
   real(r8), parameter :: FPART1=1.00_r8
   real(r8), parameter :: FPART2=0.40_r8
@@ -718,24 +719,26 @@ module PlantBranchMod
   !     LRemob_brch,BegRemoblize=remobilization flags
   !     FLGZ=control rate of remobilization
   !
-  IF((iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. &
-     Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)) &
-    .OR. (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0))THEN
+  check_annual    = (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)
+  check_perennial = (iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. &
+    Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ))
+  check_decidous=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+
+  IF( check_perennial .OR. check_annual)THEN 
     !set remobilization true
     BegRemoblize = itrue
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen)THEN
       !annual plant or evergreen perennial
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF((iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. &
-      iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) .AND. &
-      TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN
+    ELSEIF(check_decidous .AND. TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN           !chill temperature in effect 
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(iPlantPhenolType_pft(NZ).GE.2 .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN
+    ELSEIF(check_decidous .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN !drought stress in effect
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ENDIF
+
     IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen)THEN
       PART(ibrch_stalk)  = PART(ibrch_stalk)+0.5_r8*(PART(ibrch_leaf)+PART(ibrch_petole))
       PART(ibrch_resrv)  = PART(ibrch_resrv)+0.5_r8*(PART(ibrch_leaf)+PART(ibrch_petole))
@@ -747,9 +750,10 @@ module PlantBranchMod
     LRemob_brch                 = ifalse
     HoursDoingRemob_brch(NB,NZ) = 0._r8
   ENDIF
-!
-!     CHECK PARTITIONING COEFFICIENTS
-!
+
+  !
+  !     CHECK PARTITIONING COEFFICIENTS
+  !
   D1000: DO N=1,NumOfPlantMorphUnits
     IF(N.EQ.ibrch_stalk.AND.isclose(NodeLenPergC_pft(NZ),0._r8))THEN
       PART(N)=0._r8
@@ -1782,8 +1786,7 @@ module PlantBranchMod
       !     LeafLength=leaf length
 
       HeightStalk    = HeightBranchBase+StalkNodeHeight_brch(K,NB,NZ)
-      HeightLeafNode = HeightStalk+PetoleLength_node(K,NB,NZ)
-      
+      HeightLeafNode = HeightStalk+PetoleLength_node(K,NB,NZ)      
       LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopulation_pft(NZ)*FracGroth2Node_pft(NZ))))
 
       !
@@ -2094,7 +2097,7 @@ module PlantBranchMod
 !   MaxSeedNumPerSite_pft=maximum seed number per GrothStalkMaxSeedSites_pft from PFT file
 !   dReproNodeNumNormByMatG_brch=change in reproductive node number normalized for maturity group
 !
-  IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0 .AND. iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
+  IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).NE.0 .AND. iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN !anthesis stage
     SeedSET=AMIN1(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ)+SETC) &
       ,LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+SETN) &
       ,LeafPetoNonstElmConc_brch(ielmp,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+SETP))

@@ -67,18 +67,18 @@ implicit none
   IF(reset_check)THEN
     
     NumDeadBranches=0
-!
-!     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
-!
+    !
+    !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
+    !
 
     call LiterFallDeadBranches(yearIJ%I,yearIJ%J,NZ,NumDeadBranches,C4PhotoShootNonstC_brch)
 
     call SetDeadPlant(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
-!
-!     DEAD ROOTS
-!
-!     LitrFall FROM DEAD ROOTS
-!
+    !
+    !     DEAD ROOTS
+    !
+    !     LitrFall FROM DEAD ROOTS
+    !
     call LiterFallDeadRoots(yearIJ%I,yearIJ%J,NZ)
 
     call LiterFallRootShootStorage(yearIJ%I,yearIJ%J,NZ,C4PhotoShootNonstC_brch)
@@ -604,6 +604,7 @@ implicit none
   integer, intent(in) :: I,J,NZ
   integer, intent(inout) :: NumDeadBranches
   real(r8), intent(inout) :: C4PhotoShootNonstC_brch(NumCanopyLayers1,JP1)
+  character(len=*), parameter :: subname='LiterFallDeadBranches'
   real(r8) :: dDeadE
   integer :: M,NE,NB
 !     begin_execution
@@ -666,6 +667,8 @@ implicit none
     doPlantLeaveOff_brch              => plt_pheno%doPlantLeaveOff_brch               ,& !output :branch phenology flag, [-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
   )
+
+  call PrintInfo('beg '//subname)
   D8845: DO NB=1,NumOfBranches_pft(NZ)
     IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
@@ -762,6 +765,7 @@ implicit none
       NumDeadBranches=NumDeadBranches+1
     ENDIF
   ENDDO D8845
+  call PrintInfo('end '//subname)
   end associate
   end subroutine LiterFallDeadBranches
 

@@ -430,6 +430,7 @@ module InitPlantMod
 !     SeedTempSens_pft=sensitivity to HTC (seeds oC-1 above HTC)
 !
   rPlantThermoAdaptZone_pft(NZ) = PlantInitThermoAdaptZone_pft(NZ)
+  !greater thermal adaptation zone, greater TC4LeafOut_pft and TC4LeafOff_pft values
   TempOffset_pft(NZ)            = 2.667_r8*(2.5_r8-rPlantThermoAdaptZone_pft(NZ))
   TC4LeafOut_pft(NZ)            = TCZD-TempOffset_pft(NZ)
   TC4LeafOff_pft(NZ)            = AMIN1(15.0_r8,TCXD-TempOffset_pft(NZ))

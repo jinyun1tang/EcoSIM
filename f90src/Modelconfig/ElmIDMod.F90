@@ -139,7 +139,7 @@ implicit none
   integer, parameter :: ipltcal_InitFloral    = 2
   integer, parameter :: ipltcal_Jointing      = 3
   integer, parameter :: ipltcal_Elongation    = 4
-  integer, parameter :: ipltcal_Heading       = 5
+  integer, parameter :: ipltcal_FlowerHead    = 5
   integer, parameter :: ipltcal_Anthesis      = 6
   integer, parameter :: ipltcal_BeginSeedFill = 7
   integer, parameter :: ipltcal_SetSeedNumber = 8
