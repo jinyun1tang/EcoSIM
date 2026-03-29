@@ -108,7 +108,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RainPrecThrufall_col(:,:)                  !precipitation through canopy, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  RainPrec2Sno_col(:,:)                      !rainfall to snow, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface, [m3 H2O d-2 h-1]
-  real(r8),target,allocatable ::  QWatIntLaterFlow_col(:,:)                  !Internal lateral flow between grids, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  QLaterFlow2Cell_col(:,:)                  !Internal lateral flow between grids, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  HydCondSoil_3D(:,:,:,:)                    !3D micropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  TWatFlowCellMicP_vr(:,:,:)                 !water flow into cell through micropores, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  TWatFlowCellMacP_vr(:,:,:)                 !water flow into cell through macropores, [m3 H2O d-2 h-1]  
@@ -132,7 +132,7 @@ module SoilWaterDataType
   allocate(TWatFlowCellMacP_vr(JZ,JY,JX));    TWatFlowCellMacP_vr=0._r8
   allocate(iPondBotLev_col(JY,JX)); iPondBotLev_col=0
   allocate(iPondFlag_col(JY,JX)); iPondFlag_col =.false.
-  allocate(QWatIntLaterFlow_col(JY,JX)); QWatIntLaterFlow_col=0._r8
+  allocate(QLaterFlow2Cell_col(JY,JX)); QLaterFlow2Cell_col=0._r8
   allocate(Rain2ExposedSurf_col(JY,JX)); Rain2ExposedSurf_col=0._r8
   allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
   allocate(RainPrecThrufall_col(JY,JX)); RainPrecThrufall_col=0._r8
@@ -242,7 +242,7 @@ module SoilWaterDataType
   CALL destroy(DVLiceMicP_vr)
   call destroy(iPondBotLev_col)
   call destroy(iPondFlag_col)
-  call destroy(QWatIntLaterFlow_col)
+  call destroy(QLaterFlow2Cell_col)
   call destroy(Rain2ExposedSurf_col)
   call destroy(RainPrec2Sno_col)
   call destroy(RainPrecThrufall_col)
