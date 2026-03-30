@@ -399,16 +399,16 @@ module RedistMod
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
-  CRAIN_lnd                = CRAIN_lnd+WI
-  QRain_CumYr_col(NY,NX)   = QRain_CumYr_col(NY,NX)+WI
-  WO                       = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
-  CEVAP                    = CEVAP-WO
-  QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
-  EvapoTransp_col(NY,NX)   = -WO
-  QDischarg2WTBL_col(NY,NX)      = QDischarg2WTBL_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)    
-  QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
+  WI                        = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux      = rain/snowfall + irrigation
+  CRAIN_lnd                 = CRAIN_lnd+WI
+  QRain_CumYr_col(NY,NX)    = QRain_CumYr_col(NY,NX)+WI
+  WO                        = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
+  CEVAP                     = CEVAP-WO
+  QEvap_CumYr_col(NY,NX)    = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
+  EvapoTransp_col(NY,NX)    = -WO
+  QDischarg2WTBL_col(NY,NX) = QDischarg2WTBL_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  H2OLoss_CumYr_col(NY,NX)  = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  QH2OLoss_lnds             = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !

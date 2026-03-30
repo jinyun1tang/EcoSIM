@@ -750,9 +750,9 @@ contains
         call endrun('crazy snow temperature '//trim(mod_filename),__LINE__)
       endif
 
-      if(M.EQ.1.AND.MM.EQ.1.AND.L.EQ.1)then
-         write(99,*) TKSnow1_snvr(1,NY,NX), " " , ENGY0, " " , NetHeat2LayL, " " , HeatByFrezThaw
-      endif
+!      if(M.EQ.1.AND.MM.EQ.1.AND.L.EQ.1)then
+!         write(99,*) TKSnow1_snvr(1,NY,NX), " " , ENGY0, " " , NetHeat2LayL, " " , HeatByFrezThaw
+!      endif
 
       if(cphwat < 0._r8)then
         if(abs(cphwat/VLHeatCapSnowM1_snvr(L,NY,NX))>1.e-3_r8)then
