@@ -38,7 +38,9 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
   real(r8), intent(out) :: PSISoilMatric      ! soil matric potential
-  real(r8), optional, intent(out) :: THETA1S  ! porosity
+  real(r8), optional, intent(out) :: THETA1S  ! liquid-water filled porosity [m3 water m-3 micropore soil]
+  character(len=*), parameter :: subname='CalcSoilWatPotential'
+
   real(r8) :: THETA1                          !volumetric soil moisture
   !     BKVL=soil mass
   !     FC,WP=water contents at field capacity,wilting point
@@ -51,6 +53,7 @@ implicit none
   !     PSISO=osmotic potential
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
+  call PrintInfo('beg '//subname)
 
   THETA1=AMAX1(SoilWatAirDry_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1),safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
 
@@ -70,8 +73,9 @@ implicit none
     THETA1        = POROS_vr(N3,N2,N1)
     PSISoilMatric = PSISE_vr(N3,N2,N1)
   ENDIF
-
   if(present(THETA1S))THETA1S=THETA1
+
+  call PrintInfo('end '//subname)  
   end subroutine CalcSoilWatPotential
 !------------------------------------------------------------------------------------------
 

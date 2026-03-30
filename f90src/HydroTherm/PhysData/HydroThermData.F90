@@ -49,15 +49,15 @@ implicit none
   real(r8),allocatable ::  WatFlx2LitRByRunoff_2DH(:,:,:,:)      !surface runoff flux  
   real(r8),allocatable ::  HeatFlx2LitRByRunoff_2DH(:,:,:,:)                      !  
   real(r8),allocatable ::  HeatFlow2Soili_3D(:,:,:,:)                     !  
-  real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                      !    
-  real(r8),allocatable ::  WaterFlow2Macpt_3D(:,:,:,:)                     !  
-  real(r8),allocatable ::  WaterFlow2Micptl_3D(:,:,:,:)                      !    
-  real(r8),allocatable ::  WaterFlow2Macptl_3D(:,:,:,:)                     !    
-  real(r8),allocatable ::  WaterFlow2MicptX_3D(:,:,:,:)                     !  
-  real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                       !
-  real(r8),allocatable ::  VLairMicP_vr(:,:,:)                      !
-  real(r8),allocatable ::  VLWatMicPX1_vr(:,:,:)               !micropore water volume behind wetting front
-  real(r8),allocatable ::  Qinflx2SoilM_col(:,:)
+  real(r8),allocatable ::  WaterFlow2Micpt_3D(:,:,:,:)                    !Micropore flow into the grid cell along direction N at iteration M [m3 H2O dt-1]
+  real(r8),allocatable ::  WaterFlow2Macpt_3D(:,:,:,:)                    !Macropore flow into the grid cell along direction N at iteration M [m3 H2O dt-1] 
+  real(r8),allocatable ::  WaterFlow2Micptl_3D(:,:,:,:)                   !temporarily copy of Micropore flow into the grid cell along direction N  [m3 H2O dt-1]    
+  real(r8),allocatable ::  WaterFlow2Macptl_3D(:,:,:,:)                   !temporarily copy of Macropore flow into the grid cell along direction N [m3 H2O dt-1]     
+  real(r8),allocatable ::  WaterFlow2MicptX_3D(:,:,:,:)                   !before saturation correction Micropore flow into the grid cell along direction N  [m3 H2O dt-1]  
+  real(r8),allocatable ::  VLWatMicP2_vr(:,:,:)                           !liquid water volume 
+  real(r8),allocatable ::  VLairMicP_vr(:,:,:)                            !gas volume content
+  real(r8),allocatable ::  VLWatMicPX1_vr(:,:,:)                          !micropore water volume behind wetting front
+  real(r8),allocatable ::  Qinflx2SoilM_col(:,:)                          !infiltration flux at iteration M
   real(r8),save :: HeatAdv_scal = 1._r8
   public :: InitHydroThermData
   public :: DestructHydroThermData

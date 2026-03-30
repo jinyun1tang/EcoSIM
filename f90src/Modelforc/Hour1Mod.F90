@@ -336,7 +336,7 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      QWatIntLaterFlow_col(NY,NX)    = 0._r8
+      QLaterFlow2Cell_col(NY,NX)    = 0._r8
       QCanopyWat2Dist_col(NY,NX)     = 0._r8
       HeatCanopy2Dist_col(NY,NX)     = 0._r8
       HydroSufDOCFlx_col(NY,NX)      = 0._r8
