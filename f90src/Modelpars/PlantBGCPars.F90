@@ -98,8 +98,8 @@ module PlantBGCPars
   real(r8) :: FXFZ(0:1)                           !rate constant for leaf-reserve nonstructural N,P exchange, [h-1]
   real(r8) :: RateK4ShootSeaStoreNonstEXfer(0:3)  !rate constant for leaf-storage nonstructural chemical element exchange, [h-1]
   real(r8) :: RateK4RootSeaStorNonstEXfer(0:3)    !rate constant for root-storage nonstructural chemical element exchange, [h-1]
-  real(r8) :: FXRT(0:1)                           !root partitioning of storage C during leafout,[-]
-  real(r8) :: FXSH(0:1)                           !shoot partitioning of storage C during leafout,[-]
+  real(r8) :: FX2RT(0:1)                           !root partitioning of storage C during leafout,[-]
+  real(r8) :: FX2SH(0:1)                           !shoot partitioning of storage C during leafout,[-]
   real(r8) :: FXRN(6)                             !rate constant for plant-nodule bacteria nonstructl C,N,P exchange,[h-1]
   REAL(R8) :: RCCX(0:3)                           !maximum fractions for shoot N recycling,[-]
   real(r8) :: RCCQ(0:3)                           !maximum fractions for shoot P recycling,[-]
@@ -308,7 +308,7 @@ module PlantBGCPars
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   RateK4ShootSeaStoreNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   RateK4RootSeaStorNonstEXfer=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
-  FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
+  FX2SH=real((/0.50,0.75/),r8);FX2RT=1._r8-FX2SH
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
   Hours4SenesAftMature=real((/360.0,1440.0,720.0,720.0/),r8)
