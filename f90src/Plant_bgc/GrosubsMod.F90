@@ -258,6 +258,7 @@ module grosubsMod
   real(r8) :: tvegE_beg(NumPlantChemElms)
   real(r8) :: tvegE_end(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
+  real(r8) :: canopyE_finale(NumPlantChemElms)
   real(r8) :: err,arr(12),arr1(11),GrothPART2LeafPetole
 ! begin_execution
   associate(                                                 &
@@ -302,7 +303,6 @@ module grosubsMod
   call RemoveBiomByMgmt(yearIJ,NZ)  
 
   !
-
   call PrintInfo('end '//subname)  
   end associate
   end subroutine GrowOnePlant

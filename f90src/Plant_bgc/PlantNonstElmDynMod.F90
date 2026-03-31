@@ -616,7 +616,7 @@ module PlantNonstElmDynMod
   call ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC)
 
 !  call SumReserveBiomass(I,J,NZ,massE_end)
-  
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine PlantNonstElmTransfer
@@ -641,6 +641,8 @@ module PlantNonstElmDynMod
     ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !input  :branch live stalk C, [gC d-2]
+    SSXferElms_pft            => plt_bgcr%SSXferElms_pft              ,& !inoput :flux export from seasonal storage, [g h-1 d-2]    
+    SSXfer2ShootElms_pft      => plt_bgcr%SSXfer2ShootElms_pft        ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]
     SeasonalNonstElms_pft     => plt_biom%SeasonalNonstElms_pft       ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch        ,& !inoput :branch nonstructural element, [g d-2]
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch           & !inoput :branch reserve element mass, [g d-2]
@@ -668,6 +670,8 @@ module PlantNonstElmDynMod
     call ExchFluxLimiter(StalkRsrvElms_brch(NE,NB,NZ),SeasonalNonstElms_pft(NE,NZ),XFRE(NE))
     StalkRsrvElms_brch(NE,NB,NZ) = StalkRsrvElms_brch(NE,NB,NZ)-XFRE(NE)
     SeasonalNonstElms_pft(NE,NZ) = SeasonalNonstElms_pft(NE,NZ)+XFRE(NE)
+    SSXferElms_pft(NE,NZ)        = SSXferElms_pft(NE,NZ) + XFRE(NE)
+    SSXfer2ShootElms_pft(NE,NZ)  = SSXfer2ShootElms_pft(NE,NZ)+ XFRE(NE)
   ENDDO
   IF(LeafPetoNonstElmConc_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
     CNL=LeafPetoNonstElmConc_brch(ielmc,NB,NZ)/(LeafPetoNonstElmConc_brch(ielmc,NB,NZ) &
@@ -689,6 +693,8 @@ module PlantNonstElmDynMod
     call ExchFluxLimiter(CanopyNonstElms_brch(NE,NB,NZ),SeasonalNonstElms_pft(NE,NZ),XFRE(NE))
     CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
     SeasonalNonstElms_pft(NE,NZ)   = SeasonalNonstElms_pft(NE,NZ)+XFRE(NE)
+    SSXferElms_pft(NE,NZ)          = SSXferElms_pft(NE,NZ) + XFRE(NE)
+    SSXfer2ShootElms_pft(NE,NZ)    = SSXfer2ShootElms_pft(NE,NZ)+ XFRE(NE)
   ENDDO
   call PrintInfo('end '//subname)
   end associate
@@ -698,6 +704,7 @@ module PlantNonstElmDynMod
   subroutine StalkRsrvShootNonstTransfer(I,J,NB,NZ)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
+  character(len=*), parameter :: subname='StalkRsrvShootNonstTransfer'
   REAL(R8) :: ShootBiomC_brch
   real(r8) :: CPOOLT,CPOOLD
   real(r8) :: NonstGradt
@@ -712,7 +719,7 @@ module PlantNonstElmDynMod
     StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
     CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch       & !inoput :branch nonstructural element, [g d-2]
   )
-
+  call PrintInfo('beg '//subname)
   ShootBiomC_brch = CanopyLeafSheathC_brch(NB,NZ)+SapwoodBiomassC_brch(NB,NZ)
   CPOOLT          = CanopyNonstElms_brch(ielmc,NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ)
   IF(ShootBiomC_brch.GT.ZERO4Groth_pft(NZ))THEN
@@ -733,6 +740,7 @@ module PlantNonstElmDynMod
       StalkRsrvElms_brch(NE,NB,NZ)   = StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
     ENDDO
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine StalkRsrvShootNonstTransfer
 
@@ -916,6 +924,8 @@ module PlantNonstElmDynMod
     StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
     CanopySapwoodC_pft      => plt_biom%CanopySapwoodC_pft        ,& !input  :canopy active stalk C, [g d-2]  
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !inoput :plant stored nonstructural element at current step, [g d-2]    
+    SSXferElms_pft          => plt_bgcr%SSXferElms_pft            ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]    
+    SSXfer2ShootElms_pft    => plt_bgcr%SSXfer2ShootElms_pft      ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]    
     SapwoodBiomassC_brch    => plt_biom%SapwoodBiomassC_brch      ,& !input  :branch live stalk C, [gC d-2]
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]    
     RootElms_pft            => plt_biom%RootElms_pft               & !input  :plant root element mass, [g d-2]
@@ -937,7 +947,8 @@ module PlantNonstElmDynMod
     XFRE(ielmc)                     = XFRY*AZMAX1(NonstElmGradt)
     StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
     SeasonalNonstElms_pft(ielmc,NZ) = SeasonalNonstElms_pft(ielmc,NZ)-XFRE(ielmc)
-
+    SSXferElms_pft(ielmc,NZ)        = SSXferElms_pft(ielmc,NZ)-XFRE(ielmc)
+    SSXfer2ShootElms_pft(ielmc,NZ)  = SSXfer2ShootElms_pft(ielmc,NZ)-XFRE(ielmc)
     CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
     DO NE=2,NumPlantChemElms
       WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
@@ -945,9 +956,11 @@ module PlantNonstElmDynMod
       !achor for seasonal storage is root, achor for stalkrsv is sap
       NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT
       XFRE(NE)                          = XFRY*AZMAX1(NonstElmGradt)
-      call ExchFluxLimiter(SeasonalNonstElms_pft(NE,NZ),StalkRsrvElms_brch(ielmc,NB,NZ),XFRE(NE))
-      StalkRsrvElms_brch(ielmc,NB,NZ)   = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(NE)
-      SeasonalNonstElms_pft(NE,NZ)      = SeasonalNonstElms_pft(NE,NZ)-XFRE(NE)
+      call ExchFluxLimiter(SeasonalNonstElms_pft(NE,NZ),StalkRsrvElms_brch(NE,NB,NZ),XFRE(NE))
+      StalkRsrvElms_brch(NE,NB,NZ) = StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
+      SeasonalNonstElms_pft(NE,NZ) = SeasonalNonstElms_pft(NE,NZ)-XFRE(NE)
+      SSXferElms_pft(NE,NZ)        = SSXferElms_pft(NE,NZ)-XFRE(NE)
+      SSXfer2ShootElms_pft(NE,NZ)  = SSXfer2ShootElms_pft(NE,NZ)-XFRE(NE)
     ENDDO
   ENDIF
   call PrintInfo('end '//subname)

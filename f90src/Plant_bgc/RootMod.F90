@@ -80,7 +80,8 @@ implicit none
 !
   call PrintInfo('beg '//subname)
   !  call RootCheck(I,J,NZ,'head')
-  call SumRootBiome(yearIJ,NZ,mass_inital)
+!  call SumRootBiome(yearIJ,NZ,mass_inital)
+
   !first add newly acquired nutrients
   call SummarizeRootSink(yearIJ,NZ,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,RootSinkC)
 
@@ -95,7 +96,7 @@ implicit none
 
 !  call SumRootBiome(yearIJ,NZ,mass_finale) 
 !  call SumRootAR(NZ);call SumLitfallBlg(NZ)
-!  if(yearIJ%I>=143)write(423,*)yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
+!  if(plt_site%NX==5)write(423,*)NZ,yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
 !    plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)-tmpval,'bfnod'
   !
   !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
@@ -132,8 +133,8 @@ implicit none
 
 !  call SumRootBiome(yearIJ,NZ,mass_finale)
 !  call SumRootAR(NZ);call SumLitfallBlg(NZ)
-!  if(yearIJ%I>=144)write(423,*)yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
-!    plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'afnod'
+!  if(plt_site%NX==5)write(423,*)NZ,'root',yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
+!    plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'afnod',mass_finale(ielmc),mass_inital(ielmc)
   call PrintInfo('end '//subname)  
   end associate
   end subroutine RootBGCModel

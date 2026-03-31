@@ -22,6 +22,8 @@ implicit none
   public :: SumPlantRootGas
   public :: SumRootAR
   public :: SumLitfallBlg
+  public :: SumCanopyBiome
+  public :: SumLitfallAbg
   logical,save  :: lfile(2)=.true.
   contains
   ![header]
@@ -62,25 +64,17 @@ implicit none
   endif  
 
   call SumRootAR(NZ)
+  
+  call SumLitfallAbg(NZ)
+
   call SumLitfallBlg(NZ)
+
   !sum fluxes
   !     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
   NH3Dep2Can_pft(NZ)=0._r8
   DO NB=1,NumOfBranches_pft(NZ)
     NH3Dep2Can_pft(NZ)=NH3Dep2Can_pft(NZ)+NH3Dep2Can_brch(NB,NZ)
   ENDDO    
-
-  LitrfallElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  LitrfallAbvgElms_pft(1:NumPlantChemElms,NZ) = 0._r8
-  L  = 0
-  DO K=1,pltpar%NumOfPlantLitrCmplxs      
-    DO M=1,jsken
-      DO NE=1,NumPlantChemElms
-        LitrfallAbvgElms_pft(NE,NZ)=LitrfallAbvgElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,L,NZ)
-      ENDDO
-    ENDDO
-  ENDDO      
-
 
   DO NE=1,NumPlantChemElms
     LitrfallElms_pft(NE,NZ)=LitrfallAbvgElms_pft(NE,NZ)+LitrfallBlgrElms_pft(NE,NZ)
@@ -90,6 +84,30 @@ implicit none
 
   end associate
   end subroutine SumPlantBiome
+!----------------------------------------------------------------------------------------------------
+  subroutine SumLitfallAbg(NZ)  
+  implicit none
+  integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='SumLitfallAbg'
+  integer :: L,K,M,NE
+
+  associate(                                                         &
+    LitrfallElms_pvr         => plt_bgcr%LitrfallElms_pvr           ,& !input  :plant LitrFall element, [g d-2 h-1]
+    LitrfallAbvgElms_pft     => plt_bgcr%LitrfallAbvgElms_pft        & !output :aboveground plant element LitrFall, [g d-2 h-1]
+  )    
+  call PrintInfo('beg '//subname)
+  LitrfallAbvgElms_pft(1:NumPlantChemElms,NZ) = 0._r8
+  L  = 0
+  DO K=1,pltpar%NumOfPlantLitrCmplxs      
+    DO M=1,jsken
+      DO NE=1,NumPlantChemElms
+        LitrfallAbvgElms_pft(NE,NZ)=LitrfallAbvgElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,L,NZ)
+      ENDDO
+    ENDDO
+  ENDDO      
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine SumLitfallAbg
 !----------------------------------------------------------------------------------------------------
   subroutine SumLitfallBlg(NZ)
   implicit none
@@ -190,6 +208,7 @@ implicit none
   implicit none
   integer, intent(in) :: NZ
   real(r8), optional, intent(out) :: canopyE(NumPlantChemElms)
+  character(len=*), parameter :: subname='SumCanopyBiome'
   integer :: NB,NE,jk
 
   associate(                                                          &
@@ -221,6 +240,7 @@ implicit none
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     ,& !output :standing dead element, [g d-2]
     CanopyNonstElms_pft       => plt_biom%CanopyNonstElms_pft         & !output :canopy nonstructural element concentration, [g d-2]        
   )
+  call PrintInfo('beg '//subname)
   !shoots
   DO NB=1,NumOfBranches_pft(NZ)
     CALL SumPlantBranchBiome(NB,NZ)
@@ -261,6 +281,7 @@ implicit none
   if(present(canopyE))then
     canopyE=ShootElms_pft(:,NZ)+ShootNoduleElms_pft(:,NZ)+StandDeadStrutElms_pft(:,NZ)
   endif
+  call PrintInfo('end '//subname)
   END associate
   end subroutine SumCanopyBiome
 !----------------------------------------------------------------------------------------------------
@@ -306,7 +327,7 @@ implicit none
     CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch         ,& !input  :branch nonstructural element, [g d-2]
     CPOOL3_node                => plt_photo%CPOOL3_node                 ,& !input  :minimum sink strength for nonstructural C transfer, [g d-2]
     CPOOL4_node                => plt_photo%CPOOL4_node                 ,& !input  :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
-    iPlantPhotosynsType_pft   => plt_photo%iPlantPhotosynsType_pft    ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft    => plt_photo%iPlantPhotosynsType_pft     ,& !input  :plant photosynthetic type (C3 or C4),[-]
     CMassHCO3BundleSheath_node => plt_photo%CMassHCO3BundleSheath_node  ,& !input  :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     CMassCO2BundleSheath_node  => plt_photo%CMassCO2BundleSheath_node   ,& !input  :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
     C4PhotoShootNonstC_brch    => plt_biom%C4PhotoShootNonstC_brch      ,& !inoput :branch shoot nonstrucal elelment, [g d-2]
@@ -361,7 +382,9 @@ implicit none
     RootNutUptakeN_pft     => plt_rbgc%RootNutUptakeN_pft     ,& !output :total N uptake by plant roots, [gN d-h2 h-1]
     RootNutUptakeP_pft     => plt_rbgc%RootNutUptakeP_pft     ,& !output :total P uptake by plant roots, [gP d-h2 h-1]
     CanopyGrosRCO2_pft     => plt_bgcr%CanopyGrosRCO2_pft     ,& !output :canopy plant+nodule autotrophic respiraiton, [gC d-2]
-    CanopyResp_brch        => plt_bgcr%CanopyResp_brch        ,& !inoput :canopy respiration for a branch, [gC d-2 h-1]        
+    CanopyResp_brch        => plt_bgcr%CanopyResp_brch        ,& !inoput :canopy respiration for a branch, [gC d-2 h-1]       
+    SSXferElms_pft         => plt_bgcr%SSXferElms_pft         ,& !inoput :flux export from seasonal storage, [g h-1 d-2] 
+    SSXfer2ShootElms_pft   => plt_bgcr%SSXfer2ShootElms_pft   ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]            
     PlantElmDistLoss_pft   => plt_distb%PlantElmDistLoss_pft  ,& !ouput  :plant element loss due to disturbance, [g d-2 h-1]
     LitrfallElms_pvr       => plt_bgcr%LitrfallElms_pvr       ,& !output :plant LitrFall element, [g d-2 h-1]
     LitrFallElms_brch      => plt_bgcr%LitrFallElms_brch      ,& !inoput :litterfall from the branch, [g d-2 h-1]        
@@ -385,6 +408,8 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
+    SSXferElms_pft(:,NZ)                        = 0._r8
     trcs_deadroot2soil_pvr(:,:,NZ)              = 0._r8  
     fNCLFW_pft(NZ) = 0._r8  
     fPCLFW_pft(NZ) = 0._r8
