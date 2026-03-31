@@ -266,7 +266,7 @@ implicit none
     DO NX=NH1,NH2
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP_col(NY,NX))
-          write(iulog,*)'NZ,pft_nmgnt=',NZ,pft_nmgnt(NZ)
+          !write(iulog,*)'NZ,pft_nmgnt=',NZ,pft_nmgnt(NZ)
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)

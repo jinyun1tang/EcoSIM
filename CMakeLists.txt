@@ -8,6 +8,23 @@ set (ECOSIM_MINOR_VERSION 1)
 set (ECOSIM_PATCH_VERSION 0)
 set (ECOSIM_VERSION "${ECOSIM_MAJOR_VERSION}.${ECOSIM_MINOR_VERSION}.${ECOSIM_PATCH_VERSION}")
 
+  # This tells CMake/Clang to target version 26.0 specifically
+if (APPLE)
+    # Execute a system command to get the current SDK version (e.g., 26.0 or 15.1)
+    execute_process(
+        COMMAND xcrun --show-sdk-version
+        OUTPUT_VARIABLE CURRENT_SDK_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Only force the deployment target if it hasn't been set or is outdated
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "${CURRENT_SDK_VERSION}" CACHE STRING "OSX Deployment Target" FORCE)
+    endif()
+
+    message(STATUS "Setting Apple Deployment Target to SDK Version: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 set(TPL_INSTALL_PREFIX $ENV{AMANZI_TPLS_DIR})
 
 # Adjust CMake's module path.
