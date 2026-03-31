@@ -64,7 +64,11 @@ implicit none
   endif  
 
   call SumRootAR(NZ)
+  
+  call SumLitfallAbg(NZ)
+
   call SumLitfallBlg(NZ)
+
   !sum fluxes
   !     NH3Dep2Can_brch,NH3Dep2Can_pft=PFT NH3 flux between atmosphere and branch,canopy
   NH3Dep2Can_pft(NZ)=0._r8

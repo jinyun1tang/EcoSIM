@@ -128,35 +128,14 @@ module PlantBranchMod
     call BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
       DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeID)
 
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfgroleaf',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif  
     CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
     !     DISTRIBUTE SHEATH OR PETIOLE GROWTH AMONG CURRENTLY GROWING NODES
     !
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfpetol. ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     CALL GrowPetioleOnBranch(NZ,NB,MinNodeID,Growth_brch(:,ibrch_petole),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
     !   DISTRIBUTE STALK GROWTH AMONG CURRENTLY GROWING NODES
     !
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfgrostak',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     call GrowStalkOnBranch(I,J,NZ,NB,Growth_brch(:,ibrch_stalk),EtoliationCoeff)
 
     !
@@ -202,22 +181,7 @@ module PlantBranchMod
     !       XRLA=rate of leaf appearance at 25 oC (h-1)
     !       FSNC=fraction of lowest leaf to be remobilized
     !
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfsens.  ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     call SenescenceBranch(NZ,NB,RCCE)
-
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfremobl ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
 
     call RemobilizeBranch(I,J,NZ,NB,BegRemoblize,LRemob_brch,RCCC,RCCN,RCCP,RMxess_brch)
     !
@@ -235,13 +199,6 @@ module PlantBranchMod
       iPlantBranchState_brch(NB,NZ)=iDead
     endif
 
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfnutbrl ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
     call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
 
@@ -260,41 +217,15 @@ module PlantBranchMod
     IF(SineSunInclAnglNxtHour_col.GT.0.0_r8)THEN
       call LeafClassAllocation(NB,NZ)
     ENDIF
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfgrain  ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
+
     call GrainFillOnBranch(I,J,NB,NZ,Growth_brch(:,ibrch_grain),Growth_brch(ielmc,ibrch_stalk))
 
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfresetph',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     !
     call ResetBranchPhenology(I,J,NB,NZ)
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfxfer.  ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
+
     !   
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
 
-!    if(plt_site%NX==5)then
-!      call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-!      write(423,*)'bfnodul  ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'dm',plt_biom%ShootElms_pft(ielmc,NZ),plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-!      plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif      
     !   CANOPY N2 FIXATION (CYANOBACTERIA)
     !
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WaterStress4Groth)
@@ -302,7 +233,7 @@ module PlantBranchMod
     CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
 
   ENDIF
-!  if(plt_site%NX==5)write(423,*)'---------'
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine GrowOneBranch
@@ -2848,13 +2779,7 @@ module PlantBranchMod
       ENDDO
     ENDIF
   ENDIF
-  if(plt_site%NX==5)then
-    call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-    write(423,*)'bfssxfer ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-    +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-    'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-  endif      
+
   !
   ! TRANSFER LEAF AND STALK NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   ! IN PERENNIALS AFTER GRAIN FILL IN DETERMINATES, AFTER AUTUMNIZ'N
@@ -2874,13 +2799,6 @@ module PlantBranchMod
   !   iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date setting for final seed number
   !   CanopyLeafSheathC_brch=leaf+petiole mass
   !   SapwoodBiomassC_brch=stalk sapwood mass
-  if(plt_site%NX==5)then
-    call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-    write(423,*)'afssxfer ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-    +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-    'dm',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-  endif      
   !
   IF((iPlantPhenolPattern_pft(NZ).EQ.iplt_annual  &
     .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0) &
@@ -2895,13 +2813,7 @@ module PlantBranchMod
       call StalkRsrvRootNonstTransfer(I,J,NB,NZ)
     ENDIF
   ENDIF
-  if(plt_site%NX==5)then
-    call SumCanopyBiome(NZ);call SumLitfallAbg(NZ)  
-    write(423,*)'bfreplx  ',NZ,I*1000+J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-    +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-    'dm',plt_biom%ShootElms_pft(ielmc,NZ),plt_biom%ShootElmsBeg_pft(ielmc,NZ), &
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ),plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-  endif        
+
   !
   !   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
   !   SEASONAL STORAGE POOL 

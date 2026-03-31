@@ -282,13 +282,6 @@ module grosubsMod
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
     !
     !     CALCULATE GROWTH OF EACH BRANCH
-    call SumCanopyBiome(NZ,canopyE_finale);call SumLitfallAbg(NZ)  
-!    if(plt_site%NX==5)then
-!      write(423,*)('-',KK=1,100)
-!      write(423,*)'bfNZ',NZ,yearIJ%I*1000+yearIJ%J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'xf',plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ)
-!    endif
 
     DO  NB=1,NumOfBranches_pft(NZ)
       call GrowOneBranch(yearIJ%I,yearIJ%J,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
@@ -296,12 +289,6 @@ module grosubsMod
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
 
-    call SumCanopyBiome(NZ,canopyE_finale);call SumLitfallAbg(NZ)  
-!    if(plt_site%NX==5)then
-!      write(423,*)'afNZ',NZ,yearIJ%I*1000+yearIJ%J/24.,'abg',plt_biom%ShootElms_pft(ielmc,NZ)-plt_biom%ShootElmsBeg_pft(ielmc,NZ) &
-!      +plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz)-plt_bgcr%CanopyGrosRCO2_pft(NZ)+plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),&
-!      'xf',plt_bgcr%SSXfer2ShootElms_pft(ielmc,NZ),plt_bgcr%LitrfallAbvgElms_pft(ielmc,nz),plt_bgcr%CanopyGrosRCO2_pft(NZ)
-!    endif
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
