@@ -507,7 +507,7 @@ module StartqMod
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)      = 0
     MatureGroup_brch(NB,NZ,NY,NX)                  = MatureGroup_pft(NZ,NY,NX)
     ShootNodeNum_brch(NB,NZ,NY,NX)                 = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
-    NodeNum2InitFloral_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
+    NodeNumInitial_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
     NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)                  = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)       = 0._r8
@@ -551,7 +551,7 @@ module StartqMod
   EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)           = 0._r8
   CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
   LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = 0._r8
-  PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
+  PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   
   D25: DO NB=1,MaxNumBranches
@@ -578,7 +578,7 @@ module StartqMod
       StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                  = 0._r8
       PetoleLength_node(K,NB,NZ,NY,NX)                        = 0._r8
       LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
-      PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8
+      PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8
       StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = 0._r8
       LeafProteinC_node(K,NB,NZ,NY,NX)                      = 0._r8
       PetoleProteinC_node(K,NB,NZ,NY,NX)                    = 0._r8
@@ -840,7 +840,7 @@ module StartqMod
 !
 !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     CanopyLeafSheathC_brch=C in leaves+petioles (g)
+!     CanopyLeafSheathC_brch=C in leaves+PetolSheths (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
 !     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)

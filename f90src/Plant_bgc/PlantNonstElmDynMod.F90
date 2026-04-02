@@ -61,7 +61,7 @@ module PlantNonstElmDynMod
     !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
     !     Hours2LeafOut_brch=hourly leafout counter
     !     HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
-    !     CanopyLeafSheathC_brch=leaf+petiole mass
+    !     CanopyLeafSheathC_brch=leaf+PetolSheth mass
     !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
     !
   call PrintInfo('beg '//subname)  
@@ -434,7 +434,7 @@ module PlantNonstElmDynMod
   !     OF TOTAL SINK STRENGTH OF ROOTS IN ALL SOIL LAYERS
   !
   !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-  !     WTLS,WTRT=total PFT leaf+petiole,root C mass
+  !     WTLS,WTRT=total PFT leaf+PetolSheth,root C mass
   !     FWTC,FWTS,FWTR=canopy,root system,root layer 
   !     RootSinkC_vr,RootSinkC=root layer,root system sink strength
   !
@@ -472,7 +472,7 @@ module PlantNonstElmDynMod
   !     RATE CONSTANT FOR TRANSFER IS SET FROM INPUT IN 'READQ'
   !     BUT IS NOT USED FOR ANNUALS DURING GRAIN FILL
   !
-  !     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
+  !     WTLS,WTLSB=total,branch PFT leaf+PetolSheth C mass
   !
   CanopyLeafSheathC_pft(NZ)=0._r8
   D309: DO NB=1,NumOfBranches_pft(NZ)
@@ -487,7 +487,7 @@ module PlantNonstElmDynMod
   !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
   !     iPlantCalendar_brch(ipltcal_SetSeedNumber,=end date for setting final seed number
   !     BranchSinkWeight_pft=branch sink weighting factor
-  !     GrothPART2LeafPetole=allocation to leaf+petiole used to modify ShootRootNonstElmConduts_pft,in annuals
+  !     GrothPART2LeafPetole=allocation to leaf+PetolSheth used to modify ShootRootNonstElmConduts_pft,in annuals
   !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
   !     FWODB=C woody fraction in branch:0=woody,1=non-woody
   !     FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
@@ -500,7 +500,7 @@ module PlantNonstElmDynMod
   ENDDO
 
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-    PTSHTR=ShootRootNonstElmConduts_pft(NZ)*GrothPART2LeafPetole**0.167_r8    !0.167=(1/6)~sqrt(length), GrothPART2LeafPetole is the main branch growth allocation to leaf+petiole
+    PTSHTR=ShootRootNonstElmConduts_pft(NZ)*GrothPART2LeafPetole**0.167_r8    !0.167=(1/6)~sqrt(length), GrothPART2LeafPetole is the main branch growth allocation to leaf+PetolSheth
   ELSE
     PTSHTR=ShootRootNonstElmConduts_pft(NZ)
   ENDIF

@@ -261,9 +261,9 @@ contains
   !
   !     OTHER NON-FOLIAR GRAZED,REMOVED
   !
-  !     WTSHE,WTHSK,WTEAR,WTGR=PFT petiole,husk,ear,grain C mass
+  !     WTSHE,WTHSK,WTEAR,WTGR=PFT PetolSheth,husk,ear,grain C mass
   !     WHVSH*,WHVHS*,WHVEA*,WHVGR*,WHVSC*=
-  !            petiole,husk,ear,grain,nonstructural C removed
+  !            PetolSheth,husk,ear,grain,nonstructural C removed
   !     GrazingUnMetLeafC=grazing requirement unmet by non-foliar removal
   !
   totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ)+EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
@@ -326,12 +326,12 @@ contains
     HarvestedStalkRsrvC  = 0._r8
     GrazingUnMetLeafC = AZMAX1(GrazedPhytoStalkC_pft)
     !
-    !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
+    !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PetolSheth,HUSK
     !     EAR,GRAIN
     !
     !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
     !     WHVSH*,WHVHS,WHVEA,WHVGR,WHVSC=
-    !            petiole,husk,ear,grain,nonstructural C removed
+    !            PetolSheth,husk,ear,grain,nonstructural C removed
     !
     IF(GrazingUnMetLeafC.GT.0.0_r8)THEN
       GrazingMeetLeafC      = AMIN1(LeafStrutElms_pft(ielmc,NZ)-HarvestedLeafC-GrazedLeafNonstC,GrazingUnMetLeafC)

@@ -59,6 +59,7 @@ module ExtractsMod
   subroutine TotalLitrFall()
 
   implicit none
+  character(len=*), parameter :: subname='TotalLitrFall'
   integer :: NZ,L,K,M
   integer :: NE
   associate(                                                          &
@@ -76,6 +77,7 @@ module ExtractsMod
     StemArea_col              => plt_morph%StemArea_col              ,& !output :grid canopy stem area, [m2 d-2]
     tCanLeafC_clyr            => plt_biom%tCanLeafC_clyr              & !output :total leaf carbon mass in canopy layers, [gC d-2]
   )
+  call PrintInfo('beg '//subname)
   DO NZ=1,NP0
 !
 !   TOTAL LitrFall OF ALL PLANT SPECIES
@@ -112,6 +114,7 @@ module ExtractsMod
     tCanLeafC_clyr(L)        = 0._r8
     CanopyStemAareZ_col(L) = 0._r8
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TotalLitrFall
 
@@ -127,6 +130,7 @@ module ExtractsMod
 !
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='CalcTotalLeafArea'
   integer :: L
   associate(                                               &
     CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  ,& !input  :canopy layer leaf area, [m2 d-2]
@@ -136,11 +140,13 @@ module ExtractsMod
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !inoput :total stem area, [m2 d-2]
     tCanLeafC_clyr      => plt_biom%tCanLeafC_clyr         & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
   )
+  call PrintInfo('beg '//subname)
   DO L=1,NumCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
     tCanLeafC_clyr(L)=tCanLeafC_clyr(L)+CanopyLeafCLyr_pft(L,NZ)
     CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine CalcTotalLeafArea
 
@@ -152,7 +158,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
-
+  character(len=*), parameter :: subname='TotalGasandSoluteUptake'
   integer :: N,L,K,idg,NE,ids
  
   associate(                                                          &
@@ -204,7 +210,7 @@ module ExtractsMod
     trcs_Soil2plant_uptake_pvr=> plt_rbgc%trcs_Soil2plant_uptake_pvr ,& !inoput :plant root-soil solute flux non-band, [g d-2 h-1]    
     trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr   & !inoput :total root-soil solute flux non-band, [g d-2 h-1]
   )
-  
+  call PrintInfo('beg '//subname)
   DO L=NU,MaxNumRootLays
     DO N=1,Myco_pft(NZ)  
 !
@@ -285,24 +291,19 @@ module ExtractsMod
       REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TotalGasandSoluteUptake
 
 !----------------------------------------------------------------------------------------------------
   subroutine ExtractCanopyFluxes(I,J,NZ)
 !
-!     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
-!
-!     TRootN2Fix_pft=total root N2 fixation
-!     RootN2Fix_pvr=PFT root N2 fixation
-!
-
   implicit none
   integer, intent(in) :: I,J,NZ
+  character(len=*), parameter :: subname='ExtractCanopyFluxes'
   integer :: L, NE,NB,idg
   real(r8) :: ENGYC
-
+  
   associate(                                                          &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft              ,& !input  :canopy net CO2 exchange, [gC d-2 h-1]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !input  :canopy water content, [m3 d-2]
@@ -343,6 +344,7 @@ module ExtractsMod
     VapXAir2Canopy_col        => plt_ew%VapXAir2Canopy_col           ,& !inoput :grid canopy evaporation, [m3 d-2]
     WatHeldOnCanopy_col       => plt_ew%WatHeldOnCanopy_col           & !inoput :canopy surface water content, [m3 d-2]
   )
+  call PrintInfo('beg '//subname)
 !
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
@@ -407,7 +409,7 @@ module ExtractsMod
 !
     
   NH3Emis_CumYr_pft(NZ)=NH3Emis_CumYr_pft(NZ)+NH3Dep2Can_pft(NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ExtractCanopyFluxes
   ![tail]

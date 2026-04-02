@@ -55,31 +55,34 @@ module grosubsMod
   use PlantDisturbsMod, only : RemoveBiomassByDisturbance,StageDisturbances
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
-
+  character(len=*), parameter :: subname='GrowPlants'
+  
   real(r8) :: CanopyHeight_copy(JP1)
   integer :: L,K,M
   integer :: NZ,NE
   real(r8) :: tvegE(NumPlantChemElms),tvegE1(NumPlantChemElms)
-! begin_execution
+
+  ! begin_execution
   associate(                                                               &
     IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
     CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
-!     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
-!
-!
-!     INITIALIZE SENESCENCE ARRAYS
+  call PrintInfo('beg '//subname)
+  !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
+  !
+  !
+  !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
     CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)                   = 0._r8
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
-!
-!     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
-!
+  !
+  !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
+  !
 
   D9985: DO NZ=1,NP
     call StageDisturbances(yearIJ%I,yearIJ%J,NZ)
@@ -103,7 +106,7 @@ module grosubsMod
   DO NZ=1,NP
     call SumPlantBiome(yearIJ,NZ,'exgrosubs')
   ENDDO
-
+  call PrintInfo('end '//subname)
   end associate
   END subroutine GrowPlants
 
@@ -247,7 +250,7 @@ module grosubsMod
   integer  :: BegRemoblize
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
-  real(r8) :: PTRT    !main branch growth allocated to leaf and petiole
+  real(r8) :: PTRT    !main branch growth allocated to leaf and PetolSheth
   real(r8) :: TFN5
   real(r8) :: WaterStress4Groth
   real(r8) :: Stomata_Stress
@@ -395,14 +398,14 @@ module grosubsMod
   ENDDO D6
 
 !
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
 !     WTSTK,WVSTK=stalk,sapwood mass
 !     FWOOD,FWODB=C woody fraction in stalk,other organs:0=woody,1=non-woody
 !     CN*,CP*=N:C,P:C ratios in plant organs from PFT files
 !     CN*W,CP*W=N:C,P:C ratios in plant organs weighted for wood content
-!     *LF=leaf,*SHE=petiole,*STK=stalk,*RT=root
+!     *LF=leaf,*SHE=PetolSheth,*STK=stalk,*RT=root
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
-!     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
+!     FWODSN,FWODSP=N,P woody fraction in PetolSheth:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0                      & !'Rapid, like deciduous tree '
@@ -667,6 +670,7 @@ module grosubsMod
     Soil2RootMycoExudE_pft(ielmp,NZ)
 
   PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
+  
   end associate
   end subroutine AccumulateStates
 

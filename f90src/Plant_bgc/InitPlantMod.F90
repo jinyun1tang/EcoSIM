@@ -381,12 +381,14 @@ module InitPlantMod
 !
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowthNode_pft=number of concurrently growing nodes
-!     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+petiole,2=none,3=between 1,2!
+!     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+PetolSheth,2=none,3=between 1,2!
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
     !Annual plant (e.g.crops) or grass or bryophyte
     !The following may be revised for maize or soybean, or crops in general
     FracGroth2Node_pft(NZ) = 1.0_r8
-    IF(MatureGroup_pft(NZ).LE.10)THEN
+    IF(MatureGroup_pft(NZ).LE.6)THEN
+      NumCogrowthNode_pft(NZ) = 2
+    ELSEIF(MatureGroup_pft(NZ).LE.10)THEN
       NumCogrowthNode_pft(NZ) = 3
     ELSEIF(MatureGroup_pft(NZ).LE.15)THEN
       NumCogrowthNode_pft(NZ) = 4
@@ -589,7 +591,7 @@ module InitPlantMod
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]
     NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]
     PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
-    PetioleChemElmRemobFlx_brch       => plt_pheno%PetioleChemElmRemobFlx_brch        ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
+    PetolShethChemElmRemobFlx_brch       => plt_pheno%PetolShethChemElmRemobFlx_brch        ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch             ,& !input  :flag to detect branch death, [-]
     Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
@@ -629,7 +631,7 @@ module InitPlantMod
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     StalkNodeHeight_brch              => plt_morph%StalkNodeHeight_brch               ,& !output :internode height, [m]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
-    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
+    NodeNumInitial_brch           => plt_morph%NodeNumInitial_brch            ,& !output :shoot node number at floral initiation, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
     NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !output :number of branches,[-]
@@ -667,7 +669,7 @@ module InitPlantMod
     plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ) = 0
     MatureGroup_brch(NB,NZ)                       = MatureGroup_pft(NZ)
     ShootNodeNum_brch(NB,NZ)                      = ShootNodeNumAtPlanting_pft(NZ)
-    NodeNum2InitFloral_brch(NB,NZ)                = ShootNodeNum_brch(NB,NZ)
+    NodeNumInitial_brch(NB,NZ)                    = ShootNodeNum_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)              = 0._r8
     NumOfLeaves_brch(NB,NZ)                       = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)            = 0._r8
@@ -711,7 +713,7 @@ module InitPlantMod
   plt_biom%EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)            = 0._r8
   plt_biom%CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)    = 0._r8
   plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)      = 0._r8
-  plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = 0._r8
+  plt_pheno%PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = 0._r8
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)     = 0._r8
   plt_morph%NActiveRootSegs_raxes(:,NZ) = 0
   plt_morph%IndRootSegBase_raxes(:,NZ)   = 1
@@ -744,7 +746,7 @@ module InitPlantMod
       plt_biom%PetoleProteinC_node(K,NB,NZ)                     = 0._r8
       plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)       = 0._r8
       plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
-      plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = 0._r8
+      plt_biom%PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = 0._r8
 
       D55: DO L=1,NumCanopyLayers1
         CanopyLeafArea_lnode(L,K,NB,NZ)=0._r8
@@ -1082,7 +1084,7 @@ module InitPlantMod
 !
 !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     CanopyLeafSheathC_brch=C in leaves+petioles (g)
+!     CanopyLeafSheathC_brch=C in leaves+PetolSheths (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
 !     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)

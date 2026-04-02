@@ -269,7 +269,7 @@ implicit none
     CO2CuticleResist_pft(NZ,NY,NX)                      = plt_photo%CO2CuticleResist_pft(NZ)
     NH3Dep2Can_pft(NZ,NY,NX)                            = plt_bgcr%NH3Dep2Can_pft(NZ)
     RadNet2Canopy_pft(NZ,NY,NX)                         = plt_rad%RadNet2Canopy_pft(NZ)
-    CanopyIsothBndlResist_pft(NZ,NY,NX)                       = plt_ew%CanopyIsothBndlResist_pft(NZ)
+    CanopyIsothBndlResist_pft(NZ,NY,NX)                 = plt_ew%CanopyIsothBndlResist_pft(NZ)
     CanPStomaResistH2O_pft(NZ,NY,NX)                    = plt_photo%CanPStomaResistH2O_pft(NZ)
     CanopyBndlResist_pft(NZ,NY,NX)                      = plt_photo%CanopyBndlResist_pft(NZ)
     PlantinDepz_pft(NZ,NY,NX)                           = plt_morph%PlantinDepz_pft(NZ)
@@ -400,7 +400,7 @@ implicit none
         CanopyNodulStrutElms_brch(NE,NB,NZ,NY,NX) = plt_biom%CanopyNodulStrutElms_brch(NE,NB,NZ)
       ENDDO
     ENDDO
-
+    
     DO NB=1,pltpar%MaxNumBranches
       DO L=1,NumCanopyLayers
         CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)=plt_morph%CanopyStalkArea_lbrch(L,NB,NZ)
@@ -434,10 +434,10 @@ implicit none
       KLowestGroLeafNode_brch(NB,NZ,NY,NX)                        = plt_pheno%KLowestGroLeafNode_brch(NB,NZ)
       BranchNumerID_brch(NB,NZ,NY,NX)                              = plt_morph%BranchNumerID_brch(NB,NZ)
       ShootNodeNum_brch(NB,NZ,NY,NX)                              = plt_morph%ShootNodeNum_brch(NB,NZ)
-      NodeNum2InitFloral_brch(NB,NZ,NY,NX)                        = plt_morph%NodeNum2InitFloral_brch(NB,NZ)
+      NodeNumInitial_brch(NB,NZ,NY,NX)                        = plt_morph%NodeNumInitial_brch(NB,NZ)
       NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)                      = plt_morph%NodeNumberAtAnthesis_brch(NB,NZ)
       LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)      = plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
-      PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) = plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
+      PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX) = plt_pheno%PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)
 
       TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)               = plt_pheno%TotalNodeNumNormByMatgrp_brch(NB,NZ)
       TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)           = plt_pheno%TotReproNodeNumNormByMatrgrp_brch(NB,NZ)
@@ -463,7 +463,7 @@ implicit none
         StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
         LeafProteinC_node(K,NB,NZ,NY,NX)                      = plt_biom%LeafProteinC_node(K,NB,NZ)
-        PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
+        PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = plt_biom%PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)
         PetoleProteinC_node(K,NB,NZ,NY,NX)                    = plt_biom%PetoleProteinC_node(K,NB,NZ)
       ENDDO
       DO  L=1,NumCanopyLayers
@@ -890,14 +890,14 @@ implicit none
     plt_pheno%CriticPhotoPeriod_pft(NZ)      = CriticPhotoPeriod_pft(NZ,NY,NX)
     plt_pheno%PhotoPeriodSens_pft(NZ)        = PhotoPeriodSens_pft(NZ,NY,NX)
     plt_morph%SLA1_pft(NZ)                   = SLA1_pft(NZ,NY,NX)
-    plt_morph%PetoLen2Mass_pft(NZ)           = PetoLen2Mass_pft(NZ,NY,NX)
+    plt_morph%PetolShethLen2Mass_pft(NZ)           = PetolShethLen2Mass_pft(NZ,NY,NX)
     plt_morph%NodeLenPergC_pft(NZ)               = NodeLenPergC_pft(NZ,NY,NX)
     DO  N=1,NumLeafZenithSectors
       plt_morph%LeafAngleClass_pft(N,NZ)=LeafAngleClass_pft(N,NZ,NY,NX)
     ENDDO
     plt_morph%ClumpFactorInit_pft(NZ)     = ClumpFactorInit_pft(NZ,NY,NX)
     plt_morph%SineBranchAngle_pft(NZ)     = SineBranchAngle_pft(NZ,NY,NX)
-    plt_morph%SinePetioleAngle_pft(NZ)    = SinePetioleAngle_pft(NZ,NY,NX)
+    plt_morph%SinePetolShethAngle_pft(NZ)    = SinePetolShethAngle_pft(NZ,NY,NX)
     plt_morph%GrothStalkMaxSeedSites_pft(NZ) = GrothStalkMaxSeedSites_pft(NZ,NY,NX)
     plt_morph%MaxSeedNumPerSite_pft(NZ)   = MaxSeedNumPerSite_pft(NZ,NY,NX)
     plt_morph%SeedCMassMax_pft(NZ)        = SeedCMassMax_pft(NZ,NY,NX)
@@ -931,7 +931,7 @@ implicit none
     plt_photo%CuticleResist_pft(NZ)             = CuticleResist_pft(NZ,NY,NX)
 
     plt_allom%LeafBiomGrowthYld_pft(NZ)    = LeafBiomGrowthYld_pft(NZ,NY,NX)
-    plt_allom%PetioleBiomGrowthYld_pft(NZ) = PetioleBiomGrowthYld_pft(NZ,NY,NX)
+    plt_allom%PetolShethBiomGrowthYld_pft(NZ) = PetolShethBiomGrowthYld_pft(NZ,NY,NX)
     plt_allom%StalkBiomGrowthYld_pft(NZ)   = StalkBiomGrowthYld_pft(NZ,NY,NX)
     plt_allom%ReserveBiomGrowthYld_pft(NZ) = ReserveBiomGrowthYld_pft(NZ,NY,NX)
     plt_allom%HuskBiomGrowthYld_pft(NZ)    = HuskBiomGrowthYld_pft(NZ,NY,NX)
@@ -1330,10 +1330,10 @@ implicit none
       plt_pheno%KLowestGroLeafNode_brch(NB,NZ)         = KLowestGroLeafNode_brch(NB,NZ,NY,NX)
       plt_morph%BranchNumerID_brch(NB,NZ)               = BranchNumerID_brch(NB,NZ,NY,NX)
       plt_morph%ShootNodeNum_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ,NY,NX)
-      plt_morph%NodeNum2InitFloral_brch(NB,NZ)                        = NodeNum2InitFloral_brch(NB,NZ,NY,NX)
+      plt_morph%NodeNumInitial_brch(NB,NZ)                        = NodeNumInitial_brch(NB,NZ,NY,NX)
       plt_morph%NodeNumberAtAnthesis_brch(NB,NZ)                      = NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)
       plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)      = LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
-      plt_pheno%PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ) = PetioleChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
+      plt_pheno%PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ) = PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ,NY,NX)
       plt_pheno%TotalNodeNumNormByMatgrp_brch(NB,NZ)                  = TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)
       plt_pheno%TotReproNodeNumNormByMatrgrp_brch(NB,NZ)              = TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)
       plt_pheno%LeafNumberAtFloralInit_brch(NB,NZ)                    = LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)
@@ -1369,7 +1369,7 @@ implicit none
         plt_biom%StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)       = LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%LeafProteinC_node(K,NB,NZ)                           = LeafProteinC_node(K,NB,NZ,NY,NX)
-        plt_biom%PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
+        plt_biom%PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)    = PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)
         plt_biom%PetoleProteinC_node(K,NB,NZ)                     = PetoleProteinC_node(K,NB,NZ,NY,NX)
       ENDDO
 

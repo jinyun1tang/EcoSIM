@@ -332,6 +332,8 @@ implicit none
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)   
   real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)      
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:) 
+  real(r8),pointer   :: h1D_MainBranchNodeNumber_ptc(:)
+  real(r8),pointer   :: h1D_ShootNodeNumber_ptc(:)
   real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:) 
   real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)   
   real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
@@ -877,6 +879,8 @@ implicit none
   allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_C_FLX_ptc(:)=spval
   allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_AUTO_RESP_FLX_ptc(:)=spval
   allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_C_FLX_ptc(:)=spval
+  allocate(this%h1D_MainBranchNodeNumber_ptc(beg_ptc:end_ptc));this%h1D_MainBranchNodeNumber_ptc(:)=spval
+  allocate(this%h1D_ShootNodeNumber_ptc(beg_ptc:end_ptc)) ;this%h1D_ShootNodeNumber_ptc(:)=spval
   allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
   allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CO2_FLX_ptc(:)=spval
   allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
@@ -1902,7 +1906,7 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_RootN_Fix_col(beg_col:end_col)
-  call hist_addfld1d(fname='Root_N_FIX_col',units='gN/m2',&
+  call hist_addfld1d(fname='Root_N_FIX_col',units='gN/m2/hr',&
     avgflag='A',long_name='Root N2 fixation',ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_AR_WetDep_FLX_col(beg_col:end_col)
@@ -2166,7 +2170,7 @@ implicit none
     long_name='Canopy leaf C',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_Petole_C_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='PETIOLE_C_pft',units='gC/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_C_pft',units='gC/m2',avgflag='A',&
     long_name='Canopy sheath C',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_STALK_C_ptc(beg_ptc:end_ptc)   
@@ -2309,6 +2313,14 @@ implicit none
   call hist_addfld1d(fname='STANDING_DEAD_C_pft',units='gC/m2',avgflag='A',&
     long_name='pft Standing dead C',ptr_patch=data1d_ptr,default='inactive')                  
 
+  data1d_ptr => this%h1D_MainBranchNodeNumber_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='MainBranchNodeNumber_pft',units='-',avgflag='I',&
+    long_name='Plant main branch node number as a measure of phenoloigcal development',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_ShootNodeNumber_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='ShootNodeNumber_pft',units='-',avgflag='I',&
+    long_name='Plant shoot total node number as a measure of phenoloigcal development',ptr_patch=data1d_ptr,default='inactive')                  
+
   data1d_ptr => this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='FIREp_CO2_FLX_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Plant CO2 from fire',ptr_patch=data1d_ptr,default='inactive')                  
@@ -2443,7 +2455,7 @@ implicit none
     long_name='Canopy leaf structural N per m2 leaf area, excluding storage',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_Petole_N_ptc(beg_ptc:end_ptc)      
-  call hist_addfld1d(fname='Petiole_N_pft',units='gN/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_N_pft',units='gN/m2',avgflag='A',&
     long_name='Canopy sheath N',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_STALK_N_ptc(beg_ptc:end_ptc)       
@@ -2568,7 +2580,7 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_Petole_P_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='Petiole_P_pft',units='gP/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_P_pft',units='gP/m2',avgflag='A',&
     long_name='Canopy sheath P',ptr_patch=data1d_ptr,&
     default='inactive')            
 
@@ -4243,7 +4255,13 @@ implicit none
         this%h1D_STANDING_DEAD_N_ptc(nptc)  = StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_P_ptc(nptc)  = StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_C_ptc(nptc)  = StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+        if(MainBranchNum_pft(NZ,NY,NX)>0) then
+          this%h1D_ShootNodeNumber_ptc(nptc)  = SUM(ShootNodeNum_brch(1:NumOfBranches_pft(NZ,NY,NX),NZ,NY,NX))
+          this%h1D_MainBranchNodeNumber_ptc(nptc)=ShootNodeNum_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX)
+        else
+          this%h1D_MainBranchNodeNumber_ptc(nptc)=0
+          this%h1D_ShootNodeNumber_ptc(nptc)  = 0
+        endif
         if (PlantPopulation_pft(NZ,NY,NX) .LE. 0._r8)then
           call this%ZeroPlantHistVars(nptc)
           cycle

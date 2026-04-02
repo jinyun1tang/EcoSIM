@@ -41,7 +41,7 @@ implicit none
 !     iYearCurrent=current year
 !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
 !     GROUP=node number required for floral initiation
-!     NodeNum2InitFloral_brch=node number at floral initiation
+!     NodeNumInitial_brch=node number at floral initiation
 !     NodeNumberAtAnthesis_brch=node number at flowering
 !     NumOfLeaves_brch=number of leaves appeared
 !     KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
@@ -267,7 +267,7 @@ implicit none
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
+!     WTSHEB,WTSHBN,WTSHBP=branch PetolSheth C,N,P mass
 !     WTHSKB,WTEARB,WTGRB=branch husk,ear,grain C mass
 !     WTHSBN,WTEABN,WTGRBN=branch husk,ear,grain N mass
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
@@ -665,7 +665,7 @@ implicit none
     KLeafNumber_brch                  => plt_morph%KLeafNumber_brch                   ,& !output :leaf number, [-]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
-    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
+    NodeNumInitial_brch           => plt_morph%NodeNumInitial_brch            ,& !output :shoot node number at floral initiation, [-]
     NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
     Prep4Literfall_brch               => plt_pheno%Prep4Literfall_brch                ,& !output :branch phenology flag, [-]
@@ -683,7 +683,7 @@ implicit none
     IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
       ShootNodeNum_brch(NB,NZ)                 = ShootNodeNumAtPlanting_pft(NZ)
-      NodeNum2InitFloral_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
+      NodeNumInitial_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
       NodeNumberAtAnthesis_brch(NB,NZ)         = 0.0_r8
       NumOfLeaves_brch(NB,NZ)                  = 0.0_r8
       LeafNumberAtFloralInit_brch(NB,NZ)       = 0.0_r8
@@ -713,7 +713,7 @@ implicit none
       !
       !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
       !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
-      !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+      !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
       !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
       !
       D6405: DO M=1,jsken
@@ -915,7 +915,7 @@ implicit none
     LeafProteinC_node          => plt_biom%LeafProteinC_node            ,& !output :layer leaf protein C, [g d-2]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !output :branch leaf structural element mass, [g d-2]
     StalkNodeHeight_brch       => plt_morph%StalkNodeHeight_brch        ,& !output :internode height, [m]
-    PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch        ,& !output :sheath chemical element, [g d-2]
+    PetolShethElmntNode_brch      => plt_biom%PetolShethElmntNode_brch        ,& !output :sheath chemical element, [g d-2]
     PetoleLength_node        => plt_morph%PetoleLength_node         ,& !output :sheath height, [m]
     PetoleProteinC_node    => plt_biom%PetoleProteinC_node      ,& !output :layer sheath protein C, [g d-2]
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch         ,& !output :branch sheath structural element, [g d-2]
@@ -933,7 +933,7 @@ implicit none
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
-!     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
+!     WTSHEB,WTSHBN,WTSHBP=branch PetolSheth C,N,P mass
 !     WTSTKB,WTSTBN,WTSTBP=stalk C,N,P mass
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     WTHSKB,WTHSBN,WTHSBP=husk C,N,P mass
@@ -950,7 +950,7 @@ implicit none
 !     LeafProteinC_node=leaf protein mass
 !     LeafAreaLive_brch=branch leaf area
 !     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
-!     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinC_node=node petiole C,N,P,protein mass
+!     PetolShethElmntNode_brch,WGSHN,WGSHP,PetoleProteinC_node=node PetolSheth C,N,P,protein mass
 !     StructInternodeElms_brch,WGNODN,WGNODP=node stalk C,N,P mass
 !
   C4PhotoShootNonstC_brch(NB,NZ)                      = 0._r8
@@ -987,7 +987,7 @@ implicit none
     LeafProteinC_node(K,NB,NZ)                      = 0._r8
     PetoleProteinC_node(K,NB,NZ)                    = 0._r8
     LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)      = 0._r8
-    PetioleElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
+    PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ)   = 0._r8
     StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ) = 0._r8
     D8865: DO L=1,NumCanopyLayers1
       CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)-CanopyLeafArea_lnode(L,K,NB,NZ)

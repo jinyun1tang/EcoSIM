@@ -153,7 +153,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyNodulStrutElms_brch(:,:,:,:,:)       !branch nodule chemical element, [g d-2]
   real(r8),target,allocatable ::  SenecStalkStrutElms_brch(:,:,:,:,:)        !senescing branch stalk structural chemical elements, [g d-2]
   real(r8),target,allocatable ::  LeafElmntNode_brch(:,:,:,:,:,:)            !leaf chemical element, [g d-2]
-  real(r8),target,allocatable ::  PetioleElmntNode_brch(:,:,:,:,:,:)         !sheath chemical element , [g d-2]
+  real(r8),target,allocatable ::  PetolShethElmntNode_brch(:,:,:,:,:,:)         !sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StructInternodeElms_brch(:,:,:,:,:,:)       !internode chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafLayerElms_node(:,:,:,:,:,:,:)    !layer leaf chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_lnode(:,:,:,:,:,:)           !layer leaf area, [m2 d-2]
@@ -371,7 +371,7 @@ module CanopyDataType
   allocate(CanopyNodulStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); CanopyNodulStrutElms_brch=0._r8
   allocate(SenecStalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));SenecStalkStrutElms_brch=0._r8
   allocate(LeafElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafElmntNode_brch=0._r8
-  allocate(PetioleElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetioleElmntNode_brch=0._r8
+  allocate(PetolShethElmntNode_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetolShethElmntNode_brch=0._r8
   allocate(StructInternodeElms_brch(NumPlantChemElms,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StructInternodeElms_brch=0._r8
   allocate(LeafLayerElms_node(NumPlantChemElms,NumCanopyLayers,0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));
   LeafLayerElms_node=0._r8
@@ -556,7 +556,7 @@ module CanopyDataType
   call destroy(CanopyNodulStrutElms_brch)
   call destroy(SenecStalkStrutElms_brch)
   call destroy(LeafElmntNode_brch)
-  call destroy(PetioleElmntNode_brch)
+  call destroy(PetolShethElmntNode_brch)
   call destroy(StructInternodeElms_brch)
   call destroy(LeafLayerElms_node)
   call destroy(CanopyLeafArea_lnode)

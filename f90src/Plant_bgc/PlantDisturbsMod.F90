@@ -32,7 +32,7 @@ module PlantDisturbsMod
   real(r8) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8) :: StandeadElmnt2Litr(NumPlantChemElms)
   real(r8) :: LeafElmntHarv2Litr(NumPlantChemElms)
-  real(r8) :: PetioleElmntHarv2Litr(NumPlantChemElms)
+  real(r8) :: PetolShethElmntHarv2Litr(NumPlantChemElms)
   real(r8) :: WoodyElmntHarv2Litr(NumPlantChemElms)      !harvested woody element goes to litter
   real(r8) :: StandeadElmntHarv2Litr(NumPlantChemElms)   !harvested standing dead that turns into litter
   real(r8) :: GrainHarvst(NumPlantChemElms)
@@ -63,7 +63,7 @@ module PlantDisturbsMod
   WoodyElmnt2Litr(1:NumPlantChemElms)         = 0._r8
   StandeadElmnt2Litr(1:NumPlantChemElms)      = 0._r8
   LeafElmntHarv2Litr(1:NumPlantChemElms)      = 0._r8
-  PetioleElmntHarv2Litr(1:NumPlantChemElms)   = 0._r8
+  PetolShethElmntHarv2Litr(1:NumPlantChemElms)   = 0._r8
   WoodyElmntHarv2Litr(1:NumPlantChemElms)     = 0._r8
   GrainHarvst(1:NumPlantChemElms)             = 0._r8
   end subroutine StageDisturbances
@@ -142,6 +142,7 @@ module PlantDisturbsMod
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
   integer , intent(in) :: NZ
+  character(len=*), parameter :: subname='RemoveBiomassByDisturbance'
 
 !     begin_execution
   associate(                                                      &
@@ -154,27 +155,27 @@ module PlantDisturbsMod
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft           ,& !output :threshold zero for plang growth calculation, [-]
     ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft          & !output :threshold zero for leaf calculation, [-]
   )
+  call PrintInfo('beg '//subname)
+  !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
+  !                       ,3=pruning,4=grazing,5=fire,6=herbivory
+  !     THIN_pft=thinning:fraction of population removed
+  !     FrcLeafMassNotHarvst(ielmc)=fraction of standing dead mass not harvested
 
-!     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
-!                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!     THIN_pft=thinning:fraction of population removed
-!     FrcLeafMassNotHarvst(ielmc)=fraction of standing dead mass not harvested
-
-!     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
-!          iHarvstType_pft=3:reduction of clumping factor
-!          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
-!
-  IF(iHarvstType_pft(NZ).GE.iharvtyp_none)THEN
+  !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
+  !          iHarvstType_pft=3:reduction of clumping factor
+  !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
   !
+  IF(iHarvstType_pft(NZ).GE.iharvtyp_none)THEN
+    !
     CALL RemoveStandingDead(yearIJ,NZ)
-!
+    !
     call PlantDisturbance(yearIJ,NZ)
 
     ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
     ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
     ZERO4LeafVar_pft(NZ) = ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
   ENDIF
-   
+  call PrintInfo('end '//subname) 
   end associate
   end subroutine RemoveBiomassByDisturbance
 
@@ -195,13 +196,13 @@ module PlantDisturbsMod
   real(r8) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8) :: HarvestElmnt2Litr(NumPlantChemElms)
 
+  call PrintInfo('beg '//subname)
   NonstructElmntOffEcosystem(1:NumPlantChemElms) = 0._r8
   LeafElmntOffEcosystem(1:NumPlantChemElms)      = 0._r8
   FineNonleafElmOffEcosystem(1:NumPlantChemElms) = 0._r8
   WoodyElmntOffEcosystem(1:NumPlantChemElms)     = 0._r8
   StandeadElmntOffEcosystem(1:NumPlantChemElms)  = 0._r8
   NonstructElmnt2Litr(1:NumPlantChemElms)        = 0._r8
-
 
   call ApplyDisturbanceBiomRemoval(yearIJ,NZ,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
@@ -214,7 +215,7 @@ module PlantDisturbsMod
   call LiterfallByDisturbance(yearIJ,NZ,HarvestElmnt2Litr,TotalElmnt2Litr,NonstructElmnt2Litr,&
     NonstructElmntOffEcosystem,LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,&
     WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
-
+  call PrintInfo('end '//subname)
   end subroutine PlantDisturbance
 
 
@@ -259,7 +260,7 @@ module PlantDisturbsMod
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
   !     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
   !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
-  !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+  !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
   !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
   !
   IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
@@ -270,7 +271,7 @@ module PlantDisturbsMod
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
             +PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(NonstructElmnt2Litr(NE)) &
             +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
-            +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE))
+            +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetolShethElmntHarv2Litr(NE))
 
           IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
@@ -294,13 +295,13 @@ module PlantDisturbsMod
       !
       !     ABOVE-GROUND LitrFall FROM FIRE
       !
-      !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+      !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
       !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
       !
     ELSE
       call AbvGrndLiterFallByFire(yearIJ%I,yearIJ%J,NZ,NonstructElmnt2Litr,StandeadElmntOffEcosystem, &
         FineNonleafElmOffEcosystem,LeafElmnt2Litr,LeafElmntOffEcosystem,NonstructElmntOffEcosystem,&
-        WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetioleElmntHarv2Litr,&
+        WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetolShethElmntHarv2Litr,&
         FineNonleafElmnt2Litr,LeafElmntHarv2Litr,StandeadElmntHarv2Litr,WoodyElmntHarv2Litr)
 
     ENDIF
@@ -367,11 +368,10 @@ module PlantDisturbsMod
 ! harvest/disturbance cause actual removal (which is taken away) and addition to litter.
 ! need double check
 !
-!  NE=ielmc
   DO NE=1,NumPlantChemElms
     TotalElmntRemoval(NE)       = NonstructElmntRemoval(NE)+LeafElmntRemoval(NE)+FineNonleafElmntRemoval(NE)+WoodyElmntRemoval(NE)+StandeadElmntRemoval(NE)
     TotalElmnt2Litr(NE)         = NonstructElmnt2Litr(NE)+LeafElmnt2Litr(NE)+FineNonleafElmnt2Litr(NE)+WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE)
-    HarvestElmnt2Litr(NE)       = LeafElmntHarv2Litr(NE)+PetioleElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
+    HarvestElmnt2Litr(NE)       = LeafElmntHarv2Litr(NE)+PetolShethElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
 
   IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN
@@ -399,11 +399,11 @@ module PlantDisturbsMod
       
       IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed)THEN
         !terminate and reseed
-
+        
         DO NE=1,NumPlantChemElms
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
-       
+        
         !other
       ELSE
         !harvested
@@ -477,9 +477,9 @@ module PlantDisturbsMod
       WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*FracAftHVST23         !woody
       StandeadElmnt2Litr(NE)    = StandeadElmntRemoval(NE)*FracAftHVST24      !standing dead
     ENDDO
-!
-!     IF ONLY GRAIN C,N,P REMOVED AT HARVEST
-!
+    !
+    !     IF ONLY GRAIN C,N,P REMOVED AT HARVEST
+    !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grain)THEN
     DO NE=1,NumPlantChemElms
       NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)
@@ -781,7 +781,7 @@ module PlantDisturbsMod
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
-    NodeNum2InitFloral_brch           => plt_morph%NodeNum2InitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
+    NodeNumInitial_brch           => plt_morph%NodeNumInitial_brch            ,& !output :shoot node number at floral initiation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
@@ -793,7 +793,7 @@ module PlantDisturbsMod
   !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
   !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
   !     GROUP=node number required for floral initiation
-  !     NodeNum2InitFloral_brch=node number at floral initiation
+  !     NodeNumInitial_brch=node number at floral initiation
   !     NodeNumberAtAnthesis_brch=node number at flowering
   !     VSTGX=leaf number on date of floral initiation
   !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
@@ -807,7 +807,7 @@ module PlantDisturbsMod
 
   IF(nonEvergreenChk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
     MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
-    NodeNum2InitFloral_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ)
+    NodeNumInitial_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)             = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
@@ -821,7 +821,7 @@ module PlantDisturbsMod
       D3010: DO NBX=1,NumOfBranches_pft(NZ)
         IF(NBX.NE.MainBranchNum_pft(NZ))THEN
           MatureGroup_brch(NBX,NZ)                   = MatureGroup_pft(NZ)
-          NodeNum2InitFloral_brch(NBX,NZ)            = ShootNodeNum_brch(NBX,NZ)
+          NodeNumInitial_brch(NBX,NZ)            = ShootNodeNum_brch(NBX,NZ)
           NodeNumberAtAnthesis_brch(NBX,NZ)          = 0._r8
           LeafNumberAtFloralInit_brch(NBX,NZ)        = 0._r8
           TotalNodeNumNormByMatgrp_brch(NBX,NZ)      = 0._r8
@@ -1139,7 +1139,7 @@ module PlantDisturbsMod
     FineNonleafElmntRemoval(NE)=FineNonleafElmntRemoval(NE)+(1._r8-FracShethHuskNotHvsted)*HuskStrutElms_brch(NE,NB,NZ)&
       +(1._r8-FracShethNotHvsted)*EarStrutElms_brch(NE,NB,NZ)+(1._r8-FracShethGrainNotHvsted)*GrainStrutElms_brch(NE,NB,NZ)
 
-    PetioleElmntHarv2Litr(NE)=PetioleElmntHarv2Litr(NE)+(FracShethHuskNotHvsted-FracHuskNotHvsted)*HuskStrutElms_brch(NE,NB,NZ) &
+    PetolShethElmntHarv2Litr(NE)=PetolShethElmntHarv2Litr(NE)+(FracShethHuskNotHvsted-FracHuskNotHvsted)*HuskStrutElms_brch(NE,NB,NZ) &
       +(FracShethNotHvsted-FracEarNotHvsted)*EarStrutElms_brch(NE,NB,NZ) &
       +(FracShethGrainNotHvsted-FracGrainNotHvsted)*GrainStrutElms_brch(NE,NB,NZ)
 
@@ -1161,12 +1161,12 @@ module PlantDisturbsMod
   END subroutine BranchCutReprodOrgans
 
 !----------------------------------------------------------------------------------------------------
-  subroutine CutBranchNonstructural(I,J,NB,NZ,LeafCafCut_brch,PetioleCAfHvst_brch,LeafCB4Cut_brch,&
-    PetioleCB4Hvst_brch,GrazedCanopyNonstC,GrazedCanopyNoduleC)
+  subroutine CutBranchNonstructural(I,J,NB,NZ,LeafCafCut_brch,PetolShethCAfHvst_brch,LeafCB4Cut_brch,&
+    PetolShethCB4Hvst_brch,GrazedCanopyNonstC,GrazedCanopyNoduleC)
 
   implicit none
   integer, intent(in) :: I,J,NB,NZ
-  real(r8), intent(in) :: LeafCafCut_brch,PetioleCAfHvst_brch,LeafCB4Cut_brch,PetioleCB4Hvst_brch
+  real(r8), intent(in) :: LeafCafCut_brch,PetolShethCAfHvst_brch,LeafCB4Cut_brch,PetolShethCB4Hvst_brch
   real(r8), intent(in) :: GrazedCanopyNoduleC
   real(r8), intent(in) :: GrazedCanopyNonstC
 
@@ -1201,11 +1201,11 @@ module PlantDisturbsMod
   !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-  !     FrcLeafMassLeft=fraction of leaf+petiole node mass not harvested
+  !     FrcLeafMassLeft=fraction of leaf+PetolSheth node mass not harvested
   !     CanopyNonstElmAfhvst_brch(),=branch non-structural C,N,P mass after harvest
   !     CanopyNodulNonstElmAfhvst=nonstructural C,N,P in bacteria after harvest
   !     CanopyNodulStrutElmAfhvst=bacterial C,N,P mass after harvest
-  !     WTLS,CanopyLeafSheathC_brch=total,branch PFT leaf+petiole C mass
+  !     WTLS,CanopyLeafSheathC_brch=total,branch PFT leaf+PetolSheth C mass
   !     WHVSC*=nonstructural C removed
   ! make a copy of canopy variables preparing for harvest
   DO NE=1,NumPlantChemElms
@@ -1219,8 +1219,8 @@ module PlantDisturbsMod
       GrazedCanopyNoduleC,CanopyNodulNonstElmCopy_brch,CanopyNonstElmAfhvst_brch,CanopyNodulNonstElmAfhvst,&
       CanopyNodulStrutElmAfhvst)  
   ELSE
-    IF(LeafCB4Cut_brch+PetioleCB4Hvst_brch.GT.ZERO4Groth_pft(NZ))THEN
-      FrcLeafMassLeft=AZMAX1(AMIN1(1.0_r8,(LeafCafCut_brch+PetioleCAfHvst_brch)/(LeafCB4Cut_brch+PetioleCB4Hvst_brch)))
+    IF(LeafCB4Cut_brch+PetolShethCB4Hvst_brch.GT.ZERO4Groth_pft(NZ))THEN
+      FrcLeafMassLeft=AZMAX1(AMIN1(1.0_r8,(LeafCafCut_brch+PetolShethCAfHvst_brch)/(LeafCB4Cut_brch+PetolShethCB4Hvst_brch)))
       DO NE=1,NumPlantChemElms
         CanopyNonstElmAfhvst_brch(NE) = CanopyNonstElmCopy_brch(NE)*FrcLeafMassLeft
         CanopyNodulNonstElmAfhvst(NE) = CanopyNodulNonstElmCopy_brch(NE)*FrcLeafMassLeft
@@ -1282,14 +1282,14 @@ module PlantDisturbsMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine CutBranchSheathPetole(I,J,NB,NZ,HarvestedPetoleC,FracIntnodeNotHvsted,&
-    FracNodeNotHvsted,BranchLength,PetioleCAfHvst_brch,PetioleCB4Hvst_brch)
+    FracNodeNotHvsted,BranchLength,PetolShethCAfHvst_brch,PetolShethCB4Hvst_brch)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: HarvestedPetoleC
   real(r8), intent(inout) :: FracIntnodeNotHvsted(0:MaxNodesPerBranch1)
   real(r8), intent(inout) :: FracNodeNotHvsted(0:MaxNodesPerBranch1)  
   real(r8), intent(out) :: BranchLength
-  real(r8), intent(out) :: PetioleCAfHvst_brch,PetioleCB4Hvst_brch
+  real(r8), intent(out) :: PetolShethCAfHvst_brch,PetolShethCB4Hvst_brch
 
   real(r8) :: FinePetoleMassE,WoodyPetoleMassE
   character(len=*), parameter :: subname='CutBranchSheathPetole'
@@ -1306,18 +1306,18 @@ module PlantDisturbsMod
     FracShootPetolAlloc2Litr   => plt_allom%FracShootPetolAlloc2Litr    ,& !input  :woody element allocation, [-]
     iHarvstType_pft            => plt_distb%iHarvstType_pft             ,& !input  :type of harvest,[-]
     PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch         ,& !inoput :branch sheath structural element, [g d-2]
-    PetioleElmntNode_brch      => plt_biom%PetioleElmntNode_brch        ,& !inoput :sheath chemical element, [g d-2]
+    PetolShethElmntNode_brch      => plt_biom%PetolShethElmntNode_brch        ,& !inoput :sheath chemical element, [g d-2]
     PetoleLength_node          => plt_morph%PetoleLength_node           ,& !inoput :sheath height, [m]
     PetoleProteinC_node        => plt_biom%PetoleProteinC_node           & !inoput :layer sheath protein C, [g d-2]
   )
   call PrintInfo('beg '//subname)
-  PetioleCB4Hvst_brch=0._r8;PetioleCAfHvst_brch=0._r8
+  PetolShethCB4Hvst_brch=0._r8;PetolShethCAfHvst_brch=0._r8
   !
-  !     CUT SHEATHS OR PETIOLES AND STALKS HARVESTED NODES AND LAYERS
+  !     CUT SHEATHS OR PetolShethS AND STALKS HARVESTED NODES AND LAYERS
   !
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-  !     PetoleCRmved_brch,HarvestedPetoleC=branch, PFT petiole C mass removed
+  !     PetoleCRmved_brch,HarvestedPetoleC=branch, PFT PetolSheth C mass removed
   !     StalkNodeHeight_brch=internode length
   !     BranchLength=internode length removed
   !
@@ -1333,18 +1333,18 @@ module PlantDisturbsMod
   D9805: DO K=MaxNodesPerBranch1,0,-1
     IF(StalkNodeHeight_brch(K,NB,NZ).GT.0.0_r8) BranchLength=AMAX1(BranchLength,StalkNodeHeight_brch(K,NB,NZ))
     !
-    !     HARVESTED SHEATH OR PETIOLE C,N,P
+    !     HARVESTED SHEATH OR PetolSheth C,N,P
     !
     !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
     !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-    !     PetoleCRmved_brch=branch petiole C mass removed
-    !     PetioleElmntNode_brch,WGSHN,WGSHP,PetoleProteinC_node=node petiole C,N,P,protein mass
+    !     PetoleCRmved_brch=branch PetolSheth C mass removed
+    !     PetolShethElmntNode_brch,WGSHN,WGSHP,PetoleProteinC_node=node PetolSheth C,N,P,protein mass
     !     FracIntnodeNotHvsted=fraction of internode layer mass not harvested
-    !     FineNonleafElmntRemoval=harvested petiole C,N,P
-    !     PetioleElmntHarv2Litr=harvested petiole C,N,P to litter
+    !     FineNonleafElmntRemoval=harvested PetolSheth C,N,P
+    !     PetolShethElmntHarv2Litr=harvested PetolSheth C,N,P to litter
     !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
     !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
-    !     PetoleLength_node,StalkNodeHeight_brch=petiole,internode length
+    !     PetoleLength_node,StalkNodeHeight_brch=PetolSheth,internode length
     !
     !neither grazing nor herbivory
     IF((iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
@@ -1352,8 +1352,8 @@ module PlantDisturbsMod
       !
       !grazing or herbivory
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-        IF(PetioleElmntNode_brch(ielmc,K,NB,NZ).GT.PetoleCRmved_brch)THEN
-          FracIntnodeNotHvsted(K) = AZMAX1(AMIN1(1.0_r8,(PetioleElmntNode_brch(ielmc,K,NB,NZ)-PetoleCRmved_brch)/PetioleElmntNode_brch(ielmc,K,NB,NZ)))
+        IF(PetolShethElmntNode_brch(ielmc,K,NB,NZ).GT.PetoleCRmved_brch)THEN
+          FracIntnodeNotHvsted(K) = AZMAX1(AMIN1(1.0_r8,(PetolShethElmntNode_brch(ielmc,K,NB,NZ)-PetoleCRmved_brch)/PetolShethElmntNode_brch(ielmc,K,NB,NZ)))
           FracNodeNotHvsted(K)    = FracIntnodeNotHvsted(K)
         ELSE
           FracIntnodeNotHvsted(K) = 0._r8
@@ -1361,33 +1361,33 @@ module PlantDisturbsMod
         ENDIF
       ENDIF
       !
-      !remove petiole mass from node K
-      PetoleCRmved_brch=PetoleCRmved_brch-(1._r8-FracIntnodeNotHvsted(K))*PetioleElmntNode_brch(ielmc,K,NB,NZ)
+      !remove PetolSheth mass from node K
+      PetoleCRmved_brch=PetoleCRmved_brch-(1._r8-FracIntnodeNotHvsted(K))*PetolShethElmntNode_brch(ielmc,K,NB,NZ)
 
       DO NE=1,NumPlantChemElms
-        FinePetoleMassE             = PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_fine_comp)
+        FinePetoleMassE             = PetolShethElmntNode_brch(NE,K,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_fine_comp)
         FineNonleafElmntRemoval(NE) = FineNonleafElmntRemoval(NE)+(1._r8-FracNodeNotHvsted(K))*FinePetoleMassE
-        PetioleElmntHarv2Litr(NE)   = PetioleElmntHarv2Litr(NE)+(FracNodeNotHvsted(K)-FracIntnodeNotHvsted(K))*FinePetoleMassE
+        PetolShethElmntHarv2Litr(NE)   = PetolShethElmntHarv2Litr(NE)+(FracNodeNotHvsted(K)-FracIntnodeNotHvsted(K))*FinePetoleMassE
 
-        WoodyPetoleMassE        = PetioleElmntNode_brch(NE,K,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_woody_comp)
+        WoodyPetoleMassE        = PetolShethElmntNode_brch(NE,K,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_woody_comp)
         WoodyElmntRemoval(NE)   = WoodyElmntRemoval(NE)+(1._r8-FracNodeNotHvsted(K))*WoodyPetoleMassE
         WoodyElmntHarv2Litr(NE) = WoodyElmntHarv2Litr(NE)+(FracNodeNotHvsted(K)-FracIntnodeNotHvsted(K))*WoodyPetoleMassE
       ENDDO
       !
-      !     ACCUMULATE REMAINING SHEATH OR PETIOLE C,N,P AND LENGTH
+      !     ACCUMULATE REMAINING SHEATH OR PetolSheth C,N,P AND LENGTH
       !
-      !     PetioleElmntNode_brch=petiole node C mass
-      !     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
-      !     PetoleLength_node=node petiole height
-      !     PetoleProteinC_node=petiole protein mass
+      !     PetolShethElmntNode_brch=PetolSheth node C mass
+      !     WTSHEB,WTSHBN,WTSHBP=branch PetolSheth C,N,P mass
+      !     PetoleLength_node=node PetolSheth height
+      !     PetoleProteinC_node=PetolSheth protein mass
       !
-      PetioleCB4Hvst_brch          = PetioleCB4Hvst_brch+PetioleElmntNode_brch(ielmc,K,NB,NZ)
+      PetolShethCB4Hvst_brch          = PetolShethCB4Hvst_brch+PetolShethElmntNode_brch(ielmc,K,NB,NZ)
       PetoleProteinC_node(K,NB,NZ) = FracIntnodeNotHvsted(K)*PetoleProteinC_node(K,NB,NZ)
 
       DO NE=1,NumPlantChemElms
         PetoleStrutElms_brch(NE,NB,NZ)=PetoleStrutElms_brch(NE,NB,NZ) &
-          -(1._r8-FracIntnodeNotHvsted(K))*PetioleElmntNode_brch(NE,K,NB,NZ)
-        PetioleElmntNode_brch(NE,K,NB,NZ)=FracIntnodeNotHvsted(K)*PetioleElmntNode_brch(NE,K,NB,NZ)
+          -(1._r8-FracIntnodeNotHvsted(K))*PetolShethElmntNode_brch(NE,K,NB,NZ)
+        PetolShethElmntNode_brch(NE,K,NB,NZ)=FracIntnodeNotHvsted(K)*PetolShethElmntNode_brch(NE,K,NB,NZ)
       ENDDO
       !      PetoleProteinC_node(K,NB,NZ)=FracIntnodeNotHvsted(K)*PetoleProteinC_node(K,NB,NZ)
       !
@@ -1398,7 +1398,7 @@ module PlantDisturbsMod
       ELSE
         PetoleLength_node(K,NB,NZ)=FracIntnodeNotHvsted(K)*PetoleLength_node(K,NB,NZ)
       ENDIF
-      PetioleCAfHvst_brch=PetioleCAfHvst_brch+PetioleElmntNode_brch(ielmc,K,NB,NZ)
+      PetolShethCAfHvst_brch=PetolShethCAfHvst_brch+PetolShethElmntNode_brch(ielmc,K,NB,NZ)
 
       !     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing.AND.iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       !     IF(StalkNodeHeight_brch(K,NB,NZ).GT.CanopyCutProxy_pft(NZ)
@@ -1701,7 +1701,7 @@ module PlantDisturbsMod
   character(len=*), parameter :: subname='CutPlant'
   integer :: NB
   real(r8) :: FracNodeNotHvsted(0:MaxNodesPerBranch1),FracIntnodeNotHvsted(0:MaxNodesPerBranch1)
-  real(r8) :: LeafCafCut_brch,PetioleCAfHvst_brch,LeafCB4Cut_brch,PetioleCB4Hvst_brch
+  real(r8) :: LeafCafCut_brch,PetolShethCAfHvst_brch,LeafCB4Cut_brch,PetolShethCB4Hvst_brch
   real(r8) :: VOLWPX,WVPLT  
   real(r8) :: BranchLength  !Branch node length subject to removal
   real(r8) :: FDM  
@@ -1737,9 +1737,9 @@ module PlantDisturbsMod
 
     CALL StageBranch4Cut(I,J,NB,NZ,LeafCafCut_brch,LeafCB4Cut_brch,FracIntnodeNotHvsted,FracNodeNotHvsted)
     
-    call CutBranchSheathPetole(I,J,NB,NZ,HarvestedPetoleC,FracIntnodeNotHvsted,FracNodeNotHvsted,BranchLength,PetioleCAfHvst_brch,PetioleCB4Hvst_brch)
+    call CutBranchSheathPetole(I,J,NB,NZ,HarvestedPetoleC,FracIntnodeNotHvsted,FracNodeNotHvsted,BranchLength,PetolShethCAfHvst_brch,PetolShethCB4Hvst_brch)
 
-    call CutBranchNonstructural(I,J,NB,NZ,LeafCafCut_brch,PetioleCAfHvst_brch,LeafCB4Cut_brch,PetioleCB4Hvst_brch,GrazedCanopyNonstC,GrazedCanopyNoduleC)    
+    call CutBranchNonstructural(I,J,NB,NZ,LeafCafCut_brch,PetolShethCAfHvst_brch,LeafCB4Cut_brch,PetolShethCB4Hvst_brch,GrazedCanopyNonstC,GrazedCanopyNoduleC)    
     !
     !     CUT STALKS
     call BranchCutPlantStalk(I,J,NB,NZ,BranchLength,HarvestedStalkC,HarvestedStalkRsrvC)
@@ -1777,7 +1777,7 @@ module PlantDisturbsMod
     !
     !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
     !
-    !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+    !     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
     !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
     !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
     !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -1796,7 +1796,7 @@ module PlantDisturbsMod
     !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,and reseed
     !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
     !     PP=PFT population
-    !     WTLS=total PFT leaf+petiole C mass
+    !     WTLS=total PFT leaf+PetolSheth C mass
     !     WTSTK=total PFT stalk C mass
     !     WVSTK=total PFT sapwood C mass
     !     CanopyStalkArea_lbrch=total PFT stalk surface area

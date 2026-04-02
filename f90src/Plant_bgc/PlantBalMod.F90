@@ -632,6 +632,7 @@ implicit none
   )
 
   DO NZ=1,NP
+    
     DO NE=1,NumPlantChemElms
       TotEndVegE_pft(NE,NZ) = RootElms_pft(NE,NZ)+ShootElms_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)  + &
         ShootNoduleElms_pft(NE,NZ)  + RootNoduleElms_pft(NE,NZ)   

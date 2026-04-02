@@ -85,7 +85,7 @@ contains
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
     SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch            ,& !inoput :branch grain number, [d-2]
     PetoleProteinC_node         => plt_biom%PetoleProteinC_node           ,& !inoput :layer sheath protein C, [g d-2]
-    PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
+    PetolShethElmntNode_brch       => plt_biom%PetolShethElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !output :flag for stand replacing disturbance,[-]
     iPlantState_pft             => plt_pheno%iPlantState_pft              ,& !output :flag for species death, [-]
@@ -124,7 +124,7 @@ contains
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
 !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
     D6380: DO M=1,jsken
@@ -220,7 +220,7 @@ contains
       DO NE=1,NumPlantChemElms
         StructInternodeElms_brch(NE,K,NB,NZ) = StructInternodeElms_brch(NE,K,NB,NZ)*XHVST
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
-        PetioleElmntNode_brch(NE,K,NB,NZ)   = PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
+        PetolShethElmntNode_brch(NE,K,NB,NZ)   = PetolShethElmntNode_brch(NE,K,NB,NZ)*XHVST
         DO L=1,NumCanopyLayers1
           LeafLayerElms_node(NE,L,K,NB,NZ)=LeafLayerElms_node(NE,L,K,NB,NZ)*XHVST
         ENDDO
@@ -298,7 +298,7 @@ contains
     PlantPopulation_pft       => plt_site%PlantPopulation_pft          & !inoput :plant population, [d-2]
   )
 !     SolarNoonHour_col=hour of solar noon
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
 !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !     iYearCurrent=current year
