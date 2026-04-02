@@ -115,6 +115,7 @@ module PlantPhenolMod
   integer, intent(in) :: I,J,NZ
   character(len=*), parameter :: subname='Emerged_plant_Phenology'
   integer :: NB
+  REAL(R8) :: TFNP,WFNG,OFNG
   integer :: LeafNumberGrowing
   associate(                                                               &
     iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch       ,& !input  :flag to detect branch death, [-]
@@ -129,10 +130,13 @@ module PlantPhenolMod
     KLeafNumber_brch            => plt_morph%KLeafNumber_brch              & !output :leaf number, [-]
   )
   call PrintInfo('beg '//subname)
+    
+  call CalcPhenolEnvfactor(I,J,NZ,TFNP,WFNG,OFNG)
+  
   D2010: DO NB=1,NumOfBranches_pft(NZ)
 
     IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
-      call live_branch_phenology(I,J,NB,nz)
+      call live_branch_phenology(I,J,NB,NZ,TFNP,WFNG,OFNG)
     ENDIF
     !
     !           KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
@@ -888,11 +892,14 @@ module PlantPhenolMod
   end subroutine ColdDeciduousBranchPhenology
 
 !----------------------------------------------------------------------------------------------------
-  subroutine live_branch_phenology(I,J,NB,NZ)
+  subroutine live_branch_phenology(I,J,NB,NZ,TFNP,WFNG,OFNG)
   implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NB  !plant branch id
-  integer, intent(in) :: NZ  !plant species id
+  integer,  intent(in) :: I,J
+  integer,  intent(in) :: NB  !plant branch id
+  integer,  intent(in) :: NZ  !plant species id
+  real(r8), intent(in) :: TFNP
+  real(r8), intent(in) :: WFNG
+  real(r8), intent(in) :: OFNG
 
   character(len=*), parameter :: subname='live_branch_phenology'
 
@@ -930,7 +937,7 @@ module PlantPhenolMod
   ! RATES AT 25C ENTERED IN 'READQ' EXCEPT WHEN DORMANT
   !  
   IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .OR. Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ))THEN
-    call UpdateBranchNodeNumber(I,J,NB,NZ)
+    call UpdateBranchNodeNumber(I,J,NB,NZ,TFNP,WFNG,OFNG)
     doSenescence_brch(NB,NZ)=itrue
   ELSE
     doSenescence_brch(NB,NZ)=ifalse
@@ -1003,27 +1010,59 @@ module PlantPhenolMod
   end associate
   end subroutine live_branch_phenology
 !----------------------------------------------------------------------------------------------------
-  subroutine UpdateBranchNodeNumber(I,J,NB,NZ)
+  subroutine CalcPhenolEnvfactor(I,J,NZ,TFNP,WFNG,OFNG)
   implicit none
-  integer, intent(in) :: I,J,NB,NZ
-
-  character(len=*), parameter :: subname='UpdateBranchNodeNumber'
-  real(r8) :: TFNP              !temperature function for phenology (25 oC =1 )
-  real(r8) :: WFNG              !water stress effect on phenology
-  real(r8) :: NodeInitRate      !rates of node initiation
-  real(r8) :: LeafAppearRate    !leaf appearance
-  real(r8) :: OFNG              !oxygen stress
+  integer, intent(in) :: I,J,NZ
+  real(r8),intent(out) :: TFNP              !temperature function for phenology (25 oC =1 )
+  real(r8),intent(out) :: WFNG              !water stress effect on phenology
+  real(r8),intent(out) :: OFNG              !oxygen stress
+  character(len=*), parameter :: subname='CalcPhenolEnvfactor'
   real(r8) :: ACTV
   real(r8) :: RTK
   real(r8) :: STK,TKCO
+
+  associate(                                                                           &
+    iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft            ,& !input  :plant growth habit: annual or perennial,[-]  
+    TKGroth_pft                       => plt_pheno%TKGroth_pft                        ,& !input  :canopy growth temperature, [K]
+    PSICanopy_pft                     => plt_ew%PSICanopy_pft                         ,& !input  :canopy total water potential, [Mpa]        
+    PlantO2Stress_pft                 => plt_pheno%PlantO2Stress_pft                  ,& !input  :plant O2 stress indicator, [-]       
+    CanPhenoMoistStress_pft           => plt_pheno%CanPhenoMoistStress_pft            ,& !output :moisture stress for plant phenology development,[-]
+    CanPhenoTempStress_pft            => plt_pheno%CanPhenoTempStress_pft             ,& !output :temperature stress for plant phenology development,[-]
+    TempOffset_pft                    => plt_pheno%TempOffset_pft                      & !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]    
+  )
+  call PrintInfo('beg '//subname)
+  !
+  TKCO = TKGroth_pft(NZ)+TempOffset_pft(NZ)
+  TFNP = calc_leave_grow_tempf(TKCO)
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
+    WFNG = EXP(0.025_r8*AMAX1(PSICanopy_pft(NZ),-1000._r8))
+    OFNG = SQRT(PlantO2Stress_pft(NZ))
+  ELSE
+    WFNG=1._r8
+    OFNG=1._r8
+  ENDIF
+  CanPhenoMoistStress_pft(NZ) = WFNG*OFNG
+  CanPhenoTempStress_pft(NZ)  = TFNP
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine CalcPhenolEnvfactor
+
+!----------------------------------------------------------------------------------------------------
+  subroutine UpdateBranchNodeNumber(I,J,NB,NZ,TFNP,WFNG,OFNG)
+  implicit none
+  integer, intent(in) :: I,J,NB,NZ
+  real(r8),intent(in) :: TFNP              !temperature function for phenology (25 oC =1 )
+  real(r8),intent(in) :: WFNG              !water stress effect on phenology
+  real(r8),intent(in) :: OFNG              !oxygen stress
+  character(len=*), parameter :: subname='UpdateBranchNodeNumber'  
+  real(r8) :: NodeInitRate      !rates of node initiation
+  real(r8) :: LeafAppearRate    !leaf appearance
+
   real(r8) :: HourlyNodeNumNormByMatgrp_brch
 
   associate(                                                                           &
-    TKGroth_pft                       => plt_pheno%TKGroth_pft                        ,& !input  :canopy growth temperature, [K]
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]    
-    PlantO2Stress_pft                 => plt_pheno%PlantO2Stress_pft                  ,& !input  :plant O2 stress indicator, [-]    
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !inoput :leaf number, [-]    
-    PSICanopy_pft                     => plt_ew%PSICanopy_pft                         ,& !input  :canopy total water potential, [Mpa]    
     NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !input  :shoot node number at anthesis, [-]    
     RefNodeInitRate_pft               => plt_pheno%RefNodeInitRate_pft                ,& !input  :rate of node initiation at 25 oC, [h-1]    
     NodeNumInitial_brch               => plt_morph%NodeNumInitial_brch                ,& !input  :shoot node number at floral initiation, [-]    
@@ -1035,32 +1074,23 @@ module PlantPhenolMod
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !inoput :normalized node number during vegetative growth stages, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
     dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch       ,& !output :gain in normalized node number during reproductive growth stages, [h-1]
-    ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]    
-    TempOffset_pft                    => plt_pheno%TempOffset_pft                      & !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+    ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch     & !output :normalized node number during reproductive growth stages, [-]    
   )
   call PrintInfo('beg '//subname)
-  ! 8.313,710.0=gas constant,enthalpy
-  ! 60000,197500,218500=energy of activn,high,low temp inactivn(KJ mol-1)
-  ! NodeInitRate,LeafAppearRate=
-  ! XRNI,XRLA=rate of node initiation,leaf appearance at 25 oC (h-1)
-  !
-  TKCO           = TKGroth_pft(NZ)+TempOffset_pft(NZ)
-  TFNP           = calc_leave_grow_tempf(TKCO)
+
   NodeInitRate   = AZMAX1(RefNodeInitRate_pft(NZ)*TFNP)
   LeafAppearRate = AZMAX1(RateRefLeafAppearance_pft(NZ)*TFNP)
   !
   !   NODE INITIATION AND LEAF APPEARANCE RATES SLOWED BY LOW TURGOR
   !
-  !   only annual plants depends on moisture
+  !for leaf/node growth, only annual plants depends on moisture
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
     IF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN
-      WFNG           = EXP(0.025_r8*AMAX1(PSICanopy_pft(NZ),-1000._r8))
       NodeInitRate   = NodeInitRate*WFNG
       LeafAppearRate = LeafAppearRate*WFNG
     ENDIF
 
     IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
-      OFNG           = SQRT(PlantO2Stress_pft(NZ))
       NodeInitRate   = NodeInitRate*OFNG
       LeafAppearRate = LeafAppearRate*OFNG
     ENDIF

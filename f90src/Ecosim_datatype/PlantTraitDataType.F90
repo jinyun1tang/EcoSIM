@@ -94,6 +94,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)               !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8),target,allocatable ::  CanPhenoMoistStress_pft(:,:,:)              !moisture stress for plant phenology development,[-]
+  real(r8),target,allocatable ::  CanPhenoTempStress_pft(:,:,:)               !temperature stress for plant phenology development,[-]  
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                   !plant O2 stress indicator, []
   real(r8),target,allocatable ::  MorphogenBase_pft(:,:,:)                   !base line morphogen concentration for secondary growth, [-]
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                   !canopy temperature growth function, [-]
@@ -271,6 +273,8 @@ contains
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
+  allocate(CanPhenoMoistStress_pft(JP,JY,JX)); CanPhenoMoistStress_pft=1._R8
+  allocate(CanPhenoTempStress_pft(JP,JY,JX)); CanPhenoTempStress_pft=1._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
   allocate(MorphogenBase_pft(JP,JY,JX)); MorphogenBase_pft=0._r8
@@ -445,6 +449,8 @@ contains
   call destroy(PlantPopu_col)
   call destroy(PPatSeeding_pft)
   call destroy(HoursTooLowPsiCan_pft)
+  call destroy(CanPhenoTempStress_pft)
+  call destroy(CanPhenoMoistStress_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
   call destroy(MorphogenBase_pft)

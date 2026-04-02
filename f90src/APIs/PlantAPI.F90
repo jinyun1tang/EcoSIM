@@ -252,6 +252,8 @@ implicit none
     NumCogrowthNode_pft(NZ,NY,NX)        = plt_morph%NumCogrowthNode_pft(NZ)
     O2L_pft(NZ,NY,NX)                                       = plt_photo%O2L_pft(NZ)
     O2I_pft(NZ,NY,NX)                                       = plt_photo%O2I_pft(NZ)
+    CanPhenoMoistStress_pft(NZ,NY,NX) = plt_pheno%CanPhenoMoistStress_pft(NZ)
+    CanPhenoTempStress_pft(NZ,NY,NX) =  plt_pheno%CanPhenoTempStress_pft(NZ)
     TempOffset_pft(NZ,NY,NX)                            = plt_pheno%TempOffset_pft(NZ)
     PlantO2Stress_pft(NZ,NY,NX)                         = plt_pheno%PlantO2Stress_pft(NZ)
     PPX_pft(NZ,NY,NX)                                   = plt_site%PPX_pft(NZ)

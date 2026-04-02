@@ -278,6 +278,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)      
   real(r8),pointer   :: h1D_O2L_ptc(:)
   real(r8),pointer   :: h1D_LAI_ptc(:)          
+  real(r8),pointer   :: h1D_CanPhenol_WSTRSS_ptc(:)
+  real(r8),pointer   :: h1D_CanPhenol_TSTRSS_ptc(:)
   real(r8),pointer   :: h1D_PSI_CAN_ptc(:)      
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)     
   real(r8),pointer   :: h1D_STOML_RSC_H2O_ptc(:) 
@@ -838,6 +840,8 @@ implicit none
   allocate(this%h1D_O2L_ptc(beg_ptc:end_ptc)); this%h1D_O2L_ptc(:)=spval
   allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))             ;this%h1D_LAI_ptc(:)=spval
   allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PSI_CAN_ptc(:)=spval
+  allocate(this%h1D_CanPhenol_WSTRSS_ptc(beg_ptc:end_ptc));this%h1D_CanPhenol_WSTRSS_ptc(:)=spval
+  allocate(this%h1D_CanPhenol_TSTRSS_ptc(beg_ptc:end_ptc)); this%h1D_CanPhenol_TSTRSS_ptc(:)=spval
   allocate(this%h1D_RootAR_ptc(beg_ptc:end_ptc))          ;this%h1D_RootAR_ptc(:)=spval
   allocate(this%h1D_RootLenPerPlant_ptc(beg_ptc:end_ptc))         ;this%h1D_RootLenPerPlant_ptc(:)=spval
   allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))        ;this%h1D_TURG_CAN_ptc(:)=spval
@@ -2087,6 +2091,16 @@ implicit none
   data1d_ptr => this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PSI_CAN_pft',units='MPa',avgflag='A',&
     long_name='Canopy total water potential',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_CanPhenol_WSTRSS_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='CanPhenol_WSTRESS_pft',units='-',avgflag='A',&
+    long_name='Canopy water stress for phenology development',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_CanPhenol_TSTRSS_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='CanPhenol_TSTRESS_pft',units='-',avgflag='A',&
+    long_name='Canopy temperature stress for phenology development',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_RootAR_ptc(beg_ptc:end_ptc)   
@@ -4311,6 +4325,8 @@ implicit none
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
         this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_CanPhenol_WSTRSS_ptc(nptc)=CanPhenoMoistStress_pft(NZ,NY,NX) 
+        this%h1D_CanPhenol_TSTRSS_ptc(nptc)=CanPhenoTempStress_pft(NZ,NY,NX) 
         this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)
         this%h1D_STOML_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
@@ -4664,6 +4680,8 @@ implicit none
   this%h1D_LAI_ptc(nptc)           = 0._r8
   this%h1D_PSI_CAN_ptc(nptc)       = 0._r8
   this%h1D_TURG_CAN_ptc(nptc)      = 0._r8
+  this%h1D_CanPhenol_WSTRSS_ptc(nptc)=0._r8
+  this%h1D_CanPhenol_TSTRSS_ptc(nptc)=0._r8
   this%h1D_STOML_RSC_H2O_ptc(nptc)  = 0._r8
   this%h1D_BLYR_RSC_H2O_ptc(nptc)  = 0._r8
   this%h1D_TRANSPN_ptc(nptc)       = 0._r8
