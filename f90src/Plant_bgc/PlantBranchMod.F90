@@ -1885,12 +1885,12 @@ module PlantBranchMod
         IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=MIN(KK,KHiestGroLeafNode_brch(NB,NZ))
       ENDIF
     ENDDO D560
-    if(I==118 .AND. NZ==1 .AND. J==12)THEN
-      write(798,*)I*1000+J/24.,NB,NZ,KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
-      DO K=0,MaxNodesPerBranch1    
-        write(798,*)I*1000+J/24.,NB,NZ,K,SUM(LeafLayerElms_node(ielmc,:,K,NB,NZ))-LeafElmntNode_brch(ielmc,K,NB,NZ),LeafElmntNode_brch(ielmc,K,NB,NZ)
-      ENDDO
-    ENDIF
+!    if(I==118 .AND. NZ==1 .AND. J==12)THEN
+!      write(798,*)I*1000+J/24.,NB,NZ,KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
+!      DO K=0,MaxNodesPerBranch1    
+!        write(798,*)I*1000+J/24.,NB,NZ,K,SUM(LeafLayerElms_node(ielmc,:,K,NB,NZ))-LeafElmntNode_brch(ielmc,K,NB,NZ),LeafElmntNode_brch(ielmc,K,NB,NZ)
+!      ENDDO
+!    ENDIF
 
     IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=KHiestGroLeafNode_brch(NB,NZ)
     K1 = pMOD(KHiestGroLeafNode_brch(NB,NZ),MaxNodesPerBranch1)
