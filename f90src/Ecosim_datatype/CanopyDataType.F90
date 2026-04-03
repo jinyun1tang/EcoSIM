@@ -120,7 +120,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  C4PhotoShootNonstC_brch(:,:,:,:)           !C4 specific nonstructural shoot C in branch, [gC d-2]
   real(r8),target,allocatable ::  ShootElms_pft(:,:,:,:)                     !canopy shoot chemical element, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_pft(:,:,:,:)                 !canopy leaf chemical element, [g d-2]
-  real(r8),target,allocatable ::  PetoleStrutElms_pft(:,:,:,:)               !canopy sheath chemical element , [g d-2]
+  real(r8),target,allocatable ::  PetolShethStrutElms_pft(:,:,:,:)               !canopy sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StalkStrutElms_pft(:,:,:,:)                !canopy stalk chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopySapwoodC_pft(:,:,:)                    !canopy active stalk C, [g d-2]
   real(r8),target,allocatable ::  StalkRsrvElms_pft(:,:,:,:)                 !canopy reserve chemical element, [g d-2]
@@ -142,7 +142,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyLeafSheathC_brch(:,:,:,:)            !plant branch leaf + sheath C, [g d-2]
   real(r8),target,allocatable ::  ShootElms_brch(:,:,:,:,:)             !branch shoot C, [g d-2]
   real(r8),target,allocatable ::  LeafStrutElms_brch(:,:,:,:,:)              !branch leaf chemical element, [g d-2]
-  real(r8),target,allocatable ::  PetoleStrutElms_brch(:,:,:,:,:)            !branch sheath chemical element , [g d-2]
+  real(r8),target,allocatable ::  PetolShethStrutElms_brch(:,:,:,:,:)            !branch sheath chemical element , [g d-2]
   real(r8),target,allocatable ::  StalkStrutElms_brch(:,:,:,:,:)             !branch stalk chemical element, [g d-2]
   real(r8),target,allocatable ::  StalkRsrvElms_brch(:,:,:,:,:)              !branch reserve chemical element, [g d-2]
   real(r8),target,allocatable ::  HuskStrutElms_brch(:,:,:,:,:)              !branch husk chemical element, [g d-2]
@@ -328,7 +328,7 @@ module CanopyDataType
   allocate(tCanLeafC_clyr(NumCanopyLayers,JY,JX));    tCanLeafC_clyr=0._r8
   allocate(PlantElmAllocMat4Litr(NumPlantChemElms,0:NumLitterGroups,jsken,JP,JY,JX));PlantElmAllocMat4Litr=0._r8
   allocate(LeafStrutElms_pft(NumPlantChemElms,JP,JY,JX));  LeafStrutElms_pft=0._r8
-  allocate(PetoleStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetoleStrutElms_pft=0._r8
+  allocate(PetolShethStrutElms_pft(NumPlantChemElms,JP,JY,JX)); PetolShethStrutElms_pft=0._r8
   allocate(StalkStrutElms_pft(NumPlantChemElms,JP,JY,JX)); StalkStrutElms_pft=0._r8
   allocate(CanopySapwoodC_pft(JP,JY,JX));    CanopySapwoodC_pft=0._r8
   allocate(StalkRsrvElms_pft(NumPlantChemElms,JP,JY,JX));    StalkRsrvElms_pft=0._r8
@@ -360,7 +360,7 @@ module CanopyDataType
   allocate(CanopyLeafSheathC_brch(MaxNumBranches,JP,JY,JX)); CanopyLeafSheathC_brch=0._r8
   allocate(ShootElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));ShootElms_brch=0._r8
   allocate(LeafStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafStrutElms_brch=0._r8
-  allocate(PetoleStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetoleStrutElms_brch=0._r8
+  allocate(PetolShethStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));PetolShethStrutElms_brch=0._r8
   allocate(StalkStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkStrutElms_brch=0._r8
   allocate(StalkRsrvElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));StalkRsrvElms_brch=0._r8
   allocate(HuskStrutElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX));HuskStrutElms_brch=0._r8
@@ -522,7 +522,7 @@ module CanopyDataType
   call destroy(tCanLeafC_clyr)
   call destroy(PlantElmAllocMat4Litr)
   call destroy(LeafStrutElms_pft)
-  call destroy(PetoleStrutElms_pft)
+  call destroy(PetolShethStrutElms_pft)
   call destroy(StalkStrutElms_pft)
   call destroy(CanopySapwoodC_pft)
   call destroy(StalkRsrvElms_pft)
@@ -545,7 +545,7 @@ module CanopyDataType
   call destroy(CanopyLeafSheathC_brch)
   call destroy(ShootElms_brch)
   call destroy(LeafStrutElms_brch)
-  call destroy(PetoleStrutElms_brch)
+  call destroy(PetolShethStrutElms_brch)
   call destroy(StalkStrutElms_brch)
   call destroy(StalkRsrvElms_brch)
   call destroy(HuskStrutElms_brch)

@@ -21,6 +21,7 @@ implicit none
   public :: ExitPlantBalance
   public :: SumPlantRootGas
   public :: SumRootAR
+  public :: CheckPlantBalanceZ
   public :: SumLitfallBlg
   public :: SumCanopyBiome
   public :: SumLitfallAbg
@@ -212,13 +213,15 @@ implicit none
   integer :: NB,NE,jk
 
   associate(                                                          &
+    k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
+    k_woody_comp              => pltpar%k_woody_comp                 ,& !input  :woody litter complex id
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootElmsBeg_pft           => plt_biom%RootElmsBeg_pft            ,& !input  :plant root element at previous time step, [g d-2]    
     ShootElmsBeg_pft          => plt_biom%ShootElmsBeg_pft           ,& !input  :previous whole plant shoot element mass, [g d-2]    
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
-    PetoleStrutElms_brch      => plt_biom%PetoleStrutElms_brch       ,& !input :branch sheath structural element, [g d-2]    
+    PetolShethStrutElms_brch  => plt_biom%PetolShethStrutElms_brch   ,& !input :branch sheath structural element, [g d-2]    
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !input :branch leaf structural element mass, [g d-2]    
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch         ,& !input  :branch reserve element mass, [g d-2]    
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch        ,& !input  :branch stalk structural element mass, [g d-2]    
@@ -230,7 +233,13 @@ implicit none
     ShootElms_brch            => plt_biom%ShootElms_brch             ,& !input  :branch shoot structural element mass, [g d-2]
     ShootElms_pft             => plt_biom%ShootElms_pft              ,& !inoput :current time whole plant shoot element mass, [g d-2]
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft          ,& !output :canopy leaf structural element mass, [g d-2]    
-    PetoleStrutElms_pft       => plt_biom%PetoleStrutElms_pft        ,& !output :canopy sheath structural element mass, [g d-2]    
+    ShootFineNonLeafElms_pft  => plt_biom%ShootFineNonLeafElms_pft   ,& !output :canopy non-leaf fine structural element mass, [g d-2]
+    FracLeafShethElmAlloc2Litr=> plt_allom%FracLeafShethElmAlloc2Litr,& !input  :leave-sheath element allocation, [-]    
+    ShootNonstElms_pft        => plt_biom%ShootNonstElms_pft         ,& !output :shoot nonstructural element mass, [g d-2]
+    ShootLeafElms_pft         => plt_biom%ShootLeafElms_pft          ,& !output :shoot leaf element mass, [g d-2]
+    ShootWoodyElms_pft        => plt_biom%ShootWoodyElms_pft         ,& !output :canopy woody element mass, [g d-2]
+    FracPetolShethAlloc2Litr  => plt_allom%FracPetolShethAlloc2Litr  ,& !input  :woody element allocation, [-]    
+    PetolShethStrutElms_pft   => plt_biom%PetolShethStrutElms_pft    ,& !output :canopy sheath structural element mass, [g d-2]    
     ShootNoduleElms_pft       => plt_biom%ShootNoduleElms_pft        ,& !output :current time canopy nodule element mass, [g d-2]    
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
     StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
@@ -246,18 +255,6 @@ implicit none
     CALL SumPlantBranchBiome(NB,NZ)
   ENDDO
 
-  DO NE=1,NumPlantChemElms
-    ShootElms_pft(NE,NZ)       = AZMAX1(sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    LeafStrutElms_pft(NE,NZ)   = AZMAX1(sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    PetoleStrutElms_pft(NE,NZ) = AZMAX1(sum(PetoleStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    StalkStrutElms_pft(NE,NZ)  = AZMAX1(sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    StalkRsrvElms_pft(NE,NZ)   = AZMAX1(sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    HuskStrutElms_pft(NE,NZ)   = AZMAX1(sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    EarStrutElms_pft(NE,NZ)    = AZMAX1(sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    GrainStrutElms_pft(NE,NZ)  = AZMAX1(sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-    CanopyNonstElms_pft(NE,NZ) = AZMAX1(sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
-  ENDDO
-
   !add nodule, currently, a plant either has canopy or root N-fixing symbiosis, not both
   ShootNoduleElms_pft(:,NZ)=0._r8
   IF(is_plant_N2fix(iPlantNfixType_pft(NZ)))THEN
@@ -269,6 +266,26 @@ implicit none
       ENDDO
     ENDIF
   ENDIF
+
+  DO NE=1,NumPlantChemElms
+    ShootElms_pft(NE,NZ)           = AZMAX1(sum(ShootElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    LeafStrutElms_pft(NE,NZ)       = AZMAX1(sum(LeafStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    PetolShethStrutElms_pft(NE,NZ) = AZMAX1(sum(PetolShethStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    StalkStrutElms_pft(NE,NZ)      = AZMAX1(sum(StalkStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    StalkRsrvElms_pft(NE,NZ)       = AZMAX1(sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    HuskStrutElms_pft(NE,NZ)       = AZMAX1(sum(HuskStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    EarStrutElms_pft(NE,NZ)        = AZMAX1(sum(EarStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    GrainStrutElms_pft(NE,NZ)      = AZMAX1(sum(GrainStrutElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+    CanopyNonstElms_pft(NE,NZ)     = AZMAX1(sum(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ)))
+
+    ShootNonstElms_pft(NE,NZ)       = CanopyNonstElms_pft(NE,NZ)    +ShootNoduleElms_pft(NE,NZ)
+    ShootleafElms_pft(NE,NZ)        = LeafStrutElms_pft(NE,NZ)*FracLeafShethElmAlloc2Litr(NE,k_fine_comp)
+    ShootFineNonLeafElms_pft(NE,NZ) = HuskStrutElms_pft(NE,NZ)+EarStrutElms_pft(NE,NZ)+GrainStrutElms_pft(NE,NZ) &
+      +PetolShethStrutElms_pft(NE,NZ)*FracPetolShethAlloc2Litr(NE,k_fine_comp)
+    ShootWoodyElms_pft(NE,NZ)       = StalkStrutElms_pft(NE,NZ) +StalkRsrvElms_pft(NE,NZ)+PetolShethStrutElms_pft(NE,NZ) &
+      *FracPetolShethAlloc2Litr(NE,k_woody_comp)+LeafStrutElms_pft(NE,NZ)*FracLeafShethElmAlloc2Litr(NE,k_woody_comp)
+  ENDDO
+
 !
 !     TOTAL STANDING DEAD
 !
@@ -317,9 +334,8 @@ implicit none
     MaxNodesPerBranch1         => pltpar%MaxNodesPerBranch1             ,& !input  :maximum number of canopy nodes, 25
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft           ,& !input  :number of branches,[-]
     LeafStrutElms_brch         => plt_biom%LeafStrutElms_brch           ,& !input  :branch leaf structural element mass, [g d-2]
-    PetoleStrutElms_brch       => plt_biom%PetoleStrutElms_brch         ,& !input  :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch   => plt_biom%PetolShethStrutElms_brch     ,& !input  :branch sheath structural element, [g d-2]
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch          ,& !input  :branch stalk structural element mass, [g d-2]
-    CanopyLeafSheathC_brch     => plt_biom%CanopyLeafSheathC_brch       ,& !input  :plant branch leaf + sheath C, [g d-2]
     StalkRsrvElms_brch         => plt_biom%StalkRsrvElms_brch           ,& !input  :branch reserve element mass, [g d-2]
     HuskStrutElms_brch         => plt_biom%HuskStrutElms_brch           ,& !input  :branch husk structural element mass, [g d-2]
     EarStrutElms_brch          => plt_biom%EarStrutElms_brch            ,& !input  :branch ear structural chemical element mass, [g d-2]
@@ -336,7 +352,7 @@ implicit none
 
   DO NE=1,NumPlantChemElms
     ShootElms_brch(NE,NB,NZ)=LeafStrutElms_brch(NE,NB,NZ) &
-      +PetoleStrutElms_brch(NE,NB,NZ)+StalkStrutElms_brch(NE,NB,NZ)+StalkRsrvElms_brch(NE,NB,NZ) &
+      +PetolShethStrutElms_brch(NE,NB,NZ)+StalkStrutElms_brch(NE,NB,NZ)+StalkRsrvElms_brch(NE,NB,NZ) &
       +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ)+GrainStrutElms_brch(NE,NB,NZ) &
       +CanopyNonstElms_brch(NE,NB,NZ)    
   ENDDO
@@ -574,7 +590,7 @@ implicit none
 
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ExitPlantBalance(I,J,NP)
+  subroutine ExitPlantBalance(yearIJ,NP)
   !
   !Description:
   ! mass balance check for plants
@@ -585,12 +601,27 @@ implicit none
   ! C output: respiration, harvest
   
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NP
-  integer :: NZ,NE
-  real(r8) :: balE(NumPlantChemElms)
-  real(r8) :: err_rel,dGPP
+  integer :: NZ
   character(len=*), parameter :: subname='ExitPlantBalance'
+
+  DO NZ=1,NP      
+    call CheckPlantBalanceZ(yearIJ,NZ,'')
+  ENDDO
+
+  end subroutine ExitPlantBalance
+
+!----------------------------------------------------------------------------------------------------
+  subroutine CheckPlantBalanceZ(yearIJ,NZ,header)
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
+  character(len=*), intent(in) :: header
+  character(len=*), parameter :: subname='CheckPlantBalanceZ'
+  integer :: NE,I,J,K
+  real(r8) :: balE(NumPlantChemElms)
+  real(r8) :: err_rel,dGPP  
   associate(                                                          &
     NY                        => plt_site%NY                         ,& !input  : Y coordinate
     NX                        => plt_site%NX                         ,& !input  : X coordinate
@@ -601,6 +632,8 @@ implicit none
     GrossResp_pft             => plt_bgcr%GrossResp_pft              ,& !input  :total plant respiration, [gC d-2 ]
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft        ,& !input  :nodule infection chemical element mass, [g d-2]
     LitrfallElms_pft          => plt_bgcr%LitrfallElms_pft           ,& !input  :plant element LitrFall, [g d-2 h-1]
+    canopy_growth_pft         => plt_rbgc%canopy_growth_pft          ,& !inoput :canopy structural C growth rate, [gC d-2 h-1]    
+    RCanMaintDef_CO2_pft      => plt_bgcr%RCanMaintDef_CO2_pft       ,& !inoput :canopy maintenance respiraiton deficit as CO2, [gC d-2 h-1]    
     Soil2RootMycoExudE_pft    => plt_rbgc%Soil2RootMycoExudE_pft     ,& !input  :total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
     RootElmsBeg_pft           => plt_biom%RootElmsBeg_pft            ,& !input  :plant root element at previous time step, [g d-2]
     RootElms_pft              => plt_biom%RootElms_pft               ,& !input  :plant root element mass, [g d-2]
@@ -628,117 +661,122 @@ implicit none
     LitrfallBlgrElms_pft      => plt_bgcr%LitrfallBlgrElms_pft       ,& !input :belowground plant element LitrFall, [g d-2 h-1]
     TotBegVegE_pft            => plt_biom%TotBegVegE_pft             ,& !Input  :total vegetation carbon at the beginning of the time step,[g d-2]
     TotEndVegE_pft            => plt_biom%TotEndVegE_pft              & !output :total vegetation carbon at the end of the time step,[g d-2]
-
   )
 
-  DO NZ=1,NP
-    
-    DO NE=1,NumPlantChemElms
-      TotEndVegE_pft(NE,NZ) = RootElms_pft(NE,NZ)+ShootElms_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)  + &
-        ShootNoduleElms_pft(NE,NZ)  + RootNoduleElms_pft(NE,NZ)   
+  call PrintInfo('beg '//subname)
+  
+  call SumPlantBiome(yearIJ,NZ,header)
 
-      balE(NE)=TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ) &
-        -NodulInfectElms_pft(NE,NZ)-Soil2RootMycoExudE_pft(NE,NZ) &
-        +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)    
-    ENDDO
+  I=yearIJ%I; J=yearIJ%J  
 
-    dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
-    balE(ielmc)=balE(ielmc)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   
-    balE(ielmn)=balE(ielmn)-RootNutUptakeN_pft(NZ)-CanopyN2Fix_pft(NZ)-RootN2Fix_pft(NZ)-NH3Dep2Can_pft(NZ)             
-    balE(ielmp)=balE(ielmp)-RootNutUptakeP_pft(NZ)      
+  DO NE=1,NumPlantChemElms
+    TotEndVegE_pft(NE,NZ) = RootElms_pft(NE,NZ)+ShootElms_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)+StandDeadStrutElms_pft(NE,NZ)  + &
+      ShootNoduleElms_pft(NE,NZ)  + RootNoduleElms_pft(NE,NZ)   
 
-    NE=ielmc
-    if(abs(balE(NE))>1.e-10_r8)then
-      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
-    else
-      err_rel=1.e-10_r8
-    endif
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
-      write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
-      write(888,*)'NY, NX=',NY,NX
-      write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
-      write(888,*)'end, beg rootC    =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
-      write(888,*)'shootC            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
-      write(888,*)'sstoreC           =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
-      write(888,*)'ssteadC           =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
-      write(888,*)'ShootNodulC       =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
-      write(888,*)'RootNoduleC       =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
-      write(888,*)'nodulinfectC      =',NodulInfectElms_pft(NE,NZ)
-      write(888,*)'rootexudC         =',Soil2RootMycoExudE_pft(NE,NZ)
-      write(888,*)'litfallC, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
-      write(888,*)'disturbC          =',PlantElmDistLoss_pft(NE,NZ)    
-      write(888,*)'GPP               =',GrossCO2Fix_pft(NZ),dGPP,GrossCO2Fix_pft(NZ)-dGPP
-      write(888,*)'AR,rootAR,shootAR =',GrossResp_pft(NZ),RootAutoCO2_pft(NZ),CanopyGrosRCO2_pft(NZ)   
-      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)
-      write(888,*)'surf literfall C =',SurfLitrfallElms_pft(NE,NZ)            
-      if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-        call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)                    
-      
-    endif
-
-    NE=ielmn
-    if(abs(balE(NE))>1.e-10_r8)then            
-      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))      
-    else
-      err_rel=1.e-10_r8
-    endif
-
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
-      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
-      write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
-      write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
-      write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
-      write(888,*)'sstoreN           =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
-      write(888,*)'ssteadN           =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
-      write(888,*)'ShootNodulN       =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
-      write(888,*)'RootNoduleN       =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
-      write(888,*)'nodulinfectN      =',NodulInfectElms_pft(NE,NZ)
-      write(888,*)'rootexudN         =',Soil2RootMycoExudE_pft(NE,NZ)
-      write(888,*)'litfallN, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
-      write(888,*)'disturbN          =',PlantElmDistLoss_pft(NE,NZ)    
-      write(888,*)'RootNuptk         =',RootNutUptakeN_pft(NZ)
-      write(888,*)'CanopyNFix        =',CanopyN2Fix_pft(NZ)
-      write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
-      write(888,*)'RootNFix          =',RootN2Fix_pft(NZ)            
-      write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
-      write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)      
-      if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-        call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
-    endif
-
-    NE=ielmp
-    if(abs(balE(NE))>1.e-10_r8)then
-      err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
-    else
-      err_rel=1.e-10_r8
-    endif
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then  
-      write(888,*)iYearCurrent*1000+I+J/24.,NZ,'P',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
-      write(888,*)'endP, begP       =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
-      write(888,*)'rootP            =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
-      write(888,*)'shootP           =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
-      write(888,*)'sstoreP          =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
-      write(888,*)'ssteadP          =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
-      write(888,*)'ShootNodulP      =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
-      write(888,*)'RootNoduleP      =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
-      write(888,*)'nodulinfectP     =',NodulInfectElms_pft(NE,NZ)
-      write(888,*)'rootexudP        =',Soil2RootMycoExudE_pft(NE,NZ)
-      write(888,*)'litfallP,abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
-      write(888,*)'disturbP         =',PlantElmDistLoss_pft(NE,NZ)    
-      write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
-      write(888,*)'seed planted     =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
-      write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)      
-      if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-        call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
-    endif
-    
-    DO NE=1,NumPlantChemElms
-      PlantElmBalCum_pft(NE,NZ)=PlantElmBalCum_pft(NE,NZ)+balE(NE)
-    ENDDO
-
+    balE(NE)=TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ) &
+      -NodulInfectElms_pft(NE,NZ)-Soil2RootMycoExudE_pft(NE,NZ) &
+      +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)    
   ENDDO
+
+  dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
+  balE(ielmc)=balE(ielmc)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   
+  balE(ielmn)=balE(ielmn)-RootNutUptakeN_pft(NZ)-CanopyN2Fix_pft(NZ)-RootN2Fix_pft(NZ)-NH3Dep2Can_pft(NZ)             
+  balE(ielmp)=balE(ielmp)-RootNutUptakeP_pft(NZ)      
+
+  NE=ielmc
+  if(abs(balE(NE))>1.e-10_r8)then
+    err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
+  else
+    err_rel=1.e-10_r8
+  endif
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
+    write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
+    write(888,*)'NY, NX=',NY,NX,header
+    write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
+    write(888,*)'end, beg rootC    =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
+    write(888,*)'shootC            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
+    write(888,*)'sstoreC           =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
+    write(888,*)'ssteadC           =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
+    write(888,*)'ShootNodulC       =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
+    write(888,*)'RootNoduleC       =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
+    write(888,*)'nodulinfectC      =',NodulInfectElms_pft(NE,NZ)
+    write(888,*)'rootexudC         =',Soil2RootMycoExudE_pft(NE,NZ)
+    write(888,*)'litfallC, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
+    write(888,*)'disturbC          =',PlantElmDistLoss_pft(NE,NZ)    
+    write(888,*)'canMaintDef       =',RCanMaintDef_CO2_pft(NZ)
+    write(888,*)'CanoGroth         =',canopy_growth_pft(NZ)
+    write(888,*)'GPP               =',GrossCO2Fix_pft(NZ),dGPP,GrossCO2Fix_pft(NZ)-dGPP
+    write(888,*)'AR,rootAR,shootAR =',GrossResp_pft(NZ),RootAutoCO2_pft(NZ),CanopyGrosRCO2_pft(NZ)   
+    write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)
+    write(888,*)'surf literfall C  =',SurfLitrfallElms_pft(NE,NZ)       
+    write(888,*)('-',K=1,100)         
+    !if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
+    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)                    
+    
+  endif
+
+  NE=ielmn
+  if(abs(balE(NE))>1.e-10_r8)then            
+    err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))      
+  else
+    err_rel=1.e-10_r8
+  endif
+
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
+    write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
+    write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
+    write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
+    write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
+    write(888,*)'sstoreN           =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
+    write(888,*)'ssteadN           =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
+    write(888,*)'ShootNodulN       =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
+    write(888,*)'RootNoduleN       =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
+    write(888,*)'nodulinfectN      =',NodulInfectElms_pft(NE,NZ)
+    write(888,*)'rootexudN         =',Soil2RootMycoExudE_pft(NE,NZ)
+    write(888,*)'litfallN, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
+    write(888,*)'disturbN          =',PlantElmDistLoss_pft(NE,NZ)    
+    write(888,*)'RootNuptk         =',RootNutUptakeN_pft(NZ)
+    write(888,*)'CanopyNFix        =',CanopyN2Fix_pft(NZ)
+    write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
+    write(888,*)'RootNFix          =',RootN2Fix_pft(NZ)            
+    write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
+    write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)      
+    if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
+      call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+  endif
+
+  NE=ielmp
+  if(abs(balE(NE))>1.e-10_r8)then
+    err_rel=safe_adb(balE(NE),AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)))
+  else
+    err_rel=1.e-10_r8
+  endif
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then  
+    write(888,*)iYearCurrent*1000+I+J/24.,NZ,'P',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
+    write(888,*)'endP, begP       =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
+    write(888,*)'rootP            =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
+    write(888,*)'shootP           =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
+    write(888,*)'sstoreP          =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
+    write(888,*)'ssteadP          =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
+    write(888,*)'ShootNodulP      =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
+    write(888,*)'RootNoduleP      =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
+    write(888,*)'nodulinfectP     =',NodulInfectElms_pft(NE,NZ)
+    write(888,*)'rootexudP        =',Soil2RootMycoExudE_pft(NE,NZ)
+    write(888,*)'litfallP,abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
+    write(888,*)'disturbP         =',PlantElmDistLoss_pft(NE,NZ)    
+    write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
+    write(888,*)'seed planted     =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
+    write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)      
+    if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
+      call endrun('P balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+  endif
+  
+  DO NE=1,NumPlantChemElms
+    PlantElmBalCum_pft(NE,NZ)=PlantElmBalCum_pft(NE,NZ)+balE(NE)
+  ENDDO
+  call PrintInfo('end '//subname)  
   end associate
 
-  end subroutine ExitPlantBalance
+  end subroutine CheckPlantBalanceZ
   ![tail]
 end module PlantBalMod

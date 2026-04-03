@@ -14,8 +14,8 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootElmAllocm(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracLeafShethElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracPetolShethAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
@@ -142,7 +142,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)    !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)      !gain in normalized node number during reproductive growth stages, [h-1]
   real(r8),target,allocatable ::  ShootNodeNum_brch(:,:,:,:)                 !shoot node number, [-]
-  real(r8),target,allocatable ::  NodeNumInitial_brch(:,:,:,:)           !node number at floral initiation, [-]
+  real(r8),target,allocatable ::  ShootNodeNumAtInitFloral_brch(:,:,:,:)           !node number at floral initiation, [-]
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)   !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)         !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)     !normalized node number during vegetative growth stages , [-]
@@ -193,8 +193,8 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
-  allocate(FracShootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootElmAllocm=0._r8
+  allocate(FracPetolShethAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracPetolShethAlloc2Litr=0._r8
+  allocate(FracLeafShethElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracLeafShethElmAlloc2Litr=0._r8
   allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
@@ -321,7 +321,7 @@ contains
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
   allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
   allocate(ShootNodeNum_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNum_brch=0._r8
-  allocate(NodeNumInitial_brch(MaxNumBranches,JP,JY,JX)); NodeNumInitial_brch=0._r8
+  allocate(ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP,JY,JX)); ShootNodeNumAtInitFloral_brch=0._r8
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
@@ -371,7 +371,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootElmAllocm)
+  call destroy(FracLeafShethElmAlloc2Litr)
   call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
@@ -497,7 +497,7 @@ contains
   call destroy(HourlyNodeNumNormByMatgrp_brch)
   call destroy(dReproNodeNumNormByMatG_brch)
   call destroy(ShootNodeNum_brch)
-  call destroy(NodeNumInitial_brch)
+  call destroy(ShootNodeNumAtInitFloral_brch)
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)

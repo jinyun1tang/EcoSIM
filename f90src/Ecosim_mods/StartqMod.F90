@@ -507,7 +507,7 @@ module StartqMod
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)      = 0
     MatureGroup_brch(NB,NZ,NY,NX)                  = MatureGroup_pft(NZ,NY,NX)
     ShootNodeNum_brch(NB,NZ,NY,NX)                 = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
-    NodeNumInitial_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
+    ShootNodeNumAtInitFloral_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
     NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)                  = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)       = 0._r8
@@ -542,7 +542,7 @@ module StartqMod
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
   ShootElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
-  PetoleStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
+  PetolShethStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
   StalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
   LeafStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
   StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
@@ -611,7 +611,7 @@ module StartqMod
 
   ShootElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
   LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)      = 0._r8
-  PetoleStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
+  PetolShethStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
   StalkStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
   StalkRsrvElms_pft(1:NumPlantChemElms,NZ,NY,NX)   = 0._r8
   HuskStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)   = 0._r8
@@ -854,7 +854,7 @@ module StartqMod
 
   LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = rNCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = rPCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
-  CanopyLeafSheathC_brch(1,NZ,NY,NX)    = LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetoleStrutElms_brch(ielmc,1,NZ,NY,NX)
+  CanopyLeafSheathC_brch(1,NZ,NY,NX)    = LeafStrutElms_brch(ielmc,1,NZ,NY,NX)+PetolShethStrutElms_brch(ielmc,1,NZ,NY,NX)
   CanopyLeafSheathC_pft(NZ,NY,NX)        = CanopyLeafSheathC_pft(NZ,NY,NX)+CanopyLeafSheathC_brch(1,NZ,NY,NX)
     
   WatHeldOnCanopy_pft(NZ,NY,NX)          = 0._r8
@@ -883,7 +883,7 @@ module StartqMod
   NB=1
   DO NE=1,NumPlantChemElms
     ShootElms_brch(NE,NB,NZ,NY,NX)=LeafStrutElms_brch(NE,NB,NZ,NY,NX) &
-      +PetoleStrutElms_brch(NE,NB,NZ,NY,NX)+StalkStrutElms_brch(NE,NB,NZ,NY,NX) &
+      +PetolShethStrutElms_brch(NE,NB,NZ,NY,NX)+StalkStrutElms_brch(NE,NB,NZ,NY,NX) &
       +StalkRsrvElms_brch(NE,NB,NZ,NY,NX)+HuskStrutElms_brch(NE,NB,NZ,NY,NX)&
       +EarStrutElms_brch(NE,NB,NZ,NY,NX)+GrainStrutElms_brch(NE,NB,NZ,NY,NX) &
       +CanopyNonstElms_brch(NE,NB,NZ,NY,NX)
