@@ -863,7 +863,9 @@ implicit none
   real(r8), pointer :: RAutoRootO2Limter_rpvr(:,:,:)     => null()  !O2 constraint to root respiration (0-1),                        [-]
   real(r8), pointer :: trcg_rootml_pvr(:,:,:,:)          => null() !root gas content,                                                [g d-2]
   real(r8), pointer :: trcs_rootml_pvr(:,:,:,:)          => null() !root aqueous content,                                            [g d-2]
-  real(r8), pointer :: RootAtmGasConductance_rpvr(:,:,:,:)   => null()  !Conductance for gas diffusion                                   [m3 d-2 h-1]
+  real(r8), pointer :: RootAtmGasConductance_rpvr(:,:,:,:)   => null()  !Conductance for gas diffusion                               [m3 d-2 h-1]
+  real(r8), pointer :: RNodeInitiate_pft(:)               => null()    !node initiation rate, [h-1]
+  real(r8), pointer :: RLeafAppear_pft(:)                 => null()    !leaf appearing rate, [h-1]
   real(r8), pointer :: NH3Dep2Can_brch(:,:)              => null()  !gaseous NH3 flux fron root disturbance band,                    [g d-2 h-1]
   real(r8), pointer :: GPP_brch(:,:)                    => null()  !dGPP (C4-C3 product) over branch, [gC d-2 h-1]
   real(r8), pointer :: Cytokinin1stConc_rpvr(:,:,:)     => null()   !cytokinin concentration in primary roots, [gC m-3 H2O]
@@ -958,6 +960,8 @@ implicit none
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
   allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=spval
   allocate(this%GPP_brch(MaxNumBranches,JP1)); this%GPP_brch=spval
+  allocate(this%RNodeInitiate_pft(JP1));this%RNodeInitiate_pft=spval   
+  allocate(this%RLeafAppear_pft(JP1));this%RLeafAppear_pft=spval     
   allocate(this%CO2FixCL_pft(JP1)); this%CO2FixCL_pft=spval
   allocate(this%CO2FixLL_pft(JP1)); this%CO2FixLL_pft=spval
   allocate(this%GroSrcRootStress_pvr(JZ1,JP1));this%GroSrcRootStress_pvr=1._R8

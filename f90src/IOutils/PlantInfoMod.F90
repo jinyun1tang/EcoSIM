@@ -482,9 +482,6 @@ implicit none
       ShootNodeNumAtPlanting_pft(NZ,NY,NX) = ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
 
-    IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
-      CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax_col(NY,NX)
-    ENDIF
     D5: DO NB=1,NumCanopyLayers
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
         !perennial evergreen
@@ -798,6 +795,9 @@ implicit none
   rPCRootr_pft(NZ,NY,NX)   = rPCRootr_tab(loc)
   rPCNoduler_pft(NZ,NY,NX) = rPCNoduler_tab(loc)
 
+  IF(CriticPhotoPeriod_pft(NZ,NY,NX).LT.0.0_r8)THEN
+    CriticPhotoPeriod_pft(NZ,NY,NX)=DayLenthMax_col(NY,NX)
+  ENDIF
   if(disp_planttrait.and.pft_changed)then
     call pft_display(nu_plt,NZ,NY,NX,pft_lname,koppen_climl,koppen_clims)
     call photosyns_trait_disp(nu_plt,NZ,NY,NX)

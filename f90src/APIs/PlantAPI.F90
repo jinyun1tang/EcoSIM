@@ -259,6 +259,8 @@ implicit none
     PPX_pft(NZ,NY,NX)                                   = plt_site%PPX_pft(NZ)
     PlantPopulation_pft(NZ,NY,NX)                       = plt_site%PlantPopulation_pft(NZ)
     PPI_pft(NZ,NY,NX)                                   = plt_site%PPI_pft(NZ)
+    RLeafAppear_pft(NZ,NY,NX)                           = plt_rbgc%RLeafAppear_pft(NZ)
+    RNodeInitiate_pft(NZ,NY,NX)                         = plt_rbgc%RNodeInitiate_pft(NZ)
     PSICanopy_pft(NZ,NY,NX)                             = plt_ew%PSICanopy_pft(NZ)
     PSICanopyOsmo_pft(NZ,NY,NX)                         = plt_ew%PSICanopyOsmo_pft(NZ)
     PSICanopyTurg_pft(NZ,NY,NX)                         = plt_ew%PSICanopyTurg_pft(NZ)

@@ -213,6 +213,8 @@ implicit none
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    
   real(r8),pointer   :: h1D_PAR_col(:)        
   real(r8),pointer   :: h1d_fPAR_col(:)
+  real(r8),pointer   :: h1D_RNodeInitiate_ptc(:)
+  real(r8),pointer   :: h1D_RLeafAppear_ptc(:)
   real(r8),pointer   :: h1D_Plant_C_ptc(:)    
   real(r8),pointer   :: h1D_Plant_N_ptc(:)    
   real(r8),pointer   :: h1D_Plant_P_ptc(:)    
@@ -856,7 +858,8 @@ implicit none
   allocate(this%h1D_TC_Groth_ptc(beg_ptc:end_ptc))        ;this%h1D_TC_Groth_ptc(:)=spval
   allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
-
+  allocate(this%h1D_RNodeInitiate_ptc(beg_ptc:end_ptc));this%h1D_RNodeInitiate_ptc(:)=spval
+  allocate(this%h1D_RLeafAppear_ptc(beg_ptc:end_ptc)); this%h1D_RLeafAppear_ptc(:)=spval
   allocate(this%h1D_Plant_C_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_C_ptc(:)=spval
   allocate(this%h1D_frcPARabs_ptc(beg_ptc:end_ptc))       ;this%h1D_frcPARabs_ptc(:)=spval
   allocate(this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PAR_CAN_ptc(:)=spval
@@ -2178,6 +2181,14 @@ implicit none
   data1d_ptr => this%h1D_Plant_C_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='Plant_C_pft',units='gC/m2',avgflag='A',&
     long_name='Plant C',ptr_patch=data1d_ptr)                  
+
+  data1d_ptr => this%h1D_RNodeInitiate_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='RNodeAppear_pft',units='1/day',avgflag='A',&
+    long_name='Plant node initation rate',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_RLeafAppear_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='RLeafAppear_pft',units='1/day',avgflag='A',&
+    long_name='Plant leaf appearance rate',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_LEAF_C_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LEAF_C_pft',units='gC/m2',avgflag='A',&
@@ -4345,6 +4356,8 @@ implicit none
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)       = (ShootElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RNodeInitiate_ptc(nptc) = RNodeInitiate_pft(NZ,NY,NX)*24._r8          
+        this%h1D_RLeafAppear_ptc(nptc) = RLeafAppear_pft(NZ,NY,NX)*24._r8          
         this%h1D_LEAF_C_ptc(nptc)        = LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Petole_C_ptc(nptc)      = PetolShethStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)       = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4695,6 +4708,8 @@ implicit none
   this%h1D_PAR_CAN_ptc(nptc)       = 0._r8    
   this%h1D_SHOOT_C_ptc(nptc)       = 0._r8
   this%h1D_Plant_C_ptc(nptc)       = 0._r8
+  this%h1D_RNodeInitiate_ptc(nptc) = 0._r8
+  this%h1D_RLeafAppear_ptc(nptc) = 0._r8
   this%h1D_LEAF_C_ptc(nptc)        = 0._r8
   this%h1D_Petole_C_ptc(nptc)      = 0._r8
   this%h1D_STALK_C_ptc(nptc)       =  0._r8

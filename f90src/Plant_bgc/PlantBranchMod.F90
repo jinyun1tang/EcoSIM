@@ -640,8 +640,8 @@ module PlantBranchMod
       PART(ibrch_petole) = AMAX1(PART2PETOL_MIN,(0.275_r8-FPART2)*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
     ENDIF
     PARTS             = 1.0_r8-PART(ibrch_leaf)-PART(ibrch_petole)
-    PART(ibrch_stalk) = AZMAX1(0.60_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
-    PART(ibrch_resrv) = AZMAX1(0.30_r8*PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PART(ibrch_stalk) = 0.60_r8*AZMAX1(PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
+    PART(ibrch_resrv) = 0.30_r8*AZMAX1(PARTS*(1.0_r8-TotReproNodeNumNormByMatrgrp_brch(NB,NZ)))
     PARTX             = PARTS-PART(ibrch_stalk)-PART(ibrch_resrv)
     PART(ibrch_husk)  = 0.5_r8*PARTX
     PART(ibrch_ear)   = 0.5_r8*PARTX
@@ -699,7 +699,7 @@ module PlantBranchMod
       D1020: DO N=1,NumOfPlantMorphUnits
         IF(N.NE.ibrch_resrv)THEN
           PART(ibrch_resrv) = PART(ibrch_resrv)+0.10_r8*PART(N)
-          PART(N)           = PART(N)-0.10_r8*PART(N)
+          PART(N)           = (1._r8-0.10_r8)*PART(N)
         ENDIF
       ENDDO D1020
       !
@@ -741,7 +741,7 @@ module PlantBranchMod
     Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ))
   check_decidous=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
 
-  IF( check_perennial .OR. check_annual)THEN 
+  IF(check_perennial .OR. check_annual)THEN 
     !set remobilization true
     BegRemoblize = itrue
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen)THEN
@@ -767,7 +767,6 @@ module PlantBranchMod
     LRemob_brch                 = ifalse
     HoursDoingRemob_brch(NB,NZ) = 0._r8
   ENDIF
-
   !
   !     CHECK PARTITIONING COEFFICIENTS
   !
@@ -1885,12 +1884,6 @@ module PlantBranchMod
         IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=MIN(KK,KHiestGroLeafNode_brch(NB,NZ))
       ENDIF
     ENDDO D560
-!    if(I==118 .AND. NZ==1 .AND. J==12)THEN
-!      write(798,*)I*1000+J/24.,NB,NZ,KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
-!      DO K=0,MaxNodesPerBranch1    
-!        write(798,*)I*1000+J/24.,NB,NZ,K,SUM(LeafLayerElms_node(ielmc,:,K,NB,NZ))-LeafElmntNode_brch(ielmc,K,NB,NZ),LeafElmntNode_brch(ielmc,K,NB,NZ)
-!      ENDDO
-!    ENDIF
 
     IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=KHiestGroLeafNode_brch(NB,NZ)
     K1 = pMOD(KHiestGroLeafNode_brch(NB,NZ),MaxNodesPerBranch1)
@@ -2327,7 +2320,7 @@ module PlantBranchMod
     iPlantTurnoverPattern_pft         => plt_pheno%iPlantTurnoverPattern_pft          ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     PlantElmAllocMat4Litr             => plt_soilchem%PlantElmAllocMat4Litr           ,& !input  :litter kinetic fraction, [-]
     FracPetolShethAlloc2Litr          => plt_allom%FracPetolShethAlloc2Litr           ,& !input  :leaf element allocation,[-]
-    FracLeafShethElmAlloc2Litr                => plt_allom%FracLeafShethElmAlloc2Litr                 ,& !input  :woody element allocation, [-]
+    FracLeafShethElmAlloc2Litr        => plt_allom%FracLeafShethElmAlloc2Litr         ,& !input  :woody element allocation, [-]
     HourReq4LeafOut_brch              => plt_pheno%HourReq4LeafOut_brch               ,& !input  :hours above threshold temperature required for spring leafout/dehardening, [-]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft              ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -2336,7 +2329,7 @@ module PlantBranchMod
     LitrfallElms_pvr                  => plt_bgcr%LitrfallElms_pvr                    ,& !inoput :plant LitrFall element, [g d-2 h-1]
     LitrFallElms_brch                 => plt_bgcr%LitrFallElms_brch                   ,& !inoput :litterfall from the branch, [g d-2 h-1]    
     LeafStrutElms_brch                => plt_biom%LeafStrutElms_brch                  ,& !inoput :branch leaf structural element mass, [g d-2]
-    PetolShethStrutElms_brch              => plt_biom%PetolShethStrutElms_brch                ,& !inoput :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch          => plt_biom%PetolShethStrutElms_brch            ,& !inoput :branch sheath structural element, [g d-2]
     HuskStrutElms_brch                => plt_biom%HuskStrutElms_brch                  ,& !inoput :branch husk structural element mass, [g d-2]
     EarStrutElms_brch                 => plt_biom%EarStrutElms_brch                   ,& !inoput :branch ear structural chemical element mass, [g d-2]
     GrainStrutElms_brch               => plt_biom%GrainStrutElms_brch                 ,& !inoput :branch grain structural element mass, [g d-2]

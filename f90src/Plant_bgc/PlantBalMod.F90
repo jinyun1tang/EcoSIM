@@ -415,6 +415,8 @@ implicit none
     CH2OSunsha_pft         => plt_photo%CH2OSunsha_pft        ,& !output :carbon fixation by sun-shaded leaf, [gC d-2 h-1]   
     ShootRootXferElm_pft   => plt_bgcr%ShootRootXferElm_pft   ,& !inoput :shoot-root nonstructural element transfer, [ g d-2 h-1]    
     trcs_deadroot2soil_pvr => plt_rbgc%trcs_deadroot2soil_pvr ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]    
+    RNodeInitiate_pft      => plt_rbgc%RNodeInitiate_pft      ,& !inoput :node initiation rate, [h-1]
+    RLeafAppear_pft        => plt_rbgc%RLeafAppear_pft        ,& !inoput :leaf appearing rate, [h-1]
     fNCLFW_brch            => plt_pheno%fNCLFW_brch           ,& !output : NC ratio of growing leaf on branch, [gN/gC]
     fPCLFW_brch            => plt_pheno%fPCLFW_brch           ,& !output : PC ratio of growing leaf on branch, [gP/gC]
     fNCLFW_pft             => plt_pheno%fNCLFW_pft            ,& !output : NC ratio of growing leaf, [gN/gC]
@@ -424,6 +426,8 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    RLeafAppear_pft(NZ) = 0._r8
+    RNodeInitiate_pft(NZ) = 0._r8
     SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
     SSXferElms_pft(:,NZ)                        = 0._r8
     trcs_deadroot2soil_pvr(:,:,NZ)              = 0._r8  

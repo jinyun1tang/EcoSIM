@@ -91,6 +91,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  PSICanopy_pft(:,:,:)                       !plant canopy total water potential , [Mpa]
   real(r8),target,allocatable ::  PSICanopyTurg_pft(:,:,:)                   !plant canopy turgor water potential, [Mpa]
   real(r8),target,allocatable ::  PSICanopyOsmo_pft(:,:,:)                   !platn canopy osmotic water potential, [Mpa]
+  real(r8),target,allocatable ::  RNodeInitiate_pft(:,:,:)                   !node initiation rate, [h-1]
+  real(r8),target,allocatable ::  RLeafAppear_pft(:,:,:)                     !leaf appearing rate, [h-1]
   real(r8),target,allocatable ::  CanopyBndlResist_pft(:,:,:)                !canopy boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  Transpiration_pft(:,:,:)                   !canopy transpiration, [m3 d-2 h-1]
   real(r8),target,allocatable ::  VapXAir2Canopy_pft(:,:,:)                  !negative of canopy evaporation, [m2 d-2 h-1]
@@ -304,6 +306,8 @@ module CanopyDataType
   allocate(VHeatCapCanopy_pft(JP,JY,JX));    VHeatCapCanopy_pft=0._r8
   allocate(PSICanopy_pft(JP,JY,JX));    PSICanopy_pft=0._r8
   allocate(PSICanopyTurg_pft(JP,JY,JX));    PSICanopyTurg_pft=0._r8
+  allocate(RNodeInitiate_pft(JP,JY,JX)); RNodeInitiate_pft=0._r8
+  allocate(RLeafAppear_pft(JP,JY,JX)); RLeafAppear_pft=0._r8
   allocate(PSICanopyOsmo_pft(JP,JY,JX));    PSICanopyOsmo_pft=0._r8
   allocate(CanopyBndlResist_pft(JP,JY,JX));       CanopyBndlResist_pft=0._r8
   allocate(Transpiration_pft(JP,JY,JX));       Transpiration_pft=0._r8
@@ -497,6 +501,8 @@ module CanopyDataType
   call destroy(VHeatCapCanopy_pft)
   call destroy(PSICanopy_pft)
   call destroy(PSICanopyTurg_pft)
+  call destroy(RNodeInitiate_pft)
+  call destroy(RLeafAppear_pft)
   call destroy(PSICanopyOsmo_pft)
   call destroy(CanopyBndlResist_pft)
   call destroy(Transpiration_pft)

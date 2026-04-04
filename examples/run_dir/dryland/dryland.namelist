@@ -29,7 +29,7 @@ continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2001,2006,3,2001,2002,0,2001,2006,0
 hist_fincl1='dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','VSPore_vr','Root_N_FIX_col','RootLen_pft'
-  'NH4_vr','NO3_vr','Root_C_pft','GRAIN_C_pft','SHOOT_C_pft','VmaxNH4Root_pvr','VmaxNO3Root_pvr',
+  'NH4_vr','NO3_vr','Root_C_pft','GRAIN_C_pft','SHOOT_C_pft','VmaxNH4Root_pvr','VmaxNO3Root_pvr','ShootNodeNumber_pft'
   'VcMax25C_RUBISCO_pft','VcMax25C_PEP_pft','VoMax25C_RUBISCO_pft','JMax25C_photo_pft','cumN_FIXED_pft',
   'RootLDS_pvr','RootKond2H2O_pvr','Uptk_N_CumYr_FLX_pft','Growth_Stage_pft','UPTK_NH4_FLX_pft','UPTK_NO3_FLX_pft',
   'EXUD_CumYr_N_FLX_pft','CH2OSunlit_pft','CH2OSunsha_pft','PARSunlit_pft','PARSunsha_pft','RUB_ACTVN_pft',
