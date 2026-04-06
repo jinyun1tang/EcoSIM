@@ -176,7 +176,7 @@ implicit none
 
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
-      TKS_vr(L,NY,NX)              = a_TEMP(LNY)
+      TKS_vr(L,NY,NX)              = a_TEMP(L,NY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0 !This is percentage of Soil void that is micropores (100% for now)
       !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
