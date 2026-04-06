@@ -176,6 +176,7 @@ implicit none
 
       VLiceMicP1_vr(L,NY,NX)       = 0.0
       TKSoil1_vr(L,NY,NX)          = a_TEMP(L,NY)
+      TKS_vr(L,NY,NX)              = a_TEMP(LNY)
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0 !This is percentage of Soil void that is micropores (100% for now)
       !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
@@ -358,10 +359,11 @@ implicit none
   DO NY=1,NYS
     !for every column send the top layer to the transfer var
     !Convert heat and water flux flux from the subcycled value
-    !to ATS units (flux / s)
-    write(*,*) "NY: ", NY, " Hinfl2Soil: ", HeatFlx2Grnd_col(NY,1), " Qinfl2MicP: ", Qinflx2Soil_col(NY,1)
-    surf_e_source(NY) = HeatFlx2Grnd_col(NY,1) / (dts_HeatWatTP)
-    surf_w_source(NY) = Qinflx2Soil_col(NY,1) / (dts_HeatWatTP)
+    !The ATS units for water flux is m/s for energy it is MW/m^2
+    !As EcoSIM is an hourly model, the conversion is done in ATS
+    !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
+    surf_e_source(NY) = HeatFlx2Grnd_col(NY,1) / (column_area(NY))
+    surf_w_source(NY) = Qinflx2Soil_col(NY,1)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
     LWRadCanGPrev_col(NY,NX) = LWRadCanG_col(NY,NX)
