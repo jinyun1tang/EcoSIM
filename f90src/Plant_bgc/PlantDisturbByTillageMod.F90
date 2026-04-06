@@ -35,8 +35,8 @@ contains
     iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]
-    FracShootElmAllocm     => plt_allom%FracShootElmAllocm      ,& !input  :woody element allocation, [-]
-    FracShootPetolAlloc2Litr    => plt_allom%FracShootPetolAlloc2Litr     ,& !input  :leaf element allocation,[-]
+    FracLeafShethElmAlloc2Litr     => plt_allom%FracLeafShethElmAlloc2Litr      ,& !input  :woody element allocation, [-]
+    FracPetolShethAlloc2Litr    => plt_allom%FracPetolShethAlloc2Litr     ,& !input  :leaf element allocation,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !input  :woody element allocation,[-]
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
@@ -76,7 +76,7 @@ contains
     ShootElms_brch              => plt_biom%ShootElms_brch                ,& !inoput :branch shoot structural element mass, [g d-2]
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch           ,& !inoput :branch stalk structural element mass, [g d-2]
     LeafLayerElms_node          => plt_biom%LeafLayerElms_node            ,& !inoput :layer leaf element, [g d-2]
-    PetoleStrutElms_brch        => plt_biom%PetoleStrutElms_brch          ,& !inoput :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch        => plt_biom%PetolShethStrutElms_brch          ,& !inoput :branch sheath structural element, [g d-2]
     LeafElmntNode_brch          => plt_biom%LeafElmntNode_brch            ,& !inoput :leaf element, [g d-2]
     SenecStalkStrutElms_brch    => plt_biom%SenecStalkStrutElms_brch      ,& !inoput :senescing branch stalk structural element, [g d-2]
     SapwoodBiomassC_brch        => plt_biom%SapwoodBiomassC_brch          ,& !inoput :branch live stalk C, [gC d-2]
@@ -85,7 +85,7 @@ contains
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
     SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch            ,& !inoput :branch grain number, [d-2]
     PetoleProteinC_node         => plt_biom%PetoleProteinC_node           ,& !inoput :layer sheath protein C, [g d-2]
-    PetioleElmntNode_brch       => plt_biom%PetioleElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
+    PetolShethElmntNode_brch       => plt_biom%PetolShethElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !output :flag for stand replacing disturbance,[-]
     iPlantState_pft             => plt_pheno%iPlantState_pft              ,& !output :flag for species death, [-]
@@ -124,15 +124,15 @@ contains
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
 !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
     D6380: DO M=1,jsken
       dNonstLitr=PlantElmAllocMat4Litr(ielmc,inonstruct,M,NZ)*(CanopyNonstElms_brch(ielmc,NB,NZ) &
         +CanopyNodulNonstElms_brch(ielmc,NB,NZ)+C4PhotoShootNonstC_brch(NB,NZ)+StalkRsrvElms_brch(ielmc,NB,NZ))
-      dFoliarLitr = PlantElmAllocMat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracShootElmAllocm(ielmc,k_fine_comp) &
+      dFoliarLitr = PlantElmAllocMat4Litr(ielmc,ifoliar,M,NZ)*(LeafStrutElms_brch(ielmc,NB,NZ)*FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp) &
         +CanopyNodulStrutElms_brch(ielmc,NB,NZ))
-      dNonFoliar = PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(PetoleStrutElms_brch(ielmc,NB,NZ)*FracShootPetolAlloc2Litr(ielmc,k_fine_comp) &
+      dNonFoliar = PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(PetolShethStrutElms_brch(ielmc,NB,NZ)*FracPetolShethAlloc2Litr(ielmc,k_fine_comp) &
         +HuskStrutElms_brch(ielmc,NB,NZ)+EarStrutElms_brch(ielmc,NB,NZ))
 
       LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ) &
@@ -141,9 +141,9 @@ contains
       DO NE=2,NumPlantChemElms
         dNonstLitr=PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*(CanopyNonstElms_brch(NE,NB,NZ)+CanopyNodulNonstElms_brch(NE,NB,NZ)&
           +StalkRsrvElms_brch(NE,NB,NZ))
-        dFoliarLitr=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootElmAllocm(NE,k_fine_comp) &
+        dFoliarLitr=PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracLeafShethElmAlloc2Litr(NE,k_fine_comp) &
           +CanopyNodulStrutElms_brch(NE,NB,NZ))
-        dNonFoliar=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_fine_comp) &
+        dNonFoliar=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(PetolShethStrutElms_brch(NE,NB,NZ)*FracPetolShethAlloc2Litr(NE,k_fine_comp) &
           +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ))
 
         LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XHVST1 &
@@ -154,8 +154,8 @@ contains
     DO M=1,jsken
       DO NE=1,NumPlantChemElms
         LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XHVST1 &
-          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracShootElmAllocm(NE,k_woody_comp) &
-          +PetoleStrutElms_brch(NE,NB,NZ)*FracShootPetolAlloc2Litr(NE,k_woody_comp))
+          *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracLeafShethElmAlloc2Litr(NE,k_woody_comp) &
+          +PetolShethStrutElms_brch(NE,NB,NZ)*FracPetolShethAlloc2Litr(NE,k_woody_comp))
 
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1 &
@@ -187,7 +187,7 @@ contains
       GrainStrutElms_brch(NE,NB,NZ)       = GrainStrutElms_brch(NE,NB,NZ)*XHVST
       LeafStrutElms_brch(NE,NB,NZ)        = LeafStrutElms_brch(NE,NB,NZ)*XHVST
       CanopyNodulStrutElms_brch(NE,NB,NZ) = CanopyNodulStrutElms_brch(NE,NB,NZ)*XHVST
-      PetoleStrutElms_brch(NE,NB,NZ)      = PetoleStrutElms_brch(NE,NB,NZ)*XHVST
+      PetolShethStrutElms_brch(NE,NB,NZ)      = PetolShethStrutElms_brch(NE,NB,NZ)*XHVST
       StalkStrutElms_brch(NE,NB,NZ)       = StalkStrutElms_brch(NE,NB,NZ)*XHVST
       SenecStalkStrutElms_brch(NE,NB,NZ)  = SenecStalkStrutElms_brch(NE,NB,NZ)*XHVST
     ENDDO
@@ -198,7 +198,7 @@ contains
     LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
 
     !summarize C mass after tillage
-    CanopyLeafSheathC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetoleStrutElms_brch(ielmc,NB,NZ))
+    CanopyLeafSheathC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
     CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ)+CanopyLeafSheathC_brch(NB,NZ)
     CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
 
@@ -220,7 +220,7 @@ contains
       DO NE=1,NumPlantChemElms
         StructInternodeElms_brch(NE,K,NB,NZ) = StructInternodeElms_brch(NE,K,NB,NZ)*XHVST
         LeafElmntNode_brch(NE,K,NB,NZ)      = LeafElmntNode_brch(NE,K,NB,NZ)*XHVST
-        PetioleElmntNode_brch(NE,K,NB,NZ)   = PetioleElmntNode_brch(NE,K,NB,NZ)*XHVST
+        PetolShethElmntNode_brch(NE,K,NB,NZ)   = PetolShethElmntNode_brch(NE,K,NB,NZ)*XHVST
         DO L=1,NumCanopyLayers1
           LeafLayerElms_node(NE,L,K,NB,NZ)=LeafLayerElms_node(NE,L,K,NB,NZ)*XHVST
         ENDDO
@@ -298,7 +298,7 @@ contains
     PlantPopulation_pft       => plt_site%PlantPopulation_pft          & !inoput :plant population, [d-2]
   )
 !     SolarNoonHour_col=hour of solar noon
-!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
+!     iPlantTurnoverPattern_pft=turnover:0=all abve-grd,1=all leaf+PetolSheth,2=none,3=between 1,2
 !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !     iYearCurrent=current year

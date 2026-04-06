@@ -107,7 +107,7 @@ contains
 !----------------------------------------------------------------------------------------------------
   subroutine AbvGrndLiterFallByFire(I,J,NZ,NonstructElmnt2Litr,StandeadElmntOffEcosystem, &
     FineNonleafElmOffEcosystem,LeafElmnt2Litr,LeafElmntOffEcosystem,NonstructElmntOffEcosystem,&
-    WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetioleElmntHarv2Litr,&
+    WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetolShethElmntHarv2Litr,&
     FineNonleafElmnt2Litr,LeafElmntHarv2Litr,StandeadElmntHarv2Litr,WoodyElmntHarv2Litr)
   implicit none 
   integer, intent(in) :: I,J
@@ -121,7 +121,7 @@ contains
   real(r8), intent(in) :: WoodyElmntOffEcosystem(NumPlantChemElms)  
   real(r8), intent(in) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: StandeadElmnt2Litr(NumPlantChemElms)
-  real(r8), intent(in) :: PetioleElmntHarv2Litr(NumPlantChemElms)
+  real(r8), intent(in) :: PetolShethElmntHarv2Litr(NumPlantChemElms)
   real(r8), intent(in) :: FineNonleafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: LeafElmntHarv2Litr(NumPlantChemElms)
   real(r8), intent(in) :: StandeadElmntHarv2Litr(NumPlantChemElms)
@@ -150,7 +150,7 @@ contains
     LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ) &
       +PlantElmAllocMat4Litr(ielmc,inonstruct,M,NZ)*NonstructElmnt2Litr(ielmc) &
       +PlantElmAllocMat4Litr(ielmc,ifoliar,M,NZ)   *LeafElmnt2Litr(ielmc)+LeafElmntHarv2Litr(ielmc) &
-      +PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmc)+PetioleElmntHarv2Litr(ielmc))
+      +PlantElmAllocMat4Litr(ielmc,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(ielmc)+PetolShethElmntHarv2Litr(ielmc))
 
     DO NE=2,NumPlantChemElms
       LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
@@ -161,7 +161,7 @@ contains
       LitrfallElms_pvr(NE,ilignin,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,ilignin,k_fine_comp,0,NZ) &
         +PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*(NonstructElmnt2Litr(NE)-NonstructElmntOffEcosystem(NE)) &
         +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)   *(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)-LeafElmntOffEcosystem(NE)) &
-        +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetioleElmntHarv2Litr(NE) &
+        +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetolShethElmntHarv2Litr(NE) &
         -FineNonleafElmOffEcosystem(NE))
     ENDDO
 

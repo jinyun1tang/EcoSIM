@@ -50,12 +50,12 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: CriticPhotoPeriod_tab(:)
   real(r8), target, allocatable :: PhotoPeriodSens_tab(:)
   real(r8), target, allocatable :: SLA1_tab(:)
-  real(r8), target, allocatable :: PetoLen2Mass_tab(:)
+  real(r8), target, allocatable :: PetolShethLen2Mass_tab(:)
   real(r8), target, allocatable :: NodeLenPergC_tab(:)
   real(r8), target, allocatable :: LeafAngleClass_tab(:,:)
   real(r8), target, allocatable :: ClumpFactorInit_tab(:)
   real(r8), target, allocatable :: BranchAngle_tab(:)
-  real(r8), target, allocatable :: PetioleAngle_tab(:)
+  real(r8), target, allocatable :: PetolShethAngle_tab(:)
   real(r8), target, allocatable :: MaxPotentSeedNumber_tab(:)
   real(r8), target, allocatable :: MaxSeedNumPerSite_tab(:)
   real(r8), target, allocatable :: SeedCMassMax_tab(:)
@@ -84,7 +84,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: RCS_tab(:)
   real(r8), target, allocatable :: CuticleResist_tab(:)
   real(r8), target, allocatable :: LeafBiomGrowthYld_tab(:)
-  real(r8), target, allocatable :: PetioleBiomGrowthYld_tab(:)
+  real(r8), target, allocatable :: PetolShethBiomGrowthYld_tab(:)
   real(r8), target, allocatable :: StalkBiomGrowthYld_tab(:)
   real(r8), target, allocatable :: ReserveBiomGrowthYld_tab(:)
   real(r8), target, allocatable :: HuskBiomGrowthYld_tab(:)
@@ -179,12 +179,12 @@ module PlantTraitTableMod
   allocate(CriticPhotoPeriod_tab(npfts));CriticPhotoPeriod_tab=0._r8
   allocate(PhotoPeriodSens_tab(npfts));PhotoPeriodSens_tab=0._r8
   allocate(SLA1_tab(npfts));SLA1_tab=0._r8
-  allocate(PetoLen2Mass_tab(npfts));PetoLen2Mass_tab=0._r8
+  allocate(PetolShethLen2Mass_tab(npfts));PetolShethLen2Mass_tab=0._r8
   allocate(NodeLenPergC_tab(npfts));NodeLenPergC_tab=0._r8
   allocate(LeafAngleClass_tab(1:NumLeafZenithSectors,npfts));LeafAngleClass_tab=0._r8
   allocate(ClumpFactorInit_tab(npfts));ClumpFactorInit_tab=0._r8
   allocate(BranchAngle_tab(npfts));BranchAngle_tab=0._r8
-  allocate(PetioleAngle_tab(npfts));PetioleAngle_tab=0._r8
+  allocate(PetolShethAngle_tab(npfts));PetolShethAngle_tab=0._r8
   allocate(MaxPotentSeedNumber_tab(npfts));MaxPotentSeedNumber_tab=0._r8
   allocate(MaxSeedNumPerSite_tab(npfts));MaxSeedNumPerSite_tab=0._r8
   allocate(SeedCMassMax_tab(npfts));SeedCMassMax_tab=0._r8
@@ -213,7 +213,7 @@ module PlantTraitTableMod
   allocate(RCS_tab(npfts));RCS_tab=0._r8
   allocate(CuticleResist_tab(npfts));CuticleResist_tab=0._r8
   allocate(LeafBiomGrowthYld_tab(npfts));LeafBiomGrowthYld_tab=0._r8
-  allocate(PetioleBiomGrowthYld_tab(npfts));PetioleBiomGrowthYld_tab=0._r8
+  allocate(PetolShethBiomGrowthYld_tab(npfts));PetolShethBiomGrowthYld_tab=0._r8
   allocate(StalkBiomGrowthYld_tab(npfts));StalkBiomGrowthYld_tab=0._r8
   allocate(ReserveBiomGrowthYld_tab(npfts));ReserveBiomGrowthYld_tab=0._r8
   allocate(HuskBiomGrowthYld_tab(npfts));HuskBiomGrowthYld_tab=0._r8
@@ -308,12 +308,12 @@ module PlantTraitTableMod
   call destroy(CriticPhotoPeriod_tab)
   call destroy(PhotoPeriodSens_tab)
   call destroy(SLA1_tab)
-  call destroy(PetoLen2Mass_tab)
+  call destroy(PetolShethLen2Mass_tab)
   call destroy(NodeLenPergC_tab)
   call destroy(LeafAngleClass_tab)
   call destroy(ClumpFactorInit_tab)
   call destroy(BranchAngle_tab)
-  call destroy(PetioleAngle_tab)
+  call destroy(PetolShethAngle_tab)
   call destroy(MaxPotentSeedNumber_tab)
   call destroy(MaxSeedNumPerSite_tab)
   call destroy(SeedCMassMax_tab)
@@ -342,7 +342,7 @@ module PlantTraitTableMod
   call destroy(RCS_tab)
   call destroy(CuticleResist_tab)
   call destroy(LeafBiomGrowthYld_tab)
-  call destroy(PetioleBiomGrowthYld_tab)
+  call destroy(PetolShethBiomGrowthYld_tab)
   call destroy(StalkBiomGrowthYld_tab)
   call destroy(ReserveBiomGrowthYld_tab)
   call destroy(HuskBiomGrowthYld_tab)

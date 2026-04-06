@@ -13,7 +13,7 @@ module WatsubMod
   use SurfPhysData,      only: InitSurfPhysData,            DestructSurfPhysData
   use EcosysWarmingMod,  only: check_warming_dates,         is_warming_layerL,    apply_soil_cable_warming
   use PlantDataRateType, only: TWaterPlantRoot2SoilPrev_vr, THeatPlantRoot2SoilPrev_vr
-  use InitSOMBGCMod,     only: gOC_to_m3_OM
+  use MiniFuncMod,       only: gOC_to_m3_OM
   use DebugToolMod
   use EcoSIMCtrlMod  
   use minimathmod      

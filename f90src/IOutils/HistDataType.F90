@@ -213,6 +213,8 @@ implicit none
   real(r8),pointer   :: h1D_PAR_CAN_ptc(:)    
   real(r8),pointer   :: h1D_PAR_col(:)        
   real(r8),pointer   :: h1d_fPAR_col(:)
+  real(r8),pointer   :: h1D_RNodeInitiate_ptc(:)
+  real(r8),pointer   :: h1D_RLeafAppear_ptc(:)
   real(r8),pointer   :: h1D_Plant_C_ptc(:)    
   real(r8),pointer   :: h1D_Plant_N_ptc(:)    
   real(r8),pointer   :: h1D_Plant_P_ptc(:)    
@@ -278,6 +280,8 @@ implicit none
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)      
   real(r8),pointer   :: h1D_O2L_ptc(:)
   real(r8),pointer   :: h1D_LAI_ptc(:)          
+  real(r8),pointer   :: h1D_CanPhenol_WSTRSS_ptc(:)
+  real(r8),pointer   :: h1D_CanPhenol_TSTRSS_ptc(:)
   real(r8),pointer   :: h1D_PSI_CAN_ptc(:)      
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)     
   real(r8),pointer   :: h1D_STOML_RSC_H2O_ptc(:) 
@@ -332,6 +336,8 @@ implicit none
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)   
   real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)      
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:) 
+  real(r8),pointer   :: h1D_MainBranchNodeNumber_ptc(:)
+  real(r8),pointer   :: h1D_ShootNodeNumber_ptc(:)
   real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:) 
   real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)   
   real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
@@ -432,7 +438,7 @@ implicit none
   real(r8),pointer   :: h1D_Gchem_CO2_prod_col(:)
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)      
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:) 
-  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:) 
+  real(r8),pointer   :: h1D_Num_Leaves_ptc(:) 
   real(r8),pointer   :: h1D_RUB_ACTVN_ptc(:)    
   real(r8),pointer   :: h1D_CanopyNLim_ptc(:)
   real(r8),pointer   :: h1D_CanopyPLim_ptc(:)
@@ -836,6 +842,8 @@ implicit none
   allocate(this%h1D_O2L_ptc(beg_ptc:end_ptc)); this%h1D_O2L_ptc(:)=spval
   allocate(this%h1D_LAI_ptc(beg_ptc:end_ptc))             ;this%h1D_LAI_ptc(:)=spval
   allocate(this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PSI_CAN_ptc(:)=spval
+  allocate(this%h1D_CanPhenol_WSTRSS_ptc(beg_ptc:end_ptc));this%h1D_CanPhenol_WSTRSS_ptc(:)=spval
+  allocate(this%h1D_CanPhenol_TSTRSS_ptc(beg_ptc:end_ptc)); this%h1D_CanPhenol_TSTRSS_ptc(:)=spval
   allocate(this%h1D_RootAR_ptc(beg_ptc:end_ptc))          ;this%h1D_RootAR_ptc(:)=spval
   allocate(this%h1D_RootLenPerPlant_ptc(beg_ptc:end_ptc))         ;this%h1D_RootLenPerPlant_ptc(:)=spval
   allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))        ;this%h1D_TURG_CAN_ptc(:)=spval
@@ -850,7 +858,8 @@ implicit none
   allocate(this%h1D_TC_Groth_ptc(beg_ptc:end_ptc))        ;this%h1D_TC_Groth_ptc(:)=spval
   allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
-
+  allocate(this%h1D_RNodeInitiate_ptc(beg_ptc:end_ptc));this%h1D_RNodeInitiate_ptc(:)=spval
+  allocate(this%h1D_RLeafAppear_ptc(beg_ptc:end_ptc)); this%h1D_RLeafAppear_ptc(:)=spval
   allocate(this%h1D_Plant_C_ptc(beg_ptc:end_ptc))         ;this%h1D_Plant_C_ptc(:)=spval
   allocate(this%h1D_frcPARabs_ptc(beg_ptc:end_ptc))       ;this%h1D_frcPARabs_ptc(:)=spval
   allocate(this%h1D_PAR_CAN_ptc(beg_ptc:end_ptc))         ;this%h1D_PAR_CAN_ptc(:)=spval
@@ -877,6 +886,8 @@ implicit none
   allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_C_FLX_ptc(:)=spval
   allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_AUTO_RESP_FLX_ptc(:)=spval
   allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_C_FLX_ptc(:)=spval
+  allocate(this%h1D_MainBranchNodeNumber_ptc(beg_ptc:end_ptc));this%h1D_MainBranchNodeNumber_ptc(:)=spval
+  allocate(this%h1D_ShootNodeNumber_ptc(beg_ptc:end_ptc)) ;this%h1D_ShootNodeNumber_ptc(:)=spval
   allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
   allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CO2_FLX_ptc(:)=spval
   allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
@@ -995,7 +1006,7 @@ implicit none
   allocate(this%h2D_litrN_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrN_vr(:,:)=spval
   allocate(this%h2D_litrP_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrP_vr(:,:)=spval
   allocate(this%h2D_VHeatCap_vr(beg_col:end_col,1:JZ));this%h2D_VHeatCap_vr(:,:)=spval
-  allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
+  allocate(this%h1D_Num_Leaves_ptc(beg_ptc:end_ptc));this%h1D_Num_Leaves_ptc(:)=spval
   allocate(this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc));  this%h1D_RUB_ACTVN_ptc(:)=spval
   allocate(this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyNLim_ptc(:)=spval
   allocate(this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyPLim_ptc(:)=spval  
@@ -1902,7 +1913,7 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_RootN_Fix_col(beg_col:end_col)
-  call hist_addfld1d(fname='Root_N_FIX_col',units='gN/m2',&
+  call hist_addfld1d(fname='Root_N_FIX_col',units='gN/m2/hr',&
     avgflag='A',long_name='Root N2 fixation',ptr_col=data1d_ptr)            
 
   data1d_ptr => this%h1D_AR_WetDep_FLX_col(beg_col:end_col)
@@ -2085,6 +2096,16 @@ implicit none
     long_name='Canopy total water potential',ptr_patch=data1d_ptr,&
     default='inactive')            
 
+  data1d_ptr => this%h1D_CanPhenol_WSTRSS_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='CanPhenol_WSTRESS_pft',units='-',avgflag='A',&
+    long_name='Canopy water stress for phenology development',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_CanPhenol_TSTRSS_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='CanPhenol_TSTRESS_pft',units='-',avgflag='A',&
+    long_name='Canopy temperature stress for phenology development',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
   data1d_ptr => this%h1D_RootAR_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='RootAR_pft',units='gC/m2/h',avgflag='A',&
     long_name='Root autotrophic respiraiton',ptr_patch=data1d_ptr,&
@@ -2161,12 +2182,20 @@ implicit none
   call hist_addfld1d(fname='Plant_C_pft',units='gC/m2',avgflag='A',&
     long_name='Plant C',ptr_patch=data1d_ptr)                  
 
+  data1d_ptr => this%h1D_RNodeInitiate_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='RNodeAppear_pft',units='1/day',avgflag='A',&
+    long_name='Plant node initation rate',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_RLeafAppear_ptc(beg_ptc:end_ptc)     
+  call hist_addfld1d(fname='RLeafAppear_pft',units='1/day',avgflag='A',&
+    long_name='Plant leaf appearance rate',ptr_patch=data1d_ptr,default='inactive')                  
+
   data1d_ptr => this%h1D_LEAF_C_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LEAF_C_pft',units='gC/m2',avgflag='A',&
     long_name='Canopy leaf C',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_Petole_C_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='PETIOLE_C_pft',units='gC/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_C_pft',units='gC/m2',avgflag='A',&
     long_name='Canopy sheath C',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_STALK_C_ptc(beg_ptc:end_ptc)   
@@ -2309,6 +2338,14 @@ implicit none
   call hist_addfld1d(fname='STANDING_DEAD_C_pft',units='gC/m2',avgflag='A',&
     long_name='pft Standing dead C',ptr_patch=data1d_ptr,default='inactive')                  
 
+  data1d_ptr => this%h1D_MainBranchNodeNumber_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='MainBranchNodeNumber_pft',units='-',avgflag='I',&
+    long_name='Plant main branch node number as a measure of phenoloigcal development',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_ShootNodeNumber_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='ShootNodeNumber_pft',units='-',avgflag='I',&
+    long_name='Plant shoot total node number as a measure of phenoloigcal development',ptr_patch=data1d_ptr,default='inactive')                  
+
   data1d_ptr => this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='FIREp_CO2_FLX_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Plant CO2 from fire',ptr_patch=data1d_ptr,default='inactive')                  
@@ -2443,7 +2480,7 @@ implicit none
     long_name='Canopy leaf structural N per m2 leaf area, excluding storage',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_Petole_N_ptc(beg_ptc:end_ptc)      
-  call hist_addfld1d(fname='Petiole_N_pft',units='gN/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_N_pft',units='gN/m2',avgflag='A',&
     long_name='Canopy sheath N',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_STALK_N_ptc(beg_ptc:end_ptc)       
@@ -2568,7 +2605,7 @@ implicit none
     default='inactive')            
 
   data1d_ptr => this%h1D_Petole_P_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='Petiole_P_pft',units='gP/m2',avgflag='A',&
+  call hist_addfld1d(fname='PetolSheth_P_pft',units='gP/m2',avgflag='A',&
     long_name='Canopy sheath P',ptr_patch=data1d_ptr,&
     default='inactive')            
 
@@ -2801,9 +2838,9 @@ implicit none
   call hist_addfld2d(fname='VHeatCap_vr',units='MJ/m3/K',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved Volumetric heat capacity',ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
-  call hist_addfld2d(fname='LEAF_NODE_NO_pft',units='none',type2d='nbranches',avgflag='I',&
-    long_name='Leaf number',ptr_patch=data2d_ptr,default='inactive')       
+  data1d_ptr => this%h1D_Num_Leaves_ptc(beg_ptc:end_ptc)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
+  call hist_addfld1d(fname='Num_Leaves_pft',units='none',avgflag='A',&
+    long_name='Number of leaves',ptr_patch=data1d_ptr,default='inactive')       
 
   data1d_ptr => this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='RUB_ACTVN_pft',units='none',avgflag='A',&
@@ -4243,7 +4280,13 @@ implicit none
         this%h1D_STANDING_DEAD_N_ptc(nptc)  = StandDeadStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_P_ptc(nptc)  = StandDeadStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STANDING_DEAD_C_ptc(nptc)  = StandDeadStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-
+        if(MainBranchNum_pft(NZ,NY,NX)>0) then
+          this%h1D_ShootNodeNumber_ptc(nptc)  = SUM(ShootNodeNum_brch(1:NumOfBranches_pft(NZ,NY,NX),NZ,NY,NX))
+          this%h1D_MainBranchNodeNumber_ptc(nptc)=ShootNodeNum_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX)
+        else
+          this%h1D_MainBranchNodeNumber_ptc(nptc)=0
+          this%h1D_ShootNodeNumber_ptc(nptc)  = 0
+        endif
         if (PlantPopulation_pft(NZ,NY,NX) .LE. 0._r8)then
           call this%ZeroPlantHistVars(nptc)
           cycle
@@ -4293,6 +4336,8 @@ implicit none
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
         this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_CanPhenol_WSTRSS_ptc(nptc)=CanPhenoMoistStress_pft(NZ,NY,NX) 
+        this%h1D_CanPhenol_TSTRSS_ptc(nptc)=CanPhenoTempStress_pft(NZ,NY,NX) 
         this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)
         this%h1D_STOML_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
@@ -4311,8 +4356,10 @@ implicit none
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)       = (ShootElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RNodeInitiate_ptc(nptc) = RNodeInitiate_pft(NZ,NY,NX)*24._r8          
+        this%h1D_RLeafAppear_ptc(nptc) = RLeafAppear_pft(NZ,NY,NX)*24._r8          
         this%h1D_LEAF_C_ptc(nptc)        = LeafStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_Petole_C_ptc(nptc)      = PetoleStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Petole_C_ptc(nptc)      = PetolShethStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STALK_C_ptc(nptc)       = StalkStrutElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_RESERVE_C_ptc(nptc)     = StalkRsrvElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_HUSK_C_ptc(nptc)        = (HuskStrutElms_pft(ielmc,NZ,NY,NX) &
@@ -4358,7 +4405,7 @@ implicit none
         this%h1D_fCPLFW_ptc(nptc) = safe_adb(1._r8,fPCLFW_pft(NZ,NY,NX))
         this%h1D_LEAF_N_ptc(nptc)    = LeafStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_LeafNperm2LAI_ptc(nptc) = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX),CanopyLeafArea_pft(NZ,NY,NX))
-        this%h1D_Petole_N_ptc(nptc)  = PetoleStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Petole_N_ptc(nptc)  = PetolShethStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STALK_N_ptc(nptc)   = StalkStrutElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_RESERVE_N_ptc(nptc) = StalkRsrvElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_HUSK_N_ptc(nptc)    = (HuskStrutElms_pft(ielmn,NZ,NY,NX) &
@@ -4374,7 +4421,7 @@ implicit none
           +RootElms_pft(ielmp,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)        
         this%h1D_stomatal_stress_ptc(nptc) = StomatalStress_pft(NZ,NY,NX)
         this%h1D_LEAF_P_ptc(nptc)          = LeafStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_Petole_P_ptc(nptc)        = PetoleStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Petole_P_ptc(nptc)        = PetolShethStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STALK_P_ptc(nptc)         = StalkStrutElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_RESERVE_P_ptc(nptc)       = StalkRsrvElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_HUSK_P_ptc(nptc)          = (HuskStrutElms_pft(ielmp,NZ,NY,NX) &
@@ -4418,8 +4465,9 @@ implicit none
           this%h1D_RUB_ACTVN_ptc(nptc)=0._r8; NB1=0
           this%h1D_CanopyNLim_ptc(nptc)=0._r8
           this%h1D_CanopyPLim_ptc(nptc)=0._r8
+          this%h1D_Num_Leaves_ptc(nptc)=0._r8
           DO NB=1,NumOfBranches_pft(NZ,NY,NX)
-            this%h2D_LEAF_NODE_NO_ptc(nptc,NB)              = NumOfLeaves_brch(NB,NZ,NY,NX)
+            this%h1D_Num_Leaves_ptc(nptc)  = this%h1D_Num_Leaves_ptc(nptc)+NumOfLeaves_brch(NB,NZ,NY,NX)
             if(RubiscoActivity_brch(NB,NZ,NY,NX)>0._r8)then
               NB1=NB1+1
               this%h1D_RUB_ACTVN_ptc(nptc)   = this%h1D_RUB_ACTVN_ptc(nptc)+ RubiscoActivity_brch(NB,NZ,NY,NX)
@@ -4646,6 +4694,8 @@ implicit none
   this%h1D_LAI_ptc(nptc)           = 0._r8
   this%h1D_PSI_CAN_ptc(nptc)       = 0._r8
   this%h1D_TURG_CAN_ptc(nptc)      = 0._r8
+  this%h1D_CanPhenol_WSTRSS_ptc(nptc)=0._r8
+  this%h1D_CanPhenol_TSTRSS_ptc(nptc)=0._r8
   this%h1D_STOML_RSC_H2O_ptc(nptc)  = 0._r8
   this%h1D_BLYR_RSC_H2O_ptc(nptc)  = 0._r8
   this%h1D_TRANSPN_ptc(nptc)       = 0._r8
@@ -4659,6 +4709,8 @@ implicit none
   this%h1D_PAR_CAN_ptc(nptc)       = 0._r8    
   this%h1D_SHOOT_C_ptc(nptc)       = 0._r8
   this%h1D_Plant_C_ptc(nptc)       = 0._r8
+  this%h1D_RNodeInitiate_ptc(nptc) = 0._r8
+  this%h1D_RLeafAppear_ptc(nptc) = 0._r8
   this%h1D_LEAF_C_ptc(nptc)        = 0._r8
   this%h1D_Petole_C_ptc(nptc)      = 0._r8
   this%h1D_STALK_C_ptc(nptc)       =  0._r8
@@ -4738,7 +4790,7 @@ implicit none
   this%h2D_ProteinNperm2LeafArea_pnd(nptc,:)=0._r8
   this%h1D_Growth_Stage_ptc(nptc)   =0
   
-
+  this%h1D_Num_Leaves_ptc(nptc)                     = 0._r8
   this%h1D_RUB_ACTVN_ptc(nptc)                      = 0._r8;
   this%h1D_CanopyNLim_ptc(nptc)                     = 0._r8
   this%h1D_CanopyPLim_ptc(nptc)                     = 0._r8

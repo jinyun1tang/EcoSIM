@@ -5,7 +5,7 @@ module SurfPhysMod
 !
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun
-  use InitSOMBGCMod, only: gOC_to_m3_OM
+  use MiniFuncMod, only: gOC_to_m3_OM
   use DebugToolMod
   use GridDataType
   use HydroThermData

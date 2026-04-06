@@ -14,8 +14,8 @@ module PlantTraitDataType
 
 !allocation parameter
 
-  REAL(R8),target,allocatable :: FracShootElmAllocm(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
-  real(r8),target,allocatable :: FracShootPetolAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
+  REAL(R8),target,allocatable :: FracLeafShethElmAlloc2Litr(:,:)             !fraction of shoot leaf element allocation to woody/fine litter,[-]
+  real(r8),target,allocatable :: FracPetolShethAlloc2Litr(:,:)            !fraction of shoot stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
@@ -40,9 +40,9 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyHeight_col(:,:)                      !canopy height over grid, [m]
   real(r8),target,allocatable ::  CanopyHeightZ_col(:,:,:)                   !canopy layer height , [m]
   real(r8),target,allocatable ::  BranchAngle_pft(:,:,:)                     !branching angle, [degree from horizontal]
-  real(r8),target,allocatable ::  PetioleAngle_pft(:,:,:)                    !sheath angle, [degree from horizontal]
+  real(r8),target,allocatable ::  PetolShethAngle_pft(:,:,:)                    !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                 !branching angle, [degree from horizontal]
-  real(r8),target,allocatable ::  SinePetioleAngle_pft(:,:,:)                !sheath angle, [degree from horizontal]
+  real(r8),target,allocatable ::  SinePetolShethAngle_pft(:,:,:)                !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
   real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
@@ -94,12 +94,14 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  HoursTooLowPsiCan_pft(:,:,:)               !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8),target,allocatable ::  CanPhenoMoistStress_pft(:,:,:)              !moisture stress for plant phenology development,[-]
+  real(r8),target,allocatable ::  CanPhenoTempStress_pft(:,:,:)               !temperature stress for plant phenology development,[-]  
   real(r8),target,allocatable ::  PlantO2Stress_pft(:,:,:)                   !plant O2 stress indicator, []
   real(r8),target,allocatable ::  MorphogenBase_pft(:,:,:)                   !base line morphogen concentration for secondary growth, [-]
   real(r8),target,allocatable ::  fTCanopyGroth_pft(:,:,:)                   !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCGroth_pft(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKGroth_pft(:,:,:)                         !canopy growth temperature, [K]
-  real(r8),target,allocatable ::  PetioleBiomGrowthYld_pft(:,:,:)            !sheath growth yield, [g g-1]
+  real(r8),target,allocatable ::  PetolShethBiomGrowthYld_pft(:,:,:)            !sheath growth yield, [g g-1]
   real(r8),target,allocatable ::  StalkBiomGrowthYld_pft(:,:,:)              !stalk growth yield, [g g-1]
   real(r8),target,allocatable ::  ReserveBiomGrowthYld_pft(:,:,:)            !reserve growth yield, [g g-1]
   real(r8),target,allocatable ::  HuskBiomGrowthYld_pft(:,:,:)               !husk growth yield, [g g-1]
@@ -121,7 +123,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  rLen2WidthLeaf_pft(:,:,:)                  !leaf length:width ratio, [-]
   real(r8),target,allocatable ::  SLA1_pft(:,:,:)                            !leaf area:mass during growth, [m2 g-1]
   real(r8),target,allocatable ::  TC4LeafOut_pft(:,:,:)                      !threshold temperature for spring leafout/dehardening, [oC]
-  real(r8),target,allocatable ::  PetoLen2Mass_pft(:,:,:)                    !petiole length:mass during growth, [m g-1]
+  real(r8),target,allocatable ::  PetolShethLen2Mass_pft(:,:,:)                    !PetolSheth length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  HourReq4LeafOut_brch(:,:,:,:)              !hours above threshold temperature required for spring leafout/dehardening, [h]
   integer,target,allocatable ::  NumOfBranches_pft(:,:,:)                    !number of branches of the plant, [-]
   integer,target,allocatable ::  BranchNumber_pft(:,:,:)                     !main branch number, [-]
@@ -140,7 +142,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)    !gain in normalized node number during vegetative growth stages , [h-1]
   real(r8),target,allocatable ::  dReproNodeNumNormByMatG_brch(:,:,:,:)      !gain in normalized node number during reproductive growth stages, [h-1]
   real(r8),target,allocatable ::  ShootNodeNum_brch(:,:,:,:)                 !shoot node number, [-]
-  real(r8),target,allocatable ::  NodeNum2InitFloral_brch(:,:,:,:)           !node number at floral initiation, [-]
+  real(r8),target,allocatable ::  ShootNodeNumAtInitFloral_brch(:,:,:,:)           !node number at floral initiation, [-]
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)   !normalized node number during reproductive growth stages, [-]
   real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)         !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)     !normalized node number during vegetative growth stages , [-]
@@ -191,8 +193,8 @@ contains
   implicit none
   integer, intent(in) :: NumOfPlantLitrCmplxs
 
-  allocate(FracShootPetolAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootPetolAlloc2Litr=0._r8
-  allocate(FracShootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracShootElmAllocm=0._r8
+  allocate(FracPetolShethAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracPetolShethAlloc2Litr=0._r8
+  allocate(FracLeafShethElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracLeafShethElmAlloc2Litr=0._r8
   allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
@@ -216,9 +218,9 @@ contains
   allocate(CanopyHeight_col(JY,JX));          CanopyHeight_col=0._r8
   allocate(CanopyHeightZ_col(0:NumCanopyLayers,JY,JX));     CanopyHeightZ_col=0._r8
   allocate(BranchAngle_pft(JP,JY,JX));    BranchAngle_pft=0._r8
-  allocate(PetioleAngle_pft(JP,JY,JX));    PetioleAngle_pft=0._r8
+  allocate(PetolShethAngle_pft(JP,JY,JX));    PetolShethAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
-  allocate(SinePetioleAngle_pft(JP,JY,JX));    SinePetioleAngle_pft=0._r8
+  allocate(SinePetolShethAngle_pft(JP,JY,JX));    SinePetolShethAngle_pft=0._r8
   allocate(CanopyIsothBndlResist_pft(JP,JY,JX));      CanopyIsothBndlResist_pft=0._r8
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
@@ -271,12 +273,14 @@ contains
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
   allocate(HoursTooLowPsiCan_pft(JP,JY,JX));     HoursTooLowPsiCan_pft=0._r8
+  allocate(CanPhenoMoistStress_pft(JP,JY,JX)); CanPhenoMoistStress_pft=1._R8
+  allocate(CanPhenoTempStress_pft(JP,JY,JX)); CanPhenoTempStress_pft=1._r8
   allocate(PlantO2Stress_pft(JP,JY,JX));     PlantO2Stress_pft=0._r8
   allocate(fTCanopyGroth_pft(JP,JY,JX));     fTCanopyGroth_pft=0._r8
   allocate(MorphogenBase_pft(JP,JY,JX)); MorphogenBase_pft=0._r8
   allocate(TCGroth_pft(JP,JY,JX));      TCGroth_pft=0._r8
   allocate(TKGroth_pft(JP,JY,JX));      TKGroth_pft=0._r8
-  allocate(PetioleBiomGrowthYld_pft(JP,JY,JX));    PetioleBiomGrowthYld_pft=0._r8
+  allocate(PetolShethBiomGrowthYld_pft(JP,JY,JX));    PetolShethBiomGrowthYld_pft=0._r8
   allocate(StalkBiomGrowthYld_pft(JP,JY,JX));    StalkBiomGrowthYld_pft=0._r8
   allocate(ReserveBiomGrowthYld_pft(JP,JY,JX));    ReserveBiomGrowthYld_pft=0._r8
   allocate(HuskBiomGrowthYld_pft(JP,JY,JX));    HuskBiomGrowthYld_pft=0._r8
@@ -298,7 +302,7 @@ contains
   allocate(rLen2WidthLeaf_pft(JP,JY,JX));     rLen2WidthLeaf_pft=0._r8
   allocate(SLA1_pft(JP,JY,JX));     SLA1_pft=0._r8
   allocate(TC4LeafOut_pft(JP,JY,JX));      TC4LeafOut_pft=0._r8
-  allocate(PetoLen2Mass_pft(JP,JY,JX));     PetoLen2Mass_pft=0._r8
+  allocate(PetolShethLen2Mass_pft(JP,JY,JX));     PetolShethLen2Mass_pft=0._r8
   allocate(HourReq4LeafOut_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOut_brch=0._r8
   allocate(NumOfBranches_pft(JP,JY,JX));      NumOfBranches_pft=0
   allocate(BranchNumber_pft(JP,JY,JX));      BranchNumber_pft=0
@@ -317,7 +321,7 @@ contains
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
   allocate(dReproNodeNumNormByMatG_brch(MaxNumBranches,JP,JY,JX));dReproNodeNumNormByMatG_brch=0._r8
   allocate(ShootNodeNum_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNum_brch=0._r8
-  allocate(NodeNum2InitFloral_brch(MaxNumBranches,JP,JY,JX)); NodeNum2InitFloral_brch=0._r8
+  allocate(ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP,JY,JX)); ShootNodeNumAtInitFloral_brch=0._r8
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
   allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
@@ -367,7 +371,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(FracShootElmAllocm)
+  call destroy(FracLeafShethElmAlloc2Litr)
   call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopyStalkArea_lbrch)
@@ -390,9 +394,9 @@ contains
   call destroy(CanopyHeight_col)
   call destroy(CanopyHeightZ_col)
   call destroy(BranchAngle_pft)
-  call destroy(PetioleAngle_pft)
+  call destroy(PetolShethAngle_pft)
   call destroy(SineBranchAngle_pft)
-  call destroy(SinePetioleAngle_pft)
+  call destroy(SinePetolShethAngle_pft)
   call destroy(CanopyIsothBndlResist_pft)
   call destroy(CanopyHeight4WatUptake_pft)
   call destroy(LeafArea_node)
@@ -445,12 +449,14 @@ contains
   call destroy(PlantPopu_col)
   call destroy(PPatSeeding_pft)
   call destroy(HoursTooLowPsiCan_pft)
+  call destroy(CanPhenoTempStress_pft)
+  call destroy(CanPhenoMoistStress_pft)
   call destroy(PlantO2Stress_pft)
   call destroy(fTCanopyGroth_pft)
   call destroy(MorphogenBase_pft)
   call destroy(TCGroth_pft)
   call destroy(TKGroth_pft)
-  call destroy(PetioleBiomGrowthYld_pft)
+  call destroy(PetolShethBiomGrowthYld_pft)
   call destroy(StalkBiomGrowthYld_pft)
   call destroy(ReserveBiomGrowthYld_pft)
   call destroy(HuskBiomGrowthYld_pft)
@@ -472,7 +478,7 @@ contains
   call destroy(rLen2WidthLeaf_pft)
   call destroy(SLA1_pft)
   call destroy(TC4LeafOut_pft)
-  call destroy(PetoLen2Mass_pft)
+  call destroy(PetolShethLen2Mass_pft)
   call destroy(HourReq4LeafOut_brch)
   call destroy(NumOfBranches_pft)
   call destroy(BranchNumber_pft)
@@ -491,7 +497,7 @@ contains
   call destroy(HourlyNodeNumNormByMatgrp_brch)
   call destroy(dReproNodeNumNormByMatG_brch)
   call destroy(ShootNodeNum_brch)
-  call destroy(NodeNum2InitFloral_brch)
+  call destroy(ShootNodeNumAtInitFloral_brch)
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
   call destroy(NodeNumberAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)

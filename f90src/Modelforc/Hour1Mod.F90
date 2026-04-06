@@ -155,20 +155,20 @@ module Hour1Mod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-!
-!
-!     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
-!     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
-!
+      !
+      !
+      !     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
+      !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
+      !
       call SetHourlyDiagnostics(I,J,NY,NX)
-!
-!     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
-!     AND BETWEEN SOILS AND PLANTS
-!
+      !
+      !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
+      !     AND BETWEEN SOILS AND PLANTS
+      !
       call SetArrays4PlantSoilTransfer(NY,NX)
-!
-!     IF SOC FLAG IS SET
-!
+      !
+      !     IF SOC FLAG IS SET
+      !
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
         call UpdateTotalSOC(NY,NX)
       ENDIF
@@ -953,10 +953,9 @@ module Hour1Mod
   DO L=1,NL_col(NY,NX)
     !d'Oriano and Kontoe (2022), Dynamic Properties of Organic Soils.
     !Hardin and Drnevich, 1972
-    HBAconst_vr(L,NY,NX)=HBAMin_vr(L,NY,NX)*exp(-5._r8*ORGCX_vr(L,NY,NX))
-    
+    HBAconst_vr(L,NY,NX)=HBAMin_vr(L,NY,NX)*exp(-5._r8*ORGCX_vr(L,NY,NX))    
   ENDDO
-  stop
+  
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 module SurfLitterPhysMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod, only : etimer  
-  use InitSOMBGCMod, only : gOC_to_m3_OM
+  use MiniFuncMod,   only : gOC_to_m3_OM
   use DebugToolMod
   use MiniMathMod
   use HydroThermData
@@ -43,7 +43,9 @@ implicit none
   subroutine PartLitSoilFractionM(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J,NY,NX
+  character(len=*), parameter :: subname='PartLitSoilFractionM'
 
+  call PrintInfo('beg '//subname)
   !if there is heat-wise significant litter layer
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX))THEN
 
@@ -60,7 +62,7 @@ implicit none
   ENDIF
 
   FracSurfByLitR_col(NY,NX)=1.0_r8-FracSurfBareSoil_col(NY,NX)
-
+  call PrintInfo('end '//subname)
   end subroutine PartLitSoilFractionM
 
 !------------------------------------------------------------------------------------------
@@ -495,13 +497,14 @@ implicit none
   real(r8), intent(in) :: dWat   !water added due to litter fall, m3 H2O/d2/h
   real(r8), intent(in) :: dHeat  !heat added due to litter fall, MJ/d2/h
   real(r8), intent(inout) :: HEATIN_lnd
+  character(len=*), parameter :: subname='UpdateLitRPhys'
 
   real(r8) :: VHeatCapacityLitrX  !previous litr heat capacity before change in litter OM and water
   real(r8) :: VHeatCapacityLitR   !current litr heat capacity before change in water
   real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: tkspre,ENGYR,VLWatMicPr,VLiceMicPr
   real(r8) :: ENGYZ,HS,m3OM,HeatByMassChange
-
+  call PrintInfo('beg '//subname)
   IF(FracSurfByLitR_col(NY,NX).LE.ZEROL)return
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
@@ -539,7 +542,7 @@ implicit none
 
   TCS_vr(0,NY,NX)  = units%Kelvin2Celcius(TKS_vr(0,NY,NX))
   HEATIN_lnd    = HEATIN_lnd+TLitrIceHeatFlxFrez_col(NY,NX)
-
+  call PrintInfo('end '//subname)
   end subroutine UpdateLitRPhys
 
 !------------------------------------------------------------------------------------------

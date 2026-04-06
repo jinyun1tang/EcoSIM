@@ -16,7 +16,8 @@ target_include_directories(disturb_mods  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/)
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  )
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods)

@@ -32,7 +32,6 @@ module InitSOMBGCMOD
   public :: InitSOMBGC
   public :: DestructSOMBGC
   public :: MicrobeByLitterFall
-  public :: gOC_to_m3_OM
   contains
 !------------------------------------------------------------------------------------------
 
@@ -787,20 +786,7 @@ module InitSOMBGCMOD
   
   end associate
   end subroutine MicrobeByLitterFall
-!------------------------------------------------------------------------------------------
 
-  function gOC_to_m3_OM(gram_OC)result(ans)
-  !
-  !Description
-  !convert gram organic C into m3 OM
-  implicit none
-  real(r8), intent(in) :: gram_OC    ![gC]
-  real(r8) :: ans
-
-  !1.e-6*[gC]/([gC gOM-1]*[gOM cm-3])-> [cm3 OM]*1.e-6 -> [m3 OM]
-  ans = 1.e-6_r8*AZMAX1(gram_OC)/(OMCMassFrac*DensitySolidOM)
-
-  end function gOC_to_m3_OM
 !------------------------------------------------------------------------------------------
 
   subroutine DestructSOMBGC

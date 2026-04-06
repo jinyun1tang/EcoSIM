@@ -23,6 +23,7 @@ module NoduleBGCMod
   implicit none
   integer, intent(in) :: I,J,NZ,NB
   real(r8), intent(in) :: TFN5,WFNG
+  character(len=*), parameter :: subname='CanopyNoduleBiochemistry'
   integer :: M
   real(r8) :: ZPOOLD
   real(r8) :: CCC,CNC,CPC
@@ -81,6 +82,7 @@ module NoduleBGCMod
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !inoput :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch   & !inoput :branch nodule structural element, [g d-2]
   )
+  call PrintInfo('beg '//subname)
 !     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
   CanopyN2Fix_pft(NZ)=0._r8
@@ -211,8 +213,8 @@ module NoduleBGCMod
     !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
     !     RCCZN,RCCYN=min,max fractions for bacteria C recycling
     !     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-    !     CanopyLeafSheathC_brch=leaf+petiole mass
-    !     CCNDLB=bacteria:leaf+petiole ratio
+    !     CanopyLeafSheathC_brch=leaf+PetolSheth mass
+    !     CCNDLB=bacteria:leaf+PetolSheth ratio
     !     RDNDBX=effect of CCNDLB on bacteria decomposition rate
     !     SPNDX=specific bacterial decomposition rate at current CCNDLB
     !     SPNDL=specific decomposition rate by bacterial N2 fixers
@@ -365,12 +367,12 @@ module NoduleBGCMod
     !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
     !
     !     CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-    !     CanopyLeafSheathC_brch=leaf+petiole C mass
+    !     CanopyLeafSheathC_brch=leaf+PetolSheth C mass
     !     WTNDB=bacterial C mass
     !     NodulBiomCatInfection=initial bacterial mass at infection
     !     FXRN=rate constant for plant-bacteria nonstructural C,N,P exchange
     !     CCNGB=parameter to calculate nonstructural C,N,P exchange
-    !     CCNDLB=bacteria:leaf+petiole ratio
+    !     CCNDLB=bacteria:leaf+PetolSheth ratio
     !     XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=nonstructural C,N,P transfer
     !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
     !
@@ -404,6 +406,7 @@ module NoduleBGCMod
       ENDIF
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine CanopyNoduleBiochemistry
 
@@ -613,7 +616,7 @@ module NoduleBGCMod
         ENDIF
         RootN2Fix_pvr(L,NZ) = Rauto4Nfix_rvr*EN2F
         RootN2Fix_pft(NZ)   = RootN2Fix_pft(NZ)+RootN2Fix_pvr(L,NZ)
-
+        
         !
         !     NODULE C,N,P REMOBILIZATION AND DECOMPOSITION
         !
