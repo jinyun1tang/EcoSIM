@@ -438,7 +438,7 @@ implicit none
   real(r8),pointer   :: h1D_Gchem_CO2_prod_col(:)
   real(r8),pointer   :: h1D_LEAF_NC_ptc(:)      
   real(r8),pointer   :: h1D_Growth_Stage_ptc(:) 
-  real(r8),pointer   :: h2D_LEAF_NODE_NO_ptc(:,:) 
+  real(r8),pointer   :: h1D_Num_Leaves_ptc(:) 
   real(r8),pointer   :: h1D_RUB_ACTVN_ptc(:)    
   real(r8),pointer   :: h1D_CanopyNLim_ptc(:)
   real(r8),pointer   :: h1D_CanopyPLim_ptc(:)
@@ -1006,7 +1006,7 @@ implicit none
   allocate(this%h2D_litrN_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrN_vr(:,:)=spval
   allocate(this%h2D_litrP_vr(beg_col:end_col,1:JZ))   ;this%h2D_litrP_vr(:,:)=spval
   allocate(this%h2D_VHeatCap_vr(beg_col:end_col,1:JZ));this%h2D_VHeatCap_vr(:,:)=spval
-  allocate(this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches));this%h2D_LEAF_NODE_NO_ptc(:,:)=spval
+  allocate(this%h1D_Num_Leaves_ptc(beg_ptc:end_ptc));this%h1D_Num_Leaves_ptc(:)=spval
   allocate(this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc));  this%h1D_RUB_ACTVN_ptc(:)=spval
   allocate(this%h1D_CanopyNLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyNLim_ptc(:)=spval
   allocate(this%h1D_CanopyPLim_ptc(beg_ptc:end_ptc)); this%h1D_CanopyPLim_ptc(:)=spval  
@@ -2838,9 +2838,9 @@ implicit none
   call hist_addfld2d(fname='VHeatCap_vr',units='MJ/m3/K',type2d='levsoi',avgflag='A',&
     long_name='Vertically resolved Volumetric heat capacity',ptr_col=data2d_ptr,default='inactive')       
 
-  data2d_ptr => this%h2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:MaxNumBranches)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
-  call hist_addfld2d(fname='LEAF_NODE_NO_pft',units='none',type2d='nbranches',avgflag='I',&
-    long_name='Leaf number',ptr_patch=data2d_ptr,default='inactive')       
+  data1d_ptr => this%h1D_Num_Leaves_ptc(beg_ptc:end_ptc)        !NumOfLeaves_brch(MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX), leaf NO
+  call hist_addfld1d(fname='Num_Leaves_pft',units='none',avgflag='A',&
+    long_name='Number of leaves',ptr_patch=data1d_ptr,default='inactive')       
 
   data1d_ptr => this%h1D_RUB_ACTVN_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='RUB_ACTVN_pft',units='none',avgflag='A',&
@@ -4465,8 +4465,9 @@ implicit none
           this%h1D_RUB_ACTVN_ptc(nptc)=0._r8; NB1=0
           this%h1D_CanopyNLim_ptc(nptc)=0._r8
           this%h1D_CanopyPLim_ptc(nptc)=0._r8
+          this%h1D_Num_Leaves_ptc(nptc)=0._r8
           DO NB=1,NumOfBranches_pft(NZ,NY,NX)
-            this%h2D_LEAF_NODE_NO_ptc(nptc,NB)              = NumOfLeaves_brch(NB,NZ,NY,NX)
+            this%h1D_Num_Leaves_ptc(nptc)  = this%h1D_Num_Leaves_ptc(nptc)+NumOfLeaves_brch(NB,NZ,NY,NX)
             if(RubiscoActivity_brch(NB,NZ,NY,NX)>0._r8)then
               NB1=NB1+1
               this%h1D_RUB_ACTVN_ptc(nptc)   = this%h1D_RUB_ACTVN_ptc(nptc)+ RubiscoActivity_brch(NB,NZ,NY,NX)
@@ -4789,7 +4790,7 @@ implicit none
   this%h2D_ProteinNperm2LeafArea_pnd(nptc,:)=0._r8
   this%h1D_Growth_Stage_ptc(nptc)   =0
   
-
+  this%h1D_Num_Leaves_ptc(nptc)                     = 0._r8
   this%h1D_RUB_ACTVN_ptc(nptc)                      = 0._r8;
   this%h1D_CanopyNLim_ptc(nptc)                     = 0._r8
   this%h1D_CanopyPLim_ptc(nptc)                     = 0._r8

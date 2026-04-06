@@ -135,16 +135,16 @@ implicit none
   integer, parameter :: ideterminate          = 0
   integer, parameter :: inondeterminate       = 1
   integer, parameter :: ipltcal_Planting      = 0
-  integer, parameter :: ipltcal_Emerge        = 1
-  integer, parameter :: ipltcal_InitFloral    = 2
-  integer, parameter :: ipltcal_Jointing      = 3
-  integer, parameter :: ipltcal_Elongation    = 4
-  integer, parameter :: ipltcal_FlowerHead    = 5
-  integer, parameter :: ipltcal_Anthesis      = 6
-  integer, parameter :: ipltcal_BeginSeedFill = 7
-  integer, parameter :: ipltcal_SetSeedNumber = 8
-  integer, parameter :: ipltcal_SetSeedMass   = 9
-  integer, parameter :: ipltcal_EndSeedFill   = 10
+  integer, parameter :: ipltcal_Emerge        = 1  !germination, ->0.9
+  integer, parameter :: ipltcal_InitFloral    = 2  !main shoot or parent shoot leaf production, ->1.9
+  integer, parameter :: ipltcal_Jointing      = 3  !tiller production, ->2.9
+  integer, parameter :: ipltcal_Elongation    = 4  !stem elongation and booting, ->4.9
+  integer, parameter :: ipltcal_heading       = 5  !heading, ->5.9
+  integer, parameter :: ipltcal_Anthesis      = 6  !anthesis, ->6.9
+  integer, parameter :: ipltcal_BeginSeedFill = 7  !grain milk stage, -7.9
+  integer, parameter :: ipltcal_SetSeedNumber = 8  !grain doug s1, -8.5
+  integer, parameter :: ipltcal_SetSeedMass   = 9  !grain dough s2, ->9.0
+  integer, parameter :: ipltcal_EndSeedFill   = 10 !ripening, 9.9
 
   integer, parameter :: iphotop_neutral=0
   integer, parameter :: iphotop_short  =1

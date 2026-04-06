@@ -65,20 +65,17 @@ module PlantPhenolMod
   D9985: DO NZ=1,NP
 
     IF(DATAP(NZ).NE.'NO')THEN
-!
-!     PlantPopu_col=total biome population
-!
+      !
+      !     PlantPopu_col=total biome population
+      !
       PlantPopu_col=PlantPopu_col+PlantPopulation_pft(NZ)
-!
-!         SET CROP FLAG ACCORDINGTopRootLayer_pftTO PLANTING, HARVEST DATES, DEATH,
-!         1 = ALIVE, 0 = NOT ALIVE
-!         DATAP=PFT file name
-!
+      !
+      !         SET CROP FLAG ACCORDINGTopRootLayer_pftTO PLANTING, HARVEST DATES, DEATH,
+      !
       call set_plant_flags(I,J,NZ)
-
-!
-!         INITIALIZE VARIABLES IN ACTIVE PFT
-!
+      !
+      !         INITIALIZE VARIABLES IN ACTIVE PFT
+      !
       IF(IsPlantActive_pft(NZ).EQ.iActive)THEN
 
         call FindMainBranchNumber(NZ)
@@ -88,13 +85,7 @@ module PlantPhenolMod
         call TestPlantEmergence(I,J,NZ)
 
         call root_shoot_branching(I,J,NZ)
-
-        !
-        !           THE REST OF THE subroutine MODELS THE PHENOLOGY OF EACH BRANCH
-        !
-        !           doInitLeafOut_brch,doPlantLeafOut_brch=flags for initializing leafout,leafoff
-        !           Hours4Leafout_brch=leafout hours
-        !
+        
         IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR. doInitPlant_pft(NZ).EQ.itrue)THEN          
           call Emerged_plant_Phenology(I,J,NZ)
         ENDIF        
@@ -157,13 +148,13 @@ module PlantPhenolMod
     call branch_specific_phenology(I,J,NB,NZ)
 
   ENDDO D2010
-!
-!             WATER STRESS INDICATOR
-!
-!             PSICanopy_pft=canopy total water potential
-!             PSIMin4LeafOff=minimum canopy water potential for leafoff
-!             HoursTooLowPsiCan_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
-!
+  !
+  !             WATER STRESS INDICATOR
+  !
+  !             PSICanopy_pft=canopy total water potential
+  !             PSIMin4LeafOff=minimum canopy water potential for leafoff
+  !             HoursTooLowPsiCan_pft=number of hours PSICanopy_pft(< PSIMin4LeafOff (for output only)
+  !
   IF(PSICanopy_pft(NZ).LT.PSIMin4LeafOff(iPlantRootProfile_pft(NZ)))THEN
     HoursTooLowPsiCan_pft(NZ)=HoursTooLowPsiCan_pft(NZ)+1.0_r8
   ENDIF
@@ -482,13 +473,13 @@ module PlantPhenolMod
       ENDIF
     ENDDO D160
   ENDDO D180
-!
-! NON-STRUCTURAL C, N, P CONCENTRATIONS IN SHOOT
-!
-! CCPOLP,CZPOLP,CPPOLP=nonstructural C,N,P concn in canopy(g g-1)
-! CanopyNoduleNonstCConc_pft=nonstructural C concentration in canopy nodules
-! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
-!
+  !
+  ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN SHOOT
+  !
+  ! CCPOLP,CZPOLP,CPPOLP=nonstructural C,N,P concn in canopy(g g-1)
+  ! CanopyNoduleNonstCConc_pft=nonstructural C concentration in canopy nodules
+  ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
+  !
   IF(CanopyLeafSheathC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
     DO NE=1,NumPlantChemElms
       CanopyNonstElmConc_pft(NE,NZ)=AZMAX1(AMIN1(1.0_r8,CanopyNonstElms_pft(NE,NZ)/CanopyLeafSheathC_pft(NZ)))
@@ -956,39 +947,39 @@ module PlantPhenolMod
   !
   DayLensShortenChk=DayLenthCurrent.LT.DayLenthPrev
 
-  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    !2
-
+  IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN    !->2
+    !Main shoot or parent shoot leaf production
     call InitiateBranchFloral(I,J,NB,NZ,DayLensShortenChk)
-  !
-  ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN  !3
+    !
+  ELSEIF(iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).EQ.0)THEN  !->3
     !Stem jointing in phenological development marks the onset of rapid stem elongation in cereals 
     !like maize or wheat, when internodes begin to lengthen and the first node becomes visible or 
     !palpable above the soil surface.
-
+    !
+    !Tiller production
     call BranchStemJointing(I,J,NB,NZ,DayLensShortenChk)
     !
     !   ipltcal_Elongation,=mid stem elongation
     !
-  ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN !4
+  ELSEIF(iPlantCalendar_brch(ipltcal_Elongation,NB,NZ).EQ.0)THEN !->4
+    !Stem elongation and booting
     !Stem elongation in phenological development is the phase when cereal stems 
     !rapidly lengthen due to internode expansion, transitioning from tillering to booting/heading
 !    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'elongation'    
     call BranchStemElongation(I,J,NB,NZ,DayLensShortenChk)
-    !
-    !   ipltcal_FlowerHead,=end of stem elongation and setting max seed number
-    !
-  ELSEIF(iPlantCalendar_brch(ipltcal_FlowerHead,NB,NZ).EQ.0)THEN !5
+
+  ELSEIF(iPlantCalendar_brch(ipltcal_heading,NB,NZ).EQ.0)THEN !->5
     !“heading” is the stage when the plant’s inflorescence (flower head) becomes visible and emerges from the enclosing leaves or sheath.
- !   if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'heading'    
+    !
     call BranchFlowerHeading(I,J,NB,NZ,DayLensShortenChk) 
     !!
-  ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN !6
+  ELSEIF(iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ).EQ.0)THEN !->6
     !Anthesis in phenological development is the stage when flowers are fully open and functional, allowing pollination to occur.
-    !
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'anthesis'    
+    !Anthesis stage or flowering marks the beginning of grain setting and filling
+
     call BranchAnthesis(I,J,NB,NZ,DayLensShortenChk) 
 !
-  ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN !7
+  ELSEIF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).EQ.0)THEN !->7
     !
 !    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'bgseedfill'    
     call BeginBranchSeedFill(I,J,NB,NZ,DayLensShortenChk) 
@@ -997,7 +988,7 @@ module PlantPhenolMod
 !
 !   end date setting for final seed number
 !
-  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN !8
+  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).EQ.0)THEN !->8
 
 !    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'seedmass'      
     IF(CheckBranchNodeState(ipltcal_SetSeedNumber,NB,NZ,I,J))THEN
@@ -1008,7 +999,7 @@ module PlantPhenolMod
   !
   !   end of setting max seed size
   !
-  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN  !9
+  ELSEIF(iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN  !->9->10
 !    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'endseedfill'    
     IF(CheckBranchNodeState(ipltcal_SetSeedMass,NB,NZ,I,J))THEN
       iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ)=I
@@ -1130,9 +1121,10 @@ module PlantPhenolMod
   !
   !   NodeNumNormByMatgrp_brch=vegetative node number normalized for maturity group
   !   MatureGroup_pft=node number required for floral initiation
-
+  
+  
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
-    NodeNumNormByMatgrp_brch(NB,NZ)      = (ShootNodeNum_brch(NB,NZ)-ShootNodeNumAtInitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)
+    NodeNumNormByMatgrp_brch(NB,NZ)      = (ShootNodeNum_brch(NB,NZ)-ShootNodeNumAtInitFloral_brch(NB,NZ))/MatureGroup_pft(NZ)    
     HourlyNodeNumNormByMatgrp_brch       = NodeInitRate/(MatureGroup_pft(NZ)*GrothStageNorm4VegetaPheno)
     TotalNodeNumNormByMatgrp_brch(NB,NZ) = TotalNodeNumNormByMatgrp_brch(NB,NZ)+HourlyNodeNumNormByMatgrp_brch
   ENDIF
@@ -1148,6 +1140,9 @@ module PlantPhenolMod
 
 !----------------------------------------------------------------------------------------------------
   function CheckBranchNodeState(ipltcal,NB,NZ,I,J)result(NodeNumChk)
+  !
+  !Description:
+  !
   implicit none
   integer, intent(in) :: ipltcal   !phenological stage
   integer, intent(in) :: NB,NZ,I,J
@@ -1155,6 +1150,7 @@ module PlantPhenolMod
   logical :: NodeNumChk
 
   associate(                                                                        &
+    MatureGroup_pft                 => plt_pheno%MatureGroup_pft                  , & !input  :acclimated plant maturity group, [-]  
     MatureGroup_brch                => plt_pheno%MatureGroup_brch                 , & !input  :plant maturity group, [-]  
     ShootNodeNum_brch               => plt_morph%ShootNodeNum_brch                , & !input  :shoot node number, [-]  
     NumOfLeaves_brch                => plt_morph%NumOfLeaves_brch                 , & !input  :leaf number, [-]  
@@ -1166,31 +1162,21 @@ module PlantPhenolMod
 
   select case(ipltcal)
     case(ipltcal_InitFloral) !2
-    NodeNumChk  = ShootNodeNum_brch(NB,NZ).GT.MatureGroup_brch(NB,NZ)+ShootNodeNumAtInitFloral_brch(NB,NZ)
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initflora',ShootNodeNum_brch(NB,NZ),NodeNumChk,ShootNodeNumAtInitFloral_brch(NB,NZ)
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initflora',ShootNodeNum_brch(NB,NZ),NodeNumChk,ShootNodeNumAtInitFloral_brch(NB,NZ)
+    !ensures the plant is tall enough 
+    !the transition of the shoot apical meristem from vegetative to reproductive growth
+    NodeNumChk  = ShootNodeNum_brch(NB,NZ).GT.MatureGroup_pft(NZ)+ShootNodeNumAtInitFloral_brch(NB,NZ)    
 
     case(ipltcal_Jointing) !3
     NodeNumChk = NodeNumNormByMatgrp_brch(NB,NZ).GT.0.25_r8*GrothStageNorm4VegetaPheno
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'jointing',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk    
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'jointing',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk    
 
     case(ipltcal_Elongation) !4
     NodeNumChk = NodeNumNormByMatgrp_brch(NB,NZ).GT.0.50_r8*GrothStageNorm4VegetaPheno
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'elong',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk    
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'elong',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk    
 
-    case(ipltcal_FlowerHead) !5
+    case(ipltcal_heading) !5
     NodeNumChk = NodeNumNormByMatgrp_brch(NB,NZ).GT.1.00_r8*GrothStageNorm4VegetaPheno
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'heading',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk,&
-!      ShootNodeNum_brch(NB,NZ),ShootNodeNumAtInitFloral_brch(NB,NZ)    
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'heading',NodeNumNormByMatgrp_brch(NB,NZ),NodeNumChk,&
-!      ShootNodeNum_brch(NB,NZ),ShootNodeNumAtInitFloral_brch(NB,NZ)        
 
     case(ipltcal_Anthesis)   !6 
     NodeNumChk = NumOfLeaves_brch(NB,NZ).GT.ShootNodeNumAtInitFloral_brch(NB,NZ)
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'anthesis',NumOfLeaves_brch(NB,NZ),ShootNodeNumAtInitFloral_brch(NB,NZ),NodeNumChk    
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'anthesis',NumOfLeaves_brch(NB,NZ),ShootNodeNumAtInitFloral_brch(NB,NZ),NodeNumChk    
 
     case(ipltcal_BeginSeedFill) !7
     NodeNumChk = ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.0.50_r8*GrothStageNorm4ReprodPheno
@@ -1200,8 +1186,6 @@ module PlantPhenolMod
 
     case(ipltcal_SetSeedMass) !9
     NodeNumChk=ReprodNodeNumNormByMatrgrp_brch(NB,NZ).GT.1.50_r8*GrothStageNorm4ReprodPheno
-!    if(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'setseedmass',ReprodNodeNumNormByMatrgrp_brch(NB,NZ),NodeNumChk    
-!    if(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'setseedmass',ReprodNodeNumNormByMatrgrp_brch(NB,NZ),NodeNumChk    
 
     case default
     NodeNumChk=.False.
@@ -1263,7 +1247,7 @@ module PlantPhenolMod
   integer, intent(in) :: NZ
   logical, intent(in) :: DayLensShortenChk
   character(len=*), parameter :: subname='BranchAnthesis'
-  logical :: LeafOffChk,PhenoChk1,PhenoChk2,CalChk
+  logical :: LeafOffChk,PerennialPhenoChk,AnnualPhenoChk,CalChk
 
   associate(                                                           &
     Hours4LeafOff_brch        => plt_pheno%Hours4LeafOff_brch         ,& !input  :cold requirement for autumn leafoff/hardening, [h]
@@ -1279,17 +1263,16 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
 
-  LeafOffChk = Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
+  LeafOffChk = Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ) .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable
 
-  PhenoChk1  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+  PerennialPhenoChk  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
     .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short .AND. DayLensShortenChk
 
-  PhenoChk2 = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
-  CalChk    = iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantCalendar_brch(ipltcal_FlowerHead,NB,NZ).NE.0 
+  AnnualPhenoChk = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
+  CalChk    = iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantCalendar_brch(ipltcal_heading,NB,NZ).NE.0 
 
   IF(CheckBranchNodeState(ipltcal_Anthesis,NB,NZ,I,J) .OR. CalChk &
-    .OR. (PhenoChk1 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) &
-    .OR. (PhenoChk2 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk))THEN
+    .OR. (PerennialPhenoChk  .AND. LeafOffChk) .OR. (AnnualPhenoChk .AND. LeafOffChk))THEN
 
     IF(NB.EQ.MainBranchNum_pft(NZ) .OR. iPlantCalendar_brch(ipltcal_Anthesis,MainBranchNum_pft(NZ),NZ).NE.0)THEN
       iPlantCalendar_brch(ipltcal_Anthesis,NB,NZ) = I
@@ -1316,7 +1299,7 @@ module PlantPhenolMod
   integer, intent(in) :: NZ
   logical, intent(in) :: DayLensShortenChk   !true when day length is decreasing
   character(len=*), parameter :: subname='BranchFlowerHeading'
-  logical :: LeafOffChk,PhenoChk1,PhenoChk2
+  logical :: LeafOffChk,PerennialPhenoChk,AnnualPhenoChk
 
   associate(                                                           &
     Hours4LeafOff_brch        => plt_pheno%Hours4LeafOff_brch         ,& !input  :cold requirement for autumn leafoff/hardening, [h]
@@ -1334,14 +1317,14 @@ module PlantPhenolMod
   LeafOffChk = doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ) 
 
   !Perennial (Cold deciduous, or cold drought deciduous) .and. not short photoperiod and day length is decreasing
-  PhenoChk1  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+  PerennialPhenoChk  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
     .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short .AND. DayLensShortenChk
 
   !Annual drought deciduous  
-  PhenoChk2=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual  
+  AnnualPhenoChk=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual  
 
-  IF(CheckBranchNodeState(ipltcal_FlowerHead,NB,NZ,I,J) .OR. ((PhenoChk1 .OR. PhenoChk2)  .AND.  LeafOffChk))THEN
-    iPlantCalendar_brch(ipltcal_FlowerHead,NB,NZ)=I
+  IF(CheckBranchNodeState(ipltcal_heading,NB,NZ,I,J) .OR. ((PerennialPhenoChk .OR. AnnualPhenoChk)  .AND.  LeafOffChk))THEN
+    iPlantCalendar_brch(ipltcal_heading,NB,NZ)=I
   ENDIF
   call PrintInfo('end '//subname)
   end associate
@@ -1360,7 +1343,7 @@ module PlantPhenolMod
   integer, intent(in) :: NZ
   logical, intent(in) :: DayLensShortenChk   !is day length decreasing
   character(len=*), parameter :: subname='BranchStemElongation'
-  logical :: NodeNumChk,LeafOffChk,PhenoChk1,PhenoChk2
+  logical :: NodeNumChk,LeafOffChk,PerennialPhenoChk,AnnualPhenoChk
 
   associate(                                                               &
     NodeNumNormByMatgrp_brch    => plt_pheno%NodeNumNormByMatgrp_brch     ,& !input  :normalized node number during vegetative growth stages, [-]
@@ -1380,16 +1363,17 @@ module PlantPhenolMod
   LeafOffChk = doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
 
   !perrennial (cold deciduous or drought deciduous)
-  PhenoChk1  = iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. &
+  PerennialPhenoChk  = iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. &
     (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
     .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short .AND. DayLensShortenChk
 
   !annual drought deciduous  
-  PhenoChk2= iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu 
+  AnnualPhenoChk= iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu 
 
-  IF(CheckBranchNodeState(ipltcal_Elongation,NB,NZ,I,J) .OR. ((PhenoChk1 .OR. PhenoChk2) .AND.  LeafOffChk))THEN
+  IF(CheckBranchNodeState(ipltcal_Elongation,NB,NZ,I,J) .OR. ((PerennialPhenoChk .OR. AnnualPhenoChk) .AND.  LeafOffChk))THEN
     iPlantCalendar_brch(ipltcal_Elongation,NB,NZ)=I
 
+    !indeterminate
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantDevelopPattern_pft(NZ).NE.ideterminate)THEN
       LeafNumberAtFloralInit_brch(NB,NZ)=ShootNodeNum_brch(NB,NZ)
     ENDIF
@@ -1408,7 +1392,7 @@ module PlantPhenolMod
   integer, intent(in) :: NZ
   logical, intent(in) :: DayLensShortenChk
   character(len=*), parameter :: subname='BranchStemJointing'
-  logical :: PhenoChk1,PhenoChk2,LeafOffChk
+  logical :: PerennialPhenoChk,AnnualPhenoChk,LeafOffChk
 
   associate(                                                           &
     iPlantPhenolType_pft      => plt_pheno%iPlantPhenolType_pft       ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
@@ -1421,14 +1405,15 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
 
-  PhenoChk1  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
+  PerennialPhenoChk  = (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid) &
     .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short .AND. DayLensShortenChk
-  PhenoChk2  = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
 
-  LeafOffChk = Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
+  AnnualPhenoChk  = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
 
-  IF(CheckBranchNodeState(ipltcal_Jointing,NB,NZ,I,J) .OR. (PhenoChk1 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) &
-                .OR. (PhenoChk2 .AND. doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. LeafOffChk) )THEN
+  LeafOffChk = doPlantLeafOut_brch(NB,NZ).EQ.iDisable .AND. Hours4LeafOff_brch(NB,NZ).GT.HourReq4LeafOff_brch(NB,NZ)
+
+  IF(CheckBranchNodeState(ipltcal_Jointing,NB,NZ,I,J) &
+    .OR. (PerennialPhenoChk .AND. LeafOffChk) .OR. (AnnualPhenoChk .AND. LeafOffChk))THEN
     
     iPlantCalendar_brch(ipltcal_Jointing,NB,NZ)=I
   ENDIF
@@ -1438,14 +1423,17 @@ module PlantPhenolMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine InitiateBranchFloral(I,J,NB,NZ,DayLensShortenChk)
+  !
+  !Description:
   implicit none
   integer, intent(in) :: I
   integer, intent(in) :: J
   integer, intent(in) :: NB
   integer, intent(in) :: NZ
-  logical, intent(in) :: DayLensShortenChk
+  logical, intent(in) :: DayLensShortenChk  !true when day length is decreasing
   character(len=*), parameter :: subname='InitiateBranchFloral'
-  logical :: NodeNumChk,LeafOutChk,PlantDayChk,CanopyHeightChk,PhenoDecidChk,CropPhenoChk,PhotoPrdChk,PhenolCheck
+  logical :: NodeNumChk,LeafOutChk,PlantDayChk,CanopyHeightChk,PerennialPhenoDecidChk
+  logical :: CropPhenoChk,PhotoPrdChk,PhenolCheck,PhotoLongCheck,PhotoShortCheck,AnnualFloralCheck
   real(r8) :: PPD
 
   associate(                                                                     &
@@ -1476,18 +1464,16 @@ module PlantPhenolMod
   LeafOutChk      = Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
   PlantDayChk     = I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
   CanopyHeightChk = CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
-  PhenoDecidChk   = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
+  PerennialPhenoDecidChk   = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
     (iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
 
   !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
   !iPlantPhenolType_pft should be set according to koppen climate zone.  
+
   CropPhenoChk = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
-  PhenolCheck  = ((PhenoDecidChk .OR. CropPhenoChk) .AND. CanopyHeightChk .AND. DayLensShortenChk)
-
-!  iF(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initflo',LeafOutChk, PlantDayChk,Hours4Leafout_brch(NB,NZ),HourReq4LeafOut_brch(NB,NZ)
-!  iF(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initflo',LeafOutChk, PlantDayChk,Hours4Leafout_brch(NB,NZ),HourReq4LeafOut_brch(NB,NZ)
-
-  IF((CheckBranchNodeState(ipltcal_InitFloral,NB,NZ,I,J) .AND. (LeafOutChk .OR. PlantDayChk)) .OR. PhenolCheck)THEN
+  PhenolCheck  = ((PerennialPhenoDecidChk .OR. CropPhenoChk) .AND. CanopyHeightChk .AND. DayLensShortenChk)
+  AnnualFloralCheck= (CheckBranchNodeState(ipltcal_InitFloral,NB,NZ,I,J) .AND. (LeafOutChk .OR. PlantDayChk))
+  IF( AnnualFloralCheck .OR. PhenolCheck)THEN
     !
     !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
     !     AND ON MATURITY GROUP, CRITICAL PHOTOPERIOD AND PHOTOPERIOD
@@ -1505,13 +1491,11 @@ module PlantPhenolMod
       PPD=AZMAX1(CriticPhotoPeriod_pft(NZ)-DayLenthCurrent)
       IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short .AND. DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
     ENDIF
-    
-    PhotoPrdChk=iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral &
-      .OR. (iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ)) &
-      .OR. (iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
 
-!    iF(NZ==1)write(683,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initbfl',PhotoPrdChk,PPD,PhotoPeriodSens_pft(NZ)
-!    iF(NZ==2)write(684,*)(plt_site%iYearCurrent*1000+I)*10+J/24.,NB,'initbfl',PhotoPrdChk,PPD,PhotoPeriodSens_pft(NZ)    
+    PhotoShortCheck=(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ))
+    PhotoLongCheck=(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
+    PhotoPrdChk=iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral .OR. PhotoShortCheck .OR. PHotoLongCheck
+    
     IF( PhotoPrdChk .OR. PhenolCheck)THEN
       iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ) = I
       ShootNodeNumAtInitFloral_brch(NB,NZ)          = ShootNodeNum_brch(NB,NZ)

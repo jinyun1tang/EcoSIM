@@ -4,8 +4,8 @@ module SnowBalanceMod
   use abortutils,       only: endrun
   use SnowTransportMod, only: SoluteTransportThruSnow
   use EcoSIMCtrlMod,    only: lverb,  snowRedist_model, fixWaterLevel
-  use minimathmod,      only: AZMAX1, isclose,          AZMIN1, AZMAX1d, AZERO
-  use InitSOMBGCMod,    only: gOC_to_m3_OM
+  use minimathmod,      only: AZMAX1, isclose, AZMIN1, AZMAX1d, AZERO
+  use MiniFuncMod,      only: gOC_to_m3_OM
   use DebugToolMod
   use SoilPropertyDataType
   use SurfLitterDataType

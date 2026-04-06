@@ -833,7 +833,7 @@ module PlantDisturbsMod
 
   IF(nonEvergreenChk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
     MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
-    ShootNodeNumAtInitFloral_brch(NB,NZ)               = ShootNodeNum_brch(NB,NZ)
+    ShootNodeNumAtInitFloral_brch(NB,NZ)         = ShootNodeNum_brch(NB,NZ)
     NodeNumberAtAnthesis_brch(NB,NZ)             = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
@@ -847,7 +847,7 @@ module PlantDisturbsMod
       D3010: DO NBX=1,NumOfBranches_pft(NZ)
         IF(NBX.NE.MainBranchNum_pft(NZ))THEN
           MatureGroup_brch(NBX,NZ)                   = MatureGroup_pft(NZ)
-          ShootNodeNumAtInitFloral_brch(NBX,NZ)            = ShootNodeNum_brch(NBX,NZ)
+          ShootNodeNumAtInitFloral_brch(NBX,NZ)      = ShootNodeNum_brch(NBX,NZ)
           NodeNumberAtAnthesis_brch(NBX,NZ)          = 0._r8
           LeafNumberAtFloralInit_brch(NBX,NZ)        = 0._r8
           TotalNodeNumNormByMatgrp_brch(NBX,NZ)      = 0._r8

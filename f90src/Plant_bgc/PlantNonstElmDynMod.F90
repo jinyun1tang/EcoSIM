@@ -1,8 +1,9 @@
 module PlantNonstElmDynMod
   use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use DebugToolMod,  only: PrintInfo
+  use DebugToolMod,  only: PrintInfo,DebugPrint
   use PlantMathFuncMod, only : ExchFluxLimiter
+  USE minimathmod, only : AZERO
   use ElmIDMod
   use PlantBGCPars
   use PlantAPIData  
@@ -121,7 +122,7 @@ module PlantNonstElmDynMod
   DO NE=1,NumPlantChemElms
     mass_inital(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
-
+  call PrintInfo('here2')
   TotStalkMassC                        = 0._r8
   TotStalkRsrv_loc(1:NumPlantChemElms) = 0._r8
   D330: DO NB=1,NumOfBranches_pft(NZ)
@@ -138,6 +139,7 @@ module PlantNonstElmDynMod
   sumchk1=TotStalkRsrv_loc(ielmc)
   sumchk2=0._r8
   IF(TotStalkMassC.GT.ZERO4Groth_pft(NZ).AND.TotStalkRsrv_loc(ielmc).GT.ZERO4Groth_pft(NZ))THEN
+
     D335: DO NB=1,NumOfBranches_pft(NZ)
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
@@ -145,12 +147,13 @@ module PlantNonstElmDynMod
           XFRE(ielmc)                     = 0.1_r8*StalkRsrvGradt/TotStalkMassC
           StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
           sumchk2                         = sumchk2+StalkRsrvElms_brch(ielmc,NB,NZ)
+
           !based on stoichiometry gradient
-          DO NE=2,NumPlantChemElms
-            StalkRsrvGradt               = TotStalkRsrv_loc(NE)*StalkRsrvElms_brch(ielmc,NB,NZ)-StalkRsrvElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)
-            XFRE(NE)                     = 0.1_r8*StalkRsrvGradt/TotStalkRsrv_loc(ielmc)
+          DO NE=2,NumPlantChemElms            
+            StalkRsrvGradt               = TotStalkRsrv_loc(NE)*StalkRsrvElms_brch(ielmc,NB,NZ)-StalkRsrvElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)            
+            XFRE(NE)                     = 0.1_r8*AZERO(StalkRsrvGradt)/TotStalkRsrv_loc(ielmc)
             StalkRsrvElms_brch(NE,NB,NZ) = StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
-          ENDDO
+          ENDDO          
         ENDIF
       ENDIF
     ENDDO D335
@@ -725,7 +728,8 @@ module PlantNonstElmDynMod
   IF(ShootBiomC_brch.GT.ZERO4Groth_pft(NZ))THEN
     CPOOLD=(CanopyNonstElms_brch(ielmc,NB,NZ)*SapwoodBiomassC_brch(NB,NZ) &
       -StalkRsrvElms_brch(ielmc,NB,NZ)*CanopyLeafSheathC_brch(NB,NZ))/ShootBiomC_brch
-    XFRE(ielmc)                       = FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD
+
+    XFRE(ielmc)                       = FXFY(iPlantPhenolPattern_pft(NZ))*AZERO(CPOOLD)
     CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE(ielmc)
     StalkRsrvElms_brch(ielmc,NB,NZ)   = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
   ENDIF
@@ -734,7 +738,7 @@ module PlantNonstElmDynMod
     DO NE=2,NumPlantChemElms
       NonstGradt=(CanopyNonstElms_brch(NE,NB,NZ)*StalkRsrvElms_brch(ielmc,NB,NZ) &
         -StalkRsrvElms_brch(NE,NB,NZ)*CanopyNonstElms_brch(ielmc,NB,NZ))/CPOOLT
-      XFRE(NE)                       = FXFZ(iPlantPhenolPattern_pft(NZ))*NonstGradt
+      XFRE(NE)                       = FXFZ(iPlantPhenolPattern_pft(NZ))*AZERO(NonstGradt)
       call ExchFluxLimiter(CanopyNonstElms_brch(NE,NB,NZ),StalkRsrvElms_brch(NE,NB,NZ),XFRE(NE))
       CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)-XFRE(NE)
       StalkRsrvElms_brch(NE,NB,NZ)   = StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -777,7 +781,8 @@ module PlantNonstElmDynMod
       IF(WTPLTX.GT.ZERO4Groth_pft(NZ))THEN
         CPOOLD=(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*SapwoodBiomassC_brch(NB,NZ) &
           -StalkRsrvElms_brch(ielmc,NB,NZ)*WTRTRX)/WTPLTX
-        XFRE(ielmc)                                 = AZMAX1(FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD)
+
+        XFRE(ielmc) = AZMAX1(FXFY(iPlantPhenolPattern_pft(NZ))*CPOOLD)
 
         call ExchFluxLimiter(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ),StalkRsrvElms_brch(ielmc,NB,NZ),XFRE(ielmc))
 

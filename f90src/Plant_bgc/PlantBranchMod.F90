@@ -437,7 +437,7 @@ module PlantBranchMod
   real(r8), intent(in) :: CNRTW,CPRTW   !root/stalk
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
   real(r8), intent(out) :: ShootStructE_brch(NumPlantChemElms)    
-  real(r8), intent(out) :: YCO2Gro_brch                               !respiraiton ratio of canopy growth, 1./YCO2Gro_brch, total biomass required to give 1 unit of CO2 respiration
+  real(r8), intent(out) :: YCO2Gro_brch     !respiraiton ratio of canopy growth, 1./YCO2Gro_brch, total biomass required to give 1 unit of CO2 respiration
   real(r8), intent(out) :: CNLFM,CPLFM
   real(r8), intent(out) :: CNSHX,CPSHX
   real(r8), intent(out) :: CNLFX,CPLFX
@@ -446,30 +446,30 @@ module PlantBranchMod
   character(len=*), parameter :: subname='UpdateBranchAllometry'
   real(r8)   :: DMSHT  !shoot C biomass yield, averaged across all canopy organs
 
-  associate(                                                         &
-    LeafBiomGrowthYld_pft    => plt_allom%LeafBiomGrowthYld_pft     ,& !input  :leaf growth yield, [g g-1]
+  associate(                                                               &
+    LeafBiomGrowthYld_pft       => plt_allom%LeafBiomGrowthYld_pft        ,& !input  :leaf growth yield, [g g-1]
     PetolShethBiomGrowthYld_pft => plt_allom%PetolShethBiomGrowthYld_pft  ,& !input  :sheath growth yield, [g g-1]
-    EarBiomGrowthYld_pft     => plt_allom%EarBiomGrowthYld_pft      ,& !input  :ear growth yield, [gC gC-1]
-    rNCEar_pft               => plt_allom%rNCEar_pft                ,& !input  :ear N:C ratio, [gN gC-1]
-    rPCReserve_pft           => plt_allom%rPCReserve_pft            ,& !input  :reserve P:C ratio, [gP gC-1]
-    rPCHusk_pft              => plt_allom%rPCHusk_pft               ,& !input  :husk P:C ratio, [gP gC-1]
-    rPCStalk_pft             => plt_allom%rPCStalk_pft              ,& !input  :stalk P:C ratio, [g g-1]
-    rNCStalk_pft             => plt_allom%rNCStalk_pft              ,& !input  :stalk N:C ratio, [gN gC-1]
-    rNCReserve_pft           => plt_allom%rNCReserve_pft            ,& !input  :reserve N:C ratio, [gN gC-1]
-    StalkBiomGrowthYld_pft   => plt_allom%StalkBiomGrowthYld_pft    ,& !input  :stalk growth yield, [gC gC-1]
-    HuskBiomGrowthYld_pft    => plt_allom%HuskBiomGrowthYld_pft     ,& !input  :husk growth yield, [gC gC-1]
-    rNCHusk_pft              => plt_allom%rNCHusk_pft               ,& !input  :husk N:C ratio, [gN gC-1]
-    rPCEar_pft               => plt_allom%rPCEar_pft                ,& !input  :ear P:C ratio, [gP gC-1]
-    ReserveBiomGrowthYld_pft => plt_allom%ReserveBiomGrowthYld_pft  ,& !input  :reserve growth yield, [gC gC-1]
-    GrainBiomGrowthYld_pft   => plt_allom%GrainBiomGrowthYld_pft    ,& !input  :grain growth yield, [gC gC-1]
-    iPlantCalendar_brch      => plt_pheno%iPlantCalendar_brch       ,& !input  :plant growth stage, [-]
-    PetolShethStrutElms_brch     => plt_biom%PetolShethStrutElms_brch       ,& !input  :branch sheath structural element, [g d-2]
-    GrainStrutElms_brch      => plt_biom%GrainStrutElms_brch        ,& !input  :branch grain structural element mass, [g d-2]
-    EarStrutElms_brch        => plt_biom%EarStrutElms_brch          ,& !input  :branch ear structural chemical element mass, [g d-2]
-    HuskStrutElms_brch       => plt_biom%HuskStrutElms_brch         ,& !input  :branch husk structural element mass, [g d-2]
-    LeafStrutElms_brch       => plt_biom%LeafStrutElms_brch         ,& !input  :branch leaf structural element mass, [g d-2]
-    SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch sapwood C, [gC d-2]
-    RootBiomGrosYld_pft      => plt_allom%RootBiomGrosYld_pft        & !input  :root growth yield, [g g-1]
+    EarBiomGrowthYld_pft        => plt_allom%EarBiomGrowthYld_pft         ,& !input  :ear growth yield, [gC gC-1]
+    rNCEar_pft                  => plt_allom%rNCEar_pft                   ,& !input  :ear N:C ratio, [gN gC-1]
+    rPCReserve_pft              => plt_allom%rPCReserve_pft               ,& !input  :reserve P:C ratio, [gP gC-1]
+    rPCHusk_pft                 => plt_allom%rPCHusk_pft                  ,& !input  :husk P:C ratio, [gP gC-1]
+    rPCStalk_pft                => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
+    rNCStalk_pft                => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]
+    rNCReserve_pft              => plt_allom%rNCReserve_pft               ,& !input  :reserve N:C ratio, [gN gC-1]
+    StalkBiomGrowthYld_pft      => plt_allom%StalkBiomGrowthYld_pft       ,& !input  :stalk growth yield, [gC gC-1]
+    HuskBiomGrowthYld_pft       => plt_allom%HuskBiomGrowthYld_pft        ,& !input  :husk growth yield, [gC gC-1]
+    rNCHusk_pft                 => plt_allom%rNCHusk_pft                  ,& !input  :husk N:C ratio, [gN gC-1]
+    rPCEar_pft                  => plt_allom%rPCEar_pft                   ,& !input  :ear P:C ratio, [gP gC-1]
+    ReserveBiomGrowthYld_pft    => plt_allom%ReserveBiomGrowthYld_pft     ,& !input  :reserve growth yield, [gC gC-1]
+    GrainBiomGrowthYld_pft      => plt_allom%GrainBiomGrowthYld_pft       ,& !input  :grain growth yield, [gC gC-1]
+    iPlantCalendar_brch         => plt_pheno%iPlantCalendar_brch          ,& !input  :plant growth stage, [-]
+    PetolShethStrutElms_brch    => plt_biom%PetolShethStrutElms_brch      ,& !input  :branch sheath structural element, [g d-2]
+    GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch           ,& !input  :branch grain structural element mass, [g d-2]
+    EarStrutElms_brch           => plt_biom%EarStrutElms_brch             ,& !input  :branch ear structural chemical element mass, [g d-2]
+    HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch            ,& !input  :branch husk structural element mass, [g d-2]
+    LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch            ,& !input  :branch leaf structural element mass, [g d-2]
+    SapwoodBiomassC_brch        => plt_biom%SapwoodBiomassC_brch          ,& !input  :branch sapwood C, [gC d-2]
+    RootBiomGrosYld_pft         => plt_allom%RootBiomGrosYld_pft           & !input  :root growth yield, [g g-1]
   )
 
   call PrintInfo('beg '//subname)
@@ -2493,9 +2493,9 @@ module PlantBranchMod
       ENDIF
     ENDIF
   ENDIF
-!
-!   SPRING OR FALL FLAG RESET
-!
+  !
+  !   SPRING OR FALL FLAG RESET
+  !
 
   IF(doPlantLeafOut_brch(NB,NZ).EQ.iEnable .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
     doPlantLeafOut_brch(NB,NZ)          = iDisable
@@ -2712,7 +2712,8 @@ module PlantBranchMod
   real(r8), intent(in) :: TurgEff4CanopyResp
   integer :: NE
   real(r8) :: XFRE(1:NumPlantChemElms)
-  logical :: PlantingChk,RemobChk,LeafOutChk,AnnualPlantChk,LeafMobil4OutChk
+  logical :: AnnualPlantChk,PerennialPlantChk  
+  logical :: PlantingChk,RemobChk,LeafOutChk,LeafMobil4OutChk
   character(len=*), parameter :: subname='BranchElmntTransfer'
 
   ! begin_execution
@@ -2793,14 +2794,11 @@ module PlantBranchMod
       ENDDO
     ENDIF
   ENDIF
-
   !
   ! TRANSFER LEAF AND STALK NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   ! IN PERENNIALS AFTER GRAIN FILL IN DETERMINATES, AFTER AUTUMNIZ'N
   ! IN INDETERMINATES, OR AFTER SUSTAINED WATER STRESS
   !
-  !
-
   IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
     call SeasonStoreShootTransfer(I,J,NB,NZ)
   ENDIF
@@ -2815,20 +2813,17 @@ module PlantBranchMod
   !   CanopyLeafSheathC_brch=leaf+PetolSheth mass
   !   SapwoodBiomassC_brch=stalk sapwood mass
   !
-  IF((iPlantPhenolPattern_pft(NZ).EQ.iplt_annual  &
-    .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0) &
-    .OR. (iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial &
-     .AND. iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).NE.0))THEN
-
+  AnnualPlantChk=iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0
+  PerennialPlantChk=iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. iPlantCalendar_brch(ipltcal_Jointing,NB,NZ).NE.0
+  IF(AnnualPlantChk .OR. PerennialPlantChk)THEN
+    !
     call StalkRsrvShootNonstTransfer(I,J,NB,NZ)
-
-    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.&
-      iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)THEN
+    !
+    IF(AnnualPlantChk)THEN
       !stalk-root transfer
       call StalkRsrvRootNonstTransfer(I,J,NB,NZ)
     ENDIF
   ENDIF
-
   !
   !   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
   !   SEASONAL STORAGE POOL 
@@ -3254,7 +3249,8 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8),intent(in) :: TFN6_vr(JZ1)
-  real(r8), intent(in) :: YCO2Gro_brch,CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
+  real(r8), intent(in) :: YCO2Gro_brch !respiration quotient
+  real(r8), intent(in) :: CNLFM,CPLFM,CNSHX,CPSHX,CNLFX,CPLFX
   real(r8), intent(in) :: ShootStructN_brch
   real(r8), intent(in) :: WaterStress4Groth
   real(r8), intent(in) :: TurgEff4CanopyResp
@@ -3485,17 +3481,17 @@ module PlantBranchMod
     KNOD   = MXNOD-MNNOD+1
     GNOD   = KNOD           !number of growing nodes
     ALLOCL = 1.0_r8/GNOD    !allocation to each growing nodes
-    DO NE     = 1, NumPlantChemElms
+    DO NE  = 1, NumPlantChemElms
       GrowthElms(NE)=ALLOCL*GrowthLeaf(NE)
     ENDDO
 
     GrozNodesPerPlant=ALLOCL*FracGroth2Node_pft(NZ)*NumCogrowthNode_pft(NZ)
-!
-!     GROWTH AT EACH CURRENT NODE
-!
-!     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
-!     CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
-!
+    !
+    !     GROWTH AT EACH CURRENT NODE
+    !
+    !     WGLF,WGLFN,WGLFP,LeafProteinC_node=node leaf C,N,P,protein mass
+    !     CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
+    !
     D490: DO KK=MNNOD,MXNOD
       K=MOD(KK,MaxNodesPerBranch1)
       IF(K.EQ.0.AND.KK.NE.0)K=MaxNodesPerBranch1
@@ -4022,9 +4018,8 @@ module PlantBranchMod
       !
 
       IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
-
         CanPBranchHeight(NB,NZ)=AZMAX1(PetoleLength_node(K,NB,NZ))
-
+        !
         IF(PetolShethElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
             PetolShethChemElmRemobFlx_brch(NE,NB,NZ) = PetolShethElmntNode_brch(NE,K,NB,NZ)*RCCE(NE)

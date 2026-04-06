@@ -31,7 +31,8 @@ implicit none
   REAL(R8),target,allocatable ::  LOGPSIMN_col(:,:)                            !log water potential at wilting point,[-]
   REAL(R8),target,allocatable ::  LOGPSIMXD_col(:,:)                           !log water potential at field capacity ,[-]
   REAL(R8),target,allocatable ::  LOGPSIMND_col(:,:)                           !log water potential at saturation - log water potential at field capacity,[-]
-  real(r8),target,allocatable ::  VHeatCapSolidSoil_vr(:,:,:)                 !soil solid heat capacity, [MPa m-3 K-1]
+  real(r8),target,allocatable ::  VHeatCapSolidSoil_vr(:,:,:)                  !soil solid heat capacity, [MPa m-3 K-1]
+  real(r8),target,allocatable ::  VHeatCapMineralSoil_vr(:,:,:)                !mineral soil heat capacity, [MPa m-3 K-1]
   real(r8),target,allocatable ::  ActiveLayDepZ_col(:,:)                       !active layer depth of a permafrost soil, [m]
   real(r8),target,allocatable ::  CondGasXSurf_col(:,:)                        !gas conductance for soil-atmosphere exchange, [m/h]
   real(r8),target,allocatable ::  HBAconst_vr(:,:,:)                           !A factor degraded root stress, for the the Hardin & Black method with OM, [sqrt(MPa)]
@@ -67,6 +68,7 @@ contains
   allocate(LOGPSIMXD_col(JY,JX));       LOGPSIMXD_col=0._r8
   allocate(LOGPSIMND_col(JY,JX));       LOGPSIMND_col=0._r8
   allocate(VHeatCapSolidSoil_vr(0:JZ,JY,JX));   VHeatCapSolidSoil_vr=0._r8
+  allocate(VHeatCapMineralSoil_vr(JZ,JY,JX)); VHeatCapMineralSoil_vr=0._r8
   allocate(ActiveLayDepZ_col(JY,JX));       ActiveLayDepZ_col=0._r8
   allocate(CondGasXSurf_col(JY,JX)); CondGasXSurf_col=0._r8
   allocate(HBAconst_vr(JZ,JY,JX)); HBAconst_vr=0._r8
@@ -105,6 +107,7 @@ contains
   call destroy(LOGPSIMXD_col)
   call destroy(LOGPSIMND_col)
   call destroy(VHeatCapSolidSoil_vr)
+  call destroy(VHeatCapMineralSoil_vr)
   call destroy(ActiveLayDepZ_col)
   end subroutine DestructSoilPhysData
 
