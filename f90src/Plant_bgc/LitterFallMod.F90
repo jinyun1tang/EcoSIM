@@ -119,7 +119,7 @@ implicit none
     IsPlantActive_pft(NZ) = iDormant
 
     call InitPlantPhenoMorphoBio(NZ)
-    write(*,*)'reseed',I*1000+J/24.,NZ,CanopySeedNumX_pft(NZ)
+    
     if(CanopySeedNumX_pft(NZ)>0._r8)then
       SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*(PlantPopulation_pft(NZ)-CanopySeedNumX_pft(NZ))
       SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)

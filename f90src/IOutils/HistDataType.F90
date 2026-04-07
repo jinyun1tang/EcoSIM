@@ -341,7 +341,7 @@ implicit none
   real(r8),pointer   :: h1D_STANDING_DEAD_C_ptc(:) 
   real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)   
   real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
-  real(r8),pointer   :: h1D_cNPP_ptc(:)        
+  real(r8),pointer   :: h1D_NPP_ptc(:)        
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)     
   real(r8),pointer   :: h1D_EmergeHeight_ptc(:)
   real(r8),pointer   :: h1D_CanopyCutProxy_ptc(:)
@@ -891,7 +891,7 @@ implicit none
   allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
   allocate(this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CO2_FLX_ptc(:)=spval
   allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
-  allocate(this%h1D_cNPP_ptc(beg_ptc:end_ptc))             ;this%h1D_cNPP_ptc(:)=spval
+  allocate(this%h1D_NPP_ptc(beg_ptc:end_ptc))             ;this%h1D_NPP_ptc(:)=spval
   allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_HT_ptc(:)=spval
   allocate(this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)); this%h1D_EmergeHeight_ptc(:)=spval
   allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))            ;this%h1D_POPN_ptc(:)=spval
@@ -2355,9 +2355,9 @@ implicit none
   call hist_addfld1d(fname='FIREp_CH4_FLX_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Plant CH4 emission from fire',ptr_patch=data1d_ptr,default='inactive')                  
 
-  data1d_ptr => this%h1D_cNPP_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='cNPP_pft',units='gC/m2',avgflag='I',&
-    long_name='Plant cumulative net primary productivity',ptr_patch=data1d_ptr)                  
+  data1d_ptr => this%h1D_NPP_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='NPP_pft',units='gC/m2',avgflag='A',&
+    long_name='Plant net primary productivity',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_CAN_HT_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_HT_pft',units='m',avgflag='A',&
@@ -4261,7 +4261,7 @@ implicit none
         this%h1D_PLANT_BALANCE_P_ptc(nptc)  = PlantElmBalCum_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_CO2_FLX_ptc(nptc)    = CO2ByFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_FIREp_CH4_FLX_ptc(nptc)    = CH4ByFire_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_cNPP_ptc(nptc)              = cumNPP_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_NPP_ptc(nptc)              = NetPrimProduct_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_tTRANSPN_ptc(nptc)         = -ETCanopy_CumYr_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_N_FLX_ptc(nptc)       = PlantExudElm_CumYr_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Uptk_NMIN_Flx_ptc(nptc)    = RootUptk_Nmin_cumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
