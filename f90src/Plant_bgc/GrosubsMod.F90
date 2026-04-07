@@ -514,6 +514,7 @@ module grosubsMod
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='AccumulateStates'
   integer :: L,NR,N,NE,NB
 
 !     begin_execution
@@ -552,27 +553,30 @@ module grosubsMod
     fPCLFW_brch               => plt_pheno%fPCLFW_brch               ,& !input : PC ratio of growing leaf on branch, [gP/gC]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !output :branch leaf area, [m2 d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !output :branch leaf structural element mass, [g d-2]
-    PetolShethStrutElms_brch      => plt_biom%PetolShethStrutElms_brch       ,& !output :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch  => plt_biom%PetolShethStrutElms_brch   ,& !output :branch sheath structural element, [g d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !output :plant canopy leaf area, [m2 d-2]
     CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft      ,& !output :canopy leaf + sheath C, [g d-2]
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
+    CanopySeedNumX_pft        => plt_morph%CanopySeedNumX_pft        ,& !output :last nonzero canopy grain number, [d-2]    
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !output :plant stem area, [m2 d-2]
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft           ,& !output :canopy ear structural element, [g d-2]
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft         ,& !output :canopy grain structural element, [g d-2]
     HuskStrutElms_pft         => plt_biom%HuskStrutElms_pft          ,& !output :canopy husk structural element mass, [g d-2]
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft          ,& !output :canopy leaf structural element mass, [g d-2]
-    PetolShethStrutElms_pft       => plt_biom%PetolShethStrutElms_pft        ,& !output :canopy sheath structural element mass, [g d-2]
+    PetolShethStrutElms_pft   => plt_biom%PetolShethStrutElms_pft    ,& !output :canopy sheath structural element mass, [g d-2]
     StalkRsrvElms_pft         => plt_biom%StalkRsrvElms_pft          ,& !output :canopy reserve element mass, [g d-2]
     StalkStrutElms_pft        => plt_biom%StalkStrutElms_pft         ,& !output :canopy stalk structural element mass, [g d-2]
     fNCLFW_pft                => plt_pheno%fNCLFW_pft                ,& !output : NC ratio of growing leaf, [gN/gC]
     fPCLFW_pft                => plt_pheno%fPCLFW_pft                 & !output : PC ratio of growing leaf, [gP/gC]
 
   )
-!
-!     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
-!
-!
+  !
+  !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
+  !
+  !
+  
+  call PrintInfo('beg '//subname)
   DO NB=1,NumOfBranches_pft(NZ)    
     if(isclose(CanopyLeafSheathC_brch(NB,NZ),0._r8))then
       LeafStrutElms_brch(1:NumPlantChemElms,NB,NZ) = 0._r8
@@ -598,6 +602,7 @@ module grosubsMod
       CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
+  if(CanopySeedNum_pft(NZ)>0._r8)CanopySeedNumX_pft(NZ)=CanopySeedNum_pft(NZ)
   if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
     fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
     fPCLFW_pft(NZ)=fPCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
@@ -632,6 +637,7 @@ module grosubsMod
 
   PlantN2Fix_CumYr_pft(NZ)=PlantN2Fix_CumYr_pft(NZ)+RootN2Fix_pft(NZ)+CanopyN2Fix_pft(NZ)
   
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AccumulateStates
 

@@ -268,8 +268,9 @@ implicit none
   real(r8), pointer :: LeafAngleClass_pft(:,:)         => null() !fractionction of leaves in different angle classes,                         [-]
   real(r8), pointer :: CanopyStemAreaZ_pft(:,:)        => null() !plant canopy layer stem area,                                               [m2 d-2]
   real(r8), pointer :: CanopyLeafAreaZ_pft(:,:)        => null() !canopy layer leaf area,                                                     [m2 d-2]
-  real(r8), pointer :: LeafArea_node(:,:,:)        => null() !leaf area,                                                                  [m2 d-2]
+  real(r8), pointer :: LeafArea_node(:,:,:)            => null() !leaf area,                                                                  [m2 d-2]
   real(r8), pointer :: CanopySeedNum_pft(:)            => null() !canopy grain number,                                                        [d-2]
+  real(r8), pointer :: CanopySeedNumX_pft(:)           => null() !last nonzero canopy grain number,                                           [d-2]  
   real(r8), pointer :: SeedDepth_pft(:)                => null() !seeding depth,                                                              [m]
   real(r8), pointer :: PlantinDepz_pft(:)              => null() !planting depth,                                                             [m]
   real(r8), pointer :: SeedMeanLen_pft(:)              => null() !seed length,                                                                [m]
@@ -2124,6 +2125,7 @@ implicit none
   allocate(this%CanopyLeafAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
   allocate(this%LeafArea_node(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafArea_node=spval
   allocate(this%CanopySeedNum_pft(JP1));this%CanopySeedNum_pft=spval
+  allocate(this%CanopySeedNumX_pft(JP1));this%CanopySeedNumX_pft=spval  
   allocate(this%SeedDepth_pft(JP1));this%SeedDepth_pft=spval
   allocate(this%PlantinDepz_pft(JP1));this%PlantinDepz_pft=spval
   allocate(this%SeedMeanLen_pft(JP1));this%SeedMeanLen_pft=spval

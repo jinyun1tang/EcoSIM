@@ -926,6 +926,7 @@ implicit none
   allocate(this%h1D_HUSK_N_ptc(beg_ptc:end_ptc))          ;this%h1D_HUSK_N_ptc(:)=spval
   allocate(this%h1D_GRAIN_N_ptc(beg_ptc:end_ptc))         ;this%h1D_GRAIN_N_ptc(:)=spval
   allocate(this%h1D_ROOT_N_ptc(beg_ptc:end_ptc))          ;this%h1D_ROOT_N_ptc(:)=spval
+
   allocate(this%h1D_RootNodule_N_ptc(beg_ptc:end_ptc))        ;this%h1D_RootNodule_N_ptc(:)=spval
   allocate(this%h1D_STORED_N_ptc(beg_ptc:end_ptc))        ;this%h1D_STORED_N_ptc(:)=spval
   allocate(this%h1D_EXUD_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_EXUD_N_FLX_ptc(:)=spval
@@ -2303,8 +2304,8 @@ implicit none
     long_name='PEP carboxylase N in mesophyll for C4 plants',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_GRAIN_NO_ptc(beg_ptc:end_ptc) 
-  call hist_addfld1d(fname='GRAIN_NO_pft',units='1/m2',avgflag='A',&
-    long_name='Canopy grain number',ptr_patch=data1d_ptr,default='inactive')                  
+  call hist_addfld1d(fname='GRAIN_Number_pft',units='1/m2',avgflag='A',&
+    long_name='Number of grains in canopy',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_LAIb_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='LAI_xstk_pft',units='m2/m2',avgflag='A',&

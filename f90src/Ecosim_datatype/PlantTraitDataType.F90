@@ -54,6 +54,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SeedSitesSet_brch(:,:,:,:)                   !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
+  real(r8),target,allocatable ::  CanopySeedNumX_pft(:,:,:)                   !last nonzero canopy grain number, [d-2]  
   real(r8),target,allocatable ::  PlantPopulation_pft(:,:,:)                 !plant population, [d-2]
   real(r8),target,allocatable ::  StalkNodeVertLength_brch(:,:,:,:,:)        !Dead internode height, [m]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
@@ -233,6 +234,7 @@ contains
   allocate(SeedSitesSet_brch(MaxNumBranches,JP,JY,JX)); SeedSitesSet_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
+  allocate(CanopySeedNumX_pft(JP,JY,JX));     CanopySeedNumX_pft=0._r8  
   allocate(PlantPopulation_pft(JP,JY,JX));       PlantPopulation_pft=0._r8
   allocate(StalkNodeVertLength_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeVertLength_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
@@ -408,6 +410,7 @@ contains
   call destroy(SeedSitesSet_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
+  call destroy(CanopySeedNumX_pft)  
   call destroy(PlantPopulation_pft)
   call destroy(StalkNodeVertLength_brch)
   call destroy(PARTS_brch)

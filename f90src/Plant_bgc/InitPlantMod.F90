@@ -1064,7 +1064,7 @@ module InitPlantMod
     rPCGrain_pft                  => plt_allom%rPCGrain_pft                   ,& !input  :grain P:C ratio, [gP gP-1]
     jHarvstType_pft               => plt_distb%jHarvstType_pft                ,& !input  :flag for stand replacing disturbance,[-]    
     NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft             ,& !input  :soil layer at planting depth, [-]
-    PetolShethStrutElms_brch          => plt_biom%PetolShethStrutElms_brch            ,& !input  :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch      => plt_biom%PetolShethStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
     PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !input  :root layer C, [gC d-2]
     RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !input  :reference root protein N, [gN g-1]

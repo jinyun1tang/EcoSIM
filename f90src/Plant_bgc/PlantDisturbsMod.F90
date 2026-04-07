@@ -428,7 +428,6 @@ module PlantDisturbsMod
         DO NE=1,NumPlantChemElms
           SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
         ENDDO
-        
         !other
       ELSE
         !harvested
@@ -610,6 +609,7 @@ module PlantDisturbsMod
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col           ,& !input  :canopy layer height, [m]
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft           ,& !input  :number of branches,[-]
     CanopyStalkArea_lbrch      => plt_morph%CanopyStalkArea_lbrch       ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+!    SeedBankSize_pft           => plt_morph%SeedBankSize_pft            ,& !output :seed bank size, in terms of number of seeds [d-2]
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col          ,& !input  :grid canopy leaf area, [m2 d-2]
     CanopyCutProxy_pft         => plt_distb%CanopyCutProxy_pft          ,& !inoput :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     PlantPopulation_pft        => plt_site%PlantPopulation_pft          ,& !inoput :plant population, [d-2]
@@ -655,7 +655,9 @@ module PlantDisturbsMod
         PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
         !terminate and reseed        
       ELSE
-        ! PPI_pft(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
+        !modeling seed bank effect
+        !SeedBankSize_pft(NZ)    = 0.5_r8*PPI_pft(NZ)
+        !PPI_pft(NZ)             = AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
         PPX_pft(NZ)             = PPI_pft(NZ)
         PlantPopulation_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
       ENDIF
@@ -2050,6 +2052,7 @@ module PlantDisturbsMod
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='TerminateRoots4Annuals'
   real(r8) :: FracLeftThin,XHVST1
   integer :: N,L
   associate(                                                             &
@@ -2057,13 +2060,14 @@ module PlantDisturbsMod
     NU                         => plt_site%NU                           ,& !input  :current soil surface layer number, [-]
     MaxNumRootLays             => plt_site%MaxNumRootLays                & !input  :maximum root layer number,[-]
   )
-
+  call PrintInfo('beg '//subname)
   DO N=1,Myco_pft(NZ)
     DO L=NU,MaxNumRootLays
       call RootRemovalL4Annual(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
       call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)            
     ENDDO
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TerminateRoots4Annuals
 !----------------------------------------------------------------------------------------------------

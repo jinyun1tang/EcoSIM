@@ -100,11 +100,16 @@ implicit none
   logical :: reseed_check
   character(len=*), parameter :: subname='ReSeedPlants'
   associate(                                                  &
+    rNCGrain_pft          => plt_allom%rNCGrain_pft          ,& !input  :grain N:C ratio, [g g-1]
+    rPCGrain_pft          => plt_allom%rPCGrain_pft          ,& !input  :grain P:C ratio, [gP gP-1]  
+    PlantPopulation_pft   => plt_site%PlantPopulation_pft    ,& !input  :plant population, [d-2]  
     SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft  ,& !input  :plant stored nonstructural element at current step, [g d-2]
+    CanopySeedNumX_pft    => plt_morph%CanopySeedNumX_pft    ,& !input :canopy grain number, [d-2]        
+    SeedCMass_pft         => plt_morph%SeedCMass_pft         ,& !input  :grain size at seeding, [g]    
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft         ,& !input  :threshold zero for plang growth calculation, [-]
     doReSeed_pft          => plt_pheno%doReSeed_pft          ,& !input  :flag to do annual plant reseeding, [-]
+    SeedPlantedElm_pft    => plt_biom%SeedPlantedElm_pft     ,& !output :plant stored nonstructural C at planting, [gC d-2]    
     IsPlantActive_pft     => plt_pheno%IsPlantActive_pft      & !output :flag for living pft, [-]
-
   )
   call PrintInfo('beg '//subname)
 
@@ -114,7 +119,14 @@ implicit none
     IsPlantActive_pft(NZ) = iDormant
 
     call InitPlantPhenoMorphoBio(NZ)
-
+    write(*,*)'reseed',I*1000+J/24.,NZ,CanopySeedNumX_pft(NZ)
+    if(CanopySeedNumX_pft(NZ)>0._r8)then
+      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*(PlantPopulation_pft(NZ)-CanopySeedNumX_pft(NZ))
+      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+      SeasonalNonstElms_pft(:,NZ) = SeasonalNonstElms_pft(:,NZ)+SeedPlantedElm_pft(:,NZ)
+      CanopySeedNumX_pft(NZ)=0._r8
+    endif
   endif  
   call PrintInfo('end '//subname)
 
