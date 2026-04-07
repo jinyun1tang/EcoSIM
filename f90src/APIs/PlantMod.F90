@@ -84,7 +84,7 @@ implicit none
 
         ENDDO
 
-        call ExitPlantBalance(yearIJ%I,yearIJ%J,NP_col(NY,NX))
+        call ExitPlantBalance(yearIJ,NP_col(NY,NX))
 
         call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
 

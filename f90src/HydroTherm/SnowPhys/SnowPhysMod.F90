@@ -10,7 +10,6 @@ module SnowPhysMod
   use abortutils,    only: endrun
   use EcoSIMCtrlMod, only: fixWaterLevel, mod_snow_albedo
   use DebugToolMod,  only: PrintInfo
-  use InitSOMBGCMod, only: gOC_to_m3_OM
   use SnowDataType
   use SurfLitterDataType
   use SOMDataType

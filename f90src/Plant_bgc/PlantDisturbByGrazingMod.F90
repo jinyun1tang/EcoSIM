@@ -211,7 +211,7 @@ contains
     StalkStrutElms_pft          => plt_biom%StalkStrutElms_pft,          &
     StalkRsrvElms_pft           => plt_biom%StalkRsrvElms_pft,           &
     EarStrutElms_pft            => plt_biom%EarStrutElms_pft,            &
-    PetoleStrutElms_pft         => plt_biom%PetoleStrutElms_pft,         &
+    PetolShethStrutElms_pft         => plt_biom%PetolShethStrutElms_pft,         &
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft,      &
     fTCanopyGroth_pft           => plt_pheno%fTCanopyGroth_pft,          &
     AvgCanopyBiomC2Graze_pft    => plt_biom%AvgCanopyBiomC2Graze_pft     &
@@ -261,16 +261,16 @@ contains
   !
   !     OTHER NON-FOLIAR GRAZED,REMOVED
   !
-  !     WTSHE,WTHSK,WTEAR,WTGR=PFT petiole,husk,ear,grain C mass
+  !     WTSHE,WTHSK,WTEAR,WTGR=PFT PetolSheth,husk,ear,grain C mass
   !     WHVSH*,WHVHS*,WHVEA*,WHVGR*,WHVSC*=
-  !            petiole,husk,ear,grain,nonstructural C removed
+  !            PetolSheth,husk,ear,grain,nonstructural C removed
   !     GrazingUnMetLeafC=grazing requirement unmet by non-foliar removal
   !
-  totShootC=PetoleStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ)+EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
+  totShootC=PetolShethStrutElms_pft(ielmc,NZ)+HuskStrutElms_pft(ielmc,NZ)+EarStrutElms_pft(ielmc,NZ)+GrainStrutElms_pft(ielmc,NZ)
   
   IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-    GrazingDmndPetole   = GrazedPhytoLeafC_pft*PetoleStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
-    GrazingMeetPetoleC  = AMIN1(PetoleStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
+    GrazingDmndPetole   = GrazedPhytoLeafC_pft*PetolShethStrutElms_pft(ielmc,NZ)/totShootC+GrazingUnMetLeafC
+    GrazingMeetPetoleC  = AMIN1(PetolShethStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
     HarvestedPetoleC    = GrazingMeetPetoleC*(1._r8-CCPOLX)
     GrazedPetoleNonstC  = GrazingMeetPetoleC*CCPOLX
     GrazedPetoleNoduleC = GrazingMeetPetoleC*CCPLNX
@@ -326,12 +326,12 @@ contains
     HarvestedStalkRsrvC  = 0._r8
     GrazingUnMetLeafC = AZMAX1(GrazedPhytoStalkC_pft)
     !
-    !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PETIOLE,HUSK
+    !     ALLOCATE UNMET DEMAND FOR GRAZING TO LEAF,PetolSheth,HUSK
     !     EAR,GRAIN
     !
     !     WHVSL*,WHVSC*,WHVSN=leaf,nonstructural,bacteria removed
     !     WHVSH*,WHVHS,WHVEA,WHVGR,WHVSC=
-    !            petiole,husk,ear,grain,nonstructural C removed
+    !            PetolSheth,husk,ear,grain,nonstructural C removed
     !
     IF(GrazingUnMetLeafC.GT.0.0_r8)THEN
       GrazingMeetLeafC      = AMIN1(LeafStrutElms_pft(ielmc,NZ)-HarvestedLeafC-GrazedLeafNonstC,GrazingUnMetLeafC)
@@ -343,8 +343,8 @@ contains
       GrazingUnMetLeafC = AZMAX1(GrazingUnMetLeafC-GrazingMeetLeafC)
 
       IF(totShootC.GT.ZERO4Groth_pft(NZ))THEN
-        GrazingDmndPetole = GrazingUnMetLeafC*PetoleStrutElms_pft(ielmc,NZ)/totShootC
-        GrazingMeetPetoleC     = AMIN1(PetoleStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
+        GrazingDmndPetole = GrazingUnMetLeafC*PetolShethStrutElms_pft(ielmc,NZ)/totShootC
+        GrazingMeetPetoleC     = AMIN1(PetolShethStrutElms_pft(ielmc,NZ),GrazingDmndPetole)
         HarvestedPetoleC            = HarvestedPetoleC+GrazingMeetPetoleC*(1._r8-CCPOLX)
         GrazedPetoleNonstC            = GrazedPetoleNonstC+GrazingMeetPetoleC*CCPOLX
         GrazedPetoleNoduleC            = GrazedPetoleNoduleC+GrazingMeetPetoleC*CCPLNX

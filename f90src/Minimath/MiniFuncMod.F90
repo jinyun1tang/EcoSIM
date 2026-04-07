@@ -2,6 +2,7 @@ module MiniFuncMod
 
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcosimConst
+  use MiniMathMod
 implicit none
 
   character(len=*),private, parameter :: mod_filename = &
@@ -205,4 +206,19 @@ implicit none
         1.50_r8 * SIN(b_rad)
   eot = eot/60._r8 
   END FUNCTION calculate_equation_of_time
+
+!------------------------------------------------------------------------------------------
+
+  pure function gOC_to_m3_OM(gram_OC)result(ans)
+  !
+  !Description
+  !convert gram organic C into m3 OM
+  implicit none
+  real(r8), intent(in) :: gram_OC    ![gC]
+  real(r8) :: ans
+
+  !1.e-6*[gC]/([gC gOM-1]*[gOM cm-3])-> [cm3 OM]*1.e-6 -> [m3 OM]
+  ans = 1.e-6_r8*AZMAX1(gram_OC)/(OMCMassFrac*DensitySolidOM)
+
+  end function gOC_to_m3_OM  
 end module MiniFuncMod

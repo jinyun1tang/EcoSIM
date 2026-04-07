@@ -6,7 +6,7 @@ module TillageMixMod
   use minimathmod,      only: AZMAX1
   use SoilBGCNLayMod,   only: sumLitrOMLayL, sumORGMLayL
   use EcoSIMCtrlMod,    only: salt_model
-  use InitSOMBGCMod,    only: gOC_to_m3_OM
+  use MiniFuncMod,    only: gOC_to_m3_OM
   use DebugToolMod
   use EcosimConst
   use SOMDataType

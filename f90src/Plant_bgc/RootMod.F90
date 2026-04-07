@@ -667,7 +667,7 @@ implicit none
   !Consume nonstrucal elements for growth
   DO NE=1,NumPlantChemElms  
     RootMycoNonst4Grow_Oltd(NE)       = AMIN1(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonst4Grow_Oltd(NE))
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE)
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE))
   ENDDO
 
   ! net growth=positive growth - senescence
@@ -1413,7 +1413,7 @@ implicit none
 
   DO NE=1,NumPlantChemElms
     RootMycoNonst4Grow_Oltd(NE) =AMIN1(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonst4Grow_Oltd(NE))    
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE)    
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE))
   ENDDO
   
   !dealing with negative growth
@@ -1426,7 +1426,7 @@ implicit none
     RCO2T1st_Oltd,Root1stNetGrowthElms,litrflxt,RCO2MaintDef1stStruct_Oltd,RCO2MaintDef1stStruct_OUltd,RootTipZone=.True.)
 
   DO NE=1,NumPlantChemElms
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZERO(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
   ENDDO         
 
   !
@@ -1654,7 +1654,7 @@ implicit none
     !  REMOVE ANY NEGATIVE ROOT MASS FROM NONSTRUCTURAL C
     IF(RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ).LT.0.0_r8)THEN
       DO NE=1,NumPlantChemElms
-        RootMycoNonstElms_rpvr(NE,N,L,NZ)       = AZERO(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))
+        RootMycoNonstElms_rpvr(NE,N,L,NZ)       = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))
         RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) = 0._r8
       ENDDO
     ENDIF
@@ -1662,7 +1662,7 @@ implicit none
     !  what if nonstructural C is insufficient to meet the negative root mass
     IF(RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ).LT.0.0_r8)THEN
       DO NE=1,NumPlantChemElms
-        RootMycoNonstElms_rpvr(NE,N,L,NZ)     = AZERO(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMyco1stStrutElms_rpvr(NE,L,NR,NZ))
+        RootMycoNonstElms_rpvr(NE,N,L,NZ)     = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMyco1stStrutElms_rpvr(NE,L,NR,NZ))
         RootMyco1stElm_raxs(NE,NR,NZ)         = RootMyco1stElm_raxs(NE,NR,NZ)+RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)
         RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = 0._r8 
         Root1stActStructElms_rpvr(NE,L,NR,NZ) = 0._R8    
@@ -1934,7 +1934,7 @@ implicit none
   RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RootMycoNonst4Grow_Oltd(ielmc)  
   DO NE=2,NumPlantChemElms
     RootMycoNonst4Grow_Oltd(NE)       = AMIN1(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonst4Grow_Oltd(NE))
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE)
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Grow_Oltd(NE))
     RootMycoNonst4Thick_Oltd(NE)      = RootMycoNonst4Grow_Oltd(NE)
   ENDDO
 
@@ -1947,7 +1947,7 @@ implicit none
     RootMycoNonst4Lig_Oltd(ielmp) = -Rlignif_Oltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
 
     DO NE=1,NumPlantChemElms
-      RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Lig_Oltd(NE)
+      RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Lig_Oltd(NE))
     ENDDO         
 
     !apply the structrual growth    
@@ -1993,7 +1993,7 @@ implicit none
     RCO2T1st_Oltd,Root1stNetGrowthElms,litrflxt,RCO2MaintDef1stStruct_Oltd,RCO2MaintDef1stStruct_OUltd,RootTipZone=.false.)
 
   DO NE=1,NumPlantChemElms
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZERO(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
   ENDDO 
 
   IF(-RCO2PotGroth_Oltd.GT.RCO2MaintDef1stStruct_Oltd)then  
@@ -2019,7 +2019,7 @@ implicit none
     DO L1=L,1,-1
       DO NE=1,NumPlantChemElms
         if(-Root1stNetGrowthElms(NE).LT.RootMycoNonstElms_rpvr(NE,N,L1,NZ))then
-          RootMycoNonstElms_rpvr(NE,N,L1,NZ)=RootMycoNonstElms_rpvr(NE,N,L1,NZ)+Root1stNetGrowthElms(NE)
+          RootMycoNonstElms_rpvr(NE,N,L1,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L1,NZ)+Root1stNetGrowthElms(NE))
           Root1stNetGrowthElms(NE)=0._r8
         else
           Root1stNetGrowthElms(NE)=Root1stNetGrowthElms(NE)+RootMycoNonstElms_rpvr(NE,N,L1,NZ)
@@ -2190,7 +2190,7 @@ implicit none
   Root1stcylc(ielmc) = Root1stcylc(ielmc)-RCO2MaintDef1stStruct_Oltd  
 
   DO NE=1,NumPlantChemElms
-    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZERO(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
+    RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+Root1stcylc(NE))
   ENDDO 
 
   call PrintInfo('end '//subname)
@@ -2332,7 +2332,7 @@ implicit none
           RootMyco2ndStrutElms_rpvr(NE,N,LL,NR,NZ) = 0._r8
         ENDIF
       ENDIF
-    ENDDO D5106
+    ENDDO D5106    
     !
     !     CONCURRENT LOSS OF MYCORRHIZAE AND NODULES WITH LOSS
     !     OF SECONDARY ROOTS
@@ -2363,19 +2363,18 @@ implicit none
 
       dRootMyco2ndst2Litr = 0._r8
       dRootMycoNonst2Litr = 0._r8
-
+      
       D6450: DO M=1,jsken
         D64511: DO NE=1,NumPlantChemElms
           dsenecE = FSNCM*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ))
           dwoodyE = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*dsenecE*FracRootElmAllocm(NE,k_woody_comp)
-          dfineE1 = PlantElmAllocMat4Litr(NE,iroot,M,NZ)*dsenecE*FracRootElmAllocm(NE,k_fine_comp)
 
+          dfineE1 = PlantElmAllocMat4Litr(NE,iroot,M,NZ)*dsenecE*FracRootElmAllocm(NE,k_fine_comp)          
           LitrfallElms_pvr(NE,M,k_woody_comp,LL,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,LL,NZ)+dwoodyE
           LitrfallElms_pvr(NE,M,k_fine_comp,LL,NZ)  = LitrfallElms_pvr(NE,M,k_fine_comp,LL,NZ)+dfineE1
           dRootMyco2ndst2Litr(NE)                   = dRootMyco2ndst2Litr(NE)+dwoodyE+dfineE1
 
           litrflxt(NE)=litrflxt(NE)+dwoodyE+dfineE1
-
           dfineE2=PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*FSNCP*RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)
           LitrfallElms_pvr(NE,M,k_fine_comp,LL,NZ) = LitrfallElms_pvr(NE,M,k_fine_comp,LL,NZ)+dfineE2
           dRootMycoNonst2Litr(NE)                  = dRootMycoNonst2Litr(NE)+dfineE2
@@ -2383,10 +2382,10 @@ implicit none
           litrflxt(NE)=litrflxt(NE)+dfineE2              
         ENDDO D64511   
       ENDDO D6450
-
+      
       DO NE=1,NumPlantChemElms  
-        RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ) = RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)-dRootMyco2ndst2Litr(NE)
-        RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)       = RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)-dRootMycoNonst2Litr(NE)        
+        RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ) = AZMAX1(RootMyco2ndStrutElms_rpvr(NE,imycorrhz,LL,NR,NZ)-dRootMyco2ndst2Litr(NE))
+        RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)       = AZMAX1(RootMycoNonstElms_rpvr(NE,imycorrhz,LL,NZ)-dRootMycoNonst2Litr(NE))
       ENDDO
       Root2ndLen_rpvr(imycorrhz,LL,NR,NZ)=AZMAX1(Root2ndLen_rpvr(imycorrhz,LL,NR,NZ))*(1.0_r8-FSNCM)
     ENDIF
@@ -2738,8 +2737,10 @@ implicit none
     !divide and extend into next layer
     DO NE=1,NumPlantChemElms
       XFRE(NE)                              = FGROZ*RootMycoNonstElms_rpvr(NE,N,L,NZ)
-      RootMycoNonstElms_rpvr(NE,N,L,NZ)     = RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE)
-      RootMycoNonstElms_rpvr(NE,N,Lnext,NZ) = RootMycoNonstElms_rpvr(NE,N,Lnext,NZ)+XFRE(NE)
+
+      call ExchFluxLimiter(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonstElms_rpvr(NE,N,Lnext,NZ),XFRE(NE))
+      RootMycoNonstElms_rpvr(NE,N,L,NZ)     = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-XFRE(NE))
+      RootMycoNonstElms_rpvr(NE,N,Lnext,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,Lnext,NZ)+XFRE(NE))
     ENDDO
     PSIRoot_pvr(N,Lnext,NZ)      = PSIRoot_pvr(N,L,NZ)
     PSIRootOSMO_vr(N,Lnext,NZ)   = PSIRootOSMO_vr(N,L,NZ)
@@ -2845,7 +2846,7 @@ implicit none
 
         RootMyco2ndStrutElms_rpvr(NE,NN,LL,NR,NZ) = 0._r8
         XFRE = FracRootSinkL*RootMycoNonstElms_rpvr(NE,NN,LL,NZ)
-        XFRE = AMAX1(AMIN1(RootMycoNonstElms_rpvr(NE,NN,LL,NZ),XFRE),-RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ))*scalp
+        call ExchFluxLimiter(RootMycoNonstElms_rpvr(NE,NN,LL,NZ),RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ),XFRE)
 
         RootMycoNonstElms_rpvr(NE,NN,LL,NZ)   = RootMycoNonstElms_rpvr(NE,NN,LL,NZ)-XFRE
         RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ) = RootMycoNonstElms_rpvr(NE,NN,LL-1,NZ)+XFRE

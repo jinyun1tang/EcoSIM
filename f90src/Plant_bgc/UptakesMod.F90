@@ -5,7 +5,7 @@ module UptakesMod
   use EcoSIMCtrlMod,  only: etimer, ldo_sp_mode, ats_cpl_mode
   use UnitMod,        only: units
   use PlantBalMod,    only: SumPlantRootGas
-  use InitSOMBGCMod,  only: gOC_to_m3_OM
+  use MiniFuncMod,    only: gOC_to_m3_OM
   use PlantBGCPars
   use minimathmod
   use DebugToolMod

@@ -14,7 +14,7 @@ module PlantBGCPars
 !
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]
   real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
-  real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to petiole, [-]
+  real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to PetolSheth, [-]
 !
   real(r8) :: VMXC                                !rate constant for nonstructural C oxidation in respiration, [h-1]
   real(r8) :: RSpecLiterFall                      !rate constant for LitrFall at end of growing season, [h-1]
@@ -68,7 +68,7 @@ module PlantBGCPars
   real(r8) :: SETN                                !Km for nonstructural N concn on seed set, [g g-1]
   real(r8) :: SETP                                !Km for nonstructural P concn on seed set, [g g-1]
   real(r8) :: SLA2                                !parameter for calculating leaf area expansion, [-]
-  real(r8) :: SSL2                                !parameter for calculating petiole extension,[-]
+  real(r8) :: SSL2                                !parameter for calculating PetolSheth extension,[-]
   real(r8) :: SNL2                                !parameter for calculating stalk extension, [-]
   real(r8) :: CNMX                                !maximum C:N ratio for nonstructural N transfer, [-]
   real(r8) :: CPMX                                !maximum C:P ratio for nonstructural P transfer, [-]
