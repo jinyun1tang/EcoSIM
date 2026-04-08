@@ -144,10 +144,9 @@ module PlantNonstElmDynMod
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
           StalkRsrvGradt                  = TotStalkRsrv_loc(ielmc)*SapwoodBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*TotStalkMassC
-          XFRE(ielmc)                     = 0.1_r8*StalkRsrvGradt/TotStalkMassC
+          XFRE(ielmc)                     = 0.1_r8*AZERO(StalkRsrvGradt)/TotStalkMassC
           StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
           sumchk2                         = sumchk2+StalkRsrvElms_brch(ielmc,NB,NZ)
-
           !based on stoichiometry gradient
           DO NE=2,NumPlantChemElms            
             StalkRsrvGradt               = TotStalkRsrv_loc(NE)*StalkRsrvElms_brch(ielmc,NB,NZ)-StalkRsrvElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)            

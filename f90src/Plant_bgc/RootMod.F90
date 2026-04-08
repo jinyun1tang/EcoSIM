@@ -1800,6 +1800,12 @@ implicit none
   fctyok=Cytokinin1stConc_rpvr(L,NR,NZ)/(Km_cyto+Cytokinin1stConc_rpvr(L,NR,NZ)*(1._r8+Cytokinin1stConc_rpvr(L,NR,NZ)/Ki_cyto))
   FracRoot1stCSinkL=FracRoot1stCSinkL*fctyok
 
+  !apply nutrient limitation to growth respiraiton
+  DMRespEff  = 1._r8-StalkBiomGrowthYld_pft(NZ)       ![gC CO2/gC nonst]
+  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
+  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
+  FNP    = AMIN1(ZPOOLB/rNCStalk_pft(NZ),PPOOLB/rPCStalk_pft(NZ))*DMRespEff/StalkBiomGrowthYld_pft(NZ)*FracRoot1stCSinkL
+  if(isclose(FNP,0._r8))return  
 
   !Do maintenance respiration 
   Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)+Root1stLigStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)
@@ -1833,6 +1839,7 @@ implicit none
   Rlignif_OUltd = KLigMax_pft(NZ)*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
   alpha_fill    = (CRootActVolPerMassC_pft(NZ)-CRootLigVolPerMassC_pft(NZ))/CRootLigVolPerMassC_pft(NZ)
   RligCO2_OUltd = Rlignif_OUltd*alpha_fill*CO2Qt_lig
+  call DebugPrint('RligCO2_OUltd',RligCO2_OUltd)
 
   if(RligCO2_OUltd > RGrowCO2_OUltd)then
     RligCO2_OUltd = RGrowCO2_OUltd
@@ -1852,12 +1859,6 @@ implicit none
   RThickCO2_OUltd = AZMAX1(RGrowCO2_Oltd - RligCO2_OUltd)
   RThickCO2_Oltd =  AZMAX1(RGrowCO2_Oltd - RligCO2_Oltd)
 
-  !apply nutrient limitation to growth respiraiton
-  DMRespEff  = 1._r8-StalkBiomGrowthYld_pft(NZ)       ![gC CO2/gC nonst]
-  ZPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmn,N,L,NZ))
-  PPOOLB = AZMAX1(RootMycoNonstElms_rpvr(ielmp,N,L,NZ))
-  FNP    = AMIN1(ZPOOLB/rNCStalk_pft(NZ),PPOOLB/rPCStalk_pft(NZ))*DMRespEff/StalkBiomGrowthYld_pft(NZ)*FracRoot1stCSinkL
-  
   !active growth
   IF(RThickCO2_OUltd.GT.0.0)THEN
     RThickCO2_OUltd=AMIN1(RThickCO2_OUltd,FNP*RAutoRootO2Limter_rpvr(N,L,NZ))
@@ -1897,6 +1898,7 @@ implicit none
 
   dRPotexp = RootMycoNonst4Thick_Oltd(ielmc)*CRootActVolPerMassC_pft(NZ)/(TwoPiCON*Root1stRadius_rpvr(L,NR,NZ)*Root1stLenPP_rpvr(L,NR,NZ))
   dRExp    = dRPotexp
+  call DebugPrint('dRPotexp',dRPotexp)
   if(lsoilCompaction)then
     if(dRPotexp>0._r8)then
       dRExp    = AMIN1(dRPotexp,dR1stExp)
@@ -3290,6 +3292,7 @@ implicit none
 
 !  call SumRootBiome(yearIJ,NZ,mass_inital)
   flag2ndGrowth_pvr(:,:,NZ)=.false.
+  call PrintInfo("D4995")
 
   D4995: DO N=1,Myco_pft(NZ)
     Ltip=NU
@@ -3370,7 +3373,7 @@ implicit none
 
         RootNutUptakeN_pft(NZ)=RootNutUptakeN_pft(NZ)+dUptakeN
         RootNutUptakeP_pft(NZ)=RootNutUptakeP_pft(NZ)+dUptakeP
-
+        call PrintInfo("D4985")
         IF(N.EQ.ipltroot)DistRootEffDepz_pvr(L,NZ)=0._r8
         D4985: DO NR=1,NumPrimeRootAxes_pft(NZ)
           if(L>NRoot1stTipLay_raxes(NR,NZ))cycle
@@ -3386,6 +3389,7 @@ implicit none
           !     RRAD1,Root2ndRadius_rpvr=primary, secondary root radius
           !     RootSinkC,RootSinkC_vr=total root sink strength
           !
+          call DebugPrint("NR=",NR)
           IF(N.EQ.ipltroot)THEN
             Root1stLocDepz_vr(NR,L) = AZMAX1(Root1stDepz_raxes(NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
             Root1stLocDepz_vr(NR,L) = AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L))-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))
@@ -3413,7 +3417,7 @@ implicit none
             !     RootSinkC,RootSinkC_vr=total root sink strength
             !
             TipRadius=AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
-
+            call DebugPrint("TipRadius",TipRadius)
             IF(DistRootEffDepz.GT.ZERO)THEN
               !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um radius), 
               !and the R**2 rule counts the number of pores. 
@@ -3430,7 +3434,7 @@ implicit none
             ELSE
               Root2ndSink_pvr(N,L,NR)=0._r8
             ENDIF
-            
+            call PrintInfo('checkCoarseRootLay') 
             checkCoarseRootLay= is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) .and. &
                 RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ) .and. RootEffDepz<Root1stDepz_raxes(NR,NZ) .and. &
                 Root1stDepz_raxes(NR,NZ)>7.5_r8*TipRadius
@@ -3438,12 +3442,13 @@ implicit none
             Ltip=NRoot1stTipLay_raxes(NR,NZ)            
 
             IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN              
+              call DebugPrint('Root1stDepz_raxes(NR,NZ)',Root1stDepz_raxes(NR,NZ))
               IF(Root1stDepz_raxes(NR,NZ).LT.CumSoilThickness_vr(L) .and. L==Ltip)THEN
                 !Root tip in layer L
                 Root1stSink_pvr(L,NR) = RTSK(iPlantRootProfile_pft(NZ))*NumAxesPerPrimRoot_pft(NZ)/RphoResist_vr(L,NR)
                 RootSinkC_vr(N,L)      = RootSinkC_vr(N,L)+Root1stSink_pvr(L,NR)
-
-              elseif(checkCoarseRootLay)THEN
+                call DebugPrint('Root1stSink_pvr(L,NR)',Root1stSink_pvr(L,NR))
+              elseif(checkCoarseRootLay .and. Fcrwt(Ltip,NR)>0._r8)THEN
                 !non-tip layer
                 flag2ndGrowth_pvr(L,NR,NZ)=.true.
                 if(Root1stSink_pvr(MaxSoiL4Root_pft(NZ),NR).LE.ZERO .and. NRoot1stTipLay_raxes(NR,NZ)==MaxSoiL4Root_pft(NZ))then
@@ -3452,6 +3457,9 @@ implicit none
                 else
                   BaseSink  = Root1stSink_pvr(Ltip,NR)
                 endif
+                call DebugPrint('Fcrwt(Ltip,NR)',Fcrwt(Ltip,NR))
+                call DebugPrint('Fcrwt(L,NR)',Fcrwt(L,NR))
+
                 Root1stSink_pvr(L,NR) = BaseSink*Fcrwt(L,NR)/Fcrwt(Ltip,NR)
                 RootSinkC_vr(N,L)     = RootSinkC_vr(N,L)+Root1stSink_pvr(L,NR)
               ENDIF
@@ -3459,7 +3467,8 @@ implicit none
           ELSE
             !mycorrhizae
             Root2ndSink_pvr(N,L,NR)=safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
-          ENDIF          
+          ENDIF         
+          call DebugPrint('Root2ndSink_pvr(N,L,NR)',Root2ndSink_pvr(N,L,NR)) 
           RootSinkC_vr(N,L) = RootSinkC_vr(N,L)+Root2ndSink_pvr(N,L,NR)
         ENDDO D4985       
         IF(N.EQ.ipltroot .and. DistRootEffDepz_pvr(L,NZ)>0._r8)DistRootEffDepz_pvr(L,NZ)=DistRootEffDepz_pvr(L,NZ)/NumPrimeRootAxes_pft(NZ) 
@@ -3467,7 +3476,7 @@ implicit none
         RootSinkC(N)      = RootSinkC(N)+RootSinkC_vr(N,L)
       ENDIF
     ENDDO D4990
-
+    call PrintInfo("end D4990")
     Root2ndSinkWeight_pvr(:,N,NZ)=0._r8
     if(RootSinkC(N).GT.0._r8)then
       DO L=NU,MaxSoiL4Root_pft(NZ)
