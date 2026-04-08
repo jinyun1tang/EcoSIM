@@ -226,6 +226,7 @@ contains
 
   size_col = sizes%ncells_per_col_
   size_procs = state%porosity%cols
+  num_cols = sizes%num_columns
 
   call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
   data2D(:,:)=a_SSWS
