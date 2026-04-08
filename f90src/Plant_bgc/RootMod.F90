@@ -1487,13 +1487,13 @@ implicit none
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8)THEN          
     call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)
   ENDIF
-
+  call DebugPrint('Root1stNetGrowthElms(ielmc)',Root1stNetGrowthElms(ielmc))
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8 .AND. RootMyco1stElm_raxs(ielmc,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
     !primary roots withdraw, note that primary root depth was initialized at seedDepth
+    call DebugPrint('Root1stExtenzPP',Root1stExtenzPP)
     Root1stExtenzPP=Root1stExtenzPP+(Root1stDepz_raxes(NR,NZ)-SeedDepth_pft(NZ))* &
       Root1stNetGrowthElms(ielmc)/RootMyco1stElm_raxs(ielmc,NR,NZ)
   ENDIF
-
   !the extension should not exceed soil layer thickness
   IF(L.LT.MaxNumRootLays)THEN
     Root1stExtenzPP=AMIN1(DLYR3(Lnext),Root1stExtenzPP)
@@ -2015,7 +2015,7 @@ implicit none
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8)THEN          
     call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)    
   ENDIF
-
+  call DebugPrint('Root1stNetGrowthElms(ielmc)',Root1stNetGrowthElms(ielmc))
   if(Root1stNetGrowthElms(ielmc).LT.0._r8)then
     !withdraw storage carbon from layers above
     DO L1=L,1,-1
@@ -2033,11 +2033,12 @@ implicit none
 
   !apply the structrual growth
   DO NE=1,NumPlantChemElms
+    Root1stNetGrowthElms(NE)=AZERO(Root1stNetGrowthElms(NE))
     RootMyco1stElm_raxs(NE,NR,NZ)         = RootMyco1stElm_raxs(NE,NR,NZ)+Root1stNetGrowthElms(NE)
     Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)+Root1stNetGrowthElms(NE)
     RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)+Root1stNetGrowthElms(NE)
   ENDDO
-
+  call DebugPrint('Root1stLenPP_rpvr(L,NR,NZ)',Root1stLenPP_rpvr(L,NR,NZ))
   Root1stRadius_rpvr(L,NR,NZ)=sqrt(RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)*CRootActVolPerMassC_pft(NZ) &
     /(PiCON*Root1stLenPP_rpvr(L,NR,NZ)*PlantPopulation_pft(NZ)))
 
