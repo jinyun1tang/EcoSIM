@@ -65,7 +65,7 @@ subroutine EcoSIM_Setup(properties, state, sizes, num_iterations,&
 
   call Init_EcoSIM(sizes)
 
-  call EcoSIM2ATSData(num_columns, state, sizes)
+  !call EcoSIM2ATSData(num_columns, state, sizes)
 
 end subroutine EcoSIM_Setup
 
