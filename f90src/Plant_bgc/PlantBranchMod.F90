@@ -1827,8 +1827,8 @@ module PlantBranchMod
       D555: DO N=NumLeafZenithSectors1,1,-1
         !assuming the maximum growth rate in 30 mm/hour, note bamboo can growth as fast as 38 mm per hour.
         LeafElevation = SineLeafAngle(N)*LeafAngleClass_pft(N,NZ)*LeafLength
-        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.03_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
-        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.03_r8,HeightLeafLow+LeafElevation)
+        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
+        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
 
         LU = 0
         LL = 0
