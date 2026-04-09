@@ -1,6 +1,6 @@
 module RootGasMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux,isclose
   use DebugToolMod
   use EcosimConst
   use EcoSIMSolverPar
@@ -271,6 +271,7 @@ module RootGasMod
       !
       !     AQUEOUS GAS DIFFUSIVITY THROUGH SOIL WATER TO ROOT
       !
+      if(isclose(VLWatMicPM_vr(M,L),0._r8))cycle
       VLWatMicPMO = VLWatMicPM_vr(M,L)*FOXYX
       VLWatMicPMM = VLWatMicPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM = VLsoiAirPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
