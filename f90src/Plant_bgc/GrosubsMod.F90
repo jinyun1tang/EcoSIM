@@ -87,9 +87,9 @@ module grosubsMod
   D9985: DO NZ=1,NP
 
     IF(IsPlantActive_pft(NZ).EQ.iActive .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
-
+      !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
-
+      ! 
       call RemoveBiomassByDisturbance(yearIJ,NZ)
 
       !   RESET DEAD BRANCHES
@@ -99,10 +99,9 @@ module grosubsMod
     call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
-!
+  !
   call LiveDeadTransformation(yearIJ)
-
-
+  !
   call PrintInfo('end '//subname)
   end associate
   END subroutine GrowPlants
@@ -282,18 +281,16 @@ module grosubsMod
     !     CALCULATE GROWTH OF EACH BRANCH
 
     DO  NB=1,NumOfBranches_pft(NZ)
-
+      !
       call GrowOneBranch(yearIJ,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
-
+      !
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
-
     ENDDO
 
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
-
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
   ENDIF

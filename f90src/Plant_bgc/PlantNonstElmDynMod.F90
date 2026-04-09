@@ -26,9 +26,13 @@ module PlantNonstElmDynMod
   ![header]
 !----------------------------------------------------------------------------------------------------
   subroutine WithinBranchElmTransfer(I,J,NZ)
-
+  !
+  !Description:
+  !Do nonstrucal material transfer within branches
+  !
   implicit none
   integer, intent(in) :: I,J,NZ
+
   character(len=*), parameter :: subname='WithinBranchElmTransfer'
   real(r8) :: TotNonstElm_loc(NumPlantChemElms)
   real(r8) :: NonstElm_loc(NumPlantChemElms,NumCanopyLayers1)  
@@ -36,7 +40,7 @@ module PlantNonstElmDynMod
   real(r8) :: StalkRsrvGradt  
   real(r8) :: TotStalkRsrv_loc(NumPlantChemElms)  
   real(r8) :: TotStalkMassC  
-  real(r8) :: sumchk1,sumchk2  
+  real(r8) :: sumchk1,sumchk2(NumPlantChemElms)  
   integer  :: NB,NE
   real(r8) :: XFRE(NumPlantChemElms)
   real(r8) :: mass_inital(NumPlantChemElms)
@@ -55,16 +59,16 @@ module PlantNonstElmDynMod
     StalkRsrvElms_brch      => plt_biom%StalkRsrvElms_brch        ,& !inoput :branch reserve element mass, [g d-2]
     CanopyNonstElms_brch    => plt_biom%CanopyNonstElms_brch       & !inoput :branch nonstructural element, [g d-2]
   )
-    !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
-    !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
-    !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
-    !
-    !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-    !     Hours2LeafOut_brch=hourly leafout counter
-    !     HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
-    !     CanopyLeafSheathC_brch=leaf+PetolSheth mass
-    !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
-    !
+  !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
+  !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
+  !     WHEN SEASONAL STORAGE C IS NOT BEING MOBILIZED
+  !
+  !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
+  !     Hours2LeafOut_brch=hourly leafout counter
+  !     HourReq2InitSStor4LeafOut=number of hours required to initiate remobilization of storage C for leafout
+  !     CanopyLeafSheathC_brch=leaf+PetolSheth mass
+  !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
+  !
   call PrintInfo('beg '//subname)  
   TwoCompMassC=0._r8
   TotNonstElm_loc(1:NumPlantChemElms)=0._r8
@@ -91,11 +95,11 @@ module PlantNonstElmDynMod
         !leaf out criterion met
       IF(Hours2LeafOut_brch(NB,NZ).GT.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)))THEN
         IF(TwoCompMassC.GT.ZERO4Groth_pft(NZ) .AND. TotNonstElm_loc(ielmc).GT.ZERO4Groth_pft(NZ))THEN
-          NonstElmGradt=TotNonstElm_loc(ielmc)*LeafPetoMassC_brch(NB)-NonstElm_loc(ielmc,NB)*TwoCompMassC
-          XFRE(ielmc)=0.01_r8*NonstElmGradt/TwoCompMassC
+          NonstElmGradt = TotNonstElm_loc(ielmc)*LeafPetoMassC_brch(NB)-NonstElm_loc(ielmc,NB)*TwoCompMassC
+          XFRE(ielmc)   = 0.01_r8*AZERO(NonstElmGradt/TwoCompMassC)
           DO NE=2,NumPlantChemElms
             NonstElmGradt = TotNonstElm_loc(NE)*NonstElm_loc(ielmc,NB)-NonstElm_loc(NE,NB)*TotNonstElm_loc(ielmc)
-            XFRE(NE)      = 0.01_r8*NonstElmGradt/TotNonstElm_loc(ielmc)
+            XFRE(NE)      = 0.01_r8*AZERO(NonstElmGradt/TotNonstElm_loc(ielmc))
           ENDDO
           DO NE=1,NumPlantChemElms
             CanopyNonstElms_brch(NE,NB,NZ)=CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -108,7 +112,6 @@ module PlantNonstElmDynMod
   DO NE=1,NumPlantChemElms
     mass_finale(NE)=SUM(CanopyNonstElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   enddo
-  
   !=============================================================================
   !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH STALK RESERVES
   !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
@@ -122,7 +125,7 @@ module PlantNonstElmDynMod
   DO NE=1,NumPlantChemElms
     mass_inital(NE)=sum(StalkRsrvElms_brch(NE,1:NumOfBranches_pft(NZ),NZ))
   ENDDO
-  call PrintInfo('here2')
+  !
   TotStalkMassC                        = 0._r8
   TotStalkRsrv_loc(1:NumPlantChemElms) = 0._r8
   D330: DO NB=1,NumOfBranches_pft(NZ)
@@ -130,7 +133,8 @@ module PlantNonstElmDynMod
       IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
         TotStalkMassC=TotStalkMassC+SapwoodBiomassC_brch(NB,NZ)
         DO NE=1,NumPlantChemElms
-          TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+StalkRsrvElms_brch(NE,NB,NZ)
+          NonstElm_loc(NE,NB)=AZMAX1(StalkRsrvElms_brch(NE,NB,NZ))
+          TotStalkRsrv_loc(NE)=TotStalkRsrv_loc(NE)+NonstElm_loc(NE,NB)
         ENDDO
       ENDIF
     ENDIF
@@ -144,15 +148,16 @@ module PlantNonstElmDynMod
       IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
         IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
           StalkRsrvGradt                  = TotStalkRsrv_loc(ielmc)*SapwoodBiomassC_brch(NB,NZ)-StalkRsrvElms_brch(ielmc,NB,NZ)*TotStalkMassC
-          XFRE(ielmc)                     = 0.1_r8*AZERO(StalkRsrvGradt)/TotStalkMassC
+          XFRE(ielmc)                     = 0.1_r8*AZERO(StalkRsrvGradt/TotStalkMassC)
           StalkRsrvElms_brch(ielmc,NB,NZ) = StalkRsrvElms_brch(ielmc,NB,NZ)+XFRE(ielmc)
-          sumchk2                         = sumchk2+StalkRsrvElms_brch(ielmc,NB,NZ)
+
           !based on stoichiometry gradient
           DO NE=2,NumPlantChemElms            
-            StalkRsrvGradt               = TotStalkRsrv_loc(NE)*StalkRsrvElms_brch(ielmc,NB,NZ)-StalkRsrvElms_brch(NE,NB,NZ)*TotStalkRsrv_loc(ielmc)            
-            XFRE(NE)                     = 0.1_r8*AZERO(StalkRsrvGradt)/TotStalkRsrv_loc(ielmc)
+            StalkRsrvGradt               = TotStalkRsrv_loc(NE)*NonstElm_loc(ielmc,NB)-NonstElm_loc(NE,NB)*TotStalkRsrv_loc(ielmc)            
+            XFRE(NE)                     = 0.1_r8*AZERO(StalkRsrvGradt/TotStalkRsrv_loc(ielmc))
             StalkRsrvElms_brch(NE,NB,NZ) = StalkRsrvElms_brch(NE,NB,NZ)+XFRE(NE)
-          ENDDO          
+          ENDDO    
+          sumchk2  = sumchk2+XFRE
         ENDIF
       ENDIF
     ENDDO D335
@@ -598,27 +603,26 @@ module PlantNonstElmDynMod
   )
   call PrintInfo('beg '//subname)
 
-!  call SumReserveBiomass(I,J,NZ,massE_beg)
+  call SumReserveBiomass(I,J,NZ,massE_beg)
 
   IF(NumOfBranches_pft(NZ).GT.1)THEN
     call WithinBranchElmTransfer(I,J,NZ)
   ENDIF
-
+  !
   IF(Myco_pft(NZ).GT.ipltroot)then
     call RootMycoNonstTransfer(I,J,NZ)
   endif    
-
+  !
   !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   !     IN PERENNIALS
   !
   IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
-
+  !
   call ShootRootElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC)
-
-!  call SumReserveBiomass(I,J,NZ,massE_end)
-
+  !
+  call SumReserveBiomass(I,J,NZ,massE_end)
   call PrintInfo('end '//subname)
   end associate
   end subroutine PlantNonstElmTransfer
