@@ -453,13 +453,13 @@ module PlantPhenolMod
       ENDDO     
     ENDIF
   ENDDO D140
-!
-! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
-!
-! WTRTL=root mas(g)
-! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
-! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
-!
+  !
+  ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
+  !
+  ! WTRTL=root mas(g)
+  ! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
+  ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
+  !
   D180: DO N=1,Myco_pft(NZ)
     D160: DO L=NU,MaxSoiL4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
@@ -507,6 +507,7 @@ module PlantPhenolMod
   subroutine TestPlantEmergence(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
+  character(len=*), parameter :: subname='TestPlantEmergence'
   real(r8):: ShootArea
   logical :: CanopyChk,RootChk
 
@@ -523,19 +524,20 @@ module PlantPhenolMod
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch  ,& !input  :plant growth stage, [-]
     VHeatCapCanopy_pft  => plt_ew%VHeatCapCanopy_pft       & !output :canopy heat capacity, [MJ d-2 K-1]
   )
-!
-! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
-!
-! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
-! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
-! HypocotHeight_pft=hypocotyledon height
-! SeedDepth_pft=seeding depth
-! Root1stDepz_raxes=primary root depth,avoid plant the seed at the grid interface
-! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
-!
+  call PrintInfo('beg '//subname)
+  !
+  ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
+  !
+  ! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
+  ! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
+  ! HypocotHeight_pft=hypocotyledon height
+  ! SeedDepth_pft=seeding depth
+  ! Root1stDepz_raxes=primary root depth,avoid plant the seed at the grid interface
+  ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
+  !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
-    CanopyChk = (HypocotHeight_pft(NZ).GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
+    CanopyChk = (HypocotHeight_pft(NZ)+1.e-3_r8.GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_raxes(1,NZ).GT.(SeedDepth_pft(NZ)+1.e-8_r8)
     
     IF(CanopyChk .AND. RootChk)THEN
@@ -543,6 +545,7 @@ module PlantPhenolMod
       VHeatCapCanopy_pft(NZ)=cpw*(ShootElms_pft(ielmc,NZ)*10.0E-06_r8+WatHeldOnCanopy_pft(NZ))
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TestPlantEmergence
 
@@ -577,7 +580,6 @@ module PlantPhenolMod
   !           Hours4LenthenPhotoPeriod_brch,Hours4ShortenPhotoPeriod_brch
   !            =hourly counter for lengthening,shortening photoperiods
   !
-
   IF(iPlantBranchState_brch(NB,NZ).EQ.iLive .OR. doInitPlant_pft(NZ).EQ.itrue)THEN
     IF(DayLenthCurrent.GE.DayLenthPrev)THEN
       Hours4LenthenPhotoPeriod_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)+1.0_r8
@@ -586,7 +588,6 @@ module PlantPhenolMod
       Hours4LenthenPhotoPeriod_brch(NB,NZ)=0.0_r8
       Hours4ShortenPhotoPeriod_brch(NB,NZ)=Hours4ShortenPhotoPeriod_brch(NB,NZ)+1.0_r8
     ENDIF
-    !
     !
     IF(iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen)THEN
 
@@ -669,16 +670,17 @@ module PlantPhenolMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine ColdDroughtDeciduPhenology(I,J,NB,NZ)
-
-!     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
-!     HOURS ABOVE SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
-!     LENGTHENINGTopRootLayer_pftPHOTOPERIODS
+  ! 
+  !     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
+  !     HOURS ABOVE SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
+  !     LENGTHENINGTopRootLayer_pftPHOTOPERIODS
+  !
   implicit none
   integer, intent(in) :: I   !day
   integer, intent(in) :: J   !hour
   integer, intent(in) :: NB  !branch id
   integer, intent(in) :: NZ  !pft id
-
+  character(len=*), parameter :: subname='ColdDroughtDeciduPhenology'
   associate(                                                   &
     DayLenthCurrent       => plt_site%DayLenthCurrent         ,& !input  :current daylength of the grid, [h]
     DayLenthMax_col       => plt_site%DayLenthMax_col         ,& !input  :maximum daylength of the grid, [h]
@@ -698,39 +700,42 @@ module PlantPhenolMod
     Hours4LeafOff_brch    => plt_pheno%Hours4LeafOff_brch     ,& !inoput :cold requirement for autumn leafoff/hardening, [h]
     Hours4Leafout_brch    => plt_pheno%Hours4Leafout_brch      & !inoput :heat requirement for spring leafout/dehardening, [h]
   )
+  call PrintInfo('beg '//subname)
 
-  IF((DayLenthCurrent.GE.DayLenthPrev .OR. DayLenthCurrent.GE.DayLenthMax_col-2.0_r8) &
+  IF((DayLenthCurrent.GE.DayLenthPrev .OR. DayLenthCurrent.GE.DayLenthMax_col-2.0_r8) & !light condition met
     .AND. doPlantLeafOut_brch(NB,NZ).EQ.iEnable)THEN
-    IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ) .AND. PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN
+    IF(TCGroth_pft(NZ).GE.TC4LeafOut_pft(NZ) .AND. PSICanopyTurg_pft(NZ).GT.PSIMin4LeafExpansion)THEN !temeprature and moisture condition
       Hours4Leafout_brch(NB,NZ)=Hours4Leafout_brch(NB,NZ)+1.0_r8
     ENDIF
-    
+
+    !chilling effect
     IF(Hours4Leafout_brch(NB,NZ).LT.HourReq4LeafOut_brch(NB,NZ))THEN
       IF(TCGroth_pft(NZ).LT.TCChill4Seed_pft(NZ) .OR. PSICanopyTurg_pft(NZ).LT.PSIMin4LeafExpansion)THEN
         Hours4Leafout_brch(NB,NZ)=AZMAX1(Hours4Leafout_brch(NB,NZ)-1.5_r8)
       ENDIF
     ENDIF
+
     IF(Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
       Hours4LeafOff_brch(NB,NZ)=0.0_r8
       IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff_brch(NB,NZ)=iEnable
     ENDIF
   ENDIF
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)doPlantLeaveOff_brch(NB,NZ)=iEnable
-!
-!     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
-!     HOURS BELOW SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
-!     SHORTENINGTopRootLayer_pftPHOTOPERIODS
-!
-!     DayLenthPrev,DLYN=daylength of previous,current day
-!     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
-!     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-!     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
-!     PSICanopy_pft=canopy total water potential
-!     PSIMin4LeafOut,PSIMin4LeafOff=minimum canopy water potential for leafout,leafoff
-!     ALAT=latitude
-!     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
-!
+  !
+  !     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
+  !     HOURS BELOW SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
+  !     SHORTENINGTopRootLayer_pftPHOTOPERIODS
+  !
+  !     DayLenthPrev,DLYN=daylength of previous,current day
+  !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
+  !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
+  !     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
+  !     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !     PSICanopy_pft=canopy total water potential
+  !     PSIMin4LeafOut,PSIMin4LeafOff=minimum canopy water potential for leafout,leafoff
+  !     ALAT=latitude
+  !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
+  !
   IF((DayLenthCurrent.LT.DayLenthPrev .OR. DayLenthCurrent.LT.24.0_r8-DayLenthMax_col+2.0_r8) &
     .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable)THEN
     IF(TCGroth_pft(NZ).LE.TC4LeafOff_pft(NZ) .OR. &
@@ -743,6 +748,7 @@ module PlantPhenolMod
       doPlantLeafOut_brch(NB,NZ) = iEnable
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ColdDroughtDeciduPhenology
 
@@ -860,18 +866,18 @@ module PlantPhenolMod
     !has flower or (day length is decreasing, and current daytime is short)
     doPlantLeaveOff_brch(NB,NZ)=iEnable
   ENDIF
-!
-!     CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayer_pftHOURS BELOW
-!     SPECIFIED TEMPERATURE DURINGTopRootLayer_pftSHORTENINGTopRootLayer_pftPHOTOPERIODS
-!
-!     DayLenthPrev,DLYN=daylength of previous,current day
-!     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
-!     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
-!     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
-!     ALAT=latitude
-!     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
-!
+  !
+  !     CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayer_pftHOURS BELOW
+  !     SPECIFIED TEMPERATURE DURINGTopRootLayer_pftSHORTENINGTopRootLayer_pftPHOTOPERIODS
+  !
+  !     DayLenthPrev,DLYN=daylength of previous,current day
+  !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
+  !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
+  !     doPlantLeafOut_brch,doPlantLeaveOff_brch=flag for enabling leafout,leafoff:0=enable,1=disable
+  !     TCGroth_pft,TCZ,TCChill4Seed_pft=canopy temp,leafout threshold temp,chilling temp
+  !     ALAT=latitude
+  !     iPlantCalendar_brch(ipltcal_InitFloral,=date of floral initiation
+  !
   IF(DayLenthCurrent.LT.DayLenthPrev .AND. doPlantLeaveOff_brch(NB,NZ).EQ.iEnable &
     .AND.iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).NE.0)THEN
     IF(TCGroth_pft(NZ).LE.TC4LeafOff_pft(NZ))THEN
@@ -916,8 +922,6 @@ module PlantPhenolMod
     doSenescence_brch                 => plt_pheno%doSenescence_brch                  ,& !output :branch phenology flag, [-]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                  & !output :branch phenology flag, [-]
   )
-!  write(491,*)I*1000+J/24.,NB,subname,iPlantCalendar_brch(1,NB,NZ),iPlantCalendar_brch(10,NB,NZ),&
-!    Hours4LeafOff_brch(NB,NZ).LT.HourReq4LeafOff_brch(NB,NZ),Hours4LeafOff_brch(NB,NZ),HourReq4LeafOff_brch(NB,NZ)
 
   call PrintInfo('beg '//subname)
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN

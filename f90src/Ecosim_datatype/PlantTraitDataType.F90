@@ -24,6 +24,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                    !pft canopy height, [m]
+  real(r8),target,allocatable ::  StalkHeight_pft(:,:,:)                     !pft stalk height, [m]
   real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
@@ -203,6 +204,7 @@ contains
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
   allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
+  allocate(StalkHeight_pft(JP,JY,JX)); StalkHeight_pft=0._r8
   allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
@@ -381,6 +383,7 @@ contains
   call destroy(LeafStalkArea_pft)
   call destroy(CanopyStemArea_pft)
   call destroy(CanopyHeight_pft)
+  call destroy(StalkHeight_pft)
   call destroy(CanopyLeafAareZ_col)
   call destroy(CanopyStemAareZ_col)
   call destroy(CanopyLeafArea_col)

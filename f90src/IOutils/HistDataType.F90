@@ -342,6 +342,7 @@ implicit none
   real(r8),pointer   :: h1D_FIREp_CO2_FLX_ptc(:)   
   real(r8),pointer   :: h1D_FIREp_CH4_FLX_ptc(:)   
   real(r8),pointer   :: h1D_NPP_ptc(:)        
+  real(r8),pointer   :: h1D_Stalk_HT_ptc(:)
   real(r8),pointer   :: h1D_CAN_HT_ptc(:)     
   real(r8),pointer   :: h1D_EmergeHeight_ptc(:)
   real(r8),pointer   :: h1D_CanopyCutProxy_ptc(:)
@@ -893,6 +894,7 @@ implicit none
   allocate(this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_FIREp_CH4_FLX_ptc(:)=spval
   allocate(this%h1D_NPP_ptc(beg_ptc:end_ptc))             ;this%h1D_NPP_ptc(:)=spval
   allocate(this%h1D_CAN_HT_ptc(beg_ptc:end_ptc))          ;this%h1D_CAN_HT_ptc(:)=spval
+  allocate(this%h1D_Stalk_HT_ptc(beg_ptc:end_ptc))        ;this%h1D_Stalk_HT_ptc(:)=spval
   allocate(this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)); this%h1D_EmergeHeight_ptc(:)=spval
   allocate(this%h1D_POPN_ptc(beg_ptc:end_ptc))            ;this%h1D_POPN_ptc(:)=spval
   allocate(this%h1D_CanopyCutProxy_ptc(beg_ptc:end_ptc))  ;this%h1D_CanopyCutProxy_ptc(:)=spval
@@ -2362,6 +2364,10 @@ implicit none
   data1d_ptr => this%h1D_CAN_HT_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='CAN_HT_pft',units='m',avgflag='A',&
     long_name='Canopy height',ptr_patch=data1d_ptr)      
+
+  data1d_ptr => this%h1D_Stalk_HT_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Stalk_HT_pft',units='m',avgflag='A',&
+    long_name='Canopy stalk height',ptr_patch=data1d_ptr, default='inactive')      
 
   data1d_ptr => this%h1D_EmergeHeight_ptc(beg_ptc:end_ptc)    
   call hist_addfld1d(fname='EmergHeight_pft',units='m',avgflag='A',&
@@ -4381,6 +4387,7 @@ implicit none
         this%h1D_AUTO_RESP_FLX_ptc(nptc)    = GrossResp_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
         this%h1D_CAN_HT_ptc(nptc)            = CanopyHeight_pft(NZ,NY,NX)
+        this%h1D_Stalk_HT_ptc(nptc)          = StalkHeight_pft(NZ,NY,NX)
         this%h1D_EmergeHeight_ptc(nptc)     = HypocotHeight_pft(NZ,NY,NX)-SeedDepth_pft(NZ,NY,NX) 
         this%h1D_WTR_STRESS_ptc(nptc)        = HoursTooLowPsiCan_pft(NZ,NY,NX)
         this%h1D_LeafProteinNperm2_ptc(nptc) = LeafProteinCperm2LA_pft(NZ,NY,NX)/3.3_r8
@@ -4452,21 +4459,21 @@ implicit none
             this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)=this%h2D_ProteinNperm2LeafArea_pnd(nptc,K)/(NumOfBranches_pft(NZ,NY,NX)*3.3_r8)
           ENDDO  
         ENDIF
+        this%h1D_Growth_Stage_ptc(nptc) = 0
+        this%h1D_RUB_ACTVN_ptc(nptc)    = 0._r8
+        this%h1D_CanopyNLim_ptc(nptc)   = 0._r8
+        this%h1D_CanopyPLim_ptc(nptc)   = 0._r8
+        this%h1D_Num_Leaves_ptc(nptc)   = 0._r8
         if(MainBranchNum_pft(NZ,NY,NX)> 0)then
           DO KN=NumGrowthStages,0,-1
-            IF(KN==0)THEN
-              this%h1D_Growth_Stage_ptc(nptc)   =KN
-            ELSE
-              if(iPlantCalendar_brch(KN,MainBranchNum_pft(NZ,NY,NX),NZ,NY,NX)>0)then
+            IF(KN>0)THEN
+              if(any(iPlantCalendar_brch(KN,:,NZ,NY,NX)>0))then
                 this%h1D_Growth_Stage_ptc(nptc) =KN
                 exit    
               endif  
             ENDIF  
           ENDDO
-          this%h1D_RUB_ACTVN_ptc(nptc)=0._r8; NB1=0
-          this%h1D_CanopyNLim_ptc(nptc)=0._r8
-          this%h1D_CanopyPLim_ptc(nptc)=0._r8
-          this%h1D_Num_Leaves_ptc(nptc)=0._r8
+          NB1=0
           DO NB=1,NumOfBranches_pft(NZ,NY,NX)
             this%h1D_Num_Leaves_ptc(nptc)  = this%h1D_Num_Leaves_ptc(nptc)+NumOfLeaves_brch(NB,NZ,NY,NX)
             if(RubiscoActivity_brch(NB,NZ,NY,NX)>0._r8)then
@@ -4737,7 +4744,8 @@ implicit none
   this%h1D_HVST_N_FLX_ptc(nptc)       = 0._r8
   this%h1D_HVST_P_FLX_ptc(nptc)       = 0._r8
   this%h1D_CAN_HT_ptc(nptc)           = 0._r8
-  this%h1D_EmergeHeight_ptc(nptc)        = 0._r8
+  this%h1D_Stalk_HT_ptc(nptc)          = 0._r8
+  this%h1D_EmergeHeight_ptc(nptc)      = 0._r8
   this%h1D_WTR_STRESS_ptc(nptc)       = 0._r8
   this%h1D_LeafProteinNperm2_ptc(nptc)= 0._r8
   this%h1D_VcMaxRubisco_ptc(nptc) =  0._r8

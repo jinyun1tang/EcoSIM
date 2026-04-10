@@ -273,7 +273,7 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  pure function is_root_shallow(iPlantRootProfile_pft)result(ans)
+  pure function is_root_bryophyte(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -285,7 +285,7 @@ contains
   logical :: ans
 
   ans=(iPlantRootProfile_pft == iplt_bryophyte)
-  end function is_root_shallow
+  end function is_root_bryophyte
 
 !--------------------------------------------------------------------------------
   pure function is_root_N2fix(iPlantNfixType_pft)result(yesno)
@@ -326,7 +326,7 @@ contains
   integer, intent(in) :: iPlantRootProfile
   real(r8) :: ans
 
-  IF(is_root_shallow(iPlantRootProfile))THEN
+  IF(is_root_bryophyte(iPlantRootProfile))THEN
     ans=WFN**0.10_r8
   ELSE
     ans=WFN**0.25_r8

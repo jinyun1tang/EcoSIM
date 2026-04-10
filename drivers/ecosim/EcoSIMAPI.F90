@@ -474,6 +474,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
       
       if(rstwr)then
+        
         call restFile(flag='write')
       endif      
       call DebugPrint("end step",I*1000+J)

@@ -67,6 +67,7 @@ module grosubsMod
     IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
     CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
   call PrintInfo('beg '//subname)
@@ -77,6 +78,7 @@ module grosubsMod
   DO NZ=1,NP0
     CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
     CanopyHeight_pft(NZ)                   = 0._r8
+    StalkHeight_pft(NZ)                    = 0._r8
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
@@ -491,7 +493,7 @@ module grosubsMod
   !
   TurgEff4LeafPetolExpansion=real_truncate(AMIN1(1.0_r8,AZMAX1(PSICanopyTurg_pft(NZ)-TurgPSIMin4OrganExtens)),1.e-4_r8)
 
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     !bryophyte, no turgor
     Stomata_Stress    = 1.0_r8
     WaterStress4Groth = EXP(0.05_r8*AMAX1(PSICanopy_pft(NZ),-5000._r8))

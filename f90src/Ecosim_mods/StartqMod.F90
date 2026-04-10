@@ -168,7 +168,7 @@ module StartqMod
   !
   !     NON-VASCULAR (E.G. MOSSES)
   !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ,NY,NX)))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX) = 0.30_r8
@@ -238,7 +238,7 @@ module StartqMod
   !
   !     NON-VASCULAR
   !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ,NY,NX)))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ,NY,NX) = 0.30_r8
@@ -267,7 +267,7 @@ module StartqMod
 !
 !     NON-VASCULAR
 !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ,NY,NX)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ,NY,NX)))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ,NY,NX) = 0.30_r8

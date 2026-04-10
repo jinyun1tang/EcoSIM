@@ -209,7 +209,7 @@ module InitPlantMod
   !
   !     NON-VASCULAR (E.G. MOSSES)
   !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.30_r8
@@ -280,7 +280,7 @@ module InitPlantMod
 !
 !     NON-VASCULAR
 !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ)  = 0.07_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ) = 0.30_r8
@@ -309,7 +309,7 @@ module InitPlantMod
 !
 !     NON-VASCULAR
 !
-  IF(is_root_shallow(iPlantRootProfile_pft(NZ)))THEN
+  IF(is_root_bryophyte(iPlantRootProfile_pft(NZ)))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ)=0.07_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ)=0.25_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ)=0.30_r8
@@ -699,14 +699,14 @@ module InitPlantMod
       iPlantCalendar_brch(M,NB,NZ)=0
     ENDDO D15
   ENDDO D10
-!
-!     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
-!
+  !
+  !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
+  !
   HoursTooLowPsiCan_pft(NZ)=0._r8
   ChillHours_pft(NZ)=0._r8
   plt_biom%CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)            = 0._r8
   plt_biom%CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)       = 0._r8
-  plt_biom%PetolShethStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)            = 0._r8
+  plt_biom%PetolShethStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)        = 0._r8
   plt_biom%ShootElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)                  = 0._r8
   plt_biom%StalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)             = 0._r8
   plt_biom%LeafStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)              = 0._r8
