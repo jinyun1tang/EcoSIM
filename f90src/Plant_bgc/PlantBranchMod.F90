@@ -1827,8 +1827,8 @@ module PlantBranchMod
       D555: DO N=NumLeafZenithSectors1,1,-1
         !assuming the maximum growth rate in 30 mm/hour, note bamboo can growth as fast as 38 mm per hour.
         LeafElevation = SineLeafAngle(N)*LeafAngleClass_pft(N,NZ)*LeafLength
-        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.03_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
-        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.03_r8,HeightLeafLow+LeafElevation)
+        HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
+        HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
 
         LU = 0
         LL = 0
@@ -3516,7 +3516,7 @@ module PlantBranchMod
       !         LeafAreaGrowth,GRO=leaf area,mass growth
       !         LeafAreaLive_brch,LeafArea_node=branch,node leaf area
       !Eq.(3) in Grant and Hesketh, 1992, with updates for small biomass
-      dMC                      = AZMAX1(1.e-4_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GrozNodesPerPlant))
+      dMC                      = AZMAX1(1.e-9_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GrozNodesPerPlant))
       SpecAreaLeafGrowth       = EtoliationCoeff*SLA1_pft(NZ)*dMC**SLA2*TurgEff4LeafPetolExpansion
       LeafAreaGrowth           = GrowthElms(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
@@ -3598,7 +3598,7 @@ module PlantBranchMod
     !   PetoleLength_node=PetolSheth length
 !
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
-        dMC                        = AZMAX1(1.e-4_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GSSL))
+        dMC                        = AZMAX1(1.e-9_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GSSL))
         SSL                        = EtoliationCoeff*PetolShethLen2Mass_pft(NZ)*dMC**SSL2*TurgEff4LeafPetolExpansion
         GROS                       = GrowthElms(ielmc)/PlantPopulation_pft(NZ)*SSL
         PetoleLength_node(K,NB,NZ) = PetoleLength_node(K,NB,NZ)+GROS*SinePetolShethAngle_pft(NZ)
@@ -3668,7 +3668,7 @@ module PlantBranchMod
 !     StalkLenGrowth,GRO=stalk length,mass growth
 !
     StalkAveStrutC_brch = StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ)
-    SpecLenStalkGrowth  = ETOL*NodeLenPergC_pft(NZ)*AZMAX1(5.e-2_r8,StalkAveStrutC_brch)**SNL2
+    SpecLenStalkGrowth  = ETOL*NodeLenPergC_pft(NZ)*AZMAX1(1.e-9_r8,StalkAveStrutC_brch)**SNL2
     StalkLenGrowth      = GrowthElms(ielmc)/PlantPopulation_pft(NZ)*SpecLenStalkGrowth
 !
 !     GROWTH AT EACH CURRENT NODE
