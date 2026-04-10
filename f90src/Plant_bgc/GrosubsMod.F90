@@ -91,7 +91,7 @@ module grosubsMod
     IF(IsPlantActive_pft(NZ).EQ.iActive .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
-      ! 
+      !      
       call RemoveBiomassByDisturbance(yearIJ,NZ)
 
       !   RESET DEAD BRANCHES

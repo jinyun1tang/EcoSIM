@@ -114,11 +114,10 @@ module PlantBranchMod
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       GrothPART2LeafPetole=PART(ibrch_leaf)+PART(ibrch_petole)
     ENDIF
-
+    !
     call UpdateBranchAllometry(I,J,NZ,NB,PART,CNLFW,CNRTW,CNSHW,CPLFW,&
       CPRTW,CPSHW,ShootStructE_brch,YCO2Gro_brch,CNLFM,CPLFM,&
       CNSHX,CPSHX,CNLFX,CPLFX,DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB)
-
     !
     !   GROSS PRIMARY PRODUCTIVITY
     !
@@ -133,16 +132,15 @@ module PlantBranchMod
     !
     !   iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4
     !
-
     IF(iPlantPhotosynsType_pft(NZ).EQ.ic4_photo)THEN
       call C4PhotoProductTransfer(I,J,NZ,NB,CH2O3,CH2O4)
     ENDIF
-
+    !
     canopy_growth_pft(NZ) = canopy_growth_pft(NZ)+RNonstC4Groth_brch
-
+    !
     call BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
       DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeID)
-
+    !
     CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
     !     DISTRIBUTE SHEATH OR PetolSheth GROWTH AMONG CURRENTLY GROWING NODES
@@ -152,7 +150,6 @@ module PlantBranchMod
     !   DISTRIBUTE STALK GROWTH AMONG CURRENTLY GROWING NODES
     !
     call GrowStalkOnBranch(I,J,NZ,NB,Growth_brch(:,ibrch_stalk),EtoliationCoeff)
-
     !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
     !   ON SHOOT NON-STRUCTURAL C:N:P
@@ -213,12 +210,10 @@ module PlantBranchMod
       .AND. iPlantBranchState_brch(MainBranchNum_pft(NZ),NZ).EQ.iDead)then
       iPlantBranchState_brch(NB,NZ)=iDead
     endif
-
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
     call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
-
+    !
     call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
-
     !
     !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
     !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
@@ -1722,6 +1717,7 @@ module PlantBranchMod
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
     PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
+    LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]    
     SineLeafAngle             => plt_rad%SineLeafAngle                ,& !input  :sine of leaf angle,[-]
     LeafLayerElms_node        => plt_biom%LeafLayerElms_node          ,& !inoput :layer leaf element, [g d-2]
     CanopyLeafCLyr_pft        => plt_biom%CanopyLeafCLyr_pft          ,& !inoput :canopy layer leaf C, [g d-2]
@@ -1968,10 +1964,11 @@ module PlantBranchMod
       ENDDO D450
     ENDIF
   ELSE
+    L=1;K=0
     SapwoodBiomassC_brch(NB,NZ)                     = 0._r8
     CanopyStalkArea_lbrch(1:NumCanopyLayers1,NB,NZ) = 0._r8
-    CanopyLeafArea_lnode(:,:,NB,NZ)                 = 0._r8
-    LeafLayerElms_node(:,:,:,NB,NZ)                 = 0._r8
+    CanopyLeafArea_lnode(L,K,NB,NZ)                 = LeafArea_node(0,NB,NZ)
+    LeafLayerElms_node(:,L,K,NB,NZ)                 = LeafStrutElms_brch(:,NB,NZ)
   ENDIF
 
   call PrintInfo('end '//subname)
@@ -3900,7 +3897,7 @@ module PlantBranchMod
     k_fine_comp                    => pltpar%k_fine_comp                        ,& !input  :fine litter complex id
     PlantElmAllocMat4Litr          => plt_soilchem%PlantElmAllocMat4Litr        ,& !input  :litter kinetic fraction, [-]
     FracPetolShethAlloc2Litr       => plt_allom%FracPetolShethAlloc2Litr        ,& !input  :leaf element allocation,[-]
-    FracLeafShethElmAlloc2Litr             => plt_allom%FracLeafShethElmAlloc2Litr              ,& !input  :woody element allocation, [-]
+    FracLeafShethElmAlloc2Litr     => plt_allom%FracLeafShethElmAlloc2Litr      ,& !input  :woody element allocation, [-]
     rProteinC2LeafN_pft            => plt_allom%rProteinC2LeafN_pft             ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft            => plt_allom%rProteinC2LeafP_pft             ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     ZERO4Groth_pft                 => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
@@ -3919,7 +3916,7 @@ module PlantBranchMod
     PetoleProteinC_node            => plt_biom%PetoleProteinC_node              ,& !inoput :layer sheath protein C, [g d-2]
     StructInternodeElms_brch       => plt_biom%StructInternodeElms_brch         ,& !inoput :internode C, [g d-2]
     LeafElmntNode_brch             => plt_biom%LeafElmntNode_brch               ,& !inoput :leaf element, [g d-2]
-    PetolShethStrutElms_brch           => plt_biom%PetolShethStrutElms_brch             ,& !inoput :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch       => plt_biom%PetolShethStrutElms_brch         ,& !inoput :branch sheath structural element, [g d-2]
     LeafArea_node                  => plt_morph%LeafArea_node                   ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch              => plt_morph%LeafAreaLive_brch               ,& !inoput :branch leaf area, [m2 d-2]
     PetoleLength_node              => plt_morph%PetoleLength_node               ,& !inoput :sheath height, [m]
