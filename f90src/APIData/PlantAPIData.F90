@@ -256,11 +256,11 @@ implicit none
   real(r8), pointer :: CanopyLeafArea_pft(:)           => null() !plant canopy leaf area,                                                     [m2 d-2]
   real(r8), pointer :: ShootNodeNum_brch(:,:)          => null() !shoot node number,                                                          [-]
   real(r8), pointer :: ShootNodeNumAtInitFloral_brch(:,:)    => null() !shoot node number at floral initiation,                                     [-]
-  real(r8), pointer :: NodeNumberAtAnthesis_brch(:,:)  => null() !shoot node number at anthesis,                                              [-]
+  real(r8), pointer :: ShootNodeNumAtAnthesis_brch(:,:)  => null() !shoot node number at anthesis,                                              [-]
   real(r8), pointer :: SineBranchAngle_pft(:)          => null() !branching angle,                                                            [degree from horizontal]
   real(r8), pointer :: LeafAreaZsec_brch(:,:,:,:,:)    => null() !leaf surface area,                                                          [m2 d-2]
   real(r8), pointer :: PotentialSeedSites_brch(:,:)    => null() !branch potential grain number,                                              [d-2]
-  real(r8), pointer :: SeedSitesSet_brch(:,:)            => null() !branch grain number,                                                        [d-2]
+  real(r8), pointer :: SetNumberSeeds_brch(:,:)            => null() !branch grain number,                                                        [d-2]
   real(r8), pointer :: CanPBranchHeight(:,:)           => null() !branch height,                                                              [m]
   real(r8), pointer :: LeafAreaDying_brch(:,:)         => null() !branch leaf area,                                                           [m2 d-2]
   real(r8), pointer :: LeafAreaLive_brch(:,:)          => null() !branch leaf area,                                                           [m2 d-2]
@@ -386,13 +386,13 @@ implicit none
   real(r8), pointer :: RateRefLeafAppearance_pft(:)      => null()     !rate of leaf initiation,                                [h-1 at 25 oC]
   real(r8), pointer :: CriticPhotoPeriod_pft(:)      => null()     !critical daylength for phenological progress,           [h]
   real(r8), pointer :: PhotoPeriodSens_pft(:)        => null()     !difference between current and critical daylengths used to calculate  phenological progress, [h]
-
+  integer,  pointer :: iEmbryophyteType_pft(:)       => null()      !plant embrophyte 
   integer,  pointer :: iPlantState_pft(:)                => null()  !flag for species death, [-]
   integer,  pointer :: IsPlantActive_pft(:)              => null()  !flag for living pft, [-]
-  integer,  pointer :: iPlantBranchState_brch(:,:)       => null()  !flag to detect branch death,                      [-]
+  integer,  pointer :: isPlantBranchAlive_brch(:,:)       => null()  !flag to detect branch death,                      [-]
   integer,  pointer :: doRemobilization_brch(:,:)        => null()  !branch phenology flag,                            [-]
   integer,  pointer :: doPlantLeaveOff_brch(:,:)         => null()  !branch phenology flag,                            [-]
-  integer,  pointer :: doPlantLeafOut_brch(:,:)          => null()  !branch phenology flag,                            [-]
+  integer,  pointer :: EnablePlantLeafOut_brch(:,:)          => null()  !branch phenology flag,                            [-]
   integer,  pointer :: doInitLeafOut_brch(:,:)           => null()  !branch phenology flag,                            [-]
   logical,  pointer :: doReSeed_pft(:)                   => null()  !flag to do annual plant reseeding, [-]
   integer,  pointer :: doSenescence_brch(:,:)            => null()  !branch phenology flag,                            [-]
@@ -401,9 +401,9 @@ implicit none
   integer,  pointer :: KHiestGroLeafNode_brch(:,:)       => null()  !leaf growth stage counter,                        [-]
   integer,  pointer :: iPlantPhenolType_pft(:)           => null()  !climate signal for phenological progress: none,   temperature, water stress,[-]
   integer,  pointer :: iPlantTurnoverPattern_pft(:)      => null()  !phenologically-driven above-ground turnover: all, foliar only, none,[-]
-  integer,  pointer :: iPlantShootState_pft(:)           => null()  !flag to detect canopy death,[-]
+  integer,  pointer :: isPlantShootAlive_pft(:)           => null()  !flag to detect canopy death,[-]
   integer,  pointer :: iPlantPhenolPattern_pft(:)        => null()  !plant growth habit: annual or perennial,[-]
-  integer,  pointer :: iPlantRootState_pft(:)            => null()  !flag to detect root system death,[-]
+  integer,  pointer :: isPlantRootAlive_pft(:)            => null()  !flag to detect root system death,[-]
   integer,  pointer :: iPlantDevelopPattern_pft(:)       => null()  !plant growth habit (determinate or indeterminate),[-]
   integer,  pointer :: iPlantPhotoperiodType_pft(:)      => null()  !photoperiod type (neutral, long day, short day),[-]
   integer,  pointer :: iPlantRootProfile_pft(:)          => null()  !plant growth type (vascular, non-vascular),[-]
@@ -1965,7 +1965,7 @@ implicit none
   allocate(this%iPlantState_pft(JP1));this%iPlantState_pft=0
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
   allocate(this%MatureGroup_brch(MaxNumBranches,JP1));this%MatureGroup_brch=spval
-  allocate(this%iPlantShootState_pft(JP1));this%iPlantShootState_pft=0
+  allocate(this%isPlantShootAlive_pft(JP1));this%isPlantShootAlive_pft=0
   allocate(this%Hours2LeafOut_brch(MaxNumBranches,JP1));this%Hours2LeafOut_brch=spval
   allocate(this%HoursDoingRemob_brch(MaxNumBranches,JP1));this%HoursDoingRemob_brch=spval
   allocate(this%HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP1));this%HourlyNodeNumNormByMatgrp_brch=spval
@@ -1976,9 +1976,10 @@ implicit none
   allocate(this%fNCLFW_brch(MaxNumBranches,JP1)); this%fNCLFW_brch=spval
   allocate(this%fPCLFW_brch(MaxNumBranches,JP1)); this%fPCLFW_brch=spval
   allocate(this%iPlantPhenolType_pft(JP1));this%iPlantPhenolType_pft=0
+  allocate(this%iEmbryophyteType_pft(JP1)); this%iEmbryophyteType_pft=0
   allocate(this%iPlantPhenolPattern_pft(JP1));this%iPlantPhenolPattern_pft=0
   allocate(this%iPlantTurnoverPattern_pft(JP1));this%iPlantTurnoverPattern_pft=0
-  allocate(this%iPlantRootState_pft(JP1));this%iPlantRootState_pft=0
+  allocate(this%isPlantRootAlive_pft(JP1));this%isPlantRootAlive_pft=0
   allocate(this%iPlantDevelopPattern_pft(JP1));this%iPlantDevelopPattern_pft=0
   allocate(this%iPlantPhotoperiodType_pft(JP1));this%iPlantPhotoperiodType_pft=0
   allocate(this%doInitPlant_pft(JP1));this%doInitPlant_pft=0
@@ -1995,10 +1996,10 @@ implicit none
   allocate(this%RefNodeInitRate_pft(JP1));this%RefNodeInitRate_pft=spval
   allocate(this%CriticPhotoPeriod_pft(JP1));this%CriticPhotoPeriod_pft=spval
   allocate(this%PhotoPeriodSens_pft(JP1));this%PhotoPeriodSens_pft=spval
-  allocate(this%iPlantBranchState_brch(MaxNumBranches,JP1));this%iPlantBranchState_brch=0
+  allocate(this%isPlantBranchAlive_brch(MaxNumBranches,JP1));this%isPlantBranchAlive_brch=iFalse
   allocate(this%doRemobilization_brch(MaxNumBranches,JP1));this%doRemobilization_brch=0
   allocate(this%doPlantLeaveOff_brch(MaxNumBranches,JP1));this%doPlantLeaveOff_brch=0
-  allocate(this%doPlantLeafOut_brch(MaxNumBranches,JP1));this%doPlantLeafOut_brch=0
+  allocate(this%EnablePlantLeafOut_brch(MaxNumBranches,JP1));this%EnablePlantLeafOut_brch=0
   allocate(this%doInitLeafOut_brch(MaxNumBranches,JP1));this%doInitLeafOut_brch=0
   allocate(this%doSenescence_brch(MaxNumBranches,JP1));this%doSenescence_brch=0
   allocate(this%Prep4Literfall_brch(MaxNumBranches,JP1));this%Prep4Literfall_brch=0
@@ -2111,7 +2112,7 @@ implicit none
   allocate(this%tsai_day_pft(JP1)); this%tsai_day_pft=spval
   allocate(this%ShootNodeNum_brch(MaxNumBranches,JP1));this%ShootNodeNum_brch=spval
   allocate(this%ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP1));this%ShootNodeNumAtInitFloral_brch=spval
-  allocate(this%NodeNumberAtAnthesis_brch(MaxNumBranches,JP1));this%NodeNumberAtAnthesis_brch=spval
+  allocate(this%ShootNodeNumAtAnthesis_brch(MaxNumBranches,JP1));this%ShootNodeNumAtAnthesis_brch=spval
   allocate(this%SineBranchAngle_pft(JP1));this%SineBranchAngle_pft=spval
   allocate(this%LeafAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafAreaZsec_brch=spval
@@ -2147,7 +2148,7 @@ implicit none
   allocate(this%CanopyStalkArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
   allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval
   allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
-  allocate(this%SeedSitesSet_brch(MaxNumBranches,JP1));this%SeedSitesSet_brch=spval
+  allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
   allocate(this%FineRootVolPerMassC_pft(jroots,JP1));this%FineRootVolPerMassC_pft=spval
   allocate(this%CRootActVolPerMassC_pft(JP1)); this%CRootActVolPerMassC_pft=spval

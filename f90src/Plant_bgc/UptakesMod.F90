@@ -121,7 +121,7 @@ module UptakesMod
 
   DO NZ=1,NP
     
-    IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
 
       call PhotosynsDiag(yearIJ%I,yearIJ%J,NZ)  
 
@@ -175,9 +175,9 @@ module UptakesMod
         ENDIF
 
         TKCX   = TKC_pft(NZ)
-!
-!     CONVERGENCE SOLUTION
-!
+        !
+        !     CONVERGENCE SOLUTION
+        !
         NN=CanopyEnergyH2OIter_func(yearIJ%I,yearIJ%J,NZ,FracGrndByPFT,CanopyMassC,&
           TotalSoilPSIMPa_vr,VHeatCapCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,&
           HeatEvapSens,FDMP,SoilRootResist4H2O_pvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,&
@@ -190,9 +190,9 @@ module UptakesMod
 
         call UpdatePlantWaterVars(NZ,VHeatCapCanopyAir,CanopyMassC,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
           TKCX,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,SoiLayerHasRoot_rvr)
-!
-!     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
-!
+        !
+        !     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
+        !
       ELSE
         call HandleBareSoil(NZ,TotalSoilPSIMPa_vr,FDMP)
       ENDIF
@@ -282,7 +282,7 @@ module UptakesMod
     D9005: DO NZ=1,NP
       DO  N=1,Myco_pft(NZ)
       !turn off to include dead plants as well
-!     IF(IsPlantActive_pft(NZ).EQ.iActive .AND. PlantPopulation_pft(NZ).GT.0.0)THEN
+!     IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopulation_pft(NZ).GT.0.0)THEN
         AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1(PopuRootMycoC_pvr(N,L,NZ))
 !     ENDIF
       enddo

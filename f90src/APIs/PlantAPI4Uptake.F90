@@ -116,9 +116,9 @@ implicit none
     Myco_pft(NZ,NY,NX)=1
     plt_ew%DeltaTKC_pft(NZ)                 = DeltaTKC_pft(NZ,NY,NX)
     if(LeafStalkArea_pft(NZ,NY,NX)>ZERO4LeafVar_pft(NZ,NY,NX))then
-      IsPlantActive_pft(NZ,NY,NX)=iActive
+      IsPlantActive_pft(NZ,NY,NX)=iTrue
     else
-      IsPlantActive_pft(NZ,NY,NX)=iDormant
+      IsPlantActive_pft(NZ,NY,NX)=iFalse
     endif
     plt_ew%ETCanopy_CumYr_pft(NZ)      = ETCanopy_CumYr_pft(NZ,NY,NX)
     plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)

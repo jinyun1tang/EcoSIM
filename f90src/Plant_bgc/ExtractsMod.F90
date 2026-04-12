@@ -39,7 +39,7 @@ module ExtractsMod
   DO NZ=1,plt_site%NP
 
     call PrintRootTracer(I,J,NZ,'extract')
-    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
+    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iTrue)THEN
       if(.not.ldo_sp_mode)then
         call CalcTotalLeafArea(NZ)
 

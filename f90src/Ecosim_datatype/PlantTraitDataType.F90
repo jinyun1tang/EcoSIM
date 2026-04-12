@@ -52,7 +52,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  LeafAreaLive_brch(:,:,:,:)                 !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafAreaDying_brch(:,:,:,:)                !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanPBranchHeight(:,:,:,:)                  !branch height, [m]
-  real(r8),target,allocatable ::  SeedSitesSet_brch(:,:,:,:)                   !branch grain number, [d-2]
+  real(r8),target,allocatable ::  SetNumberSeeds_brch(:,:,:,:)                   !branch grain number, [d-2]
   real(r8),target,allocatable ::  PotentialSeedSites_brch(:,:,:,:)           !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNumX_pft(:,:,:)                   !last nonzero canopy grain number, [d-2]  
@@ -136,9 +136,9 @@ module PlantTraitDataType
   integer,target,allocatable ::  doSenescence_brch(:,:,:,:)                  !branch phenological senescence flag, [-]
   integer,target,allocatable ::  doRemobilization_brch(:,:,:,:)              !branch phenological remobilization flag, [-]
   integer,target,allocatable ::  doInitLeafOut_brch(:,:,:,:)                 !branch phenological flag for leafout initialization, [-]
-  integer,target,allocatable ::  doPlantLeafOut_brch(:,:,:,:)                !branch phenological flag for leafout, [-]
+  integer,target,allocatable ::  EnablePlantLeafOut_brch(:,:,:,:)                !branch phenological flag for leafout, [-]
   integer,target,allocatable ::  doPlantLeaveOff_brch(:,:,:,:)               !branch phenological flag for leaf off, [-]
-  integer,target,allocatable ::  iPlantBranchState_brch(:,:,:,:)             !flag to detect branch death , [-]
+  integer,target,allocatable ::  isPlantBranchAlive_brch(:,:,:,:)             !flag to detect branch death , [-]
   real(r8),target,allocatable ::  NonstCMinConc2InitBranch_pft(:,:,:)        !branch nonstructural C content required for new branch, [g g-1]
   real(r8),target,allocatable ::  NodeNumNormByMatgrp_brch(:,:,:,:)          !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  HourlyNodeNumNormByMatgrp_brch(:,:,:,:)    !gain in normalized node number during vegetative growth stages , [h-1]
@@ -146,7 +146,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ShootNodeNum_brch(:,:,:,:)                 !shoot node number, [-]
   real(r8),target,allocatable ::  ShootNodeNumAtInitFloral_brch(:,:,:,:)           !node number at floral initiation, [-]
   real(r8),target,allocatable ::  ReprodNodeNumNormByMatrgrp_brch(:,:,:,:)   !normalized node number during reproductive growth stages, [-]
-  real(r8),target,allocatable ::  NodeNumberAtAnthesis_brch(:,:,:,:)         !node number at anthesis, [-]
+  real(r8),target,allocatable ::  ShootNodeNumAtAnthesis_brch(:,:,:,:)         !node number at anthesis, [-]
   real(r8),target,allocatable ::  TotalNodeNumNormByMatgrp_brch(:,:,:,:)     !normalized node number during vegetative growth stages , [-]
   real(r8),target,allocatable ::  TotReproNodeNumNormByMatrgrp_brch(:,:,:,:) !normalized node number during reproductive growth stages , [-]
   real(r8),target,allocatable ::  RefNodeInitRate_pft(:,:,:)                 !rate of node initiation  at 25 oC, [h-1]
@@ -156,7 +156,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PSICanPDailyMin_pft(:,:,:)                     !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  ClumpFactorNow_pft(:,:,:)                  !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  ClumpFactor_pft(:,:,:)                     !clumping factor for self-shading in canopy layer, [-]
-  integer,target,allocatable ::  iPlantShootState_pft(:,:,:)                 !flag to detect canopy death , [-]
+  integer,target,allocatable ::  isPlantShootAlive_pft(:,:,:)                 !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  GrothStalkMaxSeedSites_pft(:,:,:)             !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  MaxSeedNumPerSite_pft(:,:,:)               !maximum grain number per node , [-]
   real(r8),target,allocatable ::  SeedCMassMax_pft(:,:,:)                    !maximum grain size   , [g]
@@ -176,6 +176,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                 !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)              !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                      !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+  integer,target,allocatable ::  iEmbryophyteType_pft(:,:,:)                 !plant embroytype [Bryophytes,Pteridophytes,Gymnosperms,Monocots and Eudicots]
   integer,target,allocatable ::  iPlantPhotosynsType_pft(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                !plant growth type (vascular, non-vascular),[-]
   integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)              !plant growth habit (annual or perennial),[-]
@@ -233,7 +234,7 @@ contains
   allocate(LeafAreaLive_brch(MaxNumBranches,JP,JY,JX)); LeafAreaLive_brch=0._r8
   allocate(LeafAreaDying_brch(MaxNumBranches,JP,JY,JX)); LeafAreaDying_brch=0._r8
   allocate(CanPBranchHeight(MaxNumBranches,JP,JY,JX));CanPBranchHeight=0._r8
-  allocate(SeedSitesSet_brch(MaxNumBranches,JP,JY,JX)); SeedSitesSet_brch=0._r8
+  allocate(SetNumberSeeds_brch(MaxNumBranches,JP,JY,JX)); SetNumberSeeds_brch=0._r8
   allocate(PotentialSeedSites_brch(MaxNumBranches,JP,JY,JX)); PotentialSeedSites_brch=0._r8
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(CanopySeedNumX_pft(JP,JY,JX));     CanopySeedNumX_pft=0._r8  
@@ -317,9 +318,9 @@ contains
   allocate(doSenescence_brch(MaxNumBranches,JP,JY,JX)); doSenescence_brch=0
   allocate(doRemobilization_brch(MaxNumBranches,JP,JY,JX)); doRemobilization_brch=0
   allocate(doInitLeafOut_brch(MaxNumBranches,JP,JY,JX)); doInitLeafOut_brch=0
-  allocate(doPlantLeafOut_brch(MaxNumBranches,JP,JY,JX)); doPlantLeafOut_brch=0
+  allocate(EnablePlantLeafOut_brch(MaxNumBranches,JP,JY,JX)); EnablePlantLeafOut_brch=0
   allocate(doPlantLeaveOff_brch(MaxNumBranches,JP,JY,JX)); doPlantLeaveOff_brch=0
-  allocate(iPlantBranchState_brch(MaxNumBranches,JP,JY,JX)); iPlantBranchState_brch=0
+  allocate(isPlantBranchAlive_brch(MaxNumBranches,JP,JY,JX)); isPlantBranchAlive_brch=iFalse
   allocate(NonstCMinConc2InitBranch_pft(JP,JY,JX));       NonstCMinConc2InitBranch_pft=0._r8
   allocate(NodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX)); NodeNumNormByMatgrp_brch=0._r8
   allocate(HourlyNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));HourlyNodeNumNormByMatgrp_brch=0._r8
@@ -327,7 +328,7 @@ contains
   allocate(ShootNodeNum_brch(MaxNumBranches,JP,JY,JX));  ShootNodeNum_brch=0._r8
   allocate(ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP,JY,JX)); ShootNodeNumAtInitFloral_brch=0._r8
   allocate(ReprodNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX)); ReprodNodeNumNormByMatrgrp_brch=0._r8
-  allocate(NodeNumberAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); NodeNumberAtAnthesis_brch=0._r8
+  allocate(ShootNodeNumAtAnthesis_brch(MaxNumBranches,JP,JY,JX)); ShootNodeNumAtAnthesis_brch=0._r8
   allocate(TotalNodeNumNormByMatgrp_brch(MaxNumBranches,JP,JY,JX));TotalNodeNumNormByMatgrp_brch=0._r8
   allocate(TotReproNodeNumNormByMatrgrp_brch(MaxNumBranches,JP,JY,JX));TotReproNodeNumNormByMatrgrp_brch=0._r8
   allocate(RefNodeInitRate_pft(JP,JY,JX));     RefNodeInitRate_pft=0._r8
@@ -337,7 +338,7 @@ contains
   allocate(PSICanPDailyMin_pft(JP,JY,JX));    PSICanPDailyMin_pft=0._r8
   allocate(ClumpFactorNow_pft(JP,JY,JX));      ClumpFactorNow_pft=0._r8
   allocate(ClumpFactor_pft(JP,JY,JX));       ClumpFactor_pft=0._r8
-  allocate(iPlantShootState_pft(JP,JY,JX));    iPlantShootState_pft=0
+  allocate(isPlantShootAlive_pft(JP,JY,JX));    isPlantShootAlive_pft=0
   allocate(GrothStalkMaxSeedSites_pft(JP,JY,JX));     GrothStalkMaxSeedSites_pft=0._r8
   allocate(MaxSeedNumPerSite_pft(JP,JY,JX));     MaxSeedNumPerSite_pft=0._r8
   allocate(SeedCMassMax_pft(JP,JY,JX));     SeedCMassMax_pft=0._r8
@@ -358,6 +359,7 @@ contains
   allocate(HourReq4LeafOff_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
   allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
   allocate(iPlantPhotosynsType_pft(JP,JY,JX));    iPlantPhotosynsType_pft=0
+  allocate(iEmbryophyteType_pft(JP,JY,JX)); iEmbryophyteType_pft=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
   allocate(iPlantPhenolPattern_pft(JP,JY,JX));    iPlantPhenolPattern_pft=0
   allocate(iPlantDevelopPattern_pft(JP,JY,JX));    iPlantDevelopPattern_pft=0
@@ -410,7 +412,7 @@ contains
   call destroy(LeafAreaLive_brch)
   call destroy(LeafAreaDying_brch)
   call destroy(CanPBranchHeight)
-  call destroy(SeedSitesSet_brch)
+  call destroy(SetNumberSeeds_brch)
   call destroy(PotentialSeedSites_brch)
   call destroy(CanopySeedNum_pft)
   call destroy(CanopySeedNumX_pft)  
@@ -495,9 +497,9 @@ contains
   call destroy(doSenescence_brch)
   call destroy(doRemobilization_brch)
   call destroy(doInitLeafOut_brch)
-  call destroy(doPlantLeafOut_brch)
+  call destroy(EnablePlantLeafOut_brch)
   call destroy(doPlantLeaveOff_brch)
-  call destroy(iPlantBranchState_brch)
+  call destroy(isPlantBranchAlive_brch)
   call destroy(NonstCMinConc2InitBranch_pft)
   call destroy(NodeNumNormByMatgrp_brch)
   call destroy(HourlyNodeNumNormByMatgrp_brch)
@@ -505,7 +507,7 @@ contains
   call destroy(ShootNodeNum_brch)
   call destroy(ShootNodeNumAtInitFloral_brch)
   call destroy(ReprodNodeNumNormByMatrgrp_brch)
-  call destroy(NodeNumberAtAnthesis_brch)
+  call destroy(ShootNodeNumAtAnthesis_brch)
   call destroy(TotalNodeNumNormByMatgrp_brch)
   call destroy(TotReproNodeNumNormByMatrgrp_brch)
   call destroy(RefNodeInitRate_pft)
@@ -515,7 +517,7 @@ contains
   call destroy(PSICanPDailyMin_pft)
   call destroy(ClumpFactorNow_pft)
   call destroy(ClumpFactor_pft)
-  call destroy(iPlantShootState_pft)
+  call destroy(isPlantShootAlive_pft)
   call destroy(GrothStalkMaxSeedSites_pft)
   call destroy(MaxSeedNumPerSite_pft)
   call destroy(SeedCMassMax_pft)
@@ -535,6 +537,7 @@ contains
   call destroy(ClumpFactorInit_pft)
   call destroy(HourReq4LeafOff_brch)
   call destroy(TempOffset_pft)
+  call destroy(iEmbryophyteType_pft)
   call destroy(iPlantPhotosynsType_pft)
   call destroy(iPlantRootProfile_pft)
   call destroy(iPlantPhenolPattern_pft)

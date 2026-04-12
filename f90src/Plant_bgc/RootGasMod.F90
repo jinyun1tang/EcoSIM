@@ -296,7 +296,7 @@ module RootGasMod
         do idg = idg_beg, idg_NH3
           DifAqueVolatile(idg)=(THETM*SolDifc_tscaled(idg)+GasDifc_tscaled(idg)*POROQ*FracAirFilledSoilPoreM_vr(M,L)**2/(VLSoilMicP_vr(L)*GasSolbility_vr(idg,L)))*RTARRX
         enddo
-!        write(913,*)I*1000+J/24.,M,'DifAqueVolatile(idg)',DifAqueVolatile(idg_O2),RTARRX,N,L,RootEffLen4Absorption_pvr(N,L),RRADS,RootOxyDemandPerPlant
+
         
         DifAqueVolatile(idg_NH3)  = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
         DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
@@ -380,15 +380,11 @@ module RootGasMod
               ROxyRoot2UptkPerPlant = 0.0_r8
             ENDIF
           ENDIF
-!          write(913,*)I*1000+J/24.,MX,N,L,X,'ROxySoil2UptkPerPlant',ROxySoil2UptkPerPlant,RootOxyDemandPerPlant,DifAqueVolatile(idg_O2),trcaqu_conc_soi_loc(idg_O2)-COXYR
           !
           !     MASS FLOW + DIFFUSIVE EXCHANGE OF OTHER GASES
           !     BETWEEN ROOT AND SOIL, CONSTRAINED BY COMPETITION
           !     WITH OTHER ROOT AND MICROBIAL POPULATIONS
           !
-!          if(N==ipltroot)write(349,*)I*1000+J/24.,((N*100+L)*100+NZ)*100+MX,ROxySoil2UptkPerPlant,RootTotLenPerPlant_pvr(N,L,NZ),X,'X',&
-!            DifAqueVolatile(idg_O2),dtPerPlantRootH2OUptake,trcaqu_conc_soi_loc(idg_O2),&
-!            'dfop',DIFOP,trc_conc_root_loc(idg_O2),COXYR,trc_solml_loc(idg_O2)
           RSoilSolute2Roots(idg_beg:idg_end)=0.0_r8          
           ROxySoil2Uptk             = ROxySoil2UptkPerPlant*PlantPopulation_pft(NZ)
           ROxyRoot2Uptk             = ROxyRoot2UptkPerPlant*PlantPopulation_pft(NZ)

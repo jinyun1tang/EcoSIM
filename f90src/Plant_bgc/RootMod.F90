@@ -73,8 +73,8 @@ implicit none
     SeedVolumeMean_pft         => plt_morph%SeedVolumeMean_pft         ,& !input  :seed volume, [m3 ]
     SeedAreaMean_pft           => plt_morph%SeedAreaMean_pft           ,& !input  :seed surface area, [m2]
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft       ,& !input  :root primary axis number,[-]
-    iPlantRootState_pft        => plt_pheno%iPlantRootState_pft        ,& !output :flag to detect root system death,[-]
-    iPlantShootState_pft       => plt_pheno%iPlantShootState_pft        & !output :flag to detect canopy death,[-]
+    isPlantRootAlive_pft        => plt_pheno%isPlantRootAlive_pft        ,& !output :flag to detect root system death,[-]
+    isPlantShootAlive_pft       => plt_pheno%isPlantShootAlive_pft        & !output :flag to detect canopy death,[-]
   )
 !     ROOT GROWTH
 !
@@ -123,8 +123,8 @@ implicit none
 
   IF(NumRootAxes4DeadPlant.EQ.NumPrimeRootAxes_pft(NZ) .OR. (SeasonalNonstElms_pft(ielmc,NZ).LE.ZERO4LeafVar_pft(NZ).AND. &
     iPlantPhenolPattern_pft(NZ).NE.iplt_annual))THEN
-    iPlantRootState_pft(NZ)  = iDead
-    iPlantShootState_pft(NZ) = iDead
+    isPlantRootAlive_pft(NZ)  = iFalse
+    isPlantShootAlive_pft(NZ) = iFalse
   ENDIF
 
 !

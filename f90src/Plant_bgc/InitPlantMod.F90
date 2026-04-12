@@ -63,7 +63,7 @@ module InitPlantMod
   NZ2X=MIN(NZ2Q,NP)
   D9985: DO NZ=NZ1Q,NZ2X
 
-    IF(IsPlantActive_pft(NZ).EQ.iDormant)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iFalse)THEN
 
       call InitShootGrowth(NZ)
 
@@ -123,7 +123,7 @@ module InitPlantMod
     rPCRootr_pft                  => plt_allom%rPCRootr_pft                   ,& !input  :root P:C ratio, [gP gC-1]
     iHarvestDay_pft               => plt_distb%iHarvestDay_pft                ,& !input  :day of harvest, [-]
     iHarvestYear_pft              => plt_distb%iHarvestYear_pft               ,& !input  :year of harvest,[-]
-    iPlantPhotosynsType_pft      => plt_photo%iPlantPhotosynsType_pft       ,& !input  :plant photosynthetic type (C3 or C4),[-]
+    iPlantPhotosynsType_pft       => plt_photo%iPlantPhotosynsType_pft        ,& !input  :plant photosynthetic type (C3 or C4),[-]
     iPlantingDay_pft              => plt_distb%iPlantingDay_pft               ,& !input  :day of planting,[-]
     iPlantingYear_pft             => plt_distb%iPlantingYear_pft              ,& !input  :year of planting,[-]
     PPI_pft                       => plt_site%PPI_pft                         ,& !output :initial plant population, [plants d-2]
@@ -595,7 +595,7 @@ module InitPlantMod
     PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
     PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
-    iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch             ,& !input  :flag to detect branch death, [-]
+    isPlantBranchAlive_brch            => plt_pheno%isPlantBranchAlive_brch             ,& !input  :flag to detect branch death, [-]
     Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
     Hours4ShortenPhotoPeriod_brch     => plt_pheno%Hours4ShortenPhotoPeriod_brch      ,& !output :initial cold requirement for autumn leafoff/hardening, [h]
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
@@ -635,14 +635,14 @@ module InitPlantMod
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !output :shoot node number at floral initiation, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
-    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !output :number of branches,[-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
     PlantPopulation_pft               => plt_site%PlantPopulation_pft                 ,& !output :plant population, [d-2]
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
-    SeedSitesSet_brch                 => plt_morph%SeedSitesSet_brch                  ,& !output :branch grain number, [d-2]
+    SetNumberSeeds_brch                 => plt_morph%SetNumberSeeds_brch                  ,& !output :branch grain number, [d-2]
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
@@ -657,23 +657,23 @@ module InitPlantMod
   call PrintInfo('beg '//subname)
   PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
   plt_pheno%doInitPlant_pft(NZ)      = ifalse
-  plt_pheno%iPlantShootState_pft(NZ) = iLive
-  plt_pheno%iPlantRootState_pft(NZ)  = iLive
+  plt_pheno%isPlantShootAlive_pft(NZ) = iTrue
+  plt_pheno%isPlantRootAlive_pft(NZ)  = iTrue
   BranchNumber_pft(NZ)               = 0
   NumOfBranches_pft(NZ)              = 0
   HypocotHeight_pft(NZ)              = 0._r8
   CanopyHeight_pft(NZ)               = 0._r8
   Cytokinin2ndConc_rpvr(:,:,:,NZ)    = 0._r8
   D10: DO NB=1,MaxNumBranches
-    plt_pheno%doInitLeafOut_brch(NB,NZ)           = iEnable
-    plt_pheno%doPlantLeafOut_brch(NB,NZ)          = iEnable
-    plt_pheno%doPlantLeaveOff_brch(NB,NZ)         = iEnable
+    plt_pheno%doInitLeafOut_brch(NB,NZ)           = iTrue
+    plt_pheno%EnablePlantLeafOut_brch(NB,NZ)      = iTrue
+    plt_pheno%doPlantLeaveOff_brch(NB,NZ)         = iTrue
     plt_pheno%Prep4Literfall_brch(NB,NZ)          = ifalse
     plt_pheno%Hours4LiterfalAftMature_brch(NB,NZ) = 0
     MatureGroup_brch(NB,NZ)                       = MatureGroup_pft(NZ)
     ShootNodeNum_brch(NB,NZ)                      = ShootNodeNumAtPlanting_pft(NZ)
     ShootNodeNumAtInitFloral_brch(NB,NZ)          = ShootNodeNum_brch(NB,NZ)
-    NodeNumberAtAnthesis_brch(NB,NZ)              = 0._r8
+    ShootNodeNumAtAnthesis_brch(NB,NZ)              = 0._r8
     NumOfLeaves_brch(NB,NZ)                       = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)            = 0._r8
     KLeafNumber_brch(NB,NZ)                       = 1
@@ -694,7 +694,7 @@ module InitPlantMod
     HourFailGrainFill_brch(NB,NZ)           = 0
     HoursDoingRemob_brch(NB,NZ)             = 0
     BranchNumerID_brch(NB,NZ)               = 0
-    plt_pheno%iPlantBranchState_brch(NB,NZ) = iDead
+    plt_pheno%isPlantBranchAlive_brch(NB,NZ) = iFalse
     D15: DO M=1,pltpar%NumGrowthStages
       iPlantCalendar_brch(M,NB,NZ)=0
     ENDDO D15
@@ -727,7 +727,7 @@ module InitPlantMod
     plt_biom%SapwoodBiomassC_brch(NB,NZ)     = 0._r8
     plt_biom%CanopyLeafSheathC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
-    SeedSitesSet_brch(NB,NZ)                 = 0._r8
+    SetNumberSeeds_brch(NB,NZ)                 = 0._r8
     plt_allom%GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
     LeafAreaLive_brch(NB,NZ)                 = 0._r8
     plt_rbgc%NH3Dep2Can_brch(NB,NZ)          = 0._r8
@@ -865,6 +865,7 @@ module InitPlantMod
 
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='InitPlantHeatWater'
   REAL(R8) :: FDM
 
   associate(                                                    &
@@ -889,14 +890,15 @@ module InitPlantMod
     Transpiration_pft       => plt_ew%Transpiration_pft        ,& !output :canopy transpiration, [m2 d-2 h-1]
     fTCanopyGroth_pft       => plt_pheno%fTCanopyGroth_pft      & !output :canopy temperature growth function, [-]
   )
-!
-!     INITIALIZE PLANT HEAT AND WATER STATUS
-!
-!     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
-!     TdegCCanopy_pft,TKC=canopy temperature for growth (oC,K)
-!     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
-!     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE PLANT HEAT AND WATER STATUS
+  !
+  !     VHeatCapCanopy_pft=canopy heat capacity (MJ m-3 K-1)
+  !     TdegCCanopy_pft,TKC=canopy temperature for growth (oC,K)
+  !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
+  !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
+  !
   VHeatCapCanopy_pft(NZ)    = cpw*ShootElms_pft(ielmc,NZ)*10.0E-06
   ENGYX_pft(NZ)             = 0._r8
   DeltaTKC_pft(NZ)          = 0._r8
@@ -915,7 +917,7 @@ module InitPlantMod
   VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*SpecStalkVolume+CanopyBiomWater_pft(NZ))
   QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
   HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantHeatWater
 
@@ -923,6 +925,8 @@ module InitPlantMod
   subroutine InitRootMychorMorphoBio(NZ)
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='InitRootMychorMorphoBio'
+
   integer :: K,L,M,N,NR,idg
   REAL(R8) :: CCO2A
   REAL(R8) :: CCO2P
@@ -956,13 +960,14 @@ module InitPlantMod
     RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !output :root layer protein C, [gC d-2]
     RootProteinConc_rpvr          => plt_biom%RootProteinConc_rpvr             & !output :root layer protein C concentration, [g g-1]
   )
-!
-!     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
-!
-!     PSIRoot_pvr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
-!     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
-!     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
+  !
+  !     PSIRoot_pvr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
+  !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
+  !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
+  !
   NumPrimeRootAxes_pft(NZ)=0
   plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
   plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
@@ -1050,6 +1055,7 @@ module InitPlantMod
   ENDDO D20
 
   plt_morph%RootLenDensPerPlant_pvr(1:2,NL+1:JZ1,NZ)=0._r8
+  call PrintInfo('end '//subname)
   end associate
   end subroutine InitRootMychorMorphoBio
 
@@ -1058,6 +1064,7 @@ module InitPlantMod
 
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='InitSeedMorphoBio'
 
   associate(                                                                   &
     rNCGrain_pft                  => plt_allom%rNCGrain_pft                   ,& !input  :grain N:C ratio, [g g-1]
@@ -1083,21 +1090,22 @@ module InitPlantMod
     SeedPlantedElm_pft            => plt_biom%SeedPlantedElm_pft              ,& !output :plant stored nonstructural C at planting, [gC d-2]
     WatHeldOnCanopy_pft           => plt_ew%WatHeldOnCanopy_pft                & !output :canopy surface water content, [m3 d-2]
   )
-!
-!     INITIALIZE SEED MORPHOLOGY AND BIOMASS
-!
-!     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
-!     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     CanopyLeafSheathC_brch=C in leaves+PetolSheths (g)
-!     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
-!     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
-!     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
-!     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
-!     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=total root C mass (g)
-!     RootProteinC_pvr=total root protein C mass (g)
-!     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
+  !
+  !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
+  !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
+  !     CanopyLeafSheathC_brch=C in leaves+PetolSheths (g)
+  !     FDM-dry matter fraction (g DM C g FM C-1)
+  !     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
+  !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
+  !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
+  !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
+  !     RootMycoActiveBiomC_pvr, PopuRootMycoC_pvr=total root C mass (g)
+  !     RootProteinC_pvr=total root protein C mass (g)
+  !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
+  !
   IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed .and. SeasonalNonstElms_pft(ielmc,NZ)>1.e-10_r8)then
     SeedPlantedElm_pft(:,NZ)=0._r8
   else
@@ -1107,6 +1115,7 @@ module InitPlantMod
     SeasonalNonstElms_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
     SeedPlantedElm_pft(2:NumPlantChemElms,NZ)=SeasonalNonstElms_pft(2:NumPlantChemElms,NZ)
   endif
+  
   LeafStrutElms_brch(ielmn,1,NZ)  = rNCGrain_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   LeafStrutElms_brch(ielmp,1,NZ)  = rPCGrain_pft(NZ)*LeafStrutElms_brch(ielmc,1,NZ)
   CanopyLeafSheathC_brch(1,NZ)    = LeafStrutElms_brch(ielmc,1,NZ)+PetolShethStrutElms_brch(ielmc,1,NZ)
@@ -1127,7 +1136,7 @@ module InitPlantMod
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
   RootMycoNonstElms_rpvr(ielmp,1,NGTopRootLayer_pft(NZ),NZ)=rPCGrain_pft(NZ) &
     *RootMycoNonstElms_rpvr(ielmc,1,NGTopRootLayer_pft(NZ),NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine InitSeedMorphoBio
   ![tail]

@@ -13,7 +13,7 @@ module RootDataType
   integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                     !root primary axis number, [-]
   real(sp),target,allocatable::  RootShootExch_pvr(:,:,:,:,:)                    !Root-shoot nonstrucal element exchange, [g d-2 h-1]
   integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
-  integer,target,allocatable ::  iPlantRootState_pft(:,:,:)                      !flag to detect root system death , [-]
+  integer,target,allocatable ::  isPlantRootAlive_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  irootType_col(:,:)                              !Root type integer from ATS [-]
@@ -157,7 +157,7 @@ contains
   allocate(RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoMassElm_pvr=0._sp
   allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
   allocate(NRoot1stTipLay_raxes(MaxNumRootAxes,JP,JY,JX));  NRoot1stTipLay_raxes=1  !set to one to avoid numerical failure
-  allocate(iPlantRootState_pft(JP,JY,JX));    iPlantRootState_pft=iDead
+  allocate(isPlantRootAlive_pft(JP,JY,JX));    isPlantRootAlive_pft=iFalse
   allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
   allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
@@ -291,7 +291,7 @@ contains
   call destroy(NumPrimeRootAxes_pft)
   call destroy(NRoot1stTipLay_raxes)
   call destroy(irootType_col)
-  call destroy(iPlantRootState_pft)
+  call destroy(isPlantRootAlive_pft)
   call destroy(NMaxRootBotLayer_pft)
   call destroy(MaxSoiL4Root_pft)
   call destroy(RootElmsbeg_pft)

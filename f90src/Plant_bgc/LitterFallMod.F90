@@ -20,6 +20,7 @@ implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
   integer, intent(in) :: NZ
 
+  character(len=*), parameter :: subname='ResetDeadPlant'
   integer :: NumDeadBranches
   logical :: emerge_check,harvst_check,reset_check
 
@@ -33,31 +34,31 @@ implicit none
     iYearCurrent            => plt_site%iYearCurrent              ,& !input  :current year,[-]
     iYearPlantHarvest_pft   => plt_distb%iYearPlantHarvest_pft     & !input  :year of harvest,[-]
   )
-!
-!     SolarNoonHour_col=hour of solar noon
-!     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
-!     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     iDayPlantHarvest_pft,iYearPlantHarvest_pft=day,year of harvesting
-!     iYearCurrent=current year
-!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
-!     GROUP=node number required for floral initiation
-!     ShootNodeNumAtInitFloral_brch=node number at floral initiation
-!     NodeNumberAtAnthesis_brch=node number at flowering
-!     NumOfLeaves_brch=number of leaves appeared
-!     KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
-!     VSTGX=leaf number on date of floral initiation
-!     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
-!     TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
-!     HourFailGrainFill_brch=number of hours with no grain fill
-!     doInitLeafOut_brch=flag for initializing leafout
-!     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
-!     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
-!     Hours2LeafOut_brch=hourly leafout counter
-!     RubiscoActivity_brch,GrainFillDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
-!     doInitLeafOut_brch,doPlantLeafOut_brch=flag for initializing,enabling leafout
-!     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
-!     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of LitrFall
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     SolarNoonHour_col=hour of solar noon
+  !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
+  !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
+  !     iDayPlantHarvest_pft,iYearPlantHarvest_pft=day,year of harvesting
+  !     iYearCurrent=current year
+  !     GROUP=node number required for floral initiation
+  !     ShootNodeNumAtInitFloral_brch=node number at floral initiation
+  !     ShootNodeNumAtAnthesis_brch=node number at flowering
+  !     NumOfLeaves_brch=number of leaves appeared
+  !     KHiestGroLeafNode_brch=integer of most recent leaf number currently growing
+  !     VSTGX=leaf number on date of floral initiation
+  !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
+  !     TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
+  !     HourFailGrainFill_brch=number of hours with no grain fill
+  !     doInitLeafOut_brch=flag for initializing leafout
+  !     Hours4Leafout_brch,VRNL=leafout hours,hours required for leafout
+  !     Hours4LeafOff_brch,VRNX=leafoff hours,hours required for leafoff
+  !     Hours2LeafOut_brch=hourly leafout counter
+  !     RubiscoActivity_brch,GrainFillDowreg_brch=N,P feedback inhibition on C3 CO2 fixation
+  !     doInitLeafOut_brch,EnablePlantLeafOut_brch=flag for initializing,enabling leafout
+  !     doPlantLeaveOff_brch=flag for enabling leafoff:0=enable,1=disable
+  !     Hours4LiterfalAftMature_brch=current hours after physl maturity until start of LitrFall
+  !
   plt_pheno%doReSeed_pft(NZ)=.FALSE.
   harvst_check = (yearIJ%I.GE.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ))
   emerge_check = yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0
@@ -83,7 +84,7 @@ implicit none
     call LiterFallRootShootStorage(yearIJ%I,yearIJ%J,NZ)
 
   ENDIF
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ResetDeadPlant
 
@@ -116,17 +117,17 @@ implicit none
   reseed_check=doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ)
   if(doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ))then
 
-    IsPlantActive_pft(NZ) = iDormant
+    IsPlantActive_pft(NZ) = iFalse
 
     call InitPlantPhenoMorphoBio(NZ)
     
-    if(CanopySeedNumX_pft(NZ)>0._r8)then
-      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*(PlantPopulation_pft(NZ)-CanopySeedNumX_pft(NZ))
-      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
-      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
+    !if(CanopySeedNumX_pft(NZ)>0._r8)then
+      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmc,NZ)
+      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmn,NZ)
+      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmp,NZ)
       SeasonalNonstElms_pft(:,NZ) = SeasonalNonstElms_pft(:,NZ)+SeedPlantedElm_pft(:,NZ)
       CanopySeedNumX_pft(NZ)=0._r8
-    endif
+    !endif
   endif  
   call PrintInfo('end '//subname)
 
@@ -139,6 +140,7 @@ implicit none
   INTEGER, intent(in) :: i,J
   integer, intent(in) :: NZ
   integer, intent(in) :: NumDeadBranches
+  character(len=*), parameter :: subname='SetDeadPlant'
 
   associate(                                                       &
     PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
@@ -151,16 +153,16 @@ implicit none
     H2OLoss_CumYr_col       => plt_ew%H2OLoss_CumYr_col           ,& !inoput :total subsurface water flux, [m3 d-2]
     NumOfBranches_pft       => plt_morph%NumOfBranches_pft        ,& !inoput :number of branches,[-]
     QH2OLoss_lnds           => plt_site%QH2OLoss_lnds             ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
-    iPlantRootState_pft     => plt_pheno%iPlantRootState_pft      ,& !output :flag to detect root system death,[-]
+    isPlantRootAlive_pft    => plt_pheno%isPlantRootAlive_pft     ,& !output :flag to detect root system death,[-]
     BranchNumber_pft        => plt_morph%BranchNumber_pft         ,& !output :main branch numeric id,[-]
     HoursTooLowPsiCan_pft   => plt_pheno%HoursTooLowPsiCan_pft    ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
     HypocotHeight_pft       => plt_morph%HypocotHeight_pft        ,& !output :cotyledon height, [m]
     doReSeed_pft            => plt_pheno%doReSeed_pft             ,& !output :flag to do annual plant reseeding, [-]
-    iPlantShootState_pft    => plt_pheno%iPlantShootState_pft      & !output :flag to detect canopy death,[-]
+    isPlantShootAlive_pft   => plt_pheno%isPlantShootAlive_pft     & !output :flag to detect canopy death,[-]
   )
-
+  call PrintInfo('beg '//subname)
   IF(NumDeadBranches.EQ.NumOfBranches_pft(NZ))THEN
-    iPlantShootState_pft(NZ)  = iDead
+    isPlantShootAlive_pft(NZ)  = iFalse
     BranchNumber_pft(NZ)      = 0
     HoursTooLowPsiCan_pft(NZ) = 0._r8
 
@@ -179,27 +181,27 @@ implicit none
     !     WTRVC,WTRT=PFT storage,root C
     !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial
     !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
-    !     PP=PFT population
-    !     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+    !     PP=PFT population    
     !
     IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ) .AND. &
       iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
-      iPlantRootState_pft(NZ)=iDead
+      isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then
-      iPlantRootState_pft(NZ)=iDead
+      isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction)then
-      iPlantRootState_pft(NZ)=iDead
+      isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
-      iPlantRootState_pft(NZ)=iDead
+      isPlantRootAlive_pft(NZ)=iFalse
     endif
-    IF(iPlantRootState_pft(NZ).EQ.iDead)then
-      iPlantShootState_pft(NZ)=iDead
+    IF(isPlantRootAlive_pft(NZ).EQ.iFalse)then
+      isPlantShootAlive_pft(NZ)=iFalse
     endif
     doReSeed_pft(NZ)=.true.    
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine SetDeadPlant
 
@@ -245,8 +247,8 @@ implicit none
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft        ,& !input  :plant growth type (vascular, non-vascular),[-]
-    iPlantRootState_pft         => plt_pheno%iPlantRootState_pft          ,& !input  :flag to detect root system death,[-]
-    iPlantShootState_pft        => plt_pheno%iPlantShootState_pft         ,& !input  :flag to detect canopy death,[-]
+    isPlantRootAlive_pft         => plt_pheno%isPlantRootAlive_pft          ,& !input  :flag to detect root system death,[-]
+    isPlantShootAlive_pft        => plt_pheno%isPlantShootAlive_pft         ,& !input  :flag to detect canopy death,[-]
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft    ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     icwood                      => pltpar%icwood                          ,& !input  :group id of coarse woody litter
     ifoliar                     => pltpar%ifoliar                         ,& !input  :group id of plant foliar litter
@@ -268,7 +270,7 @@ implicit none
 !     LitrFall AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM SHOOT AT DEATH
 !
-!     iPlantShootState_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
+!     isPlantShootAlive_pft,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !     doInitPlant_pft=PFT initialization flag:0=no,1=yes
 !     CSNC,ZSNC,PSNC=C,N,P LitrFall from senescence
 !     CFOPC,CFOPN,CFOPC=fraction of LitrFall C,N,P allocated to litter components
@@ -288,7 +290,7 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 ! whole plant is dead
-  IF(iPlantShootState_pft(NZ).EQ.iDead .AND. iPlantRootState_pft(NZ).EQ.iDead)THEN
+  IF(isPlantShootAlive_pft(NZ).EQ.iFalse .AND. isPlantRootAlive_pft(NZ).EQ.iFalse)THEN
     !both plant shoots and roots are dead
     IF(doInitPlant_pft(NZ).EQ.ifalse)THEN      
       !surface litterfall
@@ -425,7 +427,7 @@ implicit none
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft      ,& !input  :maximum radius of secondary roots, [m]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !input  :seeding depth, [m]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    iPlantRootState_pft       => plt_pheno%iPlantRootState_pft       ,& !input  :flag to detect root system death,[-]
+    isPlantRootAlive_pft       => plt_pheno%isPlantRootAlive_pft       ,& !input  :flag to detect root system death,[-]
     icwood                    => pltpar%icwood                       ,& !input  :group id of coarse woody litter
     inonstruct                => pltpar%inonstruct                   ,& !input  :group id of plant nonstructural litter
     iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
@@ -479,7 +481,7 @@ implicit none
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
   call PrintInfo('beg '//subname)
-  IF(iPlantRootState_pft(NZ).EQ.iDead)THEN
+  IF(isPlantRootAlive_pft(NZ).EQ.iFalse)THEN
     !add root to LitrFall
     DO L=NU,MaxNumRootLays        
       DO N=1,Myco_pft(NZ)
@@ -645,7 +647,7 @@ implicit none
     StalkRsrvElms_brch                => plt_biom%StalkRsrvElms_brch                  ,& !input  :branch reserve element mass, [g d-2]
     StalkStrutElms_brch               => plt_biom%StalkStrutElms_brch                 ,& !input  :branch stalk structural element mass, [g d-2]
     iHarvstType_pft                   => plt_distb%iHarvstType_pft                    ,& !input  :type of harvest,[-]
-    iPlantBranchState_brch            => plt_pheno%iPlantBranchState_brch             ,& !input  :flag to detect branch death, [-]
+    isPlantBranchAlive_brch            => plt_pheno%isPlantBranchAlive_brch             ,& !input  :flag to detect branch death, [-]
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft            ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantPhenolType_pft              => plt_pheno%iPlantPhenolType_pft               ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft              ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -678,25 +680,25 @@ implicit none
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     ShootNodeNumAtInitFloral_brch           => plt_morph%ShootNodeNumAtInitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
-    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
     Prep4Literfall_brch               => plt_pheno%Prep4Literfall_brch                ,& !output :branch phenology flag, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
-    doPlantLeafOut_brch               => plt_pheno%doPlantLeafOut_brch                ,& !output :branch phenology flag, [-]
+    EnablePlantLeafOut_brch               => plt_pheno%EnablePlantLeafOut_brch                ,& !output :branch phenology flag, [-]
     doPlantLeaveOff_brch              => plt_pheno%doPlantLeaveOff_brch               ,& !output :branch phenology flag, [-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
   )
 
   call PrintInfo('beg '//subname)
   D8845: DO NB=1,NumOfBranches_pft(NZ)
-    IF(iPlantBranchState_brch(NB,NZ).EQ.iDead)THEN
+    IF(isPlantBranchAlive_brch(NB,NZ).EQ.iFalse)THEN
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
       ShootNodeNum_brch(NB,NZ)                 = ShootNodeNumAtPlanting_pft(NZ)
       ShootNodeNumAtInitFloral_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
-      NodeNumberAtAnthesis_brch(NB,NZ)         = 0.0_r8
+      ShootNodeNumAtAnthesis_brch(NB,NZ)         = 0.0_r8
       NumOfLeaves_brch(NB,NZ)                  = 0.0_r8
       LeafNumberAtFloralInit_brch(NB,NZ)       = 0.0_r8
       KLeafNumber_brch(NB,NZ)                  = 1
@@ -711,9 +713,9 @@ implicit none
       HourFailGrainFill_brch(NB,NZ)            = 0.0_r8
       RubiscoActivity_brch(NB,NZ)              = 1.0_r8
       GrainFillDowreg_brch(NB,NZ)             = 1.0_r8
-      doInitLeafOut_brch(NB,NZ)                = iEnable
-      doPlantLeafOut_brch(NB,NZ)               = iDisable
-      doPlantLeaveOff_brch(NB,NZ)              = iEnable
+      doInitLeafOut_brch(NB,NZ)                = iTrue
+      EnablePlantLeafOut_brch(NB,NZ)               = iFalse
+      doPlantLeaveOff_brch(NB,NZ)              = iTrue
       Prep4Literfall_brch(NB,NZ)               = ifalse
       Hours4LiterfalAftMature_brch(NB,NZ)      = 0
       BranchNumerID_brch(NB,NZ)                = 0
@@ -888,7 +890,7 @@ implicit none
     enddo
   ENDDO D6416
   SeasonalNonstElms_pft(1:NumPlantChemElms,NZ) = 0._r8
-  iPlantState_pft(NZ)                          = iDead
+  iPlantState_pft(NZ)                          = iFalse
   end associate
   end subroutine ResetBranchRootStates
 
@@ -932,7 +934,7 @@ implicit none
     PetoleProteinC_node    => plt_biom%PetoleProteinC_node      ,& !output :layer sheath protein C, [g d-2]
     PetolShethStrutElms_brch       => plt_biom%PetolShethStrutElms_brch         ,& !output :branch sheath structural element, [g d-2]
     PotentialSeedSites_brch    => plt_morph%PotentialSeedSites_brch     ,& !output :branch potential grain number, [d-2]
-    SeedSitesSet_brch          => plt_morph%SeedSitesSet_brch           ,& !output :branch grain number, [d-2]
+    SetNumberSeeds_brch          => plt_morph%SetNumberSeeds_brch           ,& !output :branch grain number, [d-2]
     SenecStalkStrutElms_brch   => plt_biom%SenecStalkStrutElms_brch     ,& !output :branch stalk structural element, [g d-2]
     ShootElms_brch             => plt_biom%ShootElms_brch               ,& !output :branch shoot structural element mass, [g d-2]
     SapwoodBiomassC_brch       => plt_biom%SapwoodBiomassC_brch         ,& !output :branch live stalk C, [gC d-2]
@@ -954,7 +956,7 @@ implicit none
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
-!     SeedSitesSet_brch=seed set number
+!     SetNumberSeeds_brch=seed set number
 !     PotentialSeedSites_brch=potential number of seed set sites
 !     GrainSeedBiomCMean_brch=individual seed size
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
@@ -980,7 +982,7 @@ implicit none
   SapwoodBiomassC_brch(NB,NZ)                         = 0._r8
   CanopyLeafSheathC_brch(NB,NZ)                       = 0._r8
   PotentialSeedSites_brch(NB,NZ)                      = 0._r8
-  SeedSitesSet_brch(NB,NZ)                            = 0._r8
+  SetNumberSeeds_brch(NB,NZ)                            = 0._r8
   GrainSeedBiomCMean_brch(NB,NZ)                      = 0._r8
   LeafAreaLive_brch(NB,NZ)                            = 0._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)  = 0._r8

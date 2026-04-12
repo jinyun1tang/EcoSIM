@@ -27,6 +27,7 @@
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='PhotosynsDiag'
   real(r8) :: BundlSheathRubiscoC, BundlSheathChlC,MesophyllChlC, MesophyllPEPC, MesophyllRubiscoC
   real(r8) :: tLeafArea,tLeafC
   integer :: K,NB
@@ -37,7 +38,7 @@
     VmaxSpecRubCarboxyRef_pft       => plt_photo%VmaxSpecRubCarboxyRef_pft    ,& !input  :rubisco carboxylase activity at 25 oC, [umol g-1 h-1 m-2]    
     VmaxPEPCarboxyRef_pft           => plt_photo%VmaxPEPCarboxyRef_pft        ,& !input  :PEP carboxylase activity at 25 oC [umol g-1 h-1]    
     ProteinCperm2LeafArea_node      => plt_photo%ProteinCperm2LeafArea_node   ,& !output :Protein C per m2 of leaf aera, [gC (leaf area m-2)]        
-    iPlantPhotosynsType_pft        => plt_photo%iPlantPhotosynsType_pft     ,& !input  :plant photosynthetic type (C3 or C4),[-]      
+    iPlantPhotosynsType_pft         => plt_photo%iPlantPhotosynsType_pft      ,& !input  :plant photosynthetic type (C3 or C4),[-]      
     VmaxRubOxyRef_pft               => plt_photo%VmaxRubOxyRef_pft            ,& !input  :rubisco oxygenase activity at 25 oC, [umol g-1 h-1]    
     iPlantPhenolType_pft            => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]  
     Hours4Leafout_brch              => plt_pheno%Hours4Leafout_brch           ,& !input  :heat requirement for spring leafout/dehardening, [h]    
@@ -73,7 +74,7 @@
     SpecificLeafArea_pft            => plt_biom%SpecificLeafArea_pft          ,& !ouptut :specifc leaf area per g C of leaf mass, [m2 leaf area (gC leaf C)-1]
     ElectronTransptJmaxRef_brch     => plt_photo%ElectronTransptJmaxRef_brch   & !output :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]    
   )
-
+  call PrintInfo('beg '//subname)
   tLeafArea=0._r8;tLeafC=0._r8
   LeafProteinCperm2LA_pft(NZ)    = 0._r8
   CanopyVcMaxRubisco25C_pft(NZ)  = 0._r8
@@ -186,6 +187,7 @@
     LeafC4ChlCperm2LA_pft(NZ)      = 0._r8
     SpecificLeafArea_pft(NZ)       = 0._r8
   endif
+  call PrintInfo('end '//subname)
   end associate
   end subroutine PhotosynsDiag
 !----------------------------------------------------------------------------------------------------
@@ -818,7 +820,7 @@
     HourFailGrainFill_brch    => plt_pheno%HourFailGrainFill_brch     ,& !input  :flag to detect physiological maturity from grain fill, [-]
     Hours2LeafOut_brch        => plt_pheno%Hours2LeafOut_brch         ,& !input  :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
     iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft    ,& !input  :plant growth habit: annual or perennial,[-]
-    iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch     ,& !input  :flag to detect branch death, [-]
+    isPlantBranchAlive_brch    => plt_pheno%isPlantBranchAlive_brch     ,& !input  :flag to detect branch death, [-]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     RubiscoActivity_brch      => plt_photo%RubiscoActivity_brch       ,& !inoput :branch down-regulation of CO2 fixation, [-]
     GrainFillDowreg_brch      => plt_photo%GrainFillDowreg_brch        & !output :grain fill down-regulation of annual plants, [-]
@@ -873,12 +875,11 @@
 !
 !     FOR EACH NODE
 !
-!     iPlantBranchState_brch=branch life flag:0=living,1=dead
 !     LeafArea_node,WGLF,LeafProteinC_node=leaf area,C mass,protein mass
 !     ProteinCLeafAreaDensity=leaf protein C surficial density (gC protein m-2 leaf)
 !
 
-  IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+  IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
     call LiveBranchPhotosynthesis(I,J,NB,NZ,CH2O,TFN_Carboxy,TFN_Oxygen,TFN_eTranspt,Km4RubOxy)
   ENDIF
   call PrintInfo('end '//subname)

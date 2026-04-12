@@ -109,7 +109,7 @@ implicit none
 
 !  activeroot=.false.
 !  DO NZ=1,NP_col(NY,NX)
-!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
+!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
 !    if(activeroot)return
 !  ENDDO
 !  end function test_active_plant

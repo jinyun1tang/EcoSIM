@@ -2096,8 +2096,7 @@ implicit none
 
   data1d_ptr => this%h1D_PSI_CAN_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='PSI_CAN_pft',units='MPa',avgflag='A',&
-    long_name='Canopy total water potential',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Canopy total water potential',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_CanPhenol_WSTRSS_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='CanPhenol_WSTRESS_pft',units='-',avgflag='A',&
@@ -2475,11 +2474,11 @@ implicit none
     long_name='Canopy leaf N',ptr_patch=data1d_ptr,default='inactive')                  
 
   data1d_ptr => this%h1D_fCNLFW_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='fLEAF_CN_pft',units='gN/gC',avgflag='A',&
+  call hist_addfld1d(fname='fLEAF_CN_pft',units='gC/gN',avgflag='A',&
     long_name='Canopy new leaf C:N mass ratio',ptr_patch=data1d_ptr) 
 
   data1d_ptr => this%h1D_fCPLFW_ptc(beg_ptc:end_ptc)  
-  call hist_addfld1d(fname='fLEAF_CP_pft',units='gP/gC',avgflag='A',&
+  call hist_addfld1d(fname='fLEAF_CP_pft',units='gC/gP',avgflag='A',&
     long_name='Canopy new leaf C:P mass ratio',ptr_patch=data1d_ptr) 
 
   data1d_ptr => this%h1D_LeafNperm2LAI_ptc(beg_ptc:end_ptc)  
@@ -4499,7 +4498,7 @@ implicit none
         ENDDO  
         this%h1D_RootAR_ptc(nptc)          = 0._r8
         this%h1D_RootLenPerPlant_ptc(nptc) = 0._r8
-        if(IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
+        if(IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopulation_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stDepz_ptc(nptc,NR)      = Root1stDepz_raxes(NR,NZ,NY,NX)
           ENDDO

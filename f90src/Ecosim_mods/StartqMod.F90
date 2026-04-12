@@ -58,7 +58,7 @@ module StartqMod
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP_col(NY,NX))
       D9985: DO NZ=NZ1Q,NZ2X
-        IF(IsPlantActive_pft(NZ,NY,NX).EQ.iDormant)THEN
+        IF(IsPlantActive_pft(NZ,NY,NX).EQ.iFalse)THEN
 
           call InitShootGrowth(NZ,NY,NX)
 
@@ -492,23 +492,23 @@ module StartqMod
 !
   PlantPopulation_pft(NZ,NY,NX)  = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
   doInitPlant_pft(NZ,NY,NX)      = ifalse
-  iPlantShootState_pft(NZ,NY,NX) = iLive
-  iPlantRootState_pft(NZ,NY,NX)  = iLive
+  isPlantShootAlive_pft(NZ,NY,NX) = iTrue
+  isPlantRootAlive_pft(NZ,NY,NX)  = iTrue
   BranchNumber_pft(NZ,NY,NX)     = 0
   NumOfBranches_pft(NZ,NY,NX)    = 0
   HypocotHeight_pft(NZ,NY,NX)    = 0._r8
   CanopyHeight_pft(NZ,NY,NX)     = 0._r8
   Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX)=0._r8
   D10: DO NB=1,MaxNumBranches
-    doInitLeafOut_brch(NB,NZ,NY,NX)                = iEnable
-    doPlantLeafOut_brch(NB,NZ,NY,NX)               = iEnable
-    doPlantLeaveOff_brch(NB,NZ,NY,NX)              = iEnable
+    doInitLeafOut_brch(NB,NZ,NY,NX)                = iTrue
+    EnablePlantLeafOut_brch(NB,NZ,NY,NX)               = iTrue
+    doPlantLeaveOff_brch(NB,NZ,NY,NX)              = iTrue
     Prep4Literfall_brch(NB,NZ,NY,NX)               = ifalse
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)      = 0
     MatureGroup_brch(NB,NZ,NY,NX)                  = MatureGroup_pft(NZ,NY,NX)
     ShootNodeNum_brch(NB,NZ,NY,NX)                 = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     ShootNodeNumAtInitFloral_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
-    NodeNumberAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
+    ShootNodeNumAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)                  = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)       = 0._r8
     KLeafNumber_brch(NB,NZ,NY,NX)                  = 1
@@ -529,7 +529,7 @@ module StartqMod
     HourFailGrainFill_brch(NB,NZ,NY,NX)            = 0
     HoursDoingRemob_brch(NB,NZ,NY,NX)              = 0
     BranchNumerID_brch(NB,NZ,NY,NX)                 = 0
-    iPlantBranchState_brch(NB,NZ,NY,NX)            = iDead
+    isPlantBranchAlive_brch(NB,NZ,NY,NX)            = iFalse
     D15: DO M=1,NumGrowthStages
       iPlantCalendar_brch(M,NB,NZ,NY,NX)=0
     ENDDO D15
@@ -558,7 +558,7 @@ module StartqMod
     SapwoodBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
     CanopyLeafSheathC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
-    SeedSitesSet_brch(NB,NZ,NY,NX)         = 0._r8
+    SetNumberSeeds_brch(NB,NZ,NY,NX)         = 0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX) = 0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)       = 0._r8
     NH3Dep2Can_brch(NB,NZ,NY,NX)         = 0._r8

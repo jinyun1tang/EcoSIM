@@ -807,7 +807,7 @@ module PlantDisturbsMod
     Hours4LeafOff_brch                => plt_pheno%Hours4LeafOff_brch                 ,& !input  :cold requirement for autumn leafoff/hardening, [h]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                ,& !inoput :plant growth stage, [-]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
-    NodeNumberAtAnthesis_brch         => plt_morph%NodeNumberAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     ShootNodeNumAtInitFloral_brch           => plt_morph%ShootNodeNumAtInitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
@@ -822,7 +822,7 @@ module PlantDisturbsMod
   !     iPlantCalendar_brch(ipltcal_Emerge,=emergence date
   !     GROUP=node number required for floral initiation
   !     ShootNodeNumAtInitFloral_brch=node number at floral initiation
-  !     NodeNumberAtAnthesis_brch=node number at flowering
+  !     ShootNodeNumAtAnthesis_brch=node number at flowering
   !     VSTGX=leaf number on date of floral initiation
   !     TotalNodeNumNormByMatgrp_brch=total change in vegve node number normalized for maturity group
   !     TotReproNodeNumNormByMatrgrp_brch=total change in reprve node number normalized for maturity group
@@ -836,21 +836,21 @@ module PlantDisturbsMod
   IF(nonEvergreenChk .OR. (iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen .AND. iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).NE.0))THEN
     MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
     ShootNodeNumAtInitFloral_brch(NB,NZ)         = ShootNodeNum_brch(NB,NZ)
-    NodeNumberAtAnthesis_brch(NB,NZ)             = 0._r8
+    ShootNodeNumAtAnthesis_brch(NB,NZ)             = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
     HourFailGrainFill_brch(NB,NZ)                = 0._r8
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
-    doInitLeafOut_brch(NB,NZ)                    = iEnable
+    doInitLeafOut_brch(NB,NZ)                    = iTrue
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       D3010: DO NBX=1,NumOfBranches_pft(NZ)
         IF(NBX.NE.MainBranchNum_pft(NZ))THEN
           MatureGroup_brch(NBX,NZ)                   = MatureGroup_pft(NZ)
           ShootNodeNumAtInitFloral_brch(NBX,NZ)      = ShootNodeNum_brch(NBX,NZ)
-          NodeNumberAtAnthesis_brch(NBX,NZ)          = 0._r8
+          ShootNodeNumAtAnthesis_brch(NBX,NZ)          = 0._r8
           LeafNumberAtFloralInit_brch(NBX,NZ)        = 0._r8
           TotalNodeNumNormByMatgrp_brch(NBX,NZ)      = 0._r8
           TotReproNodeNumNormByMatrgrp_brch(NBX,NZ)  = 0._r8
@@ -1090,7 +1090,7 @@ module PlantDisturbsMod
     GrainStrutElms_brch     => plt_biom%GrainStrutElms_brch       ,& !inoput :branch grain structural element mass, [g d-2]
     EarStrutElms_brch       => plt_biom%EarStrutElms_brch         ,& !inoput :branch ear structural chemical element mass, [g d-2]
     PotentialSeedSites_brch => plt_morph%PotentialSeedSites_brch  ,& !inoput :branch potential grain number, [d-2]
-    SeedSitesSet_brch       => plt_morph%SeedSitesSet_brch        ,& !inoput :branch grain number, [d-2]
+    SetNumberSeeds_brch       => plt_morph%SetNumberSeeds_brch        ,& !inoput :branch grain number, [d-2]
     GrainSeedBiomCMean_brch => plt_allom%GrainSeedBiomCMean_brch  ,& !inoput :maximum grain C during grain fill, [g d-2]
     HuskStrutElms_brch      => plt_biom%HuskStrutElms_brch         & !inoput :branch husk structural element mass, [g d-2]
   )
@@ -1182,7 +1182,7 @@ module PlantDisturbsMod
   ENDDO
 
   PotentialSeedSites_brch(NB,NZ) = FracGrainNotHvsted*PotentialSeedSites_brch(NB,NZ)
-  SeedSitesSet_brch(NB,NZ)         = FracGrainNotHvsted*SeedSitesSet_brch(NB,NZ)
+  SetNumberSeeds_brch(NB,NZ)         = FracGrainNotHvsted*SetNumberSeeds_brch(NB,NZ)
   GrainSeedBiomCMean_brch(NB,NZ) = FracGrainNotHvsted*GrainSeedBiomCMean_brch(NB,NZ)
   call PrintInfo('end '//subname)
   end associate
@@ -1763,7 +1763,7 @@ module PlantDisturbsMod
     QH2OLoss_lnds             => plt_site%QH2OLoss_lnds               ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
     H2OLoss_CumYr_col         => plt_ew%H2OLoss_CumYr_col             ,& !inoput :total subsurface water flux, [m3 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch      ,& !output :plant branch leaf + sheath C, [g d-2]
-    iPlantBranchState_brch    => plt_pheno%iPlantBranchState_brch      & !output :flag to detect branch death, [-]
+    isPlantBranchAlive_brch    => plt_pheno%isPlantBranchAlive_brch      & !output :flag to detect branch death, [-]
   )
 
   call PrintInfo('beg '//subname)
@@ -1828,7 +1828,7 @@ module PlantDisturbsMod
     !     DEATH OF BRANCH IF KILLING HARVEST ENTERED IN 'READQ'
     !
     !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,and reseed
-    !     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
+    !     isPlantBranchAlive_brch=branch living flag: 0=alive,1=dead
     !     PP=PFT population
     !     WTLS=total PFT leaf+PetolSheth C mass
     !     WTSTK=total PFT stalk C mass
@@ -1836,7 +1836,7 @@ module PlantDisturbsMod
     !     CanopyStalkArea_lbrch=total PFT stalk surface area
     !
     IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction .or. PlantPopulation_pft(NZ).LE.0.0_r8)then
-      iPlantBranchState_brch(NB,NZ)=iDead      
+      isPlantBranchAlive_brch(NB,NZ)=iFalse      
     endif
     
   ENDDO D9835
