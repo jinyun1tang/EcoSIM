@@ -1147,7 +1147,7 @@ contains
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else
-      if(.not. fixWaterLevel)then
+      if(.not. fixWaterLevel .and. .not. ats_cpl_mode)then
         VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
         VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
         ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)

@@ -155,7 +155,7 @@ implicit none
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     RMAX = swrad(NY)*0.0036_r8
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
-
+    SoilAlbedo_col(NY,NX) = 0.2_r8
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
