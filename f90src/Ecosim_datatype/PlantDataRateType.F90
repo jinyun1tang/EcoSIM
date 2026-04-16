@@ -12,6 +12,7 @@ module PlantDataRateType
   real(r8),target,allocatable :: CanopyGrosRCO2_pft(:,:,:)                       !canopy autotrophic respiraiton, [gC d-2 h-1]
   real(r8),target,allocatable ::  Eco_NEE_col(:,:)                               !total canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Dep2Can_pft(:,:,:)                          !canopy NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  RNFixCO2_pft(:,:,:)                            !CO2 respired by nodules, [gC d-2]    
   real(r8),target,allocatable ::  NodulInfectElms_pft(:,:,:,:)                   !pft nodule infection [g d-2 h-1]
   real(r8),target,allocatable ::  NH3Emis_CumYr_pft(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),target,allocatable ::  SurfLitrfalStrutElms_CumYr_pft(:,:,:,:)        !total surface LitrFall element, [g d-2]
@@ -167,6 +168,7 @@ module PlantDataRateType
   allocate(CanopyGrosRCO2_pft(JP,JY,JX)); CanopyGrosRCO2_pft=0._r8
   allocate(Eco_NEE_col(JY,JX));       Eco_NEE_col=0._r8
   allocate(NH3Dep2Can_pft(JP,JY,JX));    NH3Dep2Can_pft=0._r8
+  allocate(RNFixCO2_pft(JP,JY,JX)); RNFixCO2_pft=0._r8
   allocate(NH3Emis_CumYr_pft(JP,JY,JX));    NH3Emis_CumYr_pft=0._r8  
   allocate(NodulInfectElms_pft(NumPlantChemElms,JP,JY,JX));NodulInfectElms_pft=0._r8
   allocate(SurfLitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    SurfLitrfalStrutElms_CumYr_pft=0._r8
@@ -307,6 +309,7 @@ module PlantDataRateType
   call destroy(TPlantRootH2OUptake_col)
   call destroy(CanopyGrosRCO2_pft)
   call destroy(Eco_NEE_col)
+  call destroy(RNFixCO2_pft)
   call destroy(NH3Dep2Can_pft)
   call destroy(NH3Emis_CumYr_pft)
   call destroy(SurfLitrfalStrutElms_CumYr_pft)

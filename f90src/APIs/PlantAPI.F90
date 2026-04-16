@@ -324,6 +324,7 @@ implicit none
     CanopyLeafSheathC_pft(NZ,NY,NX)             = plt_biom%CanopyLeafSheathC_pft(NZ)
     RootBiomCPerPlant_pft(NZ,NY,NX)            = plt_biom%RootBiomCPerPlant_pft(NZ)
     Km4LeafaqCO2_pft(NZ,NY,NX)                 = plt_photo%Km4LeafaqCO2_pft(NZ)
+    RNFixCO2_pft(NZ,NY,NX)                     = plt_bgcr%RNFixCO2_pft(NZ)
     Km4RubiscoCarboxy_pft(NZ,NY,NX)            = plt_photo%Km4RubiscoCarboxy_pft(NZ)
     CanopyHeight_pft(NZ,NY,NX)                 = plt_morph%CanopyHeight_pft(NZ)
     StalkHeight_pft(NZ,NY,NX)                  = plt_morph%StalkHeight_pft(NZ)

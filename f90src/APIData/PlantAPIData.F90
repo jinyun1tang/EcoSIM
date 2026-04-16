@@ -754,6 +754,7 @@ implicit none
   real(r8), pointer :: NH3Dep2Can_pft(:)                   => null()  !canopy NH3 flux,                            [g d-2 h-1]
   real(r8), pointer :: tRootMycoExud2Soil_vr(:,:,:)        => null()  !total root element exchange,                 [g d-2 h-1]
   real(r8), pointer :: RCO2Nodule_pvr(:,:)                 => null()  !layered root nodule respiration, [gC d-2 h-1]
+  real(r8), pointer :: RNFixCO2_pft(:)                     => null()  !CO2 respired by nodules, [gC d-2]    
   real(r8), pointer :: RootN2Fix_pvr(:,:)                  => null()  !root N2 fixation,                            [gN d-2 h-1]
   real(r8), pointer :: RootO2_TotSink_pvr(:,:,:)           => null()  !root O2 sink for autotrophic respiraiton,     [gC d-2 h-1]
   real(r8), pointer :: RootO2_TotSink_vr(:)                => null()  !all root O2 sink for autotrophic respiraiton, [gC d-2 h-1]
@@ -1191,6 +1192,7 @@ implicit none
   allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=0._r8
   allocate(this%RCO2Nodule_pvr(JZ1,JP1)); this%RCO2Nodule_pvr=0._r8
+  allocate(this%RNFixCO2_pft(JP1)); this%RNFixCO2_pft=0._r8
   allocate(this%RootO2_TotSink_pvr(jroots,JZ1,JP1)); this%RootO2_TotSink_pvr=0._r8
   allocate(this%RootO2_TotSink_vr(JZ1)); this%RootO2_TotSink_vr=0._r8
   allocate(this%CanopyRespC_CumYr_pft(JP1));this%CanopyRespC_CumYr_pft=spval

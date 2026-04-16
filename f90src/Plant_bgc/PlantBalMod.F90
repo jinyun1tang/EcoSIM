@@ -420,6 +420,7 @@ implicit none
     fNCLFW_brch            => plt_pheno%fNCLFW_brch           ,& !output : NC ratio of growing leaf on branch, [gN/gC]
     fPCLFW_brch            => plt_pheno%fPCLFW_brch           ,& !output : PC ratio of growing leaf on branch, [gP/gC]
     fNCLFW_pft             => plt_pheno%fNCLFW_pft            ,& !output : NC ratio of growing leaf, [gN/gC]
+    RNFixCO2_pft           => plt_bgcr%RNFixCO2_pft           ,& !inoput :CO2 respired by nodules, [gC d-2]    
     fPCLFW_pft             => plt_pheno%fPCLFW_pft             & !output : PC ratio of growing leaf, [gP/gC]
   )
   
@@ -431,8 +432,9 @@ implicit none
     SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
     SSXferElms_pft(:,NZ)                        = 0._r8
     trcs_deadroot2soil_pvr(:,:,NZ)              = 0._r8  
-    fNCLFW_pft(NZ) = 0._r8  
-    fPCLFW_pft(NZ) = 0._r8
+    RNFixCO2_pft(NZ)                             = 0._r8
+    fNCLFW_pft(NZ)                               = 0._r8
+    fPCLFW_pft(NZ)                               = 0._r8
     plt_photo%CanopyVcMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVoMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVcMaxPEP25C_pft(NZ)          = 0._r8

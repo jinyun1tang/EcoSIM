@@ -291,6 +291,7 @@ implicit none
   real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)  
   real(r8),pointer   :: h1D_N2_FIXN_FLX_ptc(:)   
   real(r8),pointer   :: h1D_cNH3_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_RNFixCO2_ptc(:)
   real(r8),pointer   :: h1D_PO4_UPTK_FLX_ptc(:)   
   real(r8),pointer   :: h1D_TC_Groth_ptc(:)
   real(r8),pointer   :: h2D_SoilBulkStress_vr(:,:)
@@ -856,6 +857,7 @@ implicit none
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
   allocate(this%h1D_cNH3_FLX_ptc(beg_ptc:end_ptc))        ;this%h1D_cNH3_FLX_ptc(:)=spval
+  allocate(this%h1D_RNFixCO2_ptc(beg_ptc:end_ptc)); this%h1D_RNFixCO2_ptc(:)=spval
   allocate(this%h1D_TC_Groth_ptc(beg_ptc:end_ptc))        ;this%h1D_TC_Groth_ptc(:)=spval
   allocate(this%h1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_PO4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_SHOOT_C_ptc(beg_ptc:end_ptc))         ;this%h1D_SHOOT_C_ptc(:)=spval
@@ -2155,6 +2157,11 @@ implicit none
   call hist_addfld1d(fname='CAN_NH3_FLX_pft',units='gN/m2/hr',avgflag='A',&
     long_name='*canopy NH3 flux',ptr_patch=data1d_ptr,&
     default='inactive')            
+
+  data1d_ptr => this%h1D_RNFixCO2_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='RNFixCO2_FLX_pft',units='gC/m2/hr',avgflag='A',&
+    long_name='CO2 respired for N fixation',ptr_patch=data1d_ptr,&
+    default='inactive')              
 
   data1d_ptr => this%h1D_TC_Groth_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='TC_Groth_pft',units='oC',avgflag='A',&
@@ -4354,6 +4361,7 @@ implicit none
         this%h1D_NO3_UPTK_FLX_ptc(nptc)  = RootNO3Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)        
         this%h1D_N2_FIXN_FLX_ptc(nptc)   = RootN2Fix_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_cNH3_FLX_ptc(nptc)      = NH3Dep2Can_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RNFixCO2_ptc(nptc)      =RNFixCO2_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_TC_Groth_ptc(nptc)      = TCGroth_pft(NZ,NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)
@@ -4710,6 +4718,7 @@ implicit none
   this%h1D_NO3_UPTK_FLX_ptc(nptc)  = 0._r8   
   this%h1D_N2_FIXN_FLX_ptc(nptc)   = 0._r8
   this%h1D_cNH3_FLX_ptc(nptc)      = 0._r8
+  this%h1D_RNFixCO2_ptc(nptc)      = 0._R8
   this%h1D_TC_Groth_ptc(nptc)      = 0._r8
   this%h1D_PO4_UPTK_FLX_ptc(nptc)  = 0._r8
   this%h1D_frcPARabs_ptc(nptc)     = 0._r8
