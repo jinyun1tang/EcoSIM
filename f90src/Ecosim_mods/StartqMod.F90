@@ -499,6 +499,7 @@ module StartqMod
   HypocotHeight_pft(NZ,NY,NX)    = 0._r8
   CanopyHeight_pft(NZ,NY,NX)     = 0._r8
   Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX)=0._r8
+  Days4FalseBreak_pft(NZ,NY,NX) = 0
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)                = iTrue
     EnablePlantLeafOut_brch(NB,NZ,NY,NX)               = iTrue

@@ -243,6 +243,7 @@ module grosubsMod
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), intent(in) :: CanopyHeight_copy(JP1)
+
   character(len=*), parameter :: subname='GrowOnePlant'
   real(r8)  :: CanopyN2Fix_pft(JP1)
   integer  :: NB,NE,KK
@@ -263,14 +264,14 @@ module grosubsMod
   real(r8) :: canopyE_finale(NumPlantChemElms)
   real(r8) :: err,arr(12),arr1(11),GrothPART2LeafPetole
 ! begin_execution
-  associate(                                                 &
-    NumOfBranches_pft    => plt_morph%NumOfBranches_pft     ,& !input  :number of branches,[-]
-    PlantPopulation_pft  => plt_site%PlantPopulation_pft    ,& !input  :plant population, [d-2]
-    ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft         ,& !input  :threshold zero for plang growth calculation, [-]
+  associate(                                                   &
+    NumOfBranches_pft     => plt_morph%NumOfBranches_pft      ,& !input  :number of branches,[-]
+    PlantPopulation_pft   => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantRootAlive_pft  => plt_pheno%isPlantRootAlive_pft   ,& !input  :flag to detect root system death,[-]
-    NU                   => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
-    MaxSoiL4Root_pft     => plt_morph%MaxSoiL4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
-    MainBranchNum_pft    => plt_morph%MainBranchNum_pft     ,& !input  :number of main branch,[-]    
+    NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
+    MaxSoiL4Root_pft      => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
+    MainBranchNum_pft     => plt_morph%MainBranchNum_pft      ,& !input  :number of main branch,[-]    
     isPlantShootAlive_pft => plt_pheno%isPlantShootAlive_pft   & !input  :flag to detect canopy death,[-]
   )
 

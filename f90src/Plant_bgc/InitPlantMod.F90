@@ -18,6 +18,7 @@ module InitPlantMod
   __FILE__
   public :: StartPlants
   public :: InitPlantPhenoMorphoBio
+  public :: InitRootMychorMorphoBio
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -595,7 +596,7 @@ module InitPlantMod
     PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
     PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
-    isPlantBranchAlive_brch            => plt_pheno%isPlantBranchAlive_brch             ,& !input  :flag to detect branch death, [-]
+    isPlantBranchAlive_brch           => plt_pheno%isPlantBranchAlive_brch            ,& !input  :flag to detect branch death, [-]
     Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
     Hours4ShortenPhotoPeriod_brch     => plt_pheno%Hours4ShortenPhotoPeriod_brch      ,& !output :initial cold requirement for autumn leafoff/hardening, [h]
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
@@ -635,14 +636,14 @@ module InitPlantMod
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !output :shoot node number at floral initiation, [-]
     NodeNumNormByMatgrp_brch          => plt_pheno%NodeNumNormByMatgrp_brch           ,& !output :normalized node number during vegetative growth stages, [-]
-    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    ShootNodeNumAtAnthesis_brch       => plt_morph%ShootNodeNumAtAnthesis_brch        ,& !output :shoot node number at anthesis, [-]
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !output :number of branches,[-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
     PlantPopulation_pft               => plt_site%PlantPopulation_pft                 ,& !output :plant population, [d-2]
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
-    SetNumberSeeds_brch                 => plt_morph%SetNumberSeeds_brch                  ,& !output :branch grain number, [d-2]
+    SetNumberSeeds_brch               => plt_morph%SetNumberSeeds_brch                ,& !output :branch grain number, [d-2]
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
@@ -655,6 +656,7 @@ module InitPlantMod
   !     PP=population (grid cell-1)
   !
   call PrintInfo('beg '//subname)
+  plt_pheno%Days4FalseBreak_pft(NZ) = 0
   PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
   plt_pheno%doInitPlant_pft(NZ)      = ifalse
   plt_pheno%isPlantShootAlive_pft(NZ) = iTrue
@@ -775,25 +777,25 @@ module InitPlantMod
     plt_biom%CanopyLeafCLyr_pft(L,NZ) = 0._r8
     CanopyStemAreaZ_pft(L,NZ)         = 0._r8
   ENDDO D35
-  plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
-  plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ) = 0._r8
-  plt_biom%CanopyNoduleNonstCConc_pft(NZ)                = 0._r8
-  plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)          = 0._r8
-  plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
-  plt_biom%PetolShethStrutElms_pft(1:NumPlantChemElms,NZ)    = 0._r8
-  plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  plt_biom%CanopySapwoodC_pft(NZ)                        = 0._r8
-  plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
-  plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
-  plt_biom%EarStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
-  plt_biom%GrainStrutElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
-  plt_biom%RootStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
-  plt_biom%CanopyLeafSheathC_pft(NZ)                     = 0._r8
-  plt_biom%RootNoduleElms_pft(:,NZ)                      = 0._r8
-  plt_biom%ShootNoduleElms_pft(:,NZ)                     = 0._r8
-  CanopyLeafArea_pft(NZ)                                 = 0._r8
-  plt_biom%RootBiomCPerPlant_pft(NZ)                     = 0._r8
-  CanopyStemArea_pft(NZ)                                 = 0._r8
+  plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
+  plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ)  = 0._r8
+  plt_biom%CanopyNoduleNonstCConc_pft(NZ)                 = 0._r8
+  plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)           = 0._r8
+  plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
+  plt_biom%PetolShethStrutElms_pft(1:NumPlantChemElms,NZ) = 0._r8
+  plt_biom%StalkStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
+  plt_biom%CanopySapwoodC_pft(NZ)                         = 0._r8
+  plt_biom%StalkRsrvElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
+  plt_biom%HuskStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
+  plt_biom%EarStrutElms_pft(1:NumPlantChemElms,NZ)        = 0._r8
+  plt_biom%GrainStrutElms_pft(1:NumPlantChemElms,NZ)      = 0._r8
+  plt_biom%RootStrutElms_pft(1:NumPlantChemElms,NZ)       = 0._r8
+  plt_biom%CanopyLeafSheathC_pft(NZ)                      = 0._r8
+  plt_biom%RootNoduleElms_pft(:,NZ)                       = 0._r8
+  plt_biom%ShootNoduleElms_pft(:,NZ)                      = 0._r8
+  CanopyLeafArea_pft(NZ)                                  = 0._r8
+  plt_biom%RootBiomCPerPlant_pft(NZ)                      = 0._r8
+  CanopyStemArea_pft(NZ)                                  = 0._r8
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantPhenoMorphoBio
@@ -1045,9 +1047,9 @@ module InitPlantMod
       plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
 
-    D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-      plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
-    ENDDO D6400
+!    D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
+!      plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
+!    ENDDO D6400
     plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
     plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
     RootN2Fix_pvr(L,NZ)                                       = 0._r8

@@ -1118,6 +1118,24 @@ implicit none
   endif  
 
   if(flag=='read')then
+    dat1pr => datip_1d
+    call restartvar(ncid, flag, varname='Days4FalseBreak_pft', dim1name='pft',&
+     long_name='Accumulated days to singifying false breakout of plants', units='# d-2', &
+     interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Days4FalseBreak_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    !print*,'PP'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,Days4FalseBreak_pft,datip_1d,&
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)    
+    dat1pr => datip_1d
+    call restartvar(ncid, flag, varname='Days4FalseBreak_pft', dim1name='pft',&
+     long_name='Accumulated days to singifying false breakout of plants', units='# d-2', &
+     interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)        
+  endif  
+
+
+  if(flag=='read')then
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PlantPopulation_pft', dim1name='pft',&
      long_name='plant population', units='# d-2', &

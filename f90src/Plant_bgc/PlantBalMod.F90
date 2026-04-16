@@ -726,9 +726,9 @@ implicit none
     err_rel=1.e-10_r8
   endif
 
-  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
     write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
-    write(888,*)'NY,NX=',plt_site%NY,plt_site%NX
+    write(888,*)'NY,NX=',plt_site%NY,plt_site%NX,header
     write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
     write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
     write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
@@ -745,9 +745,9 @@ implicit none
     write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
     write(888,*)'RootNFix          =',RootN2Fix_pft(NZ)            
     write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
-    write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)      
-    if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-      call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+    write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)          
+    write(888,*)('-',K=1,100)             
+    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
   endif
 
   NE=ielmp

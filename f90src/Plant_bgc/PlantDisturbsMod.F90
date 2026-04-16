@@ -94,7 +94,117 @@ module PlantDisturbsMod
   call PrintInfo('end '//subname)
   end subroutine RemoveBiomByMgmt
 
+!----------------------------------------------------------------------------------------------------
+  subroutine RemoveDeadAnnual(yearIJ,NZ)
+  use LitterFallMod, only : SetDeadPlant
+  use InitPlantMod,  only : InitPlantPhenoMorphoBio,InitRootMychorMorphoBio  
+!  use PlantBalMod,   only : CheckPlantBalanceZ
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='RemoveDeadAnnual'
 
+  logical :: checkDroughtDeciduos
+  real(r8) :: dshootLoss(NumPlantChemElms)
+  real(r8) :: drootLoss(NumPlantChemElms)
+  integer :: NE,M,NB,L,N
+  associate(                                                               &
+    ifoliar                     => pltpar%ifoliar                         ,& !input  :group id of plant foliar litter    
+    NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]    
+    LeafStrutElms_brch          => plt_biom%LeafStrutElms_brch            ,& !input  :branch leaf structural element mass, [g d-2]    
+    PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
+    PetolShethStrutElms_brch    => plt_biom%PetolShethStrutElms_brch      ,& !input  :branch sheath structural element, [g d-2]    
+    k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id    
+    LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]    
+    SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !input: plant stored nonstructural element at current step, [g d-2]  
+    MainBranchNum_pft           => plt_morph%MainBranchNum_pft            ,& !input  :id number of main branch,[-]    
+    Myco_pft                    => plt_morph%Myco_pft                     ,& !input  :mycorrhizal type (no or yes),[-]    
+    iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]    
+    iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]    
+    RootNodulStrutElms_rpvr     => plt_biom%RootNodulStrutElms_rpvr       ,& !input  :root layer nodule element, [g d-2]
+    RootNodulNonstElms_rpvr     => plt_biom%RootNodulNonstElms_rpvr       ,& !input  :root layer nonstructural element, [g d-2]
+    RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr     ,& !input  :root layer element secondary axes, [g d-2]    
+    RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr     ,& !input  :root layer element primary axes, [g d-2]    
+    NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft           ,& !input  :soil layer at planting depth, [-]    
+    NumPrimeRootAxes_pft        => plt_morph%NumPrimeRootAxes_pft         ,& !input  :root primary axis number,[-]    
+    RootMycoNonstElms_rpvr      => plt_biom%RootMycoNonstElms_rpvr        ,& !inoput :root layer nonstructural element, [g d-2]    
+    CanopyNonstElms_brch        => plt_biom%CanopyNonstElms_brch          ,& !inoput :branch nonstructural element, [g d-2]    
+    Days4FalseBreak_pft         => plt_pheno%Days4FalseBreak_pft          ,& !inoput :accumulated days to singifying false break
+    SeasonalNonstCDayAve_pft    => plt_biom%SeasonalNonstCDayAve_pft       & !inoput: daily average seasonal storage C for annual plant death check, [g d-2]   
+  )
+  call PrintInfo('beg '//subname)
+  checkDroughtDeciduos=iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid
+
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .and. checkDroughtDeciduos)THEN
+    SeasonalNonstCDayAve_pft(NZ)=SeasonalNonstCDayAve_pft(NZ)+SeasonalNonstElms_pft(ielmc,NZ)/24._r8
+    if(eval_annual_false_break_death(yearIJ,NZ))then
+      Days4FalseBreak_pft(NZ)=Days4FalseBreak_pft(NZ)+1._r8
+    endif
+    
+    if(Days4FalseBreak_pft(NZ).GE.Days2CallFalseBreak)then
+      !add CanopyNonstElms_brch to below ground litter at layer NGTopRootLayer_pft(NZ)
+!      call CheckPlantBalanceZ(yearIJ,NZ,subname)
+
+      DO M=1,jsken
+        DO  NB=1,NumOfBranches_pft(NZ)
+          DO NE=1,NumPlantChemElms
+            LitrfallElms_pvr(NE,M,k_fine_comp,NGTopRootLayer_pft(NZ),NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,NGTopRootLayer_pft(NZ),NZ)+&
+              (CanopyNonstElms_brch(NE,NB,NZ)+LeafStrutElms_brch(NE,NB,NZ)+PetolShethStrutElms_brch(NE,NB,NZ))*PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)
+            dshootLoss(NE) =dshootLoss(NE) +(CanopyNonstElms_brch(NE,NB,NZ)+LeafStrutElms_brch(NE,NB,NZ)+PetolShethStrutElms_brch(NE,NB,NZ))*PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)
+          ENDDO
+        ENDDO
+
+        DO L=1,3
+          DO NE=1,NumPlantChemElms        
+            DO N=1,Myco_pft(NZ)
+              LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
+              (sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + &              
+                RootMycoNonstElms_rpvr(NE,N,L,NZ))*PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)
+            ENDDO  
+            LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
+              (sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))  &
+              +RootNodulStrutElms_rpvr(NE,L,NZ)+ RootNodulNonstElms_rpvr(NE,L,NZ))*PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)            
+          ENDDO  
+        ENDDO  
+      ENDDO 
+      !      
+      call SetDeadPlant(yearIJ,NZ,NumOfBranches_pft(NZ))
+      !
+      plt_pheno%doReSeed_pft(NZ)=.FALSE.
+      call InitPlantPhenoMorphoBio(NZ)
+      !
+      call InitRootMychorMorphoBio(NZ)
+    endif
+  endif  
+  call PrintInfo('end '//subname)
+  end associate    
+  END subroutine RemoveDeadAnnual
+!----------------------------------------------------------------------------------------------------
+  function eval_annual_false_break_death(yearIJ,NZ)result(tokill)
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NZ
+  logical :: tokill
+  associate(                                                           &
+    CanopyHeight_pft           => plt_morph%CanopyHeight_pft         , & !inoput :canopy height, [m]    
+    SeasonalNonstCDayAve_pft   => plt_biom%SeasonalNonstCDayAve_pft  , & !input : daily average seasonal storage C for annual plant death check, [g d-2]
+    ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft            , & !input :threshold zero for plang growth calculation, [-]    
+    Hours2LeafOut_brch         => plt_pheno%Hours2LeafOut_brch       , & !inoput:counter for mobilizing nonstructural C during spring leafout/dehardening, [h]    
+    NumOfBranches_pft          => plt_morph%NumOfBranches_pft        , & !input :number of branches,[-]    
+    iPlantPhenolPattern_pft    => plt_pheno%iPlantPhenolPattern_pft  , & !input :plant growth habit: annual or perennial,[-]        
+    SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft     , & !inoput:plant stored nonstructural element at current step, [g d-2]  
+    CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch        & !input :branch nonstructural element, [g d-2]
+  )
+!  write(1034,*)NZ,yearIJ%I*1000+yearIJ%J/24.,any(CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)>0._r8),&
+!    isclose(SeasonalNonstCDayAve_pft(NZ),SeasonalNonstElms_pft(ielmc,NZ)),&
+!    any(Hours2LeafOut_brch(1:NumOfBranches_pft(NZ),NZ).GT.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)))
+  tokill= any(CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)>0._r8) &
+    .and. isclose(SeasonalNonstCDayAve_pft(NZ),SeasonalNonstElms_pft(ielmc,NZ)) &
+    .and. any(Hours2LeafOut_brch(1:NumOfBranches_pft(NZ),NZ).GT.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ))) &
+    .and. SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .and. isclose(CanopyHeight_pft(NZ),0._r8)
+
+  end associate
+  end function eval_annual_false_break_death
 !----------------------------------------------------------------------------------------------------
   subroutine RemoveStandingDead(yearIJ,NZ)
   implicit none
@@ -169,14 +279,9 @@ module PlantDisturbsMod
 
   call StageDisturbances(yearIJ,NZ)
 
+  CALL RemoveDeadAnnual(yearIJ,NZ)
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
-  !     THIN_pft=thinning:fraction of population removed
-  !     FrcLeafMassNotHarvst(ielmc)=fraction of standing dead mass not harvested
-
-  !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
-  !          iHarvstType_pft=3:reduction of clumping factor
-  !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
   !
   call RemoveBiomByMgmt(yearIJ,NZ)  
 

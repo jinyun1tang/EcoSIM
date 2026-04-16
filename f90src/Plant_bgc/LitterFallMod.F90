@@ -12,6 +12,7 @@ implicit none
   __FILE__
   public :: ResetDeadPlant
   public :: ReSeedPlants
+  public :: SetDeadPlant
   contains
   ![header]  
 !----------------------------------------------------------------------------------------------------
@@ -70,10 +71,9 @@ implicit none
     !
     !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
     !
-
     call LiterFallDeadBranches(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
 
-    call SetDeadPlant(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
+    call SetDeadPlant(yearIJ,NZ,NumDeadBranches)
     !
     !     DEAD ROOTS
     !
@@ -135,9 +135,9 @@ implicit none
   end subroutine ReSeedPlants
 
 !----------------------------------------------------------------------------------------------------
-  subroutine SetDeadPlant(I,J,NZ,NumDeadBranches)
+  subroutine SetDeadPlant(yearIJ,NZ,NumDeadBranches)
   implicit none
-  INTEGER, intent(in) :: i,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   integer, intent(in) :: NumDeadBranches
   character(len=*), parameter :: subname='SetDeadPlant'
@@ -183,8 +183,7 @@ implicit none
     !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
     !     PP=PFT population    
     !
-    IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ) .AND. &
-      iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
+    IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ) .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
       isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then
@@ -225,7 +224,7 @@ implicit none
     PlantElmAllocMat4Litr       => plt_soilchem%PlantElmAllocMat4Litr     ,& !input  :litter kinetic fraction, [-]
     FracRootElmAllocm           => plt_allom%FracRootElmAllocm            ,& !input  :C woody fraction in root,[-]
     FracWoodStalkElmAlloc2Litr  => plt_allom%FracWoodStalkElmAlloc2Litr   ,& !input  :woody element allocation,[-]
-    FracLeafShethElmAlloc2Litr          => plt_allom%FracLeafShethElmAlloc2Litr           ,& !input  :woody element allocation, [-]
+    FracLeafShethElmAlloc2Litr  => plt_allom%FracLeafShethElmAlloc2Litr   ,& !input  :woody element allocation, [-]
     FracPetolShethAlloc2Litr    => plt_allom%FracPetolShethAlloc2Litr     ,& !input  :leaf element allocation,[-]
     GrainStrutElms_brch         => plt_biom%GrainStrutElms_brch           ,& !input  :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch            ,& !input  :branch husk structural element mass, [g d-2]
@@ -237,7 +236,7 @@ implicit none
     C4PhotoShootNonstC_brch     => plt_biom%C4PhotoShootNonstC_brch       ,& !input  :branch shoot nonstrucal elelment, [g d-2]    
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     NumPrimeRootAxes_pft        => plt_morph%NumPrimeRootAxes_pft         ,& !input  :root primary axis number,[-]
-    PetolShethStrutElms_brch        => plt_biom%PetolShethStrutElms_brch          ,& !input  :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch    => plt_biom%PetolShethStrutElms_brch      ,& !input  :branch sheath structural element, [g d-2]
     RootMyco1stStrutElms_rpvr   => plt_biom%RootMyco1stStrutElms_rpvr     ,& !input  :root layer element primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr   => plt_biom%RootMyco2ndStrutElms_rpvr     ,& !input  :root layer element secondary axes, [g d-2]
     RootMycoNonstElms_rpvr      => plt_biom%RootMycoNonstElms_rpvr        ,& !input  :root layer nonstructural element, [g d-2]
@@ -247,8 +246,8 @@ implicit none
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantPhenolType_pft        => plt_pheno%iPlantPhenolType_pft         ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft        ,& !input  :plant growth type (vascular, non-vascular),[-]
-    isPlantRootAlive_pft         => plt_pheno%isPlantRootAlive_pft          ,& !input  :flag to detect root system death,[-]
-    isPlantShootAlive_pft        => plt_pheno%isPlantShootAlive_pft         ,& !input  :flag to detect canopy death,[-]
+    isPlantRootAlive_pft        => plt_pheno%isPlantRootAlive_pft         ,& !input  :flag to detect root system death,[-]
+    isPlantShootAlive_pft       => plt_pheno%isPlantShootAlive_pft        ,& !input  :flag to detect canopy death,[-]
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft    ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     icwood                      => pltpar%icwood                          ,& !input  :group id of coarse woody litter
     ifoliar                     => pltpar%ifoliar                         ,& !input  :group id of plant foliar litter
@@ -635,19 +634,19 @@ implicit none
     CanopyNonstElms_brch              => plt_biom%CanopyNonstElms_brch                ,& !input  :branch nonstructural element, [g d-2]
     EarStrutElms_brch                 => plt_biom%EarStrutElms_brch                   ,& !input  :branch ear structural chemical element mass, [g d-2]
     PlantElmAllocMat4Litr             => plt_soilchem%PlantElmAllocMat4Litr           ,& !input  :litter kinetic fraction, [-]
-    FracLeafShethElmAlloc2Litr                => plt_allom%FracLeafShethElmAlloc2Litr                 ,& !input  :woody element allocation, [-]
+    FracLeafShethElmAlloc2Litr        => plt_allom%FracLeafShethElmAlloc2Litr         ,& !input  :woody element allocation, [-]
     FracPetolShethAlloc2Litr          => plt_allom%FracPetolShethAlloc2Litr           ,& !input  :leaf element allocation,[-]
     GrainStrutElms_brch               => plt_biom%GrainStrutElms_brch                 ,& !input  :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch                => plt_biom%HuskStrutElms_brch                  ,& !input  :branch husk structural element mass, [g d-2]
     LeafStrutElms_brch                => plt_biom%LeafStrutElms_brch                  ,& !input  :branch leaf structural element mass, [g d-2]
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !input  :number of branches,[-]
-    PetolShethStrutElms_brch              => plt_biom%PetolShethStrutElms_brch                ,& !input  :branch sheath structural element, [g d-2]
+    PetolShethStrutElms_brch          => plt_biom%PetolShethStrutElms_brch            ,& !input  :branch sheath structural element, [g d-2]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     StalkRsrvElms_brch                => plt_biom%StalkRsrvElms_brch                  ,& !input  :branch reserve element mass, [g d-2]
     StalkStrutElms_brch               => plt_biom%StalkStrutElms_brch                 ,& !input  :branch stalk structural element mass, [g d-2]
     iHarvstType_pft                   => plt_distb%iHarvstType_pft                    ,& !input  :type of harvest,[-]
-    isPlantBranchAlive_brch            => plt_pheno%isPlantBranchAlive_brch             ,& !input  :flag to detect branch death, [-]
+    isPlantBranchAlive_brch           => plt_pheno%isPlantBranchAlive_brch            ,& !input  :flag to detect branch death, [-]
     iPlantPhenolPattern_pft           => plt_pheno%iPlantPhenolPattern_pft            ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantPhenolType_pft              => plt_pheno%iPlantPhenolType_pft               ,& !input  :climate signal for phenological progress: none, temperature, water stress,[-]
     iPlantRootProfile_pft             => plt_pheno%iPlantRootProfile_pft              ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -679,15 +678,15 @@ implicit none
     KLeafNumber_brch                  => plt_morph%KLeafNumber_brch                   ,& !output :leaf number, [-]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
-    ShootNodeNumAtInitFloral_brch           => plt_morph%ShootNodeNumAtInitFloral_brch            ,& !output :shoot node number at floral initiation, [-]
-    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !output :shoot node number at anthesis, [-]
+    ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !output :shoot node number at floral initiation, [-]
+    ShootNodeNumAtAnthesis_brch       => plt_morph%ShootNodeNumAtAnthesis_brch        ,& !output :shoot node number at anthesis, [-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
     Prep4Literfall_brch               => plt_pheno%Prep4Literfall_brch                ,& !output :branch phenology flag, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
-    EnablePlantLeafOut_brch               => plt_pheno%EnablePlantLeafOut_brch                ,& !output :branch phenology flag, [-]
+    EnablePlantLeafOut_brch           => plt_pheno%EnablePlantLeafOut_brch            ,& !output :branch phenology flag, [-]
     doPlantLeaveOff_brch              => plt_pheno%doPlantLeaveOff_brch               ,& !output :branch phenology flag, [-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
   )

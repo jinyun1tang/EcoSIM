@@ -400,6 +400,7 @@ implicit none
   integer,  pointer :: Hours4LiterfalAftMature_brch(:,:) => null()  !branch phenology flag,                            [h]
   integer,  pointer :: KHiestGroLeafNode_brch(:,:)       => null()  !leaf growth stage counter,                        [-]
   integer,  pointer :: iPlantPhenolType_pft(:)           => null()  !climate signal for phenological progress: none,   temperature, water stress,[-]
+  integer,  pointer :: Days4FalseBreak_pft(:)            => null()  !accumulated days to singifying false break, [day]  
   integer,  pointer :: iPlantTurnoverPattern_pft(:)      => null()  !phenologically-driven above-ground turnover: all, foliar only, none,[-]
   integer,  pointer :: isPlantShootAlive_pft(:)           => null()  !flag to detect canopy death,[-]
   integer,  pointer :: iPlantPhenolPattern_pft(:)        => null()  !plant growth habit: annual or perennial,[-]
@@ -570,6 +571,7 @@ implicit none
   real(r8), pointer :: StandDeadStrutElmsBeg_pft(:,:)       => null()    !standing dead element at previous time step,        [g d-2]
   real(r8), pointer :: RootStrutElms_pft(:,:)               => null()    !plant root structural element mass,                 [g d-2]
   real(r8), pointer :: SeedPlantedElm_pft(:,:)              => null()    !plant stored nonstructural chemical elements at planting,           [gC d-2]
+  real(r8), pointer :: SeasonalNonstCDayAve_pft(:)          => null()    !daily average seasonal storage C for annual plant death check, [g d-2]
   real(r8), pointer :: SeasonalNonstElms_pft(:,:)           => null()    !plant stored nonstructural element at current step, [g d-2]
   real(r8), pointer :: SeasonalNonstElmsbeg_pft(:,:)        => null()    !plant stored nonstructural element at prev step,    [g d-2]
   real(r8), pointer :: CanopyLeafSheathC_pft(:)              => null()    !canopy leaf + sheath C,                             [g d-2]
@@ -1503,6 +1505,7 @@ implicit none
   allocate(this%RootElmsBeg_pft(NumPlantChemElms,JP1));this%RootElmsBeg_pft=spval
   allocate(this%SeedPlantedElm_pft(NumPlantChemElms,JP1));this%SeedPlantedElm_pft=spval
   allocate(this%SeasonalNonstElms_pft(NumPlantChemElms,JP1));this%SeasonalNonstElms_pft=spval
+  allocate(this%SeasonalNonstCDayAve_pft(JP1)); this%SeasonalNonstCDayAve_pft=spval
   allocate(this%SeasonalNonstElmsbeg_pft(NumPlantChemElms,JP1));this%SeasonalNonstElmsbeg_pft=spval
   allocate(this%TotBegVegE_pft(NumPlantChemElms,JP1)); this%TotBegVegE_pft=spval
   allocate(this%TotEndVegE_pft(NumPlantChemElms,JP1)); this%TotEndVegE_pft=spval
@@ -1976,6 +1979,7 @@ implicit none
   allocate(this%fNCLFW_brch(MaxNumBranches,JP1)); this%fNCLFW_brch=spval
   allocate(this%fPCLFW_brch(MaxNumBranches,JP1)); this%fPCLFW_brch=spval
   allocate(this%iPlantPhenolType_pft(JP1));this%iPlantPhenolType_pft=0
+  allocate(this%Days4FalseBreak_pft(JP1)); this%Days4FalseBreak_pft = 0
   allocate(this%iEmbryophyteType_pft(JP1)); this%iEmbryophyteType_pft=0
   allocate(this%iPlantPhenolPattern_pft(JP1));this%iPlantPhenolPattern_pft=0
   allocate(this%iPlantTurnoverPattern_pft(JP1));this%iPlantTurnoverPattern_pft=0

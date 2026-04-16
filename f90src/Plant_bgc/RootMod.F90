@@ -1487,10 +1487,10 @@ implicit none
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8)THEN          
     call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)
   ENDIF
-  call DebugPrint('Root1stNetGrowthElms(ielmc)',Root1stNetGrowthElms(ielmc))
+  
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8 .AND. RootMyco1stElm_raxs(ielmc,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
     !primary roots withdraw, note that primary root depth was initialized at seedDepth
-    call DebugPrint('Root1stExtenzPP',Root1stExtenzPP)
+  
     Root1stExtenzPP=Root1stExtenzPP+(Root1stDepz_raxes(NR,NZ)-SeedDepth_pft(NZ))* &
       Root1stNetGrowthElms(ielmc)/RootMyco1stElm_raxs(ielmc,NR,NZ)
   ENDIF
@@ -1839,7 +1839,6 @@ implicit none
   Rlignif_OUltd = KLigMax_pft(NZ)*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
   alpha_fill    = (CRootActVolPerMassC_pft(NZ)-CRootLigVolPerMassC_pft(NZ))/CRootLigVolPerMassC_pft(NZ)
   RligCO2_OUltd = Rlignif_OUltd*alpha_fill*CO2Qt_lig
-  call DebugPrint('RligCO2_OUltd',RligCO2_OUltd)
 
   if(RligCO2_OUltd > RGrowCO2_OUltd)then
     RligCO2_OUltd = RGrowCO2_OUltd
@@ -1898,7 +1897,7 @@ implicit none
 
   dRPotexp = RootMycoNonst4Thick_Oltd(ielmc)*CRootActVolPerMassC_pft(NZ)/(TwoPiCON*Root1stRadius_rpvr(L,NR,NZ)*Root1stLenPP_rpvr(L,NR,NZ))
   dRExp    = dRPotexp
-  call DebugPrint('dRPotexp',dRPotexp)
+  
   if(lsoilCompaction)then
     if(dRPotexp>0._r8)then
       dRExp    = AMIN1(dRPotexp,dR1stExp)
@@ -2015,7 +2014,7 @@ implicit none
   IF(Root1stNetGrowthElms(ielmc).LT.0.0_r8)THEN          
     call Withdraw2ndRoots(N,NZ,L,NR,Root1stNetGrowthElms,litrflxt)    
   ENDIF
-  call DebugPrint('Root1stNetGrowthElms(ielmc)',Root1stNetGrowthElms(ielmc))
+  
   if(Root1stNetGrowthElms(ielmc).LT.0._r8)then
     !withdraw storage carbon from layers above
     DO L1=L,1,-1
@@ -2038,7 +2037,7 @@ implicit none
     Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)+Root1stNetGrowthElms(NE)
     RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)+Root1stNetGrowthElms(NE)
   ENDDO
-  call DebugPrint('Root1stLenPP_rpvr(L,NR,NZ)',Root1stLenPP_rpvr(L,NR,NZ))
+  
   Root1stRadius_rpvr(L,NR,NZ)=sqrt(RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)*CRootActVolPerMassC_pft(NZ) &
     /(PiCON*Root1stLenPP_rpvr(L,NR,NZ)*PlantPopulation_pft(NZ)))
 
@@ -3389,8 +3388,7 @@ implicit none
           !     NumAxesPerPrimRoot_pft=number of primary root axes
           !     RRAD1,Root2ndRadius_rpvr=primary, secondary root radius
           !     RootSinkC,RootSinkC_vr=total root sink strength
-          !
-          call DebugPrint("NR=",NR)
+          !          
           IF(N.EQ.ipltroot)THEN
             Root1stLocDepz_vr(NR,L) = AZMAX1(Root1stDepz_raxes(NR,NZ)-CumSoilThickness_vr(L-1)-RTDPX)
             Root1stLocDepz_vr(NR,L) = AZMAX1(AMIN1(DLYR3(L),Root1stLocDepz_vr(NR,L))-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))
@@ -3418,7 +3416,7 @@ implicit none
             !     RootSinkC,RootSinkC_vr=total root sink strength
             !
             TipRadius=AMAX1(Root1stMaxRadius1_pft(N,NZ),(1.0_r8+PSIRoot_pvr(N,L,NZ)/EMODR)*Root1stMaxRadius_pft(N,NZ))
-            call DebugPrint("TipRadius",TipRadius)
+            
             IF(DistRootEffDepz.GT.ZERO)THEN
               !In the Münch model, it is assumed the actual phloem flow is via a collection of thin sieve pores (about 1 um radius), 
               !and the R**2 rule counts the number of pores. 
@@ -3443,12 +3441,12 @@ implicit none
             Ltip=NRoot1stTipLay_raxes(NR,NZ)            
 
             IF(Root1stDepz_raxes(NR,NZ).GT.CumSoilThickness_vr(L-1))THEN              
-              call DebugPrint('Root1stDepz_raxes(NR,NZ)',Root1stDepz_raxes(NR,NZ))
+              
               IF(Root1stDepz_raxes(NR,NZ).LT.CumSoilThickness_vr(L) .and. L==Ltip)THEN
                 !Root tip in layer L
                 Root1stSink_pvr(L,NR) = RTSK(iPlantRootProfile_pft(NZ))*NumAxesPerPrimRoot_pft(NZ)/RphoResist_vr(L,NR)
                 RootSinkC_vr(N,L)      = RootSinkC_vr(N,L)+Root1stSink_pvr(L,NR)
-                call DebugPrint('Root1stSink_pvr(L,NR)',Root1stSink_pvr(L,NR))
+                
               elseif(checkCoarseRootLay .and. Fcrwt(Ltip,NR)>0._r8)THEN
                 !non-tip layer
                 flag2ndGrowth_pvr(L,NR,NZ)=.true.
@@ -3458,8 +3456,6 @@ implicit none
                 else
                   BaseSink  = Root1stSink_pvr(Ltip,NR)
                 endif
-                call DebugPrint('Fcrwt(Ltip,NR)',Fcrwt(Ltip,NR))
-                call DebugPrint('Fcrwt(L,NR)',Fcrwt(L,NR))
 
                 Root1stSink_pvr(L,NR) = BaseSink*Fcrwt(L,NR)/Fcrwt(Ltip,NR)
                 RootSinkC_vr(N,L)     = RootSinkC_vr(N,L)+Root1stSink_pvr(L,NR)
@@ -3469,7 +3465,7 @@ implicit none
             !mycorrhizae
             Root2ndSink_pvr(N,L,NR)=safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
           ENDIF         
-          call DebugPrint('Root2ndSink_pvr(N,L,NR)',Root2ndSink_pvr(N,L,NR)) 
+          
           RootSinkC_vr(N,L) = RootSinkC_vr(N,L)+Root2ndSink_pvr(N,L,NR)
         ENDDO D4985       
         IF(N.EQ.ipltroot .and. DistRootEffDepz_pvr(L,NZ)>0._r8)DistRootEffDepz_pvr(L,NZ)=DistRootEffDepz_pvr(L,NZ)/NumPrimeRootAxes_pft(NZ) 
