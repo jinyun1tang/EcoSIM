@@ -15,7 +15,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                  !Soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesureHeight_col(:,:)              !Wind speed measurement height, [m]
   real(r8),target,allocatable ::  ALT_col(:,:)                           !Altitude of grid cell, [m]
-  real(r8),target,allocatable ::  AbvCanopyBndlResist_col(:,:)           !Isothermal boundary layer resistance, [h m-1]
+  real(r8),target,allocatable ::  RAerodynNeutral_col(:,:)           !Isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB_col(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8),target,allocatable ::  ALTI_col(:,:)                          !Altitude of landscape, [m]
   real(r8),target,allocatable ::  SineGrndSlope_col(:,:)                 !Sine of slope, [-]
@@ -37,7 +37,7 @@ contains
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
   allocate(WindMesureHeight_col(JY,JX));          WindMesureHeight_col=0._r8
   allocate(ALT_col(JY,JX));         ALT_col=0._r8
-  allocate(AbvCanopyBndlResist_col(JY,JX));         AbvCanopyBndlResist_col=0._r8
+  allocate(RAerodynNeutral_col(JY,JX));         RAerodynNeutral_col=0._r8
   allocate(RIB_col(JY,JX));         RIB_col=0._r8
   allocate(ALTI_col(JY,JX));        ALTI_col=0._r8
   allocate(SineGrndSlope_col(JY,JX));        SineGrndSlope_col=0._r8
@@ -59,7 +59,7 @@ contains
   call destroy(SoiSurfRoughness)
   call destroy(WindMesureHeight_col)
   call destroy(ALT_col)
-  call destroy(AbvCanopyBndlResist_col)
+  call destroy(RAerodynNeutral_col)
   call destroy(RIB_col)
   call destroy(ALTI_col)
   call destroy(SineGrndSlope_col)

@@ -19,10 +19,10 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
-  real(r8),target,allocatable ::  CanopyStalkArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStalkSurfArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                  !Canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyStemArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemSurfArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                    !pft canopy height, [m]
   real(r8),target,allocatable ::  StalkHeight_pft(:,:,:)                     !pft stalk height, [m]
   real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
@@ -201,10 +201,10 @@ contains
   allocate(FracLeafShethElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracLeafShethElmAlloc2Litr=0._r8
   allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
-  allocate(CanopyStalkArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkArea_lbrch=0._r8
+  allocate(CanopyStalkSurfArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkSurfArea_lbrch=0._r8
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
-  allocate(CanopyStemArea_pft(JP,JY,JX));    CanopyStemArea_pft=0._r8
+  allocate(CanopyStemSurfArea_pft(JP,JY,JX));    CanopyStemSurfArea_pft=0._r8
   allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
   allocate(StalkHeight_pft(JP,JY,JX)); StalkHeight_pft=0._r8
   allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
@@ -382,10 +382,10 @@ contains
   call destroy(FracLeafShethElmAlloc2Litr)
   call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
-  call destroy(CanopyStalkArea_lbrch)
+  call destroy(CanopyStalkSurfArea_lbrch)
   call destroy(CanopyLeafArea_pft)
   call destroy(LeafStalkArea_pft)
-  call destroy(CanopyStemArea_pft)
+  call destroy(CanopyStemSurfArea_pft)
   call destroy(CanopyHeight_pft)
   call destroy(StalkHeight_pft)
   call destroy(CanopyLeafAareZ_col)

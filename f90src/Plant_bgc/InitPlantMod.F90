@@ -612,9 +612,9 @@ module InitPlantMod
     CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft                ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafArea_lnode              => plt_morph%CanopyLeafArea_lnode               ,& !output :layer/node/branch leaf area, [m2 d-2]
     CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft                 ,& !output :plant canopy leaf area, [m2 d-2]
-    CanopyStalkArea_lbrch             => plt_morph%CanopyStalkArea_lbrch              ,& !output :plant canopy layer branch stem area, [m2 d-2]
-    CanopyStemAreaZ_pft               => plt_morph%CanopyStemAreaZ_pft                ,& !output :plant canopy layer stem area, [m2 d-2]
-    CanopyStemArea_pft                => plt_morph%CanopyStemArea_pft                 ,& !output :plant stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch             => plt_morph%CanopyStalkSurfArea_lbrch              ,& !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft               => plt_morph%CanopyStemSurfAreaZ_pft                ,& !output :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfArea_pft                => plt_morph%CanopyStemSurfArea_pft                 ,& !output :plant stem area, [m2 d-2]
     ChillHours_pft                    => plt_photo%ChillHours_pft                     ,& !output :chilling effect on CO2 fixation, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
     Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch                 ,& !output :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -736,7 +736,7 @@ module InitPlantMod
     LeafAreaDying_brch(NB,NZ)                = 0._r8
     CanPBranchHeight(NB,NZ)                  = 0._r8
     D5: DO L=1,NumCanopyLayers1
-      CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
+      CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
       DO N=1,NumLeafZenithSectors1
         StemAreaZsec_brch(N,L,NB,NZ)=0._r8
       enddo
@@ -775,7 +775,7 @@ module InitPlantMod
   D35: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)         = 0._r8
     plt_biom%CanopyLeafCLyr_pft(L,NZ) = 0._r8
-    CanopyStemAreaZ_pft(L,NZ)         = 0._r8
+    CanopyStemSurfAreaZ_pft(L,NZ)         = 0._r8
   ENDDO D35
   plt_biom%CanopyNonstElms_pft(1:NumPlantChemElms,NZ)     = 0._r8
   plt_biom%CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ)  = 0._r8
@@ -795,7 +795,7 @@ module InitPlantMod
   plt_biom%ShootNoduleElms_pft(:,NZ)                      = 0._r8
   CanopyLeafArea_pft(NZ)                                  = 0._r8
   plt_biom%RootBiomCPerPlant_pft(NZ)                      = 0._r8
-  CanopyStemArea_pft(NZ)                                  = 0._r8
+  CanopyStemSurfArea_pft(NZ)                                  = 0._r8
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantPhenoMorphoBio

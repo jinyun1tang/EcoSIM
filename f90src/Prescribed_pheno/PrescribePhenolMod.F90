@@ -141,7 +141,7 @@ implicit none
   integer  :: N,L,NZ,NB
 
   associate(                                                 &
-    CanopyStemAreaZ_pft   => plt_morph%CanopyStemAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft   => plt_morph%CanopyStemSurfAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
     CanopyLeafAreaZ_pft   => plt_morph%CanopyLeafAreaZ_pft  ,& !inoput :total leaf area, [m2 d-2]
     LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft    ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col    ,& !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
@@ -165,8 +165,8 @@ implicit none
         LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
       ENDDO
       StemAreaZsec_lpft(:,L,NZ)=0._r8
-      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)
-      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemAreaZ_pft(L,NZ)
+      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)
+      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemSurfAreaZ_pft(L,NZ)
 
       !Assuming uniform azimuth desitribution for leaves
       DO N=1,NumLeafZenithSectors1
@@ -266,7 +266,7 @@ implicit none
         StemArea_col(NY,NX)        = StemArea_col(NY,NX)+tsai_day_pft(NZ,NY,NX)
         CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeight_pft(NZ,NY,NX))
         CanopyLeafAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tlai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
-        CanopyStemAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
+        CanopyStemSurfAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
       ENDDO
 
       !set vertical desitribution of LAI and

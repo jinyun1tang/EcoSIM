@@ -33,7 +33,7 @@ implicit none
 !     CANOPY RETENTION OF PRECIPITATION
 !
 !     FoliarWatRetcap=foliar surface water retention capacity
-!     CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk area of PFT
+!     CanopyLeafArea_pft,CanopyStemSurfArea_pft=leaf,stalk area of PFT
 !     FLWC,TFLWC=water retention of PFT,combined canopy
 !     PRECA=precipitation+irrigation
 !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
@@ -43,7 +43,7 @@ implicit none
 
   DO  NZ=1,NP_col(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
-      *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemArea_pft(NZ,NY,NX))
+      *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemSurfArea_pft(NZ,NY,NX))
       
     prec2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
     PrecIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(prec2canopy_pft,CanopyWatHeldCap-WatHeldOnCanopy_pft(NZ,NY,NX)))

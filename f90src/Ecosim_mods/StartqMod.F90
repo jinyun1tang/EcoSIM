@@ -572,7 +572,7 @@ module StartqMod
     CanPBranchHeight(NB,NZ,NY,NX)        = 0._r8
     
     D5: DO L=1,NumCanopyLayers
-      CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)=0._r8
+      CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)=0._r8
       DO N=1,NumLeafZenithSectors
         StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=0._r8
       enddo
@@ -611,7 +611,7 @@ module StartqMod
   D35: DO L=1,NumCanopyLayers
     CanopyLeafAreaZ_pft(L,NZ,NY,NX) = 0._r8
     CanopyLeafCLyr_pft(L,NZ,NY,NX)  = 0._r8
-    CanopyStemAreaZ_pft(L,NZ,NY,NX) = 0._r8
+    CanopyStemSurfAreaZ_pft(L,NZ,NY,NX) = 0._r8
   ENDDO D35
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)    = 0._r8
   CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
@@ -633,7 +633,7 @@ module StartqMod
   CanopyLeafSheathC_pft(NZ,NY,NX)     = 0._r8
   CanopyLeafArea_pft(NZ,NY,NX)       = 0._r8
   RootBiomCPerPlant_pft(NZ,NY,NX)    = 0._r8
-  CanopyStemArea_pft(NZ,NY,NX)       = 0._r8
+  CanopyStemSurfArea_pft(NZ,NY,NX)       = 0._r8
   call PrintInfo('end '//subname)
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------

@@ -66,7 +66,7 @@ implicit none
   plt_site%ALT                     = ALT_col(NY,NX)                    !column altitude [m]
   plt_ew%TKSnow                    = TKSnow_snvr(1,NY,NX)              !surface snow temperature
   plt_ew%SnowDepth                 = SnowDepth_col(NY,NX)              !total snow depth
-  plt_ew%AbvCanopyBndlResist_col   = AbvCanopyBndlResist_col(NY,NX)    !aboveground canopy resistance,  computed in the radiation code
+  plt_ew%RAerodynNeutral_col   = RAerodynNeutral_col(NY,NX)    !aboveground canopy resistance,  computed in the radiation code
   plt_ew%TairK                     = TairK_col(NY,NX)                  !air temperature
   plt_ew%RoughHeight               = RoughHeight_col(NY,NX)            !computed in the radiation coce
   plt_morph%CanopyHeight_col       = CanopyHeight_col(NY,NX)           !canopy height as prescribed input
@@ -82,7 +82,7 @@ implicit none
   plt_ew%Eco_Heat_Sens_col         = Eco_Heat_Sens_col(NY,NX)          !whole ecosystem sensible heat, updated iteratively, reset to zero in hour1.F90
   plt_ew%Eco_Heat_Latent_col       = Eco_Heat_Latent_col(NY,NX)        !whole ecosystem latent heat, updated iterately, reset to zero in hour1.F90
   plt_ew%Eco_Heat_GrndSurf_col     = Eco_Heat_GrndSurf_col(NY,NX)      !heat to ground surface, updated iterately, reset to zero in hour1.F90
-  plt_ew%CanopyWat_col             = CanopyWat_col(NY,NX)              !canopy water content, updated iterately
+  plt_ew%CanopyBiomWater_col             = CanopyBiomWater_col(NY,NX)              !canopy water content, updated iterately
   plt_ew%WatHeldOnCanopy_col       = WatHeldOnCanopy_col(NY,NX)        !water held on canopy, updated iterately
   plt_ew%QVegET_col                = QVegET_col(NY,NX)                 !canopy evapotranspiration, reset to zero in hour1.F90
   plt_ew%VapXAir2Canopy_col        = VapXAir2Canopy_col(NY,NX)         !canopy evaporation, reset to zero in hour1.F90
@@ -128,7 +128,7 @@ implicit none
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
     plt_ew%CanopyIsothBndlResist_pft(NZ)          = CanopyIsothBndlResist_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
     plt_morph%CanopyHeight_pft(NZ)          = CanopyHeight_pft(NZ,NY,NX)       !canopy height, set as prescribed input
-    plt_morph%CanopyStemArea_pft(NZ)        = CanopyStemArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
+    plt_morph%CanopyStemSurfArea_pft(NZ)        = CanopyStemSurfArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
     plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
@@ -222,7 +222,7 @@ implicit none
   Eco_Heat_Latent_col(NY,NX)       = plt_ew%Eco_Heat_Latent_col
   Eco_Heat_Sens_col(NY,NX)         = plt_ew%Eco_Heat_Sens_col
   Eco_Heat_GrndSurf_col(NY,NX)     = plt_ew%Eco_Heat_GrndSurf_col
-  CanopyWat_col(NY,NX)             = plt_ew%CanopyWat_col
+  CanopyBiomWater_col(NY,NX)             = plt_ew%CanopyBiomWater_col
   WatHeldOnCanopy_col(NY,NX)       = plt_ew%WatHeldOnCanopy_col
   QVegET_col(NY,NX)                = plt_ew%QVegET_col
   VapXAir2Canopy_col(NY,NX)        = plt_ew%VapXAir2Canopy_col

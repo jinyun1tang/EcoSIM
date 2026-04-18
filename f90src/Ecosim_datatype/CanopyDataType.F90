@@ -105,7 +105,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  VapXAir2Canopy_col(:,:)                    !total canopy evaporation, [m3 d-2]
   real(r8),target,allocatable ::  CanopyHeatStor_col(:,:)                    !total canopy heat content, [MJ  d-2]
   real(r8),target,allocatable ::  HeatFlx2Canopy_col(:,:)                    !total canopy heat flux, [MJ  d-2 h-1]
-  real(r8),target,allocatable ::  CanopyWat_col(:,:)                         !total canopy water content stored in dry matter, [m3 d-2]
+  real(r8),target,allocatable ::  CanopyBiomWater_col(:,:)                         !total canopy water content stored in dry matter, [m3 d-2]
   real(r8),target,allocatable ::  LWRadCanG_col(:,:)                         !total canopy LW emission, [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWLeafAlbedo_pft(:,:,:)                 !canopy shortwave albedo , [-]
   real(r8),target,allocatable ::  RadSWLeafTransmis_pft(:,:,:)               !canopy shortwave transmissivity , [-]
@@ -136,7 +136,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  CanopyLeafCLyr_pft(:,:,:,:)                !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_pft(:,:,:,:)               !canopy nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElmConc_pft(:,:,:,:)            !canopy nonstructural chemical element concentration, [g d-2]
-  real(r8),target,allocatable ::  CanopyStemAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStemSurfAreaZ_pft(:,:,:,:)               !plant canopy layer stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyNodulNonstElms_pft(:,:,:,:)          !canopy nodule nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  ShootNoduleElms_pft(:,:,:,:)               !canopy nodule chemical elemental biomass [g d-2]
   real(r8),target,allocatable ::  SapwoodBiomassC_brch(:,:,:,:)              !branch active stalk C, [g d-2]
@@ -318,7 +318,7 @@ module CanopyDataType
   allocate(VapXAir2Canopy_col(JY,JX));      VapXAir2Canopy_col=0._r8
   allocate(CanopyHeatStor_col(JY,JX));      CanopyHeatStor_col=0._r8
   allocate(HeatFlx2Canopy_col(JY,JX));      HeatFlx2Canopy_col=0._r8
-  allocate(CanopyWat_col(JY,JX));      CanopyWat_col=0._r8
+  allocate(CanopyBiomWater_col(JY,JX));      CanopyBiomWater_col=0._r8
   allocate(LWRadCanG_col(JY,JX));       LWRadCanG_col=0._r8
   allocate(RadSWLeafAlbedo_pft(JP,JY,JX));     RadSWLeafAlbedo_pft=0._r8
   allocate(RadSWLeafTransmis_pft(JP,JY,JX));     RadSWLeafTransmis_pft=0._r8
@@ -347,7 +347,7 @@ module CanopyDataType
   allocate(CanopyLeafCLyr_pft(NumCanopyLayers,JP,JY,JX)); CanopyLeafCLyr_pft=0._r8
   allocate(CanopyNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElms_pft=0._r8
   allocate(CanopyNonstElmConc_pft(NumPlantChemElms,JP,JY,JX));   CanopyNonstElmConc_pft=0._r8
-  allocate(CanopyStemAreaZ_pft(NumCanopyLayers,JP,JY,JX)); CanopyStemAreaZ_pft=0._r8
+  allocate(CanopyStemSurfAreaZ_pft(NumCanopyLayers,JP,JY,JX)); CanopyStemSurfAreaZ_pft=0._r8
   allocate(ShootNoduleElms_pft(NumPlantChemElms,JP,JY,JX));ShootNoduleElms_pft=0._r8
   allocate(CanopyNodulNonstElms_pft(NumPlantChemElms,JP,JY,JX));   CanopyNodulNonstElms_pft=0._r8
   allocate(SapwoodBiomassC_brch(MaxNumBranches,JP,JY,JX));SapwoodBiomassC_brch=0._r8
@@ -514,7 +514,7 @@ module CanopyDataType
   call destroy(VapXAir2Canopy_col)
   call destroy(CanopyHeatStor_col)
   call destroy(HeatFlx2Canopy_col)
-  call destroy(CanopyWat_col)
+  call destroy(CanopyBiomWater_col)
   call destroy(LWRadCanG_col)
   call destroy(RadSWLeafAlbedo_pft)
   call destroy(RadSWLeafTransmis_pft)
@@ -544,7 +544,7 @@ module CanopyDataType
   call destroy(CanopyLeafCLyr_pft)
   call destroy(CanopyNonstElms_pft)
   call destroy(CanopyNonstElmConc_pft)
-  call destroy(CanopyStemAreaZ_pft)
+  call destroy(CanopyStemSurfAreaZ_pft)
   call destroy(CanopyNodulNonstElms_pft)
   call destroy(ShootNoduleElms_pft)
   call destroy(SapwoodBiomassC_brch)

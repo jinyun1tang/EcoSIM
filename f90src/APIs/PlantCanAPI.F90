@@ -125,7 +125,7 @@ implicit none
     plt_morph%ClumpFactor_pft(NZ)      = ClumpFactor_pft(NZ,NY,NX)
 
     DO  L=1,NumCanopyLayers
-      plt_morph%CanopyStemAreaZ_pft(L,NZ) = CanopyStemAreaZ_pft(L,NZ,NY,NX)
+      plt_morph%CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ,NY,NX)
       plt_morph%CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ,NY,NX)
     ENDDO
 
@@ -136,7 +136,7 @@ implicit none
         ENDDO
       ENDDO
       DO  L=1,NumCanopyLayers
-        plt_morph%CanopyStalkArea_lbrch(L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)
+        plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
@@ -182,7 +182,7 @@ implicit none
 
   ZERO4PlantDisplace_col(NY,NX)  = plt_ew%ZERO4PlantDisplace_col
   RoughHeight_col(NY,NX)         = plt_ew%RoughHeight
-  AbvCanopyBndlResist_col(NY,NX) = plt_ew%AbvCanopyBndlResist_col
+  RAerodynNeutral_col(NY,NX) = plt_ew%RAerodynNeutral_col
   RIB_col(NY,NX)                     = plt_ew%RIB
   
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col

@@ -801,7 +801,7 @@ module Hour1Mod
   THeatSnowThaw_col(NY,NX)                        = 0._r8
   THeatSoiThaw_col(NY,NX)                         = 0._r8
   TPlantRootH2OUptake_col(NY,NX)                  = 0._r8
-  CanopyWat_col(NY,NX)                            = 0._r8
+  CanopyBiomWater_col(NY,NX)                            = 0._r8
   WatHeldOnCanopy_col(NY,NX)                      = 0._r8
   Prec2Canopy_col(NY,NX)                          = 0._r8
   PrecIntceptByCanopy_col(NY,NX)                  = 0._r8

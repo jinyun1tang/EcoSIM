@@ -1724,7 +1724,7 @@ module PlantBranchMod
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch sapwood C, [gC d-2]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !output :leaf growth stage counter, [-]
     TreeRingAveRadius_pft     => plt_morph%TreeRingAveRadius_pft      ,& !output :tree ring radius,[m]
-    CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch       & !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch     => plt_morph%CanopyStalkSurfArea_lbrch       & !output :plant canopy layer branch stem area, [m2 d-2]
   )
   call DebugPrint('beg '//subname//' NZ',NZ)
   !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
@@ -1755,7 +1755,7 @@ module PlantBranchMod
     ENDDO D540
 
     D535: DO L=1,NumCanopyLayers1
-      CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
+      CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
     ENDDO D535
     !
     !   BRANCH HEIGHT
@@ -1901,7 +1901,7 @@ module PlantBranchMod
     !     SapwoodBiomassC_brch=stalk sapwood mass, the living, outermost portion of a tree trunk or branch. 
     !          It lies just beneath the bark and cambium layer but surrounds the darker, inner "heartwood
     !     FRACL=stalk fraction in each layer
-    !     CanopyStalkArea_lbrch=total branch stalk surface area in each layer
+    !     CanopyStalkSurfArea_lbrch=total branch stalk surface area in each layer
     !
     IF(StalkNodeHeight_brch(K1,NB,NZ).GT.0.0_r8)THEN
       LU=0
@@ -1948,18 +1948,18 @@ module PlantBranchMod
         ELSE
           FRACL=1.0_r8
         ENDIF
-        CanopyStalkArea_lbrch(L,NB,NZ)=FRACL*StalkSurfArea
+        CanopyStalkSurfArea_lbrch(L,NB,NZ)=FRACL*StalkSurfArea
       ENDDO D445
     ELSE
       SapwoodBiomassC_brch(NB,NZ)=0._r8
       D450: DO L=1,NumCanopyLayers1
-        CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
+        CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
       ENDDO D450
     ENDIF
   ELSE
     L=1;K=0
     SapwoodBiomassC_brch(NB,NZ)                     = 0._r8
-    CanopyStalkArea_lbrch(1:NumCanopyLayers1,NB,NZ) = 0._r8
+    CanopyStalkSurfArea_lbrch(1:NumCanopyLayers1,NB,NZ) = 0._r8
     CanopyLeafArea_lnode(L,K,NB,NZ)                 = LeafArea_node(0,NB,NZ)
     LeafLayerElms_node(:,L,K,NB,NZ)                 = LeafStrutElms_brch(:,NB,NZ)
   ENDIF
@@ -1979,7 +1979,7 @@ module PlantBranchMod
   associate(                                                   &
     SineBranchAngle_pft   => plt_morph%SineBranchAngle_pft    ,& !input  :branching angle, [degree from horizontal]
     LeafArea_node         => plt_morph%LeafArea_node          ,& !input  :leaf area, [m2 d-2]
-    CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft     ,& !input  :fractionction of leaves in different angle classes, [-]
     CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode   ,& !input  :layer/node/branch leaf area, [m2 d-2]
     MainBranchNum_pft     => plt_morph%MainBranchNum_pft      ,& !input  :number of main branch,[-]
@@ -2015,7 +2015,7 @@ module PlantBranchMod
   !
   ! StemAreaZsec_brch=stalk surface area in canopy layer
   ! SineBranchAngle_pft=stem angle from horizontal
-  ! CanopyStalkArea_lbrch=total branch stalk surface area in each layer
+  ! CanopyStalkSurfArea_lbrch=total branch stalk surface area in each layer
   !
   D910: DO L=1,NumCanopyLayers1
     DO  N=1,NumLeafZenithSectors1
@@ -2032,7 +2032,7 @@ module PlantBranchMod
     N      = MIN(NumLeafZenithSectors1,INT(ASIN(SineBranchAngle_pft(NZ))/dangle)+1)
   ENDIF
   D710: DO L=NumCanopyLayers1,1,-1
-    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ)/real(NumOfLeafAzimuthSectors1,r8)
+    StemAreaZsec_brch(N,L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ)/real(NumOfLeafAzimuthSectors1,r8)
   ENDDO D710
   call PrintInfo('end '//subname)
   end associate

@@ -185,8 +185,9 @@ implicit none
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
   real(r8),pointer   :: h1D_O2_SEMIS_FLX_col(:)  
   real(r8),pointer   :: h1D_CO2_LITR_col(:)      
-  real(r8),pointer   :: h1D_EVAPN_col(:)         
+  real(r8),pointer   :: h1D_EVAPG_col(:)         
   real(r8),pointer   :: h1D_CANET_col(:)         
+  real(r8),pointer   :: h1D_CanopyEvap_col(:)
   real(r8),pointer   :: h1D_RUNOFF_FLX_col(:)    
   real(r8),pointer   :: h1D_SEDIMENT_FLX_col(:)  
   real(r8),pointer   :: h1D_tSWC_col(:)       
@@ -800,9 +801,10 @@ implicit none
   allocate(this%h1D_Ar_DIF_flx_col(beg_col:end_col)); this%h1D_Ar_DIF_flx_col(:)=spval
   allocate(this%h1D_O2_SEMIS_FLX_col(beg_col:end_col))          ;this%h1D_O2_SEMIS_FLX_col(:)=spval
   allocate(this%h1D_CO2_LITR_col(beg_col:end_col))        ;this%h1D_CO2_LITR_col(:)=spval
-  allocate(this%h1D_EVAPN_col(beg_col:end_col))           ;this%h1D_EVAPN_col(:)=spval
+  allocate(this%h1D_EVAPG_col(beg_col:end_col))           ;this%h1D_EVAPG_col(:)=spval
   allocate(this%h1D_CondGasXSurf_col(beg_col:end_col)); this%h1D_CondGasXSurf_col(:)=spval
   allocate(this%h1D_CANET_col(beg_col:end_col))           ;this%h1D_CANET_col(:)=spval
+  allocate(this%h1D_CanopyEvap_col(beg_col:end_col)) ; this%h1D_CanopyEvap_col(:)=spval
   allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
   allocate(this%h1d_fPAR_col(beg_col:end_col));   this%h1d_fPAR_col(:)=spval
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
@@ -1840,7 +1842,7 @@ implicit none
   call hist_addfld1d(fname='CO2_LITR_col',units='gC/m3',avgflag='A',&
     long_name='CO2 solute concentration in litter',ptr_col=data1d_ptr,default='inactive')            
 
-  data1d_ptr => this%h1D_EVAPN_col(beg_col:end_col)      
+  data1d_ptr => this%h1D_EVAPG_col(beg_col:end_col)      
   call hist_addfld1d(fname='EVAPGrnd_col',units='mm H2O/m2/hr',avgflag='A',&
     long_name='Column-integrated ground surface evaporation(>0 into soil)',ptr_col=data1d_ptr)      
 
@@ -1851,6 +1853,10 @@ implicit none
   data1d_ptr => this%h1D_CANET_col(beg_col:end_col)
   call hist_addfld1d(fname='QVegET_col',units='mm H2O/m2/hr',avgflag='A',&
     long_name='Column-integrated canopy evapotranspiration(<0 int atmosphere)',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_CanopyEvap_col(beg_col:end_col)
+  call hist_addfld1d(fname='QVegEvap_col',units='mm H2O/m2/hr',avgflag='A',&
+    long_name='Column-integrated canopy evaporation(<0 int atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tSWC_col(beg_col:end_col)  
   call hist_addfld1d(fname='tSWC_col',units='mmH2O/m2',avgflag='A', &
@@ -3926,8 +3932,9 @@ implicit none
       this%h1D_CO2_Drain_flx_col(ncol)    = trcs_drainage_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CO2_hydloss_flx_col(ncol)  = GasHydroLoss_cumflx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CO2_LITR_col(ncol)         = trc_solcl_vr(idg_CO2,0,NY,NX)
-      this%h1D_EVAPN_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_EVAPG_col(ncol)            = VapXAir2GSurf_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CondGasXSurf_col(ncol)     = CondGasXSurf_col(NY,NX)
+      this%h1D_CanopyEvap_col(ncol)       = VapXAir2Canopy_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CANET_col(ncol)            = QVegET_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RUNOFF_FLX_col(ncol)       = -QRunSurf_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SEDIMENT_FLX_col(ncol)     = SedmErossLoss_CumYr_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)

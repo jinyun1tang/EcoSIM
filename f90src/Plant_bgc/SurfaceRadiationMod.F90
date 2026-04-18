@@ -71,7 +71,7 @@ module SurfaceRadiationMod
     ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
     AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     KoppenClimZone          => plt_site%KoppenClimZone           ,& !input  :Koppen climate zone for the grid,[-]
-    SoilSurfRoughness_col => plt_site%SoilSurfRoughness_col  ,& !input  :initial soil surface roughness height, [m]
+    SoilSurfRoughness_col   => plt_site%SoilSurfRoughness_col    ,& !input  :initial soil surface roughness height, [m]
     ZEROS                   => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
     NU                      => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
     TairK                   => plt_ew%TairK                      ,& !input  :air temperature, [K]
@@ -81,7 +81,7 @@ module SurfaceRadiationMod
     CanopyHeight_col        => plt_morph%CanopyHeight_col        ,& !input  :canopy height , [m]
     StemArea_col            => plt_morph%StemArea_col            ,& !input  :grid canopy stem area, [m2 d-2]
     CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
-    AbvCanopyBndlResist_col => plt_ew%AbvCanopyBndlResist_col    ,& !output :isothermal boundary layer resistance, [h m-1]
+    RAerodynNeutral_col     => plt_ew%RAerodynNeutral_col        ,& !output :netural aerodynamic resistance, [h m-1]
     ZERO4PlantDisplace_col  => plt_ew%ZERO4PlantDisplace_col     ,& !output :zero plane displacement height, [m]
     RoughHeight             => plt_ew%RoughHeight                ,& !output :canopy surface roughness height, [m]
     RIB                     => plt_ew%RIB                         & !output :Richardson number for calculating boundary layer resistance, [-]
@@ -90,21 +90,23 @@ module SurfaceRadiationMod
 !
 !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
 !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-!     ZT,ZERO4PlantDisplace_col,RoughHeight=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
   ARLSC=CanopyLeafArea_col+StemArea_col
 !  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
   IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO)then 
-    ARLSG                  = ARLSC/AREA3(NU)
-    ZX                     = EXP(-0.5_r8*ARLSG)
-    ZY                     = 1.0_r8-ZX
+    !
+    ARLSG = ARLSC/AREA3(NU)
+    ZX    = EXP(-0.5_r8*ARLSG)
+    ZY    = 1.0_r8-ZX
+    ZE    = CanopyHeight_col*AMAX1(0.05_r8,ZX*ZY)
+    !
     ZERO4PlantDisplace_col = CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
-    ZE                     = CanopyHeight_col*AMAX1(0.05_r8,ZX*ZY)
   ELSE
-    ZERO4PlantDisplace_col = 0.0_r8
     ZE                     = 0.0_r8
+    ZERO4PlantDisplace_col = 0.0_r8
   ENDIF
+  !
   IF(IFLGW.EQ.1)THEN
     ZZ=WindMesureHeight_col+CanopyHeight_col
   ELSE
@@ -117,20 +119,22 @@ module SurfaceRadiationMod
     ELSE
       RoughHeight=AMAX1(0.001_r8,ZE,SoilSurfRoughness_col)
     ENDIF
-!
-!     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
-!
-!     AbvCanopyBndlResist_col,RAM=biome canopy,minimum isothermal boundary layer resistance
-!     WindSpeedAtm_col=wind speed
-!     RIB=canopy isothermal Richardson number
-!   here 0.168 = cvonkarman**2
-    AbvCanopyBndlResist_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2/(0.168_r8*WindSpeedAtm_col))
-    RIB                     = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2*TairK)
+    !
+    !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
+    !
+    !   RAerodynNeutral_col,RAM=biome canopy,minimum isothermal boundary layer resistance
+    !   WindSpeedAtm_col=wind speed
+    !   RIB=canopy isothermal Richardson number
+    !   here 0.168 = cvonkarman**2
+    !eq.(17) from Choudhury and Monteith (1988)
+    RAerodynNeutral_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2/(0.168_r8*WindSpeedAtm_col))
+    !1.27E+08_r8=g*(3600^2), from eq. (19) in Choudhury and Monteith (1988)
+    RIB                 = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2*TairK)
 
   ELSE
-    AbvCanopyBndlResist_col = RAM
-    RIB                     = 0.0_r8
-    RoughHeight             = 0._r8
+    RAerodynNeutral_col = RAM
+    RIB                 = 0.0_r8
+    RoughHeight         = 0._r8
   ENDIF
 
   end associate
@@ -234,7 +238,7 @@ module SurfaceRadiationMod
     LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch      ,& !input  :leaf surface area, [m2 d-2]
     CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode   ,& !input  :layer/node/branch leaf area, [m2 d-2]
     StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch      ,& !input  :stem surface area, [m2 d-2]
-    CanopyStalkArea_lbrch => plt_morph%CanopyStalkArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyHeightZ_col     => plt_morph%CanopyHeightZ_col      ,& !input  :canopy layer height, [m]
     LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft      ,& !output :plant leaf+stem/stalk area, [m2 d-2]
     LeafStalkArea_col     => plt_morph%LeafStalkArea_col       & !output :stalk area of combined, each PFT canopy,[m^2 d-2]
@@ -243,7 +247,7 @@ module SurfaceRadiationMod
 
   if(I==6.and.J==22.and..false.)then
   CanopyLeafArea_lnode(1,1,1,1)=0.1
-  CanopyStalkArea_lbrch(1,1,1)=0.05
+  CanopyStalkSurfArea_lbrch(1,1,1)=0.05
   LeafAreaZsec_brch(:,1,1,1,1)=(/0.025,0.025,0.025,0.025/)
   StemAreaZsec_brch(:,1,1,1)=(/0.0125,0.0125,0.0125,0.0125/)
   endif
@@ -264,8 +268,8 @@ module SurfaceRadiationMod
 
           ENDDO D1130
           !add stem/stalk area
-          LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
-          LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkArea_lbrch(L,NB,NZ)
+          LeafStalkArea_pft(NZ) = LeafStalkArea_pft(NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
+          LeafStalkArea_col     = LeafStalkArea_col+CanopyStalkSurfArea_lbrch(L,NB,NZ)
         ENDIF
       enddo
     enddo
@@ -353,7 +357,7 @@ module SurfaceRadiationMod
   !     LeafStalkArea_pft,LeafStalkArea_col=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
   !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-  !     CanopyLeafArea_lnode,CanopyStalkArea_lbrch=leaf,stalk areas of PFT
+  !     CanopyLeafArea_lnode,CanopyStalkSurfArea_lbrch=leaf,stalk areas of PFT
   !     RAD,RadPARSolarBeam_col=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,RadPARDiffus_col=solar beam direct,diffuse SW,PAR
   !     SineSunInclAngle_col,TotSineSkyAngles_grd=sine of solar,sky angles

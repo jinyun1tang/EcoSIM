@@ -713,8 +713,8 @@ module PlantDisturbsMod
     CanopyLeafAareZ_col        => plt_morph%CanopyLeafAareZ_col         ,& !input  :total leaf area, [m2 d-2]
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col           ,& !input  :canopy layer height, [m]
     NumOfBranches_pft          => plt_morph%NumOfBranches_pft           ,& !input  :number of branches,[-]
-    CanopyStalkArea_lbrch      => plt_morph%CanopyStalkArea_lbrch       ,& !input  :plant canopy layer branch stem area, [m2 d-2]
-!    SeedBankSize_pft           => plt_morph%SeedBankSize_pft            ,& !output :seed bank size, in terms of number of seeds [d-2]
+    CanopyStalkSurfArea_lbrch  => plt_morph%CanopyStalkSurfArea_lbrch   ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+!    SeedBankSize_pft          => plt_morph%SeedBankSize_pft            ,& !output :seed bank size, in terms of number of seeds [d-2]
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col          ,& !input  :grid canopy leaf area, [m2 d-2]
     CanopyCutProxy_pft         => plt_distb%CanopyCutProxy_pft          ,& !inoput :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     PlantPopulation_pft        => plt_site%PlantPopulation_pft          ,& !inoput :plant population, [d-2]
@@ -725,7 +725,7 @@ module PlantDisturbsMod
     CanopySapwoodC_pft         => plt_biom%CanopySapwoodC_pft           ,& !inoput :canopy active stalk C, [g d-2]
     CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft        ,& !inoput :canopy leaf + sheath C, [g d-2]
     StalkStrutElms_pft         => plt_biom%StalkStrutElms_pft           ,& !inoput :canopy stalk structural element mass, [g d-2]
-    CanopyStemArea_pft         => plt_morph%CanopyStemArea_pft          ,& !inoput :plant stem area, [m2 d-2]
+    CanopyStemSurfArea_pft     => plt_morph%CanopyStemSurfArea_pft      ,& !inoput :plant stem area, [m2 d-2]
     ClumpFactor_pft            => plt_morph%ClumpFactor_pft              & !inoput :clumping factor for self-shading in canopy layer, [-]
   )
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
@@ -806,7 +806,7 @@ module PlantDisturbsMod
       !     GRAZING REMOVAL
       call GrazingPlant(yearIJ%I,yearIJ%J,NZ,HarvestedLeafC,HarvestedShethC,HarvestedEarC,HarvestedGrainC,&
         GrazedCanopyNonstC,HarvestedStalkC,HarvestedStalkRsrvC,HarvestedPetoleC,GrazedCanopyNoduleC,LeafLayerC_brch)
-
+      !
     ENDIF
     !
     !     HARVEST REMOVAL FROM TOP TO BOTTOM OF CANOPY
@@ -818,7 +818,7 @@ module PlantDisturbsMod
     CanopyLeafSheathC_pft(NZ)     = 0._r8
     StalkStrutElms_pft(:,NZ)     = 0._r8
     CanopySapwoodC_pft(NZ)       = 0._r8
-    CanopyStemArea_pft(NZ)       = 0._r8
+    CanopyStemSurfArea_pft(NZ)       = 0._r8
 
     D9840: DO NB=1,NumOfBranches_pft(NZ)
       CanopyLeafSheathC_pft(NZ)    = CanopyLeafSheathC_pft(NZ)+CanopyLeafSheathC_brch(NB,NZ)
@@ -827,7 +827,7 @@ module PlantDisturbsMod
         StalkStrutElms_pft(NE,NZ) = StalkStrutElms_pft(NE,NZ)+StalkStrutElms_brch(NE,NB,NZ)
       ENDDO
       D9830: DO L=1,NumCanopyLayers1
-        CanopyStemArea_pft(NZ)=CanopyStemArea_pft(NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+        CanopyStemSurfArea_pft(NZ)=CanopyStemSurfArea_pft(NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
       ENDDO D9830
     ENDDO D9840
     !
@@ -1582,9 +1582,9 @@ module PlantDisturbsMod
     FracLeafShethElmAlloc2Litr  => plt_allom%FracLeafShethElmAlloc2Litr   ,& !input  :leaf element allocation,[-]
     iHarvstType_pft             => plt_distb%iHarvstType_pft              ,& !input  :type of harvest,[-]
     LeafLayerElms_node          => plt_biom%LeafLayerElms_node            ,& !inoput :layer leaf element, [g d-2]
-    CanopyStalkArea_lbrch       => plt_morph%CanopyStalkArea_lbrch        ,& !inoput :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch       => plt_morph%CanopyStalkSurfArea_lbrch        ,& !inoput :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
-    CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !inoput :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft         => plt_morph%CanopyStemSurfAreaZ_pft          ,& !inoput :plant canopy layer stem area, [m2 d-2]
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft             & !output :canopy layer leaf C, [g d-2]
   )
@@ -1695,14 +1695,14 @@ module PlantDisturbsMod
           !
           CanopyLeafArea_lnode(L,K,NB,NZ)=FrcLeafMassLeft*CanopyLeafArea_lnode(L,K,NB,NZ)
           IF(K.EQ.1)THEN
-            CanopyStalkArea_lbrch(L,NB,NZ)=FrcLeafMassLeft*CanopyStalkArea_lbrch(L,NB,NZ)
+            CanopyStalkSurfArea_lbrch(L,NB,NZ)=FrcLeafMassLeft*CanopyStalkSurfArea_lbrch(L,NB,NZ)
           ENDIF
         ENDIF
       ENDDO D9845
     ENDDO D9855
     CanopyLeafAreaZ_pft(L,NZ) = 0._r8
     CanopyLeafCLyr_pft(L,NZ)  = 0._r8
-    CanopyStemAreaZ_pft(L,NZ) = CanopyStemAreaZ_pft(L,NZ)*FrcLeafMassLeft
+    CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ)*FrcLeafMassLeft
   ENDDO D9865
   call PrintInfo('end '//subname)
   end associate
@@ -1938,7 +1938,7 @@ module PlantDisturbsMod
     !     WTLS=total PFT leaf+PetolSheth C mass
     !     WTSTK=total PFT stalk C mass
     !     WVSTK=total PFT sapwood C mass
-    !     CanopyStalkArea_lbrch=total PFT stalk surface area
+    !     CanopyStalkSurfArea_lbrch=total PFT stalk surface area
     !
     IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction .or. PlantPopulation_pft(NZ).LE.0.0_r8)then
       isPlantBranchAlive_brch(NB,NZ)=iFalse      

@@ -394,7 +394,7 @@ module minimathmod
   pure function RichardsonNumber(RIB,TK1,TK2)result(ans)
   implicit none
   real(r8), intent(in) :: RIB  !isothermal RI
-  real(r8), intent(in) :: TK1, TK2
+  real(r8), intent(in) :: TK1, TK2 !temperature 1 and 2
 
   real(r8) :: ans
 

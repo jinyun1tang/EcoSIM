@@ -362,7 +362,7 @@ module grosubsMod
     TurgEff4CanopyResp_pft      => plt_rbgc%TurgEff4CanopyResp_pft        ,& !output :Turg pressure effect on canopy respiration, [-]
     CanopyLeafAreaZ_pft         => plt_morph%CanopyLeafAreaZ_pft          ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
-    CanopyStemAreaZ_pft         => plt_morph%CanopyStemAreaZ_pft          ,& !output :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft     => plt_morph%CanopyStemSurfAreaZ_pft      ,& !output :plant canopy layer stem surface area, [m2 d-2]
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr             ,& !output :root layer number primary axes, [d-2]
     NumAxesPerPrimRoot_pft      => plt_morph%NumAxesPerPrimRoot_pft       ,& !output :primary root axes number, [d-2]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
@@ -376,7 +376,7 @@ module grosubsMod
   D2: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ) = 0._r8
     CanopyLeafCLyr_pft(L,NZ)  = 0._r8
-    CanopyStemAreaZ_pft(L,NZ) = 0._r8
+    CanopyStemSurfAreaZ_pft(L,NZ) = 0._r8
   ENDDO D2
 
 
@@ -527,7 +527,7 @@ module grosubsMod
     ZEROS                     => plt_site%ZEROS                      ,& !input  :threshold zero for numerical stability,[-]  
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
-    CanopyStalkArea_lbrch     => plt_morph%CanopyStalkArea_lbrch     ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch     => plt_morph%CanopyStalkSurfArea_lbrch     ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
@@ -541,11 +541,11 @@ module grosubsMod
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
     CanopyN2Fix_pft           => plt_rbgc%CanopyN2Fix_pft            ,& !input :total canopy N2 fixation, [g d-2 h-1]                    
-    SetNumberSeeds_brch         => plt_morph%SetNumberSeeds_brch         ,& !input  :branch grain number, [d-2]
+    SetNumberSeeds_brch       => plt_morph%SetNumberSeeds_brch       ,& !input  :branch grain number, [d-2]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft   ,& !inoput :canopy nodule nonstructural element, [g d-2]
-    CanopyStemAreaZ_pft       => plt_morph%CanopyStemAreaZ_pft       ,& !inoput :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft   => plt_morph%CanopyStemSurfAreaZ_pft   ,& !inoput :plant canopy layer stem area, [m2 d-2]
     PlantExudElm_CumYr_pft    => plt_rbgc%PlantExudElm_CumYr_pft     ,& !inoput :total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
     PlantN2Fix_CumYr_pft      => plt_bgcr%PlantN2Fix_CumYr_pft       ,& !inoput :total plant N2 fixation, [g d-2 ]
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft   ,& !inoput :net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
@@ -564,7 +564,7 @@ module grosubsMod
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
     CanopySeedNumX_pft        => plt_morph%CanopySeedNumX_pft        ,& !output :last nonzero canopy grain number, [d-2]    
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
-    CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !output :plant stem area, [m2 d-2]
+    CanopyStemSurfArea_pft        => plt_morph%CanopyStemSurfArea_pft        ,& !output :plant stem area, [m2 d-2]
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft           ,& !output :canopy ear structural element, [g d-2]
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft         ,& !output :canopy grain structural element, [g d-2]
     HuskStrutElms_pft         => plt_biom%HuskStrutElms_pft          ,& !output :canopy husk structural element mass, [g d-2]
@@ -594,7 +594,7 @@ module grosubsMod
   CanopyLeafSheathC_pft(NZ) = 0._r8
   CanopySeedNum_pft(NZ)    = 0._r8
   CanopyLeafArea_pft(NZ)   = 0._r8
-  CanopyStemArea_pft(NZ)   = 0._r8
+  CanopyStemSurfArea_pft(NZ)   = 0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
@@ -604,7 +604,7 @@ module grosubsMod
     fNCLFW_pft(NZ)             = fNCLFW_pft(NZ)+fNCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
     fPCLFW_pft(NZ)             = fPCLFW_pft(NZ)+fPCLFW_brch(NB,NZ)*LeafAreaLive_brch(NB,NZ)
     DO L=1,NumCanopyLayers1
-      CanopyStemAreaZ_pft(L,NZ)=CanopyStemAreaZ_pft(L,NZ)+CanopyStalkArea_lbrch(L,NB,NZ)
+      CanopyStemSurfAreaZ_pft(L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
   if(CanopySeedNum_pft(NZ)>0._r8)CanopySeedNumX_pft(NZ)=CanopySeedNum_pft(NZ)
@@ -673,8 +673,8 @@ module grosubsMod
   plt_biom%CanopyLeafSheathC_pft(NZ) =0._r8
   plt_morph%CanopySeedNum_pft(NZ) =0._r8
   plt_morph%CanopyLeafArea_pft(NZ)=0._r8
-  plt_morph%CanopyStemArea_pft(NZ)=0._r8
-  plt_morph%CanopyStemAreaZ_pft(1:NumCanopyLayers1,NZ)=0._r8
+  plt_morph%CanopyStemSurfArea_pft(NZ)=0._r8
+  plt_morph%CanopyStemSurfAreaZ_pft(1:NumCanopyLayers1,NZ)=0._r8
 
   end subroutine ZeroPlantStates
 

@@ -367,15 +367,16 @@ contains
   !     AERODYNAMIC RESISTANCE OF CANOPY TO SNOW/RESIDUE/SOIL
   !     SURFACE ENERGY EXCHANGE WITH ATMOSPHERE
   !
-  !     ALFZ=parameter for canopy effect on windspeed
+  !     ALFZ=attenuation coefficient
   !
   ALFZ=2.0_r8*(1.0_r8-FracSWRad2Grnd_col(NY,NX))
-  IF(AbvCanopyBndlResist_col(NY,NX).GT.ZERO .AND. CanopyHeight_col(NY,NX).GT.SoilSurfRoughness_col(NY,NX) &
+  IF(RAerodynNeutral_col(NY,NX).GT.ZERO .AND. CanopyHeight_col(NY,NX).GT.SoilSurfRoughness_col(NY,NX) &
     .AND. ALFZ.GT.ZERO)THEN
     !If there are plants
     WindSpeedGrnd               = WindSpeedAtm_col(NY,NX)*EXP(-ALFZ)
+    !Choudhury and Monteith (1988)
     CanopyBndlResist_col(NY,NX) = AMIN1(RACX,AZMAX1(CanopyHeight_col(NY,NX)*EXP(ALFZ) &
-      /(ALFZ/AbvCanopyBndlResist_col(NY,NX))*AZMAX1(EXP(-ALFZ*SoilSurfRoughness_col(NY,NX)/CanopyHeight_col(NY,NX)) &
+      /(ALFZ/RAerodynNeutral_col(NY,NX))*AZMAX1(EXP(-ALFZ*SoilSurfRoughness_col(NY,NX)/CanopyHeight_col(NY,NX)) &
       -EXP(-ALFZ*(ZERO4PlantDisplace_col(NY,NX)+RoughHeight_col(NY,NX))/CanopyHeight_col(NY,NX)))))
   ELSE
     WindSpeedGrnd               = WindSpeedAtm_col(NY,NX)
@@ -409,7 +410,7 @@ contains
   VaporDiffusivityLitR_col(NY,NX) = TFACR*7.70E-02_r8
   VapDiffusResistanceLitR(NY,NX)  = DLYRR_COL(NY,NX)/VaporDiffusivityLitR_col(NY,NX)
 
-  ResistAreodynOverSoil_col(NY,NX) = CanopyBndlResist_col(NY,NX)+AbvCanopyBndlResist_col(NY,NX)
+  ResistAreodynOverSoil_col(NY,NX) = CanopyBndlResist_col(NY,NX)+RAerodynNeutral_col(NY,NX)
   ResistAreodynOverSnow_col(NY,NX) = ResistAreodynOverSoil_col(NY,NX)
   ResistAreodynOverLitr_col(NY,NX) = ResistAreodynOverSoil_col(NY,NX)+LitRSurfResistance
   RARG_col(NY,NX)                  = ResistAreodynOverLitr_col(NY,NX)

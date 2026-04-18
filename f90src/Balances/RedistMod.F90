@@ -1342,7 +1342,7 @@ module RedistMod
 
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
-      CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
+      CanopyBiomWater_col(NY,NX)         = CanopyBiomWater_col(NY,NX)-RAINR
       HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR

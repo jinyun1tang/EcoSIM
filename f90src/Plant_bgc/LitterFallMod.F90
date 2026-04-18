@@ -913,7 +913,7 @@ implicit none
     CanopyNodulNonstElms_brch  => plt_biom%CanopyNodulNonstElms_brch    ,& !output :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch  => plt_biom%CanopyNodulStrutElms_brch    ,& !output :branch nodule structural element, [g d-2]
     CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch         ,& !output :branch nonstructural element, [g d-2]
-    CanopyStalkArea_lbrch      => plt_morph%CanopyStalkArea_lbrch       ,& !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch      => plt_morph%CanopyStalkSurfArea_lbrch       ,& !output :plant canopy layer branch stem area, [m2 d-2]
     EarStrutElms_brch          => plt_biom%EarStrutElms_brch            ,& !output :branch ear structural chemical element mass, [g d-2]
     GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch     ,& !output :maximum grain C during grain fill, [g d-2]
     GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch          ,& !output :branch grain structural element mass, [g d-2]
@@ -1015,7 +1015,7 @@ implicit none
     ENDDO D8865
   ENDDO D8855
   D8875: DO L=1,NumCanopyLayers1
-    CanopyStalkArea_lbrch(L,NB,NZ)=0._r8
+    CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
     DO  N=1,NumLeafZenithSectors1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo

@@ -513,7 +513,7 @@ module PlantPhenolMod
     Root1stDepz_raxes   => plt_morph%Root1stDepz_raxes    ,& !input  :root layer depth, [m]
     ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft      ,& !input  :threshold zero for leaf calculation, [-]
     WatHeldOnCanopy_pft => plt_ew%WatHeldOnCanopy_pft     ,& !input  :canopy surface water content, [m3 d-2]
-    CanopyStemArea_pft  => plt_morph%CanopyStemArea_pft   ,& !input  :plant stem area, [m2 d-2]
+    CanopyStemSurfArea_pft  => plt_morph%CanopyStemSurfArea_pft   ,& !input  :plant stem area, [m2 d-2]
     SeedDepth_pft       => plt_morph%SeedDepth_pft        ,& !input  :seeding depth, [m]
     iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch  ,& !input  :plant growth stage, [-]
     VHeatCapCanopy_pft  => plt_ew%VHeatCapCanopy_pft       & !output :canopy heat capacity, [MJ d-2 K-1]
@@ -523,14 +523,14 @@ module PlantPhenolMod
   ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
   !
   ! iPlantCalendar_brch(ipltcal_Emerge,=emergence date
-  ! CanopyLeafArea_pft,CanopyStemArea_pft=leaf,stalk areas
+  ! CanopyLeafArea_pft,CanopyStemSurfArea_pft=leaf,stalk areas
   ! HypocotHeight_pft=hypocotyledon height
   ! SeedDepth_pft=seeding depth
   ! Root1stDepz_raxes=primary root depth,avoid plant the seed at the grid interface
   ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
   !
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
-    ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemArea_pft(NZ)
+    ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemSurfArea_pft(NZ)
     CanopyChk = (HypocotHeight_pft(NZ)+1.e-3_r8.GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_raxes(1,NZ).GT.(SeedDepth_pft(NZ)+1.e-8_r8)
     

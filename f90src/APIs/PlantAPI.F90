@@ -82,7 +82,7 @@ implicit none
   LWRadCanG_col(NY,NX)                                = plt_ew%LWRadCanG
   VapXAir2Canopy_col(NY,NX)                           = plt_ew%VapXAir2Canopy_col
   HeatFlx2Canopy_col(NY,NX)                           = plt_ew%HeatFlx2Canopy_col
-  CanopyWat_col(NY,NX)                                = plt_ew%CanopyWat_col
+  CanopyBiomWater_col(NY,NX)                                = plt_ew%CanopyBiomWater_col
   CanopyHeatStor_col(NY,NX)                           = plt_ew%CanopyHeatStor_col
   TRootGasLossDisturb_col(idg_beg:idg_NH3,NY,NX)      = plt_rbgc%TRootGasLossDisturb_col(idg_beg:idg_NH3)
   Canopy_NEE_col(NY,NX)                               = plt_bgcr%Canopy_NEE_col
@@ -197,7 +197,7 @@ implicit none
     CH2OSunlit_pft(NZ,NY,NX)            = plt_photo%CH2OSunlit_pft(NZ)         
     CH2OSunsha_pft(NZ,NY,NX)            = plt_photo%CH2OSunsha_pft(NZ)     
     CanopyMassC_pft(NZ,NY,NX)           = plt_biom%CanopyMassC_pft(NZ)
-    CanopyStemArea_pft(NZ,NY,NX)        = plt_morph%CanopyStemArea_pft(NZ)
+    CanopyStemSurfArea_pft(NZ,NY,NX)        = plt_morph%CanopyStemSurfArea_pft(NZ)
     CanopyNoduleNonstCConc_pft(NZ,NY,NX)  = plt_biom%CanopyNoduleNonstCConc_pft(NZ)
     CO2NetFix_pft(NZ,NY,NX)             = plt_bgcr%CO2NetFix_pft(NZ)
     RCanMaintDef_CO2_pft(NZ,NY,NX)      = plt_bgcr%RCanMaintDef_CO2_pft(NZ)
@@ -366,7 +366,7 @@ implicit none
     DO L=1,NumCanopyLayers
       CanopyLeafAreaZ_pft(L,NZ,NY,NX) = plt_morph%CanopyLeafAreaZ_pft(L,NZ)
       CanopyLeafCLyr_pft(L,NZ,NY,NX)  = plt_biom%CanopyLeafCLyr_pft(L,NZ)
-      CanopyStemAreaZ_pft(L,NZ,NY,NX) = plt_morph%CanopyStemAreaZ_pft(L,NZ)
+      CanopyStemSurfAreaZ_pft(L,NZ,NY,NX) = plt_morph%CanopyStemSurfAreaZ_pft(L,NZ)
     ENDDO
 
     DO L=0,NL_col(NY,NX)
@@ -411,7 +411,7 @@ implicit none
     
     DO NB=1,pltpar%MaxNumBranches
       DO L=1,NumCanopyLayers
-        CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)=plt_morph%CanopyStalkArea_lbrch(L,NB,NZ)
+        CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)=plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)
       ENDDO
       Hours2LeafOut_brch(NB,NZ,NY,NX) = plt_pheno%Hours2LeafOut_brch(NB,NZ)
       LeafAreaLive_brch(NB,NZ,NY,NX)  = plt_morph%LeafAreaLive_brch(NB,NZ)
@@ -765,7 +765,7 @@ implicit none
   plt_site%NU                         = NUM_col(NY,NX)
   plt_site%NK                         = NK_col(NY,NX)
   plt_site%OXYE                       = OXYE_col(NY,NX)
-  plt_ew%AbvCanopyBndlResist_col      = AbvCanopyBndlResist_col(NY,NX)
+  plt_ew%RAerodynNeutral_col      = RAerodynNeutral_col(NY,NX)
   plt_ew%RIB                          = RIB_col(NY,NX)
   plt_rad%SineSunInclAnglNxtHour_col  = SineSunInclAnglNxtHour_col(NY,NX)
   plt_rad%SineSunInclAngle_col        = SineSunInclAngle_col(NY,NX)
@@ -1039,7 +1039,7 @@ implicit none
   plt_ew%QVegET_col                                        = QVegET_col(NY,NX)
   plt_ew%HeatFlx2Canopy_col                              = HeatFlx2Canopy_col(NY,NX)
   plt_ew%LWRadCanG                                       = LWRadCanG_col(NY,NX)
-  plt_ew%CanopyWat_col                                   = CanopyWat_col(NY,NX)
+  plt_ew%CanopyBiomWater_col                                   = CanopyBiomWater_col(NY,NX)
   plt_ew%CanopyHeatStor_col                              = CanopyHeatStor_col(NY,NX)
   plt_bgcr%Canopy_NEE_col                                = Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)                                   = FERT(1:20,I1,NY,NX)
@@ -1191,7 +1191,7 @@ implicit none
     plt_distb%iHarvstType_pft(NZ)         = iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvstType_pft(NZ)         = jHarvstType_pft(NZ,I,NY,NX)
     plt_distb%THIN_pft(NZ)                = THIN_pft(NZ,I,NY,NX)
-    plt_morph%CanopyStemArea_pft(NZ)      = CanopyStemArea_pft(NZ,NY,NX)
+    plt_morph%CanopyStemSurfArea_pft(NZ)      = CanopyStemSurfArea_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)      = CanopyLeafArea_pft(NZ,NY,NX)
 
     plt_photo%O2I_pft(NZ)                      = O2I_pft(NZ,NY,NX)
@@ -1390,7 +1390,7 @@ implicit none
         ENDDO
       ENDDO
       DO  L=1,NumCanopyLayers
-        plt_morph%CanopyStalkArea_lbrch(L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)
+        plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)
       ENDDO
     enddo
 
@@ -1447,7 +1447,7 @@ implicit none
     ENDDO
 
     DO L=1,NumCanopyLayers
-      plt_morph%CanopyStemAreaZ_pft(L,NZ) = CanopyStemAreaZ_pft(L,NZ,NY,NX)
+      plt_morph%CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ,NY,NX)
       plt_morph%CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ,NY,NX)
       plt_biom%CanopyLeafCLyr_pft(L,NZ)   = CanopyLeafCLyr_pft(L,NZ,NY,NX)
     ENDDO

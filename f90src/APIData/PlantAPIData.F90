@@ -252,7 +252,7 @@ implicit none
   real(r8), pointer :: HypocotHeight_pft(:)            => null() !cotyledon height,                                                           [m]
   real(r8), pointer :: CanopyHeight4WatUptake_pft(:)   => null() !canopy height,                                                              [m]
   real(r8), pointer :: CanopyHeightZ_col(:)            => null() !canopy layer height,                                                        [m]
-  real(r8), pointer :: CanopyStemArea_pft(:)           => null() !plant stem area,                                                            [m2 d-2]
+  real(r8), pointer :: CanopyStemSurfArea_pft(:)           => null() !plant stem area,                                                            [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_pft(:)           => null() !plant canopy leaf area,                                                     [m2 d-2]
   real(r8), pointer :: ShootNodeNum_brch(:,:)          => null() !shoot node number,                                                          [-]
   real(r8), pointer :: ShootNodeNumAtInitFloral_brch(:,:)    => null() !shoot node number at floral initiation,                                     [-]
@@ -266,7 +266,7 @@ implicit none
   real(r8), pointer :: LeafAreaLive_brch(:,:)          => null() !branch leaf area,                                                           [m2 d-2]
   real(r8), pointer :: SinePetolShethAngle_pft(:)         => null() !sheath angle,                                                               [degree from horizontal]
   real(r8), pointer :: LeafAngleClass_pft(:,:)         => null() !fractionction of leaves in different angle classes,                         [-]
-  real(r8), pointer :: CanopyStemAreaZ_pft(:,:)        => null() !plant canopy layer stem area,                                               [m2 d-2]
+  real(r8), pointer :: CanopyStemSurfAreaZ_pft(:,:)        => null() !plant canopy layer stem area,                                               [m2 d-2]
   real(r8), pointer :: CanopyLeafAreaZ_pft(:,:)        => null() !canopy layer leaf area,                                                     [m2 d-2]
   real(r8), pointer :: LeafArea_node(:,:,:)            => null() !leaf area,                                                                  [m2 d-2]
   real(r8), pointer :: CanopySeedNum_pft(:)            => null() !canopy grain number,                                                        [d-2]
@@ -287,7 +287,7 @@ implicit none
   real(r8), pointer :: StalkNodeHeight_brch(:,:,:)  => null() !internode height,                                                           [m]
   real(r8), pointer :: StemAreaZsec_brch(:,:,:,:)      => null() !stem surface area,                                                          [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_lnode(:,:,:,:)   => null() !layer/node/branch leaf area,                                                [m2 d-2]
-  real(r8), pointer :: CanopyStalkArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area,                                        [m2 d-2]
+  real(r8), pointer :: CanopyStalkSurfArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area,                                        [m2 d-2]
   real(r8), pointer :: ClumpFactor_pft(:)              => null() !clumping factor for self-shading in canopy layer,                           [-]
   real(r8), pointer :: ShootNodeNumAtPlanting_pft(:)   => null() !number of nodes in seed,                                                    [-]
   real(r8), pointer :: CanopyHeight_pft(:)             => null() !canopy height,                                                              [m]
@@ -642,7 +642,7 @@ implicit none
   real(r8) :: VPA                           !vapor concentration, [m3 m-3]
   real(r8) :: EMS_Modify_Scalar_col                !canopy longwave radiation emissivity scalar
   real(r8) :: TairK                         !air temperature, [K]
-  real(r8) :: CanopyWat_col                 !total canopy water content stored with dry matter, [m3 d-2]
+  real(r8) :: CanopyBiomWater_col                 !total canopy water content stored with dry matter, [m3 d-2]
   real(r8) :: Eco_Heat_Latent_col           !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8) :: Air_Heat_Latent_store_col     !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VcumIceSnow_col               !ice volume in snowpack, [m3 d-2]
@@ -651,7 +651,7 @@ implicit none
   real(r8) :: Eco_Heat_Sens_col             !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight                   !canopy surface roughness height, [m]
   real(r8) :: ZERO4PlantDisplace_col        !zero plane displacement height, [m]
-  real(r8) :: AbvCanopyBndlResist_col       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: RAerodynNeutral_col       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_GrndSurf_col         !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8) :: HeatCanopy2Dist_col           !canopy energy +/- due to disturbance, [MJ /d2]
@@ -2097,7 +2097,7 @@ implicit none
   allocate(this%StalkHeight_pft(JP1)); this%StalkHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
-  allocate(this%CanopyStemArea_pft(JP1));this%CanopyStemArea_pft=spval
+  allocate(this%CanopyStemSurfArea_pft(JP1));this%CanopyStemSurfArea_pft=spval
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
   allocate(this%NMaxRootBotLayer_pft(JP1));this%NMaxRootBotLayer_pft=0
@@ -2130,7 +2130,7 @@ implicit none
   allocate(this%LeafAreaLive_brch(MaxNumBranches,JP1));this%LeafAreaLive_brch=spval
   allocate(this%SinePetolShethAngle_pft(JP1));this%SinePetolShethAngle_pft=spval
   allocate(this%LeafAngleClass_pft(NumLeafZenithSectors1,JP1));this%LeafAngleClass_pft=spval
-  allocate(this%CanopyStemAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyStemAreaZ_pft=spval
+  allocate(this%CanopyStemSurfAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyStemSurfAreaZ_pft=spval
   allocate(this%CanopyLeafAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
   allocate(this%LeafArea_node(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafArea_node=spval
   allocate(this%CanopySeedNum_pft(JP1));this%CanopySeedNum_pft=spval
@@ -2151,7 +2151,7 @@ implicit none
   allocate(this%StalkNodeHeight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%StalkNodeHeight_brch=spval
   allocate(this%StemAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
   allocate(this%CanopyLeafArea_lnode(NumCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lnode=0._r8
-  allocate(this%CanopyStalkArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkArea_lbrch=spval
+  allocate(this%CanopyStalkSurfArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkSurfArea_lbrch=spval
   allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval
   allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
   allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval
