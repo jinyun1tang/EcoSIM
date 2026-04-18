@@ -4,8 +4,9 @@ module StartqMod
   use DebugToolMod,     only: PrintInfo
   use UnitMod,          only: units
   use EcoSiMParDataMod, only: pltpar
-  use SoilPhysDataType
+  use PlantBGCPars, only : BlkDActCoarseRoots,BlkDLigCoarseRoots,SpecStalkVolume  
   use GridConsts
+  use SoilPhysDataType
   use FlagDataType
   use EcosimConst
   use TracerIDMod
@@ -20,7 +21,6 @@ module StartqMod
   use EcoSIMHistMod
   use GridDataType
   use EcoSIMConfig
-  use PlantBGCPars
   use PlantMathFuncMod
   implicit none
 
@@ -481,34 +481,39 @@ module StartqMod
 !------------------------------------------------------------------------------------------
 
   subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
-
+  !
+  use GridConsts, only : MaxNumBranches,NumGrowthStages,MaxNumRootAxes
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  character(len=*), parameter :: subname='InitPlantPhenoMorphoBio'
   integer :: K,L,M,N,NB
-!
-!     INITIALIZE PLANT PHENOLOGY
-!
-!     PP=population (grid cell-1)
-!
-  PlantPopulation_pft(NZ,NY,NX)  = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-  doInitPlant_pft(NZ,NY,NX)      = ifalse
-  isPlantShootAlive_pft(NZ,NY,NX) = iTrue
-  isPlantRootAlive_pft(NZ,NY,NX)  = iTrue
-  BranchNumber_pft(NZ,NY,NX)     = 0
-  NumOfBranches_pft(NZ,NY,NX)    = 0
-  HypocotHeight_pft(NZ,NY,NX)    = 0._r8
-  CanopyHeight_pft(NZ,NY,NX)     = 0._r8
-  Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX)=0._r8
-  Days4FalseBreak_pft(NZ,NY,NX) = 0
+
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE PLANT PHENOLOGY
+  !
+  !     PP=population (grid cell-1)
+  !
+  PlantPopulation_pft(NZ,NY,NX)         = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  doInitPlant_pft(NZ,NY,NX)             = ifalse
+  isPlantShootAlive_pft(NZ,NY,NX)       = iTrue
+  isPlantRootAlive_pft(NZ,NY,NX)        = iTrue
+  BranchNumber_pft(NZ,NY,NX)            = 0
+  NumOfBranches_pft(NZ,NY,NX)           = 0
+  HypocotHeight_pft(NZ,NY,NX)           = 0._r8
+  CanopyHeight_pft(NZ,NY,NX)            = 0._r8
+  Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX) = 0._r8
+  Days4FalseBreak_pft(NZ,NY,NX)         = 0
+
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)                = iTrue
-    EnablePlantLeafOut_brch(NB,NZ,NY,NX)               = iTrue
+    EnablePlantLeafOut_brch(NB,NZ,NY,NX)           = iTrue
     doPlantLeaveOff_brch(NB,NZ,NY,NX)              = iTrue
     Prep4Literfall_brch(NB,NZ,NY,NX)               = ifalse
     Hours4LiterfalAftMature_brch(NB,NZ,NY,NX)      = 0
     MatureGroup_brch(NB,NZ,NY,NX)                  = MatureGroup_pft(NZ,NY,NX)
     ShootNodeNum_brch(NB,NZ,NY,NX)                 = ShootNodeNumAtPlanting_pft(NZ,NY,NX)
-    ShootNodeNumAtInitFloral_brch(NB,NZ,NY,NX)           = ShootNodeNum_brch(NB,NZ,NY,NX)
+    ShootNodeNumAtInitFloral_brch(NB,NZ,NY,NX)      = ShootNodeNum_brch(NB,NZ,NY,NX)
     ShootNodeNumAtAnthesis_brch(NB,NZ,NY,NX)         = 0._r8
     NumOfLeaves_brch(NB,NZ,NY,NX)                  = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ,NY,NX)       = 0._r8
@@ -556,10 +561,10 @@ module StartqMod
   SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   
   D25: DO NB=1,MaxNumBranches
-    SapwoodBiomassC_brch(NB,NZ,NY,NX)      = 0._r8
+    SapwoodBiomassC_brch(NB,NZ,NY,NX)    = 0._r8
     CanopyLeafSheathC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
-    SetNumberSeeds_brch(NB,NZ,NY,NX)         = 0._r8
+    SetNumberSeeds_brch(NB,NZ,NY,NX)     = 0._r8
     GrainSeedBiomCMean_brch(NB,NZ,NY,NX) = 0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)       = 0._r8
     NH3Dep2Can_brch(NB,NZ,NY,NX)         = 0._r8
@@ -574,15 +579,15 @@ module StartqMod
     ENDDO D5
 
     DO K=0,MaxNodesPerBranch
-      LeafArea_node(K,NB,NZ,NY,NX)                          = 0._r8
-      StalkNodeHeight_brch(K,NB,NZ,NY,NX)                    = 0._r8
-      StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                  = 0._r8
-      PetoleLength_node(K,NB,NZ,NY,NX)                        = 0._r8
-      LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)      = 0._r8
-      PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)   = 0._r8
+      LeafArea_node(K,NB,NZ,NY,NX)                               = 0._r8
+      StalkNodeHeight_brch(K,NB,NZ,NY,NX)                        = 0._r8
+      StalkNodeVertLength_brch(K,NB,NZ,NY,NX)                    = 0._r8
+      PetoleLength_node(K,NB,NZ,NY,NX)                           = 0._r8
+      LeafElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX)       = 0._r8
+      PetolShethElmntNode_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = 0._r8
       StructInternodeElms_brch(1:NumPlantChemElms,K,NB,NZ,NY,NX) = 0._r8
-      LeafProteinC_node(K,NB,NZ,NY,NX)                      = 0._r8
-      PetoleProteinC_node(K,NB,NZ,NY,NX)                    = 0._r8
+      LeafProteinC_node(K,NB,NZ,NY,NX)                           = 0._r8
+      PetoleProteinC_node(K,NB,NZ,NY,NX)                         = 0._r8
 
       D55: DO L=1,NumCanopyLayers
         CanopyLeafArea_lnode(L,K,NB,NZ,NY,NX)=0._r8
@@ -602,6 +607,7 @@ module StartqMod
       ENDIF
     enddo
   ENDDO D25
+
   D35: DO L=1,NumCanopyLayers
     CanopyLeafAreaZ_pft(L,NZ,NY,NX) = 0._r8
     CanopyLeafCLyr_pft(L,NZ,NY,NX)  = 0._r8
@@ -628,7 +634,7 @@ module StartqMod
   CanopyLeafArea_pft(NZ,NY,NX)       = 0._r8
   RootBiomCPerPlant_pft(NZ,NY,NX)    = 0._r8
   CanopyStemArea_pft(NZ,NY,NX)       = 0._r8
-
+  call PrintInfo('end '//subname)
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -715,26 +721,29 @@ module StartqMod
 !------------------------------------------------------------------------------------------
 
   subroutine InitRootMychorMorphoBio(NZ,NY,NX)
+  use GridConsts, only : MaxNumRootAxes
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  character(len=*), parameter :: subname='InitRootMychorMorphoBio'
   integer :: K,L,M,N,NR
   REAL(R8) :: CCO2A
   REAL(R8) :: CCO2P
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
-!
-!     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
-!
-!     PSIRoot_pvr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
-!     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
-!     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
-!
-  NumPrimeRootAxes_pft(NZ,NY,NX)=0
-  RootNH4Uptake_pft(NZ,NY,NX)=0._r8
-  RootNO3Uptake_pft(NZ,NY,NX)=0._r8
-  RootH2PO4Uptake_pft(NZ,NY,NX)=0._r8
-  RootHPO4Uptake_pft(NZ,NY,NX)=0._r8
-  RootN2Fix_pft(NZ,NY,NX)=0._r8
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
+  !
+  !     PSIRoot_pvr,PSIRootOSMO_vr,PSIRootTurg_vr=root,myco total,osmotic,turgor water potl(MPa)
+  !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
+  !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
+  !
+  NumPrimeRootAxes_pft(NZ,NY,NX) = 0
+  RootNH4Uptake_pft(NZ,NY,NX)    = 0._r8
+  RootNO3Uptake_pft(NZ,NY,NX)    = 0._r8
+  RootH2PO4Uptake_pft(NZ,NY,NX)  = 0._r8
+  RootHPO4Uptake_pft(NZ,NY,NX)   = 0._r8
+  RootN2Fix_pft(NZ,NY,NX)        = 0._r8
 
   DO NR=1,MaxNumRootAxes
     RootSegBaseDepth_raxes(NR,NZ,NY,NX)                 = SeedDepth_pft(NZ,NY,NX)
@@ -801,8 +810,8 @@ module StartqMod
         Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)                              = 0._r8
         RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = 0._r8
       ENDDO D30
-
     ENDDO D40
+
     Root1stXNumL_pvr(L,NZ,NY,NX)             = 0._r8      
     DO NR=1,MaxNumRootAxes
       RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ,NY,NX) = 0._r8
@@ -811,11 +820,13 @@ module StartqMod
       Root1stLenPP_rpvr(L,NR,NZ,NY,NX)                              = 0._r8
       RootAge_rpvr(L,NR,NZ,NY,NX)                                 = 0._r8
     ENDDO
+
     D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
       DO  M=1,jskenc
         LitrfallElms_pvr(1:NumPlantChemElms,M,K,L,NZ,NY,NX)=0._r8
       enddo
     ENDDO D6400
+
     RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX) = 0._r8
     RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX) = 0._r8
     RootN2Fix_pvr(L,NZ,NY,NX)                              = 0._r8
@@ -827,6 +838,7 @@ module StartqMod
   RootNutUptake_pvr(ids_H2PO4,1:2,NL_col(NY,NX)+1:JZ,NZ,NY,NX)  = 0._r8
   RootNutUptake_pvr(ids_H2PO4B,1:2,NL_col(NY,NX)+1:JZ,NZ,NY,NX) = 0._r8
   RootLenDensPerPlant_pvr(1:2,NL_col(NY,NX)+1:JZ,NZ,NY,NX)      = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -834,8 +846,11 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  character(len=*), parameter :: subname='InitSeedMorphoBio'
   REAL(R8) :: FDM
   INTEGER :: NR,L,NB,NE
+
+  call PrintInfo('beg '//subname)
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 !
@@ -887,31 +902,12 @@ module StartqMod
       +PetolShethStrutElms_brch(NE,NB,NZ,NY,NX)+StalkStrutElms_brch(NE,NB,NZ,NY,NX) &
       +StalkRsrvElms_brch(NE,NB,NZ,NY,NX)+HuskStrutElms_brch(NE,NB,NZ,NY,NX)&
       +EarStrutElms_brch(NE,NB,NZ,NY,NX)+GrainStrutElms_brch(NE,NB,NZ,NY,NX) &
-      +CanopyNonstElms_brch(NE,NB,NZ,NY,NX)
-        
-!    ShootElms_pft(NE,NZ,NY,NX)=ShootElms_pft(NE,NZ,NY,NX)+ShootElms_brch(NE,NB,NZ,NY,NX) 
-      
+      +CanopyNonstElms_brch(NE,NB,NZ,NY,NX)              
   ENDDO
   
   RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)=0._r8
-  !roots
-!  DO NR=1,MaxNumRootAxes
-!    DO L=NU_col(NY,NX),NGTopRootLayer_pft(NZ,NY,NX)
-!      DO NE=1,NumPlantChemElms
-!        !add reserve to struct
-!        RootElms_pft(NE,NZ,NY,NX)=RootElms_pft(NE,NZ,NY,NX)+RootMyco1stStrutElms_rpvr(NE,L,NR,NZ,NY,NX)&
-!          +RootMyco2ndStrutElms_rpvr(NE,ipltroot,L,NR,NZ,NY,NX)
-!      ENDDO
-!    ENDDO    
-!  ENDDO
-  
-!  DO L=NU_col(NY,NX),NGTopRootLayer_pft(NZ,NY,NX)
-!    DO NE=1,NumPlantChemElms
-!        !add reserve to struct
-!      RootElms_pft(NE,NZ,NY,NX)=RootElms_pft(NE,NZ,NY,NX)+RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ,NY,NX)
-!    ENDDO
-!  ENDDO    
 
+  call PrintInfo('end '//subname)
   end subroutine InitSeedMorphoBio
 
   end module StartqMod

@@ -14,7 +14,7 @@ implicit none
   real(r8),allocatable ::  ResistAreodynOverLitr_col(:,:)          !aerodynamic resistance over litter [m]
   real(r8),allocatable ::  AScaledCdWOverSoil_col(:,:)             !area scaled conductance for latent heat flux over exposed soil [m^2 h]
   real(r8),allocatable ::  AScaledCdWOverLitr_col(:,:)             !area scaled conductance for latent heat flux over litter [m^2 h]
-  real(r8),allocatable ::  RARG(:,:)                               !
+  real(r8),allocatable ::  RARG_col(:,:)                           !
   real(r8),allocatable ::  AScaledCdHOverLitr_col(:,:)             !area scaled conductance for sensible heat flux over litter [MJ h /(m K)]
   real(r8),allocatable ::  VapDiffusResistanceLitR(:,:)            !
   real(r8),allocatable ::  WatFLo2LitrM_col(:,:)                   !
@@ -59,7 +59,7 @@ implicit none
   allocate(ResistAreodynOverLitr_col(JY,JX));        ResistAreodynOverLitr_col=0._r8
   allocate(AScaledCdWOverSoil_col(JY,JX));       AScaledCdWOverSoil_col=0._r8
   allocate(AScaledCdWOverLitr_col(JY,JX));       AScaledCdWOverLitr_col=0._r8
-  allocate(RARG(JY,JX));        RARG=0._r8
+  allocate(RARG_col(JY,JX));        RARG_col=0._r8
   allocate(AScaledCdHOverLitr_col(JY,JX));       AScaledCdHOverLitr_col=0._r8
   allocate(VapDiffusResistanceLitR(JY,JX));         VapDiffusResistanceLitR=0._r8  
   allocate(WatFLo2LitrM_col(JY,JX));       WatFLo2LitrM_col=0._r8
@@ -100,7 +100,7 @@ allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
   call destroy(ResistAreodynOverLitr_col)
   call destroy(AScaledCdWOverSoil_col)
   call destroy(AScaledCdWOverLitr_col)
-  call destroy(RARG)
+  call destroy(RARG_col)
   call destroy(AScaledCdHOverLitr_col)
   call destroy(VapDiffusResistanceLitR)  
   call destroy(WatFLo2LitrM_col)

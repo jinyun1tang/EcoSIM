@@ -1841,15 +1841,15 @@ implicit none
     long_name='CO2 solute concentration in litter',ptr_col=data1d_ptr,default='inactive')            
 
   data1d_ptr => this%h1D_EVAPN_col(beg_col:end_col)      
-  call hist_addfld1d(fname='EVAPN_col',units='mm H2O/m2/hr',avgflag='A',&
-    long_name='Column-integrated ground surface evaporation(<0 into atmosphere)',ptr_col=data1d_ptr)      
+  call hist_addfld1d(fname='EVAPGrnd_col',units='mm H2O/m2/hr',avgflag='A',&
+    long_name='Column-integrated ground surface evaporation(>0 into soil)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CondGasXSurf_col(beg_col:end_col)      
   call hist_addfld1d(fname='GasXSurfConduct_col',units='m/hr',avgflag='A',&
     long_name='Conductance for soil-air gas exchange',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_CANET_col(beg_col:end_col)
-  call hist_addfld1d(fname='CANET_col',units='mm H2O/m2/hr',avgflag='A',&
+  call hist_addfld1d(fname='QVegET_col',units='mm H2O/m2/hr',avgflag='A',&
     long_name='Column-integrated canopy evapotranspiration(<0 int atmosphere)',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_tSWC_col(beg_col:end_col)  
@@ -2134,9 +2134,8 @@ implicit none
     default='inactive')            
   
   data1d_ptr => this%h1D_TRANSPN_ptc(beg_ptc:end_ptc)      
-  call hist_addfld1d(fname='QvTransp_pft',units='mmH2O/m2/h',avgflag='A',&
-    long_name='Canopy transpiration (<0 into atmosphere)',ptr_patch=data1d_ptr,&
-    default='inactive')            
+  call hist_addfld1d(fname='QVegTransp_pft',units='mmH2O/m2/h',avgflag='A',&
+    long_name='Canopy transpiration (<0 into atmosphere)',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='UPTK_NH4_FLX_pft',units='gN/m2/hr',&
@@ -4327,7 +4326,7 @@ implicit none
         this%h1D_LEAF_PC_ptc(nptc)       = safe_adb(LeafStrutElms_pft(ielmp,NZ,NY,NX)+CanopyNonstElms_pft(ielmp,NZ,NY,NX), &
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_CAN_RN_ptc(nptc)        = MJ2W*RadNet2Canopy_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_CAN_LE_ptc(nptc)        = MJ2W*EvapTransLHeat_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_CAN_LE_ptc(nptc)        = MJ2W*CanopyEvapTransLHeat_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_H_ptc(nptc)         = MJ2W*HeatXAir2PCan_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_G_ptc(nptc)         = MJ2W*HeatStorCanopy_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_TEMPC_ptc(nptc)     = TdegCCanopy_pft(NZ,NY,NX)

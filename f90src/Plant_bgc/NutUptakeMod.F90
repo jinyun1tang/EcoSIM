@@ -343,7 +343,7 @@ module NutUptakeMod
 
   plt_rad%RadNet2Canopy_pft     = 0.0_r8
   plt_rad%LWRadCanopy_pft       = 0.0_r8
-  plt_ew%EvapTransLHeat_pft     = 0.0_r8
+  plt_ew%CanopyEvapTransLHeat_pft     = 0.0_r8
   plt_ew%HeatXAir2PCan_pft      = 0.0_r8
   plt_ew%HeatStorCanopy_pft     = 0.0_r8
   plt_ew%Transpiration_pft      = 0.0_r8
@@ -1400,9 +1400,8 @@ module NutUptakeMod
   !     OQC=soil DOC
   !     RDFOMC,RDFOMN,RDFOMP=nonstructl C,N,P exchange:-ve=exudn,+ve=uptake
   !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation
-  !     Air_Heat_Latent_store_col,Air_Heat_Sens_store_col=total fluxes x blr for calculating canopy air temperature,
   !     vapor pressure in watsub.f
-  !      EvapTransLHeat_pft,SFLXC=canopylatent,sensible heat fluxes
+  !      CanopyEvapTransLHeat_pft,SFLXC=canopylatent,sensible heat fluxes
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !

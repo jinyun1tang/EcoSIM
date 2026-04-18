@@ -310,7 +310,7 @@ module ExtractsMod
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
     CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !input  :plant stem area, [m2 d-2]
     PlantElmBalCum_pft         => plt_site%PlantElmBalCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
+    CanopyEvapTransLHeat_pft        => plt_ew%CanopyEvapTransLHeat_pft           ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
     HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           ,& !input  :canopy storage heat flux, [MJ d-2 h-1]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft            ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             ,& !input  :canopy longwave radiation, [MJ d-2 h-1]
@@ -351,7 +351,7 @@ module ExtractsMod
 !     Eco_NetRad_col=total net SW+LW absorbed by canopy
 !     RadNet2Canopy_pft=PFT net SW+LW absorbed by canopy
 !     Eco_Heat_Latent_col=total canopy latent heat flux
-!     EvapTransLHeat_pft=PFT canopy latent heat flux
+!     CanopyEvapTransLHeat_pft=PFT canopy latent heat flux
 !     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan_pft=PFT canopy sensible heat flux
 !     Eco_Heat_GrndSurf_col=total canopy storage heat flux
@@ -375,7 +375,7 @@ module ExtractsMod
 !
   
   Eco_NetRad_col         = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
-  Eco_Heat_Latent_col    = Eco_Heat_Latent_col+EvapTransLHeat_pft(NZ)
+  Eco_Heat_Latent_col    = Eco_Heat_Latent_col+CanopyEvapTransLHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)

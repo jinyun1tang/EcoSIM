@@ -41,7 +41,7 @@ implicit none
   integer :: MMit
   public :: InitSnowLayers
   public :: SnowRedistributionM
-  public :: SnowBNDResistance
+  public :: CalcSnowBNDResistance
   public :: ZeroSnowFluxM
   public :: PrepIterSnowLayerM
   public :: InitSnowAccumsM
@@ -1362,7 +1362,7 @@ contains
 
   end subroutine ZeroSnowFluxM
 !------------------------------------------------------------------------------------------
-  FUNCTION SnowBNDResistance(NY,NX)result(RAS)
+  FUNCTION CalcSnowBNDResistance(NY,NX)result(RAS)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8) :: RAS
@@ -1396,7 +1396,7 @@ contains
       ENDIF
     ENDDO D9775
   ENDIF
-  END FUNCTION SnowBNDResistance
+  END FUNCTION CalcSnowBNDResistance
 
 !------------------------------------------------------------------------------------------
 

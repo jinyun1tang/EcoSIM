@@ -71,7 +71,7 @@ module SurfaceRadiationMod
     ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
     AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     KoppenClimZone          => plt_site%KoppenClimZone           ,& !input  :Koppen climate zone for the grid,[-]
-    SoilSurfRoughnesst0_col => plt_site%SoilSurfRoughnesst0_col  ,& !input  :initial soil surface roughness height, [m]
+    SoilSurfRoughness_col => plt_site%SoilSurfRoughness_col  ,& !input  :initial soil surface roughness height, [m]
     ZEROS                   => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
     NU                      => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
     TairK                   => plt_ew%TairK                      ,& !input  :air temperature, [K]
@@ -115,7 +115,7 @@ module SurfaceRadiationMod
     IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN
       RoughHeight=AMAX1(0.001_r8,ZE,ZW)
     ELSE
-      RoughHeight=AMAX1(0.001_r8,ZE,SoilSurfRoughnesst0_col)
+      RoughHeight=AMAX1(0.001_r8,ZE,SoilSurfRoughness_col)
     ENDIF
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
@@ -336,7 +336,7 @@ module SurfaceRadiationMod
     RadSWDiffus_col       => plt_rad%RadSWDiffus_col        ,& !inoput :diffuse shortwave radiation, [W m-2]
     RadDirectPAR_col      => plt_rad%RadDirectPAR_col       ,& !inoput :direct PAR, [umol m-2 s-1]
     RadPARDiffus_col      => plt_rad%RadPARDiffus_col       ,& !inoput :diffuse PAR, [umol m-2 s-1]
-    FracSWRad2Grnd_col    => plt_rad%FracSWRad2Grnd_col     ,& !inoput :fraction of radiation intercepted by ground surface, [-]
+    FracSWRad2Grnd_col    => plt_rad%FracSWRad2Grnd_col     ,& !inoput :fraction of radiation directed at ground surface, [-]
     RadSWbyCanopy_pft     => plt_rad%RadSWbyCanopy_pft      ,& !output :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     RadSWSolarBeam_col    => plt_rad%RadSWSolarBeam_col     ,& !output :shortwave radiation in solar beam, [MJ m-2 h-1]
     RadPARSolarBeam_col   => plt_rad%RadPARSolarBeam_col    ,& !output :PAR radiation in solar beam, [umol m-2 s-1]

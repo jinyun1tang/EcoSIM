@@ -160,7 +160,7 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
@@ -183,6 +183,7 @@ contains
 
   lsoilCompaction=.false.
   idebug_day  =-1
+  idebug_year =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
   grid_mode             = 3
@@ -419,7 +420,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   DO I  = 1, DazCurrYear
     call DebugPrint("beg step",I*1000)
     yearIJ%I=I
-    if(idebug_day==I)then
+    if(idebug_day==I .and. idebug_year==iYearCurrent)then
       lverb=.true.      
     else
       lverb=lverb0

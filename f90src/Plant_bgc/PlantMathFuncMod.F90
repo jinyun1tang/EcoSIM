@@ -4,6 +4,7 @@ module PlantMathFuncMod
   ! code for small functions used by plant processes
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun, iulog
+  use PlantAPIData
   use DebugToolMod
   use EcoSimConst
   use MiniMathMod
@@ -559,5 +560,25 @@ contains
        end if
     end do
   end subroutine interp_linear_clamped
+
+!--------------------------------------------------------------------
+  pure function CalcStomataResist4H2O(NZ)result(Stomata_Resist)
+  implicit none
+  integer, intent(in) :: NZ
+  real(r8) :: Stomata_Stress
+  real(r8) :: Stomata_Resist
+  
+  associate(                                                               &
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
+    PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]  
+    CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft          & !input  :maximum stomatal resistance to vapor, [s h-1]
+  )
+  !greater value of RCS_pft(NZ), more sensitive to turgor change.
+
+  Stomata_Stress = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
+  Stomata_Resist = CanopyMinStomaResistH2O_pft(NZ)+(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
+  end associate
+  end function CalcStomataResist4H2O
 
 end module PlantMathFuncMod

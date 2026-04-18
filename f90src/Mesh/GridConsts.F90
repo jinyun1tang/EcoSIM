@@ -14,8 +14,8 @@ implicit none
   integer :: JV
   integer :: JD
   integer :: NMaxRootSegs
-  integer :: MaxNumBranches=10      !number of plant branches
-  integer :: NumGrowthStages     !number of plant growth states
+  integer :: MaxNumBranches   =10      !number of plant branches
+  integer :: NumGrowthStages  =10   !number of plant growth states
   integer :: NumOfPlantMorphUnits !
   integer :: MaxNumRootAxes     !maximum number of root layers
   integer :: NumLitterGroups !number of liter groups

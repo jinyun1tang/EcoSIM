@@ -56,7 +56,6 @@ implicit none
       FracSurfBareSoil_col(NY,NX)=1._r8
     endif
 
-!    if(FracSurfBareSoil_col(NY,NX)+ZEROL>1._r8)FracSurfBareSoil_col(NY,NX)=1._r8
   ELSE
     FracSurfBareSoil_col(NY,NX)=1.0_r8
   ENDIF
@@ -251,7 +250,7 @@ implicit none
   character(len=*), parameter :: subname='SurfLitterIterationM'
   integer  :: NN
   real(r8) :: tk1pre,VHCPRXX
-  real(r8) :: RAa,VaporSoi1,VapLitR,VPY
+  real(r8) :: VaporSoi1,VapLitR,VPY
   real(r8) :: TKXR,TK1X,TKY
   real(r8) :: FLVC,FLVX,ENGYR
   real(r8) :: HFLWC,HFLWX
@@ -310,20 +309,20 @@ implicit none
       ! CdLitREvap,CdLitRHSens=conductance for litter latent,sensible heat fluxes
       !
       RI   = RichardsonNumber(RIB_col(NY,NX),TKQ_col(NY,NX),TKR1)
-      RAGX = AMAX1(RAM,0.8_r8*ResistAreodynOverLitr_col(NY,NX),&
-        AMIN1(1.2_r8*ResistAreodynOverLitr_col(NY,NX),RARG(NY,NX)/(1.0_r8-10.0_r8*RI)))
-      ResistAreodynOverLitr_col(NY,NX) = RAGX
-      RAa                              = RAGX
-      CdLitREvap                       = AScaledCdWOverLitr_col(NY,NX)/(RAa+RZ)
-      CdLitRHSens                      = AScaledCdHOverLitr_col(NY,NX)/RAa
-!
-!     NET RADIATION AT RESIDUE SURFACE
-!
-!     LWRadLitR2=longwave radiation emitted by litter
-!     ThetaWLitR=litter water content
-!     VWatLitRHoldCapcity=maximum water retention by litter
-!     PSISM1=litter matric water potential
-!
+      RAGX = ResistAreodynOverLitr_col(NY,NX)
+
+      !update aerodynamic resistance over litter
+      ResistAreodynOverLitr_col(NY,NX) = AMAX1(RAM,0.8_r8*RAGX,AMIN1(1.2_r8*RAGX,RARG_col(NY,NX)/(1.0_r8-10.0_r8*RI)))            
+      CdLitREvap                       = AScaledCdWOverLitr_col(NY,NX)/(ResistAreodynOverLitr_col(NY,NX)+RZ)
+      CdLitRHSens                      = AScaledCdHOverLitr_col(NY,NX)/ResistAreodynOverLitr_col(NY,NX)
+      !
+      !     NET RADIATION AT RESIDUE SURFACE
+      !
+      !     LWRadLitR2=longwave radiation emitted by litter
+      !     ThetaWLitR=litter water content
+      !     VWatLitRHoldCapcity=maximum water retention by litter
+      !     PSISM1=litter matric water potential
+      !
       LWRadLitR2   = LWEmscefLitR_col(NY,NX)*TKR1**4/real(NPR,kind=r8)
       Radnet2LitR2 = Radt2LitR-LWRadLitR2
 
@@ -350,18 +349,17 @@ implicit none
         ThetaWLitR         = POROS0_col(NY,NX)
         PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
       ENDIF
-
-!
-!     VAPOR FLUX AT RESIDUE SURFACE
-!
-!     VapLitR,VaporSoi1,VPQ_col=vapor pressure in litter,soil,canopy air, m3/m-3
-!     TKS1=soil temperature
-!     EVAPR2=negative of litter evaporation,<0 into atmosphere
-!     LatentHeatAir2LitR2=litter latent heat flux
-!     VAP=latent heat of evaporation
-!     HeatSensEvapAir2LitR2=convective heat of evaporation flux
-!     
-!     in litter      
+      !
+      !     VAPOR FLUX AT RESIDUE SURFACE
+      !
+      !     VapLitR,VaporSoi1,VPQ_col=vapor pressure in litter,soil,canopy air, m3/m-3
+      !     TKS1=soil temperature
+      !     EVAPR2=negative of litter evaporation,<0 into atmosphere
+      !     LatentHeatAir2LitR2=litter latent heat flux
+      !     VAP=latent heat of evaporation
+      !     HeatSensEvapAir2LitR2=convective heat of evaporation flux
+      !     
+      !     in litter      
       VapLitR               = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))
       VaporSoi1             = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3
       EVAPR2                = AMAX1(-AZMAX1(VWatLitr2)*dts_wat,CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]

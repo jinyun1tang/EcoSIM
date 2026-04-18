@@ -233,7 +233,7 @@ implicit none
     ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)
     ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)
     DeltaTKC_pft(NZ,NY,NX)           = plt_ew%DeltaTKC_pft(NZ)
-    EvapTransLHeat_pft(NZ,NY,NX)     = plt_ew%EvapTransLHeat_pft(NZ)
+    CanopyEvapTransLHeat_pft(NZ,NY,NX)     = plt_ew%CanopyEvapTransLHeat_pft(NZ)
     HeatXAir2PCan_pft(NZ,NY,NX)      = plt_ew%HeatXAir2PCan_pft(NZ)
     TKC_pft(NZ,NY,NX)                = plt_ew%TKC_pft(NZ)
     Transpiration_pft(NZ,NY,NX)      = plt_ew%Transpiration_pft(NZ)

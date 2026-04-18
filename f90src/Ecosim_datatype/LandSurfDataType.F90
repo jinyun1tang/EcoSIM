@@ -9,7 +9,7 @@ module LandSurfDataType
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   real(r8) :: ALTIG                                                      !Altitude of landscape, [m]
-  real(r8),target,allocatable ::  SoilSurfRoughnesst0_col(:,:)           !Initial soil surface roughness height, [m]
+  real(r8),target,allocatable ::  SoilSurfRoughness_col(:,:)           !Initial soil surface roughness height, [m]
   real(r8),target,allocatable ::  ZERO4PlantDisplace_col(:,:)            !Zero plane displacement height, [m]
   real(r8),target,allocatable ::  RoughHeight_col(:,:)                   !Canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                  !Soil surface roughness height for calculating runoff velocity, [m]
@@ -31,7 +31,7 @@ contains
   subroutine InitLandSurfData
 
   implicit none
-  allocate(SoilSurfRoughnesst0_col(JY,JX));          SoilSurfRoughnesst0_col=0._r8
+  allocate(SoilSurfRoughness_col(JY,JX));          SoilSurfRoughness_col=0._r8
   allocate(ZERO4PlantDisplace_col(JY,JX));          ZERO4PlantDisplace_col=0._r8
   allocate(RoughHeight_col(JY,JX));          RoughHeight_col=0._r8
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
@@ -53,7 +53,7 @@ contains
   subroutine DestructLandSurfData
   use abortutils, only : destroy
   implicit none
-  call destroy(SoilSurfRoughnesst0_col)
+  call destroy(SoilSurfRoughness_col)
   call destroy(ZERO4PlantDisplace_col)
   call destroy(RoughHeight_col)
   call destroy(SoiSurfRoughness)

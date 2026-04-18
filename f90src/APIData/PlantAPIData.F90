@@ -44,7 +44,7 @@ implicit none
   real(r8) :: DayLenthPrev                         !daylength of previous day, [h]
   real(r8) :: DayLenthCurrent                      !current daylength of the grid, [h]
   real(r8) :: DayLenthMax_col                      !maximum daylength of the grid, [h]
-  real(r8) :: SoilSurfRoughnesst0_col              !initial soil surface roughness height, [m]
+  real(r8) :: SoilSurfRoughness_col              !initial soil surface roughness height, [m]
   real(r8) :: OXYE                                 !atmospheric O2 concentration, [umol mol-1]
   real(r8) :: PlantPopu_col                        !total plant population, [plants d-2]
   real(r8) :: POROS1                               !top layer soil porosity, [m3 m-3]
@@ -640,7 +640,7 @@ implicit none
   real(r8) :: HeatFlx2Canopy_col            !total canopy heat flux, [MJ  d-2]
   real(r8) :: H2OLoss_CumYr_col             !total subsurface water flux, [m3 d-2]
   real(r8) :: VPA                           !vapor concentration, [m3 m-3]
-  real(r8) :: EMS_scalar_col                !canopy longwave radiation emissivity scalar
+  real(r8) :: EMS_Modify_Scalar_col                !canopy longwave radiation emissivity scalar
   real(r8) :: TairK                         !air temperature, [K]
   real(r8) :: CanopyWat_col                 !total canopy water content stored with dry matter, [m3 d-2]
   real(r8) :: Eco_Heat_Latent_col           !ecosystem latent heat flux, [MJ d-2 h-1]
@@ -664,7 +664,7 @@ implicit none
   real(r8), pointer :: PSICanopy_pft(:)               => null()    !canopy total water potential,                                 [Mpa]
   real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation,                                           [m3 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)          => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
-  real(r8), pointer :: EvapTransLHeat_pft(:)          => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
+  real(r8), pointer :: CanopyEvapTransLHeat_pft(:)          => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
   real(r8), pointer :: CanopyIsothBndlResist_pft(:)   => null()    !canopy isothermal boundary later resistance,                  [h m-1]
   real(r8), pointer :: TKS_vr(:)                      => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin_pft(:)         => null()    !minimum daily canopy water potential,                         [MPa]
@@ -1311,7 +1311,7 @@ implicit none
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
   allocate(this%HeatStorCanopy_pft(JP1));this%HeatStorCanopy_pft=spval
-  allocate(this%EvapTransLHeat_pft(JP1));this%EvapTransLHeat_pft=spval
+  allocate(this%CanopyEvapTransLHeat_pft(JP1));this%CanopyEvapTransLHeat_pft=spval
   allocate(this%WatHeldOnCanopy_pft(JP1));this%WatHeldOnCanopy_pft=spval
   allocate(this%VHeatCapCanopy_pft(JP1));this%VHeatCapCanopy_pft=spval
   allocate(this%CanopyBiomWater_pft(JP1));this%CanopyBiomWater_pft=spval
