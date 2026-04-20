@@ -273,7 +273,7 @@ implicit none
 
     !Fill in column-wise values needed for prescribed phenology
     CanopyHeight_col(NY,NX) = 17.0
-    LAI_col(NX,NY) = a_LAI(NY)
+    LAI_col(NY,NX) = a_LAI(NY)
     irootType_col(NY,NX) = a_VEG(NY)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
     !Fill number of plants from npfts
