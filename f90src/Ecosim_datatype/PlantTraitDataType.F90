@@ -44,7 +44,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PetolShethAngle_pft(:,:,:)                    !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  SineBranchAngle_pft(:,:,:)                 !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  SinePetolShethAngle_pft(:,:,:)                !sheath angle, [degree from horizontal]
-  real(r8),target,allocatable ::  CanopyIsothBndlResist_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
+  real(r8),target,allocatable ::  RawIsoTCanopy2Atm_pft(:,:,:)           !ccanopy isothermal boundary later resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyHeight4WatUptake_pft(:,:,:)          !effecive canopy height for water uptake, [m]
   real(r8),target,allocatable ::  LeafArea_node(:,:,:,:,:)               !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  PetoleLength_node(:,:,:,:,:)             !sheath height, [m]
@@ -226,7 +226,7 @@ contains
   allocate(PetolShethAngle_pft(JP,JY,JX));    PetolShethAngle_pft=0._r8
   allocate(SineBranchAngle_pft(JP,JY,JX));    SineBranchAngle_pft=0._r8
   allocate(SinePetolShethAngle_pft(JP,JY,JX));    SinePetolShethAngle_pft=0._r8
-  allocate(CanopyIsothBndlResist_pft(JP,JY,JX));      CanopyIsothBndlResist_pft=0._r8
+  allocate(RawIsoTCanopy2Atm_pft(JP,JY,JX));      RawIsoTCanopy2Atm_pft=0._r8
   allocate(CanopyHeight4WatUptake_pft(JP,JY,JX));    CanopyHeight4WatUptake_pft=0._r8
   allocate(PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP,JY,JX));PARTS_brch=0._r8
   allocate(LeafArea_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));LeafArea_node=0._r8
@@ -406,7 +406,7 @@ contains
   call destroy(PetolShethAngle_pft)
   call destroy(SineBranchAngle_pft)
   call destroy(SinePetolShethAngle_pft)
-  call destroy(CanopyIsothBndlResist_pft)
+  call destroy(RawIsoTCanopy2Atm_pft)
   call destroy(CanopyHeight4WatUptake_pft)
   call destroy(LeafArea_node)
   call destroy(PetoleLength_node)

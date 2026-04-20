@@ -9,7 +9,7 @@ implicit none
   logical :: column_mode=.false.
   logical :: do_instequil=.false.
   logical :: brnch_retain_casename = .false.
-  integer :: IFLGW                 !flag for raising Z0G with vegn
+  integer :: iFlagRaiseZ0GbyVeg                 !flag for raising Z0G with vegn
 
   character(len=256), public :: rpntdir = '.'
   character(len=256), public :: rpntfil = 'rpointer.esim'

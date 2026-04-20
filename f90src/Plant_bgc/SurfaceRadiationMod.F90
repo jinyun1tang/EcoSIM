@@ -60,38 +60,43 @@ module SurfaceRadiationMod
   subroutine CalcBoundaryLayerProperties(DepthSurfWatIce)
   implicit none
   real(r8), intent(in) :: DepthSurfWatIce
+  character(len=*), parameter :: subname='CalcBoundaryLayerProperties'
   real(r8) :: ARLSC
   real(r8) :: ARLSG
   real(r8) :: ZX,ZY,ZE
-  REAL(R8) :: ZZ
+  REAL(R8) :: ZWind,HZnorm
+  real(r8) :: WindH !wind speed at canopy height [m/h]
 !     begin_execution
-  associate(                                                      &
-    WindSpeedAtm_col        => plt_site%WindSpeedAtm_col         ,& !input  :wind speed, [m h-1]
-    WindMesureHeight_col    => plt_site%WindMesureHeight_col     ,& !input  :wind speed measurement height, [m]
-    ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
-    AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    KoppenClimZone          => plt_site%KoppenClimZone           ,& !input  :Koppen climate zone for the grid,[-]
-    SoilSurfRoughness_col   => plt_site%SoilSurfRoughness_col    ,& !input  :initial soil surface roughness height, [m]
-    ZEROS                   => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
-    NU                      => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
-    TairK                   => plt_ew%TairK                      ,& !input  :air temperature, [K]
-    VLHeatCapSnowMin_col    => plt_ew%VLHeatCapSnowMin_col       ,& !input  :minimum snowpack heat capacity, [MJ d-2 K-1]
-    SnowDepth               => plt_ew%SnowDepth                  ,& !input  :snowpack depth, [m]
-    VLHeatCapSurfSnow_col   => plt_ew%VLHeatCapSurfSnow_col      ,& !input  :snowpack heat capacity, [MJ m-3 K-1]
-    CanopyHeight_col        => plt_morph%CanopyHeight_col        ,& !input  :canopy height , [m]
-    StemArea_col            => plt_morph%StemArea_col            ,& !input  :grid canopy stem area, [m2 d-2]
-    CanopyLeafArea_col      => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
-    RAerodynNeutral_col     => plt_ew%RAerodynNeutral_col        ,& !output :netural aerodynamic resistance, [h m-1]
-    ZERO4PlantDisplace_col  => plt_ew%ZERO4PlantDisplace_col     ,& !output :zero plane displacement height, [m]
-    RoughHeight             => plt_ew%RoughHeight                ,& !output :canopy surface roughness height, [m]
-    RIB                     => plt_ew%RIB                         & !output :Richardson number for calculating boundary layer resistance, [-]
+  associate(                                                          &
+    WindSpeedAtm_col            => plt_site%WindSpeedAtm_col         ,& !input  :wind speed, [m h-1]
+    WindMesureHeight_col        => plt_site%WindMesureHeight_col     ,& !input  :wind speed measurement height, [m]
+    ZERO                        => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
+    AREA3                       => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    KoppenClimZone              => plt_site%KoppenClimZone           ,& !input  :Koppen climate zone for the grid,[-]
+    SoilSurfRoughness_col       => plt_site%SoilSurfRoughness_col    ,& !input  :initial soil surface roughness height, [m]
+    ZEROS                       => plt_site%ZEROS                    ,& !input  :threshold zero for numerical stability,[-]
+    NU                          => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
+    TairK                       => plt_ew%TairK                      ,& !input  :air temperature, [K]
+    VLHeatCapSnowMin_col        => plt_ew%VLHeatCapSnowMin_col       ,& !input  :minimum snowpack heat capacity, [MJ d-2 K-1]
+    SnowDepth                   => plt_ew%SnowDepth                  ,& !input  :snowpack depth, [m]
+    VLHeatCapSurfSnow_col       => plt_ew%VLHeatCapSurfSnow_col      ,& !input  :snowpack heat capacity, [MJ m-3 K-1]
+    CanopyHeight_col            => plt_morph%CanopyHeight_col        ,& !input  :canopy height , [m]
+    StemArea_col                => plt_morph%StemArea_col            ,& !input  :grid canopy stem area, [m2 d-2]
+    CanopyLeafArea_col          => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
+    RawIsoTSurf2CanopyHScal_col => plt_ew%RawIsoTSurf2CanopyHScal_col,& !output :scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
+    RawIsoTAtm2CanopySinkZ_col  => plt_ew%RawIsoTAtm2CanopySinkZ_col ,& !output :isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
+    RawCanopyH2SinkZ_col        => plt_ew%RawCanopyH2SinkZ_col       ,& !output :isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
+    ZeroPlaneDisplacem_col      => plt_ew%ZeroPlaneDisplacem_col     ,& !output :zero plane displacement height, [m]
+    RoughnessLength             => plt_ew%RoughnessLength            ,& !output :canopy surface roughness height, [m]
+    RIB                         => plt_ew%RIB                         & !output :Richardson number for calculating boundary layer resistance, [-]
   )
-!     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
-!
-!     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
-!     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
-!     ZZ=reference height for wind speed
-!
+  call PrintInfo('beg '//subname)
+  !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
+  !
+  !     CanopyLeafArea_col,StemArea_col=leaf,stalk area of combined canopy
+  !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
+  !     ZWind=reference height for wind speed
+  !
   ARLSC=CanopyLeafArea_col+StemArea_col
 !  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
   IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO)then 
@@ -101,42 +106,56 @@ module SurfaceRadiationMod
     ZY    = 1.0_r8-ZX
     ZE    = CanopyHeight_col*AMAX1(0.05_r8,ZX*ZY)
     !
-    ZERO4PlantDisplace_col = CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
+    ZeroPlaneDisplacem_col = CanopyHeight_col*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
   ELSE
     ZE                     = 0.0_r8
-    ZERO4PlantDisplace_col = 0.0_r8
+    ZeroPlaneDisplacem_col = 0.0_r8
   ENDIF
   !
-  IF(IFLGW.EQ.1)THEN
-    ZZ=WindMesureHeight_col+CanopyHeight_col
+  IF(iFlagRaiseZ0GbyVeg.EQ.iTrue)THEN !when wind measurement height in available.
+    ZWind=WindMesureHeight_col+CanopyHeight_col
   ELSE
-    ZZ=AMAX1(WindMesureHeight_col,ZERO4PlantDisplace_col+2.0_r8)
+    ZWind=AMAX1(WindMesureHeight_col,ZeroPlaneDisplacem_col+2.0_r8)
   ENDIF
 
   IF(KoppenClimZone.GE.0)THEN
-    IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN
-      RoughHeight=AMAX1(0.001_r8,ZE,ZW)
+    !significant snowcover on ground
+    IF(VLHeatCapSurfSnow_col.GT.VLHeatCapSnowMin_col)THEN 
+      RoughnessLength=AMAX1(0.001_r8,ZE,ZW)
     ELSE
-      RoughHeight=AMAX1(0.001_r8,ZE,SoilSurfRoughness_col)
+      RoughnessLength=AMAX1(0.001_r8,ZE,SoilSurfRoughness_col)
     ENDIF
     !
     !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
     !
-    !   RAerodynNeutral_col,RAM=biome canopy,minimum isothermal boundary layer resistance
+    !   RawIsoTAtm2CanopySinkZ_col,RAM=biome canopy,minimum isothermal boundary layer resistance
     !   WindSpeedAtm_col=wind speed
     !   RIB=canopy isothermal Richardson number
     !   here 0.168 = cvonkarman**2
     !eq.(17) from Choudhury and Monteith (1988)
-    RAerodynNeutral_col = AMAX1(RAM,(LOG((ZZ-ZERO4PlantDisplace_col)/RoughHeight))**2/(0.168_r8*WindSpeedAtm_col))
+    RawIsoTAtm2CanopySinkZ_col = AMAX1(RAM,(LOG((ZWind-ZeroPlaneDisplacem_col)/RoughnessLength))**2/(0.168_r8*WindSpeedAtm_col))
+    HZnorm                     = (CanopyHeight_col-ZeroPlaneDisplacem_col)/RoughnessLength
+    if(HZnorm.GT.0._r8)then
+      WindH=WindSpeedAtm_col*(log(CanopyHeight_col-ZeroPlaneDisplacem_col)-log(RoughnessLength)) &
+        /(log((ZWind-ZeroPlaneDisplacem_col)-log(RoughnessLength)))
+      !eq. (24) from Choudhury and Monteith (1988)  
+      RawIsoTSurf2CanopyHScal_col = log((CanopyHeight_col-ZeroPlaneDisplacem_col)/RoughnessLength) &
+        /(0.168*(CanopyHeight_col-ZeroPlaneDisplacem_col)*WindH)
+      RawCanopyH2SinkZ_col = AMAX1(RAM,(LOG(HZnorm))**2/(0.168_r8*WindH))
+    else
+      RawIsoTSurf2CanopyHScal_col=0._r8
+      WindH                = WindSpeedAtm_col
+      RawCanopyH2SinkZ_col = 0._r8
+    endif  
+    !
     !1.27E+08_r8=g*(3600^2), from eq. (19) in Choudhury and Monteith (1988)
-    RIB                 = 1.27E+08_r8*(ZZ-RoughHeight)/(WindSpeedAtm_col**2*TairK)
-
+    RIB  = 1.27E+08_r8*(ZWind-RoughnessLength)/(WindSpeedAtm_col**2*TairK)
   ELSE
-    RAerodynNeutral_col = RAM
-    RIB                 = 0.0_r8
-    RoughHeight         = 0._r8
+    RawIsoTAtm2CanopySinkZ_col = RAM
+    RIB                    = 0.0_r8
+    RoughnessLength        = 0._r8
   ENDIF
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine CalcBoundaryLayerProperties
 

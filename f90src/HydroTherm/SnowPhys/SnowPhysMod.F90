@@ -830,7 +830,7 @@ contains
   !
   RI   = RichardsonNumber(RIB_col(NY,NX),TKQ_col(NY,NX),TKSnow1_snvr(1,NY,NX))
   RAGX = AMAX1(RAM,0.8_r8*ResistAreodynOverSnow_col(NY,NX), &
-    AMIN1(1.2_r8*ResistAreodynOverSnow_col(NY,NX),ResistAreodynOverSoil_col(NY,NX)/(1.0_r8-10.0_r8*RI)))
+    AMIN1(1.2_r8*ResistAreodynOverSnow_col(NY,NX),RawIsoTSoil2ATM_col(NY,NX)/(1.0_r8-10.0_r8*RI)))
   ResistAreodynOverSnow_col(NY,NX) = RAGX
   RAa                              = RAGX
   !

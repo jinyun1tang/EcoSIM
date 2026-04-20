@@ -64,7 +64,6 @@ contains
   !
   !   UPDATE PLANT biogeochemistry
   !
-
   if(plant_model .and. (.not.ldo_radiation_test))then
     if(do_timing)call start_timer(t1)  
     call PlantModel(yearIJ,NHW,NHE,NVN,NVS)

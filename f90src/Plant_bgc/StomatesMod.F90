@@ -207,7 +207,7 @@
 !     begin_execution
   associate(                                                             &
     RIB                         => plt_ew%RIB                           ,& !input  :Richardson number for calculating boundary layer resistance, [-]
-    CanopyIsothBndlResist_pft   => plt_ew%CanopyIsothBndlResist_pft     ,& !input  :canopy isothermal boundary later resistance, [h m-1]
+    RawIsoTCanopy2Atm_pft   => plt_ew%RawIsoTCanopy2Atm_pft     ,& !input  :canopy isothermal boundary later resistance, [h m-1]
     TairK                       => plt_ew%TairK                         ,& !input  :air temperature, [K]
     TKCanopy_pft                => plt_ew%TKCanopy_pft                  ,& !input  :canopy temperature, [K]
     CO2E                        => plt_site%CO2E                        ,& !input  :atmospheric CO2 concentration, [umol mol-1]
@@ -231,12 +231,12 @@
 !     RI=Richardson's number
 !     RIB=canopy isothermal Richardson's number
 !     TairK,TKCanopy_pft=air,canopy temperature
-!     CanopyIsothBndlResist_pft=canopy isothermal boundary later resistance
+!     RawIsoTCanopy2Atm_pft=canopy isothermal boundary later resistance
 !     CanopyCO2BndlResist_pft=canopy boundary layer resistance to CO2, h/m
 !     AirConc_pft=number of moles of air per m3
 !
   RI                       = RichardsonNumber(RIB,TairK,TKCanopy_pft(NZ))
-  CanopyCO2BndlResist_pft  = 1.34_r8*AMAX1(5.56E-03_r8,CanopyIsothBndlResist_pft(NZ)/(1.0_r8-10.0_r8*RI))
+  CanopyCO2BndlResist_pft  = 1.34_r8*AMAX1(5.56E-03_r8,RawIsoTCanopy2Atm_pft(NZ)/(1.0_r8-10.0_r8*RI))
   AirConc_pft(NZ)          = GetMolAirPerm3(TKCanopy_pft(NZ))    !assuming pressure is one atmosphere
 
   ! For prescribed phenolgoy, the canopy CO2 concentration should be computed differently

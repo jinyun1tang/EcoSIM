@@ -163,14 +163,14 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='RoughHeight', dim1name='column',&
+    call restartvar(ncid, flag, varname='RoughnessLength', dim1name='column',&
        long_name='Roughness height', units='m', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
   else     
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='RoughHeight', dim1name='column',&
+    call restartvar(ncid, flag, varname='RoughnessLength', dim1name='column',&
        long_name='Roughness height', units='m', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
   endif
@@ -180,9 +180,9 @@ implicit none
     call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
        long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
   else     
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughHeight_col,datrc_1d)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
     datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
        long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
@@ -4854,16 +4854,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='ZERO4PlantDisplace_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='ZeroPlaneDisplacem_col', dim1name='column',&
        long_name='threshold for plant shoot displacement', units='', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZERO4PlantDisplace_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,ZeroPlaneDisplacem_col,datrc_1d)
   else
     !print*,'CanopyHeight_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZERO4PlantDisplace_col,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZeroPlaneDisplacem_col,datrc_1d)  
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='ZERO4PlantDisplace_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='ZeroPlaneDisplacem_col', dim1name='column',&
        long_name='threshold for plant shoot displacement', units='', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -4871,16 +4871,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='RAerodynNeutral_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='RawIsoTAtm2CanopySinkZ_col', dim1name='column',&
        long_name='above canopy boundary layer resistance', units='h m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,RAerodynNeutral_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RawIsoTAtm2CanopySinkZ_col,datrc_1d)
   else
     !print*,'CanopyHeight_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RAerodynNeutral_col,datrc_1d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RawIsoTAtm2CanopySinkZ_col,datrc_1d)  
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='RAerodynNeutral_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='RawIsoTAtm2CanopySinkZ_col', dim1name='column',&
        long_name='above canopy boundary layer resistance', units='h m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)

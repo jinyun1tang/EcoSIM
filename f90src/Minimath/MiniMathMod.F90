@@ -33,6 +33,7 @@ module minimathmod
   public :: isAinsideBC,isABetweenBC,isALeftinBC,isARightinBC
   public :: sfexp
   public :: Viscosity_H2O
+  public :: VapMass2KPa
   public :: SubstrateDribbling  
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
@@ -394,9 +395,10 @@ module minimathmod
   pure function RichardsonNumber(RIB,TK1,TK2)result(ans)
   implicit none
   real(r8), intent(in) :: RIB  !isothermal RI
-  real(r8), intent(in) :: TK1, TK2 !temperature 1 and 2
+  real(r8), intent(in) :: TK1  !target temperature
+  real(r8), intent(in) :: TK2  !reference temperature
 
-  real(r8) :: ans
+  real(r8) :: ans !>0 stable, < 0 unstable
 
   ans = AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB*(TK1-TK2)))
   
@@ -669,5 +671,19 @@ module minimathmod
     ans=exp(a)
   endif
   end function sfexp
+!------------------------------------------------------------------------
+  pure function VapMass2KPa(VP,TA,fwd)result(ans)
+  implicit none
+  real(r8), intent(in) :: VP ! pressure, trune kPa, false  m3/m3, 
+  real(r8), intent(in) :: TA ! temperature K
+  logical, intent(in) :: fwd !true, does kPa -> m3/m3; false, m3/m3 -> kPa
+  real(r8) :: ans !true m3/m3, false kPa
 
+  if(fwd)then
+    ans =VP*2.173E-03_r8/TA
+  else
+    ans=VP*TA/2.173E-03_r8  
+  endif
+
+  end function VapMass2KPa
 end module minimathmod

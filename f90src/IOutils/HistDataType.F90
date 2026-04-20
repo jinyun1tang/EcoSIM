@@ -6,8 +6,9 @@ module HistDataType
   use data_const_mod,   only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
   use SoilBGCNLayMod,   only: SumMicbGroup, sumDOML, sumMicBiomLayL,SumSolidOML
   use UnitMod,          only: units
-  use MiniMathMod,      only: safe_adb, AZMAX1,AZERO
+  use MiniMathMod,      only: safe_adb, AZMAX1,AZERO,VapMass2KPa
   use EcoSiMParDataMod, only: pltpar, micpar
+  use LandSurfDataType
   use DebugToolMod     
   use EcoSIMCtrlMod
   use MicrobialDataType
@@ -177,9 +178,13 @@ implicit none
   real(r8),pointer   :: h1D_CH4_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_CO2_PLTROOT_flx_col(:)
   real(r8),pointer   :: h1D_O2_PLTROOT_flx_col(:)
+  real(r8),pointer   :: h1D_VPQ_col(:)
+  real(r8),pointer   :: h1D_TKQ_col(:)
   real(r8),pointer   :: h1D_CO2_DIF_flx_col(:)
   real(r8),pointer   :: h1D_O2_DIF_flx_col(:)  
   real(r8),pointer   :: h1D_Ar_DIF_flx_col(:)
+  real(r8),pointer   :: h1D_RoughnessLength_col(:)
+  real(r8),pointer   :: h1D_ZeroPlaneDisplacem_col(:)
   real(r8),pointer   :: h1D_CH4_DIF_flx_col(:)
   real(r8),pointer   :: h1D_NH3_DIF_flx_col(:)
   real(r8),pointer   :: h1D_Ar_soilMass_col(:)
@@ -794,11 +799,15 @@ implicit none
   allocate(this%h1D_AR_PLTROOT_flx_col(beg_col:end_col)); this%h1D_AR_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_CO2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_CO2_PLTROOT_flx_col(:)=spval
   allocate(this%h1D_O2_PLTROOT_flx_col(beg_col:end_col)) ;this%h1D_O2_PLTROOT_flx_col(:)=spval
+  allocate(this%h1D_VPQ_col(beg_col:end_col)); this%h1D_VPQ_col(:)=spval
+  allocate(this%h1D_TKQ_col(beg_col:end_col));this%h1D_TKQ_col(:)=spval
   allocate(this%h1D_CO2_DIF_flx_col(beg_col:end_col)); this%h1D_CO2_DIF_flx_col(:)=spval
   allocate(this%h1D_O2_DIF_flx_col(beg_col:end_col)); this%h1D_O2_DIF_flx_col(:)=spval
   allocate(this%h1D_CH4_DIF_flx_col(beg_col:end_col)); this%h1D_CH4_DIF_flx_col(:)=spval  
   allocate(this%h1D_NH3_DIF_flx_col(beg_col:end_col)); this%h1D_NH3_DIF_flx_col(:)=spval
   allocate(this%h1D_Ar_DIF_flx_col(beg_col:end_col)); this%h1D_Ar_DIF_flx_col(:)=spval
+  allocate(this%h1D_RoughnessLength_col(beg_col:end_col)); this%h1D_RoughnessLength_col(:)=spval
+  allocate(this%h1D_ZeroPlaneDisplacem_col(beg_col:end_col)); this%h1D_ZeroPlaneDisplacem_col(:)=spval
   allocate(this%h1D_O2_SEMIS_FLX_col(beg_col:end_col))          ;this%h1D_O2_SEMIS_FLX_col(:)=spval
   allocate(this%h1D_CO2_LITR_col(beg_col:end_col))        ;this%h1D_CO2_LITR_col(:)=spval
   allocate(this%h1D_EVAPG_col(beg_col:end_col))           ;this%h1D_EVAPG_col(:)=spval
@@ -1804,6 +1813,16 @@ implicit none
     long_name='soil CO2 flux through plants(<0 into atmosphere)',ptr_col=data1d_ptr,&
     default='inactive')            
 
+  data1d_ptr => this%h1D_TKQ_col(beg_col:end_col)
+  call hist_addfld1d(fname='TKQ_col',units='K',avgflag='A',&
+    long_name='Sink level atmospheric temperature',ptr_col=data1d_ptr,&
+    default='inactive')       
+
+  data1d_ptr => this%h1D_VPQ_col(beg_col:end_col)
+  call hist_addfld1d(fname='VPQ_col',units='kPa',avgflag='A',&
+    long_name='Sink level atmospheric vapor pressure',ptr_col=data1d_ptr,&
+    default='inactive')       
+
   data1d_ptr => this%h1D_O2_PLTROOT_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='O2_PLTROOT_FLX_col',units='umol O2/m2/s',avgflag='A',&
     long_name='soil O2 flux through plants(<0 into atmosphere)',ptr_col=data1d_ptr,&
@@ -1832,6 +1851,16 @@ implicit none
   data1d_ptr => this%h1D_Ar_DIF_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='Ar_DIF_FLX_col',units='umol Ar/m2/s',avgflag='A',&
     long_name='soil Ar flux through advection+diffusion (<0 into atmosphere)',ptr_col=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_RoughnessLength_col(beg_col:end_col)
+  call hist_addfld1d(fname='Z0_col',units='m',avgflag='A',&
+    long_name='Roughness length of the grid (considering vegetation cover)',ptr_col=data1d_ptr,&
+    default='inactive')            
+
+  data1d_ptr => this%h1D_ZeroPlaneDisplacem_col(beg_col:end_col)
+  call hist_addfld1d(fname='d_col',units='m',avgflag='A',&
+    long_name='Zero plane displacement of the grid (considering vegetation cover)',ptr_col=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_O2_SEMIS_FLX_col(beg_col:end_col)      
@@ -3922,7 +3951,11 @@ implicit none
       this%h1D_CH4_PLTROOT_flx_col(ncol)  = trcg_air2root_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
       this%h1D_CO2_PLTROOT_flx_col(ncol)  = trcg_air2root_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_air2root_flx_col(idg_O2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
-      this%h1D_CO2_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
+      this%h1D_VPQ_col(ncol)                = VapMass2KPa(VPQ_col(NY,NX),TKQ_col(NY,NX),fwd=.FALSE.)
+      this%h1D_TKQ_col(ncol)                = TKQ_col(NY,NX)
+      this%h1D_RoughnessLength_col(ncol)    = RoughnessLength_col(NY,NX)
+      this%h1D_ZeroPlaneDisplacem_col(ncol) = ZeroPlaneDisplacem_col(NY,NX)
+      this%h1D_CO2_DIF_flx_col(ncol)        = GasDiff2Surf_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_CH4_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)      
       this%h1D_Ar_DIF_flx_col(ncol)       = GasDiff2Surf_flx_col(idg_Ar,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)  
       this%h1D_NH3_DIF_flx_col(ncol)      = GasDiff2Surf_flx_col(idg_NH3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_NH3)    
@@ -4351,7 +4384,7 @@ implicit none
         this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=CanopyMinStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_Km_CO2_carboxy_ptc(nptc)= Km4RubiscoCarboxy_pft(NZ,NY,NX)
         this%h1D_Ci_mesophyll_ptc(nptc)  = LeafIntracellularCO2_pft(NZ,NY,NX)
-        this%h1D_BLYR_RSC_CO2_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*1.34_r8*secs1hour
+        this%h1D_BLYR_RSC_CO2_ptc(nptc)  = RawCanopy2Atm_pft(NZ,NY,NX)*1.34_r8*secs1hour
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
         this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4360,7 +4393,7 @@ implicit none
         this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
         this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)
         this%h1D_STOML_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
-        this%h1D_BLYR_RSC_H2O_ptc(nptc)  = CanopyBndlResist_pft(NZ,NY,NX)*secs1hour
+        this%h1D_BLYR_RSC_H2O_ptc(nptc)  = RawCanopy2Atm_pft(NZ,NY,NX)*secs1hour
         this%h1D_TRANSPN_ptc(nptc)       = Transpiration_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_QTRANSP_col(ncol)       = this%h1D_QTRANSP_col(ncol)+this%h1D_TRANSPN_ptc(nptc)        
         this%h1D_NH4_UPTK_FLX_ptc(nptc)  = RootNH4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)

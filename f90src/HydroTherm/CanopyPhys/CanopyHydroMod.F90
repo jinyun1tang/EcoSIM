@@ -13,19 +13,20 @@ implicit none
   private
   character(len=*), parameter :: mod_filename=&
   __FILE__
-  public :: CanopyInterceptPrecp
+  public :: CanopyInterceptPrecip
 
   real(r8), parameter :: FoliarWatRetcap(0:3)=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
 
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine CanopyInterceptPrecp(NY,NX)
+  subroutine CanopyInterceptPrecip(NY,NX)
   !
   !DESCRIPTION
   !precipitation intercepation by canopy
   implicit none
   integer, intent(in) :: NY,NX
+  character(len=*), parameter :: subname='CanopyInterceptPrecip'
   integer :: NZ
   real(r8) :: CanopyWatHeldCap  !maximum precipitation holding capacity by canopy (leaf+stem) [m3 H2O]
   real(r8) :: prec2canopy_pft   !precipiation onto canopy [m H2O/h]
@@ -40,7 +41,7 @@ implicit none
 !     VOLWC=canopy surface water retention
 !
 !     Warning: No snofall intercepation is considered at the moment.
-
+  call PrintInfo('beg '//subname)
   DO  NZ=1,NP_col(NY,NX)
     CanopyWatHeldCap                 = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX)) &
       *(CanopyLeafArea_pft(NZ,NY,NX)+CanopyStemSurfArea_pft(NZ,NY,NX))
@@ -51,7 +52,7 @@ implicit none
     PrecIntceptByCanopy_col(NY,NX)   = PrecIntceptByCanopy_col(NY,NX)+PrecIntcptByCanopy_pft(NZ,NY,NX)
   ENDDO
   RainPrecThrufall_col(NY,NX) = PrecRainAndIrrig_col(NY,NX)-PrecIntceptByCanopy_col(NY,NX)
-
-  end subroutine CanopyInterceptPrecp
+  call PrintInfo('end '//subname)
+  end subroutine CanopyInterceptPrecip
 
 end module CanopyHydroMod

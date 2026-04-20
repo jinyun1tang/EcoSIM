@@ -123,7 +123,7 @@ implicit none
   real(r8), pointer :: CanopyMinStomaResistH2O_pft(:)         => null()   !canopy minimum stomatal resistance,                          [s m-1]
   real(r8), pointer :: CuticleResist_pft(:)                 => null()   !maximum stomatal resistance to vapor,                        [s m-1]
   real(r8), pointer :: CanPStomaResistH2O_pft(:)            => null()   !canopy stomatal resistance,                                  [h m-1]
-  real(r8), pointer :: CanopyBndlResist_pft(:)              => null()   !canopy boundary layer resistance,                            [h m-1]
+  real(r8), pointer :: RawCanopy2Atm_pft(:)              => null()   !canopy boundary layer resistance,                            [h m-1]
   real(r8), pointer :: LeafO2Solubility_pft(:)              => null()   !leaf O2 solubility,                                          [uM /umol mol-1]
   real(r8), pointer :: CO2CuticleResist_pft(:)              => null()   !maximum stomatal resistance to CO2,                          [s h-1]
   real(r8), pointer :: DiffCO2Atmos2Intracel_pft(:)         => null()   !gaesous CO2 concentration difference across stomates,        [umol m-3]
@@ -649,9 +649,11 @@ implicit none
   real(r8) :: TKSnow                        !snow temperature, [K]
   real(r8) :: WatHeldOnCanopy_col           !canopy surface water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col             !ecosystem sensible heat flux, [MJ d-2 h-1]
-  real(r8) :: RoughHeight                   !canopy surface roughness height, [m]
-  real(r8) :: ZERO4PlantDisplace_col        !zero plane displacement height, [m]
-  real(r8) :: RAerodynNeutral_col       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: RoughnessLength                   !canopy surface roughness height, [m]
+  real(r8) :: ZeroPlaneDisplacem_col        !zero plane displacement height, [m]
+  real(r8) :: RawIsoTAtm2CanopySinkZ_col        !isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
+  real(r8) :: RawCanopyH2SinkZ_col           !isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
+  real(r8) :: RawIsoTSurf2CanopyHScal_col   !scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]  
   real(r8) :: RIB                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: Eco_Heat_GrndSurf_col         !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8) :: HeatCanopy2Dist_col           !canopy energy +/- due to disturbance, [MJ /d2]
@@ -665,7 +667,7 @@ implicit none
   real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation,                                           [m3 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)          => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
   real(r8), pointer :: CanopyEvapTransLHeat_pft(:)          => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
-  real(r8), pointer :: CanopyIsothBndlResist_pft(:)   => null()    !canopy isothermal boundary later resistance,                  [h m-1]
+  real(r8), pointer :: RawIsoTCanopy2Atm_pft(:)   => null()    !canopy isothermal boundary later resistance,                  [h m-1]
   real(r8), pointer :: TKS_vr(:)                      => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin_pft(:)         => null()    !minimum daily canopy water potential,                         [MPa]
   real(r8), pointer :: TdegCCanopy_pft(:)             => null()    !canopy temperature,                                           [oC]
@@ -1327,7 +1329,7 @@ implicit none
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
   allocate(this%OrganOsmoPsi0pt_pft(JP1));this%OrganOsmoPsi0pt_pft=spval
-  allocate(this%CanopyIsothBndlResist_pft(JP1));this%CanopyIsothBndlResist_pft=spval
+  allocate(this%RawIsoTCanopy2Atm_pft(JP1));this%RawIsoTCanopy2Atm_pft=spval
   allocate(this%DeltaTKC_pft(JP1));this%DeltaTKC_pft=spval
   allocate(this%TKC_pft(JP1));this%TKC_pft=spval
   allocate(this%ENGYX_pft(JP1));this%ENGYX_pft=spval
@@ -1861,7 +1863,7 @@ implicit none
   allocate(this%CuticleResist_pft(JP1));this%CuticleResist_pft=spval
   allocate(this%CanopyMinStomaResistH2O_pft(JP1));this%CanopyMinStomaResistH2O_pft=spval
   allocate(this%LeafO2Solubility_pft(JP1));this%LeafO2Solubility_pft=spval
-  allocate(this%CanopyBndlResist_pft(JP1));this%CanopyBndlResist_pft=spval
+  allocate(this%RawCanopy2Atm_pft(JP1));this%RawCanopy2Atm_pft=spval
   allocate(this%CanPStomaResistH2O_pft(JP1));this%CanPStomaResistH2O_pft=spval
   allocate(this%DiffCO2Atmos2Intracel_pft(JP1));this%DiffCO2Atmos2Intracel_pft=spval
   allocate(this%AirConc_pft(JP1));this%AirConc_pft=spval

@@ -60,7 +60,7 @@ implicit none
   plt_ew%TairK                   = TairK_col(NY,NX)
   plt_morph%CanopyHeight_col     = CanopyHeight_col(NY,NX)
   plt_site%WindMesureHeight_col  = WindMesureHeight_col(NY,NX)
-  plt_ew%ZERO4PlantDisplace_col  = ZERO4PlantDisplace_col(NY,NX)
+  plt_ew%ZeroPlaneDisplacem_col  = ZeroPlaneDisplacem_col(NY,NX)
   plt_site%WindSpeedAtm_col      = WindSpeedAtm_col(NY,NX)
   plt_ew%VLHeatCapSnowMin_col    = VLHeatCapSnowMin_col(NY,NX)
   plt_ew%VLHeatCapSurfSnow_col   = VLHeatCapSnow_snvr(1,NY,NX)
@@ -180,9 +180,11 @@ implicit none
 
   integer :: N,M,NN,L,NZ,K,NB
 
-  ZERO4PlantDisplace_col(NY,NX)  = plt_ew%ZERO4PlantDisplace_col
-  RoughHeight_col(NY,NX)         = plt_ew%RoughHeight
-  RAerodynNeutral_col(NY,NX) = plt_ew%RAerodynNeutral_col
+  ZeroPlaneDisplacem_col(NY,NX)  = plt_ew%ZeroPlaneDisplacem_col
+  RoughnessLength_col(NY,NX)         = plt_ew%RoughnessLength
+  RawIsoTAtm2CanopySinkZ_col(NY,NX) = plt_ew%RawIsoTAtm2CanopySinkZ_col
+  RawIsoTSurf2CanopyHScal_col(NY,NX)= plt_ew%RawIsoTSurf2CanopyHScal_col
+  RawCanopyH2SinkZ_col(NY,NX)       = plt_ew%RawCanopyH2SinkZ_col
   RIB_col(NY,NX)                     = plt_ew%RIB
   
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col

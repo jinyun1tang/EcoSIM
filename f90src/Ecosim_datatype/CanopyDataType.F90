@@ -25,7 +25,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  TurgEff4CanopyResp_pft(:,:,:)              !Turgor pressure effect on canopy respiration, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O_pft(:,:,:)              !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  CanopyMinStomaResistH2O_pft(:,:,:)           !canopy minimum stomatal resistance, [s m-1]
-  real(r8),target,allocatable ::  CanopyBndlResist_col(:,:)                  !canopy boundary layer resistance, [m h-1]
+  real(r8),target,allocatable ::  RawIsoTSurf2SinkZ_col(:,:)                  !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I_pft(:,:,:)                             !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  LeafIntracellularCO2_pft(:,:,:)            !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  AirConc_pft(:,:,:)                         !total gas concentration, [mol m-3]
@@ -93,7 +93,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  PSICanopyOsmo_pft(:,:,:)                   !platn canopy osmotic water potential, [Mpa]
   real(r8),target,allocatable ::  RNodeInitiate_pft(:,:,:)                   !node initiation rate, [h-1]
   real(r8),target,allocatable ::  RLeafAppear_pft(:,:,:)                     !leaf appearing rate, [h-1]
-  real(r8),target,allocatable ::  CanopyBndlResist_pft(:,:,:)                !canopy boundary layer resistance, [h m-1]
+  real(r8),target,allocatable ::  RawCanopy2Atm_pft(:,:,:)                !canopy boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  Transpiration_pft(:,:,:)                   !canopy transpiration, [m3 d-2 h-1]
   real(r8),target,allocatable ::  VapXAir2Canopy_pft(:,:,:)                  !negative of canopy evaporation, [m2 d-2 h-1]
   real(r8),target,allocatable ::  CanopyBiomWater_pft(:,:,:)                 !canopy water content associated with dry matter, [m3 d-2]
@@ -242,7 +242,7 @@ module CanopyDataType
   allocate(TurgEff4CanopyResp_pft(JP,JY,JX)); TurgEff4CanopyResp_pft=0._r8
   allocate(CanPStomaResistH2O_pft(JP,JY,JX));       CanPStomaResistH2O_pft=0._r8
   allocate(CanopyMinStomaResistH2O_pft(JP,JY,JX));     CanopyMinStomaResistH2O_pft=0._r8
-  allocate(CanopyBndlResist_col(JY,JX));         CanopyBndlResist_col=0._r8
+  allocate(RawIsoTSurf2SinkZ_col(JY,JX));         RawIsoTSurf2SinkZ_col=0._r8
   allocate(O2I_pft(JP,JY,JX));      O2I_pft=0._r8
   allocate(LeafIntracellularCO2_pft(JP,JY,JX));     LeafIntracellularCO2_pft=0._r8
   allocate(AirConc_pft(JP,JY,JX));     AirConc_pft=0._r8
@@ -310,7 +310,7 @@ module CanopyDataType
   allocate(RNodeInitiate_pft(JP,JY,JX)); RNodeInitiate_pft=0._r8
   allocate(RLeafAppear_pft(JP,JY,JX)); RLeafAppear_pft=0._r8
   allocate(PSICanopyOsmo_pft(JP,JY,JX));    PSICanopyOsmo_pft=0._r8
-  allocate(CanopyBndlResist_pft(JP,JY,JX));       CanopyBndlResist_pft=0._r8
+  allocate(RawCanopy2Atm_pft(JP,JY,JX));       RawCanopy2Atm_pft=0._r8
   allocate(Transpiration_pft(JP,JY,JX));       Transpiration_pft=0._r8
   allocate(VapXAir2Canopy_pft(JP,JY,JX));    VapXAir2Canopy_pft=0._r8
   allocate(CanopyBiomWater_pft(JP,JY,JX));    CanopyBiomWater_pft=0._r8
@@ -440,7 +440,7 @@ module CanopyDataType
   call destroy(TurgEff4CanopyResp_pft)
   call destroy(CanPStomaResistH2O_pft)
   call destroy(CanopyMinStomaResistH2O_pft)
-  call destroy(CanopyBndlResist_col)
+  call destroy(RawIsoTSurf2SinkZ_col)
   call destroy(O2I_pft)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)
@@ -506,7 +506,7 @@ module CanopyDataType
   call destroy(RNodeInitiate_pft)
   call destroy(RLeafAppear_pft)
   call destroy(PSICanopyOsmo_pft)
-  call destroy(CanopyBndlResist_pft)
+  call destroy(RawCanopy2Atm_pft)
   call destroy(Transpiration_pft)
   call destroy(VapXAir2Canopy_pft)
   call destroy(CanopyBiomWater_pft)

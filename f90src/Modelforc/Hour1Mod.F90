@@ -234,8 +234,8 @@ module Hour1Mod
         ENDDO
       ENDDO
 
-      if(lverb)write(*,*)'CanopyInterceptPrecp'
-      CALL CanopyInterceptPrecp(NY,NX)
+      if(lverb)write(*,*)'CanopyInterceptPrecip'
+      CALL CanopyInterceptPrecip(NY,NX)
 !
 !     WRITE SW AND PAR ALBEDO
 
