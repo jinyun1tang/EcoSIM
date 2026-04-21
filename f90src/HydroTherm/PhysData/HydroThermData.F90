@@ -25,9 +25,9 @@ implicit none
   real(r8),allocatable ::  SnowFallt_col(:,:)                    !  snowfall to snow, [m3 d-2]
   real(r8),allocatable ::  Rain2Snowt_col(:,:)                   !  rainfall to snow, [m3 d-2]
   real(r8),allocatable ::  VLairMacP1_vr(:,:,:)                  !  positively corrected macropore volume, [m^3/d^2]
-  real(r8),allocatable ::  EVAPW(:,:)                            !  
-  real(r8),allocatable ::  EVAPS(:,:)                            !  
-  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
+  real(r8),allocatable ::  EVAPW_col(:,:)                        !  evaporation between atmosphere and surface snow [m3 H2O d-2/h]
+  real(r8),allocatable ::  EVAPS_col(:,:)                        !  sublimation from surface snow into atmosphere, [m3 H2O d-2/h]
+  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                  ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)             !  
   real(r8),allocatable ::  PrecHeat2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
 
@@ -82,8 +82,8 @@ implicit none
   allocate(Rain2Snowt_col(JY,JX));       Rain2Snowt_col=0._r8
   allocate(VLairMacP1_vr(JZ,JY,JX));   VLairMacP1_vr=0._r8 
   allocate(VapXAir2Sno_col(JY,JX));      VapXAir2Sno_col=0._r8  
-  allocate(EVAPW(JY,JX));       EVAPW=0._r8    
-  allocate(EVAPS(JY,JX));       EVAPS=0._r8  
+  allocate(EVAPW_col(JY,JX));       EVAPW_col=0._r8    
+  allocate(EVAPS_col(JY,JX));       EVAPS_col=0._r8  
   allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
   allocate(PrecHeat2Snowt_col(JY,JX));      PrecHeat2Snowt_col=0._r8  
 
@@ -145,8 +145,8 @@ implicit none
   call destroy(SnowFallt_col)
   call destroy(Rain2Snowt_col)
   call destroy(VLairMacP1_vr)    
-  call destroy(EVAPW)  
-  call destroy(EVAPS)  
+  call destroy(EVAPW_col)  
+  call destroy(EVAPS_col)  
   call destroy(VapXAir2Sno_col)  
   call destroy(SoilFracAsMacP1_vr)  
   call destroy(PrecHeat2Snowt_col)

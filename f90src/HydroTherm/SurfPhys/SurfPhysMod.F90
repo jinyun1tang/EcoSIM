@@ -1172,12 +1172,11 @@ contains
   RAS                        = CalcSnowBNDResistance(NY,NX)
   CondGasXSnowM_col(M,NY,NX) = AREA_3D(3,NUM_col(NY,NX),NY,NX)*dts_HeatWatTP/(ResistBndlSurf_col(NY,NX)+RAS)  !m^2 h/(h/m) = m3
   CondGasXSurf_col(NY,NX)    = 1._r8/(ResistBndlSurf_col(NY,NX)+RAS)  !m/h
-
-!
-! REDISTRIBUTE INCOMING PRECIPITATION
-! BETWEEN RESIDUE AND SOIL SURFACE
-!
-! The model always assumes there is a litter layer
+  !
+  ! REDISTRIBUTE INCOMING PRECIPITATION
+  ! BETWEEN RESIDUE AND SOIL SURFACE
+  !
+  ! The model always assumes there is a litter layer
   IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO)THEN
     !soil bulk density significant
     !get flow to litter
@@ -1211,18 +1210,17 @@ contains
 
   Prec2LitR2             = RainPrecAir2LitR*XNPR
   RainHeat2LitR2         = RainPrecHeatAir2LitR*XNPR
-
-!
-! WATER GAS EXCHANGE COEFFICIENTS IN SURFACE LITTER
-!
-! VOLA1,VLiceMicP1,VLWatMicP1,VsoiPM=total,ice-,water-,air-filled porosity
-! TScal4Aquadifsvity=temperature effect on gas diffusivity
-! DiffusivitySolutEff=rate constant for air-water gas exchange
-! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
-! XNPD=time step for gas transfer calculations, it is tunable parameter
-! TORT=tortuosity for aqueous diffusivity
-! VOLAT0=ice-excluded porosity in litter
-
+  !
+  ! WATER GAS EXCHANGE COEFFICIENTS IN SURFACE LITTER
+  !
+  ! VOLA1,VLiceMicP1,VLWatMicP1,VsoiPM=total,ice-,water-,air-filled porosity
+  ! TScal4Aquadifsvity=temperature effect on gas diffusivity
+  ! DiffusivitySolutEff=rate constant for air-water gas exchange
+  ! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
+  ! XNPD=time step for gas transfer calculations, it is tunable parameter
+  ! TORT=tortuosity for aqueous diffusivity
+  ! VOLAT0=ice-excluded porosity in litter
+  !
   VOLAT0=VLPoreLitR_col(NY,NX)-VLiceMicP1_vr(0,NY,NX)
   IF(VOLAT0.GT.ZEROS2(NY,NX).AND.VLsoiAirPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     !litter layer is not saturated
@@ -1243,20 +1241,20 @@ contains
   ENDIF
   !TORT=tortuosity in litter (treated as micropore)
   TortMicPM_vr(M,0,NY,NX)=TortMicporeW(THETWT)
-!
-! KINETIC ENERGY OF DIRECT RAINFALL AND THROUGHFALL
-!
-! PRECD,PRECB=direct,indirect precipn+irrign at soil surface
-! ENGYD,ENGYB=energy impact of direct,indirect precipn+irrign at soil surface
-! VWatStoreCapSurf_col=ground surface water retention capacity
-! XVOLW=free surface water
-! ZT=canopy height
-! EnergyImpact4Erosion_colM=total energy impact for use in erosion.f
-! EnergyImpact4Erosion_col=cumulative rainfall energy impact on soil surface
-! RainEkReducedKsat=reduction in soil surface Ksat from rainfall energy impact
-! Note: A good reference for the following formula and alternatives
-! is "Rainfall intensity-kinetic energy relationships for soil loss prediction",
-! Kinnell, 1981
+  !
+  ! KINETIC ENERGY OF DIRECT RAINFALL AND THROUGHFALL
+  !
+  ! PRECD,PRECB=direct,indirect precipn+irrign at soil surface
+  ! ENGYD,ENGYB=energy impact of direct,indirect precipn+irrign at soil surface
+  ! VWatStoreCapSurf_col=ground surface water retention capacity
+  ! XVOLW=free surface water
+  ! ZT=canopy height
+  ! EnergyImpact4Erosion_colM=total energy impact for use in erosion.f
+  ! EnergyImpact4Erosion_col=cumulative rainfall energy impact on soil surface
+  ! RainEkReducedKsat=reduction in soil surface Ksat from rainfall energy impact
+  ! Note: A good reference for the following formula and alternatives
+  ! is "Rainfall intensity-kinetic energy relationships for soil loss prediction",
+  ! Kinnell, 1981
 
   IF(PrecDirect2Grnd_col(NY,NX).GT.ZERO)THEN
     ENGYD=AZMAX1(8.95_r8+8.44_r8*LOG(PRECM_col(NY,NX)))
@@ -1279,10 +1277,9 @@ contains
   ENDIF
   RainEkReducedKsat=EXP(-2.0E-03_r8*(CSILT_vr(NUM_col(NY,NX),NY,NX)+CCLAY_vr(NUM_col(NY,NX),NY,NX)) &
     *EnergyImpact4Erosion_col(NY,NX))
-
-!
-!  SNOWPACK FLUX ACCUMULATORS
-!
+  !
+  !  SNOWPACK FLUX ACCUMULATORS
+  !
    call InitSnowAccumsM(I,J,M,NY,NX)
 
   call PrepIterSnowLayerM(I,J,M,NY,NX)
@@ -1627,7 +1624,7 @@ contains
   end subroutine SumAftEnergyBalanceM
 !------------------------------------------------------------------------------------------
   subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
-    TopLayWatVol_col,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
+    TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
   !
   !run surface energy/water model for iteration M
   implicit none
@@ -1638,6 +1635,7 @@ contains
   REAL(R8), dimension(:,:),INTENT(OUT) :: RainEkReducedKsat
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol_col(JY,JX)
   real(r8), dimension(:,:),intent(out) :: HeatFluxAir2Soi(JY,JX)
+  real(r8), dimension(:,:),intent(out) :: dLWRaddTKsoi1(JY,JX)
   real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)       !flow into micropore
   real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)       !flow into macropore
   real(r8), dimension(:,:),optional,intent(out) :: HeatInfl2Soil(JY,JX)    !heat flow into soil [MJ d-2]
@@ -1675,8 +1673,9 @@ contains
       if(present(Qinfl2MicP))Qinfl2MicP(NY,NX)=WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)
       if(present(Qinfl2MacP))Qinfl2MacP(NY,NX)=WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)
       if(present(HeatInfl2Soil))HeatInfl2Soil(NY,NX)=HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)
-
       LWRadGrnd_col(NY,NX)   = LWRadBySurf_col(NY,NX)
+      
+      dLWRaddTKsoi1(NY,NX)=-4._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3
     ENDDO D9890
   ENDDO D9895
 
