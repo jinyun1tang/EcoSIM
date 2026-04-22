@@ -21,7 +21,7 @@ module PlantPhenolMod
   __FILE__
 !
   real(r8), PARAMETER :: PSIMin4LeafExpansion=0.1_r8                                   !minimum canopy turgor potential for leaf expansion, [MPa]
-  real(r8), parameter :: PSIMin4LeafOut(3:4)=(/-1.5_r8,-0.5_r8/)                       !minimum canopy water potential for leafout of drought-deciduous PFT, [MPa]
+  real(r8), parameter :: PSIMin4LeafOut(2:4)=(/-0.5_r8,-1.5_r8,-0.5_r8/)               !minimum canopy water potential for leafout of drought-deciduous PFT, [MPa]
   real(r8) ,PARAMETER :: GrothStageNorm4VegetaPheno= 2.0_r8                            !normalized growth stage durations for vegetative phenology,[-]
   real(r8), PARAMETER :: GrothStageNorm4ReprodPheno= 0.667_r8                          !normalized growth stage durations for reproductive phenology,[-]
   real(r8), PARAMETER :: MaxPhotoHour4LeafOutOff   = 3600.0_r8                         !maximum light exposure hours for leaf off [h]
@@ -1059,7 +1059,7 @@ module PlantPhenolMod
   associate(                                                                           &
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]    
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !inoput :leaf number, [-]    
-    ShootNodeNumAtAnthesis_brch         => plt_morph%ShootNodeNumAtAnthesis_brch          ,& !input  :shoot node number at anthesis, [-]    
+    ShootNodeNumAtAnthesis_brch       => plt_morph%ShootNodeNumAtAnthesis_brch        ,& !input  :shoot node number at anthesis, [-]    
     RefNodeInitRate_pft               => plt_pheno%RefNodeInitRate_pft                ,& !input  :rate of node initiation at 25 oC, [h-1]    
     ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !input  :shoot node number at floral initiation, [-]    
     RateRefLeafAppearance_pft         => plt_pheno%RateRefLeafAppearance_pft          ,& !input  :rate of leaf initiation at 25 oC, [h-1]

@@ -1254,11 +1254,11 @@ implicit none
   !--------------------------------------------------------------------
   data1d_ptr => this%h1D_cumFIRE_CO2_col(beg_col:end_col) 
   call hist_addfld1d(fname='cumFIRE_CO2_col',units='gC m-2',avgflag='I',&
-    long_name='cumulative CO2 flux from fire (<0 into atmosphere)',ptr_col=data1d_ptr,default='inactive')        
+    long_name='cumulative CO2 flux from fire (<0 into atmosphere)',ptr_col=data1d_ptr)        
 
   data1d_ptr => this%h1D_cumFIRE_CH4_col(beg_col:end_col)  
   call hist_addfld1d(fname='cumFIRE_CH4_col',units='gC d-2',avgflag='I', &
-    long_name='cumulative CH4 flux from fire (<0 into atmosphere)', ptr_col=data1d_ptr,default='inactive')      
+    long_name='cumulative CH4 flux from fire (<0 into atmosphere)', ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_cNH4_LITR_col(beg_col:end_col) 
   call hist_addfld1d(fname='cNH4_LITR_col',units='gN NH4/g litter',avgflag='A', &
@@ -1479,7 +1479,7 @@ implicit none
 
   data1d_ptr => this%h1D_PO4_FIRE_col(beg_col:end_col)  
   call hist_addfld1d(fname='PO4_FIRE_col',units='gP/m2',avgflag='I',&
-    long_name='Cumulative PO4 flux from fire',ptr_col=data1d_ptr,default='inactive')      
+    long_name='Cumulative PO4 flux from fire',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_cPO4_LITR_col(beg_col:end_col)   
   call hist_addfld1d(fname='cPO4_LITR_col',units='gP/g litr',avgflag='A',&
@@ -2391,7 +2391,7 @@ implicit none
 
   data1d_ptr => this%h1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='FIREp_CO2_FLX_pft',units='gC/m2/hr',avgflag='A',&
-    long_name='Plant CO2 from fire',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Plant CO2 from fire',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='FIREp_CH4_FLX_pft',units='gC/m2/hr',avgflag='A',&
@@ -2618,8 +2618,7 @@ implicit none
 
   data1d_ptr => this%h1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='FIREp_N_FLX_pft',units='gN/m2/hr',avgflag='A',&
-    long_name='Plant N emission from fire',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Plant N emission from fire',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='SURF_LITRf_N_FLX_pft',units='gN/m2/hr',avgflag='A',&
@@ -2741,8 +2740,7 @@ implicit none
 
   data1d_ptr => this%h1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc)             
   call hist_addfld1d(fname='FIREp_P_FLX_pft',units='gP/m2/hr',avgflag='A',&
-    long_name='Plant PO4 emission from fire',ptr_patch=data1d_ptr,&
-    default='inactive')            
+    long_name='Plant PO4 emission from fire',ptr_patch=data1d_ptr)            
 
   data1d_ptr => this%h1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc)         !SurfLitrfallElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
   call hist_addfld1d(fname='SURF_LITRf_P_FLX_pft',units='gP/m2/hr',avgflag='A',&
