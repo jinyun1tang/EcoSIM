@@ -235,9 +235,9 @@ implicit none
   integer :: NTOPO,NY,NX,NZ
   character(len=128) :: pft_pltinfo(JP),tstr  
   character(len=128) :: pft_mgmtinfo(24,JP)
-  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS
+  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS
   integer :: M,NN,N,nn1
-  integer :: JCUT
+
 
   call PrintInfo('beg '//subname)
   call InitPlantMgmnt(NHW,NHE,NVN,NVS)

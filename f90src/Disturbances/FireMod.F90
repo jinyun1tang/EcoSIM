@@ -15,7 +15,7 @@ implicit none
   integer :: fire_years(max_fire_events)
   integer :: num_fire_events
   integer :: fire_event_loc
-  character(len=10) :: fire_files(max_fire_events)
+  character(len=21) :: fire_files(max_fire_events)
 
   public :: config_fire
   public :: check_fire
@@ -100,7 +100,7 @@ implicit none
   function check_fire(year_model,fire_event_entry)result(fire_yesno)
   implicit none
   integer, intent(in) :: year_model  !current model year
-  character(len=10), intent(out) :: fire_event_entry  !retrieved fire_event
+  character(len=21), intent(out) :: fire_event_entry  !retrieved fire_event
   logical :: fire_yesno
 
   

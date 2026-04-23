@@ -12,7 +12,7 @@ module ReadManagementMod
   use FlagDataType
   use FertilizerDataType
   use ClimForcDataType
-  use EcoSIMCtrlMod, only : lverb, first_topou
+  use EcoSIMCtrlMod, only : lverb, first_topou,pft_mgmt_in
   use SoilWaterDataType
   use LandSurfDataType
   use EcoSIMCtrlDataType
@@ -55,6 +55,7 @@ implicit none
   if(ntill>367)then
     call endrun('Not enough memory size for array tillf in '//trim(mod_filename),__LINE__)
   endif
+
   call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
   if(.not. readvar)then
     call endrun('fail to find tillage file '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
@@ -63,12 +64,12 @@ implicit none
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf(1:ntill)),&
       trim(mod_filename))
 
-!
-!     DY=date DDMMYYYY
-!     IPLOW,DPLOW=intensity,depth of disturbance
-!     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-!     DepzCorp_col=intensity (fire) or depth (tillage,drainage) of disturbance
-!
+  !
+  !     DY=date DDMMYYYY
+  !     IPLOW,DPLOW=intensity,depth of disturbance
+  !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
+  !     DepzCorp_col=intensity (fire) or depth (tillage,drainage) of disturbance
+  !
   kk=1
   do while(len_trim(tillf(kk))>0)
 
@@ -512,16 +513,19 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+  subroutine ReadFire(yearc,fire_event_entry,NHW,NHE,NVN,NVS)
   use EcoSIMCtrlMod, only : soil_mgmt_in  
   implicit none
-  character(len=10), intent(in) :: fire_event_entry
+  integer, intent(in) :: yearc
+  character(len=21), intent(in) :: fire_event_entry
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(file_desc_t) :: soilmgmt_nfid
   character(len=10) :: firef
-  integer :: ntopou,ntopo
+  integer :: ntopou,ntopo,pair_end
   logical :: readvar
   type(Var_desc_t) :: vardesc
+  type(file_desc_t) :: pftinfo_nfid
+
   integer :: NH1,NH2,NV1,NV2
 
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
@@ -529,6 +533,7 @@ implicit none
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
   if(ntopou==0)return
   if(first_topou)ntopou=1  
+  pair_end = index(fire_event_entry, ',')  
   DO NTOPO=1,ntopou
     call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
     call ncd_getvar(soilmgmt_nfid,'NV1',ntopo,NV1)
@@ -540,9 +545,9 @@ implicit none
         //' in '//trim(mod_filename), __LINE__)
     endif
 
-    call check_var(soilmgmt_nfid, fire_event_entry, vardesc, readvar)
+    call check_var(soilmgmt_nfid, trim(fire_event_entry(pair_end+1:)), vardesc, readvar)
     if(.not. readvar)then
-      call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
+      call endrun('fail to find soil fire mgmt in '//trim(mod_filename), __LINE__)
     endif
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
@@ -553,7 +558,118 @@ implicit none
   ENDDO  
   call ncd_pio_closefile(soilmgmt_nfid)
 
+  !    
+  call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
+
+  DO NTOPO=1,ntopou
+    call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
+
+    if(any((/NH1,NH2,NV1,NV2/)<0))THEN
+      call endrun('something wrong in NHX or NHX indices on file '//trim(pft_mgmt_in)&
+        //' in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_var(pftinfo_nfid, trim(fire_event_entry(1:pair_end-1)), vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find plant fire mgmt in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, firef, &
+      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     
+    call ReadPlantFireMgmt(yearc,pftinfo_nfid,firef,NH1,NH2,NV1,NV2)
+  ENDDO
+
+  call ncd_pio_closefile(pftinfo_nfid)
+
   end subroutine ReadFire  
+
+!------------------------------------------------------------------------------------------
+  subroutine ReadPlantFireMgmt(yearc,pftinfo_nfid,fireFile,NH1,NH2,NV1,NV2)
+  use PlantMgmtDataType 
+  implicit none
+  integer, intent(in) :: yearc
+  type(file_desc_t), intent(in) :: pftinfo_nfid
+  character(len=*), intent(in) :: fireFile
+  integer, intent(in) :: NH1,NH2,NV1,NV2
   
+  character(len=128) :: firefstr(5),tstr
+  integer :: maxpfts
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
+  real(r8) :: ECUT24,HCUT,PCUT
+  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,JCUT
+  integer :: NY,NX,NZ
+
+  maxpfts=get_dim_len(pftinfo_nfid,'maxpfts')
+
+  call check_var(pftinfo_nfid, fireFile, vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find fire file '//trim(fireFile)//' in '//trim(mod_filename), __LINE__)
+  endif
+  
+  call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, firefstr(1:maxpfts)),&
+      trim(mod_filename))
+
+  DO NX=NH1,NH2
+    DO NY=NV1,NV2
+      DO NZ=1,NP_col(NY,NX)
+        if(len_trim(firefstr(NZ))==0)cycle
+        tstr=trim(firefstr(NZ))
+
+        !read day/month/year when management occurs
+        read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+!        write(*,*)TSTR
+        READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+            ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+        !"17050000,2,0,0.06,0.0,0.9,0.3,0.0,0.1,0.9,0.9,0.0,0.5               
+        LPY=0
+        if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+        !obtain the ordinal day
+        IF(IMO.EQ.1)then
+          IDY=IDX
+        else
+          IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+        endif
+
+        IF(IDY.GT.0 .AND. JCUT.EQ.1)THEN
+          iDayPlantHarvest_pft(NZ,NY,NX)=IDY
+          IYR=yearc
+          iYearPlantHarvest_pft(NZ,NY,NX)=MIN(IYR,iYearCurrent)
+        ENDIF
+        !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
+        !          iHarvstType_pft=3:reduction of clumping factor, pruning
+        !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),
+        !          iHarvstType_pft=5:fire
+        !     THIN_pft=iHarvstType_pft=0-3,5: fraction of population removed,
+        !          iHarvstType_pft=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
+        !
+        !harvest is specified with two type numbers, first is large categroy, second is pft-specific operation
+        iHarvstType_pft(NZ,IDY,NY,NX)    = ICUT
+        jHarvstType_pft(NZ,IDY,NY,NX)    = JCUT
+        CanopyCutProxy_pft(NZ,IDY,NY,NX) = HCUT
+        THIN_pft(NZ,IDY,NY,NX)           = PCUT  
+        
+        !Note: pft-level-harvest minus ecosystem-level-harvest = litter to soil 
+        !pft-level harvest
+        FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT11
+        FracBiomHarvsted(iHarvst_pft,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT12
+        FracBiomHarvsted(iHarvst_pft,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT13
+        FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
+
+        !ecosystem-level harvest
+        FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
+        FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
+        FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT23
+        FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
+      ENDDO        
+    ENDDO
+  ENDDO
+  
+  end subroutine ReadPlantFireMgmt
 end module ReadManagementMod
