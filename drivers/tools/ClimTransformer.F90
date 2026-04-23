@@ -11,7 +11,7 @@ program ClimTransformer
   use data_const_mod , only : spval  => DAT_CONST_SPVAL
   use ncdio_pio
   use netcdf
-  use EcoSIMConfig, only : IFLGW
+  use EcoSIMConfig, only : iFlagRaiseZ0GbyVeg
 implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
@@ -239,7 +239,7 @@ implicit none
     data1(1)=atmf%CKARG; call ncd_putvar(ncf,'CKARG',k,data1)
     data1(1)=atmf%CSORG; call ncd_putvar(ncf,'CSORG',k,data1)
     data1(1)=atmf%CCLRG; call ncd_putvar(ncf,'CCLRG',k,data1)
-    idata(1)=IFLGW; call ncd_putvar(ncf,'IFLGW',k,idata)
+    idata(1)=iFlagRaiseZ0GbyVeg; call ncd_putvar(ncf,'IFLGW',k,idata)
     call ncd_putvar(ncf,'year',k,iyear)
     iyear=iyear+1
   ENDDO

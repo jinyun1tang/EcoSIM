@@ -45,7 +45,7 @@ contains
   allocate(ISOILR_col(JY,JX));                 ISOILR_col=0
   allocate(iUreaHydInhibitorType_col(JY,JX));  iUreaHydInhibitorType_col=0
   allocate(ITILL1_col(JY,JX));                 ITILL1_col=0
-  allocate(IsPlantActive_pft(JP,JY,JX));       IsPlantActive_pft=iDormant
+  allocate(IsPlantActive_pft(JP,JY,JX));       IsPlantActive_pft=iFalse
   allocate(doInitPlant_pft(JP,JY,JX));         doInitPlant_pft=ifalse
   allocate(IDWaterTable_col(JY,JX));           IDWaterTable_col=0
   end subroutine InitFlagData

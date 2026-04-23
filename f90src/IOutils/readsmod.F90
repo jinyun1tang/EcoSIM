@@ -98,7 +98,7 @@ module readsmod
   integer :: LPY,IX
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
-  character(len=12) :: fire_event_entry
+  character(len=21) :: fire_event_entry
   integer :: IDY,IFLG3,I,ICHECK
 
 ! begin_execution
@@ -234,9 +234,10 @@ module readsmod
 !
   if(use_fire)then
     if(check_fire(yearc,fire_event_entry))then
-      call ReadFire(fire_event_entry,NHW,NHE,NVN,NVS)
+      call ReadFire(yearc,fire_event_entry,NHW,NHE,NVN,NVS)
     endif
   endif
+
   IF(trim(soil_mgmt_in).NE.'NO')THEN
     call ReadManagementFiles(yeari)
   ENDIF

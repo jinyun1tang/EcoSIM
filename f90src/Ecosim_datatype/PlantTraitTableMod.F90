@@ -5,6 +5,7 @@ module PlantTraitTableMod
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  integer, target, allocatable :: iEmbryophyteType_pft_tab(:)
   integer, target, allocatable :: iPlantPhotosynsType_pft_tab(:)
   integer, target, allocatable :: iPlantRootProfile_tab(:)
   real(r8), target,allocatable  :: xylemPhi_mean_tab(:)
@@ -138,6 +139,7 @@ module PlantTraitTableMod
   allocate(xylemPhi_min_tab(npfts)); xylemPhi_min_tab=0._r8
   allocate(Radius95pctMature_tab(npfts)); Radius95pctMature_tab=0._r8
   allocate(xylemPhi_mean_tab(npfts)); xylemPhi_mean_tab=0._r8
+  allocate(iEmbryophyteType_pft_tab(npfts)); iEmbryophyteType_pft_tab=0._r8
   allocate(iPlantPhotosynsType_pft_tab(npfts));iPlantPhotosynsType_pft_tab=0
   allocate(iPlantRootProfile_tab(npfts));iPlantRootProfile_tab=0
   allocate(iPlantPhenolPattern_tab(npfts));iPlantPhenolPattern_tab=0
@@ -268,6 +270,7 @@ module PlantTraitTableMod
   call destroy(Radius95pctMature_tab)
   call destroy(xylemPhi_mean_tab)
   call destroy(MorphogenBase_tab)
+  call destroy(iEmbryophyteType_pft_tab)
   call destroy(iPlantPhotosynsType_pft_tab)
   call destroy(iPlantRootProfile_tab)
   call destroy(iPlantPhenolPattern_tab)

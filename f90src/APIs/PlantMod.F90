@@ -79,15 +79,14 @@ implicit none
         CALL EXTRACTs(yearIJ%I,yearIJ%J)
 
         DO NZ=1,NP_col(NY,NX)
-
+          !
           Call ReSeedPlants(yearIJ%I,yearIJ%J,NZ)
-
         ENDDO
 
         call ExitPlantBalance(yearIJ,NP_col(NY,NX))
 
         call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
-
+        
       endif
 
     ENDDO
@@ -109,7 +108,7 @@ implicit none
 
 !  activeroot=.false.
 !  DO NZ=1,NP_col(NY,NX)
-!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iActive .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
+!    activeroot=IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopulation_pft(NZ,NY,NX)>ZEROS(NY,NX)
 !    if(activeroot)return
 !  ENDDO
 !  end function test_active_plant

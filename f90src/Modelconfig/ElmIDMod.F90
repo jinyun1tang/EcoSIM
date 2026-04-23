@@ -101,15 +101,6 @@ implicit none
   integer, parameter :: itrue=1
   integer, parameter :: ifalse=0
 
-  integer, parameter :: iEnable  = 0
-  integer, parameter :: iDisable = 1
-
-  integer, parameter :: iLive=0  !plant organ alive
-  integer, parameter :: iDead=1  !plant organ dead
-
-  integer, parameter :: iActive  = 1  !plant active
-  integer, parameter :: iDormant = 0  !plant dormant/dead
-
   integer, parameter :: jharvtyp_noaction  = 0
   integer, parameter :: jharvtyp_terminate = 1
   integer, parameter :: jharvtyp_tmareseed = 2
@@ -149,6 +140,12 @@ implicit none
   integer, parameter :: iphotop_neutral=0
   integer, parameter :: iphotop_short  =1
   integer, parameter :: iphotop_long   =2
+
+  integer, parameter :: iembryotyp_Bryophytes   =0
+  integer, parameter :: iembryotyp_Pteridophytes=1
+  integer, parameter :: iembroytyp_Gymnosperms  =2
+  integer, parameter :: iembroytyp_Monocots     =3
+  integer, parameter :: iembroytyp_Eudicots     =4
 
   integer, parameter :: iphenotyp_evgreen       = 0
   integer, parameter :: iphenotyp_coldecid      = 1

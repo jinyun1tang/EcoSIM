@@ -605,7 +605,7 @@ implicit none
   READ(3,'(50A1)')(TYP(K),K=1,NN)
   read(3,*)(datav(kk),kk=1,3)
   atmf%Z0G=datav(1)
-  IFLGW=int(datav(2))
+  iFlagRaiseZ0GbyVeg=int(datav(2))
   atmf%ZNOONG=datav(3)
 
 !  fourth line in the weather file
@@ -627,7 +627,7 @@ implicit none
     write(*,*)'weather var type: VAR ',(VAR(K),K=1,NN)
     write(*,*)'weather var units: TYP ',(TYP(K),K=1,NN)
     write(*,*)'windspeed measurement height: Z0G',atmf%Z0G
-    write(*,*)'flag for raising Z0G with vegn: IFLGW ',IFLGW
+    write(*,*)'flag for raising Z0G with vegn: IFLGW ',iFlagRaiseZ0GbyVeg
     write(*,*)'time of solar noon: ZNOONG ',atmf%ZNOONG
     write(*,*)'pH in precipitation: PHRG ',atmf%PHRG
     write(*,*)'NH4 conc in precip: CN4RIG ',atmf%CN4RIG
@@ -759,7 +759,7 @@ implicit none
     call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
     call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
     call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
-    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
+    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); iFlagRaiseZ0GbyVeg=idatav(1)
 
     !fill in day 366
     if (.not. isLeap(yeari))then
@@ -823,7 +823,7 @@ implicit none
     call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
     call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
     call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
-    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
+    call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); iFlagRaiseZ0GbyVeg=idatav(1)
 
     call check_var(clm_nfid, 'XRADH', vardesc, readvar,print_err=.false.)
     if(readvar)then

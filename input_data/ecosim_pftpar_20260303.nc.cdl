@@ -19,6 +19,10 @@ variables:
 		IGTYP:long_name = "root profile" ;
 		IGTYP:units = "none" ;
 		IGTYP:flags = "0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)" ;
+   byte IEBTYP(npfts) ;
+		IEBTYP:long_name = "Embrophyte type" ;
+		IEBTYP:units = "none" ;
+		IEBTYP:flags = "1=bryophyte,2=Pteridophytes,3=Gymnosperms,4=Monocots,5=Eudicots" ;   
 	byte ISTYP(npfts) ;
 		ISTYP:long_name = "growth habit" ;
 		ISTYP:units = "none" ;
@@ -379,6 +383,11 @@ data:
     3, 3, 3, 3, 3, 3, 4, 3 ;
 
  IGTYP = 1, 1, 2, 1, 1, 0, 3, 1, 2, 1, 0, 3, 1, 1, 1, 0, 2, 1, 2, 2, 1, 2, 2, 
+    1, 2, 2, 2, 2, 3, 1, 2, 2, 3, 3, 1, 2, 0, 1, 0, 1, 1, 1, 1, 0, 2, 0, 2, 
+    2, 1, 3, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 3, 2, 2, 0, 1, 3, 0, 1, 0, 0, 0, 
+    1, 3, 1, 1, 1, 1, 1, 2 ;
+
+ IEBTYP = 1, 1, 2, 1, 1, 0, 3, 1, 2, 1, 0, 3, 1, 1, 1, 0, 2, 1, 2, 2, 1, 2, 2, 
     1, 2, 2, 2, 2, 3, 1, 2, 2, 3, 3, 1, 2, 0, 1, 0, 1, 1, 1, 1, 0, 2, 0, 2, 
     2, 1, 3, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 3, 2, 2, 0, 1, 3, 0, 1, 0, 0, 0, 
     1, 3, 1, 1, 1, 1, 1, 2 ;
@@ -1372,8 +1381,8 @@ data:
   "woat35",
   "clvs32",
   "gr3s43",
-  "maiz41    ",
-  "soyb41    " ;
+  "maiz41",
+  "soyb41" ;
 
  pfts_short =
   "alfa",

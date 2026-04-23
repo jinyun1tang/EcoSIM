@@ -4,6 +4,7 @@ module SaltChemEquilibriaMod
   use minimathmod,        only: isclose
   use SoluteChemDataType, only: chem_var_type, solute_flx_type
   use minimathmod,        only: AZMAX1
+  use DebugToolMod
   use SoluteParMod
   use EcosimConst
   use EcoSIMSolverPar
@@ -1341,29 +1342,29 @@ module SaltChemEquilibriaMod
   subroutine SummarizeIonFluxes
 
   implicit none
-!     begin_execution
-!     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
-!     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
-!
-  TRChem_NH4_soil_mole             = TRChem_NH4_soil_mole*VLWatMicPNH
-  TRChem_NH4_band_soil_mole             = TRChem_NH4_band_soil_mole*VLWatMicPNB
-  TRChem_NH3_soil_mole               = TRChem_NH3_soil_mole*VLWatMicPNH
-  TRChem_NH3_band_soil             = TRChem_NH3_band_soil*VLWatMicPNB
-  TRChem_Al_3p_soil                = TRChem_Al_3p_soil*VLWatMicPM
-  TRChem_Fe_3p_soil                = TRChem_Fe_3p_soil*VLWatMicPM
-  TRChem_H_p_soil                  = TRChem_H_p_soil*VLWatMicPM
-  TRChem_Ca_2p_soil                = TRChem_Ca_2p_soil*VLWatMicPM
-  TRChem_Mg_2p_soil                = TRChem_Mg_2p_soil*VLWatMicPM
-  TRChem_Na_p_soil                 = TRChem_Na_p_soil*VLWatMicPM
-  TRChem_K_1p_soil                 = TRChem_K_1p_soil*VLWatMicPM
-  TRChem_OH_1e_soil                = TRChem_OH_1e_soil*VLWatMicPM
-  TRChem_SO4_2e_soil               = TRChem_SO4_2e_soil*VLWatMicPM
-  TRChem_CO3_2e_soil               = TRChem_CO3_2e_soil*VLWatMicPM
-  TRChem_HCO3_soil                 = TRChem_HCO3_soil*VLWatMicPM
-  TRChem_CO2_gchem_soil            = TRChem_CO2_gchem_soil*VLWatMicPM
-  TRChem_AlOH_soil                 = TRChem_AlOH_soil*VLWatMicPM
-  TRChem_AlO2H2_soil               = TRChem_AlO2H2_soil*VLWatMicPM
-  TRChem_AlO3H3_soil               = TRChem_AlO3H3_soil*VLWatMicPM
+  !     begin_execution
+  !     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
+  !     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
+  !
+  TRChem_NH4_soil_mole      = TRChem_NH4_soil_mole*VLWatMicPNH
+  TRChem_NH4_band_soil_mole = TRChem_NH4_band_soil_mole*VLWatMicPNB
+  TRChem_NH3_soil_mole      = TRChem_NH3_soil_mole*VLWatMicPNH
+  TRChem_NH3_band_soil      = TRChem_NH3_band_soil*VLWatMicPNB
+  TRChem_Al_3p_soil         = TRChem_Al_3p_soil*VLWatMicPM
+  TRChem_Fe_3p_soil         = TRChem_Fe_3p_soil*VLWatMicPM
+  TRChem_H_p_soil           = TRChem_H_p_soil*VLWatMicPM
+  TRChem_Ca_2p_soil         = TRChem_Ca_2p_soil*VLWatMicPM
+  TRChem_Mg_2p_soil         = TRChem_Mg_2p_soil*VLWatMicPM
+  TRChem_Na_p_soil          = TRChem_Na_p_soil*VLWatMicPM
+  TRChem_K_1p_soil          = TRChem_K_1p_soil*VLWatMicPM
+  TRChem_OH_1e_soil         = TRChem_OH_1e_soil*VLWatMicPM
+  TRChem_SO4_2e_soil        = TRChem_SO4_2e_soil*VLWatMicPM
+  TRChem_CO3_2e_soil        = TRChem_CO3_2e_soil*VLWatMicPM
+  TRChem_HCO3_soil          = TRChem_HCO3_soil*VLWatMicPM
+  TRChem_CO2_gchem_soil     = TRChem_CO2_gchem_soil*VLWatMicPM
+  TRChem_AlOH_soil          = TRChem_AlOH_soil*VLWatMicPM
+  TRChem_AlO2H2_soil        = TRChem_AlO2H2_soil*VLWatMicPM
+  TRChem_AlO3H3_soil        = TRChem_AlO3H3_soil*VLWatMicPM
   TRChem_AlO4H4_soil               = TRChem_AlO4H4_soil*VLWatMicPM
   TRChem_AlSO4_soil                = TRChem_AlSO4_soil*VLWatMicPM
   TRChem_FeOH_soil                 = TRChem_FeOH_soil*VLWatMicPM
@@ -1479,8 +1480,9 @@ module SaltChemEquilibriaMod
 
   subroutine GetSoluteConcentrations
   implicit none
+  character(len=*), parameter :: subname='GetSoluteConcentrations'
 !     begin_execution
-
+  call PrintInfo('beg '//subname)
   NH4_1p_aque_mole_conc      = AMAX1(ZERO,NH4_1p_aque_mole_conc)
   NH4_1p_band_mole_conc      = AMAX1(ZERO,NH4_1p_band_mole_conc)
   NH3_aque_mole_conc         = AMAX1(ZERO,NH3_aque_mole_conc)
@@ -1539,20 +1541,23 @@ module SaltChemEquilibriaMod
   CaH4P2O8_1p_band_conc      = AMAX1(ZERO,CaH4P2O8_1p_band_conc)
   MgHPO4_band_conc           = AMAX1(ZERO,MgHPO4_band_conc)
   XCOO                       = AZMAX1(XCOOH_mole_conc-XHC1-XAlO2H2_conc-XFeO2H2_conc)
+  call PrintInfo('end '//subname)
   end subroutine GetSoluteConcentrations
 !------------------------------------------------------------------------------------------
 
   subroutine IonStrengthActivity
   implicit none
+  character(len=*), parameter :: subname='IonStrengthActivity'
   real(r8) :: cation_3p_aque_mole_conc,anion_3e_conc,cation_2p_aque_mole_conc
   real(r8) :: anion_2e_aque_mole_conc,cation_1p_aque_mole_conc,anion_1e_aque_mole_conc,CSTR1,CSTR2
   real(r8) :: A1,A3,FSTR2
-!     begin_execution
-!     IONIC STRENGTH FROM SUMS OF ION CONCENTRATIONS
-!
-!     cation_3p_aque_mole_conc,anion_3e_conc,cation_2p_aque_mole_conc,anion_2e_aque_mole_conc,cation_1p_aque_mole_conc,anion_1e_aque_mole_conc=total tri-,di-,univalent cations C,anions A
-!     CSTR1=ion strength
-!
+  !     begin_execution
+  call PrintInfo('beg '//subname)
+  !     IONIC STRENGTH FROM SUMS OF ION CONCENTRATIONS
+  !
+  !     cation_3p_aque_mole_conc,anion_3e_conc,cation_2p_aque_mole_conc,anion_2e_aque_mole_conc,cation_1p_aque_mole_conc,anion_1e_aque_mole_conc=total tri-,di-,univalent cations C,anions A
+  !     CSTR1=ion strength
+  !
   cation_3p_aque_mole_conc=Al_3p_aque_mole_conc+Fe_3p_aque_mole_conc
   anion_3e_conc=H0PO4_3e_conc*VLPO4+H0PO4_3e_band_conc*VLPOB
   cation_2p_aque_mole_conc=Ca_2p_aque_mole_conc+Mg_2p_aque_mole_conc+AlOH_2p_aque_mole_conc+FeOH_2p_aque_mole_conc+FeH2PO4_2p_aque_mole_conc*VLPO4+FeH2PO4_2p_band_conc*VLPOB
@@ -1646,6 +1651,7 @@ module SaltChemEquilibriaMod
   NaCO3_1e_activity         = NaCO3_1e_aque_mole_conc*A1
   NaSO4_1e_activity         = NaSO4_1e_aque_mole_conc*A1
   AKAS1                     = KSO4_1e_aque_mole_conc*A1
+  call PrintInfo('end '//subname)
   end subroutine IonStrengthActivity
 !------------------------------------------------------------------------------------------
 
