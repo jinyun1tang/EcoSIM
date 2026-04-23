@@ -329,10 +329,13 @@ implicit none
     !call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,&
     !  KSatReductByRainKineticEnergy,TopLayWatVol,HeatFluxAir2Soi,Qinfl2MicPM,Hinfl2SoilM)
 
-    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay, &
-    KSatReductByRainKineticEnergy,TopLayWatVol_col,HeatFluxAir2Soi, &
-    Qinfl2MicP_col,HeatInfl2Soil)
+    !call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay, &
+    !KSatReductByRainKineticEnergy,TopLayWatVol_col,HeatFluxAir2Soi, &
+    !Qinfl2MicP_col,HeatInfl2Soil)
 
+    call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
+      TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP)
+    
     !call subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
     !  TopLayWatVol_col,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
 
