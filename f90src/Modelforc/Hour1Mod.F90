@@ -234,8 +234,8 @@ module Hour1Mod
         ENDDO
       ENDDO
 
-      if(lverb)write(*,*)'CanopyInterceptPrecp'
-      CALL CanopyInterceptPrecp(NY,NX)
+      if(lverb)write(*,*)'CanopyInterceptPrecip'
+      CALL CanopyInterceptPrecip(NY,NX)
 !
 !     WRITE SW AND PAR ALBEDO
 
@@ -593,7 +593,7 @@ module Hour1Mod
 !     IDWaterTable=water table flag from site file
 !     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
 !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
-!     SoilSurfRoughnesst0_col,ZW=soil,water surface roughness
+!     SoilSurfRoughness_col,ZW=soil,water surface roughness
 !     VLWatHeldCapSurf_col=soil surface water retention capacity
 !     VWatStoreCapSurf_col=VLWatHeldCapSurf_col accounting for above-ground water table
 !     EHUM=fraction of microbial decompn product allocated to surface humus
@@ -610,15 +610,17 @@ module Hour1Mod
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=DTBLD_col(NY,NX)
   ENDIF
-
+  !
+  !surface roughness parameterization can be better
   IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
-    SoilSurfRoughnesst0_col(NY,NX)=0.020_r8
+    SoilSurfRoughness_col(NY,NX)=0.020_r8
   ELSE
-    SoilSurfRoughnesst0_col(NY,NX)=ZW
+    SoilSurfRoughness_col(NY,NX)=ZW
   ENDIF
-  VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughnesst0_col(NY,NX)+&
-    3.10_r8*SoilSurfRoughnesst0_col(NY,NX)**2._r8 &
-    -0.012_r8*SoilSurfRoughnesst0_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  !
+  VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughness_col(NY,NX)+&
+    3.10_r8*SoilSurfRoughness_col(NY,NX)**2._r8 &
+    -0.012_r8*SoilSurfRoughness_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX)
 
   VWatStoreCapSurf_col(NY,NX)=AMAX1(VLWatHeldCapSurf_col(NY,NX),-(ExtWaterTable_col(NY,NX)-&
     CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX))
@@ -799,7 +801,7 @@ module Hour1Mod
   THeatSnowThaw_col(NY,NX)                        = 0._r8
   THeatSoiThaw_col(NY,NX)                         = 0._r8
   TPlantRootH2OUptake_col(NY,NX)                  = 0._r8
-  CanopyWat_col(NY,NX)                            = 0._r8
+  CanopyBiomWater_col(NY,NX)                            = 0._r8
   WatHeldOnCanopy_col(NY,NX)                      = 0._r8
   Prec2Canopy_col(NY,NX)                          = 0._r8
   PrecIntceptByCanopy_col(NY,NX)                  = 0._r8
@@ -916,7 +918,7 @@ module Hour1Mod
       D50=1.0_r8*CCLAY_vr(NU_col(NY,NX),NY,NX)+10._r8*CSILT_vr(NU_col(NY,NX),NY,NX) &
         +100._r8*CSAND_vr(NU_col(NY,NX),NY,NX)+100._r8*CORGM
       ZD50                    = 0.041*(ppmc*D50)**0.167_r8
-      SoiSurfRoughness(NY,NX) = SoilSurfRoughnesst0_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA_3D(3,0,NY,NX)
+      SoiSurfRoughness(NY,NX) = SoilSurfRoughness_col(NY,NX)+ZD50+1.0_r8*VLitR_col(NY,NX)/AREA_3D(3,0,NY,NX)
       IF(iErosionMode.EQ.ieros_frzthawsom .OR. iErosionMode.EQ.ieros_frzthawsomeros)THEN
         CER_col(NY,NX)              = ((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
         XER_col(NY,NX)              = ((D50+5.0_r8)/300._r8)**0.25_r8

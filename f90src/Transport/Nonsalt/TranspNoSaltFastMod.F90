@@ -990,7 +990,7 @@ implicit none
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VLWatMacPS,VOLWT
 
-  integer :: iDisableEbu,N,L,K,LL,NY,NX
+  integer :: iFalseEbu,N,L,K,LL,NY,NX
   integer :: N1,N2,N3  !source grid index
   integer :: N4,N5,N6  !dest grid index
 
@@ -1002,7 +1002,7 @@ implicit none
 !
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      iDisableEbu=ifalse
+      iFalseEbu=ifalse
       D125: DO L=NU_col(NY,NX),NL_col(NY,NX)
         !source
         N1=NX;N2=NY;N3=L    

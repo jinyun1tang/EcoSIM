@@ -2730,7 +2730,7 @@ implicit none
   integer, intent(in) :: I,J,M,NHE,NHW,NVS,NVN
 
   integer  :: N1,N2,N3
-  logical  :: iDisableEbu                        !bubbling flag
+  logical  :: iFalseEbu                        !bubbling flag
 
   character(len=*), parameter :: subname='BubbleEffluxM'  
   real(r8) :: THETW1
@@ -2747,7 +2747,7 @@ implicit none
   LG=0
   DO N1=NHW,NHE
     DO N2=NVN,NVS
-      iDisableEbu = .false.
+      iFalseEbu = .false.
       trcg_Ebu_flxM_vr(idg_beg:idg_end,NUM_col(N2,N1):NL_col(N2,N1),N2,N1)=0.0_r8      
 
       DO N3=NLF_col(N2,N1),NUM_col(N2,N1),-1  !sweep upward assuming bubbles go upward
@@ -2755,7 +2755,7 @@ implicit none
         THETW1=AZMAX1(safe_adb(VLWatMicPM_vr(M,N3,N2,N1),VLSoilMicP_vr(N3,N2,N1)))
         !
         IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1)     & ! has significant water 
-          .AND. .not.iDisableEbu)THEN                 ! ebullition is allowed
+          .AND. .not.iFalseEbu)THEN                 ! ebullition is allowed
 
           dPond=AZMAX1(CumDepz2LayBottom_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))*10._r8
 
@@ -2821,7 +2821,7 @@ implicit none
             RCH4PhysexchPrev_vr(N3,N2,N1)  = RCH4PhysexchPrev_vr(N3,N2,N1)+trcg_Ebu_flxM_vr(idg_CH4,N3,N2,N1)
           ENDIF
         ELSE
-          iDisableEbu=.true.
+          iFalseEbu=.true.
           DO idg=idg_beg,idg_end
             !add to the gas phase, which will then go through gaseous transport, triggering bubbling
             if(trcg_ebu_flx_col(idg,N2,N1)<0._r8)then

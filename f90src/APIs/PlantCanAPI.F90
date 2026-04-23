@@ -60,7 +60,7 @@ implicit none
   plt_ew%TairK                   = TairK_col(NY,NX)
   plt_morph%CanopyHeight_col     = CanopyHeight_col(NY,NX)
   plt_site%WindMesureHeight_col  = WindMesureHeight_col(NY,NX)
-  plt_ew%ZERO4PlantDisplace_col  = ZERO4PlantDisplace_col(NY,NX)
+  plt_ew%ZeroPlaneDisplacem_col  = ZeroPlaneDisplacem_col(NY,NX)
   plt_site%WindSpeedAtm_col      = WindSpeedAtm_col(NY,NX)
   plt_ew%VLHeatCapSnowMin_col    = VLHeatCapSnowMin_col(NY,NX)
   plt_ew%VLHeatCapSurfSnow_col   = VLHeatCapSnow_snvr(1,NY,NX)
@@ -102,7 +102,7 @@ implicit none
   plt_rad%RadPARDiffus_col         = RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col          = RadSWDirect_col(NY,NX)
   plt_rad%RadDirectPAR_col         = RadDirectPAR_col(NY,NX)
-  plt_site%SoilSurfRoughnesst0_col = SoilSurfRoughnesst0_col(NY,NX)
+  plt_site%SoilSurfRoughness_col = SoilSurfRoughness_col(NY,NX)
   plt_ew%VcumWatSnow_col           = VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col           = VcumIceSnow_col(NY,NX)
   plt_ew%VcumDrySnoWE_col          = VcumDrySnoWE_col(NY,NX)
@@ -125,7 +125,7 @@ implicit none
     plt_morph%ClumpFactor_pft(NZ)      = ClumpFactor_pft(NZ,NY,NX)
 
     DO  L=1,NumCanopyLayers
-      plt_morph%CanopyStemAreaZ_pft(L,NZ) = CanopyStemAreaZ_pft(L,NZ,NY,NX)
+      plt_morph%CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ,NY,NX)
       plt_morph%CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ,NY,NX)
     ENDDO
 
@@ -136,7 +136,7 @@ implicit none
         ENDDO
       ENDDO
       DO  L=1,NumCanopyLayers
-        plt_morph%CanopyStalkArea_lbrch(L,NB,NZ)=CanopyStalkArea_lbrch(L,NB,NZ,NY,NX)
+        plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
@@ -180,9 +180,11 @@ implicit none
 
   integer :: N,M,NN,L,NZ,K,NB
 
-  ZERO4PlantDisplace_col(NY,NX)  = plt_ew%ZERO4PlantDisplace_col
-  RoughHeight_col(NY,NX)         = plt_ew%RoughHeight
-  AbvCanopyBndlResist_col(NY,NX) = plt_ew%AbvCanopyBndlResist_col
+  ZeroPlaneDisplacem_col(NY,NX)  = plt_ew%ZeroPlaneDisplacem_col
+  RoughnessLength_col(NY,NX)         = plt_ew%RoughnessLength
+  RawIsoTAtm2CanopySinkZ_col(NY,NX) = plt_ew%RawIsoTAtm2CanopySinkZ_col
+  RawIsoTSurf2CanopyHScal_col(NY,NX)= plt_ew%RawIsoTSurf2CanopyHScal_col
+  RawCanopyH2SinkZ_col(NY,NX)       = plt_ew%RawCanopyH2SinkZ_col
   RIB_col(NY,NX)                     = plt_ew%RIB
   
   CanopyHeight_col(NY,NX)    = plt_morph%CanopyHeight_col

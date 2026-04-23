@@ -25,15 +25,15 @@ implicit none
   real(r8),allocatable ::  SnowFallt_col(:,:)                    !  snowfall to snow, [m3 d-2]
   real(r8),allocatable ::  Rain2Snowt_col(:,:)                   !  rainfall to snow, [m3 d-2]
   real(r8),allocatable ::  VLairMacP1_vr(:,:,:)                  !  positively corrected macropore volume, [m^3/d^2]
-  real(r8),allocatable ::  EVAPW(:,:)                            !  
-  real(r8),allocatable ::  EVAPS(:,:)                            !  
-  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                      ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
+  real(r8),allocatable ::  EVAPW_col(:,:)                        !  evaporation between atmosphere and surface snow [m3 H2O d-2/h]
+  real(r8),allocatable ::  EVAPS_col(:,:)                        !  sublimation from surface snow into atmosphere, [m3 H2O d-2/h]
+  real(r8),allocatable ::  VapXAir2Sno_col(:,:)                  ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
   real(r8),allocatable ::  SoilFracAsMacP1_vr(:,:,:)             !  
   real(r8),allocatable ::  PrecHeat2Snowt_col(:,:)               ! total heat flux to snow due to precipitation, [m3 d-2]
-  real(r8),allocatable ::  VPQ_col(:,:)                          !  
+
   real(r8),allocatable ::  AScaledCdHOverSnow_col(:,:)           ! area scaled sensible heat flux conductance over snow  [MJ h /(m K)]
   real(r8),allocatable ::  Ice2Snowt_col(:,:)                    ! icefall to snow, [m3 d-2]
-  real(r8),allocatable ::  TKQ_col(:,:)                          ! air temperature in canopy [K]
+
   real(r8),allocatable ::  ResistAreodynOverSnow_col(:,:)        !  
   real(r8),allocatable ::  VLairMicP1_vr(:,:,:)                  ! corrected air-filled micropore volume [m3/d2]
   real(r8),allocatable ::  TKSnow0_snvr(:,:,:)                   !  
@@ -41,7 +41,7 @@ implicit none
   real(r8),allocatable ::  SoilFracAsMicP_vr(:,:,:)              !
   real(r8),allocatable ::  VLHeatCapacityA_vr(:,:,:)             !
   real(r8),allocatable ::  VLHeatCapacityB_vr(:,:,:)             !
-  real(r8),allocatable ::  ResistAreodynOverSoil_col(:,:)        ! aerodynamic resistance over soil, [m]
+  real(r8),allocatable ::  RawIsoTSoil2ATM_col(:,:)        ! aerodynamic resistance over soil, [m]
   real(r8),allocatable ::  AScaledCdWOverSnow_col(:,:)           ! area scaled latent heat flux conductance over snow, [m^2 h]
   real(r8),allocatable ::  Altitude_col(:,:)                    ! grid altitude [m]
   real(r8),allocatable ::  VLiceMacP1_vr(:,:,:)                      !
@@ -82,14 +82,14 @@ implicit none
   allocate(Rain2Snowt_col(JY,JX));       Rain2Snowt_col=0._r8
   allocate(VLairMacP1_vr(JZ,JY,JX));   VLairMacP1_vr=0._r8 
   allocate(VapXAir2Sno_col(JY,JX));      VapXAir2Sno_col=0._r8  
-  allocate(EVAPW(JY,JX));       EVAPW=0._r8    
-  allocate(EVAPS(JY,JX));       EVAPS=0._r8  
+  allocate(EVAPW_col(JY,JX));       EVAPW_col=0._r8    
+  allocate(EVAPS_col(JY,JX));       EVAPS_col=0._r8  
   allocate(SoilFracAsMacP1_vr(JZ,JY,JX));     SoilFracAsMacP1_vr=0._r8  
   allocate(PrecHeat2Snowt_col(JY,JX));      PrecHeat2Snowt_col=0._r8  
-  allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
+
   allocate(AScaledCdHOverSnow_col(JY,JX));       AScaledCdHOverSnow_col=0._r8
   allocate(Ice2Snowt_col(JY,JX));       Ice2Snowt_col=0._r8    
-  allocate(TKQ_col(JY,JX));         TKQ_col=0._r8  
+
   allocate(LWEmscefSnow_col(JY,JX));       LWEmscefSnow_col=0._r8  
   allocate(ResistAreodynOverSnow_col(JY,JX));        ResistAreodynOverSnow_col=0._r8  
   allocate(LWRad2Snow_col(JY,JX));       LWRad2Snow_col=0._r8  
@@ -99,7 +99,7 @@ implicit none
   allocate(SoilFracAsMicP_vr(JZ,JY,JX));     SoilFracAsMicP_vr=0._r8
   allocate(VLHeatCapacityA_vr(JZ,JY,JX));   VLHeatCapacityA_vr=0._r8
   allocate(VLHeatCapacityB_vr(JZ,JY,JX));   VLHeatCapacityB_vr=0._r8  
-  allocate(ResistAreodynOverSoil_col(JY,JX));         ResistAreodynOverSoil_col=0._r8
+  allocate(RawIsoTSoil2ATM_col(JY,JX));         RawIsoTSoil2ATM_col=0._r8
   allocate(AScaledCdWOverSnow_col(JY,JX));       AScaledCdWOverSnow_col=0._r8
   allocate(Altitude_col(JY,JX));        Altitude_col=0._r8  
   allocate(VLiceMacP1_vr(JZ,JY,JX));   VLiceMacP1_vr=0._r8  
@@ -145,15 +145,15 @@ implicit none
   call destroy(SnowFallt_col)
   call destroy(Rain2Snowt_col)
   call destroy(VLairMacP1_vr)    
-  call destroy(EVAPW)  
-  call destroy(EVAPS)  
+  call destroy(EVAPW_col)  
+  call destroy(EVAPS_col)  
   call destroy(VapXAir2Sno_col)  
   call destroy(SoilFracAsMacP1_vr)  
   call destroy(PrecHeat2Snowt_col)
-  call destroy(VPQ_col)    
+
   call destroy(AScaledCdHOverSnow_col)  
   call destroy(Ice2Snowt_col)
-  call destroy(TKQ_col)
+
   call destroy(LWEmscefSnow_col)
   call destroy(ResistAreodynOverSnow_col) 
   call destroy(LWRad2Snow_col)
@@ -163,7 +163,7 @@ implicit none
   call destroy(SoilFracAsMicP_vr)
   call destroy(VLHeatCapacityA_vr)
   call destroy(VLHeatCapacityB_vr)  
-  call destroy(ResistAreodynOverSoil_col)
+  call destroy(RawIsoTSoil2ATM_col)
   call destroy(AScaledCdWOverSnow_col)
   call destroy(Altitude_col)
   call destroy(VLiceMacP1_vr)

@@ -100,12 +100,14 @@
   call PrintInfo('beg '//subname)
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
-!     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
-!     ALAT=latitude +ve=N,-ve=S
-!
+
+      !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
+      !     ALAT=latitude +ve=N,-ve=S
+      !
       HUDX_col(NY,NX)=0._r8
       HUDN_col(NY,NX)=100.0_r8
       TWIND_col(NY,NX)=0._r8
+      SeasonalNonstCDayAve_pft(:,NY,NX) = 0._r8
 !      PrecDaily_col(NY,NX)=0._r8
 !
 !

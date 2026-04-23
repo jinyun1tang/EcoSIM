@@ -474,7 +474,7 @@ module EcosysWarmingMod
   !
   !Description
   !set up cable warming reference tempeature
-  use ClimForcDataType,  only: SineSunInclAngle_col,EMS_scalar_col,srad_scalar_col,WindSpeedAtm_col
+  use ClimForcDataType,  only: SineSunInclAngle_col,EMS_Modify_Scalar_col,srad_scalar_col,WindSpeedAtm_col
   use PlantDataRateType, only: GrossCO2Fix_pft
   implicit none
   integer, intent(in) :: I,J
@@ -496,7 +496,7 @@ module EcosysWarmingMod
           !When Open Top Chamber (OTC) is applied, the typical wind speed inside the chamber ranges from about 0.3 to 0.8 m/s based on several studies.
           WindSpeedAtm_col(NY,NX)=wind_otc*3600._r8    
           !Open Top Chambers (OTCs) can reduce the effective long-wave radiation emissivity of the plant canopy by about 5% to 10%.
-          EMS_scalar_col(NY,NX) = 1._r8-ems_reduct_otc   !reduce canopy emissivity
+          EMS_Modify_Scalar_col(NY,NX) = 1._r8-ems_reduct_otc   !reduce canopy emissivity
           srad_scalar_col(NY,NX)= taus_otc               !reduces incoming solar radiation, it tries not to differentiate direct and diffuse radiation
         endif
       endif

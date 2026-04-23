@@ -420,6 +420,7 @@ implicit none
     fNCLFW_brch            => plt_pheno%fNCLFW_brch           ,& !output : NC ratio of growing leaf on branch, [gN/gC]
     fPCLFW_brch            => plt_pheno%fPCLFW_brch           ,& !output : PC ratio of growing leaf on branch, [gP/gC]
     fNCLFW_pft             => plt_pheno%fNCLFW_pft            ,& !output : NC ratio of growing leaf, [gN/gC]
+    RNFixCO2_pft           => plt_bgcr%RNFixCO2_pft           ,& !inoput :CO2 respired by nodules, [gC d-2]    
     fPCLFW_pft             => plt_pheno%fPCLFW_pft             & !output : PC ratio of growing leaf, [gP/gC]
   )
   
@@ -431,8 +432,9 @@ implicit none
     SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
     SSXferElms_pft(:,NZ)                        = 0._r8
     trcs_deadroot2soil_pvr(:,:,NZ)              = 0._r8  
-    fNCLFW_pft(NZ) = 0._r8  
-    fPCLFW_pft(NZ) = 0._r8
+    RNFixCO2_pft(NZ)                             = 0._r8
+    fNCLFW_pft(NZ)                               = 0._r8
+    fPCLFW_pft(NZ)                               = 0._r8
     plt_photo%CanopyVcMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVoMaxRubisco25C_pft(NZ)      = 0._r8
     plt_photo%CanopyVcMaxPEP25C_pft(NZ)          = 0._r8
@@ -539,7 +541,9 @@ implicit none
     massnonst1(NE)      = sum(RootMycoNonstElms_pft(NE,1:Myco_pft(NZ),NZ))
     
     RootElms_pft(NE,NZ) = massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
-
+    if(RootElms_pft(NE,NZ)<0._r8)then
+    write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumPrimeRootAxes_pft(NZ)
+    endif
     !add reserve to struct
     RootNoduleElms_pft(NE,NZ)=0._r8
     if(is_plant_N2fix(iPlantNfixType_pft(NZ)) .and. is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
@@ -570,11 +574,11 @@ implicit none
         plt_biom%SeasonalNonstElms_pft(NE,NZ)+plt_biom%StandDeadStrutElms_pft(NE,NZ)+ plt_biom%ShootNoduleElms_pft(NE,NZ)  + &
         plt_biom%RootNoduleElms_pft(NE,NZ) 
 
-      if(plt_biom%RootElms_pft(NE,NZ)<0._r8)then
-        write(944,*)yearIJ%I*1000+yearIJ%J/24.,NE,plt_biom%RootElms_pft(NE,NZ),plt_biom%ShootElms_pft(NE,NZ),&
-        plt_biom%SeasonalNonstElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ), plt_biom%ShootNoduleElms_pft(NE,NZ), &
-        plt_biom%RootNoduleElms_pft(NE,NZ) 
-      endif
+!      if(plt_biom%RootElms_pft(NE,NZ)<0._r8)then
+!        write(944,*)yearIJ%I*1000+yearIJ%J/24.,NE,plt_biom%RootElms_pft(NE,NZ),plt_biom%ShootElms_pft(NE,NZ),&
+!        plt_biom%SeasonalNonstElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ), plt_biom%ShootNoduleElms_pft(NE,NZ), &
+!        plt_biom%RootNoduleElms_pft(NE,NZ) 
+!      endif
       plt_biom%RootElmsBeg_pft(NE,NZ)           = plt_biom%RootElms_pft(NE,NZ)
       plt_biom%StandDeadStrutElmsBeg_pft(NE,NZ) = plt_biom%StandDeadStrutElms_pft(NE,NZ)
       plt_biom%ShootElmsBeg_pft(NE,NZ)          = plt_biom%ShootElms_pft(NE,NZ)
@@ -726,9 +730,9 @@ implicit none
     err_rel=1.e-10_r8
   endif
 
-  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)then      
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
     write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
-    write(888,*)'NY,NX=',plt_site%NY,plt_site%NX
+    write(888,*)'NY,NX=',plt_site%NY,plt_site%NX,header
     write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
     write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
     write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
@@ -745,9 +749,9 @@ implicit none
     write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
     write(888,*)'RootNFix          =',RootN2Fix_pft(NZ)            
     write(888,*)'seed planted      =',plt_biom%SeedPlantedElm_pft(NE,NZ)     
-    write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)      
-    if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-      call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
+    write(888,*)'surf literfall N =',SurfLitrfallElms_pft(NE,NZ)          
+    write(888,*)('-',K=1,100)             
+    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8)call endrun('N balance error test failure in '//trim(mod_filename)//' at line',__LINE__)      
   endif
 
   NE=ielmp

@@ -35,7 +35,7 @@ module PlantBGCPars
   real(r8) :: EMODR                               !root modulus of elasticity, [MPa]
   real(r8) :: QNTM                                !quantum efficiency, [umol e- umol-1 PAR]
   real(r8) :: CURV                                !shape parameter for e- transport response to PAR,[-]
-
+  integer  :: Days2CallFalseBreak                 !days to call a plant did false breakout.
   real(r8) :: CNKI_rubisco                        !nonstruct N inhibition constant on rubisco (g N g-1 C),1.0E+02_r8
   real(r8) :: CPKI_rubisco                        !nonstruct P inhibition constant on rubisco (g P g-1 C),1.0E+03_r8
   real(r8) :: RSMY_stomaCO2                       !minimum stomatal resistance for CO2 uptake (h m-1)
@@ -298,7 +298,7 @@ module PlantBGCPars
 
   HoursReq4LiterfalAftMature = 960
 
-
+  Days2CallFalseBreak = 10 !continusly 10 days to call false break out.
   RCCZ=real((/0.167,0.167,0.167,0.056/),r8)
   RCCY=real((/0.333,0.333,0.167,0.333/),r8)
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)

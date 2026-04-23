@@ -115,6 +115,7 @@ implicit none
   integer, intent(in) :: iyear    !file record number
   integer, intent(in) :: yearc    !current model year
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  character(len=*), parameter :: subname='readplantinginfo'
   logical  :: readvar
   integer  :: NH1,NV1,NH2,NV2,NS
   integer :: NTOPO,NY,NX,NZ
@@ -123,6 +124,7 @@ implicit none
   character(len=128) :: pft_pltinfo(JP),tstr
   integer :: LPY,IDX,IMO,IYR,IDY
 
+  call PrintInfo('beg '//subname)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
@@ -166,19 +168,23 @@ implicit none
           else
             IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
           endif
+
           IF(IDY.GT.0.AND.IYR.GT.0)THEN
-            iDayPlanting_pft(NZ,NY,NX)  = IDY
-            IYR                         = yearc
-            iYearPlanting_pft(NZ,NY,NX) = MIN(IYR,iYearCurrent)
-            iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX)    !planting day
-            iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
-            PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)             !population density
+            IF(iselect_plantZ==-1 .OR. (iselect_plantZ>0 .and. NZ==iselect_plantZ))THEN
+              iDayPlanting_pft(NZ,NY,NX)  = IDY
+              IYR                         = yearc
+              iYearPlanting_pft(NZ,NY,NX) = MIN(IYR,iYearCurrent)
+              iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX)    !planting day
+              iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
+              PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)             !population density              
+            ENDIF            
           ENDIF          
         ENDDO
       ENDDO
     ENDDO
   ENDDO  
-  end subroutine readplantinginfo  
+  CALL PrintInfo('end '//subname)
+  end subroutine readplantinginfo
 
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -219,7 +225,7 @@ implicit none
   integer, intent(in) :: iyear    !file record number
   integer, intent(in) :: yearc    !current model year  
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  character(len=*), parameter :: subname='readplantmgmtinfo'
   logical  :: readvar
   real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
   real(r8) :: ECUT24,HCUT,PCUT
@@ -229,10 +235,11 @@ implicit none
   integer :: NTOPO,NY,NX,NZ
   character(len=128) :: pft_pltinfo(JP),tstr  
   character(len=128) :: pft_mgmtinfo(24,JP)
-  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS
+  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS
   integer :: M,NN,N,nn1
-  integer :: JCUT
 
+
+  call PrintInfo('beg '//subname)
   call InitPlantMgmnt(NHW,NHE,NVN,NVS)
   
   DO NTOPO=1,ntopou
@@ -349,7 +356,8 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-  ENDDO        
+  ENDDO  
+  call PrintInfo('end '//subname)      
   end subroutine readplantmgmtinfo
 !------------------------------------------------------------------------------------------
 
@@ -667,7 +675,7 @@ implicit none
   integer :: loc,N
   
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
-
+  iEmbryophyteType_pft(NZ,NY,NX)     = iEmbryophyteType_pft_tab(loc)
   iPlantPhotosynsType_pft(NZ,NY,NX)  = iPlantPhotosynsType_pft_tab(loc)
   iPlantRootProfile_pft(NZ,NY,NX)     = iPlantRootProfile_tab(loc)
   iPlantPhenolPattern_pft(NZ,NY,NX)   = iPlantPhenolPattern_tab(loc)
@@ -723,7 +731,7 @@ implicit none
   LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX) = LeafAngleClass_tab(1:NumLeafZenithSectors,loc)
   ClumpFactorInit_pft(NZ,NY,NX)                       = ClumpFactorInit_tab(loc)
   BranchAngle_pft(NZ,NY,NX)                           = BranchAngle_tab(loc)
-  PetolShethAngle_pft(NZ,NY,NX)                          = PetolShethAngle_tab(loc)
+  PetolShethAngle_pft(NZ,NY,NX)                       = PetolShethAngle_tab(loc)
   GrothStalkMaxSeedSites_pft(NZ,NY,NX)                = MaxPotentSeedNumber_tab(loc)
   MaxSeedNumPerSite_pft(NZ,NY,NX)                     = MaxSeedNumPerSite_tab(loc)
   SeedCMassMax_pft(NZ,NY,NX)                          = SeedCMassMax_tab(loc)
@@ -857,6 +865,23 @@ implicit none
   end select
   id=addone(id)
   call writefixsl(nu_plt,'ICTYP: Photosynthesis pathway',strval,60,id)
+
+  select case (iEmbryophyteType_pft(NZ,NY,NX))
+  CASE (iembryotyp_Bryophytes)
+    strval='Bryophytes'
+  case (iembryotyp_Pteridophytes)
+    strval='Pteridophytes'
+  case (iembroytyp_Gymnosperms)
+    strval='Gymnosperms'
+  case (iembroytyp_Monocots)
+    strval='Monocots'
+  case (iembroytyp_Eudicots)
+    strval='Eudicots'
+  case default
+     strval='Not defined'
+  end select
+  id=addone(id)
+  call writefixsl(nu_plt,'IEBTYP: Embrophyte type',strval,60,id)
 
   select case(iPlantRootProfile_pft(NZ,NY,NX))
   case (0)
@@ -1084,13 +1109,13 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'CTC','Chilling temperature for CO2 fixation, seed loss [oC]',TCChill4Seed_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'VRNLI','Hours that meet leafout condition (temp or water) required for spring leafout [h]',VRNLI,100)
+  call writefixl(nu_plt,id,'VRNLI','Hours of favorable conditions (temp or water) required for spring leafout [h]',VRNLI,100)
   id=addone(id)
-  call writefixl(nu_plt,id,'VRNXI','Hours that meet leafoff condition (temp or water) required for autumn leafoff [h]',VRNXI,100)
+  call writefixl(nu_plt,id,'VRNXI','Hours of senescence conditions (temp or water) required for autumn leafoff [h]',VRNXI,100)
   id=addone(id)
   call writefixl(nu_plt,id,'PB','Nonstructural C concentration needed for branching [gC nonst/gC structl]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'GROUPX','Maturity group, node number required for floral initiation [-]',GROUPX_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'GROUPX','Maturity group, node number (on top of XTLI) required for floral initiation [-]',GROUPX_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'XTLI','Embryonic node number at planting [-]',ShootNodeNumAtPlanting_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1113,11 +1138,12 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'SLA1','Specific leaf area vs mass [m2 gC-1]',SLA1_pft(NZ,NY,NX),100)
   id=addone(id)  
-  call writefixl(nu_plt,id,'SSL1','Specific PetolSheth length vs mass [m gC-1]',PetolShethLen2Mass_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'SSL1','Specific Petiole/Sheath length vs mass [m gC-1]',PetolShethLen2Mass_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
+  call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',&
+    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'WDLF','Leaf length:width ratio [-]',rLen2WidthLeaf_pft(NZ,NY,NX),100)  
   id=addone(id)
@@ -1127,8 +1153,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'ANGSH','PetolSheth angle from horizontal [degrees]',PetolShethAngle_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'STMX','Maximum potential seed sites for '// &
-    'pre-anthesis stalk growth [sites (gC stalk)-1]',GrothStalkMaxSeedSites_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'STMX','Maximum potential seed sites for pre-anthesis stalk [sites (gC stalk)-1]',GrothStalkMaxSeedSites_pft(NZ,NY,NX),100)
   id=addone(id)  
   call writefixl(nu_plt,id,'SDMX','Maximum seed number per grain site [seeds site-1]',MaxSeedNumPerSite_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1603,6 +1628,7 @@ implicit none
   call ncd_getvar(pft_nfid,'koppen_clim_short',koppen_clim_short_tab)
   call ncd_getvar(pft_nfid,'koppen_clim_long',koppen_clim_long_tab)
   call ncd_getvar(pft_nfid, 'ICTYP', iPlantPhotosynsType_pft_tab)
+  call ncd_getvar(pft_nfid,'IEBTYP',iEmbryophyteType_pft_tab)
   call ncd_getvar(pft_nfid, 'IGTYP', iPlantRootProfile_tab)  
   call ncd_getvar(pft_nfid, 'ISTYP', iPlantPhenolPattern_tab)
   call ncd_getvar(pft_nfid, 'IDTYP', iPlantDevelopPattern_tab)

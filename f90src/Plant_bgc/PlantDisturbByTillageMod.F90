@@ -57,7 +57,7 @@ contains
     CanopyLeafSheathC_pft       => plt_biom%CanopyLeafSheathC_pft         ,& !inoput :canopy leaf + sheath C, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
     CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft            ,& !inoput :canopy active stalk C, [g d-2]
-    iPlantBranchState_brch      => plt_pheno%iPlantBranchState_brch       ,& !inoput :flag to detect branch death, [-]
+    isPlantBranchAlive_brch      => plt_pheno%isPlantBranchAlive_brch       ,& !inoput :flag to detect branch death, [-]
     RootSegBaseDepth_raxes      => plt_morph%RootSegBaseDepth_raxes       ,& !inoput : base depth of different root axes, [m]
     Root1stDepz_raxes           => plt_morph%Root1stDepz_raxes            ,& !inoput : root layer depth, [m]    
     MaxNumRootAxes              => pltpar%MaxNumRootAxes                  ,& !input  : maximum number root axes,[-]
@@ -83,14 +83,14 @@ contains
     LeafArea_node               => plt_morph%LeafArea_node                ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch           => plt_morph%LeafAreaLive_brch            ,& !inoput :branch leaf area, [m2 d-2]
     PotentialSeedSites_brch     => plt_morph%PotentialSeedSites_brch      ,& !inoput :branch potential grain number, [d-2]
-    SeedSitesSet_brch           => plt_morph%SeedSitesSet_brch            ,& !inoput :branch grain number, [d-2]
+    SetNumberSeeds_brch           => plt_morph%SetNumberSeeds_brch            ,& !inoput :branch grain number, [d-2]
     PetoleProteinC_node         => plt_biom%PetoleProteinC_node           ,& !inoput :layer sheath protein C, [g d-2]
     PetolShethElmntNode_brch       => plt_biom%PetolShethElmntNode_brch         ,& !inoput :sheath chemical element, [g d-2]
     CanopyLeafArea_lnode        => plt_morph%CanopyLeafArea_lnode         ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     jHarvstType_pft             => plt_distb%jHarvstType_pft              ,& !output :flag for stand replacing disturbance,[-]
     iPlantState_pft             => plt_pheno%iPlantState_pft              ,& !output :flag for species death, [-]
-    iPlantRootState_pft         => plt_pheno%iPlantRootState_pft          ,& !output :flag to detect root system death,[-]
-    iPlantShootState_pft        => plt_pheno%iPlantShootState_pft         ,& !output :flag to detect canopy death,[-]
+    isPlantRootAlive_pft         => plt_pheno%isPlantRootAlive_pft          ,& !output :flag to detect root system death,[-]
+    isPlantShootAlive_pft        => plt_pheno%isPlantShootAlive_pft         ,& !output :flag to detect canopy death,[-]
     iDayPlantHarvest_pft        => plt_distb%iDayPlantHarvest_pft         ,& !output :day of harvest,[-]
     iYearPlantHarvest_pft       => plt_distb%iYearPlantHarvest_pft        ,& !output :year of harvest,[-]
     CanopyLeafSheathC_brch      => plt_biom%CanopyLeafSheathC_brch         & !output :plant branch leaf + sheath C, [g d-2]
@@ -108,13 +108,13 @@ contains
 !
 !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
-!     iPlantBranchState_brch=branch living flag: 0=alive,1=dead
+!     isPlantBranchAlive_brch=branch living flag: 0=alive,1=dead
 !     PP=PFT population
 !
   D8975: DO NB=1,NumOfBranches_pft(NZ)
-    IF(iPlantBranchState_brch(NB,NZ).EQ.iLive)THEN
+    IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
       IF(PlantPopulation_pft(NZ).LE.0.0)then
-        iPlantBranchState_brch(NB,NZ)=iDead
+        isPlantBranchAlive_brch(NB,NZ)=iFalse
       endif
 !
 !     LitrFall FROM BRANCHES DURING TILLAGE
@@ -193,7 +193,7 @@ contains
     ENDDO
 
     PotentialSeedSites_brch(NB,NZ) = PotentialSeedSites_brch(NB,NZ)*XHVST
-    SeedSitesSet_brch(NB,NZ)       = SeedSitesSet_brch(NB,NZ)*XHVST
+    SetNumberSeeds_brch(NB,NZ)       = SetNumberSeeds_brch(NB,NZ)*XHVST
     GrainSeedBiomCMean_brch(NB,NZ) = GrainSeedBiomCMean_brch(NB,NZ)*XHVST
     LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
 
@@ -250,16 +250,16 @@ contains
 !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
 !
 !     PP=PFT population
-!     IDTHR,iPlantShootState_pft=PFT root,shoot living flag: 0=alive,1=dead
+!     IDTHR,isPlantShootAlive_pft=PFT root,shoot living flag: 0=alive,1=dead
 !     IDTH=PFT living flag: 0=alive,1=dead
 !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,and reseed
 !     iDayPlantHarvest_pft,iYearPlantHarvest_pft=day,year of harvesting
 !     iYearCurrent=current year
 !
   IF(PlantPopulation_pft(NZ).LE.0.0_r8)THEN
-    iPlantRootState_pft(NZ)   = iDead
-    iPlantShootState_pft(NZ)  = iDead
-    iPlantState_pft(NZ)       = iDead
+    isPlantRootAlive_pft(NZ)   = iFalse
+    isPlantShootAlive_pft(NZ)  = iFalse
+    iPlantState_pft(NZ)       = iFalse
     jHarvstType_pft(NZ)       = jharvtyp_terminate
     iDayPlantHarvest_pft(NZ)  = I
     iYearPlantHarvest_pft(NZ) = iYearCurrent

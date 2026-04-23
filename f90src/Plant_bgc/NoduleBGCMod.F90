@@ -80,6 +80,7 @@ module NoduleBGCMod
     NodulInfectElms_pft       => plt_bgcr%NodulInfectElms_pft        ,& !inoput :nodule infection chemical element mass, [g d-2]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !inoput :branch nonstructural element, [g d-2]
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !inoput :branch nodule nonstructural element, [g d-2]
+    RNFixCO2_pft              => plt_bgcr%RNFixCO2_pft               ,& !inoput :CO2 respired by nodules, [gC d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch   & !inoput :branch nodule structural element, [g d-2]
   )
   call PrintInfo('beg '//subname)
@@ -87,14 +88,14 @@ module NoduleBGCMod
 !
   CanopyN2Fix_pft(NZ)=0._r8
   IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
-!
-!     INITIAL INFECTION
-!
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     NodulBiomCatInfection=initial bacterial mass at infection
-!     AREA=grid cell area
-!     CNND,rPCNoduler_pft=bacterial N:C,P:C ratio from PFT file
-!
+    !
+    !     INITIAL INFECTION
+    !
+    !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
+    !     NodulBiomCatInfection=initial bacterial mass at infection
+    !     AREA=grid cell area
+    !     CNND,rPCNoduler_pft=bacterial N:C,P:C ratio from PFT file
+    !
     
     IF(CanopyNodulStrutElms_brch(ielmc,NB,NZ).LE.0.0_r8)THEN    
       NoduleInfectE(ielmc)=NodulBiomCatInfection*AREA3(NU)
@@ -106,18 +107,18 @@ module NoduleBGCMod
         NodulInfectElms_pft(NE,NZ)          = NodulInfectElms_pft(NE,NZ)+NoduleInfectE(NE)
       ENDDO
     ENDIF
-!
-!     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
-!     IN NODULE FROM SPECIFIC OXIDATION RATE, ACTIVE BIOMASS,
-!     NON-STRUCTURAL C CONCENTRATION, MICROBIAL C:N:P FACTOR,
-!     AND TEMPERATURE
-!
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmp)=nonstructural C,N,P concn in bacteria
-!     CNKI,CPKI=nonstructural N,P inhibition constant on growth
-!     FCNPF=N,P constraint to bacterial activity
-!
+    !
+    !     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
+    !     IN NODULE FROM SPECIFIC OXIDATION RATE, ACTIVE BIOMASS,
+    !     NON-STRUCTURAL C CONCENTRATION, MICROBIAL C:N:P FACTOR,
+    !     AND TEMPERATURE
+    !
+    !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
+    !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
+    !     NodulNonstElmConc(ielmc),NodulNonstElmConc(ielmn),NodulNonstElmConc(ielmp)=nonstructural C,N,P concn in bacteria
+    !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
+    !     FCNPF=N,P constraint to bacterial activity
+    !
     IF(CanopyNodulStrutElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       DO NE=1,NumPlantChemElms
         NodulNonstElmConc(NE)=AZMAX1(CanopyNodulNonstElms_brch(NE,NB,NZ)/CanopyNodulStrutElms_brch(ielmc,NB,NZ))
@@ -308,6 +309,7 @@ module NoduleBGCMod
     !     Eco_AutoR_CumYr_col=total autotrophic respiration
     !
     RCO2T                     = AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
+    RNFixCO2_pft(NZ)          = RNFixCO2_pft(NZ)+RCO2T
     CanopyGrosRCO2_pft(NZ)    = CanopyGrosRCO2_pft(NZ)-RCO2T
     CanopyRespC_CumYr_pft(NZ) = CanopyRespC_CumYr_pft(NZ)-RCO2T
     CO2NetFix_pft(NZ)         = CO2NetFix_pft(NZ)-RCO2T
@@ -482,6 +484,7 @@ module NoduleBGCMod
     RootNodulNonstElms_rpvr => plt_biom%RootNodulNonstElms_rpvr   ,& !inoput :layered root nonstructural element, [g d-2]
     RootMycoNonstElms_rpvr  => plt_biom%RootMycoNonstElms_rpvr    ,& !inoput :layered root nonstructural element, [g d-2]
     RCO2Nodule_pvr          => plt_bgcr%RCO2Nodule_pvr            ,& !inoput :layered root nodule respiration, [gC d-2 h-1]
+    RNFixCO2_pft            => plt_bgcr%RNFixCO2_pft              ,& !inoput :CO2 respired by nodules, [gC d-2]    
     RootN2Fix_pvr           => plt_bgcr%RootN2Fix_pvr              & !output :root N2 fixation, [gN d-2 h-1]
   )
 
@@ -710,6 +713,7 @@ module NoduleBGCMod
         RootCO2EmisPot_pvr(ipltroot,L,NZ) = RootCO2EmisPot_pvr(ipltroot,L,NZ)+RCO2T
         RootCO2Autor_pvr(ipltroot,L,NZ)   = RootCO2Autor_pvr(ipltroot,L,NZ)-RCO2T
         RCO2Nodule_pvr(L,NZ)              = RCO2Nodule_pvr(L,NZ)+RCO2T
+        RNFixCO2_pft(NZ)                  = RNFixCO2_pft(NZ)+RCO2T
         !
         !     NODULE LitrFall CAUSED BY REMOBILIZATION
         !

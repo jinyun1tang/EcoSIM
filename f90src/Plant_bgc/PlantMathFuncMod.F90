@@ -4,6 +4,7 @@ module PlantMathFuncMod
   ! code for small functions used by plant processes
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun, iulog
+  use PlantAPIData
   use DebugToolMod
   use EcoSimConst
   use MiniMathMod
@@ -273,7 +274,7 @@ contains
 
 !--------------------------------------------------------------------------------
 
-  pure function is_root_shallow(iPlantRootProfile_pft)result(ans)
+  pure function is_root_bryophyte(iPlantRootProfile_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -285,7 +286,7 @@ contains
   logical :: ans
 
   ans=(iPlantRootProfile_pft == iplt_bryophyte)
-  end function is_root_shallow
+  end function is_root_bryophyte
 
 !--------------------------------------------------------------------------------
   pure function is_root_N2fix(iPlantNfixType_pft)result(yesno)
@@ -326,7 +327,7 @@ contains
   integer, intent(in) :: iPlantRootProfile
   real(r8) :: ans
 
-  IF(is_root_shallow(iPlantRootProfile))THEN
+  IF(is_root_bryophyte(iPlantRootProfile))THEN
     ans=WFN**0.10_r8
   ELSE
     ans=WFN**0.25_r8
@@ -559,5 +560,25 @@ contains
        end if
     end do
   end subroutine interp_linear_clamped
+
+!--------------------------------------------------------------------
+  pure function CalcStomataResist4H2O(NZ)result(Stomata_Resist)
+  implicit none
+  integer, intent(in) :: NZ
+  real(r8) :: Stomata_Stress
+  real(r8) :: Stomata_Resist
+  
+  associate(                                                               &
+    RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
+    PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]  
+    CanopyMinStomaResistH2O_pft => plt_photo%CanopyMinStomaResistH2O_pft  ,& !input  :canopy minimum stomatal resistance, [s m-1]
+    H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft          & !input  :maximum stomatal resistance to vapor, [s h-1]
+  )
+  !greater value of RCS_pft(NZ), more sensitive to turgor change.
+
+  Stomata_Stress = EXP(-PSICanopyTurg_pft(NZ)/RCS_pft(NZ))
+  Stomata_Resist = CanopyMinStomaResistH2O_pft(NZ)+(H2OCuticleResist_pft(NZ)-CanopyMinStomaResistH2O_pft(NZ))*Stomata_Stress
+  end associate
+  end function CalcStomataResist4H2O
 
 end module PlantMathFuncMod
