@@ -77,7 +77,7 @@ implicit none
   plt_site%ZEROS2                  = ZEROS2(NY,NX)                     !numerical threshold
   plt_ew%Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col(NY,NX)    !initialized to zero,  but is needed iterately to update heat source for surface energy balance calculation?
   plt_ew%Air_Heat_Latent_store_col = Air_Heat_Latent_store_col(NY,NX)  !initialized to zero,  but is needed iteratively for surface energy calculation
-  plt_ew%EMS_scalar_col            = EMS_scalar_col(NY,NX)             !scaling factor for longwave radiation, should be 1 in the coupling, but needs to be in the API
+  plt_ew%EMS_modify_scalar_col     = EMS_modify_scalar_col(NY,NX)             !scaling factor for longwave radiation, should be 1 in the coupling, but needs to be in the API
   !plt_ew%ZERO4PlantDisplace_col    = ZERO4PlantDisplace_col(NY,NX)    
   plt_ew%ZeroPlaneDisplacem_col    = ZeroPlaneDisplacem_col(NY,NX)     !numerical threshold
   plt_rad%Eco_NetRad_col           = Eco_NetRad_col(NY,NX)             !net ecosystem radiation, updated through model iterations, reset to zero in hour1.F90
