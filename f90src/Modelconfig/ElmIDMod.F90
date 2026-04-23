@@ -39,7 +39,7 @@ implicit none
 ! plant harvest
   integer, parameter :: iplthvst_leaf       =1 !leaf
   integer, parameter :: iplthvst_finenonleaf=2 !fine non-leaf
-  integer, parameter :: iplthvst_woody      =3 !woody
+  integer, parameter :: iplthvst_stalk      =3 !woody
   integer, parameter :: iplthvst_stdead     =4 !standing dead
 ! photosynthesis
   integer, parameter :: ic4_photo=4
@@ -101,22 +101,13 @@ implicit none
   integer, parameter :: itrue=1
   integer, parameter :: ifalse=0
 
-  integer, parameter :: iEnable  = 0
-  integer, parameter :: iDisable = 1
-
-  integer, parameter :: iLive=0  !plant organ alive
-  integer, parameter :: iDead=1  !plant organ dead
-
-  integer, parameter :: iActive  = 1  !plant active
-  integer, parameter :: iDormant = 0  !plant dormant/dead
-
   integer, parameter :: jharvtyp_noaction  = 0
   integer, parameter :: jharvtyp_terminate = 1
   integer, parameter :: jharvtyp_tmareseed = 2
 
   integer, parameter :: iharvtyp_none    = 0
   integer, parameter :: iharvtyp_grain   = 1
-  integer, parameter :: iharvtyp_allabv  = 2
+  integer, parameter :: iharvtyp_allabvg = 2
   integer, parameter :: iharvtyp_pruning = 3
   integer, parameter :: iharvtyp_grazing = 4
   integer, parameter :: iharvtyp_fire    = 5
@@ -135,20 +126,26 @@ implicit none
   integer, parameter :: ideterminate          = 0
   integer, parameter :: inondeterminate       = 1
   integer, parameter :: ipltcal_Planting      = 0
-  integer, parameter :: ipltcal_Emerge        = 1
-  integer, parameter :: ipltcal_InitFloral    = 2
-  integer, parameter :: ipltcal_Jointing      = 3
-  integer, parameter :: ipltcal_Elongation    = 4
-  integer, parameter :: ipltcal_Heading       = 5
-  integer, parameter :: ipltcal_Anthesis      = 6
-  integer, parameter :: ipltcal_BeginSeedFill = 7
-  integer, parameter :: ipltcal_SetSeedNumber = 8
-  integer, parameter :: ipltcal_SetSeedMass   = 9
-  integer, parameter :: ipltcal_EndSeedFill   = 10
+  integer, parameter :: ipltcal_Emerge        = 1  !germination, ->0.9
+  integer, parameter :: ipltcal_InitFloral    = 2  !main shoot or parent shoot leaf production, ->1.9
+  integer, parameter :: ipltcal_Jointing      = 3  !tiller production, ->2.9
+  integer, parameter :: ipltcal_Elongation    = 4  !stem elongation and booting, ->4.9
+  integer, parameter :: ipltcal_heading       = 5  !heading, ->5.9
+  integer, parameter :: ipltcal_Anthesis      = 6  !anthesis, ->6.9
+  integer, parameter :: ipltcal_BeginSeedFill = 7  !grain milk stage, -7.9
+  integer, parameter :: ipltcal_SetSeedNumber = 8  !grain doug s1, -8.5
+  integer, parameter :: ipltcal_SetSeedMass   = 9  !grain dough s2, ->9.0
+  integer, parameter :: ipltcal_EndSeedFill   = 10 !ripening, 9.9
 
   integer, parameter :: iphotop_neutral=0
   integer, parameter :: iphotop_short  =1
   integer, parameter :: iphotop_long   =2
+
+  integer, parameter :: iembryotyp_Bryophytes   =0
+  integer, parameter :: iembryotyp_Pteridophytes=1
+  integer, parameter :: iembroytyp_Gymnosperms  =2
+  integer, parameter :: iembroytyp_Monocots     =3
+  integer, parameter :: iembroytyp_Eudicots     =4
 
   integer, parameter :: iphenotyp_evgreen       = 0
   integer, parameter :: iphenotyp_coldecid      = 1

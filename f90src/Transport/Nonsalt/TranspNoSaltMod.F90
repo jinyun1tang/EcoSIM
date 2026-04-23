@@ -195,7 +195,7 @@ module TranspNoSaltMod
           errmass=errmass+trcs_solml_drib_col(idg_NH3B) 
         endif
  
-        if(abs(errmass)>1.e-5)then
+        if(abs(errmass)>1.e-4 .and. abs(safe_adb(errmass,delta_mass))>1.e-3_r8)then
           if(iVerbLevel==1 .or. abs(errmass)>1.e-4)then
             write(121,*)('-',L=1,50)
             if(present(M))then

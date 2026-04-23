@@ -1881,7 +1881,7 @@ implicit none
     do t = 1, ntapes
        if ( tape(t)%nhtfrq>=0 .and. ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) &
          .or. (if_disphist(t) .and. tape(t)%ntimes>=tape(t)%mfilt .and. tape(t)%nhtfrq<0 .and. lnyr)) then
-          print*,'htapwrap',lnyr,tape(t)%ntimes,tape(t)%mfilt
+          !print*,'htapwrap',lnyr,tape(t)%ntimes,tape(t)%mfilt
           tape(t)%ntimes = 0
        end if
     end do

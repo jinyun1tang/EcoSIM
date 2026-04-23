@@ -64,7 +64,6 @@ contains
   !
   !   UPDATE PLANT biogeochemistry
   !
-
   if(plant_model .and. (.not.ldo_radiation_test))then
     if(do_timing)call start_timer(t1)  
     call PlantModel(yearIJ,NHW,NHE,NVN,NVS)
@@ -160,8 +159,8 @@ contains
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
-    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,ldo_sp_mode,iverblevel,&
-    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in
+    atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
+    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
@@ -179,10 +178,11 @@ contains
   do_timing    = .false.
   continue_run = .false.
   NPXS         = 30   !number of cycles per hour for water, heat, solute flux calcns
-  NPYS         = 20   !number of cycles per NPX for gas flux calculations
+  NPYS         = 10   !number of cycles per NPX for gas flux calculations
 
   lsoilCompaction=.false.
   idebug_day  =-1
+  idebug_year =-1
   NCYC_LITR             = 20
   NCYC_SNOW             = 20
   grid_mode             = 3
@@ -238,6 +238,7 @@ contains
   atm_ch4_fix        = -100._r8
   micpar_file_in     =''  
   first_topou        = .false.
+  iselect_plantZ     = -1
   ldo_radiation_test = .false.
   
   read(nml_buffer, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
@@ -418,7 +419,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   DO I  = 1, DazCurrYear
     call DebugPrint("beg step",I*1000)
     yearIJ%I=I
-    if(idebug_day==I)then
+    if(idebug_day==I .and. idebug_year==iYearCurrent)then
       lverb=.true.      
     else
       lverb=lverb0
@@ -474,6 +475,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
       
       if(rstwr)then
+        
         call restFile(flag='write')
       endif      
       call DebugPrint("end step",I*1000+J)
@@ -531,7 +533,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP_col(NY,NX)
-      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iActive)THEN
+      IF(IsPlantActive_pft(NZ,NY,NX).EQ.iTrue)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'

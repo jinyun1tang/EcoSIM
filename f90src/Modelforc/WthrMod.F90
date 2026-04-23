@@ -263,7 +263,7 @@ module WthrMod
         PrecAsRain_col(NY,NX) = 0.0_r8
         PrecAsSnow_col(NY,NX) = RAINH(J,I)
       ENDIF
-      EMS_scalar_col(NY,NX) = 1._r8        
+      EMS_Modify_Scalar_col(NY,NX) = 1._r8        
       srad_scalar_col(NY,NX)= 1._r8
     enddo
   enddo

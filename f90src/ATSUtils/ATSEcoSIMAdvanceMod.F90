@@ -389,8 +389,8 @@ implicit none
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
     a_EvapLitr(NY) = TEvapXAir2LitR_col(NY,NX) !litter evaporation
-    a_EvapSnow(NY) = EVAPW(NY,NX) !water evapoartion from snow
-    a_Sublim(NY) = EVAPS(NY,NX) !water sublimation from snow
+    a_EvapSnow(NY) = EVAPW_col(NY,NX) !water evapoartion from snow
+    a_Sublim(NY) = EVAPS_col(NY,NX) !water sublimation from snow
     !DO LS=1,JS
     !  a_TS(LS,L) = TKSnow1_snvr(LS,NY,NX)
     !ENDDO

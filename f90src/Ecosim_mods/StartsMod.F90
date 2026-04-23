@@ -8,7 +8,7 @@ module StartsMod
   use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate,AZERO
   use EcoSiMParDataMod, only: micpar
   use SnowPhysMod,      only: InitSnowLayers
-  use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars,gOC_to_m3_OM
+  use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
   use TracerPropMod,    only: gas_solubility
   use DebugToolMod
@@ -461,10 +461,12 @@ module StartsMod
         VORGC = VORGCM*VSolidSoil*1.e-6                            ![m3 OM m-3 soil]
         VMINL = (CSILT_vr(L,NY,NX)+CCLAY_vr(L,NY,NX))*VSolidSoil   ![m3 mineral m-3 soil]
         VSAND = CSAND_vr(L,NY,NX)*VSolidSoil                       ![m3 sand m-3 soil]
-        VHeatCapSolidSoil_vr(L,NY,NX)=((cpo*VORGC+cpmins*VMINL+cpsand*VSAND) &
-          *FracSoiAsMicP_vr(L,NY,NX)+cpsand*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)     ![MJ m-3 K-1]*[m3]=[MJ K-1]
+        VHeatCapMineralSoil_vr(L,NY,NX)=((cpmins*VMINL+cpsand*VSAND) &
+          *FracSoiAsMicP_vr(L,NY,NX)+cpsand*ROCK_vr(L,NY,NX))*VGeomLayer_vr(L,NY,NX)     ![MJ m-3 K-1]*[m3]=[MJ K-1]          
+        VHeatCapSolidSoil_vr(L,NY,NX)=VHeatCapMineralSoil_vr(L,NY,NX)+cpo*VORGC*FracSoiAsMicP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)     ![MJ m-3 K-1]*[m3]=[MJ K-1]          
       ELSE
         VHeatCapSolidSoil_vr(L,NY,NX)=0.0_r8
+        VHeatCapMineralSoil_vr(L,NY,NX)=0._r8
       ENDIF
       !
       !     INITIAL SOIL WATER AND ICE CONTENTS

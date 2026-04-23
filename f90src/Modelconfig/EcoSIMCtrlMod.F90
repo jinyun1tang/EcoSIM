@@ -9,8 +9,10 @@ implicit none
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
   integer :: idebug_day  = -1         !specify the day being debugged
+  integer :: idebug_year = -1         !specify the year being debugged
+  integer :: iselect_plantZ=-1
   logical :: salt_model   =.false.    !toggle for salt model
-  logical :: erosion_model=.false.
+  logical :: erosion_model=.false.  
   logical :: first_topou   = .false.  !only simulate first topo unit
   logical :: first_pft     = .false.  !only simulate first pft
   integer :: iErosionMode =-1         !erosion option

@@ -126,6 +126,7 @@ implicit none
 !       SOC LOSS IF FIRE OR REMOVAL EVENT IS ENTERED IN DISTURBANCE FILE
 !
       call SOMRemovalByDisturbance(I,J,NY,NX)
+      
     ENDDO D9990
   ENDDO D9995
   call PrintInfo('end '//subname)
@@ -239,7 +240,6 @@ implicit none
   micfor%RO2AquaXchangePrev       = RO2AquaSourcePrev_vr(L,NY,NX)
   micfor%RDOMEcoDmndPrev(1:KL)    = RDOMEcoDmndPrev_vr(1:KL,L,NY,NX)
 
-!  write(201,*)I+J/24.,L,RDOMEcoDmndPrev_vr(1:KL,L,NY,NX)
   micfor%RAcetateEcoDmndPrev(1:KL) = RAcetateEcoDmndPrev_vr(1:KL,L,NY,NX)
 
   !litter layer is modeled
@@ -339,7 +339,6 @@ implicit none
 
   FermOXYI_vr(L,NY,NX)  = 1.0_r8-1.0_r8/(1.0_r8+EXP(1.0_r8*AMAX1(-micstt%COXYS+2.5_r8,-50._r8)))
 
-!  write(115,*)I+J/24.,L,micstt%COXYG,micstt%COXYS,VLsoiAirPM(1,L,NY,NX)
   micstt%O2GSolubility     = GasSolbility_vr(idg_O2,L,NY,NX)  
   micstt%CH4AquaSolubility = GasSolbility_vr(idg_CH4,L,NY,NX)
   micstt%ZNFN0             = ZNFN0_vr(L,NY,NX)

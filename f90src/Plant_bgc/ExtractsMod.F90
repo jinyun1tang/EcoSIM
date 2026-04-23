@@ -39,7 +39,7 @@ module ExtractsMod
   DO NZ=1,plt_site%NP
 
     call PrintRootTracer(I,J,NZ,'extract')
-    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iActive)THEN
+    IF(plt_pheno%IsPlantActive_pft(NZ).EQ.iTrue)THEN
       if(.not.ldo_sp_mode)then
         call CalcTotalLeafArea(NZ)
 
@@ -59,6 +59,7 @@ module ExtractsMod
   subroutine TotalLitrFall()
 
   implicit none
+  character(len=*), parameter :: subname='TotalLitrFall'
   integer :: NZ,L,K,M
   integer :: NE
   associate(                                                          &
@@ -76,6 +77,7 @@ module ExtractsMod
     StemArea_col              => plt_morph%StemArea_col              ,& !output :grid canopy stem area, [m2 d-2]
     tCanLeafC_clyr            => plt_biom%tCanLeafC_clyr              & !output :total leaf carbon mass in canopy layers, [gC d-2]
   )
+  call PrintInfo('beg '//subname)
   DO NZ=1,NP0
 !
 !   TOTAL LitrFall OF ALL PLANT SPECIES
@@ -112,6 +114,7 @@ module ExtractsMod
     tCanLeafC_clyr(L)        = 0._r8
     CanopyStemAareZ_col(L) = 0._r8
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TotalLitrFall
 
@@ -121,26 +124,29 @@ module ExtractsMod
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
 !     CanopyLeafAareZ_col,CanopyStemAareZ_col=total leaf,stalk area of combined canopy layer
-!     CanopyLeafAreaZ_pft,CanopyStemAreaZ_pft=PFT leaf,stalk area in canopy layer
+!     CanopyLeafAreaZ_pft,CanopyStemSurfAreaZ_pft=PFT leaf,stalk area in canopy layer
 !     tCanLeafC_clyr=total leaf C of combined canopy layer
 !     CanopyLeafCLyr_pft=PFT leaf C in canopy layer
 !
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='CalcTotalLeafArea'
   integer :: L
   associate(                                               &
     CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  ,& !input  :canopy layer leaf area, [m2 d-2]
     CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft    ,& !input  :canopy layer leaf C, [g d-2]
-    CanopyStemAreaZ_pft => plt_morph%CanopyStemAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft => plt_morph%CanopyStemSurfAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
     CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col  ,& !inoput :total leaf area, [m2 d-2]
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !inoput :total stem area, [m2 d-2]
     tCanLeafC_clyr      => plt_biom%tCanLeafC_clyr         & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
   )
+  call PrintInfo('beg '//subname)
   DO L=1,NumCanopyLayers1
     CanopyLeafAareZ_col(L)=CanopyLeafAareZ_col(L)+CanopyLeafAreaZ_pft(L,NZ)
     tCanLeafC_clyr(L)=tCanLeafC_clyr(L)+CanopyLeafCLyr_pft(L,NZ)
-    CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemAreaZ_pft(L,NZ)
+    CanopyStemAareZ_col(L)=CanopyStemAareZ_col(L)+CanopyStemSurfAreaZ_pft(L,NZ)
   ENDDO
+  call PrintInfo('end '//subname)
   end associate
   end subroutine CalcTotalLeafArea
 
@@ -152,7 +158,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: I,J,NZ
-
+  character(len=*), parameter :: subname='TotalGasandSoluteUptake'
   integer :: N,L,K,idg,NE,ids
  
   associate(                                                          &
@@ -204,7 +210,7 @@ module ExtractsMod
     trcs_Soil2plant_uptake_pvr=> plt_rbgc%trcs_Soil2plant_uptake_pvr ,& !inoput :plant root-soil solute flux non-band, [g d-2 h-1]    
     trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr   & !inoput :total root-soil solute flux non-band, [g d-2 h-1]
   )
-  
+  call PrintInfo('beg '//subname)
   DO L=NU,MaxNumRootLays
     DO N=1,Myco_pft(NZ)  
 !
@@ -285,31 +291,26 @@ module ExtractsMod
       REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine TotalGasandSoluteUptake
 
 !----------------------------------------------------------------------------------------------------
   subroutine ExtractCanopyFluxes(I,J,NZ)
 !
-!     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
-!
-!     TRootN2Fix_pft=total root N2 fixation
-!     RootN2Fix_pvr=PFT root N2 fixation
-!
-
   implicit none
   integer, intent(in) :: I,J,NZ
+  character(len=*), parameter :: subname='ExtractCanopyFluxes'
   integer :: L, NE,NB,idg
   real(r8) :: ENGYC
-
+  
   associate(                                                          &
     CO2NetFix_pft             => plt_bgcr%CO2NetFix_pft              ,& !input  :canopy net CO2 exchange, [gC d-2 h-1]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !input  :canopy water content, [m3 d-2]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
-    CanopyStemArea_pft        => plt_morph%CanopyStemArea_pft        ,& !input  :plant stem area, [m2 d-2]
-    PlantElmBalCum_pft         => plt_site%PlantElmBalCum_pft          ,& !input  :cumulative plant element balance, [g d-2]
-    EvapTransLHeat_pft        => plt_ew%EvapTransLHeat_pft           ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
+    CanopyStemSurfArea_pft    => plt_morph%CanopyStemSurfArea_pft    ,& !input  :plant stem area, [m2 d-2]
+    PlantElmBalCum_pft        => plt_site%PlantElmBalCum_pft         ,& !input  :cumulative plant element balance, [g d-2]
+    CanopyEvapTransLHeat_pft  => plt_ew%CanopyEvapTransLHeat_pft     ,& !input  :canopy latent heat flux, [MJ d-2 h-1]
     HeatStorCanopy_pft        => plt_ew%HeatStorCanopy_pft           ,& !input  :canopy storage heat flux, [MJ d-2 h-1]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft            ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
     LWRadCanopy_pft           => plt_rad%LWRadCanopy_pft             ,& !input  :canopy longwave radiation, [MJ d-2 h-1]
@@ -324,7 +325,7 @@ module ExtractsMod
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          ,& !input  :canopy surface water content, [m3 d-2]
     CanopyHeatStor_col        => plt_ew%CanopyHeatStor_col           ,& !inoput :total canopy heat content, [MJ d-2]
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col        ,& !inoput :grid canopy leaf area, [m2 d-2]
-    CanopyWat_col             => plt_ew%CanopyWat_col                ,& !inoput :total canopy water content stored with dry matter, [m3 d-2]
+    CanopyBiomWater_col       => plt_ew%CanopyBiomWater_col          ,& !inoput :total canopy water content stored with dry matter, [m3 d-2]
     Canopy_NEE_col            => plt_bgcr%Canopy_NEE_col             ,& !inoput :total net CO2 fixation, [gC d-2]
     ENGYX_pft                 => plt_ew%ENGYX_pft                    ,& !inoput :canopy heat storage from previous time step, [MJ d-2]
     ETCanopy_CumYr_pft        => plt_ew%ETCanopy_CumYr_pft           ,& !inoput :total transpiration, [m H2O d-2]
@@ -343,27 +344,28 @@ module ExtractsMod
     VapXAir2Canopy_col        => plt_ew%VapXAir2Canopy_col           ,& !inoput :grid canopy evaporation, [m3 d-2]
     WatHeldOnCanopy_col       => plt_ew%WatHeldOnCanopy_col           & !inoput :canopy surface water content, [m3 d-2]
   )
+  call PrintInfo('beg '//subname)
 !
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
 !     Eco_NetRad_col=total net SW+LW absorbed by canopy
 !     RadNet2Canopy_pft=PFT net SW+LW absorbed by canopy
 !     Eco_Heat_Latent_col=total canopy latent heat flux
-!     EvapTransLHeat_pft=PFT canopy latent heat flux
+!     CanopyEvapTransLHeat_pft=PFT canopy latent heat flux
 !     Eco_Heat_Sens_col=total canopy sensible heat flux
 !     HeatXAir2PCan_pft=PFT canopy sensible heat flux
 !     Eco_Heat_GrndSurf_col=total canopy storage heat flux
 !     HeatStorCanopy_pft=PFT canopy storage heat flux
 !     Canopy_NEE_col=total net CO2 fixation in the column
 !     CO2NetFix_pft=PFT net CO2 fixation
-!     CanopyWat_col,WatHeldOnCanopy=total water volume in canopy,on canopy surfaces
+!     CanopyBiomWater_col,WatHeldOnCanopy=total water volume in canopy,on canopy surfaces
 !     CanopyBiomWater_pft,WatHeldOnCanopy_pft=PFT water volume in canopy,on canopy surfaces
 !     QVegET_col,VapXAir2Canopy_col=total water flux to,from canopy,canopy surfaces
 !     VapXAir2PCan,Transpiration_pft=water flux to,from canopy surfaces, inside canopy
 !     CanopyHeatStor_col=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
 !     CanopyLeafArea_col,StemArea_col=total leaf,stalk area
-!     CanopyLeafArea_pft,CanopyStemArea_pft=PFT leaf,stalk area
+!     CanopyLeafArea_pft,CanopyStemSurfArea_pft=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -373,11 +375,11 @@ module ExtractsMod
 !
   
   Eco_NetRad_col         = Eco_NetRad_col+RadNet2Canopy_pft(NZ)
-  Eco_Heat_Latent_col    = Eco_Heat_Latent_col+EvapTransLHeat_pft(NZ)
+  Eco_Heat_Latent_col    = Eco_Heat_Latent_col+CanopyEvapTransLHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  CanopyWat_col          = CanopyWat_col+CanopyBiomWater_pft(NZ)
+  CanopyBiomWater_col          = CanopyBiomWater_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
   QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
@@ -390,7 +392,7 @@ module ExtractsMod
   if(ldo_sp_mode)return
   Canopy_NEE_col         = Canopy_NEE_col+CO2NetFix_pft(NZ)
   CanopyLeafArea_col     = CanopyLeafArea_col+CanopyLeafArea_pft(NZ)
-  StemArea_col           = StemArea_col+CanopyStemArea_pft(NZ)
+  StemArea_col           = StemArea_col+CanopyStemSurfArea_pft(NZ)
 
   DO NE=1,NumPlantChemElms
     LitrFallStrutElms_col(NE)     = LitrFallStrutElms_col(NE)-PlantRootSoilElmNetX_pft(NE,NZ)
@@ -407,7 +409,7 @@ module ExtractsMod
 !
     
   NH3Emis_CumYr_pft(NZ)=NH3Emis_CumYr_pft(NZ)+NH3Dep2Can_pft(NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ExtractCanopyFluxes
   ![tail]

@@ -56,7 +56,7 @@ module PlantDisturbMod
             D1990: DO NY1=NVN,NVS
               !when grazing occurs, it occurs to the same plant species over all grids of the landscape
               IF(LSG_pft(NZ,NY1,NX1).EQ.LSG_pft(NZ,NY,NX))THEN
-                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iActive)THEN
+                IF(IsPlantActive_pft(NZ,NY1,NX1).EQ.iTrue)THEN
                   WTSHTZ = WTSHTZ+ShootElms_pft(ielmc,NZ,NY1,NX1)
                   NN     = NN+1
                 ENDIF

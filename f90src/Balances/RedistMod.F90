@@ -4,7 +4,8 @@ module RedistMod
   use minimathmod,       only: safe_adb, AZMAX1, AZERO, fixEXConsumpFlux, fixnegmass, isclose
   use EcoSiMParDataMod,  only: micpar
   use SurfLitterPhysMod, only: UpdateLitRPhys
-  use InitSOMBGCMOD,     only: MicrobeByLitterFall,gOC_to_m3_OM
+  use InitSOMBGCMOD,     only: MicrobeByLitterFall
+  use MiniFuncMod,       only: gOC_to_m3_OM
   use TracerPropMod,     only: MolecularWeight
   use BalancesMod,       only: SummarizeTracers
   use DebugToolMod
@@ -217,8 +218,8 @@ module RedistMod
   Eco_Heat_Sens_col(NY,NX)     = Eco_Heat_Sens_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)
   Eco_Heat_GrndSurf_col(NY,NX) = Eco_Heat_GrndSurf_col(NY,NX)-(HeatNet2Surf_col(NY,NX)-HeatSensVapAir2Surf_col(NY,NX))
 
-  Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
-  Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*CanopyBndlResist_col(NY,NX)
+  Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
+  Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   Eco_NPP_CumYr_col(NY,NX)         = Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
@@ -399,16 +400,16 @@ module RedistMod
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
-  WI                       = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux    = rain/snowfall + irrigation
-  CRAIN_lnd                = CRAIN_lnd+WI
-  QRain_CumYr_col(NY,NX)   = QRain_CumYr_col(NY,NX)+WI
-  WO                       = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
-  CEVAP                    = CEVAP-WO
-  QEvap_CumYr_col(NY,NX)   = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
-  EvapoTransp_col(NY,NX)   = -WO
-  QDischarg2WTBL_col(NY,NX)      = QDischarg2WTBL_col(NY,NX)-IrrigSubsurf_col(NY,NX)
-  H2OLoss_CumYr_col(NY,NX) = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)    
-  QH2OLoss_lnds            = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
+  WI                        = PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX)   !total incoming water flux      = rain/snowfall + irrigation
+  CRAIN_lnd                 = CRAIN_lnd+WI
+  QRain_CumYr_col(NY,NX)    = QRain_CumYr_col(NY,NX)+WI
+  WO                        = VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)        !total outgoing water flux, > 0 into ground surface
+  CEVAP                     = CEVAP-WO
+  QEvap_CumYr_col(NY,NX)    = QEvap_CumYr_col(NY,NX)-WO         !>0 into atmosphere
+  EvapoTransp_col(NY,NX)    = -WO
+  QDischarg2WTBL_col(NY,NX) = QDischarg2WTBL_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  H2OLoss_CumYr_col(NY,NX)  = H2OLoss_CumYr_col(NY,NX)-IrrigSubsurf_col(NY,NX)
+  QH2OLoss_lnds             = QH2OLoss_lnds-IrrigSubsurf_col(NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
@@ -667,6 +668,8 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
+  character(len=*), parameter :: subname='LitterLayerSummary'
+
   integer :: K,N,M,NGL,NB,NE
   real(r8) :: PSS,HS,CS
   real(r8) :: OS
@@ -674,18 +677,19 @@ module RedistMod
   real(r8) :: SSS,ZG,Z4S,Z4X
   real(r8) :: Z4F,ZOS,ZOF
 
-  if(lverb)write(*,*)'LitterLayerSummary'
-!     begin_execution
-!     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
-!
+  call PrintInfo('beg '//subname)
+  !     begin_execution
+  !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
+  !
   call sumSurfOMCK(NY,NX,SurfLitterC_col(:,NY,NX),RC0ff_col(NY,NX))
 
   call sumMicBiomLayL(0,NY,NX,tMicBiome_col(1:NumPlantChemElms,NY,NX))
 
   call sumLitrOMLayL(0,NY,NX,litrOM_vr(1:NumPlantChemElms,0,NY,NX),I,J)
 
-  SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM_vr(1:NumPlantChemElms,0,NY,NX)
 
+  SoilOrgM_vr(1:NumPlantChemElms,0,NY,NX)=litrOM_vr(1:NumPlantChemElms,0,NY,NX)
+  
   !update heat capacity for consistency
   VHeatCapacity_vr(0,NY,NX) = cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
   DO NE=1,NumPlantChemElms
@@ -737,7 +741,7 @@ module RedistMod
   tXPO4_col(NY,NX)  = tXPO4_col(NY,NX)+POP
 
   IF(salt_model)call DiagSurfLitRLayerSalt(NY,NX,TDisolPi_lnd)
-
+  call PrintInfo('end '//subname)
   end subroutine LitterLayerSummary
 !------------------------------------------------------------------------------------------
 
@@ -776,6 +780,7 @@ module RedistMod
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
+  character(len=*), parameter :: subname='UpdateTSoilVSMProfile'
   real(r8) :: TKS00,TKSX,TKSpre
   real(r8) :: ENGY,EngyF
   real(r8) :: TVHeatCapacity
@@ -787,7 +792,7 @@ module RedistMod
   real(r8) :: tplantH2O,tPoreWat
   real(r8) :: dWAT,fWMacP,fWMicP,dIceMicp,dIceMacp,rootC
 
-  if(lverb)write(*,*)'UpdateTSoilVSMProfile'
+  call PrintInfo('beg '//subname)
   TVHeatCapacity      = 0.0_r8
   TVHeatCapacitySoilM = 0.0_r8
   TVOLW               = 0.0_r8
@@ -883,7 +888,7 @@ module RedistMod
     ENDDO
 
   endif
-
+  call PrintInfo('end '//subname)
   end subroutine UpdateTSoilVSMProfile
 !------------------------------------------------------------------------------------------
   subroutine UpdateChemInSoilLays(I,J,NY,NX,LG,DORGC,Txchem_CO2_col,DORGE_col)
@@ -1300,6 +1305,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
+  character(len=*), parameter :: subname='AddFlux2SurfaceResidue'
   real(r8)  :: dWat,dHeat
   integer :: M,N,K,NGL,NE
   real(r8) :: HRAINR,RAINR
@@ -1316,8 +1322,9 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN_lnd=cumulative net surface heat transfer
 !
-  call PrintInfo('beg AddFlux2SurfaceResidue')
+  call PrintInfo('beg '//subname)
   dWat=0._r8; dHeat=0._r8
+  
   DO   K=1,micpar%NumOfPlantLitrCmplxs
     OSCMK=0._r8
     DO  M=1,jsken
@@ -1335,7 +1342,7 @@ module RedistMod
 
       VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
       QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
-      CanopyWat_col(NY,NX)         = CanopyWat_col(NY,NX)-RAINR
+      CanopyBiomWater_col(NY,NX)         = CanopyBiomWater_col(NY,NX)-RAINR
       HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR
@@ -1345,7 +1352,6 @@ module RedistMod
       PrecHeat_col(NY,NX)          = PrecHeat_col(NY,NX) + HRAINR
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
-!    write(113,*)I+J/24.,K,OSCMK,SolidOM_vr(ielmc,1:jsken,K,0,NY,NX)
     call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
   ENDDO
 
@@ -1354,7 +1360,7 @@ module RedistMod
   !update litter physical property
   call UpdateLitRPhys(I,J,NY,NX,dWat,dHeat,HEATIN_lnd)
 
-  call PrintInfo('end AddFlux2SurfaceResidue')
+  call PrintInfo('end '//subname)
   end subroutine AddFlux2SurfaceResidue
 
 !------------------------------------------------------------------------------------------
