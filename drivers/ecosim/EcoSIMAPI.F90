@@ -371,8 +371,6 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 
   if(do_timing)call init_timer(outdir)
 
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
-
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
 
@@ -391,6 +389,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !are set using the checkpoint file.
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
+
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !

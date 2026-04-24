@@ -586,6 +586,7 @@ implicit none
       plt_biom%ShootNoduleElmsBeg_pft(NE,NZ)    = plt_biom%ShootNoduleElms_pft(NE,NZ)
       plt_biom%TotBegVegE_pft(NE,NZ)            = plt_biom%TotEndVegE_pft(NE,NZ)
       plt_biom%RootNoduleElmsBeg_pft(NE,NZ)     = plt_biom%RootNoduleElms_pft(NE,NZ)
+      plt_distb%FireLossE_pft(NE,NZ)            = 0._r8
     ENDDO
 
   ENDDO
@@ -665,8 +666,9 @@ implicit none
     CanopyN2Fix_pft           => plt_rbgc%CanopyN2Fix_pft            ,& !input  :total canopy N2 fixation, [gN d-2 h-1]        
     SeedPlantedElm_pft        => plt_biom%SeedPlantedElm_pft         ,& !input  :seed biomass at planting, [g d-2] 
     iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft      ,& !input  : day of plant harvest,[-]
-    LitrfallAbvgElms_pft      => plt_bgcr%LitrfallAbvgElms_pft       ,& !input :aboveground plant element LitrFall, [g d-2 h-1]
-    LitrfallBlgrElms_pft      => plt_bgcr%LitrfallBlgrElms_pft       ,& !input :belowground plant element LitrFall, [g d-2 h-1]
+    LitrfallAbvgElms_pft      => plt_bgcr%LitrfallAbvgElms_pft       ,& !input  :aboveground plant element LitrFall, [g d-2 h-1]
+    LitrfallBlgrElms_pft      => plt_bgcr%LitrfallBlgrElms_pft       ,& !input  :belowground plant element LitrFall, [g d-2 h-1]
+    FireLossE_pft             => plt_distb%FireLossE_pft             ,& !input  :plant element lost by fire, [g d-2 h-1]
     TotBegVegE_pft            => plt_biom%TotBegVegE_pft             ,& !Input  :total vegetation carbon at the beginning of the time step,[g d-2]
     TotEndVegE_pft            => plt_biom%TotEndVegE_pft              & !output :total vegetation carbon at the end of the time step,[g d-2]
   )
@@ -712,6 +714,7 @@ implicit none
     write(888,*)'litfallC, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
     write(888,*)'disturbC          =',PlantElmDistLoss_pft(NE,NZ)    
     write(888,*)'canMaintDef       =',RCanMaintDef_CO2_pft(NZ)
+    write(888,*)'FireLossC         =',FireLossE_pft(NE,NZ)
     write(888,*)'CanoGroth         =',canopy_growth_pft(NZ)
     write(888,*)'GPP               =',GrossCO2Fix_pft(NZ),dGPP,GrossCO2Fix_pft(NZ)-dGPP
     write(888,*)'AR,rootAR,shootAR =',GrossResp_pft(NZ),RootAutoCO2_pft(NZ),CanopyGrosRCO2_pft(NZ)   
@@ -744,6 +747,7 @@ implicit none
     write(888,*)'rootexudN         =',Soil2RootMycoExudE_pft(NE,NZ)
     write(888,*)'litfallN, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
     write(888,*)'disturbN          =',PlantElmDistLoss_pft(NE,NZ)    
+    write(888,*)'FireLossN         =',FireLossE_pft(NE,NZ)    
     write(888,*)'RootNuptk         =',RootNutUptakeN_pft(NZ)
     write(888,*)'CanopyNFix        =',CanopyN2Fix_pft(NZ)
     write(888,*)'CanopyNH3dep      =',NH3Dep2Can_pft(NZ)
@@ -774,6 +778,7 @@ implicit none
     write(888,*)'rootexudP        =',Soil2RootMycoExudE_pft(NE,NZ)
     write(888,*)'litfallP,abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)
     write(888,*)'disturbP         =',PlantElmDistLoss_pft(NE,NZ)    
+    write(888,*)'FireLossP         =',FireLossE_pft(NE,NZ)    
     write(888,*)'RootPuptk        =',RootNutUptakeP_pft(NZ)      
     write(888,*)'seed planted     =',plt_biom%SeedPlantedElm_pft(NE,NZ)  
     write(888,*)'surf literfall P =',SurfLitrfallElms_pft(NE,NZ)      

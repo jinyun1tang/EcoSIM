@@ -22,7 +22,7 @@ module PlantDisturbsMod
 ! end_include_section
 
 ! disturbance variables
-  real(r8) :: NonstructElmntRemoval(NumPlantChemElms)
+  real(r8) :: CanopyNonstElmRemoval(NumPlantChemElms)
   real(r8) :: LeafElmntRemoval(NumPlantChemElms)
   real(r8) :: FineNonleafElmntRemoval(NumPlantChemElms)
   real(r8) :: WoodyElmntRemoval(NumPlantChemElms)
@@ -56,7 +56,7 @@ module PlantDisturbsMod
   character(len=*), parameter :: subname='StageDisturbances'
 
   call PrintInfo('beg '//subname)
-  NonstructElmntRemoval(1:NumPlantChemElms)    = 0._r8
+  CanopyNonstElmRemoval(1:NumPlantChemElms)    = 0._r8
   LeafElmntRemoval(1:NumPlantChemElms)         = 0._r8
   FineNonleafElmntRemoval(1:NumPlantChemElms)  = 0._r8
   WoodyElmntRemoval(1:NumPlantChemElms)        = 0._r8
@@ -312,7 +312,7 @@ module PlantDisturbsMod
   real(r8) :: FineNonleafElmOffEcosystem(NumPlantChemElms)
   real(r8) :: WoodyElmntOffEcosystem(NumPlantChemElms)
   real(r8) :: StandeadElmntOffEcosystem(NumPlantChemElms)
-  real(r8) :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8) :: CanopyNonstElm2Litr(NumPlantChemElms)
   real(r8) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8) :: HarvestElmnt2Litr(NumPlantChemElms)
 
@@ -322,17 +322,17 @@ module PlantDisturbsMod
   FineNonleafElmOffEcosystem(1:NumPlantChemElms) = 0._r8
   WoodyElmntOffEcosystem(1:NumPlantChemElms)     = 0._r8
   StandeadElmntOffEcosystem(1:NumPlantChemElms)  = 0._r8
-  NonstructElmnt2Litr(1:NumPlantChemElms)        = 0._r8
+  CanopyNonstElm2Litr(1:NumPlantChemElms)        = 0._r8
 
-  call ApplyDisturbanceBiomRemoval(yearIJ,NZ,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+  call ApplyDisturbanceBiomRemoval(yearIJ,NZ,CanopyNonstElm2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
 
 !     TOTAL C,N,P REMOVAL FROM DISTURBANCE
-  call AbvgBiomRemovalByDisturb(yearIJ,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
+  call AbvgBiomRemovalByDisturb(yearIJ,NZ,CanopyNonstElm2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
 !
 !     ABOVE-GROUND LitrFall FROM HARVESTING
 !
-  call LiterfallByDisturbance(yearIJ,NZ,HarvestElmnt2Litr,TotalElmnt2Litr,NonstructElmnt2Litr,&
+  call LiterfallByDisturbance(yearIJ,NZ,HarvestElmnt2Litr,TotalElmnt2Litr,CanopyNonstElm2Litr,&
     NonstructElmntOffEcosystem,LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,&
     WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
 
@@ -341,7 +341,7 @@ module PlantDisturbsMod
 
 
 !----------------------------------------------------------------------------------------------------
-  subroutine LiterfallByDisturbance(yearIJ,NZ,HarvestElmnt2Litr,TotalElmnt2Litr,NonstructElmnt2Litr,&
+  subroutine LiterfallByDisturbance(yearIJ,NZ,HarvestElmnt2Litr,TotalElmnt2Litr,CanopyNonstElm2Litr,&
     NonstructElmntOffEcosystem,LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,&
     WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
 
@@ -350,12 +350,13 @@ module PlantDisturbsMod
   integer , intent(in) :: NZ
   real(r8), intent(in) :: HarvestElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)
-  real(r8), intent(in) :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(in) :: CanopyNonstElm2Litr(NumPlantChemElms)
   real(r8), intent(in) :: NonstructElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(in) :: LeafElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(in) :: FineNonleafElmOffEcosystem(NumPlantChemElms)
   real(r8), intent(in) :: WoodyElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(in) :: StandeadElmntOffEcosystem(NumPlantChemElms)
+  character(len=*), parameter :: subname='LiterfallByDisturbance'
   integer :: M,NE
   real(r8) :: dWoody
 !     begin_execution
@@ -377,6 +378,8 @@ module PlantDisturbsMod
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
     SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft   & !inoput :total surface LitrFall element, [g d-2]
   )
+
+  call PrintInfo('beg '//subname)
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
   !     CSNC,ZSNC,PSNC=C,N,P LitrFall from disturbance
@@ -390,7 +393,7 @@ module PlantDisturbsMod
       D6375: DO M=1,jsken
         DO NE=1,NumPlantChemElms        
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
-            +PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(NonstructElmnt2Litr(NE)) &
+            +PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(CanopyNonstElm2Litr(NE)) &
             +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*(LeafElmnt2Litr(NE)+LeafElmntHarv2Litr(NE)) &
             +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(FineNonleafElmnt2Litr(NE)+PetolShethElmntHarv2Litr(NE))
 
@@ -420,11 +423,11 @@ module PlantDisturbsMod
       !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
       !
     ELSE
-      call AbvGrndLiterFallByFire(yearIJ%I,yearIJ%J,NZ,NonstructElmnt2Litr,StandeadElmntOffEcosystem, &
+      !
+      call AbvGrndLiterFallByFire(yearIJ%I,yearIJ%J,NZ,CanopyNonstElm2Litr,StandeadElmntOffEcosystem, &
         FineNonleafElmOffEcosystem,LeafElmnt2Litr,LeafElmntOffEcosystem,NonstructElmntOffEcosystem,&
         WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetolShethElmntHarv2Litr,&
         FineNonleafElmnt2Litr,LeafElmntHarv2Litr,StandeadElmntHarv2Litr,WoodyElmntHarv2Litr)
-
     ENDIF
     !by grazing or herbivory
   ELSE
@@ -439,11 +442,12 @@ module PlantDisturbsMod
       SurfLitrfalStrutElms_CumYr_pft(NE,NZ) = SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+TotalElmnt2Litr(NE)+HarvestElmnt2Litr(NE)
     ENDDO
   ENDIF
+  call PrintInfo('beg '//subname)
   end associate
   end subroutine LiterfallByDisturbance
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AbvgBiomRemovalByDisturb(yearIJ,NZ,NonstructElmnt2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
+  subroutine AbvgBiomRemovalByDisturb(yearIJ,NZ,CanopyNonstElm2Litr,HarvestElmnt2Litr,TotalElmnt2Litr)
   !
   !Description:
   !Loss of above ground biomass due to disturbance
@@ -452,9 +456,10 @@ module PlantDisturbsMod
   type(yearIJ_type), intent(in) :: yearIJ  
 
   integer , intent(in)  :: NZ
-  real(r8), intent(in)  :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(in)  :: CanopyNonstElm2Litr(NumPlantChemElms)
   real(r8), intent(out) :: HarvestElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: TotalElmnt2Litr(NumPlantChemElms)
+  character(len=*), parameter :: subname='AbvgBiomRemovalByDisturb'
   real(r8) :: TotalElmntRemoval(NumPlantChemElms)
   integer :: NE,NR
 !     begin_execution
@@ -477,32 +482,33 @@ module PlantDisturbsMod
     Root1stDepz_raxes       => plt_morph%Root1stDepz_raxes        ,& !inoput : root layer depth, [m]    
     Eco_NBP_CumYr_col       => plt_bgcr%Eco_NBP_CumYr_col          & !inoput :total NBP, [g d-2]
   )
-!
-!     TotalElmntRemoval=total C,N,P removed
-!     TotalElmnt2Litr=total C,N,P to litter
-!     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
-!                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
-!     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
-!     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
-!     WTRVC,WTRVN,WTRVP=storage C,N,P
-! harvest/disturbance cause actual removal (which is taken away) and addition to litter.
-! need double check
-!
+  call PrintInfo('beg '//subname)
+  !
+  !     TotalElmntRemoval=total C,N,P removed
+  !     TotalElmnt2Litr=total C,N,P to litter
+  !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
+  !                       ,3=pruning,4=grazing,5=fire,6=herbivory
+  !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
+  !     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
+  !     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
+  !     WTRVC,WTRVN,WTRVP=storage C,N,P
+  ! harvest/disturbance cause actual removal (which is taken away) and addition to litter.
+  ! need double check
+  !
   DO NE=1,NumPlantChemElms
-    TotalElmntRemoval(NE)       = NonstructElmntRemoval(NE)+LeafElmntRemoval(NE)+FineNonleafElmntRemoval(NE)+WoodyElmntRemoval(NE)+StandeadElmntRemoval(NE)
-    TotalElmnt2Litr(NE)         = NonstructElmnt2Litr(NE)+LeafElmnt2Litr(NE)+FineNonleafElmnt2Litr(NE)+WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE)
+    TotalElmntRemoval(NE)       = CanopyNonstElmRemoval(NE)+LeafElmntRemoval(NE)+FineNonleafElmntRemoval(NE)+WoodyElmntRemoval(NE)+StandeadElmntRemoval(NE)
+    TotalElmnt2Litr(NE)         = CanopyNonstElm2Litr(NE)+LeafElmnt2Litr(NE)+FineNonleafElmnt2Litr(NE)+WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE)
     HarvestElmnt2Litr(NE)       = LeafElmntHarv2Litr(NE)+PetolShethElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
 
-!  if(yearIJ%I>=154.and.yearIJ%J==12 .AND. NZ==2)then
-!  write(798,*)TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc),HarvestElmnt2Litr(ielmc)
-!  NE=ielmc
-!  write(798,*)'rm',NonstructElmntRemoval(NE),LeafElmntRemoval(NE),FineNonleafElmntRemoval(NE),WoodyElmntRemoval(NE),StandeadElmntRemoval(NE)
-!  write(798,*)'st',plt_biom%ShootNonstElms_pft(NE,NZ),plt_biom%ShootLeafElms_pft(NE,NZ),plt_biom%ShootFineNonLeafElms_pft(NE,NZ),&
-!    plt_biom%ShootWoodyElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ)
-!  write(798,*)plt_biom%CanopyNonstElms_pft(NE,NZ),plt_biom%ShootNoduleElms_pft(NE,NZ)
-!  endif
+  if(yearIJ%I>=226 .AND. NZ==1 .and. TotalElmntRemoval(ielmc)>0._r8)then
+  write(798,*)yearIJ%I*1000+yearIJ%J/24.,TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc),HarvestElmnt2Litr(ielmc)
+  NE=ielmc
+  write(798,*)'rm',CanopyNonstElmRemoval(NE),LeafElmntRemoval(NE),FineNonleafElmntRemoval(NE),WoodyElmntRemoval(NE),StandeadElmntRemoval(NE)
+  write(798,*)'st',plt_biom%ShootNonstElms_pft(NE,NZ),plt_biom%ShootLeafElms_pft(NE,NZ),plt_biom%ShootFineNonLeafElms_pft(NE,NZ),&
+    plt_biom%ShootWoodyElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ)
+  write(798,*)plt_biom%CanopyNonstElms_pft(NE,NZ),plt_biom%ShootNoduleElms_pft(NE,NZ)
+  endif
 
   IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN
   !not do harvest and reseed
@@ -562,37 +568,40 @@ module PlantDisturbsMod
       ENDIF
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AbvgBiomRemovalByDisturb
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ApplyDisturbanceBiomRemoval(yearIJ,NZ,NonstructElmnt2Litr,&
+  subroutine ApplyDisturbanceBiomRemoval(yearIJ,NZ,CanopyNonstElm2Litr,&
     NonstructElmntOffEcosystem,LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,&
     WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
-
   integer, intent(in) :: NZ
-  real(r8), intent(out) :: NonstructElmnt2Litr(NumPlantChemElms)
+  real(r8), intent(out) :: CanopyNonstElm2Litr(NumPlantChemElms)
   real(r8), intent(out) :: NonstructElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: LeafElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: FineNonleafElmOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: WoodyElmntOffEcosystem(NumPlantChemElms)
   real(r8), intent(out) :: StandeadElmntOffEcosystem(NumPlantChemElms)
+  character(len=*), parameter :: subname='ApplyDisturbanceBiomRemoval'
 
   real(r8) :: FracAftHVST21,FracAftHVST22,FracAftHVST23,FracAftHVST24
 
   integer  :: NE
-!     begin_execution
+  !   begin_execution
   associate(                                         &
     FracBiomHarvsted => plt_distb%FracBiomHarvsted  ,& !input  :harvest efficiency, [-]
     iHarvstType_pft  => plt_distb%iHarvstType_pft    & !input  :type of harvest,[-]
   )
-!     IF NO PLANT C,N,P REMOVED AT HARVEST (ALL RESIDUE RETURNED)
-!
-!     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
-!                       ,3=pruning,4=grazing,5=fire,6=herbivory
-!
+
+  call PrintInfo('beg '//subname)
+  !     IF NO PLANT C,N,P REMOVED AT HARVEST (ALL RESIDUE RETURNED)
+  !
+  !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
+  !                       ,3=pruning,4=grazing,5=fire,6=herbivory
+  !
   FracAftHVST21=1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ)
   FracAftHVST22=1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ)
   FracAftHVST23=1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ)
@@ -600,7 +609,7 @@ module PlantDisturbsMod
 
   IF(iHarvstType_pft(NZ).EQ.iharvtyp_none)THEN
     DO NE=1,NumPlantChemElms
-      NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*FracAftHVST21     !non-structural
+      CanopyNonstElm2Litr(NE)   = CanopyNonstElmRemoval(NE)*FracAftHVST21     !non-structural
       LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*FracAftHVST21          !leaf
       FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*FracAftHVST22   !fine, non-woody, grain
       WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*FracAftHVST23         !woody
@@ -611,7 +620,7 @@ module PlantDisturbsMod
     !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grain)THEN
     DO NE=1,NumPlantChemElms
-      NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)
+      CanopyNonstElm2Litr(NE)   = CanopyNonstElmRemoval(NE)
       LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)
       FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)-GrainHarvst(NE)*FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ)
       WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)
@@ -622,7 +631,7 @@ module PlantDisturbsMod
 !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_allabvg)THEN
     DO NE=1,NumPlantChemElms
-      NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*FracAftHVST21
+      CanopyNonstElm2Litr(NE)   = CanopyNonstElmRemoval(NE)*FracAftHVST21
       LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*FracAftHVST21
       FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*FracAftHVST22
       WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*FracAftHVST23
@@ -633,7 +642,7 @@ module PlantDisturbsMod
 !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
     DO NE=1,NumPlantChemElms
-      NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*FracAftHVST21
+      CanopyNonstElm2Litr(NE)   = CanopyNonstElmRemoval(NE)*FracAftHVST21
       LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*FracAftHVST21
       FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*FracAftHVST22
       WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*FracAftHVST23
@@ -645,8 +654,8 @@ module PlantDisturbsMod
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
 
     call ApplyBiomRemovalByGrazing(yearIJ%I,yearIJ%J,NZ,FracAftHVST21,FracAftHVST22,FracAftHVST23,FracAftHVST24,&
-      NonstructElmntRemoval,LeafElmntRemoval,FineNonleafElmntRemoval,WoodyElmntRemoval,StandeadElmntRemoval,&
-      NonstructElmnt2Litr,LeafElmnt2Litr,FineNonleafElmnt2Litr,WoodyElmnt2Litr,StandeadElmnt2Litr)
+      CanopyNonstElmRemoval,LeafElmntRemoval,FineNonleafElmntRemoval,WoodyElmntRemoval,StandeadElmntRemoval,&
+      CanopyNonstElm2Litr,LeafElmnt2Litr,FineNonleafElmnt2Litr,WoodyElmnt2Litr,StandeadElmnt2Litr)
 !
 !     REMOVALS BY FIRE
 !
@@ -654,14 +663,16 @@ module PlantDisturbsMod
 !
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_fire)THEN
 
-    call ApplyBiomRemovalByFire(yearIJ%I,yearIJ%J,NZ,FracAftHVST21,FracAftHVST22, FracAftHVST23, FracAftHVST24,&
-      StandeadElmntRemoval,NonstructElmntRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
-      FineNonleafElmntRemoval,NonstructElmnt2Litr,NonstructElmntOffEcosystem,&
+    call ApplyBiomRemovalByFire(yearIJ%I,yearIJ%J,NZ,&
+      FracAftHVST21,FracAftHVST22, FracAftHVST23, FracAftHVST24,&
+      StandeadElmntRemoval,CanopyNonstElmRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
+      FineNonleafElmntRemoval,CanopyNonstElm2Litr,NonstructElmntOffEcosystem,&
       LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
       StandeadElmntOffEcosystem,LeafElmnt2Litr,FineNonleafElmnt2Litr,&
       WoodyElmnt2Litr,StandeadElmnt2Litr)
 
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine ApplyDisturbanceBiomRemoval
 
@@ -843,7 +854,7 @@ module PlantDisturbsMod
     !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
     !     EFIRE=combustion  of N,P relative to C
     !
-
+    !
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo .AND. iHarvstType_pft(NZ).NE.iharvtyp_allabvg)THEN
 
       FracLeftThin=1.0_r8-THIN_pft(NZ)
@@ -857,6 +868,7 @@ module PlantDisturbsMod
       D3985: DO N=1,Myco_pft(NZ)
         D3980: DO L=NU,MaxNumRootLays
           CALL RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
+
           call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
         ENDDO D3980
       ENDDO D3985
@@ -1368,13 +1380,13 @@ module PlantDisturbsMod
   !
   !     HARVESTED NON-STRUCTURAL C, N, P
   !
-  !     NonstructElmntRemoval()=nonstructural C,N,P removed
+  !     CanopyNonstElmRemoval()=nonstructural C,N,P removed
   !
 
   DO NE=1,NumPlantChemElms
-    NonstructElmntRemoval(NE)=NonstructElmntRemoval(NE)+CanopyNonstElmCopy_brch(NE)-CanopyNonstElmAfhvst_brch(NE)+&
+    CanopyNonstElmRemoval(NE)=CanopyNonstElmRemoval(NE)+CanopyNonstElmCopy_brch(NE)-CanopyNonstElmAfhvst_brch(NE)+&
       CanopyNodulNonstElmCopy_brch(NE)-CanopyNodulNonstElmAfhvst(NE)
-    NonstructElmntRemoval(NE)=NonstructElmntRemoval(NE)+CanopyNodulStrutElms_brch(NE,NB,NZ)-CanopyNodulStrutElmAfhvst(NE)
+    CanopyNonstElmRemoval(NE)=CanopyNonstElmRemoval(NE)+CanopyNodulStrutElms_brch(NE,NB,NZ)-CanopyNodulStrutElmAfhvst(NE)
     !
     ! REMAINING NON-STRUCTURAL C, N, P
     !
@@ -1392,7 +1404,7 @@ module PlantDisturbsMod
   !     iPlantPhotosynsType_pft=photosynthesis type:3=C3,4=C4 from PFT file
   !     FracNonstLeft=fraction of nonstructural mass not harvested
   !     CanopyNonstElmAfhvst_brch(ielmc)=branch non-structural C mass after harvest
-  !     NonstructElmntRemoval()=nonstructural C,N,P removed
+  !     CanopyNonstElmRemoval()=nonstructural C,N,P removed
   !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
   !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
   !
@@ -1400,7 +1412,7 @@ module PlantDisturbsMod
     FracNonstLeft    = CanopyNonstElmAfhvst_brch(ielmc)/CanopyNonstElmCopy_brch(ielmc)
     FracNonstRemoved = 1._r8-FracNonstLeft
     D9810: DO K   = 1, MaxNodesPerBranch1
-      NonstructElmntRemoval(ielmc)=NonstructElmntRemoval(ielmc) &
+      CanopyNonstElmRemoval(ielmc)=CanopyNonstElmRemoval(ielmc) &
         +FracNonstRemoved*(CPOOL3_node(K,NB,NZ)+CPOOL4_node(K,NB,NZ) &
         +CMassCO2BundleSheath_node(K,NB,NZ)+CMassHCO3BundleSheath_node(K,NB,NZ))
       CPOOL3_node(K,NB,NZ)                = FracNonstLeft*CPOOL3_node(K,NB,NZ)
@@ -1956,9 +1968,9 @@ module PlantDisturbsMod
   type(yearIJ_type), intent(in) :: yearIJ
   integer , intent(in) :: N,L,NZ
   real(r8), intent(out) :: FracLeftThin
-  real(r8), intent(out):: XHVST1
+  real(r8), intent(out):: XHVST1         !fraction of biomass removed by disturbance
   character(len=*), parameter :: subname='RootRemovalLbyFire'
-  real(r8) :: FrcMassNotHarvst(NumPlantChemElms)
+  real(r8) :: HarvestedBiomass(NumPlantChemElms)
   real(r8) :: FFIRE(NumPlantChemElms)
   integer  :: NR,idg,M,NE
 
@@ -1984,61 +1996,66 @@ module PlantDisturbsMod
   )
   call PrintInfo('beg '//subname)
   IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
-    FracLeftThin=1.0_r8-THIN_pft(NZ)
-    FFIRE(1:NumPlantChemElms)=0._r8
+    FracLeftThin              = 1.0_r8-THIN_pft(NZ)
+    FFIRE(1:NumPlantChemElms) = 0._r8
   ELSE
     !fire
     call StageRootRemovalByFire(yearIJ,NZ,L,FFIRE,DCORP,FracLeftThin)
   ENDIF
-
+  !
   XHVST1=1._r8-FracLeftThin
   D3385: DO M=1,jsken
-    DO NE=1,NumPlantChemElms
-      FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
-      LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
-        +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
-    ENDDO
-
     !nonstructural root biomass
-    call RemoveRootByFire(yearIJ,NZ,FrcMassNotHarvst,FFIRE)
-
+    DO NE=1,NumPlantChemElms
+      HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
+      LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
+        +(1._r8-FFIRE(NE))*HarvestedBiomass(NE)
+    ENDDO
+    if(FFIRE(ielmc)>0._r8)call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+    !
     D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
-          FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
             *FracRootElmAllocm(NE,k_woody_comp)
+
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
-            (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
+            (1._r8-FFIRE(NE))*HarvestedBiomass(NE)       
         ENDDO
       ENDIF
 
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ) &
+          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
           *FracRootElmAllocm(NE,k_woody_comp)
+
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+&
-          (1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)       
+          (1._r8-FFIRE(NE))*HarvestedBiomass(NE)       
       ENDDO
 
       !woody roots
-      call RemoveRootByFire(yearIJ,NZ,FrcMassNotHarvst,FFIRE)
+      if(FFIRE(ielmc)>0._r8)call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
-          FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
+            *AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
             *FracRootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
-            +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
+            +(1._r8-FFIRE(NE))*HarvestedBiomass(NE)
         ENDDO
       ENDIF
 
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
+          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
           *FracRootElmAllocm(NE,k_fine_comp)
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ) &
-          +(1._r8-FFIRE(NE))*FrcMassNotHarvst(NE)
+          +(1._r8-FFIRE(NE))*HarvestedBiomass(NE)
       ENDDO
 
       !fine roots
-      CALL RemoveRootByFire(yearIJ,NZ,FrcMassNotHarvst,FFIRE)
+      if(FFIRE(ielmc)>0._r8)CALL RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
 
     enddo D3960
   ENDDO D3385
@@ -2067,7 +2084,9 @@ module PlantDisturbsMod
   integer , intent(in) :: N,L,NZ
   real(r8), intent(out) :: FracLeftThin
   real(r8), intent(out):: XHVST1
-  real(r8) :: FrcMassNotHarvst(NumPlantChemElms)
+  character(len=*), parameter :: subname='RootRemovalL4Annual'
+
+  real(r8) :: HarvestedBiomass(NumPlantChemElms)
   real(r8) :: FFIRE(NumPlantChemElms)
   integer  :: NR,idg,M,NE
 
@@ -2091,43 +2110,43 @@ module PlantDisturbsMod
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr            ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr             & !inoput :root aqueous content, [g d-2]
   )
-
+  call PrintInfo('beg '//subname)
   FracLeftThin = 0._r8
   XHVST1       = 1._r8-FracLeftThin
   D3385: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
-      LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+FrcMassNotHarvst(NE)
+      HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
+      LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+HarvestedBiomass(NE)
     ENDDO
 
     DO NR=1,NumPrimeRootAxes_pft(NZ)
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
-          FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
             *FracRootElmAllocm(NE,k_woody_comp)
-          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+FrcMassNotHarvst(NE)       
+          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+HarvestedBiomass(NE)       
         ENDDO
       ENDIF
 
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
           *FracRootElmAllocm(NE,k_woody_comp)
-        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+FrcMassNotHarvst(NE)       
+        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+HarvestedBiomass(NE)       
       ENDDO
 
       !woody roots
       if(N==ipltroot)THEN
         DO NE=1,NumPlantChemElms
-          FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
             *FracRootElmAllocm(NE,k_fine_comp)
-          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+FrcMassNotHarvst(NE)
+          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+HarvestedBiomass(NE)
         ENDDO
       ENDIF
 
       DO NE=1,NumPlantChemElms
-        FrcMassNotHarvst(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
           *FracRootElmAllocm(NE,k_fine_comp)
-        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+FrcMassNotHarvst(NE)
+        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+HarvestedBiomass(NE)
       ENDDO
 
     enddo
@@ -2145,7 +2164,7 @@ module PlantDisturbsMod
     trcg_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcg_rootml_pvr(idg,N,L,NZ)
     trcs_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(idg,N,L,NZ)
   ENDDO
-
+  call PrintInfo('end '//subname)
   end associate          
   end subroutine RootRemovalL4Annual
 !----------------------------------------------------------------------------------------------------
@@ -2169,6 +2188,7 @@ module PlantDisturbsMod
   DO N=1,Myco_pft(NZ)
     DO L=NU,MaxNumRootLays
       call RootRemovalL4Annual(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
+
       call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)            
     ENDDO
   ENDDO
@@ -2234,8 +2254,8 @@ module PlantDisturbsMod
   !     RootVH2O_pvr,RootPoreVol_pvr=root or myco aqueous,gaseous volume
   !     RootSAreaPerPlant_pvr=root surface area per plant
   !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
-  !
-    
+  !    
+  call PrintInfo('beg '//subname)
   if(N==ipltroot)then
     DO NR=1,NumPrimeRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms
@@ -2292,6 +2312,7 @@ module PlantDisturbsMod
       RootNodulNonstElms_rpvr(NE,L,NZ) = RootNodulNonstElms_rpvr(NE,L,NZ)*FracLeftThin
     ENDDO
   ENDIF
+  call PrintInfo('end '//subname)
   end associate          
   end subroutine HarvstUpdateRootStateL
   ![tail]

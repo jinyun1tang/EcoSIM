@@ -101,8 +101,8 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine ApplyBiomRemovalByGrazing(I,J,NZ,EHVST21,EHVST22,EHVST23,EHVST24,&
-    NonstructElmntRemoval,LeafElmntRemoval,FineNonleafElmntRemoval,WoodyElmntRemoval,StandeadElmntRemoval,&
-    NonstructElmnt2Litr,LeafElmnt2Litr,FineNonleafElmnt2Litr,WoodyElmnt2Litr,StandeadElmnt2Litr)
+    CanopyNonstElmRemoval,LeafElmntRemoval,FineNonleafElmntRemoval,WoodyElmntRemoval,StandeadElmntRemoval,&
+    CanopyNonstElm2Litr,LeafElmnt2Litr,FineNonleafElmnt2Litr,WoodyElmnt2Litr,StandeadElmnt2Litr)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ
@@ -110,12 +110,12 @@ contains
   real(r8), intent(in) :: EHVST22
   real(r8), intent(in) :: EHVST23
   real(r8), intent(in) :: EHVST24
-  real(r8), intent(in) :: NonstructElmntRemoval(NumPlantChemElms)
+  real(r8), intent(in) :: CanopyNonstElmRemoval(NumPlantChemElms)
   real(r8), intent(in) :: LeafElmntRemoval(NumPlantChemElms)
   real(r8), intent(in) :: FineNonleafElmntRemoval(NumPlantChemElms)
   real(r8), intent(in) :: WoodyElmntRemoval(NumPlantChemElms)
   real(r8), intent(in) :: StandeadElmntRemoval(NumPlantChemElms)
-  real(r8), intent(out) :: NonstructElmnt2Litr(NumPlantChemElms)  
+  real(r8), intent(out) :: CanopyNonstElm2Litr(NumPlantChemElms)  
   real(r8), intent(out) :: LeafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: FineNonleafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: WoodyElmnt2Litr(NumPlantChemElms)
@@ -134,14 +134,14 @@ contains
   EHVST23h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ)*0.5_r8
   EHVST24h = 1._r8-FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ)*0.5_r8
 
-  NonstructElmnt2Litr(ielmc)   = NonstructElmntRemoval(ielmc)*EHVST21
+  CanopyNonstElm2Litr(ielmc)   = CanopyNonstElmRemoval(ielmc)*EHVST21
   LeafElmnt2Litr(ielmc)        = LeafElmntRemoval(ielmc)*EHVST21
   FineNonleafElmnt2Litr(ielmc) = FineNonleafElmntRemoval(ielmc)*EHVST22
   WoodyElmnt2Litr(ielmc)       = WoodyElmntRemoval(ielmc)*EHVST23
   StandeadElmnt2Litr(ielmc)    = StandeadElmntRemoval(ielmc)*EHVST24
 
   DO NE=2,NumPlantChemElms
-    NonstructElmnt2Litr(NE)   = NonstructElmntRemoval(NE)*EHVST21h
+    CanopyNonstElm2Litr(NE)   = CanopyNonstElmRemoval(NE)*EHVST21h
     LeafElmnt2Litr(NE)        = LeafElmntRemoval(NE)*EHVST21h
     FineNonleafElmnt2Litr(NE) = FineNonleafElmntRemoval(NE)*EHVST22h
     WoodyElmnt2Litr(NE)       = WoodyElmntRemoval(NE)*EHVST23h
@@ -153,13 +153,13 @@ contains
   !     FERT=fertilizer type from fertilizer input file
   !     IYTYP=fertilizer release type from fertilizer input file
   !
-  FERT(ifert_plant_manuC)=FERT(ifert_plant_manuC)+(NonstructElmnt2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
+  FERT(ifert_plant_manuC)=FERT(ifert_plant_manuC)+(CanopyNonstElm2Litr(ielmc)+LeafElmnt2Litr(ielmc)+&
     FineNonleafElmnt2Litr(ielmc)+WoodyElmnt2Litr(ielmc)+StandeadElmnt2Litr(ielmc))/AREA3(NU)
-  FERT(ifert_plant_manuN)=FERT(ifert_plant_manuN)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
+  FERT(ifert_plant_manuN)=FERT(ifert_plant_manuN)+(CanopyNonstElm2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8    
-  FERT(ifert_N_urea)=FERT(ifert_N_urea)+(NonstructElmnt2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
+  FERT(ifert_N_urea)=FERT(ifert_N_urea)+(CanopyNonstElm2Litr(ielmn)+LeafElmnt2Litr(ielmn)+&
     FineNonleafElmnt2Litr(ielmn)+WoodyElmnt2Litr(ielmn)+StandeadElmnt2Litr(ielmn))/AREA3(NU)*0.5_r8
-  FERT(ifert_plant_manuP)=FERT(ifert_plant_manuP)+(NonstructElmnt2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&
+  FERT(ifert_plant_manuP)=FERT(ifert_plant_manuP)+(CanopyNonstElm2Litr(ielmp)+LeafElmnt2Litr(ielmp)+&
     FineNonleafElmnt2Litr(ielmp)+WoodyElmnt2Litr(ielmp)+StandeadElmnt2Litr(ielmp))/AREA3(NU)
   IYTYP=imanure_grazing
   end associate

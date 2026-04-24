@@ -586,7 +586,7 @@ implicit none
 
   call ncd_pio_closefile(pftinfo_nfid)
 
-  end subroutine ReadFire  
+  end subroutine ReadFire
 
 !------------------------------------------------------------------------------------------
   subroutine ReadPlantFireMgmt(yearc,pftinfo_nfid,fireFile,NH1,NH2,NV1,NV2)
@@ -666,10 +666,10 @@ implicit none
         FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
         FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
         FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT23
-        FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
+        FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24        
       ENDDO        
     ENDDO
   ENDDO
-  
+
   end subroutine ReadPlantFireMgmt
 end module ReadManagementMod
