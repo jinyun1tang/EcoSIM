@@ -12,12 +12,11 @@ module PlantDisturbByFireMod
   __FILE__
 
   public :: StageRootRemovalByFire
-  public :: RemoveRootByFire
   public :: AbvGrndLiterFallByFire
   public :: AbvgBiomRemovalByFire
   public :: ApplyBiomRemovalByFire
   public :: InitPlantFireMod
-
+  public :: RootRemovalLbyFire
   real(r8) :: EFIRE(2,5:5) !emission efficiency of N and P along with C loss due to fire
 
 contains
@@ -288,7 +287,7 @@ contains
   Eco_NBP_CumYr_col       = Eco_NBP_CumYr_col-FrcAsCH4byFire*dFireE(ielmc)
 
   FireLossE_pft(:,NZ) = FireLossE_pft(:,NZ)+dFireE(:)
-
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine AbvgBiomRemovalByFire
@@ -376,5 +375,118 @@ contains
   call PrintInfo('end '//subname)
   end associate
   end subroutine ApplyBiomRemovalByFire
+!----------------------------------------------------------------------------------------------------
+  subroutine RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
+
+  implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer , intent(in) :: N,L,NZ
+  real(r8), intent(out) :: FracLeftThin
+  real(r8), intent(out):: XHVST1         !fraction of biomass removed by disturbance
+  character(len=*), parameter :: subname='RootRemovalLbyFire'
+  real(r8) :: HarvestedBiomass(NumPlantChemElms)
+  real(r8) :: FFIRE(NumPlantChemElms)
+  real(r8) :: XFFIRE(NumPlantChemElms)
+  integer  :: NR,idg,M,NE
+
+  associate(                                                          &
+    PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr  ,& !input  :litter kinetic fraction, [-]
+    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !input  :root layer nonstructural element, [g d-2]
+    THIN_pft                  => plt_distb%THIN_pft                  ,& !input  :thinning of plant population, [-]
+    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
+    DCORP                     => plt_distb%DCORP                     ,& !input  :soil mixing fraction with tillage, [-]
+    FracRootElmAllocm         => plt_allom%FracRootElmAllocm         ,& !input  :C woody fraction in root,[-]
+    k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
+    k_woody_comp              => pltpar%k_woody_comp                 ,& !input  :woody litter complex id
+    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !input  :root layer element secondary axes, [g d-2]
+    RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !input  :root layer element primary axes, [g d-2]
+    iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
+    inonstruct                => pltpar%inonstruct                   ,& !input  :group id of plant nonstructural litter
+    icwood                    => pltpar%icwood                       ,& !input  :group id of coarse woody litter
+    iHarvstType_pft           => plt_distb%iHarvstType_pft           ,& !input  :type of harvest,[-]
+    LitrfallElms_pvr          => plt_bgcr%LitrfallElms_pvr           ,& !inoput :plant LitrFall element, [g d-2 h-1]
+    RootGasLossDisturb_pft    => plt_bgcr%RootGasLossDisturb_pft     ,& !inoput :gaseous flux fron root disturbance, [g d-2 h-1]
+    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr            ,& !inoput :root gas content, [g d-2]
+    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr             & !inoput :root aqueous content, [g d-2]
+  )
+  call PrintInfo('beg '//subname)
+  IF(iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
+    FracLeftThin              = 1.0_r8-THIN_pft(NZ)
+    FFIRE(1:NumPlantChemElms) = 0._r8
+  ELSE
+    !fire
+    call StageRootRemovalByFire(yearIJ,NZ,L,FFIRE,DCORP,FracLeftThin)
+  ENDIF
+  !
+  XHVST1 = 1._r8-FracLeftThin
+  XFFIRE = 1._r8-FFIRE(:)
+  
+  D3385: DO M=1,jsken
+    !nonstructural root biomass
+    DO NE=1,NumPlantChemElms
+      HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ))
+      LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
+    ENDDO
+
+    if(FFIRE(ielmc)>0._r8)call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+    !
+    D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)
+      if(N==ipltroot)THEN
+        DO NE=1,NumPlantChemElms
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+            *FracRootElmAllocm(NE,k_woody_comp)
+
+          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)       
+        ENDDO
+      ENDIF
+
+      DO NE=1,NumPlantChemElms
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ) &
+          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+          *FracRootElmAllocm(NE,k_woody_comp)
+
+        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)       
+      ENDDO
+
+      !woody roots
+      if(FFIRE(ielmc)>0._r8)call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+
+      if(N==ipltroot)THEN
+        DO NE=1,NumPlantChemElms
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
+            *AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)) &
+            *FracRootElmAllocm(NE,k_fine_comp)
+          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
+        ENDDO
+      ENDIF
+
+      DO NE=1,NumPlantChemElms
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
+          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+          *FracRootElmAllocm(NE,k_fine_comp)
+        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
+      ENDDO
+
+      !fine roots
+      if(FFIRE(ielmc)>0._r8)CALL RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+
+    enddo D3960
+  ENDDO D3385
+  !
+  !     RELEASE ROOT GAS CONTENTS DURING HARVESTING
+  !
+  !     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
+  !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
+  !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
+  !
+  DO idg=idg_beg,idg_NH3
+    RootGasLossDisturb_pft(idg,NZ)=RootGasLossDisturb_pft(idg,NZ)-XHVST1 &
+      *(trcg_rootml_pvr(idg,N,L,NZ)+trcs_rootml_pvr(idg,N,L,NZ))
+    trcg_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcg_rootml_pvr(idg,N,L,NZ)
+    trcs_rootml_pvr(idg,N,L,NZ)=FracLeftThin*trcs_rootml_pvr(idg,N,L,NZ)
+  ENDDO
+  call PrintInfo('end '//subname)
+  end associate          
+  end subroutine RootRemovalLbyFire
   ![tail]
   end module PlantDisturbByFireMod

@@ -376,6 +376,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 
   call etimer%get_ymdhs(ymdhs)
 
+  iYearCurrent=frectyp%yearcur
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     if(lverb)WRITE(*,333)'STARTS'
     CALL STARTS(NHW,NHE,NVN,NVS)
@@ -408,14 +410,13 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
-  iYearCurrent=frectyp%yearcur
-
   if(check_warming_dates(iYearCurrent,1,1))then
     call read_soil_warming_Tref(iYearCurrent,NHW,NHE,NVN,NVS)    
   endif
   lverb0      = lverb
   DazCurrYear = etimer%get_days_cur_year()
   yearIJ%year = frectyp%yearcur
+  
   DO I  = 1, DazCurrYear
     call DebugPrint("beg step",I*1000)
     yearIJ%I=I

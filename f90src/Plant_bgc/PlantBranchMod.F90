@@ -3435,9 +3435,7 @@ module PlantBranchMod
   RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootRespPotent_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+RCO2TM
   RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ) = RootCO2EmisPot_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)+Rauto_brch
   RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)   = RootCO2Autor_pvr(ipltroot,NGTopRootLayer_pft(NZ),NZ)-Rauto_brch
-!  if(NZ==1)write(935,*)plt_site%iYearCurrent,I*1000+J/24.,NB,NZ,Rauto_brch,FNP,CanopyNonstElms_brch(:,NB,NZ),'SS',plt_biom%SeasonalNonstElms_pft(:,NZ)
-!  if(NZ==2)write(936,*)plt_site%iYearCurrent,I*1000+J/24.,NB,NZ,Rauto_brch,FNP,CanopyNonstElms_brch(:,NB,NZ),'SS',plt_biom%SeasonalNonstElms_pft(:,NZ)
-!  stop_flag=(FNP<0.01 .and. CanopyNonstElms_brch(ielmc,NB,NZ)<1.e-3*CanopyNonstElms_brch(ielmn,NB,NZ))
+
   call PrintInfo('end '//subname)
   end associate
   end subroutine ComputRAutoB4Emergence

@@ -245,7 +245,7 @@ module readsmod
 
   call GetAtmGts(yearc,NHW,NHE,NVN,NVS)
   call PrintInfo('end '//subname)
-
+  
   RETURN
   END subroutine ReadClimSoilForcing
 !------------------------------------------------------------------------------------------

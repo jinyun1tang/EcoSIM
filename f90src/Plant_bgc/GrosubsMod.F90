@@ -67,6 +67,8 @@ module grosubsMod
     IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]    
+    PlantPopulation_pft          => plt_site%PlantPopulation_pft          ,& !input  :plant population, [d-2]    
     StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
     CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
@@ -88,7 +90,7 @@ module grosubsMod
 
   D9985: DO NZ=1,NP
     !
-    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
@@ -96,8 +98,9 @@ module grosubsMod
 
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
-    ENDIF  
 
+    ENDIF  
+    
     call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
@@ -419,7 +422,7 @@ module grosubsMod
 
   FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp))
   FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp))
-  FracRootElmAllocm(ielmc,k_woody_comp)      = AZMAX1(1.0_r8-FracRootElmAllocm(ielmc,k_fine_comp))
+  FracRootElmAllocm(ielmc,k_woody_comp)          = AZMAX1(1.0_r8-FracRootElmAllocm(ielmc,k_fine_comp))
 
   CNLFW=FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*rNCLeaf_pft(NZ)
   CPLFW=FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*rPCLeaf_pft(NZ)
@@ -612,19 +615,19 @@ module grosubsMod
     fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
     fPCLFW_pft(NZ)=fPCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
   endif
-
-!
-!     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
-!
-!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!
-!
-!     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
-!
-!     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
-!     PlantRootSoilElmNetX_pft= > 0 taking from soil 
+  !
+  !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
+  !
+  !     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
+  !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
+  !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
+  !
+  !
+  !     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
+  !
+  !     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
+  !     PlantRootSoilElmNetX_pft= > 0 taking from soil 
+  !
   PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
   PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+&

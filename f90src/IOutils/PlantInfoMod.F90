@@ -177,7 +177,7 @@ implicit none
               iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX)    !planting day
               iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
               PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)             !population density              
-            ENDIF            
+            ENDIF           
           ENDIF          
         ENDDO
       ENDDO
@@ -216,7 +216,7 @@ implicit none
 
   end subroutine InitPlantMgmnt
 !------------------------------------------------------------------------------------------
-  subroutine readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantMgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   !
   !read plant management information
   implicit none
@@ -225,7 +225,7 @@ implicit none
   integer, intent(in) :: iyear    !file record number
   integer, intent(in) :: yearc    !current model year  
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  character(len=*), parameter :: subname='readplantmgmtinfo'
+  character(len=*), parameter :: subname='ReadPlantMgmtinfo'
   logical  :: readvar
   real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
   real(r8) :: ECUT24,HCUT,PCUT
@@ -237,7 +237,6 @@ implicit none
   character(len=128) :: pft_mgmtinfo(24,JP)
   integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS
   integer :: M,NN,N,nn1
-
 
   call PrintInfo('beg '//subname)
   call InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -357,6 +356,7 @@ implicit none
       ENDDO
     ENDDO
   ENDDO  
+
   call PrintInfo('end '//subname)      
   end subroutine readplantmgmtinfo
 !------------------------------------------------------------------------------------------

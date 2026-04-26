@@ -185,7 +185,7 @@ module PlantPhenolMod
   !first hour of day
   IF(J.EQ.1)THEN
     HarvestChk=iDayPlanting_pft(NZ).LE.iDayPlantHarvest_pft(NZ) .OR. iYearPlanting_pft(NZ).LT.iYearPlantHarvest_pft(NZ)
-
+    
     !Before harvest  
     IF(HarvestChk)THEN
       !planting is feasible
@@ -209,6 +209,8 @@ module PlantPhenolMod
           IF(DATAP(NZ).NE.'NO' .AND. iPlantState_pft(NZ).EQ.iTrue)then
             IsPlantActive_pft(NZ)=iTrue
           endif
+!          write(930,*)I*1000+J/24.,NZ,I,iDayPlanting_pft(NZ),iYearCurrent,iYearPlanting_pft(NZ)
+!          write(930,*)I*1000+J/24.,NZ,IsPlantActive_pft(NZ),DATAP(NZ).NE.'NO', iPlantState_pft(NZ).EQ.iTrue
         ENDIF
       ELSE
         IsPlantActive_pft(NZ)=iFalse
@@ -237,6 +239,7 @@ module PlantPhenolMod
     ENDIF
     NumActivePlants=NumActivePlants+IsPlantActive_pft(NZ)
   ENDIF
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine set_plant_flags
@@ -921,7 +924,7 @@ module PlantPhenolMod
     !plant emergence
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ) = I
     doInitLeafOut_brch(NB,NZ)                 = iFalse
-    EnablePlantLeafOut_brch(NB,NZ)                = iTrue
+    EnablePlantLeafOut_brch(NB,NZ)            = iTrue
     Hours4Leafout_brch(NB,NZ)                 = 0.5_r8*Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ)
   ENDIF
   !

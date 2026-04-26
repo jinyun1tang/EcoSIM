@@ -32,8 +32,10 @@ contains
   integer, intent(in) :: NZ
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)  
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)  
+  character(len=*), parameter :: subname='AbvgBiomRemovalByGrazing'
   integer :: NE
   real(r8) :: dRespC
+
   associate(                                                      &
     Eco_AutoR_CumYr_col     => plt_bgcr%Eco_AutoR_CumYr_col,      &
     CanopyRespC_CumYr_pft   => plt_bgcr%CanopyRespC_CumYr_pft,    &
@@ -42,13 +44,14 @@ contains
     EcoHavstElmnt_CumYr_col => plt_distb%EcoHavstElmnt_CumYr_col, &
     EcoHavstElmnt_CumYr_pft => plt_distb%EcoHavstElmnt_CumYr_pft  &
   )
-!     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
-!     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
-!     GY=growth yield of grazers
-!     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
-!     TotalElmnt2Litr(ielmc),TotalElmnt2Litr(ielmn),TotalElmnt2Litr(ielmp)=total C,N,P to litter
-!     ECO_ER_col=ecosystem respiration
-!     Eco_AutoR_CumYr_col=total autotrophic respiration
+  call PrintInfo('beg '//subname)
+  !     HVSTC,HVSTN,HVSTP=total C,N,P removed from ecosystem from PFT
+  !     XHVSTC,XHVSTN,XHVSTP=total C,N,P removed from ecosystem from all PFT
+  !     GY=growth yield of grazers
+  !     TotalElmntRemoval(ielmc),TotalElmntRemoval(ielmn),TotalElmntRemoval(ielmp)=total C,N,P removed
+  !     TotalElmnt2Litr(ielmc),TotalElmnt2Litr(ielmn),TotalElmnt2Litr(ielmp)=total C,N,P to litter
+  !     ECO_ER_col=ecosystem respiration
+  !     Eco_AutoR_CumYr_col=total autotrophic respiration
 
   EcoHavstElmnt_CumYr_pft(ielmc,NZ) = EcoHavstElmnt_CumYr_pft(ielmc,NZ)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
   EcoHavstElmnt_CumYr_col(ielmc)    = EcoHavstElmnt_CumYr_col(ielmc)+GY*(TotalElmntRemoval(ielmc)-TotalElmnt2Litr(ielmc))
@@ -65,6 +68,7 @@ contains
 !     CO2NetFix_pft(NZ)=CO2NetFix_pft(NZ)-dRespC
   ECO_ER_col          = ECO_ER_col-dRespC
   Eco_AutoR_CumYr_col = Eco_AutoR_CumYr_col-dRespC
+  call PrintInfo('end '//subname)
   end associate
   end subroutine AbvgBiomRemovalByGrazing
 

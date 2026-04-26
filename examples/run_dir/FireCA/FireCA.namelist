@@ -11,7 +11,7 @@ pft_mgmt_in='../../inputs/FireCA/FireCA_pft_20250609.nc'
 clm_hour_file_in='../../inputs/FireCA/FireCA.clim.hour.1979-2010.nc'
 soil_mgmt_in='../../inputs/FireCA/FireCA_soilmgmt_20250609.nc'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2025.nc'
-FireEvents='1903/a_pmf,b_smf'    !should be in the format: year1/fire_event1;year2/fire_event2'
+FireEvents='1920/a_pmf,b_smf'    !should be in the format: year1/fire_event1;year2/fire_event2'
 lverbose=.false.
 iVerbLevel=0
 disp_planttrait=.true.
@@ -22,7 +22,7 @@ soichem_model=.true.
 !set up the first year of simulation
 start_date  = '19000101000000'
 grid_mode=1
-continue_run=.true.
+continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=1980,1989,10,1990,2010,1,2003,2008,0
 !ldebug_day=113
@@ -44,10 +44,10 @@ hist_nhtfrq=-24 !,-1
 
 !namelist for timer
 &ecosim_time
-rest_opt='nmonths'  !'ndays','nmonths','nyears'
+rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n= 5            !this shall overwrite what is set in forc_periods
+stop_n= 50            !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'
