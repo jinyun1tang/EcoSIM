@@ -420,8 +420,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   DO I  = 1, DazCurrYear
     call DebugPrint("beg step",I*1000)
     yearIJ%I=I
-    if(idebug_day==I .and. idebug_year==iYearCurrent)then
-      lverb=.true.      
+    if(idebug_day==I)then
+      lverb=(idebug_year==iYearCurrent .and. idebug_year.GT.0) .or. (idebug_year.LT.0)      
     else
       lverb=lverb0
     endif  

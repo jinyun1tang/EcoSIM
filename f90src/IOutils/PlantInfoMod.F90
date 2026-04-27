@@ -403,7 +403,7 @@ implicit none
       call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
       call InitPlantMgmnt(NHW,NHE,NVN,NVS)
     elseif(IGO>0)then
-      iyear=2
+      iyear=1
       call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
    
@@ -416,7 +416,6 @@ implicit none
       if(year==yeari)exit   !when year is found matching the forcing data yeari.
       iyear=iyear+1
     ENDDO
-    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
     pft_changed_loc=.true.
@@ -1255,7 +1254,7 @@ implicit none
   write(nu_plt,*)('-',j=1,110)    
   write(nu_plt,*)'WATER RELATIONS'
   id=0;id=addone(id)
-  call writefixl(nu_plt,id,'OSMO','Organ osmotic potential at zero water potential [MPa]',OrganOsmoPsi0pt_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'OSMO','Organ osmotic potential at full turgor i.e. zero water potential [MPa]',OrganOsmoPsi0pt_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'RCS','e-folding turgor pressure for stomatal resistance [MPa]',RCS_pft(NZ,NY,NX),100)
   id=addone(id)

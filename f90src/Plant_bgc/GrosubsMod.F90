@@ -89,23 +89,24 @@ module grosubsMod
   !
 
   D9985: DO NZ=1,NP
-    !
+    !    
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
+!      if(yearIJ%I>=235 .and. NZ==2)call CheckPlantBalanceZ(yearIJ,NZ,'aft growone')      
       call RemoveBiomassByDisturbance(yearIJ,NZ)
-
+      
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
-
+      
     ENDIF  
     
     call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
   !
-  call LiveDeadTransformation(yearIJ)
+  call LiveDeadTransformation(yearIJ)     
   !
   call PrintInfo('end '//subname)
   end associate
@@ -168,17 +169,17 @@ module grosubsMod
     !
     !     ACTIVATE DORMANT SEEDS
     !
-    D205: DO NB=1,NumOfBranches_pft(NZ)
-      IF(doInitPlant_pft(NZ).EQ.itrue)THEN
+    IF(doInitPlant_pft(NZ).EQ.itrue)THEN
+      D205: DO NB=1,NumOfBranches_pft(NZ)      
         IF(EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)  = yearIJ%I
           iYearPlanting_pft(NZ) = iYearCurrent
           PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
           doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
           exit  
-        ENDIF
-      ENDIF
-    ENDDO D205
+        ENDIF  
+      ENDDO D205
+    ENDIF
     !
     !     LitrFall FROM STANDING DEAD (i.e. loss of standing dead)
     !
@@ -199,21 +200,23 @@ module grosubsMod
         StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
       ENDDO
     ENDDO D6235
-!
-!     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
-!
-!   diagnose surface literfall 
+    !
+    !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
+    !
+    !   diagnose surface literfall 
+    !
     SurfLitrfallElms_pft(:,NZ)=0._r8
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          SurfLitrfallElms_pft(NE,NZ)=SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
-          SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfallElms_pft(NE,NZ)           = SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfalStrutElms_CumYr_pft(NE,NZ) = SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
     ENDDO
-
-!   the following purposely starts from layer 0.
+    !
+    !   the following purposely starts from layer 0.
+    !
     LitrfallElms_pft(1:NumPlantChemElms,NZ)=0._r8
     D8955: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs      

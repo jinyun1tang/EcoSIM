@@ -205,8 +205,9 @@ implicit none
   end associate
   end subroutine SumPlantRootGas
 !----------------------------------------------------------------------------------------------------
-  subroutine SumCanopyBiome(NZ,canopyE)
+  subroutine SumCanopyBiome(yearIJ,NZ,canopyE)
   implicit none
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), optional, intent(out) :: canopyE(NumPlantChemElms)
   character(len=*), parameter :: subname='SumCanopyBiome'
@@ -285,7 +286,7 @@ implicit none
     ShootWoodyElms_pft(NE,NZ)       = StalkStrutElms_pft(NE,NZ) +StalkRsrvElms_pft(NE,NZ)+PetolShethStrutElms_pft(NE,NZ) &
       *FracPetolShethAlloc2Litr(NE,k_woody_comp)+LeafStrutElms_pft(NE,NZ)*FracLeafShethElmAlloc2Litr(NE,k_woody_comp)
   ENDDO
-
+  
 !
 !     TOTAL STANDING DEAD
 !
@@ -313,12 +314,12 @@ implicit none
 !     begin_execution
   
   if(present(tvegE))then
-    call SumCanopyBiome(NZ,canopyE)
+    call SumCanopyBiome(yearIJ,NZ,canopyE)
 
      call SumRootBiome(yearIJ,NZ,RootE)
      tvegE=canopyE+RootE+plt_biom%SeasonalNonstElms_pft(:,NZ)
   else
-    call SumCanopyBiome(NZ)
+    call SumCanopyBiome(yearIJ,NZ)
 
     call SumRootBiome(yearIJ,NZ)
   endif  

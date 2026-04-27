@@ -72,7 +72,7 @@ implicit none
     !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
     !
     call LiterFallDeadBranches(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
-
+    !
     call SetDeadPlant(yearIJ,NZ,NumDeadBranches)
     !
     !     DEAD ROOTS
@@ -696,8 +696,8 @@ implicit none
     IF(isPlantBranchAlive_brch(NB,NZ).EQ.iFalse)THEN
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
       ShootNodeNum_brch(NB,NZ)                 = ShootNodeNumAtPlanting_pft(NZ)
-      ShootNodeNumAtInitFloral_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
-      ShootNodeNumAtAnthesis_brch(NB,NZ)         = 0.0_r8
+      ShootNodeNumAtInitFloral_brch(NB,NZ)     = ShootNodeNum_brch(NB,NZ)
+      ShootNodeNumAtAnthesis_brch(NB,NZ)       = 0.0_r8
       NumOfLeaves_brch(NB,NZ)                  = 0.0_r8
       LeafNumberAtFloralInit_brch(NB,NZ)       = 0.0_r8
       KLeafNumber_brch(NB,NZ)                  = 1
@@ -711,9 +711,9 @@ implicit none
       Hours2LeafOut_brch(NB,NZ)                = 0.0_r8
       HourFailGrainFill_brch(NB,NZ)            = 0.0_r8
       RubiscoActivity_brch(NB,NZ)              = 1.0_r8
-      GrainFillDowreg_brch(NB,NZ)             = 1.0_r8
+      GrainFillDowreg_brch(NB,NZ)              = 1.0_r8
       doInitLeafOut_brch(NB,NZ)                = iTrue
-      EnablePlantLeafOut_brch(NB,NZ)               = iFalse
+      EnablePlantLeafOut_brch(NB,NZ)           = iFalse
       doPlantLeaveOff_brch(NB,NZ)              = iTrue
       Prep4Literfall_brch(NB,NZ)               = ifalse
       Hours4LiterfalAftMature_brch(NB,NZ)      = 0

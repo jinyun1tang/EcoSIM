@@ -813,11 +813,10 @@ module PlantBranchMod
   real(r8) :: CH2OClmt,CH2OLlmt
   integer :: K
   associate(                                                 &
-    NH3Dep2Can_brch      => plt_rbgc%NH3Dep2Can_brch        ,& !input  :gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
     iPlantCalendar_brch  => plt_pheno%iPlantCalendar_brch   ,& !input  :plant growth stage, [-]
     CO2FixCL_pft         => plt_rbgc%CO2FixCL_pft           ,& !inoput :Rubisco-limited CO2 fixation, [gC d-2 h-1]
     CO2FixLL_pft         => plt_rbgc%CO2FixLL_pft           ,& !inoput :Light-limited CO2 fixation, [gC d-h2 h-1]
-    GPP_brch            => plt_rbgc%GPP_brch              ,& !inoput :dGPP (C4-C3 product) over branch, [gC d-2 h-1]
+    GPP_brch             => plt_rbgc%GPP_brch               ,& !inoput :dGPP (C4-C3 product) over branch, [gC d-2 h-1]
     CanopyNonstElms_brch => plt_biom%CanopyNonstElms_brch    & !inoput :branch nonstructural element, [g d-2]
   )
 ! begin_execution
@@ -856,10 +855,9 @@ module PlantBranchMod
   !   RCO2Maint_brch=maintenance respiration
   !   RCO2NonstC_brch=respiration from non-structural C
   !   RCO2NonstC4Nassim_brch=respiration for N assimilation
-  !   NH3Dep2Can_brch=NH3 flux between atmosphere and branch from uptake.f
   !
   CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)-CanopyNonstElm4Gros(ielmc)+CH2O
-  CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)+NH3Dep2Can_brch(NB,NZ)
+  CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)-CanopyNonstElm4Gros(ielmn)
   CanopyNonstElms_brch(ielmp,NB,NZ) = CanopyNonstElms_brch(ielmp,NB,NZ)-CanopyNonstElm4Gros(ielmp)
 
   call PrintInfo('end '//subname)
