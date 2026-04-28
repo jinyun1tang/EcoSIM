@@ -1269,7 +1269,7 @@ module PlantPhenolMod
     .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. iPlantPhotoperiodType_pft(NZ).NE.iphotop_short 
 
   AnnualPhenoChk = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_annual
-  CalChk    = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. iPlantCalendar_brch(ipltcal_heading,NB,NZ).NE.0 
+  CalChk         = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. iPlantCalendar_brch(ipltcal_heading,NB,NZ).NE.0
 
   IF(CheckBranchNodeState(ipltcal_Anthesis,NB,NZ,I,J) .OR. CalChk &
     .OR. (PerennialPhenoChk  .AND. LeafOffChk) .OR. (AnnualPhenoChk .AND. LeafOffChk))THEN
@@ -1468,9 +1468,10 @@ module PlantPhenolMod
   !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
   !iPlantPhenolType_pft should be set according to koppen climate zone.  
 
-  CropPhenoChk = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
-  PhenolCheck  = ((PerennialPhenoDecidChk .OR. CropPhenoChk) .AND. CanopyHeightChk .AND. DayLensShortenChk)
-  AnnualFloralCheck= (CheckBranchNodeState(ipltcal_InitFloral,NB,NZ,I,J) .AND. (LeafOutChk .OR. PlantDayChk))
+  CropPhenoChk      = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
+  PhenolCheck       = ((PerennialPhenoDecidChk .OR. CropPhenoChk) .AND. CanopyHeightChk .AND. DayLensShortenChk)
+  AnnualFloralCheck = (CheckBranchNodeState(ipltcal_InitFloral,NB,NZ,I,J) .AND. (LeafOutChk .OR. PlantDayChk))
+  !
   IF( AnnualFloralCheck .OR. PhenolCheck)THEN
     !
     !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
@@ -1490,9 +1491,9 @@ module PlantPhenolMod
       IF(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short .AND. DayLenthCurrent.GE.DayLenthPrev)PPD=0.0_r8
     ENDIF
 
-    PhotoShortCheck=(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ))
-    PhotoLongCheck=(iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
-    PhotoPrdChk=iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral .OR. PhotoShortCheck .OR. PHotoLongCheck
+    PhotoShortCheck = (iPlantPhotoperiodType_pft(NZ).EQ.iphotop_short.AND. PPD.GT.PhotoPeriodSens_pft(NZ))
+    PhotoLongCheck  = (iPlantPhotoperiodType_pft(NZ).EQ.iphotop_long .AND. PPD.LT.PhotoPeriodSens_pft(NZ))
+    PhotoPrdChk     = iPlantPhotoperiodType_pft(NZ).EQ.iphotop_neutral .OR. PhotoShortCheck .OR. PHotoLongCheck
     
     IF( PhotoPrdChk .OR. PhenolCheck)THEN
       iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ) = I

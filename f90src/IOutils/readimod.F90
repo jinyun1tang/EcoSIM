@@ -74,12 +74,6 @@ module readiMod
 ! OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
 ! FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'
 !
-  OPEN(18,FILE=trim(outdir)//'logfile1',STATUS='UNKNOWN')
-  OPEN(19,FILE=trim(outdir)//'logfile2',STATUS='UNKNOWN')
-  OPEN(20,FILE=trim(outdir)//'logfile3',STATUS='UNKNOWN')
-
-  WRITE(18,5000)' 08 JUL 2021'
-5000  FORMAT(A16)
 
   call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
 
