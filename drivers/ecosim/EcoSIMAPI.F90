@@ -160,7 +160,7 @@ contains
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
-    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ
+    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ,llignification
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
@@ -192,6 +192,7 @@ contains
   plant_model           = .true.
   soichem_model         = .true.
   microbial_model       = .true.
+  llignification        = .true.
   disp_planttrait       = .false.
   ref_date              = '18000101000000'   !place holder for future
   start_date            = '18000101000000'   !start date of the simulation, differ from the forcing date
