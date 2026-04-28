@@ -1,4 +1,4 @@
-netcdf FenStordIsland_pft_20240208 {
+netcdf sample_pft_20230131 {
 dimensions:
 	ntopou = 1 ;
 	nchar1 = 10 ;
@@ -6,7 +6,9 @@ dimensions:
 	ncharmgnt = 128 ;
 	maxpfts = 5 ;
 	maxpmgt = 24 ;
-	year = UNLIMITED ; // (2 currently)
+	year = UNLIMITED ; // (1 currently)
+	ncol = 1 ;
+	nrow = 1 ;
 variables:
 	int NH1(ntopou) ;
 		NH1:long_name = "Starting column from the west for a topo unit" ;
@@ -33,8 +35,7 @@ variables:
 		pft_dflag:flags = "-1 no pft data, 0 only plantation information, 1 transient pft data" ;
 
 // global attributes:
-		:description = "PFT input data created on 2024/02/08/14:37:23\n",
-			" use READ(tline,*)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX) to read planting information from pft_pltinfo; use READ(tline,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24 to read management information from pft_mgmt" ;
+		:description = "PFT input data created on 2023/01/31/13:03:11\n use READ(tline,*)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX) to read planting information from pft_pltinfo; use READ(tline,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24 to read management information from pft_mgmt" ;
 data:
 
  NH1 = 1 ;
@@ -45,24 +46,25 @@ data:
 
  NV2 = 1 ;
 
- NZ = 1 ;
+ NZ = 2 ;
 
  nmgnts =
-  0, _, _, _, _;
+  0, 0, _, _, _;
 
  pft_type =
-  "sedg62",
-  "",
+  "ndlf62",
+  "gr3s62",
   "",
   "",
   "";
 
  pft_pltinfo =
-  "01071980 40  0.0                                                                                                                ",
-  "",
+  "15039999 1 0.001                                                                                                                ",
+  "15039999 100 0.001                                                                                                              ",
   "",
   "",
   "";
 
+ 
  pft_dflag = 0 ;
 }

@@ -177,7 +177,7 @@ implicit none
               iPlantingDay_pft(NZ,NY,NX)  = iDayPlanting_pft(NZ,NY,NX)    !planting day
               iPlantingYear_pft(NZ,NY,NX) = iYearPlanting_pft(NZ,NY,NX)   !planting year
               PPatSeeding_pft(NZ,NY,NX)   = PPI_pft(NZ,NY,NX)             !population density              
-            ENDIF            
+            ENDIF           
           ENDIF          
         ENDDO
       ENDDO
@@ -216,7 +216,7 @@ implicit none
 
   end subroutine InitPlantMgmnt
 !------------------------------------------------------------------------------------------
-  subroutine readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantMgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   !
   !read plant management information
   implicit none
@@ -225,7 +225,7 @@ implicit none
   integer, intent(in) :: iyear    !file record number
   integer, intent(in) :: yearc    !current model year  
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  character(len=*), parameter :: subname='readplantmgmtinfo'
+  character(len=*), parameter :: subname='ReadPlantMgmtinfo'
   logical  :: readvar
   real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
   real(r8) :: ECUT24,HCUT,PCUT
@@ -237,7 +237,6 @@ implicit none
   character(len=128) :: pft_mgmtinfo(24,JP)
   integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS
   integer :: M,NN,N,nn1
-
 
   call PrintInfo('beg '//subname)
   call InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -357,6 +356,7 @@ implicit none
       ENDDO
     ENDDO
   ENDDO  
+
   call PrintInfo('end '//subname)      
   end subroutine readplantmgmtinfo
 !------------------------------------------------------------------------------------------
@@ -403,7 +403,7 @@ implicit none
       call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
       call InitPlantMgmnt(NHW,NHE,NVN,NVS)
     elseif(IGO>0)then
-      iyear=2
+      iyear=1
       call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     endif
    
@@ -416,7 +416,6 @@ implicit none
       if(year==yeari)exit   !when year is found matching the forcing data yeari.
       iyear=iyear+1
     ENDDO
-    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
     pft_changed_loc=.true.
@@ -1255,7 +1254,7 @@ implicit none
   write(nu_plt,*)('-',j=1,110)    
   write(nu_plt,*)'WATER RELATIONS'
   id=0;id=addone(id)
-  call writefixl(nu_plt,id,'OSMO','Organ osmotic potential at zero water potential [MPa]',OrganOsmoPsi0pt_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'OSMO','Organ osmotic potential at full turgor i.e. zero water potential [MPa]',OrganOsmoPsi0pt_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'RCS','e-folding turgor pressure for stomatal resistance [MPa]',RCS_pft(NZ,NY,NX),100)
   id=addone(id)

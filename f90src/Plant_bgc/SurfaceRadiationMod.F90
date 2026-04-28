@@ -117,6 +117,7 @@ module SurfaceRadiationMod
   ELSE
     ZWind=AMAX1(WindMesureHeight_col,ZeroPlaneDisplacem_col+2.0_r8)
   ENDIF
+  call DebugPrint('ZWind',ZWind)
 
   IF(KoppenClimZone.GE.0)THEN
     !significant snowcover on ground
@@ -135,9 +136,9 @@ module SurfaceRadiationMod
     !eq.(17) from Choudhury and Monteith (1988)
     RawIsoTAtm2CanopySinkZ_col = AMAX1(RAM,(LOG((ZWind-ZeroPlaneDisplacem_col)/RoughnessLength))**2/(0.168_r8*WindSpeedAtm_col))
     HZnorm                     = (CanopyHeight_col-ZeroPlaneDisplacem_col)/RoughnessLength
-    if(HZnorm.GT.0._r8)then
-      WindH=WindSpeedAtm_col*(log(CanopyHeight_col-ZeroPlaneDisplacem_col)-log(RoughnessLength)) &
-        /(log((ZWind-ZeroPlaneDisplacem_col)-log(RoughnessLength)))
+
+    if(HZnorm.GT.1._r8)then
+      WindH=WindSpeedAtm_col*log(HZnorm)/(log((ZWind-ZeroPlaneDisplacem_col)-log(RoughnessLength)))
       !eq. (24) from Choudhury and Monteith (1988)  
       RawIsoTSurf2CanopyHScal_col = log((CanopyHeight_col-ZeroPlaneDisplacem_col)/RoughnessLength) &
         /(0.168*(CanopyHeight_col-ZeroPlaneDisplacem_col)*WindH)

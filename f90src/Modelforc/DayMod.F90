@@ -233,6 +233,7 @@
 !     ITILL=soil disturbance type, 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     CORP=soil mixing fraction used in redist.f
 !
+      CORP=0._r8
       IF(iSoilDisturbType_col(I,NY,NX).LE.10)THEN
         ! type-1 tillage
         CORP=AMIN1(1.0_r8,AZMAX1(iSoilDisturbType_col(I,NY,NX)/10.0_r8))

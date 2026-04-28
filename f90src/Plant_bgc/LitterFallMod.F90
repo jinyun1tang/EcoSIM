@@ -72,7 +72,7 @@ implicit none
     !     RESET PHENOLOGY AND GROWTH STAGE OF DEAD BRANCHES
     !
     call LiterFallDeadBranches(yearIJ%I,yearIJ%J,NZ,NumDeadBranches)
-
+    !
     call SetDeadPlant(yearIJ,NZ,NumDeadBranches)
     !
     !     DEAD ROOTS
@@ -426,7 +426,7 @@ implicit none
     Root2ndMaxRadius_pft      => plt_morph%Root2ndMaxRadius_pft      ,& !input  :maximum radius of secondary roots, [m]
     SeedDepth_pft             => plt_morph%SeedDepth_pft             ,& !input  :seeding depth, [m]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    isPlantRootAlive_pft       => plt_pheno%isPlantRootAlive_pft       ,& !input  :flag to detect root system death,[-]
+    isPlantRootAlive_pft      => plt_pheno%isPlantRootAlive_pft      ,& !input  :flag to detect root system death,[-]
     icwood                    => pltpar%icwood                       ,& !input  :group id of coarse woody litter
     inonstruct                => pltpar%inonstruct                   ,& !input  :group id of plant nonstructural litter
     iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
@@ -696,8 +696,8 @@ implicit none
     IF(isPlantBranchAlive_brch(NB,NZ).EQ.iFalse)THEN
       MatureGroup_brch(NB,NZ)                  = MatureGroup_pft(NZ)
       ShootNodeNum_brch(NB,NZ)                 = ShootNodeNumAtPlanting_pft(NZ)
-      ShootNodeNumAtInitFloral_brch(NB,NZ)           = ShootNodeNum_brch(NB,NZ)
-      ShootNodeNumAtAnthesis_brch(NB,NZ)         = 0.0_r8
+      ShootNodeNumAtInitFloral_brch(NB,NZ)     = ShootNodeNum_brch(NB,NZ)
+      ShootNodeNumAtAnthesis_brch(NB,NZ)       = 0.0_r8
       NumOfLeaves_brch(NB,NZ)                  = 0.0_r8
       LeafNumberAtFloralInit_brch(NB,NZ)       = 0.0_r8
       KLeafNumber_brch(NB,NZ)                  = 1
@@ -711,9 +711,9 @@ implicit none
       Hours2LeafOut_brch(NB,NZ)                = 0.0_r8
       HourFailGrainFill_brch(NB,NZ)            = 0.0_r8
       RubiscoActivity_brch(NB,NZ)              = 1.0_r8
-      GrainFillDowreg_brch(NB,NZ)             = 1.0_r8
+      GrainFillDowreg_brch(NB,NZ)              = 1.0_r8
       doInitLeafOut_brch(NB,NZ)                = iTrue
-      EnablePlantLeafOut_brch(NB,NZ)               = iFalse
+      EnablePlantLeafOut_brch(NB,NZ)           = iFalse
       doPlantLeaveOff_brch(NB,NZ)              = iTrue
       Prep4Literfall_brch(NB,NZ)               = ifalse
       Hours4LiterfalAftMature_brch(NB,NZ)      = 0
@@ -820,8 +820,8 @@ implicit none
     HuskStrutElms_brch        => plt_biom%HuskStrutElms_brch         ,& !output :branch husk structural element mass, [g d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !output :plant branch leaf + sheath C, [g d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch         ,& !output :branch leaf structural element mass, [g d-2]
-    PetolShethStrutElms_brch      => plt_biom%PetolShethStrutElms_brch       ,& !output :branch sheath structural element, [g d-2]
-    Root1stLenPP_rpvr           => plt_morph%Root1stLenPP_rpvr           ,& !output :root layer length primary axes, [m d-2]
+    PetolShethStrutElms_brch  => plt_biom%PetolShethStrutElms_brch   ,& !output :branch sheath structural element, [g d-2]
+    Root1stLenPP_rpvr         => plt_morph%Root1stLenPP_rpvr         ,& !output :root layer length primary axes, [m d-2]
     RootAge_rpvr              => plt_morph%RootAge_rpvr              ,& !output :root age,[h]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !output :root layer length secondary axes, [m d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !output :root layer number secondary axes, [d-2]

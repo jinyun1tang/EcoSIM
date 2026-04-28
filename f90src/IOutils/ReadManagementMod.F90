@@ -33,14 +33,14 @@ implicit none
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2)
+  subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2,dimtill)
   !
   !read soil tillage information. It also includes events due to fire and drainage
   implicit none
   character(len=*), intent(in) :: FileTillage
   integer, intent(in) :: NH1,NH2,NV1,NV2
   type(file_desc_t), intent(in) :: soilmgmt_nfid
-
+  character(len=*), intent(in) :: dimtill
   integer :: NY,NX
   integer  :: IPLOW,IDY
   real(r8) :: DPLOW,DY
@@ -51,7 +51,7 @@ implicit none
   character(len=24) :: tillf(367)
   integer :: ntill
 
-  ntill=get_dim_len(soilmgmt_nfid,'ntill')
+  ntill=get_dim_len(soilmgmt_nfid,dimtill)
   if(ntill>367)then
     call endrun('Not enough memory size for array tillf in '//trim(mod_filename),__LINE__)
   endif
@@ -489,7 +489,7 @@ implicit none
 !
     IF(trim(tillf).NE.'NO')THEN
       if(lverb)print*,'ReadTillageFile'
-      call ReadTillageFile(soilmgmt_nfid,tillf,NH1,NH2,NV1,NV2)
+      call ReadTillageFile(soilmgmt_nfid,tillf,NH1,NH2,NV1,NV2,'ntill')
     ENDIF
 !
 !   READ FERTLIZER INPUT FILE
@@ -554,7 +554,7 @@ implicit none
       start = (/1,ntopou/),count = (/len(firef),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 
-    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2)
+    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2,'nfire')
   ENDDO  
   call ncd_pio_closefile(soilmgmt_nfid)
 
@@ -586,7 +586,7 @@ implicit none
 
   call ncd_pio_closefile(pftinfo_nfid)
 
-  end subroutine ReadFire  
+  end subroutine ReadFire
 
 !------------------------------------------------------------------------------------------
   subroutine ReadPlantFireMgmt(yearc,pftinfo_nfid,fireFile,NH1,NH2,NV1,NV2)
@@ -666,10 +666,10 @@ implicit none
         FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
         FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
         FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT23
-        FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
+        FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24        
       ENDDO        
     ENDDO
   ENDDO
-  
+
   end subroutine ReadPlantFireMgmt
 end module ReadManagementMod

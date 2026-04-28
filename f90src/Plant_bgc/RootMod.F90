@@ -1,7 +1,7 @@
 module RootMod
   use data_kind_mod,       only: r8 => DAT_KIND_R8, yearIJ_type
   use minimathmod,         only: safe_adb,  AZMAX1, AZMIN1, AZERO, sfexp
-  use EcoSIMCtrlMod,       only: lsoilCompaction
+  use EcoSIMCtrlMod,       only: lsoilCompaction,llignification
   use DebugToolMod,        only: PrintInfo
   use abortutils,          only: endrun
   use PlantNonstElmDynMod, only: RepleteLowSeaStorByRoot
@@ -3381,7 +3381,7 @@ implicit none
 
         RootNutUptakeN_pft(NZ)=RootNutUptakeN_pft(NZ)+dUptakeN
         RootNutUptakeP_pft(NZ)=RootNutUptakeP_pft(NZ)+dUptakeP
-        call PrintInfo("D4985")
+        
         IF(N.EQ.ipltroot)DistRootEffDepz_pvr(L,NZ)=0._r8
         D4985: DO NR=1,NumPrimeRootAxes_pft(NZ)
           if(L>NRoot1stTipLay_raxes(NR,NZ))cycle
@@ -3441,10 +3441,10 @@ implicit none
             ELSE
               Root2ndSink_pvr(N,L,NR)=0._r8
             ENDIF
-            call PrintInfo('checkCoarseRootLay') 
+            
             checkCoarseRootLay= is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) .and. &
                 RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ) .and. RootEffDepz<Root1stDepz_raxes(NR,NZ) .and. &
-                Root1stDepz_raxes(NR,NZ)>7.5_r8*TipRadius
+                Root1stDepz_raxes(NR,NZ)>7.5_r8*TipRadius .and. llignification
 
             Ltip=NRoot1stTipLay_raxes(NR,NZ)            
 
