@@ -446,7 +446,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
-
+  use GridConsts, only : MaxNumBranches
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer, intent(in) :: nu_plt
@@ -490,7 +490,7 @@ implicit none
       ShootNodeNumAtPlanting_pft(NZ,NY,NX) = ShootNodeNumAtPlanting_pft(NZ,NY,NX)/MaxNodesPerBranch
     ENDIF
 
-    D5: DO NB=1,NumCanopyLayers
+    D5: DO NB=1,MaxNumBranches
       IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).EQ.iplt_perennial)THEN
         !perennial evergreen
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
@@ -972,15 +972,15 @@ implicit none
   if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
-      write(strval,'(A,I2)')'Rapid, like deciduous tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+      write(strval,'(A,I2)')'Rapid, like deciduous trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (2)
-      write(strval,'(A,I2)')'Very slow, like evergreen needleleaf tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+      write(strval,'(A,I2)')'Very slow, like evergreen trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (3)
-      write(strval,'(A,I2)')'Slow, like evergreen broadleaf ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+      write(strval,'(A,I2)')'Slow, like evergreen broadleaf trees',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (4)
-      write(strval,'(A,I2)')'Like semi-deciduous tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+      write(strval,'(A,I2)')'Like semi-deciduous trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case (5)
-      write(strval,'(A,I2)')'Like semi-evergreen tree ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+      write(strval,'(A,I2)')'Like semi-evergreen trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     case default
       write(strval,'(A,I2)')'Undefined tree-like pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
@@ -988,6 +988,8 @@ implicit none
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
       write(strval,'(A,I2)')'Rapid all aboveground biome, herbaceous ',iPlantTurnoverPattern_pft(NZ,NY,NX)
+    case (3)  
+      write(strval,'(A,I2)')'Very slow, like evergreen grass ',iPlantTurnoverPattern_pft(NZ,NY,NX)      
     case default
       write(strval,'(A,I2)')'Undefined herbaceous pattern ',iPlantTurnoverPattern_pft(NZ,NY,NX)
     end select
