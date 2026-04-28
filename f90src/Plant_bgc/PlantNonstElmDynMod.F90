@@ -615,7 +615,7 @@ module PlantNonstElmDynMod
   !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   !     IN PERENNIALS
   !
-  IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
+  IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
   !

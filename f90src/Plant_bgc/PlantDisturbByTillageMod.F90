@@ -143,7 +143,7 @@ contains
             *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracLeafShethElmAlloc2Litr(NE,k_woody_comp) &
             +PetolShethStrutElms_brch(NE,NB,NZ)*FracPetolShethAlloc2Litr(NE,k_woody_comp))
 
-          IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).NE.0)THEN
+          IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen)THEN
             !annual, not evergreen, meaning not annual crops
             SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+XHVST1 &
               *PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
