@@ -3953,7 +3953,6 @@ module PlantBranchMod
       !
       !       RSpecKillLeafPetol,FSNCL=fraction of lowest leaf to be remobilized
       !
-
       RSpecKillLeaf=AMIN1(RSpecKillLeafPetol,1.0_R8)
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
@@ -3965,7 +3964,6 @@ module PlantBranchMod
       !       FWODB=C woody fraction in other organs:0=woody,1=non-woody
       !       FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
       !
-
       DO NE=1,NumPlantChemElms
         LeafEKill(NE)=RSpecKillLeaf*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))
         LeafEcycl(NE)=RSpecKillLeaf*LeafElmntRemobFlx_brch(NE,NB,NZ)
@@ -4063,17 +4061,17 @@ module PlantBranchMod
           LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
         ENDDO    
       ENDDO D6305      
-!
-!       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LitrFall
-!
-!       RSpecKillPetol=fraction of lowest PetolSheth to be remobilized
-!       PetoleLength_node,CanPBranchHeight=living,senescing PetolSheth length
-!       WTSHB,WTSHBN,WTSHBP,WGSHEX,WGSHNX,WGSHPX=C,N,P mass in living,senescing PetolSheth
-!       PetoleProteinC_node=PetolSheth protein mass
-!       CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
-!       CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
-!       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing PetolSheth
-!
+      !
+      !       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LitrFall
+      !
+      !       RSpecKillPetol=fraction of lowest PetolSheth to be remobilized
+      !       PetoleLength_node,CanPBranchHeight=living,senescing PetolSheth length
+      !       WTSHB,WTSHBN,WTSHBP,WGSHEX,WGSHNX,WGSHPX=C,N,P mass in living,senescing PetolSheth
+      !       PetoleProteinC_node=PetolSheth protein mass
+      !       CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
+      !       CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
+      !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing PetolSheth
+      !
       DO NE=1,NumPlantChemElms
         PetolShethStrutElms_brch(NE,NB,NZ)   = PetolShethStrutElms_brch(NE,NB,NZ)-PetolEKill(NE)
         PetolShethElmntNode_brch(NE,K,NB,NZ) = PetolShethElmntNode_brch(NE,K,NB,NZ)-PetolEKill(NE)
