@@ -17,6 +17,7 @@ module ATSEcoSIMInitMod
   use SurfLitterDataType
   use EcoSIMConfig
   use MiniMathMod
+  use SnowDataType
   use EcoSiMParDataMod, only : micpar
 implicit none
   character(len=*), private, parameter :: mod_filename=&
@@ -108,7 +109,8 @@ implicit none
     VPA_col(NY,NX)              = VPK_col(NY,NX)*2.173E-03_r8/TairK_col(NY,NX)
 
     WindSpeedAtm_col(NY,NX)  = uwind(NY)*3600.0_r8
-
+    SnowDepth_col(NY,NX) = surf_snow_depth(NY)
+    
     !Need to check if litter area is set or not
     if(VGeomLayer_vr(0,NY,NX).EQ.0.0)then
       VGeomLayer_vr(0,NY,NX) = 0.1
@@ -131,7 +133,7 @@ implicit none
 
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
-
+  
   call startsim(NHW,NHE,NVN,NVS)
 
   end subroutine Init_EcoSIM_Soil

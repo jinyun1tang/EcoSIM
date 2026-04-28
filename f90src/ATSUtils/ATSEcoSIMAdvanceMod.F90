@@ -63,12 +63,13 @@ implicit none
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
-  real(r8) :: KSatReductByRainKineticEnergy(JY,JX)
+  real(r8) :: RainEkReducedKsat(JY,JX)
   real(r8) :: HeatFluxAir2Soi(JY,JX)
   real(r8) :: TopLayWatVol_col(JY,JX)
   real(r8) :: Qinfl2MicP_col(JY,JX)
   real(r8) :: HeatInfl2Soil(JY,JX)
   real(r8) :: Qinfl2MacP_col(JY,JX)
+  real(r8) :: dLWRaddTKsoi1(JY,JX)
   !real(r8) :: SnowDepth_col(JY,JX)
   real(r8) :: PrecAsRain(JY,JX)
   real(r8) :: PrecAsSnow(JY,JX)
@@ -156,6 +157,7 @@ implicit none
     RMAX = swrad(NY)*0.0036_r8
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
     SoilAlbedo_col(NY,NX) = 0.2_r8
+    SnowDepth_col(NY,NX) = surf_snow_depth(NY)
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
@@ -334,7 +336,7 @@ implicit none
     !Qinfl2MicP_col,HeatInfl2Soil)
 
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
-      TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP)
+      TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP_col)
     
     !call subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
     !  TopLayWatVol_col,HeatFluxAir2Soi,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
