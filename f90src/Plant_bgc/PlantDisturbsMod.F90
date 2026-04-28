@@ -902,7 +902,7 @@ module PlantDisturbsMod
       !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
       !     WTRVC,WTRVN,WTRVP=storage C,N,P
       !
-      IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual)THEN
+      IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
         XHVST1=1._r8-FracLeftThin    
         DO NE=1,NumPlantChemElms
           D3400: DO M=1,jsken

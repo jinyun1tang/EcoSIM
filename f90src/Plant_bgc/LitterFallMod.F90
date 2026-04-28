@@ -63,7 +63,7 @@ implicit none
   plt_pheno%doReSeed_pft(NZ)=.FALSE.
   harvst_check = (yearIJ%I.GE.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ))
   emerge_check = yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).GT.0
-  reset_check  = emerge_check .AND. (iPlantPhenolPattern_pft(NZ).NE.iplt_annual .OR. harvst_check)
+  reset_check  = emerge_check .AND. (iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .OR. harvst_check)
 
   IF(reset_check)THEN
     
@@ -183,7 +183,7 @@ implicit none
     !     jHarvstType_pft=terminate PFT:0=no,1=yes,2=yes,but reseed
     !     PP=PFT population    
     !
-    IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ) .AND. iPlantPhenolPattern_pft(NZ).NE.iplt_annual)then
+    IF(SeasonalNonstElms_pft(ielmc,NZ).LT.1.0E-04_r8*RootElms_pft(ielmc,NZ) .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)then
       isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then
@@ -311,7 +311,7 @@ implicit none
               +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*(PetolShethStrutElms_brch(NE,NB,NZ)*FracPetolShethAlloc2Litr(NE,k_fine_comp) &
               +HuskStrutElms_brch(NE,NB,NZ)+EarStrutElms_brch(NE,NB,NZ))
 
-            IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
+            IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen)THEN
               dFall=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*AZMAX1(GrainStrutElms_brch(NE,NB,NZ))
               SSXferElms_pft(NE,NZ)        = SSXferElms_pft(NE,NZ)+dFall
               SeasonalNonstElms_pft(NE,NZ) = SeasonalNonstElms_pft(NE,NZ)+dFall
@@ -393,7 +393,7 @@ implicit none
 !     DazCurrYear=number of days in current year
 !     iDayPlanting_pft,iYearPlanting_pft=day,year of planting
 !
-    IF(iPlantPhenolPattern_pft(NZ).NE.iplt_annual .AND. jHarvstType_pft(NZ).EQ.jharvtyp_noaction)THEN
+    IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. jHarvstType_pft(NZ).EQ.jharvtyp_noaction)THEN
       IF(I.LT.DazCurrYear)THEN
         iDayPlanting_pft(NZ)  = I+1
         iYearPlanting_pft(NZ) = iYearCurrent
@@ -739,7 +739,7 @@ implicit none
           LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ) &
             +PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(LeafStrutElms_brch(NE,NB,NZ)*FracLeafShethElmAlloc2Litr(NE,k_woody_comp)+PetolShethStrutElms_brch(NE,NB,NZ)*FracPetolShethAlloc2Litr(NE,k_woody_comp))
 
-          IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.0)THEN
+          IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual.AND.iPlantPhenolType_pft(NZ).NE.iphenotyp_evgreen)THEN
             dFall=PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
             SSXferElms_pft(NE,NZ)        = SSXferElms_pft(NE,NZ)+ dFall
             SSXfer2ShootElms_pft(NE,NZ)  = SSXfer2ShootElms_pft(NE,NZ)+dFall

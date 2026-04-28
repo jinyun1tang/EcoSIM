@@ -122,7 +122,7 @@ implicit none
     SeedAreaMean_pft(NZ)
 
   IF(NumRootAxes4DeadPlant.EQ.NumPrimeRootAxes_pft(NZ) .OR. (SeasonalNonstElms_pft(ielmc,NZ).LE.ZERO4LeafVar_pft(NZ).AND. &
-    iPlantPhenolPattern_pft(NZ).NE.iplt_annual))THEN
+    iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial))THEN
     isPlantRootAlive_pft(NZ)  = iFalse
     isPlantShootAlive_pft(NZ) = iFalse
   ENDIF

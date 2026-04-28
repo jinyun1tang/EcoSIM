@@ -416,6 +416,7 @@ implicit none
       if(year==yeari)exit   !when year is found matching the forcing data yeari.
       iyear=iyear+1
     ENDDO
+    call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)    
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
     pft_changed_loc=.true.
@@ -490,7 +491,7 @@ implicit none
     ENDIF
 
     D5: DO NB=1,NumCanopyLayers
-      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).NE.iplt_annual)THEN
+      IF(iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_evgreen .AND. iPlantPhenolPattern_pft(NZ,NY,NX).EQ.iplt_perennial)THEN
         !perennial evergreen
         HourReq4LeafOut_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNLI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
         HourReq4LeafOff_brch(NB,NZ,NY,NX)=AMIN1(4380.0_r8,VRNXI+144.0_r8*PlantInitThermoAdaptZone_pft(NZ,NY,NX)*(NB-1))
