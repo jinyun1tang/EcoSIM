@@ -335,10 +335,14 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
     rPlantThermoAdaptZone_pft(NZ,NY,NX)        = plt_pheno%rPlantThermoAdaptZone_pft(NZ)
-    CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)
-    iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
-    jHarvstType_pft(NZ,I,NY,NX)                = plt_distb%jHarvstType_pft(NZ)
-    THIN_pft(NZ,I,NY,NX)                       = plt_distb%THIN_pft(NZ)
+
+    if(plt_distb%iHarvstType_pft(NZ).GT.0)then
+      CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)    
+      iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
+      jHarvstType_pft(NZ,I,NY,NX)                = plt_distb%jHarvstType_pft(NZ)
+      THIN_pft(NZ,I,NY,NX)                       = plt_distb%THIN_pft(NZ)
+      FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomHarvsted(1:2,1:4,NZ)
+    endif
     ShootElms_pft(1:NumPlantChemElms,NZ,NY,NX) = plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)
     TurgEff4CanopyResp_pft(NZ,NY,NX)           = plt_rbgc%TurgEff4CanopyResp_pft(NZ)
     CanopyGrosRCO2_pft(NZ,NY,NX)               = plt_bgcr%CanopyGrosRCO2_pft(NZ)
@@ -662,8 +666,6 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-
-    FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomHarvsted(1:2,1:4,NZ)
 
     DO L=NU_col(NY,NX),MaxSoiL4Root_pft(NZ,NY,NX)
       DO K=1,jcplx
@@ -1191,6 +1193,7 @@ implicit none
     plt_distb%CanopyCutProxy_pft(NZ) = CanopyCutProxy_pft(NZ,I,NY,NX)
     plt_distb%iHarvstType_pft(NZ)         = iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvstType_pft(NZ)         = jHarvstType_pft(NZ,I,NY,NX)
+
     plt_distb%THIN_pft(NZ)                = THIN_pft(NZ,I,NY,NX)
     plt_morph%CanopyStemSurfArea_pft(NZ)      = CanopyStemSurfArea_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)      = CanopyLeafArea_pft(NZ,NY,NX)

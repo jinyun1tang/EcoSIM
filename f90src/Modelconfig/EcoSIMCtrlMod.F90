@@ -20,6 +20,7 @@ implicit none
   logical :: microbial_model   =.true.
   logical :: soichem_model     =.true.
   logical :: snowRedist_model  =.true.
+  logical :: llignification    =.true.
   logical :: ATS_cpl_mode      =.false.
   logical :: plantOM4Heat      =.false.
   logical :: fixWaterLevel     =.false.

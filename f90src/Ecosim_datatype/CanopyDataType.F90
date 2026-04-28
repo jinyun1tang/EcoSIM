@@ -131,7 +131,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  GrainStrutElms_pft(:,:,:,:)                !canopy grain chemical element, [g d-2]
   real(r8),target,allocatable ::  CanopyLeafSheathC_pft(:,:,:)                !plant canopy leaf + sheath C, [gC d-2]
   real(r8),target,allocatable ::  CanopyLeafAreaZ_pft(:,:,:,:)               !canopy layer-distributed leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                       !canopy net CO2 exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  CO2NetFix_pft(:,:,:)                       !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8),target,allocatable ::  RCanMaintDef_CO2_pft(:,:,:)                !canopy maintenance respiraiton deficit as CO2,  [gC d-2 h-1]
   real(r8),target,allocatable ::  CanopyLeafCLyr_pft(:,:,:,:)                !canopy layer leaf C, [g d-2]
   real(r8),target,allocatable ::  CanopyNonstElms_pft(:,:,:,:)               !canopy nonstructural chemical element, [g d-2]

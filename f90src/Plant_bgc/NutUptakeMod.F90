@@ -85,7 +85,7 @@ module NutUptakeMod
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
     LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch  ,& !input  :branch nonstructural C concentration, [g d-2]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    ,& !input  :canopy stomatal resistance, [h m-1]
-    RawCanopy2Atm_pft      => plt_photo%RawCanopy2Atm_pft      ,& !input  :canopy boundary layer resistance, [h m-1]
+    RawCanopy2Atm_pft         => plt_photo%RawCanopy2Atm_pft         ,& !input  :canopy boundary layer resistance, [h m-1]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !input  :branch leaf area, [m2 d-2]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -113,13 +113,14 @@ module NutUptakeMod
   FNH3P = 1.0E-04_r8*FDMP
   if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
-      IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
+      IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         CNH3P                  = AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB                 = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ) = AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(RawCanopy2Atm_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracPARads2Canopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
+        CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)+NH3Dep2Can_brch(NB,NZ)  
       ELSE
         NH3Dep2Can_brch(NB,NZ)=0.0_r8
       ENDIF
