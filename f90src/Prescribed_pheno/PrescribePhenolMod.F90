@@ -206,7 +206,7 @@ implicit none
   !REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
-  irootType=1
+  !irootType=1
   PerPlantRootC_vr = 0.0_r8
   PerPlantRootLen_vr = 0.0_r8
   DO NX=NHW,NHE
@@ -256,12 +256,15 @@ implicit none
 
       CanopyLeafArea_col(NY,NX) = 0._r8
       StemArea_col(NY,NX)       = 0._r8
-      CanopyHeight_col(NY,NX)   = 0.0_r8
+      !CanopyHeight_col(NY,NX)   = 0.0_r8
 
       DO NZ=1,NP_col(NY,NX)
-        tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
-        tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
-        CanopyHeight_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
+        if(.not.ats_cpl_mode)then
+          tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
+          tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
+          CanopyHeight_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
+        endif
+        
         CanopyLeafArea_col(NY,NX)  = CanopyLeafArea_col(NY,NX)+tlai_day_pft(NZ,NY,NX)
         StemArea_col(NY,NX)        = StemArea_col(NY,NX)+tsai_day_pft(NZ,NY,NX)
         CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeight_pft(NZ,NY,NX))

@@ -76,6 +76,7 @@ implicit none
   real(r8) :: VLTSoiPore
   real(r8) :: VPS(JY,JX)
   real(r8) :: EMM
+  real(r8) :: dTexp, Tfinal
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
@@ -155,9 +156,13 @@ implicit none
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
     RMAX = swrad(NY)*0.0036_r8
+    
+    !Set snow and initialize snow layers
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
     SoilAlbedo_col(NY,NX) = 0.2_r8
     SnowDepth_col(NY,NX) = surf_snow_depth(NY)
+    !call InitSnowLayers(NY,NX) 
+    
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
     EMM = 0.684
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
@@ -275,7 +280,8 @@ implicit none
 
     !Fill in column-wise values needed for prescribed phenology
     CanopyHeight_col(NY,NX) = 17.0
-    LAI_col(NY,NX) = a_LAI(NY)
+    tlai_day_pft(1,NY,NX) = a_LAI(NY)
+    tsai_day_pft(1,NY,NX) = a_SAI(NY)
     irootType_col(NY,NX) = a_VEG(NY)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
     !Fill number of plants from npfts
@@ -368,6 +374,10 @@ implicit none
     !As EcoSIM is an hourly model, the conversion is done in ATS
     !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
     surf_e_source(NY) = HeatFlx2Grnd_col(NY,1) / (column_area(NY))
+    
+    dTexp = surf_e_source(NY)/heat_capacity
+    Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 
+    
     surf_w_source(NY) = Qinflx2Soil_col(NY,1)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
