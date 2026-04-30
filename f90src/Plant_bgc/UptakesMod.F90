@@ -155,6 +155,7 @@ module UptakesMod
           .AND.(Root1stDepz_raxes(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))                     &  !active root
           .and. CanopyMassC4H2OStorage.GT.0._r8
       endif
+      !add snow coverage check 
 
       IF(HydroActivePlant)THEN  
       
@@ -543,6 +544,7 @@ module UptakesMod
   REAL(R8) , INTENT(IN) :: TotalSoilPSIMPa_vr(JZ1)
   real(r8) , intent(in) :: DIFF   !divergence check
   real(r8), intent(out):: FDMP
+  character(len=*), parameter :: subname='HandlingDivergence'
   real(r8) :: APSILT
   real(r8) :: CCPOLT
   real(r8) :: FTHRM
@@ -581,6 +583,7 @@ module UptakesMod
     LWRadCanopy_pft             => plt_rad%LWRadCanopy_pft                ,& !output :canopy longwave radiation, [MJ d-2 h-1]
     VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft               & !output :canopy heat capacity, [MJ d-2 K-1]
   )
+  call PrintInfo('beg '//subname)
   IF(NN.GE.MaxIterNum)THEN
     WRITE(*,9999)iYearCurrent,I,J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
@@ -629,6 +632,7 @@ module UptakesMod
       ENDDO D4290
     ENDIF
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine HandlingDivergence
 
@@ -1196,7 +1200,7 @@ module UptakesMod
   !     HYCDMicP4RootUptake_vr=soil hydraulic conductivity for root uptake
   !     SoiLayerHasRoot_rvr:1=rooted,0=not rooted
   !     N:1=root,2=mycorrhizae
-!
+  !
   D3880: DO N=1,Myco_pft(NZ)
     DO  L=NU,MaxSoiL4Root_pft(NZ)
 

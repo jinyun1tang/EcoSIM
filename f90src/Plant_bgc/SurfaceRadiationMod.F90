@@ -44,7 +44,7 @@ module SurfaceRadiationMod
     !do prescribed phenolgoy mode
     call SetCanopyProfile(I,J,LeafAreaZsec_lpft,StemAreaZsec_lpft)
   else
-    call DivideCanopyAreaByHeight(I,J)
+    call DeriveCanopyHeightProfile(I,J)
 
     call SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft)
   endif
@@ -161,19 +161,16 @@ module SurfaceRadiationMod
   end subroutine CalcBoundaryLayerProperties
 
 !----------------------------------------------------------------------------------------------------
-  subroutine DivideCanopyAreaByHeight(I,J)
+  subroutine DeriveCanopyHeightProfile(I,J)
   implicit none
   integer, intent(in) :: I,J
-  character(len=*), parameter :: subname='DivideCanopyAreaByHeight'
-  real(r8) :: ZL1(0:NumCanopyLayers1)
-  real(r8) :: AreaInterval,AreaL
-  real(r8) :: ARX  !interval canopy area: leaf+stem
-  real(r8) :: DZL  !canopy interval height
-  integer :: NZ,L,K,NB,N
+  character(len=*), parameter :: subname='DeriveCanopyHeightProfile'
+
+  real(r8) :: SLAProfileZ(NumCanopyLayers1),SLA
+  integer :: NZ,L
   !     begin_execution
   associate(                                               &
     NP                  => plt_site%NP                    ,& !input  :current number of plant species,[-]
-    ZEROS               => plt_site%ZEROS                 ,& !input  :threshold zero for numerical stability,[-]
     CanopyHeight_pft    => plt_morph%CanopyHeight_pft     ,& !input  :canopy height, [m]
     CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !input  :total stem area, [m2 d-2]
     CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col  ,& !input  :total leaf area, [m2 d-2]
@@ -196,45 +193,83 @@ module SurfaceRadiationMod
     CanopyHeight_col=AMAX1(CanopyHeight_col,CanopyHeight_pft(NZ))
   ENDDO D9685
 
+  !derive the grid level canopy profile 
+  DO L= 1, NumCanopyLayers1
+    SLAProfileZ(L)=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
+  ENDDO
+  SLA = CanopyLeafArea_col+StemArea_col
+  call DeriveCanopyHeightZ(SLA, CanopyHeight_col,SLAProfileZ,CanopyHeightZ_col)
+
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine DeriveCanopyHeightProfile
+
+!----------------------------------------------------------------------------------------------------
+  subroutine DeriveCanopyHeightZ(SLA_col, CanopyHeight_col,SLAProfileZ,CanopyHeightZ_col)
+  implicit none
+  real(r8), intent(in)   :: SLA_col
+  real(r8), intent(in)   :: CanopyHeight_col
+  real(r8), intent(in)   :: SLAProfileZ(NumCanopyLayers1)
+  real(r8), intent(inout):: CanopyHeightZ_col(0:NumCanopyLayers1)
+
+  character(len=*), parameter :: subname='DeriveCanopyHeightZ'
+  real(r8) :: CHeightZ1(0:NumCanopyLayers1)    !temporary copy of canopy height profile
+  real(r8) :: AreaInterval,AreaL
+  real(r8) :: ARX  !interval canopy area: leaf+stem
+  real(r8) :: DZL  !canopy interval height
+  integer  :: L
+  associate(                                               &  
+    ZEROS               => plt_site%ZEROS                  & !input  :threshold zero for numerical stability,[-]
+  )
+  call PrintInfo('beg '//subname)
   CanopyHeightZ_col(NumCanopyLayers1) = CanopyHeight_col+0.01_r8
-  ZL1(NumCanopyLayers1)               = CanopyHeightZ_col(NumCanopyLayers1)
-  ZL1(0)                                = 0.0_r8
+  CHeightZ1(NumCanopyLayers1)         = CanopyHeightZ_col(NumCanopyLayers1) !top
+  CHeightZ1(0)                        = 0.0_r8                              !bottom
 
   !divide total are into NumCanopyLayers1, from top to bottom
-  AreaInterval=(CanopyLeafArea_col+StemArea_col)/NumCanopyLayers1
+  AreaInterval=SLA_col/NumCanopyLayers1
+
+  !the division assumes within each layer, leaf area is uniformly distributed with a relative error of 0.01
   IF(AreaInterval.GT.ZEROS)THEN
     D2765: DO L=NumCanopyLayers1,2,-1
-      AreaL=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)
+      !leaf+stem area in layer L
+      AreaL=SLAProfileZ(L)
 
       !greater than the mean leaf area or area-interval
       IF(AreaL.GT.1.01_r8*AreaInterval)THEN
-        DZL      = CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)
-        ZL1(L-1) = CanopyHeightZ_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
+        !interval length for AreaL
+        DZL  = CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)
+        !
+        CHeightZ1(L-1) = CanopyHeightZ_col(L-1)+0.5_r8*AMIN1(1.0_r8,(AreaL-AreaInterval)/AreaL)*DZL
       ELSEIF(AreaL.LT.0.99_r8*AreaInterval)THEN
-        ARX = CanopyLeafAareZ_col(L-1)+CanopyStemAareZ_col(L-1)
+        !leaf+stem area in layer L-1
+        ARX = SLAProfileZ(L-1)
+
+        !interval length for ARX
         DZL = CanopyHeightZ_col(L-1)-CanopyHeightZ_col(L-2)
+
         !layer L-1 has significant leaf+stem (canopy) area
         IF(ARX.GT.ZEROS)THEN
-          ZL1(L-1)=CanopyHeightZ_col(L-1)-0.5_r8*AMIN1(1.0_r8,(AreaInterval-AreaL)/ARX)*DZL
+          CHeightZ1(L-1)=CanopyHeightZ_col(L-1)-0.5_r8*AMIN1(1.0_r8,(AreaInterval-AreaL)/ARX)*DZL
         ELSE
-          ZL1(L-1)=CanopyHeightZ_col(L-1)
+          CHeightZ1(L-1)=CanopyHeightZ_col(L-1)
         ENDIF
       ELSE
-        ZL1(L-1)=CanopyHeightZ_col(L-1)
+        CHeightZ1(L-1)=CanopyHeightZ_col(L-1)
       ENDIF
-      if(I==10.and.J==16.and..false.)then  
-      write(4444,*)'L',L,ZL1(L-1),AreaL,AreaInterval
-      endif
     ENDDO D2765
 
     D2770: DO L=NumCanopyLayers1,2,-1
-      CanopyHeightZ_col(L-1)=ZL1(L-1)
+      CanopyHeightZ_col(L-1)=CHeightZ1(L-1)
     ENDDO D2770
+  ELSE
+    DO L=NumCanopyLayers1,2,-1
+      CanopyHeightZ_col(L-1)=0._r8
+    ENDDO
   ENDIF
   call PrintInfo('end '//subname)
   end associate
-  end subroutine DivideCanopyAreaByHeight
-
+  end subroutine DeriveCanopyHeightZ
 !----------------------------------------------------------------------------------------------------
   subroutine SummaryCanopyAREA(I,J,DepthSurfWatIce,LeafAreaZsec_lpft,StemAreaZsec_lpft)
   !
@@ -560,7 +595,7 @@ module SurfaceRadiationMod
   !  
   !direct radiation only applies to sunlit leaf/stalk, diffusive radiation applies to all.
   !
-  call SweepTopDown(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
+  call DownwellSweep(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
     StemAreaZsec_lpft,RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec,&
     RadSWDiffusL,RadPARDiffusL,TAU_DifuseRTransmit,RadSWFwdScat2NextL,RadSWBakScat2NextL,RadPARFwdScat2NextL,RadPARBakScat2NextL)
 
@@ -573,7 +608,7 @@ module SurfaceRadiationMod
   !
   !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
   !
-  call SweepBottomUp(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
+  call UpwellSweep(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
     TAU_DifuseRTransmit,RadSWBakScat2NextL,&
     RadPARBakScat2NextL,RadSWFwdScat2NextL,RadPARFwdScat2NextL)
   !
@@ -601,7 +636,7 @@ module SurfaceRadiationMod
   end subroutine MultiCanLayerRadiation
 !----------------------------------------------------------------------------------------------------
 
-  subroutine SweepTopDown(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
+  subroutine DownwellSweep(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
     StemAreaZsec_lpft,RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec,&
     RadSWDiffusL,RadPARDiffusL,TAU_DifuseRTransmit,RadSWFwdScat2NextL,RadSWBakScat2NextL,RadPARFwdScat2NextL,RadPARBakScat2NextL)
 
@@ -622,7 +657,7 @@ module SurfaceRadiationMod
   real(r8), intent(out)   :: RadSWBakScat2NextL(0:NumCanopyLayers1+1)   !total backscattered SW to next layer
   real(r8), intent(out)   :: RadPARFwdScat2NextL(0:NumCanopyLayers1+1)  !total fwd scattered PAR to next layer
   real(r8), intent(out)   :: RadPARBakScat2NextL(0:NumCanopyLayers1+1)  !total backscattered PAR to next layer
-  character(len=*), parameter :: subname='SweepTopDown'
+  character(len=*), parameter :: subname='DownwellSweep'
   real(r8) :: RadDirSWbyLeafL_pft(JP1)
   real(r8) :: RadDirPARbyLeafL_pft(JP1)
   real(r8) :: RadDifSWbyStalk_pft(JP1)
@@ -702,7 +737,7 @@ module SurfaceRadiationMod
       ENDDO D1500
       !
       !     ACCUMULATED INTERCEPTION BY CANOPY LAYER
-
+      !
       call AccumulateRadation4CanopyL(NP,L,YAREA,RadDirPARLeafSurf_zsec,                      &
         FracDirRadAbsorbtCum,FracDirRadAbsorbtL,                                              &
         FracDifRadAbsorbtCum,FracDifRadAbsorbtL,RadDirSWbyLeafL_pft,RadDirPARbyLeafL_pft,     &
@@ -733,11 +768,11 @@ module SurfaceRadiationMod
   ENDDO D1800
   call PrintInfo('end '//subname)
   end associate
-  end subroutine SweepTopDown
+  end subroutine DownwellSweep
 
 !----------------------------------------------------------------------------------------------------
 
-  subroutine SweepBottomUp(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
+  subroutine UpwellSweep(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
     TAU_DifuseRTransmit,RadSWBakScat2NextL,&
     RadPARBakScat2NextL,RadSWFwdScat2NextL,RadPARFwdScat2NextL)
 
@@ -750,7 +785,7 @@ module SurfaceRadiationMod
   real(r8), intent(inout)  :: RadPARBakScat2NextL(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadSWFwdScat2NextL(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadPARFwdScat2NextL(0:NumCanopyLayers1+1)
-  character(len=*), parameter :: subname='SweepBottomUp'
+  character(len=*), parameter :: subname='UpwellSweep'
 
   REAL(R8) :: SunlitLeafArea,SunlitStalkArea  
   real(r8) :: RadSWDiffusL,diffusSWLeafAbsorptAzclass,diffusSWStalkAbsorptAzclass
@@ -835,7 +870,7 @@ module SurfaceRadiationMod
   ENDDO D2800  
   call PrintInfo('end '//subname)     
   end associate
-  end subroutine SweepBottomUp
+  end subroutine UpwellSweep
 
 !----------------------------------------------------------------------------------------------------
   subroutine AccumulateRadation4CanopyL(NP,L,YAREA,RadDirPARLeafSurf_zsec,                  &
@@ -887,17 +922,17 @@ module SurfaceRadiationMod
   real(r8) :: XTAUS,XTAUY
   integer  :: N,M,NZ
 
-  associate(                                                    &
-    RadSWLeafAlbedo_pft    => plt_rad%RadSWLeafAlbedo_pft      ,& !input  :canopy shortwave albedo, [-]
-    CanopyPARalbedo_pft    => plt_rad%CanopyPARalbedo_pft      ,& !input  :canopy PAR albedo, [-]
+  associate(                                                            &
+    RadSWLeafAlbedo_pft        => plt_rad%RadSWLeafAlbedo_pft          ,& !input  :canopy shortwave albedo, [-]
+    CanopyPARalbedo_pft        => plt_rad%CanopyPARalbedo_pft          ,& !input  :canopy PAR albedo, [-]
     RadPARLeafTransmitance_pft => plt_rad%RadPARLeafTransmitance_pft   ,& !input  :canopy PAR transmissivity, [-]
     RadSWLeafTransmitance_pft  => plt_rad%RadSWLeafTransmitance_pft    ,& !input  :canopy shortwave transmissivity, [-]
-    ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]  
-    TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit      ,& !inoput :fraction of radiation intercepted by canopy layer, [-]  
-    RadSWbyCanopy_pft      => plt_rad%RadSWbyCanopy_pft        ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
-    RadPARbyCanopy_pft     => plt_rad%RadPARbyCanopy_pft       ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]    
-    RadTotPAR_zsec         => plt_rad%RadTotPAR_zsec           ,& !inoput :total incoming PAR, [umol m-2 s-1]    
-    RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec            & !inoput :diffuse incoming PAR, [umol m-2 s-1]
+    ZERO                       => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]  
+    TAU_DirectRTransmit        => plt_rad%TAU_DirectRTransmit          ,& !inoput :fraction of radiation intercepted by canopy layer, [-]  
+    RadSWbyCanopy_pft          => plt_rad%RadSWbyCanopy_pft            ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    RadPARbyCanopy_pft         => plt_rad%RadPARbyCanopy_pft           ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]    
+    RadTotPAR_zsec             => plt_rad%RadTotPAR_zsec               ,& !inoput :total incoming PAR, [umol m-2 s-1]    
+    RadDifPAR_zsec             => plt_rad%RadDifPAR_zsec                & !inoput :diffuse incoming PAR, [umol m-2 s-1]
   )
   !
   !     XTAUS=interception of direct radiation in current layer

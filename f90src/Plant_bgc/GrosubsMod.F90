@@ -533,7 +533,7 @@ module grosubsMod
     ZEROS                     => plt_site%ZEROS                      ,& !input  :threshold zero for numerical stability,[-]  
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
-    CanopyStalkSurfArea_lbrch     => plt_morph%CanopyStalkSurfArea_lbrch     ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
@@ -570,7 +570,7 @@ module grosubsMod
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
     CanopySeedNumX_pft        => plt_morph%CanopySeedNumX_pft        ,& !output :last nonzero canopy grain number, [d-2]    
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
-    CanopyStemSurfArea_pft        => plt_morph%CanopyStemSurfArea_pft        ,& !output :plant stem area, [m2 d-2]
+    CanopyStemSurfArea_pft    => plt_morph%CanopyStemSurfArea_pft    ,& !output :plant stem area, [m2 d-2]
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft           ,& !output :canopy ear structural element, [g d-2]
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft         ,& !output :canopy grain structural element, [g d-2]
     HuskStrutElms_pft         => plt_biom%HuskStrutElms_pft          ,& !output :canopy husk structural element mass, [g d-2]
@@ -586,7 +586,6 @@ module grosubsMod
   !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
   !
   !
-  
   call PrintInfo('beg '//subname)
   DO NB=1,NumOfBranches_pft(NZ)    
     if(isclose(CanopyLeafSheathC_brch(NB,NZ),0._r8))then
@@ -613,6 +612,7 @@ module grosubsMod
       CanopyStemSurfAreaZ_pft(L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
+  
   if(CanopySeedNum_pft(NZ)>0._r8)CanopySeedNumX_pft(NZ)=CanopySeedNum_pft(NZ)
   if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
     fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
