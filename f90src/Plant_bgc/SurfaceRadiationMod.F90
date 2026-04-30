@@ -503,52 +503,29 @@ module SurfaceRadiationMod
   real(r8) :: TAU_DifuseRTransmit(0:NumCanopyLayers1+1)
   real(r8) :: RadDirPARLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)
   real(r8) :: RadDirPARStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)
+  real(r8) :: RadSWFwdScat2NextL(0:NumCanopyLayers1+1)   !total fwd scattered SW to next layer  
   real(r8) :: RadSWBakScat2NextL(0:NumCanopyLayers1+1)
   real(r8) :: RadPARBakScat2NextL(0:NumCanopyLayers1+1)
-  real(r8) :: RadSWFwdScat2NextL(0:NumCanopyLayers1+1)
   real(r8) :: RadPARFwdScat2NextL(0:NumCanopyLayers1+1)
-  real(r8) :: RadDirSWbyLeafL_pft(JP1)
-  real(r8) :: RadDirPARbyLeafL_pft(JP1)
-  real(r8) :: RadDifSWbyStalk_pft(JP1)
-  real(r8) :: RadDifPARbyStalk_pft(JP1)
-  real(r8) :: RadDirSWbyStalkL_pft(JP1)
-  real(r8) :: RadDirPARbyStalkL_pft(JP1)
-
-  real(r8) :: bakScatRadDirSWbyLeafL_pft(JP1),fwdScatRadDirSWbyLeafL_pft(JP1)
-  real(r8) :: bakScatRadDirPARbyLeafL_pft(JP1),fwdScatRadDirPARbyLeafL_pft(JP1)
-  real(r8) :: bakScatRadDirPARbyStalkL_pft(JP1),fwdScatRadDirPARbyStalkL_pft(JP1)
-  real(r8) :: bakScatRadDirSWbyStalkL_pft(JP1),fwdScatRadDirSWbyStalkL_pft(JP1)
-  real(r8) :: RadDifSWbyLeaf_pft(JP1),RadDifPARbyLeaf_pft(JP1)
-  real(r8) :: bakScatRadDifSWbyLeaf_pft(JP1),fwdScatRadDifSWbyLeaf_pft(JP1)
-  real(r8) :: bakScatRadDifPARbyLeaf_pft(JP1),fwdScatRadDifPARbyLeaf_pft(JP1)
-  real(r8) :: bakScatRadDifSWbyStalk_pft(JP1),fwdScatRadDifSWbyStalk_pft(JP1)
-  real(r8) :: bakScatRadDifPARbyStalk_pft(JP1),fwdScatRadDifPARbyStalk_pft(JP1)
-  real(r8) :: BETA(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                         !sine of direct solar radiation on leaf surface, [-]
+  
   real(r8) :: BETX(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]
   REAL(R8) :: RadDirSWLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !direct shortwave radiation on leave in each canopy sector
   real(r8) :: RadDirSWStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !direct shortwave radiation on stalk in each canopy sector
 
   real(r8) :: RadSWDiffusL
   real(r8) :: RadPARDiffusL
-  real(r8) :: FracDirRadAbsorbtCum, FracDifRadAbsorbtCum
-  real(r8) :: FracDirRadAbsorbtL, FracDifRadAbsorbtL
   real(r8) :: XAREA
   real(r8) :: YAREA
 
 
   associate(                                                    &
-    SnowDepth              => plt_ew%SnowDepth                 ,& !input  :snowpack depth, [m]
-    RadSWDiffus_col        => plt_rad%RadSWDiffus_col          ,& !input  :diffuse shortwave radiation, [W m-2]    
-    RadPARDiffus_col       => plt_rad%RadPARDiffus_col         ,& !input  :diffuse PAR, [umol m-2 s-1]
     SineSunInclAngle_col   => plt_rad%SineSunInclAngle_col     ,& !input  :sine of solar angle, [-]
     NumOfBranches_pft      => plt_morph%NumOfBranches_pft      ,& !input  :number of branches,[-]    
     LeafAreaZsec_brch      => plt_morph%LeafAreaZsec_brch      ,& !input  :leaf surface area, [m2 d-2]    
     NU                     => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     AREA3                  => plt_site%AREA3                   ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     NP                     => plt_site%NP                      ,& !input  :current number of plant species,[-]
-    ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     ClumpFactorNow_pft     => plt_morph%ClumpFactorNow_pft     ,& !input  :clumping factor for self-shading in canopy layer at current LAI, [-]
-    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col      ,& !input  :canopy layer height, [m]    
     LeafAreaSunlit_zsec    => plt_photo%LeafAreaSunlit_zsec    ,& !inoput :leaf irradiated surface area, [m2 d-2]    
     RadTotPAR_zsec         => plt_rad%RadTotPAR_zsec           ,& !inoput :total incoming PAR, [umol m-2 s-1]
     RadDifPAR_zsec         => plt_rad%RadDifPAR_zsec           ,& !inoput :diffuse incoming PAR, [umol m-2 s-1]
@@ -562,22 +539,12 @@ module SurfaceRadiationMod
   call PrintInfo('beg '//subname)
 
   !distribute radiation into different leaf/canopy sector
-  CALL AngularDistributeRadiation(NP,SolarAzimuthAngle,CosineSunInclAngle,BETA,BETX,iScatteringDirect,&
+  CALL AngularDistributeRadiation(NP,SolarAzimuthAngle,CosineSunInclAngle,BETX,iScatteringDirect,&
     RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec)
 
   XAREA = 1.0_r8/AREA3(NU)                      !average over the grid
   YAREA = XAREA/REAL(NumOfSkyAzimuthSects1,R8)  !area for one azimuthal zone
-
-  !incoming SW and PAR
-  RadSWDiffusL  = RadSWDiffus_col
-  RadPARDiffusL = RadPARDiffus_col
   !
-  TAU_DirectRTransmit(NumCanopyLayers1+1) = 1.0_r8
-  TAU_DifuseRTransmit(NumCanopyLayers1+1) = 1.0_r8
-  RadSWFwdScat2NextL(NumCanopyLayers1+1)  = 0.0_r8
-  RadPARFwdScat2NextL(NumCanopyLayers1+1) = 0.0_r8
-  FracDirRadAbsorbtCum                    = 0.0_r8
-
   !distribute radiation from top of canopy to ground
   !it is only applicable to upland vegetation
   !
@@ -590,8 +557,113 @@ module SurfaceRadiationMod
   !     CALCULATE ABSORPTION, REFLECTION AND TRANSMISSION OF DIRECT AND
   !     DIFFUSE DOWNWARD TOTAL AND VISIBLE RADIATION BY EACH SPECIES
   !     NZ IN EACH LAYER L
-  !
+  !  
   !direct radiation only applies to sunlit leaf/stalk, diffusive radiation applies to all.
+  !
+  call SweepTopDown(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
+    StemAreaZsec_lpft,RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec,&
+    RadSWDiffusL,RadPARDiffusL,TAU_DifuseRTransmit,RadSWFwdScat2NextL,RadSWBakScat2NextL,RadPARFwdScat2NextL,RadPARBakScat2NextL)
+
+  !set lower boundary condition
+  call RadiationAtGround(GrndIncidSolarAngle,                       &
+    RadSWDiffusL,RadPARDiffusL,                                     &
+    TAU_DirectRTransmit(1),TAU_DifuseRTransmit(1),                  &
+    RadSWFwdScat2NextL(1),RadPARFwdScat2NextL(1),                   &
+    RadSWBakScat2NextL(0),RadPARBakScat2NextL(0),RadSW_Grnd)  
+  !
+  !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
+  !
+  call SweepBottomUp(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
+    TAU_DifuseRTransmit,RadSWBakScat2NextL,&
+    RadPARBakScat2NextL,RadSWFwdScat2NextL,RadPARFwdScat2NextL)
+  !
+  !summarize sunlit/shaded PAR
+  DO NZ=1,NP
+    LeafAreaSunlit_pft(NZ) = 0._r8;PARSunlit_pft(NZ) = 0._r8;ParSunsha_pft(NZ) = 0._r8
+
+    D500: DO NB=1,NumOfBranches_pft(NZ)
+      D550: DO K=1,MaxNodesPerBranch1
+        D600: DO L=NumCanopyLayers1,1,-1
+          D650: DO N=1,NumLeafZenithSectors1
+            LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
+            LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
+            DO M=1,NumOfSkyAzimuthSects1
+              PARSunlit_pft(NZ)=PARSunlit_pft(NZ)+RadTotPAR_zsec(N,M,L,NZ)*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1)
+              ParSunsha_pft(NZ)=ParSunsha_pft(NZ)+RadDifPAR_zsec(N,M,L,NZ)*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_RadThru(L+1)
+            ENDDO
+          ENDDO D650
+        ENDDO D600
+      ENDDO D550 
+    ENDDO D500
+  ENDDO
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine MultiCanLayerRadiation
+!----------------------------------------------------------------------------------------------------
+
+  subroutine SweepTopDown(DepthSurfWatIce,XAREA,YAREA,BETX,iScatteringDirect, LeafAreaZsec_lpft,&
+    StemAreaZsec_lpft,RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec,&
+    RadSWDiffusL,RadPARDiffusL,TAU_DifuseRTransmit,RadSWFwdScat2NextL,RadSWBakScat2NextL,RadPARFwdScat2NextL,RadPARBakScat2NextL)
+
+  implicit none
+  real(r8), intent(in)    :: DepthSurfWatIce
+  real(r8), intent(in)    :: XAREA,YAREA
+  real(r8), intent(in)    :: BETX(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]  
+  integer,  INTENT(IN)    :: iScatteringDirect(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)    
+  real(r8), intent(in)    :: LeafAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)
+  real(r8), intent(in)    :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)
+  REAL(R8), intent(in)    :: RadDirSWLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)     !direct shortwave radiation on leave in each canopy sector
+  real(r8), intent(in)    :: RadDirSWStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !direct shortwave radiation on stalk in each canopy sector
+  real(r8), intent(in)    :: RadDirPARLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !PAR radiation on leave in each canopy sector
+  real(r8), intent(in)    :: RadDirPARStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)   !PAR radiation on stalk in each canopy sector
+  real(r8), intent(out)   :: RadSWDiffusL,RadPARDiffusL
+  real(r8), intent(out)   :: TAU_DifuseRTransmit(0:NumCanopyLayers1+1)
+  real(r8), intent(out)   :: RadSWFwdScat2NextL(0:NumCanopyLayers1+1)   !total fwd scattered SW to next layer
+  real(r8), intent(out)   :: RadSWBakScat2NextL(0:NumCanopyLayers1+1)   !total backscattered SW to next layer
+  real(r8), intent(out)   :: RadPARFwdScat2NextL(0:NumCanopyLayers1+1)  !total fwd scattered PAR to next layer
+  real(r8), intent(out)   :: RadPARBakScat2NextL(0:NumCanopyLayers1+1)  !total backscattered PAR to next layer
+  character(len=*), parameter :: subname='SweepTopDown'
+  real(r8) :: RadDirSWbyLeafL_pft(JP1)
+  real(r8) :: RadDirPARbyLeafL_pft(JP1)
+  real(r8) :: RadDifSWbyStalk_pft(JP1)
+  real(r8) :: RadDifPARbyStalk_pft(JP1)
+  real(r8) :: RadDirSWbyStalkL_pft(JP1)
+  real(r8) :: RadDirPARbyStalkL_pft(JP1)
+  real(r8) :: RadDifSWbyLeaf_pft(JP1),RadDifPARbyLeaf_pft(JP1)  
+  real(r8) :: bakScatRadDirSWbyLeafL_pft(JP1),fwdScatRadDirSWbyLeafL_pft(JP1)
+  real(r8) :: bakScatRadDirPARbyLeafL_pft(JP1),fwdScatRadDirPARbyLeafL_pft(JP1)
+  real(r8) :: bakScatRadDirPARbyStalkL_pft(JP1),fwdScatRadDirPARbyStalkL_pft(JP1)
+  real(r8) :: bakScatRadDirSWbyStalkL_pft(JP1),fwdScatRadDirSWbyStalkL_pft(JP1)
+  real(r8) :: bakScatRadDifSWbyLeaf_pft(JP1),fwdScatRadDifSWbyLeaf_pft(JP1)
+  real(r8) :: bakScatRadDifPARbyLeaf_pft(JP1),fwdScatRadDifPARbyLeaf_pft(JP1)
+  real(r8) :: bakScatRadDifSWbyStalk_pft(JP1),fwdScatRadDifSWbyStalk_pft(JP1)
+  real(r8) :: bakScatRadDifPARbyStalk_pft(JP1),fwdScatRadDifPARbyStalk_pft(JP1)
+
+  integer :: L, NZ
+  real(r8) :: FracDirRadAbsorbtCum, FracDifRadAbsorbtCum
+  real(r8) :: FracDirRadAbsorbtL, FracDifRadAbsorbtL
+
+  associate(                                                    &
+    SnowDepth              => plt_ew%SnowDepth                 ,& !input  :snowpack depth, [m]  
+    NP                     => plt_site%NP                      ,& !input  :current number of plant species,[-]    
+    ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]    
+    RadSWDiffus_col        => plt_rad%RadSWDiffus_col          ,& !input  :diffuse shortwave radiation, [W m-2]    
+    RadPARDiffus_col       => plt_rad%RadPARDiffus_col         ,& !input  :diffuse PAR, [umol m-2 s-1]    
+    CanopyHeightZ_col      => plt_morph%CanopyHeightZ_col      ,& !input  :canopy layer height, [m]      
+    TAU_RadThru            => plt_rad%TAU_RadThru              ,& !output :fraction of radiation transmitted by canopy layer, [-]    
+    TAU_DirectRTransmit    => plt_rad%TAU_DirectRTransmit       & !inoput :fraction of radiation intercepted by canopy layer, [-]
+  )
+  call PrintInfo('beg '//subname)
+  !incoming SW and PAR
+  RadSWDiffusL  = RadSWDiffus_col
+  RadPARDiffusL = RadPARDiffus_col
+
+  FracDirRadAbsorbtCum                    = 0.0_r8
+  TAU_DirectRTransmit(NumCanopyLayers1+1) = 1.0_r8
+  TAU_DifuseRTransmit(NumCanopyLayers1+1) = 1.0_r8
+  RadSWFwdScat2NextL(NumCanopyLayers1+1)  = 0.0_r8
+  RadPARFwdScat2NextL(NumCanopyLayers1+1) = 0.0_r8
+
   D1800: DO L=NumCanopyLayers1,1,-1 !top -> down
     !only compute radiation for canopy layers above snow and ponding water
     !IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
@@ -649,7 +721,7 @@ module SurfaceRadiationMod
       TAU_DirectRTransmit(L) = 1.0_r8-FracDirRadAbsorbtCum
       TAU_RadThru(L)         = 1.0_r8-TAU_DirectRTransmit(L)
       TAU_DifuseRTransmit(L) = 1.0_r8-FracDifRadAbsorbtCum
-
+      !
     ELSE
       !layer L is not in active canopy, so just make a copy from layer L+1
       RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L+1)
@@ -659,54 +731,13 @@ module SurfaceRadiationMod
       TAU_DifuseRTransmit(L) = TAU_DifuseRTransmit(L+1)
     ENDIF
   ENDDO D1800
-
-  call RadiationAtGround(GrndIncidSolarAngle,                       &
-    RadSWDiffusL,RadPARDiffusL,                                     &
-    TAU_DirectRTransmit(1),TAU_DifuseRTransmit(1),                  &
-    RadSWFwdScat2NextL(1),RadPARFwdScat2NextL(1),                   &
-    RadSWBakScat2NextL(0),RadPARBakScat2NextL(0),RadSW_Grnd)  
-  !
-  !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
-  !
-  !     RadSWBakScat2NextL,RadPARBakScat2NextL=total backscattered SW,PAR to next layer
-  !     RadSWFwdScat2NextL,RadPARFwdScat2NextL=total fwd scattered SW,PAR to next layer
-  !     diffusSWLeafAbsorptAzclass,diffusSWStalkAbsorptAzclass,diffusPARLeafAbsorptAzclass,diffusPARStalkAbsorptAzclass=leaf,stalk SW,PAR absbd fwd+back flux
-  !     RadDifSWbyLeaf_pft,RadDifSWbyStalk_pft,RadDifPARbyLeaf_pft,RadDifPARbyStalk_pft=total leaf,stalk SW,PAR absbd fwd+back
-  !     RadSWbyCanopy_pft,TRADC,RadPARbyCanopy_pft,TRADP=total SW,PAR absbd by each,all PFT
-  !
-  TAU_DifuseRTransmit(0) = 1.0_r8
-  RadSWFwdScat2NextL(0)  = 0.0_r8
-  RadPARFwdScat2NextL(0) = 0.0_r8
-  !
-  call ReflectedRadiation2Canopy(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
-    TAU_DifuseRTransmit,RadSWBakScat2NextL,&
-    RadPARBakScat2NextL,RadSWFwdScat2NextL,RadPARFwdScat2NextL)
-  !
-  !summarize sunlit/shaded PAR
-  DO NZ=1,NP
-    LeafAreaSunlit_pft(NZ) = 0._r8;PARSunlit_pft(NZ) = 0._r8;ParSunsha_pft(NZ) = 0._r8
-
-    D500: DO NB=1,NumOfBranches_pft(NZ)
-      D550: DO K=1,MaxNodesPerBranch1
-        D600: DO L=NumCanopyLayers1,1,-1
-          D650: DO N=1,NumLeafZenithSectors1
-            LeafAreaSunlit_zsec(N,L,K,NB,NZ) = LeafAreaZsec_brch(N,L,K,NB,NZ)*ClumpFactorNow_pft(NZ)
-            LeafAreaSunlit_pft(NZ)           = LeafAreaSunlit_pft(NZ)+LeafAreaSunlit_zsec(N,L,K,NB,NZ)
-            DO M=1,NumOfSkyAzimuthSects1
-              PARSunlit_pft(NZ)=PARSunlit_pft(NZ)+RadTotPAR_zsec(N,M,L,NZ)*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1)
-              ParSunsha_pft(NZ)=ParSunsha_pft(NZ)+RadDifPAR_zsec(N,M,L,NZ)*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_RadThru(L+1)
-            ENDDO
-          ENDDO D650
-        ENDDO D600
-      ENDDO D550 
-    ENDDO D500
-  ENDDO
   call PrintInfo('end '//subname)
   end associate
-  end subroutine MultiCanLayerRadiation
+  end subroutine SweepTopDown
+
 !----------------------------------------------------------------------------------------------------
 
-  subroutine ReflectedRadiation2Canopy(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
+  subroutine SweepBottomUp(YAREA,LeafAreaZsec_lpft,StemAreaZsec_lpft,&
     TAU_DifuseRTransmit,RadSWBakScat2NextL,&
     RadPARBakScat2NextL,RadSWFwdScat2NextL,RadPARFwdScat2NextL)
 
@@ -714,12 +745,12 @@ module SurfaceRadiationMod
   real(r8), intent(in)     :: YAREA
   real(r8), intent(in)     :: LeafAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)
   real(r8), intent(in)     :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)  
-  real(r8), intent(in)     :: TAU_DifuseRTransmit(0:NumCanopyLayers1+1)
+  real(r8), intent(inout)  :: TAU_DifuseRTransmit(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadSWBakScat2NextL(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadPARBakScat2NextL(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadSWFwdScat2NextL(0:NumCanopyLayers1+1)
   real(r8), intent(inout)  :: RadPARFwdScat2NextL(0:NumCanopyLayers1+1)
-  character(len=*), parameter :: subname='ReflectedRadiation2Canopy'
+  character(len=*), parameter :: subname='SweepBottomUp'
 
   REAL(R8) :: SunlitLeafArea,SunlitStalkArea  
   real(r8) :: RadSWDiffusL,diffusSWLeafAbsorptAzclass,diffusSWStalkAbsorptAzclass
@@ -746,8 +777,11 @@ module SurfaceRadiationMod
     SnowDepth                  => plt_ew%SnowDepth                     ,& !input  :snowpack depth, [m]    
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col           & !input  :canopy layer height, [m]    
   )
-
   call PrintInfo('beg '//subname)
+  !
+  TAU_DifuseRTransmit(0) = 1.0_r8
+  RadSWFwdScat2NextL(0)  = 0.0_r8
+  RadPARFwdScat2NextL(0) = 0.0_r8  
   RadSWDiffusL           = 0.0_r8
   RadPARDiffusL          = 0.0_r8
   D2800: DO L=1,NumCanopyLayers1 !bottom->up
@@ -801,7 +835,7 @@ module SurfaceRadiationMod
   ENDDO D2800  
   call PrintInfo('end '//subname)     
   end associate
-  end subroutine ReflectedRadiation2Canopy
+  end subroutine SweepBottomUp
 
 !----------------------------------------------------------------------------------------------------
   subroutine AccumulateRadation4CanopyL(NP,L,YAREA,RadDirPARLeafSurf_zsec,                  &
@@ -1250,20 +1284,19 @@ module SurfaceRadiationMod
 
 !----------------------------------------------------------------------------------------------------
 
-  subroutine AngularDistributeRadiation(NP,SolarAzimuthAngle,CosineSunInclAngle,BETA,BETX,iScatteringDirect,&
+  subroutine AngularDistributeRadiation(NP,SolarAzimuthAngle,CosineSunInclAngle,BETX,iScatteringDirect,&
     RadDirSWLeafSurf_zsec,RadDirSWStalkSurf_zsec,RadDirPARLeafSurf_zsec,RadDirPARStalkSurf_zsec)
   implicit none
   integer , intent(in) :: NP
   real(r8), intent(in) :: SolarAzimuthAngle  
   real(r8), intent(in) :: CosineSunInclAngle  
   integer , INTENT(OUT) :: iScatteringDirect(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)  
-  real(r8), intent(out) :: BETA(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                          !sine of direct solar radiation on leaf surface, [-]
   real(r8), intent(out) :: BETX(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                          !sine of direct solar radiation on leaf surface/sine
   REAL(R8), intent(out) :: RadDirSWLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)     !direct shortwave radiation on leave in each canopy sector
   real(r8), intent(out) :: RadDirSWStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !direct shortwave radiation on stalk in each canopy sector
   real(r8), intent(out) :: RadDirPARLeafSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)    !PAR radiation on leave in each canopy sector
   real(r8), intent(out) :: RadDirPARStalkSurf_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,JP1)   !PAR radiation on stalk in each canopy sector
-
+  real(r8)  :: BETA(NumLeafZenithSectors1,NumOfSkyAzimuthSects1)                          !sine of direct solar radiation on leaf surface, [-]
   REAL(R8) :: SolarAngle  
   real(r8) :: RadSWbyStalkSurf_pft(JP1)
   real(r8) :: RadSWbyLeafSurf_pft(JP1)
