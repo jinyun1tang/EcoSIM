@@ -63,8 +63,8 @@ module ExtractsMod
   integer :: NZ,L,K,M
   integer :: NE
   associate(                                                          &
-    LitrfallElms_pft      => plt_bgcr%LitrfallElms_pft       ,& !input  :plant element LitrFall, [g d-2 h-1]
-    LitrfallElms_pvr      => plt_bgcr%LitrfallElms_pvr       ,& !input  :plant LitrFall element, [g d-2 h-1]
+    LitrfallElms_pft          => plt_bgcr%LitrfallElms_pft           ,& !input  :plant element LitrFall, [g d-2 h-1]
+    LitrfallElms_pvr          => plt_bgcr%LitrfallElms_pvr           ,& !input  :plant LitrFall element, [g d-2 h-1]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NP0                       => plt_site%NP0                        ,& !input  :intitial number of plant species,[-]
     StandDeadStrutElms_pft    => plt_biom%StandDeadStrutElms_pft     ,& !input  :standing dead element, [g d-2]
@@ -132,13 +132,13 @@ module ExtractsMod
   integer, intent(in) :: NZ
   character(len=*), parameter :: subname='CalcTotalLeafArea'
   integer :: L
-  associate(                                               &
-    CanopyLeafAreaZ_pft => plt_morph%CanopyLeafAreaZ_pft  ,& !input  :canopy layer leaf area, [m2 d-2]
-    CanopyLeafCLyr_pft  => plt_biom%CanopyLeafCLyr_pft    ,& !input  :canopy layer leaf C, [g d-2]
+  associate(                                                       &
+    CanopyLeafAreaZ_pft     => plt_morph%CanopyLeafAreaZ_pft      ,& !input  :canopy layer leaf area, [m2 d-2]
+    CanopyLeafCLyr_pft      => plt_biom%CanopyLeafCLyr_pft        ,& !input  :canopy layer leaf C, [g d-2]
     CanopyStemSurfAreaZ_pft => plt_morph%CanopyStemSurfAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
-    CanopyLeafAareZ_col => plt_morph%CanopyLeafAareZ_col  ,& !inoput :total leaf area, [m2 d-2]
-    CanopyStemAareZ_col => plt_morph%CanopyStemAareZ_col  ,& !inoput :total stem area, [m2 d-2]
-    tCanLeafC_clyr      => plt_biom%tCanLeafC_clyr         & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
+    CanopyLeafAareZ_col     => plt_morph%CanopyLeafAareZ_col      ,& !inoput :total leaf area, [m2 d-2]
+    CanopyStemAareZ_col     => plt_morph%CanopyStemAareZ_col      ,& !inoput :total stem area, [m2 d-2]
+    tCanLeafC_clyr          => plt_biom%tCanLeafC_clyr             & !inoput :total leaf carbon mass in canopy layers, [gC d-2]
   )
   call PrintInfo('beg '//subname)
   DO L=1,NumCanopyLayers1
@@ -322,6 +322,7 @@ module ExtractsMod
     Transpiration_pft         => plt_ew%Transpiration_pft            ,& !input  :canopy transpiration, [m2 d-2 h-1]
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft           ,& !input  :canopy heat capacity, [MJ d-2 K-1]
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           ,& !input  :canopy evaporation, [m2 d-2 h-1]
+    SnoSub2AirCanopy_pft      => plt_ew%SnoSub2AirCanopy_pft         ,& !input  :canopy snow sublimation,[m3 d-2 h-1]    
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          ,& !input  :canopy surface water content, [m3 d-2]
     CanopyHeatStor_col        => plt_ew%CanopyHeatStor_col           ,& !inoput :total canopy heat content, [MJ d-2]
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col        ,& !inoput :grid canopy leaf area, [m2 d-2]
@@ -378,11 +379,11 @@ module ExtractsMod
   Eco_Heat_Latent_col    = Eco_Heat_Latent_col+CanopyEvapTransLHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
-  ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
   CanopyBiomWater_col          = CanopyBiomWater_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
-  QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
-  VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
+  QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
+  VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
   ENGYC                  = VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   CanopyHeatStor_col     = CanopyHeatStor_col+ENGYC
   HeatFlx2Canopy_col     = HeatFlx2Canopy_col+ENGYC-ENGYX_pft(NZ)

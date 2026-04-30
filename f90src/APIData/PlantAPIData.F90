@@ -202,8 +202,8 @@ implicit none
   real(r8), pointer :: RadNet2Canopy_pft(:)      => null() !canopy net radiation,                              [MJ d-2 h-1]
   real(r8), pointer :: LeafSWabsorpty_pft(:)     => null() !canopy shortwave absorptivity,                     [-]
   real(r8), pointer :: LeafPARabsorpty_pft(:)    => null() !canopy PAR absorptivity,[-]
-  real(r8), pointer :: RadSWLeafTransmis_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
-  real(r8), pointer :: RadPARLeafTransmis_pft(:) => null() !canopy PAR transmissivity,                         [-]
+  real(r8), pointer :: RadSWLeafTransmitance_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
+  real(r8), pointer :: RadPARLeafTransmitance_pft(:) => null() !canopy PAR transmissivity,                         [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
   real(r8), pointer :: FracPARads2Canopy_pft(:)  => null() !fraction of incoming PAR absorbed by canopy,       [-]
   real(r8), pointer :: RadTotPAR_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
@@ -647,9 +647,13 @@ implicit none
   real(r8) :: Air_Heat_Latent_store_col     !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VcumIceSnow_col               !ice volume in snowpack, [m3 d-2]
   real(r8) :: TKSnow                        !snow temperature, [K]
+  
   real(r8) :: WatHeldOnCanopy_col           !canopy surface water content, [m3 d-2]
+  real(r8) :: fSnowCanopy_col               !fraction snow covered canopy, [-]
+  real(r8) :: SnowOnCanopy_col              !canopy snow water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col             !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughnessLength                   !canopy surface roughness height, [m]
+  real(r8) :: BulkFactor4Snow_col           !grid bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   real(r8) :: ZeroPlaneDisplacem_col        !zero plane displacement height, [m]
   real(r8) :: RawIsoTAtm2CanopySinkZ_col        !isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
   real(r8) :: RawCanopyH2SinkZ_col           !isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
@@ -659,10 +663,11 @@ implicit none
   real(r8) :: HeatCanopy2Dist_col           !canopy energy +/- due to disturbance, [MJ /d2]
   real(r8) :: QCanopyWat2Dist_col           !canopy water +/- due to disturbance, [m3 H2O/d2]
   real(r8) :: TPlantRootH2OUptake_col       !total water uptake by roots, [m3 H2O/d2]
-
+  real(r8), pointer :: fSnowCanopy_pft(:)             => null()    !fraction of canopy is snow covered, [-]
   real(r8), pointer :: Transpiration_pft(:)           => null()    !canopy transpiration,                                         [m3 d-2 h-1]
   real(r8), pointer :: PSICanopyTurg_pft(:)           => null()    !plant canopy turgor water potential,                          [MPa]
-  real(r8), pointer :: PrecIntcptByCanopy_pft(:)      => null()    !water flux into canopy,                                       [m3 d-2 h-1]
+  real(r8), pointer :: RainIntcptByCanopy_pft(:)      => null()    !water flux into canopy,                                       [m3 d-2 h-1]
+  real(r8), pointer :: SnowIntcptByCanopy_pft(:)      => null()    !snow flux into canopy,                                        [m3 d-2 h-1]
   real(r8), pointer :: PSICanopy_pft(:)               => null()    !canopy total water potential,                                 [Mpa]
   real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation,                                           [m3 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)          => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
@@ -687,6 +692,8 @@ implicit none
   real(r8), pointer :: RootH2OUptkStress_pvr(:,:,:)   => null()    !root water uptake stress indicated by rate,                   [m3 d-2 h-1] 
   real(r8), pointer :: THeatLossRoot2Soil_vr(:)       => null()    !total root heat uptake,                                       [MJ d-2]
   real(r8), pointer :: TWaterPlantRoot2Soil_vr(:)     => null()    !total root water uptake,                                      [m3 d-2]
+  real(r8), pointer :: SnowOnCanopy_pft(:)            => null()    !canopy held snow, [m3 d-2]
+  real(r8), pointer :: SnoSub2AirCanopy_pft(:)        => null()    !canopy snow sublimation,[m3 d-2 h-1]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)         => null()    !canopy surface water content,                                 [m3 d-2]
   real(r8), pointer :: CanopyBiomWater_pft(:)         => null()    !canopy water content,                                         [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)          => null()    !canopy heat capacity,                                         [MJ d-2 K-1]
@@ -1310,13 +1317,16 @@ implicit none
   allocate(this%THeatLossRoot2Soil_vr(0:JZ1));this%THeatLossRoot2Soil_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
   allocate(this%HeatXAir2PCan_pft(JP1));this%HeatXAir2PCan_pft=spval
-  allocate(this%PrecIntcptByCanopy_pft(JP1));this%PrecIntcptByCanopy_pft=spval
+  allocate(this%RainIntcptByCanopy_pft(JP1));this%RainIntcptByCanopy_pft=spval
+  allocate(this%SnowIntcptByCanopy_pft(JP1));this%SnowIntcptByCanopy_pft=spval
   allocate(this%PSICanopyTurg_pft(JP1));this%PSICanopyTurg_pft=spval
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
   allocate(this%HeatStorCanopy_pft(JP1));this%HeatStorCanopy_pft=spval
   allocate(this%CanopyEvapTransLHeat_pft(JP1));this%CanopyEvapTransLHeat_pft=spval
   allocate(this%WatHeldOnCanopy_pft(JP1));this%WatHeldOnCanopy_pft=spval
+  allocate(this%SnowOnCanopy_pft(JP1)); this%SnowOnCanopy_pft=spval
+  allocate(this%SnoSub2AirCanopy_pft(JP1));this%SnoSub2AirCanopy_pft=spval
   allocate(this%VHeatCapCanopy_pft(JP1));this%VHeatCapCanopy_pft=spval
   allocate(this%CanopyBiomWater_pft(JP1));this%CanopyBiomWater_pft=spval
   allocate(this%PSIRoot_pvr(jroots,JZ1,JP1));this%PSIRoot_pvr=spval
@@ -1328,6 +1338,7 @@ implicit none
   allocate(this%RootH2OUptkStress_pvr(jroots,JZ1,JP1)); this%RootH2OUptkStress_pvr=spval
   allocate(this%TWaterPlantRoot2Soil_vr(0:JZ1));this%TWaterPlantRoot2Soil_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
+  allocate(this%fSnowCanopy_pft(JP1)); this%fSnowCanopy_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
   allocate(this%OrganOsmoPsi0pt_pft(JP1));this%OrganOsmoPsi0pt_pft=spval
@@ -1842,8 +1853,8 @@ implicit none
   allocate(this%RadNet2Canopy_pft(JP1))
   allocate(this%LeafSWabsorpty_pft(JP1))
   allocate(this%LeafPARabsorpty_pft(JP1))
-  allocate(this%RadPARLeafTransmis_pft(JP1))
-  allocate(this%RadSWLeafTransmis_pft(JP1))
+  allocate(this%RadPARLeafTransmitance_pft(JP1))
+  allocate(this%RadSWLeafTransmitance_pft(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
   allocate(this%FracPARads2Canopy_pft(JP1))
   end subroutine plt_rad_init

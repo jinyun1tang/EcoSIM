@@ -854,7 +854,7 @@ module StartsMod
   WatHeldOnCanopy_col(:,:)          = 0.0_r8
   CanopyLeafArea_col(:,:)        = 0.0_r8
   StemArea_col(:,:)              = 0.0_r8
-  PrecIntceptByCanopy_col(:,:)   = 0.0_r8
+  RainIntceptByCanopy_col(:,:)   = 0.0_r8
   PlantPopu_col(:,:)             = 0.0_r8
   DayLensCurr_col(:,:)           = 12.0_r8
   SurfAlbedo_col(:,:)            = SoilAlbedo_col(:,:)

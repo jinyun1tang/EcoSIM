@@ -212,7 +212,7 @@ contains
 
       SnowMassErr_test = SnowMassBeg_col(NY,NX)-SnowMassEnd_col(NY,NX)+Prec2Snow_col(NY,NX)-QSnowH2Oloss_col(NY,NX)
 
-      canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+PrecIntceptByCanopy_col(NY,NX) &
+      canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+RainIntceptByCanopy_col(NY,NX) &
         +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
 
       if(fixWaterLevel)then
@@ -237,7 +237,7 @@ contains
           write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
           write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
           write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
-          write(110,*)'PrecIntceptByCan =',PrecIntceptByCanopy_col(NY,NX)   
+          write(110,*)'PrecIntceptByCan =',RainIntceptByCanopy_col(NY,NX)   
           write(110,*)'plant evap       =',QVegET_col(NY,NX)
           write(110,*)'run on           =',QRunSurf_col(NY,NX),WatFLo2LitR_col(NY,NX)
           write(110,*)('-',ii=1,50)

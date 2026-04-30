@@ -31,6 +31,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
   real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
+  integer , target, allocatable :: iPlantSnowIntercepType_tab(:)
   real(r8), target, allocatable :: LeafChl2Protein_tab(:)
   real(r8), target, allocatable :: fChlMesophyll_tab(:)           !fraction of cholorophyll in mesophyll cells
   real(r8), target, allocatable :: MorphogenBase_tab(:)           !baseline morphogen signal, [%]
@@ -143,6 +144,7 @@ module PlantTraitTableMod
   allocate(iPlantPhotosynsType_pft_tab(npfts));iPlantPhotosynsType_pft_tab=0
   allocate(iPlantRootProfile_tab(npfts));iPlantRootProfile_tab=0
   allocate(iPlantPhenolPattern_tab(npfts));iPlantPhenolPattern_tab=0
+  allocate(iPlantSnowIntercepType_tab(npfts)); iPlantSnowIntercepType_tab=0
   allocate(iPlantDevelopPattern_tab(npfts));iPlantDevelopPattern_tab=0
   allocate(iPlantNfixType_tab(npfts));iPlantNfixType_tab=0
   allocate(iPlantPhenolType_tab(npfts));iPlantPhenolType_tab=0
@@ -292,6 +294,7 @@ module PlantTraitTableMod
   call destroy(LeafRubisco2Protein_tab)
   call destroy(LeafPEP2Protein_tab)
   call destroy(SpecChloryfilAct_tab)
+  call destroy(iPlantSnowIntercepType_tab)
   call destroy(LeafChl2Protein_tab)
   call destroy(fChlMesophyll_tab)
   call destroy(CanopyCi2CaRatio_pft_tab)

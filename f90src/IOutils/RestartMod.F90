@@ -1390,6 +1390,22 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='SnowOnCanopy_pft', dim1name='pft',&
+     long_name='plant canopy held snow content', units='m3 d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='SnowOnCanopy_pft', dim1name='pft',&
+     long_name='plant canopy held snow content', units='m3 d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='WatHeldOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
@@ -4888,16 +4904,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='PrecIntceptByCanopy_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='RainIntceptByCanopy_col', dim1name='column',&
        long_name='net water transfer to whole grid canopy', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntceptByCanopy_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RainIntceptByCanopy_col,datrc_1d)
   else
-    !print*,'PrecIntceptByCanopy_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,PrecIntceptByCanopy_col,datrc_1d)  
+    !print*,'RainIntceptByCanopy_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RainIntceptByCanopy_col,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='PrecIntceptByCanopy_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='RainIntceptByCanopy_col', dim1name='column',&
        long_name='net water transfer to whole grid canopy', units='MJ d-2 t-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
