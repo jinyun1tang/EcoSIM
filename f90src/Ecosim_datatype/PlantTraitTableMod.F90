@@ -18,6 +18,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlantPhenolType_tab(:)
   integer, target, allocatable :: iPlantPhotoperiodType_tab(:)
   integer, target, allocatable :: iPlantTurnoverPattern_tab(:)
+  integer, target, allocatable :: iPlant2ndGrothPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
   real(r8), target, allocatable :: PlantInitThermoAdaptZone_pft_tab(:)
@@ -150,6 +151,7 @@ module PlantTraitTableMod
   allocate(iPlantPhenolType_tab(npfts));iPlantPhenolType_tab=0
   allocate(iPlantPhotoperiodType_tab(npfts));iPlantPhotoperiodType_tab=0
   allocate(iPlantTurnoverPattern_tab(npfts));iPlantTurnoverPattern_tab=0
+  allocate(iPlant2ndGrothPattern_tab(npfts)); iPlant2ndGrothPattern_tab=0
   allocate(iPlantGrainType_tab(npfts));iPlantGrainType_tab=0
   allocate(Myco_tab(npfts));Myco_tab=0
   allocate(PlantInitThermoAdaptZone_pft_tab(npfts));PlantInitThermoAdaptZone_pft_tab=0.0_r8
@@ -281,6 +283,7 @@ module PlantTraitTableMod
   call destroy(iPlantPhenolType_tab)
   call destroy(iPlantPhotoperiodType_tab)
   call destroy(iPlantTurnoverPattern_tab)
+  call destroy(iPlant2ndGrothPattern_tab)
   call destroy(iPlantGrainType_tab)
   call destroy(Myco_tab)
   call destroy(PlantInitThermoAdaptZone_pft_tab)

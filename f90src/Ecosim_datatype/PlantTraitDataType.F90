@@ -188,6 +188,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                 !climate signal for phenological progress none, temperature, water stress,[-]
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)            !photoperiod type (neutral, long day, short day),[-]
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)            !phenologically-driven above-ground turnover (all, foliar only, none),[-]
+  integer,target,allocatable :: iPlant2ndGrothPattern_pft(:,:,:)             !does the plant express secondary growth, [-]
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                  !grain type (below or above-ground), e.g. potato and onion are below,[-]
   integer,target,allocatable ::  Myco_pft(:,:,:)                               !mycorrhizal type, 1, 2 ,[-]
 
@@ -373,6 +374,7 @@ contains
   allocate(Days4FalseBreak_pft(JP,JY,JX)); Days4FalseBreak_pft=0
   allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
+  allocate(iPlant2ndGrothPattern_pft(JP,JY,JX)); iPlant2ndGrothPattern_pft=0
   allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
   allocate(Myco_pft(JP,JY,JX));       Myco_pft=0
 
@@ -382,6 +384,8 @@ contains
   subroutine DestructPlantTraits
   use abortutils, only : destroy
   implicit none
+
+  call destroy(iPlant2ndGrothPattern_pft)
   call destroy(iPlantSnowIntercepType_pft)
   call destroy(Days4FalseBreak_pft)
   call destroy(FracLeafShethElmAlloc2Litr)

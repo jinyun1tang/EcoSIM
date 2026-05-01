@@ -794,7 +794,7 @@ implicit none
     plt_morph%CanopyHeightZ_col(L) = CanopyHeightZ_col(L,NY,NX)
   ENDDO
   DO  L=1,NumCanopyLayers+1 
-    plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)  
+    plt_rad%TAU_DirectRTransmitance(L) = TAU_DirectRTransmitance(L,NY,NX)  
     plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)  
   ENDDO  
 
@@ -878,6 +878,7 @@ implicit none
     plt_pheno%iEmbryophyteType_pft(NZ)             = iEmbryophyteType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhotoperiodType_pft(NZ)       = iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)       = iPlantTurnoverPattern_pft(NZ,NY,NX)
+    plt_pheno%iPlant2ndGrothPattern_pft(NZ)       = iPlant2ndGrothPattern_pft(NZ,NY,NX)
     plt_pheno%PlantInitThermoAdaptZone_pft(NZ)    = PlantInitThermoAdaptZone_pft(NZ,NY,NX)
     plt_morph%iPlantGrainType_pft(NZ)             = iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType_pft(NZ)              = iPlantNfixType_pft(NZ,NY,NX)

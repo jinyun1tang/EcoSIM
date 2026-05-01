@@ -311,7 +311,7 @@
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CH2O=total rubisco carboxylation rate
 !     LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!     TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+!     TAU_DirectRTransmitance=fraction of direct radiation transmitted from layer above
 !
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
   CH2O = CH2O+VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
@@ -334,7 +334,7 @@
     RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :sunlit incoming PAR, [umol m-2 s-1]
     RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :shade incoming PAR, [umol m-2 s-1]
     LeafAreaZsec_brch    => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
-    TAU_DirectRTransmit  => plt_rad%TAU_DirectRTransmit    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectRTransmitance  => plt_rad%TAU_DirectRTransmitance    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     TAU_RadThru          => plt_rad%TAU_RadThru             & !input  :fraction of radiation transmitted by canopy layer, [-]
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -348,7 +348,7 @@
           IF(LP==1)THEN
             ! SUNLIT LEAVES
             PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-            Tau_rad  = TAU_DirectRTransmit(L+1)
+            Tau_rad  = TAU_DirectRTransmitance(L+1)
           else
             ! shade          
             PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
@@ -393,7 +393,7 @@
     LeafProteinC_node             => plt_biom%LeafProteinC_node               ,& !input  :node leaf protein C, [g d-2]    
     LeafArea_node                 => plt_morph%LeafArea_node                  ,& !input  :node leaf area, [m2 d-2]    
     LeafRubisco2Protein_pft       => plt_photo%LeafRubisco2Protein_pft        ,& !input  :leaf rubisco content, [gC gC-1]
-    TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectRTransmitance           => plt_rad%TAU_DirectRTransmitance              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
     ElectronTransptJmaxRef_brch   => plt_photo%ElectronTransptJmaxRef_brch    ,& !inoput :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]
     Vmax4RubiscoCarboxy_node      => plt_photo%Vmax4RubiscoCarboxy_node       ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
@@ -672,7 +672,7 @@
     RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :direct incoming PAR, [umol m-2 s-1]
     RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
     TAU_RadThru          => plt_rad%TAU_RadThru            ,& !input  :fraction of radiation transmitted by canopy layer, [-]
-    TAU_DirectRTransmit  => plt_rad%TAU_DirectRTransmit     & !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectRTransmitance  => plt_rad%TAU_DirectRTransmitance     & !input  :fraction of radiation intercepted by canopy layer, [-]
   )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -684,7 +684,7 @@
           ! SUNLIT LEAVES
           IF(LP==1)THEN
             PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-            TAU_rad  = TAU_DirectRTransmit(L+1)
+            TAU_rad  = TAU_DirectRTransmitance(L+1)
           ELSE
             ! SHADED LEAVES
             PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)

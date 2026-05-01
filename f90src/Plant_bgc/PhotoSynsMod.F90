@@ -62,7 +62,7 @@ implicit none
     RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                   ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
     RadTotPAR_zsec                => plt_rad%RadTotPAR_zsec                   ,& !input  :direct incoming PAR, [umol m-2 s-1]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
-    TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectRTransmitance           => plt_rad%TAU_DirectRTransmitance              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     CH2OSunlit_pft                => plt_photo%CH2OSunlit_pft                 ,& !inoput :carbon fixation by sun-lit leaf, [gC d-2 h-1]
     CH2OSunsha_pft                => plt_photo%CH2OSunsha_pft                  & !inoput :carbon fixation by sun-shaded leaf, [gC d-2 h-1]
   )
@@ -88,7 +88,7 @@ implicit none
               if (LP==1)then
                 !sun-lit leave
                 PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-                Tau_rad  = TAU_DirectRTransmit(L+1)
+                Tau_rad  = TAU_DirectRTransmitance(L+1)
               else
                 !sun-shaded leave
                 PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
@@ -190,7 +190,7 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+!               TAU_DirectRTransmitance=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*clscal
                   if(LP==1)then
@@ -262,7 +262,7 @@ implicit none
     RadDifPAR_zsec                => plt_rad%RadDifPAR_zsec                   ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
     RadTotPAR_zsec                => plt_rad%RadTotPAR_zsec                   ,& !input  :direct incoming PAR, [umol m-2 s-1]
     TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
-    TAU_DirectRTransmit           => plt_rad%TAU_DirectRTransmit              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectRTransmitance           => plt_rad%TAU_DirectRTransmitance              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
     CH2OSunlit_pft                => plt_photo%CH2OSunlit_pft                 ,& !inoput :carbon fixation by sun-lit leaf, []
     CH2OSunsha_pft                => plt_photo%CH2OSunsha_pft                  & !inoput :carbon fixation by sun-shaded leaf, []    
   )
@@ -288,7 +288,7 @@ implicit none
             DO LP=1,2
               if(LP==1)then
                 PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-                Tau_rad  = TAU_DirectRTransmit(L+1)
+                Tau_rad  = TAU_DirectRTransmitance(L+1)
               else
                 PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
                 Tau_rad  = TAU_RadThru(L+1)
@@ -387,7 +387,7 @@ implicit none
                   !
                   !  CH2O4=total C4 CO2 fixation
                   !  LeafAreaSunlit_zsec=unself-shaded leaf surface area
-                  !  TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+                  !  TAU_DirectRTransmitance=fraction of direct radiation transmitted from layer above
                   !
                   CH2O4K=CH2O4K+VL*clscal
                   if(LP==1)then
@@ -397,7 +397,7 @@ implicit none
                   endif                  
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmit(L+1))*0.0432
+!              2+(VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_DirectRTransmitance(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -419,7 +419,7 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!               TAU_DirectRTransmit=fraction of direct radiation transmitted from layer above
+!               TAU_DirectRTransmitance=fraction of direct radiation transmitted from layer above
 !
                   CH2O3K=CH2O3K+VL*clscal
                 ENDIF  

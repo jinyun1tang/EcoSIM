@@ -80,10 +80,10 @@ implicit none
     plt_morph%CanopyStemAareZ_col(L) = CanopyStemAareZ_col(L,NY,NX)
     plt_morph%CanopyLeafAareZ_col(L) = CanopyLeafAareZ_col(L,NY,NX)
     plt_morph%CanopyHeightZ_col(L)   = CanopyHeightZ_col(L,NY,NX)
-    plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)
+    plt_rad%TAU_DirectRTransmitance(L)      = TAU_DirectRTransmitance(L,NY,NX)
   ENDDO
   DO L=1,NumCanopyLayers+1
-    plt_rad%TAU_DirectRTransmit(L)      = TAU_DirectRTransmit(L,NY,NX)  
+    plt_rad%TAU_DirectRTransmitance(L)      = TAU_DirectRTransmitance(L,NY,NX)  
   ENDDO  
 
   DO L=0,NL_col(NY,NX)
@@ -92,6 +92,7 @@ implicit none
     plt_soilchem%VLSoilMicP_vr(L)     = VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)      = VLWatMicP_vr(L,NY,NX)
   ENDDO
+  
   plt_ew%SnowOnCanopy_col          = SnowOnCanopy_col(NY,NX)
   plt_ew%fSnowCanopy_col           = fSnowCanopy_col(NY,NX)
   plt_rad%SineSunInclAngle_col     = SineSunInclAngle_col(NY,NX)
@@ -115,11 +116,12 @@ implicit none
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
   DO NZ=1,NP_col(NY,NX)
+    plt_pheno%iPlant2ndGrothPattern_pft(NZ) = iPlant2ndGrothPattern_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)   = CanopyLeafArea_pft(NZ,NY,NX)
     plt_morph%CanopyHeight_pft(NZ)     = CanopyHeight_pft(NZ,NY,NX)
     plt_morph%ClumpFactorNow_pft(NZ)   = ClumpFactorNow_pft(NZ,NY,NX)
-    plt_rad%LeafSWabsorpty_pft(NZ)     = LeafSWabsorpty_pft(NZ,NY,NX)
-    plt_rad%LeafPARabsorpty_pft(NZ)    = LeafPARabsorpty_pft(NZ,NY,NX)
+    plt_rad%LeafSWabsorptivity_pft(NZ)     = LeafSWabsorptivity_pft(NZ,NY,NX)
+    plt_rad%LeafPARabsorptivity_pft(NZ)    = LeafPARabsorptivity_pft(NZ,NY,NX)
     plt_rad%RadSWLeafTransmitance_pft(NZ)  = RadSWLeafTransmitance_pft(NZ,NY,NX)
     plt_rad%RadSWLeafAlbedo_pft(NZ)    = RadSWLeafAlbedo_pft(NZ,NY,NX)
     plt_rad%RadPARLeafTransmitance_pft(NZ) = RadPARLeafTransmitance_pft(NZ,NY,NX)
@@ -204,7 +206,7 @@ implicit none
     CanopyHeightZ_col(L,NY,NX)=plt_morph%CanopyHeightZ_col(L)
   ENDDO
   DO L=1,NumCanopyLayers+1
-    TAU_DirectRTransmit(L,NY,NX) = plt_rad%TAU_DirectRTransmit(L)
+    TAU_DirectRTransmitance(L,NY,NX) = plt_rad%TAU_DirectRTransmitance(L)
     TAU_RadThru(L,NY,NX)         = plt_rad%TAU_RadThru(L)
   ENDDO
   LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col

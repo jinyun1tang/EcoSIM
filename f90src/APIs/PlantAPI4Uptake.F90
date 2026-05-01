@@ -172,10 +172,10 @@ implicit none
           plt_rad%RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO
-      plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)
+      plt_rad%TAU_DirectRTransmitance(L) = TAU_DirectRTransmitance(L,NY,NX)
       plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)
     ENDDO
-    plt_rad%TAU_DirectRTransmit(NumCanopyLayers+1) = TAU_DirectRTransmit(NumCanopyLayers+1,NY,NX)
+    plt_rad%TAU_DirectRTransmitance(NumCanopyLayers+1) = TAU_DirectRTransmitance(NumCanopyLayers+1,NY,NX)
     plt_rad%TAU_RadThru(NumCanopyLayers+1)         = TAU_RadThru(NumCanopyLayers+1,NY,NX)
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)

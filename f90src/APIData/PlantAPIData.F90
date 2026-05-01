@@ -190,7 +190,7 @@ implicit none
   integer,  pointer :: iScatteringDiffus(:,:,:)  => null() !flag for calculating backscattering of radiation in canopy,[-]
   real(r8), pointer :: RadSWLeafAlbedo_pft(:)    => null() !canopy shortwave albedo,                           [-]
   real(r8), pointer :: CanopyPARalbedo_pft(:)    => null() !canopy PAR albedo,                                 [-]
-  real(r8), pointer :: TAU_DirectRTransmit(:)    => null() !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), pointer :: TAU_DirectRTransmitance(:)    => null() !fraction of radiation intercepted by canopy layer, [-]
   real(r8), pointer :: TAU_RadThru(:)            => null() !fraction of radiation transmitted by canopy layer, [-]
   real(r8), pointer :: LWRadCanopy_pft(:)        => null() !canopy longwave radiation,                         [MJ d-2 h-1]
   real(r8), pointer :: RadSWbyCanopy_pft(:)      => null() !canopy absorbed shortwave radiation,               [MJ d-2 h-1]
@@ -200,8 +200,8 @@ implicit none
   real(r8), pointer :: SineLeafAngle(:)          => null() !sine of leaf angle,[-]
   real(r8), pointer :: CosineLeafAngle(:)        => null() !cosine of leaf angle,[-]
   real(r8), pointer :: RadNet2Canopy_pft(:)      => null() !canopy net radiation,                              [MJ d-2 h-1]
-  real(r8), pointer :: LeafSWabsorpty_pft(:)     => null() !canopy shortwave absorptivity,                     [-]
-  real(r8), pointer :: LeafPARabsorpty_pft(:)    => null() !canopy PAR absorptivity,[-]
+  real(r8), pointer :: LeafSWabsorptivity_pft(:)     => null() !canopy shortwave absorptivity,                     [-]
+  real(r8), pointer :: LeafPARabsorptivity_pft(:)    => null() !canopy PAR absorptivity,[-]
   real(r8), pointer :: RadSWLeafTransmitance_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
   real(r8), pointer :: RadPARLeafTransmitance_pft(:) => null() !canopy PAR transmissivity,                         [-]
   real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
@@ -402,6 +402,7 @@ implicit none
   integer,  pointer :: iPlantPhenolType_pft(:)           => null()  !climate signal for phenological progress: none,   temperature, water stress,[-]
   integer,  pointer :: Days4FalseBreak_pft(:)            => null()  !accumulated days to singifying false break, [day]  
   integer,  pointer :: iPlantTurnoverPattern_pft(:)      => null()  !phenologically-driven above-ground turnover: all, foliar only, none,[-]
+  integer,  pointer :: iPlant2ndGrothPattern_pft(:)       => null() !does the plant express secondary growth, [-]
   integer,  pointer :: isPlantShootAlive_pft(:)           => null()  !flag to detect canopy death,[-]
   integer,  pointer :: iPlantPhenolPattern_pft(:)        => null()  !plant growth habit: annual or perennial,[-]
   integer,  pointer :: isPlantRootAlive_pft(:)            => null()  !flag to detect root system death,[-]
@@ -1840,7 +1841,7 @@ implicit none
   allocate(this%RadDifPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
   allocate(this%RadSWLeafAlbedo_pft(JP1))
   allocate(this%CanopyPARalbedo_pft(JP1))
-  allocate(this%TAU_DirectRTransmit(NumCanopyLayers1+1));this%TAU_DirectRTransmit=0._r8
+  allocate(this%TAU_DirectRTransmitance(NumCanopyLayers1+1));this%TAU_DirectRTransmitance=0._r8
   allocate(this%TAU_RadThru(NumCanopyLayers1+1));this%TAU_RadThru=0._r8
   allocate(this%LWRadCanopy_pft(JP1))
   allocate(this%RadSWbyCanopy_pft(JP1))
@@ -1851,8 +1852,8 @@ implicit none
   allocate(this%CosineLeafAngle(NumLeafZenithSectors1));this%CosineLeafAngle=0._r8
   allocate(this%iScatteringDiffus(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2Canopy_pft(JP1))
-  allocate(this%LeafSWabsorpty_pft(JP1))
-  allocate(this%LeafPARabsorpty_pft(JP1))
+  allocate(this%LeafSWabsorptivity_pft(JP1))
+  allocate(this%LeafPARabsorptivity_pft(JP1))
   allocate(this%RadPARLeafTransmitance_pft(JP1))
   allocate(this%RadSWLeafTransmitance_pft(JP1))
   allocate(this%RadPARbyCanopy_pft(JP1))
@@ -2000,6 +2001,7 @@ implicit none
   allocate(this%iEmbryophyteType_pft(JP1)); this%iEmbryophyteType_pft=0
   allocate(this%iPlantPhenolPattern_pft(JP1));this%iPlantPhenolPattern_pft=0
   allocate(this%iPlantTurnoverPattern_pft(JP1));this%iPlantTurnoverPattern_pft=0
+  allocate(this%iPlant2ndGrothPattern_pft(JP1));this%iPlant2ndGrothPattern_pft=0
   allocate(this%isPlantRootAlive_pft(JP1));this%isPlantRootAlive_pft=0
   allocate(this%iPlantDevelopPattern_pft(JP1));this%iPlantDevelopPattern_pft=0
   allocate(this%iPlantPhotoperiodType_pft(JP1));this%iPlantPhotoperiodType_pft=0
