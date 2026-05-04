@@ -167,21 +167,21 @@ implicit none
     !variables updated from surface energy calculation
     DO L=1,NumCanopyLayers
       DO  M=1,NumOfSkyAzimuthSects
-        DO  N=1,NumLeafZenithSectors
-          plt_rad%RadTotPAR_zsec(N,M,L,NZ)    = RadTotPAR_zsec(N,M,L,NZ,NY,NX)
-          plt_rad%RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ,NY,NX)
+        DO  N=1,NumLeafInclinationClasses
+          plt_rad%RadTotPARAbsorption_zsec(N,M,L,NZ)    = RadTotPARAbsorption_zsec(N,M,L,NZ,NY,NX)
+          plt_rad%RadDifPARAbsorption_zsec(N,M,L,NZ) = RadDifPARAbsorption_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO
-      plt_rad%TAU_DirectRTransmitance(L) = TAU_DirectRTransmitance(L,NY,NX)
-      plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)
+      plt_rad%TAU_DirectSunLit(L) = TAU_DirectSunLit(L,NY,NX)
+      plt_rad%TAU_DirectSunSha(L)         = TAU_DirectSunSha(L,NY,NX)
     ENDDO
-    plt_rad%TAU_DirectRTransmitance(NumCanopyLayers+1) = TAU_DirectRTransmitance(NumCanopyLayers+1,NY,NX)
-    plt_rad%TAU_RadThru(NumCanopyLayers+1)         = TAU_RadThru(NumCanopyLayers+1,NY,NX)
+    plt_rad%TAU_DirectSunLit(NumCanopyLayers+1) = TAU_DirectSunLit(NumCanopyLayers+1,NY,NX)
+    plt_rad%TAU_DirectSunSha(NumCanopyLayers+1)         = TAU_DirectSunSha(NumCanopyLayers+1,NY,NX)
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
-          DO N=1,NumLeafZenithSectors
+          DO N=1,NumLeafInclinationClasses
              plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
@@ -193,7 +193,6 @@ implicit none
     ENDDO
     !variables updated iteratively
     plt_ew%CanopyBiomWater_pft(NZ)          = CanopyBiomWater_pft(NZ,NY,NX)    !canopy biom water, updated iteratively
-    plt_morph%ClumpFactorNow_pft(NZ)        = ClumpFactorNow_pft(NZ,NY,NX)
     plt_ew%TKC_pft(NZ)                      = TKC_pft(NZ,NY,NX)                !canopy temeprature updated iteratively
     plt_ew%TKCanopy_pft(NZ)                 = TKCanopy_pft(NZ,NY,NX)           !canopy temperature updated iteratively
     plt_photo%RawCanopy2Atm_pft(NZ)      = RawCanopy2Atm_pft(NZ,NY,NX)
@@ -201,8 +200,8 @@ implicit none
     plt_ew%WatHeldOnCanopy_pft(NZ)          = WatHeldOnCanopy_pft(NZ,NY,NX)     !water held by canopy surface
     plt_rad%FracPARads2Canopy_pft(NZ)       = FracPARads2Canopy_pft(NZ,NY,NX)
     plt_ew%HeatXAir2PCan_pft(NZ)            = HeatXAir2PCan_pft(NZ,NY,NX)
-    plt_rad%RadPARbyCanopy_pft(NZ)          = RadPARbyCanopy_pft(NZ,NY,NX)      !computed from surface energy module
-    plt_rad%RadSWbyCanopy_pft(NZ)           = RadSWbyCanopy_pft(NZ,NY,NX)       !computed from surface energy module
+    plt_rad%RadPARCanopyAbsorption_pft(NZ)          = RadPARCanopyAbsorption_pft(NZ,NY,NX)      !computed from surface energy module
+    plt_rad%RadSWCanopyAbsorption_pft(NZ)           = RadSWCanopyAbsorption_pft(NZ,NY,NX)       !computed from surface energy module
     plt_ew%RainIntcptByCanopy_pft(NZ)       = RainIntcptByCanopy_pft(NZ,NY,NX)  !computed from hour1,           rainfall partition
     plt_ew%SnowIntcptByCanopy_pft(NZ)       = SnowIntcptByCanopy_pft(NZ,NY,NX)
     plt_pheno%IsPlantActive_pft(NZ)         = IsPlantActive_pft(NZ,NY,NX)       !lai >0,                        active

@@ -298,7 +298,7 @@ module WthrMod
 !
 !     IF OUTDOORS
 !
-!     SineSunInclAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
+!     SineSunInclinationAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
 !     
 !     IETYP: koppen climate zone
       IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
@@ -307,18 +307,18 @@ module WthrMod
         !check eq.(11.1) in Campbell and Norman, 1998, p168.
         if(fixClime)then
           !always assume the light is from zenith when using fixed climate forcing.
-          SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-11.5_r8)))
+          SineSunInclinationAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-11.5_r8)))
           SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-12.5_r8)))
         else
-          SineSunInclAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
+          SineSunInclinationAngle_col(NY,NX)       = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J-0.5_r8))))
           SineSunInclAnglNxtHour_col(NY,NX) = AZMAX1(AZI+DEC*COS(PICON12*(SolarNoonHour_col(NY,NX)-(J+0.5_r8))))
         endif
 
-        !IF(SineSunInclAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclAngle_col(NY,NX).LT.TWILGT)SineSunInclAngle_col(NY,NX)=TWILGT
-        IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclAngle_col(NY,NX)=0.0_r8
-        IF(SineSunInclAngle_col(NY,NX).LE.-TWILGT)RADN_col(NY,NX)=0.0_r8
+        !IF(SineSunInclinationAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclinationAngle_col(NY,NX).LT.TWILGT)SineSunInclinationAngle_col(NY,NX)=TWILGT
+        IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclinationAngle_col(NY,NX)=0.0_r8
+        IF(SineSunInclinationAngle_col(NY,NX).LE.-TWILGT)RADN_col(NY,NX)=0.0_r8
         
-        RADX            = SolConst*AZMAX1(SineSunInclAngle_col(NY,NX))
+        RADX            = SolConst*AZMAX1(SineSunInclinationAngle_col(NY,NX))
         RADN_col(NY,NX) = AMIN1(RADX,RADN_col(NY,NX))
         !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
@@ -327,7 +327,7 @@ module WthrMod
         !     RADS,RADY,RAPS,RadPARDiffus_col=direct,diffuse SW,PAR in solar beam
         !
         RADZ                    = AMIN1(RADN_col(NY,NX),0.5_r8*(RADX-RADN_col(NY,NX)))
-        RadSWDirect_col(NY,NX)  = safe_adb(RADN_col(NY,NX)-RADZ,SineSunInclAngle_col(NY,NX))
+        RadSWDirect_col(NY,NX)  = safe_adb(RADN_col(NY,NX)-RADZ,SineSunInclinationAngle_col(NY,NX))
         RadSWDirect_col(NY,NX)  = AMIN1(4.167_r8,RadSWDirect_col(NY,NX))*srad_scalar_col(NY,NX)
         RadSWDiffus_col(NY,NX)  = RADZ/TotSineSkyAngles_grd*srad_scalar_col(NY,NX)
         RadDirectPAR_col(NY,NX) = RadSWDirect_col(NY,NX)*CDIR*PDIR  !MJ/m2/hr
@@ -351,9 +351,9 @@ module WthrMod
         !
       ELSE
         IF(RADN_col(NY,NX).LE.0.0_r8)THEN
-          SineSunInclAngle_col(NY,NX)=0.0_r8
+          SineSunInclinationAngle_col(NY,NX)=0.0_r8
         ELSE
-          SineSunInclAngle_col(NY,NX)=1.0_r8
+          SineSunInclinationAngle_col(NY,NX)=1.0_r8
         ENDIF
         SineSunInclAnglNxtHour_col(NY,NX)=1.0_r8
         CLD=0.0_r8
@@ -387,7 +387,7 @@ module WthrMod
       !     UA=WINDSPEED (M H-1)
       !     PrecAsRain_col(NY,NX)=RAIN (M H2O H-1 m-2)
       !     PrecAsSnow_col(NY,NX)=SNOW (M H2O H-1 m-2)
-      !     SineSunInclAngle_col=SOLAR ANGLE CURRENT HOUR (SINE)
+      !     SineSunInclinationAngle_col=SOLAR ANGLE CURRENT HOUR (SINE)
       !     SineSunInclAnglNxtHour_col=SOLAR ANGLE NEXT HOUR (SINE)
       !     ENDIF
       !
@@ -539,8 +539,8 @@ module WthrMod
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SineSunInclAngle_col(NY,NX).GT.0._r8)then
-        TRAD_col(NY,NX)= RadSWDirect_col(NY,NX)*SineSunInclAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
+      IF(SineSunInclinationAngle_col(NY,NX).GT.0._r8)then
+        TRAD_col(NY,NX)= RadSWDirect_col(NY,NX)*SineSunInclinationAngle_col(NY,NX)+RadSWDiffus_col(NY,NX)*TotSineSkyAngles_grd
       endif
       HUDX_col(NY,NX)  = AMAX1(HUDX_col(NY,NX),VPK_col(NY,NX))          !maximum humidity, vapor pressure, [KPa]
       HUDN_col(NY,NX)  = AMIN1(HUDN_col(NY,NX),VPK_col(NY,NX))          !minimum humidity, vapor pressure, [KPa]

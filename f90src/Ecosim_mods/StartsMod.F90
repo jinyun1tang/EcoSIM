@@ -610,9 +610,9 @@ module StartsMod
   real(r8) :: SineGrndSurfAzimuth_col(JY,JX),CosineGrndSurfAzimuth_col(JY,JX)  !diagnostic
 
 ! begin_execution
-! GroundSurfAzimuth_col=ground surface azimuth, aspect in radians
+! GroundSurfaceAzimuth_col=ground surface azimuth, aspect in radians
 ! SineGrndSlope_col,CosineGrndSlope_col=sine,cosine of ground surface
-! OMEGAG=incident sky angle at ground surface
+! OMEGA2Ground=incident sky angle at ground surface
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
@@ -629,12 +629,12 @@ module StartsMod
       ZEROS(NY,NX)  = ZERO*GridArea
       ZEROS2(NY,NX) = ZERO2*GridArea
 !     compute slopes
-      GroundSurfAzimuth_col(NY,NX)          = ASP_col(NY,NX)*RadianPerDegree   !radian
-      SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfAzimuth_col(NY,NX)))
-      CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfAzimuth_col(NY,NX)))
+      GroundSurfaceAzimuth_col(NY,NX)       = ASP_col(NY,NX)*RadianPerDegree   !radian
+      SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfaceAzimuth_col(NY,NX)))
+      CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfaceAzimuth_col(NY,NX)))
       SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
-      SLOPE_col(iWestEastDirection,NY,NX)   = -AZERO(SLOPE_col(0,NY,NX)*COS(GroundSurfAzimuth_col(NY,NX)))   !elevation increases from west to east, if west facing
-      SLOPE_col(iNorthSouthDirection,NY,NX) = AZERO(SLOPE_col(0,NY,NX)*SIN(GroundSurfAzimuth_col(NY,NX)))    !elevation increases from north to south, if north facing
+      SLOPE_col(iWestEastDirection,NY,NX)   = -AZERO(SLOPE_col(0,NY,NX)*COS(GroundSurfaceAzimuth_col(NY,NX)))   !elevation increases from west to east, if west facing
+      SLOPE_col(iNorthSouthDirection,NY,NX) = AZERO(SLOPE_col(0,NY,NX)*SIN(GroundSurfaceAzimuth_col(NY,NX)))    !elevation increases from north to south, if north facing
 
       !aspect angle 
       IF(ASP_col(NY,NX).GE.0.0_r8 .AND. ASP_col(NY,NX).LT.90.0_r8)THEN
@@ -675,10 +675,10 @@ module StartsMod
 
 !    compute incident sky angle at ground surface
       SineGrndSlope_col(NY,NX)   = SLOPE_col(0,NY,NX)    !this is exact
-      CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2._r8)
+      CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2)
       D240: DO N=1,NumOfSkyAzimuthSects
-        DGAZI           = COS(GroundSurfAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
-        OMEGAG(N,NY,NX) = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
+        DGAZI                 = COS(GroundSurfaceAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
+        OMEGA2Ground(N,NY,NX) = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
           SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
 !     compute ground surface elevation

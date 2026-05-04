@@ -380,8 +380,8 @@ module grosubsMod
   )
   call PrintInfo('beg '//subname)
   D2: DO L=1,NumCanopyLayers1
-    CanopyLeafAreaZ_pft(L,NZ) = 0._r8
-    CanopyLeafCLyr_pft(L,NZ)  = 0._r8
+    CanopyLeafAreaZ_pft(L,NZ)     = 0._r8
+    CanopyLeafCLyr_pft(L,NZ)      = 0._r8
     CanopyStemSurfAreaZ_pft(L,NZ) = 0._r8
   ENDDO D2
 

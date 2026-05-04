@@ -214,7 +214,7 @@
     CanopyLeafArea_pft          => plt_morph%CanopyLeafArea_pft         ,& !input  :plant canopy leaf area, [m2 d-2]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     NetCO2Flx2Canopy_col        => plt_bgcr%NetCO2Flx2Canopy_col        ,& !input  :total net canopy CO2 exchange, [g d-2 h-1]
-    SineSunInclAngle_col        => plt_rad%SineSunInclAngle_col         ,& !input  :sine of solar angle, [-]
+    SineSunInclinationAngle_col        => plt_rad%SineSunInclinationAngle_col         ,& !input  :sine of solar angle, [-]
     CanopyCi2CaRatio_pft        => plt_photo%CanopyCi2CaRatio_pft       ,& !input  :Ci:Ca ratio, [-]
     H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
     CanopyGasCO2_pft            => plt_photo%CanopyGasCO2_pft           ,& !inoput :canopy gaesous CO2 concentration, [umol mol-1]
@@ -254,12 +254,12 @@
   !
   !     LeafIntracellularCO2_pft=intercellular CO2 concentration
   !     CanopyCi2CaRatio_pft=intercellular:atmospheric CO2 concn ratio from PFT file, parameter
-  !     SineSunInclAngle_col=sine of solar angle
+  !     SineSunInclinationAngle_col=sine of solar angle
   !     CanopyLeafArea_pft=PFT leaf area 
   !
   LeafIntracellularCO2_pft(NZ)=CanopyCi2CaRatio_pft(NZ)*CanopyGasCO2_pft(NZ)
 
-  IF(SineSunInclAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
+  IF(SineSunInclinationAngle_col.GT.0.0_r8 .AND. CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
     call PhotoActivePFT(I,J,NZ)
   ELSE
@@ -285,7 +285,7 @@
     CO2lmtRubiscoCarboxyRate_node => plt_photo%CO2lmtRubiscoCarboxyRate_node  ,& !input  :carboxylation rate, [umol m-2 s-1]
     RubiscoCarboxyEff_node        => plt_photo%RubiscoCarboxyEff_node         ,& !input  :carboxylation efficiency, [umol umol-1]
     LigthSatCarboxyRate_node      => plt_photo%LigthSatCarboxyRate_node       ,& !input  :maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
-    LeafAreaSunlit_zsec           => plt_photo%LeafAreaSunlit_zsec            ,& !input  :leaf irradiated surface area, [m2 d-2]
+    LeafEffArea_zsec           => plt_photo%LeafEffArea_zsec            ,& !input  :leaf irradiated surface area, [m2 d-2]
     RubiscoActivity_brch          => plt_photo%RubiscoActivity_brch            & !input  :branch down-regulation of CO2 fixation, [-]
   )
 !
@@ -310,11 +310,11 @@
 !     EGRO=light-limited rubisco carboxylation rate
 !     RubiscoActivity_brch=N,P feedback inhibition on C3 CO2 fixation
 !     CH2O=total rubisco carboxylation rate
-!     LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!     TAU_DirectRTransmitance=fraction of direct radiation transmitted from layer above
+!     LeafEffArea_zsec=unself-shaded leaf surface area
+!     TAU_DirectSunLit=fraction of direct radiation transmitted from layer above
 !
   VL   = AMIN1(CO2lmtRubiscoCarboxyRate_node(K,NB,NZ),EGRO)*RubiscoActivity_brch(NB,NZ)
-  CH2O = CH2O+VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
+  CH2O = CH2O+VL*LeafEffArea_zsec(N,L,K,NB,NZ)*TAU_Rad
 
   call PrintInfo('end '//subname)
   end associate
@@ -330,29 +330,29 @@
 !     begin_execution
   associate(                                                &
     ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft        ,& !input  :threshold zero for plang growth calculation, [-]
-    LeafAreaSunlit_zsec  => plt_photo%LeafAreaSunlit_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
-    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :sunlit incoming PAR, [umol m-2 s-1]
-    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :shade incoming PAR, [umol m-2 s-1]
+    LeafEffArea_zsec  => plt_photo%LeafEffArea_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
+    RadTotPARAbsorption_zsec       => plt_rad%RadTotPARAbsorption_zsec         ,& !input  :sunlit incoming PAR, [umol m-2 s-1]
+    RadDifPARAbsorption_zsec       => plt_rad%RadDifPARAbsorption_zsec         ,& !input  :shade incoming PAR, [umol m-2 s-1]
     LeafAreaZsec_brch    => plt_morph%LeafAreaZsec_brch    ,& !input  :leaf surface area, [m2 d-2]    
-    TAU_DirectRTransmitance  => plt_rad%TAU_DirectRTransmitance    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
-    TAU_RadThru          => plt_rad%TAU_RadThru             & !input  :fraction of radiation transmitted by canopy layer, [-]
+    TAU_DirectSunLit  => plt_rad%TAU_DirectSunLit    ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectSunSha          => plt_rad%TAU_DirectSunSha             & !input  :fraction of radiation transmitted by canopy layer, [-]
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO N=1,NumLeafZenithSectors1
+  DO N=1,NumLeafInclinationClasses1
 
     DO M=1,NumOfSkyAzimuthSects1
-      IF(LeafAreaSunlit_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      IF(LeafEffArea_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !
         DO LP=1,2
           IF(LP==1)THEN
             ! SUNLIT LEAVES
-            PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-            Tau_rad  = TAU_DirectRTransmitance(L+1)
+            PAR_zsec = RadTotPARAbsorption_zsec(N,M,L,NZ)
+            Tau_rad  = TAU_DirectSunLit(L+1)
           else
             ! shade          
-            PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
-            Tau_rad  = TAU_RadThru(L+1)
+            PAR_zsec = RadDifPARAbsorption_zsec(N,M,L,NZ)
+            Tau_rad  = TAU_DirectSunSha(L+1)
           ENDIF
     !
           if(PAR_zsec>0._r8)call C3FixCO2(LP,I,J,K,N,M,L,NB,NZ,PAR_zsec,Tau_rad,CH2O)     
@@ -393,8 +393,8 @@
     LeafProteinC_node             => plt_biom%LeafProteinC_node               ,& !input  :node leaf protein C, [g d-2]    
     LeafArea_node                 => plt_morph%LeafArea_node                  ,& !input  :node leaf area, [m2 d-2]    
     LeafRubisco2Protein_pft       => plt_photo%LeafRubisco2Protein_pft        ,& !input  :leaf rubisco content, [gC gC-1]
-    TAU_DirectRTransmitance           => plt_rad%TAU_DirectRTransmitance              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
-    TAU_RadThru                   => plt_rad%TAU_RadThru                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
+    TAU_DirectSunLit           => plt_rad%TAU_DirectSunLit              ,& !input  :fraction of radiation intercepted by canopy layer, [-]
+    TAU_DirectSunSha                   => plt_rad%TAU_DirectSunSha                      ,& !input  :fraction of radiation transmitted by canopy layer, [-]
     ElectronTransptJmaxRef_brch   => plt_photo%ElectronTransptJmaxRef_brch    ,& !inoput :Branch Maximum electron transport rate at reference temperature, [umol e- s-1]
     Vmax4RubiscoCarboxy_node      => plt_photo%Vmax4RubiscoCarboxy_node       ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     LigthSatCarboxyRate_node      => plt_photo%LigthSatCarboxyRate_node       ,& !output :maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
@@ -459,7 +459,7 @@
 !     FOR EACH CANOPY LAYER
 !
 !     CanopyLeafArea_lnode=leaf area
-!     LeafAreaSunlit_zsec=unself-shaded leaf surface area
+!     LeafEffArea_zsec=unself-shaded leaf surface area
 !
 
   DO L=NumCanopyLayers1,1,-1    
@@ -592,7 +592,7 @@
 !     FOR EACH CANOPY LAYER
 !
 !     CanopyLeafArea_lnode=leaf area
-!     LeafAreaSunlit_zsec=unself-shaded leaf surface area
+!     LeafEffArea_zsec=unself-shaded leaf surface area
 !
   DO L=NumCanopyLayers1,1,-1
     IF(CanopyLeafArea_lnode(L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -667,28 +667,28 @@
   real(r8) :: TAU_rad    !PAR transmisivity
 !     begin_execution
   associate(                                                &
-    LeafAreaSunlit_zsec  => plt_photo%LeafAreaSunlit_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
+    LeafEffArea_zsec  => plt_photo%LeafEffArea_zsec  ,& !input  :leaf irradiated surface area, [m2 d-2]
     ZERO4Groth_pft       => plt_biom%ZERO4Groth_pft        ,& !input  :threshold zero for plang growth calculation, [-]
-    RadTotPAR_zsec       => plt_rad%RadTotPAR_zsec         ,& !input  :direct incoming PAR, [umol m-2 s-1]
-    RadDifPAR_zsec       => plt_rad%RadDifPAR_zsec         ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
-    TAU_RadThru          => plt_rad%TAU_RadThru            ,& !input  :fraction of radiation transmitted by canopy layer, [-]
-    TAU_DirectRTransmitance  => plt_rad%TAU_DirectRTransmitance     & !input  :fraction of radiation intercepted by canopy layer, [-]
+    RadTotPARAbsorption_zsec       => plt_rad%RadTotPARAbsorption_zsec         ,& !input  :direct incoming PAR, [umol m-2 s-1]
+    RadDifPARAbsorption_zsec       => plt_rad%RadDifPARAbsorption_zsec         ,& !input  :diffuse incoming PAR, [umol m-2 s-1]
+    TAU_DirectSunSha          => plt_rad%TAU_DirectSunSha            ,& !input  :fraction of radiation transmitted by canopy layer, [-]
+    TAU_DirectSunLit  => plt_rad%TAU_DirectSunLit     & !input  :fraction of radiation intercepted by canopy layer, [-]
   )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO  N=1,NumLeafZenithSectors1
+  DO  N=1,NumLeafInclinationClasses1
     DO  M=1,NumOfSkyAzimuthSects1
-      IF(LeafAreaSunlit_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
+      IF(LeafEffArea_zsec(N,L,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
         DO LP=1,2
           ! SUNLIT LEAVES
           IF(LP==1)THEN
-            PAR_zsec = RadTotPAR_zsec(N,M,L,NZ)
-            TAU_rad  = TAU_DirectRTransmitance(L+1)
+            PAR_zsec = RadTotPARAbsorption_zsec(N,M,L,NZ)
+            TAU_rad  = TAU_DirectSunLit(L+1)
           ELSE
             ! SHADED LEAVES
-            PAR_zsec = RadDifPAR_zsec(N,M,L,NZ)
-            TAU_rad  = TAU_RadThru(L+1)
+            PAR_zsec = RadDifPARAbsorption_zsec(N,M,L,NZ)
+            TAU_rad  = TAU_DirectSunSha(L+1)
           ENDIF
           if(PAR_zsec>0._r8)call C4FixCO2(I,J,K,N,M,L,NB,NZ,PAR_zsec,TAU_rad,CH2O)
         ENDDO  
@@ -709,7 +709,7 @@
   real(r8) :: VL
 !     begin_execution
   associate(                                                                 &
-    LeafAreaSunlit_zsec          => plt_photo%LeafAreaSunlit_zsec           ,& !input  :leaf irradiated surface area, [m2 d-2]
+    LeafEffArea_zsec          => plt_photo%LeafEffArea_zsec           ,& !input  :leaf irradiated surface area, [m2 d-2]
     NutrientCtrlonC4Carboxy_node => plt_photo%NutrientCtrlonC4Carboxy_node  ,& !input  :down-regulation of C4 photosynthesis, [-]
     C4CarboxyEff_node            => plt_photo%C4CarboxyEff_node             ,& !input  :C4 carboxylation efficiency, [umol umol-1]
     CO2lmtPEPCarboxyRate_node    => plt_photo%CO2lmtPEPCarboxyRate_node     ,& !input  :C4 carboxylation rate, [umol m-2 s-1]
@@ -719,7 +719,7 @@
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
 !     QNTM=quantum efficiency
-!     RadDifPAR_zsec=diffuse PAR flux
+!     RadDifPARAbsorption_zsec=diffuse PAR flux
 !     LigthSatC4CarboxyRate_node=light saturated e- transport rate
 !     ETLF4=light-limited e- transport rate
 !     CURV=shape parameter for e- transport response to PAR
@@ -737,11 +737,11 @@
 !     EGRO4=light-limited PEP carboxylation rate
 !     CH2O=total PEP carboxylation rate
 !     NutrientCtrlonC4Carboxy_node=N,P feedback inhibition on C4 CO2 fixation
-!     LeafAreaSunlit_zsec=unself-shaded leaf surface area
-!     TAU_RadThru=fraction of diffuse radiation transmitted from layer above
+!     LeafEffArea_zsec=unself-shaded leaf surface area
+!     TAU_DirectSunSha=fraction of diffuse radiation transmitted from layer above
 !  
   VL   = AMIN1(CO2lmtPEPCarboxyRate_node(K,NB,NZ),EGRO4)*NutrientCtrlonC4Carboxy_node(K,NB,NZ)
-  CH2O = CH2O+VL*LeafAreaSunlit_zsec(N,L,K,NB,NZ)*TAU_Rad
+  CH2O = CH2O+VL*LeafEffArea_zsec(N,L,K,NB,NZ)*TAU_Rad
   end associate
   end subroutine C4FixCO2
 

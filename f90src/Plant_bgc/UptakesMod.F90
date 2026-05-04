@@ -315,7 +315,6 @@ module UptakesMod
     RawIsoTSurf2CanopyHScal_col   => plt_ew%RawIsoTSurf2CanopyHScal_col   ,& !input  :scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
     CanopyHeight_col              => plt_morph%CanopyHeight_col           ,& !input  :canopy height , [m]
     CanopyHeight_pft              => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
-    ClumpFactorNow_pft            => plt_morph%ClumpFactorNow_pft         ,& !input  :clumping factor for self-shading in canopy layer at current LAI, [-]
     DeltaTKC_pft                  => plt_ew%DeltaTKC_pft                  ,& !input  :change in canopy temperature, [K]
     FracPARads2Canopy_pft         => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     KoppenClimZone                => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
@@ -348,7 +347,6 @@ module UptakesMod
 !
 !     LeafArea_node=leaf area
 !     LeafProteinC_node=leaf protein content
-!     ClumpFactorNow_pft=clumping factor from PFT file
 !
 !      IF(LeafArea_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafProteinC_node(K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
 !        KMinNumLeaf4GroAlloc_brch(NB,NZ)=K
@@ -723,7 +721,7 @@ module UptakesMod
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     RainIntcptByCanopy_pft      => plt_ew%RainIntcptByCanopy_pft          ,& !input  :water flux into canopy, [m3 d-2 h-1]
     RIB                         => plt_ew%RIB                             ,& !input  :Richardson number for calculating boundary layer resistance, [-]
-    RadSWbyCanopy_pft           => plt_rad%RadSWbyCanopy_pft              ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    RadSWCanopyAbsorption_pft           => plt_rad%RadSWCanopyAbsorption_pft              ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     RawIsoTCanopy2Atm_pft       => plt_ew%RawIsoTCanopy2Atm_pft           ,& !input  :canopy roughness height, [m]
     TKS_vr                      => plt_ew%TKS_vr                          ,& !input  :mean annual soil temperature, [K]
     TairK                       => plt_ew%TairK                           ,& !input  :air temperature, [K]
@@ -785,13 +783,13 @@ module UptakesMod
     !
     !     LWRadCanopy_pft=LW emitted by canopy
     !     DTHS1=net LW absorbed by canopy
-    !     RadSWbyCanopy_pft=total SW absorbed by canopy
+    !     RadSWCanopyAbsorption_pft=total SW absorbed by canopy
     !     RadNet2Canopy_pft=net SW+LW absorbed by canopy
     !
     TKC1                  = TKCanopy_pft(NZ)
     LWRadCanopy_pft(NZ)   = FTHRM*TKC1**4              !long wave radiation
     DTHS1                 = LWRad2Canopy-LWRadCanopy_pft(NZ)*2.0_r8        !net long wave radiation to canopy
-    RadNet2Canopy_pft(NZ) = RadSWbyCanopy_pft(NZ)+DTHS1  !total radiation to canopy
+    RadNet2Canopy_pft(NZ) = RadSWCanopyAbsorption_pft(NZ)+DTHS1  !total radiation to canopy
     dRadNetdT             = -8._r8*FTHRM*TKC1**3
     !
     !     BOUNDARY LAYER RESISTANCE FROM RICHARDSON NUMBER

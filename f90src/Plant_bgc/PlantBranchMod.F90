@@ -217,7 +217,7 @@ module PlantBranchMod
     !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
     !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
     !
-    !     SineSunInclAngle_col=sine of solar angle
+    !     SineSunInclinationAngle_col=sine of solar angle
     !     LeafAreaZsec_brch=leaf node surface area in canopy layer
     !     LeafArea_node,CanopyLeafArea_lnode=leaf node surface area in canopy layer
     !     ZC,DPTHS=canopy,snowpack height
@@ -1722,7 +1722,7 @@ module PlantBranchMod
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch sapwood C, [gC d-2]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !output :leaf growth stage counter, [-]
     TreeRingAveRadius_pft     => plt_morph%TreeRingAveRadius_pft      ,& !output :tree ring radius,[m]
-    CanopyStalkSurfArea_lbrch     => plt_morph%CanopyStalkSurfArea_lbrch       & !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch   & !output :plant canopy layer branch stem area, [m2 d-2]
   )
   call DebugPrint('beg '//subname//' NZ',NZ)
   !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
@@ -1817,7 +1817,7 @@ module PlantBranchMod
       !     FRACL=leaf fraction in each layer
       !
       TotLeafElevation = 0._r8
-      D555: DO N=NumLeafZenithSectors1,1,-1
+      D555: DO N=NumLeafInclinationClasses1,1,-1
         !assuming the maximum growth rate in 30 mm/hour, note bamboo can growth as fast as 38 mm per hour.
         LeafElevation = SineLeafAngle(N)*LeafAngleClass_pft(N,NZ)*LeafLength
         HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
@@ -1987,7 +1987,7 @@ module PlantBranchMod
   call DebugPrint('beg '//subname//' NZ',NZ)
   D900: DO K=1,MaxNodesPerBranch1
     DO  L=1,NumCanopyLayers1
-      DO  N=1,NumLeafZenithSectors1
+      DO  N=1,NumLeafInclinationClasses1
         LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
       enddo
     enddo
@@ -2000,7 +2000,7 @@ module PlantBranchMod
     IF(LeafArea_node(K,NB,NZ).GT.0.0_r8)THEN
       D700: DO L=NumCanopyLayers1,1,-1
 !       ARLFXL=ARLFXL+CanopyLeafArea_lnode(L,K,NB,NZ)
-        D800: DO N=1,NumLeafZenithSectors1
+        D800: DO N=1,NumLeafInclinationClasses1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(LeafAngleClass_pft(N,NZ)*CanopyLeafArea_lnode(L,K,NB,NZ))/REAL(NumOfLeafAzimuthSectors1,R8)
   !       SURFXX=SURFXX+LeafAreaZsec_brch(N,L,K,NB,NZ)
         ENDDO D800
@@ -2016,18 +2016,18 @@ module PlantBranchMod
   ! CanopyStalkSurfArea_lbrch=total branch stalk surface area in each layer
   !
   D910: DO L=1,NumCanopyLayers1
-    DO  N=1,NumLeafZenithSectors1
+    DO  N=1,NumLeafInclinationClasses1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D910
 
-  !locate the stem angle class id for the branch, 1 means horizontal, NumLeafZenithSectors1 means vertical
+  !locate the stem angle class id for the branch, 1 means horizontal, NumLeafInclinationClasses1 means vertical
   !the main branch always vertical
   IF(NB.EQ.MainBranchNum_pft(NZ))THEN
-    N=NumLeafZenithSectors1
+    N=NumLeafInclinationClasses1
   ELSE
-    dangle = PICON2h/real(NumLeafZenithSectors1,r8)       !pi/2=PICON2h 
-    N      = MIN(NumLeafZenithSectors1,INT(ASIN(SineBranchAngle_pft(NZ))/dangle)+1)
+    dangle = PICON2h/real(NumLeafInclinationClasses1,r8)       !pi/2=PICON2h 
+    N      = MIN(NumLeafInclinationClasses1,INT(ASIN(SineBranchAngle_pft(NZ))/dangle)+1)
   ENDIF
   D710: DO L=NumCanopyLayers1,1,-1
     StemAreaZsec_brch(N,L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ)/real(NumOfLeafAzimuthSectors1,r8)

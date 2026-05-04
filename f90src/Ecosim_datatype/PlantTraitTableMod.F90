@@ -1,6 +1,6 @@
 module PlantTraitTableMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use GridConsts,    only: NumLeafZenithSectors
+  use GridConsts,    only: NumLeafInclinationClasses
   implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
@@ -187,7 +187,7 @@ module PlantTraitTableMod
   allocate(SLA1_tab(npfts));SLA1_tab=0._r8
   allocate(PetolShethLen2Mass_tab(npfts));PetolShethLen2Mass_tab=0._r8
   allocate(NodeLenPergC_tab(npfts));NodeLenPergC_tab=0._r8
-  allocate(LeafAngleClass_tab(1:NumLeafZenithSectors,npfts));LeafAngleClass_tab=0._r8
+  allocate(LeafAngleClass_tab(1:NumLeafInclinationClasses,npfts));LeafAngleClass_tab=0._r8
   allocate(ClumpFactorInit_tab(npfts));ClumpFactorInit_tab=0._r8
   allocate(BranchAngle_tab(npfts));BranchAngle_tab=0._r8
   allocate(PetolShethAngle_tab(npfts));PetolShethAngle_tab=0._r8

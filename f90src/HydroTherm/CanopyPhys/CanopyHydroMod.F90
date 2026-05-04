@@ -18,7 +18,7 @@ implicit none
 
   real(r8), parameter :: FoliarWatRetcap(0:3)=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)                !bryophyte, grasses, deep roots, very deep roots
   real(r8), parameter :: FoliarSnowRetcap(0:4)=real((/1.0E-04,2.0E-04,3.0e-04,2.E-03,7.0E-03/),r8)        !bryophyte, grasses, shrubs, deciduous trees, confiers
-  real(r8), parameter :: BulkFactor4Snow(0:4)=real((/0.03E+03,0.02E+03,0.07E+03,0.04E+03,0.1E+03/),r8)  !bulking factor for snow covered canopy radiation calculation [m2/m3 SWE] bryophyte, grasses, shrubs, deciduous trees, confiers
+  real(r8), parameter :: BulkFactor4Snow(0:4)=real((/0.03E+03,0.02E+03,0.07E+03,0.04E+03,0.1E+03/),r8)    !bulking factor for snow covered canopy radiation calculation [m2/m3 SWE] bryophyte, grasses, shrubs, deciduous trees, confiers
   contains
 !------------------------------------------------------------------------------------------
 
@@ -76,6 +76,7 @@ implicit none
       ENGYS                      = ENGYS+SnowUnload_pft*TKCanopy_pft(NZ,NY,NX)
       CanopySnowUnload_col       = CanopySnowUnload_col+SnowUnload_pft
       fSnowCanopy_pft(NZ,NY,NX)  = ((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
+      BulkFactor4Snow_pft(NZ,NY,NX)=BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
       BulkFactor4Snow_col(NY,NX) = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
       SnowOnCanopy_col(NY,NX)    = SnowOnCanopy_col(NY,NX)+SnowOnCanopy_pft(NZ,NY,NX)
       fSnowCanopy_col(NY,NX)     = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
@@ -83,6 +84,7 @@ implicit none
       SnowIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
       RainIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
       fSnowCanopy_pft(NZ,NY,NX)        = 0._r8
+      BulkFactor4Snow_pft(NZ,NY,NX)    = 0._R8
     endif
   ENDDO
   RainPrecThrufall_col(NY,NX) = PrecRainAndIrrig_col(NY,NX)-RainIntceptByCanopy_col(NY,NX)

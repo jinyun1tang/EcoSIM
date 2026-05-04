@@ -125,7 +125,7 @@ implicit none
   sz2=max(MaxNumBranches+1,JZ+1,NumCanopyLayers)
   sz3=max(jsken,NumPlantChemElms,JZ+1,MaxNodesPerBranch+1,NMaxRootSegs)
   sz4=max(MaxNodesPerBranch+1,NumCanopyLayers)
-  sz5=max(NumLeafZenithSectors,NumPlantChemElms)
+  sz5=max(NumLeafInclinationClasses,NumPlantChemElms)
   allocate(datrp_2d(bounds%begp:bounds%endp,sz2))
   allocate(datrp_3d(bounds%begp:bounds%endp,sz3,sz2))
   allocate(datrp_4d(bounds%begp:bounds%endp,sz4,sz3,sz2))  
@@ -3377,7 +3377,7 @@ implicit none
   endif  
 
   if(flag=='read')then 
-    datpr5 => datrp_5d(1:npfts,1:NumLeafZenithSectors,1:NumCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumLeafInclinationClasses,1:NumCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='leaf surface area',&
       units='m2 d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
@@ -3387,7 +3387,7 @@ implicit none
     !print*,'LeafAreaZsec_brch'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LeafAreaZsec_brch,datrp_5d,&
       NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft) 
-    datpr5 => datrp_5d(1:npfts,1:NumLeafZenithSectors,1:NumCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
+    datpr5 => datrp_5d(1:npfts,1:NumLeafInclinationClasses,1:NumCanopyLayers,1:MaxNodesPerBranch,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nodes',dim5name='nbranches',long_name='leaf surface area',&
       units='m2 d-2',interpinic_flag='skip', data=datpr5, missing_value=spval, fill_value=spval)
@@ -3411,7 +3411,7 @@ implicit none
   endif  
 
   if(flag=='read')then 
-    datpr4 => datrp_4d(1:npfts,1:NumLeafZenithSectors,1:NumCanopyLayers,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumLeafInclinationClasses,1:NumCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='StemAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nbranches',long_name='stem surface area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)       
@@ -3421,7 +3421,7 @@ implicit none
     !print*,'StemAreaZsec_brch'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StemAreaZsec_brch,datrp_4d,&
       NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr4 => datrp_4d(1:npfts,1:NumLeafZenithSectors,1:NumCanopyLayers,1:MaxNumBranches)
+    datpr4 => datrp_4d(1:npfts,1:NumLeafInclinationClasses,1:NumCanopyLayers,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='StemAreaZsec_brch', dim1name='pft',dim2name='cansecz',&
       dim3name='levcan',dim4name='nbranches',long_name='stem surface area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)       
@@ -7525,15 +7525,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumCanopyLayers+1)                        
-    call restartvar(ncid, flag, varname='TAU_DirectRTransmitance', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectSunLit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmitance,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectSunLit,datrc_2d)      
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectRTransmitance,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectSunLit,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumCanopyLayers+1)    
-    call restartvar(ncid, flag, varname='TAU_DirectRTransmitance', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectSunLit', dim1name='column',dim2name='levcan1',&
        long_name='Direct radiation transmission coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
@@ -7541,15 +7541,15 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:NumCanopyLayers+1)                        
-    call restartvar(ncid, flag, varname='TAU_RadThru', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectSunSha', dim1name='column',dim2name='levcan1',&
        long_name='Through canopy radiation coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_RadThru,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectSunSha,datrc_2d)      
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_RadThru,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TAU_DirectSunSha,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:NumCanopyLayers+1)    
-    call restartvar(ncid, flag, varname='TAU_RadThru', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='TAU_DirectSunSha', dim1name='column',dim2name='levcan1',&
        long_name='Through canopy radiation coefficient', units='', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
@@ -9433,7 +9433,7 @@ implicit none
   call check_dim(ncid,'rootaxs',MaxNumRootAxes)
   call check_dim(ncid,'nodes',MaxNodesPerBranch)
   call check_dim(ncid,'nodes1',MaxNodesPerBranch+1)
-  call check_dim(ncid,'cansecz',NumLeafZenithSectors)
+  call check_dim(ncid,'cansecz',NumLeafInclinationClasses)
   call check_dim(ncid,'fertN',trc_confs%NFertNitro)
   call check_dim(ncid,'fertNb',trc_confs%NFertNitrob)
   call check_dim(ncid,'automicb',NumMicrobAutoTrophCmplx)
@@ -9713,7 +9713,7 @@ implicit none
   call ncd_defdim(ncid,'rootaxs',MaxNumRootAxes,dimid)
   call ncd_defdim(ncid,'nodes',MaxNodesPerBranch,dimid)
   call ncd_defdim(ncid,'nodes1',MaxNodesPerBranch+1,dimid)  
-  call ncd_defdim(ncid,'cansecz',NumLeafZenithSectors,dimid)
+  call ncd_defdim(ncid,'cansecz',NumLeafInclinationClasses,dimid)
   call ncd_defdim(ncid,'fertN',trc_confs%NFertNitro, dimid)
   call ncd_defdim(ncid,'fertNb',trc_confs%NFertNitrob, dimid)
   call ncd_defdim(ncid,'automicb',NumMicrobAutoTrophCmplx, dimid)

@@ -86,8 +86,8 @@ implicit none
   !)
 
   !All the necessary sizes are taken from GridConsts
-  !real(r8) :: LeafAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
-  !real(r8) :: StemAreaZsec_lpft(NumLeafZenithSectors,NumCanopyLayers,JP)
+  !real(r8) :: LeafAreaZsec_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
+  !real(r8) :: StemAreaZsec_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -160,7 +160,7 @@ implicit none
     SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
-    !SineSunInclAngle_col(NY,NX) = 1.0_r8
+    !SineSunInclinationAngle_col(NY,NX) = 1.0_r8
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       CumDepz2LayBottom_vr(L,NY,NX) = a_CumDepz2LayBottom_vr(L,NY)

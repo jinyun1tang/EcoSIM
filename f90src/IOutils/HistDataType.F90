@@ -4402,8 +4402,8 @@ implicit none
         this%h1D_TC_Groth_ptc(nptc)      = TCGroth_pft(NZ,NY,NX)
         this%h1D_PO4_UPTK_FLX_ptc(nptc)  = RootH2PO4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_frcPARabs_ptc(nptc)     = FracPARads2Canopy_pft(NZ,NY,NX)
-        this%h1D_PAR_CAN_ptc(nptc)       = RadPARbyCanopy_pft(NZ,NY,NX)   !umol /m2/s      
-        this%h1d_fPAR_col(ncol)          = this%h1d_fPAR_col(ncol)+RadPARbyCanopy_pft(NZ,NY,NX)
+        this%h1D_PAR_CAN_ptc(nptc)       = RadPARCanopyAbsorption_pft(NZ,NY,NX)   !umol /m2/s      
+        this%h1d_fPAR_col(ncol)          = this%h1d_fPAR_col(ncol)+RadPARCanopyAbsorption_pft(NZ,NY,NX)
         this%h1D_SHOOT_C_ptc(nptc)       = ShootElms_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_C_ptc(nptc)       = (ShootElms_pft(ielmc,NZ,NY,NX) &
           +RootElms_pft(ielmc,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)

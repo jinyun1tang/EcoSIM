@@ -472,12 +472,7 @@ implicit none
     VmaxRubOxyRef_pft(NZ,NY,NX)          = 1.92_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
     VmaxPEPCarboxyRef_pft(NZ,NY,NX)      = 1.92_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
     SpecLeafChlAct_pft(NZ,NY,NX)         = 1.35_r8*SpecLeafChlAct_pft(NZ,NY,NX)
-    LeafSWabsorptivity_pft(NZ,NY,NX)     = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmitance_pft(NZ,NY,NX)
-    LeafPARabsorptivity_pft(NZ,NY,NX)    = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmitance_pft(NZ,NY,NX)
-    RadSWLeafAlbedo_pft(NZ,NY,NX)        = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorptivity_pft(NZ,NY,NX)
-    CanopyPARalbedo_pft(NZ,NY,NX)        = CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorptivity_pft(NZ,NY,NX)
-    RadSWLeafTransmitance_pft(NZ,NY,NX)  = RadSWLeafTransmitance_pft(NZ,NY,NX)/LeafSWabsorptivity_pft(NZ,NY,NX)
-    RadPARLeafTransmitance_pft(NZ,NY,NX) = RadPARLeafTransmitance_pft(NZ,NY,NX)/LeafPARabsorptivity_pft(NZ,NY,NX)
+    
     SineBranchAngle_pft(NZ,NY,NX)        = SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
     SinePetolShethAngle_pft(NZ,NY,NX)    = SIN(PetolShethAngle_pft(NZ,NY,NX)*RadianPerDegree)
     MatureGroup_pft(NZ,NY,NX)            = GROUPX_pft(NZ,NY,NX)
@@ -549,7 +544,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBP', loc, RadPARLeafAlbedo_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUR', loc, RadSWLeafTransmitance_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmitance_pft(NZ,NY,NX))
 
@@ -571,7 +566,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC_pft(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetolShethAngle_pft(NZ,NY,NX))
@@ -711,7 +706,7 @@ implicit none
   CanopyCi2CaRatio_pft(NZ,NY,NX)      = CanopyCi2CaRatio_pft_tab(loc)
 
   RadSWLeafAlbedo_pft(NZ,NY,NX)        = RadSWLeafAlbedo_tab(loc)
-  CanopyPARalbedo_pft(NZ,NY,NX)        = CanopyPARalbedo_tab(loc)
+  RadPARLeafAlbedo_pft(NZ,NY,NX)        = CanopyPARalbedo_tab(loc)
   RadSWLeafTransmitance_pft(NZ,NY,NX)  = RadSWLeafTransmis_tab(loc)
   RadPARLeafTransmitance_pft(NZ,NY,NX) = RadPARLeafTransmis_tab(loc)
 
@@ -732,7 +727,7 @@ implicit none
   PetolShethLen2Mass_pft(NZ,NY,NX) = PetolShethLen2Mass_tab(loc)
   NodeLenPergC_pft(NZ,NY,NX) = NodeLenPergC_tab(loc)
 
-  LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX) = LeafAngleClass_tab(1:NumLeafZenithSectors,loc)
+  LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX) = LeafAngleClass_tab(1:NumLeafInclinationClasses,loc)
   ClumpFactorInit_pft(NZ,NY,NX)                       = ClumpFactorInit_tab(loc)
   BranchAngle_pft(NZ,NY,NX)                           = BranchAngle_tab(loc)
   PetolShethAngle_pft(NZ,NY,NX)                       = PetolShethAngle_tab(loc)
@@ -1173,7 +1168,7 @@ implicit none
   call writefixl(nu_plt,id,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   id=addone(id)
   call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',&
-    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
+    LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'WDLF','Leaf length:width ratio [-]',rLen2WidthLeaf_pft(NZ,NY,NX),100)  
   id=addone(id)
@@ -1404,7 +1399,7 @@ implicit none
   id=0;id=addone(id)
   call writefixl(nu_plt,id,'ALBR','Leaf shortwave (0.3-2.5 um) radiation albedo [-]',RadSWLeafAlbedo_pft(NZ,NY,NX),80)
   id=addone(id)
-  call writefixl(nu_plt,id,'ALBP','Leaf PAR (0.4-0.7 um) albedo [-]',CanopyPARalbedo_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,id,'ALBP','Leaf PAR (0.4-0.7 um) albedo [-]',RadPARLeafAlbedo_pft(NZ,NY,NX),80)
   id=addone(id)
   call writefixl(nu_plt,id,'TAUR','Leaf shortwave radiation (0.3-2.5 um) transmittance [-]',RadSWLeafTransmitance_pft(NZ,NY,NX),80)
   id=addone(id)

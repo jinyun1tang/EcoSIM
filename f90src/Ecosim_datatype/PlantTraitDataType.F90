@@ -32,6 +32,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  StemArea_col(:,:)                          !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  LeafStalkArea_col(:,:)                     !canopy area of combined over the grid [m2 d-2]
   real(r8),target,allocatable ::  BulkFactor4Snow_col(:,:)                   !grid bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
+  real(r8),target,allocatable ::  BulkFactor4Snow_pft(:,:,:)                 !pft bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                  !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepz_pft(:,:,:)                     !planting depth, [m]
   real(r8),target,allocatable ::  SeedDepth_pft(:,:,:)                       !seeding depth, [m]
@@ -218,6 +219,7 @@ contains
   allocate(StemArea_col(JY,JX));       StemArea_col=0._r8
   allocate(LeafStalkArea_col(JY,JX));       LeafStalkArea_col=0._r8
   allocate(BulkFactor4Snow_col(JY,JX)); BulkFactor4Snow_col=0._r8
+  allocate(BulkFactor4Snow_pft(JP,JY,JX)); BulkFactor4Snow_pft=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
   allocate(PlantinDepz_pft(JP,JY,JX));   PlantinDepz_pft=0._r8
   allocate(SeedDepth_pft(JP,JY,JX));    SeedDepth_pft=0._r8
@@ -403,6 +405,7 @@ contains
   call destroy(StemArea_col)
   call destroy(LeafStalkArea_col)
   call destroy(NGTopRootLayer_pft)
+  call destroy(BulkFactor4Snow_pft)
   call destroy(BulkFactor4Snow_col)
   call destroy(PlantinDepz_pft)
   call destroy(SeedDepth_pft)

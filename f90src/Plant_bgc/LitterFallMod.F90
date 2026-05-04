@@ -1008,7 +1008,7 @@ implicit none
       CanopyLeafArea_lnode(L,K,NB,NZ)                         = 0._r8
       LeafLayerElms_node(1:NumPlantChemElms,L,K,NB,NZ) = 0._r8
       IF(K.NE.0)THEN
-        D8860: DO N=1,NumLeafZenithSectors1
+        D8860: DO N=1,NumLeafInclinationClasses1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
         ENDDO D8860
       ENDIF
@@ -1016,7 +1016,7 @@ implicit none
   ENDDO D8855
   D8875: DO L=1,NumCanopyLayers1
     CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
-    DO  N=1,NumLeafZenithSectors1
+    DO  N=1,NumLeafInclinationClasses1
       StemAreaZsec_brch(N,L,NB,NZ)=0._r8
     enddo
   ENDDO D8875
