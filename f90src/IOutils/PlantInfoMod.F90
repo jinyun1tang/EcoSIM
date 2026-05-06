@@ -466,22 +466,17 @@ implicit none
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
-!   LeafSWabsorpty_pft,LeafPARabsorpty_pft=leaf SW,PAR absorbtivity
+!   LeafSWabsorptivity_pft,LeafPARabsorptivity_pft=leaf SW,PAR absorbtivity
 !   2.5 converts g enzyme mass into g enzyme C
-    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX) = 1.92_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
-    VmaxRubOxyRef_pft(NZ,NY,NX)         = 1.92_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
-    VmaxPEPCarboxyRef_pft(NZ,NY,NX)     = 1.92_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
-    SpecLeafChlAct_pft(NZ,NY,NX)        = 1.35_r8*SpecLeafChlAct_pft(NZ,NY,NX)
-    LeafSWabsorpty_pft(NZ,NY,NX)        = 1.0_r8-RadSWLeafAlbedo_pft(NZ,NY,NX)-RadSWLeafTransmis_pft(NZ,NY,NX)
-    LeafPARabsorpty_pft(NZ,NY,NX)       = 1.0_r8-CanopyPARalbedo_pft(NZ,NY,NX)-RadPARLeafTransmis_pft(NZ,NY,NX)
-    RadSWLeafAlbedo_pft(NZ,NY,NX)       = RadSWLeafAlbedo_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
-    CanopyPARalbedo_pft(NZ,NY,NX)       = CanopyPARalbedo_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
-    RadSWLeafTransmis_pft(NZ,NY,NX)     = RadSWLeafTransmis_pft(NZ,NY,NX)/LeafSWabsorpty_pft(NZ,NY,NX)
-    RadPARLeafTransmis_pft(NZ,NY,NX)    = RadPARLeafTransmis_pft(NZ,NY,NX)/LeafPARabsorpty_pft(NZ,NY,NX)
-    SineBranchAngle_pft(NZ,NY,NX)       = SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
-    SinePetolShethAngle_pft(NZ,NY,NX)   = SIN(PetolShethAngle_pft(NZ,NY,NX)*RadianPerDegree)
-    MatureGroup_pft(NZ,NY,NX)           = GROUPX_pft(NZ,NY,NX)
-    MatureGroup_pft(NZ,NY,NX)           = MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
+    VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)  = 1.92_r8*VmaxSpecRubCarboxyRef_pft(NZ,NY,NX)
+    VmaxRubOxyRef_pft(NZ,NY,NX)          = 1.92_r8*VmaxRubOxyRef_pft(NZ,NY,NX)
+    VmaxPEPCarboxyRef_pft(NZ,NY,NX)      = 1.92_r8*VmaxPEPCarboxyRef_pft(NZ,NY,NX)
+    SpecLeafChlAct_pft(NZ,NY,NX)         = 1.35_r8*SpecLeafChlAct_pft(NZ,NY,NX)
+    
+    SineBranchAngle_pft(NZ,NY,NX)        = SIN(BranchAngle_pft(NZ,NY,NX)*RadianPerDegree)
+    SinePetolShethAngle_pft(NZ,NY,NX)    = SIN(PetolShethAngle_pft(NZ,NY,NX)*RadianPerDegree)
+    MatureGroup_pft(NZ,NY,NX)            = GROUPX_pft(NZ,NY,NX)
+    MatureGroup_pft(NZ,NY,NX)            = MatureGroup_pft(NZ,NY,NX)-ShootNodeNumAtPlanting_pft(NZ,NY,NX)
     
     IF(iPlantTurnoverPattern_pft(NZ,NY,NX).NE.0)THEN
       RefNodeInitRate_pft(NZ,NY,NX)        = RefNodeInitRate_pft(NZ,NY,NX)/MaxNodesPerBranch
@@ -528,6 +523,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'IWTYP', loc, iPlantPhenolType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IPTYP', loc, iPlantPhotoperiodType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IBTYP', loc, iPlantTurnoverPattern_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'I2EXP', loc, iPlant2ndGrothPattern_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISNTYP',loc, iPlantSnowIntercepType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IRTYP', loc, iPlantGrainType_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'MY', loc, Myco_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ZTYPI', loc, PlantInitThermoAdaptZone_pft(NZ,NY,NX))
@@ -547,9 +544,9 @@ implicit none
   call ncd_getvar(pft_nfid, 'FCO2', loc, CanopyCi2CaRatio_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'ALBR', loc, RadSWLeafAlbedo_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'ALBP', loc, CanopyPARalbedo_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUR', loc, RadSWLeafTransmis_pft(NZ,NY,NX))
-  call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmis_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBP', loc, RadPARLeafAlbedo_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUR', loc, RadSWLeafTransmitance_pft(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUP', loc, RadPARLeafTransmitance_pft(NZ,NY,NX))
 
   call ncd_getvar(pft_nfid, 'XRNI', loc, RefNodeInitRate_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'XRLA', loc, RateRefLeafAppearance_pft(NZ,NY,NX))
@@ -569,7 +566,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'SNL1', loc,NodeLenPergC_pft(NZ,NY,NX))
 
 
-  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CLASS', loc,LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'CFI', loc,ClumpFactorInit_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGBR', loc,BranchAngle_pft(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ANGSH', loc,PetolShethAngle_pft(NZ,NY,NX))
@@ -684,6 +681,7 @@ implicit none
   iPlantPhenolType_pft(NZ,NY,NX)      = iPlantPhenolType_tab(loc)
   iPlantPhotoperiodType_pft(NZ,NY,NX) = iPlantPhotoperiodType_tab(loc)
   iPlantTurnoverPattern_pft(NZ,NY,NX) = iPlantTurnoverPattern_tab(loc)
+  iPlant2ndGrothPattern_pft(NZ,NY,NX) = iPlant2ndGrothPattern_tab(loc)
   iPlantGrainType_pft(NZ,NY,NX)       = iPlantGrainType_tab(loc)
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
   PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
@@ -702,14 +700,15 @@ implicit none
   LeafRubisco2Protein_pft(NZ,NY,NX)   = LeafRubisco2Protein_tab(loc)
   LeafPEP2Protein_pft(NZ,NY,NX)       = LeafPEP2Protein_tab(loc)
   SpecLeafChlAct_pft(NZ,NY,NX)        = SpecChloryfilAct_tab(loc)
+  iPlantSnowIntercepType_pft(NZ,NY,NX)= iPlantSnowIntercepType_tab(loc)
   LeafProtein2Chl_pft(NZ,NY,NX)       = LeafChl2Protein_tab(loc)
   fMesophyllChlProtein_pft(NZ,NY,NX)  = fChlMesophyll_tab(loc)
   CanopyCi2CaRatio_pft(NZ,NY,NX)      = CanopyCi2CaRatio_pft_tab(loc)
 
-  RadSWLeafAlbedo_pft(NZ,NY,NX)    = RadSWLeafAlbedo_tab(loc)
-  CanopyPARalbedo_pft(NZ,NY,NX)    = CanopyPARalbedo_tab(loc)
-  RadSWLeafTransmis_pft(NZ,NY,NX)  = RadSWLeafTransmis_tab(loc)
-  RadPARLeafTransmis_pft(NZ,NY,NX) = RadPARLeafTransmis_tab(loc)
+  RadSWLeafAlbedo_pft(NZ,NY,NX)        = RadSWLeafAlbedo_tab(loc)
+  RadPARLeafAlbedo_pft(NZ,NY,NX)        = CanopyPARalbedo_tab(loc)
+  RadSWLeafTransmitance_pft(NZ,NY,NX)  = RadSWLeafTransmis_tab(loc)
+  RadPARLeafTransmitance_pft(NZ,NY,NX) = RadPARLeafTransmis_tab(loc)
 
   RefNodeInitRate_pft(NZ,NY,NX)          = RefNodeInitRate_tab(loc)
   RateRefLeafAppearance_pft(NZ,NY,NX)    = RefLeafAppearRate_tab(loc)
@@ -728,7 +727,7 @@ implicit none
   PetolShethLen2Mass_pft(NZ,NY,NX) = PetolShethLen2Mass_tab(loc)
   NodeLenPergC_pft(NZ,NY,NX) = NodeLenPergC_tab(loc)
 
-  LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX) = LeafAngleClass_tab(1:NumLeafZenithSectors,loc)
+  LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX) = LeafAngleClass_tab(1:NumLeafInclinationClasses,loc)
   ClumpFactorInit_pft(NZ,NY,NX)                       = ClumpFactorInit_tab(loc)
   BranchAngle_pft(NZ,NY,NX)                           = BranchAngle_tab(loc)
   PetolShethAngle_pft(NZ,NY,NX)                       = PetolShethAngle_tab(loc)
@@ -997,6 +996,30 @@ implicit none
   id=addone(id)
   call writefixsl(nu_plt,'IBTYP: Biome turnover pattern',strval,60,id)
 
+  id=addone(id)
+  if(iPlant2ndGrothPattern_pft(NZ,NY,NX).eq.0)THEN
+    call writefixsl(nu_plt,'I2EXP: Secondary growth expression','No (0)',60,id)
+  elseif(iPlant2ndGrothPattern_pft(NZ,NY,NX).eq.1)THEN
+    call writefixsl(nu_plt,'I2EXP: Secondary growth expression','Yes (1)',60,id)
+  ENDIF
+
+  id=addone(id)
+  select case(iPlantSnowIntercepType_pft(NZ,NY,NX))
+  case (isnowcept_bryophyte)
+    write(strval,'(A,I2)')'bryophyte ',iPlantSnowIntercepType_pft(NZ,NY,NX)
+  case (isnowcept_grasses)
+    write(strval,'(A,I2)')'grasse ',iPlantSnowIntercepType_pft(NZ,NY,NX)
+  case (isnowcept_shrub)
+    write(strval,'(A,I2)')'shrub ',iPlantSnowIntercepType_pft(NZ,NY,NX)  
+  case (isnowcept_decidtree)
+    write(strval,'(A,I2)')'deciduous tree ',iPlantSnowIntercepType_pft(NZ,NY,NX)  
+  case (isnowcept_coniftree)
+    write(strval,'(A,I2)')'confierous tree ',iPlantSnowIntercepType_pft(NZ,NY,NX)
+  case default
+    write(strval,'(A,I2)')'Undefined ',iPlantSnowIntercepType_pft(NZ,NY,NX)
+  end select
+  call writefixsl(nu_plt,'ISNTYP: snow interception pattern',strval,60,id)
+
   select case(iPlantGrainType_pft(NZ,NY,NX))
   case (igraintyp_abvgrnd)
     strval='Aboveground 0'
@@ -1086,7 +1109,7 @@ implicit none
     call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'fCHLMESO','Fraction of chlorophyll-binded proteins in mesophyll cells [-]',fMesophyllChlProtein_pft(NZ,NY,NX),110)
-  endif
+  endif  
   id=addone(id)
   call writefixl(nu_plt,id,'FCO2','Intercellular-to-atmospheric CO2 concentration ratio  [-]',CanopyCi2CaRatio_pft(NZ,NY,NX),110)
   end subroutine photosyns_trait_disp
@@ -1145,7 +1168,7 @@ implicit none
   call writefixl(nu_plt,id,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   id=addone(id)
   call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',&
-    LeafAngleClass_pft(1:NumLeafZenithSectors,NZ,NY,NX),100)
+    LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'WDLF','Leaf length:width ratio [-]',rLen2WidthLeaf_pft(NZ,NY,NX),100)  
   id=addone(id)
@@ -1376,11 +1399,11 @@ implicit none
   id=0;id=addone(id)
   call writefixl(nu_plt,id,'ALBR','Leaf shortwave (0.3-2.5 um) radiation albedo [-]',RadSWLeafAlbedo_pft(NZ,NY,NX),80)
   id=addone(id)
-  call writefixl(nu_plt,id,'ALBP','Leaf PAR (0.4-0.7 um) albedo [-]',CanopyPARalbedo_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,id,'ALBP','Leaf PAR (0.4-0.7 um) albedo [-]',RadPARLeafAlbedo_pft(NZ,NY,NX),80)
   id=addone(id)
-  call writefixl(nu_plt,id,'TAUR','Leaf shortwave radiation (0.3-2.5 um) transmission [-]',RadSWLeafTransmis_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,id,'TAUR','Leaf shortwave radiation (0.3-2.5 um) transmittance [-]',RadSWLeafTransmitance_pft(NZ,NY,NX),80)
   id=addone(id)
-  call writefixl(nu_plt,id,'TAUP','Leaf PAR (0.4-0.7 um) transmission [-]',RadPARLeafTransmis_pft(NZ,NY,NX),80)
+  call writefixl(nu_plt,id,'TAUP','Leaf PAR (0.4-0.7 um) transmittance [-]',RadPARLeafTransmitance_pft(NZ,NY,NX),80)
   end subroutine plant_optic_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1638,6 +1661,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'IWTYP', iPlantPhenolType_tab)
   call ncd_getvar(pft_nfid, 'IPTYP', iPlantPhotoperiodType_tab)
   call ncd_getvar(pft_nfid, 'IBTYP', iPlantTurnoverPattern_tab)
+  call ncd_getvar(pft_nfid, 'I2EXP', iPlant2ndGrothPattern_tab)
   call ncd_getvar(pft_nfid, 'IRTYP', iPlantGrainType_tab)
   call ncd_getvar(pft_nfid, 'MY',  Myco_tab)
   call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_pft_tab)
@@ -1650,6 +1674,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'XKCO24',Km4PEPCarboxy_tab)
   call ncd_getvar(pft_nfid, 'RUBP', LeafRubisco2Protein_tab)
   call ncd_getvar(pft_nfid, 'PEPC', LeafPEP2Protein_tab)
+  call ncd_getvar(pft_nfid, 'ISNTYP',iPlantSnowIntercepType_tab)
   call ncd_getvar(pft_nfid, 'ETMX', SpecChloryfilAct_tab)
   call ncd_getvar(pft_nfid, 'CHL',  LeafChl2Protein_tab)
   call ncd_getvar(pft_nfid, 'fCHLMESO', fChlMesophyll_tab)

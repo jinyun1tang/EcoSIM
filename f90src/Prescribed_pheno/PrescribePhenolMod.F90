@@ -135,8 +135,8 @@ implicit none
   !
   implicit none
   integer , intent(in) :: I,J
-  real(r8),intent(out) :: LeafAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)     !leaf area in different zenith sectors in different canopy layers
-  real(r8),intent(out) :: StemAreaZsec_lpft(NumLeafZenithSectors1,NumCanopyLayers1,JP1)     !stem area in different zenith sectors in different canopy layers
+  real(r8),intent(out) :: LeafAreaZsec_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !leaf area in different zenith sectors in different canopy layers
+  real(r8),intent(out) :: StemAreaZsec_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !stem area in different zenith sectors in different canopy layers
   real(r8) :: dangle
   integer  :: N,L,NZ,NB
 
@@ -155,21 +155,21 @@ implicit none
 
   StemAreaZsec_lpft  = 0._r8
   LeafAreaZsec_lpft  = 0._r8
-  dangle            = PICON2h/real(NumLeafZenithSectors1,r8)         !the angle section width
+  dangle            = PICON2h/real(NumLeafInclinationClasses1,r8)         !the angle section width
   LeafStalkArea_col = StemArea_col+CanopyLeafArea_col
   DO NZ=1,NP
     LeafStalkArea_pft(NZ)=0._r8
     NB=1
     DO L=1,NumCanopyLayers1
-      DO N=1,NumLeafZenithSectors1
+      DO N=1,NumLeafInclinationClasses1
         LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
       ENDDO
       StemAreaZsec_lpft(:,L,NZ)=0._r8
-      StemAreaZsec_lpft(NumLeafZenithSectors1,L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)/real(NumLeafZenithSectors1,kind=r8)
+      StemAreaZsec_lpft(NumLeafInclinationClasses1,L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)/real(NumLeafInclinationClasses1,kind=r8)
       LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemSurfAreaZ_pft(L,NZ)
 
       !Assuming uniform azimuth desitribution for leaves
-      DO N=1,NumLeafZenithSectors1
+      DO N=1,NumLeafInclinationClasses1
         LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)
       ENDDO
     ENDDO
@@ -217,7 +217,7 @@ implicit none
         tlai_mon_pft(:,NZ,NY,NX)       = LAI
         tsai_mon_pft(:,NZ,NY,NX)       = SAI
         height_top_mon_pft(:,NZ,NY,NX) = 17._r8
-        LeafAngleClass_pft(:,NZ,NY,NX) = 1._r8/real(NumLeafZenithSectors,kind=r8)
+        LeafAngleClass_pft(:,NZ,NY,NX) = 1._r8/real(NumLeafInclinationClasses,kind=r8)
       ENDDO
     ENDDO
   ENDDO

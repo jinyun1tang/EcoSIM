@@ -105,7 +105,9 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  QSnoWatXfer2Soil_col(:,:)                 !snow water flux to soil, [m3 d-2 h-1]
   real(r8),target,allocatable ::  QSnoIceXfer2Soil_col(:,:)                 !snow ice flux to soil, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PrecipAtm2LandSurf_col(:,:)                !precipiation from atmosphere to land surface ,[m3 d-2 h-1]
-  real(r8),target,allocatable ::  RainPrecThrufall_col(:,:)                  !precipitation through canopy, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  RainPrecThrufall_col(:,:)                  !rainfall precipitation through canopy, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  SnowPrecThrufall_col(:,:)                  !snowfall through canopy, [m3 H2O d-2 h-1]
+  real(r8),target,allocatable ::  TKSnowThrufall_col(:,:)                    !temperature of canopy throughfall snow, [K]
   real(r8),target,allocatable ::  RainPrec2Sno_col(:,:)                      !rainfall to snow, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  Rain2ExposedSurf_col(:,:)                  !rainfall to exposed surface, [m3 H2O d-2 h-1]
   real(r8),target,allocatable ::  QLaterFlow2Cell_col(:,:)                  !Internal lateral flow between grids, [m3 H2O d-2 h-1]
@@ -134,6 +136,8 @@ module SoilWaterDataType
   allocate(iPondFlag_col(JY,JX)); iPondFlag_col =.false.
   allocate(QLaterFlow2Cell_col(JY,JX)); QLaterFlow2Cell_col=0._r8
   allocate(Rain2ExposedSurf_col(JY,JX)); Rain2ExposedSurf_col=0._r8
+  allocate(SnowPrecThrufall_col(JY,JX)); SnowPrecThrufall_col=0._r8
+  allocate(TKSnowThrufall_col(JY,JX)); TKSnowThrufall_col=0._r8
   allocate(RainPrec2Sno_col(JY,JX)); RainPrec2Sno_col = 0._r8
   allocate(RainPrecThrufall_col(JY,JX)); RainPrecThrufall_col=0._r8
   allocate(PrecipAtm2LandSurf_col(JY,JX)); PrecipAtm2LandSurf_col=0._r8
@@ -244,6 +248,8 @@ module SoilWaterDataType
   call destroy(iPondFlag_col)
   call destroy(QLaterFlow2Cell_col)
   call destroy(Rain2ExposedSurf_col)
+  call destroy(SnowPrecThrufall_col)
+  call destroy(TKSnowThrufall_col)
   call destroy(RainPrec2Sno_col)
   call destroy(RainPrecThrufall_col)
   call destroy(PrecipAtm2LandSurf_col)

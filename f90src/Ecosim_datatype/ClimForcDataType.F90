@@ -70,7 +70,7 @@ implicit none
   real(r8),target,allocatable ::  DayLensCurr_col(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DayLenthPrev_col(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DayLenthMax_col(:,:)                          !maximum daylength, [h]
-  real(r8),target,allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
+  real(r8),target,allocatable ::  OMEGA2Ground(:,:,:)                      !sine of solar beam on leaf surface, [-]
   real(r8),target,allocatable ::  LWRadSky_col(:,:)                  !sky longwave radiation , [MJ/h]
   real(r8),target,allocatable ::  TRAD_col(:,:)                          !total daily solar radiation, [MJ d-1]
   real(r8),target,allocatable ::  HUDX_col(:,:)                          !daily maximum vapor pressure , [kPa]
@@ -100,7 +100,7 @@ implicit none
   real(r8),target,allocatable ::  RadSWDiffus_col(:,:)               !diffuse shortwave radiation, [W m-2]
   real(r8),target,allocatable ::  RadDirectPAR_col(:,:)              !direct PAR, [umol m-2 s-1]
   real(r8),target,allocatable ::  RadPARDiffus_col(:,:)              !diffuse PAR, [umol m-2 s-1]
-  real(r8),target,allocatable ::  SineSunInclAngle_col(:,:)              !sine of solar angle, [-]
+  real(r8),target,allocatable ::  SineSunInclinationAngle_col(:,:)              !sine of solar angle, [-]
   real(r8),target,allocatable ::  SineSunInclAnglNxtHour_col(:,:)        !sine of solar angle next hour, [-]
   real(r8),target,allocatable ::  TLEX_col(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHX_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -181,7 +181,7 @@ implicit none
   allocate(DayLensCurr_col(JY,JX));        DayLensCurr_col=0._r8
   allocate(DayLenthPrev_col(JY,JX));        DayLenthPrev_col=0._r8
   allocate(DayLenthMax_col(JY,JX));        DayLenthMax_col=0._r8
-  allocate(OMEGAG(NumOfSkyAzimuthSects,JY,JX));  OMEGAG=0._r8
+  allocate(OMEGA2Ground(NumOfSkyAzimuthSects,JY,JX));  OMEGA2Ground=0._r8
   allocate(LWRadSky_col(JY,JX));         LWRadSky_col=0._r8
   allocate(TRAD_col(JY,JX));        TRAD_col=0._r8
   allocate(HUDX_col(JY,JX));        HUDX_col=0._r8
@@ -212,7 +212,7 @@ implicit none
   allocate(RadSWDiffus_col(JY,JX));        RadSWDiffus_col=0._r8
   allocate(RadDirectPAR_col(JY,JX));        RadDirectPAR_col=0._r8
   allocate(RadPARDiffus_col(JY,JX));        RadPARDiffus_col=0._r8
-  allocate(SineSunInclAngle_col(JY,JX));        SineSunInclAngle_col=0._r8
+  allocate(SineSunInclinationAngle_col(JY,JX));        SineSunInclinationAngle_col=0._r8
   allocate(SineSunInclAnglNxtHour_col(JY,JX));       SineSunInclAnglNxtHour_col=0._r8
   allocate(TLEX_col(JY,JX));        TLEX_col=0._r8
   allocate(TSHX_col(JY,JX));        TSHX_col=0._r8
@@ -274,7 +274,7 @@ implicit none
   call destroy(DayLensCurr_col)
   call destroy(DayLenthPrev_col)
   call destroy(DayLenthMax_col)
-  call destroy(OMEGAG)
+  call destroy(OMEGA2Ground)
   call destroy(LWRadSky_col)
   call destroy(TRAD_col)
   call destroy(HUDX_col)
@@ -308,7 +308,7 @@ implicit none
   call destroy(RadSWDiffus_col)
   call destroy(RadDirectPAR_col)
   call destroy(RadPARDiffus_col)
-  call destroy(SineSunInclAngle_col)
+  call destroy(SineSunInclinationAngle_col)
   call destroy(SineSunInclAnglNxtHour_col)
   call destroy(TLEX_col)
   call destroy(TSHX_col)

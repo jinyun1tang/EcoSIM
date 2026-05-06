@@ -147,6 +147,12 @@ implicit none
   integer, parameter :: iembroytyp_Monocots     =3
   integer, parameter :: iembroytyp_Eudicots     =4
 
+  integer, parameter :: isnowcept_bryophyte = 0
+  integer, parameter :: isnowcept_grasses   = 1
+  integer, parameter :: isnowcept_shrub     = 2
+  integer, parameter :: isnowcept_decidtree = 3
+  integer, parameter :: isnowcept_coniftree = 4
+
   integer, parameter :: iphenotyp_evgreen       = 0
   integer, parameter :: iphenotyp_coldecid      = 1
   integer, parameter :: iphenotyp_drouhtdecidu  = 2
