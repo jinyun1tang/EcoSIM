@@ -635,8 +635,8 @@ module UptakesMod
   end subroutine HandlingDivergence
 
 !----------------------------------------------------------------------------------------------------
-  function CanopyEnergyH2OIter_func(I,J,NZ,FracGridPFTCovered,CanopyMassC4H2OStorage,TotalSoilPSIMPa_vr,&
-    CdHeatCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,FDMP,&
+  function CanopyEnergyH2OIter_func(I,J,NZ,FracGridPFTCovered,CanopyMassC4H2OStorage,TotalSoilPSIMPa_vr,  &
+    CdHeatCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,FDMP,                       &
     SoilRootResist4H2O_pvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CdH2ORootxSoil,&
     VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr) result(NN)
   !
@@ -687,10 +687,11 @@ module UptakesMod
   real(r8) :: XC,Stomata_Stress, dCanopyAvailWater
   real(r8) :: RichardsNO,psi_H2O_flx
   real(r8) :: CanopyAvailWater      !available canopy water for canopy ET and hydraulic redistribution
+  real(r8) :: CanopyAvailSnow       !available canopy snow for sublimation
   real(r8) :: CumHeatPlant2Soil,CumHeatSoil2Plant
   real(r8) :: CumWaterPlant2Soil,CumWaterSoil2Plant
   real(r8) :: dRadNetdT
-
+  
   character(len=*), parameter :: subname='CanopyEnergyH2OIter_func'
   integer  :: IC
   logical :: LIterationExit
@@ -720,8 +721,9 @@ module UptakesMod
     PSICanopyOsmo_pft           => plt_ew%PSICanopyOsmo_pft               ,& !input  :canopy osmotic water potential, [Mpa]
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     RainIntcptByCanopy_pft      => plt_ew%RainIntcptByCanopy_pft          ,& !input  :water flux into canopy, [m3 d-2 h-1]
+    SnowIntcptByCanopy_pft      => plt_ew%SnowIntcptByCanopy_pft          ,& !input  :snow flux onto canopy, [m3 d-2 h-1]
     RIB                         => plt_ew%RIB                             ,& !input  :Richardson number for calculating boundary layer resistance, [-]
-    RadSWCanopyAbsorption_pft           => plt_rad%RadSWCanopyAbsorption_pft              ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    RadSWCanopyAbsorption_pft   => plt_rad%RadSWCanopyAbsorption_pft      ,& !input  :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     RawIsoTCanopy2Atm_pft       => plt_ew%RawIsoTCanopy2Atm_pft           ,& !input  :canopy roughness height, [m]
     TKS_vr                      => plt_ew%TKS_vr                          ,& !input  :mean annual soil temperature, [K]
     TairK                       => plt_ew%TairK                           ,& !input  :air temperature, [K]
@@ -738,9 +740,11 @@ module UptakesMod
     LWRadCanopy_pft             => plt_rad%LWRadCanopy_pft                ,& !output :canopy longwave radiation, [MJ d-2 h-1]
     RadNet2Canopy_pft           => plt_rad%RadNet2Canopy_pft              ,& !output :canopy net radiation, [MJ d-2 h-1]
     TKC_pft                     => plt_ew%TKC_pft                         ,& !output :canopy temperature, [K]
+    SnowOnCanopy_pft            => plt_ew%SnowOnCanopy_pft                ,& !input  :snow water equivalent held on canopy, [m3 d-2]        
     Transpiration_pft           => plt_ew%Transpiration_pft               ,& !output :canopy transpiration, [m2 d-2 h-1]
     VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft              ,& !output :canopy heat capacity, [MJ d-2 K-1]
-    VapXAir2Canopy_pft          => plt_ew%VapXAir2Canopy_pft              ,& !output :canopy evaporation, [m2 d-2 h-1]
+    VapXAir2CanopyLiq_pft       => plt_ew%VapXAir2CanopyLiq_pft           ,& !output :canopy evaporation, [m2 d-2 h-1]
+    VapXAir2Canopy_pft          => plt_ew%VapXAir2Canopy_pft              ,& !output :canopy evaporation+sublimation, [m2 d-2 h-1]    
     SnoSub2AirCanopy_pft        => plt_ew%SnoSub2AirCanopy_pft            ,& !output :canopy snow sublimation,[m3 d-2 h-1]        
     DeltaTKC_pft                => plt_ew%DeltaTKC_pft                    ,& !output :change in canopy temperature, [K]
     QdewCanopy_pft              => plt_ew%QdewCanopy_pft                  ,& !output :dew fall on to canopy, [m3 H2O d-2 h-1]
@@ -762,6 +766,8 @@ module UptakesMod
   endif  
   !      
   CanopyAvailWater    = CanopyBiomWater_pft(NZ)+WatHeldOnCanopy_pft(NZ)+RainIntcptByCanopy_pft(NZ)
+  CanopyAvailSnow     = SnowOnCanopy_pft(NZ)+SnowIntcptByCanopy_pft(NZ)
+
   EffPFTGridArea4H2O  = FracGridPFTCovered*AREA3(NU)                    !area coverd by pft m2
   EffPFTGridArea4Heat = FracGridPFTCovered*AREA3(NU)*1.25E-03_r8        !1.25e-3 is heat capacity of air [MJ/(m3 K)], assuming air volume is not affected by plant mass
   RA1                 = RawIsoTCanopy2Atm_pft(NZ)                   !canopy isothermal boundary later resistance
@@ -783,8 +789,6 @@ module UptakesMod
     !
     !     LWRadCanopy_pft=LW emitted by canopy
     !     DTHS1=net LW absorbed by canopy
-    !     RadSWCanopyAbsorption_pft=total SW absorbed by canopy
-    !     RadNet2Canopy_pft=net SW+LW absorbed by canopy
     !
     TKC1                  = TKCanopy_pft(NZ)
     LWRadCanopy_pft(NZ)   = FTHRM*TKC1**4              !long wave radiation
@@ -844,16 +848,28 @@ module UptakesMod
       HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TairK               !enthalpy of condensed water add to canopy, MJ/(h)    
     ELSEIF(EX.LE.0.0_r8)THEN 
       !canopy loses water, and there is canopy-held water  
-      if(WatHeldOnCanopy_pft(NZ).GT.0.0_r8)THEN
+      if(WatHeldOnCanopy_pft(NZ).GT.0.0_r8 .OR. SnowOnCanopy_pft(NZ).GT.0._r8)THEN
         !evaporation, and there is water stored in canopy
         !VapXAir2Canopy_pft <0._r8, off canopy as evaporation, cannot be more than WatHeldOnCanopy_pft(NZ)
         !
-        VapXAir2Canopy_pft(NZ) = AMAX1(VapXAir2Canopy_pft(NZ),-WatHeldOnCanopy_pft(NZ))
-        EX                     = EX-VapXAir2Canopy_pft(NZ)                !demand for transpiration
-        HeatEvapSens           = VapXAir2Canopy_pft(NZ)*cpw*TKC1          !enthalpy of evaporated water leaving canopy
+        !evaporation
+        VapXAir2CanopyLiq_pft(NZ) = AMAX1(VapXAir2Canopy_pft(NZ),-WatHeldOnCanopy_pft(NZ))
+        VapXAir2Canopy_pft(NZ)    = VapXAir2Canopy_pft(NZ)-VapXAir2CanopyLiq_pft(NZ)
+        HeatEvapSens              = VapXAir2CanopyLiq_pft(NZ)*cpw*TKC1             !enthalpy of evaporated water leaving canopy
+
+        !sublimation 
+        if(VapXAir2Canopy_pft(NZ).LE.0._r8)then
+          SnoSub2AirCanopy_pft(NZ) = AMAX1(VapXAir2Canopy_pft(NZ),-SnowOnCanopy_pft(NZ))
+          HeatEvapSens = HeatEvapSens+SnoSub2AirCanopy_pft(NZ)*cps*TKC1
+        endif
+        !
+        VapXAir2Canopy_pft(NZ)=VapXAir2CanopyLiq_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
+        EX                    = EX-VapXAir2CanopyLiq_pft(NZ)                        !demand for transpiration
       ELSE
-        VapXAir2Canopy_pft(NZ) =0._r8
-        HeatEvapSens = 0._r8
+        VapXAir2Canopy_pft(NZ)    = 0._r8
+        VapXAir2CanopyLiq_pft(NZ) = 0.0_r8
+        SnoSub2AirCanopy_pft(NZ)  = 0._r8
+        HeatEvapSens              = 0._r8
       ENDIF
     ENDIF
     !
@@ -861,7 +877,7 @@ module UptakesMod
     !CanopyEvapTransLHeat_pft:latent heat flux, negative means into atmosphere
     !
     Transpiration_pft(NZ)        = EX*RawCanopy2Atm_pft(NZ)/(RawCanopy2Atm_pft(NZ)+CanPStomaResistH2O_pft(NZ))
-    CanopyEvapTransLHeat_pft(NZ) = (Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ))*EvapLHTC
+    CanopyEvapTransLHeat_pft(NZ) = (Transpiration_pft(NZ)+VapXAir2CanopyLiq_pft(NZ))*EvapLHTC+SnoSub2AirCanopy_pft(NZ)*SublmHTC
     HeatEvapSens                 = HeatEvapSens + Transpiration_pft(NZ)*cpw*TKC1
     !
     !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
@@ -880,8 +896,8 @@ module UptakesMod
     !   assuming transpiration does not change water binded by the canopy, i.e. CanopyBiomWater_pft(NZ)
     !   canopy bound water is changing
     !
-    VHeatCapCanopy_pft(NZ)=VHeatCapCanopyPrev_pft+cpw*(RainIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ) &
-       +Transpiration_pft(NZ)-cumPRootH2OUptake)
+    VHeatCapCanopy_pft(NZ)=VHeatCapCanopyPrev_pft+cpw*(RainIntcptByCanopy_pft(NZ)+VapXAir2CanopyLiq_pft(NZ) &
+       +Transpiration_pft(NZ)-cumPRootH2OUptake)+cps*(SnowIntcptByCanopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ))
     !   
     ! new canopy temperature 
     TKCY=(TKCX*(VHeatCapCanopyPrev_pft-dRadNetdT)+HeatAdd2Can+TairK*CdHeatCanopyAir) &
@@ -975,7 +991,8 @@ module UptakesMod
       ENDDO D4200
 
       !check for water availability
-      dCanopyAvailWater=CanopyAvailWater-CumWaterSoil2Plant+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+      dCanopyAvailWater=CanopyAvailWater-CumWaterSoil2Plant+Transpiration_pft(NZ)+VapXAir2CanopyLiq_pft(NZ) 
+      dCanopyAvailWater=dCanopyAvailWater+CanopyAvailSnow+SnoSub2AirCanopy_pft(NZ) 
       !
       !plant does not have enough water to support release to soil
       if(dCanopyAvailWater.GE.CumWaterPlant2Soil)then
@@ -1336,7 +1353,8 @@ module UptakesMod
     Transpiration_pft           => plt_ew%Transpiration_pft               ,& !output :canopy transpiration, [m2 d-2 h-1]
     VHeatCapCanopy_pft          => plt_ew%VHeatCapCanopy_pft              ,& !output :canopy heat capacity, [MJ d-2 K-1]
     SnoSub2AirCanopy_pft        => plt_ew%SnoSub2AirCanopy_pft            ,& !output :canopy snow sublimation,[m3 d-2 h-1]        
-    VapXAir2Canopy_pft          => plt_ew%VapXAir2Canopy_pft               & !output :canopy evaporation, [m2 d-2 h-1]
+    VapXAir2CanopyLiq_pft       => plt_ew%VapXAir2CanopyLiq_pft           ,& !output :canopy evaporation, [m2 d-2 h-1]
+    VapXAir2Canopy_pft          => plt_ew%VapXAir2Canopy_pft               & !output :canopy evaporation+sublimation, [m2 d-2 h-1]
   )
   call PrintInfo('beg '//subname)
   RadNet2Canopy_pft(NZ)        = 0.0_r8
@@ -1345,6 +1363,7 @@ module UptakesMod
   HeatStorCanopy_pft(NZ)       = 0.0_r8
   VapXAir2Canopy_pft(NZ)       = 0.0_r8
   SnoSub2AirCanopy_pft(NZ)     = 0.0_r8
+  VapXAir2CanopyLiq_pft(NZ)    = 0.0_r8
   Transpiration_pft(NZ)        = 0.0_r8
   QdewCanopy_pft(NZ)           = 0.0_r8
   IF(CanopyHeight_pft(NZ).GE.SnowDepth-ZERO .or. TKSnow==spval)THEN
@@ -1429,7 +1448,8 @@ module UptakesMod
     TKS_vr                    => plt_ew%TKS_vr                       ,& !input  :mean annual soil temperature, [K]
     TairK                     => plt_ew%TairK                        ,& !input  :air temperature, [K]
     Transpiration_pft         => plt_ew%Transpiration_pft            ,& !input  :canopy transpiration, [m3 d-2 h-1]
-    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           ,& !input  :canopy evaporation, [m3 d-2 h-1]
+    VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           ,& !input  :canopy evaporation+sublimation, [m3 d-2 h-1]
+    VapXAir2CanopyLiq_pft     => plt_ew%VapXAir2CanopyLiq_pft        ,& !input  :canopy evaporation, [m3 d-2 h-1]
     SnoSub2AirCanopy_pft      => plt_ew%SnoSub2AirCanopy_pft         ,& !input  :canopy snow sublimation,[m3 d-2 h-1]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft          ,& !inoput :canopy water content, [m3 d-2]
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          ,& !inoput :canopy surface water content, [m3 d-2]
@@ -1454,7 +1474,7 @@ module UptakesMod
   !     cumPRootH2OUptake < 0., add water to canopy 
   !     Transpiration_pft < 0., lost from canopy, [m3 d-2 h-1]
   CanopyBiomWater_pft(NZ) = CanopyBiomWater_pft(NZ)+Transpiration_pft(NZ)-cumPRootH2OUptake
-  WatHeldOnCanopy_pft(NZ) = WatHeldOnCanopy_pft(NZ)+RainIntcptByCanopy_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  WatHeldOnCanopy_pft(NZ) = WatHeldOnCanopy_pft(NZ)+RainIntcptByCanopy_pft(NZ)+VapXAir2CanopyLiq_pft(NZ)
   SnowOnCanopy_pft(NZ)    = SnowOnCanopy_pft(NZ)+SnowIntcptByCanopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
   VHeatCapCanopy_pft(NZ)  = cpo*gOC_to_m3_OM(CanopyMassC4H2OStorage)+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ))
   HeatXAir2PCan_pft(NZ)   = CdHeatCanopyAir*(TairK-TKCanopy_pft(NZ))

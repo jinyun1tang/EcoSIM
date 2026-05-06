@@ -124,7 +124,6 @@ module SurfaceRadiationMod
   ELSE
     ZWind=AMAX1(WindMesureHeight_col,ZeroPlaneDisplacem_col+2.0_r8)
   ENDIF
-  call DebugPrint('ZWind',ZWind)
 
   IF(KoppenClimZone.GE.0)THEN
     !significant snowcover on ground
@@ -400,6 +399,8 @@ module SurfaceRadiationMod
     RadPARDiffus_col             => plt_rad%RadPARDiffus_col              ,& !inoput :diffuse PAR, [umol m-2 s-1]
     FracSWRad2Grnd_col           => plt_rad%FracSWRad2Grnd_col            ,& !inoput :fraction of radiation directed at ground surface, [-]
     RadSWCanopyAbsorption_pft    => plt_rad%RadSWCanopyAbsorption_pft     ,& !output :canopy absorbed shortwave radiation, [MJ d-2 h-1]
+    RadSWCanopyLAbsroption_pft   => plt_rad%RadSWCanopyLAbsroption_pft    ,& !output :profile of canopy absorbed shortwave radiation, [MJ d-2 h-1]     
+    RadPARCanopyLAbsorption_pft  => plt_rad%RadPARCanopyLAbsorption_pft   ,& !output :profile of canopy absorbed PAR, [MJ d-2 h-1]
     RadSWSolarBeam_col           => plt_rad%RadSWSolarBeam_col            ,& !output :shortwave radiation in solar beam, [MJ m-2 h-1]
     RadPARSolarBeam_col          => plt_rad%RadPARSolarBeam_col           ,& !output :PAR radiation in solar beam, [umol m-2 s-1]
     RadPARCanopyAbsorption_pft   => plt_rad%RadPARCanopyAbsorption_pft    ,& !output :canopy absorbed PAR, [umol m-2 s-1]
@@ -420,7 +421,6 @@ module SurfaceRadiationMod
   !     RAD,RadPARSolarBeam_col=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,RadPARDiffus_col=solar beam direct,diffuse SW,PAR
   !     SineSunInclinationAngle_col,TotSineSkyAngles_grd=sine of solar,sky angles
-  !     RadSWCanopyAbsorption_pft,RADP=total SW,PAR absorbed by canopy
   !     ClumpFactorNow_pft=clumping factor for self-shading
   !
   IF(SineSunInclinationAngle_col.GT.ZERO)THEN
@@ -436,9 +436,13 @@ module SurfaceRadiationMod
   ENDIF
 
   D1025: DO NZ=1,NP
-    RadSWCanopyAbsorption_pft(NZ)  = 0.0_r8
-    RadPARCanopyAbsorption_pft(NZ) = 0.0_r8
+    RadSWCanopyAbsorption_pft(NZ)     = 0.0_r8
+    RadPARCanopyAbsorption_pft(NZ)    = 0.0_r8
+    RadSWCanopyLAbsroption_pft(:,NZ)  = 0.0_r8
+    RadPARCanopyLAbsorption_pft(:,NZ) = 0.0_r8
   ENDDO D1025
+
+
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
   !
@@ -459,6 +463,7 @@ module SurfaceRadiationMod
 
     !when there is canopy
     IF(LeafStalkArea_col.GT.0.0_r8)THEN
+
       if(ldo_radiation_test)then
         RadSW2Ground=ABS(cosGroundIncidentSolarAngle)*RadSWDirect_col
         D121: DO N=1,NumOfSkyAzimuthSects1
@@ -476,10 +481,6 @@ module SurfaceRadiationMod
         RadSW2Ground=RadSW2Ground+ABS(OMEGA2Ground(N))*RadSWDiffus_col
       ENDDO D120
 
-      D135: DO NZ=1,NP
-        RadSWCanopyAbsorption_pft(NZ)  = 0.0_r8
-        RadPARCanopyAbsorption_pft(NZ) = 0.0_r8
-      ENDDO D135
     ENDIF
     RadSWGrnd_col=RadSW2Ground*AREA3(NU)
     !
@@ -487,10 +488,6 @@ module SurfaceRadiationMod
     !
   ELSE
     RadSWGrnd_col=0.0_r8
-    D125: DO NZ=1,NP
-      RadSWCanopyAbsorption_pft(NZ)  = 0.0_r8
-      RadPARCanopyAbsorption_pft(NZ) = 0.0_r8
-    ENDDO D125
   ENDIF
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
@@ -813,6 +810,7 @@ module SurfaceRadiationMod
     ClumpFactorNow_pft         => plt_morph%ClumpFactorNow_pft         ,& !input  :clumping factor for self-shading in canopy layer at current LAI, [-]    
     RadSWCanopyAbsorption_pft  => plt_rad%RadSWCanopyAbsorption_pft    ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     RadPARCanopyAbsorption_pft => plt_rad%RadPARCanopyAbsorption_pft   ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]        
+    RadSWCanopyLAbsroption_pft => plt_rad%RadSWCanopyLAbsroption_pft   ,& !output :profile of canopy absorbed shortwave radiation, [MJ d-2 h-1]         
     RadTotPARAbsorption_zsec   => plt_rad%RadTotPARAbsorption_zsec     ,& !inoput :total incoming PAR, [umol m-2 s-1]
     RadDifPARAbsorption_zsec   => plt_rad%RadDifPARAbsorption_zsec     ,& !inoput :diffuse incoming PAR, [umol m-2 s-1]
     LeafPARabsorptivity_pft    => plt_rad%LeafPARabsorptivity_pft      ,& !input  :canopy PAR absorptivity,[-]
@@ -831,8 +829,9 @@ module SurfaceRadiationMod
     !the following line shuts off radiation when it is below water 
 !    IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO .AND. CanopyHeightZ_col(L-1).GE.DepthSurfWatIce-ZERO)THEN
     IF(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)THEN
-      RadSWDiffusL           = RadSWDiffusL*TAU_RDiffusTransmitance(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
-      RadPARDiffusL          = RadPARDiffusL*TAU_RDiffusTransmitance(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
+
+      RadSWDiffusL  = RadSWDiffusL*TAU_RDiffusTransmitance(L-1)+RadSWFwdScat2NextL(L-1)+RadSWBakScat2NextL(L-1)
+      RadPARDiffusL = RadPARDiffusL*TAU_RDiffusTransmitance(L-1)+RadPARFwdScat2NextL(L-1)+RadPARBakScat2NextL(L-1)
 
       RadSWFwdScat2NextL(L)  = 0.0
       RadPARFwdScat2NextL(L) = 0.0_r8
@@ -871,6 +870,8 @@ module SurfaceRadiationMod
 
         RadSWCanopyAbsorption_pft(NZ)  = RadSWCanopyAbsorption_pft(NZ)+RadDifSWLeafAbsorption_pft(NZ)+RadDifSWStemAbsorption_pft(NZ)
         RadPARCanopyAbsorption_pft(NZ) = RadPARCanopyAbsorption_pft(NZ)+RadDifPARLeafAbsorption_pft(NZ)+RadDifPARStemAbsorption_pft(NZ)
+        RadSWCanopyLAbsroption_pft(L,NZ)  = RadSWCanopyLAbsroption_pft(L,NZ)+RadDifSWLeafAbsorption_pft(NZ)+RadDifSWStemAbsorption_pft(NZ)
+
       ENDDO D2500
     ELSE
       RadSWFwdScat2NextL(L)  = RadSWFwdScat2NextL(L-1)
@@ -884,7 +885,7 @@ module SurfaceRadiationMod
   end subroutine UpwellSweep
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AccumulateRadation4CanopyL(L,YAREA,RadDirPAR2Leaf_zsec,                                          &
+  subroutine AccumulateRadation4CanopyL(L,YAREA,RadDirPAR2Leaf_zsec,                                                   &
     FractionDirRadAbsorbtCum,FractionDifRadAbsorbtCum,FractionDirRadAbsorbtL,                                          &
     FractionDifRadAbsorbtL,RadDirSWLeafLAbsorption_pft,RadDirPARLeafLAbsorption_pft,                                   &
     RadDifSWStemAbsorption_pft,RadDifPARStemAbsorption_pft,RadDirSWStemLAbsorption_pft,RadDirPARStemLAbsorption_pft,   &
@@ -927,10 +928,10 @@ module SurfaceRadiationMod
   real(r8), intent(inout) :: TAU_RDiffusTransmitance(0:NumCanopyLayers1+1)
 
   character(len=*), parameter :: subname='AccumulateRadation4CanopyL'
-  real(r8) :: RadSWbyLeafT,RadSWbyStalkT
+  real(r8) :: RadDirSWLeafAbsorbT,RadDirSWStemAbsorbT
   real(r8) :: RadPARbyLeafT,RadPARbyStalkT  
-  real(r8) :: bakScatRadSWbyLeafT,bakScatRadSWbyStalkT,bakScatRadPARbyLeafT,bakScatRadPARbyStalkT,fwdScatRadSWbyLeafT
-  real(r8) :: fwdScatRadSWbyStalkT,fwdScatRadPARbyLeafT,fwdScatRadPARbyStalkT  
+  real(r8) :: bakScatRadDirSWLeafAbsorbT,bakScatRadDirSWStemAbsorbT,bakScatRadPARbyLeafT,bakScatRadPARbyStalkT,fwdScatRadDirSWLeafAbsorbT
+  real(r8) :: fwdScatRadDirSWStemAbsorbT,fwdScatRadPARbyLeafT,fwdScatRadPARbyStalkT  
   real(r8) :: XTAUS,XTAUY
   integer  :: N,M,NZ
 
@@ -940,6 +941,7 @@ module SurfaceRadiationMod
     TAU_DirectSunLit           => plt_rad%TAU_DirectSunLit             ,& !inoput :fraction of radiation intercepted by canopy layer, [-]  
     RadSWCanopyAbsorption_pft  => plt_rad%RadSWCanopyAbsorption_pft    ,& !inoput :canopy absorbed shortwave radiation, [MJ d-2 h-1]
     RadPARCanopyAbsorption_pft => plt_rad%RadPARCanopyAbsorption_pft   ,& !inoput :canopy absorbed PAR, [umol m-2 s-1]    
+    RadSWCanopyLAbsroption_pft => plt_rad%RadSWCanopyLAbsroption_pft   ,& !output :profile of canopy absorbed shortwave radiation, [MJ d-2 h-1]         
     RadTotPARAbsorption_zsec   => plt_rad%RadTotPARAbsorption_zsec     ,& !inoput :total incoming PAR absorbed, [umol m-2 s-1]    
     RadDifPARAbsorption_zsec   => plt_rad%RadDifPARAbsorption_zsec      & !inoput :diffuse incoming PAR absorbed, [umol m-2 s-1]
   )
@@ -960,7 +962,7 @@ module SurfaceRadiationMod
     ENDIF
     TAU_DirectSunLit(L+1)  = TAU_DirectSunLit(L+1)*XTAUS
     FractionDirRadAbsorbtL = FractionDirRadAbsorbtL*XTAUS
-
+    
     D1510: DO NZ=1,NP
       RadDirSWLeafLAbsorption_pft(NZ)  = RadDirSWLeafLAbsorption_pft(NZ)*XTAUS
       RadDirSWStemLAbsorption_pft(NZ)  = RadDirSWStemLAbsorption_pft(NZ)*XTAUS
@@ -1018,44 +1020,46 @@ module SurfaceRadiationMod
   ! Summarize radiation in layer L
   !     TOTAL RADIATION ABSORBED, REFLECTED AND TRANSMITTED BY ALL PFTs
   !
-  !     RadSWCanopyAbsorption_pft,TRADC,RADP,TRADP=total atmospheric SW,PAR absbd by each,all PFT
   !     FractionDirRadAbsorbtCum,FractionDifRadAbsorbtCum=accumulated interception of direct,diffuse radiation
   !     TAU_DirectSunLit,TAU_RDiffusTransmitance=transmission of direct,diffuse radiation to next lower layer
   !
   D1530: DO NZ=1,NP
-    RadSWbyLeafT   = RadDirSWLeafLAbsorption_pft(NZ)+RadDifSWLeafAbsorption_pft(NZ)
-    RadSWbyStalkT  = RadDirSWStemLAbsorption_pft(NZ)+RadDifSWStemAbsorption_pft(NZ)
+
+    RadDirSWLeafAbsorbT = RadDirSWLeafLAbsorption_pft(NZ)+RadDifSWLeafAbsorption_pft(NZ)
+    RadDirSWStemAbsorbT = RadDirSWStemLAbsorption_pft(NZ)+RadDifSWStemAbsorption_pft(NZ)
 
     RadPARbyLeafT  = RadDirPARLeafLAbsorption_pft(NZ)+RadDifPARLeafAbsorption_pft(NZ)
     RadPARbyStalkT = RadDirPARStemLAbsorption_pft(NZ)+RadDifPARStemAbsorption_pft(NZ)
 
-    bakScatRadSWbyLeafT   = backScatDirSWLeafLAbsorb_pft(NZ)+BackScatDifSWLeafLAbsorb_pft(NZ)
-    bakScatRadSWbyStalkT  = backScatDirSWStemLAbsorb_pft(NZ)+BackScatDifSWStemLAbsorb_pft(NZ)
+    bakScatRadDirSWLeafAbsorbT   = backScatDirSWLeafLAbsorb_pft(NZ)+BackScatDifSWLeafLAbsorb_pft(NZ)
+    bakScatRadDirSWStemAbsorbT  = backScatDirSWStemLAbsorb_pft(NZ)+BackScatDifSWStemLAbsorb_pft(NZ)
     bakScatRadPARbyLeafT  = backScatDirPARLeafLAbsorb_pft(NZ)+BackScatDifPARLeafLAbsorb_pft(NZ)
     bakScatRadPARbyStalkT = backScatDirPARStemLAbsorb_pft(NZ)+BackScatDifPARStemLAbsorb_pft(NZ)
 
-    fwdScatRadSWbyLeafT   = FwdScatDirSWLeafLAbsorb_pft(NZ)+FwdScatDifSWLeafLAbsorb_pft(NZ)
-    fwdScatRadSWbyStalkT  = FwdScatDirSWStemLAbsorb_pft(NZ)+FwdScatDifSWStemLAbsorb_pft(NZ)
+    fwdScatRadDirSWLeafAbsorbT   = FwdScatDirSWLeafLAbsorb_pft(NZ)+FwdScatDifSWLeafLAbsorb_pft(NZ)
+    fwdScatRadDirSWStemAbsorbT  = FwdScatDirSWStemLAbsorb_pft(NZ)+FwdScatDifSWStemLAbsorb_pft(NZ)
     fwdScatRadPARbyLeafT  = FwdScatDirPARLeafLAbsorb_pft(NZ)+FwdScatDifPARLeafLAbsorb_pft(NZ)
     fwdScatRadPARbyStalkT = FwdScatDirPARStemLAbsorb_pft(NZ)+FwdScatDifPARStemLAbsorb_pft(NZ)
 
-    RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L)+(RadSWbyLeafT*RadSWLeafTransmitanceL_pft(L,NZ) &
-      +fwdScatRadSWbyLeafT*RadSWLeafAlbedoL_pft(L,NZ) &
-      +fwdScatRadSWbyStalkT*RadSWStemAlbedoL_pft(L,NZ))*YAREA
+    RadSWFwdScat2NextL(L)=RadSWFwdScat2NextL(L)+(RadDirSWLeafAbsorbT*RadSWLeafTransmitanceL_pft(L,NZ) &
+      +fwdScatRadDirSWLeafAbsorbT*RadSWLeafAlbedoL_pft(L,NZ) &
+      +fwdScatRadDirSWStemAbsorbT*RadSWStemAlbedoL_pft(L,NZ))*YAREA
 
     RadPARFwdScat2NextL(L)=RadPARFwdScat2NextL(L)+(RadPARbyLeafT*RadPARLeafTransmitanceL_pft(L,NZ) &
       +fwdScatRadPARbyLeafT*RadPARLeafAlbedoL_pft(L,NZ) &
       +fwdScatRadPARbyStalkT*RadPARStemAlbedoL_pft(L,NZ))*YAREA
 
-    RadSWBakScat2NextL(L)=RadSWBakScat2NextL(L)+(bakScatRadSWbyLeafT*RadSWLeafAlbedoL_pft(L,NZ)+ &
-      bakScatRadSWbyStalkT*RadSWStemAlbedoL_pft(L,NZ))*YAREA
+    RadSWBakScat2NextL(L)=RadSWBakScat2NextL(L)+(bakScatRadDirSWLeafAbsorbT*RadSWLeafAlbedoL_pft(L,NZ)+ &
+      bakScatRadDirSWStemAbsorbT*RadSWStemAlbedoL_pft(L,NZ))*YAREA
 
     RadPARBakScat2NextL(L)=RadPARBakScat2NextL(L)+(bakScatRadPARbyLeafT*RadPARLeafAlbedoL_pft(L,NZ)+&
       bakScatRadPARbyStalkT*RadPARStemAlbedoL_pft(L,NZ))*YAREA
 
     !accumulate shortwave radiation on canopy
-    RadSWCanopyAbsorption_pft(NZ)  = RadSWCanopyAbsorption_pft(NZ)+RadSWbyLeafT+RadSWbyStalkT
-    RadPARCanopyAbsorption_pft(NZ) = RadPARCanopyAbsorption_pft(NZ)+RadPARbyLeafT+RadPARbyStalkT
+
+    RadSWCanopyAbsorption_pft(NZ)    = RadSWCanopyAbsorption_pft(NZ)+RadDirSWLeafAbsorbT+RadDirSWStemAbsorbT
+    RadSWCanopyLAbsroption_pft(L,NZ) = RadDirSWLeafAbsorbT+RadDirSWStemAbsorbT
+    RadPARCanopyAbsorption_pft(NZ)   = RadPARCanopyAbsorption_pft(NZ)+RadPARbyLeafT+RadPARbyStalkT
   ENDDO D1530
 
   call PrintInfo('end '//subname)
@@ -1263,6 +1267,7 @@ module SurfaceRadiationMod
     D1700: DO M=1,NumOfSkyAzimuthSects1
       
       DirSWLeafAbsorptionAzclass  = SulitLeafEffArea*RadDirSW2Leaf_zsec(N,M,NZ)*LeafSWabsorptivityL_pft(L,NZ)
+
       DirSWStemAbsorptionAzclass  = SunlitStemEffArea*RadDirSW2Stem_zsec(N,M,NZ)*StemSWAbsorptivityL_pft(L,NZ)
       RadDirSWLeafLAbsorption_pft = RadDirSWLeafLAbsorption_pft+DirSWLeafAbsorptionAzclass
       RadDirSWStemLAbsorption_pft = RadDirSWStemLAbsorption_pft+DirSWStemAbsorptionAzclass
@@ -1390,6 +1395,7 @@ module SurfaceRadiationMod
     StemClumpFactor_pft(NZ) = StemClumpFactor(iPlant2ndGrothPattern_pft(NZ))
 
     if(SnowOnCanopy_pft(NZ).GT.ZERO)then
+
       !assuming snow cause 20% reduction of clumping factor
       ClumpFactorNow_pft(NZ) = ClumpFactorNow_pft(NZ) *(1._r8-dOMEGA_SNOW*fSnowCanopy_pft(NZ))
 

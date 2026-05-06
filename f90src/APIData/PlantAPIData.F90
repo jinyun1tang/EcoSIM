@@ -194,6 +194,8 @@ implicit none
   real(r8), pointer :: TAU_DirectSunSha(:)            => null() !fraction of radiation transmitted by canopy layer, [-]
   real(r8), pointer :: LWRadCanopy_pft(:)        => null() !canopy longwave radiation,                         [MJ d-2 h-1]
   real(r8), pointer :: RadSWCanopyAbsorption_pft(:)      => null() !canopy absorbed shortwave radiation,               [MJ d-2 h-1]
+  real(r8), pointer :: RadSWCanopyLAbsroption_pft(:,:)   => null() !profile of canopy absorbed shortwave radiation, [MJ d-2 h-1]     
+  real(r8), pointer :: RadPARCanopyLAbsorption_pft(:,:)  => null() !profile of canopy absorbed PAR, [MJ d-2 h-1]  
   real(r8), pointer :: OMEGX(:,:,:)              => null() !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation,[-]
   real(r8), pointer :: OMEGA2Ground(:)           => null() !sine of solar beam on ground surface,                [-]
   real(r8), pointer :: OMEGA2Leaf(:,:,:)              => null() !sine of indirect sky radiation on leaf surface,[-]
@@ -671,10 +673,11 @@ implicit none
   real(r8), pointer :: RainIntcptByCanopy_pft(:)      => null()    !water flux into canopy,                                       [m3 d-2 h-1]
   real(r8), pointer :: SnowIntcptByCanopy_pft(:)      => null()    !snow flux into canopy,                                        [m3 d-2 h-1]
   real(r8), pointer :: PSICanopy_pft(:)               => null()    !canopy total water potential,                                 [Mpa]
-  real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation,                                           [m3 d-2 h-1]
+  real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation+sublimation,                                           [m3 d-2 h-1]
+  real(r8), pointer :: VapXAir2CanopyLiq_pft(:)       => null()    !canopy evaporation, [m3 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)          => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
-  real(r8), pointer :: CanopyEvapTransLHeat_pft(:)          => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
-  real(r8), pointer :: RawIsoTCanopy2Atm_pft(:)   => null()    !canopy isothermal boundary later resistance,                  [h m-1]
+  real(r8), pointer :: CanopyEvapTransLHeat_pft(:)    => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
+  real(r8), pointer :: RawIsoTCanopy2Atm_pft(:)       => null()    !canopy isothermal boundary later resistance,                  [h m-1]
   real(r8), pointer :: TKS_vr(:)                      => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin_pft(:)         => null()    !minimum daily canopy water potential,                         [MPa]
   real(r8), pointer :: TdegCCanopy_pft(:)             => null()    !canopy temperature,                                           [oC]
@@ -1324,6 +1327,7 @@ implicit none
   allocate(this%PSICanopyTurg_pft(JP1));this%PSICanopyTurg_pft=spval
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
+  allocate(this%VapXAir2CanopyLiq_pft(JP1));this%VapXAir2CanopyLiq_pft=spval
   allocate(this%HeatStorCanopy_pft(JP1));this%HeatStorCanopy_pft=spval
   allocate(this%CanopyEvapTransLHeat_pft(JP1));this%CanopyEvapTransLHeat_pft=spval
   allocate(this%WatHeldOnCanopy_pft(JP1));this%WatHeldOnCanopy_pft=spval
@@ -1846,6 +1850,8 @@ implicit none
   allocate(this%TAU_DirectSunLit(NumCanopyLayers1+1));this%TAU_DirectSunLit=0._r8
   allocate(this%TAU_DirectSunSha(NumCanopyLayers1+1));this%TAU_DirectSunSha=0._r8
   allocate(this%LWRadCanopy_pft(JP1))
+  allocate(this%RadSWCanopyLAbsroption_pft(NumCanopyLayers1,JP1)); this%RadSWCanopyLAbsroption_pft=0._r8
+  allocate(this%RadPARCanopyLAbsorption_pft(NumCanopyLayers1,JP1)); this%RadPARCanopyLAbsorption_pft=0._r8
   allocate(this%RadSWCanopyAbsorption_pft(JP1))
   allocate(this%OMEGX(NumOfSkyAzimuthSects1,NumLeafInclinationClasses1,NumOfLeafAzimuthSectors1));this%OMEGX=0._r8
   allocate(this%OMEGA2Ground(NumOfSkyAzimuthSects1));this%OMEGA2Ground=0._r8

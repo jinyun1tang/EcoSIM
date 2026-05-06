@@ -166,6 +166,7 @@ implicit none
     ENDDO
     !variables updated from surface energy calculation
     DO L=1,NumCanopyLayers
+      plt_rad%RadSWCanopyLAbsroption_pft(L,NZ)   =RadSWCanopyLAbsroption_pft(L,NZ,NY,NX)
       DO  M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafInclinationClasses
           plt_rad%RadTotPARAbsorption_zsec(N,M,L,NZ)    = RadTotPARAbsorption_zsec(N,M,L,NZ,NY,NX)
@@ -227,7 +228,6 @@ implicit none
   Eco_Heat_GrndSurf_col(NY,NX)     = plt_ew%Eco_Heat_GrndSurf_col
   CanopyBiomWater_col(NY,NX)       = plt_ew%CanopyBiomWater_col
   WatHeldOnCanopy_col(NY,NX)       = plt_ew%WatHeldOnCanopy_col
-  SnowOnCanopy_col(NY,NX)          = plt_ew%SnowOnCanopy_col
   SnowOnCanopy_col(NY,NX)          = plt_ew%SnowOnCanopy_col
   QVegET_col(NY,NX)                = plt_ew%QVegET_col
   VapXAir2Canopy_col(NY,NX)        = plt_ew%VapXAir2Canopy_col

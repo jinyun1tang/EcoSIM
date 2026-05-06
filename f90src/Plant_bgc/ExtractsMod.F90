@@ -324,6 +324,7 @@ module ExtractsMod
     VapXAir2Canopy_pft        => plt_ew%VapXAir2Canopy_pft           ,& !input  :canopy evaporation, [m2 d-2 h-1]
     SnoSub2AirCanopy_pft      => plt_ew%SnoSub2AirCanopy_pft         ,& !input  :canopy snow sublimation,[m3 d-2 h-1]    
     WatHeldOnCanopy_pft       => plt_ew%WatHeldOnCanopy_pft          ,& !input  :canopy surface water content, [m3 d-2]
+    SnowOnCanopy_pft          => plt_ew%SnowOnCanopy_pft             ,& !input  :snow water equivalent held on canopy, [m3 d-2]    
     CanopyHeatStor_col        => plt_ew%CanopyHeatStor_col           ,& !inoput :total canopy heat content, [MJ d-2]
     CanopyLeafArea_col        => plt_morph%CanopyLeafArea_col        ,& !inoput :grid canopy leaf area, [m2 d-2]
     CanopyBiomWater_col       => plt_ew%CanopyBiomWater_col          ,& !inoput :total canopy water content stored with dry matter, [m3 d-2]
@@ -343,6 +344,7 @@ module ExtractsMod
     StemArea_col              => plt_morph%StemArea_col              ,& !inoput :grid canopy stem area, [m2 d-2]
     TRootGasLossDisturb_col   => plt_rbgc%TRootGasLossDisturb_col    ,& !inoput :total root gas content, [g d-2]
     VapXAir2Canopy_col        => plt_ew%VapXAir2Canopy_col           ,& !inoput :grid canopy evaporation, [m3 d-2]
+    SnowOnCanopy_col          => plt_ew%SnowOnCanopy_col             ,& !inoput :snow water equivalent held on canopy, [m3 d-2]    
     WatHeldOnCanopy_col       => plt_ew%WatHeldOnCanopy_col           & !inoput :canopy surface water content, [m3 d-2]
   )
   call PrintInfo('beg '//subname)
@@ -378,11 +380,12 @@ module ExtractsMod
   Eco_Heat_Latent_col    = Eco_Heat_Latent_col+CanopyEvapTransLHeat_pft(NZ)
   Eco_Heat_Sens_col      = Eco_Heat_Sens_col+HeatXAir2PCan_pft(NZ)
   Eco_Heat_GrndSurf_col  = Eco_Heat_GrndSurf_col+HeatStorCanopy_pft(NZ)
-  ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
-  CanopyBiomWater_col          = CanopyBiomWater_col+CanopyBiomWater_pft(NZ)
+  ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  CanopyBiomWater_col    = CanopyBiomWater_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
-  QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
-  VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
+  SnowOnCanopy_col       = SnowOnCanopy_col+SnowOnCanopy_pft(NZ)
+  QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
+  VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
   ENGYC                  = VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   CanopyHeatStor_col     = CanopyHeatStor_col+ENGYC
   HeatFlx2Canopy_col     = HeatFlx2Canopy_col+ENGYC-ENGYX_pft(NZ)

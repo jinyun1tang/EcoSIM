@@ -116,6 +116,7 @@ implicit none
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
   DO NZ=1,NP_col(NY,NX)
+    plt_ew%fSnowCanopy_pft(NZ) = fSnowCanopy_pft(NZ,NY,NX)
     plt_ew%BulkFactor4Snow_pft(NZ) = BulkFactor4Snow_pft(NZ,NY,NX)
     plt_pheno%iPlant2ndGrothPattern_pft(NZ) = iPlant2ndGrothPattern_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)   = CanopyLeafArea_pft(NZ,NY,NX)
@@ -210,9 +211,14 @@ implicit none
     TAU_DirectSunLit(L,NY,NX) = plt_rad%TAU_DirectSunLit(L)
     TAU_DirectSunSha(L,NY,NX)         = plt_rad%TAU_DirectSunSha(L)
   ENDDO
+
   LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col
   
   DO NZ=1,NP_col(NY,NX)
+    DO L=1,NumCanopyLayers
+      RadSWCanopyLAbsroption_pft(L,NZ,NY,NX)=plt_rad%RadSWCanopyLAbsroption_pft(L,NZ)      
+    ENDDO
+
     LeafStalkArea_pft(NZ,NY,NX)     = plt_morph%LeafStalkArea_pft(NZ)
     RadSWCanopyAbsorption_pft(NZ,NY,NX)     = plt_rad%RadSWCanopyAbsorption_pft(NZ)
     RadPARCanopyAbsorption_pft(NZ,NY,NX)    = plt_rad%RadPARCanopyAbsorption_pft(NZ)

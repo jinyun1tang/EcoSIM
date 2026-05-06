@@ -983,8 +983,8 @@ implicit none
     plt_distb%iPlantingYear_pft(NZ)                     = iPlantingYear_pft(NZ,NY,NX)
     plt_distb%iPlantingDay_pft(NZ)                      = iPlantingDay_pft(NZ,NY,NX)
     plt_distb%iHarvestYear_pft(NZ)                      = iHarvestYear_pft(NZ,NY,NX)
-    plt_rad%RadPARCanopyAbsorption_pft(NZ)                      = RadPARCanopyAbsorption_pft(NZ,NY,NX)
-    plt_rad%RadSWCanopyAbsorption_pft(NZ)                       = RadSWCanopyAbsorption_pft(NZ,NY,NX)
+    plt_rad%RadPARCanopyAbsorption_pft(NZ)              = RadPARCanopyAbsorption_pft(NZ,NY,NX)
+    plt_rad%RadSWCanopyAbsorption_pft(NZ)               = RadSWCanopyAbsorption_pft(NZ,NY,NX)
     plt_ew%RainIntcptByCanopy_pft(NZ)                   = RainIntcptByCanopy_pft(NZ,NY,NX)
     plt_ew%SnowIntcptByCanopy_pft(NZ)                   = SnowIntcptByCanopy_pft(NZ,NY,NX)
     plt_site%PPatSeeding_pft(NZ)                        = PPatSeeding_pft(NZ,NY,NX)
@@ -1000,9 +1000,10 @@ implicit none
     ENDDO
 
     DO L=1,NumCanopyLayers
+      plt_rad%RadSWCanopyLAbsroption_pft(L,NZ)  =RadSWCanopyLAbsroption_pft(L,NZ,NY,NX)
       DO  M=1,NumOfSkyAzimuthSects
         DO  N=1,NumLeafInclinationClasses
-          plt_rad%RadTotPARAbsorption_zsec(N,M,L,NZ)    = RadTotPARAbsorption_zsec(N,M,L,NZ,NY,NX)
+          plt_rad%RadTotPARAbsorption_zsec(N,M,L,NZ) = RadTotPARAbsorption_zsec(N,M,L,NZ,NY,NX)
           plt_rad%RadDifPARAbsorption_zsec(N,M,L,NZ) = RadDifPARAbsorption_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO

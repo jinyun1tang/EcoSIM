@@ -71,15 +71,15 @@ implicit none
       SnowTempUnload = SnowOnCanopy_pft(NZ,NY,NX)*AZMAX1(TKCanopy_pft(NZ,NY,NX)-270._r8)/(1.87E5_r8*3600._r8)
 
       !update by unloading
-      SnowUnload_pft             = AMIN1(SnowWindUnload+SnowTempUnload,SnowOnCanopy_pft(NZ,NY,NX))
-      SnowOnCanopy_pft(NZ,NY,NX) = SnowOnCanopy_pft(NZ,NY,NX)-SnowUnload_pft
-      ENGYS                      = ENGYS+SnowUnload_pft*TKCanopy_pft(NZ,NY,NX)
-      CanopySnowUnload_col       = CanopySnowUnload_col+SnowUnload_pft
-      fSnowCanopy_pft(NZ,NY,NX)  = ((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
-      BulkFactor4Snow_pft(NZ,NY,NX)=BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
-      BulkFactor4Snow_col(NY,NX) = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
-      SnowOnCanopy_col(NY,NX)    = SnowOnCanopy_col(NY,NX)+SnowOnCanopy_pft(NZ,NY,NX)
-      fSnowCanopy_col(NY,NX)     = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
+      SnowUnload_pft                = AMIN1(SnowWindUnload+SnowTempUnload,SnowOnCanopy_pft(NZ,NY,NX))
+      SnowOnCanopy_pft(NZ,NY,NX)    = SnowOnCanopy_pft(NZ,NY,NX)-SnowUnload_pft
+      ENGYS                         = ENGYS+SnowUnload_pft*TKCanopy_pft(NZ,NY,NX)
+      CanopySnowUnload_col          = CanopySnowUnload_col+SnowUnload_pft
+      fSnowCanopy_pft(NZ,NY,NX)     = ((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
+      BulkFactor4Snow_pft(NZ,NY,NX) = BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
+      BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
+      SnowOnCanopy_col(NY,NX)       = SnowOnCanopy_col(NY,NX)+SnowOnCanopy_pft(NZ,NY,NX)
+      fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
     else
       SnowIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
       RainIntcptByCanopy_pft(NZ,NY,NX) = 0._r8

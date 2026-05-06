@@ -508,18 +508,18 @@ module PlantPhenolMod
   real(r8):: ShootArea
   logical :: CanopyChk,RootChk
 
-  associate(                                               &
-    MainBranchNum_pft   => plt_morph%MainBranchNum_pft    ,& !input  :number of main branch,[-]
-    CanopyLeafArea_pft  => plt_morph%CanopyLeafArea_pft   ,& !input  :plant canopy leaf area, [m2 d-2]
-    ShootElms_pft       => plt_biom%ShootElms_pft         ,& !input  :canopy shoot structural chemical element mass, [g d-2]
-    HypocotHeight_pft   => plt_morph%HypocotHeight_pft    ,& !input  :cotyledon height, [m]
-    Root1stDepz_raxes   => plt_morph%Root1stDepz_raxes    ,& !input  :root layer depth, [m]
-    ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft      ,& !input  :threshold zero for leaf calculation, [-]
-    WatHeldOnCanopy_pft => plt_ew%WatHeldOnCanopy_pft     ,& !input  :canopy surface water content, [m3 d-2]
+  associate(                                                       &
+    MainBranchNum_pft       => plt_morph%MainBranchNum_pft        ,& !input  :number of main branch,[-]
+    CanopyLeafArea_pft      => plt_morph%CanopyLeafArea_pft       ,& !input  :plant canopy leaf area, [m2 d-2]
+    ShootElms_pft           => plt_biom%ShootElms_pft             ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    HypocotHeight_pft       => plt_morph%HypocotHeight_pft        ,& !input  :cotyledon height, [m]
+    Root1stDepz_raxes       => plt_morph%Root1stDepz_raxes        ,& !input  :root layer depth, [m]
+    ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft          ,& !input  :threshold zero for leaf calculation, [-]
+    WatHeldOnCanopy_pft     => plt_ew%WatHeldOnCanopy_pft         ,& !input  :canopy surface water content, [m3 d-2]
     CanopyStemSurfArea_pft  => plt_morph%CanopyStemSurfArea_pft   ,& !input  :plant stem area, [m2 d-2]
-    SeedDepth_pft       => plt_morph%SeedDepth_pft        ,& !input  :seeding depth, [m]
-    iPlantCalendar_brch => plt_pheno%iPlantCalendar_brch  ,& !input  :plant growth stage, [-]
-    VHeatCapCanopy_pft  => plt_ew%VHeatCapCanopy_pft       & !output :canopy heat capacity, [MJ d-2 K-1]
+    SeedDepth_pft           => plt_morph%SeedDepth_pft            ,& !input  :seeding depth, [m]
+    iPlantCalendar_brch     => plt_pheno%iPlantCalendar_brch      ,& !input  :plant growth stage, [-]
+    VHeatCapCanopy_pft      => plt_ew%VHeatCapCanopy_pft           & !output :canopy heat capacity, [MJ d-2 K-1]
   )
   call PrintInfo('beg '//subname)
   !

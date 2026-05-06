@@ -803,6 +803,7 @@ module Hour1Mod
   TPlantRootH2OUptake_col(NY,NX)                  = 0._r8
   CanopyBiomWater_col(NY,NX)                      = 0._r8
   WatHeldOnCanopy_col(NY,NX)                      = 0._r8
+  SnowOnCanopy_col(NY,NX)                         = 0._r8
   Prec2Canopy_col(NY,NX)                          = 0._r8
   RainIntceptByCanopy_col(NY,NX)                  = 0._r8
   SnowIntcptByCanopy_col(NY,NX)                   = 0._r8

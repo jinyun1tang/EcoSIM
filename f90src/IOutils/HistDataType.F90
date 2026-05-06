@@ -68,6 +68,8 @@ implicit none
   real(r8),pointer   :: h1D_QTRANSP_col(:)
   real(r8),pointer   :: h1D_Qdrain_col(:)            
   real(r8),pointer   :: h1D_tPREC_P_col(:)     
+  real(r8),pointer   :: h1D_SnowCanopy_col(:)
+  real(r8),pointer   :: h1D_fSnowCan_pft(:)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)    
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
@@ -689,7 +691,7 @@ implicit none
   allocate(this%h1D_SUB_DOC_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DOC_FLX_col(:)=spval 
   allocate(this%h1D_SUR_DIC_FLX_col(beg_col:end_col))    ;this%h1D_SUR_DIC_FLX_col(:)=spval 
   allocate(this%h1D_SUB_DIC_FLX_col(beg_col:end_col))    ;this%h1D_SUB_DIC_FLX_col(:)=spval 
-
+  allocate(this%h1D_SnowCanopy_col(beg_col:end_col)) ; this%h1D_SnowCanopy_col(:)=spval
   allocate(this%h1D_tPREC_P_col(beg_col:end_col))      ;this%h1D_tPREC_P_col(:)=spval 
   allocate(this%h1D_tMICRO_P_col(beg_col:end_col))       ;this%h1D_tMICRO_P_col(:)=spval
   allocate(this%h1D_PO4_FIRE_col(beg_col:end_col))       ;this%h1D_PO4_FIRE_col(:)=spval
@@ -864,6 +866,7 @@ implicit none
   allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_H2O_ptc(:)=spval
   allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))         ;this%h1D_TRANSPN_ptc(:)=spval
   allocate(this%h1D_QTRANSP_col(beg_col:end_col)); this%h1D_QTRANSP_col(:)=spval
+  allocate(this%h1D_fSnowCan_pft(beg_ptc:end_ptc));this%h1D_fSnowCan_pft(:)=spval
   allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NH4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
@@ -1477,6 +1480,10 @@ implicit none
     long_name='Column-integrated micriobial P (include surface litter)',ptr_col=data1d_ptr, &
     default='inactive')            
 
+  data1d_ptr => this%h1D_SnowCanopy_col(beg_col:end_col)    
+  call hist_addfld1d(fname='SWECanopy_col',units='mmH2O/m2',avgflag='A', &
+    long_name='Column-integrated canopy held  (water equivalent) snow',ptr_col=data1d_ptr)            
+
   data1d_ptr => this%h1D_PO4_FIRE_col(beg_col:end_col)  
   call hist_addfld1d(fname='PO4_FIRE_col',units='gP/m2',avgflag='I',&
     long_name='Cumulative PO4 flux from fire',ptr_col=data1d_ptr)      
@@ -2089,6 +2096,10 @@ implicit none
   call hist_addfld1d(fname='cAbvNonstP_pft',units='gP/gC',avgflag='A',&
     long_name='Canopy nonstructural P concentration',ptr_patch=data1d_ptr,&
     default='inactive')            
+
+  data1d_ptr => this%h1D_fSnowCan_pft(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='fSnowCanopy_pft',units='-',avgflag='A',&
+    long_name='Canopy covered by snow',ptr_patch=data1d_ptr)          
 
   data1d_ptr => this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='CanNonstBConc_pft',units='g',avgflag='A',&
@@ -3854,6 +3865,7 @@ implicit none
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tPREC_P_col(ncol)          = tXPO4_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tMICRO_P_col(ncol)         = tMicBiome_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_SnowCanopy_col(ncol)        =SnowOnCanopy_col(NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_PO4_FIRE_col(ncol)         = PO4byFire_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_cPO4_LITR_col(ncol)        = safe_adb(trcs_solml_vr(ids_H2PO4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_cEXCH_P_LITR_col(ncol)     = patomw*safe_adb(trcx_solml_vr(idx_HPO4,0,NY,NX)+&
@@ -4341,7 +4353,7 @@ implicit none
           call this%ZeroPlantHistVars(nptc)
           cycle
         endif       
-
+        this%h1D_fSnowCan_pft(nptc)     = fSnowCanopy_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)

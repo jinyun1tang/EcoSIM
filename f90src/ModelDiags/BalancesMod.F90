@@ -113,7 +113,7 @@ contains
   integer :: L
 
   !canopy
-  CanopyWaterMassEnd_col(NY,NX) = WatHeldOnCanopy_col(NY,NX)+CanopyBiomWater_col(NY,NX)
+  CanopyWaterMassEnd_col(NY,NX) = WatHeldOnCanopy_col(NY,NX)+CanopyBiomWater_col(NY,NX)+SnowOnCanopy_col(NY,NX)
   !snow  
   SnowMassEnd_col(NY,NX)=0._r8
   DO  L=1,JS
@@ -250,6 +250,7 @@ contains
           write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
           write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
           write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
+          write(110,*)'SnowOnCanopy     =',SnowOnCanopy_col(NY,NX)
           write(110,*)'CanopyBiomWater_col    =',CanopyBiomWater_col(NY,NX)
           write(110,*)'SoilWatMassBegEnd=',SoilWatMassBeg_col(NY,NX),SoilWatMassEnd_col(NY,NX),&
             SoilWatMassBeg_col(NY,NX)-SoilWatMassEnd_col(NY,NX),NU_col(NY,NX)
