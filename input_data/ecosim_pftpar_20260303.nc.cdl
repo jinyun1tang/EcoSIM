@@ -27,6 +27,14 @@ variables:
 		ISTYP:long_name = "growth habit" ;
 		ISTYP:units = "none" ;
 		ISTYP:flags = "0=annual,1=perennial" ;
+   byte I2EXP(npfts) ;
+      I2EXP:long_name = "secondary growth expression" ;
+      I2EXP:units = "none";
+      I2EXP:flags ="0=no,1=yes";
+   byte ISNTYP(npfts) ;
+      ISNTYP:long_name="snow interception vegetation class" ;
+      ISNTYP:units ="none" ;
+      ISNTYP:flags = "0=bryophyte,1=grass,2=shrubs,3=deciduous tree,4=confierous tree" ;   
 	byte IDTYP(npfts) ;
 		IDTYP:long_name = "growth pattern" ;
 		IDTYP:units = "none" ;
@@ -397,10 +405,21 @@ data:
     1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     0, 1, 0, 0, 1, 1, 0, 0 ;
 
+ I2EXP = 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 
+    1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    0, 1, 1, 0, 0, 0, 0, 1 ;
+
+ ISNTYP = 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 
+    1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    0, 1, 1, 0, 0, 0, 0, 1 ;
+
  IDTYP = 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 
     1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     0, 1, 1, 0, 0, 0, 0, 1 ;
+
 
  INTYP = 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 1, 0, 2, 1, 6, 0, 0, 0, 1, 2, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 0, 5, 0, 5, 0, 0, 0, 0, 5, 2, 6, 0, 

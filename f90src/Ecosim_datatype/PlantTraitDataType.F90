@@ -31,6 +31,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  StemArea_col(:,:)                          !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  LeafStalkArea_col(:,:)                     !canopy area of combined over the grid [m2 d-2]
+  real(r8),target,allocatable ::  BulkFactor4Snow_col(:,:)                   !grid bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
+  real(r8),target,allocatable ::  BulkFactor4Snow_pft(:,:,:)                 !pft bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                  !soil layer at planting depth, [-]
   real(r8),target,allocatable ::  PlantinDepz_pft(:,:,:)                     !planting depth, [m]
   real(r8),target,allocatable ::  SeedDepth_pft(:,:,:)                       !seeding depth, [m]
@@ -179,6 +181,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  iEmbryophyteType_pft(:,:,:)                 !plant embroytype [Bryophytes,Pteridophytes,Gymnosperms,Monocots and Eudicots]
   integer,target,allocatable ::  iPlantPhotosynsType_pft(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
   integer,target,allocatable ::  iPlantRootProfile_pft(:,:,:)                !plant growth type (vascular, non-vascular),[-]
+  integer,target,allocatable ::  iPlantSnowIntercepType_pft(:,:,:)           !plant snow interception type, (bryophyte, grasses, shrubs, deciduous trees, confierous trees)
   integer,target,allocatable ::  iPlantPhenolPattern_pft(:,:,:)              !plant growth habit (annual or perennial),[-]
   integer,target,allocatable ::  iPlantDevelopPattern_pft(:,:,:)             !plant growth habit (determinate or indeterminate),[-]  
   integer,target,allocatable ::  iPlantNfixType_pft(:,:,:)                   !N2 fixation type,[-]
@@ -186,6 +189,7 @@ module PlantTraitDataType
   integer,target,allocatable ::  iPlantPhenolType_pft(:,:,:)                 !climate signal for phenological progress none, temperature, water stress,[-]
   integer,target,allocatable ::  iPlantPhotoperiodType_pft(:,:,:)            !photoperiod type (neutral, long day, short day),[-]
   integer,target,allocatable ::  iPlantTurnoverPattern_pft(:,:,:)            !phenologically-driven above-ground turnover (all, foliar only, none),[-]
+  integer,target,allocatable :: iPlant2ndGrothPattern_pft(:,:,:)             !does the plant express secondary growth, [-]
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                  !grain type (below or above-ground), e.g. potato and onion are below,[-]
   integer,target,allocatable ::  Myco_pft(:,:,:)                               !mycorrhizal type, 1, 2 ,[-]
 
@@ -202,6 +206,7 @@ contains
   allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkSurfArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkSurfArea_lbrch=0._r8
+  allocate(iPlantSnowIntercepType_pft(JP,JY,JX)); iPlantSnowIntercepType_pft=0
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
   allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
   allocate(CanopyStemSurfArea_pft(JP,JY,JX));    CanopyStemSurfArea_pft=0._r8
@@ -213,6 +218,8 @@ contains
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
   allocate(StemArea_col(JY,JX));       StemArea_col=0._r8
   allocate(LeafStalkArea_col(JY,JX));       LeafStalkArea_col=0._r8
+  allocate(BulkFactor4Snow_col(JY,JX)); BulkFactor4Snow_col=0._r8
+  allocate(BulkFactor4Snow_pft(JP,JY,JX)); BulkFactor4Snow_pft=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
   allocate(PlantinDepz_pft(JP,JY,JX));   PlantinDepz_pft=0._r8
   allocate(SeedDepth_pft(JP,JY,JX));    SeedDepth_pft=0._r8
@@ -369,6 +376,7 @@ contains
   allocate(Days4FalseBreak_pft(JP,JY,JX)); Days4FalseBreak_pft=0
   allocate(iPlantPhotoperiodType_pft(JP,JY,JX));    iPlantPhotoperiodType_pft=0
   allocate(iPlantTurnoverPattern_pft(JP,JY,JX));    iPlantTurnoverPattern_pft=0
+  allocate(iPlant2ndGrothPattern_pft(JP,JY,JX)); iPlant2ndGrothPattern_pft=0
   allocate(iPlantGrainType_pft(JP,JY,JX));    iPlantGrainType_pft=0
   allocate(Myco_pft(JP,JY,JX));       Myco_pft=0
 
@@ -378,6 +386,9 @@ contains
   subroutine DestructPlantTraits
   use abortutils, only : destroy
   implicit none
+
+  call destroy(iPlant2ndGrothPattern_pft)
+  call destroy(iPlantSnowIntercepType_pft)
   call destroy(Days4FalseBreak_pft)
   call destroy(FracLeafShethElmAlloc2Litr)
   call destroy(FracRootElmAllocm)
@@ -394,6 +405,8 @@ contains
   call destroy(StemArea_col)
   call destroy(LeafStalkArea_col)
   call destroy(NGTopRootLayer_pft)
+  call destroy(BulkFactor4Snow_pft)
+  call destroy(BulkFactor4Snow_col)
   call destroy(PlantinDepz_pft)
   call destroy(SeedDepth_pft)
   call destroy(SeedVolumeMean_pft)

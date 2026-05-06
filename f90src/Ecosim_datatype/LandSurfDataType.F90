@@ -23,7 +23,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  ALTI_col(:,:)                          !Altitude of landscape, [m]
   real(r8),target,allocatable ::  SineGrndSlope_col(:,:)                 !Sine of slope, [-]
   real(r8),target,allocatable ::  CosineGrndSlope_col(:,:)               !Cosine of slope, [-]
-  real(r8),target,allocatable ::  GroundSurfAzimuth_col(:,:)             !Azimuth of slope, [-]
+  real(r8),target,allocatable ::  GroundSurfaceAzimuth_col(:,:)             !Azimuth of slope, [-]
   real(r8),target,allocatable ::  ALTZ_col(:,:)                          !Altitude, [m]
   real(r8),target,allocatable ::  SL_col(:,:)                            !Slope, [degree]
   real(r8),target,allocatable ::  ASP_col(:,:)                           !Aspect , [degree]
@@ -49,7 +49,7 @@ contains
   allocate(ALTI_col(JY,JX));        ALTI_col=0._r8
   allocate(SineGrndSlope_col(JY,JX));        SineGrndSlope_col=0._r8
   allocate(CosineGrndSlope_col(JY,JX));        CosineGrndSlope_col=0._r8
-  allocate(GroundSurfAzimuth_col(JY,JX));        GroundSurfAzimuth_col=0._r8
+  allocate(GroundSurfaceAzimuth_col(JY,JX));        GroundSurfaceAzimuth_col=0._r8
   allocate(ALTZ_col(JY,JX));        ALTZ_col=0._r8
   allocate(SL_col(JY,JX));          SL_col=0._r8
   allocate(ASP_col(JY,JX));         ASP_col=0._r8
@@ -74,7 +74,7 @@ contains
   call destroy(ALTI_col)
   call destroy(SineGrndSlope_col)
   call destroy(CosineGrndSlope_col)
-  call destroy(GroundSurfAzimuth_col)
+  call destroy(GroundSurfaceAzimuth_col)
   call destroy(ALTZ_col)
   call destroy(SL_col)
   call destroy(ASP_col)

@@ -474,7 +474,7 @@ module EcosysWarmingMod
   !
   !Description
   !set up cable warming reference tempeature
-  use ClimForcDataType,  only: SineSunInclAngle_col,EMS_Modify_Scalar_col,srad_scalar_col,WindSpeedAtm_col
+  use ClimForcDataType,  only: SineSunInclinationAngle_col,EMS_Modify_Scalar_col,srad_scalar_col,WindSpeedAtm_col
   use PlantDataRateType, only: GrossCO2Fix_pft
   implicit none
   integer, intent(in) :: I,J
@@ -509,7 +509,7 @@ module EcosysWarmingMod
   !
   !Description
   !set up cable warming reference tempeature
-  use ClimForcDataType,  only: SineSunInclAngle_col
+  use ClimForcDataType,  only: SineSunInclinationAngle_col
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -522,8 +522,8 @@ module EcosysWarmingMod
     DO NY=NVN,NVS
       if(warm_type(NY,NX)==2 .or.warm_type(NY,NX)>20)then
         !it is cable warming, use solar angle to determine day or night 
-        daytime_chk=ihtime==0 .or. (ihtime==1 .and. SineSunInclAngle_col(NY,NX) > 1.e-2_r8) &
-          .or. (ihtime==2 .and. SineSunInclAngle_col(NY,NX) <= 1.e-2_r8)
+        daytime_chk=ihtime==0 .or. (ihtime==1 .and. SineSunInclinationAngle_col(NY,NX) > 1.e-2_r8) &
+          .or. (ihtime==2 .and. SineSunInclinationAngle_col(NY,NX) <= 1.e-2_r8)
 
         !use plant GPP to test growing season 
         season_chk=check_warming_season(I,NY,NX)
@@ -546,7 +546,7 @@ module EcosysWarmingMod
   !
   !Description
   !Apply infrared warming
-  use ClimForcDataType,  only: TairK_col,SineSunInclAngle_col
+  use ClimForcDataType,  only: TairK_col,SineSunInclinationAngle_col
   use GridDataType,      only: AREA_3D, NU_col
   use PlantDataRateType, only: GrossCO2Fix_pft
   implicit none
@@ -560,8 +560,8 @@ module EcosysWarmingMod
     DO NY=NVN,NVS
       if(mod(warm_type(NY,NX),10)==1)then      
         !it is ir heating warming, use solar angle to determine day or night 
-        daytime_chk= ihtime==0 .or. (ihtime==1 .and. SineSunInclAngle_col(NY,NX) > 1.e-2_r8) &
-          .or. (ihtime==2 .and. SineSunInclAngle_col(NY,NX) <= 1.e-2_r8)
+        daytime_chk= ihtime==0 .or. (ihtime==1 .and. SineSunInclinationAngle_col(NY,NX) > 1.e-2_r8) &
+          .or. (ihtime==2 .and. SineSunInclinationAngle_col(NY,NX) <= 1.e-2_r8)
 
         season_chk=check_warming_season(I,NY,NX)
         if(daytime_chk .and. season_chk)then
