@@ -27,6 +27,11 @@ module SurfaceRadiationMod
   real(r8), parameter :: SnowPARAlbedo        = 0.95_r8
   real(r8), parameter :: SnowSWTransmitance   = 0._r8
   real(r8), parameter :: SnowPARTransmitance  = 0._r8
+  real(r8), parameter :: StdeadSWAlbedo(0:1)  = (/0.25_r8,0.1_r8/)         !shortwave albedo for standing dead (grass, trees)
+  real(r8), parameter :: StdeadPARAlbedo(0:1) = (/0.2_r8,0.14_r8/)         !PAR albedo for standing dead (grass, trees) 
+  real(r8), parameter :: StdeadSWTransmitance(0:1)=(/0.1_r8,0.1_r8/)       !shortwave transmittance for standing dead (grass, trees)
+  real(r8), parameter :: StdeadPARTransmitance(0:1)=(/0.4_r8,0.4_r8/)      !PAR transmittance for standing dead (grass, trees)
+  
   integer :: iyrc
   logical :: dowrite
 
