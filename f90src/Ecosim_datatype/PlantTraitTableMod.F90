@@ -1,6 +1,6 @@
 module PlantTraitTableMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use GridConsts,    only: NumLeafZenithSectors
+  use GridConsts,    only: NumLeafInclinationClasses
   implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
@@ -18,6 +18,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlantPhenolType_tab(:)
   integer, target, allocatable :: iPlantPhotoperiodType_tab(:)
   integer, target, allocatable :: iPlantTurnoverPattern_tab(:)
+  integer, target, allocatable :: iPlant2ndGrothPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
   real(r8), target, allocatable :: PlantInitThermoAdaptZone_pft_tab(:)
@@ -31,6 +32,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: LeafRubisco2Protein_tab(:)
   real(r8), target, allocatable :: LeafPEP2Protein_tab(:)
   real(r8), target, allocatable :: SpecChloryfilAct_tab(:)
+  integer , target, allocatable :: iPlantSnowIntercepType_tab(:)
   real(r8), target, allocatable :: LeafChl2Protein_tab(:)
   real(r8), target, allocatable :: fChlMesophyll_tab(:)           !fraction of cholorophyll in mesophyll cells
   real(r8), target, allocatable :: MorphogenBase_tab(:)           !baseline morphogen signal, [%]
@@ -143,11 +145,13 @@ module PlantTraitTableMod
   allocate(iPlantPhotosynsType_pft_tab(npfts));iPlantPhotosynsType_pft_tab=0
   allocate(iPlantRootProfile_tab(npfts));iPlantRootProfile_tab=0
   allocate(iPlantPhenolPattern_tab(npfts));iPlantPhenolPattern_tab=0
+  allocate(iPlantSnowIntercepType_tab(npfts)); iPlantSnowIntercepType_tab=0
   allocate(iPlantDevelopPattern_tab(npfts));iPlantDevelopPattern_tab=0
   allocate(iPlantNfixType_tab(npfts));iPlantNfixType_tab=0
   allocate(iPlantPhenolType_tab(npfts));iPlantPhenolType_tab=0
   allocate(iPlantPhotoperiodType_tab(npfts));iPlantPhotoperiodType_tab=0
   allocate(iPlantTurnoverPattern_tab(npfts));iPlantTurnoverPattern_tab=0
+  allocate(iPlant2ndGrothPattern_tab(npfts)); iPlant2ndGrothPattern_tab=0
   allocate(iPlantGrainType_tab(npfts));iPlantGrainType_tab=0
   allocate(Myco_tab(npfts));Myco_tab=0
   allocate(PlantInitThermoAdaptZone_pft_tab(npfts));PlantInitThermoAdaptZone_pft_tab=0.0_r8
@@ -183,7 +187,7 @@ module PlantTraitTableMod
   allocate(SLA1_tab(npfts));SLA1_tab=0._r8
   allocate(PetolShethLen2Mass_tab(npfts));PetolShethLen2Mass_tab=0._r8
   allocate(NodeLenPergC_tab(npfts));NodeLenPergC_tab=0._r8
-  allocate(LeafAngleClass_tab(1:NumLeafZenithSectors,npfts));LeafAngleClass_tab=0._r8
+  allocate(LeafAngleClass_tab(1:NumLeafInclinationClasses,npfts));LeafAngleClass_tab=0._r8
   allocate(ClumpFactorInit_tab(npfts));ClumpFactorInit_tab=0._r8
   allocate(BranchAngle_tab(npfts));BranchAngle_tab=0._r8
   allocate(PetolShethAngle_tab(npfts));PetolShethAngle_tab=0._r8
@@ -279,6 +283,7 @@ module PlantTraitTableMod
   call destroy(iPlantPhenolType_tab)
   call destroy(iPlantPhotoperiodType_tab)
   call destroy(iPlantTurnoverPattern_tab)
+  call destroy(iPlant2ndGrothPattern_tab)
   call destroy(iPlantGrainType_tab)
   call destroy(Myco_tab)
   call destroy(PlantInitThermoAdaptZone_pft_tab)
@@ -292,6 +297,7 @@ module PlantTraitTableMod
   call destroy(LeafRubisco2Protein_tab)
   call destroy(LeafPEP2Protein_tab)
   call destroy(SpecChloryfilAct_tab)
+  call destroy(iPlantSnowIntercepType_tab)
   call destroy(LeafChl2Protein_tab)
   call destroy(fChlMesophyll_tab)
   call destroy(CanopyCi2CaRatio_pft_tab)

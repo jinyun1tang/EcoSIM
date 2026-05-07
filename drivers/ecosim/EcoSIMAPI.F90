@@ -160,7 +160,7 @@ contains
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
-    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ
+    ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ,llignification
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
@@ -192,6 +192,7 @@ contains
   plant_model           = .true.
   soichem_model         = .true.
   microbial_model       = .true.
+  llignification        = .true.
   disp_planttrait       = .false.
   ref_date              = '18000101000000'   !place holder for future
   start_date            = '18000101000000'   !start date of the simulation, differ from the forcing date
@@ -371,12 +372,12 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 
   if(do_timing)call init_timer(outdir)
 
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
-
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
 
   call etimer%get_ymdhs(ymdhs)
+
+  iYearCurrent=frectyp%yearcur
 
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     if(lverb)WRITE(*,333)'STARTS'
@@ -391,6 +392,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !are set using the checkpoint file.
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
   endif
+
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !
@@ -408,19 +411,18 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
-  iYearCurrent=frectyp%yearcur
-
   if(check_warming_dates(iYearCurrent,1,1))then
     call read_soil_warming_Tref(iYearCurrent,NHW,NHE,NVN,NVS)    
   endif
   lverb0      = lverb
   DazCurrYear = etimer%get_days_cur_year()
   yearIJ%year = frectyp%yearcur
+  
   DO I  = 1, DazCurrYear
     call DebugPrint("beg step",I*1000)
     yearIJ%I=I
-    if(idebug_day==I .and. idebug_year==iYearCurrent)then
-      lverb=.true.      
+    if(idebug_day==I)then
+      lverb=(idebug_year==iYearCurrent .and. idebug_year.GT.0) .or. (idebug_year.LT.0)      
     else
       lverb=lverb0
     endif  

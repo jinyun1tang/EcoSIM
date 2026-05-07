@@ -737,7 +737,7 @@ module InitPlantMod
     CanPBranchHeight(NB,NZ)                  = 0._r8
     D5: DO L=1,NumCanopyLayers1
       CanopyStalkSurfArea_lbrch(L,NB,NZ)=0._r8
-      DO N=1,NumLeafZenithSectors1
+      DO N=1,NumLeafInclinationClasses1
         StemAreaZsec_brch(N,L,NB,NZ)=0._r8
       enddo
     ENDDO D5
@@ -764,7 +764,7 @@ module InitPlantMod
         CMassHCO3BundleSheath_node(K,NB,NZ) = 0._r8
         CPOOL4_node(K,NB,NZ)                = 0._r8
         D45: DO L=1,NumCanopyLayers1
-          DO N=1,NumLeafZenithSectors1
+          DO N=1,NumLeafInclinationClasses1
             LeafAreaZsec_brch(N,L,K,NB,NZ)=0._r8
           enddo
         ENDDO D45

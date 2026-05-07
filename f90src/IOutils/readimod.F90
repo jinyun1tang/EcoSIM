@@ -74,12 +74,6 @@ module readiMod
 ! OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
 ! FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'
 !
-  OPEN(18,FILE=trim(outdir)//'logfile1',STATUS='UNKNOWN')
-  OPEN(19,FILE=trim(outdir)//'logfile2',STATUS='UNKNOWN')
-  OPEN(20,FILE=trim(outdir)//'logfile3',STATUS='UNKNOWN')
-
-  WRITE(18,5000)' 08 JUL 2021'
-5000  FORMAT(A16)
 
   call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
 
@@ -384,11 +378,11 @@ module readiMod
         ASP_col(NY,NX)       = ASPX
         SL_col(NY,NX)        = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
-!
-!     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
-!
-!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south, (clockwise)
-!     geometric format 0/360 is east, 90 north, 180 west, 270 south (counter-clockwise)
+        !
+        !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
+        !
+        !     what is geometric format mean? geographic format 0 is north, 90 east, 180 south, (clockwise)
+        !     geometric or mathematical format: 0/360 east, 90 north, 180 west, 270 south (counter-clockwise)
         ASP_col(NY,NX)=450.0_r8-ASP_col(NY,NX)
         IF(ASP_col(NY,NX).GE.360.0_r8)ASP_col(NY,NX)=ASP_col(NY,NX)-360.0_r8
       ENDDO

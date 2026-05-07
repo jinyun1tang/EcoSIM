@@ -46,6 +46,7 @@ implicit none
   use SedimentDataType    , only : InitSedimentData
   use SoilWaterDataType   , only : InitSoilWater
   use PlantAPIData        , only : InitPlantAPIData
+  use RadiationDataMod    , only : InitRadiationData
   use PlantMgmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use EcoSIMConfig        , only : jcplx1 => jcplxcm1
@@ -141,6 +142,8 @@ implicit none
 
   call InitNumericAux()
 
+  call InitRadiationData
+  
   if(salt_model)call InitSoluteProperty
 
   call InitSoilWarming
@@ -159,7 +162,7 @@ implicit none
   pltpar%JP1                     = JP
   pltpar%NumOfLeafAzimuthSectors = NumOfLeafAzimuthSectors
   pltpar%NumOfSkyAzimuthSects1   = NumOfSkyAzimuthSects
-  pltpar%NumLeafZenithSectors1   = NumLeafZenithSectors
+  pltpar%NumLeafInclinationClasses1   = NumLeafInclinationClasses
   pltpar%MaxNodesPerBranch1      = MaxNodesPerBranch
   pltpar%iprotein                = micpar%iprotein
   pltpar%icarbhyro               = micpar%icarbhyro

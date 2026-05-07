@@ -85,7 +85,7 @@ module NutUptakeMod
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]
     LeafPetoNonstElmConc_brch => plt_biom%LeafPetoNonstElmConc_brch  ,& !input  :branch nonstructural C concentration, [g d-2]
     CanPStomaResistH2O_pft    => plt_photo%CanPStomaResistH2O_pft    ,& !input  :canopy stomatal resistance, [h m-1]
-    RawCanopy2Atm_pft      => plt_photo%RawCanopy2Atm_pft      ,& !input  :canopy boundary layer resistance, [h m-1]
+    RawCanopy2Atm_pft         => plt_photo%RawCanopy2Atm_pft         ,& !input  :canopy boundary layer resistance, [h m-1]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !input  :branch leaf area, [m2 d-2]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
@@ -113,13 +113,14 @@ module NutUptakeMod
   FNH3P = 1.0E-04_r8*FDMP
   if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
-      IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ).AND.LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
+      IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
         CNH3P                  = AZMAX1(FNH3P*LeafPetoNonstElmConc_brch(ielmn,NB,NZ)/SNH3P)
         ZPOOLB                 = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ) = AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(RawCanopy2Atm_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
           *FracPARads2Canopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
+        CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)+NH3Dep2Can_brch(NB,NZ)  
       ELSE
         NH3Dep2Can_brch(NB,NZ)=0.0_r8
       ENDIF
@@ -307,7 +308,6 @@ module NutUptakeMod
     ENDIF
   ENDDO D950
   
-  call PrintRootTracer(I,J,NZ,'nute')
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootMycoO2NutrientUptake
@@ -316,8 +316,9 @@ module NutUptakeMod
   subroutine ZeroNutrientUptake()
 
   implicit none
-
+  character(len=*), parameter :: subname='ZeroNutrientUptake'
   !     begin_execution
+  call PrintInfo('end '//subname)
   plt_rbgc%RootCO2Ar2RootX_rpvr       = 0._r8
   plt_rbgc%RootCO2Ar2Soil_pvr         = 0._r8
   plt_bgcr%RootO2_TotSink_pvr         = 0._r8
@@ -348,6 +349,7 @@ module NutUptakeMod
   plt_ew%HeatStorCanopy_pft     = 0.0_r8
   plt_ew%Transpiration_pft      = 0.0_r8
   plt_ew%VapXAir2Canopy_pft     = 0.0_r8
+  plt_ew%SnoSub2AirCanopy_pft   = 0.0_r8
   plt_rbgc%Soil2RootMycoExudE_pft = 0.0_r8
   plt_rbgc%RootNH4Uptake_pft    = 0.0_r8
   plt_rbgc%RootNO3Uptake_pft    = 0.0_r8
@@ -367,7 +369,7 @@ module NutUptakeMod
     
   plt_rbgc%trcs_Soil2plant_uptake_vr  =0._r8      
   
-
+  call PrintInfo('end '//subname)
   end subroutine ZeroNutrientUptake
 
 
@@ -386,6 +388,7 @@ module NutUptakeMod
   real(r8), intent(in):: FSatNutTransporter
   real(r8), intent(in):: PerPlantRootH2OUptake
   real(r8), intent(in):: RootMyMassC
+  character(len=*), parameter :: subname='UptakeMineralPhosporhus'
 
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
   real(r8) :: DIFFL
@@ -407,6 +410,7 @@ module NutUptakeMod
     RH1PO4EcoDmndSoilPrev_vr     => plt_bgcr%RH1PO4EcoDmndSoilPrev_vr  ,& !input  :HPO4 demand in non-band by all microbial, root, myco populations, [gP d-2 h-1]
     RH2PO4EcoDmndSoilPrev_vr     => plt_bgcr%RH2PO4EcoDmndSoilPrev_vr   & !input  :total root + microbial PO4 uptake non-band, [gP d-2 h-1]
   )
+  call PrintInfo('beg '//subname)
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
   TFP14X=0.0_r8
@@ -460,6 +464,7 @@ module NutUptakeMod
     call UptakeHPO4(N,L,NZ,DIFFL,FP14X,FP1BX,FCUP,FPUP,FSatNutTransporter,PerPlantRootH2OUptake,RootMyMassC)
 
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine UptakeMineralPhosporhus
 
@@ -480,6 +485,8 @@ module NutUptakeMod
   real(r8), intent(in):: FSatNutTransporter
   real(r8), intent(in):: PerPlantRootH2OUptake
   real(r8), intent(in):: RootMyMassC
+  character(len=*), parameter :: subname='UptakeNO3'
+
   real(r8) :: DIFFL
   real(r8) :: DIFNO3,DIFNOB
   real(r8) :: PATHL
@@ -512,6 +519,7 @@ module NutUptakeMod
     VLWatMicP_vr           => plt_soilchem%VLWatMicP_vr        ,& !input  :soil micropore water content, [m3 d-2]
     VmaxNO3Root_pvr        => plt_rbgc%VmaxNO3Root_pvr          & !output :maximum NO3 uptake rate,  [gN h-1 (gC root)-1]
   )
+  call PrintInfo('beg '//subname)
   ldebug=.false.
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
@@ -651,6 +659,7 @@ module NutUptakeMod
 
   ENDIF
   if(RootMyMassC>1.e-4_r8)VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3Root_pvr(N,L,NZ)/RootMyMassC
+  call PrintInfo('end '//subname)
   end associate
   end subroutine UptakeNO3
 

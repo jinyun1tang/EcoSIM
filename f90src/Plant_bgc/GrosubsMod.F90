@@ -67,6 +67,8 @@ module grosubsMod
     IsPlantActive_pft            => plt_pheno%IsPlantActive_pft           ,& !input  :flag for living pft, [-]
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
+    ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]    
+    PlantPopulation_pft          => plt_site%PlantPopulation_pft          ,& !input  :plant population, [d-2]    
     StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
     CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
@@ -87,32 +89,34 @@ module grosubsMod
   !
 
   D9985: DO NZ=1,NP
-    !
-    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. plt_site%PlantPopulation_pft(NZ)>plt_site%ZEROS)THEN      
+    !    
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
+!      if(yearIJ%I>=235 .and. NZ==2)call CheckPlantBalanceZ(yearIJ,NZ,'aft growone')      
       call RemoveBiomassByDisturbance(yearIJ,NZ)
-
+      
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
+      
     ENDIF  
-
+    
     call AccumulateStates(yearIJ,NZ)
 
   ENDDO D9985
   !
-  call LiveDeadTransformation(yearIJ)
+  call Live2DeadTransformation(yearIJ)     
   !
   call PrintInfo('end '//subname)
   end associate
   END subroutine GrowPlants
 
 !----------------------------------------------------------------------------------------------------
-  subroutine LiveDeadTransformation(yearIJ)
+  subroutine Live2DeadTransformation(yearIJ)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
-  character(len=*), parameter :: subname='LiveDeadTransformation'
+  character(len=*), parameter :: subname='Live2DeadTransformation'
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
   real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
@@ -165,17 +169,17 @@ module grosubsMod
     !
     !     ACTIVATE DORMANT SEEDS
     !
-    D205: DO NB=1,NumOfBranches_pft(NZ)
-      IF(doInitPlant_pft(NZ).EQ.itrue)THEN
+    IF(doInitPlant_pft(NZ).EQ.itrue)THEN
+      D205: DO NB=1,NumOfBranches_pft(NZ)      
         IF(EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
           iDayPlanting_pft(NZ)  = yearIJ%I
           iYearPlanting_pft(NZ) = iYearCurrent
           PlantinDepz_pft(NZ)   = 0.005_r8+CumSoilThickness_vr(0)
           doInitPlant_pft(NZ)   = ifalse   !mark plant as initialized
           exit  
-        ENDIF
-      ENDIF
-    ENDDO D205
+        ENDIF  
+      ENDDO D205
+    ENDIF
     !
     !     LitrFall FROM STANDING DEAD (i.e. loss of standing dead)
     !
@@ -196,21 +200,23 @@ module grosubsMod
         StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
       ENDDO
     ENDDO D6235
-!
-!     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
-!
-!   diagnose surface literfall 
+    !
+    !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LitrFall
+    !
+    !   diagnose surface literfall 
+    !
     SurfLitrfallElms_pft(:,NZ)=0._r8
     DO K=1,pltpar%NumOfPlantLitrCmplxs      
       D6431: DO M=1,jsken
         DO NE=1,NumPlantChemElms
-          SurfLitrfallElms_pft(NE,NZ)=SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
-          SurfLitrfalStrutElms_CumYr_pft(NE,NZ)=SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfallElms_pft(NE,NZ)           = SurfLitrfallElms_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
+          SurfLitrfalStrutElms_CumYr_pft(NE,NZ) = SurfLitrfalStrutElms_CumYr_pft(NE,NZ)+LitrfallElms_pvr(NE,M,K,0,NZ)
         ENDDO
       ENDDO D6431  
     ENDDO
-
-!   the following purposely starts from layer 0.
+    !
+    !   the following purposely starts from layer 0.
+    !
     LitrfallElms_pft(1:NumPlantChemElms,NZ)=0._r8
     D8955: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs      
@@ -232,7 +238,7 @@ module grosubsMod
   ENDDO D9975
   call PrintInfo('end '//subname)
   end associate
-  end subroutine LiveDeadTransformation
+  end subroutine Live2DeadTransformation
 
 !----------------------------------------------------------------------------------------------------
   subroutine GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
@@ -374,8 +380,8 @@ module grosubsMod
   )
   call PrintInfo('beg '//subname)
   D2: DO L=1,NumCanopyLayers1
-    CanopyLeafAreaZ_pft(L,NZ) = 0._r8
-    CanopyLeafCLyr_pft(L,NZ)  = 0._r8
+    CanopyLeafAreaZ_pft(L,NZ)     = 0._r8
+    CanopyLeafCLyr_pft(L,NZ)      = 0._r8
     CanopyStemSurfAreaZ_pft(L,NZ) = 0._r8
   ENDDO D2
 
@@ -419,7 +425,7 @@ module grosubsMod
 
   FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp))
   FracWoodStalkElmAlloc2Litr(ielmc,k_woody_comp) = AZMAX1(1.0_r8-FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp))
-  FracRootElmAllocm(ielmc,k_woody_comp)      = AZMAX1(1.0_r8-FracRootElmAllocm(ielmc,k_fine_comp))
+  FracRootElmAllocm(ielmc,k_woody_comp)          = AZMAX1(1.0_r8-FracRootElmAllocm(ielmc,k_fine_comp))
 
   CNLFW=FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp)*rNCStalk_pft(NZ)+FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*rNCLeaf_pft(NZ)
   CPLFW=FracLeafShethElmAlloc2Litr(ielmc,k_woody_comp)*rPCStalk_pft(NZ)+FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*rPCLeaf_pft(NZ)
@@ -527,7 +533,7 @@ module grosubsMod
     ZEROS                     => plt_site%ZEROS                      ,& !input  :threshold zero for numerical stability,[-]  
     CanopyNodulNonstElms_brch => plt_biom%CanopyNodulNonstElms_brch  ,& !input  :branch nodule nonstructural element, [g d-2]
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
-    CanopyStalkSurfArea_lbrch     => plt_morph%CanopyStalkSurfArea_lbrch     ,& !input  :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
     MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
@@ -564,7 +570,7 @@ module grosubsMod
     CanopySeedNum_pft         => plt_morph%CanopySeedNum_pft         ,& !output :canopy grain number, [d-2]
     CanopySeedNumX_pft        => plt_morph%CanopySeedNumX_pft        ,& !output :last nonzero canopy grain number, [d-2]    
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft         ,& !output :canopy active stalk C, [g d-2]
-    CanopyStemSurfArea_pft        => plt_morph%CanopyStemSurfArea_pft        ,& !output :plant stem area, [m2 d-2]
+    CanopyStemSurfArea_pft    => plt_morph%CanopyStemSurfArea_pft    ,& !output :plant stem area, [m2 d-2]
     EarStrutElms_pft          => plt_biom%EarStrutElms_pft           ,& !output :canopy ear structural element, [g d-2]
     GrainStrutElms_pft        => plt_biom%GrainStrutElms_pft         ,& !output :canopy grain structural element, [g d-2]
     HuskStrutElms_pft         => plt_biom%HuskStrutElms_pft          ,& !output :canopy husk structural element mass, [g d-2]
@@ -580,7 +586,6 @@ module grosubsMod
   !     ACCUMULATE PFT STATE VARIABLES FROM BRANCH STATE VARIABLES
   !
   !
-  
   call PrintInfo('beg '//subname)
   DO NB=1,NumOfBranches_pft(NZ)    
     if(isclose(CanopyLeafSheathC_brch(NB,NZ),0._r8))then
@@ -607,24 +612,25 @@ module grosubsMod
       CanopyStemSurfAreaZ_pft(L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
     ENDDO
   ENDDO
+  
   if(CanopySeedNum_pft(NZ)>0._r8)CanopySeedNumX_pft(NZ)=CanopySeedNum_pft(NZ)
   if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
     fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
     fPCLFW_pft(NZ)=fPCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)
   endif
-
-!
-!     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
-!
-!     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!
-!
-!     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
-!
-!     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
-!     PlantRootSoilElmNetX_pft= > 0 taking from soil 
+  !
+  !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
+  !
+  !     iPlantNfixType_pft=N2 fixation: 1,2,3=rapid to slow root symbiosis
+  !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
+  !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
+  !
+  !
+  !     ACCUMULATE TOTAL SOIL-PLANT C,N,P EXCHANGE
+  !
+  !     PlantN2Fix_CumYr_pft=cumulative PFT N2 fixation
+  !     PlantRootSoilElmNetX_pft= > 0 taking from soil 
+  !
   PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)=Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)
 
   PlantRootSoilElmNetX_pft(ielmn,NZ)=PlantRootSoilElmNetX_pft(ielmn,NZ)+&

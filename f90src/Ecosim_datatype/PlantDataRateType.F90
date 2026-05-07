@@ -44,6 +44,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  EcoHavstElmnt_CumYr_pft(:,:,:,:)               !plant element harvest, [g d-2 ]
   real(r8),target,allocatable ::  EcoHavstElmntCum_pft(:,:,:,:)                  !total plant harvest, [g d-2 ]
   real(r8),target,allocatable ::  CO2ByFire_CumYr_pft(:,:,:)                     !plant CO2 emission from fire, [g d-2 ]
+  real(r8),target,allocatable ::  FireLossE_pft(:,:,:,:)                         !plant element lost by fire, [g d-2 h-1]
   real(r8),target,allocatable ::  CH4ByFire_CumYr_pft(:,:,:)                     !plant CH4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  O2ByFire_CumYr_pft(:,:,:)                      !plant O2 uptake from fire, [g d-2 ]
   real(r8),target,allocatable ::  NH3byFire_CumYr_pft(:,:,:)                     !plant NH3 emission from fire, [g d-2 ]
@@ -199,6 +200,7 @@ module PlantDataRateType
   allocate(EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_CumYr_pft=0._r8
   allocate(EcoHavstElmntCum_pft(NumPlantChemElms,JP,JY,JX));   EcoHavstElmntCum_pft=0._r8
   allocate(CO2ByFire_CumYr_pft(JP,JY,JX));    CO2ByFire_CumYr_pft=0._r8
+  allocate(FireLossE_pft(NumPlantChemElms,JP,JY,JX)); FireLossE_pft=0._r8
   allocate(CH4ByFire_CumYr_pft(JP,JY,JX));    CH4ByFire_CumYr_pft=0._r8
   allocate(O2ByFire_CumYr_pft(JP,JY,JX));    O2ByFire_CumYr_pft=0._r8
   allocate(NH3byFire_CumYr_pft(JP,JY,JX));    NH3byFire_CumYr_pft=0._r8
@@ -342,6 +344,7 @@ module PlantDataRateType
   call destroy(EcoHavstElmntCum_pft)
   call destroy(NodulInfectElms_pft)
   call destroy(CO2ByFire_CumYr_pft)
+  call destroy(FireLossE_pft)
   call destroy(CH4ByFire_CumYr_pft)
   call destroy(O2ByFire_CumYr_pft)
   call destroy(NH3byFire_CumYr_pft)

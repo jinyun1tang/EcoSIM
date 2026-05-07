@@ -310,6 +310,7 @@ implicit none
     RootH2PO4Uptake_pft(NZ,NY,NX)              = plt_rbgc%RootH2PO4Uptake_pft(NZ)
     RootHPO4Uptake_pft(NZ,NY,NX)               = plt_rbgc%RootHPO4Uptake_pft(NZ)
     WatHeldOnCanopy_pft(NZ,NY,NX)              = plt_ew%WatHeldOnCanopy_pft(NZ)
+    SnowOnCanopy_pft(NZ,NY,NX)                 = plt_ew%SnowOnCanopy_pft(NZ)
     CanopyBiomWater_pft(NZ,NY,NX)              = plt_ew%CanopyBiomWater_pft(NZ)
     CO2ByFire_CumYr_pft(NZ,NY,NX)              = plt_distb%CO2ByFire_CumYr_pft(NZ)
     CH4ByFire_CumYr_pft(NZ,NY,NX)              = plt_distb%CH4ByFire_CumYr_pft(NZ)
@@ -335,10 +336,14 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
     rPlantThermoAdaptZone_pft(NZ,NY,NX)        = plt_pheno%rPlantThermoAdaptZone_pft(NZ)
-    CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)
-    iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
-    jHarvstType_pft(NZ,I,NY,NX)                = plt_distb%jHarvstType_pft(NZ)
-    THIN_pft(NZ,I,NY,NX)                       = plt_distb%THIN_pft(NZ)
+
+    if(plt_distb%iHarvstType_pft(NZ).GT.0)then
+      CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)    
+      iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
+      jHarvstType_pft(NZ,I,NY,NX)                = plt_distb%jHarvstType_pft(NZ)
+      THIN_pft(NZ,I,NY,NX)                       = plt_distb%THIN_pft(NZ)
+      FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomHarvsted(1:2,1:4,NZ)
+    endif
     ShootElms_pft(1:NumPlantChemElms,NZ,NY,NX) = plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)
     TurgEff4CanopyResp_pft(NZ,NY,NX)           = plt_rbgc%TurgEff4CanopyResp_pft(NZ)
     CanopyGrosRCO2_pft(NZ,NY,NX)               = plt_bgcr%CanopyGrosRCO2_pft(NZ)
@@ -475,7 +480,7 @@ implicit none
         PetoleProteinC_node(K,NB,NZ,NY,NX)                    = plt_biom%PetoleProteinC_node(K,NB,NZ)
       ENDDO
       DO  L=1,NumCanopyLayers
-        DO N=1,NumLeafZenithSectors
+        DO N=1,NumLeafInclinationClasses
           StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=plt_morph%StemAreaZsec_brch(N,L,NB,NZ)
         ENDDO
       ENDDO
@@ -491,7 +496,7 @@ implicit none
 
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
-          DO N=1,NumLeafZenithSectors
+          DO N=1,NumLeafInclinationClasses
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)  = plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)
           ENDDO
         ENDDO
@@ -663,8 +668,6 @@ implicit none
       ENDDO
     ENDDO
 
-    FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)=plt_distb%FracBiomHarvsted(1:2,1:4,NZ)
-
     DO L=NU_col(NY,NX),MaxSoiL4Root_pft(NZ,NY,NX)
       DO K=1,jcplx
         DO N=1,Myco_pft(NZ,NY,NX)
@@ -744,6 +747,7 @@ implicit none
   plt_site%ZERO2                      = ZERO2
   plt_site%ALAT                       = ALAT_col(NY,NX)
   plt_site%ATCA                       = ATCA_col(NY,NX)
+  plt_ew%BulkFactor4Snow_col          =BulkFactor4Snow_col(NY,NX)
   plt_morph%LeafStalkArea_col         = LeafStalkArea_col(NY,NX)
   plt_morph%CanopyLeafArea_col        = CanopyLeafArea_col(NY,NX)
   plt_site%ALT                        = ALT_col(NY,NX)
@@ -769,7 +773,7 @@ implicit none
   plt_ew%RawIsoTAtm2CanopySinkZ_col   = RawIsoTAtm2CanopySinkZ_col(NY,NX)  
   plt_ew%RIB                          = RIB_col(NY,NX)
   plt_rad%SineSunInclAnglNxtHour_col  = SineSunInclAnglNxtHour_col(NY,NX)
-  plt_rad%SineSunInclAngle_col        = SineSunInclAngle_col(NY,NX)
+  plt_rad%SineSunInclinationAngle_col        = SineSunInclinationAngle_col(NY,NX)
   plt_ew%TKSnow                       = TKSnow_snvr(1,NY,NX)  !surface layer snow temperature
   plt_ew%TairK                        = TairK_col(NY,NX)
   plt_rad%LWRadGrnd_col               = LWRadGrnd_col(NY,NX)
@@ -790,11 +794,11 @@ implicit none
     plt_morph%CanopyHeightZ_col(L) = CanopyHeightZ_col(L,NY,NX)
   ENDDO
   DO  L=1,NumCanopyLayers+1 
-    plt_rad%TAU_DirectRTransmit(L) = TAU_DirectRTransmit(L,NY,NX)  
-    plt_rad%TAU_RadThru(L)         = TAU_RadThru(L,NY,NX)  
+    plt_rad%TAU_DirectSunLit(L) = TAU_DirectSunLit(L,NY,NX)  
+    plt_rad%TAU_DirectSunSha(L)         = TAU_DirectSunSha(L,NY,NX)  
   ENDDO  
 
-  DO N=1,NumLeafZenithSectors
+  DO N=1,NumLeafInclinationClasses
     plt_rad%SineLeafAngle(N)=SineLeafAngle(N)
   ENDDO
 
@@ -874,6 +878,7 @@ implicit none
     plt_pheno%iEmbryophyteType_pft(NZ)             = iEmbryophyteType_pft(NZ,NY,NX)
     plt_pheno%iPlantPhotoperiodType_pft(NZ)       = iPlantPhotoperiodType_pft(NZ,NY,NX)
     plt_pheno%iPlantTurnoverPattern_pft(NZ)       = iPlantTurnoverPattern_pft(NZ,NY,NX)
+    plt_pheno%iPlant2ndGrothPattern_pft(NZ)       = iPlant2ndGrothPattern_pft(NZ,NY,NX)
     plt_pheno%PlantInitThermoAdaptZone_pft(NZ)    = PlantInitThermoAdaptZone_pft(NZ,NY,NX)
     plt_morph%iPlantGrainType_pft(NZ)             = iPlantGrainType_pft(NZ,NY,NX)
     plt_morph%iPlantNfixType_pft(NZ)              = iPlantNfixType_pft(NZ,NY,NX)
@@ -902,7 +907,7 @@ implicit none
     plt_morph%SLA1_pft(NZ)                   = SLA1_pft(NZ,NY,NX)
     plt_morph%PetolShethLen2Mass_pft(NZ)           = PetolShethLen2Mass_pft(NZ,NY,NX)
     plt_morph%NodeLenPergC_pft(NZ)               = NodeLenPergC_pft(NZ,NY,NX)
-    DO  N=1,NumLeafZenithSectors
+    DO  N=1,NumLeafInclinationClasses
       plt_morph%LeafAngleClass_pft(N,NZ)=LeafAngleClass_pft(N,NZ,NY,NX)
     ENDDO
     plt_morph%ClumpFactorInit_pft(NZ)     = ClumpFactorInit_pft(NZ,NY,NX)
@@ -978,9 +983,10 @@ implicit none
     plt_distb%iPlantingYear_pft(NZ)                     = iPlantingYear_pft(NZ,NY,NX)
     plt_distb%iPlantingDay_pft(NZ)                      = iPlantingDay_pft(NZ,NY,NX)
     plt_distb%iHarvestYear_pft(NZ)                      = iHarvestYear_pft(NZ,NY,NX)
-    plt_rad%RadPARbyCanopy_pft(NZ)                      = RadPARbyCanopy_pft(NZ,NY,NX)
-    plt_rad%RadSWbyCanopy_pft(NZ)                       = RadSWbyCanopy_pft(NZ,NY,NX)
-    plt_ew%PrecIntcptByCanopy_pft(NZ)                   = PrecIntcptByCanopy_pft(NZ,NY,NX)
+    plt_rad%RadPARCanopyAbsorption_pft(NZ)              = RadPARCanopyAbsorption_pft(NZ,NY,NX)
+    plt_rad%RadSWCanopyAbsorption_pft(NZ)               = RadSWCanopyAbsorption_pft(NZ,NY,NX)
+    plt_ew%RainIntcptByCanopy_pft(NZ)                   = RainIntcptByCanopy_pft(NZ,NY,NX)
+    plt_ew%SnowIntcptByCanopy_pft(NZ)                   = SnowIntcptByCanopy_pft(NZ,NY,NX)
     plt_site%PPatSeeding_pft(NZ)                        = PPatSeeding_pft(NZ,NY,NX)
     plt_distb%iHarvestDay_pft(NZ)                       = iHarvestDay_pft(NZ,NY,NX)
     plt_morph%ClumpFactorNow_pft(NZ)                    = ClumpFactorNow_pft(NZ,NY,NX)
@@ -994,10 +1000,11 @@ implicit none
     ENDDO
 
     DO L=1,NumCanopyLayers
+      plt_rad%RadSWCanopyLAbsroption_pft(L,NZ)  =RadSWCanopyLAbsroption_pft(L,NZ,NY,NX)
       DO  M=1,NumOfSkyAzimuthSects
-        DO  N=1,NumLeafZenithSectors
-          plt_rad%RadTotPAR_zsec(N,M,L,NZ)    = RadTotPAR_zsec(N,M,L,NZ,NY,NX)
-          plt_rad%RadDifPAR_zsec(N,M,L,NZ) = RadDifPAR_zsec(N,M,L,NZ,NY,NX)
+        DO  N=1,NumLeafInclinationClasses
+          plt_rad%RadTotPARAbsorption_zsec(N,M,L,NZ) = RadTotPARAbsorption_zsec(N,M,L,NZ,NY,NX)
+          plt_rad%RadDifPARAbsorption_zsec(N,M,L,NZ) = RadDifPARAbsorption_zsec(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -1026,6 +1033,7 @@ implicit none
   plt_morph%StemArea_col                                 = StemArea_col(NY,NX)
   plt_ew%Eco_Heat_Sens_col                               = Eco_Heat_Sens_col(NY,NX)
   plt_ew%WatHeldOnCanopy_col                             = WatHeldOnCanopy_col(NY,NX)
+  plt_ew%SnowOnCanopy_col                                = SnowOnCanopy_col(NY,NX)
   plt_bgcr%Eco_NBP_CumYr_col                             = Eco_NBP_CumYr_col(NY,NX)
   plt_ew%Air_Heat_Latent_store_col                       = Air_Heat_Latent_store_col(NY,NX)
   plt_ew%Air_Heat_Sens_store_col                         = Air_Heat_Sens_store_col(NY,NX)
@@ -1191,6 +1199,7 @@ implicit none
     plt_distb%CanopyCutProxy_pft(NZ) = CanopyCutProxy_pft(NZ,I,NY,NX)
     plt_distb%iHarvstType_pft(NZ)         = iHarvstType_pft(NZ,I,NY,NX)
     plt_distb%jHarvstType_pft(NZ)         = jHarvstType_pft(NZ,I,NY,NX)
+
     plt_distb%THIN_pft(NZ)                = THIN_pft(NZ,I,NY,NX)
     plt_morph%CanopyStemSurfArea_pft(NZ)      = CanopyStemSurfArea_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)      = CanopyLeafArea_pft(NZ,NY,NX)
@@ -1252,7 +1261,8 @@ implicit none
     plt_rbgc%RootHPO4Uptake_pft(NZ)                        = RootHPO4Uptake_pft(NZ,NY,NX)
     plt_rbgc%RootH2PO4Uptake_pft(NZ)                       = RootH2PO4Uptake_pft(NZ,NY,NX)
     plt_ew%WatHeldOnCanopy_pft(NZ)                         = WatHeldOnCanopy_pft(NZ,NY,NX)
-    plt_ew%VHeatCapCanopy_pft(NZ)                            = VHeatCapCanopy_pft(NZ,NY,NX)
+    plt_ew%SnowOnCanopy_pft(NZ)                            = SnowOnCanopy_pft(NZ,NY,NX)
+    plt_ew%VHeatCapCanopy_pft(NZ)                          = VHeatCapCanopy_pft(NZ,NY,NX)
     plt_distb%CH4ByFire_CumYr_pft(NZ)                      = CH4ByFire_CumYr_pft(NZ,NY,NX)
     plt_distb%CO2ByFire_CumYr_pft(NZ)                      = CO2ByFire_CumYr_pft(NZ,NY,NX)
     plt_distb%N2ObyFire_CumYr_pft(NZ)                      = N2ObyFire_CumYr_pft(NZ,NY,NX)
@@ -1288,8 +1298,8 @@ implicit none
     DO NB=1,pltpar%MaxNumBranches
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
-          DO N=1,NumLeafZenithSectors
-            plt_photo%LeafAreaSunlit_zsec(N,L,K,NB,NZ)=LeafAreaSunlit_zsec(N,L,K,NB,NZ,NY,NX)  
+          DO N=1,NumLeafInclinationClasses
+            plt_photo%LeafEffArea_zsec(N,L,K,NB,NZ)=LeafEffArea_zsec(N,L,K,NB,NZ,NY,NX)  
           ENDDO
         ENDDO
       ENDDO
@@ -1365,7 +1375,7 @@ implicit none
         plt_photo%CMassHCO3BundleSheath_node(K,NB,NZ) = CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX)
 
         DO  L=1,NumCanopyLayers
-          DO N=1,NumLeafZenithSectors
+          DO N=1,NumLeafInclinationClasses
             plt_morph%LeafAreaZsec_brch(N,L,K,NB,NZ)=LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)   
           ENDDO
         ENDDO

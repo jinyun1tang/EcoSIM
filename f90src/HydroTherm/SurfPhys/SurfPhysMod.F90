@@ -94,7 +94,7 @@ contains
   VapXAir2GSurf_col(NY,NX)       = 0.0_r8
 
   !TFLWCI(NY,NX)           = 0.0_r8
-  PrecIntceptByCanopy_col(NY,NX) = 0.0_r8
+  RainIntceptByCanopy_col(NY,NX) = 0.0_r8
 
 ! zero arrays in the snow layers
   WatConvSno2MicP_snvr(1:JS,NY,NX)   = 0.0_r8
@@ -1398,7 +1398,7 @@ contains
   !convert water flux from m/hour to mm/hour
   PRECM_col(NY,NX)             = m2mm*PrecRainAndIrrig_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
   PrecDirect2Grnd_col(NY,NX)   = m2mm*(PrecRainAndIrrig_col(NY,NX)-Prec2Canopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-  PrecIndirect2Grnd_col(NY,NX) = m2mm*(Prec2Canopy_col(NY,NX)-PrecIntceptByCanopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PrecIndirect2Grnd_col(NY,NX) = m2mm*(Prec2Canopy_col(NY,NX)-RainIntceptByCanopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
 !
 !     RESIDUE WATER ABSORPTION CAPACITY
 !
@@ -1421,14 +1421,14 @@ contains
 !     RainThrufall2SoiMicP,RainThrufall2SoiMacP=precip to soil micropores,macropores
 !     TFLWC=canopy intercepted precipitation
 !     FSNW=fraction of snow cover
-!     PrecIntceptByCanopy_col=precipitation intercepted by plant canopy
+!     RainIntceptByCanopy_col=precipitation intercepted by plant canopy
 
 ! partition throughfall
-  IF(PrecRainAndIrrig_col(NY,NX).GT.0.0_r8 .OR. SnoFalPrec_col(NY,NX).GT.0.0_r8)THEN
+  IF(PrecRainAndIrrig_col(NY,NX).GT.0.0_r8 .OR. SnowPrecThrufall_col(NY,NX).GT.0.0_r8)THEN
   ! there is precipitation
     Rain2Snow            = RainPrecThrufall_col(NY,NX)*FracSurfAsSnow_col(NY,NX)
-    SnoFall              = SnoFalPrec_col(NY,NX) !snowfall
-    PrecHeat2Sno         = cps*TairK_col(NY,NX)*SnoFall+cpw*TairK_col(NY,NX)*Rain2Snow                                  !incoming heat flux from precipitations to snow-covered surface
+    SnoFall              = SnowPrecThrufall_col(NY,NX) !snowfall
+    PrecHeat2Sno         = cps*TKSnowThrufall_col(NY,NX)*SnoFall+cpw*TairK_col(NY,NX)*Rain2Snow                                  !incoming heat flux from precipitations to snow-covered surface
     Rain2ExposedSurf     = RainPrecThrufall_col(NY,NX) *FracSurfSnoFree_col(NY,NX)       !incoming precipitation to snow-free surface
     RainThrufall2LitR    = Rain2ExposedSurf*FracSurfByLitR_col(NY,NX)                             !water flux to snow-free coverd by litter
     RainHeat2LitR        = cpw*TairK_col(NY,NX)*RainThrufall2LitR                                 !heat flux to snow-free surface covered by litter
@@ -1461,7 +1461,7 @@ contains
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   !there is precipitation, there is significant snow layer
-  IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 &
+  IF(SnowPrecThrufall_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 &
     .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     Rain2LitRSurf_col(NY,NX)  = 0.0_r8
     Irrig2LitRSurf_col(NY,NX) = 0.0_r8

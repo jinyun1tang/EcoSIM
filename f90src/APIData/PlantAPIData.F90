@@ -20,7 +20,7 @@ implicit none
   integer, pointer :: NumOfLeafAzimuthSectors1     !number of sectors for the leaf azimuth, [0,pi]
   integer, pointer :: NumCanopyLayers1           !number of canopy layers
   integer, pointer :: JZ1                          !number of soil layers
-  integer, pointer :: NumLeafZenithSectors1      !number of sectors for the leaf zenith [0,pi/2]
+  integer, pointer :: NumLeafInclinationClasses1      !number of sectors for the leaf zenith [0,pi/2]
   integer, pointer :: MaxNodesPerBranch1           !number of canopy nodes
   integer, pointer :: jsken                        !number of kinetic components in litter, PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer, pointer :: NumLitterGroups              !number of litter groups nonstructural(0,*),foliar(1,*),non-foliar(jroots,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -127,7 +127,7 @@ implicit none
   real(r8), pointer :: LeafO2Solubility_pft(:)              => null()   !leaf O2 solubility,                                          [uM /umol mol-1]
   real(r8), pointer :: CO2CuticleResist_pft(:)              => null()   !maximum stomatal resistance to CO2,                          [s h-1]
   real(r8), pointer :: DiffCO2Atmos2Intracel_pft(:)         => null()   !gaesous CO2 concentration difference across stomates,        [umol m-3]
-  real(r8), pointer :: LeafAreaSunlit_zsec(:,:,:,:,:)        => null()  !leaf irradiated surface area in different leaf sector,       [m2 d-2]
+  real(r8), pointer :: LeafEffArea_zsec(:,:,:,:,:)        => null()  !leaf irradiated surface area in different leaf sector,       [m2 d-2]
   real(r8), pointer :: CPOOL3_node(:,:,:)                   => null()   !minimum sink strength for nonstructural C transfer,          [g d-2]
   real(r8), pointer :: CPOOL4_node(:,:,:)                   => null()   !leaf nonstructural C4 content in C4 photosynthesis,          [g d-2]
   real(r8), pointer :: CMassCO2BundleSheath_node(:,:,:)     => null()   !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
@@ -180,34 +180,36 @@ implicit none
   real(r8) :: FracSWRad2Grnd_col             !fraction of radiation intercepted by ground surface, [-]
   real(r8) :: RadSWGrnd_col                  !radiation intercepted by ground surface, [MJ m-2 h-1]
   real(r8) :: SineGrndSlope_col              !sine of slope, [-]
-  real(r8) :: GroundSurfAzimuth_col          !azimuth of slope, [-]
+  real(r8) :: GroundSurfaceAzimuth_col          !azimuth of slope, [-]
   real(r8) :: CosineGrndSlope_col            !cosine of slope, [-]
   real(r8) :: LWRadGrnd_col                      !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8) :: LWRadSky_col                   !sky longwave radiation , [MJ d-2 h-1]
   real(r8) :: SineSunInclAnglNxtHour_col     !sine of solar angle next hour, [-]
-  real(r8) :: SineSunInclAngle_col           !sine of solar angle, [-]
+  real(r8) :: SineSunInclinationAngle_col           !sine of solar angle, [-]
 
   integer,  pointer :: iScatteringDiffus(:,:,:)  => null() !flag for calculating backscattering of radiation in canopy,[-]
   real(r8), pointer :: RadSWLeafAlbedo_pft(:)    => null() !canopy shortwave albedo,                           [-]
-  real(r8), pointer :: CanopyPARalbedo_pft(:)    => null() !canopy PAR albedo,                                 [-]
-  real(r8), pointer :: TAU_DirectRTransmit(:)    => null() !fraction of radiation intercepted by canopy layer, [-]
-  real(r8), pointer :: TAU_RadThru(:)            => null() !fraction of radiation transmitted by canopy layer, [-]
+  real(r8), pointer :: RadPARLeafAlbedo_pft(:)    => null() !canopy PAR albedo,                                 [-]
+  real(r8), pointer :: TAU_DirectSunLit(:)    => null() !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), pointer :: TAU_DirectSunSha(:)            => null() !fraction of radiation transmitted by canopy layer, [-]
   real(r8), pointer :: LWRadCanopy_pft(:)        => null() !canopy longwave radiation,                         [MJ d-2 h-1]
-  real(r8), pointer :: RadSWbyCanopy_pft(:)      => null() !canopy absorbed shortwave radiation,               [MJ d-2 h-1]
+  real(r8), pointer :: RadSWCanopyAbsorption_pft(:)      => null() !canopy absorbed shortwave radiation,               [MJ d-2 h-1]
+  real(r8), pointer :: RadSWCanopyLAbsroption_pft(:,:)   => null() !profile of canopy absorbed shortwave radiation, [MJ d-2 h-1]     
+  real(r8), pointer :: RadPARCanopyLAbsorption_pft(:,:)  => null() !profile of canopy absorbed PAR, [MJ d-2 h-1]  
   real(r8), pointer :: OMEGX(:,:,:)              => null() !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation,[-]
-  real(r8), pointer :: OMEGAG(:)                 => null() !sine of solar beam on leaf surface,                [-]
-  real(r8), pointer :: OMEGA(:,:,:)              => null() !sine of indirect sky radiation on leaf surface,[-]
+  real(r8), pointer :: OMEGA2Ground(:)           => null() !sine of solar beam on ground surface,                [-]
+  real(r8), pointer :: OMEGA2Leaf(:,:,:)              => null() !sine of indirect sky radiation on leaf surface,[-]
   real(r8), pointer :: SineLeafAngle(:)          => null() !sine of leaf angle,[-]
   real(r8), pointer :: CosineLeafAngle(:)        => null() !cosine of leaf angle,[-]
   real(r8), pointer :: RadNet2Canopy_pft(:)      => null() !canopy net radiation,                              [MJ d-2 h-1]
-  real(r8), pointer :: LeafSWabsorpty_pft(:)     => null() !canopy shortwave absorptivity,                     [-]
-  real(r8), pointer :: LeafPARabsorpty_pft(:)    => null() !canopy PAR absorptivity,[-]
-  real(r8), pointer :: RadSWLeafTransmis_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
-  real(r8), pointer :: RadPARLeafTransmis_pft(:) => null() !canopy PAR transmissivity,                         [-]
-  real(r8), pointer :: RadPARbyCanopy_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
+  real(r8), pointer :: LeafSWabsorptivity_pft(:)     => null() !canopy shortwave absorptivity,                     [-]
+  real(r8), pointer :: LeafPARabsorptivity_pft(:)    => null() !canopy PAR absorptivity,[-]
+  real(r8), pointer :: RadSWLeafTransmitance_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
+  real(r8), pointer :: RadPARLeafTransmitance_pft(:) => null() !canopy PAR transmissivity,                         [-]
+  real(r8), pointer :: RadPARCanopyAbsorption_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
   real(r8), pointer :: FracPARads2Canopy_pft(:)  => null() !fraction of incoming PAR absorbed by canopy,       [-]
-  real(r8), pointer :: RadTotPAR_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
-  real(r8), pointer :: RadDifPAR_zsec(:,:,:,:)   => null()  !diffuse incoming PAR,                             [umol m-2 s-1]
+  real(r8), pointer :: RadTotPARAbsorption_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
+  real(r8), pointer :: RadDifPARAbsorption_zsec(:,:,:,:)   => null()  !diffuse incoming PAR,                             [umol m-2 s-1]
   contains
     procedure, public :: Init    => plt_rad_init
     procedure, public :: Destroy => plt_rad_destroy
@@ -402,6 +404,7 @@ implicit none
   integer,  pointer :: iPlantPhenolType_pft(:)           => null()  !climate signal for phenological progress: none,   temperature, water stress,[-]
   integer,  pointer :: Days4FalseBreak_pft(:)            => null()  !accumulated days to singifying false break, [day]  
   integer,  pointer :: iPlantTurnoverPattern_pft(:)      => null()  !phenologically-driven above-ground turnover: all, foliar only, none,[-]
+  integer,  pointer :: iPlant2ndGrothPattern_pft(:)       => null() !does the plant express secondary growth, [-]
   integer,  pointer :: isPlantShootAlive_pft(:)           => null()  !flag to detect canopy death,[-]
   integer,  pointer :: iPlantPhenolPattern_pft(:)        => null()  !plant growth habit: annual or perennial,[-]
   integer,  pointer :: isPlantRootAlive_pft(:)            => null()  !flag to detect root system death,[-]
@@ -647,9 +650,13 @@ implicit none
   real(r8) :: Air_Heat_Latent_store_col     !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: VcumIceSnow_col               !ice volume in snowpack, [m3 d-2]
   real(r8) :: TKSnow                        !snow temperature, [K]
+  
   real(r8) :: WatHeldOnCanopy_col           !canopy surface water content, [m3 d-2]
+  real(r8) :: fSnowCanopy_col               !fraction snow covered canopy, [-]
+  real(r8) :: SnowOnCanopy_col              !canopy snow water content, [m3 d-2]
   real(r8) :: Eco_Heat_Sens_col             !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughnessLength                   !canopy surface roughness height, [m]
+  real(r8) :: BulkFactor4Snow_col           !grid bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   real(r8) :: ZeroPlaneDisplacem_col        !zero plane displacement height, [m]
   real(r8) :: RawIsoTAtm2CanopySinkZ_col        !isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
   real(r8) :: RawCanopyH2SinkZ_col           !isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
@@ -659,15 +666,18 @@ implicit none
   real(r8) :: HeatCanopy2Dist_col           !canopy energy +/- due to disturbance, [MJ /d2]
   real(r8) :: QCanopyWat2Dist_col           !canopy water +/- due to disturbance, [m3 H2O/d2]
   real(r8) :: TPlantRootH2OUptake_col       !total water uptake by roots, [m3 H2O/d2]
-
+  REAL(R8), pointer :: BulkFactor4Snow_pft(:)         => null()    !pft bulking factor for canopy snow interception effect on radiation, [m2 (ton SWE)-1]
+  real(r8), pointer :: fSnowCanopy_pft(:)             => null()    !fraction of canopy is snow covered, [-]
   real(r8), pointer :: Transpiration_pft(:)           => null()    !canopy transpiration,                                         [m3 d-2 h-1]
   real(r8), pointer :: PSICanopyTurg_pft(:)           => null()    !plant canopy turgor water potential,                          [MPa]
-  real(r8), pointer :: PrecIntcptByCanopy_pft(:)      => null()    !water flux into canopy,                                       [m3 d-2 h-1]
+  real(r8), pointer :: RainIntcptByCanopy_pft(:)      => null()    !water flux into canopy,                                       [m3 d-2 h-1]
+  real(r8), pointer :: SnowIntcptByCanopy_pft(:)      => null()    !snow flux into canopy,                                        [m3 d-2 h-1]
   real(r8), pointer :: PSICanopy_pft(:)               => null()    !canopy total water potential,                                 [Mpa]
-  real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation,                                           [m3 d-2 h-1]
+  real(r8), pointer :: VapXAir2Canopy_pft(:)          => null()    !canopy evaporation+sublimation,                                           [m3 d-2 h-1]
+  real(r8), pointer :: VapXAir2CanopyLiq_pft(:)       => null()    !canopy evaporation, [m3 d-2 h-1]
   real(r8), pointer :: HeatStorCanopy_pft(:)          => null()    !canopy storage heat flux,                                     [MJ d-2 h-1]
-  real(r8), pointer :: CanopyEvapTransLHeat_pft(:)          => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
-  real(r8), pointer :: RawIsoTCanopy2Atm_pft(:)   => null()    !canopy isothermal boundary later resistance,                  [h m-1]
+  real(r8), pointer :: CanopyEvapTransLHeat_pft(:)    => null()    !canopy latent heat flux,                                      [MJ d-2 h-1]
+  real(r8), pointer :: RawIsoTCanopy2Atm_pft(:)       => null()    !canopy isothermal boundary later resistance,                  [h m-1]
   real(r8), pointer :: TKS_vr(:)                      => null()    !mean annual soil temperature,                                 [K]
   real(r8), pointer :: PSICanPDailyMin_pft(:)         => null()    !minimum daily canopy water potential,                         [MPa]
   real(r8), pointer :: TdegCCanopy_pft(:)             => null()    !canopy temperature,                                           [oC]
@@ -687,6 +697,8 @@ implicit none
   real(r8), pointer :: RootH2OUptkStress_pvr(:,:,:)   => null()    !root water uptake stress indicated by rate,                   [m3 d-2 h-1] 
   real(r8), pointer :: THeatLossRoot2Soil_vr(:)       => null()    !total root heat uptake,                                       [MJ d-2]
   real(r8), pointer :: TWaterPlantRoot2Soil_vr(:)     => null()    !total root water uptake,                                      [m3 d-2]
+  real(r8), pointer :: SnowOnCanopy_pft(:)            => null()    !canopy held snow, [m3 d-2]
+  real(r8), pointer :: SnoSub2AirCanopy_pft(:)        => null()    !canopy snow sublimation,[m3 d-2 h-1]
   real(r8), pointer :: WatHeldOnCanopy_pft(:)         => null()    !canopy surface water content,                                 [m3 d-2]
   real(r8), pointer :: CanopyBiomWater_pft(:)         => null()    !canopy water content,                                         [m3 d-2]
   real(r8), pointer :: VHeatCapCanopy_pft(:)          => null()    !canopy heat capacity,                                         [MJ d-2 K-1]
@@ -725,6 +737,7 @@ implicit none
   real(r8), pointer :: FERT(:)                      => null()  !fertilizer application,                                       [g m-2]
   real(r8), pointer :: FracBiomHarvsted(:,:,:)      => null()  !harvest efficiency,                                           [-]
   real(r8), pointer :: CanopyCutProxy_pft(:)   => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  real(r8), pointer :: FireLossE_pft(:,:)        => null() !plant element lost by fire, [g d-2 h-1]
   real(r8), pointer :: THIN_pft(:)                  => null()  !thinning of plant population,                                 [-]
   real(r8), pointer :: CH4ByFire_CumYr_pft(:)       => null()  !plant CH4 emission from fire,                                 [g d-2 ]
   real(r8), pointer :: CO2ByFire_CumYr_pft(:)       => null()  !plant CO2 emission from fire,                                 [g d-2 ]
@@ -1241,6 +1254,7 @@ implicit none
   allocate(this%EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP1));this%EcoHavstElmnt_CumYr_pft=spval
   allocate(this%CH4ByFire_CumYr_pft(JP1));this%CH4ByFire_CumYr_pft=spval
   allocate(this%CO2ByFire_CumYr_pft(JP1));this%CO2ByFire_CumYr_pft=spval
+  allocate(this%FireLossE_pft(NumPlantChemElms,JP1)); this%FireLossE_pft=spval
   allocate(this%PlantElmDistLoss_pft(NumPlantChemElms,JP1)); this%PlantElmDistLoss_pft=spval
   allocate(this%N2ObyFire_CumYr_pft(JP1));this%N2ObyFire_CumYr_pft=spval
   allocate(this%NH3byFire_CumYr_pft(JP1));this%NH3byFire_CumYr_pft=spval
@@ -1308,13 +1322,17 @@ implicit none
   allocate(this%THeatLossRoot2Soil_vr(0:JZ1));this%THeatLossRoot2Soil_vr=spval
   allocate(this%TKCanopy_pft(JP1));this%TKCanopy_pft=spval
   allocate(this%HeatXAir2PCan_pft(JP1));this%HeatXAir2PCan_pft=spval
-  allocate(this%PrecIntcptByCanopy_pft(JP1));this%PrecIntcptByCanopy_pft=spval
+  allocate(this%RainIntcptByCanopy_pft(JP1));this%RainIntcptByCanopy_pft=spval
+  allocate(this%SnowIntcptByCanopy_pft(JP1));this%SnowIntcptByCanopy_pft=spval
   allocate(this%PSICanopyTurg_pft(JP1));this%PSICanopyTurg_pft=spval
   allocate(this%PSICanopy_pft(JP1));this%PSICanopy_pft=spval
   allocate(this%VapXAir2Canopy_pft(JP1));this%VapXAir2Canopy_pft=spval
+  allocate(this%VapXAir2CanopyLiq_pft(JP1));this%VapXAir2CanopyLiq_pft=spval
   allocate(this%HeatStorCanopy_pft(JP1));this%HeatStorCanopy_pft=spval
   allocate(this%CanopyEvapTransLHeat_pft(JP1));this%CanopyEvapTransLHeat_pft=spval
   allocate(this%WatHeldOnCanopy_pft(JP1));this%WatHeldOnCanopy_pft=spval
+  allocate(this%SnowOnCanopy_pft(JP1)); this%SnowOnCanopy_pft=spval
+  allocate(this%SnoSub2AirCanopy_pft(JP1));this%SnoSub2AirCanopy_pft=spval
   allocate(this%VHeatCapCanopy_pft(JP1));this%VHeatCapCanopy_pft=spval
   allocate(this%CanopyBiomWater_pft(JP1));this%CanopyBiomWater_pft=spval
   allocate(this%PSIRoot_pvr(jroots,JZ1,JP1));this%PSIRoot_pvr=spval
@@ -1326,6 +1344,8 @@ implicit none
   allocate(this%RootH2OUptkStress_pvr(jroots,JZ1,JP1)); this%RootH2OUptkStress_pvr=spval
   allocate(this%TWaterPlantRoot2Soil_vr(0:JZ1));this%TWaterPlantRoot2Soil_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
+  allocate(this%fSnowCanopy_pft(JP1)); this%fSnowCanopy_pft=spval
+  allocate(this%BulkFactor4Snow_pft(JP1)); this%BulkFactor4Snow_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval
   allocate(this%TKS_vr(0:JZ1));this%TKS_vr=spval
   allocate(this%OrganOsmoPsi0pt_pft(JP1));this%OrganOsmoPsi0pt_pft=spval
@@ -1740,7 +1760,7 @@ implicit none
   JP1                      => pltpar%JP1
   NumOfLeafAzimuthSectors1 => pltpar%NumOfLeafAzimuthSectors
   NumOfSkyAzimuthSects1    => pltpar%NumOfSkyAzimuthSects1
-  NumLeafZenithSectors1    => pltpar%NumLeafZenithSectors1
+  NumLeafInclinationClasses1    => pltpar%NumLeafInclinationClasses1
   MaxNodesPerBranch1       => pltpar%MaxNodesPerBranch1
 
   !the following variable should be consistent with the soil bgc model
@@ -1823,26 +1843,28 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
-  allocate(this%RadTotPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadTotPAR_zsec=0._r8
-  allocate(this%RadDifPAR_zsec(NumLeafZenithSectors1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadDifPAR_zsec=0._r8
+  allocate(this%RadTotPARAbsorption_zsec(NumLeafInclinationClasses1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadTotPARAbsorption_zsec=0._r8
+  allocate(this%RadDifPARAbsorption_zsec(NumLeafInclinationClasses1,NumOfSkyAzimuthSects1,NumCanopyLayers1,JP1));this%RadDifPARAbsorption_zsec=0._r8
   allocate(this%RadSWLeafAlbedo_pft(JP1))
-  allocate(this%CanopyPARalbedo_pft(JP1))
-  allocate(this%TAU_DirectRTransmit(NumCanopyLayers1+1));this%TAU_DirectRTransmit=0._r8
-  allocate(this%TAU_RadThru(NumCanopyLayers1+1));this%TAU_RadThru=0._r8
+  allocate(this%RadPARLeafAlbedo_pft(JP1))
+  allocate(this%TAU_DirectSunLit(NumCanopyLayers1+1));this%TAU_DirectSunLit=0._r8
+  allocate(this%TAU_DirectSunSha(NumCanopyLayers1+1));this%TAU_DirectSunSha=0._r8
   allocate(this%LWRadCanopy_pft(JP1))
-  allocate(this%RadSWbyCanopy_pft(JP1))
-  allocate(this%OMEGX(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGX=0._r8
-  allocate(this%OMEGAG(NumOfSkyAzimuthSects1));this%OMEGAG=0._r8
-  allocate(this%OMEGA(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1));this%OMEGA=0._r8
-  allocate(this%SineLeafAngle(NumLeafZenithSectors1));this%SineLeafAngle=0._r8
-  allocate(this%CosineLeafAngle(NumLeafZenithSectors1));this%CosineLeafAngle=0._r8
-  allocate(this%iScatteringDiffus(NumOfSkyAzimuthSects1,NumLeafZenithSectors1,NumOfLeafAzimuthSectors1))
+  allocate(this%RadSWCanopyLAbsroption_pft(NumCanopyLayers1,JP1)); this%RadSWCanopyLAbsroption_pft=0._r8
+  allocate(this%RadPARCanopyLAbsorption_pft(NumCanopyLayers1,JP1)); this%RadPARCanopyLAbsorption_pft=0._r8
+  allocate(this%RadSWCanopyAbsorption_pft(JP1))
+  allocate(this%OMEGX(NumOfSkyAzimuthSects1,NumLeafInclinationClasses1,NumOfLeafAzimuthSectors1));this%OMEGX=0._r8
+  allocate(this%OMEGA2Ground(NumOfSkyAzimuthSects1));this%OMEGA2Ground=0._r8
+  allocate(this%OMEGA2Leaf(NumOfSkyAzimuthSects1,NumLeafInclinationClasses1,NumOfLeafAzimuthSectors1));this%OMEGA2Leaf=0._r8
+  allocate(this%SineLeafAngle(NumLeafInclinationClasses1));this%SineLeafAngle=0._r8
+  allocate(this%CosineLeafAngle(NumLeafInclinationClasses1));this%CosineLeafAngle=0._r8
+  allocate(this%iScatteringDiffus(NumOfSkyAzimuthSects1,NumLeafInclinationClasses1,NumOfLeafAzimuthSectors1))
   allocate(this%RadNet2Canopy_pft(JP1))
-  allocate(this%LeafSWabsorpty_pft(JP1))
-  allocate(this%LeafPARabsorpty_pft(JP1))
-  allocate(this%RadPARLeafTransmis_pft(JP1))
-  allocate(this%RadSWLeafTransmis_pft(JP1))
-  allocate(this%RadPARbyCanopy_pft(JP1))
+  allocate(this%LeafSWabsorptivity_pft(JP1))
+  allocate(this%LeafPARabsorptivity_pft(JP1))
+  allocate(this%RadPARLeafTransmitance_pft(JP1))
+  allocate(this%RadSWLeafTransmitance_pft(JP1))
+  allocate(this%RadPARCanopyAbsorption_pft(JP1))
   allocate(this%FracPARads2Canopy_pft(JP1))
   end subroutine plt_rad_init
 !------------------------------------------------------------------------
@@ -1880,7 +1902,7 @@ implicit none
   allocate(this%CH2OSunlit_pft(JP1));this%CH2OSunlit_pft=0._r8
   allocate(this%CH2OSunsha_pft(JP1));this%CH2OSunsha_pft=0._r8
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
-  allocate(this%LeafAreaSunlit_zsec(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafAreaSunlit_zsec=0._r8
+  allocate(this%LeafEffArea_zsec(NumLeafInclinationClasses1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafEffArea_zsec=0._r8
   allocate(this%CPOOL3_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL3_node=spval
   allocate(this%CPOOL4_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CPOOL4_node=spval
   allocate(this%CMassCO2BundleSheath_node(MaxNodesPerBranch1,MaxNumBranches,JP1));this%CMassCO2BundleSheath_node=spval
@@ -1987,6 +2009,7 @@ implicit none
   allocate(this%iEmbryophyteType_pft(JP1)); this%iEmbryophyteType_pft=0
   allocate(this%iPlantPhenolPattern_pft(JP1));this%iPlantPhenolPattern_pft=0
   allocate(this%iPlantTurnoverPattern_pft(JP1));this%iPlantTurnoverPattern_pft=0
+  allocate(this%iPlant2ndGrothPattern_pft(JP1));this%iPlant2ndGrothPattern_pft=0
   allocate(this%isPlantRootAlive_pft(JP1));this%isPlantRootAlive_pft=0
   allocate(this%iPlantDevelopPattern_pft(JP1));this%iPlantDevelopPattern_pft=0
   allocate(this%iPlantPhotoperiodType_pft(JP1));this%iPlantPhotoperiodType_pft=0
@@ -2122,7 +2145,7 @@ implicit none
   allocate(this%ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP1));this%ShootNodeNumAtInitFloral_brch=spval
   allocate(this%ShootNodeNumAtAnthesis_brch(MaxNumBranches,JP1));this%ShootNodeNumAtAnthesis_brch=spval
   allocate(this%SineBranchAngle_pft(JP1));this%SineBranchAngle_pft=spval
-  allocate(this%LeafAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
+  allocate(this%LeafAreaZsec_brch(NumLeafInclinationClasses1,NumCanopyLayers1,MaxNodesPerBranch1,MaxNumBranches,JP1))
   this%LeafAreaZsec_brch=spval
   allocate(this%KMinNumLeaf4GroAlloc_brch(MaxNumBranches,JP1));this%KMinNumLeaf4GroAlloc_brch=0
   allocate(this%BranchNumerID_brch(MaxNumBranches,JP1));this%BranchNumerID_brch=0
@@ -2131,7 +2154,7 @@ implicit none
   allocate(this%LeafAreaDying_brch(MaxNumBranches,JP1));this%LeafAreaDying_brch=spval
   allocate(this%LeafAreaLive_brch(MaxNumBranches,JP1));this%LeafAreaLive_brch=spval
   allocate(this%SinePetolShethAngle_pft(JP1));this%SinePetolShethAngle_pft=spval
-  allocate(this%LeafAngleClass_pft(NumLeafZenithSectors1,JP1));this%LeafAngleClass_pft=spval
+  allocate(this%LeafAngleClass_pft(NumLeafInclinationClasses1,JP1));this%LeafAngleClass_pft=spval
   allocate(this%CanopyStemSurfAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyStemSurfAreaZ_pft=spval
   allocate(this%CanopyLeafAreaZ_pft(NumCanopyLayers1,JP1));this%CanopyLeafAreaZ_pft=spval
   allocate(this%LeafArea_node(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%LeafArea_node=spval
@@ -2151,7 +2174,7 @@ implicit none
   allocate(this%StalkNodeVertLength_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%StalkNodeVertLength_brch=spval
   allocate(this%PetoleLength_node(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetoleLength_node=spval
   allocate(this%StalkNodeHeight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%StalkNodeHeight_brch=spval
-  allocate(this%StemAreaZsec_brch(NumLeafZenithSectors1,NumCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
+  allocate(this%StemAreaZsec_brch(NumLeafInclinationClasses1,NumCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
   allocate(this%CanopyLeafArea_lnode(NumCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lnode=0._r8
   allocate(this%CanopyStalkSurfArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkSurfArea_lbrch=spval
   allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval

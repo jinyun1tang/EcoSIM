@@ -581,4 +581,22 @@ contains
   end associate
   end function CalcStomataResist4H2O
 
+!--------------------------------------------------------------------
+  pure function is_drought_deciduos(iphenotype)result(ans)
+  implicit none
+  integer, intent(in) :: iphenotype
+  logical :: ans
+
+  ans = iphenotype .GT. iphenotyp_coldecid
+
+  end function is_drought_deciduos
+!--------------------------------------------------------------------
+  pure function is_cold_deciduos(iphenotype)result(ans)
+  implicit none
+  integer, intent(in) :: iphenotype
+  logical :: ans
+  
+  ans = iphenotype .EQ.iphenotyp_coldecid .OR. iphenotype.EQ.iphenotyp_coldroutdecid
+  end function is_cold_deciduos
+
 end module PlantMathFuncMod

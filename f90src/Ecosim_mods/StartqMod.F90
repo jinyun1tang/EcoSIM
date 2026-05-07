@@ -573,7 +573,7 @@ module StartqMod
     
     D5: DO L=1,NumCanopyLayers
       CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)=0._r8
-      DO N=1,NumLeafZenithSectors
+      DO N=1,NumLeafInclinationClasses
         StemAreaZsec_brch(N,L,NB,NZ,NY,NX)=0._r8
       enddo
     ENDDO D5
@@ -600,7 +600,7 @@ module StartqMod
         CMassHCO3BundleSheath_node(K,NB,NZ,NY,NX) = 0._r8
         CPOOL4_node(K,NB,NZ,NY,NX)                = 0._r8
         D45: DO L=1,NumCanopyLayers
-          DO N=1,NumLeafZenithSectors
+          DO N=1,NumLeafInclinationClasses
             LeafAreaZsec_brch(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
         ENDDO D45
