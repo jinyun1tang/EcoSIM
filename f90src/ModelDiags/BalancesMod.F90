@@ -213,7 +213,7 @@ contains
       SnowMassErr_test = SnowMassBeg_col(NY,NX)-SnowMassEnd_col(NY,NX)+Prec2Snow_col(NY,NX)-QSnowH2Oloss_col(NY,NX)
 
       canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+RainIntceptByCanopy_col(NY,NX) &
-        +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
+        +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)+SnowIntceptByCanopy_col(NY,NX)
 
       if(fixWaterLevel)then
         WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)
@@ -230,14 +230,15 @@ contains
       if(abs(WaterErr_test)>err_h2o .and. etimer%get_nstep()>1)then
         if(iVerbLevel==1 .or. abs(SoilWatErr_test)>err_h2o)then
           write(110,*)('=',ii=1,50)
-          write(110,*)I*1000+J,'NY,NX ',NY,NX
+          write(110,*)I*1000+J/24.,'NY,NX ',NY,NX
           write(110,*)'init H2O         =',WaterErr_col(NY,NX)
           write(110,*)'final H2O        =',WatMass_col(NY,NX)
           write(110,*)'delta H2O        =',WatMass_col(NY,NX)-WaterErr_col(NY,NX)
           write(110,*)'prec, irrig      =',PrecAtm_col(NY,NX),Irrigation_col(NY,NX) 
           write(110,*)'litfall H2O      =',RainLitr_col(NY,NX)
           write(110,*)'surf evap        =',VapXAir2GSurf_col(NY,NX)    
-          write(110,*)'PrecIntceptByCan =',RainIntceptByCanopy_col(NY,NX)   
+          write(110,*)'RainIntceptByCan =',RainIntceptByCanopy_col(NY,NX)   
+          write(110,*)'SnowIntceptByCan =',SnowIntceptByCanopy_col(NY,NX)
           write(110,*)'plant evap       =',QVegET_col(NY,NX)
           write(110,*)'run on           =',QRunSurf_col(NY,NX),WatFLo2LitR_col(NY,NX)
           write(110,*)('-',ii=1,50)
@@ -248,7 +249,7 @@ contains
           write(110,*)'QWatIntLaterflow =',QLaterFlow2Cell_col(NY,NX)
           write(110,*)('-',ii=1,50)
           write(110,*)'SnowMassBeg,end  =',SnowMassBeg_col(NY,NX),SnowMassEnd_col(NY,NX)
-          write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)
+          write(110,*)'CanopyWatbeg,end =',CanopyWaterMassBeg_col(NY,NX),CanopyWaterMassEnd_col(NY,NX)          
           write(110,*)'WatHeldOnCanopy  =',WatHeldOnCanopy_col(NY,NX)
           write(110,*)'SnowOnCanopy     =',SnowOnCanopy_col(NY,NX)
           write(110,*)'CanopyBiomWater_col    =',CanopyBiomWater_col(NY,NX)

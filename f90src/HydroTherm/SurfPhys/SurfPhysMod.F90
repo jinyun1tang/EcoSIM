@@ -1391,8 +1391,8 @@ contains
 
   !convert water flux from m/hour to mm/hour
   PRECM_col(NY,NX)             = m2mm*PrecRainAndIrrig_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-  PrecDirect2Grnd_col(NY,NX)   = m2mm*(PrecRainAndIrrig_col(NY,NX)-Prec2Canopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-  PrecIndirect2Grnd_col(NY,NX) = m2mm*(Prec2Canopy_col(NY,NX)-RainIntceptByCanopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PrecDirect2Grnd_col(NY,NX)   = m2mm*(PrecRainAndIrrig_col(NY,NX)-Rain2Canopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PrecIndirect2Grnd_col(NY,NX) = m2mm*(Rain2Canopy_col(NY,NX)-RainIntceptByCanopy_col(NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
 !
 !     RESIDUE WATER ABSORPTION CAPACITY
 !
