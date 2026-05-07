@@ -106,17 +106,17 @@ module grosubsMod
 
   ENDDO D9985
   !
-  call LiveDeadTransformation(yearIJ)     
+  call Live2DeadTransformation(yearIJ)     
   !
   call PrintInfo('end '//subname)
   end associate
   END subroutine GrowPlants
 
 !----------------------------------------------------------------------------------------------------
-  subroutine LiveDeadTransformation(yearIJ)
+  subroutine Live2DeadTransformation(yearIJ)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
-  character(len=*), parameter :: subname='LiveDeadTransformation'
+  character(len=*), parameter :: subname='Live2DeadTransformation'
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
   real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
@@ -238,7 +238,7 @@ module grosubsMod
   ENDDO D9975
   call PrintInfo('end '//subname)
   end associate
-  end subroutine LiveDeadTransformation
+  end subroutine Live2DeadTransformation
 
 !----------------------------------------------------------------------------------------------------
   subroutine GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
