@@ -140,6 +140,7 @@ module BGCContainers_module
      integer (c_int) :: ncells_per_col_
      integer (c_int) :: num_components
      integer (c_int) :: num_columns
+     integer (c_int) :: num_pfts
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
@@ -170,6 +171,7 @@ module BGCContainers_module
      type (BGCVectorDouble) :: evaporation_snow
      type (BGCVectorDouble) :: sublimation_snow
      type (BGCMatrixDouble) :: snow_temperature
+     type (BGCMatrixDouble) :: canopy_snow
      type (BGCTensorDouble) :: mole_fraction
   end type BGCState
 
