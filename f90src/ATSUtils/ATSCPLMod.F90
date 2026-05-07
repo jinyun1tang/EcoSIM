@@ -37,13 +37,14 @@ contains
   ! Ecosim variables
   real(r8), pointer :: data(:), nested_ptr(:)
   real(r8), pointer :: data2D(:,:)
+  real(r8), pointer :: data3D(:,:,:)
   real(r8), pointer :: temp, temp_deref, double_deref
   real(r8) :: real_deref
   type(c_ptr), pointer :: cptr_temp, ptr1
   real(r8), target :: target_val
   real(r8), pointer :: ptr(:,:)
   real(r8), pointer :: temp_array(:,:)
-  integer :: ncol, nvar, size_col, num_cols, size_col_pad
+  integer :: ncol, nvar, size_col, num_cols, size_col_pad, num_components
   integer :: j1,j2,j3,i,j
   integer :: test_rows, test_columns
   real(r8) :: temp_eq, double_eq
@@ -53,11 +54,16 @@ contains
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
+  num_components = state%mole_fraction%procs
 
   size_col_pad = size_col+30
 
   allocate(temp_array(size_col, num_cols))
 
+  data_ptr = state%mole_fraction%data
+  call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
+  a_MFrac=data3D(:,:,:)
+  
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP=data2D(:,:)

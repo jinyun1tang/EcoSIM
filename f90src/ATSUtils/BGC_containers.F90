@@ -170,7 +170,7 @@ module BGCContainers_module
      type (BGCVectorDouble) :: evaporation_snow
      type (BGCVectorDouble) :: sublimation_snow
      type (BGCMatrixDouble) :: snow_temperature
-     type (BGCTensorDouble) :: total_component_concentration
+     type (BGCTensorDouble) :: mole_fraction
   end type BGCState
 
   type, public, bind(c) :: BGCProperties
@@ -215,6 +215,7 @@ module BGCContainers_module
      logical (c_bool) :: p_bool
      logical (c_bool) :: a_bool
      logical (c_bool) :: pheno_bool
+     logical (c_bool) :: microbe_bool
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData

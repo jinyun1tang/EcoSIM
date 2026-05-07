@@ -611,6 +611,12 @@ contains
   HeatSensAir2Grnd = CdSoiHSens*(TKQ_col(NY,NX)-TKSoil1_vr(NUM_col(NY,NX),NY,NX))
   tHeatAir2Grnd    = Radnet2Grnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd !net energy into soil, subtracting latent heat and sensible heat
   HeatFluxAir2Soi  = tHeatAir2Grnd+HeatSensVapAir2Grnd !total heat plus convective heat > 0 to ground
+  
+  HeatSensAir2Grnd_col(NY,NX) = HeatSensAir2Grnd_col(NY,NX) + HeatSensAir2Grnd
+  Radnet2Grnd_col(NY,NX) = Radnet2Grnd_col(NY,NX) + Radnet2Grnd
+  LatentHeatEvapAir2Grnd_col(NY,NX) = LatentHeatEvapAir2Grnd_col(NY,NX) + LatentHeatEvapAir2Grnd
+  HeatSensVapAir2Grnd_col(NY,NX) = HeatSensVapAir2Grnd_col(NY,NX) + HeatSensVapAir2Grnd
+  
   call PrintInfo('end '//subname)
 
   end subroutine SoilSRFEnerbyBalanceM
@@ -1566,6 +1572,10 @@ contains
   NetWatXFlxAir2SoiMicP = PrecNet2SoiMicP+VapXAir2TopLay+EvapLitR2Soi1
   NetWatFlxAir2SoiMacP  = PrecNet2SoiMacP
   cumHeatSensAir2Soil   = PrecHeat2SoiNet+HeatFluxAir2Soi+HeatSensVapLitR2Soi1+HeatSensLitR2Soi1
+  !write(*,*) "PrecHeat2SoiNet: ", PrecHeat2SoiNet
+  !write(*,*) "HeatFluxAir2Soi: ", HeatFluxAir2Soi
+  !write(*,*) "HeatSensVapLitR2Soi1: ", HeatSensVapLitR2Soi1
+  !write(*,*) "HeatSensLitR2Soi1: ", HeatSensLitR2Soi1
 
   !total water and heat fluxes to litter
   NetWatFlxAir2LitR   = RainPrecAir2LitR+VapXAir2LitR-EvapLitR2Soi1

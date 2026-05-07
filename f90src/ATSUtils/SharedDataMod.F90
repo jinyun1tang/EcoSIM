@@ -14,6 +14,7 @@ Module SharedDataMod
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
   real(r8) :: heat_capacity, pressure_at_field_capacity, pressure_at_wilting_point
+  real(r8), allocatable :: a_MFrac(:,:,:)   !molecular fraction
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density

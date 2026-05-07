@@ -240,6 +240,7 @@ contains
   real(r8) :: HeatFlowSno2LitrByWat  !heat flow from bottom snow layer to litter due to water flow
   real(r8) :: WatFloInSnoMax
   real(r8) :: HeatFlowSno2SoiByWat   !heat flow from bottom snow layer to soil due to water flow
+  !real(r8) :: HAltFlowSno2SoiByWat
   real(r8) :: HeatCndFlxSno2Soi,HeatCndFlxInSno,PSDX,TCND2W,THETRR
   real(r8) :: TK0X,TK1X,VapSnoSrc,VapSnoDest,WPX
   integer :: L,L2
@@ -425,6 +426,7 @@ contains
             WatFlowSno2MacP       = PtWatFlowSno2Soi*SoilFracAsMacP1_vr(NUM_col(NY,NX),NY,NX)
             WatFlowSno2Soil       = WatFlowSno2MicP+WatFlowSno2MacP
             HeatFlowSno2SoiByWat  = cpw*TKSnow1_snvr(L,NY,NX)*WatFlowSno2Soil*HeatAdv_scal
+            !HeatFlowSno2SoiByWat  = cpw*(TKSnow1_snvr(L,NY,NX)-TKSoil1_vr(NUM_col(NY,NX),NY,NX))*WatFlowSno2Soil*HeatAdv_scal
             WatFlowSno2LitR       = 0._r8
             HeatFlowSno2LitrByWat = 0._r8
           endif
@@ -467,6 +469,15 @@ contains
           CumWatXFlx2SoiMicP  = CumWatXFlx2SoiMicP+WatFlowSno2MicP
           CumWatFlx2SoiMacP   = CumWatFlx2SoiMacP+WatFlowSno2MacP
           TotHeatFlow2Soi     = HeatFlowSno2SoiByWat+HeatConvFlxSno2Soi1+HeatCndFlxSno2Soi+cumHeatConvFlxLitr2Soi1+cumHeatCndFlxLitr2Soi
+          
+          !Heat flux diagnostics
+          HeatFlowSno2SoiByWat_col(NY,NX) = HeatFlowSno2SoiByWat_col(NY,NX)+HeatFlowSno2SoiByWat
+          !HAltFlowSno2SoiByWat_col(NY,NX) = HAltFlowSno2SoiByWat_col(NY,NX)+HAltFlowSno2SoiByWat
+          HeatConvFlxSno2Soi_col(NY,NX) = HeatConvFlxSno2Soi_col(NY,NX)+HeatConvFlxSno2Soi1
+          HeatCndFlxSno2Soi_col(NY,NX) = HeatCndFlxSno2Soi_col(NY,NX)+HeatCndFlxSno2Soi
+          HeatConvFlxLitr2Soi_col(NY,NX) = HeatConvFlxLitr2Soi_col(NY,NX)+cumHeatConvFlxLitr2Soi1
+          HeatCndFlxLitr2Soi_col(NY,NX) = HeatConvFlxLitr2Soi_col(NY,NX)+cumHeatCndFlxLitr2Soi
+          
           cumNetHeatFlow2Soil  = cumNetHeatFlow2Soil+TotHeatFlow2Soi
           TotSnoWatFlow2Litr  = WatFlowSno2LitR+CumVapFlxSno2Litr-CumVapFlxLitr2Soi
           TotSnoHeatFlow2Litr = HeatFlowSno2LitrByWat+CumHeatConvFlxSno2Litr+CumHeatCndFlxSno2Litr &

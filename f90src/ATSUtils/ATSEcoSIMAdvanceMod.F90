@@ -323,12 +323,23 @@ implicit none
   !These arrays sometimes have junk in them when initialized so we have to zero
   !them out before iteration
   do NY=1, NYS
-    Qinfl2MicP_col(NY,NX)=0.0
-    HeatInfl2Soil(NY,NX)=0.0
-    Qinflx2Soil_col(NY,NX)=0.0
-    HeatFlx2Grnd_col(NY,NX)=0.0
+    Qinfl2MicP_col(NY,NX)=0.0_r8
+    HeatInfl2Soil(NY,NX)=0.0_r8
+    Qinflx2Soil_col(NY,NX)=0.0_r8
+    HeatFlx2Grnd_col(NY,NX)=0.0_r8
+    
+    HeatFlowSno2SoiByWat_col(NY,NX)=0.0_r8
+    HeatConvFlxSno2Soi_col(NY,NX)=0.0_r8
+    HeatCndFlxSno2Soi_col(NY,NX)=0.0_r8
+    HeatConvFlxLitr2Soi_col(NY,NX)=0.0_r8
+    HeatCndFlxLitr2Soi_col(NY,NX)=0.0_r8
+  
+    HeatSensAir2Grnd_col(NY,NX)=0.0_r8
+    Radnet2Grnd_col(NY,NX)=0.0_r8
+    LatentHeatEvapAir2Grnd_col(NY,NX)=0.0_r8
+    HeatSensVapAir2Grnd_col(NY,NX)=0.0_r8
   enddo
-
+  
   !Runs the main subcycling for the surface energy and water balance in
   !addition to snow.
   !
@@ -357,7 +368,7 @@ implicit none
     call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
-
+  
   !Does final update of the snow masses after the surface model is run
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))
@@ -373,7 +384,7 @@ implicit none
     !The ATS units for water flux is m/s for energy it is MW/m^2
     !As EcoSIM is an hourly model, the conversion is done in ATS
     !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
-    surf_e_source(NY) = HeatFlx2Grnd_col(NY,1) / (column_area(NY))
+    surf_e_source(NY) = (HeatFlx2Grnd_col(NY,1)-HeatFlowSno2SoiByWat_col(NY,1)) / (column_area(NY))
     
     dTexp = surf_e_source(NY)/heat_capacity
     Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 
