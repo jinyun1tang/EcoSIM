@@ -23,6 +23,7 @@ module ATSEcoSIMAdvanceMod
   use HydroThermData
   use SurfPhysData
   use SnowPhysData
+  use CanopyHydroMod
   use EcoSIMSolverPar, only : NPH, dts_HeatWatTP
   use UnitMod    , only : units
   use EcoSIMCtrlDataType
@@ -59,7 +60,7 @@ implicit none
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
-  integer :: NY,NX,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS, npfts, NP
+  integer :: NY,NX,NZ,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS, npfts, NP
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -290,24 +291,26 @@ implicit none
     else
       NP0_col(NY,NX) = 1
     endif
+    
+    !loop over npfts and fill snow on canopy variables
+    DO NZ=1,num_pfts
+       SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
+       iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
+    enddo
 
   ENDDO
 
   !Run precribe phenology interpolation which sets necessary variables
   !To do the phenology
   if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
-  !Need submodules of wthr to compute precipitation variables
-  !And Canopy Radiation variables
-  !IWTHR = -999 !runs Hourly weather
-  !PrepHourlyWeather was moved as it overwrites some variables set in the loop before
-  ! How should this be handled?
-  !call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
-
+  
   !PlantCanopyRadsModel processes the input radiation
   ! into radiation to ground and to canopy
   if(ldo_sp_mode)then
     do NY=1,NYS
         call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+        
+        call CanopyInterceptprecip(NY,NX)
     enddo
   endif
 

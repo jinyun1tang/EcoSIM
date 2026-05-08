@@ -64,6 +64,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_EvapSnow(:)     !water evaporation from snow
   real(r8), allocatable :: a_Sublim(:)       !water sublimation from snow
   real(r8), allocatable :: a_TS(:,:)         !snow temperature (LS,L dimensions)
+  real(r8), allocatable :: a_CanSnow(:,:)    !Canopy snow (Npfts,Ncols)
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
   real(r8), allocatable :: p_rain(:)      !precipitation, m H2O/s
@@ -83,6 +84,7 @@ Module SharedDataMod
   integer,  allocatable :: a_MaxNumRootLays_col(:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
+  integer :: num_pfts
   logical :: p_bool, a_bool, pheno_bool
   contains
 
@@ -167,6 +169,7 @@ Module SharedDataMod
     !Set these to zero to prevent truncation errors in the summations later
     a_Transpiration=0.0
     a_EvapCan=0.0
+    num_pfts=5
 
   end subroutine InitSharedData
 

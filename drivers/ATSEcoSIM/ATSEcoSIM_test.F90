@@ -71,6 +71,7 @@ subroutine Init_ATSEcoSIM_driver()
   ncol = 1
   dist_step = 1.0
   dist_tot = 1.0 !IC or first layer is zero
+  num_pfts = 5
 
   ! Initialize sizes structure
   sizes%num_components = 1
@@ -132,6 +133,7 @@ subroutine Init_ATSEcoSIM_driver()
 
   !Pheno vars
   !allocate(LAI_col(ncells_per_col_,ncol))
+  allocate(a_CanSnow(num_pfts,ncol))
   allocate(a_VEG(ncol))
   allocate(a_lwcan(ncol))
   allocate(a_clhf(ncol))
