@@ -2,6 +2,9 @@ module DebugToolMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: iulog
   use EcoSIMCtrlMod, only: lverb
+  use GridDataType
+  use EcoSimConst
+  use SoilWaterDataType
 implicit none
   private
   character(len=*), parameter :: mod_filename =&
@@ -9,7 +12,7 @@ implicit none
 
   public :: PrintInfo
   public :: DebugPrint
-
+  public :: GetSoilWaterMass
   interface DebugPrint
     module procedure DebugPrint_real_arr
     module procedure DebugPrint_real_sp
@@ -79,4 +82,16 @@ contains
    write(iulog,*)vname,'=',val
    end subroutine DebugPrint_int
 
+  !-----------------------------------------------------------------------
+  function GetSoilWaterMass(NY,NX)result(mass)
+  implicit none
+  integer, intent(in) :: NY,NX
+  real(r8) :: mass
+  integer  :: L
+  mass = 0._r8
+  !add water in soil 
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
+    mass = mass+ VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
+  ENDDO
+  END function GetSoilWaterMass
 end module DebugToolMod

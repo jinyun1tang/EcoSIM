@@ -383,7 +383,7 @@ module ExtractsMod
   ETCanopy_CumYr_pft(NZ) = ETCanopy_CumYr_pft(NZ)+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   CanopyBiomWater_col    = CanopyBiomWater_col+CanopyBiomWater_pft(NZ)
   WatHeldOnCanopy_col    = WatHeldOnCanopy_col+WatHeldOnCanopy_pft(NZ)
-  SnowOnCanopy_col       = SnowOnCanopy_col+SnowOnCanopy_pft(NZ)
+  SnowOnCanopy_col       = AZMAX1(SnowOnCanopy_col+SnowOnCanopy_pft(NZ))
   QVegET_col             = QVegET_col+Transpiration_pft(NZ)+VapXAir2Canopy_pft(NZ)
   VapXAir2Canopy_col     = VapXAir2Canopy_col+VapXAir2Canopy_pft(NZ)
   ENGYC                  = VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)

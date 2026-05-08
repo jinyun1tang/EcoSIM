@@ -804,9 +804,9 @@ module Hour1Mod
   CanopyBiomWater_col(NY,NX)                      = 0._r8
   WatHeldOnCanopy_col(NY,NX)                      = 0._r8
   SnowOnCanopy_col(NY,NX)                         = 0._r8
-  Prec2Canopy_col(NY,NX)                          = 0._r8
+  Rain2Canopy_col(NY,NX)                          = 0._r8
   RainIntceptByCanopy_col(NY,NX)                  = 0._r8
-  SnowIntcptByCanopy_col(NY,NX)                   = 0._r8
+  SnowIntceptByCanopy_col(NY,NX)                   = 0._r8
   QVegET_col(NY,NX)                               = 0._r8
   VapXAir2Canopy_col(NY,NX)                       = 0._r8
   HeatFlx2Canopy_col(NY,NX)                       = 0._r8

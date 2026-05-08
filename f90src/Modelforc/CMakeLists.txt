@@ -9,13 +9,13 @@ add_ecosim_library(modelforc ${MODELFORC_MOD_SOURCES})
 
 target_include_directories(modelforc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/  
   ${CMAKE_BINARY_DIR}/f90src/Disturbances/
-  ${CMAKE_BINARY_DIR}/f90src/DebugTools/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
-  ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/

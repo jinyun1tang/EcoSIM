@@ -68,6 +68,7 @@ implicit none
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
   EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)   = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
   WatHeldOnCanopy_col(NY,NX)                          = plt_ew%WatHeldOnCanopy_col
+  SnowOnCanopy_col(NY,NX)                             = plt_ew%SnowOnCanopy_col
   Eco_Heat_Sens_col(NY,NX)                            = plt_ew%Eco_Heat_Sens_col
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
   H2OLoss_CumYr_col(NY,NX)                            = plt_ew%H2OLoss_CumYr_col
