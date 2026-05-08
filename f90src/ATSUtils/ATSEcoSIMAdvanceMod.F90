@@ -306,13 +306,19 @@ implicit none
   
   !PlantCanopyRadsModel processes the input radiation
   ! into radiation to ground and to canopy
-  if(ldo_sp_mode)then
-    do NY=1,NYS
-        call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+  do NY=1,NYS
+    if(ldo_sp_mode)then  
+      call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
         
-        call CanopyInterceptprecip(NY,NX)
-    enddo
-  endif
+      !call CanopyInterceptprecip(NY,NX)
+     else
+       !If not using phenology set the thrufall snow and rain
+       !to the total
+       SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
+       RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
+       TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
+     endif
+  enddo
 
   PSIAtFldCapacity_col = pressure_at_field_capacity
   PSIAtWiltPoint_col = pressure_at_wilting_point
