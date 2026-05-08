@@ -83,10 +83,10 @@ module CanopyDataType
   real(r8),target,allocatable ::  WatHeldOnCanopy_col(:,:)                   !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  SnowOnCanopy_col(:,:)                      !canopy held snow, [m3 d-2]
   real(r8),target,allocatable ::  fSnowCanopy_col(:,:)                       !fraction snow covered canopy, [-]
-  real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                       !precipitation to canopy over the grid, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Rain2Canopy_col(:,:)                       !precipitation to canopy over the grid, [m3 d-2 h-1]
   real(r8),target,allocatable ::  fSnowCanopy_pft(:,:,:)                     !fraction of canopy is snow covered, [-]
   real(r8),target,allocatable ::  RainIntceptByCanopy_col(:,:)               !grid net rainfall water interception to canopy, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  SnowIntcptByCanopy_col(:,:)                !grid net snowfall water interception to canopy, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SnowIntceptByCanopy_col(:,:)                !grid net snowfall water interception to canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  CanopyEvapTransLHeat_pft(:,:,:)            !canopy latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatXAir2PCan_pft(:,:,:)                   !air to canopy sensible heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatStorCanopy_pft(:,:,:)                  !canopy storage heat flux, [MJ d-2 h-1]
@@ -306,10 +306,10 @@ module CanopyDataType
   allocate(SnowOnCanopy_col(JY,JX)); SnowOnCanopy_col=0._r8
   allocate(fSnowCanopy_col(JY,JX)); fSnowCanopy_col=0._r8
   allocate(WatHeldOnCanopy_col(JY,JX));      WatHeldOnCanopy_col=0._r8
-  allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
+  allocate(Rain2Canopy_col(JY,JX));      Rain2Canopy_col=0._r8
   allocate(fSnowCanopy_pft(JP,JY,JX)); fSnowCanopy_pft=0._r8
   allocate(RainIntceptByCanopy_col(JY,JX));       RainIntceptByCanopy_col=0._r8
-  allocate(SnowIntcptByCanopy_col(JY,JX)); SnowIntcptByCanopy_col=0._r8
+  allocate(SnowIntceptByCanopy_col(JY,JX)); SnowIntceptByCanopy_col=0._r8
   allocate(CanopyEvapTransLHeat_pft(JP,JY,JX));    CanopyEvapTransLHeat_pft=0._r8
   allocate(HeatXAir2PCan_pft(JP,JY,JX));    HeatXAir2PCan_pft=0._r8
   allocate(HeatStorCanopy_pft(JP,JY,JX));    HeatStorCanopy_pft=0._r8
@@ -508,10 +508,10 @@ module CanopyDataType
   call destroy(WatHeldOnCanopy_col)
   call destroy(SnowOnCanopy_col)
   call destroy(fSnowCanopy_col)
-  call destroy(Prec2Canopy_col)
+  call destroy(Rain2Canopy_col)
   call destroy(fSnowCanopy_pft)
   call destroy(RainIntceptByCanopy_col)
-  call destroy(SnowIntcptByCanopy_col)
+  call destroy(SnowIntceptByCanopy_col)
   call destroy(CanopyEvapTransLHeat_pft)
   call destroy(HeatXAir2PCan_pft)
   call destroy(HeatStorCanopy_pft)

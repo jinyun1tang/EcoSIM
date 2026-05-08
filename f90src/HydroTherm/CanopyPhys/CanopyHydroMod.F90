@@ -49,7 +49,6 @@ implicit none
   call PrintInfo('beg '//subname)
   CanopySnowUnload_col       = 0._r8
   BulkFactor4Snow_col(NY,NX) = 0.0_r8
-  SnowOnCanopy_col(NY,NX)    = 0._r8
   fSnowCanopy_col(NY,NX)     = 0._r8
   ENGYS                      = 0._R8
   DO  NZ=1,NP_col(NY,NX)
@@ -61,9 +60,9 @@ implicit none
       rain2canopy_pft                  = PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX)
       SnowIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(snow2canopy_pft,CanopySnowHeldCap-SnowOnCanopy_pft(NZ,NY,NX)))
       RainIntcptByCanopy_pft(NZ,NY,NX) = AZMAX1(AMIN1(rain2canopy_pft,CanopyWatHeldCap-WatHeldOnCanopy_pft(NZ,NY,NX)))
-      Prec2Canopy_col(NY,NX)           = Prec2Canopy_col(NY,NX)+rain2canopy_pft
+      Rain2Canopy_col(NY,NX)           = Rain2Canopy_col(NY,NX)+rain2canopy_pft
       RainIntceptByCanopy_col(NY,NX)   = RainIntceptByCanopy_col(NY,NX)+RainIntcptByCanopy_pft(NZ,NY,NX)
-      SnowIntcptByCanopy_col(NY,NX)    = SnowIntcptByCanopy_col(NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX)
+      SnowIntceptByCanopy_col(NY,NX)    = SnowIntceptByCanopy_col(NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX)
 
       !wind-induced unloading
       SnowWindUnload= WindSpeedAtm_col(NY,NX)*SnowOnCanopy_pft(NZ,NY,NX)/1.56E5_r8
@@ -78,7 +77,6 @@ implicit none
       fSnowCanopy_pft(NZ,NY,NX)     = ((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
       BulkFactor4Snow_pft(NZ,NY,NX) = BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
       BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
-      SnowOnCanopy_col(NY,NX)       = SnowOnCanopy_col(NY,NX)+SnowOnCanopy_pft(NZ,NY,NX)
       fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
     else
       SnowIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
@@ -88,9 +86,9 @@ implicit none
     endif
   ENDDO
   RainPrecThrufall_col(NY,NX) = PrecRainAndIrrig_col(NY,NX)-RainIntceptByCanopy_col(NY,NX)
-  SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)-SnowIntcptByCanopy_col(NY,NX)+CanopySnowUnload_col
+  SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)-SnowIntceptByCanopy_col(NY,NX)+CanopySnowUnload_col
   IF(ENGYS.GT.ZEROS(NY,NX))THEN
-    TKSnowThrufall_col(NY,NX) = (TairK_col(NY,NX)*(SnoFalPrec_col(NY,NX)-SnowIntcptByCanopy_col(NY,NX))+ENGYS)/SnowPrecThrufall_col(NY,NX)
+    TKSnowThrufall_col(NY,NX) = (TairK_col(NY,NX)*(SnoFalPrec_col(NY,NX)-SnowIntceptByCanopy_col(NY,NX))+ENGYS)/SnowPrecThrufall_col(NY,NX)
   else
     TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
   endif
