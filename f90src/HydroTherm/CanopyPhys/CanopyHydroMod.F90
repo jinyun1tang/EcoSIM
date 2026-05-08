@@ -49,7 +49,6 @@ implicit none
   call PrintInfo('beg '//subname)
   CanopySnowUnload_col       = 0._r8
   BulkFactor4Snow_col(NY,NX) = 0.0_r8
-  SnowOnCanopy_col(NY,NX)    = 0._r8
   fSnowCanopy_col(NY,NX)     = 0._r8
   ENGYS                      = 0._R8
   DO  NZ=1,NP_col(NY,NX)
@@ -78,7 +77,6 @@ implicit none
       fSnowCanopy_pft(NZ,NY,NX)     = ((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
       BulkFactor4Snow_pft(NZ,NY,NX) = BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
       BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
-      SnowOnCanopy_col(NY,NX)       = SnowOnCanopy_col(NY,NX)+SnowOnCanopy_pft(NZ,NY,NX)
       fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
     else
       SnowIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
