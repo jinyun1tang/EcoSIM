@@ -103,7 +103,7 @@ implicit none
   associate(                                                  &
     rNCGrain_pft          => plt_allom%rNCGrain_pft          ,& !input  :grain N:C ratio, [g g-1]
     rPCGrain_pft          => plt_allom%rPCGrain_pft          ,& !input  :grain P:C ratio, [gP gP-1]  
-    PlantPopulation_pft   => plt_site%PlantPopulation_pft    ,& !input  :plant population, [d-2]  
+    PlantPopuLive_pft   => plt_site%PlantPopuLive_pft    ,& !input  :plant population, [d-2]  
     SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft  ,& !input  :plant stored nonstructural element at current step, [g d-2]
     CanopySeedNumX_pft    => plt_morph%CanopySeedNumX_pft    ,& !input :canopy grain number, [d-2]        
     SeedCMass_pft         => plt_morph%SeedCMass_pft         ,& !input  :grain size at seeding, [g]    
@@ -122,9 +122,9 @@ implicit none
     call InitPlantPhenoMorphoBio(NZ)
     
     !if(CanopySeedNumX_pft(NZ)>0._r8)then
-      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmc,NZ)
-      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmn,NZ)
-      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)-SeasonalNonstElms_pft(ielmp,NZ)
+      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmc,NZ)
+      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmn,NZ)
+      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmp,NZ)
       SeasonalNonstElms_pft(:,NZ) = SeasonalNonstElms_pft(:,NZ)+SeedPlantedElm_pft(:,NZ)
       CanopySeedNumX_pft(NZ)=0._r8
     !endif
@@ -143,7 +143,7 @@ implicit none
   character(len=*), parameter :: subname='SetDeadPlant'
 
   associate(                                                       &
-    PlantPopulation_pft     => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
     RootElms_pft            => plt_biom%RootElms_pft              ,& !input  :plant root element mass, [g d-2]
     SeasonalNonstElms_pft   => plt_biom%SeasonalNonstElms_pft     ,& !input  :plant stored nonstructural element at current step, [g d-2]
     doInitPlant_pft         => plt_pheno%doInitPlant_pft          ,& !input  :PFT initialization flag:0=no,1=yes,[-]
@@ -192,7 +192,7 @@ implicit none
     IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction)then
       isPlantRootAlive_pft(NZ)=iFalse
     endif
-    IF(PlantPopulation_pft(NZ).LE.0.0_r8)then
+    IF(PlantPopuLive_pft(NZ).LE.0.0_r8)then
       isPlantRootAlive_pft(NZ)=iFalse
     endif
     IF(isPlantRootAlive_pft(NZ).EQ.iFalse)then
@@ -837,7 +837,7 @@ implicit none
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !output :branch live stalk C, [gC d-2]
     StalkRsrvElms_brch        => plt_biom%StalkRsrvElms_brch         ,& !output :branch reserve element mass, [g d-2]
     StalkStrutElms_brch       => plt_biom%StalkStrutElms_brch        ,& !output :branch stalk structural element mass, [g d-2]
-    iPlantState_pft           => plt_pheno%iPlantState_pft            & !output :flag for species death, [-]
+    iPlantStateLive_pft           => plt_pheno%iPlantStateLive_pft            & !output :flag for species death, [-]
   )
 !     RESET BRANCH STATE VARIABLES
 !
@@ -889,7 +889,7 @@ implicit none
     enddo
   ENDDO D6416
   SeasonalNonstElms_pft(1:NumPlantChemElms,NZ) = 0._r8
-  iPlantState_pft(NZ)                          = iFalse
+  iPlantStateLive_pft(NZ)                          = iFalse
   end associate
   end subroutine ResetBranchRootStates
 

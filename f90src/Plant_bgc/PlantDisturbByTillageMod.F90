@@ -44,7 +44,7 @@ contains
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     iYearCurrent                => plt_site%iYearCurrent                  ,& !input  :current year,[-]
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col               ,& !inoput :total subsurface water flux, [m3 d-2]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !inoput :canopy water content, [m3 d-2]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
@@ -106,7 +106,7 @@ contains
   !
   D8975: DO NB=1,NumOfBranches_pft(NZ)
     IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
-      IF(PlantPopulation_pft(NZ).LE.0.0)then
+      IF(PlantPopuLive_pft(NZ).LE.0.0)then
         isPlantBranchAlive_brch(NB,NZ)=iFalse
       endif
       !
@@ -276,9 +276,9 @@ contains
     iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft      ,& !output :year of harvest,[-]    
     RootSegBaseDepth_raxes    => plt_morph%RootSegBaseDepth_raxes     ,& !inoput : base depth of different root axes, [m]
     Root1stDepz_raxes         => plt_morph%Root1stDepz_raxes          ,& !inoput : root layer depth, [m]    
-    iPlantState_pft           => plt_pheno%iPlantState_pft            ,& !output :flag for species death, [-]    
+    iPlantStateLive_pft           => plt_pheno%iPlantStateLive_pft            ,& !output :flag for species death, [-]    
     jHarvstType_pft           => plt_distb%jHarvstType_pft            ,& !output :flag for stand replacing disturbance,[-]    
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft          & !inoput :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft          & !inoput :plant population, [d-2]
   )
   call PrintInfo('beg '//subname)
   !     SolarNoonHour_col=hour of solar noon
@@ -297,17 +297,17 @@ contains
       IF(yearIJ%I.GT.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
         XHVST                   = XCORP
         PPX_pft(NZ)             = PPX_pft(NZ)*XHVST
-        PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*XHVST
+        PlantPopuLive_pft(NZ) = PlantPopuLive_pft(NZ)*XHVST
 
         call RemoveShootByTillage(yearIJ,NZ,XHVST)
 
         ! LitrFall FROM ROOTS DURING TILLAGE
         call RemoveRootsByTillage(yearIJ,NZ,XHVST)
 
-        IF(PlantPopulation_pft(NZ).LE.0.0_r8)THEN
+        IF(PlantPopuLive_pft(NZ).LE.0.0_r8)THEN
           isPlantRootAlive_pft(NZ)   = iFalse
           isPlantShootAlive_pft(NZ)  = iFalse
-          iPlantState_pft(NZ)        = iFalse
+          iPlantStateLive_pft(NZ)        = iFalse
           jHarvstType_pft(NZ)        = jharvtyp_terminate
           iDayPlantHarvest_pft(NZ)   = yearIJ%I
           iYearPlantHarvest_pft(NZ)  = iYearCurrent

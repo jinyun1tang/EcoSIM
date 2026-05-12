@@ -6,7 +6,7 @@ module RestartMod
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx,nlbiomcp=>NumLiveMicrbCompts
-  use EcoSIMConfig      , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc, cold_run
+  use EcoSIMConfig      , only : ndbiomcp=>NumDeadMicrbCompts,jsken=>jskenc, is_cold_run
   use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle, finidat
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSiMParDataMod  , only : micpar,pltpar
@@ -238,15 +238,15 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datip_1d
-    call restartvar(ncid, flag, varname='iPlantState_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='iPlantStateLive_pft', dim1name='pft',&
        long_name='flag for species death, 0:live, 1:dead', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iPlantState_pft,datip_1d)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iPlantStateLive_pft,datip_1d)
   else 
-    !print*,'iPlantState_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iPlantState_pft,datip_1d)  
+    !print*,'iPlantStateLive_pft'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iPlantStateLive_pft,datip_1d)  
     dat1pr => datip_1d
-    call restartvar(ncid, flag, varname='iPlantState_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='iPlantStateLive_pft', dim1name='pft',&
        long_name='flag for species death, 0:live, 1:dead', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)    
   endif
@@ -258,7 +258,7 @@ implicit none
        data=dat1pr, missing_value=ispval, fill_value=ispval)
     call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumCogrowthNode_pft,datip_1d)
   else 
-    !print*,'iPlantState_pft'
+    !print*,'iPlantStateLive_pft'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,NumCogrowthNode_pft,datip_1d)  
     dat1pr => datip_1d
     call restartvar(ncid, flag, varname='NumCogrowthNode_pft', dim1name='pft',&
@@ -1134,21 +1134,37 @@ implicit none
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)        
   endif  
 
-
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PlantPopulation_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PlantPopuLive_pft', dim1name='pft',&
      long_name='plant population', units='# d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopulation_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopuLive_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
   else
     !print*,'PP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopulation_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopuLive_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PlantPopulation_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='PlantPopuLive_pft', dim1name='pft',&
      long_name='plant population', units='# d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='PlantPopuAll_pft', dim1name='pft',&
+     long_name='Standing dead plant population', units='# d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopuAll_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    !print*,'PP'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantPopuAll_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)    
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='PlantPopuAll_pft', dim1name='pft',&
+     long_name='Standing dead plant population', units='# d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
   endif  
 
@@ -9415,7 +9431,7 @@ implicit none
   ! !ARGUMENTS:
   type(file_desc_t), intent(inout) :: ncid
 
-  if ( .not. cold_run() )then
+  if ( .not. is_cold_run() )then
 !      call get_proc_global(ng=numg, nt=numt, nl=numl, nc=numc, np=nump, nCohorts=numCohort)
 !      call check_dim(ncid, nameg, numg)
 !      call check_dim(ncid, namet, numt)

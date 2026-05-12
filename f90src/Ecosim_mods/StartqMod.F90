@@ -1,10 +1,10 @@
 module StartqMod
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use minimathmod,      only: AZMAX1, isclose
-  use DebugToolMod,     only: PrintInfo
-  use UnitMod,          only: units
-  use EcoSiMParDataMod, only: pltpar
-  use PlantBGCPars, only : BlkDActCoarseRoots,BlkDLigCoarseRoots,SpecStalkVolume  
+  use data_kind_mod,    only : r8 => DAT_KIND_R8
+  use minimathmod,      only : AZMAX1, isclose
+  use DebugToolMod,     only : PrintInfo
+  use UnitMod,          only : units
+  use EcoSiMParDataMod, only : pltpar
+  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots,SpecStalkVolume  
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -78,10 +78,14 @@ module StartqMod
 
           call InitPlantHeatandWater(NZ,NY,NX)
 
+          if(IGO==0 .and. is_cold_run())then
+
+          endif
+          
         ENDIF
-        ZERO4Groth_pft(NZ,NY,NX)   = ZERO*PlantPopulation_pft(NZ,NY,NX)
-        ZERO4Uptk_pft(NZ,NY,NX)    = ZERO*PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        ZERO4LeafVar_pft(NZ,NY,NX) = AMIN1(ZERO*PlantPopulation_pft(NZ,NY,NX)*1.0E+06_r8,1.e-8_r8)
+        ZERO4Groth_pft(NZ,NY,NX)   = ZERO*PlantPopuLive_pft(NZ,NY,NX)
+        ZERO4Uptk_pft(NZ,NY,NX)    = ZERO*PlantPopuLive_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        ZERO4LeafVar_pft(NZ,NY,NX) = AMIN1(ZERO*PlantPopuLive_pft(NZ,NY,NX)*1.0E+06_r8,1.e-8_r8)
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -109,8 +113,8 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  iYearPlanting_pft(NZ,NY,NX)     = iPlantingYear_pft(NZ,NY,NX)   !planting year
-  iDayPlanting_pft(NZ,NY,NX)      = iPlantingDay_pft(NZ,NY,NX) !planting day
+  iYearPlanting_pft(NZ,NY,NX)     = iPlantingYear_pft(NZ,NY,NX) !planting year
+  iDayPlanting_pft(NZ,NY,NX)      = iPlantingDay_pft(NZ,NY,NX)  !planting day
   iYearPlantHarvest_pft(NZ,NY,NX) = iHarvestYear_pft(NZ,NY,NX)
   iDayPlantHarvest_pft(NZ,NY,NX)  = iHarvestDay_pft(NZ,NY,NX)
   PPI_pft(NZ,NY,NX)               = PPatSeeding_pft(NZ,NY,NX)
@@ -494,7 +498,7 @@ module StartqMod
   !
   !     PP=population (grid cell-1)
   !
-  PlantPopulation_pft(NZ,NY,NX)         = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PlantPopuLive_pft(NZ,NY,NX)           = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
   doInitPlant_pft(NZ,NY,NX)             = ifalse
   isPlantShootAlive_pft(NZ,NY,NX)       = iTrue
   isPlantRootAlive_pft(NZ,NY,NX)        = iTrue
@@ -547,8 +551,8 @@ module StartqMod
   ChillHours_pft(NZ,NY,NX)                                                  = 0._r8
   CanopyNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
   CanopyNodulNonstElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
-  ShootElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
-  PetolShethStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)        = 0._r8
+  ShootElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)              = 0._r8
+  PetolShethStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   StalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)         = 0._r8
   LeafStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
   StalkRsrvElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)          = 0._r8
@@ -866,7 +870,7 @@ module StartqMod
 !     RootProteinC_pvr=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  SeedPlantedElm_pft(ielmc,NZ,NY,NX)    = SeedCMass_pft(NZ,NY,NX)*PlantPopulation_pft(NZ,NY,NX)
+  SeedPlantedElm_pft(ielmc,NZ,NY,NX)    = SeedCMass_pft(NZ,NY,NX)*PlantPopuLive_pft(NZ,NY,NX)
 
   LeafStrutElms_brch(ielmn,1,NZ,NY,NX)  = rNCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)
   LeafStrutElms_brch(ielmp,1,NZ,NY,NX)  = rPCGrain_pft(NZ,NY,NX)*LeafStrutElms_brch(ielmc,1,NZ,NY,NX)

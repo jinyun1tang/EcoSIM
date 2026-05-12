@@ -128,7 +128,7 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
-        PlantinDepz_pft(NZ,NY,NX)=ppmc
+        PlantinDepz_pft(NZ,NY,NX)=1.e-6_r8
       ENDDO
     ENDDO
   ENDDO
@@ -159,7 +159,7 @@ implicit none
           endif
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
           read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
-          PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),ppmc)
+          PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),1.e-6_r8)
           LPY=0
           if(isLeap(iyr) .and. IMO.GT.2)LPY=1
           !obtain the ordinal day
@@ -435,8 +435,9 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
-        iHarvestDay_pft(NZ,NY,NX)  = iDayPlantHarvest_pft(NZ,NY,NX)
-        iHarvestYear_pft(NZ,NY,NX) = iYearPlantHarvest_pft(NZ,NY,NX)
+        iHarvestDay_pft(NZ,NY,NX)      = iDayPlantHarvest_pft(NZ,NY,NX)
+        iHarvestYear_pft(NZ,NY,NX)     = iYearPlantHarvest_pft(NZ,NY,NX)
+        iMaintPlantTrait_pft(NZ,NY,NX) = iFalse
       ENDDO
     ENDDO
   ENDDO

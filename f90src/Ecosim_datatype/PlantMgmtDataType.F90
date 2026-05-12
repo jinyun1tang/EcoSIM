@@ -16,7 +16,7 @@ module PlantMgmtDataType
   integer ,target,allocatable ::  iYearPlantHarvest_pft(:,:,:)                 !year of harvest, [-]
   integer ,target,allocatable ::  iDayPlanting_pft(:,:,:)                      !day of planting, [-]
   integer ,target,allocatable ::  iDayPlantHarvest_pft(:,:,:)                  !day of harvest, [-]
-  integer ,target,allocatable ::  iPlantState_pft(:,:,:)                       !flag for species death, [-]
+  integer ,target,allocatable ::  iPlantStateLive_pft(:,:,:)                       !flag for species death, [-]
   integer ,target,allocatable ::  iPlantingYear_pft(:,:,:)                     !alternate year of planting, [-]
   integer ,target,allocatable ::  iPlantingDay_pft(:,:,:)                      !alternate day of planting, [-]
   integer ,target,allocatable ::  iHarvestYear_pft(:,:,:)                      !alternate year of harvest, [-]
@@ -57,7 +57,7 @@ module PlantMgmtDataType
   allocate(iYearPlantHarvest_pft(JP,JY,JX));     iYearPlantHarvest_pft = 0
   allocate(iDayPlanting_pft(JP,JY,JX));    iDayPlanting_pft            = 0
   allocate(iDayPlantHarvest_pft(JP,JY,JX));    iDayPlantHarvest_pft    = 0
-  allocate(iPlantState_pft(JP,JY,JX));     iPlantState_pft             = 0
+  allocate(iPlantStateLive_pft(JP,JY,JX));     iPlantStateLive_pft             = 0
   allocate(iPlantingYear_pft(JP,JY,JX));     iPlantingYear_pft         = 0
   allocate(iPlantingDay_pft(JP,JY,JX));    iPlantingDay_pft            = 0
   allocate(iHarvestYear_pft(JP,JY,JX));     iHarvestYear_pft           = 0
@@ -90,7 +90,7 @@ module PlantMgmtDataType
   call destroy(iYearPlantHarvest_pft)
   call destroy(iDayPlanting_pft)
   call destroy(iDayPlantHarvest_pft)
-  call destroy(iPlantState_pft)
+  call destroy(iPlantStateLive_pft)
   call destroy(iPlantingYear_pft)
   call destroy(iPlantingDay_pft)
   call destroy(iHarvestYear_pft)

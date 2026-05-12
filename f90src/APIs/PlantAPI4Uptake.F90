@@ -137,7 +137,7 @@ implicit none
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
     plt_biom%CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
     plt_biom%CanopySapwoodC_pft(NZ)           = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
-    plt_site%PlantPopulation_pft(NZ)        = PlantPopulation_pft(NZ,NY,NX)
+    plt_site%PlantPopuLive_pft(NZ)        = PlantPopuLive_pft(NZ,NY,NX)
     plt_biom%ZERO4LeafVar_pft(NZ)           = ZERO4LeafVar_pft(NZ,NY,NX)
     plt_biom%ZERO4Groth_pft(NZ)             = ZERO4Groth_pft(NZ,NY,NX)
     plt_photo%RCS_pft(NZ)                   = RCS_pft(NZ,NY,NX)                    !read in pft parameter

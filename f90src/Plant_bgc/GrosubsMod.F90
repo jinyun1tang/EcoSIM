@@ -68,7 +68,7 @@ module grosubsMod
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
     ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]    
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft          ,& !input  :plant population, [d-2]    
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft          ,& !input  :plant population, [d-2]    
     StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
     CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
   )
@@ -90,7 +90,7 @@ module grosubsMod
 
   D9985: DO NZ=1,NP
     !    
-    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZEROS)THEN      
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
@@ -272,7 +272,7 @@ module grosubsMod
 ! begin_execution
   associate(                                                   &
     NumOfBranches_pft     => plt_morph%NumOfBranches_pft      ,& !input  :number of branches,[-]
-    PlantPopulation_pft   => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft   => plt_site%PlantPopuLive_pft     ,& !input  :plant population, [d-2]
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantRootAlive_pft  => plt_pheno%isPlantRootAlive_pft   ,& !input  :flag to detect root system death,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
@@ -283,7 +283,7 @@ module grosubsMod
 
   call PrintInfo('beg '//subname)
   
-  IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
+  IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
     call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
@@ -342,7 +342,7 @@ module grosubsMod
     NU                          => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]    
     RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RootElms_pft                => plt_biom%RootElms_pft                  ,& !input  :plant root element mass, [g d-2]
@@ -478,16 +478,16 @@ module grosubsMod
   !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
   !     WTRT,PP=root mass,PFT population
   !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
-  RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+  RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopuLive_pft(NZ))
 
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopulation_pft(NZ)   
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopuLive_pft(NZ)   
   elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
     !for woody vascular, **(1/1.4)
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)   
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopuLive_pft(NZ)   
   else
     !for herbaceous plant, **(1./0.95) 
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopulation_pft(NZ)
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopuLive_pft(NZ)
   endif
 
   !

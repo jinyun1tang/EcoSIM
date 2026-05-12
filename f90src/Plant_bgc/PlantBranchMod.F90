@@ -1707,7 +1707,7 @@ module PlantBranchMod
     CanopyHeightZ_col         => plt_morph%CanopyHeightZ_col          ,& !input  :canopy layer height, [m]
     LeafAngleClass_pft        => plt_morph%LeafAngleClass_pft         ,& !input  :fractionction of leaves in different angle classes, [-]
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]    
     SineLeafAngle             => plt_rad%SineLeafAngle                ,& !input  :sine of leaf angle,[-]
@@ -1736,7 +1736,7 @@ module PlantBranchMod
 
   IF(HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     !plant not emerged yet
-    LeafLength            = SQRT(1.0E+02_r8*LeafArea_node(0,MainBranchNum_pft(NZ),NZ)/PlantPopulation_pft(NZ))
+    LeafLength            = SQRT(1.0E+02_r8*LeafArea_node(0,MainBranchNum_pft(NZ),NZ)/PlantPopuLive_pft(NZ))
     !pushed upward, 
     HypocotHeight_pft(NZ) = LeafLength+PetoleLength_node(0,MainBranchNum_pft(NZ),NZ)+StalkNodeHeight_brch(0,MainBranchNum_pft(NZ),NZ)
   ENDIF
@@ -1801,7 +1801,7 @@ module PlantBranchMod
       HeightStalk    = HeightBranchBase+StalkNodeHeight_brch(K,NB,NZ)
       StalkHeight_pft(NZ) = AMAX1(StalkHeight_pft(NZ),HeightStalk)
       HeightLeafNode = HeightStalk+PetoleLength_node(K,NB,NZ)      
-      LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopulation_pft(NZ)*FracGroth2Node_pft(NZ))))
+      LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopuLive_pft(NZ)*FracGroth2Node_pft(NZ))))
 
       !
       !   ALLOCATE FRACTIONS OF LEAF IN EACH INCLINATION CLASS
@@ -1916,13 +1916,13 @@ module PlantBranchMod
         ENDIF
       ENDDO D545
       
-      StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopulation_pft(NZ)) &
+      StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopuLive_pft(NZ)) &
         /(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
 
       if(NB.EQ.MainBranchNum_pft(NZ) .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
 
       !assume stalk is cylindrical
-      StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopulation_pft(NZ)
+      StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopuLive_pft(NZ)
 
       IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
         SapwoodBiomassC_brch(NB,NZ)=StalkStrutElms_brch(ielmc,NB,NZ)
@@ -1932,7 +1932,7 @@ module PlantBranchMod
         !the definition of sapwood here is not exact. For a tree, from the core to bark, they are heartwood, sapwood, vascular cambium, 
         !living phloem, cork cambium and cork. 
         StalkSectionArea            = PICON*(2._r8*StalkRadius*DTransportTube-DTransportTube**2)
-        SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/SpecStalkVolume*StalkNodeHeight_brch(K1,NB,NZ)*PlantPopulation_pft(NZ)
+        SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/SpecStalkVolume*StalkNodeHeight_brch(K1,NB,NZ)*PlantPopuLive_pft(NZ)
       ENDIF
 
       D445: DO L=LNumHeightBranchBase,LNumHeightBranchTip
@@ -2068,7 +2068,7 @@ module PlantBranchMod
     HighTempLimitSeed_pft        => plt_pheno%HighTempLimitSeed_pft         ,& !input  :temperature above which seed set is adversely affected, [oC]
     dReproNodeNumNormByMatG_brch => plt_pheno%dReproNodeNumNormByMatG_brch  ,& !input  :gain in normalized node number during reproductive growth stages, [h-1]
     TCChill4Seed_pft             => plt_pheno%TCChill4Seed_pft              ,& !input  :temperature below which seed set is adversely affected, [oC]
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]
     MaxSeedNumPerSite_pft        => plt_morph%MaxSeedNumPerSite_pft         ,& !input  :maximum grain number per node, [-]
     SeedCMassMax_pft             => plt_morph%SeedCMassMax_pft              ,& !input  :maximum grain size, [g]
     GrothStalkMaxSeedSites_pft   => plt_morph%GrothStalkMaxSeedSites_pft    ,& !input  :maximum grain sites per unit of stalk/branch growth, [-]
@@ -2258,7 +2258,7 @@ module PlantBranchMod
   !   iPlantCalendar_brch(ipltcal_EndSeedFill,=date of physiological maturity
   !
   IF(iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)THEN
-    IF(Reserve2GrainE(ielmc).LE.1.0E-09_r8*PlantPopulation_pft(NZ))THEN
+    IF(Reserve2GrainE(ielmc).LE.1.0E-09_r8*PlantPopuLive_pft(NZ))THEN
       HourFailGrainFill_brch(NB,NZ)=HourFailGrainFill_brch(NB,NZ)+1.0
     ELSE
       HourFailGrainFill_brch(NB,NZ)=0._r8
@@ -3462,7 +3462,7 @@ module PlantBranchMod
     rProteinC2LeafN_pft    => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft    => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft     => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
     LeafArea_node          => plt_morph%LeafArea_node           ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch      => plt_morph%LeafAreaLive_brch       ,& !inoput :branch leaf area, [m2 d-2]
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch       ,& !inoput :leaf element, [g d-2]
@@ -3511,7 +3511,7 @@ module PlantBranchMod
       !         LeafAreaGrowth,GRO=leaf area,mass growth
       !         LeafAreaLive_brch,LeafArea_node=branch,node leaf area
       !Eq.(3) in Grant and Hesketh, 1992, with updates for small biomass
-      dMC                      = AZMAX1(1.e-9_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GrozNodesPerPlant))
+      dMC                      = AZMAX1(1.e-9_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GrozNodesPerPlant))
       SpecAreaLeafGrowth       = EtoliationCoeff*SLA1_pft(NZ)*dMC**SLA2*TurgEff4LeafPetolExpansion
       LeafAreaGrowth           = GrowthElms(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
@@ -3546,7 +3546,7 @@ module PlantBranchMod
     rProteinC2LeafN_pft       => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft       => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
     KHiestGroLeafNode_brch    => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
     PetoleLength_node         => plt_morph%PetoleLength_node       ,& !inoput :sheath height, [m]
     PetolShethElmntNode_brch  => plt_biom%PetolShethElmntNode_brch ,& !inoput :sheath chemical element, [g d-2]
@@ -3595,9 +3595,9 @@ module PlantBranchMod
       !   PetoleLength_node=PetolSheth length
       !
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
-        dMC                        = AZMAX1(1.e-9_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopulation_pft(NZ)*GSSL))
+        dMC                        = AZMAX1(1.e-9_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GSSL))
         SSL                        = EtoliationCoeff*PetolShethLen2Mass_pft(NZ)*dMC**SSL2*TurgEff4LeafPetolExpansion
-        GROS                       = GrowthElms(ielmc)/PlantPopulation_pft(NZ)*SSL
+        GROS                       = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SSL
         PetoleLength_node(K,NB,NZ) = PetoleLength_node(K,NB,NZ)+GROS*SinePetolShethAngle_pft(NZ)
       ENDIF
     ENDDO D505
@@ -3626,7 +3626,7 @@ module PlantBranchMod
     NodeLenPergC_pft           => plt_morph%NodeLenPergC_pft           ,& !input  :internode length:mass during growth, [m gC-1]
     SineBranchAngle_pft        => plt_morph%SineBranchAngle_pft        ,& !input  :branching angle, [degree from horizontal]
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch         ,& !input  :branch stalk structural element mass, [g d-2]
-    PlantPopulation_pft        => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     KHiestGroLeafNode_brch     => plt_pheno%KHiestGroLeafNode_brch     ,& !input  :leaf growth stage counter, [-]
     StalkNodeVertLength_brch   => plt_morph%StalkNodeVertLength_brch   ,& !inoput :internode height, [m]
@@ -3664,9 +3664,9 @@ module PlantBranchMod
     !     PP=PFT population
     !     StalkLenGrowth,GRO=stalk length,mass growth
     !
-    StalkAveStrutC_brch = StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopulation_pft(NZ)
+    StalkAveStrutC_brch = StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopuLive_pft(NZ)
     SpecLenStalkGrowth  = ETOL*NodeLenPergC_pft(NZ)*AZMAX1(1.e-9_r8,StalkAveStrutC_brch)**SNL2
-    StalkLenGrowth      = GrowthElms(ielmc)/PlantPopulation_pft(NZ)*SpecLenStalkGrowth
+    StalkLenGrowth      = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SpecLenStalkGrowth
 
     !
     !     GROWTH AT EACH CURRENT NODE

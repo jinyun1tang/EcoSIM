@@ -237,7 +237,7 @@ implicit none
     canopy_growth_pft(NZ,NY,NX)         = plt_rbgc%canopy_growth_pft(NZ)
     CanopyHeight4WatUptake_pft(NZ,NY,NX)      = plt_morph%CanopyHeight4WatUptake_pft(NZ)
     IsPlantActive_pft(NZ,NY,NX)         = plt_pheno%IsPlantActive_pft(NZ)
-    iPlantState_pft(NZ,NY,NX)           = plt_pheno%iPlantState_pft(NZ)
+    iPlantStateLive_pft(NZ,NY,NX)           = plt_pheno%iPlantStateLive_pft(NZ)
     isPlantShootAlive_pft(NZ,NY,NX)      = plt_pheno%isPlantShootAlive_pft(NZ)
     isPlantRootAlive_pft(NZ,NY,NX)       = plt_pheno%isPlantRootAlive_pft(NZ)
     iDayPlanting_pft(NZ,NY,NX)          = plt_distb%iDayPlanting_pft(NZ)
@@ -260,7 +260,7 @@ implicit none
     TempOffset_pft(NZ,NY,NX)                            = plt_pheno%TempOffset_pft(NZ)
     PlantO2Stress_pft(NZ,NY,NX)                         = plt_pheno%PlantO2Stress_pft(NZ)
     PPX_pft(NZ,NY,NX)                                   = plt_site%PPX_pft(NZ)
-    PlantPopulation_pft(NZ,NY,NX)                       = plt_site%PlantPopulation_pft(NZ)
+    PlantPopuLive_pft(NZ,NY,NX)                       = plt_site%PlantPopuLive_pft(NZ)
     PPI_pft(NZ,NY,NX)                                   = plt_site%PPI_pft(NZ)
     RLeafAppear_pft(NZ,NY,NX)                           = plt_rbgc%RLeafAppear_pft(NZ)
     RNodeInitiate_pft(NZ,NY,NX)                         = plt_rbgc%RNodeInitiate_pft(NZ)
@@ -1146,7 +1146,7 @@ implicit none
     plt_photo%aquCO2Intraleaf_pft(NZ)      = aquCO2Intraleaf_pft(NZ,NY,NX)
     plt_distb%FracBiomHarvsted(1:2,1:4,NZ) = FracBiomHarvsted(1:2,1:4,NZ,I,NY,NX)
 
-    plt_pheno%iPlantState_pft(NZ)    = iPlantState_pft(NZ,NY,NX)
+    plt_pheno%iPlantStateLive_pft(NZ)    = iPlantStateLive_pft(NZ,NY,NX)
     plt_distb%iYearPlanting_pft(NZ)  = iYearPlanting_pft(NZ,NY,NX)
     plt_morph%NumCogrowthNode_pft(NZ) = NumCogrowthNode_pft(NZ,NY,NX)
 
@@ -1234,7 +1234,7 @@ implicit none
     plt_pheno%TempOffset_pft(NZ)                             = TempOffset_pft(NZ,NY,NX)
 
     plt_pheno%PlantO2Stress_pft(NZ)                       = PlantO2Stress_pft(NZ,NY,NX)
-    plt_site%PlantPopulation_pft(NZ)                      = PlantPopulation_pft(NZ,NY,NX)
+    plt_site%PlantPopuLive_pft(NZ)                      = PlantPopuLive_pft(NZ,NY,NX)
     plt_ew%PSICanopy_pft(NZ)                              = PSICanopy_pft(NZ,NY,NX)
     plt_ew%PSICanopyTurg_pft(NZ)                          = PSICanopyTurg_pft(NZ,NY,NX)
     plt_photo%CO2CuticleResist_pft(NZ)                    = CO2CuticleResist_pft(NZ,NY,NX)

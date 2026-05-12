@@ -167,7 +167,7 @@ module ExtractsMod
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft        ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft        ,& !input  :plant population, [d-2]
     RCO2Emis2Root_rpvr        => plt_rbgc%RCO2Emis2Root_rpvr         ,& !input  :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     RootH1PO4DmndBand_pvr     => plt_rbgc%RootH1PO4DmndBand_pvr      ,& !input  :HPO4 demand in band by each root population, [g d-2 h-1]
     RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr      ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
@@ -225,7 +225,7 @@ module ExtractsMod
       !     PP=PFT population, this is dynamic, and can goes to zero
       !
       IF(N.EQ.ipltroot)THEN
-        totRootLenDens_vr(L)=totRootLenDens_vr(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)/AREA3(L)
+        totRootLenDens_vr(L)=totRootLenDens_vr(L)+RootLenDensPerPlant_pvr(N,L,NZ)*PlantPopuLive_pft(NZ)/AREA3(L)
       ENDIF
       !
       !     TOTAL WATER UPTAKE

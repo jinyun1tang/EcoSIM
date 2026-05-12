@@ -33,17 +33,31 @@ module InitPlantMod
   character(len=*), parameter :: subname='StartPlants'
 !     begin_execution
 
-  associate(                                              &
-    AREA3               => plt_site%AREA3                ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
-    IsPlantActive_pft   => plt_pheno%IsPlantActive_pft   ,& !input  :flag for living pft, [-]
-    NL                  => plt_site%NL                   ,& !input  :lowest soil layer number,[-]
-    NP                  => plt_site%NP                   ,& !input  :current number of plant species,[-]
-    NU                  => plt_site%NU                   ,& !input  :current soil surface layer number, [-]
-    PlantPopulation_pft => plt_site%PlantPopulation_pft  ,& !input  :plant population, [d-2]
-    ZERO                => plt_site%ZERO                 ,& !input  :threshold zero for numerical stability, [-]
-    ZERO4Groth_pft      => plt_biom%ZERO4Groth_pft       ,& !output :threshold zero for plang growth calculation, [-]
-    ZERO4LeafVar_pft    => plt_biom%ZERO4LeafVar_pft     ,& !output :threshold zero for leaf calculation, [-]
-    ZERO4Uptk_pft       => plt_rbgc%ZERO4Uptk_pft         & !output :threshold zero for uptake calculation, [-]
+  associate(                                                   &
+    iYearPlanting_pft     => plt_distb%iYearPlanting_pft      ,& !input  :year of planting,[-]
+    iYearPlantHarvest_pft => plt_distb%iYearPlantHarvest_pft  ,& !input  :year of harvest,[-]
+    iDayPlanting_pft      => plt_distb%iDayPlanting_pft       ,& !input  :day of planting,[-]
+    iDayPlantHarvest_pft  => plt_distb%iDayPlantHarvest_pft   ,& !input  :day of harvest,[-]
+    AREA3                 => plt_site%AREA3                   ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
+    iYearCurrent          => plt_site%iYearCurrent            ,& !input  :current year,[-]    
+    iHarvestDay_pft       => plt_distb%iHarvestDay_pft        ,& !input  :day of harvest, [-]
+    iHarvestYear_pft      => plt_distb%iHarvestYear_pft       ,& !input  :year of harvest,[-]
+    iPlantingDay_pft      => plt_distb%iPlantingDay_pft       ,& !input  :day of planting,[-]
+    iPlantingYear_pft     => plt_distb%iPlantingYear_pft      ,& !input  :year of planting,[-]    
+    IsPlantActive_pft     => plt_pheno%IsPlantActive_pft      ,& !input  :flag for living pft, [-]
+    PPatSeeding_pft       => plt_site%PPatSeeding_pft         ,& !input  :plant population at seeding, [plants d-2]    
+    PPI_pft               => plt_site%PPI_pft                 ,& !output :initial plant population, [plants d-2]    
+    PPX_pft               => plt_site%PPX_pft                 ,& !output :plant population, [plants m-2]    
+    NL                    => plt_site%NL                      ,& !input  :lowest soil layer number,[-]
+    NP                    => plt_site%NP                      ,& !input  :current number of plant species,[-]
+    NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
+    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
+    PlantPopuAll_pft      => plt_site%PlantPopuAll_pft        ,& !input  :live+standing dead plant population, [d-2]
+    ZERO                  => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
+    iMaintPlantTrait_pft  => plt_pheno%iMaintPlantTrait_pft   ,& !inoput :flag for maintain or reset plant traits, [-]    
+    ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !output :threshold zero for plang growth calculation, [-]
+    ZERO4LeafVar_pft      => plt_biom%ZERO4LeafVar_pft        ,& !output :threshold zero for leaf calculation, [-]
+    ZERO4Uptk_pft         => plt_rbgc%ZERO4Uptk_pft            & !output :threshold zero for uptake calculation, [-]
   )
 
   call PrintInfo('beg '//subname)
@@ -51,7 +65,6 @@ module InitPlantMod
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
 !     IsPlantActive_pft=PFT flag:0=not active,1=active
-!     iYearPlanting_pft,iDayPlanting_pft,iYearPlantHarvest_pft,iDayPlantHarvest_pft=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,ClumpFactorInit_pft=current,initial clumping factor
 !     H2OCuticleResist_pft=cuticular resistance to water (h m-1)
@@ -63,6 +76,27 @@ module InitPlantMod
 
   NZ2X=MIN(NZ2Q,NP)
   D9985: DO NZ=NZ1Q,NZ2X
+
+    IF(iMaintPlantTrait_pft(NZ).EQ.iFalse)THEN
+      iYearPlanting_pft(NZ)     = iPlantingYear_pft(NZ)
+      iDayPlanting_pft(NZ)      = iPlantingDay_pft(NZ)
+      iYearPlantHarvest_pft(NZ) = iHarvestYear_pft(NZ)
+      iDayPlantHarvest_pft(NZ)  = iHarvestDay_pft(NZ)
+    ENDIF
+
+    IF(iYearPlanting_pft(NZ).EQ.iYearCurrent)THEN
+      IF(PPI_pft(NZ).GT.0.0)THEN
+        PlantPopuLive_pft(NZ) = PPI_pft(NZ)*AREA3(NU)
+        PPatSeeding_pft(NZ)   = PPI_pft(NZ)
+        PPX_pft(NZ)           = PPatSeeding_pft(NZ)
+      ELSE
+        PlantPopuLive_pft(NZ) = PPatSeeding_pft(NZ)*AREA3(NU)
+        PPX_pft(NZ)           = PPatSeeding_pft(NZ)
+      ENDIF
+    ELSE
+      PlantPopuLive_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
+    ENDIF
+    PlantPopuAll_pft(NZ)=PlantPopuLive_pft(NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iFalse)THEN
 
@@ -88,10 +122,9 @@ module InitPlantMod
   ENDDO D9985
 
   DO NZ=NZ1Q,NZ2X
-    ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
-    ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-    ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8,1.e-8_r8)
-    
+    ZERO4Groth_pft(NZ)   = ZERO*PlantPopuLive_pft(NZ)
+    ZERO4Uptk_pft(NZ)    = ZERO*PlantPopuLive_pft(NZ)/AREA3(NU)
+    ZERO4LeafVar_pft(NZ) = AMIN1(ZERO*PlantPopuLive_pft(NZ)*1.0E+06_r8,1.e-8_r8)    
   ENDDO  
 !
 !     FILL OUT UNUSED ARRAYS
@@ -116,17 +149,14 @@ module InitPlantMod
 
   implicit none
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='InitShootGrowth'
+
   associate(                                                                   &
     ClumpFactorInit_pft           => plt_morph%ClumpFactorInit_pft            ,& !input  :initial clumping factor for self-shading in canopy layer, [-]
     CuticleResist_pft             => plt_photo%CuticleResist_pft              ,& !input  :maximum stomatal resistance to vapor, [s m-1]
-    PPatSeeding_pft               => plt_site%PPatSeeding_pft                 ,& !input  :plant population at seeding, [plants d-2]
     rNCRoot_pft                   => plt_allom%rNCRoot_pft                    ,& !input  :root N:C ratio, [gN gC-1]
     rPCRootr_pft                  => plt_allom%rPCRootr_pft                   ,& !input  :root P:C ratio, [gP gC-1]
-    iHarvestDay_pft               => plt_distb%iHarvestDay_pft                ,& !input  :day of harvest, [-]
-    iHarvestYear_pft              => plt_distb%iHarvestYear_pft               ,& !input  :year of harvest,[-]
-    iPlantPhotosynsType_pft       => plt_photo%iPlantPhotosynsType_pft        ,& !input  :plant photosynthetic type (C3 or C4),[-]
-    iPlantingDay_pft              => plt_distb%iPlantingDay_pft               ,& !input  :day of planting,[-]
-    iPlantingYear_pft             => plt_distb%iPlantingYear_pft              ,& !input  :year of planting,[-]
+    iPlantPhotosynsType_pft       => plt_photo%iPlantPhotosynsType_pft        ,& !input  :plant photosynthetic type (C3 or C4),[-]    
     PPI_pft                       => plt_site%PPI_pft                         ,& !output :initial plant population, [plants d-2]
     rProteinC2RootP_pft           => plt_allom%rProteinC2RootP_pft            ,& !output :Protein C to root P ratio in remobilizable nonstructural biomass, [-]    
     rProteinC2RootN_pft           => plt_allom%rProteinC2RootN_pft            ,& !output :Protein C to root N ratio in remobilizable nonstructural biomass, [-]
@@ -137,17 +167,9 @@ module InitPlantMod
     H2OCuticleResist_pft          => plt_photo%H2OCuticleResist_pft           ,& !output :maximum stomatal resistance to vapor, [s h-1]
     O2I_pft                       => plt_photo%O2I_pft                        ,& !output :leaf gaseous O2 concentration, [umol m-3]
     PPX_pft                       => plt_site%PPX_pft                         ,& !output :plant population, [plants m-2]
-    RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !output :maximum root protein concentration, [gC g root C-1]
-    iDayPlantHarvest_pft          => plt_distb%iDayPlantHarvest_pft           ,& !output :day of harvest,[-]
-    iDayPlanting_pft              => plt_distb%iDayPlanting_pft               ,& !output :day of planting,[-]
-    iYearPlantHarvest_pft         => plt_distb%iYearPlantHarvest_pft          ,& !output :year of harvest,[-]
-    iYearPlanting_pft             => plt_distb%iYearPlanting_pft               & !output :year of planting,[-]
+    RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft             & !output :maximum root protein concentration, [gC g root C-1]
   )
-  iYearPlanting_pft(NZ)     = iPlantingYear_pft(NZ)
-  iDayPlanting_pft(NZ)      = iPlantingDay_pft(NZ)
-  iYearPlantHarvest_pft(NZ) = iHarvestYear_pft(NZ)
-  iDayPlantHarvest_pft(NZ)  = iHarvestDay_pft(NZ)
-  PPI_pft(NZ)               = PPatSeeding_pft(NZ)
+  call PrintInfo('beg '//subname)
   PPX_pft(NZ)               = PPI_pft(NZ)
   ClumpFactor_pft(NZ)       = ClumpFactorInit_pft(NZ)
 
@@ -160,6 +182,7 @@ module InitPlantMod
   ELSE
     O2I_pft(NZ)=3.96E+05_r8
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine InitShootGrowth
 
@@ -612,9 +635,9 @@ module InitPlantMod
     CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft                ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafArea_lnode              => plt_morph%CanopyLeafArea_lnode               ,& !output :layer/node/branch leaf area, [m2 d-2]
     CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft                 ,& !output :plant canopy leaf area, [m2 d-2]
-    CanopyStalkSurfArea_lbrch             => plt_morph%CanopyStalkSurfArea_lbrch              ,& !output :plant canopy layer branch stem area, [m2 d-2]
-    CanopyStemSurfAreaZ_pft               => plt_morph%CanopyStemSurfAreaZ_pft                ,& !output :plant canopy layer stem area, [m2 d-2]
-    CanopyStemSurfArea_pft                => plt_morph%CanopyStemSurfArea_pft                 ,& !output :plant stem area, [m2 d-2]
+    CanopyStalkSurfArea_lbrch         => plt_morph%CanopyStalkSurfArea_lbrch          ,& !output :plant canopy layer branch stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft           => plt_morph%CanopyStemSurfAreaZ_pft            ,& !output :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfArea_pft            => plt_morph%CanopyStemSurfArea_pft             ,& !output :plant stem area, [m2 d-2]
     ChillHours_pft                    => plt_photo%ChillHours_pft                     ,& !output :chilling effect on CO2 fixation, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
     Hours2LeafOut_brch                => plt_pheno%Hours2LeafOut_brch                 ,& !output :counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -639,7 +662,7 @@ module InitPlantMod
     ShootNodeNumAtAnthesis_brch       => plt_morph%ShootNodeNumAtAnthesis_brch        ,& !output :shoot node number at anthesis, [-]
     NumOfBranches_pft                 => plt_morph%NumOfBranches_pft                  ,& !output :number of branches,[-]
     NumOfLeaves_brch                  => plt_morph%NumOfLeaves_brch                   ,& !output :leaf number, [-]
-    PlantPopulation_pft               => plt_site%PlantPopulation_pft                 ,& !output :plant population, [d-2]
+    PlantPopuLive_pft                 => plt_site%PlantPopuLive_pft                   ,& !output :plant population, [d-2]
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     ReprodNodeNumNormByMatrgrp_brch   => plt_pheno%ReprodNodeNumNormByMatrgrp_brch    ,& !output :normalized node number during reproductive growth stages, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
@@ -656,8 +679,7 @@ module InitPlantMod
   !     PP=population (grid cell-1)
   !
   call PrintInfo('beg '//subname)
-  plt_pheno%Days4FalseBreak_pft(NZ) = 0
-  PlantPopulation_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
+  plt_pheno%Days4FalseBreak_pft(NZ)  = 0
   plt_pheno%doInitPlant_pft(NZ)      = ifalse
   plt_pheno%isPlantShootAlive_pft(NZ) = iTrue
   plt_pheno%isPlantRootAlive_pft(NZ)  = iTrue
@@ -1074,7 +1096,7 @@ module InitPlantMod
     jHarvstType_pft               => plt_distb%jHarvstType_pft                ,& !input  :flag for stand replacing disturbance,[-]    
     NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft             ,& !input  :soil layer at planting depth, [-]
     PetolShethStrutElms_brch      => plt_biom%PetolShethStrutElms_brch        ,& !input  :branch sheath structural element, [g d-2]
-    PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft             => plt_site%PlantPopuLive_pft               ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr             => plt_biom% PopuRootMycoC_pvr              ,& !input  :root layer C, [gC d-2]
     RootProteinCMax_pft           => plt_allom%RootProteinCMax_pft            ,& !input  :reference root protein N, [gN g-1]
     RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]
@@ -1111,7 +1133,7 @@ module InitPlantMod
   IF(jHarvstType_pft(NZ).EQ.jharvtyp_tmareseed .and. SeasonalNonstElms_pft(ielmc,NZ)>1.e-10_r8)then
     SeedPlantedElm_pft(:,NZ)=0._r8
   else
-    SeedPlantedElm_pft(ielmc,NZ)    = SeedCMass_pft(NZ)*PlantPopulation_pft(NZ)
+    SeedPlantedElm_pft(ielmc,NZ)    = SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)
     SeasonalNonstElms_pft(ielmc,NZ) = SeedPlantedElm_pft(ielmc,NZ)
     SeasonalNonstElms_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)
     SeasonalNonstElms_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeasonalNonstElms_pft(ielmc,NZ)

@@ -4309,7 +4309,7 @@ implicit none
       DO NZ=1,NP0_col(NY,NX)
         nptc=get_pft(NZ,NY,NX)
         this%h1D_CanopyCutProxy_ptc(nptc)   = CanopyCutProxy_pft(NZ,I,NY,NX)
-        this%h1D_POPN_ptc(nptc)             = PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_POPN_ptc(nptc)             = PlantPopuLive_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_EXUD_CumYr_C_FLX_ptc(nptc) = PlantExudElm_CumYr_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CAN_cumGPP_ptc(nptc)       = GrossCO2Fix_CumYr_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_LITRf_C_FLX_ptc(nptc)      = LitrfalStrutElms_CumYr_pft(ielmc,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4349,7 +4349,7 @@ implicit none
           this%h1D_MainBranchNodeNumber_ptc(nptc)=0
           this%h1D_ShootNodeNumber_ptc(nptc)  = 0
         endif
-        if (PlantPopulation_pft(NZ,NY,NX) .LE. 0._r8)then
+        if (PlantPopuLive_pft(NZ,NY,NX) .LE. 0._r8)then
           call this%ZeroPlantHistVars(nptc)
           cycle
         endif       
@@ -4494,9 +4494,9 @@ implicit none
         this%h1D_ROOT_P_ptc(nptc)           = RootElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_RootNodule_P_ptc(nptc)     = RootNoduleElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STORED_P_ptc(nptc)         = SeasonalNonstElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_ShootRootXferC_ptc(nptc)   = ShootRootXferElm_pft(ielmc,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
-        this%h1D_ShootRootXferN_ptc(nptc)   = ShootRootXferElm_pft(ielmn,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
-        this%h1D_ShootRootXferP_ptc(nptc)   = ShootRootXferElm_pft(ielmp,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
+        this%h1D_ShootRootXferC_ptc(nptc)   = ShootRootXferElm_pft(ielmc,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
+        this%h1D_ShootRootXferN_ptc(nptc)   = ShootRootXferElm_pft(ielmn,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
+        this%h1D_ShootRootXferP_ptc(nptc)   = ShootRootXferElm_pft(ielmp,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
         this%h1D_BRANCH_NO_ptc(nptc)        = NumOfBranches_pft(NZ,NY,NX)
         this%h1D_MainBranchNO_ptc(nptc)     = MainBranchNum_pft(NZ,NY,NX)
         this%h1D_RCanMaintDef_CO2_pft(nptc) = RCanMaintDef_CO2_pft(NZ,NY,NX)
@@ -4555,7 +4555,7 @@ implicit none
         ENDDO  
         this%h1D_RootAR_ptc(nptc)          = 0._r8
         this%h1D_RootLenPerPlant_ptc(nptc) = 0._r8
-        if(IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopulation_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
+        if(IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopuLive_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
           DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stDepz_ptc(nptc,NR)      = Root1stDepz_raxes(NR,NZ,NY,NX)
           ENDDO
@@ -4611,7 +4611,7 @@ implicit none
             this%h2D_prtUP_PO4_pvr(nptc,L)  = (sum(RootNutUptake_pvr(ids_H2PO4,:,L,NZ,NY,NX))+&
               sum(RootNutUptake_pvr(ids_H2PO4B,:,L,NZ,NY,NX)))/AREA_3D(3,L,NY,NX)
             this%h2D_DNS_RT_pvr(nptc,L) = RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)* &
-              PlantPopulation_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*1.e-4_r8
+              PlantPopuLive_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*1.e-4_r8
             this%h1D_RootLenPerPlant_ptc(nptc)=this%h1D_RootLenPerPlant_ptc(nptc)+RootLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)
 
             this%h2D_ROOTNLim_rpvr(nptc,L) = ROOTNLim_rpvr(ipltroot,L,NZ,NY,NX)
@@ -4622,8 +4622,8 @@ implicit none
             this%h2D_Root1stSinkWeight_pvr(nptc,L)=Root1stSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)*1.e3_r8
             this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
-            if(PlantPopulation_pft(NZ,NY,NX)>0._r8)then
-              this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopulation_pft(NZ,NY,NX)
+            if(PlantPopuLive_pft(NZ,NY,NX)>0._r8)then
+              this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
             else
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= 0._r8
             endif

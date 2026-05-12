@@ -42,7 +42,7 @@ implicit none
   public :: is_restart,   &
             is_branch,    &
             set_sim_type, &
-            cold_run
+            is_cold_run
 contains
 
   logical function is_restart( )
@@ -89,10 +89,10 @@ contains
   end subroutine set_sim_type
 !-----------------------------------------------------------------------
 
-logical function cold_run()
+logical function is_cold_run()
 implicit none
 
-cold_run=(nsrest==nsrStartup)
+is_cold_run=(nsrest==nsrStartup)
 
-end function cold_run
+end function is_cold_run
 end module EcoSIMConfig

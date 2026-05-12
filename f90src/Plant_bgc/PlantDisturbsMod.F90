@@ -284,7 +284,7 @@ module PlantDisturbsMod
     ZERO                    => plt_site%ZERO                     ,& !input  :threshold zero for numerical stability, [-]
     AREA3                   => plt_site%AREA3                    ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     iHarvstType_pft         => plt_distb%iHarvstType_pft         ,& !input  :type of harvest,[-]
-    PlantPopulation_pft     => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
     ZERO4Uptk_pft           => plt_rbgc%ZERO4Uptk_pft            ,& !output :threshold zero for uptake calculation, [-]
     ZERO4Groth_pft          => plt_biom%ZERO4Groth_pft           ,& !output :threshold zero for plang growth calculation, [-]
     ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft          & !output :threshold zero for leaf calculation, [-]
@@ -306,9 +306,9 @@ module PlantDisturbsMod
     !
     call PlantDisturbance(yearIJ,NZ)
 
-    ZERO4Groth_pft(NZ)   = ZERO*PlantPopulation_pft(NZ)
-    ZERO4Uptk_pft(NZ)    = ZERO*PlantPopulation_pft(NZ)/AREA3(NU)
-    ZERO4LeafVar_pft(NZ) = ZERO*PlantPopulation_pft(NZ)*1.0E+06_r8
+    ZERO4Groth_pft(NZ)   = ZERO*PlantPopuLive_pft(NZ)
+    ZERO4Uptk_pft(NZ)    = ZERO*PlantPopuLive_pft(NZ)/AREA3(NU)
+    ZERO4LeafVar_pft(NZ) = ZERO*PlantPopuLive_pft(NZ)*1.0E+06_r8
     
   ENDIF
   call PrintInfo('end '//subname) 
@@ -562,7 +562,7 @@ module PlantDisturbsMod
         !other
       ELSE
         !harvested
-        if(plt_site%PlantPopulation_pft(NZ).LE.0._r8)then
+        if(plt_site%PlantPopuLive_pft(NZ).LE.0._r8)then
           DO NE=1,NumPlantChemElms  
             if(SeasonalNonstElms_pft(NE,NZ).GT.0._r8)then
               PlantElmDistLoss_pft(NE,NZ)  = PlantElmDistLoss_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)
@@ -748,8 +748,10 @@ module PlantDisturbsMod
 !    SeedBankSize_pft          => plt_morph%SeedBankSize_pft            ,& !output :seed bank size, in terms of number of seeds [d-2]
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col          ,& !input  :grid canopy leaf area, [m2 d-2]
     CanopyCutProxy_pft         => plt_distb%CanopyCutProxy_pft          ,& !inoput :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
-    PlantPopulation_pft        => plt_site%PlantPopulation_pft          ,& !inoput :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !inoput :plant population, [d-2]
+    PlantPopuAll_pft           => plt_site%PlantPopuAll_pft             ,& !inoput :live+standing dead plant population, [d-2]    
     CanopyHeight_pft           => plt_morph%CanopyHeight_pft            ,& !inoput  :canopy height, [m]        
+    PPatSeeding_pft            => plt_site%PPatSeeding_pft              ,& !input  :plant population at seeding, [plants d-2]        
     PPX_pft                    => plt_site%PPX_pft                      ,& !inoput :plant population, [plants m-2]
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft        ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs          ,& !inoput :root C primary axes, [g d-2]
@@ -787,15 +789,17 @@ module PlantDisturbsMod
     IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)THEN
       !not terminate and reseed
       IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN                
-        PPX_pft(NZ)             = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
-        PlantPopulation_pft(NZ) = PlantPopulation_pft(NZ)*(1._r8-THIN_pft(NZ))
+        PPX_pft(NZ)           = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
+        PlantPopuLive_pft(NZ) = PlantPopuLive_pft(NZ)*(1._r8-THIN_pft(NZ))
+        PlantPopuAll_pft(NZ)  = PlantPopuAll_pft(NZ)*(1._r8-THIN_pft(NZ))
         !terminate and reseed        
       ELSE
         !modeling seed bank effect
-        !SeedBankSize_pft(NZ)    = 0.5_r8*PPI_pft(NZ)
-        !PPI_pft(NZ)             = AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
-        PPX_pft(NZ)             = PPI_pft(NZ)
-        PlantPopulation_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
+        !SeedBankSize_pft(NZ) = 0.5_r8*PPI_pft(NZ)
+        !PPI_pft(NZ)          = AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
+        PPX_pft(NZ)           = PPatSeeding_pft(NZ)
+        PlantPopuLive_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
+        PlantPopuAll_pft(NZ)  = PlantPopuLive_pft(NZ)
       ENDIF
 
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
@@ -1882,7 +1886,7 @@ module PlantDisturbsMod
   
   associate(                                                           &
     TKC_pft                   => plt_ew%TKC_pft                       ,& !input  :canopy temperature, [K]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft         ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
     jHarvstType_pft           => plt_distb%jHarvstType_pft            ,& !input  :flag for stand replacing disturbance,[-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -1974,7 +1978,7 @@ module PlantDisturbsMod
     !     WVSTK=total PFT sapwood C mass
     !     CanopyStalkSurfArea_lbrch=total PFT stalk surface area
     !    
-    IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction .or. PlantPopulation_pft(NZ).LE.0.0_r8)then
+    IF(jHarvstType_pft(NZ).NE.jharvtyp_noaction .or. PlantPopuLive_pft(NZ).LE.0.0_r8)then
       isPlantBranchAlive_brch(NB,NZ)=iFalse      
     endif
     

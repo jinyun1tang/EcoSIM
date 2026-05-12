@@ -77,7 +77,8 @@ implicit none
   real (r8), pointer :: PPI_pft(:)                   => null()    !initial plant population,                                                 [plants d-2]
   real (r8), pointer :: PPatSeeding_pft(:)           => null()    !plant population at seeding,                                              [plants d-2]
   real (r8), pointer :: PPX_pft(:)                   => null()    !plant population,                                                         [plants m-2]
-  real (r8), pointer :: PlantPopulation_pft(:)       => null()    !plant population,                                         [d-2]
+  real (r8), pointer :: PlantPopuLive_pft(:)         => null()    !plant population,                                         [d-2]
+  real (r8), pointer :: PlantPopuAll_pft(:)         => null()     !live+standing dead plant population,                           [d-2]
   real (r8), pointer :: CumSoilThickMidL_vr(:)       => null()    !depth to middle of soil layer from  surface of grid cell, [m]
   real (r8), pointer :: FracSoiAsMicP_vr(:)          => null()    !micropore fraction,                                       [-]
   real (r8), pointer :: DLYR3(:)                     => null()    !vertical thickness of soil layer,                         [m]
@@ -389,7 +390,8 @@ implicit none
   real(r8), pointer :: CriticPhotoPeriod_pft(:)      => null()     !critical daylength for phenological progress,           [h]
   real(r8), pointer :: PhotoPeriodSens_pft(:)        => null()     !difference between current and critical daylengths used to calculate  phenological progress, [h]
   integer,  pointer :: iEmbryophyteType_pft(:)       => null()      !plant embrophyte 
-  integer,  pointer :: iPlantState_pft(:)                => null()  !flag for species death, [-]
+  integer,  pointer :: iPlantStateLive_pft(:)            => null()  !flag for species death, [-]
+  integer,  pointer :: iMaintPlantTrait_pft(:)          => null()   !flag for maintaining or reset plant traits, [-]    
   integer,  pointer :: IsPlantActive_pft(:)              => null()  !flag for living pft, [-]
   integer,  pointer :: isPlantBranchAlive_brch(:,:)       => null()  !flag to detect branch death,                      [-]
   integer,  pointer :: doRemobilization_brch(:,:)        => null()  !branch phenology flag,                            [-]
@@ -1144,7 +1146,8 @@ implicit none
   allocate(this%PPI_pft(JP1));this%PPI_pft=spval
   allocate(this%PPatSeeding_pft(JP1));this%PPatSeeding_pft=spval
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval
-  allocate(this%PlantPopulation_pft(JP1));this%PlantPopulation_pft=spval
+  allocate(this%PlantPopuLive_pft(JP1));this%PlantPopuLive_pft=spval
+  allocate(this%PlantPopuAll_pft(JP1)); this%PlantPopuAll_pft=spval
   allocate(this%flag_active_pft(JP1));  this%flag_active_pft=.false.
   allocate(this%VLWatMicPM_vr(60,0:JZ1));this%VLWatMicPM_vr=spval
   allocate(this%VLsoiAirPM_vr(60,0:JZ1));this%VLsoiAirPM_vr=spval
@@ -1991,7 +1994,8 @@ implicit none
   allocate(this%PlantInitThermoAdaptZone_pft(JP1));this%PlantInitThermoAdaptZone_pft=spval
   allocate(this%rPlantThermoAdaptZone_pft(JP1));this%rPlantThermoAdaptZone_pft=0
   allocate(this%IsPlantActive_pft(JP1));this%IsPlantActive_pft=0
-  allocate(this%iPlantState_pft(JP1));this%iPlantState_pft=0
+  allocate(this%iMaintPlantTrait_pft(JP1)); this%iMaintPlantTrait_pft=0
+  allocate(this%iPlantStateLive_pft(JP1));this%iPlantStateLive_pft=0
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
   allocate(this%MatureGroup_brch(MaxNumBranches,JP1));this%MatureGroup_brch=spval
   allocate(this%isPlantShootAlive_pft(JP1));this%isPlantShootAlive_pft=0
