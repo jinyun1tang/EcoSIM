@@ -79,6 +79,7 @@ implicit none
   real(r8) :: EMM
   real(r8) :: dTexp, Tfinal
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
+  real(r8), PARAMETER :: surf_e_max=0.33333_r8
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
@@ -296,6 +297,7 @@ implicit none
     DO NZ=1,num_pfts
        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
        iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
+       TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
     enddo
 
   ENDDO
@@ -310,7 +312,7 @@ implicit none
     if(ldo_sp_mode)then  
       call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
         
-      !call CanopyInterceptprecip(NY,NX)
+      call CanopyInterceptprecip(NY,NX)
      else
        !If not using phenology set the thrufall snow and rain
        !to the total
@@ -393,7 +395,9 @@ implicit none
     !The ATS units for water flux is m/s for energy it is MW/m^2
     !As EcoSIM is an hourly model, the conversion is done in ATS
     !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
-    surf_e_source(NY) = (HeatFlx2Grnd_col(NY,1)-HeatFlowSno2SoiByWat_col(NY,1)) / (column_area(NY))
+    !surf_e_source(NY) = (HeatFlx2Grnd_col(NY,1)-HeatFlowSno2SoiByWat_col(NY,1)) / (column_area(NY))
+    surf_e_source(NY) = MIN(HeatFlx2Grnd_col(NY,1) / (column_area(NY)), surf_e_max)
+
     
     dTexp = surf_e_source(NY)/heat_capacity
     Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 
