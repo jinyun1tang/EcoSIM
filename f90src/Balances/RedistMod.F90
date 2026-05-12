@@ -879,7 +879,6 @@ module RedistMod
       TVOLWH              = TVOLWH+VLWatMacP_vr(L,NY,NX)
       TVOLI               = TVOLI+VLiceMicP_vr(L,NY,NX)
       TVOLIH              = TVOLIH+VLiceMacP_vr(L,NY,NX)
-      TENGY               = TENGY+ENGY
       TCS_vr(L,NY,NX)        = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
       VOLISO              = VOLISO+VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
       
