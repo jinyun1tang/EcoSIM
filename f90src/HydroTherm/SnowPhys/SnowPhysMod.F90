@@ -224,12 +224,10 @@ contains
 
   real(r8) :: TCND1W,TCNDR
   real(r8) :: ATCNDW,VapCondSnoWeited,TCNDS
-  real(r8) :: H2OVapFlx,H2OVapFlxMax,CumVapFlxLitr2Soi
-  real(r8) :: CumVapFlxSno2Litr
-  real(r8) :: CumHeatConvFlxSno2Litr
+  real(r8) :: H2OVapFlx,H2OVapFlxMax
+
   real(r8) :: VapConvFlxInSnow,HeatbyVapConvInSnow
-  real(r8) :: cumHeatConvFlxLitr2Soi1,CumHeatCndFlxSno2Litr
-  real(r8) :: HeatCnduct,cumHeatCndFlxLitr2Soi,HeatCnductMax
+  real(r8) :: HeatCnduct,HeatCnductMax
   real(r8) :: PSISV1,VLairSno1,VLairSno2,VPY
   real(r8) :: TKY,FracAsAirSno1,FracAsAirInSno
   real(r8) :: FCDX,LOGFCX,FCX,VapFlxSno2Soi1,HeatConvFlxSno2Soi1
@@ -431,50 +429,35 @@ contains
           !
           call SnowTopSoilExch(dt_SnoHeat,M,L,NY,NX,VapCond1,VapSnoSrc,VLairSno1,TCND1W,&
             VapFlxSno2Soi1,HeatConvFlxSno2Soi1,HeatCndFlxSno2Soi,VapCond2,PSISV1,TCNDS)
+          !  
+          TotWatXFlx2SoiMicP = WatFlowSno2MicP+VapFlxSno2Soi1
+          TotHeatFlow2Soi     = HeatFlowSno2SoiByWat+HeatConvFlxSno2Soi1+HeatCndFlxSno2Soi
+          TotSnoWatFlow2Litr  = WatFlowSno2LitR
+          TotSnoHeatFlow2Litr = HeatFlowSno2LitrByWat
           !
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !
           !
-          CumVapFlxSno2Litr       = 0.0_r8
-          CumHeatConvFlxSno2Litr  = 0.0_r8
-          CumHeatCndFlxSno2Litr   = 0.0_r8
-          CumVapFlxLitr2Soi       = 0.0_r8
-          cumHeatConvFlxLitr2Soi1 = 0.0_r8
-          cumHeatCndFlxLitr2Soi   = 0.0_r8
-
           !surface litter layer is active
           IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX).GT.ZEROL)THEN
             !should the litter heat/water states be updated here?
             !
             call SnowSurLitterExch(I,J,dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
-              CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
-              cumHeatConvFlxLitr2Soi1,cumHeatCndFlxLitr2Soi)
+              TotWatXFlx2SoiMicP,TotHeatFlow2Soi,TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr)
+
           ENDIF
           !
           ! GATHER WATER, VAPOR AND HEAT FLUXES INTO FLUX ARRAYS
           ! FOR LATER UPDATES TO STATE VARIABLES
           !
-          TotWatXFlx2SoiMicP = WatFlowSno2MicP+VapFlxSno2Soi1+CumVapFlxLitr2Soi
           CumWatFlx2SoiMicP  = CumWatFlx2SoiMicP+TotWatXFlx2SoiMicP
-
-          if(abs(CumWatFlx2SoiMicP)>1.e20_r8)then
-            write(*,*)'CumWatFlx2SoiMicP=',WatFlowSno2MicP,VapFlxSno2Soi1,CumVapFlxLitr2Soi
-            write(*,*)'at line',__LINE__
-            call endrun(trim(mod_filename)//'at line',__LINE__)
-          endif
-
           CumWatXFlx2SoiMicP  = CumWatXFlx2SoiMicP+WatFlowSno2MicP
           CumWatFlx2SoiMacP   = CumWatFlx2SoiMacP+WatFlowSno2MacP
-          TotHeatFlow2Soi     = HeatFlowSno2SoiByWat+HeatConvFlxSno2Soi1+HeatCndFlxSno2Soi+cumHeatConvFlxLitr2Soi1+cumHeatCndFlxLitr2Soi
-          cumNetHeatFlow2Soil  = cumNetHeatFlow2Soil+TotHeatFlow2Soi
-          TotSnoWatFlow2Litr  = WatFlowSno2LitR+CumVapFlxSno2Litr-CumVapFlxLitr2Soi
-          TotSnoHeatFlow2Litr = HeatFlowSno2LitrByWat+CumHeatConvFlxSno2Litr+CumHeatCndFlxSno2Litr &
-            -cumHeatConvFlxLitr2Soi1-cumHeatCndFlxLitr2Soi
 
+          cumNetHeatFlow2Soil  = cumNetHeatFlow2Soil+TotHeatFlow2Soi
           CumSnowWatFLow2LitR = CumSnowWatFLow2LitR+TotSnoWatFlow2Litr
           CumNetHeatFlow2LitR = CumNetHeatFlow2LitR+TotSnoHeatFlow2Litr
-
           QSnowH2Oloss_col(NY,NX)   = QSnowH2Oloss_col(NY,NX)+TotSnoWatFlow2Litr+TotWatXFlx2SoiMicP+WatFlowSno2MacP
 
           WatFlowSno2LitRM_col(M,NY,NX) = WatFlowSno2LitRM_col(M,NY,NX)+WatFlowSno2LitR
@@ -1422,9 +1405,8 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SnowSurfLitRIteration(I,J,dt_SnoHeat,L,M,NY,NX,AvgThermCondctSnoLitR,AvgThermCondctSoilLitR,&
-    AvgVaporCondctSoilLitR,AvgVaporCondctSnowLitR,PSISV1,VLairSno1,CumVapFlxSno2Litr,&
-    CumVapFlxLitr2Soi,cumHeatConvFlxLitr2Soi1,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,&
-    cumHeatCndFlxLitr2Soi)
+    AvgVaporCondctSoilLitR,AvgVaporCondctSnowLitR,PSISV1,VLairSno1, &
+    TotWatXFlx2SoiMicP,TotHeatFlow2Soi,TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr)
   implicit none
   integer , intent(in) :: I,J
   real(r8), intent(in) :: dt_SnoHeat            !time step size for snow iteration
@@ -1432,14 +1414,18 @@ contains
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in) :: AvgThermCondctSnoLitR,AvgThermCondctSoilLitR,AvgVaporCondctSnowLitR
   real(r8), intent(in) :: AvgVaporCondctSoilLitR,PSISV1,VLairSno1
-  real(r8), intent(inout) :: CumVapFlxSno2Litr        !cumulative water flux from snow to litter
-  real(r8), intent(inout) :: CumVapFlxLitr2Soi        !cumulative water flux from litter to soil
-  real(r8), intent(inout) :: cumHeatConvFlxLitr2Soi1  !convective heat flux (associated with water flux) from litter to soil
-  real(r8), intent(inout) :: CumHeatConvFlxSno2Litr   !convective heat flux (associated with water flux) from snow to litter
-  real(r8), intent(inout) :: CumHeatCndFlxSno2Litr    !conductive heat flux from snow to litter
-  real(r8), intent(inout) :: cumHeatCndFlxLitr2Soi    !conductive heat flux from litter to soil
-  character(len=*), parameter :: subname='SnowSurfLitRIteration'
+  real(r8), intent(inout) :: TotWatXFlx2SoiMicP
+  real(r8), intent(inout) :: TotHeatFlow2Soi
+  real(r8), intent(inout) :: TotSnoWatFlow2Litr
+  real(r8), intent(inout) :: TotSnoHeatFlow2Litr
 
+  character(len=*), parameter :: subname='SnowSurfLitRIteration'
+  real(r8)  :: CumVapFlxSno2Litr        !cumulative water flux from snow to litter
+  real(r8)  :: CumVapFlxLitr2Soi        !cumulative water flux from litter to soil
+  real(r8)  :: cumHeatConvFlxLitr2Soi1  !convective heat flux (associated with water flux) from litter to soil
+  real(r8)  :: CumHeatConvFlxSno2Litr   !convective heat flux (associated with water flux) from snow to litter
+  real(r8)  :: CumHeatCndFlxSno2Litr    !conductive heat flux from snow to litter
+  real(r8)  :: cumHeatCndFlxLitr2Soi    !conductive heat flux from litter to soil
   integer :: NN
   real(r8)  :: TK0X         !snowpack temperature, [K]
   real(r8)  :: TKXR         !litter temperature,   [K]
@@ -1472,6 +1458,13 @@ contains
   VLWatSoil         = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)
   dts_litrvapht     = dt_SnoHeat/(real(NPR,kind=r8))
 
+  CumVapFlxSno2Litr       = 0.0_r8
+  CumVapFlxLitr2Soi       = 0.0_r8
+  cumHeatConvFlxLitr2Soi1 = 0.0_r8    
+  CumHeatConvFlxSno2Litr  = 0.0_r8
+  CumHeatCndFlxSno2Litr   = 0.0_r8
+  cumHeatCndFlxLitr2Soi   = 0.0_r8
+
   D4000: DO NN = 1, NPR
     dLWRaddTLitR = -4._r8*LWEmscefLitR_col(NY,NX)*TKXR**3/(real(NPR,kind=r8))
     dLWRaddTSoil = -4._r8*LWEmscefSoil_col(NY,NX)*TK1X**3/(real(NPR,kind=r8))
@@ -1491,6 +1484,7 @@ contains
     !
     !residue vapor pressure
     VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKXR))
+    
     if(abs(VPR)>1.e20_r8)then
       write(*,*)'TKXR=',TKXR,TKSoil1_vr(0,NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX),NN
       write(*,*)'PSISM1_vr(0,NY,NX)=',PSISM1_vr(0,NY,NX)
@@ -1624,6 +1618,13 @@ contains
     endif
 
   ENDDO D4000
+
+  TotWatXFlx2SoiMicP = TotWatXFlx2SoiMicP+CumVapFlxLitr2Soi
+  TotHeatFlow2Soi     = TotHeatFlow2Soi+cumHeatConvFlxLitr2Soi1+cumHeatCndFlxLitr2Soi
+  TotSnoWatFlow2Litr  = TotSnoWatFlow2Litr+CumVapFlxSno2Litr-CumVapFlxLitr2Soi       
+  TotSnoHeatFlow2Litr = TotSnoHeatFlow2Litr+CumHeatConvFlxSno2Litr+CumHeatCndFlxSno2Litr &
+    -cumHeatConvFlxLitr2Soi1-cumHeatCndFlxLitr2Soi
+
   call PrintInfo('end '//subname)
   end subroutine SnowSurfLitRIteration
 
@@ -1717,8 +1718,7 @@ contains
   end subroutine UpdateSoilWaterPotential
 !------------------------------------------------------------------------------------------
   subroutine SnowSurLitterExch(I,J,dt_SnoHeat,M,L,NY,NX,VapCond1,VapCond2,TCND1W,VLairSno1,PSISV1,TCNDS,&
-    CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi,&
-    cumHeatConvFlxLitr2Soi1,cumHeatCndFlxLitr2Soi )
+    TotWatXFlx2SoiMicP,TotHeatFlow2Soi,TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr)
   implicit none
   integer  , intent(in) :: I,J
   real(r8) , intent(in) :: dt_SnoHeat
@@ -1727,10 +1727,13 @@ contains
   real(r8) , intent(in) :: TCND1W             !heat conductivity in snow
   real(r8) , intent(in) :: VLairSno1,PSISV1
   real(r8) , intent(in) :: TCNDS              !heat conductivity in soil
-  real(r8) , intent(inout) :: CumVapFlxSno2Litr,CumHeatConvFlxSno2Litr
-  real(r8) , intent(inout) :: CumHeatCndFlxSno2Litr,CumVapFlxLitr2Soi
-  real(r8) , intent(inout) :: cumHeatConvFlxLitr2Soi1,cumHeatCndFlxLitr2Soi
+  real(r8), intent(inout) :: TotWatXFlx2SoiMicP
+  real(r8), intent(inout) :: TotHeatFlow2Soi
+  real(r8), intent(inout) :: TotSnoWatFlow2Litr
+  real(r8), intent(inout) :: TotSnoHeatFlow2Litr
+
   character(len=*), parameter :: subname='SnowSurLitterExch'
+
   real(r8) :: TK0X,TKXR,TK1X
   real(r8) :: CNVR
   real(r8) :: AvgVaporCondctSnowLitR
@@ -1805,10 +1808,9 @@ contains
   ! do snow-litter-soil heat-water exchange
   ! SHORTER TIME STEP FOR SURFACE RESIDUE FLUX CALCULATIONS
   call SnowSurfLitRIteration(I,J,dt_SnoHeat,L,M,NY,NX,AvgThermCondctSnoLitR,AvgThermCondctSoilLitR,&
-    AvgVaporCondctSoilLitR,AvgVaporCondctSnowLitR,PSISV1,VLairSno1,CumVapFlxSno2Litr,&
-    CumVapFlxLitr2Soi,cumHeatConvFlxLitr2Soi1,CumHeatConvFlxSno2Litr,CumHeatCndFlxSno2Litr,&
-    cumHeatCndFlxLitr2Soi)
-
+    AvgVaporCondctSoilLitR,AvgVaporCondctSnowLitR,PSISV1,VLairSno1,&
+    TotWatXFlx2SoiMicP,TotHeatFlow2Soi,TotSnoWatFlow2Litr,TotSnoHeatFlow2Litr)
+   
   call PrintInfo('end '//subname)
   end subroutine SnowSurLitterExch
 
