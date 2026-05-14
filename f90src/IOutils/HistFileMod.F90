@@ -1812,7 +1812,7 @@ implicit none
              call etimer%get_ymdhs(ymdhs)
              write(iulog,*)
              write(iulog,*) trim(subname),' : Writing current time sample to local history file ', &
-                  trim(locfnh(t)),' at = ',ymdhs, &
+                  trim(locfnh(t)),' at = ',ymdhs, ' doy=',etimer%get_curr_doy(),&
                   ' for history time interval beginning at ', tape(t)%begtime, &
                   ' and ending at ',time
              write(iulog,*)

@@ -636,7 +636,7 @@ implicit none
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
     dLWRaddTKR = -4._r8*LWEmscefLitR_col(NY,NX)*TK0Prev**3/dts_HeatWatTP
     TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)-dLWRaddTKR*TK0Prev)/(VHeatCapacity1_vr(0,NY,NX)-dLWRaddTKR)
-    if(I>=132 .and. .true. .and. NX==2)then
+    if(I>=132 .and. .false. .and. NX==2)then
       write(931,*)I*1000+J/24.,NY,NX,M,TairK_col(NY,NX),TK0Prev,TKSoil1_vr(0,NY,NX),TK0Prev-TKSoil1_vr(0,NY,NX),TMX,&
         'hcp',VLHeatCapLitRPre,VHeatCapacity1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX),'hwflow',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX),'dT',deltaT 
       write(932,*)I*1000+J/24.,M,TairK_col(NY,NX)-TKSoil1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX),'cpo',cpo*m3OM_col(NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
