@@ -481,7 +481,7 @@ implicit none
     VLHeatCapcityLitR2 = VLHeatCapcityLitR2+cpw*dWLitR        
     !
     TKR1Pre = TKR1
-    TKR1   = (ENGYR+HeatFluxAir2LitR2+RainHeat2LitR2-tHeatLitR2Soil2-dLWRaddTKR2*TKR1Pre)/(VLHeatCapcityLitR2-dLWRaddTKR2)
+    TKR1   = (ENGYR+HeatFluxAir2LitR2+RainHeat2LitR2-tHeatLitR2Soil2+(-dLWRaddTKR2+CdLitRHSens)*TKR1Pre)/(VLHeatCapcityLitR2+(-dLWRaddTKR2+CdLitRHSens))
     TKS1   = (ENGYS+tHeatLitR2Soil2-dLWRaddTKS2*TKS1)/(VLHeatCapacitySoil2-dLWRaddTKS2)
 
   ENDDO D5000
