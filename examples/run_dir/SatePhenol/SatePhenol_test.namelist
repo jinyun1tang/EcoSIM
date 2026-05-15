@@ -28,7 +28,7 @@ continue_run=.false.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2013,2013,2,2022,2012,1,2013,2022,2,2012,2022,1
 
-hist_fincl1='QvTransp_pft','CAN_TEMPC_pft','TEMP_SNOW_col'
+!hist_fincl1='QvTransp_pft','CAN_TEMPC_pft','TEMP_SNOW_col'
 !hist_fincl2='RadSW_Grnd_col'
 
 !set up solvers
