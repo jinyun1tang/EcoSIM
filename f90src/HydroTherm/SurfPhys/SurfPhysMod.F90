@@ -708,10 +708,10 @@ contains
   Radnet2Snow          = 0._r8
   cumSnoHeatFlow2Soil  = 0._r8
   HeatFluxAir2Soi1     = 0._r8
+
   !solve for energy balance over significant snow layer
   IF(VLSnowHeatCapM_snvr(M,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
-!   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
-
+    !   VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
     call SolveSnowpackM(I,J,M,NY,NX,LatentHeatAir2Sno,Radnet2Snow,HeatSensEvapAir2Snow,HeatSensAir2Snow,&
       HeatNetFlx2Snow,CumWatFlx2SoiMacP,CumWatFlx2SoiMicP,CumWatXFlx2SoiMicP,CumSnowWatFlow2LitR,&
       CumSnoHeatFlow2LitR,cumSnoHeatFlow2Soil)
@@ -1089,19 +1089,19 @@ contains
     HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)-dHeatLitR
   endif
 
-  TLitrIceFlxThaw_col(NY,NX)               = TLitrIceFlxThaw_col(NY,NX)+LitrIceFlxThaw_col(NY,NX)
-  TLitrIceHeatFlxFrez_col(NY,NX)           = TLitrIceHeatFlxFrez_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)
+  TLitrIceFlxThaw_col(NY,NX)                   = TLitrIceFlxThaw_col(NY,NX)+LitrIceFlxThaw_col(NY,NX)
+  TLitrIceHeatFlxFrez_col(NY,NX)               = TLitrIceHeatFlxFrez_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)
   WaterFlowSoiMicP_3D(3,NUM_col(NY,NX),NY,NX)  = WaterFlowSoiMicP_3D(3,NUM_col(NY,NX),NY,NX)+WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)
   WaterFlowSoiMicPX_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlowSoiMicPX_3D(3,NUM_col(NY,NX),NY,NX)+WaterFlow2MicptX_3D(3,NUM_col(NY,NX),NY,NX)
   WaterFlowSoiMacP_3D(3,NUM_col(NY,NX),NY,NX)  = WaterFlowSoiMacP_3D(3,NUM_col(NY,NX),NY,NX)+WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)
   HeatFlow2Soil_3D(3,NUM_col(NY,NX),NY,NX)     = HeatFlow2Soil_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)
 
-  WatFLo2LitR_col(NY,NX)                  = WatFLo2LitR_col(NY,NX)+WatFLo2LitrM_col(NY,NX)
-  HeatFLoByWat2LitR_col(NY,NX)            = HeatFLoByWat2LitR_col(NY,NX)+HeatFLoByWat2LitRM_col(NY,NX)
-  HeatByRad2Surf_col(NY,NX)               = HeatByRad2Surf_col(NY,NX)+Radnet2Grnd+Radnet2Snow
-  HeatSensAir2Surf_col(NY,NX)             = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
-  HeatEvapAir2Surf_col(NY,NX)             = HeatEvapAir2Surf_col(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno
-  HeatSensVapAir2Surf_col(NY,NX)          = HeatSensVapAir2Surf_col(NY,NX)+HeatSensVapAir2Grnd+HeatSensEvapAir2Snow
+  WatFLo2LitR_col(NY,NX)         = WatFLo2LitR_col(NY,NX)+WatFLo2LitrM_col(NY,NX)
+  HeatFLoByWat2LitR_col(NY,NX)   = HeatFLoByWat2LitR_col(NY,NX)+HeatFLoByWat2LitRM_col(NY,NX)
+  HeatByRad2Surf_col(NY,NX)      = HeatByRad2Surf_col(NY,NX)+Radnet2Grnd+Radnet2Snow
+  HeatSensAir2Surf_col(NY,NX)    = HeatSensAir2Surf_col(NY,NX)+HeatSensAir2Grnd+HeatSensAir2Snow
+  HeatEvapAir2Surf_col(NY,NX)    = HeatEvapAir2Surf_col(NY,NX)+LatentHeatEvapAir2Grnd+LatentHeatAir2Sno
+  HeatSensVapAir2Surf_col(NY,NX) = HeatSensVapAir2Surf_col(NY,NX)+HeatSensVapAir2Grnd+HeatSensEvapAir2Snow
 
   HeatNet2Surf_col(NY,NX)                 = HeatNet2Surf_col(NY,NX)          &
     +Radnet2Grnd+HeatSensAir2Grnd+LatentHeatEvapAir2Grnd+HeatSensVapAir2Grnd &
@@ -1549,9 +1549,13 @@ contains
   real(r8), intent(out):: NetWatFlxAir2SoiMicP
   real(r8), intent(out):: NetWatXFlxAir2SoiMicP
   real(r8), intent(out):: NetWatFlxAir2SoiMacP
+
+  character(len=*), parameter :: subname='SumAftEnergyBalanceM'
   real(r8) :: FLWVLS,VLSnowHeatCap,VLSnowHeatCap0,TKSX,ENGY
   real(r8) :: TMX,deltaT
+
   ! begin_execution
+  call PrintInfo('beg '//subname)
   !
   ! GATHER WATER, VAPOR AND HEAT FLUXES INTO FLUX ARRAYS
   ! FOR LATER UPDATES TO STATE VARIABLES
@@ -1572,14 +1576,14 @@ contains
   CumHeatSensAir2LitR = RainPrecHeatAir2LitR+HeatFluxAir2LitR-HeatSensVapLitR2Soi1-HeatSensLitR2Soi1
 
   !apply temperature stabilizer
-  deltaT = safe_adb(CumHeatSensAir2LitR,NetWatFlxAir2LitR*cpw)
-  TMX    = AMAX1(TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX))+1._r8
+!  deltaT = safe_adb(CumHeatSensAir2LitR,NetWatFlxAir2LitR*cpw)
+!  TMX    = AMAX1(TKSoil1_vr(0,NY,NX),TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX))+1._r8
 
-  if(deltaT>TMX)then
-     CumHeatSensAir2LitR=NetWatFlxAir2LitR*cpw*TMX
-  elseif(deltaT<-TMX)then
-     CumHeatSensAir2LitR=-NetWatFlxAir2LitR*cpw*TMX
-  endif
+!  if(deltaT>TMX)then
+!     CumHeatSensAir2LitR=NetWatFlxAir2LitR*cpw*TMX
+!  elseif(deltaT<-TMX)then
+!     CumHeatSensAir2LitR=-NetWatFlxAir2LitR*cpw*TMX
+!  endif
 
   FLWVLS  = (VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)-VLWatMicPX1_vr(NUM_col(NY,NX),NY,NX))*dts_HeatWatTP
   !
@@ -1619,8 +1623,9 @@ contains
   !LWRadBySurf_col=longwave emission from litter and surface soil into atmosphere
   LWRadBySurf_col(NY,NX) = LWRadBySurf_col(NY,NX)+LWRadGrnd_col
 
-  VapXAir2GSurf_col(NY,NX)                 = VapXAir2GSurf_col(NY,NX) + VapXAir2LitR
-  TEvapXAir2LitR_col(NY,NX)                = TevapXAir2LitR_col(NY,NX)+ VapXAir2LitR
+  VapXAir2GSurf_col(NY,NX)  = VapXAir2GSurf_col(NY,NX) + VapXAir2LitR
+  TEvapXAir2LitR_col(NY,NX) = TevapXAir2LitR_col(NY,NX)+ VapXAir2LitR
+  call PrintInfo('end '//subname)
   end subroutine SumAftEnergyBalanceM
 !------------------------------------------------------------------------------------------
   subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
@@ -1766,7 +1771,7 @@ contains
   real(r8) :: Heatflxlitr
 
 
-!     begin_execution
+  !  begin_execution
   call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
