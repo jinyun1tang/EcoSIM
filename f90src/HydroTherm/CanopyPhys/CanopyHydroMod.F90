@@ -75,7 +75,7 @@ implicit none
       ENGYS                         = ENGYS+SnowUnload_pft*TKCanopy_pft(NZ,NY,NX)
       
       CanopySnowUnload_col          = CanopySnowUnload_col+SnowUnload_pft
-      fSnowCanopy_pft(NZ,NY,NX)     = AZMAX1((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8
+      fSnowCanopy_pft(NZ,NY,NX)     = AMIN1(1._R8,AZMAX1((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8)
       BulkFactor4Snow_pft(NZ,NY,NX) = BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
       BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
       fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
