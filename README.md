@@ -55,13 +55,15 @@ for a full list of optional arguments
 ## using docker on mac 
 1. make sure docker is installed on your machine, please see https://www.docker.com, and ask for help from whatever chatbot you have access to.
 
-2. builidng the container 
+2. to turn on rocky-linux docker container, run
 
-docker build -f docker/ubuntu-compiler.dockerfile -t my-compiler .
+./run_docker.sh --fresh --rocky
 
-3. run the container
+where --fresh means the first time run docker, otherwise, use 
 
-docker run -it -v $(pwd):/EcoSIM -w /EcoSIM my-compiler
+./run_docker.sh --rocky
 
-this will allow you to access everything under the EcoSIM directory in the container
+One can also try ubuntu container. However, it seems buggy on my apple machine.
+
+
 
