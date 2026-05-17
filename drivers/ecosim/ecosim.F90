@@ -35,7 +35,7 @@ PROGRAM main
   integer :: nn1,nn2,nn3
   integer :: year_ini,nyr1,yeari,nstopyr
   CHARACTER(len=640):: BUF
-  character(len=36):: nmlfile
+  character(len=256):: nmlfile
   character(len=14) :: ymdhs
   character(len=14) :: ymdhs0
   logical :: is_dos,nlend
