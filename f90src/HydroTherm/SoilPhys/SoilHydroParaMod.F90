@@ -150,10 +150,10 @@ contains
     SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
   
-  ! double check cold_run() setup
+  ! double check is_cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
-  IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.cold_run()))THEN
+  IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.is_cold_run()))THEN
     ! read from check point file or if soil properties are set with soil file    
 
     LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
@@ -167,7 +167,7 @@ contains
     !
     !     THW,THI=initial soil water,ice content from soil file
     !
-    IF(cold_run())THEN
+    IF(is_cold_run())THEN
       call SetColdRunSoilStates(I,J,L,NY,NX)
     ENDIF
   ENDIF

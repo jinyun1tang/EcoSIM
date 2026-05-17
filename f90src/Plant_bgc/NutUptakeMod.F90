@@ -498,7 +498,7 @@ module NutUptakeMod
 
 ! begin_execution
   associate(                                                    &
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft     ,& !input  :plant population, [d-2]
     TortMicPM_vr           => plt_site%TortMicPM_vr            ,& !input  :micropore soil tortuosity, [m3 m-3]
     ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     RootSAreaPerPlant_pvr   => plt_morph%RootSAreaPerPlant_pvr   ,& !input  :root layer area per plant, [m p-1]
@@ -591,7 +591,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNO3X
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNO3Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3,N,L,NZ),&
@@ -651,7 +651,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNOBX
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNO3Root_pft(N,NZ)
   
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
@@ -687,7 +687,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
 ! begin_execution
   associate(                                                    &
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft     ,& !input  :plant population, [d-2]
     ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     TortMicPM_vr           => plt_site%TortMicPM_vr            ,& !input  :micropore soil tortuosity, [m3 m-3]
     fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr         ,& !input  :root layer temperature growth functiom, [-]
@@ -775,7 +775,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNH4X
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNH4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndSoil_pvr(N,L,NZ),&
@@ -837,7 +837,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNHBX
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmNH4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNH4DmndBand_pvr(N,L,NZ),&
@@ -872,7 +872,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   !     begin_execution
   associate(                                                      &
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft     ,& !input  :plant population, [d-2]
     ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr         ,& !input  :root layer temperature growth functiom, [-]
     RAutoRootO2Limter_rpvr => plt_rbgc%RAutoRootO2Limter_rpvr  ,& !input  :O2 constraint to root respiration (0-1), [-]
@@ -943,7 +943,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1POX
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH1PO4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4,N,L,NZ),&
@@ -1003,7 +1003,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1PXB
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH1PO4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H1PO4B,N,L,NZ),&
@@ -1034,7 +1034,7 @@ module NutUptakeMod
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   !
   associate(                                                      &
-    PlantPopulation_pft    => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft     ,& !input  :plant population, [d-2]
     ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     RAutoRootO2Limter_rpvr => plt_rbgc%RAutoRootO2Limter_rpvr  ,& !input  :O2 constraint to root respiration (0-1), [-]
     KmPO4Root_pft          => plt_rbgc%KmPO4Root_pft           ,& !input  :Km for root PO4 uptake, [g m-3]
@@ -1104,7 +1104,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4,L)
       PlantSoluteUptakeConfig%SoluteMassMax   = H2POX
       PlantSoluteUptakeConfig%CAvailStress    = FCUP
-      PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+      PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
       PlantSoluteUptakeConfig%SoluteKM        = KmPO4Root_pft(N,NZ)
 
       call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH2PO4DmndSoil_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4,N,L,NZ),&
@@ -1166,7 +1166,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H2PXB
     PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopulation_pft(NZ)
+    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
     PlantSoluteUptakeConfig%SoluteKM        = KmPO4Root_pft(N,NZ)
 
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootH2PO4DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_H2PO4B,N,L,NZ),&
@@ -1281,7 +1281,7 @@ module NutUptakeMod
     RO2EcoDmndPrev_vr             => plt_bgcr%RO2EcoDmndPrev_vr               ,& !input  :total root + microbial O2 uptake, [g d-2 h-1]
     RootCO2EmisPot_pvr            => plt_rbgc%RootCO2EmisPot_pvr              ,& !input  :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
     RootO2Dmnd4Resp_pvr           => plt_rbgc%RootO2Dmnd4Resp_pvr             ,& !input  :root O2 demand from respiration, [g d-2 h-1]
-    PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     ZEROS                         => plt_site%ZEROS                           ,& !input  :threshold zero for numerical stability,[-]
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]
     RPlantRootH2OUptk_pvr         => plt_ew%RPlantRootH2OUptk_pvr             ,& !input  :root water uptake, [m2 d-2 h-1]
@@ -1348,8 +1348,8 @@ module NutUptakeMod
   Nutruptk_fNlim_rpvr(N,L,NZ)=FZUP
   Nutruptk_fPlim_rpvr(N,L,NZ)=FPUP
   !NN=0
-  if(PlantPopulation_pft(NZ).GT.ZERO)then
-    PerPlantRootH2OUptake  = AZMAX1(-RPlantRootH2OUptk_pvr(N,L,NZ))/PlantPopulation_pft(NZ)
+  if(PlantPopuLive_pft(NZ).GT.ZERO)then
+    PerPlantRootH2OUptake  = AZMAX1(-RPlantRootH2OUptk_pvr(N,L,NZ))/PlantPopuLive_pft(NZ)
   else
     PerPlantRootH2OUptake  = 0._r8
   endif

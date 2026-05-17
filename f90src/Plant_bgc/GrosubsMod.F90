@@ -68,9 +68,9 @@ module grosubsMod
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
     ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]    
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft          ,& !input  :plant population, [d-2]    
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft          ,& !input  :plant population, [d-2]    
     StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
-    CanopyHeight_pft             => plt_morph%CanopyHeight_pft             & !inoput :canopy height, [m]
+    CanopyHeightLive_pft             => plt_morph%CanopyHeightLive_pft             & !inoput :canopy height, [m]
   )
   call PrintInfo('beg '//subname)
   !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -78,8 +78,8 @@ module grosubsMod
   !
   !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
-    CanopyHeight_copy(NZ)                  = CanopyHeight_pft(NZ)
-    CanopyHeight_pft(NZ)                   = 0._r8
+    CanopyHeight_copy(NZ)                  = CanopyHeightLive_pft(NZ)
+    CanopyHeightLive_pft(NZ)                   = 0._r8
     StalkHeight_pft(NZ)                    = 0._r8
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
@@ -90,7 +90,7 @@ module grosubsMod
 
   D9985: DO NZ=1,NP
     !    
-    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZEROS)THEN      
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
@@ -119,7 +119,9 @@ module grosubsMod
   character(len=*), parameter :: subname='Live2DeadTransformation'
   integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
-  real(r8), parameter :: StandingDeadKd=1.5814E-05_r8  !first-order decay rate of standing dead biomass to litter
+  real(r8), parameter :: StandingDeadKd_decid=1.5814E-04_r8  !first-order decay rate of deciduous standing dead biomass to litter
+  real(r8), parameter :: StandingDeadKd_other=1.5814E-05_r8  !first-order decay rate of non-deciduous standing dead biomass to litter
+  real(r8) :: StandingDeadKd
 !     begin_execution
 
   associate(                                                                    &
@@ -146,6 +148,7 @@ module grosubsMod
     SeasonalNonstElms_pft          => plt_biom%SeasonalNonstElms_pft           ,& !input  :plant stored nonstructural element at current step, [g d-2]
     ShootElms_pft                  => plt_biom%ShootElms_pft                   ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     EnablePlantLeafOut_brch        => plt_pheno%EnablePlantLeafOut_brch        ,& !input  :branch phenology flag, [-]
+    iPlant2ndGrothPattern_pft      => plt_pheno%iPlant2ndGrothPattern_pft      ,& !input  :plant expression of secondary growth, [-]                
     fTCanopyGroth_pft              => plt_pheno%fTCanopyGroth_pft              ,& !input  :canopy temperature growth function, [-]
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft      ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
@@ -156,7 +159,7 @@ module grosubsMod
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
     LitrfallElms_pft               => plt_bgcr%LitrfallElms_pft                ,& !inoput :plant element LitrFall, [g d-2 h-1]
     LitrfallElms_pvr               => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft          ,& !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft         => plt_biom%StandDeadCompKElms_pft          ,& !inoput :standing dead element fraction, [g d-2]
     SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft  ,& !inoput :total surface LitrFall element, [g d-2]
     doInitPlant_pft                => plt_pheno%doInitPlant_pft                ,& !inoput :PFT initialization flag:0=no,1=yes,[-]
     NetPrimProduct_pft             => plt_bgcr%NetPrimProduct_pft              ,& !output :total net primary productivity, [gC d-2]
@@ -166,6 +169,11 @@ module grosubsMod
   )
   call PrintInfo('beg '//subname)
   D9975: DO NZ=1,NP0
+    if(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .NOT.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
+      StandingDeadKd=StandingDeadKd_decid
+    else
+      StandingDeadKd=StandingDeadKd_other
+    endif
     !
     !     ACTIVATE DORMANT SEEDS
     !
@@ -188,16 +196,16 @@ module grosubsMod
     !    
     D6235: DO M=1,jsken
       DO NE=1,NumPlantChemElms
-        XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadKCompElms_pft(NE,M,NZ)
+        XFRE=StandingDeadKd*fTCanopyGroth_pft(NZ)*StandDeadCompKElms_pft(NE,M,NZ)
         
-        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
+        IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
           !grass/bryophyte
           LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)+XFRE
         ELSE
           !trees
           LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,0,NZ)+XFRE
         ENDIF
-        StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ)-XFRE
+        StandDeadCompKElms_pft(NE,M,NZ)=StandDeadCompKElms_pft(NE,M,NZ)-XFRE
       ENDDO
     ENDDO D6235
     !
@@ -272,7 +280,7 @@ module grosubsMod
 ! begin_execution
   associate(                                                   &
     NumOfBranches_pft     => plt_morph%NumOfBranches_pft      ,& !input  :number of branches,[-]
-    PlantPopulation_pft   => plt_site%PlantPopulation_pft     ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantRootAlive_pft  => plt_pheno%isPlantRootAlive_pft   ,& !input  :flag to detect root system death,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
@@ -283,7 +291,7 @@ module grosubsMod
 
   call PrintInfo('beg '//subname)
   
-  IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopulation_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
+  IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
     call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
@@ -342,7 +350,7 @@ module grosubsMod
     NU                          => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
     PSICanopyTurg_pft           => plt_ew%PSICanopyTurg_pft               ,& !input  :plant canopy turgor water potential, [MPa]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                   ,& !input  :canopy total water potential, [Mpa]
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft           ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     iPlantPhenolPattern_pft     => plt_pheno%iPlantPhenolPattern_pft      ,& !input  :plant growth habit: annual or perennial,[-]    
     RCS_pft                     => plt_photo%RCS_pft                      ,& !input  :e-folding turgor pressure for stomatal resistance, [MPa]
     RootElms_pft                => plt_biom%RootElms_pft                  ,& !input  :plant root element mass, [g d-2]
@@ -358,6 +366,7 @@ module grosubsMod
     rNCStalk_pft                => plt_allom%rNCStalk_pft                 ,& !input  :stalk N:C ratio, [gN gC-1]
     rPCStalk_pft                => plt_allom%rPCStalk_pft                 ,& !input  :stalk P:C ratio, [g g-1]
     k_fine_comp                 => pltpar%k_fine_comp                     ,& !input  :fine litter complex id
+    iPlant2ndGrothPattern_pft   => plt_pheno%iPlant2ndGrothPattern_pft    ,& !input  :plant expression of secondary growth, [-]                
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr            ,& !input  :root layer radius primary axes, [m]      
     FracRootElmAllocm           => plt_allom%FracRootElmAllocm            ,& !inoput :C woody fraction in root,[-]
@@ -410,7 +419,7 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(iPlantTurnoverPattern_pft(NZ).EQ.0                      & !'Rapid, like deciduous tree '
-    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))) &
+    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))) &
     .OR. StalkStrutElms_pft(ielmc,NZ).LE.ZERO4Groth_pft(NZ))THEN
     !not tree
     FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)     = 1.0_r8
@@ -478,16 +487,16 @@ module grosubsMod
   !     RootBiomCPerPlant_pft=root mass per plant used to calculate primary root number
   !     WTRT,PP=root mass,PFT population
   !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
-  RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopulation_pft(NZ))
+  RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopuLive_pft(NZ))
 
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopulation_pft(NZ)   
-  elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)*PlantPopuLive_pft(NZ)   
+  elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
     !for woody vascular, **(1/1.4)
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopulation_pft(NZ)   
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)*PlantPopuLive_pft(NZ)   
   else
     !for herbaceous plant, **(1./0.95) 
-    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopulation_pft(NZ)
+    NumAxesPerPrimRoot_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)*PlantPopuLive_pft(NZ)
   endif
 
   !
