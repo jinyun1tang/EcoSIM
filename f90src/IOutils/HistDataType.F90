@@ -4397,7 +4397,7 @@ implicit none
         this%h1D_BLYR_RSC_CO2_ptc(nptc)  = RawCanopy2Atm_pft(NZ,NY,NX)*1.34_r8*secs1hour
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
-        this%h1D_LAI_ptc(nptc)           = LeafStalkArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_LAI_ptc(nptc)           = LeafStalkAreaAct_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_CanPhenol_WSTRSS_ptc(nptc)=CanPhenoMoistStress_pft(NZ,NY,NX) 
         this%h1D_CanPhenol_TSTRSS_ptc(nptc)=CanPhenoTempStress_pft(NZ,NY,NX) 
         this%h1D_PSI_CAN_ptc(nptc)       = PSICanopy_pft(NZ,NY,NX)
@@ -4442,7 +4442,7 @@ implicit none
         this%h1D_LAIb_ptc(nptc)          = CanopyLeafArea_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_AUTO_RESP_FLX_ptc(nptc)    = GrossResp_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
-        this%h1D_CAN_HT_ptc(nptc)            = CanopyHeight_pft(NZ,NY,NX)
+        this%h1D_CAN_HT_ptc(nptc)            = CanopyHeightLive_pft(NZ,NY,NX)
         this%h1D_Stalk_HT_ptc(nptc)          = StalkHeight_pft(NZ,NY,NX)
         this%h1D_EmergeHeight_ptc(nptc)     = HypocotHeight_pft(NZ,NY,NX)-SeedDepth_pft(NZ,NY,NX) 
         this%h1D_WTR_STRESS_ptc(nptc)        = HoursTooLowPsiCan_pft(NZ,NY,NX)

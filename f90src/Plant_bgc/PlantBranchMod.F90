@@ -88,6 +88,7 @@ module PlantBranchMod
     iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     SineSunInclAnglNxtHour_col => plt_rad%SineSunInclAnglNxtHour_col   ,& !input  :sine of solar angle next hour, [-]
     ZERO                       => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     MainBranchNum_pft          => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
@@ -205,7 +206,7 @@ module PlantBranchMod
     !   KMinGroingLeafNodeNum,KHiestGroLeafNode_brch=integer of lowest,highest leaf number currently growing
 
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) &
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) &
       .AND. isPlantBranchAlive_brch(MainBranchNum_pft(NZ),NZ).EQ.iFalse)then
       isPlantBranchAlive_brch(NB,NZ)=iFalse
     endif
@@ -1707,7 +1708,8 @@ module PlantBranchMod
     CanopyHeightZ_col         => plt_morph%CanopyHeightZ_col          ,& !input  :canopy layer height, [m]
     LeafAngleClass_pft        => plt_morph%LeafAngleClass_pft         ,& !input  :fractionction of leaves in different angle classes, [-]
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
-    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
+    iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]    
     SineLeafAngle             => plt_rad%SineLeafAngle                ,& !input  :sine of leaf angle,[-]
@@ -1715,7 +1717,7 @@ module PlantBranchMod
     CanopyLeafCLyr_pft        => plt_biom%CanopyLeafCLyr_pft          ,& !inoput :canopy layer leaf C, [g d-2]
     CanopyLeafArea_lnode      => plt_morph%CanopyLeafArea_lnode       ,& !inoput :layer/node/branch leaf area, [m2 d-2]
     StalkNodeHeight_brch      => plt_morph%StalkNodeHeight_brch       ,& !inoput :internode height, [m]
-    CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !inoput :canopy height, [m]
+    CanopyHeightLive_pft      => plt_morph%CanopyHeightLive_pft       ,& !inoput :canopy height, [m]
     StalkHeight_pft           => plt_morph%StalkHeight_pft            ,& !inoput :stalk Height/length, [m]
     HypocotHeight_pft         => plt_morph%HypocotHeight_pft          ,& !inoput :cotyledon height (>0), [m]
     CanopyLeafAreaZ_pft       => plt_morph%CanopyLeafAreaZ_pft        ,& !inoput :canopy layer leaf area, [m2 d-2]
@@ -1764,7 +1766,7 @@ module PlantBranchMod
     !   StalkNodeHeight_brch=internode length
     !   HeightBranchBase=branch base height
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
       IF(NB.NE.MainBranchNum_pft(NZ))THEN
         KLeafNumHighestGrowing=MAX(1,KHiestGroLeafNode_brch(MainBranchNum_pft(NZ),NZ)-MaxNodesPerBranch1+1)
         IF(BranchNumerID_brch(NB,NZ).GE.KLeafNumHighestGrowing)THEN
@@ -1868,7 +1870,7 @@ module PlantBranchMod
           CanopyLeafCLyr_pft(L,NZ)  = CanopyLeafCLyr_pft(L,NZ)+YLeafElmnt_node(ielmc)
         ENDDO D570
         TotLeafElevation     = TotLeafElevation+LeafElevation
-        CanopyHeight_pft(NZ) = AMAX1(CanopyHeight_pft(NZ),HeightLeafTip)
+        CanopyHeightLive_pft(NZ) = AMAX1(CanopyHeightLive_pft(NZ),HeightLeafTip)
 
       ENDDO D555
 
@@ -1919,7 +1921,8 @@ module PlantBranchMod
       StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopuLive_pft(NZ)) &
         /(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
 
-      if(NB.EQ.MainBranchNum_pft(NZ) .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
+      if(NB.EQ.MainBranchNum_pft(NZ) .AND.  &
+        is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
 
       !assume stalk is cylindrical
       StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopuLive_pft(NZ)
@@ -2327,6 +2330,7 @@ module PlantBranchMod
     EarStrutElms_brch                 => plt_biom%EarStrutElms_brch                   ,& !inoput :branch ear structural chemical element mass, [g d-2]
     GrainStrutElms_brch               => plt_biom%GrainStrutElms_brch                 ,& !inoput :branch grain structural element mass, [g d-2]
     StalkStrutElms_brch               => plt_biom%StalkStrutElms_brch                 ,& !inoput :branch stalk structural element mass, [g d-2]
+    iPlant2ndGrothPattern_pft         => plt_pheno%iPlant2ndGrothPattern_pft          ,& !input  :plant expression of secondary growth, [-]                
     ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !output :shoot node number at plant initiation, [-]
     ShootNodeNumAtAnthesis_brch       => plt_morph%ShootNodeNumAtAnthesis_brch        ,& !output :shoot node number at anthesis, [-]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
@@ -2464,7 +2468,7 @@ module PlantBranchMod
       PotentialSeedSites_brch(NB,NZ) = 0._r8
       SetNumberSeeds_brch(NB,NZ)     = 0._r8
       GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
-      IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+      IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
         D6345: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dFall=PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
@@ -2533,6 +2537,7 @@ module PlantBranchMod
     Hours4Leafout_brch           => plt_pheno%Hours4Leafout_brch            ,& !input  :heat requirement for spring leafout/dehardening, [h]
     PlantElmAllocMat4Litr        => plt_soilchem%PlantElmAllocMat4Litr      ,& !input  :litter kinetic fraction, [-]
     iYearCurrent                 => plt_site%iYearCurrent                   ,& !input  :current year,[-]
+    iPlant2ndGrothPattern_pft    => plt_pheno%iPlant2ndGrothPattern_pft     ,& !input  :plant expression of secondary growth, [-]                
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :id number of main branch,[-]
     GrainStrutElms_brch          => plt_biom%GrainStrutElms_brch            ,& !inoput :branch grain structural element mass, [g d-2]
     SenecStalkStrutElms_brch     => plt_biom%SenecStalkStrutElms_brch       ,& !inoput :branch stalk structural element, [g d-2]
@@ -2624,8 +2629,8 @@ module PlantBranchMod
     !
     !     STALKS BECOME LitrFall IN GRASSES AT END OF SEASON
     !
-    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) &
-      .AND.iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
+    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))) &
+      .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
 
       D6335: DO M=1,jsken
         DO NE=1,NumPlantChemElms
@@ -3726,6 +3731,7 @@ module PlantBranchMod
     isPlantBranchAlive_brch   => plt_pheno%isPlantBranchAlive_brch    ,& !input  :flag to detect branch death, [-]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !input  :leaf growth stage counter, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
+    iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
     BranchNumerID_brch        => plt_morph%BranchNumerID_brch         ,& !input  :branch meric id, [-]
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch        ,& !input  :branch nonstructural element, [g d-2]
@@ -3799,7 +3805,7 @@ module PlantBranchMod
     !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+PetolSheth,2=none,3=between 1,2
     !     iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
     !
-    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) &
+    IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) &
       .AND. NB.EQ.MainBranchNum_pft(NZ) .AND. isclose(FracRecyled,0._r8))THEN
       NBY=0
       D584: DO NBL=1,NumOfBranches_pft(NZ)

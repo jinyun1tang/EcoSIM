@@ -276,9 +276,10 @@ contains
     iYearPlantHarvest_pft     => plt_distb%iYearPlantHarvest_pft      ,& !output :year of harvest,[-]    
     RootSegBaseDepth_raxes    => plt_morph%RootSegBaseDepth_raxes     ,& !inoput : base depth of different root axes, [m]
     Root1stDepz_raxes         => plt_morph%Root1stDepz_raxes          ,& !inoput : root layer depth, [m]    
-    iPlantStateLive_pft           => plt_pheno%iPlantStateLive_pft            ,& !output :flag for species death, [-]    
+    iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
+    iPlantStateLive_pft       => plt_pheno%iPlantStateLive_pft        ,& !output :flag for species death, [-]    
     jHarvstType_pft           => plt_distb%jHarvstType_pft            ,& !output :flag for stand replacing disturbance,[-]    
-    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft          & !inoput :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft            & !inoput :plant population, [d-2]
   )
   call PrintInfo('beg '//subname)
   !     SolarNoonHour_col=hour of solar noon
@@ -290,7 +291,7 @@ contains
   !     XHVST=fraction of PFT remaining after disturbance
   !
   IF(yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. (iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) &
+    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))) &
     .AND. (yearIJ%I.NE.iDayPlanting_pft(NZ) .OR. iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
 
     IF(iSoilDisturbType_col.LE.10 .OR. NZ.NE.1)THEN

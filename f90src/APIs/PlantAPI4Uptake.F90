@@ -55,7 +55,7 @@ implicit none
   plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column
   plt_site%ZERO                    = ZERO                              !numerical threshold
   plt_site%ZERO2                   = ZERO2                             !numerical threshold
-  plt_morph%LeafStalkArea_col      = LeafStalkArea_col(NY,NX)          !leaf+stalk area,  set as phenology input
+  plt_morph%LeafStalkAreaAll_col      = LeafStalkAreaAll_col(NY,NX)          !leaf+stalk area,  set as phenology input
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_morph%CanopyLeafArea_col     = CanopyLeafArea_col(NY,NX)         !canopy leaf area, set as phenolgoy input
   plt_site%NL                      = NL_col(NY,NX)                     !lower node number of the total vertical number of soil layers used for water uptake
@@ -118,7 +118,7 @@ implicit none
     plt_ew%fSnowCanopy_pft(NZ)              =fSnowCanopy_pft(NZ,NY,NX)   
     Myco_pft(NZ,NY,NX)=1
     plt_ew%DeltaTKC_pft(NZ)                 = DeltaTKC_pft(NZ,NY,NX)
-    if(LeafStalkArea_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
+    if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
       IsPlantActive_pft(NZ,NY,NX)=iTrue
     else
       IsPlantActive_pft(NZ,NY,NX)=iFalse
@@ -126,18 +126,19 @@ implicit none
     plt_ew%ETCanopy_CumYr_pft(NZ)      = ETCanopy_CumYr_pft(NZ,NY,NX)
     plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)  = 1
-    plt_morph%LeafStalkArea_pft(NZ)        = LeafStalkArea_pft(NZ,NY,NX)      !pft leaf+stalk area
-    plt_morph%HypocotHeight_pft(NZ)        = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
+    plt_morph%LeafStalkAreaAct_pft(NZ)      = LeafStalkAreaAct_pft(NZ,NY,NX)      !pft leaf+stalk area
+    plt_morph%HypocotHeight_pft(NZ)         = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
-    plt_ew%RawIsoTCanopy2Atm_pft(NZ)          = RawIsoTCanopy2Atm_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
-    plt_morph%CanopyHeight_pft(NZ)          = CanopyHeight_pft(NZ,NY,NX)       !canopy height, set as prescribed input
-    plt_morph%CanopyStemSurfArea_pft(NZ)        = CanopyStemSurfArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
+    plt_ew%RawIsoTCanopy2Atm_pft(NZ)        = RawIsoTCanopy2Atm_pft(NZ,NY,NX)    !canopy resistance, updated iteratively
+    plt_morph%CanopyHeightLive_pft(NZ)      = CanopyHeightLive_pft(NZ,NY,NX)       !canopy height, set as prescribed input
+    plt_morph%CanopyHeightDead_pft(NZ)      = CanopyHeightDead_pft(NZ,NY,NX)
+    plt_morph%CanopyStemSurfArea_pft(NZ)    = CanopyStemSurfArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
     plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
-    plt_biom%CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
-    plt_biom%CanopySapwoodC_pft(NZ)           = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
-    plt_site%PlantPopuLive_pft(NZ)        = PlantPopuLive_pft(NZ,NY,NX)
+    plt_biom%CanopyLeafSheathC_pft(NZ)      = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
+    plt_biom%CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
+    plt_site%PlantPopuLive_pft(NZ)          = PlantPopuLive_pft(NZ,NY,NX)
     plt_biom%ZERO4LeafVar_pft(NZ)           = ZERO4LeafVar_pft(NZ,NY,NX)
     plt_biom%ZERO4Groth_pft(NZ)             = ZERO4Groth_pft(NZ,NY,NX)
     plt_photo%RCS_pft(NZ)                   = RCS_pft(NZ,NY,NX)                    !read in pft parameter

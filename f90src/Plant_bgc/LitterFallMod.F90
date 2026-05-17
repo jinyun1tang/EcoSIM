@@ -249,6 +249,7 @@ implicit none
     isPlantRootAlive_pft        => plt_pheno%isPlantRootAlive_pft         ,& !input  :flag to detect root system death,[-]
     isPlantShootAlive_pft       => plt_pheno%isPlantShootAlive_pft        ,& !input  :flag to detect canopy death,[-]
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft    ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    iPlant2ndGrothPattern_pft   => plt_pheno%iPlant2ndGrothPattern_pft    ,& !input  :plant expression of secondary growth, [-]                
     icwood                      => pltpar%icwood                          ,& !input  :group id of coarse woody litter
     ifoliar                     => pltpar%ifoliar                         ,& !input  :group id of plant foliar litter
     inonfoliar                  => pltpar%inonfoliar                      ,& !input  :group id of plant non-foliar litter group
@@ -261,7 +262,7 @@ implicit none
     SSXferElms_pft              => plt_bgcr%SSXferElms_pft                ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]        
     LitrfallElms_pvr            => plt_bgcr%LitrfallElms_pvr              ,& !inoput :plant LitrFall element, [g d-2 h-1]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
-    StandDeadKCompElms_pft      => plt_biom%StandDeadKCompElms_pft        ,& !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft      => plt_biom%StandDeadCompKElms_pft        ,& !inoput :standing dead element fraction, [g d-2]
     iDayPlanting_pft            => plt_distb%iDayPlanting_pft             ,& !output :day of planting,[-]
     iYearPlanting_pft           => plt_distb%iYearPlanting_pft             & !output :year of planting,[-]
   )
@@ -320,14 +321,15 @@ implicit none
                 +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*AZMAX1(GrainStrutElms_brch(NE,NB,NZ))
             ENDIF
 
-            IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
-              !all above ground, or not a tree
+            IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
+              !all above ground is turned over or not a woody vascular tree
               LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)&
-                +PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
+                +PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))                
             ELSE
+              !woody vascular
               !planting mortality adds to standing dead
               dDeadE                          = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(StalkStrutElms_brch(NE,NB,NZ))
-              StandDeadKCompElms_pft(NE,M,NZ) = StandDeadKCompElms_pft(NE,M,NZ)+dDeadE
+              StandDeadCompKElms_pft(NE,M,NZ) = StandDeadCompKElms_pft(NE,M,NZ)+dDeadE
             ENDIF
           ENDDO
         ENDDO D6425  
@@ -658,10 +660,11 @@ implicit none
     istalk                            => pltpar%istalk                                ,& !input  :group id of plant stalk litter group
     k_fine_comp                       => pltpar%k_fine_comp                           ,& !input  :fine litter complex id
     k_woody_comp                      => pltpar%k_woody_comp                          ,& !input  :woody litter complex id
+    iPlant2ndGrothPattern_pft         => plt_pheno%iPlant2ndGrothPattern_pft          ,& !input  :plant expression of secondary growth, [-]                
     C4PhotoShootNonstC_brch           => plt_biom%C4PhotoShootNonstC_brch             ,& !input  :branch shoot nonstrucal elelment, [g d-2]    
     LitrfallElms_pvr                  => plt_bgcr%LitrfallElms_pvr                    ,& !inoput :plant LitrFall element, [g d-2 h-1]
     SeasonalNonstElms_pft             => plt_biom%SeasonalNonstElms_pft               ,& !inoput :plant stored nonstructural element at current step, [g d-2]
-    StandDeadKCompElms_pft            => plt_biom%StandDeadKCompElms_pft              ,& !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft            => plt_biom%StandDeadCompKElms_pft              ,& !inoput :standing dead element fraction, [g d-2]
     SSXferElms_pft                    => plt_bgcr%SSXferElms_pft                      ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]    
     SSXfer2ShootElms_pft              => plt_bgcr%SSXfer2ShootElms_pft                ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]            
     ShootNodeNum_brch                 => plt_morph%ShootNodeNum_brch                  ,& !output :shoot node number, [-]
@@ -748,18 +751,18 @@ implicit none
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
               +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*GrainStrutElms_brch(NE,NB,NZ)
           ENDIF
+          !
           !terminate all-aboveground or plant is not tree
-          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))THEN
+          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
               +PlantElmAllocMat4Litr(NE,istalk,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
           ELSE
             !standing dead
             dDeadE                          = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*StalkStrutElms_brch(NE,NB,NZ)
-            StandDeadKCompElms_pft(NE,M,NZ) = StandDeadKCompElms_pft(NE,M,NZ)+dDeadE              
+            StandDeadCompKElms_pft(NE,M,NZ) = StandDeadCompKElms_pft(NE,M,NZ)+dDeadE              
           ENDIF
         ENDDO
       ENDDO D6405
-
       !
       !     RECOVER NON-STRUCTURAL C,N,P FROM BRANCH TO
       !     SEASONAL STORAGE RESERVES

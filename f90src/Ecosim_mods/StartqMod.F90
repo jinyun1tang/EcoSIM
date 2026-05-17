@@ -79,7 +79,7 @@ module StartqMod
           call InitPlantHeatandWater(NZ,NY,NX)
 
           if(IGO==0 .and. is_cold_run())then
-
+            call InitStandingDead(NZ,NY,NX)
           endif
           
         ENDIF
@@ -94,6 +94,9 @@ module StartqMod
         SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
         LitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)     = 0._r8
         StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
+        StandDeadSurfArea_pft(NZ,NY,NX)                             = 0._r8
+        CanopyHeightDead_pft(NZ,NY,NX)                              = 0._R8
+
         D6401: DO L=1,NL_col(NY,NX)
           DO  K=1,pltpar%NumOfPlantLitrCmplxs
             DO  M=1,jskenc
@@ -106,6 +109,52 @@ module StartqMod
   ENDDO D9995
   call PrintInfo('end '//subname)
   END subroutine startq
+!------------------------------------------------------------------------------------------
+
+  SUBROUTINE InitStandingDead(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+  character(len=*), parameter :: subname='InitStandingDead'
+  real(r8) :: WTSTDX
+  integer :: M, NE
+
+  associate(                                   &
+    icwood          => pltpar%icwood           &
+  )
+  CALL PrintInfo('beg '//subname)
+
+  StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8    
+  WTSTDX                                                      = StandingDeadInitC_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  D155: DO M=1,jskenc
+    StandDeadCompKElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*PlantElmAllocMat4Litr(ielmc,icwood,M,NZ,NY,NX)
+    StandDeadCompKElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*PlantElmAllocMat4Litr(ielmn,icwood,M,NZ,NY,NX)
+    StandDeadCompKElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*PlantElmAllocMat4Litr(ielmp,icwood,M,NZ,NY,NX)
+    
+    DO NE=1,NumPlantChemElms
+      StandDeadStrutElms_pft(NE,NZ,NY,NX)=StandDeadStrutElms_pft(NE,NZ,NY,NX)+StandDeadCompKElms_pft(NE,M,NZ,NY,NX)
+    ENDDO  
+  ENDDO D155
+  StandDeadCompKElms_pft(:,jskenp1,NZ,NY,NX)             = 0._r8
+  CanopyHeightDead_pft(NZ,NY,NX)                         = 0._R8
+  StandDeadSurfArea_pft(NZ,NY,NX)                        = 0._r8
+  CanopySurfAreaProfDead_pft(1:NumCanopyLayers,NZ,NY,NX) = 0._r8
+
+  ENGYX_pft(NZ,NY,NX)             = 0._r8
+  DeltaTKC_pft(NZ,NY,NX)          = 0._r8
+  TdegCCanopy_pft(NZ,NY,NX)       = ATCA_col(NY,NX)
+  TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
+  TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
+  TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
+  fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
+  PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
+  PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+  Transpiration_pft(NZ,NY,NX)     = 0._r8
+  FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
+
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine InitStandingDead
 !------------------------------------------------------------------------------------------
 
   subroutine InitShootGrowth(NZ,NY,NX)
@@ -199,7 +248,7 @@ module StartqMod
   !     ANNUALS, GRASSES, SHRUBS
   !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ,NY,NX)  = 0.08_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ,NY,NX) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ,NY,NX) = 0.36_r8
@@ -251,7 +300,7 @@ module StartqMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ,NY,NX)  = 0.03_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ,NY,NX) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ,NY,NX) = 0.57_r8
@@ -280,7 +329,7 @@ module StartqMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
-    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ,NY,NX)  = 0.057_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ,NY,NX) = 0.263_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ,NY,NX) = 0.542_r8
@@ -344,7 +393,8 @@ module StartqMod
   !     NumCogrowthNode_pft=number of concurrently growing nodes
   !
   ! deciduous (0) or shallow root (not tree)
-  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ,NY,NX).EQ.0 .OR. &
+    (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 
     IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
@@ -505,7 +555,7 @@ module StartqMod
   BranchNumber_pft(NZ,NY,NX)            = 0
   NumOfBranches_pft(NZ,NY,NX)           = 0
   HypocotHeight_pft(NZ,NY,NX)           = 0._r8
-  CanopyHeight_pft(NZ,NY,NX)            = 0._r8
+  CanopyHeightLive_pft(NZ,NY,NX)        = 0._r8
   Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX) = 0._r8
   Days4FalseBreak_pft(NZ,NY,NX)         = 0
 
@@ -647,13 +697,15 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
   integer :: M,NE
-  real(r8) :: WTSTDX
+  character(len=*), parameter :: subname='InitMassBalance'
   associate(                 &
     icwood => pltpar%icwood  &
   )
-!
-!     INITIALIZE MASS BALANCE CHECKS
-!
+
+  call PrintInfo('beg '//subname)
+  !
+  !     INITIALIZE MASS BALANCE CHECKS
+  !
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ,NY,NX)                                   = 0._r8
     SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX) = 0._r8
@@ -676,18 +728,8 @@ module StartqMod
     EcoHavstElmnt_CumYr_pft(1:NumPlantChemElms,NZ,NY,NX)        = 0._r8
     NetCumElmntFlx2Plant_pft(1:NumPlantChemElms,NZ,NY,NX)       = 0._r8
     ETCanopy_CumYr_pft(NZ,NY,NX)                                = 0._r8
-    StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = 0._r8
-    WTSTDX                                                      = StandingDeadInitC_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-    D155: DO M=1,jskenc
-      StandDeadKCompElms_pft(ielmc,M,NZ,NY,NX)=WTSTDX*PlantElmAllocMat4Litr(ielmc,icwood,M,NZ,NY,NX)
-      StandDeadKCompElms_pft(ielmn,M,NZ,NY,NX)=WTSTDX*rNCStalk_pft(NZ,NY,NX)*PlantElmAllocMat4Litr(ielmn,icwood,M,NZ,NY,NX)
-      StandDeadKCompElms_pft(ielmp,M,NZ,NY,NX)=WTSTDX*rPCStalk_pft(NZ,NY,NX)*PlantElmAllocMat4Litr(ielmp,icwood,M,NZ,NY,NX)
-      
-      DO NE=1,NumPlantChemElms
-      StandDeadStrutElms_pft(NE,NZ,NY,NX)=StandDeadStrutElms_pft(NE,NZ,NY,NX)+StandDeadKCompElms_pft(NE,M,NZ,NY,NX)
-      ENDDO  
-    ENDDO D155
   ENDIF
+  call PrintInfo('end '//subname)
   end associate
   end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
@@ -705,22 +747,10 @@ module StartqMod
 !     TCGroth_pft,TKGroth_pft=canopy temperature for phenology (oC,K)
 !     PSICanopy_pft,PSICanopyOsmo_pft,PSICanopyTurg_pft=canopy total,osmotic,turgor water potl(MPa)
 !
-  FDM                          = get_FDM(PSICanopy_pft(NZ,NY,NX))
-  CanopyBiomWater_pft(NZ,NY,NX)    = ppmc*CanopyLeafSheathC_pft(NZ,NY,NX)/FDM
-  VHeatCapCanopy_pft(NZ,NY,NX) = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
+  FDM                           = get_FDM(PSICanopy_pft(NZ,NY,NX))
+  CanopyBiomWater_pft(NZ,NY,NX) = ppmc*CanopyLeafSheathC_pft(NZ,NY,NX)/FDM
+  VHeatCapCanopy_pft(NZ,NY,NX)  = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
 
-  ENGYX_pft(NZ,NY,NX)             = 0._r8
-  DeltaTKC_pft(NZ,NY,NX)          = 0._r8
-  TdegCCanopy_pft(NZ,NY,NX)    = ATCA_col(NY,NX)
-  TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
-  TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
-  TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
-  fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
-  PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
-  PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
-  PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
-  Transpiration_pft(NZ,NY,NX)     = 0._r8
-  FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 

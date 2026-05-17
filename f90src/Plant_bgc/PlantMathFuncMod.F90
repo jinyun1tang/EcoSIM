@@ -258,7 +258,7 @@ contains
   end subroutine SoluteUptakeByPlantRoots
 !--------------------------------------------------------------------------------
 
-  pure function is_plant_woody_vascular(iPlantRootProfile_pft)result(ans)
+  pure function is_plant_woody_vascular(iPlantRootProfile_pft,iPlant2ndGrothPattern_pft)result(ans)
 !
 ! currently, there are three plant growth types defined as
 ! iplt_bryophyte=0
@@ -266,10 +266,11 @@ contains
 !  iplt_treelike=2
 
   implicit none
-  integer, intent(in) :: iPlantRootProfile_pft
+  integer, intent(in) :: iPlantRootProfile_pft       !root profile type
+  integer, intent(in) :: iPlant2ndGrothPattern_pft   !toggle for expressing secondary growth
   logical :: ans
 
-  ans=iPlantRootProfile_pft > 1
+  ans=iPlantRootProfile_pft > 1 .and. iPlant2ndGrothPattern_pft == 1
   end function is_plant_woody_vascular
 
 !--------------------------------------------------------------------------------

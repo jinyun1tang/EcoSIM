@@ -78,7 +78,7 @@ implicit none
   real (r8), pointer :: PPatSeeding_pft(:)           => null()    !plant population at seeding,                                              [plants d-2]
   real (r8), pointer :: PPX_pft(:)                   => null()    !plant population,                                                         [plants m-2]
   real (r8), pointer :: PlantPopuLive_pft(:)         => null()    !plant population,                                         [d-2]
-  real (r8), pointer :: PlantPopuAll_pft(:)         => null()     !live+standing dead plant population,                           [d-2]
+  real (r8), pointer :: PlantPopuDead_pft(:)         => null()     !live+standing dead plant population,                           [d-2]
   real (r8), pointer :: CumSoilThickMidL_vr(:)       => null()    !depth to middle of soil layer from  surface of grid cell, [m]
   real (r8), pointer :: FracSoiAsMicP_vr(:)          => null()    !micropore fraction,                                       [-]
   real (r8), pointer :: DLYR3(:)                     => null()    !vertical thickness of soil layer,                         [m]
@@ -217,7 +217,7 @@ implicit none
   end type plant_radiation_type
 
   type, public :: plant_morph_type
-  real(r8) :: LeafStalkArea_col                       !stalk area of combined, each PFT canopy,[m^2 d-2]
+  real(r8) :: LeafStalkAreaAll_col                       !stalk area of combined, each PFT canopy,[m^2 d-2]
   real(r8) :: CanopyLeafArea_col                      !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_col                            !grid canopy stem area, [m2 d-2]
   real(r8) :: CanopyHeight_col                        !canopy height , [m]
@@ -284,16 +284,20 @@ implicit none
   real(r8), pointer :: NodeLenPergC_pft(:)             => null() !internode length:mass during growth,                                        [m gC-1]
   real(r8), pointer :: SLA1_pft(:)                     => null() !leaf area:mass during growth,                                               [m2 gC-1]
   real(r8), pointer :: CanopyLeafAareZ_col(:)          => null() !total leaf area,                                                            [m2 d-2]
-  real(r8), pointer :: LeafStalkArea_pft(:)            => null() !plant leaf+stem/stalk area,                                                 [m2 d-2]
+  real(r8), pointer :: LeafStalkAreaAct_pft(:)         => null() !radiation-active plant leaf+stem/stalk area,                                                 [m2 d-2]
+  real(r8), pointer :: StandDeadSurfAreaAct_pft(:)     => null() !radiation-active standing dead surface area, [m2 d-2]
   real(r8), pointer :: StalkNodeVertLength_brch(:,:,:) => null() !internode height,                                                           [m]
   real(r8), pointer :: PetoleLength_node(:,:,:)      => null() !sheath height,                                                              [m]
   real(r8), pointer :: StalkNodeHeight_brch(:,:,:)  => null() !internode height,                                                           [m]
   real(r8), pointer :: StemAreaZsec_brch(:,:,:,:)      => null() !stem surface area,                                                          [m2 d-2]
   real(r8), pointer :: CanopyLeafArea_lnode(:,:,:,:)   => null() !layer/node/branch leaf area,                                                [m2 d-2]
   real(r8), pointer :: CanopyStalkSurfArea_lbrch(:,:,:)    => null() !plant canopy layer branch stem area,                                        [m2 d-2]
+  real(r8), pointer :: CanopySurfAreaProfDead_pft(:,:) => null() !standing dead plant canopy surface area, [m2 d-2]
+  real(r8), pointer :: StandDeadSurfArea_pft(:)        => null() !standing dead canopy surface area profile, [m2 d-2]    
   real(r8), pointer :: ClumpFactor_pft(:)              => null() !clumping factor for self-shading in canopy layer,                           [-]
   real(r8), pointer :: ShootNodeNumAtPlanting_pft(:)   => null() !number of nodes in seed,                                                    [-]
-  real(r8), pointer :: CanopyHeight_pft(:)             => null() !canopy height,                                                              [m]
+  real(r8), pointer :: CanopyHeightLive_pft(:)             => null() !live plant canopy height,                                                              [m]
+  real(r8), pointer :: CanopyHeightDead_pft(:)        => null() !canopy height for standing dead, [m]
   real(r8), pointer :: StalkHeight_pft(:)              => null() !stalk height/length, [m]
   real(r8), pointer :: TreeRingAveRadius_pft(:)        => null() !tree ring radius,[m]
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground),[-]
@@ -549,7 +553,7 @@ implicit none
   real(r8), pointer :: KLigMax_pft(:)                       => null()    !Maximum lignification rate [h-1]
   real(r8), pointer :: KLigMM_pft(:)                        => null()    !Half saturation parameter for coarse root lignification, [h-1]
   real(r8), pointer :: RootMyco1stElm_raxs(:,:,:)           => null()    !root C primary axes,                                [g d-2]
-  real(r8), pointer :: StandDeadKCompElms_pft(:,:,:)        => null()    !standing dead element fraction,                     [g d-2]
+  real(r8), pointer :: StandDeadCompKElms_pft(:,:,:)        => null()    !standing dead element fraction,                     [g d-2]
   real(r8), pointer :: CanopyNonstElmConc_pft(:,:)          => null()    !canopy nonstructural element concentration,         [g d-2]
   real(r8), pointer :: CanopyNonstElms_pft(:,:)             => null()    !canopy nonstructural element concentration,         [g d-2]
   real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)        => null()    !canopy nodule nonstructural element,                [g d-2]
@@ -1147,7 +1151,7 @@ implicit none
   allocate(this%PPatSeeding_pft(JP1));this%PPatSeeding_pft=spval
   allocate(this%PPX_pft(JP1));this%PPX_pft=spval
   allocate(this%PlantPopuLive_pft(JP1));this%PlantPopuLive_pft=spval
-  allocate(this%PlantPopuAll_pft(JP1)); this%PlantPopuAll_pft=spval
+  allocate(this%PlantPopuDead_pft(JP1)); this%PlantPopuDead_pft=spval
   allocate(this%flag_active_pft(JP1));  this%flag_active_pft=.false.
   allocate(this%VLWatMicPM_vr(60,0:JZ1));this%VLWatMicPM_vr=spval
   allocate(this%VLsoiAirPM_vr(60,0:JZ1));this%VLsoiAirPM_vr=spval
@@ -1481,7 +1485,7 @@ implicit none
   allocate(this%RootNodulStrutElms_rpvr(NumPlantChemElms,JZ1,JP1));this%RootNodulStrutElms_rpvr=spval
   allocate(this%CanopyLeafCLyr_pft(NumCanopyLayers1,JP1));this%CanopyLeafCLyr_pft=spval
   allocate(this%RootNodulNonstElms_rpvr(NumPlantChemElms,JZ1,JP1));this%RootNodulNonstElms_rpvr=spval
-  allocate(this%StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP1));this%StandDeadKCompElms_pft=0._r8
+  allocate(this%StandDeadCompKElms_pft(NumPlantChemElms,jsken,JP1));this%StandDeadCompKElms_pft=0._r8
   allocate(this%RootMyco2ndStrutElms_rpvr(NumPlantChemElms,jroots,JZ1,MaxNumRootAxes,JP1))
   this%RootMyco2ndStrutElms_rpvr=spval
   allocate(this%RootMycoNonstElms_pft(NumPlantChemElms,jroots,JP1));this%RootMycoNonstElms_pft=spval
@@ -1596,7 +1600,7 @@ implicit none
 !  if(allocated(CanopyLeafCLyr_pft))deallocate(CanopyLeafCLyr_pft)
 !  call destroy(RootMyco1stElm_raxs)
 !  if(allocated(RootMyco1stStrutElms_rpvr))deallocate(RootMyco1stStrutElms_rpvr)
-!  if(allocated(StandDeadKCompElms_pft))deallocate(StandDeadKCompElms_pft)
+!  if(allocated(StandDeadCompKElms_pft))deallocate(StandDeadCompKElms_pft)
 !  if(allocated(RootMyco2ndStrutElms_rpvr))deallocate(RootMyco2ndStrutElms_rpvr)
 !  if(allocated(CanopyNonstElmConc_pft))deallocate(CanopyNonstElmConc_pft)
 !  if(allocated(CanopyNonstElms_pft))deallocate(CanopyNonstElms_pft)
@@ -2122,7 +2126,8 @@ implicit none
   allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
   allocate(this%NumAxesPerPrimRoot_pft(JP1)); this%NumAxesPerPrimRoot_pft=0._r8
   allocate(this%Radius95pctMature_pft(JP1)); this%Radius95pctMature_pft=0._r8
-  allocate(this%CanopyHeight_pft(JP1));this%CanopyHeight_pft=spval
+  allocate(this%CanopyHeightLive_pft(JP1));this%CanopyHeightLive_pft=spval
+  allocate(this%CanopyHeightDead_pft(JP1)); this%CanopyHeightDead_pft=spval
   allocate(this%StalkHeight_pft(JP1)); this%StalkHeight_pft=spval
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
@@ -2174,13 +2179,16 @@ implicit none
   allocate(this%NodeLenPergC_pft(JP1));this%NodeLenPergC_pft=spval
   allocate(this%SLA1_pft(JP1));this%SLA1_pft=spval
   allocate(this%CanopyLeafAareZ_col(NumCanopyLayers1));this%CanopyLeafAareZ_col=spval
-  allocate(this%LeafStalkArea_pft(JP1));this%LeafStalkArea_pft=spval
+  allocate(this%LeafStalkAreaAct_pft(JP1));this%LeafStalkAreaAct_pft=spval
+  allocate(this%StandDeadSurfAreaAct_pft(JP1)); this%StandDeadSurfAreaAct_pft=spval
   allocate(this%StalkNodeVertLength_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%StalkNodeVertLength_brch=spval
   allocate(this%PetoleLength_node(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%PetoleLength_node=spval
   allocate(this%StalkNodeHeight_brch(0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%StalkNodeHeight_brch=spval
   allocate(this%StemAreaZsec_brch(NumLeafInclinationClasses1,NumCanopyLayers1,MaxNumBranches,JP1));this%StemAreaZsec_brch=0._r8
   allocate(this%CanopyLeafArea_lnode(NumCanopyLayers1,0:MaxNodesPerBranch1,MaxNumBranches,JP1));this%CanopyLeafArea_lnode=0._r8
   allocate(this%CanopyStalkSurfArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkSurfArea_lbrch=spval
+  allocate(this%CanopySurfAreaProfDead_pft(NumCanopyLayers1,JP1)); this%CanopySurfAreaProfDead_pft=spval
+  allocate(this%StandDeadSurfArea_pft(JP1)); this%StandDeadSurfArea_pft=spval
   allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval
   allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
   allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval

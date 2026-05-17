@@ -19,18 +19,21 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FracRootElmAllocm(:,:)                  !fraction of root element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: FracWoodStalkElmAlloc2Litr(:,:)             !fraction of root stalk element allocation to woody/fine litter,[-]
   real(r8),target,allocatable :: PARTS_brch(:,:,:,:,:)                       !C partitioning coefficient in a branch, [-]
-  real(r8),target,allocatable ::  CanopyStalkSurfArea_lbrch(:,:,:,:,:)           !Canopy stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyStalkSurfArea_lbrch(:,:,:,:,:)       !Canopy stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopySurfAreaProfDead_pft(:,:,:,:)        !standing dead canopy surface area profile, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                  !Canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  LeafStalkArea_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
+  real(r8),target,allocatable ::  LeafStalkAreaAct_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemSurfArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
-  real(r8),target,allocatable ::  CanopyHeight_pft(:,:,:)                    !pft canopy height, [m]
+  real(r8),target,allocatable ::  CanopyHeightLive_pft(:,:,:)                !live pft canopy height, [m]
+  real(r8),target,allocatable ::  StandDeadSurfArea_pft(:,:,:)               !surface area of standing dead, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyHeightDead_pft(:,:,:)                !standing dead plant canopy height, [m]
   real(r8),target,allocatable ::  StalkHeight_pft(:,:,:)                     !pft stalk height, [m]
   real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  StemArea_col(:,:)                          !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  LeafStalkArea_col(:,:)                     !canopy area of combined over the grid [m2 d-2]
+  real(r8),target,allocatable ::  LeafStalkAreaAll_col(:,:)                     !canopy area of combined over the grid [m2 d-2]
   real(r8),target,allocatable ::  BulkFactor4Snow_col(:,:)                   !grid bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   real(r8),target,allocatable ::  BulkFactor4Snow_pft(:,:,:)                 !pft bulking factor for canopy snow interception effect on radiation, [m2 (kg SWE)-1]
   integer ,target,allocatable ::  NGTopRootLayer_pft(:,:,:)                  !soil layer at planting depth, [-]
@@ -59,7 +62,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopySeedNum_pft(:,:,:)                   !canopy grain number, [d-2]
   real(r8),target,allocatable ::  CanopySeedNumX_pft(:,:,:)                   !last nonzero canopy grain number, [d-2]  
   real(r8),target,allocatable ::  PlantPopuLive_pft(:,:,:)                   !live plant population, [d-2]
-  real(r8),target,allocatable ::  PlantPopuAll_pft(:,:,:)                   !standing dead plant population, [d-2]
+  real(r8),target,allocatable ::  PlantPopuDead_pft(:,:,:)                   !standing dead plant population, [d-2]
   real(r8),target,allocatable ::  StalkNodeVertLength_brch(:,:,:,:,:)        !Dead internode height, [m]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
@@ -207,18 +210,21 @@ contains
   allocate(FracRootElmAllocm(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracRootElmAllocm=0._r8         !
   allocate(FracWoodStalkElmAlloc2Litr(NumPlantChemElms,1:NumOfPlantLitrCmplxs));  FracWoodStalkElmAlloc2Litr=0._r8         !woody element allocation
   allocate(CanopyStalkSurfArea_lbrch(NumCanopyLayers,MaxNumBranches,JP,JY,JX));CanopyStalkSurfArea_lbrch=0._r8
+  allocate(CanopySurfAreaProfDead_pft(NumCanopyLayers,JP,JY,JX));CanopySurfAreaProfDead_pft=0._r8
   allocate(iPlantSnowIntercepType_pft(JP,JY,JX)); iPlantSnowIntercepType_pft=0
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
-  allocate(LeafStalkArea_pft(JP,JY,JX));    LeafStalkArea_pft=0._r8
+  allocate(LeafStalkAreaAct_pft(JP,JY,JX));    LeafStalkAreaAct_pft=0._r8
   allocate(CanopyStemSurfArea_pft(JP,JY,JX));    CanopyStemSurfArea_pft=0._r8
-  allocate(CanopyHeight_pft(JP,JY,JX));       CanopyHeight_pft=0._r8
+  allocate(CanopyHeightLive_pft(JP,JY,JX));       CanopyHeightLive_pft=0._r8
+  allocate(CanopyHeightDead_pft(JP,JY,JX)); CanopyHeightDead_pft=0._r8
+  allocate(StandDeadSurfArea_pft(JP,JY,JX)); StandDeadSurfArea_pft=0._r8
   allocate(StalkHeight_pft(JP,JY,JX)); StalkHeight_pft=0._r8
   allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
   allocate(StemArea_col(JY,JX));       StemArea_col=0._r8
-  allocate(LeafStalkArea_col(JY,JX));       LeafStalkArea_col=0._r8
+  allocate(LeafStalkAreaAll_col(JY,JX));       LeafStalkAreaAll_col=0._r8
   allocate(BulkFactor4Snow_col(JY,JX)); BulkFactor4Snow_col=0._r8
   allocate(BulkFactor4Snow_pft(JP,JY,JX)); BulkFactor4Snow_pft=0._r8
   allocate(NGTopRootLayer_pft(JP,JY,JX));       NGTopRootLayer_pft=0
@@ -248,7 +254,7 @@ contains
   allocate(CanopySeedNum_pft(JP,JY,JX));     CanopySeedNum_pft=0._r8
   allocate(CanopySeedNumX_pft(JP,JY,JX));     CanopySeedNumX_pft=0._r8  
   allocate(PlantPopuLive_pft(JP,JY,JX));       PlantPopuLive_pft=0._r8
-  allocate(PlantPopuAll_pft(JP,JY,JX)); PlantPopuAll_pft=0._r8
+  allocate(PlantPopuDead_pft(JP,JY,JX)); PlantPopuDead_pft=0._r8
   allocate(StalkNodeVertLength_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeVertLength_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
@@ -395,23 +401,26 @@ contains
   call destroy(FracLeafShethElmAlloc2Litr)
   call destroy(FracRootElmAllocm)
   call destroy(FracWoodStalkElmAlloc2Litr)
+  call destroy(CanopySurfAreaProfDead_pft)
   call destroy(CanopyStalkSurfArea_lbrch)
   call destroy(CanopyLeafArea_pft)
-  call destroy(LeafStalkArea_pft)
+  call destroy(LeafStalkAreaAct_pft)
   call destroy(CanopyStemSurfArea_pft)
-  call destroy(CanopyHeight_pft)
+  call destroy(CanopyHeightDead_pft)
+  call destroy(StandDeadSurfArea_pft)
+  call destroy(CanopyHeightLive_pft)
   call destroy(StalkHeight_pft)
   call destroy(CanopyLeafAareZ_col)
   call destroy(CanopyStemAareZ_col)
   call destroy(CanopyLeafArea_col)
   call destroy(StemArea_col)
-  call destroy(LeafStalkArea_col)
+  call destroy(LeafStalkAreaAll_col)
   call destroy(NGTopRootLayer_pft)
   call destroy(BulkFactor4Snow_pft)
   call destroy(BulkFactor4Snow_col)
   call destroy(PlantinDepz_pft)
   call destroy(SeedDepth_pft)
-  call destroy(PlantPopuAll_pft)
+  call destroy(PlantPopuDead_pft)
   call destroy(SeedVolumeMean_pft)
   call destroy(SeedMeanLen_pft)
   call destroy(SeedAreaMean_pft)

@@ -889,7 +889,7 @@ implicit none
   case (1)
     strval='Intermediate root profile, like herbs (1)'
   case (2)
-    strval='Deep root profile, like trees (2)'
+    strval='Deep root profile, like trees/drought tolerant grasses (2)'
   case (3)
     strval='Very deep tap root profile (3)'  
   case default
@@ -969,7 +969,7 @@ implicit none
   id=addone(id)
   call writefixsl(nu_plt,'IPTYP: Photoperiod',strval,60,id)
 
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
       write(strval,'(A,I2)')'Rapid, like deciduous trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
@@ -1210,7 +1210,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
 
-  if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
     id=addone(id)
     call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
     id=addone(id)
@@ -1339,7 +1339,7 @@ implicit none
   call writefixl(nu_plt,id,'CNSHE','Plant PetolSheth NC mass ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CNSTK','Plant stalk NC mass ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)  
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then  
     id=addone(id)
     call writefixl(nu_plt,id,'CNRTLIG','Plant lignified root NC mass ratio [gN (gC)-1]',rNCLigRoot_pft(NZ,NY,NX),100)
   endif
@@ -1367,7 +1367,7 @@ implicit none
   call writefixl(nu_plt,id,'CPSHE','Plant PetolSheth PC mass ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CPSTK','Plant stalk PC mass ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then  
     id=addone(id)
     call writefixl(nu_plt,id,'CPRTLIG','Plant lignified root PC mass ratio [gP (gC)-1]',rPCLigRoot_pft(NZ,NY,NX),100)
   endif

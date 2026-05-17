@@ -127,7 +127,7 @@ implicit none
   end function TreeStem_diameter_taperEq
 !------------------------------------------------------------------------
 
-  subroutine SetCanopyProfile(I,J,LeafAreaZsec_lpft,StemAreaZsec_lpft)
+  subroutine SetCanopyProfile(I,J,LeafAreaZsecLive_lpft,StemAreaZsecLive_lpft)
   !
   !Description:
   !distribute leaf area and stem area within the crown defined by top and bottom heights.
@@ -135,16 +135,16 @@ implicit none
   !
   implicit none
   integer , intent(in) :: I,J
-  real(r8),intent(out) :: LeafAreaZsec_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !leaf area in different zenith sectors in different canopy layers
-  real(r8),intent(out) :: StemAreaZsec_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !stem area in different zenith sectors in different canopy layers
+  real(r8),intent(out) :: LeafAreaZsecLive_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !leaf area in different zenith sectors in different canopy layers
+  real(r8),intent(out) :: StemAreaZsecLive_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)     !stem area in different zenith sectors in different canopy layers
   real(r8) :: dangle
   integer  :: N,L,NZ,NB
 
   associate(                                                 &
     CanopyStemSurfAreaZ_pft   => plt_morph%CanopyStemSurfAreaZ_pft  ,& !input  :plant canopy layer stem area, [m2 d-2]
     CanopyLeafAreaZ_pft   => plt_morph%CanopyLeafAreaZ_pft  ,& !inoput :total leaf area, [m2 d-2]
-    LeafStalkArea_pft     => plt_morph%LeafStalkArea_pft    ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
-    LeafStalkArea_col     => plt_morph%LeafStalkArea_col    ,& !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
+    LeafStalkAreaAct_pft     => plt_morph%LeafStalkAreaAct_pft    ,& !inoput :plant leaf+stem/stalk area, [m2 d-2]
+    LeafStalkAreaAll_col     => plt_morph%LeafStalkAreaAll_col    ,& !inoput :stalk area of combined, each PFT canopy,[m^2 d-2]
     StemArea_col          => plt_morph%StemArea_col         ,& !input  :grid canopy stem area, [m2 d-2]
     LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft   ,& !input  :fractionction of leaves in different angle classes, [-]
     CanopyLeafArea_col    => plt_morph%CanopyLeafArea_col   ,& !input  :grid canopy leaf area, [m2 d-2]
@@ -153,24 +153,24 @@ implicit none
   )
 
 
-  StemAreaZsec_lpft  = 0._r8
-  LeafAreaZsec_lpft  = 0._r8
+  StemAreaZsecLive_lpft  = 0._r8
+  LeafAreaZsecLive_lpft  = 0._r8
   dangle            = PICON2h/real(NumLeafInclinationClasses1,r8)         !the angle section width
-  LeafStalkArea_col = StemArea_col+CanopyLeafArea_col
+  LeafStalkAreaAll_col = StemArea_col+CanopyLeafArea_col
   DO NZ=1,NP
-    LeafStalkArea_pft(NZ)=0._r8
+    LeafStalkAreaAct_pft(NZ)=0._r8
     NB=1
     DO L=1,NumCanopyLayers1
       DO N=1,NumLeafInclinationClasses1
-        LeafAreaZsec_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
+        LeafAreaZsecLive_lpft(N,L,NZ)=LeafAngleClass_pft(N,NZ)*CanopyLeafAreaZ_pft(L,NZ)/real(NumOfLeafAzimuthSectors1,r8)
       ENDDO
-      StemAreaZsec_lpft(:,L,NZ)=0._r8
-      StemAreaZsec_lpft(NumLeafInclinationClasses1,L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)/real(NumLeafInclinationClasses1,kind=r8)
-      LeafStalkArea_pft(NZ)=LeafStalkArea_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemSurfAreaZ_pft(L,NZ)
+      StemAreaZsecLive_lpft(:,L,NZ)=0._r8
+      StemAreaZsecLive_lpft(NumLeafInclinationClasses1,L,NZ)=CanopyStemSurfAreaZ_pft(L,NZ)/real(NumLeafInclinationClasses1,kind=r8)
+      LeafStalkAreaAct_pft(NZ)=LeafStalkAreaAct_pft(NZ)+CanopyLeafAreaZ_pft(L,NZ)+CanopyStemSurfAreaZ_pft(L,NZ)
 
       !Assuming uniform azimuth desitribution for leaves
       DO N=1,NumLeafInclinationClasses1
-        LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsec_lpft(N,L,NZ)
+        LeafAreaZsec_brch(N,L,L,NB,NZ)=LeafAreaZsecLive_lpft(N,L,NZ)
       ENDDO
     ENDDO
 
@@ -261,10 +261,10 @@ implicit none
       DO NZ=1,NP_col(NY,NX)
         tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
         tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
-        CanopyHeight_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
+        CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
         CanopyLeafArea_col(NY,NX)  = CanopyLeafArea_col(NY,NX)+tlai_day_pft(NZ,NY,NX)
         StemArea_col(NY,NX)        = StemArea_col(NY,NX)+tsai_day_pft(NZ,NY,NX)
-        CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeight_pft(NZ,NY,NX))
+        CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeightLive_pft(NZ,NY,NX))
         CanopyLeafAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tlai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
         CanopyStemSurfAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
       ENDDO

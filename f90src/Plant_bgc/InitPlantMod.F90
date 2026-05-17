@@ -52,7 +52,7 @@ module InitPlantMod
     NP                    => plt_site%NP                      ,& !input  :current number of plant species,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
-    PlantPopuAll_pft      => plt_site%PlantPopuAll_pft        ,& !input  :live+standing dead plant population, [d-2]
+    PlantPopuDead_pft      => plt_site%PlantPopuDead_pft        ,& !input  :live+standing dead plant population, [d-2]
     ZERO                  => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     iMaintPlantTrait_pft  => plt_pheno%iMaintPlantTrait_pft   ,& !inoput :flag for maintain or reset plant traits, [-]    
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !output :threshold zero for plang growth calculation, [-]
@@ -96,7 +96,7 @@ module InitPlantMod
     ELSE
       PlantPopuLive_pft(NZ)=PPX_pft(NZ)*AREA3(NU)
     ENDIF
-    PlantPopuAll_pft(NZ)=PlantPopuLive_pft(NZ)
+    PlantPopuDead_pft(NZ)=PlantPopuLive_pft(NZ)
 
     IF(IsPlantActive_pft(NZ).EQ.iFalse)THEN
 
@@ -204,6 +204,7 @@ module InitPlantMod
     iPlantTurnoverPattern_pft   => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     icarbhyro                   => pltpar%icarbhyro                     ,& !input  :kinetic id of litter component as carbonhydrate
     icellulos                   => pltpar%icellulos                     ,& !input  :kinetic id of litter component as cellulose
+    iPlant2ndGrothPattern_pft   => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     icwood                      => pltpar%icwood                        ,& !input  :group id of coarse woody litter
     ifoliar                     => pltpar%ifoliar                       ,& !input  :group id of plant foliar litter
     ilignin                     => pltpar%ilignin                       ,& !input  :kinetic id of litter component as lignin
@@ -260,7 +261,7 @@ module InitPlantMod
     !     ANNUALS, GRASSES, SHRUBS
     !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,ifoliar,iprotein,NZ)  = 0.08_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icarbhyro,NZ) = 0.41_r8
     PlantElmAllocMat4Litr(ielmc,ifoliar,icellulos,NZ) = 0.36_r8
@@ -313,7 +314,7 @@ module InitPlantMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,istalk,iprotein,NZ)  = 0.03_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icarbhyro,NZ) = 0.25_r8
     PlantElmAllocMat4Litr(ielmc,istalk,icellulos,NZ) = 0.57_r8
@@ -342,7 +343,7 @@ module InitPlantMod
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+    .OR.(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
     PlantElmAllocMat4Litr(ielmc,iroot,iprotein,NZ)  = 0.057_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icarbhyro,NZ) = 0.263_r8
     PlantElmAllocMat4Litr(ielmc,iroot,icellulos,NZ) = 0.542_r8
@@ -406,7 +407,7 @@ module InitPlantMod
 !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
 !     NumCogrowthNode_pft=number of concurrently growing nodes
 !     iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+PetolSheth,2=none,3=between 1,2!
-  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+  IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
     !Annual plant (e.g.crops) or grass or bryophyte
     !The following may be revised for maize or soybean, or crops in general
     FracGroth2Node_pft(NZ) = 1.0_r8
@@ -631,7 +632,7 @@ module InitPlantMod
     CPOOL3_node                       => plt_photo%CPOOL3_node                        ,& !output :minimum sink strength for nonstructural C transfer, [g d-2]
     CPOOL4_node                       => plt_photo%CPOOL4_node                        ,& !output :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
     CanPBranchHeight                  => plt_morph%CanPBranchHeight                   ,& !output :branch height, [m]
-    CanopyHeight_pft                  => plt_morph%CanopyHeight_pft                   ,& !output :canopy height, [m]
+    CanopyHeightLive_pft                  => plt_morph%CanopyHeightLive_pft                   ,& !output :canopy height, [m]
     CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft                ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafArea_lnode              => plt_morph%CanopyLeafArea_lnode               ,& !output :layer/node/branch leaf area, [m2 d-2]
     CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft                 ,& !output :plant canopy leaf area, [m2 d-2]
@@ -686,7 +687,7 @@ module InitPlantMod
   BranchNumber_pft(NZ)               = 0
   NumOfBranches_pft(NZ)              = 0
   HypocotHeight_pft(NZ)              = 0._r8
-  CanopyHeight_pft(NZ)               = 0._r8
+  CanopyHeightLive_pft(NZ)               = 0._r8
   Cytokinin2ndConc_rpvr(:,:,:,NZ)    = 0._r8
   D10: DO NB=1,MaxNumBranches
     plt_pheno%doInitLeafOut_brch(NB,NZ)           = iTrue
@@ -839,7 +840,7 @@ module InitPlantMod
     rNCStalk_pft                   => plt_allom%rNCStalk_pft                   ,& !input  :stalk N:C ratio, [gN gC-1]
     rPCStalk_pft                   => plt_allom%rPCStalk_pft                   ,& !input  :stalk P:C ratio, [g g-1]
     StandDeadStrutElms_pft         => plt_biom%StandDeadStrutElms_pft          ,& !inoput :standing dead element, [g d-2]
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft          ,& !output :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft         => plt_biom%StandDeadCompKElms_pft          ,& !output :standing dead element fraction, [g d-2]
     CanopyRespC_CumYr_pft          => plt_bgcr%CanopyRespC_CumYr_pft           ,& !output :total autotrophic respiration, [gC d-2 ]
     ETCanopy_CumYr_pft             => plt_ew%ETCanopy_CumYr_pft                ,& !output :total transpiration, [m H2O d-2]
     GrossCO2Fix_pft                => plt_bgcr%GrossCO2Fix_pft                 ,& !output :total gross CO2 fixation, [gC d-2 ]

@@ -230,7 +230,7 @@ module PlantPhenolMod
           IsPlantActive_pft(NZ)    = iFalse
           iPlantStateLive_pft(NZ)  = iTrue
           iMaintPlantTrait_pft(NZ) = iTrue
-          
+
           CALL StartPlants(NZ,NZ)
           Eco_NBP_CumYr_col = Eco_NBP_CumYr_col+SeedPlantedElm_pft(ielmc,NZ)
         ENDIF
@@ -1444,7 +1444,7 @@ module PlantPhenolMod
     iPlantDevelopPattern_pft        => plt_pheno%iPlantDevelopPattern_pft       ,& !input  :plant growth habit (determinate or indeterminate),[-]
     iYearCurrent                    => plt_site%iYearCurrent                    ,& !input  :current year,[-]
     SnowDepth                       => plt_ew%SnowDepth                         ,& !input  :snowpack depth, [m]
-    CanopyHeight_pft                => plt_morph%CanopyHeight_pft               ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft                => plt_morph%CanopyHeightLive_pft               ,& !input  :canopy height, [m]
     iDayPlanting_pft                => plt_distb%iDayPlanting_pft               ,& !input  :day of planting,[-]
     PhotoPeriodSens_pft             => plt_pheno%PhotoPeriodSens_pft            ,& !input  :difference between current and critical daylengths used to calculate phenological progress, [h]
     HourReq4LeafOut_brch            => plt_pheno%HourReq4LeafOut_brch           ,& !input  :hours above threshold temperature required for spring leafout/dehardening, [-]
@@ -1464,7 +1464,7 @@ module PlantPhenolMod
   
   LeafOutChk      = Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
   PlantDayChk     = I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
-  CanopyHeightChk = CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
+  CanopyHeightChk = CanopyHeightLive_pft(NZ).GE.SnowDepth-ZERO
   PerennialPhenoDecidChk   = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. is_cold_deciduos(iPlantPhenolType_pft(NZ))
 
   !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 

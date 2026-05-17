@@ -294,7 +294,8 @@ implicit none
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr      ,& !input  :root layer element primary axes, [g d-2]    
     RootAge_rpvr              => plt_morph%RootAge_rpvr                  ,& !inoput :root age,[h]
     flag2ndGrowth_pvr         => plt_morph%flag2ndGrowth_pvr             ,& !input  :flag for secondary growth of primary roots, [-]    
-    CRootActVolPerMassC_pft => plt_morph%CRootActVolPerMassC_pft     ,& !input  :coarse root volume:mass ratio, [m3 gC-1]
+    iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft     ,& !input  :plant expression of secondary growth, [-]                
+    CRootActVolPerMassC_pft   => plt_morph%CRootActVolPerMassC_pft       ,& !input  :coarse root volume:mass ratio, [m3 gC-1]
     FineRootVolPerMassC_pft   => plt_morph%FineRootVolPerMassC_pft       ,& !input  :fine root volume:mass ratio, [m3 gC-1]
     Root1stRadius_rpvr        => plt_morph%Root1stRadius_rpvr            ,& !input  :root layer radius for each primary axes, [m]    
     Root1stTransptArea_pvr    => plt_morph%Root1stTransptArea_pvr        ,& !output :mean transport area by 1st order root, [m2 d-2]         
@@ -381,9 +382,8 @@ implicit none
     !total root volume [m3], with FineRootVolPerMassC_pft including contribution from water, fine roots volume > 80% as water
     !coarse roots, 45-60% volume as water 
 
-    check2ndGrothRoot=N.EQ.ipltroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) &
-      .and. TotPopuRoot1stLen>0._r8 .and. CoarseVol > 0._r8
-
+    check2ndGrothRoot=N.EQ.ipltroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) &
+      .and. TotPopuRoot1stLen>0._r8 .and. CoarseVol > 0._r8 .and. llignification
     
     if(check2ndGrothRoot)then
 
@@ -1221,7 +1221,8 @@ implicit none
     PSIRoot_pvr                  => plt_ew%PSIRoot_pvr                     ,& !input :root total water potential, [Mpa]    
     RootAge_rpvr                 => plt_morph%RootAge_rpvr                 ,& !inoput :root age,[h]
     LitrfallElms_pvr             => plt_bgcr%LitrfallElms_pvr              ,& !input  :plant LitrFall element, [g d-2 h-1]    
-    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft            => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
+    iPlant2ndGrothPattern_pft    => plt_pheno%iPlant2ndGrothPattern_pft    ,& !input  :plant expression of secondary growth, [-]                
     Root1stSpecLen_pft           => plt_morph%Root1stSpecLen_pft           ,& !input  :specific root length primary axes, [m root gC-1]
     k_fine_comp                  => pltpar%k_fine_comp                     ,& !input  :fine litter complex id    
     iroot                        => pltpar%iroot                           ,& !input  :group id of plant root litter    
@@ -1446,7 +1447,7 @@ implicit none
     LL1=NGTopRootLayer_pft(NZ)
 
     !if it is woody vascular that can grow thick, then remove mature layers
-    if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then 
+    if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then 
       !Identify the young layers
       DO LL1=NGTopRootLayer_pft(NZ),NRoot1stTipLay_raxes(NR,NZ)
         IF(.not.flag2ndGrowth_pvr(LL1,NR,NZ))exit !exit when reaching non-mature layer
@@ -2985,7 +2986,8 @@ implicit none
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft        ,& !input  :root primary axis number,[-]    
     DLYR3                      => plt_site%DLYR3                        ,& !input  :vertical thickness of soil layer, [m]    
     AREA3                      => plt_site%AREA3                        ,& !input  :grid area size, [m2]
-    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft          ,& !input  :plant population, [d-2]    
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]    
+    iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft   ,& !input  :plant expression of secondary growth, [-]                
     Radius95pctMature_pft      => plt_morph%Radius95pctMature_pft       ,& !input  :Critical radius where the woody radius is considered 95% mature, [m]
     NumAxesPerPrimRoot_pft     => plt_morph%NumAxesPerPrimRoot_pft      ,& !input  :primary root axes number, [d-2]        
     SapFlowVlinear_pvr         => plt_ew%SapFlowVlinear_pvr             ,& !output :Sap flow mean linear velocity, [m h-1]
@@ -3004,7 +3006,7 @@ implicit none
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]        
     Root2ndXNumL_rpvr          => plt_morph%Root2ndXNumL_rpvr            & !input  :within soil layer number of whole population 2nd root axes, [d-2]        
   )
-  if(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))return
+  if(.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))return
   call PrintInfo('beg '//subname)
   
   !fine roots and mycorrhizae are assumed to functioning in parallel
@@ -3029,7 +3031,7 @@ implicit none
         cycle
       endif
 
-      if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
+      if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
         LumenFraction   = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-exp(-3._r8*Root1stRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))
         lumenArea(L,NR) = get_TreeXylemSecArea(dmax,Root1stRadius_rpvr(L,NR,NZ))*NumAxesPerPrimRoot_pft(NZ)*LumenFraction
       else
@@ -3243,6 +3245,7 @@ implicit none
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft   ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes           ,& !input  :root layer depth, [m]
     HypocotHeight_pft          => plt_morph%HypocotHeight_pft           ,& !input  :cotyledon height, [m]
+    iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft   ,& !input  :plant expression of secondary growth, [-]                
     Root1stMaxRadius_pft       => plt_morph%Root1stMaxRadius_pft        ,& !input  :maximum radius of primary roots, [m]        
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr          ,& !input  :root layer radius secondary axes, [m]
     Root2ndXNum_rpvr           => plt_morph%Root2ndXNum_rpvr            ,& !input  :root layer number secondary axes, [d-2]
@@ -3286,7 +3289,7 @@ implicit none
   fRootTube_rpvr  = 0._r8 
 
   SaplMeanAxes=0._r8
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
 !    DO NR=1,NumPrimeRootAxes_pft(NZ)
 !      DO L=MaxSoiL4Root_pft(NZ),NU,-1
 !        SaplMeanAxes(NR)=SaplMeanAxes(NR)+SapFlowVLinear_rpvr(L,NR,NZ)*DLYR3(L)  
@@ -3442,7 +3445,7 @@ implicit none
               Root2ndSink_pvr(N,L,NR)=0._r8
             ENDIF
             
-            checkCoarseRootLay= is_plant_woody_vascular(iPlantRootProfile_pft(NZ)) .and. &
+            checkCoarseRootLay= is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) .and. &
                 RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ) .and. RootEffDepz<Root1stDepz_raxes(NR,NZ) .and. &
                 Root1stDepz_raxes(NR,NZ)>7.5_r8*TipRadius .and. llignification
 

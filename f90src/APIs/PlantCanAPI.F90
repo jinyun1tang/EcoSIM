@@ -97,7 +97,7 @@ implicit none
   plt_ew%fSnowCanopy_col           = fSnowCanopy_col(NY,NX)
   plt_rad%SineSunInclinationAngle_col     = SineSunInclinationAngle_col(NY,NX)
   plt_site%SolarNoonHour_col       = SolarNoonHour_col(NY,NX)
-  plt_morph%LeafStalkArea_col      = LeafStalkArea_col(NY,NX)
+  plt_morph%LeafStalkAreaAll_col      = LeafStalkAreaAll_col(NY,NX)
   plt_rad%GroundSurfaceAzimuth_col    = GroundSurfaceAzimuth_col(NY,NX)
   plt_rad%CosineGrndSlope_col      = CosineGrndSlope_col(NY,NX)
   plt_rad%SineGrndSlope_col        = SineGrndSlope_col(NY,NX)
@@ -120,7 +120,8 @@ implicit none
     plt_ew%BulkFactor4Snow_pft(NZ) = BulkFactor4Snow_pft(NZ,NY,NX)
     plt_pheno%iPlant2ndGrothPattern_pft(NZ) = iPlant2ndGrothPattern_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)   = CanopyLeafArea_pft(NZ,NY,NX)
-    plt_morph%CanopyHeight_pft(NZ)     = CanopyHeight_pft(NZ,NY,NX)
+    plt_morph%CanopyHeightDead_pft(NZ) = CanopyHeightDead_pft(NZ,NY,NX)
+    plt_morph%CanopyHeightLive_pft(NZ)     = CanopyHeightLive_pft(NZ,NY,NX)    
     plt_morph%ClumpFactorNow_pft(NZ)   = ClumpFactorNow_pft(NZ,NY,NX)
     plt_rad%LeafSWabsorptivity_pft(NZ)     = LeafSWabsorptivity_pft(NZ,NY,NX)
     plt_rad%LeafPARabsorptivity_pft(NZ)    = LeafPARabsorptivity_pft(NZ,NY,NX)
@@ -134,6 +135,7 @@ implicit none
     DO  L=1,NumCanopyLayers
       plt_morph%CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ,NY,NX)
       plt_morph%CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ,NY,NX)
+      plt_morph%CanopySurfAreaProfDead_pft(L,NZ) = CanopySurfAreaProfDead_pft(L,NZ,NY,NX)
     ENDDO
 
     DO NB=1,NumOfBranches_pft(NZ,NY,NX)
@@ -143,7 +145,7 @@ implicit none
         ENDDO
       ENDDO
       DO  L=1,NumCanopyLayers
-        plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)
+        plt_morph%CanopyStalkSurfArea_lbrch(L,NB,NZ)=CanopyStalkSurfArea_lbrch(L,NB,NZ,NY,NX)        
       ENDDO
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
@@ -212,20 +214,20 @@ implicit none
     TAU_DirectSunSha(L,NY,NX)         = plt_rad%TAU_DirectSunSha(L)
   ENDDO
 
-  LeafStalkArea_col(NY,NX)=plt_morph%LeafStalkArea_col
+  LeafStalkAreaAll_col(NY,NX)=plt_morph%LeafStalkAreaAll_col
   
   DO NZ=1,NP_col(NY,NX)
     DO L=1,NumCanopyLayers
       RadSWCanopyLAbsroption_pft(L,NZ,NY,NX)=plt_rad%RadSWCanopyLAbsroption_pft(L,NZ)      
     ENDDO
-
-    LeafStalkArea_pft(NZ,NY,NX)     = plt_morph%LeafStalkArea_pft(NZ)
-    RadSWCanopyAbsorption_pft(NZ,NY,NX)     = plt_rad%RadSWCanopyAbsorption_pft(NZ)
-    RadPARCanopyAbsorption_pft(NZ,NY,NX)    = plt_rad%RadPARCanopyAbsorption_pft(NZ)
-    ClumpFactorNow_pft(NZ,NY,NX)    = plt_morph%ClumpFactorNow_pft(NZ)
-    FracPARads2Canopy_pft(NZ,NY,NX) = plt_rad%FracPARads2Canopy_pft(NZ)
-    StomatalStress_pft(NZ,NY,NX)    = plt_biom%StomatalStress_pft(NZ)
-    Eco_RadSW_col(NY,NX)            = Eco_RadSW_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
+    StandDeadSurfArea_pft(NZ,NY,NX)      = plt_morph%StandDeadSurfArea_pft(NZ)
+    LeafStalkAreaAct_pft(NZ,NY,NX)       = plt_morph%LeafStalkAreaAct_pft(NZ)
+    RadSWCanopyAbsorption_pft(NZ,NY,NX)  = plt_rad%RadSWCanopyAbsorption_pft(NZ)
+    RadPARCanopyAbsorption_pft(NZ,NY,NX) = plt_rad%RadPARCanopyAbsorption_pft(NZ)
+    ClumpFactorNow_pft(NZ,NY,NX)         = plt_morph%ClumpFactorNow_pft(NZ)
+    FracPARads2Canopy_pft(NZ,NY,NX)      = plt_rad%FracPARads2Canopy_pft(NZ)
+    StomatalStress_pft(NZ,NY,NX)         = plt_biom%StomatalStress_pft(NZ)
+    Eco_RadSW_col(NY,NX)                 = Eco_RadSW_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
     LeafAreaSunlit_pft(NZ,NY,NX)    = plt_photo%LeafAreaSunlit_pft(NZ)
     PARSunlit_pft(NZ,NY,NX)         = plt_photo%PARSunlit_pft(NZ)

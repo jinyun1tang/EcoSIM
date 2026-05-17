@@ -202,7 +202,7 @@ module PlantDisturbsMod
   integer, intent(in) :: NZ
   logical :: tokill
   associate(                                                           &
-    CanopyHeight_pft           => plt_morph%CanopyHeight_pft         , & !inoput :canopy height, [m]    
+    CanopyHeightLive_pft           => plt_morph%CanopyHeightLive_pft         , & !inoput :canopy height, [m]    
     SeasonalNonstCDayAve_pft   => plt_biom%SeasonalNonstCDayAve_pft  , & !input : daily average seasonal storage C for annual plant death check, [g d-2]
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft            , & !input :threshold zero for plang growth calculation, [-]    
     Hours2LeafOut_brch         => plt_pheno%Hours2LeafOut_brch       , & !inoput:counter for mobilizing nonstructural C during spring leafout/dehardening, [h]    
@@ -215,7 +215,7 @@ module PlantDisturbsMod
   tokill= any(CanopyNonstElms_brch(ielmc,1:NumOfBranches_pft(NZ),NZ)>0._r8) &
     .and. isclose(SeasonalNonstCDayAve_pft(NZ),SeasonalNonstElms_pft(ielmc,NZ)) &
     .and. any(Hours2LeafOut_brch(1:NumOfBranches_pft(NZ),NZ).GT.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ))) &
-    .and. SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .and. isclose(CanopyHeight_pft(NZ),0._r8)
+    .and. SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .and. isclose(CanopyHeightLive_pft(NZ),0._r8)
 
   end associate
   end function eval_annual_false_break_death
@@ -234,7 +234,7 @@ module PlantDisturbsMod
     FracBiomHarvsted       => plt_distb%FracBiomHarvsted       ,& !input  :harvest efficiency, [-]
     THIN_pft               => plt_distb%THIN_pft               ,& !input  :thinning of plant population, [-]
     iHarvstType_pft        => plt_distb%iHarvstType_pft        ,& !input  :type of harvest,[-]
-    StandDeadKCompElms_pft => plt_biom%StandDeadKCompElms_pft   & !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft => plt_biom%StandDeadCompKElms_pft   & !inoput :standing dead element fraction, [g d-2]
   )
   call PrintInfo('beg '//subname)
   StandeadElmntRemoval(1:NumPlantChemElms)=0._r8
@@ -262,9 +262,9 @@ module PlantDisturbsMod
 
   D6475: DO M=1,jsken
     DO NE=1,NumPlantChemElms
-      StandeadElmntRemoval(NE)        = StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandeadElmntHarv2Litr(NE)      = StandeadElmntHarv2Litr(NE)+(FHVSH-FracStdeadLeft)*StandDeadKCompElms_pft(NE,M,NZ)
-      StandDeadKCompElms_pft(NE,M,NZ) = FracStdeadLeft*StandDeadKCompElms_pft(NE,M,NZ)
+      StandeadElmntRemoval(NE)        = StandeadElmntRemoval(NE)+(1._r8-FHVSH)*StandDeadCompKElms_pft(NE,M,NZ)
+      StandeadElmntHarv2Litr(NE)      = StandeadElmntHarv2Litr(NE)+(FHVSH-FracStdeadLeft)*StandDeadCompKElms_pft(NE,M,NZ)
+      StandDeadCompKElms_pft(NE,M,NZ) = FracStdeadLeft*StandDeadCompKElms_pft(NE,M,NZ)
     ENDDO
   ENDDO D6475
   call PrintInfo('end '//subname)
@@ -389,8 +389,9 @@ module PlantDisturbsMod
     FracWoodStalkElmAlloc2Litr     => plt_allom%FracWoodStalkElmAlloc2Litr     ,& !input  :woody element allocation,[-]
     PlantElmAllocMat4Litr          => plt_soilchem%PlantElmAllocMat4Litr       ,& !input  :litter kinetic fraction, [-]
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft      ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
+    iPlant2ndGrothPattern_pft      => plt_pheno%iPlant2ndGrothPattern_pft      ,& !input  :plant expression of secondary growth, [-]                
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]
-    StandDeadKCompElms_pft         => plt_biom%StandDeadKCompElms_pft          ,& !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft         => plt_biom%StandDeadCompKElms_pft          ,& !inoput :standing dead element fraction, [g d-2]
     LitrfallElms_pvr               => plt_bgcr%LitrfallElms_pvr                ,& !inoput :plant LitrFall element, [g d-2 h-1]
     LitrfalStrutElms_CumYr_pft     => plt_bgcr%LitrfalStrutElms_CumYr_pft      ,& !inoput :total plant element LitrFall, [g d-2 ]
     SurfLitrfalStrutElms_CumYr_pft => plt_bgcr%SurfLitrfalStrutElms_CumYr_pft   & !inoput :total surface LitrFall element, [g d-2]
@@ -418,11 +419,11 @@ module PlantDisturbsMod
             +PlantElmAllocMat4Litr(NE,ifoliar,M,NZ)*LeafElm2Litr(NE) &
             +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*FineElm2Litr(NE)
 
-          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+          IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) &
               +PlantElmAllocMat4Litr(NE,istalk,M,NZ)*AZMAX1(WoodElm2Litr(NE)+StdeadElm2Litr(NE))
           ELSE
-            StandDeadKCompElms_pft(NE,M,NZ)=StandDeadKCompElms_pft(NE,M,NZ) &
+            StandDeadCompKElms_pft(NE,M,NZ)=StandDeadCompKElms_pft(NE,M,NZ) &
               +PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE))
 
             dWoody=AZMAX1(WoodyElmnt2Litr(NE)+StandeadElmnt2Litr(NE))
@@ -521,13 +522,13 @@ module PlantDisturbsMod
   ENDDO
 
   if(yearIJ%I>=225 .and. .false.)then
-  write(798,*)('-',NE=1,100)
-  write(798,*)yearIJ%I*1000+yearIJ%J/24.,NZ,TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc),HarvestElmnt2Litr(ielmc)
-  NE=ielmc
-  write(798,*)'rm',CanopyNonstElmRemoval(NE),LeafElmntRemoval(NE),FineNonleafElmntRemoval(NE),WoodyElmntRemoval(NE),StandeadElmntRemoval(NE)
-  write(798,*)'st',plt_biom%ShootNonstElms_pft(NE,NZ),plt_biom%ShootLeafElms_pft(NE,NZ),plt_biom%ShootFineNonLeafElms_pft(NE,NZ),&
-    plt_biom%ShootWoodyElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ)
-  write(798,*)plt_biom%CanopyNonstElms_pft(NE,NZ),plt_biom%ShootNoduleElms_pft(NE,NZ)
+    write(798,*)('-',NE=1,100)
+    write(798,*)yearIJ%I*1000+yearIJ%J/24.,NZ,TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc),HarvestElmnt2Litr(ielmc)
+    NE=ielmc
+    write(798,*)'rm',CanopyNonstElmRemoval(NE),LeafElmntRemoval(NE),FineNonleafElmntRemoval(NE),WoodyElmntRemoval(NE),StandeadElmntRemoval(NE)
+    write(798,*)'st',plt_biom%ShootNonstElms_pft(NE,NZ),plt_biom%ShootLeafElms_pft(NE,NZ),plt_biom%ShootFineNonLeafElms_pft(NE,NZ),&
+      plt_biom%ShootWoodyElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ)
+    write(798,*)plt_biom%CanopyNonstElms_pft(NE,NZ),plt_biom%ShootNoduleElms_pft(NE,NZ)
   endif
 
   IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed .and. iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
@@ -749,8 +750,8 @@ module PlantDisturbsMod
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col          ,& !input  :grid canopy leaf area, [m2 d-2]
     CanopyCutProxy_pft         => plt_distb%CanopyCutProxy_pft          ,& !inoput :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !inoput :plant population, [d-2]
-    PlantPopuAll_pft           => plt_site%PlantPopuAll_pft             ,& !inoput :live+standing dead plant population, [d-2]    
-    CanopyHeight_pft           => plt_morph%CanopyHeight_pft            ,& !inoput  :canopy height, [m]        
+    PlantPopuDead_pft           => plt_site%PlantPopuDead_pft             ,& !inoput :live+standing dead plant population, [d-2]    
+    CanopyHeightLive_pft       => plt_morph%CanopyHeightLive_pft        ,& !inoput  :canopy height, [m]        
     PPatSeeding_pft            => plt_site%PPatSeeding_pft              ,& !input  :plant population at seeding, [plants d-2]        
     PPX_pft                    => plt_site%PPX_pft                      ,& !inoput :plant population, [plants m-2]
     SeasonalNonstElms_pft      => plt_biom%SeasonalNonstElms_pft        ,& !inoput :plant stored nonstructural element at current step, [g d-2]
@@ -791,7 +792,7 @@ module PlantDisturbsMod
       IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN                
         PPX_pft(NZ)           = PPX_pft(NZ)*(1._r8-THIN_pft(NZ))
         PlantPopuLive_pft(NZ) = PlantPopuLive_pft(NZ)*(1._r8-THIN_pft(NZ))
-        PlantPopuAll_pft(NZ)  = PlantPopuAll_pft(NZ)*(1._r8-THIN_pft(NZ))
+        PlantPopuDead_pft(NZ)  = PlantPopuDead_pft(NZ)*(1._r8-THIN_pft(NZ))
         !terminate and reseed        
       ELSE
         !modeling seed bank effect
@@ -799,7 +800,7 @@ module PlantDisturbsMod
         !PPI_pft(NZ)          = AMAX1(1.0_r8,0.5_r8*(PPI_pft(NZ)+CanopySeedNum_pft(NZ)/AREA3(NU)))
         PPX_pft(NZ)           = PPatSeeding_pft(NZ)
         PlantPopuLive_pft(NZ) = PPX_pft(NZ)*AREA3(NU)
-        PlantPopuAll_pft(NZ)  = PlantPopuLive_pft(NZ)
+        PlantPopuDead_pft(NZ)  = PlantPopuLive_pft(NZ)
       ENDIF
 
       IF(iHarvstType_pft(NZ).EQ.iharvtyp_pruning)THEN
@@ -1886,7 +1887,7 @@ module PlantDisturbsMod
   
   associate(                                                           &
     TKC_pft                   => plt_ew%TKC_pft                       ,& !input  :canopy temperature, [K]
-    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
     jHarvstType_pft           => plt_distb%jHarvstType_pft            ,& !input  :flag for stand replacing disturbance,[-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantRootProfile_pft     => plt_pheno%iPlantRootProfile_pft      ,& !input  :plant growth type (vascular, non-vascular),[-]
@@ -1896,7 +1897,8 @@ module PlantDisturbsMod
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft          ,& !input  :canopy active stalk C, [g d-2]
     CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]
-    CanopyHeight_pft          => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft      => plt_morph%CanopyHeightLive_pft       ,& !input  :canopy height, [m]
+    iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
     iHarvstType_pft           => plt_distb%iHarvstType_pft            ,& !input  :type of harvest,[-]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !inoput :canopy water content, [m3 d-2]
@@ -1906,7 +1908,7 @@ module PlantDisturbsMod
     QH2OLoss_lnds             => plt_site%QH2OLoss_lnds               ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
     H2OLoss_CumYr_col         => plt_ew%H2OLoss_CumYr_col             ,& !inoput :total subsurface water flux, [m3 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch      ,& !output :plant branch leaf + sheath C, [g d-2]
-    isPlantBranchAlive_brch    => plt_pheno%isPlantBranchAlive_brch      & !output :flag to detect branch death, [-]
+    isPlantBranchAlive_brch   => plt_pheno%isPlantBranchAlive_brch     & !output :flag to detect branch death, [-]
   )
 
   call PrintInfo('beg '//subname)
@@ -1962,9 +1964,9 @@ module PlantDisturbsMod
     !          iHarvstType_pft=3:reduction of clumping factor
     !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
     !
-    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ)))) & !grass-like
+    IF((iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))) & !grass-like
       .AND. (iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo)        & !neither grazing nor herbivory
-      .AND. CanopyHeight_pft(NZ).GT.CanopyCutProxy_pft(NZ))THEN
+      .AND. CanopyHeightLive_pft(NZ).GT.CanopyCutProxy_pft(NZ))THEN
       call ResetCutBranch(I,J,NZ,NB)
     ENDIF
     !
