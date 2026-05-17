@@ -9,7 +9,7 @@ implicit none
   character(len=*), parameter :: prognm=&
   __FILE__
 
-  character(len=36):: nmlfile
+  character(len=256):: nmlfile
 
   character(len=256) :: ioerror_msg
   integer :: rc, fu
