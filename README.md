@@ -2,6 +2,22 @@
 
 A biogeochemical modeling library spins off the ecosys model.
 
+# Pull requests (for contributors & collaborators)
+
+Before submitting your PR:
+- Search for existing PRs to prevent duplicating efforts
+
+- Test your changes:
+-Create separate PRs for each feature or fix:
+ - Avoid combining unrelated changes in a single PR
+ - For intricate features, consider opening a feature request first to discuss and align expectations
+
+ - Consider allowing write access to your branch for faster reviews, as reviewers can push commits directly
+- If you are a new contributor
+  - Limit your open PRs to 1
+  - Do not submit trivial fixes (e.g. typos, formatting changes)
+- submit the PR to next, avoid main
+
 ## Download
 
 git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
