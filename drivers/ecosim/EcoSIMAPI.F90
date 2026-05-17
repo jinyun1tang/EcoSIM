@@ -380,7 +380,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   iYearCurrent=frectyp%yearcur
 
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
-    if(lverb)WRITE(*,333)'STARTS'
+    
     CALL STARTS(NHW,NHE,NVN,NVS)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN

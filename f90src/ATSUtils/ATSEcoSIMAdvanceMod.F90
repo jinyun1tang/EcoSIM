@@ -86,8 +86,8 @@ implicit none
   !)
 
   !All the necessary sizes are taken from GridConsts
-  !real(r8) :: LeafAreaZsec_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
-  !real(r8) :: StemAreaZsec_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
+  !real(r8) :: LeafAreaZsecLive_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
+  !real(r8) :: StemAreaZsecLive_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
@@ -95,8 +95,8 @@ implicit none
   NX=1
   npfts=1
   !ldo_sp_mode = .True.
-  !LeafAreaZsec_lpft(:,:,:) = 0.2
-  !StemAreaZsec_lpft(:,:,:) = 0.05
+  !LeafAreaZsecLive_lpft(:,:,:) = 0.2
+  !StemAreaZsecLive_lpft(:,:,:) = 0.05
 
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)

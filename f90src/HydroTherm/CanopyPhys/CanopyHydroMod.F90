@@ -52,9 +52,10 @@ implicit none
   fSnowCanopy_col(NY,NX)     = 0._r8
   ENGYS                      = 0._R8
   DO  NZ=1,NP_col(NY,NX)
-    if(LeafStalkArea_pft(NZ,NY,NX).GT.ZEROS(NY,NX))then
-      CanopyWatHeldCap  = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
-      CanopySnowHeldCap = FoliarSnowRetcap(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
+
+    if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZEROS(NY,NX))then
+      CanopyWatHeldCap  = FoliarWatRetcap(iPlantRootProfile_pft(NZ,NY,NX))*LeafStalkAreaAct_pft(NZ,NY,NX)
+      CanopySnowHeldCap = FoliarSnowRetcap(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkAreaAct_pft(NZ,NY,NX)
 
       snow2canopy_pft                  = AZMAX1(SnoFalPrec_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX))
       rain2canopy_pft                  = AZMAX1(PrecRainAndIrrig_col(NY,NX)*FracPARads2Canopy_pft(NZ,NY,NX))
@@ -77,8 +78,8 @@ implicit none
       CanopySnowUnload_col          = CanopySnowUnload_col+SnowUnload_pft
       fSnowCanopy_pft(NZ,NY,NX)     = AMIN1(1._R8,AZMAX1((SnowOnCanopy_pft(NZ,NY,NX)+SnowIntcptByCanopy_pft(NZ,NY,NX))/CanopySnowHeldCap)**0.15_r8)
       BulkFactor4Snow_pft(NZ,NY,NX) = BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))
-      BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkArea_pft(NZ,NY,NX)
-      fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkArea_pft(NZ,NY,NX)
+      BulkFactor4Snow_col(NY,NX)    = BulkFactor4Snow_col(NY,NX)+BulkFactor4Snow(iPlantSnowIntercepType_pft(NZ,NY,NX))*LeafStalkAreaAct_pft(NZ,NY,NX)
+      fSnowCanopy_col(NY,NX)        = fSnowCanopy_col(NY,NX)+fSnowCanopy_pft(NZ,NY,NX)*LeafStalkAreaAct_pft(NZ,NY,NX)
     else
       SnowIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
       RainIntcptByCanopy_pft(NZ,NY,NX) = 0._r8
@@ -93,9 +94,9 @@ implicit none
   else
     TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
   endif
-  if(LeafStalkArea_col(NY,NX).GT.ZEROS(NY,NX))THEN
-    BulkFactor4Snow_col(NY,NX) = BulkFactor4Snow_col(NY,NX)/LeafStalkArea_col(NY,NX)
-    fSnowCanopy_col(NY,NX)     = fSnowCanopy_col(NY,NX) /LeafStalkArea_col(NY,NX)
+  if(LeafStalkAreaAll_col(NY,NX).GT.ZEROS(NY,NX))THEN
+    BulkFactor4Snow_col(NY,NX) = BulkFactor4Snow_col(NY,NX)/LeafStalkAreaAll_col(NY,NX)
+    fSnowCanopy_col(NY,NX)     = fSnowCanopy_col(NY,NX) /LeafStalkAreaAll_col(NY,NX)
   ENDIF  
   call PrintInfo('end '//subname)
   end subroutine CanopyInterceptPrecip
