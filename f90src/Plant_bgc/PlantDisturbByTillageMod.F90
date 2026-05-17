@@ -279,6 +279,7 @@ contains
     iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     iPlantStateLive_pft       => plt_pheno%iPlantStateLive_pft        ,& !output :flag for species death, [-]    
     jHarvstType_pft           => plt_distb%jHarvstType_pft            ,& !output :flag for stand replacing disturbance,[-]    
+    PlantPopuDead_pft         => plt_site%PlantPopuDead_pft           ,& !inoput :live+standing dead plant population, [d-2]        
     PlantPopuLive_pft         => plt_site%PlantPopuLive_pft            & !inoput :plant population, [d-2]
   )
   call PrintInfo('beg '//subname)
@@ -299,6 +300,7 @@ contains
         XHVST                   = XCORP
         PPX_pft(NZ)             = PPX_pft(NZ)*XHVST
         PlantPopuLive_pft(NZ) = PlantPopuLive_pft(NZ)*XHVST
+        PlantPopuDead_pft(NZ) = PlantPopuDead_pft(NZ)*XHVST
 
         call RemoveShootByTillage(yearIJ,NZ,XHVST)
 
