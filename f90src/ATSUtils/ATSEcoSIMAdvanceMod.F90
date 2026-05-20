@@ -79,7 +79,7 @@ implicit none
   real(r8) :: EMM
   real(r8) :: dTexp, Tfinal
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
-  real(r8), PARAMETER :: surf_e_max=0.33333_r8
+  real(r8), PARAMETER :: surf_e_max=0.1_r8
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
@@ -311,13 +311,17 @@ implicit none
   do NY=1,NYS
     if(ldo_sp_mode)then  
       call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
+      
+      SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
+      RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
+      TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
         
-      call CanopyInterceptprecip(NY,NX)
+      !call CanopyInterceptprecip(NY,NX)
      else
        !If not using phenology set the thrufall snow and rain
        !to the total
-       SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
-       RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
+       SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+       RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
        TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
      endif
   enddo
@@ -421,9 +425,11 @@ implicit none
     Air_Heat_Sens_store_col(NY,NX) = 0.0
 
     !Sum over PFTs for total transpiration and canopy evap
+    !and canopy on snow
     do NP=1,npfts
       a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NP,NY,NX)
       a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NP,NY,NX)
+      !a_CanSnow(NP,NY) = SnowOnCanopy_pft(NP,NY,NX)
     enddo
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
