@@ -13,7 +13,7 @@ program HFileTest
   real(r8), pointer :: TSOI(:)
   real(r8), pointer :: VSM(:)
   integer :: jh,jd
-  character(len=36):: nmlfile
+  character(len=256):: nmlfile
 
   character(len=256) :: ioerror_msg
   integer :: rc, fu

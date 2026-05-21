@@ -89,13 +89,13 @@ module UptakesMod
     FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft     ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     HeatXAir2PCan_pft         => plt_ew%HeatXAir2PCan_pft          ,& !input  :canopy sensible heat flux, [MJ d-2 h-1]
     IsPlantActive_pft         => plt_pheno%IsPlantActive_pft       ,& !input  :flag for living pft, [-]
-    LeafStalkArea_col         => plt_morph%LeafStalkArea_col       ,& !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
-    LeafStalkArea_pft         => plt_morph%LeafStalkArea_pft       ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
+    LeafStalkAreaAll_col         => plt_morph%LeafStalkAreaAll_col       ,& !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
+    LeafStalkAreaAct_pft         => plt_morph%LeafStalkAreaAct_pft       ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     MainBranchNum_pft         => plt_morph%MainBranchNum_pft       ,& !input  :number of main branch,[-]
     NP                        => plt_site%NP                       ,& !input  :current number of plant species,[-]
     NU                        => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
     PlantPopu_col             => plt_site%PlantPopu_col            ,& !input  :total plant population, [plants d-2]
-    PlantPopulation_pft       => plt_site%PlantPopulation_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
     RainIntcptByCanopy_pft    => plt_ew%RainIntcptByCanopy_pft     ,& !input  :water flux onto canopy, [m3 d-2 h-1]
     SnowIntcptByCanopy_pft    => plt_ew%SnowIntcptByCanopy_pft     ,& !input  :snow flux onto canopy, [m3 d-2 h-1]
     Root1stDepz_raxes         => plt_morph%Root1stDepz_raxes       ,& !input  :root layer depth, [m]
@@ -126,7 +126,7 @@ module UptakesMod
 
   DO NZ=1,NP
     
-    IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+    IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopuLive_pft(NZ).GT.0.0_r8)THEN
 
       call PhotosynsDiag(yearIJ%I,yearIJ%J,NZ)  
 
@@ -147,11 +147,11 @@ module UptakesMod
       VHeatCapCanopyPrev_pft = cpo*gOC_to_m3_OM(CanopyMassC4H2OStorage)+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ)) &
         +cps*SnowOnCanopy_pft(NZ)
 
-      if(ldo_sp_mode .and. LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ))then
+      if(ldo_sp_mode .and. LeafStalkAreaAct_pft(NZ).GT.ZERO4LeafVar_pft(NZ))then
         HydroActivePlant=.true.
       else
         HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
-          .AND.(LeafStalkArea_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
+          .AND.(LeafStalkAreaAct_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
           .AND.(Root1stDepz_raxes(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))                     &  !active root
           .and. CanopyMassC4H2OStorage.GT.0._r8
       endif
@@ -168,12 +168,12 @@ module UptakesMod
         PSICanopy_pft(NZ)      = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
         PrecpHeatbyCanopy      = (RainIntcptByCanopy_pft(NZ)*cpw+SnowIntcptByCanopy_pft(NZ)*cps)*TairK
         !
-        IF(LeafStalkArea_col.GT.ZEROS)THEN
+        IF(LeafStalkAreaAll_col.GT.ZEROS)THEN
           !the grid has significant canopy (leaf+steam) area
-          FracGridPFTCovered=LeafStalkArea_pft(NZ)/LeafStalkArea_col*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_col/AREA3(NU))
+          FracGridPFTCovered=LeafStalkAreaAct_pft(NZ)/LeafStalkAreaAll_col*AMIN1(1.0_r8,0.5_r8*CanopyLeafArea_col/AREA3(NU))
         ELSEIF(PlantPopu_col.GT.ZEROS)THEN
           !total population is > 0
-          FracGridPFTCovered=PlantPopulation_pft(NZ)/PlantPopu_col
+          FracGridPFTCovered=PlantPopuLive_pft(NZ)/PlantPopu_col
         ELSE
           FracGridPFTCovered=1.0_r8/NP
         ENDIF
@@ -285,7 +285,7 @@ module UptakesMod
     D9005: DO NZ=1,NP
       DO  N=1,Myco_pft(NZ)
       !turn off to include dead plants as well
-!     IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopulation_pft(NZ).GT.0.0)THEN
+!     IF(IsPlantActive_pft(NZ).EQ.iTrue .AND. PlantPopuLive_pft(NZ).GT.0.0)THEN
         AllRootC_vr(L)=AllRootC_vr(L)+AZMAX1(PopuRootMycoC_pvr(N,L,NZ))
 !     ENDIF
       enddo
@@ -314,14 +314,14 @@ module UptakesMod
     RawIsoTAtm2CanopySinkZ_col    => plt_ew%RawIsoTAtm2CanopySinkZ_col    ,& !input  :isothermal aerodynamic resistance between canopy top and wind ref height in atmosphere, [h m-1]
     RawIsoTSurf2CanopyHScal_col   => plt_ew%RawIsoTSurf2CanopyHScal_col   ,& !input  :scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
     CanopyHeight_col              => plt_morph%CanopyHeight_col           ,& !input  :canopy height , [m]
-    CanopyHeight_pft              => plt_morph%CanopyHeight_pft           ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft          => plt_morph%CanopyHeightLive_pft       ,& !input  :canopy height, [m]
     DeltaTKC_pft                  => plt_ew%DeltaTKC_pft                  ,& !input  :change in canopy temperature, [K]
     FracPARads2Canopy_pft         => plt_rad%FracPARads2Canopy_pft        ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     KoppenClimZone                => plt_site%KoppenClimZone              ,& !input  :Koppen climate zone for the grid,[-]
     LeafAreaZsec_brch             => plt_morph%LeafAreaZsec_brch          ,& !input  :leaf surface area, [m2 d-2]
     LeafArea_node                 => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
     LeafProteinC_node             => plt_biom%LeafProteinC_node           ,& !input  :layer leaf protein N, [g d-2]
-    LeafStalkArea_pft             => plt_morph%LeafStalkArea_pft          ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
+    LeafStalkAreaAct_pft          => plt_morph%LeafStalkAreaAct_pft       ,& !input  :plant leaf+stem/stalk area, [m2 d-2]
     NP                            => plt_site%NP                          ,& !input  :current number of plant species,[-]
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
     RoughnessLength               => plt_ew%RoughnessLength               ,& !input  :canopy surface roughness height, [m]
@@ -363,11 +363,11 @@ module UptakesMod
   !     ZC,ZT,RoughnessLength=PFT canopy,grid biome,surface roughness height
   !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !
-  IF(LeafStalkArea_pft(NZ).GT.0.0_r8)THEN
+  IF(LeafStalkAreaAct_pft(NZ).GT.0.0_r8)THEN
     IF(KoppenClimZone.GE.0)THEN
       TFRADP=0.0_r8
       D700: DO NZZ=1,NP
-        IF(CanopyHeight_pft(NZZ).GT.CanopyHeight_pft(NZ)+RoughnessLength)THEN
+        IF(CanopyHeightLive_pft(NZZ).GT.CanopyHeightLive_pft(NZ)+RoughnessLength)THEN
           TFRADP=TFRADP+FracPARads2Canopy_pft(NZZ)
         ENDIF
       ENDDO D700
@@ -380,7 +380,7 @@ module UptakesMod
         !eq.(25) from Choudhury and Monteith (1988)
         !resistance between current pft canopy height and sink height (=zero plane displacement + roughness length)
         RawCanopy2SinkZ_pft(NZ)=AMIN1(RACX,AZMAX1(CanopyHeight_col*EXP(ALFZ) &
-          /(ALFZ/RawIsoTSurf2CanopyHScal_col)*(EXP(-ALFZ*CanopyHeight_pft(NZ)/CanopyHeight_col) &
+          /(ALFZ/RawIsoTSurf2CanopyHScal_col)*(EXP(-ALFZ*CanopyHeightLive_pft(NZ)/CanopyHeight_col) &
           -EXP(-ALFZ*(ZeroPlaneDisplacem_col+RoughnessLength)/CanopyHeight_col))))
       ELSE
         RawCanopy2SinkZ_pft(NZ)=0.0_r8
@@ -443,7 +443,7 @@ module UptakesMod
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
     RootAxialResist_pft        => plt_morph%RootAxialResist_pft      ,& !input  :root axial resistivity, [MPa h m-4]    
     RootRadialResist_pft       => plt_morph%RootRadialResist_pft     ,& !input  :root radial resistivity, [MPa h m-1]        
-    PlantPopulation_pft        => plt_site%PlantPopulation_pft       ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr          => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
     Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes        ,& !input  :root layer depth, [m]
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr       ,& !input  :root layer diameter secondary axes, [m]    
@@ -513,7 +513,7 @@ module UptakesMod
       IF(RootAbsorbLenPerPlant_pvr(N,L,NZ).GT.ZERO .AND. FracSoilLBy1stRoots_pvr(L,NZ).GT.ZERO .and. .not.ldo_sp_mode)THEN
 
         FineRootRadius_rvr(N,L)=AMAX1(Root2ndMaxRadius1_pft(N,NZ),SQRT(RootVH2O_pvr(N,L,NZ) &
-          /((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ))))
+          /((1.0_r8-RootPorosity_pft(N,NZ))*PICON*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopuLive_pft(NZ))))
 
         !cylynder, pi*r^2*L=vol
         RadialMeanLen_rvr(N,L)=AMAX1(1.001_r8*FineRootRadius_rvr(N,L),&
@@ -1157,7 +1157,7 @@ module UptakesMod
   integer :: N, L
   associate(                                                                  &
     DLYR3                       => plt_site%DLYR3                            ,& !input  :vertical thickness of soil layer, [m]  
-    CanopyHeight_pft            => plt_morph%CanopyHeight_pft                ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft            => plt_morph%CanopyHeightLive_pft                ,& !input  :canopy height, [m]
     iPlantRootProfile_pft       => plt_pheno%iPlantRootProfile_pft           ,& !input  :plant growth type (vascular, non-vascular),[-]    
     CumSoilThickMidL_vr         => plt_site%CumSoilThickMidL_vr              ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     HYCDMicP4RootUptake_vr      => plt_soilchem%HYCDMicP4RootUptake_vr       ,& !input  :soil micropore hydraulic conductivity for root water uptake, [m MPa-1 h-1]
@@ -1168,7 +1168,7 @@ module UptakesMod
     PSICanopy_pft               => plt_ew%PSICanopy_pft                      ,& !input  :canopy total water potential, [Mpa]
     RootAge_rpvr                => plt_morph%RootAge_rpvr                    ,& !inoput :root age,[h]
     RootMatureAge_pft           => plt_morph%RootMatureAge_pft               ,& !input : Root maturation age, [h]
-    PlantPopulation_pft         => plt_site%PlantPopulation_pft              ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft              ,& !input  :plant population, [d-2]
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr                ,& !input  :root layer number primary axes, [d-2]
     Root2ndMaxRadius_pft        => plt_morph%Root2ndMaxRadius_pft            ,& !input  :maximum radius of secondary roots, [m]
@@ -1202,7 +1202,7 @@ module UptakesMod
   call PrintInfo('beg '//subname)
 
   CdH2ORootxSoil                           = 0.0_r8
-  CanopyHeight4WatUptake_pft(NZ) = 0.80_r8*CanopyHeight_pft(NZ)
+  CanopyHeight4WatUptake_pft(NZ) = 0.80_r8*CanopyHeightLive_pft(NZ)
   PSIGravCanopyHeight            = mGravAccelerat*CanopyHeight4WatUptake_pft(NZ)
   !
   !Hagen-Poiseuille law of stalk xylem vessels
@@ -1238,7 +1238,7 @@ module UptakesMod
         !     RadialMeanLen_rvr=mean radial path length of water and nutrient uptake
         !     FineRootRadius_rvr,RootEffLen4Absorption_pvr=root radius,surface/radius area
         
-        RSSL                    = LOG(RadialMeanLen_rvr(N,L)/FineRootRadius_rvr(N,L))/(RootEffLen4Absorption_pvr(N,L)*PlantPopulation_pft(NZ))
+        RSSL                    = LOG(RadialMeanLen_rvr(N,L)/FineRootRadius_rvr(N,L))/(RootEffLen4Absorption_pvr(N,L)*PlantPopuLive_pft(NZ))
         SoilResist4H2O_rvr(N,L) = RSSL/HYCDMicP4RootUptake_vr(L)
 
         !
@@ -1249,7 +1249,7 @@ module UptakesMod
         !     RootRadialResist_pft=radial resistivity from PFT file
         !     VLMicP,VLWatMicPM=soil micropore,water volume
         !eq. (31) in Grant, 1998
-        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopulation_pft(NZ)
+        Root2ndSurfArea           = TwoPiCON*Root2ndRadius_rpvr(N,L,NZ)*RootAbsorbLenPerPlant_pvr(N,L,NZ)*PlantPopuLive_pft(NZ)
         RootRadialResist_rvr(N,L) = RootRadialResist_pft(N,NZ)*VLMicP_vr(L)/(Root2ndSurfArea*VLWatMicPM_vr(NPH,L))     ![MPa h m-1]/[m2]=[MPa h m-3]
         !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
@@ -1316,7 +1316,7 @@ module UptakesMod
   associate(                                                               &
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft             ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyHeight_pft            => plt_morph%CanopyHeight_pft             ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft            => plt_morph%CanopyHeightLive_pft             ,& !input  :canopy height, [m]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
     MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft             ,& !input  :maximum soil layer number for all root axes,[-]
@@ -1366,7 +1366,8 @@ module UptakesMod
   VapXAir2CanopyLiq_pft(NZ)    = 0.0_r8
   Transpiration_pft(NZ)        = 0.0_r8
   QdewCanopy_pft(NZ)           = 0.0_r8
-  IF(CanopyHeight_pft(NZ).GE.SnowDepth-ZERO .or. TKSnow==spval)THEN
+  
+  IF(CanopyHeightLive_pft(NZ).GE.SnowDepth-ZERO .or. TKSnow==spval)THEN
     TKC_pft(NZ)=TairK
   ELSE
     TKC_pft(NZ)=TKSnow

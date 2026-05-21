@@ -116,11 +116,13 @@ module WatsubMod
   if(do_warming)then
     call apply_soil_cable_warming(I,J,NHW,NHE,NVN,NVS)  
   endif
-! this enters the EcoSIM interaction with the soil-water-temperature module
+
+  ! this enters the EcoSIM interaction with the soil-water-temperature module
   call LocalCopySoilVars(I,J,NHW,NHE,NVN,NVS)
 
   call BeginMassCheck(NHW,NHE,NVN,NVS,twatmass0)
   twatmasstM=twatmass0
+
   ! 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
 !
@@ -134,7 +136,7 @@ module WatsubMod
 
     ! dtime=dtime+dts_HeatWatTP
     call PrepHydroThermIterM(M,NHW,NHE,NVN,NVS,TopLayWatVol_col,NUX0)
-        
+
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
       TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP_col)
     
@@ -169,6 +171,7 @@ module WatsubMod
   !diagnose surface ice
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
+
       found_frozen=.false.
       DO L=NUM_col(NY,NX),NL_col(NY,NX)
         VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
@@ -189,6 +192,13 @@ module WatsubMod
         VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
         VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
       ENDDO  
+      if(NX==4)then
+      write(994,*)I*1000+J,'exit'
+      write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'macl',(VLWatMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'maci',(VLiceMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      endif
 
       DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
         DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
@@ -217,9 +227,7 @@ module WatsubMod
   call PrintInfo('beg '//subname)
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-!      write(1011,*)I*10+J,(VLWatMicP1_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-!      write(1012,*)I*10+J,(VLWatMacP1_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-!      write(1013,*)I*10+J,(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+
      twatmass1(NY,NX)=0._r8
      dwat0=0._r8
      DO L=NUX0(NY,NX),NUM_col(NY,NX)-1
@@ -265,7 +273,8 @@ module WatsubMod
         call endrun('soil H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)        
       endif
       if(abs(dwat)>1.e-4_r8)then
-        write(993,*)I*1000+J/24.,NY,NX, NUM_col(NY,NX),NU_col(NY,NX)
+        write(993,*)I*1000+J/24.,M,NY,NX, NUM_col(NY,NX),NU_col(NY,NX)
+        write(993,*)'watbegend=',twatmass0(NY,NX),twatmass1(NY,NX)
         write(993,*)'dwat.    =',dwat,twatmass0(NY,NX)-twatmass1(NY,NX)
         write(993,*)'infl.    =',Qinflx2Soil_col(NY,NX)
         write(993,*)'laterflow=',QLaterFlow2Cell_col(NY,NX)
@@ -273,7 +282,7 @@ module WatsubMod
         write(993,*)'qdrain.  =',QDrain_col(NY,NX)
         write(993,*)'root2soi =',TWaterPlantRoot2SoilX_col(NY,NX)      
  
-        call endrun('soil H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
+        if(abs(dwat)>1.e-4_r8)call endrun('soil H2O error test failure in '//trim(mod_filename)//' at line',__LINE__)
       endif
       twatmasstM(NY,NX) = twatmass1(NY,NX)
 !      twatmass0(NY,NX)=twatmass1(NY,NX)
@@ -397,37 +406,41 @@ module WatsubMod
           exit
         ENDIF
       ENDDO D65
-!      write(1011,*)I*10+J,(VLMicP_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-!      write(1012,*)I*10+J,(VLWatMacP_vr(L,NY,NX)/POROS_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      if(NX==4)then
+      write(994,*)I*1000+J
+      write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'macl',(VLWatMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      write(994,*)'maci',(VLiceMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
+      endif
       D30: DO L=NUM_col(NY,NX),NL_col(NY,NX)
-    !
-    !   ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
-    !   FOR USE AT INTERNAL TIME STEP IN30    con SOIL LAYERS
-    !
-    !   PSISM1,PSISM=matric water potential
-    !   VOLA*,VOLW*,VOLI*,VOLP*=pore,water,ice,air volumes of micropores
-    !   VLWatMicPX1=VLWatMicP1 accounting for wetting front
-    !   VOLAH*,VOLWH*,VOLIH*,VOLPH*=pore,water,ice,air macropores
-    !   BKDS=bulk density
-    !   CCLAY_vr=clay concentration
-    !   FVOLAH=parameter for clay effect on macropore volume
-    !   VLSoilPoreMicP_vr,VOLT=soil,total volumes
-    !   WP=wilting point
-    !   THETW*,THETI*,THETP*=water,ice,air-filled porosity
-    !   VHeatCapacity1_vr,VHCM=volumetric heat capacities of total volume, solid
-    !   VLHeatCapacityA,VLHeatCapacityB=volumetric heat capacities of micropore,macropore
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !   input to intercept the soil moisture model
+        !
+        !   ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
+        !   FOR USE AT INTERNAL TIME STEP IN30    con SOIL LAYERS
+        !
+        !   PSISM1,PSISM=matric water potential
+        !   VOLA*,VOLW*,VOLI*,VOLP*=pore,water,ice,air volumes of micropores
+        !   VLWatMicPX1=VLWatMicP1 accounting for wetting front
+        !   VOLAH*,VOLWH*,VOLIH*,VOLPH*=pore,water,ice,air macropores
+        !   BKDS=bulk density
+        !   CCLAY_vr=clay concentration
+        !   FVOLAH=parameter for clay effect on macropore volume
+        !   VLSoilPoreMicP_vr,VOLT=soil,total volumes
+        !   WP=wilting point
+        !   THETW*,THETI*,THETP*=water,ice,air-filled porosity
+        !   VHeatCapacity1_vr,VHCM=volumetric heat capacities of total volume, solid
+        !   VLHeatCapacityA,VLHeatCapacityB=volumetric heat capacities of micropore,macropore
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !   input to intercept the soil moisture model
         PSISM1_vr(L,NY,NX)      = PSISoilMatricP_vr(L,NY,NX)
         VLMicP1_vr(L,NY,NX)     = AZMAX1(VLMicP_vr(L,NY,NX))
+        VLWatMicPX1_vr(L,NY,NX) = AZMAX1(VLWatMicPX_vr(L,NY,NX))        
         VLWatMicP1_vr(L,NY,NX)  = AZMAX1(VLWatMicP_vr(L,NY,NX))
-        VLWatMicPX1_vr(L,NY,NX) = AZMAX1(VLWatMicPX_vr(L,NY,NX))
         VLiceMicP1_vr(L,NY,NX)  = AZMAX1(VLiceMicP_vr(L,NY,NX))
         VLWatMacP1_vr(L,NY,NX)  = AZMAX1(VLWatMacP_vr(L,NY,NX))
         VLiceMacP1_vr(L,NY,NX)  = AZMAX1(VLiceMacP_vr(L,NY,NX))
-        TWaterPlantRoot2SoilX_vr(L,NY,NX)=TWaterPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP        
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
           VLairMicP_vr(L,NY,NX)  = VLMicP1_vr(L,NY,NX)-VLWatMicP1_vr(L,NY,NX)-VLiceMicP1_vr(L,NY,NX)
@@ -556,7 +569,7 @@ module WatsubMod
     DO  NY=NVN,NVS
       D35: DO L=NUM_col(NY,NX),NL_col(NY,NX)
         dWaterPlantRoot2SoilPrev_vr(L,NY,NX)=TWaterPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP
-        dHeatPlantRoot2SoilPrev_vr(L,NY,NX)=THeatPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP
+        dHeatPlantRoot2SoilPrev_vr(L,NY,NX) =THeatPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP
         THeatPlantRoot2SoilPrev_vr(L,NY,NX)=0._r8
         D40: DO N=FlowDirIndicator_col(NY,NX),3
           N1=NX;N2=NY;N3=L
@@ -1260,7 +1273,7 @@ module WatsubMod
   real(r8) :: ENGY1,VLTSoiPore,VHXX
   real(r8) :: TKXX,VLWMicPre,VLHeatCapacityPre,dHeat
   integer :: it   !current model step in the simulation year
-  real(r8) :: dwat,dwat1,rootC,dflow_mic,dflow_mac
+  real(r8) :: dwat,dwat1,rootC,dflow_mic,dflow_mac,pscal,VLWatMicP1t_vr
   real(r8),parameter :: tau=100._r8
   it=(I-1)*24+J
 
@@ -1273,8 +1286,7 @@ module WatsubMod
       D13: DO L = NUM_col(NY,NX), NL_col(NY,NX)
 
         IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          TWaterPlantRoot2SoilXM_col(NY,NX) = TWaterPlantRoot2SoilXM_col(NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
-          TWaterPlantRoot2SoilX_col(NY,NX) = TWaterPlantRoot2SoilX_col(NY,NX)+TWaterPlantRoot2SoilX_vr(L,NY,NX)
+
           VLWMicPre              = VLWatMicP1_vr(L,NY,NX)
           dwat1=dwat1+VLWatMicP1_vr(L,NY,NX)+VLWatMacP1_vr(L,NY,NX)+(VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX))*DENSICE
 
@@ -1343,7 +1355,24 @@ module WatsubMod
           VHeatCapacity1_vr(L,NY,NX)  = VLHeatCapacityA_vr(L,NY,NX)+VLHeatCapacityB_vr(L,NY,NX)
 
          IF(VHeatCapacity1_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            
+
+            VLWatMicP1t_vr  = VLWatMicP1_vr(L,NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+
+            if(VLWatMicP1t_vr<0._r8 .and. VLWatMicP1_vr(L,NY,NX)>0._r8)then
+              pscal=-VLWatMicP1_vr(L,NY,NX)/dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+              TWaterPlantRoot2SoilPrev_vr(L,NY,NX) = TWaterPlantRoot2SoilPrev_vr(L,NY,NX)-(1._r8-pscal)*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+              VLWatMicP1_vr(L,NY,NX)               = VLWatMicP1_vr(L,NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+            else
+              pscal=1._r8
+              VLWatMicP1_vr(L,NY,NX)=VLWatMicP1t_vr
+            endif
+
+            VLWatMicPX1_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+            VLWatMicPX1_vr(L,NY,NX) = AMIN1(VLWatMicP1_vr(L,NY,NX),VLWatMicPX1_vr(L,NY,NX))
+
+            TWaterPlantRoot2SoilXM_col(NY,NX) = TWaterPlantRoot2SoilXM_col(NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+            TWaterPlantRoot2SoilX_col(NY,NX) = TWaterPlantRoot2SoilX_col(NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+
             if(dWaterPlantRoot2SoilPrev_vr(L,NY,NX)>0._r8)then              
               VHeatCapacity1_vr(L,NY,NX) = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
               if(L==NUM_col(NY,NX))then
@@ -1363,13 +1392,10 @@ module WatsubMod
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX))/VHeatCapacity1_vr(L,NY,NX)                              
               endif  
-              VHeatCapacity1_vr(L,NY,NX) = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)  
-              THeatPlantRoot2SoilPrev_vr(L,NY,NX)=THeatPlantRoot2SoilPrev_vr(L,NY,NX)+cpw*TKSoil1_vr(L,NY,NX)*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
+              VHeatCapacity1_vr(L,NY,NX)          = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+              THeatPlantRoot2SoilPrev_vr(L,NY,NX) = THeatPlantRoot2SoilPrev_vr(L,NY,NX)+ &
+                cpw*TKSoil1_vr(L,NY,NX)*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
             endif
-
-            VLWatMicP1_vr(L,NY,NX)  = VLWatMicP1_vr(L,NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
-            VLWatMicPX1_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)+dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
-            VLWatMicPX1_vr(L,NY,NX) = AMIN1(VLWatMicP1_vr(L,NY,NX),VLWatMicPX1_vr(L,NY,NX))
 
             if(TKSoil1_vr(L,NY,NX)>400._r8.or.TKSoil1_vr(L,NY,NX)<100._r8)then
               write(*,*)'======'

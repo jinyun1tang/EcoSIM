@@ -4,7 +4,7 @@ module CanopyDataType
   use data_const_mod, only : spval => DAT_CONST_SPVAL
   use GridConsts
   use ElmIDMod
-  use EcoSIMConfig, only : jsken => jskenc
+  use EcoSIMConfig, only : jsken => jskenc,jskenp1
   implicit none
   public
   save
@@ -83,10 +83,10 @@ module CanopyDataType
   real(r8),target,allocatable ::  WatHeldOnCanopy_col(:,:)                   !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  SnowOnCanopy_col(:,:)                      !canopy held snow, [m3 d-2]
   real(r8),target,allocatable ::  fSnowCanopy_col(:,:)                       !fraction snow covered canopy, [-]
-  real(r8),target,allocatable ::  Prec2Canopy_col(:,:)                       !precipitation to canopy over the grid, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Rain2Canopy_col(:,:)                       !precipitation to canopy over the grid, [m3 d-2 h-1]
   real(r8),target,allocatable ::  fSnowCanopy_pft(:,:,:)                     !fraction of canopy is snow covered, [-]
   real(r8),target,allocatable ::  RainIntceptByCanopy_col(:,:)               !grid net rainfall water interception to canopy, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  SnowIntcptByCanopy_col(:,:)                !grid net snowfall water interception to canopy, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  SnowIntceptByCanopy_col(:,:)                !grid net snowfall water interception to canopy, [m3 d-2 h-1]
   real(r8),target,allocatable ::  CanopyEvapTransLHeat_pft(:,:,:)            !canopy latent heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatXAir2PCan_pft(:,:,:)                   !air to canopy sensible heat flux, [MJ d-2 h-1]
   real(r8),target,allocatable ::  HeatStorCanopy_pft(:,:,:)                  !canopy storage heat flux, [MJ d-2 h-1]
@@ -171,7 +171,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  GrainSeedBiomCMean_brch(:,:,:,:)           !maximum grain C during grain fill, [g d-2]
   real(r8),target,allocatable ::  CanopyNLimFactor_brch(:,:,:,:)             !Canopy N-limitation factor, [0->1] weaker limitation,[-]
   real(r8),target,allocatable ::  CanopyPLimFactor_brch(:,:,:,:)             !Canopy P-limitation factor, [0->1] weaker limitation,[-]
-  real(r8),target,allocatable ::  StandDeadKCompElms_pft(:,:,:,:,:)          !standing dead chemical element fraction, [g d-2]
+  real(r8),target,allocatable ::  StandDeadCompKElms_pft(:,:,:,:,:)          !standing dead chemical element fraction, [g d-2]
   real(r8),target,allocatable ::  StandDeadStrutElms_pft(:,:,:,:)            !standing dead chemical element, [g d-2]
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  SeasonalNonstCDayAve_pft(:,:,:)            !daily average seasonal storage C for annual plant death check, [g d-2]
@@ -306,10 +306,10 @@ module CanopyDataType
   allocate(SnowOnCanopy_col(JY,JX)); SnowOnCanopy_col=0._r8
   allocate(fSnowCanopy_col(JY,JX)); fSnowCanopy_col=0._r8
   allocate(WatHeldOnCanopy_col(JY,JX));      WatHeldOnCanopy_col=0._r8
-  allocate(Prec2Canopy_col(JY,JX));      Prec2Canopy_col=0._r8
+  allocate(Rain2Canopy_col(JY,JX));      Rain2Canopy_col=0._r8
   allocate(fSnowCanopy_pft(JP,JY,JX)); fSnowCanopy_pft=0._r8
   allocate(RainIntceptByCanopy_col(JY,JX));       RainIntceptByCanopy_col=0._r8
-  allocate(SnowIntcptByCanopy_col(JY,JX)); SnowIntcptByCanopy_col=0._r8
+  allocate(SnowIntceptByCanopy_col(JY,JX)); SnowIntceptByCanopy_col=0._r8
   allocate(CanopyEvapTransLHeat_pft(JP,JY,JX));    CanopyEvapTransLHeat_pft=0._r8
   allocate(HeatXAir2PCan_pft(JP,JY,JX));    HeatXAir2PCan_pft=0._r8
   allocate(HeatStorCanopy_pft(JP,JY,JX));    HeatStorCanopy_pft=0._r8
@@ -397,7 +397,7 @@ module CanopyDataType
   allocate(PetoleProteinC_node(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));PetoleProteinC_node=0._r8
   allocate(CanopyNoduleNonstCConc_pft(JP,JY,JX));   CanopyNoduleNonstCConc_pft=0._r8
   allocate(GrainSeedBiomCMean_brch(MaxNumBranches,JP,JY,JX)); GrainSeedBiomCMean_brch=0._r8
-  allocate(StandDeadKCompElms_pft(NumPlantChemElms,jsken,JP,JY,JX)); StandDeadKCompElms_pft=0._r8
+  allocate(StandDeadCompKElms_pft(NumPlantChemElms,jskenp1,JP,JY,JX)); StandDeadCompKElms_pft=0._r8
   allocate(StandDeadStrutElms_pft(NumPlantChemElms,JP,JY,JX));    StandDeadStrutElms_pft=0._r8
   allocate(SeasonalNonstElms_pft(NumPlantChemElms,JP,JY,JX));  SeasonalNonstElms_pft=0._r8
   allocate(SeasonalNonstCDayAve_pft(JP,JY,JX)); SeasonalNonstCDayAve_pft=0._r8
@@ -508,10 +508,10 @@ module CanopyDataType
   call destroy(WatHeldOnCanopy_col)
   call destroy(SnowOnCanopy_col)
   call destroy(fSnowCanopy_col)
-  call destroy(Prec2Canopy_col)
+  call destroy(Rain2Canopy_col)
   call destroy(fSnowCanopy_pft)
   call destroy(RainIntceptByCanopy_col)
-  call destroy(SnowIntcptByCanopy_col)
+  call destroy(SnowIntceptByCanopy_col)
   call destroy(CanopyEvapTransLHeat_pft)
   call destroy(HeatXAir2PCan_pft)
   call destroy(HeatStorCanopy_pft)
@@ -590,7 +590,7 @@ module CanopyDataType
   call destroy(PetoleProteinC_node)
   call destroy(CanopyNoduleNonstCConc_pft)
   call destroy(GrainSeedBiomCMean_brch)
-  call destroy(StandDeadKCompElms_pft)
+  call destroy(StandDeadCompKElms_pft)
   call destroy(StandDeadStrutElms_pft)
   call destroy(SeasonalNonstElms_pft)
   call destroy(SeasonalNonstCDayAve_pft)

@@ -230,9 +230,11 @@ implicit none
     EarStrutElms_brch         => plt_biom%EarStrutElms_brch          ,& !input  :branch ear structural chemical element mass, [g d-2]    
     GrainStrutElms_brch       => plt_biom%GrainStrutElms_brch        ,& !input  :branch grain structural element mass, [g d-2]    
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch       ,& !input  :branch nonstructural element, [g d-2]    
-    StandDeadKCompElms_pft    => plt_biom%StandDeadKCompElms_pft     ,& !input  :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft    => plt_biom%StandDeadCompKElms_pft     ,& !input  :standing dead element fraction, [g d-2]
     ShootElms_brch            => plt_biom%ShootElms_brch             ,& !input  :branch shoot structural element mass, [g d-2]
     ShootElms_pft             => plt_biom%ShootElms_pft              ,& !inoput :current time whole plant shoot element mass, [g d-2]
+    CanopyHeightLive_pft      => plt_morph%CanopyHeightLive_pft      ,& !input  :live plant canopy height, [m]
+    CanopyHeightDead_pft      => plt_morph%CanopyHeightDead_pft      ,& !input  :canopy height for standing dead, [m]
     LeafStrutElms_pft         => plt_biom%LeafStrutElms_pft          ,& !output :canopy leaf structural element mass, [g d-2]    
     ShootFineNonLeafElms_pft  => plt_biom%ShootFineNonLeafElms_pft   ,& !output :canopy non-leaf fine structural element mass, [g d-2]
     FracLeafShethElmAlloc2Litr=> plt_allom%FracLeafShethElmAlloc2Litr,& !input  :leave-sheath element allocation, [-]    
@@ -294,8 +296,9 @@ implicit none
 ! standing dead are made up of different kinetic components
 !add standing dead to shoot
   DO NE=1,NumPlantChemElms
-    StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadKCompElms_pft(NE,1:jsken,NZ))    
+    StandDeadStrutElms_pft(NE,NZ)=sum(StandDeadCompKElms_pft(NE,1:jsken,NZ))    
   ENDDO
+
   if(present(canopyE))then
     canopyE=ShootElms_pft(:,NZ)+ShootNoduleElms_pft(:,NZ)+StandDeadStrutElms_pft(:,NZ)
   endif

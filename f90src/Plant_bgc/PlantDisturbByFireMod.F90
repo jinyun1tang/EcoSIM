@@ -155,10 +155,11 @@ contains
     ifoliar                    => pltpar%ifoliar                        ,& !input  :group id of plant foliar litter
     inonfoliar                 => pltpar%inonfoliar                     ,& !input  :group id of plant non-foliar litter group
     FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr  ,& !input  :woody element allocation,[-]
+    iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft   ,& !input  :plant expression of secondary growth, [-]                
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft   ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft       ,& !input  :plant growth type (vascular, non-vascular),[-]
     LitrfallElms_pvr           => plt_bgcr%LitrfallElms_pvr             ,& !inoput :plant LitrFall element, [g d-2 h-1]
-    StandDeadKCompElms_pft     => plt_biom%StandDeadKCompElms_pft        & !inoput :standing dead element fraction, [g d-2]
+    StandDeadCompKElms_pft     => plt_biom%StandDeadCompKElms_pft        & !inoput :standing dead element fraction, [g d-2]
   )
 
   call PrintInfo('beg '//subname)
@@ -186,7 +187,8 @@ contains
     ENDDO
 
     !all above ground is subject to fire
-    IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ))))THEN
+    IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. &
+      (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
       LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_fine_comp,0,NZ)+&
         PlantElmAllocMat4Litr(ielmc,istalk,M,NZ)*(Wood2LitrElms(ielmc)+Stddead2LitrElms(ielmc))
 
@@ -202,11 +204,11 @@ contains
       !not grass, has woody component 
     ELSE
       dDeadE=PlantElmAllocMat4Litr(ielmc,icwood,M,NZ)*(Wood2LitrElms(ielmc))
-      StandDeadKCompElms_pft(ielmc,M,NZ)=StandDeadKCompElms_pft(ielmc,M,NZ)+dDeadE
+      StandDeadCompKElms_pft(ielmc,M,NZ)=StandDeadCompKElms_pft(ielmc,M,NZ)+dDeadE
 
       DO NE=2,NumPlantChemElms  
         dDeadE                          = PlantElmAllocMat4Litr(NE,icwood,M,NZ)*WoodyElmntOffEcosystem(NE)
-        StandDeadKCompElms_pft(NE,M,NZ) = StandDeadKCompElms_pft(NE,M,NZ)+dDeadE
+        StandDeadCompKElms_pft(NE,M,NZ) = StandDeadCompKElms_pft(NE,M,NZ)+dDeadE
       ENDDO
         
       LitrfallElms_pvr(ielmc,M,k_woody_comp,0,NZ)=LitrfallElms_pvr(ielmc,M,k_woody_comp,0,NZ) &

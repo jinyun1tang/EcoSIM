@@ -1,12 +1,10 @@
-# Use the official Ubuntu image as the base
-FROM ubuntu:latest
+# Use a specific version for stability
+FROM ubuntu:22.04
 
-# Set non-interactive mode to prevent installation prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Combine update, install, and cleanup in ONE block to prevent caching errors
-# and reduce image size.
-RUN apt-get update && apt-get install -y \
+# We add 'ca-certificates' to ensure curl/git can verify SSL connections
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gfortran \
     git \
@@ -17,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     autoconf \
     libxml2 \
     curl \
+    ca-certificates \
     libcurl4-openssl-dev \
     libxml2-dev \
     libtool \
@@ -24,5 +23,4 @@ RUN apt-get update && apt-get install -y \
     python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Verify the installation (Optional - usually better to do this in the container, not build)
 RUN gcc --version && g++ --version

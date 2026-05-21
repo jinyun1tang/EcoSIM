@@ -94,7 +94,7 @@ contains
 
   IF(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
     HarvestedStdeadC = CanopyCutProxy_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8*AREA3(NU)*FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ)
-    FracStdeadLeft  = AZMAX1(1._r8-HarvestedStdeadC/StandDeadStrutElms_pft(ielmc,NZ))
+    FracStdeadLeft   = AZMAX1(1._r8-HarvestedStdeadC/StandDeadStrutElms_pft(ielmc,NZ))
     FHVSH  = FracStdeadLeft
   ELSE
     FracStdeadLeft=1.0_r8

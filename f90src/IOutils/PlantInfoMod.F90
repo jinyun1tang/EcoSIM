@@ -128,7 +128,7 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
-        PlantinDepz_pft(NZ,NY,NX)=ppmc
+        PlantinDepz_pft(NZ,NY,NX)=1.e-6_r8
       ENDDO
     ENDDO
   ENDDO
@@ -159,7 +159,7 @@ implicit none
           endif
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
           read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
-          PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),ppmc)
+          PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),1.e-6_r8)
           LPY=0
           if(isLeap(iyr) .and. IMO.GT.2)LPY=1
           !obtain the ordinal day
@@ -435,8 +435,9 @@ implicit none
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
-        iHarvestDay_pft(NZ,NY,NX)  = iDayPlantHarvest_pft(NZ,NY,NX)
-        iHarvestYear_pft(NZ,NY,NX) = iYearPlantHarvest_pft(NZ,NY,NX)
+        iHarvestDay_pft(NZ,NY,NX)      = iDayPlantHarvest_pft(NZ,NY,NX)
+        iHarvestYear_pft(NZ,NY,NX)     = iYearPlantHarvest_pft(NZ,NY,NX)
+        iMaintPlantTrait_pft(NZ,NY,NX) = iFalse
       ENDDO
     ENDDO
   ENDDO
@@ -888,7 +889,7 @@ implicit none
   case (1)
     strval='Intermediate root profile, like herbs (1)'
   case (2)
-    strval='Deep root profile, like trees (2)'
+    strval='Deep root profile, like trees/drought tolerant grasses (2)'
   case (3)
     strval='Very deep tap root profile (3)'  
   case default
@@ -968,7 +969,7 @@ implicit none
   id=addone(id)
   call writefixsl(nu_plt,'IPTYP: Photoperiod',strval,60,id)
 
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
     select case(iPlantTurnoverPattern_pft(NZ,NY,NX))
     case (0, 1)
       write(strval,'(A,I2)')'Rapid, like deciduous trees ',iPlantTurnoverPattern_pft(NZ,NY,NX)
@@ -1209,7 +1210,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
 
-  if(iPlantRootProfile_pft(NZ,NY,NX)>=2)then
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
     id=addone(id)
     call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
     id=addone(id)
@@ -1338,7 +1339,7 @@ implicit none
   call writefixl(nu_plt,id,'CNSHE','Plant PetolSheth NC mass ratio [gN (gC)-1]',rNCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CNSTK','Plant stalk NC mass ratio [gN (gC)-1]',rNCStalk_pft(NZ,NY,NX),100)  
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then  
     id=addone(id)
     call writefixl(nu_plt,id,'CNRTLIG','Plant lignified root NC mass ratio [gN (gC)-1]',rNCLigRoot_pft(NZ,NY,NX),100)
   endif
@@ -1366,7 +1367,7 @@ implicit none
   call writefixl(nu_plt,id,'CPSHE','Plant PetolSheth PC mass ratio [gP (gC)-1]',rPCSheath_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'CPSTK','Plant stalk PC mass ratio [gP (gC)-1]',rPCStalk_pft(NZ,NY,NX),100)
-  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX)))then  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then  
     id=addone(id)
     call writefixl(nu_plt,id,'CPRTLIG','Plant lignified root PC mass ratio [gP (gC)-1]',rPCLigRoot_pft(NZ,NY,NX),100)
   endif

@@ -97,7 +97,7 @@ module RootGasMod
   associate(                                                                 &
     RootStrutElms_pft            => plt_biom%RootStrutElms_pft              ,& !input  :plant root structural element mass, [g d-2]
     ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]
     CumSoilThickMidL_vr          => plt_site%CumSoilThickMidL_vr            ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     AtmGasc                      => plt_site%AtmGasc                        ,& !input  :atmospheric gas concentrations, [g m-3]
     ZEROS                        => plt_site%ZEROS                          ,& !input  :threshold zero for numerical stability,[-]
@@ -194,7 +194,7 @@ module RootGasMod
     ENDDO
     
     ROXYLX                = -RO2AquaSourcePrev_vr(L)*FOXYX*dts_gas   !>0 into dissolved phase
-    RootOxyDemandPerPlant = RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopulation_pft(NZ)*oscal
+    RootOxyDemandPerPlant = RootO2Dmnd4Resp_pvr(N,L,NZ)*dts_gas/PlantPopuLive_pft(NZ)*oscal
     !
     !     GASEOUS AND AQUEOUS DIFFUSIVITIES IN ROOT AND SOIL
     !
@@ -221,7 +221,7 @@ module RootGasMod
     !
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar[m]
-      RTCR1 = AMAX1(PlantPopulation_pft(NZ),Root1stXNumL_pvr(L,NZ))*Root1stTransptArea_pvr(N,L,NZ)/CumSoilThickMidL_vr(L)
+      RTCR1 = AMAX1(PlantPopuLive_pft(NZ),Root1stXNumL_pvr(L,NZ))*Root1stTransptArea_pvr(N,L,NZ)/CumSoilThickMidL_vr(L)
       !secondary roots conductance scalar, [m]
       RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
       
@@ -386,8 +386,8 @@ module RootGasMod
           !     WITH OTHER ROOT AND MICROBIAL POPULATIONS
           !
           RSoilSolute2Roots(idg_beg:idg_end)=0.0_r8          
-          ROxySoil2Uptk             = ROxySoil2UptkPerPlant*PlantPopulation_pft(NZ)
-          ROxyRoot2Uptk             = ROxyRoot2UptkPerPlant*PlantPopulation_pft(NZ)
+          ROxySoil2Uptk             = ROxySoil2UptkPerPlant*PlantPopuLive_pft(NZ)
+          ROxyRoot2Uptk             = ROxyRoot2UptkPerPlant*PlantPopuLive_pft(NZ)
           RSoilSolute2Roots(idg_O2) = ROxySoil2Uptk
           RDFAqueous(idg_CO2)       = RSolUptkTransp(idg_CO2)+DifAqueVolatile(idg_CO2)*(trcaqu_conc_soi_loc(idg_CO2)-trc_conc_root_loc(idg_CO2))
           RDXAqueous(idg_CO2)       = (RootVH2O_pvr(N,L,NZ)*AMAX1(ZERO4Groth_pft(NZ),trc_solml_loc(idg_CO2)) &
@@ -395,10 +395,10 @@ module RootGasMod
 
           IF(RDFAqueous(idg_CO2).GT.0.0_r8)THEN
             !CO2 from soil into roots          
-            RSoilSolute2Roots(idg_CO2)=AMIN1(AZMAX1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopulation_pft(NZ))
+            RSoilSolute2Roots(idg_CO2)=AMIN1(AZMAX1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopuLive_pft(NZ))
           ELSE
             !CO2 from roots into soil  
-            RSoilSolute2Roots(idg_CO2)=AMAX1(AZMIN1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopulation_pft(NZ))
+            RSoilSolute2Roots(idg_CO2)=AMAX1(AZMIN1(RDXAqueous(idg_CO2)),RDFAqueous(idg_CO2)*PlantPopuLive_pft(NZ))
           ENDIF
 
           IF(N.EQ.ipltroot)THEN
@@ -413,10 +413,10 @@ module RootGasMod
 
                 IF(RDFAqueous(idg).GT.0.0_r8)THEN
                   !flux to roots
-                  RSoilSolute2Roots(idg)=AMIN1(AZMAX1(RDXAqueous(idg)),RDFAqueous(idg)*PlantPopulation_pft(NZ))
+                  RSoilSolute2Roots(idg)=AMIN1(AZMAX1(RDXAqueous(idg)),RDFAqueous(idg)*PlantPopuLive_pft(NZ))
                 ELSE
                   !flux leaves roots
-                  RSoilSolute2Roots(idg)=AMAX1(AZMIN1(RDXAqueous(idg)),RDFAqueous(idg)*PlantPopulation_pft(NZ))
+                  RSoilSolute2Roots(idg)=AMAX1(AZMIN1(RDXAqueous(idg)),RDFAqueous(idg)*PlantPopuLive_pft(NZ))
                 ENDIF
               ENDIF
             ENDDO
@@ -433,9 +433,9 @@ module RootGasMod
 
 
             IF(RDFAqueous(idg_NH3).GT.0.0_r8)THEN
-              RSoilSolute2Roots(idg_NH3)=AMIN1(AZMAX1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopulation_pft(NZ))
+              RSoilSolute2Roots(idg_NH3)=AMIN1(AZMAX1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopuLive_pft(NZ))
             ELSE
-              RSoilSolute2Roots(idg_NH3)=AMAX1(AZMIN1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopulation_pft(NZ))
+              RSoilSolute2Roots(idg_NH3)=AMAX1(AZMIN1(RDXAqueous(idg_NH3)),RDFAqueous(idg_NH3)*PlantPopuLive_pft(NZ))
             ENDIF
 
             RDFAqueous(idg_NH3B)=RSolUptkTransp(idg_NH3B)+DifAqueVolatile(idg_NH3B)*(trcaqu_conc_soi_loc(idg_NH3B)-trc_conc_root_loc(idg_NH3))
@@ -448,9 +448,9 @@ module RootGasMod
             ENDIF
 
             IF(RDFAqueous(idg_NH3B).GT.0.0_r8)THEN
-              RSoilSolute2Roots(idg_NH3B)=AMIN1(AZMAX1(RDXAqueous(idg_NH3B)),RDFAqueous(idg_NH3B)*PlantPopulation_pft(NZ))
+              RSoilSolute2Roots(idg_NH3B)=AMIN1(AZMAX1(RDXAqueous(idg_NH3B)),RDFAqueous(idg_NH3B)*PlantPopuLive_pft(NZ))
             ELSE
-              RSoilSolute2Roots(idg_NH3B)=AMAX1(AZMIN1(RDXAqueous(idg_NH3B)),RDFAqueous(idg_NH3B)*PlantPopulation_pft(NZ))
+              RSoilSolute2Roots(idg_NH3B)=AMAX1(AZMIN1(RDXAqueous(idg_NH3B)),RDFAqueous(idg_NH3B)*PlantPopuLive_pft(NZ))
             ENDIF
           ENDIF
 

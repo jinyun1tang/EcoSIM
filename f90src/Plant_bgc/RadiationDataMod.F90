@@ -17,6 +17,12 @@ implicit none
   real(r8),allocatable ::  RadSWStemTransmitanceL_pft(:,:)        !Stem shortwave radiation transmittance profile
   real(r8),allocatable ::  RadPARStemTransmitanceL_pft(:,:)       !Stem PAR transmittance profile
   real(r8),allocatable ::  StemClumpFactor_pft(:)                 !stem clumping factor
+  real(r8),allocatable ::  DStemSWabsorptivityL_pft(:,:)          !standing dead stem shortwave radiation absorptivity profile
+  real(r8),allocatable ::  DStemPARabsorptivityL_pft(:,:)         !standing dead stem PAR absorptivity profile
+  real(r8),allocatable ::  RadSWDStemAlbedoL_pft(:,:)             !standing dead stem shortwave radiation scattering albedo profile
+  real(r8),allocatable ::  RadPARDstemAlbedoL_pft(:,:)            !standing dead stem PAR scattering albedo profile
+  real(r8),allocatable ::  RadSWDstemTransmitanceL_pft(:,:)       !standing dead stem SW transmittance profile
+  real(r8),allocatable ::  RadPARDstemTransmitanceL_pft(:,:)      !standing dead stem PAR transmittance profile
 
   public :: InitRadiationData
   public :: DestroyRadiationData
@@ -38,6 +44,14 @@ implicit none
   allocate(RadSWStemTransmitanceL_pft(NumCanopyLayers1,JP1)); RadSWStemTransmitanceL_pft=0._r8
   allocate(RadPARStemTransmitanceL_pft(NumCanopyLayers1,JP1)); RadPARStemTransmitanceL_pft=0._r8
   allocate(StemClumpFactor_pft(JP1)); StemClumpFactor_pft=0._r8
+
+  allocate(DStemSWabsorptivityL_pft(NumCanopyLayers1,JP1));      DStemSWabsorptivityL_pft=0._r8
+  allocate(DStemPARabsorptivityL_pft(NumCanopyLayers1,JP1));    DStemPARabsorptivityL_pft=0._r8       
+  allocate(RadSWDStemAlbedoL_pft(NumCanopyLayers1,JP1));      RadSWDStemAlbedoL_pft=0._r8         
+  allocate(RadPARDstemAlbedoL_pft(NumCanopyLayers1,JP1));     RadPARDstemAlbedoL_pft=0._r8         
+  allocate(RadSWDstemTransmitanceL_pft(NumCanopyLayers1,JP1));RadSWDstemTransmitanceL_pft=0._r8         
+  allocate(RadPARDstemTransmitanceL_pft(NumCanopyLayers1,JP1)); RadPARDstemTransmitanceL_pft=0._r8       
+
   end subroutine InitRadiationData
 !------------------------------------------------------------------------------------------
   subroutine DestroyRadiationData
@@ -58,6 +72,14 @@ implicit none
   call destroy(RadSWStemTransmitanceL_pft)
   call destroy(RadPARStemTransmitanceL_pft)
   call destroy(StemClumpFactor_pft)
+
+  call destroy(DStemSWabsorptivityL_pft)      
+  call destroy(DStemPARabsorptivityL_pft)     
+  call destroy(RadSWDStemAlbedoL_pft)         
+  call destroy(RadPARDstemAlbedoL_pft)        
+  call destroy(RadSWDstemTransmitanceL_pft)   
+  call destroy(RadPARDstemTransmitanceL_pft)  
+
   end subroutine DestroyRadiationData
 
 end module RadiationDataMod

@@ -14,7 +14,7 @@ PROGRAM etimerTest
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
   real(r8) :: a(3)
-  character(len=36):: nmlfile
+  character(len=256):: nmlfile
   integer :: nyr, J,mon
   character(len=16) :: ymdhs
 

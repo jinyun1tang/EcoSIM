@@ -27,6 +27,7 @@ implicit none
   integer,target,allocatable ::  IsPlantActive_pft(:,:,:)              ! flag for living pft,[-]
   integer,target,allocatable ::  doInitPlant_pft(:,:,:)                !PFT initialization flag:0=no,1=yes,[-]
   integer,target,allocatable ::  IDWaterTable_col(:,:)                 !water table flag from site file,[-]
+  integer,target,allocatable ::  iMaintPlantTrait_pft(:,:,:)           !flag for maintaining or reset plant traits, [-]    
 !----------------------------------------------------------------------
 
 contains
@@ -45,6 +46,7 @@ contains
   allocate(ISOILR_col(JY,JX));                 ISOILR_col=0
   allocate(iUreaHydInhibitorType_col(JY,JX));  iUreaHydInhibitorType_col=0
   allocate(ITILL1_col(JY,JX));                 ITILL1_col=0
+  allocate(iMaintPlantTrait_pft(JP,JY,JX)) ;   iMaintPlantTrait_pft=iFalse
   allocate(IsPlantActive_pft(JP,JY,JX));       IsPlantActive_pft=iFalse
   allocate(doInitPlant_pft(JP,JY,JX));         doInitPlant_pft=ifalse
   allocate(IDWaterTable_col(JY,JX));           IDWaterTable_col=0
@@ -67,6 +69,7 @@ contains
   call destroy(iUreaHydInhibitorType_col)
   call destroy(ITILL1_col)
   call destroy(IsPlantActive_pft)
+  call destroy(iMaintPlantTrait_pft)
   call destroy(doInitPlant_pft)
   call destroy(IDWaterTable_col)
   end subroutine DestructFlagData

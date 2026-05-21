@@ -51,7 +51,7 @@ module PlantPhenolMod
     iPlantCalendar_brch           => plt_pheno%iPlantCalendar_brch            ,& !input  :plant growth stage, [-]
     DATAP                         => plt_site%DATAP                           ,& !input  :parameter file name,[-]
     NP                            => plt_site%NP                              ,& !input  :current number of plant species,[-]
-    PlantPopulation_pft           => plt_site%PlantPopulation_pft             ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     MainBranchNum_pft             => plt_morph%MainBranchNum_pft              ,& !input  :id number of main branch,[-]
     PlantPopu_col                 => plt_site%PlantPopu_col                    & !inoput :total plant population, [plants d-2]
   )
@@ -62,7 +62,7 @@ module PlantPhenolMod
       !
       !     PlantPopu_col=total biome population
       !
-      PlantPopu_col=PlantPopu_col+PlantPopulation_pft(NZ)
+      PlantPopu_col=PlantPopu_col+PlantPopuLive_pft(NZ)
       !
       !         SET CROP FLAG ACCORDINGTopRootLayer_pftTO PLANTING, HARVEST DATES, DEATH,
       !
@@ -178,7 +178,8 @@ module PlantPhenolMod
     SeedPlantedElm_pft    => plt_biom%SeedPlantedElm_pft      ,& !input  :plant stored nonstructural C at planting, [gC d-2]
     NumActivePlants       => plt_site%NumActivePlants         ,& !inoput :number of active PFT in the grid, [-]
     Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       ,& !inoput :total NBP, [g d-2]
-    iPlantState_pft       => plt_pheno%iPlantState_pft        ,& !inoput :flag for species death, [-]
+    iPlantStateLive_pft   => plt_pheno%iPlantStateLive_pft    ,& !inoput :flag for species death, [-]
+    iMaintPlantTrait_pft  => plt_pheno%iMaintPlantTrait_pft   ,& !inoput :flag for maintain or reset plant traits, [-]
     IsPlantActive_pft     => plt_pheno%IsPlantActive_pft       & !output :flag for living pft, [-]
   )
   call PrintInfo('beg '//subname)
@@ -191,7 +192,7 @@ module PlantPhenolMod
       !planting is feasible
       IF(I.GE.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
         !planted 
-        postharvst_check=I.GT.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ) .AND. iPlantState_pft(NZ).EQ.iFalse
+        postharvst_check=I.GT.iDayPlantHarvest_pft(NZ) .AND. iYearCurrent.GE.iYearPlantHarvest_pft(NZ) .AND. iPlantStateLive_pft(NZ).EQ.iFalse
 
         IF(postharvst_check)THEN
           !post harvest
@@ -199,18 +200,17 @@ module PlantPhenolMod
         ELSE
           IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
             !planting day of year
-            IsPlantActive_pft(NZ) = iFalse
-            iPlantState_pft(NZ)   = iTrue
+            IsPlantActive_pft(NZ)   = iFalse
+            iPlantStateLive_pft(NZ) = iTrue
+            iMaintPlantTrait_pft(NZ)= iTrue
             CALL StartPlants(NZ,NZ)
             Eco_NBP_CumYr_col=Eco_NBP_CumYr_col+SeedPlantedElm_pft(ielmc,NZ)
           ENDIF
 
           !the living plant has actual properties set
-          IF(DATAP(NZ).NE.'NO' .AND. iPlantState_pft(NZ).EQ.iTrue)then
+          IF(DATAP(NZ).NE.'NO' .AND. iPlantStateLive_pft(NZ).EQ.iTrue)then
             IsPlantActive_pft(NZ)=iTrue
           endif
-!          write(930,*)I*1000+J/24.,NZ,I,iDayPlanting_pft(NZ),iYearCurrent,iYearPlanting_pft(NZ)
-!          write(930,*)I*1000+J/24.,NZ,IsPlantActive_pft(NZ),DATAP(NZ).NE.'NO', iPlantState_pft(NZ).EQ.iTrue
         ENDIF
       ELSE
         IsPlantActive_pft(NZ)=iFalse
@@ -222,17 +222,19 @@ module PlantPhenolMod
 
       !not planted
 
-      IF((HarvestChk .AND. iPlantState_pft(NZ).EQ.iFalse) .OR. PlantingChk)THEN
+      IF((HarvestChk .AND. iPlantStateLive_pft(NZ).EQ.iFalse) .OR. PlantingChk)THEN
         IsPlantActive_pft(NZ)=iFalse
       ELSE
         !planting
         IF(I.EQ.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ))THEN
-          IsPlantActive_pft(NZ) = iFalse
-          iPlantState_pft(NZ)   = iTrue
+          IsPlantActive_pft(NZ)    = iFalse
+          iPlantStateLive_pft(NZ)  = iTrue
+          iMaintPlantTrait_pft(NZ) = iTrue
+
           CALL StartPlants(NZ,NZ)
           Eco_NBP_CumYr_col = Eco_NBP_CumYr_col+SeedPlantedElm_pft(ielmc,NZ)
         ENDIF
-        IF(DATAP(NZ).NE.'NO' .AND. iPlantState_pft(NZ).EQ.iTrue)then
+        IF(DATAP(NZ).NE.'NO' .AND. iPlantStateLive_pft(NZ).EQ.iTrue)then
           IsPlantActive_pft(NZ)=iTrue
         endif
       ENDIF
@@ -264,7 +266,7 @@ module PlantPhenolMod
     NonstCMinCon2InitRoot_pft    => plt_pheno%NonstCMinCon2InitRoot_pft     ,& !input  :threshold root nonstructural C content for initiating new root axis, [gC gC-1]
     MatureGroup_pft              => plt_pheno%MatureGroup_pft               ,& !input  :acclimated plant maturity group, [-]
     NonstCMinConc2InitBranch_pft => plt_pheno%NonstCMinConc2InitBranch_pft  ,& !input  :branch nonstructural C content required for new branch, [gC gC-1]
-    PlantPopulation_pft          => plt_site%PlantPopulation_pft            ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]
     PSIRootTurg_vr               => plt_ew%PSIRootTurg_vr                   ,& !input  :root turgor water potential, [Mpa]
     FracGroth2Node_pft           => plt_allom%FracGroth2Node_pft            ,& !input  :parameter for allocation of growth to nodes, [-]
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :id number of main branch,[-]
@@ -303,7 +305,7 @@ module PlantPhenolMod
 
   IF(doInitPlant_pft(NZ).EQ.ifalse)THEN
     !plant initialized
-    IF(J.EQ.1 .AND. PlantPopulation_pft(NZ).GT.0.0_r8)THEN
+    IF(J.EQ.1 .AND. PlantPopuLive_pft(NZ).GT.0.0_r8)THEN
       !first hour of the day, population > 0
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .OR. iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
@@ -1442,7 +1444,7 @@ module PlantPhenolMod
     iPlantDevelopPattern_pft        => plt_pheno%iPlantDevelopPattern_pft       ,& !input  :plant growth habit (determinate or indeterminate),[-]
     iYearCurrent                    => plt_site%iYearCurrent                    ,& !input  :current year,[-]
     SnowDepth                       => plt_ew%SnowDepth                         ,& !input  :snowpack depth, [m]
-    CanopyHeight_pft                => plt_morph%CanopyHeight_pft               ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft                => plt_morph%CanopyHeightLive_pft               ,& !input  :canopy height, [m]
     iDayPlanting_pft                => plt_distb%iDayPlanting_pft               ,& !input  :day of planting,[-]
     PhotoPeriodSens_pft             => plt_pheno%PhotoPeriodSens_pft            ,& !input  :difference between current and critical daylengths used to calculate phenological progress, [h]
     HourReq4LeafOut_brch            => plt_pheno%HourReq4LeafOut_brch           ,& !input  :hours above threshold temperature required for spring leafout/dehardening, [-]
@@ -1462,7 +1464,7 @@ module PlantPhenolMod
   
   LeafOutChk      = Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)
   PlantDayChk     = I.GE.iDayPlanting_pft(NZ) .AND. iYearCurrent.EQ.iYearPlanting_pft(NZ) .AND. DayLenthCurrent.GT.DayLenthPrev
-  CanopyHeightChk = CanopyHeight_pft(NZ).GE.SnowDepth-ZERO
+  CanopyHeightChk = CanopyHeightLive_pft(NZ).GE.SnowDepth-ZERO
   PerennialPhenoDecidChk   = iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. is_cold_deciduos(iPlantPhenolType_pft(NZ))
 
   !Annual crop plants (i.e. those seeded by human) are set as evergreen, if it is self-seeding, then 
