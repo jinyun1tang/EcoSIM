@@ -281,7 +281,8 @@ implicit none
     POROS_vr(0,NY,NX) = 1.0
 
     !Fill in column-wise values needed for prescribed phenology
-    CanopyHeight_col(NY,NX) = 17.0
+    !CanopyHeight_col(NY,NX) = 17.0
+    CanopyHeightLive_pft(1,NY,NX) = 17.0
     tlai_day_pft(1,NY,NX) = a_LAI(NY)
     tsai_day_pft(1,NY,NX) = a_SAI(NY)
     irootType_col(NY,NX) = a_VEG(NY)

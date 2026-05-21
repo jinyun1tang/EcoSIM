@@ -109,7 +109,7 @@ contains
   XPhaseChangeHeatL_snvr(1:JS,NY,NX) = 0.0_r8
   
 ! zero plant precip accumulation arrays
-  SnowIntcptByCanopy_col(NY,NX)      = 0.0_r8
+  SnowIntceptByCanopy_col(NY,NX)      = 0.0_r8
   RainIntceptByCanopy_col(NY,NX)     = 0.0_r8 
   call PrintInfo('end '//subname)
   end subroutine SetHourlyAccumulatorsATS
