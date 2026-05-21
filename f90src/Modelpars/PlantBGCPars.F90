@@ -61,8 +61,6 @@ module PlantBGCPars
   real(r8) :: BlkDensFineRoots                    !Fine root bulk density, [gC m-3]
   real(r8) :: BlkDActCoarseRoots                  !Coarse root active zone bulk density, [gC m-3]
   real(r8) :: BlkDLigCoarseRoots                  !Coarse root inactive zone bulk density, [gC m-3]
-  real(r8) :: StalkMassDensity                    !stalk density, [MgC m-3]
-  real(r8) :: SpecStalkVolume                     !specific volume (m3 gC-1)
   real(r8) :: FRTX                                !Fraction used to calculate woody faction of stalk,root,[-]
   real(r8) :: SETC                                !Km for nonstructural C concn on seed set, [g g-1]
   real(r8) :: SETN                                !Km for nonstructural N concn on seed set, [g g-1]
@@ -265,8 +263,6 @@ module PlantBGCPars
   BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3
   FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
   ZSTX                  = 1.0E-03_r8     !one mm
-  StalkMassDensity      = 0.225_r8
-  SpecStalkVolume       = 1.0E-06_r8/StalkMassDensity
   FRTX                  = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
   SETC                  = 1.0E-02_r8
   SETN                  = 1.0E-03_r8

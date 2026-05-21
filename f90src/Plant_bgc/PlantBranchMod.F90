@@ -204,7 +204,6 @@ module PlantBranchMod
     !   iPlantTurnoverPattern_pft=turnover:0=all aboveground,1=all leaf+PetolSheth,2=none,3=between 1,2
     !   iPlantRootProfile_pft=growth type:0=bryophyte,1=graminoid,2=shrub,tree
     !   KMinGroingLeafNodeNum,KHiestGroLeafNode_brch=integer of lowest,highest leaf number currently growing
-
     !
     IF(iPlantTurnoverPattern_pft(NZ).NE.0 .AND. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) &
       .AND. isPlantBranchAlive_brch(MainBranchNum_pft(NZ),NZ).EQ.iFalse)then
@@ -1460,7 +1459,6 @@ module PlantBranchMod
 
             ENDDO    
           ENDDO D7310
-
           !
           !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LitrFall
           !
@@ -1473,7 +1471,7 @@ module PlantBranchMod
             StalkStrutElms_brch(NE,NB,NZ)        = AZMAX1(StalkStrutElms_brch(NE,NB,NZ)-dNodeH)
             StructInternodeElms_brch(NE,K,NB,NZ) = AZMAX1(StructInternodeElms_brch(NE,K,NB,NZ)-dNodeH)
           ENDDO
-          
+          !
           dNodeH                            = FSNCK*StalkNodeVertLength_brch(K,NB,NZ)
           StalkNodeHeight_brch(K,NB,NZ)     = AZMAX1(StalkNodeHeight_brch(K,NB,NZ)-dNodeH)
           StalkNodeVertLength_brch(K,NB,NZ) = AZMAX1(StalkNodeVertLength_brch(K,NB,NZ)-dNodeH)
@@ -1710,6 +1708,7 @@ module PlantBranchMod
     LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
     iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
+    StemSpecVolume_pft        => plt_morph%StemSpecVolume_pft         ,& !input  :stalk specific volume, [m3 gC-1]    
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]    
     SineLeafAngle             => plt_rad%SineLeafAngle                ,& !input  :sine of leaf angle,[-]
@@ -1742,7 +1741,6 @@ module PlantBranchMod
     !pushed upward, 
     HypocotHeight_pft(NZ) = LeafLength+PetoleLength_node(0,MainBranchNum_pft(NZ),NZ)+StalkNodeHeight_brch(0,MainBranchNum_pft(NZ),NZ)
   ENDIF
-
   !
   ! IF CANOPY HAS EMERGED
   !  
@@ -1785,7 +1783,6 @@ module PlantBranchMod
     !
     !   FOR ALL LEAFED NODES
     !
-
     D560: DO KK=KMinGroingLeafNodeNum,KHiestGroLeafNode_brch(NB,NZ)
       K=pMOD(KK,MaxNodesPerBranch1)
       !
@@ -1799,12 +1796,11 @@ module PlantBranchMod
       !     PP=plant population
       !     FracGroth2Node_pft=scales node number for perennial vegetation (e.g. trees)
       !     LeafLength=leaf length
-
-      HeightStalk    = HeightBranchBase+StalkNodeHeight_brch(K,NB,NZ)
+      !
+      HeightStalk         = HeightBranchBase+StalkNodeHeight_brch(K,NB,NZ)
       StalkHeight_pft(NZ) = AMAX1(StalkHeight_pft(NZ),HeightStalk)
-      HeightLeafNode = HeightStalk+PetoleLength_node(K,NB,NZ)      
-      LeafLength     = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopuLive_pft(NZ)*FracGroth2Node_pft(NZ))))
-
+      HeightLeafNode      = HeightStalk+PetoleLength_node(K,NB,NZ)
+      LeafLength          = AZMAX1(SQRT(rLen2WidthLeaf_pft(NZ)*AZMAX1(LeafArea_node(K,NB,NZ))/(PlantPopuLive_pft(NZ)*FracGroth2Node_pft(NZ))))
       !
       !   ALLOCATE FRACTIONS OF LEAF IN EACH INCLINATION CLASS
       !     FROM HIGHEST TO LOWEST TO CANOPY LAYER
@@ -1824,9 +1820,8 @@ module PlantBranchMod
         LeafElevation = SineLeafAngle(N)*LeafAngleClass_pft(N,NZ)*LeafLength
         HeightLeafLow = AMIN1(CanopyHeight_copy(NZ)+0.01_r8-LeafElevation,HeightLeafNode+TotLeafElevation)
         HeightLeafTip = AMIN1(CanopyHeight_copy(NZ)+0.01_r8,HeightLeafLow+LeafElevation)
-
-        LU = 0
-        LL = 0
+        !
+        LU = 0;LL = 0
         D550: DO L = NumCanopyLayers1, 1, -1
           IF(LU.EQ.1 .AND. LL.EQ.1)exit
           IF((HeightLeafTip.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) .AND. LU.EQ.0)THEN
@@ -1838,7 +1833,7 @@ module PlantBranchMod
             LL                 = 1
           ENDIF
         ENDDO D550
-
+        !
         FRACLS=0._r8
         D570: DO L=LNumHeightLeafBase,LNumHeightLeafTip
           IF(LNumHeightLeafTip.EQ.LNumHeightLeafBase)THEN
@@ -1849,6 +1844,7 @@ module PlantBranchMod
           ELSE
             FRACL=LeafAngleClass_pft(N,NZ)
           ENDIF
+          !
           YLeafArea_node=FRACL*LeafArea_node(K,NB,NZ)
           DO NE=1,NumPlantChemElms
             YLeafElmnt_node(NE)=FRACL*LeafElmntNode_brch(NE,K,NB,NZ)
@@ -1871,7 +1867,6 @@ module PlantBranchMod
         ENDDO D570
         TotLeafElevation     = TotLeafElevation+LeafElevation
         CanopyHeightLive_pft(NZ) = AMAX1(CanopyHeightLive_pft(NZ),HeightLeafTip)
-
       ENDDO D555
 
       IF(PetoleProteinC_node(K,NB,NZ).GT.0.0_r8)THEN
@@ -1882,7 +1877,7 @@ module PlantBranchMod
     IF(KLowestGroLeafNode_brch(NB,NZ).EQ.0)KLowestGroLeafNode_brch(NB,NZ)=KHiestGroLeafNode_brch(NB,NZ)
     K1 = pMOD(KHiestGroLeafNode_brch(NB,NZ),MaxNodesPerBranch1)
     K2 = pMOD(KHiestGroLeafNode_brch(NB,NZ)-1,MaxNodesPerBranch1)
-
+    !
     IF(isclose(StalkNodeHeight_brch(K1,NB,NZ),0._r8))THEN
       StalkNodeHeight_brch(K1,NB,NZ)=StalkNodeHeight_brch(K2,NB,NZ)
     ENDIF
@@ -1897,15 +1892,13 @@ module PlantBranchMod
     !     LNumHeightBranchBase,LNumHeightBranchTip=layer number of branch base,tip
     !     WTSTKB,StalkSurfArea=branch stalk mass,surface area
     !     FSTK=fraction of stalk area contributing to water,heat flow
-    !     StalkMassDensity,SpecStalkVolume=stalk density (Mg m-3),specific volume (m3 g-1)
     !     SapwoodBiomassC_brch=stalk sapwood mass, the living, outermost portion of a tree trunk or branch. 
     !          It lies just beneath the bark and cambium layer but surrounds the darker, inner "heartwood
     !     FRACL=stalk fraction in each layer
     !     CanopyStalkSurfArea_lbrch=total branch stalk surface area in each layer
     !
     IF(StalkNodeHeight_brch(K1,NB,NZ).GT.0.0_r8)THEN
-      LU=0
-      LL=0
+      LU=0;LL=0
       D545: DO L=NumCanopyLayers1,1,-1
         IF(LU.EQ.1 .AND. LL.EQ.1)exit
         IF((HeightLeafBase.GT.CanopyHeightZ_col(L-1) .OR. CanopyHeightZ_col(L-1).LE.ZERO) .AND. LU.EQ.0)THEN
@@ -1916,13 +1909,13 @@ module PlantBranchMod
           LNumHeightBranchBase = MAX(1,L)
           LL                   = 1
         ENDIF
-      ENDDO D545
+      ENDDO D545      
+      !
+      StalkRadius=SQRT(StemSpecVolume_pft(NZ)*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopuLive_pft(NZ))/(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
       
-      StalkRadius=SQRT(SpecStalkVolume*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopuLive_pft(NZ)) &
-        /(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
-
-      if(NB.EQ.MainBranchNum_pft(NZ) .AND.  &
-        is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))TreeRingAveRadius_pft(NZ)=StalkRadius
+      IF(NB.EQ.MainBranchNum_pft(NZ) .AND.  is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
+        TreeRingAveRadius_pft(NZ)=StalkRadius
+      ENDIF
 
       !assume stalk is cylindrical
       StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopuLive_pft(NZ)
@@ -1935,7 +1928,7 @@ module PlantBranchMod
         !the definition of sapwood here is not exact. For a tree, from the core to bark, they are heartwood, sapwood, vascular cambium, 
         !living phloem, cork cambium and cork. 
         StalkSectionArea            = PICON*(2._r8*StalkRadius*DTransportTube-DTransportTube**2)
-        SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/SpecStalkVolume*StalkNodeHeight_brch(K1,NB,NZ)*PlantPopuLive_pft(NZ)
+        SapwoodBiomassC_brch(NB,NZ) = StalkSectionArea/StemSpecVolume_pft(NZ)*StalkNodeHeight_brch(K1,NB,NZ)*PlantPopuLive_pft(NZ)
       ENDIF
 
       D445: DO L=LNumHeightBranchBase,LNumHeightBranchTip
@@ -2864,7 +2857,7 @@ module PlantBranchMod
     iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft    ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft  ,& !input  :photoperiod type (neutral, long day, short day),[-]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
     DayLenthCurrent           => plt_site%DayLenthCurrent             ,& !input  :current daylength of the grid, [h]
     SSXferElms_pft            => plt_bgcr%SSXferElms_pft              ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]
     SSXfer2ShootElms_pft      => plt_bgcr%SSXfer2ShootElms_pft        ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]    
@@ -2876,7 +2869,7 @@ module PlantBranchMod
   call DebugPrint('beg '//subname//' NZ',NZ)
   TotPopuPlantRootC         = 0._r8
   TotalRootNonstElms(ielmc) = 0._r8
-  D4: DO L=NU,MaxSoiL4Root_pft(NZ)
+  D4: DO L=NU,MaxSoilLays4Root_pft(NZ)
     TotPopuPlantRootC         = TotPopuPlantRootC+AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))
     TotalRootNonstElms(ielmc) = TotalRootNonstElms(ielmc)+AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))
   ENDDO D4
@@ -2929,7 +2922,7 @@ module PlantBranchMod
       ! if root condition met
       CNonst2Root=CH2OH*FX2RT(iPlantPhenolPattern_pft(NZ))
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ) .AND. TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
-        D50: DO L=NU,MaxSoiL4Root_pft(NZ)
+        D50: DO L=NU,MaxSoilLays4Root_pft(NZ)
           FXFC                                        = AZMAX1(PopuRootMycoC_pvr(ipltroot,L,NZ))/TotPopuPlantRootC
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+FXFC*CNonst2Root
         ENDDO D50
@@ -2986,7 +2979,7 @@ module PlantBranchMod
 
   DO NE=1,NumPlantChemElms
     TotalRootNonstElms(NE)=0._r8
-    D3: DO L=NU,MaxSoiL4Root_pft(NZ)
+    D3: DO L=NU,MaxSoilLays4Root_pft(NZ)
       TotalRootNonstElms(NE)=TotalRootNonstElms(NE)+AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ))
     ENDDO D3
   ENDDO
@@ -3028,7 +3021,7 @@ module PlantBranchMod
   ENDDO  
   !
   IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
-    D51: DO L=NU,MaxSoiL4Root_pft(NZ)
+    D51: DO L=NU,MaxSoilLays4Root_pft(NZ)
       FXFN=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
       DO NE=2,NumPlantChemElms
         RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)=RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) &
@@ -3631,7 +3624,7 @@ module PlantBranchMod
     NodeLenPergC_pft           => plt_morph%NodeLenPergC_pft           ,& !input  :internode length:mass during growth, [m gC-1]
     SineBranchAngle_pft        => plt_morph%SineBranchAngle_pft        ,& !input  :branching angle, [degree from horizontal]
     StalkStrutElms_brch        => plt_biom%StalkStrutElms_brch         ,& !input  :branch stalk structural element mass, [g d-2]
-    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     KHiestGroLeafNode_brch     => plt_pheno%KHiestGroLeafNode_brch     ,& !input  :leaf growth stage counter, [-]
     StalkNodeVertLength_brch   => plt_morph%StalkNodeVertLength_brch   ,& !inoput :internode height, [m]
@@ -3688,7 +3681,7 @@ module PlantBranchMod
       DO NE = 1, NumPlantChemElms
         StructInternodeElms_brch(NE,K1,NB,NZ)=StructInternodeElms_brch(NE,K1,NB,NZ)+GrowthElms(NE)
       ENDDO
-
+      !
       !grow stalk length      
       StalkNodeVertLength_brch(K1,NB,NZ)=StalkNodeVertLength_brch(K1,NB,NZ)+StalkLenGrowth*SineBranchAngle_pft(NZ)
       IF(K1.NE.0)THEN

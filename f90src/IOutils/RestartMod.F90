@@ -477,16 +477,16 @@ implicit none
 
   if(flag=='read')then  
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='MaxSoiL4Root_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='MaxSoilLays4Root_pft', dim1name='pft',&
      long_name='maximum root layer', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval, flag_values=(/0,1/))     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,MaxSoiL4Root_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,MaxSoilLays4Root_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,MaxSoiL4Root_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,MaxSoilLays4Root_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft)  
     dat1pr => datip_1d  
-    call restartvar(ncid, flag, varname='MaxSoiL4Root_pft', dim1name='pft',&
+    call restartvar(ncid, flag, varname='MaxSoilLays4Root_pft', dim1name='pft',&
      long_name='maximum root layer', units='none', interpinic_flag='skip', &
      data=dat1pr, missing_value=ispval, fill_value=ispval, flag_values=(/0,1/))         
   endif  

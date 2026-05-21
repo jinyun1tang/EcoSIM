@@ -15,7 +15,7 @@ module RootDataType
   integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  isPlantRootAlive_pft(:,:,:)                      !flag to detect root system death , [-]
   integer,target,allocatable ::  NMaxRootBotLayer_pft(:,:,:)                      !maximum soil layer number for all root axes, [-]
-  integer,target,allocatable ::  MaxSoiL4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
+  integer,target,allocatable ::  MaxSoilLays4Root_pft(:,:,:)                         !maximum soil layer number for all root axes, [-]
   integer,target,allocatable ::  irootType_col(:,:)                              !Root type integer from ATS [-]
   real(sp),target,allocatable :: RootElmsbeg_pft(:,:,:,:)                        !root biomass per pft
   real(sp),target,allocatable ::  RootBiomGrosYld_pft(:,:,:)                     !root growth yield, [g g-1]
@@ -29,6 +29,8 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
   real(sp),target,allocatable ::  Root2ndXSecArea_pft(:,:,:,:)                   !root  cross-sectional area  secondary axes, [m2]
   real(sp),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                        !root layer temperature growth functiom, [-]
+  real(r8),target,allocatable ::  Root1stActStruct_pvr(:,:,:,:,:)                    !active zone of primary roots, [g d-2]
+  real(r8),target,allocatable ::  Root1stLigStruct_pvr(:,:,:,:,:)                    !lignifed primary root biomass, [g d-2]      
   real(sp),target,allocatable ::  rNCRoot_pft(:,:,:)                             !root N:C ratio, [g g-1]
   real(sp),target,allocatable ::  rPCRootr_pft(:,:,:)                             !root P:C ratio, [g g-1]
   real(sp),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
@@ -160,7 +162,7 @@ contains
   allocate(isPlantRootAlive_pft(JP,JY,JX));    isPlantRootAlive_pft=iFalse
   allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
   allocate(NMaxRootBotLayer_pft(JP,JY,JX));      NMaxRootBotLayer_pft=0
-  allocate(MaxSoiL4Root_pft(JP,JY,JX));       MaxSoiL4Root_pft=0
+  allocate(MaxSoilLays4Root_pft(JP,JY,JX));       MaxSoilLays4Root_pft=0
   allocate(RootElmsbeg_pft(NumPlantChemElms,JP,JY,JX)); RootElmsbeg_pft=0._sp
   allocate(RootBiomGrosYld_pft(JP,JY,JX));     RootBiomGrosYld_pft=0._sp
   allocate(NonstCMinCon2InitRoot_pft(JP,JY,JX));       NonstCMinCon2InitRoot_pft=0._sp
@@ -173,6 +175,8 @@ contains
   allocate(Root1stXSecArea_pft(jroots,JP,JY,JX)); Root1stXSecArea_pft=0._sp
   allocate(Root2ndXSecArea_pft(jroots,JP,JY,JX)); Root2ndXSecArea_pft=0._sp
   allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._sp
+  allocate(Root1stActStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stActStruct_pvr=0._r8  
+  allocate(Root1stLigStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stLigStruct_pvr=0._r8  
   allocate(rNCRoot_pft(JP,JY,JX));     rNCRoot_pft=0._sp
   allocate(rPCRootr_pft(JP,JY,JX));     rPCRootr_pft=0._sp
   allocate(RootAtmGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX));RootAtmGasConductance_rpvr=0._sp
@@ -278,6 +282,9 @@ contains
   subroutine DestructRootData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(Root1stActStruct_pvr)
+  call destroy(Root1stLigStruct_pvr)
   call destroy(RootRadialKond2H2O_pvr)
   call destroy(RootAxialKond2H2O_pvr)
   call destroy(RootResist4H2O_pvr)
@@ -293,7 +300,7 @@ contains
   call destroy(irootType_col)
   call destroy(isPlantRootAlive_pft)
   call destroy(NMaxRootBotLayer_pft)
-  call destroy(MaxSoiL4Root_pft)
+  call destroy(MaxSoilLays4Root_pft)
   call destroy(RootElmsbeg_pft)
   call destroy(RootBiomGrosYld_pft)
   call destroy(NonstCMinCon2InitRoot_pft)

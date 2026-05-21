@@ -2,7 +2,7 @@ module SurfaceRadiationMod
 
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use minimathmod,        only: AZMAX1,   isnan
-  use PlantBGCPars,       only: iforward, ibackward,SpecStalkVolume
+  use PlantBGCPars,       only: iforward, ibackward
   use PrescribePhenolMod, only: SetCanopyProfile
   use EcoSIMCtrlMod,      only: ldo_sp_mode,ldo_radiation_test,etimer
   use RadiationDataMod
@@ -194,6 +194,7 @@ module SurfaceRadiationMod
     CanopyLeafAareZ_col        => plt_morph%CanopyLeafAareZ_col        ,& !input  :total leaf area, [m2 d-2]
     StemArea_col               => plt_morph%StemArea_col               ,& !input  :grid canopy stem area, [m2 d-2]
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col         ,& !input  :grid canopy leaf area, [m2 d-2]
+    StemSpecVolume_pft         => plt_morph%StemSpecVolume_pft         ,& !input  :stalk specific volume, [m3 gC-1]        
     PlantPopuDead_pft          => plt_site%PlantPopuDead_pft           ,& !inoput :live+standing dead plant population, [d-2]            
     CanopyHeight_col           => plt_morph%CanopyHeight_col           ,& !inoput :canopy height , [m]
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col          ,& !output :canopy layer height, [m]
@@ -216,7 +217,7 @@ module SurfaceRadiationMod
     if(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. PlantPopuDead_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
       CanopyHeightDead_pft(NZ) = AMAX1(1.e-2_r8,CanopyHeightDead_pft(NZ),CanopyHeightLive_pft(NZ))
       !stalk radius, assuming cylinderical shape. 
-      RSTK = SQRT(SpecStalkVolume*(StandDeadStrutElms_pft(ielmc,NZ)/PlantPopuDead_pft(NZ))/(PICON*CanopyHeightDead_pft(NZ)))
+      RSTK = SQRT(StemSpecVolume_pft(NZ)*(StandDeadStrutElms_pft(ielmc,NZ)/PlantPopuDead_pft(NZ))/(PICON*CanopyHeightDead_pft(NZ)))
       StandDeadSurfArea_pft(NZ) = 2._R8*PICON*RSTK*CanopyHeightDead_pft(NZ)*PlantPopuDead_pft(NZ)  
       EffHeightDead = AMIN1(CanopyHeightDead_pft(NZ),CanopyHeightZ_col(NumCanopyLayers1))
 

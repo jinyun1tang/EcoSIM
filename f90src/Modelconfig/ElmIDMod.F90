@@ -141,12 +141,12 @@ implicit none
   integer, parameter :: iphotop_short  =1
   integer, parameter :: iphotop_long   =2
 
-  integer, parameter :: iembryotyp_Bryophytes   =0
-  integer, parameter :: iembryotyp_Pteridophytes=1
-  integer, parameter :: iembroytyp_Gymnosperms  =2
-  integer, parameter :: iembroytyp_Monocots     =3
-  integer, parameter :: iembroytyp_Eudicots     =4
-
+  integer, parameter :: iembryotyp_Bryophytes   =0   !small, non-vascular land plants, like moss
+  integer, parameter :: iembryotyp_Pteridophytes=1   !a vascular plant with xylem and phloem that reproduces by means of spores
+  integer, parameter :: iembroytyp_Gymnosperms  =2   !example: conifers, cycads, ginkgos, and gnetophytes, woody, perennial seed-producing plants, typically lacking the protective outer covering which surrounds the seeds in flowering plants
+  integer, parameter :: iembroytyp_Monocots     =3   !example: corn, grasses, wheat,onion, flowering plants whose seeds contain only one embryonic leaf, or cotyledon, they are angiosperms
+  integer, parameter :: iembroytyp_Eudicots     =4   !example: soybean, rose, flowering plants that have two seed leaves upon germination, they are angiosperms
+  
   integer, parameter :: isnowcept_bryophyte = 0
   integer, parameter :: isnowcept_grasses   = 1
   integer, parameter :: isnowcept_shrub     = 2

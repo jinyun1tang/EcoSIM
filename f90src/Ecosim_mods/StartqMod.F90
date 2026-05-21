@@ -4,7 +4,7 @@ module StartqMod
   use DebugToolMod,     only : PrintInfo
   use UnitMod,          only : units
   use EcoSiMParDataMod, only : pltpar
-  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots,SpecStalkVolume  
+  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -749,7 +749,7 @@ module StartqMod
 !
   FDM                           = get_FDM(PSICanopy_pft(NZ,NY,NX))
   CanopyBiomWater_pft(NZ,NY,NX) = ppmc*CanopyLeafSheathC_pft(NZ,NY,NX)/FDM
-  VHeatCapCanopy_pft(NZ,NY,NX)  = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
+  VHeatCapCanopy_pft(NZ,NY,NX)  = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*StemSpecVolume_pft(NZ,NY,NX)+CanopyBiomWater_pft(NZ,NY,NX))
 
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------

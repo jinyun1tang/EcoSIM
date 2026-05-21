@@ -429,13 +429,13 @@ module PlantPhenolMod
     LeafPetoNonstElmConc_brch   => plt_biom%LeafPetoNonstElmConc_brch  ,& !output :branch nonstructural C concentration, [g d-2]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft     ,& !output :canopy nonstructural element concentration, [g d-2]
     RootNonstructElmConc_rpvr   => plt_biom%RootNonstructElmConc_rpvr  ,& !output :root layer nonstructural C concentration, [g g-1]
-    MaxSoiL4Root_pft            => plt_morph%MaxSoiL4Root_pft           & !output :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft            => plt_morph%MaxSoilLays4Root_pft           & !output :maximum soil layer number for all root axes,[-]
   )
   call PrintInfo('beg '//subname)
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
-  MaxSoiL4Root_pft(NZ)   = NMaxRootBotLayer_pft(NZ)
-  NGTopRootLayer_pft(NZ) = MIN(MaxSoiL4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
+  MaxSoilLays4Root_pft(NZ)   = NMaxRootBotLayer_pft(NZ)
+  NGTopRootLayer_pft(NZ) = MIN(MaxSoilLays4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
   
   !
   ! TOTAL PLANT NON-STRUCTURAL C, N, P
@@ -460,7 +460,7 @@ module PlantPhenolMod
   ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
   !
   D180: DO N=1,Myco_pft(NZ)
-    D160: DO L=NU,MaxSoiL4Root_pft(NZ)
+    D160: DO L=NU,MaxSoilLays4Root_pft(NZ)
       IF(RootMycoActiveBiomC_pvr(N,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
         DO NE=1,NumPlantChemElms
           RootNonstructElmConc_rpvr(NE,N,L,NZ)=AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)/RootMycoActiveBiomC_pvr(N,L,NZ))

@@ -299,12 +299,13 @@ implicit none
   real(r8), pointer :: CanopyHeightLive_pft(:)             => null() !live plant canopy height,                                                              [m]
   real(r8), pointer :: CanopyHeightDead_pft(:)        => null() !canopy height for standing dead, [m]
   real(r8), pointer :: StalkHeight_pft(:)              => null() !stalk height/length, [m]
+  real(r8), pointer :: StemSpecVolume_pft(:)               => null()  !stalk specific volume, [m3 gC-1]  
   real(r8), pointer :: TreeRingAveRadius_pft(:)        => null() !tree ring radius,[m]
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground),[-]
   integer,  pointer :: iPlantNfixType_pft(:)          => null() !N2 fixation type,[-]
   integer,  pointer :: Myco_pft(:)                    => null() !mycorrhizal type (no or yes),[-]
   integer,  pointer :: MainBranchNum_pft(:)           => null() !number of main branch,[-]
-  integer,  pointer :: MaxSoiL4Root_pft(:)            => null() !maximum soil layer number for all root axes,[-]
+  integer,  pointer :: MaxSoilLays4Root_pft(:)            => null() !maximum soil layer number for all root axes,[-]
   integer,  pointer :: NMaxRootBotLayer_pft(:)         => null() !maximum soil layer number for all root axes, [-]
   integer,  pointer :: NumPrimeRootAxes_pft(:)             => null() !root primary axis number,[-]
   real(r8), pointer :: RootMatureAge_pft(:)           => null() !Root age to trigger secondary growth, [h]
@@ -578,6 +579,8 @@ implicit none
   real(r8), pointer :: RootNoduleElmsBeg_pft(:,:)           => null()    !previous time step plant root nodule element mass,  [g d-2]  
   real(r8), pointer :: RootElmsBeg_pft(:,:)                 => null()    !plant root element at previous time step,           [g d-2]
   real(r8), pointer :: StandDeadStrutElmsBeg_pft(:,:)       => null()    !standing dead element at previous time step,        [g d-2]
+  real(r8), pointer :: Root1stActStruct_pvr(:,:,:)          => null()    !active zone of primary roots, [g d-2]
+  real(r8), pointer :: Root1stLigStruct_pvr(:,:,:)          => null()    !lignifed primary root biomass, [g d-2]    
   real(r8), pointer :: RootStrutElms_pft(:,:)               => null()    !plant root structural element mass,                 [g d-2]
   real(r8), pointer :: SeedPlantedElm_pft(:,:)              => null()    !plant stored nonstructural chemical elements at planting,           [gC d-2]
   real(r8), pointer :: SeasonalNonstCDayAve_pft(:)          => null()    !daily average seasonal storage C for annual plant death check, [g d-2]
@@ -1528,6 +1531,8 @@ implicit none
   allocate(this%CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNodulNonstElms_brch=spval
   allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
   allocate(this%RootStrutElms_pft(NumPlantChemElms,JP1));this%RootStrutElms_pft=spval
+  allocate(this%Root1stActStruct_pvr(NumPlantChemElms,JZ1,JP1)); this%Root1stActStruct_pvr=0._r8
+  allocate(this%Root1stLigStruct_pvr(NumPlantChemElms,JZ1,JP1)); this%Root1stLigStruct_pvr=0._r8
   allocate(this%StandDeadStrutElmsBeg_pft(NumPlantChemElms,JP1));this%StandDeadStrutElmsBeg_pft=spval
   allocate(this%tCanLeafC_clyr(NumCanopyLayers1));this%tCanLeafC_clyr=spval
   allocate(this%RootElms_pft(NumPlantChemElms,JP1));this%RootElms_pft=spval
@@ -2129,6 +2134,7 @@ implicit none
   allocate(this%CanopyHeightLive_pft(JP1));this%CanopyHeightLive_pft=spval
   allocate(this%CanopyHeightDead_pft(JP1)); this%CanopyHeightDead_pft=spval
   allocate(this%StalkHeight_pft(JP1)); this%StalkHeight_pft=spval
+  allocate(this%StemSpecVolume_pft(JP1)); this%StemSpecVolume_pft=0._r8  
   allocate(this%ShootNodeNumAtPlanting_pft(JP1));this%ShootNodeNumAtPlanting_pft=spval
   allocate(this%CanopyHeightZ_col(0:NumCanopyLayers1));this%CanopyHeightZ_col=spval
   allocate(this%CanopyStemSurfArea_pft(JP1));this%CanopyStemSurfArea_pft=spval
@@ -2190,7 +2196,7 @@ implicit none
   allocate(this%CanopySurfAreaProfDead_pft(NumCanopyLayers1,JP1)); this%CanopySurfAreaProfDead_pft=spval
   allocate(this%StandDeadSurfArea_pft(JP1)); this%StandDeadSurfArea_pft=spval
   allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval
-  allocate(this%MaxSoiL4Root_pft(JP1));this%MaxSoiL4Root_pft=0
+  allocate(this%MaxSoilLays4Root_pft(JP1));this%MaxSoilLays4Root_pft=0
   allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
   allocate(this%FineRootVolPerMassC_pft(jroots,JP1));this%FineRootVolPerMassC_pft=spval

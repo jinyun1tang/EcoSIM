@@ -284,7 +284,7 @@ module grosubsMod
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantRootAlive_pft  => plt_pheno%isPlantRootAlive_pft   ,& !input  :flag to detect root system death,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
-    MaxSoiL4Root_pft      => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     MainBranchNum_pft     => plt_morph%MainBranchNum_pft      ,& !input  :number of main branch,[-]    
     isPlantShootAlive_pft => plt_pheno%isPlantShootAlive_pft   & !input  :flag to detect canopy death,[-]
   )
@@ -311,7 +311,7 @@ module grosubsMod
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
   else
-    plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
+    plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
   ENDIF
 !  if(yearIJ%I>=118.and.yearIJ%J==12 .AND. NZ==1)call CheckPlantBalanceZ(yearIJ,NZ,'exit'//subname)
   !
@@ -544,7 +544,7 @@ module grosubsMod
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
     CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]

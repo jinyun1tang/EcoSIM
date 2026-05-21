@@ -1477,7 +1477,7 @@ module NutUptakeMod
     VLSoilPoreMicP_vr      => plt_soilchem%VLSoilPoreMicP_vr   ,& !input  :volume of soil layer, [m3 d-2]
     Myco_pft               => plt_morph%Myco_pft               ,& !input  :mycorrhizal type (no or yes),[-]
     RootNutUptake_pvr      => plt_rbgc%RootNutUptake_pvr       ,& !input  :root uptake of Nutrient band, [g d-2 h-1]
-    MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     REcoDOMProd_vr         => plt_bgcr%REcoDOMProd_vr          ,& !inoput :net microbial DOC flux, [gC d-2 h-1]
     RootMycoNonstElms_rpvr => plt_biom%RootMycoNonstElms_rpvr  ,& !inoput :root layer nonstructural element, [g d-2]
     Soil2RootMycoExudE_pvr => plt_rbgc%Soil2RootMycoExudE_pvr  ,& !inoput :root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
@@ -1494,7 +1494,7 @@ module NutUptakeMod
   !     RootH2PO4Uptake_pvr,RootNutUptake_pvr,RootNutUptake_pvr,RootH1PO4BUptake_pvr=uptake from non-band,band of H2PO4,HPO4
   !     RootNH4Uptake_pft,RootNO3Uptake_pft,RootH2PO4Uptake_pft,RootHPO4Uptake_pft=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
-  D9501: DO L=MaxSoiL4Root_pft(NZ),NU,-1
+  D9501: DO L=MaxSoilLays4Root_pft(NZ),NU,-1
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO)THEN  
       D295: DO K=1,jcplx
         DOM_uptk=0._r8

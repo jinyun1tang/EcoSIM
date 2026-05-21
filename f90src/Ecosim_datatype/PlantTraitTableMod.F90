@@ -66,6 +66,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: SeedWidth2LenRatio_tab(:)
   real(r8), target, allocatable :: GrainFillRate25C_tab(:)
   real(r8), target, allocatable :: StandingDeadInitC_tab(:)
+  real(r8), target, allocatable :: StemMassDensity_tab(:)
   real(r8), target, allocatable :: Root1stMaxRadius_tab(:)
   real(r8), target, allocatable :: Root2ndMaxRadius_tab(:)
   real(r8), target, allocatable :: RootPorosity_tab(:)
@@ -197,6 +198,7 @@ module PlantTraitTableMod
   allocate(SeedCMass_tab(npfts));SeedCMass_tab=0._r8
   allocate(SeedWidth2LenRatio_tab(npfts)); SeedWidth2LenRatio_tab=0._r8
   allocate(GrainFillRate25C_tab(npfts));GrainFillRate25C_tab=0._r8
+  allocate(StemMassDensity_tab(npfts)); StemMassDensity_tab=0._r8
   allocate(StandingDeadInitC_tab(npfts));StandingDeadInitC_tab=0._r8
   allocate(Root1stMaxRadius_tab(npfts));Root1stMaxRadius_tab=0._r8
   allocate(Root2ndMaxRadius_tab(npfts));Root2ndMaxRadius_tab=0._r8
@@ -268,7 +270,7 @@ module PlantTraitTableMod
   Subroutine DestructPlantTraitTable()
   use abortutils, only : destroy
   implicit none
-
+  call destroy(StemMassDensity_tab)
   call destroy(xylemPhi_max_tab)
   call destroy(xylemPhi_min_tab)
   call destroy(Radius95pctMature_tab)

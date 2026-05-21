@@ -5,7 +5,7 @@
 &ecosim
 case_name='FenStordIsland'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pftpar_20260303.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20260520.nc'
 grid_file_in='../../inputs/Fen/FenStordIsland_grid_20250820.nc'
 pft_mgmt_in='../../inputs/Fen/FenStordIsland_pft_20260426.nc'
 clm_hour_file_in='../../inputs/Fen/FenStordIsland.clim.1960-2017.nc'
@@ -40,7 +40,7 @@ NCYC_SNOW=20
 !set up output frequency
 
 hist_fincl1='CH4_cumerr_col','Hygrogen_methanogenC_vr','Acetic_methanogenC_vr',
-  'CH4Prod_aceto_vr','CH4Prod_hydro_vr','CH4Oxi_Aero_vr','CH4Oxi_ANMO_vr','acetate_vr',
+  'CH4Prod_aceto_vr','CH4Prod_hydro_vr','CH4Oxi_Aero_vr','CH4Oxi_ANMO_vr','Acetate_vr',
   'FermentorC_vr','O2w_conc_vr','tSoilOrgC_col','tMICROB_C_col','Fermentation_vr',
   'AcetoMethgen_frac_vr','HydrogMethgen_frac_vr','Fermentor_frac_vr','MicrobAct_vr',
   'Decomp_OStress_vr','RDecompC_SOM_vr','Aerobic_HetrBacterC_vr','Aerobic_HetrFungiC_vr',
@@ -74,7 +74,7 @@ hist_nhtfrq=-24,-1
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=60            !this shall overwrite what is set in forc_periods
+stop_n=3            !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

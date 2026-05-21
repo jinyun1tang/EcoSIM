@@ -134,7 +134,7 @@ implicit none
     plt_morph%CanopyHeightDead_pft(NZ)      = CanopyHeightDead_pft(NZ,NY,NX)
     plt_morph%CanopyStemSurfArea_pft(NZ)    = CanopyStemSurfArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
-    plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
+    plt_morph%MaxSoilLays4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
     plt_biom%CanopyLeafSheathC_pft(NZ)      = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
     plt_biom%CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
