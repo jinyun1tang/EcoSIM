@@ -260,15 +260,15 @@ implicit none
     !       with RainFalPrec
     if(p_bool)then
       IF(TCA_col(NY,NX).GT.TSNOW)THEN
-        RainFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert from m/s to m/hr
+        RainFalPrec_col(NY,NX)=p_total(NY)*3600.0*AREA_3D(3,NU_col(NY,NX),NY,NX) !convert from m/s to m/hr
         SnoFalPrec_col(NY,NX)=0.0_r8
       ELSE
         RainFalPrec_col(NY,NX)=0.0_r8
-        SnoFalPrec_col(NY,NX)=p_total(NY)*3600.0 !convert to m SWE/s to m SWE/hr
+        SnoFalPrec_col(NY,NX)=p_total(NY)*3600.0*AREA_3D(3,NU_col(NY,NX),NY,NX) !convert to m SWE/s to m SWE/hr
       ENDIF
     else
-      RainFalPrec_col(NY,NX)=p_rain(NY)*3600.0 !convert from m/s to m/hr
-      SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0 !convert from m SWE/s to mSWE/hr
+      RainFalPrec_col(NY,NX)=p_rain(NY)*3600.0*AREA_3D(3,NU_col(NY,NX),NY,NX) !convert from m/s to m/hr
+      SnoFalPrec_col(NY,NX)=p_snow(NY)*3600.0*AREA_3D(3,NU_col(NY,NX),NY,NX) !convert from m SWE/s to mSWE/hr
     endif
     !Set Prec equal to variables for after Irrigation and canopy processing
     !since that is not included yet
@@ -313,16 +313,16 @@ implicit none
     if(ldo_sp_mode)then  
       call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
       
-      SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
-      RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
-      TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
+      !SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
+      !RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
+      !TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
         
-      !call CanopyInterceptprecip(NY,NX)
+      call CanopyInterceptprecip(NY,NX)
      else
        !If not using phenology set the thrufall snow and rain
        !to the total
-       SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-       RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+       SnowPrecThrufall_col(NY,NX) = SnoFalPrec_col(NY,NX)
+       RainPrecThrufall_col(NY,NX) = RainFalPrec_col(NY,NX)
        TKSnowThrufall_col(NY,NX) = TairK_col(NY,NX)
      endif
   enddo
