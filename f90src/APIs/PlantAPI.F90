@@ -650,7 +650,7 @@ implicit none
 
     DO NR=1,pltpar%MaxNumRootAxes
       NRoot1stTipLay_raxes(NR,NZ,NY,NX) = plt_morph%NRoot1stTipLay_raxes(NR,NZ)
-      Root1stDepz_raxes(NR,NZ,NY,NX)      = plt_morph%Root1stDepz_raxes(NR,NZ)      
+      Root1stDepz_raxes(NR,NZ,NY,NX)    = plt_morph%Root1stDepz_raxes(NR,NZ)
       RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ,NY,NX) = plt_biom%RootMyco1stElm_raxs(1:NumPlantChemElms,NR,NZ)
       
       DO L=1,NK_col(NY,NX)

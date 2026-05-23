@@ -330,7 +330,7 @@ module PlantNonstElmDynMod
   REAL(R8) :: RootSinkWeight_vr(JZ1),BranchSinkWeight_pft(JP1)
   real(r8) :: CPOOLT
   real(r8) :: NonstElmRootE,NonstElmBrchE
-  real(r8) :: NonstElmGradt
+  real(r8) :: NonstElmGradt,NonstElmGradt1(JZ1)
   real(r8) :: CPOOLBranch,CPOOLRootS
   real(r8) :: FWTC, FWTS !canopy, root sink weighting factor
   real(r8) :: PPOOLB
@@ -360,7 +360,7 @@ module PlantNonstElmDynMod
     CanopyLeafSheathC_brch        => plt_biom%CanopyLeafSheathC_brch          ,& !input  :plant branch leaf + sheath C, [g d-2]
     CumSoilThickness_vr           => plt_site%CumSoilThickness_vr             ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]    
     RootElms_pft                  => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
-    PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]    
+    PlantPopuLive_pft             => plt_site%PlantPopuLive_pft               ,& !input  :plant population, [d-2]    
     ZERO4Groth_pft                => plt_biom%ZERO4Groth_pft                  ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantBranchAlive_brch       => plt_pheno%isPlantBranchAlive_brch        ,& !input  :flag to detect branch death, [-]
     iPlantPhenolPattern_pft       => plt_pheno%iPlantPhenolPattern_pft        ,& !input  :plant growth habit: annual or perennial,[-]
@@ -379,7 +379,7 @@ module PlantNonstElmDynMod
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     flag2ndGrowth_pvr             => plt_morph%flag2ndGrowth_pvr              ,& !input  :flag for secondary growth of primary roots, [-]        
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
-    MaxSoilLays4Root_pft              => plt_morph%MaxSoilLays4Root_pft               ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
     NMaxRootBotLayer_pft          => plt_morph%NMaxRootBotLayer_pft           ,& !input  :maximum soil layer number for all root axes, [-]    
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
@@ -463,7 +463,7 @@ module PlantNonstElmDynMod
   
   IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN  
     DO L=NU,MaxSoilLays4Root_pft(NZ)  
-      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
+      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)*DLYR3(L)/RootSinkC(ipltroot))
     ENDDO    
   ELSE
     ZTOL=CumSoilThickness_vr(MaxSoilLays4Root_pft(NZ))-CumSoilThickness_vr(NU-1)      
@@ -510,6 +510,8 @@ module PlantNonstElmDynMod
   ELSE
     PTSHTR=ShootRootNonstElmConduts_pft(NZ)
   ENDIF
+!  write(1109,*)CanopyNonstElms_brch(ielmc,1,NZ),I*1000+J/24.,RootSinkWeight_pvr(2:3,NZ),PTSHTR,GrothPART2LeafPetole
+
   PTSHTR=AMIN1(PTSHTR,1._r8)
   
   D310: DO NB=1,NumOfBranches_pft(NZ)
@@ -520,10 +522,11 @@ module PlantNonstElmDynMod
       ELSE
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
+ !     IF(NB.eq.1)write(1122,*)I*1000+J/24.,RootMycoNonstElms_rpvr(ielmc,ipltroot,2:3,NZ)
 
       !Roots at different depths are generally "wired" to the shoot (the source) like spokes 
       !on a wheel or branches on a river. They do not typically exchange carbon directly with each other deep underground.
-
+      NonstElmGradt1=0._R8
       D415: DO L=NU,MaxSoilLays4Root_pft(NZ)
         WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC
         WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAllocm(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
@@ -534,14 +537,16 @@ module PlantNonstElmDynMod
           CPOOLBranch   = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*RootSinkWeight_pvr(L,NZ))
           CPOOLRootS    = AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
           CPOOLT        = CPOOLRootS+CPOOLBranch
-          NonstElmGradt = (CPOOLBranch*WTRTLR-CPOOLRootS*WTLSBB)/TwoCompMassC
-          XFRE          = PTSHTR*NonstElmGradt
+          NonstElmGradt1(L) = (CPOOLBranch*WTRTLR-CPOOLRootS*WTLSBB)/TwoCompMassC
+          XFRE          = PTSHTR*NonstElmGradt1(L)
+
           call ExchFluxLimiter(CanopyNonstElms_brch(ielmc,NB,NZ),RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ),XFRE)
 
           ShootRootXferElm_pft(ielmc,NZ)              = ShootRootXferElm_pft(ielmc,NZ)+XFRE
           CanopyNonstElms_brch(ielmc,NB,NZ)           = CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE
           RootShootExch_pvr(ielmc,L,NZ)               = RootShootExch_pvr(ielmc,L,NZ)+XFRE
+          !
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
             DO NE=2,NumPlantChemElms
@@ -566,6 +571,7 @@ module PlantNonstElmDynMod
           ENDIF
         ENDIF
       ENDDO D415
+!      IF(NB.eq.1)write(1122,*)I*1000+J/24.,RootMycoNonstElms_rpvr(ielmc,ipltroot,2:3,NZ),NonstElmGradt1(2:3),PTSHTR
     ENDIF
   ENDDO D310
 

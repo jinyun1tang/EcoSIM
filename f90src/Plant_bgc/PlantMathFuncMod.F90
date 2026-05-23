@@ -109,7 +109,7 @@ contains
   seedHalfLength=(0.75_r8*SeedVolumeMean/PICON)**0.33_r8*rwidth2lenSeed**(-0.667_r8) !assume prolate
   SeedLengthMean = 2.0_r8*seedHalfLength  
   SeedArea       = 4.0_r8*PICON*seedHalfLength**2*((2._r8*rwidth2lenSeed**pp+rwidth2lenSeed**(2._r8*pp))/3._r8)**(1._r8/pp)
-
+  
   end subroutine calc_seed_geometry
 !--------------------------------------------------------------------------------
   pure function calc_root_grow_tempf(TKSO)result(fT_root)

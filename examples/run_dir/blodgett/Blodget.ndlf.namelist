@@ -5,13 +5,13 @@
 &ecosim
 case_name='Blodget.ndlf'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pftpar_20260303.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20260520.nc'
 grid_file_in='../../inputs/blodgett/Blodget_grid_20251115.nc'
 pft_mgmt_in='../../inputs/blodgett/Blodget_pft_20260426.ndlf.nc'
 clm_hour_file_in='../../inputs/blodgett/Blodget.clim.2012-2022.nc'
 clm_factor_in='NO'
 soil_mgmt_in='NO'
-llignification=.true.
+llignification=.false.
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2023.nc'
 !idebug_day=253
 !lsoilCompaction=.true.
@@ -59,7 +59,7 @@ hist_nhtfrq=-24 !, 0
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=10             !this shall overwrite what is set in forc_periods
+stop_n=3             !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

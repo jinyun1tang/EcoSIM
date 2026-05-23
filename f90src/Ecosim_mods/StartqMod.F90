@@ -458,7 +458,6 @@ module StartqMod
 !
   call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedWidth2LenRatio_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
     SeedMeanLen_pft(NZ,NY,NX),SeedAreaMean_pft(NZ,NY,NX))
-
   !
   !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
   !

@@ -1167,7 +1167,7 @@ implicit none
   id=addone(id)  
   call writefixl(nu_plt,id,'SSL1','Specific Petiole/Sheath length vs mass [m gC-1]',PetolShethLen2Mass_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'SNL1','Specific stem internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   id=addone(id)
   call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',&
     LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX),100)  

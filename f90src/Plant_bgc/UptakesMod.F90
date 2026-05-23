@@ -437,13 +437,13 @@ module UptakesMod
     DLYR3                      => plt_site%DLYR3                     ,& !input  :vertical thickness of soil layer, [m]
     FracSoiAsMicP_vr           => plt_site%FracSoiAsMicP_vr          ,& !input  :micropore fraction, [-]
     HypocotHeight_pft          => plt_morph%HypocotHeight_pft        ,& !input  :cotyledon height, [m]
-    MaxSoilLays4Root_pft           => plt_morph%MaxSoilLays4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft     ,& !input  :maximum soil layer number for all root axes,[-]
     Myco_pft                   => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
     NU                         => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
     RootAxialResist_pft        => plt_morph%RootAxialResist_pft      ,& !input  :root axial resistivity, [MPa h m-4]    
     RootRadialResist_pft       => plt_morph%RootRadialResist_pft     ,& !input  :root radial resistivity, [MPa h m-1]        
-    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr          => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
     Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes        ,& !input  :root layer depth, [m]
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr       ,& !input  :root layer diameter secondary axes, [m]    
@@ -498,7 +498,7 @@ module UptakesMod
       ENDIF
     ENDDO
   endif
-  call PrintInfo('beg D200')
+  
   D2000: DO N=1,Myco_pft(NZ)
 
     DO  L=NU,MaxSoilLays4Root_pft(NZ)

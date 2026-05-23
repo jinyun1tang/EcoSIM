@@ -429,7 +429,7 @@ module PlantPhenolMod
     LeafPetoNonstElmConc_brch   => plt_biom%LeafPetoNonstElmConc_brch  ,& !output :branch nonstructural C concentration, [g d-2]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft     ,& !output :canopy nonstructural element concentration, [g d-2]
     RootNonstructElmConc_rpvr   => plt_biom%RootNonstructElmConc_rpvr  ,& !output :root layer nonstructural C concentration, [g g-1]
-    MaxSoilLays4Root_pft            => plt_morph%MaxSoilLays4Root_pft           & !output :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft        => plt_morph%MaxSoilLays4Root_pft       & !output :maximum soil layer number for all root axes,[-]
   )
   call PrintInfo('beg '//subname)
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8

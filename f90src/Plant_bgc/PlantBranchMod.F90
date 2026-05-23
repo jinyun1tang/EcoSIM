@@ -59,7 +59,7 @@ module PlantBranchMod
   REAL(R8) :: CNPG
   real(r8) :: CCE
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: EtoliationCoeff
+  real(r8) :: EtiolationCoeff
   real(r8) :: Growth_brch(NumPlantChemElms,pltpar%NumOfPlantMorphUnits)
   real(r8) :: RCO2NonstC_brch
   REAL(R8) :: RCO2Maint_brch
@@ -97,9 +97,11 @@ module PlantBranchMod
     KHiestGroLeafNode_brch     => plt_pheno%KHiestGroLeafNode_brch     ,& !inoput :leaf growth stage counter, [-]    
     CanopyLeafSheathC_brch     => plt_biom%CanopyLeafSheathC_brch       & !output :plant branch leaf + sheath C, [g d-2]
   )
+  call PrintInfo('beg '//subname)
   stop_flag=.false.
   I=yearIJ%I;J=yearIJ%J
-  call DebugPrint('beg '//subname//' NZ',NZ)
+  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bf'//subname     
+  
   IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
 
     !correct the higest growing leaf node
@@ -141,17 +143,17 @@ module PlantBranchMod
     canopy_growth_pft(NZ) = canopy_growth_pft(NZ)+RNonstC4Groth_brch
     !
     call BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
-      DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeID)
+      DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtiolationCoeff,MinNodeID)
     !
-    CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
+    CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtiolationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
     !     DISTRIBUTE SHEATH OR PetolSheth GROWTH AMONG CURRENTLY GROWING NODES
     !
-    CALL GrowPetolShethOnBranch(yearIJ,NZ,NB,MinNodeID,Growth_brch(:,ibrch_petole),EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
+    CALL GrowPetolShethOnBranch(yearIJ,NZ,NB,MinNodeID,Growth_brch(:,ibrch_petole),EtiolationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
     !   DISTRIBUTE STALK GROWTH AMONG CURRENTLY GROWING NODES
     !
-    call GrowStalkOnBranch(I,J,NZ,NB,Growth_brch(:,ibrch_stalk),EtoliationCoeff)
+    call GrowStalkOnBranch(I,J,NZ,NB,Growth_brch(:,ibrch_stalk),EtiolationCoeff)
     !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
     !   ON SHOOT NON-STRUCTURAL C:N:P
@@ -242,7 +244,7 @@ module PlantBranchMod
     CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
 
   ENDIF
-  
+  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'af'//subname     
   call PrintInfo('end '//subname)
   end associate
   end subroutine GrowOneBranch
@@ -311,7 +313,7 @@ module PlantBranchMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
-    DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtoliationCoeff,MinNodeID)
+    DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtiolationCoeff,MinNodeID)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
@@ -320,7 +322,7 @@ module PlantBranchMod
   real(r8), intent(in) :: CPLFB,CNSHB,CPSHB,ZPLFD,CNPG
   real(r8), intent(out) :: Growth_brch(NumPlantChemElms,pltpar%NumOfPlantMorphUnits)
   integer , intent(out) :: MinNodeID
-  real(r8), intent(out) :: EtoliationCoeff
+  real(r8), intent(out) :: EtiolationCoeff       !nutrient effect on etiolation
 
   character(len=*), parameter :: subname='BranchBiomAllocate'
   real(r8) :: CCE
@@ -405,7 +407,7 @@ module PlantBranchMod
   CCE=AMIN1(safe_adb(LeafPetoNonstElmConc_brch(ielmn,NB,NZ),LeafPetoNonstElmConc_brch(ielmn,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CNKI) &
     ,safe_adb(LeafPetoNonstElmConc_brch(ielmp,NB,NZ),LeafPetoNonstElmConc_brch(ielmp,NB,NZ)+LeafPetoNonstElmConc_brch(ielmc,NB,NZ)*CPKI))
 
-  EtoliationCoeff = AMAX1(1.0_r8+CCE,1._r8)
+  EtiolationCoeff = AMAX1(1.0_r8+CCE,1._r8)
   !
   !   DISTRIBUTE LEAF GROWTH AMONG CURRENTLY GROWING NODES
   !
@@ -1865,7 +1867,7 @@ module PlantBranchMod
           CanopyLeafAreaZ_pft(L,NZ) = CanopyLeafAreaZ_pft(L,NZ)+YLeafArea_node
           CanopyLeafCLyr_pft(L,NZ)  = CanopyLeafCLyr_pft(L,NZ)+YLeafElmnt_node(ielmc)
         ENDDO D570
-        TotLeafElevation     = TotLeafElevation+LeafElevation
+        TotLeafElevation         = TotLeafElevation+LeafElevation
         CanopyHeightLive_pft(NZ) = AMAX1(CanopyHeightLive_pft(NZ),HeightLeafTip)
       ENDDO D555
 
@@ -2857,7 +2859,7 @@ module PlantBranchMod
     iPlantPhenolPattern_pft   => plt_pheno%iPlantPhenolPattern_pft    ,& !input  :plant growth habit: annual or perennial,[-]
     iPlantTurnoverPattern_pft => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlantPhotoperiodType_pft => plt_pheno%iPlantPhotoperiodType_pft  ,& !input  :photoperiod type (neutral, long day, short day),[-]
-    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     DayLenthCurrent           => plt_site%DayLenthCurrent             ,& !input  :current daylength of the grid, [h]
     SSXferElms_pft            => plt_bgcr%SSXferElms_pft              ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]
     SSXfer2ShootElms_pft      => plt_bgcr%SSXfer2ShootElms_pft        ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]    
@@ -2867,6 +2869,7 @@ module PlantBranchMod
     CanopyNonstElms_brch      => plt_biom%CanopyNonstElms_brch         & !inoput :branch nonstructural element, [g d-2]
   )
   call DebugPrint('beg '//subname//' NZ',NZ)
+  !write(1114,*)I*1000+J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bf'//subname  
   TotPopuPlantRootC         = 0._r8
   TotalRootNonstElms(ielmc) = 0._r8
   D4: DO L=NU,MaxSoilLays4Root_pft(NZ)
@@ -2917,8 +2920,7 @@ module PlantBranchMod
       SSXferElms_pft(ielmc,NZ)          = SSXferElms_pft(ielmc,NZ)-CH2OH
       SSXfer2ShootElms_pft(ielmc,NZ)    = SSXfer2ShootElms_pft(ielmc,NZ)-CH2OH*FX2SH(iPlantPhenolPattern_pft(NZ))
       CanopyNonstElms_brch(ielmc,NB,NZ) = CanopyNonstElms_brch(ielmc,NB,NZ)+CH2OH*FX2SH(iPlantPhenolPattern_pft(NZ))
-!      if(NZ==1)write(947,*)plt_site%iYearCurrent,I*1000+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),SeasonalNonstElms_pft(ielmc,NZ),CH2OH
-!      if(NZ==2)write(948,*)plt_site%iYearCurrent,I*1000+J/24.,CanopyNonstElms_brch(ielmc,NB,NZ),SeasonalNonstElms_pft(ielmc,NZ),CH2OH      
+      !
       ! if root condition met
       CNonst2Root=CH2OH*FX2RT(iPlantPhenolPattern_pft(NZ))
       IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ) .AND. TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
@@ -3020,7 +3022,7 @@ module PlantBranchMod
     SSXfer2ShootElms_pft(NE,NZ)    = SSXfer2ShootElms_pft(NE,NZ)+ElmXferStore2Shoot(NE)
   ENDDO  
   !
-  IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ).AND.TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
+  IF(TotPopuPlantRootC.GT.ZERO4Groth_pft(NZ) .AND. TotalRootNonstElms(ielmc).GT.ZERO4Groth_pft(NZ))THEN
     D51: DO L=NU,MaxSoilLays4Root_pft(NZ)
       FXFN=AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ))/TotalRootNonstElms(ielmc)
       DO NE=2,NumPlantChemElms
@@ -3034,6 +3036,7 @@ module PlantBranchMod
         RootMycoNonstElms_rpvr(NE,ipltroot,NGTopRootLayer_pft(NZ),NZ)+NonstElm2RootMyco(NE)   
     ENDDO            
   ENDIF
+  !write(1114,*)I*1000+J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'af'//subname 
   call PrintInfo('end '//subname)
   end associate
   end subroutine DevelopMainBranch
@@ -3436,13 +3439,13 @@ module PlantBranchMod
   end subroutine ComputRAutoB4Emergence
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,GrowthLeaf,EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
+  subroutine GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,GrowthLeaf,EtiolationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
   implicit none
   integer , intent(in) :: I,J  
   integer , intent(in) :: NB,NZ
   integer , intent(in) :: MinNodeID
   real(r8), intent(in) :: GrowthLeaf(NumPlantChemElms)
-  real(r8), intent(in) :: EtoliationCoeff
+  real(r8), intent(in) :: EtiolationCoeff
   real(r8), intent(in) :: TurgEff4LeafPetolExpansion
   REAL(R8), INTENT(OUT):: ALLOCL
   integer :: K,NE,KK
@@ -3510,7 +3513,7 @@ module PlantBranchMod
       !         LeafAreaLive_brch,LeafArea_node=branch,node leaf area
       !Eq.(3) in Grant and Hesketh, 1992, with updates for small biomass
       dMC                      = AZMAX1(1.e-9_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GrozNodesPerPlant))
-      SpecAreaLeafGrowth       = EtoliationCoeff*SLA1_pft(NZ)*dMC**SLA2*TurgEff4LeafPetolExpansion
+      SpecAreaLeafGrowth       = EtiolationCoeff*SLA1_pft(NZ)*dMC**SLA2*TurgEff4LeafPetolExpansion
       LeafAreaGrowth           = GrowthElms(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
       LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ)+LeafAreaGrowth
@@ -3521,12 +3524,12 @@ module PlantBranchMod
   END subroutine GrowLeavesOnBranch
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowPetolShethOnBranch(yearIJ,NZ,NB,MinNodeID,GrowthPetolSheth,EtoliationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
+  subroutine GrowPetolShethOnBranch(yearIJ,NZ,NB,MinNodeID,GrowthPetolSheth,EtiolationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ,MinNodeID,NB
   real(r8), intent(in) :: GrowthPetolSheth(NumPlantChemElms)
-  REAL(R8), INTENT(IN) :: EtoliationCoeff
+  REAL(R8), INTENT(IN) :: EtiolationCoeff
   real(r8), intent(in) :: TurgEff4LeafPetolExpansion
   REAL(R8), INTENT(IN) :: ALLOCL
   integer :: MXNOD,MNNOD,NE,KK,K
@@ -3594,7 +3597,7 @@ module PlantBranchMod
       !
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
         dMC                        = AZMAX1(1.e-9_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GSSL))
-        SSL                        = EtoliationCoeff*PetolShethLen2Mass_pft(NZ)*dMC**SSL2*TurgEff4LeafPetolExpansion
+        SSL                        = EtiolationCoeff*PetolShethLen2Mass_pft(NZ)*dMC**SSL2*TurgEff4LeafPetolExpansion
         GROS                       = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SSL
         PetoleLength_node(K,NB,NZ) = PetoleLength_node(K,NB,NZ)+GROS*SinePetolShethAngle_pft(NZ)
       ENDIF
@@ -3605,12 +3608,12 @@ module PlantBranchMod
   end subroutine GrowPetolShethOnBranch  
 
 !----------------------------------------------------------------------------------------------------
-  subroutine GrowStalkOnBranch(I,J,NZ,NB,GrowthStalk,ETOL)
+  subroutine GrowStalkOnBranch(I,J,NZ,NB,GrowthStalk,EtiolationCoeff)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NZ,NB
   real(r8), INTENT(IN) :: GrowthStalk(NumPlantChemElms)    !gross growth rate on stalk, [g h-1]
-  REAL(R8), INTENT(IN) :: ETOL
+  REAL(R8), INTENT(IN) :: EtiolationCoeff                  !etiolation coefficient
   
   character(len=*), parameter :: subname='GrowStalkOnBranch'  
   REAL(R8) :: GrowthElms(NumPlantChemElms)
@@ -3655,7 +3658,7 @@ module PlantBranchMod
     !     AT EACH NODE
     !
     !     SpecLenStalkGrowth=specific length of stalk growth
-    !     ETOL=coefficient for etoliation effects on expansion,extension
+    !     EtiolationCoeff=coefficient for etioliation effects on expansion,extension
     !     NodeLenPergC_pft=growth in stalk length vs mass from PFT file
     !     SNL2=parameter for calculating stalk extension
     !     WTSKB=stalk C mass
@@ -3663,7 +3666,7 @@ module PlantBranchMod
     !     StalkLenGrowth,GRO=stalk length,mass growth
     !
     StalkAveStrutC_brch = StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopuLive_pft(NZ)
-    SpecLenStalkGrowth  = ETOL*NodeLenPergC_pft(NZ)*AZMAX1(1.e-9_r8,StalkAveStrutC_brch)**SNL2
+    SpecLenStalkGrowth  = EtiolationCoeff*NodeLenPergC_pft(NZ)*AZMAX1(1.e-9_r8,StalkAveStrutC_brch)**SNL2
     StalkLenGrowth      = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SpecLenStalkGrowth
 
     !
