@@ -4,7 +4,7 @@ cmake_minimum_required (VERSION 3.10)
 
 # We declare the project here.
 message(STATUS "JDM: >>>>>> Initate the project, first thing it checks is compilers")
-project (ecosim)
+project (ecosim LANGUAGES NONE)
 
 # Version numbers.
 set (ECOSIM_MAJOR_VERSION 0)

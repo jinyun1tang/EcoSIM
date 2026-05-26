@@ -59,7 +59,7 @@ subroutine Init_ATSEcoSIM_driver()
   type (BGCState) :: state
   type (BGCProperties) :: props
   type (BGCSizes) :: sizes
-  integer :: NY, NX, L
+  integer :: NY, NX, L, NZ
   integer :: ncells_per_col_, ncol
   integer :: kmo,dofmon,ndaysmon
   real(r8) :: dist_step, dist_tot
@@ -130,11 +130,11 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_LSAT(ncells_per_col_, ncol))
   allocate(a_SSWS(ncells_per_col_,ncol))
   allocate(a_rdens(ncells_per_col_,ncol))
-
+  
   !Pheno vars
   !allocate(LAI_col(ncells_per_col_,ncol))
   allocate(a_CanSnow(num_pfts,ncol))
-  allocate(a_VEG(ncol))
+  allocate(a_VEG(num_pfts))
   allocate(a_lwcan(ncol))
   allocate(a_clhf(ncol))
   allocate(a_cshf(ncol))
@@ -177,6 +177,9 @@ subroutine Init_ATSEcoSIM_driver()
 
     a_LAI(NY) = 0.2
     a_SAI(NY) = 0.05
+    do NZ=1,num_pfts
+      a_VEG(NZ) = 1
+    enddo
 
   enddo
 

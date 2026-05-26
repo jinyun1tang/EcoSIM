@@ -33,6 +33,7 @@ module ATSEcoSIMAdvanceMod
   use RootDataType
   use FlagDataType
   use ATSUtilsMod
+  use EcoSIMHistMod
   !use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
 
@@ -56,11 +57,14 @@ implicit none
   !use SoilHydroParaMod  , only : SetColdRunSoilStates
   use PlantMod
   use WthrMod
+  use PlantInfoMod
   !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
   integer :: NY,NX,NZ,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS, npfts, NP
+  integer :: nu_plt
+  logical :: pft_changed
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -299,6 +303,12 @@ implicit none
        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
        iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
        TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
+       
+       !Load the PFT array from ATS and fill the plant traits 
+       ! based on that mapping
+       DATAPI(NZ,NY,NX) = a_VEG(NZ)
+       call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
+       
     enddo
 
   ENDDO

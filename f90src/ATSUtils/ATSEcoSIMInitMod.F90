@@ -37,6 +37,7 @@ implicit none
   use UptakesMod
   !use Hour1Mod,         only: InitHour1
   use PlantBGCPars
+  use PlantInfoMod
   use StartsMod, only : startsim, set_ecosim_solver
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
@@ -63,12 +64,17 @@ implicit none
   disp_modelconfig = .false.
   mod_snow_albedo  = a_bool
 
+  !Set pft file manually for now
+  pft_file_in = '../../../../input_data/ecosim_pftpar_20260303.nc'
+  
+  
   !Calling some setup functions
   call SetMeshATS(NHW,NVN,NHE,NVS)
   call set_ecosim_solver(30, 10, 20, 20)
 
   !call InitModules()
   call InitAlloc()
+  call ReadPlantTraitTable()
   call InitUptake
   allocate(THETRX(1:micpar%NumOfLitrCmplxs))
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
@@ -116,7 +122,6 @@ implicit none
       VGeomLayer_vr(0,NY,NX) = 0.1
     endif
     POROS0_col(NY,NX) = 0.5
-
 
     DO L=NU_col(NY,NX),NL_col(NY,NX)
       TKSoil1_vr(L,NY,NX) = a_TEMP(L,NY)
