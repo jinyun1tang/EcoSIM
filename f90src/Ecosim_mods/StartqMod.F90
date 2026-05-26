@@ -527,8 +527,8 @@ module StartqMod
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
     Root2ndMaxRadius1_pft(N,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
-    Root1stXSecArea_pft(N,NZ,NY,NX) = PICON*Root1stMaxRadius1_pft(N,NZ,NY,NX)**2._r8
-    Root2ndXSecArea_pft(N,NZ,NY,NX) = PICON*Root2ndMaxRadius1_pft(N,NZ,NY,NX)**2._r8
+    Root1stXSecArea_pft(N,NZ,NY,NX) = PICON*Root1stMaxRadius1_pft(N,NZ,NY,NX)**2
+    Root2ndXSecArea_pft(N,NZ,NY,NX) = PICON*Root2ndMaxRadius1_pft(N,NZ,NY,NX)**2
   ENDDO D500 
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -548,6 +548,7 @@ module StartqMod
   !     PP=population (grid cell-1)
   !
   PlantPopuLive_pft(NZ,NY,NX)           = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PlantPopuDead_pft(NZ,NY,NX)           = PlantPopuLive_pft(NZ,NY,NX)
   doInitPlant_pft(NZ,NY,NX)             = ifalse
   isPlantShootAlive_pft(NZ,NY,NX)       = iTrue
   isPlantRootAlive_pft(NZ,NY,NX)        = iTrue

@@ -92,7 +92,7 @@ implicit none
     plt_soilchem%VLSoilMicP_vr(L)     = VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)      = VLWatMicP_vr(L,NY,NX)
   ENDDO
-  
+
   plt_ew%SnowOnCanopy_col          = SnowOnCanopy_col(NY,NX)
   plt_ew%fSnowCanopy_col           = fSnowCanopy_col(NY,NX)
   plt_rad%SineSunInclinationAngle_col     = SineSunInclinationAngle_col(NY,NX)
@@ -116,6 +116,7 @@ implicit none
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
   DO NZ=1,NP_col(NY,NX)
+    plt_site%PlantPopuDead_pft(NZ)          = PlantPopuDead_pft(NZ,NY,NX)
     plt_morph%StemSpecVolume_pft(NZ)        = StemSpecVolume_pft(NZ,NY,NX)
     plt_ew%fSnowCanopy_pft(NZ)              = fSnowCanopy_pft(NZ,NY,NX)
     plt_ew%BulkFactor4Snow_pft(NZ)          = BulkFactor4Snow_pft(NZ,NY,NX)

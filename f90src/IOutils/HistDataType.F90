@@ -628,6 +628,7 @@ implicit none
   real(r8),pointer   :: h2D_RootNutupk_fNlim_pvr(:,:)
   real(r8),pointer   :: h2D_RootNutupk_fPlim_pvr(:,:)
   real(r8),pointer   :: h2D_RootNutupk_fProtC_pvr(:,:)
+  real(r8),pointer   :: h2D_Root1stSArea4GasTP_pvr(:,:)
   real(r8),pointer   :: h2D_RootProteinC_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stAxesNumL_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndAxesNumL_pvr(:,:)
@@ -1040,6 +1041,7 @@ implicit none
   allocate(this%h2D_RootNutupk_fNlim_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fNlim_pvr=spval
   allocate(this%h2D_RootNutupk_fPlim_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fPlim_pvr=spval
   allocate(this%h2D_RootNutupk_fProtC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNutupk_fProtC_pvr=spval
+  allocate(this%h2D_Root1stSArea4GasTP_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root1stSArea4GasTP_pvr=spval
   allocate(this%h2D_RootProteinC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootProteinC_pvr=spval
   allocate(this%h2D_O2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_O2_rootconduct_pvr(:,:)=spval
   allocate(this%h2D_CO2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_CO2_rootconduct_pvr(:,:)=spval
@@ -2924,7 +2926,7 @@ implicit none
 
   data2d_ptr => this%h2D_O2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ)    
   call hist_addfld2d(fname='O2_root_conductance_pvr',units='1/h',type2d='levsoi',avgflag='A',&
-    long_name='Root conductance for O2 gaseous in soil layer',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root conductance for O2 gaseous in soil layer',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_CO2_rootconduct_pvr(beg_ptc:end_ptc,1:JZ)    
   call hist_addfld2d(fname='CO2_root_conductance_pvr',units='1/h',type2d='levsoi',avgflag='A',&
@@ -3724,7 +3726,7 @@ implicit none
 
   data2d_ptr => this%h2D_Root1stStrutN_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootN_1st_pvr',units='gN/m3',type2d='levsoi',avgflag='A',&
-    long_name='Primary root structural biomass N density',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Primary root structural biomass N density',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_Root1stStrutP_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootP_1st_pvr',units='gP/m3',type2d='levsoi',avgflag='A',&
@@ -3732,7 +3734,7 @@ implicit none
 
   data2d_ptr => this%h2D_Root2ndStrutC_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootC_2nd_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
-    long_name='Secondary root structural biomass C density',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Secondary root structural biomass C density',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_Root2ndStrutN_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootN_2nd_pvr',units='gN/m3',type2d='levsoi',avgflag='A',&
@@ -3787,6 +3789,11 @@ implicit none
     long_name='Transporter-limitation for root nutrient uptake capacity, 0->1 weaker limitation',&
     ptr_patch=data2d_ptr)       
 
+  data2d_ptr => this%h2D_Root1stSArea4GasTP_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='Root1stSA4GasTP_pvr',units='m2',type2d='levsoi',avgflag='A',&
+    long_name='Primary root surface area for gas transport',ptr_patch=data2d_ptr,default='inactive')
+
+  
   data2d_ptr => this%h2D_RootProteinC_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootProteinC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
     long_name='Root proteinC concentration',ptr_patch=data2d_ptr,default='inactive')       
@@ -4604,6 +4611,7 @@ implicit none
             this%h2D_RootNutupk_fNlim_pvr(nptc,L)  = Nutruptk_fNlim_rpvr(ipltroot,L,NZ,NY,NX)
             this%h2D_RootNutupk_fPlim_pvr(nptc,L)  = Nutruptk_fPlim_rpvr(ipltroot,L,NZ,NY,NX)
             this%h2D_RootNutupk_fProtC_pvr(nptc,L) = Nutruptk_fProtC_rpvr(ipltroot,L,NZ,NY,NX)
+            this%h2D_Root1stSArea4GasTP_pvr(nptc,L)= Root1stTransptArea_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
             this%h2D_RootProteinC_pvr(nptc,L)      = RootProteinC_pvr(ipltroot,L,NZ,NY,NX)/DVOLL
             this%h2D_O2_rootconduct_pvr(nptc,L)    = RootAtmGasConductance_rpvr(idg_O2,ipltroot,L,NZ,NY,NX)
             this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootAtmGasConductance_rpvr(idg_CO2,ipltroot,L,NZ,NY,NX)
@@ -4704,6 +4712,7 @@ implicit none
   this%h2D_RootNutupk_fNlim_pvr(nptc,1:JZ)   = 0._r8
   this%h2D_RootNutupk_fPlim_pvr(nptc,1:JZ)   = 0._r8
   this%h2D_RootNutupk_fProtC_pvr(nptc,1:JZ)  = 0._r8
+  this%h2D_Root1stSArea4GasTP_pvr(nptc,1:JZ)  = 0._r8
   this%h2D_RootProteinC_pvr(nptc,1:JZ)       = 0._r8
   this%h2D_O2_rootconduct_pvr(nptc,1:JZ)     = 0._r8
   this%h2D_CO2_rootconduct_pvr(nptc,1:JZ)    = 0._r8

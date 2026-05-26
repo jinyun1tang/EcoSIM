@@ -52,7 +52,7 @@ module InitPlantMod
     NP                    => plt_site%NP                      ,& !input  :current number of plant species,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
-    PlantPopuDead_pft      => plt_site%PlantPopuDead_pft        ,& !input  :live+standing dead plant population, [d-2]
+    PlantPopuDead_pft     => plt_site%PlantPopuDead_pft       ,& !input  :live+standing dead plant population, [d-2]
     ZERO                  => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     iMaintPlantTrait_pft  => plt_pheno%iMaintPlantTrait_pft   ,& !inoput :flag for maintain or reset plant traits, [-]    
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !output :threshold zero for plang growth calculation, [-]

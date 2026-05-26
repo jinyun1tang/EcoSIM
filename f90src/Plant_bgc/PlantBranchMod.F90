@@ -21,13 +21,13 @@ module PlantBranchMod
   __FILE__
   public :: GrowOneBranch
 
-  integer, parameter :: ibrch_leaf=1
-  integer, parameter :: ibrch_petole=2
-  integer, parameter :: ibrch_stalk=3
-  integer, parameter :: ibrch_resrv=4
-  integer, parameter :: ibrch_husk=5
-  integer, parameter :: ibrch_ear=6
-  integer, parameter :: ibrch_grain=7
+  integer, parameter :: ibrch_leaf   = 1
+  integer, parameter :: ibrch_petole = 2
+  integer, parameter :: ibrch_stalk  = 3
+  integer, parameter :: ibrch_resrv  = 4
+  integer, parameter :: ibrch_husk   = 5
+  integer, parameter :: ibrch_ear    = 6
+  integer, parameter :: ibrch_grain  = 7
   logical :: stop_flag
   contains
   ![header]
@@ -3649,7 +3649,7 @@ module PlantBranchMod
 
   IF(GrowthStalk(ielmc).GT.0.0_r8)THEN
     GNOD=MXNOD-MNNOD+1
-    ALLOCN=1.0_r8/GNOD
+    ALLOCN=1.0_r8/GNOD   !allocate uniformly to the different nodes
     DO NE=1,NumPlantChemElms
       GrowthElms(NE)=ALLOCN*GrowthStalk(NE)
     ENDDO

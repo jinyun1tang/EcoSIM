@@ -135,8 +135,7 @@ module UptakesMod
 !     STOMATE=solve for minimum canopy stomatal resistance
       
       CALL StomatalDynamics(yearIJ%I,yearIJ%J,NZ)
-
-!
+      !
       call UpdateRootProperty(yearIJ,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,AllRootC_vr,FracPRoot4Uptake_pvr,&
         FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
 !
@@ -478,20 +477,20 @@ module UptakesMod
         ENDDO
     endif
   else
-    DO  L=NU,MaxSoilLays4Root_pft(NZ)
-      !obtain plant rooting depth
-      RootDepZ=0.0_r8
-      D2005: DO NR=1,NumPrimeRootAxes_pft(NZ)
-        RootDepZ=AMAX1(RootDepZ,Root1stDepz_raxes(NR,NZ))
-      ENDDO D2005
+    !obtain plant rooting depth
+    RootDepZ=0.0_r8
+    D2005: DO NR=1,NumPrimeRootAxes_pft(NZ)
+      RootDepZ=AMAX1(RootDepZ,Root1stDepz_raxes(NR,NZ))
+    ENDDO D2005
 
+    DO  L=NU,MaxSoilLays4Root_pft(NZ)
       IF(L.EQ.NU)THEN
         FracSoilLBy1stRoots_pvr(L,NZ)=1.0_r8
       ELSE
         IF(DLYR3(L).GT.ZERO)THEN
           RTDPX = AZMAX1(RootDepZ-CumSoilThickness_vr(L-1)) !root covered depth
-          RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))
-          FracSoilLBy1stRoots_pvr(L,NZ) = AZMIN1(RTDPX/DLYR3(L),1._r8)
+          RTDPX = AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedDepth_pft(NZ)-CumSoilThickness_vr(L-1)-HypocotHeight_pft(NZ)))          
+          FracSoilLBy1stRoots_pvr(L,NZ) = RTDPX/DLYR3(L)
         ELSE
           FracSoilLBy1stRoots_pvr(L,NZ)=0.0_r8
         ENDIF

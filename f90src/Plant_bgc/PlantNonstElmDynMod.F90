@@ -463,7 +463,7 @@ module PlantNonstElmDynMod
   
   IF(RootSinkC(ipltroot).GT.ZERO4Groth_pft(NZ))THEN  
     DO L=NU,MaxSoilLays4Root_pft(NZ)  
-      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)*DLYR3(L)/RootSinkC(ipltroot))
+      RootSinkWeight_pvr(L,NZ)=AZMAX1(RootSinkC_vr(ipltroot,L)/RootSinkC(ipltroot))
     ENDDO    
   ELSE
     ZTOL=CumSoilThickness_vr(MaxSoilLays4Root_pft(NZ))-CumSoilThickness_vr(NU-1)      

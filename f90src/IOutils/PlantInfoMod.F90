@@ -888,9 +888,9 @@ implicit none
   case (0)
     strval='Shallow root profile, like bryophytes (0)'
   case (1)
-    strval='Intermediate root profile, like herbs (1)'
+    strval='Intermediate deep fibrous root profile, like herbs (1)'
   case (2)
-    strval='Deep root profile, like trees/drought tolerant grasses (2)'
+    strval='Deep penetrative root profile, like trees/drought tolerant grasses (2)'
   case (3)
     strval='Very deep tap root profile (3)'  
   case default

@@ -220,12 +220,13 @@ module SurfaceRadiationMod
       RSTK = SQRT(StemSpecVolume_pft(NZ)*(StandDeadStrutElms_pft(ielmc,NZ)/PlantPopuDead_pft(NZ))/(PICON*CanopyHeightDead_pft(NZ)))
       StandDeadSurfArea_pft(NZ) = 2._R8*PICON*RSTK*CanopyHeightDead_pft(NZ)*PlantPopuDead_pft(NZ)  
       EffHeightDead = AMIN1(CanopyHeightDead_pft(NZ),CanopyHeightZ_col(NumCanopyLayers1))
-
+      !write(*,*)'eff',EffHeightDead,StandDeadSurfArea_pft(NZ),RSTK,CanopyHeightDead_pft(NZ),PlantPopuDead_pft(NZ)  
       DO L=1,NumCanopyLayers1
         if(CanopyHeightDead_pft(NZ).GT.ZERO .and. CanopyHeightZ_col(L-1).LT.CanopyHeightDead_pft(NZ) &
           .and. CanopyHeightZ_col(L) .GT. CanopyHeightZ_col(L-1)) then
           FARSTD=AMIN1(1.0_r8,(CanopyHeightDead_pft(NZ)-CanopyHeightZ_col(L-1))/(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)))
           CanopySurfAreaProfDead_pft(L,NZ)=FARSTD*StandDeadSurfArea_pft(NZ)*(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))/EffHeightDead
+       !   write(*,*)'L',L,FARSTD,StandDeadSurfArea_pft(NZ),(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))/EffHeightDead
         else
           FARSTD=0._r8
           CanopySurfAreaProfDead_pft(L,NZ)=0._r8
@@ -353,6 +354,7 @@ module SurfaceRadiationMod
   call PrintInfo('beg '//subname)
 
   LeafStalkAreaAll_col=0.0_r8  
+  
   D1135: DO NZ=1,NP
     StandDeadSurfAreaAct_pft(NZ) = 0.0_r8
     LeafStalkAreaAct_pft(NZ)     = 0.0_r8
@@ -374,6 +376,7 @@ module SurfaceRadiationMod
           !add stem/stalk area
           LeafStalkAreaAct_pft(NZ) = LeafStalkAreaAct_pft(NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
           LeafStalkAreaAll_col     = LeafStalkAreaAll_col+CanopyStalkSurfArea_lbrch(L,NB,NZ)
+          !write(*,*)LeafStalkAreaAll_col,CanopyStalkSurfArea_lbrch(L,NB,NZ),L,NB,CanopySurfAreaProfDead_pft(L,NZ)
         ENDDO  
       ENDIF      
     enddo    
@@ -494,8 +497,7 @@ module SurfaceRadiationMod
     RadSWCanopyLAbsroption_pft(:,NZ)  = 0.0_r8
     RadPARCanopyLAbsorption_pft(:,NZ) = 0.0_r8
   ENDDO D1025
-
-
+  call DebugPrint('SineSunInclinationAngle_col',SineSunInclinationAngle_col)
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
   !
@@ -550,6 +552,7 @@ module SurfaceRadiationMod
   !     LeafStalkAreaAll_col,LeafStalkAreaAct_pft=leaf+stalk area of all PFTs,each PFT
   !
   FracSWRad2Grnd_col=1.0_r8
+  call DebugPrint('LeafStalkAreaAll_col',LeafStalkAreaAll_col)
   IF(LeafStalkAreaAll_col.GT.ZEROS)THEN
     !will compute a weighted bulking factor (for snow) considering vertical distribution of LAI.
     !Beer's law
