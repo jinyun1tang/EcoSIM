@@ -599,8 +599,9 @@ module PlantBranchMod
   !
   !     IF BEFORE FLORAL INDUCTION
   !
-  !     iPlantCalendar_brch(ipltcal_InitFloral,=floral initiation date
-
+  !plant calendar includes:
+  !  planting, emergence, init floral, jointing, elongation, heading, anthesis, begin seed fill, set seed number, set seed mass, end seed fill.
+  !
   IF(iPlantCalendar_brch(ipltcal_InitFloral,NB,NZ).EQ.0)THEN
     PART(ibrch_leaf)   = 0.725_r8
     PART(ibrch_petole) = 0.275_r8
@@ -3547,7 +3548,7 @@ module PlantBranchMod
     rProteinC2LeafN_pft       => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft       => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft        => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
-    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft        ,& !input  :plant population, [d-2]
     KHiestGroLeafNode_brch    => plt_pheno%KHiestGroLeafNode_brch  ,& !input  :leaf growth stage counter, [-]
     PetoleLength_node         => plt_morph%PetoleLength_node       ,& !inoput :sheath height, [m]
     PetolShethElmntNode_brch  => plt_biom%PetolShethElmntNode_brch ,& !inoput :sheath chemical element, [g d-2]

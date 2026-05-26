@@ -2372,7 +2372,7 @@ implicit none
 
   data1d_ptr => this%h1D_EXUD_CumYr_C_FLX_ptc(beg_ptc:end_ptc)       
   call hist_addfld1d(fname='EXUD_CumYr_C_FLX_pft',units='gC/m2',avgflag='I',&
-    long_name='Cumulative root organic C uptake (<0 exudation into soil)',ptr_patch=data1d_ptr,default='inactive')                  
+    long_name='Cumulative root organic C uptake (<0 exudation into soil)',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='LITRf_C_pft',units='gC/m2/hr',avgflag='A',&

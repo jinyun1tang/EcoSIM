@@ -3,7 +3,7 @@
 /
 
 &ecosim
-case_name='Blodget.ndlf'
+case_name='Blodget.ndlf.nolig'
 do_regression_test=.false.
 pft_file_in='../../../input_data/ecosim_pftpar_20260520.nc'
 grid_file_in='../../inputs/blodgett/Blodget_grid_20251115.nc'
@@ -59,7 +59,7 @@ hist_nhtfrq=-24 !, 0
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=40             !this shall overwrite what is set in forc_periods
+stop_n=82             !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'
