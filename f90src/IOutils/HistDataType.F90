@@ -2974,7 +2974,7 @@ implicit none
 
   data2d_ptr => this%h2D_decomp_OStress_vr(beg_col:end_col,1:JZ)         !
   call hist_addfld2d(fname='Decomp_OStress_vr',units='none',type2d='levsoi',avgflag='A',&
-    long_name='decomposition oxygen stress [0->1 weaker]',ptr_col=data2d_ptr,default='inactive')           
+    long_name='decomposition oxygen stress [0->1 weaker]',ptr_col=data2d_ptr)           
 
   data2d_ptr => this%h2D_RO2Decomp_vr(beg_col:end_col,1:JZ)    
   call hist_addfld2d(fname='RO2Decomp_flx_vr',units='gO2/m2/h',type2d='levsoi',avgflag='A',&

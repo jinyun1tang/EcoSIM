@@ -1217,7 +1217,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
     id=addone(id)
-    call writefixl(nu_plt,id,'KLGMAX','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
+    call writefixl(nu_plt,id,'KLGMM','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)
@@ -1232,7 +1232,7 @@ implicit none
   endif
   id=addone(id)  
   call writefixl(nu_plt,id,'PR','Nonstructural C concentration needed for root'// &
-    ' branching (gC nonst/gC structl)',NonstCMinCon2InitRoot_pft(NZ,NY,NX),105)
+    ' initiation (gC nonst/gC structl)',NonstCMinCon2InitRoot_pft(NZ,NY,NX),105)
   id=addone(id)  
   call writefixl(nu_plt,id,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)

@@ -3,7 +3,7 @@
 /
 
 &ecosim
-case_name='Blodget.ndlf.nolig'
+case_name='Blodget.ndlf.lig'
 do_regression_test=.false.
 pft_file_in='../../../input_data/ecosim_pftpar_20260520.nc'
 grid_file_in='../../inputs/blodgett/Blodget_grid_20251115.nc'
@@ -11,9 +11,9 @@ pft_mgmt_in='../../inputs/blodgett/Blodget_pft_20260426.ndlf.nc'
 clm_hour_file_in='../../inputs/blodgett/Blodget.clim.2012-2022.nc'
 clm_factor_in='NO'
 soil_mgmt_in='NO'
-llignification=.false.
+llignification=.true.
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2023.nc'
-!idebug_day=253
+!idebug_day=188
 lsoilCompaction=.false.
 lverbose=.false.
 plantOM4Heat=.true.
@@ -25,7 +25,7 @@ soichem_model=.true.
 !set up the first year of simulation
 start_date  = '19410101000000'
 grid_mode=1    !enable lateral runoff
-continue_run=.false.
+continue_run=.true.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2012,2015,18,2012,2022,1,2012,2022,0
 
@@ -59,7 +59,7 @@ hist_nhtfrq=-24 !, 0
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n=82             !this shall overwrite what is set in forc_periods
+stop_n=10 !82             !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

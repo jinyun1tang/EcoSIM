@@ -571,7 +571,6 @@ module PlantNonstElmDynMod
           ENDIF
         ENDIF
       ENDDO D415
-!      IF(NB.eq.1)write(1122,*)I*1000+J/24.,RootMycoNonstElms_rpvr(ielmc,ipltroot,2:3,NZ),NonstElmGradt1(2:3),PTSHTR
     ENDIF
   ENDDO D310
 

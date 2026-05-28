@@ -463,7 +463,7 @@ data:
 
  RCHGWTG = 0 ;
 
- RCHGDG = 0 ;
+ RCHGDG = 1 ;
 
  DHI =
   1 ;
@@ -521,7 +521,7 @@ data:
 
  NJ = 11 ;
 
- NL1 = 0 ;
+ NL1 = 2 ;
 
  NL2 = 1 ;
 

@@ -1376,6 +1376,7 @@ module NutUptakeMod
   integer, intent(in) :: I,J
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
+  character(len=*), parameter :: subname='RootExudates'
 
   real(r8) :: CPOOLX,CPOOLT
   real(r8) :: PPOOLX,ZPOOLX
@@ -1395,6 +1396,7 @@ module NutUptakeMod
     DOM_MicP_vr             => plt_soilchem%DOM_MicP_vr         ,& !input  :dissolved organic C micropore, [gC d-2]
     Soil2RootMycoExudE_pvr  => plt_rbgc%Soil2RootMycoExudE_pvr   & !inoput :soil to root/myco flux via exudation, (+) to plants, (-) to soil [g d-2 h-1]
   )
+  call PrintInfo('beg '//subname)
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
   !     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
@@ -1453,7 +1455,7 @@ module NutUptakeMod
       endif
     endif    
   ENDDO      
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine RootExudates
 
