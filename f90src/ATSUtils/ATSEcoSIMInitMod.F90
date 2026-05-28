@@ -65,7 +65,8 @@ implicit none
   mod_snow_albedo  = a_bool
 
   !Set pft file manually for now
-  pft_file_in = '../../../../input_data/ecosim_pftpar_20260303.nc'
+  pft_file_in = ecosim_pft_file_path
+  !pft_file_in = '/home/ctg/Work/code/ats_dev_dir/amanzi_tpls-build-master-Debug/ecosim/ecosim-0.1.0-source/input_data/ecosim_pftpar_20260303.nc'
   
   
   !Calling some setup functions

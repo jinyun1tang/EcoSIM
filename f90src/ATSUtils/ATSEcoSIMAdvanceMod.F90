@@ -97,6 +97,8 @@ implicit none
   !real(r8) :: LeafAreaZsecLive_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
   !real(r8) :: StemAreaZsecLive_lpft(NumLeafInclinationClasses,NumCanopyLayers,JP)
 
+  allocate(a_VEG_test(5))
+  
   NHW=1;NHE=1;NVN=1;NVS=NYS
   I=1;J=1
   NPH_Test=1
@@ -298,6 +300,11 @@ implicit none
       NP0_col(NY,NX) = 1
     endif
     
+    do i=1,5
+      a_VEG_test(i) = 1
+    enddo
+    a_VEG_test(1) = a_VEG(1)
+    
     !loop over npfts and fill snow on canopy variables
     DO NZ=1,num_pfts
        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
@@ -306,7 +313,7 @@ implicit none
        
        !Load the PFT array from ATS and fill the plant traits 
        ! based on that mapping
-       DATAPI(NZ,NY,NX) = a_VEG(NZ)
+       DATAPI(NZ,NY,NX) = a_VEG_test(NZ)
        call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
        
     enddo
@@ -455,7 +462,8 @@ implicit none
     ENDDO
   ENDDO
 
-
+  call destroy(a_VEG_test)
+  
   !end associate
   end subroutine RunEcoSIMSurfaceBalance
 

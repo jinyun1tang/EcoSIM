@@ -4,6 +4,7 @@ module ATSCPLMod
   use ATSEcoSIMInitMod
   use ATSEcoSIMAdvanceMod
   use BGCContainers_module
+  use c_f_interface_module, only : c_f_string_ptr
   implicit none
 
   public
@@ -49,6 +50,7 @@ contains
   integer :: test_rows, test_columns
   real(r8) :: temp_eq, double_eq
   type(c_ptr) :: data_ptr
+  character(len=512) :: f_string_buffer
 
   !call SetBGCSizes(sizes)
 
@@ -59,6 +61,9 @@ contains
   size_col_pad = size_col+30
 
   allocate(temp_array(size_col, num_cols))
+  
+  call c_f_string_ptr(props%pft_file, f_string_buffer)
+  ecosim_pft_file_path = trim(f_string_buffer)
 
   data_ptr = state%mole_fraction%data
   call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])

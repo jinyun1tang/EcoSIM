@@ -82,10 +82,12 @@ Module SharedDataMod
   integer,  allocatable :: a_NL(:)        !lower soil layer index
   integer,  allocatable :: a_NJ(:)
   integer,  allocatable :: a_MaxNumRootLays_col(:)
+  integer,  allocatable :: a_VEG_test(:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
   integer :: num_pfts
   logical :: p_bool, a_bool, pheno_bool
+  character(len=512), public :: ecosim_pft_file_path = ""
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)

@@ -218,6 +218,7 @@ module BGCContainers_module
      logical (c_bool) :: a_bool
      logical (c_bool) :: pheno_bool
      logical (c_bool) :: microbe_bool
+     type (c_ptr)     :: pft_file
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData

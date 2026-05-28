@@ -4,7 +4,8 @@ program EcoATSTest
   use SharedDataMod
   use GridDataType
   use RootDataType
-  use EcoSIMCtrlMod, only: etimer
+  use EcoSIMCtrlMod
+  
   !use ecosim_Time_Mod  , only : ecosim_time_type
   implicit none
 
@@ -29,6 +30,9 @@ program EcoATSTest
   sizes%num_columns = 1
   a_bool = .false.
   pheno_bool = .true.
+  !Set pft file manually
+  pft_file_in = '../../../../input_data/ecosim_pftpar_20260303.nc'
+  
   call Init_ATSEcoSIM_driver()
 
   call Init_EcoSIM(sizes)
