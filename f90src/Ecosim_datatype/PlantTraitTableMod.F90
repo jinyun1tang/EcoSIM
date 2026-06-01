@@ -21,7 +21,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlant2ndGrothPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
-  real(r8), target, allocatable :: PlantInitThermoAdaptZone_pft_tab(:)
+  real(r8), target, allocatable :: PlantInitThermoAdaptZone_tab(:)
   real(r8), target, allocatable :: VmaxRubCarboxyRef_tab(:)
   real(r8), target, allocatable :: VmaxRubOxyRef_tab(:)
   real(r8), target, allocatable :: VmaxPEPCarboxyRef_tab(:)
@@ -155,7 +155,7 @@ module PlantTraitTableMod
   allocate(iPlant2ndGrothPattern_tab(npfts)); iPlant2ndGrothPattern_tab=0
   allocate(iPlantGrainType_tab(npfts));iPlantGrainType_tab=0
   allocate(Myco_tab(npfts));Myco_tab=0
-  allocate(PlantInitThermoAdaptZone_pft_tab(npfts));PlantInitThermoAdaptZone_pft_tab=0.0_r8
+  allocate(PlantInitThermoAdaptZone_tab(npfts));PlantInitThermoAdaptZone_tab=0.0_r8
   allocate(VmaxRubCarboxyRef_tab(npfts));VmaxRubCarboxyRef_tab=0.0_r8
   allocate(VmaxRubOxyRef_tab(npfts));VmaxRubOxyRef_tab=0.0_r8
   allocate(VmaxPEPCarboxyRef_tab(npfts));VmaxPEPCarboxyRef_tab=0.0_r8
@@ -288,7 +288,7 @@ module PlantTraitTableMod
   call destroy(iPlant2ndGrothPattern_tab)
   call destroy(iPlantGrainType_tab)
   call destroy(Myco_tab)
-  call destroy(PlantInitThermoAdaptZone_pft_tab)
+  call destroy(PlantInitThermoAdaptZone_tab)
   call destroy(VmaxRubCarboxyRef_tab)
   call destroy(VmaxRubOxyRef_tab)
   call destroy(VmaxPEPCarboxyRef_tab)

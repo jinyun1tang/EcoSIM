@@ -411,7 +411,7 @@ data:
 
  ALTIG = 351 ;
 
- ATCAG = 0.5 ;
+ ATCAG = 0.2 ;
 
  IDTBLG = 1 ;
 
