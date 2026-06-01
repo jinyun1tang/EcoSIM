@@ -236,6 +236,7 @@ implicit none
   HeatFlx2Canopy_col(NY,NX)        = plt_ew%HeatFlx2Canopy_col
   LWRadCanG_col(NY,NX)             = plt_ew%LWRadCanG
   DO NZ=1,NP0_col(NY,NX)
+    CdH2ORootxSoil_pft(NZ,NY,NX)     = plt_ew%CdH2ORootxSoil_pft(NZ)
     ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)
     ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)
     DeltaTKC_pft(NZ,NY,NX)           = plt_ew%DeltaTKC_pft(NZ)

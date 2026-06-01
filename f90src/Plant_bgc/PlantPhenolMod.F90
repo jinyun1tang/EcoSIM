@@ -26,7 +26,7 @@ module PlantPhenolMod
   real(r8), PARAMETER :: GrothStageNorm4ReprodPheno= 0.667_r8                          !normalized growth stage durations for reproductive phenology,[-]
   real(r8), PARAMETER :: MaxPhotoHour4LeafOutOff   = 3600.0_r8                         !maximum light exposure hours for leaf off [h]
   !PSIMin4LeafOff should be revisited for ferns
-  real(r8), parameter :: PSIMin4LeafOff(0:4)=real((/-200.0,-2.0,-8.0,-5.0,-3.0/),r8)   !minimum leaf water potential of leave off, [h]
+  real(r8), parameter :: PSIMin4LeafOff(0:4)=real((/-200.0,-2.0,-2.0,-2.0,-2.0/),r8)   !minimum leaf water potential of leave off, [h]
   integer , parameter :: BranchNumMax(0:3)=(/5,1,1,1/)                            !maximum branch number
 
   public :: PhenologyUpdate

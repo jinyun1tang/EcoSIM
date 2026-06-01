@@ -106,7 +106,7 @@ module PlantBranchMod
 
     !correct the higest growing leaf node
     DO K=MaxNodesPerBranch1,0,-1
-      if(LeafElmntNode_brch(ielmc,K,NB,NZ)>ppmc)then
+      if(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.1.e-6_r8)then
         KHiestGroLeafNode_brch(NB,NZ)=K
         exit
       endif
@@ -144,6 +144,7 @@ module PlantBranchMod
     !
     call BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
       DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtiolationCoeff,MinNodeID)
+
     !
     CALL GrowLeavesOnBranch(I,J,NZ,NB,MinNodeID,Growth_brch(:,ibrch_leaf),EtiolationCoeff,TurgEff4LeafPetolExpansion,ALLOCL)
     !
@@ -197,9 +198,8 @@ module PlantBranchMod
     !       XRLA=rate of leaf appearance at 25 oC (h-1)
     !
     call SenescenceBranch(NZ,NB,RCCE)
-
-    call RemobilizeBranch(I,J,NZ,NB,BegRemoblize,LRemob_brch,RCCC,RCCN,RCCP,RMxess_brch)
     !
+    call RemobilizeBranch(I,J,NZ,NB,BegRemoblize,LRemob_brch,RCCC,RCCN,RCCP,RMxess_brch)
     !
     !   DEATH IF MAIN STALK OF TREE DIES
     !
@@ -236,7 +236,7 @@ module PlantBranchMod
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
 
     call ResetBranchPhenology(I,J,NB,NZ)
-
+    !
     !   CANOPY N2 FIXATION (CYANOBACTERIA)
     !
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WaterStress4Groth)
@@ -244,7 +244,7 @@ module PlantBranchMod
     CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
 
   ENDIF
-  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'af'//subname     
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine GrowOneBranch
@@ -313,7 +313,8 @@ module PlantBranchMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine BranchBiomAllocate(I,J,NB,NZ,PART,RNonstC4Groth_brch,&
-    DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch,EtiolationCoeff,MinNodeID)
+    DMLFB,DMSHB,CNLFB,CPLFB,CNSHB,CPSHB,ZPLFD,CNPG,Growth_brch, &
+    EtiolationCoeff,MinNodeID)
   implicit none
   integer, intent(in) :: I,J,NB,NZ
   real(r8), intent(in) :: PART(pltpar%NumOfPlantMorphUnits)
@@ -1973,17 +1974,17 @@ module PlantBranchMod
   real(r8) :: dangle
   integer :: L,K,N
   ! begin_execution
-  associate(                                                   &
-    SineBranchAngle_pft   => plt_morph%SineBranchAngle_pft    ,& !input  :branching angle, [degree from horizontal]
-    LeafArea_node         => plt_morph%LeafArea_node          ,& !input  :leaf area, [m2 d-2]
+  associate(                                                           &
+    SineBranchAngle_pft       => plt_morph%SineBranchAngle_pft        ,& !input  :branching angle, [degree from horizontal]
+    LeafArea_node             => plt_morph%LeafArea_node              ,& !input  :leaf area, [m2 d-2]
     CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch  ,& !input  :plant canopy layer branch stem area, [m2 d-2]
-    LeafAngleClass_pft    => plt_morph%LeafAngleClass_pft     ,& !input  :fractionction of leaves in different angle classes, [-]
-    CanopyLeafArea_lnode  => plt_morph%CanopyLeafArea_lnode   ,& !input  :layer/node/branch leaf area, [m2 d-2]
-    MainBranchNum_pft     => plt_morph%MainBranchNum_pft      ,& !input  :number of main branch,[-]
-    StemAreaZsec_brch     => plt_morph%StemAreaZsec_brch      ,& !output :stem surface area, [m2 d-2]
-    LeafAreaZsec_brch     => plt_morph%LeafAreaZsec_brch       & !output :leaf surface area, [m2 d-2]
+    LeafAngleClass_pft        => plt_morph%LeafAngleClass_pft         ,& !input  :fractionction of leaves in different angle classes, [-]
+    CanopyLeafArea_lnode      => plt_morph%CanopyLeafArea_lnode       ,& !input  :layer/node/branch leaf area, [m2 d-2]
+    MainBranchNum_pft         => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
+    StemAreaZsec_brch         => plt_morph%StemAreaZsec_brch          ,& !output :stem surface area, [m2 d-2]
+    LeafAreaZsec_brch         => plt_morph%LeafAreaZsec_brch           & !output :leaf surface area, [m2 d-2]
   )
-  call DebugPrint('beg '//subname//' NZ',NZ)
+  call PrintInfo('beg '//subname)
   D900: DO K=1,MaxNodesPerBranch1
     DO  L=1,NumCanopyLayers1
       DO  N=1,NumLeafInclinationClasses1
@@ -1991,17 +1992,12 @@ module PlantBranchMod
       enddo
     enddo
   ENDDO D900
-! ARLFXB=0._r8
-! ARLFXL=0._r8
-! SURFXX=0._r8
+
   D500: DO K=1,MaxNodesPerBranch1
-!     ARLFXB=ARLFXB+LeafArea_node(K,NB,NZ)
     IF(LeafArea_node(K,NB,NZ).GT.0.0_r8)THEN
       D700: DO L=NumCanopyLayers1,1,-1
-!       ARLFXL=ARLFXL+CanopyLeafArea_lnode(L,K,NB,NZ)
         D800: DO N=1,NumLeafInclinationClasses1
           LeafAreaZsec_brch(N,L,K,NB,NZ)=AZMAX1(LeafAngleClass_pft(N,NZ)*CanopyLeafArea_lnode(L,K,NB,NZ))/REAL(NumOfLeafAzimuthSectors1,R8)
-  !       SURFXX=SURFXX+LeafAreaZsec_brch(N,L,K,NB,NZ)
         ENDDO D800
       ENDDO D700
     ENDIF
@@ -2424,7 +2420,6 @@ module PlantBranchMod
               +PlantElmAllocMat4Litr(NE,inonfoliar,M,NZ)*AZMAX1(PetolShethStrutElms_brch(NE,NB,NZ))*FracPetolShethAlloc2Litr(NE,k_fine_comp)
             LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) = LitrfallElms_pvr(NE,M,k_fine_comp,0,NZ) +dFall
             LitrFallElms_brch(NE,NB,NZ)             = LitrFallElms_brch(NE,NB,NZ)+dFall
-
           ENDDO  
         ENDDO D5330
         LeafAreaLive_brch(NB,NZ)                       = 0._r8
@@ -2895,10 +2890,6 @@ module PlantBranchMod
   Hours2LeafOut_brch(NB,NZ) = Hours2LeafOut_brch(NB,NZ)+dTimeIncLeafout
   PlantChk                  = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantPhenolType_pft(NZ).EQ.iphenotyp_evgreen
   CH2OH                     = 0._r8
-!  if(NZ==1)write(947,*)plt_site%iYearCurrent,I*1000+J/24.,Hours2LeafOut_brch(NB,NZ),HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)) &
-!    ,Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ))
-!  if(NZ==2)write(948,*)plt_site%iYearCurrent,I*1000+J/24.,Hours2LeafOut_brch(NB,NZ),HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)) &
-!    ,Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ))
 
   IF(Hours2LeafOut_brch(NB,NZ).LE.HourReq2InitSStor4LeafOut(iPlantPhenolPattern_pft(NZ)) .OR. plantChk)THEN
     IF(SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -3464,7 +3455,7 @@ module PlantBranchMod
     rProteinC2LeafN_pft    => plt_allom%rProteinC2LeafN_pft     ,& !input  :Plant leaf protein C to N ratio [g protein C (g leaf N)-1]
     rProteinC2LeafP_pft    => plt_allom%rProteinC2LeafP_pft     ,& !input  :Plant leaf protein C to P ratio [g protein C (g leaf P)-1]
     FracGroth2Node_pft     => plt_allom%FracGroth2Node_pft      ,& !input  :parameter for allocation of growth to nodes, [-]
-    PlantPopuLive_pft    => plt_site%PlantPopuLive_pft      ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft      => plt_site%PlantPopuLive_pft        ,& !input  :plant population, [d-2]
     LeafArea_node          => plt_morph%LeafArea_node           ,& !inoput :leaf area, [m2 d-2]
     LeafAreaLive_brch      => plt_morph%LeafAreaLive_brch       ,& !inoput :branch leaf area, [m2 d-2]
     LeafElmntNode_brch     => plt_biom%LeafElmntNode_brch       ,& !inoput :leaf element, [g d-2]
@@ -3513,7 +3504,7 @@ module PlantBranchMod
       !         LeafAreaGrowth,GRO=leaf area,mass growth
       !         LeafAreaLive_brch,LeafArea_node=branch,node leaf area
       !Eq.(3) in Grant and Hesketh, 1992, with updates for small biomass
-      dMC                      = AZMAX1(1.e-9_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GrozNodesPerPlant))
+      dMC                      = AZMAX1(1.e-12_r8,LeafElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GrozNodesPerPlant))
       SpecAreaLeafGrowth       = EtiolationCoeff*SLA1_pft(NZ)*dMC**SLA2*TurgEff4LeafPetolExpansion
       LeafAreaGrowth           = GrowthElms(ielmc)*SpecAreaLeafGrowth
       LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)+LeafAreaGrowth
@@ -3557,11 +3548,11 @@ module PlantBranchMod
   call DebugPrint('beg '//subname//' NZ',NZ)
 
   IF(GrowthPetolSheth(ielmc).GT.0.0_r8)THEN
-    MXNOD=KHiestGroLeafNode_brch(NB,NZ)
-    MNNOD=MAX(MinNodeID,MXNOD-NumCogrowthNode_pft(NZ)+1)
-    MXNOD=MAX(MXNOD,MNNOD)
-    GNOD=MXNOD-MNNOD+1
-    ALLOCS=1.0_r8/GNOD
+    MXNOD  = KHiestGroLeafNode_brch(NB,NZ)
+    MNNOD  = MAX(MinNodeID,MXNOD-NumCogrowthNode_pft(NZ)+1)
+    MXNOD  = MAX(MXNOD,MNNOD)
+    GNOD   = MXNOD-MNNOD+1
+    ALLOCS = 1.0_r8/GNOD
     DO NE=1,NumPlantChemElms
       GrowthElms(NE)=ALLOCS*GrowthPetolSheth(NE)
     ENDDO
@@ -3597,7 +3588,7 @@ module PlantBranchMod
       !   PetoleLength_node=PetolSheth length
       !
       IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.0.0_r8)THEN
-        dMC                        = AZMAX1(1.e-9_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GSSL))
+        dMC                        = AZMAX1(1.e-12_r8,PetolShethElmntNode_brch(ielmc,K,NB,NZ)/(PlantPopuLive_pft(NZ)*GSSL))
         SSL                        = EtiolationCoeff*PetolShethLen2Mass_pft(NZ)*dMC**SSL2*TurgEff4LeafPetolExpansion
         GROS                       = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SSL
         PetoleLength_node(K,NB,NZ) = PetoleLength_node(K,NB,NZ)+GROS*SinePetolShethAngle_pft(NZ)
@@ -3639,7 +3630,7 @@ module PlantBranchMod
   !plant hasnot emerged
   IF(iPlantCalendar_brch(ipltcal_Emerge,NB,NZ).EQ.0)THEN  
     NN=0
-  !plant emerged  
+    !plant emerged  
   ELSE
     NN=1
   ENDIF
@@ -3666,9 +3657,10 @@ module PlantBranchMod
     !     PP=PFT population
     !     StalkLenGrowth,GRO=stalk length,mass growth
     !
-    StalkAveStrutC_brch = StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopuLive_pft(NZ)
-    SpecLenStalkGrowth  = EtiolationCoeff*NodeLenPergC_pft(NZ)*AZMAX1(1.e-9_r8,StalkAveStrutC_brch)**SNL2
+    StalkAveStrutC_brch = AZMAX1(1.e-12_r8,StalkStrutElms_brch(ielmc,NB,NZ)/PlantPopuLive_pft(NZ))
+    SpecLenStalkGrowth  = EtiolationCoeff*NodeLenPergC_pft(NZ)*StalkAveStrutC_brch**SNL2    
     StalkLenGrowth      = GrowthElms(ielmc)/PlantPopuLive_pft(NZ)*SpecLenStalkGrowth
+    !write(9081,*)I*1000+J/24.,NB,GrowthElms(ielmc),PlantPopuLive_pft(NZ),StalkLenGrowth,SpecLenStalkGrowth,StalkAveStrutC_brch,EtiolationCoeff
 
     !
     !     GROWTH AT EACH CURRENT NODE
@@ -3945,7 +3937,7 @@ module PlantBranchMod
 
         IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            LeafElmntRemobFlx_brch(NE,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)*RCCE(NE)
+            LeafElmntRemobFlx_brch(NE,NB,NZ) = AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*RCCE(NE)
           ENDDO
         ELSE
           LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=0._r8
@@ -3994,7 +3986,8 @@ module PlantBranchMod
       !       CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
       !       CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
       !     canopy nonstructural Carbon/nutrient is not stored in leaves
-      LeafAreaLive_brch(NB,NZ)   = LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
+      LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
+      LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
       LeafProteinC_node(K,NB,NZ) = AZMAX1(LeafProteinC_node(K,NB,NZ)-AMAX1(LeafEKill(ielmn)*rProteinC2LeafN_pft(NZ),LeafEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
 
       DO NE=1,NumPlantChemElms
@@ -4002,7 +3995,6 @@ module PlantBranchMod
         LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-LeafEKill(NE)
         CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+LeafEcycl(NE)
       ENDDO
-      LeafArea_node(K,NB,NZ) = LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
       !
       !       REMOBILIZATION OF SHEATHS OR PetolSheth C,N,P ALSO DEPENDS ON
       !       STRUCTURAL C:N:P
@@ -4049,8 +4041,8 @@ module PlantBranchMod
       !       FWODSN,FWODSP=N,P woody fraction in PetolSheth:0=woody,1=non-woody
       !
       DO NE=1,NumPlantChemElms
-        PetolEKill(NE)=RSpecKillPetol*AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ))
-        PetolECycl(NE)=RSpecKillPetol*PetolShethChemElmRemobFlx_brch(NE,NB,NZ)
+        PetolEKill(NE) = RSpecKillPetol*AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ))
+        PetolECycl(NE) = RSpecKillPetol*PetolShethChemElmRemobFlx_brch(NE,NB,NZ)
       ENDDO
       D6305: DO M=1,jsken
         DO NE=1,NumPlantChemElms
@@ -4076,13 +4068,12 @@ module PlantBranchMod
       !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing PetolSheth
       !
       DO NE=1,NumPlantChemElms
-        PetolShethStrutElms_brch(NE,NB,NZ)   = PetolShethStrutElms_brch(NE,NB,NZ)-PetolEKill(NE)
-        PetolShethElmntNode_brch(NE,K,NB,NZ) = PetolShethElmntNode_brch(NE,K,NB,NZ)-PetolEKill(NE)
+        PetolShethStrutElms_brch(NE,NB,NZ)   = AZMAX1(PetolShethStrutElms_brch(NE,NB,NZ)-PetolEKill(NE))
+        PetolShethElmntNode_brch(NE,K,NB,NZ) = AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ)-PetolEKill(NE))
         CanopyNonstElms_brch(NE,NB,NZ)       = CanopyNonstElms_brch(NE,NB,NZ)+PetolECycl(NE)
       ENDDO
       PetoleLength_node(K,NB,NZ)   = PetoleLength_node(K,NB,NZ)-RSpecKillPetol*CanPBranchHeight(NB,NZ)
       PetoleProteinC_node(K,NB,NZ) = AZMAX1(PetoleProteinC_node(K,NB,NZ)-AMAX1(PetolEKill(ielmn)*rProteinC2LeafN_pft(NZ),PetolEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
-
     ENDIF
   ENDIF
   call PrintInfo('end '//subname)

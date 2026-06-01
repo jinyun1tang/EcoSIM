@@ -223,6 +223,7 @@ implicit none
     DiffCO2Atmos2Intracel_pft(NZ,NY,NX) = plt_photo%DiffCO2Atmos2Intracel_pft(NZ)
     DeltaTKC_pft(NZ,NY,NX)              = plt_ew%DeltaTKC_pft(NZ)
     ENGYX_pft(NZ,NY,NX)                 = plt_ew%ENGYX_pft(NZ)
+    CdH2ORootxSoil_pft(NZ,NY,NX)        = plt_ew%CdH2ORootxSoil_pft(NZ)
     Transpiration_pft(NZ,NY,NX)         = plt_ew%Transpiration_pft(NZ)
     VapXAir2Canopy_pft(NZ,NY,NX)        = plt_ew%VapXAir2Canopy_pft(NZ)
     CanopyEvapTransLHeat_pft(NZ,NY,NX)         = plt_ew%CanopyEvapTransLHeat_pft(NZ)

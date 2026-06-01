@@ -294,6 +294,7 @@ implicit none
   real(r8),pointer   :: h1D_TURG_CAN_ptc(:)     
   real(r8),pointer   :: h1D_STOML_RSC_H2O_ptc(:) 
   real(r8),pointer   :: h1D_BLYR_RSC_H2O_ptc(:) 
+  real(r8),pointer   :: h1D_CdH2ORootxSoil_ptc(:)
   real(r8),pointer   :: h1D_TRANSPN_ptc(:)      
   real(r8),pointer   :: h1D_NH4_UPTK_FLX_ptc(:)  
   real(r8),pointer   :: h1D_NO3_UPTK_FLX_ptc(:)  
@@ -867,6 +868,7 @@ implicit none
   allocate(this%h1D_TURG_CAN_ptc(beg_ptc:end_ptc))        ;this%h1D_TURG_CAN_ptc(:)=spval
   allocate(this%h1D_STOML_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_STOML_RSC_H2O_ptc(:)=spval
   allocate(this%h1D_BLYR_RSC_H2O_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_H2O_ptc(:)=spval
+  allocate(this%h1D_CdH2ORootxSoil_ptc(beg_ptc:end_ptc)) ;this%h1D_CdH2ORootxSoil_ptc(:)=spval
   allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))         ;this%h1D_TRANSPN_ptc(:)=spval
   allocate(this%h1D_QTRANSP_col(beg_col:end_col)); this%h1D_QTRANSP_col(:)=spval
   allocate(this%h1D_fSnowCan_pft(beg_ptc:end_ptc));this%h1D_fSnowCan_pft(:)=spval
@@ -2184,6 +2186,11 @@ implicit none
   call hist_addfld1d(fname='BLYR_RSC_H2O_pft',units='s/m',avgflag='A',&
     long_name='Canopy boundary layer resistance for H2O',ptr_patch=data1d_ptr,&
     default='inactive')            
+
+  data1d_ptr => this%h1D_CdH2ORootxSoil_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Cd_Root2Soil_H2O_pft',units='kg H2O m-2 h-1 MPa-1',avgflag='A',&
+    long_name='total root soil conductance for plant root H2O uptake',ptr_patch=data1d_ptr,&
+    default='inactive')            
   
   data1d_ptr => this%h1D_TRANSPN_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='QVegTransp_pft',units='mmH2O/m2/h',avgflag='A',&
@@ -2817,11 +2824,11 @@ implicit none
 
   data2d_ptr => this%h2D_litrC_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='litrC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
-    long_name='Column-level Vertically resolved litter C',ptr_col=data2d_ptr,default='inactive')       
+    long_name='Column-level Vertically resolved litter C',ptr_col=data2d_ptr)       
 
   data2d_ptr => this%h2D_litrN_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='litrN_vr',units='gN/m3',type2d='levsoi',avgflag='A',&
-    long_name='Vertically resolved litter N',ptr_col=data2d_ptr,default='inactive')       
+    long_name='Vertically resolved litter N',ptr_col=data2d_ptr)       
 
   data2d_ptr => this%h2D_litrP_vr(beg_col:end_col,1:JZ)       
   call hist_addfld2d(fname='litrP_vr',units='gP/m3',type2d='levsoi',avgflag='A',&
@@ -3415,7 +3422,7 @@ implicit none
 
   data2d_ptr =>  this%h2D_RDECOMPC_SOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_SOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
-    long_name='Layer resolved Hydrolysis of solid OM C',ptr_col=data2d_ptr,default='inactive')       
+    long_name='Layer resolved Hydrolysis of solid OM C',ptr_col=data2d_ptr)       
 
   data2d_ptr =>  this%h2D_RDECOMPC_BReSOM_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='RDecompC_BReSOM_vr',units='gC/m2/hr',type2d='levsoi',avgflag='A',&
@@ -3758,15 +3765,15 @@ implicit none
 
   data2d_ptr => this%h2D_prtUP_NH4_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='prtUP_NH4_pvr',units='gN/m3/hr',type2d='levsoi',avgflag='A',&
-    long_name='Root uptake of NH4',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root uptake of NH4',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_prtUP_NO3_pvr(beg_ptc:end_ptc,1:JZ)      
   call hist_addfld2d(fname='prtUP_NO3_pvr',units='gN/m3/hr',type2d='levsoi',&
-    avgflag='A',long_name='Root uptake of NO3',ptr_patch=data2d_ptr,default='inactive')       
+    avgflag='A',long_name='Root uptake of NO3',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_prtUP_PO4_pvr(beg_ptc:end_ptc,1:JZ)     
   call hist_addfld2d(fname='prtUP_PO4_pvr',units='gP/m3/hr',type2d='levsoi',avgflag='A',&
-    long_name='Root uptake of PO4',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root uptake of PO4',ptr_patch=data2d_ptr)       
 
   data2d_ptr => this%h2D_DNS_RT_pvr(beg_ptc:end_ptc,1:JZ)       
   call hist_addfld2d(fname='RootLDS_pvr',units='cm/cm3',type2d='levsoi',avgflag='A',&
@@ -4423,6 +4430,7 @@ implicit none
         this%h1D_TURG_CAN_ptc(nptc)      = PSICanopyTurg_pft(NZ,NY,NX)
         this%h1D_STOML_RSC_H2O_ptc(nptc)  = CanPStomaResistH2O_pft(NZ,NY,NX)*secs1hour
         this%h1D_BLYR_RSC_H2O_ptc(nptc)  = RawCanopy2Atm_pft(NZ,NY,NX)*secs1hour
+        this%h1D_CdH2ORootxSoil_ptc(nptc) = CdH2ORootxSoil_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_TRANSPN_ptc(nptc)       = Transpiration_pft(NZ,NY,NX)*m2mm/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_QTRANSP_col(ncol)       = this%h1D_QTRANSP_col(ncol)+this%h1D_TRANSPN_ptc(nptc)        
         this%h1D_NH4_UPTK_FLX_ptc(nptc)  = RootNH4Uptake_pft(NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4791,6 +4799,7 @@ implicit none
   this%h1D_CanPhenol_TSTRSS_ptc(nptc)=0._r8
   this%h1D_STOML_RSC_H2O_ptc(nptc)  = 0._r8
   this%h1D_BLYR_RSC_H2O_ptc(nptc)  = 0._r8
+  this%h1D_CdH2ORootxSoil_ptc(nptc) = 0._r8
   this%h1D_TRANSPN_ptc(nptc)       = 0._r8
   this%h1D_NH4_UPTK_FLX_ptc(nptc)  = 0._r8
   this%h1D_NO3_UPTK_FLX_ptc(nptc)  = 0._r8   

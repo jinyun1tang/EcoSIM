@@ -675,6 +675,7 @@ implicit none
   real(r8) :: HeatCanopy2Dist_col           !canopy energy +/- due to disturbance, [MJ /d2]
   real(r8) :: QCanopyWat2Dist_col           !canopy water +/- due to disturbance, [m3 H2O/d2]
   real(r8) :: TPlantRootH2OUptake_col       !total water uptake by roots, [m3 H2O/d2]
+  real(r8), pointer :: CdH2ORootxSoil_pft(:)          => null()    !total root and soil conductance for plant root water uptake, [mH2O h-1 d-2 MPa-1]
   REAL(R8), pointer :: BulkFactor4Snow_pft(:)         => null()    !pft bulking factor for canopy snow interception effect on radiation, [m2 (ton SWE)-1]
   real(r8), pointer :: fSnowCanopy_pft(:)             => null()    !fraction of canopy is snow covered, [-]
   real(r8), pointer :: Transpiration_pft(:)           => null()    !canopy transpiration,                                         [m3 d-2 h-1]
@@ -1354,6 +1355,7 @@ implicit none
   allocate(this%RootH2OUptkStress_pvr(jroots,JZ1,JP1)); this%RootH2OUptkStress_pvr=spval
   allocate(this%TWaterPlantRoot2Soil_vr(0:JZ1));this%TWaterPlantRoot2Soil_vr=spval
   allocate(this%Transpiration_pft(JP1));this%Transpiration_pft=spval
+  allocate(this%CdH2ORootxSoil_pft(JP1)); this%CdH2ORootxSoil_pft=0._r8
   allocate(this%fSnowCanopy_pft(JP1)); this%fSnowCanopy_pft=spval
   allocate(this%BulkFactor4Snow_pft(JP1)); this%BulkFactor4Snow_pft=spval
   allocate(this%PSICanopyOsmo_pft(JP1));this%PSICanopyOsmo_pft=spval

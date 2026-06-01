@@ -397,7 +397,9 @@ module StartqMod
     (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 
-    IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
+    IF(MatureGroup_pft(NZ,NY,NX).LE.6)THEN
+      NumCogrowthNode_pft(NZ,NY,NX) = 2
+    ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
       NumCoGrowthNode_pft(NZ,NY,NX)=3
     ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.15)THEN
       NumCogrowthNode_pft(NZ,NY,NX)=4

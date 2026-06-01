@@ -52,7 +52,7 @@ module UptakePars
   PCKI          = 0.5E-02_r8
   ZPKI          = ZCKI/PCKI
   PZKI          = PCKI/ZCKI
-  FEXUDE(ielmc) = 1.E-03_r8
+  FEXUDE(ielmc) = 0.5E-03_r8
   FEXUDE(ielmn) = 1.0E-02_r8
   FEXUDE(ielmp) = 1.0E-02_r8
   
