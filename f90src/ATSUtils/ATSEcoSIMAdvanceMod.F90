@@ -306,18 +306,19 @@ implicit none
     a_VEG_test(1) = a_VEG(1)
     
     !loop over npfts and fill snow on canopy variables
-    DO NZ=1,num_pfts
-       SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
-       iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
-       TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
+    if (ldo_sp_mode) then
+      DO NZ=1,num_pfts
+        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
+        iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
+        TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
        
-       !Load the PFT array from ATS and fill the plant traits 
-       ! based on that mapping
-       DATAPI(NZ,NY,NX) = a_VEG_test(NZ)
-       call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
+        !Load the PFT array from ATS and fill the plant traits 
+        ! based on that mapping
+        DATAPI(NZ,NY,NX) = a_VEG_test(NZ)
+        call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
        
-    enddo
-
+      enddo
+    endif
   ENDDO
 
   !Run precribe phenology interpolation which sets necessary variables

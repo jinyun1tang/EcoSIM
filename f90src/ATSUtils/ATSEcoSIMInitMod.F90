@@ -75,7 +75,7 @@ implicit none
 
   !call InitModules()
   call InitAlloc()
-  call ReadPlantTraitTable()
+  if(ldo_sp_mode)call ReadPlantTraitTable()
   call InitUptake
   allocate(THETRX(1:micpar%NumOfLitrCmplxs))
   THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
