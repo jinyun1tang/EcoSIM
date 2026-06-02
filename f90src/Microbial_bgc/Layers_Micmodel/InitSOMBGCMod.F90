@@ -1,7 +1,7 @@
 module InitSOMBGCMOD
   use data_kind_mod,    only : r8 => DAT_KIND_R8
   use EcoSIMConfig,     only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
-  use SoilBGCNLayMod,   only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
+  use MicrobialDiagMod, only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
   use minimathmod,      only : AZMAX1,safe_adb
   use EcoSiMParDataMod, only : micpar
   use DebugToolMod

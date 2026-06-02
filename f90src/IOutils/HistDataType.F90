@@ -1,10 +1,10 @@
 module HistDataType
-!
-! this module is an intermediate step to support ascii output
-! when output is done with netcdf, no id is needed.
+  !
+  ! this module is an intermediate step to support ascii output
+  ! when output is done with netcdf, no id is needed.
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use data_const_mod,   only: spval  => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL
-  use SoilBGCNLayMod,   only: SumMicbGroup, sumDOML, sumMicBiomLayL,SumSolidOML
+  use MicrobialDiagMod, only: SumMicbGroup, sumDOML, sumMicBiomLayL,SumSolidOML
   use UnitMod,          only: units
   use MiniMathMod,      only: safe_adb, AZMAX1,AZERO,VapMass2KPa
   use EcoSiMParDataMod, only: pltpar, micpar
@@ -2952,7 +2952,7 @@ implicit none
     long_name='Aqueous CH4 concentration in soil micropore water',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Aqua_O2_vr(beg_col:end_col,1:JZ)        
-  call hist_addfld2d(fname='O2w_conc_vr',units='g/m3 water',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='O2w_conc_vr',units='gO/m3 water',type2d='levsoi',avgflag='A',&
     long_name='Aqueous O2 concentration in soil micropore water',ptr_col=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Aqua_N2O_vr(beg_col:end_col,1:JZ)    

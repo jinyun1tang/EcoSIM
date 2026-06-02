@@ -9,7 +9,7 @@ module Hour1Mod
   use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
   use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
-  use SoilBGCNLayMod,    only: sumORGMLayL
+  use MicrobialDiagMod,  only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat

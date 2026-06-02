@@ -5,12 +5,14 @@ module StartsMod
 
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: padr,   print_info, check_bool
-  use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate,AZERO
+  use minimathMod,      only: isclose,  AZMAX1,   AZMIN1, real_truncate, AZERO
   use EcoSiMParDataMod, only: micpar
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
   use TracerPropMod,    only: gas_solubility
+  use MicrobialDiagMod, only: sumSurfOMCK
+  use UnitMod,          only: units
   use DebugToolMod
   use EcosimConst
   use TracerIDMod
@@ -45,8 +47,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
-  use SoilBGCNLayMod, only : sumSurfOMCK
-  use UnitMod, only : units
+
   implicit none
 
   private
@@ -431,8 +432,8 @@ module StartsMod
         !particle density of solid OM is about 1.20~1.4 g/cm3, while 
         !particle density for minearl soil is about 2.66 g/cm3~Mg/m3, 1 m^3=1.e6 cm^3
         PTDS              = ppmc*(DensitySolidOM*VORGCM+DensitySolidMineral*(1.0E+06_r8-VORGCM)) ![Mg m-3]
-        VSolidSoil        = SoilBulkDensity_vr(L,NY,NX)/PTDS      ! [Mg m-3]/[Mg m-3]
-        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-VSolidSoil)        
+        VSolidSoil        = SoilBulkDensity_vr(L,NY,NX)/PTDS      ! volume of soil as solid [Mg m-3]/[Mg m-3]
+        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-VSolidSoil)             ! volume of pores in one unit soil
       ELSE
         !for ponding water
         VSolidSoil        = 0._r8
@@ -953,7 +954,7 @@ module StartsMod
       
       CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)     ![m3]
-      VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)  !volume of soil occupied by micropores
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)     = VGeomLayer_vr(L,NY,NX)
 !     bulk density is defined only for soil with micropores

@@ -4,9 +4,9 @@ module TillageMixMod
   use EcoSIMConfig,     only: ndbiomcp => NumDeadMicrbCompts
   use UnitMod,          only: units
   use minimathmod,      only: AZMAX1
-  use SoilBGCNLayMod,   only: sumLitrOMLayL, sumORGMLayL
+  use MicrobialDiagMod, only: sumLitrOMLayL, sumORGMLayL
   use EcoSIMCtrlMod,    only: salt_model
-  use MiniFuncMod,    only: gOC_to_m3_OM
+  use MiniFuncMod,      only: gOC_to_m3_OM
   use DebugToolMod
   use EcosimConst
   use SOMDataType

@@ -1,7 +1,8 @@
 module MicBGCAPI
 
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use SoilBGCNLayMod,       only: DownwardMixOM,          sumMicBiomLayL
+  use SoilBGCNLayMod,       only: DownwardMixOM      
+  use MicrobialDiagMod,     only: sumMicBiomLayL
   use SoilDisturbMod,       only: SOMRemovalByDisturbance
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
@@ -150,7 +151,6 @@ implicit none
   
   call MicAPIRecv(I,J,L,NY,NX,micfor,micstt,micflx,naqfdiag,nmicdiag)
   
-  call WriteDailyDiag(I,J,L,NY,NX)
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
 
@@ -596,43 +596,7 @@ implicit none
 
   end subroutine MicAPIRecv
 
-!------------------------------------------------------------------------------------------
-  subroutine WriteDailyDiag(I,J,L,NY,NX)
-  use EcoSIMCtrlMod, only: etimer
-  use abortutils,    only: iulog
-  
-  implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: L,NY,NX
 
-  if(CumSoilThickness_vr(L,NY,NX)>0.60000001_r8 .or. L.eq.0)return
-
-  !Environmental conditions:
-  !TEMP_vr, rWatFLP_vr, 
-
-  !Chemical concentration:
-  !O2w_conc_vr,Acetate_vr,H2w_conc_vr,CH4w_conc_vr,DOC_vr,
-
-  !Microbial biomass: 
-  !Acetic_methanogenC_vr, Hygrogen_methanogenC_vr,FermentorC_vr,Aerobic_HetrBacterC_vr,
-  !Aerobic_HetrFungiC_vr,Aerobic_methanotrophC_vr,
-
-  !Rates:
-  !CH4Oxi_Aero_vr,CH4Prod_hydro_vr,CH4Prod_aceto_vr,Fermentation_vr,HR_CO2_vr
-
-
-  if(etimer%its_a_new_year() .and. L.eq.1)then
-    write(iulog,*)'start a new file',I,J
-  endif
-  if(isclose(CumSoilThickness_vr(L,NY,NX),0.6_r8))then
-    
-    if(mod(J,24)==0)then
-      !write(iulog,*)'write output'
-      !reset output array
-    endif
-  endif
-
-  end subroutine WriteDailyDiag
 
 !------------------------------------------------------------------------------------------
   subroutine WriteHeader()
