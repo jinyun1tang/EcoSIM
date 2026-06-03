@@ -66,7 +66,7 @@ hist_fincl2='TEMP30cm_col', 'THETW30cm_col','O2wConc30cm_col',
   'RAeroCH4Oxi30cm_col','RCH4ProdAcet30cm_col','RCH4ProdHG30cm_col','RFerment30cm_col','RCO2Ht30cm_col'
 
 hist_mfilt=3650,3650,3650
-hist_nhtfrq=-24,-24,3650
+hist_nhtfrq=-24,-24,-24
 !oscal_test=0.0
 /
 

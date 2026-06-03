@@ -1349,7 +1349,7 @@ implicit none
 
     data1d_ptr => this%h1d_THETW30cm_col(beg_col:end_col) 
     call hist_addfld1d(fname='THETW30cm_col',units='m3 H2O m-3 soil',avgflag='A',&
-      long_name='0-30 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+      long_name='0-30 cm mean volumetric soil moisture',ptr_col=data1d_ptr,default='inactive')        
 
     data1d_ptr => this%h1d_O2wConc30cm_col(beg_col:end_col) 
     call hist_addfld1d(fname='O2wConc30cm_col',units='gO m-3 water',avgflag='A',&
@@ -1421,7 +1421,7 @@ implicit none
 
     data1d_ptr => this%h1d_THETW60cm_col(beg_col:end_col) 
     call hist_addfld1d(fname='THETW60cm_col',units='m3 H2O m-3 soil',avgflag='A',&
-      long_name='0-60 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+      long_name='0-60 cm mean volumetric soil moisture',ptr_col=data1d_ptr,default='inactive')        
 
     data1d_ptr => this%h1d_O2wConc60cm_col(beg_col:end_col) 
     call hist_addfld1d(fname='O2wConc60cm_col',units='gO m-3 water',avgflag='A',&
