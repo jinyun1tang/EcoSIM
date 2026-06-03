@@ -21,7 +21,8 @@ module EcoSIMAPI
   use SoilWaterDataType
   use EcoSIMCtrlMod  
   use BalancesMod  
-  use SoilDiagsMod  
+  use SoilDiagsMod 
+  use MLDataDiagMod 
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
@@ -60,6 +61,8 @@ contains
     if(do_timing)call start_timer(t1)
     CALL MicrobeModel(yearIJ%I,yearIJ%J,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('NIT',t1)
+    
+    if(lmicrobeMLdiag)call MLDataDiag(yearIJ,NHW,NHE,NVN,NVS)
   endif
   !
   !   UPDATE PLANT biogeochemistry
@@ -161,7 +164,7 @@ contains
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ,llignification
-  namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
+  namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_fincl3,hist_yrclose, lmicrobeMLdiag,&
     do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
 
   logical :: laddband
@@ -187,6 +190,7 @@ contains
   NCYC_SNOW             = 20
   grid_mode             = 3
   iErosionMode          = -1
+  lmicrobeMLdiag        = .false.
   restart_out           = .false.
   do_budgets            = .false.
   plant_model           = .true.

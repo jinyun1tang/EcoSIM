@@ -8,6 +8,7 @@ module HistDataType
   use UnitMod,          only: units
   use MiniMathMod,      only: safe_adb, AZMAX1,AZERO,VapMass2KPa
   use EcoSiMParDataMod, only: pltpar, micpar
+  use MLDataDiagType
   use LandSurfDataType
   use DebugToolMod     
   use EcoSIMCtrlMod
@@ -45,6 +46,44 @@ implicit none
   character(len=*), parameter :: mod_filename = &
   __FILE__
   type, public :: histdata_type
+
+  real(r8), pointer :: h1d_TEMP60cm_col(:) 
+  real(r8), pointer :: h1d_THETW60cm_col(:)
+  real(r8), pointer :: h1d_O2wConc60cm_col(:) 
+  real(r8), pointer :: h1d_AcetConc60cm_col(:)
+  real(r8), pointer :: h1d_H2wConc60cm_col(:)
+  real(r8), pointer :: h1d_CH4wConc60cm_col(:)
+  real(r8), pointer :: h1d_DOCConc60cm_col(:)
+  real(r8), pointer :: h1d_AcetMGC60cm_col(:)
+  real(r8), pointer :: h1d_H2MGC60cm_col(:)
+  real(r8), pointer :: h1d_FermC60cm_col(:)
+  real(r8), pointer :: h1d_AeroMOC60cm_col(:)
+  real(r8), pointer :: h1d_AeroHRFungC60cm_col(:)
+  real(r8), pointer :: h1d_AeroHRBactC60cm_col(:)
+  real(r8), pointer :: h1d_RAeroCH4Oxi60cm_col(:)
+  real(r8), pointer :: h1d_RCH4ProdAcet60cm_col(:)
+  real(r8), pointer :: h1d_RCH4ProdHG60cm_col(:)
+  real(r8), pointer :: h1d_RFerment60cm_col(:)
+  real(r8), pointer :: h1d_RCO2Ht60cm_col(:)
+  real(r8), pointer :: h1d_TEMP30cm_col(:) 
+  real(r8), pointer :: h1d_THETW30cm_col(:)
+  real(r8), pointer :: h1d_O2wConc30cm_col(:) 
+  real(r8), pointer :: h1d_AcetConc30cm_col(:)
+  real(r8), pointer :: h1d_H2wConc30cm_col(:)
+  real(r8), pointer :: h1d_CH4wConc30cm_col(:)
+  real(r8), pointer :: h1d_DOCConc30cm_col(:)
+  real(r8), pointer :: h1d_AcetMGC30cm_col(:)
+  real(r8), pointer :: h1d_H2MGC30cm_col(:)
+  real(r8), pointer :: h1d_FermC30cm_col(:)
+  real(r8), pointer :: h1d_AeroMOC30cm_col(:)
+  real(r8), pointer :: h1d_AeroHRFungC30cm_col(:)
+  real(r8), pointer :: h1d_AeroHRBactC30cm_col(:)
+  real(r8), pointer :: h1d_RAeroCH4Oxi30cm_col(:)
+  real(r8), pointer :: h1d_RCH4ProdAcet30cm_col(:)
+  real(r8), pointer :: h1d_RCH4ProdHG30cm_col(:)
+  real(r8), pointer :: h1d_RFerment30cm_col(:)
+  real(r8), pointer :: h1d_RCO2Ht30cm_col(:)
+
   real(r8),pointer   :: h1D_cumFIRE_CO2_col(:)    
   real(r8),pointer   :: h1D_cumFIRE_CH4_col(:)    
   real(r8),pointer   :: h1D_cNH4_LITR_col(:)    
@@ -658,6 +697,45 @@ implicit none
 
   beg_col=1;end_col=bounds%ncols
   beg_ptc=1;end_ptc=bounds%npfts
+  if(lmicrobeMLdiag)then
+    allocate(this%h1d_TEMP60cm_col(beg_col:end_col)) ;this%h1d_TEMP60cm_col(:)=spval
+    allocate(this%h1d_THETW60cm_col(beg_col:end_col)); this%h1d_THETW60cm_col(:)=spval
+    allocate(this%h1d_O2wConc60cm_col(beg_col:end_col)) ; this%h1d_O2wConc60cm_col(:)=spval
+    allocate(this%h1d_AcetConc60cm_col(beg_col:end_col)); this%h1d_AcetConc60cm_col(:)=spval
+    allocate(this%h1d_H2wConc60cm_col(beg_col:end_col)); this%h1d_H2wConc60cm_col(:)=spval
+    allocate(this%h1d_CH4wConc60cm_col(beg_col:end_col)); this%h1d_CH4wConc60cm_col(:)=spval
+    allocate(this%h1d_DOCConc60cm_col(beg_col:end_col)); this%h1d_DOCConc60cm_col(:)=spval
+    allocate(this%h1d_AcetMGC60cm_col(beg_col:end_col)); this%h1d_AcetMGC60cm_col(:)=spval
+    allocate(this%h1d_H2MGC60cm_col(beg_col:end_col)); this%h1d_H2MGC60cm_col(:)=spval
+    allocate(this%h1d_FermC60cm_col(beg_col:end_col)); this%h1d_FermC60cm_col(:)=spval
+    allocate(this%h1d_AeroMOC60cm_col(beg_col:end_col)); this%h1d_AeroMOC60cm_col(:)=spval
+    allocate(this%h1d_AeroHRFungC60cm_col(beg_col:end_col)); this%h1d_AeroHRFungC60cm_col(:)=spval
+    allocate(this%h1d_AeroHRBactC60cm_col(beg_col:end_col)); this%h1d_AeroHRBactC60cm_col(:)=spval
+    allocate(this%h1d_RAeroCH4Oxi60cm_col(beg_col:end_col)); this%h1d_RAeroCH4Oxi60cm_col(:)=spval
+    allocate(this%h1d_RCH4ProdAcet60cm_col(beg_col:end_col)); this%h1d_RCH4ProdAcet60cm_col(:)=spval
+    allocate(this%h1d_RCH4ProdHG60cm_col(beg_col:end_col)); this%h1d_RCH4ProdHG60cm_col(:)=spval
+    allocate(this%h1d_RFerment60cm_col(beg_col:end_col)); this%h1d_RFerment60cm_col(:)=spval
+    allocate(this%h1d_RCO2Ht60cm_col(beg_col:end_col)); this%h1d_RCO2Ht60cm_col(:)=spval
+    allocate(this%h1d_TEMP30cm_col(beg_col:end_col)) ; this%h1d_TEMP30cm_col(:)=spval
+    allocate(this%h1d_THETW30cm_col(beg_col:end_col)); this%h1d_THETW30cm_col(:)=spval
+    allocate(this%h1d_O2wConc30cm_col(beg_col:end_col)); this%h1d_O2wConc30cm_col(:)=spval
+    allocate(this%h1d_AcetConc30cm_col(beg_col:end_col)); this%h1d_AcetConc30cm_col(:)=spval
+    allocate(this%h1d_H2wConc30cm_col(beg_col:end_col)); this%h1d_H2wConc30cm_col(:)=spval
+    allocate(this%h1d_CH4wConc30cm_col(beg_col:end_col)); this%h1d_CH4wConc30cm_col(:)=spval
+    allocate(this%h1d_DOCConc30cm_col(beg_col:end_col)); this%h1d_DOCConc30cm_col(:)=spval
+    allocate(this%h1d_AcetMGC30cm_col(beg_col:end_col)); this%h1d_AcetMGC30cm_col(:)=spval
+    allocate(this%h1d_H2MGC30cm_col(beg_col:end_col)); this%h1d_H2MGC30cm_col(:)=spval
+    allocate(this%h1d_FermC30cm_col(beg_col:end_col)); this%h1d_FermC30cm_col(:)=spval
+    allocate(this%h1d_AeroMOC30cm_col(beg_col:end_col)); this%h1d_AeroMOC30cm_col(:)=spval
+    allocate(this%h1d_AeroHRFungC30cm_col(beg_col:end_col)); this%h1d_AeroHRFungC30cm_col(:)=spval
+    allocate(this%h1d_AeroHRBactC30cm_col(beg_col:end_col));this%h1d_AeroHRBactC30cm_col(:)=spval
+    allocate(this%h1d_RAeroCH4Oxi30cm_col(beg_col:end_col)); this%h1d_RAeroCH4Oxi30cm_col(:)=spval
+    allocate(this%h1d_RCH4ProdAcet30cm_col(beg_col:end_col)); this%h1d_RCH4ProdAcet30cm_col(:)=spval
+    allocate(this%h1d_RCH4ProdHG30cm_col(beg_col:end_col)); this%h1d_RCH4ProdHG30cm_col(:)=spval
+    allocate(this%h1d_RFerment30cm_col(beg_col:end_col)); this%h1d_RFerment30cm_col(:)=spval
+    allocate(this%h1d_RCO2Ht30cm_col(beg_col:end_col)); this%h1d_RCO2Ht30cm_col(:)=spval
+  endif
+
   allocate(this%h1D_cumFIRE_CO2_col(beg_col:end_col)) ;this%h1D_cumFIRE_CO2_col(:)=spval    
   allocate(this%h1D_cumFIRE_CH4_col(beg_col:end_col)) ;this%h1D_cumFIRE_CH4_col(:)=spval    
   allocate(this%h1D_cNH4_LITR_col(beg_col:end_col)) ;this%h1D_cNH4_LITR_col(:)=spval    
@@ -1263,6 +1341,153 @@ implicit none
   !-----------------------------------------------------------------------
   ! initialize history fields 
   !--------------------------------------------------------------------
+
+  if(lmicrobeMLdiag)then
+    data1d_ptr => this%h1d_TEMP30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='TEMP30cm_col',units='K',avgflag='A',&
+      long_name='0-30 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_THETW30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='THETW30cm_col',units='m3 H2O m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_O2wConc30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='O2wConc30cm_col',units='gO m-3 water',avgflag='A',&
+      long_name='0-30 cm mean dissolved O2 concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AcetConc30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AcetConc30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean dissolved acetate concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_H2wConc30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='H2wConc30cm_col',units='gH m-3 water',avgflag='A',&
+      long_name='0-30 cm mean dissolved H2 concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_CH4wConc30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='CH4wConc30cm_col',units='gC m-3 water',avgflag='A',&
+      long_name='0-30 cm mean dissolved CH4 concentration',ptr_col=data1d_ptr,default='inactive')        
+    
+    data1d_ptr => this%h1d_DOCConc30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='DOCConc30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean dissolved organic C concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AcetMGC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AcetMGC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean acetoclastic methanogen C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_H2MGC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='H2MGC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean hydrogenotrohpic methanogen C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_FermC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='FermC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean fermentor C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroMOC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroMOC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean aerobic methanotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroHRFungC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroHRFungC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean aerobic fungi heterotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroHRBactC30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroHRBactC30cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean aerobic bacterial heterotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RAeroCH4Oxi30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RAeroCH4Oxi30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean aerobic CH4 oxidation rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCH4ProdAcet30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCH4ProdAcet30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean acetoclastic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCH4ProdHG30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCH4ProdHG30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean hydrogenotrohpic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RFerment30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RFerment30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean fermentation rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCO2Ht30cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCO2Ht30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-30 cm mean CO2 respiration rate',ptr_col=data1d_ptr,default='inactive')        
+!----------------------------------------------------------------------------------------------------      
+    data1d_ptr => this%h1d_TEMP60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='TEMP60cm_col',units='K',avgflag='A',&
+      long_name='0-60 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_THETW60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='THETW60cm_col',units='m3 H2O m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean soil temperature',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_O2wConc60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='O2wConc60cm_col',units='gO m-3 water',avgflag='A',&
+      long_name='0-60 cm mean dissolved O2 concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AcetConc60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AcetConc60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean dissolved acetate concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_H2wConc60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='H2wConc60cm_col',units='gH m-3 water',avgflag='A',&
+      long_name='0-60 cm mean dissolved H2 concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_CH4wConc60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='CH4wConc60cm_col',units='gC m-3 water',avgflag='A',&
+      long_name='0-60 cm mean dissolved CH4 concentration',ptr_col=data1d_ptr,default='inactive')        
+    
+    data1d_ptr => this%h1d_DOCConc60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='DOCConc60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean dissolved organic C concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AcetMGC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AcetMGC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean acetoclastic methanogen C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_H2MGC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='H2MGC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean hydrogenotrohpic methanogen C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_FermC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='FermC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean fermentor C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroMOC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroMOC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean aerobic methanotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroHRFungC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroHRFungC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean aerobic fungi heterotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_AeroHRBactC60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='AeroHRBactC60cm_col',units='gC m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean aerobic bacterial heterotroph C biomass concentration',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RAeroCH4Oxi60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RAeroCH4Oxi60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean aerobic CH4 oxidation rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCH4ProdAcet60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCH4ProdAcet60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean acetoclastic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCH4ProdHG60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCH4ProdHG60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean hydrogenotrohpic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RFerment60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RFerment60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean fermentation rate',ptr_col=data1d_ptr,default='inactive')        
+
+    data1d_ptr => this%h1d_RCO2Ht60cm_col(beg_col:end_col) 
+    call hist_addfld1d(fname='RCO2Ht60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+      long_name='0-60 cm mean CO2 respiration rate',ptr_col=data1d_ptr,default='inactive')        
+  endif
+
   data1d_ptr => this%h1D_cumFIRE_CO2_col(beg_col:end_col) 
   call hist_addfld1d(fname='cumFIRE_CO2_col',units='gC m-2',avgflag='I',&
     long_name='cumulative CO2 flux from fire (<0 into atmosphere)',ptr_col=data1d_ptr)        
@@ -3920,7 +4145,47 @@ implicit none
       this%h1D_FracBySnow_col(ncol) = FracSurfAsSnow_col(NY,NX)
       this%h1D_FracByLitr_col(ncol) = FracSurfByLitR_col(NY,NX)
       this%h1D_tLITR_C_col(ncol)    = tLitrOM_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      
+
+      if(lmicrobeMLdiag)then
+        this%h1d_TEMP60cm_col(ncol)         = TEMP60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_THETW60cm_col(ncol)        = THETW60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_O2wConc60cm_col(ncol)      = O2wConc60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AcetConc60cm_col(ncol)     = AcetConc60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_H2wConc60cm_col(ncol)      = H2wConc60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_CH4wConc60cm_col(ncol)     = CH4wConc60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_DOCConc60cm_col(ncol)      = DOCConc60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AcetMGC60cm_col(ncol)      = AcetMGC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_H2MGC60cm_col(ncol)        = H2MGC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_FermC60cm_col(ncol)        = FermC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroMOC60cm_col(ncol)      = AeroMOC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroHRFungC60cm_col(ncol)  = AeroHRFungC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroHRBactC60cm_col(ncol)  = AeroHRBactC60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RAeroCH4Oxi60cm_col(ncol)  = RAeroCH4Oxi60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCH4ProdAcet60cm_col(ncol) = RCH4ProdAcet60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCH4ProdHG60cm_col(ncol)   = RCH4ProdHG60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RFerment60cm_col(ncol)     = RFerment60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCO2Ht60cm_col(ncol)       = RCO2Ht60cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_TEMP30cm_col(ncol)         = TEMP30cm_col(NY,NX) /AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_THETW30cm_col(ncol)        = THETW30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_O2wConc30cm_col(ncol)      = O2wConc30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AcetConc30cm_col(ncol)     = AcetConc30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_H2wConc30cm_col(ncol)      = H2wConc30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_CH4wConc30cm_col(ncol)     = CH4wConc30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_DOCConc30cm_col(ncol)      = DOCConc30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AcetMGC30cm_col(ncol)      = AcetMGC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_H2MGC30cm_col(ncol)        = H2MGC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_FermC30cm_col(ncol)        = FermC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroMOC30cm_col(ncol)      = AeroMOC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroHRFungC30cm_col(ncol)  = AeroHRFungC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_AeroHRBactC30cm_col(ncol)  = AeroHRBactC30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RAeroCH4Oxi30cm_col(ncol)  = RAeroCH4Oxi30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCH4ProdAcet30cm_col(ncol) = RCH4ProdAcet30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCH4ProdHG30cm_col(ncol)   = RCH4ProdHG30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RFerment30cm_col(ncol)     = RFerment30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1d_RCO2Ht30cm_col(ncol)       = RCO2Ht30cm_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      endif
+
+
       this%h1D_AMENDED_C_col(ncol)        = AmendC_CumYr_flx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tMICRO_C_col(ncol)         = tMicBiome_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tSoilOrgC_col(ncol)        = tSoilOrgM_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
