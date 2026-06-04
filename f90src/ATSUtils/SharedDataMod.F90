@@ -33,6 +33,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
   real(r8), allocatable :: a_PORO(:,:)    !Porosity
   real(r8), allocatable :: a_MATP(:,:)    !Matric Pressure
+  
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
   real(r8), allocatable :: a_ALT(:)       !Altitude
@@ -78,11 +79,12 @@ Module SharedDataMod
   real(r8), allocatable :: surf_w_source(:) !surface water source
   real(r8), allocatable :: surf_snow_depth(:) !snow depth source
   !real(r8), allocatable :: a_AREA3(:)
-  integer,  allocatable :: a_NU(:)        !upper soil layer index
-  integer,  allocatable :: a_NL(:)        !lower soil layer index
-  integer,  allocatable :: a_NJ(:)
-  integer,  allocatable :: a_MaxNumRootLays_col(:)
-  integer,  allocatable :: a_VEG_test(:)
+  integer, allocatable :: a_NU(:)        !upper soil layer index
+  integer, allocatable :: a_NL(:)        !lower soil layer index
+  integer, allocatable :: a_NJ(:)
+  integer, allocatable :: a_MaxNumRootLays_col(:)
+  integer, allocatable :: a_VEG_test(:)
+  integer, allocatable :: a_PFT(:,:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
   integer :: num_pfts

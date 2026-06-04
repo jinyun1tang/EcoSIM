@@ -314,7 +314,7 @@ implicit none
        
         !Load the PFT array from ATS and fill the plant traits 
         ! based on that mapping
-        DATAPI(NZ,NY,NX) = a_VEG_test(NZ)
+        DATAPI(NZ,NY,NX) = a_PFT(NY,NZ)
         call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
        
       enddo

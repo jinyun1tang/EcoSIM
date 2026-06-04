@@ -466,14 +466,14 @@ module UptakesMod
       FracSoilLBy1stRoots_pvr(L,NZ)=1.0_r8
     ENDDO
     if(ats_cpl_mode)then
-        RootAxialResist_pft(N,NZ) = 500.0_r8
-        RootRadialResist_pft(N,NZ) = 400000.0_r8
+        !RootAxialResist_pft(N,NZ) = 500.0_r8
+        !RootRadialResist_pft(N,NZ) = 400000.0_r8
         DO N=1,Myco_pft(NZ)
             !test vals
-            Root2ndMaxRadius_pft(N,NZ) = 0.0002_r8
+            !Root2ndMaxRadius_pft(N,NZ) = 0.0002_r8
             DO L=NU,MaxSoiL4Root_pft(NZ)
-                Root2ndradius_rpvr(N,L,NZ) = 0.0002_r8
-                Root1stRadius_pvr(N,L,NZ) = 0.001_r8
+                Root1stRadius_pvr(N,L,NZ) = Root1stMaxRadius_pft(N,NZ)
+                Root2ndRadius_rpvr(N,L,NZ) = Root2ndMaxRadius_pft(N,NZ)
             ENDDO
         ENDDO
     endif

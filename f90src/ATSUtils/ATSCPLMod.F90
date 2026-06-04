@@ -57,7 +57,8 @@ contains
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
   num_components = state%mole_fraction%procs
-
+  num_pfts = sizes%num_pfts
+  
   size_col_pad = size_col+30
 
   allocate(temp_array(size_col, num_cols))
@@ -175,6 +176,11 @@ contains
 
   call c_f_pointer(props%snow_albedo%data, data, (/num_cols/))
   a_SALB = data(:)
+ 
+  !This dataset must be flipped due to there only being num_cols x num_pfts values
+  !Even though the technical size of the dataset is num_cols x n_cells 
+  call c_f_pointer(props%plant_functional_type%data, data2D, [num_cols, size_col])
+  a_PFT = data2D(:,:)
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
