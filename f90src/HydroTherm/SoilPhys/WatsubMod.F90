@@ -191,13 +191,6 @@ module WatsubMod
         VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
         VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
       ENDDO  
-      if(NX==4)then
-      write(994,*)I*1000+J,'exit'
-      write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'macl',(VLWatMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'maci',(VLiceMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      endif
 
       DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
         DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
@@ -405,7 +398,7 @@ module WatsubMod
           exit
         ENDIF
       ENDDO D65
-      if(NX==4)then
+      if(NX==4 .and. .false.)then
       write(994,*)I*1000+J
       write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
       write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))

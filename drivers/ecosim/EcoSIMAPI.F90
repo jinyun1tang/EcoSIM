@@ -196,7 +196,7 @@ contains
   plant_model           = .true.
   soichem_model         = .true.
   microbial_model       = .true.
-  llignification        = .true.
+  llignification        = .false.
   disp_planttrait       = .false.
   ref_date              = '18000101000000'   !place holder for future
   start_date            = '18000101000000'   !start date of the simulation, differ from the forcing date
