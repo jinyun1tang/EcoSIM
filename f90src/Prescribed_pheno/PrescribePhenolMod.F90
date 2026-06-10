@@ -211,7 +211,7 @@ implicit none
   PerPlantRootLen_vr = 0.0_r8
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      NP_col(NY,NX)=1
+      !NP_col(NY,NX)=1
       DO NZ=1,NP_col(NY,NX)
         !FOR test only
         tlai_mon_pft(:,NZ,NY,NX)       = LAI

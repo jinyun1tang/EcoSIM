@@ -120,10 +120,19 @@ implicit none
     plt_ew%fSnowCanopy_pft(NZ)              =fSnowCanopy_pft(NZ,NY,NX)   
     Myco_pft(NZ,NY,NX)=1
     plt_ew%DeltaTKC_pft(NZ)                 = DeltaTKC_pft(NZ,NY,NX)
-    if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
-      IsPlantActive_pft(NZ,NY,NX)=iTrue
+    
+    if(ats_cpl_mode)then
+      if(DATAPI(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
+          IsPlantActive_pft(NZ,NY,NX)=iTrue
+        else
+          IsPlantActive_pft(NZ,NY,NX)=iFalse
+      endif
     else
-      IsPlantActive_pft(NZ,NY,NX)=iFalse
+      if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
+        IsPlantActive_pft(NZ,NY,NX)=iTrue
+      else
+        IsPlantActive_pft(NZ,NY,NX)=iFalse
+      endif
     endif
     plt_ew%ETCanopy_CumYr_pft(NZ)      = ETCanopy_CumYr_pft(NZ,NY,NX)
     plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)

@@ -296,8 +296,10 @@ implicit none
     !Fill number of plants from npfts
     if(irootType_col(NY,NX).EQ.0.0)then
       NP0_col(NY,NX) = 0
+      NP_col(NY,NX) = 0
     else
-      NP0_col(NY,NX) = 1
+      NP0_col(NY,NX) = num_pfts
+      NP_col(NY,NX) = num_pfts
     endif
     
     do i=1,5
