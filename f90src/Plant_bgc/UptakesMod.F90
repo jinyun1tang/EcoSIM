@@ -205,6 +205,7 @@ module UptakesMod
       Air_Heat_Latent_store_col = Air_Heat_Latent_store_col+CanopyEvapTransLHeat_pft(NZ)*RawAtm2CanopySinkZ_pft
       Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col+HeatXAir2PCan_pft(NZ)*RawAtm2CanopySinkZ_pft
       TdegCCanopy_pft(NZ)       = units%Kelvin2Celcius(TKC_pft(NZ))
+      
       if(.not.ldo_sp_mode) then      
         call SetCanopyGrowthFuncs(yearIJ%I,yearIJ%J,NZ)
     
