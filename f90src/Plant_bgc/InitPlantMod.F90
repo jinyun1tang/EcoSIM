@@ -52,7 +52,7 @@ module InitPlantMod
     NP                    => plt_site%NP                      ,& !input  :current number of plant species,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
     PlantPopuLive_pft     => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
-    PlantPopuDead_pft      => plt_site%PlantPopuDead_pft        ,& !input  :live+standing dead plant population, [d-2]
+    PlantPopuDead_pft     => plt_site%PlantPopuDead_pft       ,& !input  :live+standing dead plant population, [d-2]
     ZERO                  => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
     iMaintPlantTrait_pft  => plt_pheno%iMaintPlantTrait_pft   ,& !inoput :flag for maintain or reset plant traits, [-]    
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !output :threshold zero for plang growth calculation, [-]
@@ -532,7 +532,8 @@ module InitPlantMod
 !     SeedVolumeMean_pft,SeedMeanLen_pft,SeedAreaMean_pft=seed volume(m3),length(m),AREA3(NU)(m2)
 !     SeedCMass=seed C mass (g) from PFT file
 !
-  call calc_seed_geometry(SeedCMass_pft(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ),SeedWidth2LenRatio_pft(NZ))
+  call calc_seed_geometry(SeedCMass_pft(NZ),SeedWidth2LenRatio_pft(NZ),SeedVolumeMean_pft(NZ),SeedMeanLen_pft(NZ),SeedAreaMean_pft(NZ))
+ 
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -898,6 +899,7 @@ module InitPlantMod
     OrganOsmoPsi0pt_pft     => plt_ew%OrganOsmoPsi0pt_pft      ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
     CanopyLeafSheathC_pft   => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
     ShootElms_pft           => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
+    StemSpecVolume_pft      => plt_morph%StemSpecVolume_pft    ,& !input  :stalk specific volume, [m3 gC-1]        
     HeatCanopy2Dist_col     => plt_ew%HeatCanopy2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
     QCanopyWat2Dist_col     => plt_ew%QCanopyWat2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
     CanopyBiomWater_pft     => plt_ew%CanopyBiomWater_pft      ,& !output :canopy water content, [m3 d-2]
@@ -939,7 +941,7 @@ module InitPlantMod
   FracPARads2Canopy_pft(NZ) = 0._r8
   FDM                       = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ)   = ppmc*CanopyLeafSheathC_pft(NZ)/FDM
-  VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*SpecStalkVolume+CanopyBiomWater_pft(NZ))
+  VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
   QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
   HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   call PrintInfo('end '//subname)

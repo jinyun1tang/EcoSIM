@@ -411,7 +411,7 @@ module readiMod
     
     NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
     NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
-    NM(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+NL1
+    NM(NV1,NH1)     = MaxNumRootLays_col(NV1,NH1)+NL1
     
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)

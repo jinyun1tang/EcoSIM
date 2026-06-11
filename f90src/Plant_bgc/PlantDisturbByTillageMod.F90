@@ -308,13 +308,13 @@ contains
         call RemoveRootsByTillage(yearIJ,NZ,XHVST)
 
         IF(PlantPopuLive_pft(NZ).LE.0.0_r8)THEN
-          isPlantRootAlive_pft(NZ)   = iFalse
-          isPlantShootAlive_pft(NZ)  = iFalse
-          iPlantStateLive_pft(NZ)        = iFalse
-          jHarvstType_pft(NZ)        = jharvtyp_terminate
-          iDayPlantHarvest_pft(NZ)   = yearIJ%I
-          iYearPlantHarvest_pft(NZ)  = iYearCurrent
-          NumPrimeRootAxes_pft(NZ)   = 0._r8
+          isPlantRootAlive_pft(NZ)  = iFalse
+          isPlantShootAlive_pft(NZ) = iFalse
+          iPlantStateLive_pft(NZ)   = iFalse
+          jHarvstType_pft(NZ)       = jharvtyp_terminate
+          iDayPlantHarvest_pft(NZ)  = yearIJ%I
+          iYearPlantHarvest_pft(NZ) = iYearCurrent
+          NumPrimeRootAxes_pft(NZ)  = 0._r8
           DO NR=1,MaxNumRootAxes
             RootSegBaseDepth_raxes(NR,NZ) = 0._r8
             Root1stDepz_raxes(NR,NZ)      = 0._r8

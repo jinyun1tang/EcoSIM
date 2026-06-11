@@ -203,13 +203,14 @@ module CanopyDataType
   real(r8),target,allocatable :: LeafRubiscoCperm2LA_pft(:,:,:)                     !Bundle sheath C4/mesophyll C3 Rubisco C for the branches, [gC Rubisco d-2]
   real(r8),target,allocatable :: LeafPEPCperm2LA_pft(:,:,:)                         !PEP C for the branches, [gC PEP d-2]
   real(r8),target,allocatable :: SpecificLeafArea_pft(:,:,:)                   !specifc leaf area per g C of leaf mass, [m2 leaf area (gC leaf C)-1]
-
+  real(r8),target,allocatable :: CdH2ORootxSoil_pft(:,:,:)                     !total root and soil conductance for plant root water uptake, [mH2O h-1 d-2 MPa-1]
   contains
 !----------------------------------------------------------------------
 
   subroutine InitCanopyData
 
   implicit none
+  allocate(CdH2ORootxSoil_pft(JP,JY,JX)); CdH2ORootxSoil_pft=0._r8
   allocate(LAI_col(JY,JX)); LAI_col=0._r8
   allocate(PARSunlit_pft(JP,JY,JX));PARSunlit_pft=0._r8
   allocate(PARSunsha_pft(JP,JY,JX));PARSunsha_pft=0._r8
@@ -410,6 +411,7 @@ module CanopyDataType
   use abortutils, only : destroy
   implicit none
 
+  call destroy(CdH2ORootxSoil_pft)
   call destroy(LAI_col)
   call destroy(fNCLFW_pft)
   call destroy(fPCLFW_pft)

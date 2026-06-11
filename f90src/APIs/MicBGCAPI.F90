@@ -1,13 +1,14 @@
 module MicBGCAPI
 
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use SoilBGCNLayMod,       only: DownwardMixOM,          sumMicBiomLayL
+  use SoilBGCNLayMod,       only: DownwardMixOM      
+  use MicrobialDiagMod,     only: sumMicBiomLayL
   use SoilDisturbMod,       only: SOMRemovalByDisturbance
   use MicFLuxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
-  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1,real_truncate
+  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1,real_truncate,isclose
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
@@ -61,6 +62,7 @@ implicit none
   call micflx%Init()
   call nmicdiag%Init()
 
+  call WriteHeader()
   end subroutine MicAPI_Init
 !------------------------------------------------------------------------------------------
   subroutine MicAPI_cleanup()
@@ -593,4 +595,12 @@ implicit none
   call PrintInfo('end '//subname)
 
   end subroutine MicAPIRecv
+
+
+
+!------------------------------------------------------------------------------------------
+  subroutine WriteHeader()
+  implicit none
+  
+  end subroutine WriteHeader  
 end module MicBGCAPI

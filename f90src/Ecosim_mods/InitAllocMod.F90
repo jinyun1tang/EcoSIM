@@ -58,6 +58,7 @@ implicit none
   use WatsubMod           , only : InitWatsub
   use BalanceCheckDataType, only : InitBalanceCheckData
   use PlantBGCPars          , only : InitPlantTraitTable
+  use MLDataDiagType        , only : InitMLDataType
   use GridConsts  
   implicit none
   
@@ -144,6 +145,7 @@ implicit none
 
   call InitRadiationData
   
+  call InitMLDataType
   if(salt_model)call InitSoluteProperty
 
   call InitSoilWarming

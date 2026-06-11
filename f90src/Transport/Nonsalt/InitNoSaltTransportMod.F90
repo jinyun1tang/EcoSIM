@@ -4,6 +4,7 @@ module InitNoSaltTransportMod
   USE MiniMathMod,      ONLY: AZMAX1, fixnegmass, flux_mass_limiter,AZERO
   use TracerPropMod,    only: MolecularWeight
   use EcoSiMParDataMod, only: micpar
+  use EcoSIMCtrlMod,    only: lverb  
   use NumericalAuxMod
   use DebugToolMod
   use SOMDataType
@@ -183,6 +184,7 @@ module InitNoSaltTransportMod
           ENDDO
         ENDDO    
       ENDDO 
+
       !
       !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
       !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
@@ -199,25 +201,24 @@ module InitNoSaltTransportMod
       enddo
       
       DO idg=idg_beg,idg_NH3-1
-        if(trcs_RMicbUptake_vr(idg,0,NY,NX)>0._r8)then
+        if(trcs_RMicbUptake_vr(idg,0,NY,NX).GT.0._r8)then
           RBGCSinkGasMM_vr(idg,0,NY,NX) = trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
         else
           RBGCSrceGasMM_vr(idg,0,NY,NX) =-trcs_RMicbUptake_vr(idg,0,NY,NX)*dts_gas
         endif
-        RBGCSinkGasMM_vr(idg,0,NY,NX) = RBGCSinkGasMM_vr(idg,0,NY,NX)+trcs_solml_drib_vr(idg,0,NY,NX)*dts_gas        
+        RBGCSinkGasMM_vr(idg,0,NY,NX) = RBGCSinkGasMM_vr(idg,0,NY,NX)+AZMAX1(trcs_solml_drib_vr(idg,0,NY,NX))*dts_gas        
         trcs_solml_drib_vr(idg,0,NY,NX)=0._r8
       enddo
 
       idg=idg_NH3
-      if(TRProd_chem_sol_NH3_soil_vr(0,NY,NX)>0._r8)then
+      if(TRProd_chem_sol_NH3_soil_vr(0,NY,NX).GT.0._r8)then
         RBGCSrcSoluteM_vr(idg,0,NY,NX)   = TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP      
       else      
         RBGCSinkSoluteM_vr(idg,0,NY,NX)   = -TRProd_chem_sol_NH3_soil_vr(0,NY,NX)*dts_HeatWatTP
-      endif
-      
+      endif      
       RBGCSinkGasMM_vr(idg,0,NY,NX) = RBGCSinkGasMM_vr(idg,0,NY,NX)+trcs_solml_drib_vr(idg,0,NY,NX)*dts_gas        
       trcs_solml_drib_vr(idg,0,NY,NX)=0._r8
-
+      
       DO ids=ids_nut_beg,ids_nuts_end    
         if(RNut_MicbRelease_vr(ids,0,NY,NX)>0._r8)then
           RBGCSrcSoluteM_vr(ids,0,NY,NX)   = RNut_MicbRelease_vr(ids,0,NY,NX)*dts_HeatWatTP

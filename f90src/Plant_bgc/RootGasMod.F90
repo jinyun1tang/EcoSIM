@@ -24,6 +24,10 @@ module RootGasMod
   !the other gases undergo physical exchange according to different water volumes inside/outside the roots.
   !O2 uptake includes that from inside the root through diffusion, and that directly from the soil through transpiration+diffusion.
   !CO2 is first released into roots, then diffuse into soil and atmosphere 
+  !
+  !The O2 transport for mycorrhizae needs some revision. Currently, they only get oxygen from soil. However, in saturated soil,
+  !they get oxygen mostly from the roots that are linked parenchyma. Therefore, the current model tends to underestimate mycorrhizae
+  !biomass for saturated soils.
   implicit none
   integer , intent(in) :: I,J,N,L,NZ
   real(r8), intent(in) :: FineRootRadius(jroots,JZ1),FracPRoot4Uptake(jroots,JZ1,JP1)
@@ -97,7 +101,7 @@ module RootGasMod
   associate(                                                                 &
     RootStrutElms_pft            => plt_biom%RootStrutElms_pft              ,& !input  :plant root structural element mass, [g d-2]
     ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
-    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft            => plt_site%PlantPopuLive_pft              ,& !input  :plant population, [d-2]
     CumSoilThickMidL_vr          => plt_site%CumSoilThickMidL_vr            ,& !input  :depth to middle of soil layer from surface of grid cell, [m]
     AtmGasc                      => plt_site%AtmGasc                        ,& !input  :atmospheric gas concentrations, [g m-3]
     ZEROS                        => plt_site%ZEROS                          ,& !input  :threshold zero for numerical stability,[-]
@@ -154,7 +158,7 @@ module RootGasMod
   call PrintInfo('beg '//subname)
 
   chkActiveUptk=RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. FOXYX.GT.ZERO4Uptk_pft(NZ)
-
+!  if(N.eq.1)write(9340,*)I*1000+J/24.,L,chkActiveUptk,RootStrutElms_pft(ielmc,NZ),FracSoiLayByPrimRoot_pvr(L,NZ)
   IF(.not.chkActiveUptk)THEN    
     !root not active, add CO2 to soil
     RootCO2Ar2Soil_pvr(L,NZ)       = RootCO2Ar2Soil_pvr(L,NZ)-RootCO2AutorX_pvr(N,L,NZ)
@@ -222,6 +226,7 @@ module RootGasMod
     IF(RootStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. FracSoiLayByPrimRoot_pvr(L,NZ).GT.ZERO)THEN
       !primary roots conductance scalar[m]
       RTCR1 = AMAX1(PlantPopuLive_pft(NZ),Root1stXNumL_pvr(L,NZ))*Root1stTransptArea_pvr(N,L,NZ)/CumSoilThickMidL_vr(L)
+      !
       !secondary roots conductance scalar, [m]
       RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
       
@@ -229,11 +234,18 @@ module RootGasMod
         !consider the relationship between primary and secondary roots as serial, so the resistance adds up
         RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
       ELSE
+        !fine root has lower conductance
         RTCRA = RTCR1
       ENDIF
+!      if(N==1)then
+!      write(9914,*)'root',I*1000+J/24.,L,RTCRA,RTCR1,RTCR2,Root1stXNumL_pvr(L,NZ),Root1stTransptArea_pvr(N,L,NZ)
+!      else
+!      write(9915,*)'myco',I*1000+J/24.,L,RTCRA,RTCR1,RTCR2,Root1stXNumL_pvr(L,NZ),Root1stTransptArea_pvr(N,L,NZ)    
+!      endif
     ELSE
       RTCRA=0.0_r8
     ENDIF
+
     !
     !     VARIABLES USED TO CALCULATE ROOT GAS TRANSFER
     !     BETWEEN AQUEOUS AND GASEOUS PHASES

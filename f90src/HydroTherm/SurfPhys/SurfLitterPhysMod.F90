@@ -127,7 +127,6 @@ implicit none
 ! LitRAlbedo=litter albedo
 ! VLWatMicP1,VLiceMicP1=water,ice volume in litter
 ! RadSW2LitR_col,LWRad2LitR_col=incoming shortwave,longwave radiation
-
 !
   !
   ! THERMAL CONDUCTIVITY BETWEEN SURFACE RESIDUE AND SOIL SURFACE
@@ -142,7 +141,7 @@ implicit none
     RadSWByLitR          = (1.0_r8-LitRAlbedo)*RadSW2LitR_col(NY,NX)
     Radt2LitR            = RadSWByLitR+LWRad2LitR_col(NY,NX)
     Eco_RadSW_col(NY,NX) = Eco_RadSW_col(NY,NX) + RadSWByLitR
-
+    
     CNVR = VaporDiffusivityLitR_col(NY,NX)*FracAirFilledSoilPoreM_vr(M,0,NY,NX)**2*POROQ/POROS_vr(0,NY,NX)
     CNV1 = WVapDifusvitySoil_vr(NUM_col(NY,NX),NY,NX)*FracAirFilledSoilPoreM_vr(M,NUM_col(NY,NX),NY,NX)**2 &
       *POROQ/POROS_vr(NUM_col(NY,NX),NY,NX)
@@ -288,8 +287,8 @@ implicit none
   TKS1                = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
   !
   !embedded iteration, local time step size
-  dt_litrHeat=dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
-  CdLitRHSens_col(NY,NX)=0._r8
+  dt_litrHeat            = dts_HeatWatTP/real(NPR,kind=r8)      !time step for litter flux calculation
+  CdLitRHSens_col(NY,NX) = 0._r8
   D5000: DO NN=1,NPR
     !significant litter presence
 
@@ -485,6 +484,7 @@ implicit none
     TKS1   = (ENGYS+tHeatLitR2Soil2-dLWRaddTKS2*TKS1)/(VLHeatCapacitySoil2-dLWRaddTKS2)
 
   ENDDO D5000
+  
   call PrintInfo('end '//subname)
 
   end subroutine SurfLitterIterationM
@@ -620,7 +620,6 @@ implicit none
     dLWRaddTKR = -4._r8*LWEmscefLitR_col(NY,NX)*TK0Prev**3/dts_HeatWatTP
     TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX))*TK0Prev) &
       /(VHeatCapacity1_vr(0,NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX)))
-
     !
     if(abs(TKSoil1_vr(0,NY,NX)-TK0Prev)>10._r8)then
       !revise the derivate
@@ -628,12 +627,8 @@ implicit none
       TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX))*TK0Prev) &
         /(VHeatCapacity1_vr(0,NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX)))
     endif
-    if(I>=357 .and. .false. .and. NX==1)then
-      write(931,*)I*1000+J/24.,NY,NX,M,TairK_col(NY,NX),TK0Prev,TKSoil1_vr(0,NY,NX),TK0Prev-TKSoil1_vr(0,NY,NX),TMX,&
-        'hcp',VLHeatCapLitRPre,VHeatCapacity1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX),'hwflow',HeatFLoByWat2LitRM_col(NY,NX),WatFLo2LitrM_col(NY,NX),'dT',deltaT 
-      write(932,*)I*1000+J/24.,M,TairK_col(NY,NX)-TKSoil1_vr(0,NY,NX),VHeatCapLitRMin_col(NY,NX),'cpo',cpo*m3OM_col(NY,NX),VLWatMicP1_vr(0,NY,NX),VLiceMicP1_vr(0,NY,NX)
-    endif
 
+    
     if(TKSoil1_vr(0,NY,NX)<200._r8 .or. (TKSoil1_vr(0,NY,NX)>373._r8 .and. VHeatCapacity1_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)) )then
       write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,M,NY,NX
       write(*,*)TKSoil1_vr(0,NY,NX),TK0Prev,TairK_col(NY,NX),TKSoil1_vr(NUM_col(NY,NX),NY,NX)
