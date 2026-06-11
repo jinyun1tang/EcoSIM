@@ -461,6 +461,7 @@ module NoduleBGCMod
     AREA3                   => plt_site%AREA3                     ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     ZERO                    => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
     fTgrowRootP_vr          => plt_pheno%fTgrowRootP_vr           ,& !input  :root layer temperature growth functiom, [-]
+    MaxNumRootLays          => plt_site%MaxNumRootLays            ,& !input  :maximum root layer number,[-]
     NoduGrowthYield_pft     => plt_allom%NoduGrowthYield_pft      ,& !input  :nodule growth yield, [g g-1]
     rNCNodule_pft           => plt_allom%rNCNodule_pft            ,& !input  :nodule N:C ratio, [gN gC-1]
     rPCNoduler_pft          => plt_allom%rPCNoduler_pft           ,& !input  :nodule P:C ratio, [gP gC-1]
@@ -498,11 +499,25 @@ module NoduleBGCMod
 !  call SumRootNoduleBiome(I,J,NZ,RootNoduleElms_beg)
   NoduleLitrfall(:)=0._r8
   IF(is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
-    D5400: DO L=NU,NMaxRootBotLayer_pft(NZ)
+    D5400: DO L=NU,MaxNumRootLays
+      if(L.GT.NMaxRootBotLayer_pft(NZ))then
+        DO NE=1,NumPlantChemElms
+          if(RootNodulStrutElms_rpvr(NE,L,NZ).GT.0._r8 .or. RootNodulNonstElms_rpvr(NE,L,NZ).GT.0._r8)then      
+            D6371: DO M=1,jsken
+              dELoss=PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootNodulStrutElms_rpvr(NE,L,NZ)+RootNodulNonstElms_rpvr(NE,L,NZ))
+              LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+dELoss
+              NoduleLitrfall(NE)=  NoduleLitrfall(NE)+dELoss
+            ENDDO D6371
+            RootNodulStrutElms_rpvr(NE,L,NZ)=0._r8
+            RootNodulNonstElms_rpvr(NE,L,NZ)=0._r8
+          endif  
+        ENDDO
+        cycle
+      endif
       IF(PopuRootMycoC_pvr(ipltroot,L,NZ).GT.ZERO4LeafVar_pft(NZ))THEN
-!
-!     INITIAL INFECTION
-!
+        !
+        !     INITIAL INFECTION
+        !
         IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).LE.0.0_r8)THEN
           NoduleInfectE(ielmc)=NodulBiomCatInfection*AREA3(NU)
           NoduleInfectE(ielmn)=NodulBiomCatInfection*AREA3(NU)*rNCNodule_pft(NZ)
@@ -633,8 +648,6 @@ module NoduleBGCMod
         !     SPNDX=specific bacterial decomposition rate at current CCNDLR
         !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
         !     NoduleElmDecayLoss(ielmc),NoduleElmDecayLoss(ielmn),NoduleElmDecayLoss(ielmp)=bacterial C,N,P loss from decomposition
-        !     NoduleElmntDecay2Litr(ielmc),NoduleElmntDecay2Litr(ielmn),NoduleElmntDecay2Litr(ielmp)=bacterial C,N,P decomposition to LitrFall
-        !     NodulElmDecayRecyc(ielmc),NodulElmDecayRecyc(ielmn),NodulElmDecayRecyc(ielmp)=bacterial C,N,P decomposition to recycling
         !
         RCCC  = RCCZN+CCC*RCCYN
         RCCN  = CNC*RCCXN
