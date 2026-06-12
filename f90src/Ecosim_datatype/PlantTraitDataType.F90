@@ -181,6 +181,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PhotoPeriodSens_pft(:,:,:)                 !difference between current and critical daylengths used to calculate  phenological progress, [h]
   real(r8),target,allocatable ::  ClumpFactorInit_pft(:,:,:)                 !initial clumping factor for self-shading in canopy layer, [-]
   real(r8),target,allocatable ::  HourReq4LeafOff_brch(:,:,:,:)              !number of hours below set temperature required for autumn leafoff/hardening, [-]
+  real(r8),target,allocatable ::  StemSpecVolume_pft(:,:,:)                  !stalk specific volume, [m3 gC-1]
   real(r8),target,allocatable ::  TempOffset_pft(:,:,:)                      !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   integer,target,allocatable ::  iEmbryophyteType_pft(:,:,:)                 !plant embroytype [Bryophytes,Pteridophytes,Gymnosperms,Monocots and Eudicots]
   integer,target,allocatable ::  iPlantPhotosynsType_pft(:,:,:)             !plant photosynthetic type (C3 or C4),[-]
@@ -196,6 +197,7 @@ module PlantTraitDataType
   integer,target,allocatable :: iPlant2ndGrothPattern_pft(:,:,:)             !does the plant express secondary growth, [-]
   integer,target,allocatable ::  iPlantGrainType_pft(:,:,:)                  !grain type (below or above-ground), e.g. potato and onion are below,[-]
   integer,target,allocatable ::  Myco_pft(:,:,:)                               !mycorrhizal type, 1, 2 ,[-]
+  
 
 !----------------------------------------------------------------------
 
@@ -374,6 +376,7 @@ contains
   allocate(ClumpFactorInit_pft(JP,JY,JX));      ClumpFactorInit_pft=0._r8
   allocate(HourReq4LeafOff_brch(NumCanopyLayers,JP,JY,JX));  HourReq4LeafOff_brch=0._r8
   allocate(TempOffset_pft(JP,JY,JX));    TempOffset_pft=0._r8
+  allocate(StemSpecVolume_pft(JP,JY,JX)); StemSpecVolume_pft =0._r8
   allocate(iPlantPhotosynsType_pft(JP,JY,JX));    iPlantPhotosynsType_pft=0
   allocate(iEmbryophyteType_pft(JP,JY,JX)); iEmbryophyteType_pft=0
   allocate(iPlantRootProfile_pft(JP,JY,JX));    iPlantRootProfile_pft=0
@@ -395,6 +398,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(StemSpecVolume_pft)
   call destroy(iPlant2ndGrothPattern_pft)
   call destroy(iPlantSnowIntercepType_pft)
   call destroy(Days4FalseBreak_pft)

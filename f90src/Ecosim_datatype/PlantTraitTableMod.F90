@@ -21,7 +21,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlant2ndGrothPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
-  real(r8), target, allocatable :: PlantInitThermoAdaptZone_pft_tab(:)
+  real(r8), target, allocatable :: PlantInitThermoAdaptZone_tab(:)
   real(r8), target, allocatable :: VmaxRubCarboxyRef_tab(:)
   real(r8), target, allocatable :: VmaxRubOxyRef_tab(:)
   real(r8), target, allocatable :: VmaxPEPCarboxyRef_tab(:)
@@ -66,6 +66,7 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: SeedWidth2LenRatio_tab(:)
   real(r8), target, allocatable :: GrainFillRate25C_tab(:)
   real(r8), target, allocatable :: StandingDeadInitC_tab(:)
+  real(r8), target, allocatable :: StemMassDensity_tab(:)
   real(r8), target, allocatable :: Root1stMaxRadius_tab(:)
   real(r8), target, allocatable :: Root2ndMaxRadius_tab(:)
   real(r8), target, allocatable :: RootPorosity_tab(:)
@@ -154,7 +155,7 @@ module PlantTraitTableMod
   allocate(iPlant2ndGrothPattern_tab(npfts)); iPlant2ndGrothPattern_tab=0
   allocate(iPlantGrainType_tab(npfts));iPlantGrainType_tab=0
   allocate(Myco_tab(npfts));Myco_tab=0
-  allocate(PlantInitThermoAdaptZone_pft_tab(npfts));PlantInitThermoAdaptZone_pft_tab=0.0_r8
+  allocate(PlantInitThermoAdaptZone_tab(npfts));PlantInitThermoAdaptZone_tab=0.0_r8
   allocate(VmaxRubCarboxyRef_tab(npfts));VmaxRubCarboxyRef_tab=0.0_r8
   allocate(VmaxRubOxyRef_tab(npfts));VmaxRubOxyRef_tab=0.0_r8
   allocate(VmaxPEPCarboxyRef_tab(npfts));VmaxPEPCarboxyRef_tab=0.0_r8
@@ -197,6 +198,7 @@ module PlantTraitTableMod
   allocate(SeedCMass_tab(npfts));SeedCMass_tab=0._r8
   allocate(SeedWidth2LenRatio_tab(npfts)); SeedWidth2LenRatio_tab=0._r8
   allocate(GrainFillRate25C_tab(npfts));GrainFillRate25C_tab=0._r8
+  allocate(StemMassDensity_tab(npfts)); StemMassDensity_tab=0._r8
   allocate(StandingDeadInitC_tab(npfts));StandingDeadInitC_tab=0._r8
   allocate(Root1stMaxRadius_tab(npfts));Root1stMaxRadius_tab=0._r8
   allocate(Root2ndMaxRadius_tab(npfts));Root2ndMaxRadius_tab=0._r8
@@ -268,7 +270,7 @@ module PlantTraitTableMod
   Subroutine DestructPlantTraitTable()
   use abortutils, only : destroy
   implicit none
-
+  call destroy(StemMassDensity_tab)
   call destroy(xylemPhi_max_tab)
   call destroy(xylemPhi_min_tab)
   call destroy(Radius95pctMature_tab)
@@ -286,7 +288,7 @@ module PlantTraitTableMod
   call destroy(iPlant2ndGrothPattern_tab)
   call destroy(iPlantGrainType_tab)
   call destroy(Myco_tab)
-  call destroy(PlantInitThermoAdaptZone_pft_tab)
+  call destroy(PlantInitThermoAdaptZone_tab)
   call destroy(VmaxRubCarboxyRef_tab)
   call destroy(VmaxRubOxyRef_tab)
   call destroy(VmaxPEPCarboxyRef_tab)

@@ -168,7 +168,7 @@ implicit none
     trcg_rootml_pvr  => plt_rbgc%trcg_rootml_pvr    ,& !input  :root gas content, [g d-2]
     trcs_rootml_pvr  => plt_rbgc%trcs_rootml_pvr    ,& !input  :root aqueous content, [g d-2]
     Myco_pft         => plt_morph%Myco_pft          ,& !input  :mycorrhizal type (no or yes),[-]
-    MaxSoiL4Root_pft => plt_morph%MaxSoiL4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft => plt_morph%MaxSoilLays4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
     trcg_root_vr     => plt_rbgc%trcg_root_vr        & !inoput :total root internal gas flux, [g d-2 h-1]
   )
   trcg_root_vr(idg_beg:idg_NH3,:)   = 0._r8
@@ -176,7 +176,7 @@ implicit none
   trcg(:)=0._r8
   IF(present(NZ1))THEN
     NZ=NZ1
-    DO L=1,MaxSoiL4Root_pft(NZ)
+    DO L=1,MaxSoilLays4Root_pft(NZ)
       DO N=1,Myco_pft(NZ)  
         DO idg=idg_beg,idg_NH3
           trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -189,7 +189,7 @@ implicit none
   ELSE
     DO NZ=1,plt_site%NP  
 
-      DO L=1,MaxSoiL4Root_pft(NZ)
+      DO L=1,MaxSoilLays4Root_pft(NZ)
         DO N=1,Myco_pft(NZ)  
           DO idg=idg_beg,idg_NH3
             trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -384,7 +384,7 @@ implicit none
   associate(                                                   &
     Myco_pft               => plt_morph%Myco_pft              ,& !input  :mycorrhizal type (no or yes),[-]
     NU                     => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
-    MaxSoiL4Root_pft       => plt_morph%MaxSoiL4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     MaxNumRootLays         => plt_site%MaxNumRootLays         ,& !input  :maximum root layer number,[-]
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr       ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     CO2NetFix_pft          => plt_bgcr%CO2NetFix_pft          ,& !output :canopy net CO2 exchange, [gC d-2 h-1]
@@ -470,7 +470,7 @@ implicit none
     CH2OSunlit_pft(NZ)                                          = 0._r8
     CH2OSunsha_pft(NZ)                                          = 0._r8
     RootMaintDef_CO2_pvr(:,:,NZ)                                = 0._r8
-    RootCO2Autor_pvr(1:Myco_pft(NZ),NU:MaxSoiL4Root_pft(NZ),NZ) = 0._r8
+    RootCO2Autor_pvr(1:Myco_pft(NZ),NU:MaxSoilLays4Root_pft(NZ),NZ) = 0._r8
     NH3Dep2Can_pft(NZ)                                          = 0._r8
     GrossResp_pft(NZ)                                           = 0._r8
     GrossCO2Fix_pft(NZ)                                         = 0._r8
@@ -513,9 +513,11 @@ implicit none
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft      ,& !input  :maximum soil layer number for all root axes, [-]    
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
+    Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :Root layer primary axes Active zone structrual element, [g d-2]    
+    Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]    
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
     RootNodulNonstElms_rpvr   => plt_biom%RootNodulNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !input  :root layer element primary axes, [g d-2]
@@ -525,6 +527,8 @@ implicit none
     RootNoduleElms_pft        => plt_biom%RootNoduleElms_pft         ,& !output :plant root nodule element mass, [g d-2]    
     RootMycoNonstElms_pft     => plt_biom%RootMycoNonstElms_pft      ,& !output :nonstructural root-myco chemical element, [g d-2]
     RootStrutElms_pft         => plt_biom%RootStrutElms_pft          ,& !output :plant root structural element mass, [g d-2]
+    Root1stActStruct_pvr      => plt_biom%Root1stActStruct_pvr       ,& !output :active zone of primary roots, [g d-2]
+    Root1stLigStruct_pvr      => plt_biom%Root1stLigStruct_pvr       ,& !output :lignifed primary root biomass, [g d-2]    
     RootMycoMassElm_pvr       => plt_biom%RootMycoMassElm_pvr         & !output :root biomass in chemical elements, [g d-2]
   )
   massr1st1=0._r8;massr2nd1=0._r8
@@ -537,6 +541,8 @@ implicit none
         RootMycoNonstElms_pft(NE,N,NZ) = RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
         massr2nd1(NE)                  = massr2nd1(NE)+sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))
       ENDDO  
+      Root1stActStruct_pvr(NE,L,NZ) = SUM(Root1stActStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
+      Root1stLigStruct_pvr(NE,L,NZ) = SUM(Root1stLigStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
       massr1st1(NE)=massr1st1(NE)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))        
       RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
     ENDDO

@@ -673,6 +673,7 @@ implicit none
   integer :: loc,N
   
   loc=get_pft_loc(KoppenClimZone_col(NY,NX),DATAP(NZ,NY,NX)(1:6),pft_lname,koppen_climl,koppen_clims)
+  StemSpecVolume_pft(NZ,NY,NX) = 1.e-6_r8/StemMassDensity_tab(loc)
   iEmbryophyteType_pft(NZ,NY,NX)     = iEmbryophyteType_pft_tab(loc)
   iPlantPhotosynsType_pft(NZ,NY,NX)  = iPlantPhotosynsType_pft_tab(loc)
   iPlantRootProfile_pft(NZ,NY,NX)     = iPlantRootProfile_tab(loc)
@@ -685,7 +686,7 @@ implicit none
   iPlant2ndGrothPattern_pft(NZ,NY,NX) = iPlant2ndGrothPattern_tab(loc)
   iPlantGrainType_pft(NZ,NY,NX)       = iPlantGrainType_tab(loc)
   Myco_pft(NZ,NY,NX)                  = Myco_tab(loc)
-  PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_pft_tab(loc)
+  PlantInitThermoAdaptZone_pft(NZ,NY,NX)  = PlantInitThermoAdaptZone_tab(loc)
   xylemPhi_min_pft(NZ,NY,NX)          = xylemPhi_min_tab(loc)
   Radius95pctMature_pft(NZ,NY,NX)     = Radius95pctMature_tab(loc)
   xylemPhi_max_pft(NZ,NY,NX)          = xylemPhi_max_tab(loc)
@@ -887,9 +888,9 @@ implicit none
   case (0)
     strval='Shallow root profile, like bryophytes (0)'
   case (1)
-    strval='Intermediate root profile, like herbs (1)'
+    strval='Intermediate deep fibrous root profile, like herbs (1)'
   case (2)
-    strval='Deep root profile, like trees/drought tolerant grasses (2)'
+    strval='Deep penetrative root profile, like trees/drought tolerant grasses (2)'
   case (3)
     strval='Very deep tap root profile (3)'  
   case default
@@ -1082,11 +1083,11 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKO2','Reference Km for rubisco oxygenation  at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein is Rubisco enzyme [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein as Rubisco enzyme [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity  [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein as chlorophyll-bound for light-harvesting [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
   elseif(iPlantPhotosynsType_pft(NZ,NY,NX).eq.ic4_photo)then
     id=addone(id)
     call writefixl(nu_plt,id,'VCMX','Saturated specific carboxylation rate by Rubisco  at 25oC  [umol CO2 (gC rubisco)-1 s-1]',VmaxSpecRubCarboxyRef_pft(NZ,NY,NX),110)
@@ -1097,7 +1098,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKO2','Reference Km for rubisco oxygenation at 25oC  [uM]',XKO2_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein is Rubisco enzyme  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'RUBP','Fraction of total leaf protein as Rubisco enzyme  [gC rubisco/(gC protein)]',LeafRubisco2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
     call writefixl(nu_plt,id,'ETMX','Specific chlorophyll activity at 25oC [umol e- (gC chl)-1 s-1]',SpecLeafChlAct_pft(NZ,NY,NX),110)
     id=addone(id)
@@ -1105,11 +1106,11 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'XKCO24','Reference KM for PEP carboxylation  at 25oC  [uM]',Km4PEPCarboxy_pft(NZ,NY,NX),110)    
     id=addone(id)
-    call writefixl(nu_plt,id,'PEPC','Fraction of total leaf protein is PEPC enzyme [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'PEPC','Fraction of total leaf protein as PEPC enzyme [gC PEP/(gC protein)]',LeafPEP2Protein_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that is chlorophyll-binded  [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'CHL','Fraction of total leaf protein that as chlorophyll-bound for light-harvesting protein [-]',LeafProtein2Chl_pft(NZ,NY,NX),110)
     id=addone(id)
-    call writefixl(nu_plt,id,'fCHLMESO','Fraction of chlorophyll-binded proteins in mesophyll cells [-]',fMesophyllChlProtein_pft(NZ,NY,NX),110)
+    call writefixl(nu_plt,id,'fCHLMESO','Fraction of chlorophyll-bound light-harvesting proteins in mesophyll cells [-]',fMesophyllChlProtein_pft(NZ,NY,NX),110)
   endif  
   id=addone(id)
   call writefixl(nu_plt,id,'FCO2','Intercellular-to-atmospheric CO2 concentration ratio  [-]',CanopyCi2CaRatio_pft(NZ,NY,NX),110)
@@ -1166,10 +1167,12 @@ implicit none
   id=addone(id)  
   call writefixl(nu_plt,id,'SSL1','Specific Petiole/Sheath length vs mass [m gC-1]',PetolShethLen2Mass_pft(NZ,NY,NX),100)
   id=addone(id)
-  call writefixl(nu_plt,id,'SNL1','Specific internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'SNL1','Specific stem internode length vs mass [m gC-1]',NodeLenPergC_pft(NZ,NY,NX),100)
   id=addone(id)
   call writeafixl(nu_plt,id,'CLASS','Fraction of leaf area in 0-22.5,22.5-45,45-67.5,67.5-90 degrees inclination classes (0 being flat) [-]',&
-    LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX),100)
+    LeafAngleClass_pft(1:NumLeafInclinationClasses,NZ,NY,NX),100)  
+  id=addone(id)
+  call writefixl(nu_plt,id,'STDENS','Stem dry mass density (including voids) [gC cm-3]',1.e-6_r8/StemSpecVolume_pft(NZ,NY,NX),100)    
   id=addone(id)
   call writefixl(nu_plt,id,'WDLF','Leaf length:width ratio [-]',rLen2WidthLeaf_pft(NZ,NY,NX),100)  
   id=addone(id)
@@ -1214,7 +1217,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
     id=addone(id)
-    call writefixl(nu_plt,id,'KLGMAX','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
+    call writefixl(nu_plt,id,'KLGMM','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)
@@ -1229,7 +1232,7 @@ implicit none
   endif
   id=addone(id)  
   call writefixl(nu_plt,id,'PR','Nonstructural C concentration needed for root'// &
-    ' branching (gC nonst/gC structl)',NonstCMinCon2InitRoot_pft(NZ,NY,NX),105)
+    ' initiation (gC nonst/gC structl)',NonstCMinCon2InitRoot_pft(NZ,NY,NX),105)
   id=addone(id)  
   call writefixl(nu_plt,id,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)
@@ -1330,9 +1333,9 @@ implicit none
   write(nu_plt,*)('-',j=1,110)
   write(nu_plt,*)'ORGAN N AND P CONCENTRATIONS'
   id=0;id=addone(id)
-  call writefixl(nu_plt,id,'CNWR','Plant root protein C to N ratio [g protein C (g root N)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,id,'CNWR','Ratio of root protein C to total root N [g protein C (g root N)-1]',rProteinC2RootN_pft(NZ,NY,NX),100)      
   id=addone(id)
-  call writefixl(nu_plt,id,'CNWL','Plant leaf protein C to N ratio [g protein C (g leaf N)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
+  call writefixl(nu_plt,id,'CNWL','Ratio of leaf protein C to total leaf N [g protein C (g leaf N)-1]',rProteinC2LeafN_pft(NZ,NY,NX),100)    
   id=addone(id)
   call writefixl(nu_plt,id,'CNLF','Plant leaf NC mass ratio [gN (gC)-1]',rNCLeaf_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1358,9 +1361,9 @@ implicit none
     call writefixl(nu_plt,id,'CNND','Plant nodule NC mass ratio [gN (gC)-1]',rNCNodule_pft(NZ,NY,NX),100)
   endif
   id=addone(id)
-  call writefixl(nu_plt,id,'CPWR','Plant root protein C to P ratio [g protein C (g root P)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,id,'CPWR','Ratio of total root protein C to total root P [g protein C (g root P)-1]',rProteinC2RootP_pft(NZ,NY,NX),100)      
   id=addone(id)
-  call writefixl(nu_plt,id,'CPWL','Plant leaf protein C to P ratio [g protein C (g leaf P)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
+  call writefixl(nu_plt,id,'CPWL','Ratio of total leaf protein C to total P [g protein C (g leaf P)-1]',rProteinC2LeafP_pft(NZ,NY,NX),100)      
   id=addone(id)
   call writefixl(nu_plt,id,'CPLF','Plant leaf PC mass ratio [gP (gC)-1]',rPCLeaf_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1665,7 +1668,8 @@ implicit none
   call ncd_getvar(pft_nfid, 'I2EXP', iPlant2ndGrothPattern_tab)
   call ncd_getvar(pft_nfid, 'IRTYP', iPlantGrainType_tab)
   call ncd_getvar(pft_nfid, 'MY',  Myco_tab)
-  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_pft_tab)
+  call ncd_getvar(pft_nfid,'STDENS',StemMassDensity_tab)
+  call ncd_getvar(pft_nfid, 'ZTYPI', PlantInitThermoAdaptZone_tab)
   call ncd_getvar(pft_nfid, 'VCMX',  VmaxRubCarboxyRef_tab)
   call ncd_getvar(pft_nfid, 'VOMX',  VmaxRubOxyRef_tab)
   call ncd_getvar(pft_nfid, 'VCMX4', VmaxPEPCarboxyRef_tab)

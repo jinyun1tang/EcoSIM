@@ -2,7 +2,7 @@ module SurfaceRadiationMod
 
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use minimathmod,        only: AZMAX1,   isnan
-  use PlantBGCPars,       only: iforward, ibackward,SpecStalkVolume
+  use PlantBGCPars,       only: iforward, ibackward
   use PrescribePhenolMod, only: SetCanopyProfile
   use EcoSIMCtrlMod,      only: ldo_sp_mode,ldo_radiation_test,etimer
   use RadiationDataMod
@@ -194,6 +194,7 @@ module SurfaceRadiationMod
     CanopyLeafAareZ_col        => plt_morph%CanopyLeafAareZ_col        ,& !input  :total leaf area, [m2 d-2]
     StemArea_col               => plt_morph%StemArea_col               ,& !input  :grid canopy stem area, [m2 d-2]
     CanopyLeafArea_col         => plt_morph%CanopyLeafArea_col         ,& !input  :grid canopy leaf area, [m2 d-2]
+    StemSpecVolume_pft         => plt_morph%StemSpecVolume_pft         ,& !input  :stalk specific volume, [m3 gC-1]        
     PlantPopuDead_pft          => plt_site%PlantPopuDead_pft           ,& !inoput :live+standing dead plant population, [d-2]            
     CanopyHeight_col           => plt_morph%CanopyHeight_col           ,& !inoput :canopy height , [m]
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col          ,& !output :canopy layer height, [m]
@@ -216,15 +217,16 @@ module SurfaceRadiationMod
     if(StandDeadStrutElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ) .AND. PlantPopuDead_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
       CanopyHeightDead_pft(NZ) = AMAX1(1.e-2_r8,CanopyHeightDead_pft(NZ),CanopyHeightLive_pft(NZ))
       !stalk radius, assuming cylinderical shape. 
-      RSTK = SQRT(SpecStalkVolume*(StandDeadStrutElms_pft(ielmc,NZ)/PlantPopuDead_pft(NZ))/(PICON*CanopyHeightDead_pft(NZ)))
+      RSTK = SQRT(StemSpecVolume_pft(NZ)*(StandDeadStrutElms_pft(ielmc,NZ)/PlantPopuDead_pft(NZ))/(PICON*CanopyHeightDead_pft(NZ)))
       StandDeadSurfArea_pft(NZ) = 2._R8*PICON*RSTK*CanopyHeightDead_pft(NZ)*PlantPopuDead_pft(NZ)  
       EffHeightDead = AMIN1(CanopyHeightDead_pft(NZ),CanopyHeightZ_col(NumCanopyLayers1))
-
+      !write(*,*)'eff',EffHeightDead,StandDeadSurfArea_pft(NZ),RSTK,CanopyHeightDead_pft(NZ),PlantPopuDead_pft(NZ)  
       DO L=1,NumCanopyLayers1
         if(CanopyHeightDead_pft(NZ).GT.ZERO .and. CanopyHeightZ_col(L-1).LT.CanopyHeightDead_pft(NZ) &
           .and. CanopyHeightZ_col(L) .GT. CanopyHeightZ_col(L-1)) then
           FARSTD=AMIN1(1.0_r8,(CanopyHeightDead_pft(NZ)-CanopyHeightZ_col(L-1))/(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1)))
           CanopySurfAreaProfDead_pft(L,NZ)=FARSTD*StandDeadSurfArea_pft(NZ)*(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))/EffHeightDead
+       !   write(*,*)'L',L,FARSTD,StandDeadSurfArea_pft(NZ),(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))/EffHeightDead
         else
           FARSTD=0._r8
           CanopySurfAreaProfDead_pft(L,NZ)=0._r8
@@ -352,6 +354,7 @@ module SurfaceRadiationMod
   call PrintInfo('beg '//subname)
 
   LeafStalkAreaAll_col=0.0_r8  
+  
   D1135: DO NZ=1,NP
     StandDeadSurfAreaAct_pft(NZ) = 0.0_r8
     LeafStalkAreaAct_pft(NZ)     = 0.0_r8
@@ -373,6 +376,7 @@ module SurfaceRadiationMod
           !add stem/stalk area
           LeafStalkAreaAct_pft(NZ) = LeafStalkAreaAct_pft(NZ)+CanopyStalkSurfArea_lbrch(L,NB,NZ)
           LeafStalkAreaAll_col     = LeafStalkAreaAll_col+CanopyStalkSurfArea_lbrch(L,NB,NZ)
+          !write(*,*)LeafStalkAreaAll_col,CanopyStalkSurfArea_lbrch(L,NB,NZ),L,NB,CanopySurfAreaProfDead_pft(L,NZ)
         ENDDO  
       ENDIF      
     enddo    
@@ -493,8 +497,7 @@ module SurfaceRadiationMod
     RadSWCanopyLAbsroption_pft(:,NZ)  = 0.0_r8
     RadPARCanopyLAbsorption_pft(:,NZ) = 0.0_r8
   ENDDO D1025
-
-
+  call DebugPrint('SineSunInclinationAngle_col',SineSunInclinationAngle_col)
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
   !
@@ -549,6 +552,7 @@ module SurfaceRadiationMod
   !     LeafStalkAreaAll_col,LeafStalkAreaAct_pft=leaf+stalk area of all PFTs,each PFT
   !
   FracSWRad2Grnd_col=1.0_r8
+  call DebugPrint('LeafStalkAreaAll_col',LeafStalkAreaAll_col)
   IF(LeafStalkAreaAll_col.GT.ZEROS)THEN
     !will compute a weighted bulking factor (for snow) considering vertical distribution of LAI.
     !Beer's law

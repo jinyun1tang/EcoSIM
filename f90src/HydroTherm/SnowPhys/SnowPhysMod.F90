@@ -645,7 +645,7 @@ contains
       IF(VLHeatCapSnowMX.GT.VLHeatCapSnowMin_col(NY,NX))THEN
         !apparent temperature before freeze-thaw
         TKApp=(ENGY0+NetHeat2LayL)/VLHeatCapSnowMX
-!        if(NY==1 .and. NX==6 .and. L==1)print*,MM,'Tkapp',TKApp,VOLW0X,ZERO*VcumSnoDWI_col(NY,NX)
+
         IF((TKApp.LT.TFice .AND. VOLW0X.GT.ZERO*VcumSnoDWI_col(NY,NX)) &
           .OR.(TKApp.GT.TFice .AND. VOLI0X+VOLS0X.GT.ZERO*VcumSnoDWI_col(NY,NX)))THEN
           !freeze-thaw condition met
@@ -684,18 +684,18 @@ contains
         SnowThawMass   = 0.0_r8
         IceThawMass    = 0.0_r8
       ENDIF
-!
-!     INTERNAL SNOWPACK SNOW, WATER, ICE, TEMPERATURE
-!
-!     VLDrySnoWE0M,VOLW0M,VOLI0M=snow water eqv,water,ice volume
-!     NetSno2LayL,NetWat2LayL,NetIce2LayL=net snow,water,ice transfer
-!     NetHeat2LayL=conductive+convective heat from snow,water,ice transfer
-!     SnowThawMass,IceThawMass=freeze-thaw changes in water,ice
-!     HeatByFrezThaw=source-limited latent heat flux from freeze-thaw
-!     DENSICE=ice density
-!     TKSnow1,TairK=snowpack,air temperature
-!     VHCPWMM,VLHeatCapSnowMin_col=snowpack, minimum heat capacity
-!
+      !
+      !     INTERNAL SNOWPACK SNOW, WATER, ICE, TEMPERATURE
+      !
+      !     VLDrySnoWE0M,VOLW0M,VOLI0M=snow water eqv,water,ice volume
+      !     NetSno2LayL,NetWat2LayL,NetIce2LayL=net snow,water,ice transfer
+      !     NetHeat2LayL=conductive+convective heat from snow,water,ice transfer
+      !     SnowThawMass,IceThawMass=freeze-thaw changes in water,ice
+      !     HeatByFrezThaw=source-limited latent heat flux from freeze-thaw
+      !     DENSICE=ice density
+      !     TKSnow1,TairK=snowpack,air temperature
+      !     VHCPWMM,VLHeatCapSnowMin_col=snowpack, minimum heat capacity
+      !
       if(abs(NetWat2LayL)>1.e10)call endrun(trim(mod_filename)//' at line',__LINE__)
       CumSno2SnowLM_snvr(L,NY,NX)      = CumSno2SnowLM_snvr(L,NY,NX)+NetSno2LayL
       CumWat2SnowLM_snvr(L,NY,NX)      = CumWat2SnowLM_snvr(L,NY,NX)+NetWat2LayL
@@ -727,7 +727,7 @@ contains
         TKSnow1_snvr(L,NY,NX)=TKSnow1_snvr(L-1,NY,NX)
       ENDIF
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
-!      if(I>=108 .and. L==1)write(*,*)'solvewm',M,TKSnow1_snvr(L,NY,NX),TK1X
+
       if(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 .and. &
         (TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8 .or. TKSnow1_snvr(L,NY,NX)<200._r8))then
         write(*,*)'dh, TK1X, TKSnow1',I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX)

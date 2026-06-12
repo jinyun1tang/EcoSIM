@@ -284,13 +284,13 @@ module grosubsMod
     ZERO4Groth_pft        => plt_biom%ZERO4Groth_pft          ,& !input  :threshold zero for plang growth calculation, [-]
     isPlantRootAlive_pft  => plt_pheno%isPlantRootAlive_pft   ,& !input  :flag to detect root system death,[-]
     NU                    => plt_site%NU                      ,& !input  :current soil surface layer number, [-]
-    MaxSoiL4Root_pft      => plt_morph%MaxSoiL4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft  => plt_morph%MaxSoilLays4Root_pft   ,& !input  :maximum soil layer number for all root axes,[-]
     MainBranchNum_pft     => plt_morph%MainBranchNum_pft      ,& !input  :number of main branch,[-]    
     isPlantShootAlive_pft => plt_pheno%isPlantShootAlive_pft   & !input  :flag to detect canopy death,[-]
   )
 
   call PrintInfo('beg '//subname)
-  
+  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bf'//subname   
   IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
@@ -306,13 +306,16 @@ module grosubsMod
       !
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
-
+    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bfRootBGC'
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
+    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'afRootBGC'
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
+    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'afxfer'    
   else
-    plt_morph%RootSinkWeight_pvr(NU:MaxSoiL4Root_pft(NZ),NZ)=0._r8   
+    plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
   ENDIF
+  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'af'//subname   
 !  if(yearIJ%I>=118.and.yearIJ%J==12 .AND. NZ==1)call CheckPlantBalanceZ(yearIJ,NZ,'exit'//subname)
   !
   call PrintInfo('end '//subname)  
@@ -544,7 +547,7 @@ module grosubsMod
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
     CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
-    MaxSoiL4Root_pft          => plt_morph%MaxSoiL4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]

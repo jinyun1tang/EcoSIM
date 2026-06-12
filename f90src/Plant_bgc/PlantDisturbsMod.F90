@@ -1900,6 +1900,7 @@ module PlantDisturbsMod
     CanopyHeightLive_pft      => plt_morph%CanopyHeightLive_pft       ,& !input  :canopy height, [m]
     iPlant2ndGrothPattern_pft => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches,[-]
+    StemSpecVolume_pft        => plt_morph%StemSpecVolume_pft         ,& !input  :stalk specific volume, [m3 gC-1]        
     iHarvstType_pft           => plt_distb%iHarvstType_pft            ,& !input  :type of harvest,[-]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !inoput :canopy water content, [m3 d-2]
     QCanopyWat2Dist_col       => plt_ew%QCanopyWat2Dist_col           ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
@@ -1950,7 +1951,7 @@ module PlantDisturbsMod
     QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
     H2OLoss_CumYr_col   = H2OLoss_CumYr_col+watflx
 
-    VHeatCapCanopy_pft(NZ) = cpw*(CanopyMassC*SpecStalkVolume+CanopyBiomWater_pft(NZ))
+    VHeatCapCanopy_pft(NZ) = cpw*(CanopyMassC*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
     QCanopyWat2Dist_col    = QCanopyWat2Dist_col+watflx
     HeatCanopy2Dist_col    = HeatCanopy2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
     !

@@ -100,7 +100,7 @@ module WatsubMod
   real(r8) :: Qinfl2MicP_col(JY,JX)
   real(r8) :: HeatInfl2Soil(JY,JX)
   real(r8) :: Qinfl2MacP_col(JY,JX)
-  real(r8) :: dLWRaddTKsoi1(JY,JX)
+  real(r8) :: dHGrnddTKsoi1(JY,JX)    !the derivate of surface heat flux (longwave radiation+sensible heat) with respect to surface temperature
   real(r8) :: twatmass0(JY,JX),twatmasstM(JY,JX)
   integer  :: NUX0(JY,JX)
   logical  :: found_frozen
@@ -122,10 +122,9 @@ module WatsubMod
 
   call BeginMassCheck(NHW,NHE,NVN,NVS,twatmass0)
   twatmasstM=twatmass0
-
   ! 
   call StageSurfacePhysModel(I,J,NHW,NHE,NVN,NVS,ResistanceLitRLay)
-!
+  !
   call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
   !if(lverb)  write(*,*)'DYNAMIC LOOP FOR FLUX CALCULATIONS'
@@ -138,7 +137,7 @@ module WatsubMod
     call PrepHydroThermIterM(M,NHW,NHE,NVN,NVS,TopLayWatVol_col,NUX0)
 
     call RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
-      TopLayWatVol_col,HeatFluxAir2Soi,dLWRaddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP_col)
+      TopLayWatVol_col,HeatFluxAir2Soi,dHGrnddTKsoi1,Qinfl2MicP_col,HeatInfl2Soil,Qinfl2MacP_col)
     
     call CopySoilWatVolIterateM(I,J,M,NHW,NHE,NVN,NVS,TopLayWatVol_col)
 
@@ -151,7 +150,7 @@ module WatsubMod
 
     if(snowRedist_model)call AccumulateSnowRedisFluxM(I,J,M,NHW,NHE,NVN,NVS)
 
-    call UpdateSoilMoistTempM(I,J,M,NHW,NHE,NVN,NVS,dLWRaddTKsoi1)
+    call UpdateSoilMoistTempM(I,J,M,NHW,NHE,NVN,NVS,dHGrnddTKsoi1)
 
     call AggregateSurfRunoffFluxM(I,J,M,NHW,NHE,NVN,NVS)
 
@@ -192,13 +191,6 @@ module WatsubMod
         VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
         VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
       ENDDO  
-      if(NX==4)then
-      write(994,*)I*1000+J,'exit'
-      write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'macl',(VLWatMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      write(994,*)'maci',(VLiceMacP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
-      endif
 
       DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
         DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
@@ -406,7 +398,7 @@ module WatsubMod
           exit
         ENDIF
       ENDDO D65
-      if(NX==4)then
+      if(NX==4 .and. .false.)then
       write(994,*)I*1000+J
       write(994,*)'micl',(VLWatMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
       write(994,*)'mici',(VLiceMicP_vr(L,NY,NX),L=NUM_col(NY,NX),NL_col(NY,NX))
@@ -1262,11 +1254,11 @@ module WatsubMod
   end subroutine VertBoundaryDrainM
 
 !------------------------------------------------------------------------------------------
-  subroutine UpdateSoilMoistTempM(I,J,M,NHW,NHE,NVN,NVS,dLWRaddTKsoi1)
+  subroutine UpdateSoilMoistTempM(I,J,M,NHW,NHE,NVN,NVS,dHGrnddTKsoi1)
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8), intent(in):: dLWRaddTKsoi1(JY,JX)
+  real(r8), intent(in):: dHGrnddTKsoi1(JY,JX)
   character(len=*), parameter :: subname='UpdateSoilMoistTempM'
   integer :: NY,NX,L
   real(r8) :: tk1pres,tk1l
@@ -1377,8 +1369,8 @@ module WatsubMod
               VHeatCapacity1_vr(L,NY,NX) = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
               if(L==NUM_col(NY,NX))then
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
-                  +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)+dHeatPlantRoot2SoilPrev_vr(L,NY,NX)-dLWRaddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
-                  /(VHeatCapacity1_vr(L,NY,NX)-dLWRaddTKsoi1(NY,NX))                 
+                  +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)+dHeatPlantRoot2SoilPrev_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
+                  /(VHeatCapacity1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX))                 
               else
                 TKSoil1_vr(L,NY,NX)        = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)+dHeatPlantRoot2SoilPrev_vr(L,NY,NX))/VHeatCapacity1_vr(L,NY,NX)   
@@ -1386,8 +1378,8 @@ module WatsubMod
             else
               if(L==NUM_col(NY,NX))then
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
-                  +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)-dLWRaddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
-                  /(VHeatCapacity1_vr(L,NY,NX)-dLWRaddTKsoi1(NY,NX))                              
+                  +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
+                  /(VHeatCapacity1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX))                              
               else
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX))/VHeatCapacity1_vr(L,NY,NX)                              

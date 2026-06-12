@@ -8,42 +8,43 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
-  integer :: idebug_day  = -1         !specify the day being debugged
-  integer :: idebug_year = -1         !specify the year being debugged
-  integer :: iselect_plantZ=-1
-  logical :: salt_model   =.false.    !toggle for salt model
-  logical :: erosion_model=.false.  
-  logical :: first_topou   = .false.  !only simulate first topo unit
-  logical :: first_pft     = .false.  !only simulate first pft
-  integer :: iErosionMode =-1         !erosion option
-  logical :: plant_model       =.true.
-  logical :: microbial_model   =.true.
-  logical :: soichem_model     =.true.
-  logical :: snowRedist_model  =.true.
-  logical :: llignification    =.true.
-  logical :: ATS_cpl_mode      =.false.
-  logical :: plantOM4Heat      =.false.
-  logical :: fixWaterLevel     =.false.
-  logical :: lsoilCompaction   =.false.
-  logical :: ldo_sp_mode       =.false.   !do satellite phenology mode
-  logical :: mod_snow_albedo   =.false.
-  logical :: ldo_radiation_test =.false.   !flag to turn on radiation test for prescribed phenolgoy 
-  logical :: ldo_transpt_bubbling=.true.   !flag to turn on/off ebullition during transport
+  logical :: lmicrobeMLdiag = .false.
+  integer :: idebug_day           = -1         !specify the day being debugged
+  integer :: idebug_year          = -1         !specify the year being debugged
+  integer :: iselect_plantZ       = -1
+  logical :: salt_model           = .false.    !toggle for salt model
+  logical :: erosion_model        = .false.
+  logical :: first_topou          = .false.  !only simulate first topo unit
+  logical :: first_pft            = .false.  !only simulate first pft
+  integer :: iErosionMode         = -1         !erosion option
+  logical :: plant_model          = .true.
+  logical :: microbial_model      = .true.
+  logical :: soichem_model        = .true.
+  logical :: snowRedist_model     = .true.
+  logical :: llignification       = .true.
+  logical :: ATS_cpl_mode         = .false.
+  logical :: plantOM4Heat         = .false.
+  logical :: fixWaterLevel        = .false.
+  logical :: lsoilCompaction      = .false.
+  logical :: ldo_sp_mode          = .false.   !do satellite phenology mode
+  logical :: mod_snow_albedo      = .false.
+  logical :: ldo_radiation_test   = .false.   !flag to turn on radiation test for prescribed phenolgoy
+  logical :: ldo_transpt_bubbling = .true.   !flag to turn on/off ebullition during transport
   integer :: yearf1       !first year of daily climate forcing
   integer :: yearf2       !first year of hourly climate forcing
   integer :: nyeardal1    !number of daily climate forcing
-  real(r8) :: aco2_ppm  = 280._r8
-  real(r8) :: ach4_ppm  = 1.144_r8
-  real(r8) :: an2o_ppm  = 0.270_r8
-  real(r8) :: ao2_ppm   = 0.209e6_r8
-  real(r8) :: arg_ppm   = 0.00934e6_r8
-  real(r8) :: an2_ppm   = 0.78e6_r8
-  real(r8) :: anh3_ppm  = 5.e-3_r8
-  real(r8) :: ah2_ppm   = 0.55_r8
-  real(r8) :: atm_co2_fix=-100._r8
-  real(r8) :: atm_ch4_fix=-100._r8
-  real(r8) :: atm_n2o_fix=-100._r8
-  character(len=256) :: warming_exp=''
+  real(r8) :: aco2_ppm        = 280._r8
+  real(r8) :: ach4_ppm        = 1.144_r8
+  real(r8) :: an2o_ppm        = 0.270_r8
+  real(r8) :: ao2_ppm         = 0.209e6_r8
+  real(r8) :: arg_ppm         = 0.00934e6_r8
+  real(r8) :: an2_ppm         = 0.78e6_r8
+  real(r8) :: anh3_ppm        = 5.e-3_r8
+  real(r8) :: ah2_ppm         = 0.55_r8
+  real(r8) :: atm_co2_fix     = -100._r8
+  real(r8) :: atm_ch4_fix     = -100._r8
+  real(r8) :: atm_n2o_fix     = -100._r8
+  character(len=256) :: warming_exp = ''
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in

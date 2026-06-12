@@ -604,10 +604,10 @@ implicit none
         ENDDO          
       ENDIF
     ENDDO 
-!
-!     RESET DEPTH VARIABLES OF DEAD ROOTS
-!
-!   
+    !
+    !     RESET DEPTH VARIABLES OF DEAD ROOTS
+    !
+    !   
     D8795: DO NR=1,NumPrimeRootAxes_pft(NZ)
      NRoot1stTipLay_raxes(NR,NZ)   = NGTopRootLayer_pft(NZ)
      Root1stDepz_raxes(NR,NZ)      = SeedDepth_pft(NZ)

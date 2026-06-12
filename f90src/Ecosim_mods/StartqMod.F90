@@ -4,7 +4,7 @@ module StartqMod
   use DebugToolMod,     only : PrintInfo
   use UnitMod,          only : units
   use EcoSiMParDataMod, only : pltpar
-  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots,SpecStalkVolume  
+  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -397,7 +397,9 @@ module StartqMod
     (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX))))THEN
     FracGroth2Node_pft(NZ,NY,NX)=1.0_r8
 
-    IF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
+    IF(MatureGroup_pft(NZ,NY,NX).LE.6)THEN
+      NumCogrowthNode_pft(NZ,NY,NX) = 2
+    ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.10)THEN
       NumCoGrowthNode_pft(NZ,NY,NX)=3
     ELSEIF(MatureGroup_pft(NZ,NY,NX).LE.15)THEN
       NumCogrowthNode_pft(NZ,NY,NX)=4
@@ -458,7 +460,6 @@ module StartqMod
 !
   call calc_seed_geometry(SeedCMass_pft(NZ,NY,NX),SeedWidth2LenRatio_pft(NZ,NY,NX),SeedVolumeMean_pft(NZ,NY,NX),&
     SeedMeanLen_pft(NZ,NY,NX),SeedAreaMean_pft(NZ,NY,NX))
-
   !
   !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
   !
@@ -528,8 +529,8 @@ module StartqMod
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
     Root2ndMaxRadius1_pft(N,NZ,NY,NX)=Root2ndMaxRadius_pft(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-RootPorosity_pft(N,NZ,NY,NX)))
-    Root1stXSecArea_pft(N,NZ,NY,NX) = PICON*Root1stMaxRadius1_pft(N,NZ,NY,NX)**2._r8
-    Root2ndXSecArea_pft(N,NZ,NY,NX) = PICON*Root2ndMaxRadius1_pft(N,NZ,NY,NX)**2._r8
+    Root1stXSecArea_pft(N,NZ,NY,NX) = PICON*Root1stMaxRadius1_pft(N,NZ,NY,NX)**2
+    Root2ndXSecArea_pft(N,NZ,NY,NX) = PICON*Root2ndMaxRadius1_pft(N,NZ,NY,NX)**2
   ENDDO D500 
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -549,6 +550,7 @@ module StartqMod
   !     PP=population (grid cell-1)
   !
   PlantPopuLive_pft(NZ,NY,NX)           = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PlantPopuDead_pft(NZ,NY,NX)           = PlantPopuLive_pft(NZ,NY,NX)
   doInitPlant_pft(NZ,NY,NX)             = ifalse
   isPlantShootAlive_pft(NZ,NY,NX)       = iTrue
   isPlantRootAlive_pft(NZ,NY,NX)        = iTrue
@@ -749,7 +751,7 @@ module StartqMod
 !
   FDM                           = get_FDM(PSICanopy_pft(NZ,NY,NX))
   CanopyBiomWater_pft(NZ,NY,NX) = ppmc*CanopyLeafSheathC_pft(NZ,NY,NX)/FDM
-  VHeatCapCanopy_pft(NZ,NY,NX)  = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*SpecStalkVolume+CanopyBiomWater_pft(NZ,NY,NX))
+  VHeatCapCanopy_pft(NZ,NY,NX)  = cpw*(ShootElms_pft(ielmc,NZ,NY,NX)*StemSpecVolume_pft(NZ,NY,NX)+CanopyBiomWater_pft(NZ,NY,NX))
 
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------

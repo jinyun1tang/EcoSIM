@@ -19,6 +19,7 @@ target_include_directories(APIs PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/DebugTools/    
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/APIData/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
   ${CMAKE_BINARY_DIR}/f90src/Microbial_bgc/Box_Micmodel

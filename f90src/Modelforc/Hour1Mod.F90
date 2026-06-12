@@ -9,7 +9,7 @@ module Hour1Mod
   use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
   use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
-  use SoilBGCNLayMod,    only: sumORGMLayL
+  use MicrobialDiagMod,  only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
@@ -1534,7 +1534,7 @@ module Hour1Mod
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_NH3
-        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)
+        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)        
       ENDDO
     ELSE
       trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
@@ -1548,6 +1548,7 @@ module Hour1Mod
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
   ENDDO
+  !write(9134,*)I*1000+J/24.,trc_solcl_vr(idg_O2,1:2,NY,NX),trcs_solml_vr(idg_O2,1:2,NY,NX),trcs_solml_drib_vr(idg_O2,1:2,NY,NX)  
   call PrintInfo('end '//subname)
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------
