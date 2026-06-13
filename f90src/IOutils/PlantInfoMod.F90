@@ -153,6 +153,7 @@ implicit none
     DO NX=NH1,NH2
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP_col(NY,NX))
+          if(PlantPopuLive_pft(NZ,NY,NX).GT.1.e-2_r8)cycle          
           tstr=trim(pft_pltinfo(NZ))
           if (tstr .EQ. "") then
             cycle
@@ -271,8 +272,7 @@ implicit none
 
     DO NX=NH1,NH2
       DO NY=NV1,NV2
-        DO NZ=1,MIN(NS,NP_col(NY,NX))
-          !write(iulog,*)'NZ,pft_nmgnt=',NZ,pft_nmgnt(NZ)
+        DO NZ=1,MIN(NS,NP_col(NY,NX))          
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)
@@ -319,13 +319,12 @@ implicit none
               FracBiomHarvsted(iHarvst_pft,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT14
 
               !ecosystem-level harvest
+              !For a harvested pft component, a fraction by (1- ecosystem-level harvest fraction) becomes litter
               FracBiomHarvsted(iHarvst_col,iplthvst_leaf,NZ,IDY,NY,NX)        = ECUT21
               FracBiomHarvsted(iHarvst_col,iplthvst_finenonleaf,NZ,IDY,NY,NX) = ECUT22
               FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ,IDY,NY,NX)       = ECUT23
               FracBiomHarvsted(iHarvst_col,iplthvst_stdead,NZ,IDY,NY,NX)      = ECUT24
 
-
-              !write(iulog,*)'NZ,IDY=',NZ,IDY,StriHarvtype(ICUT),StrjHarvtype(JCUT),'Cut height:',HCUT,'cut fraction:',PCUT
               IF(iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ,IDY,NY,NX).EQ.iharvtyp_herbivo)THEN
                 !animal or insect biomass
                 NN=NN+1
@@ -416,6 +415,7 @@ implicit none
       if(year==yeari)exit   !when year is found matching the forcing data yeari.
       iyear=iyear+1
     ENDDO
+    
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)    
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
@@ -424,7 +424,7 @@ implicit none
     iyear=1
     DO while(.true.)
       call ncd_getvar(pftinfo_nfid,'year',iyear,year)
-      if(year==yearc)exit
+      if(year==yearc)exit  !when year is found matching the current model year.
       iyear=iyear+1
     ENDDO
     call readplantinginfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
