@@ -1854,7 +1854,7 @@ implicit none
                      trim(locfnh(t)),' at nstep = ', etimer%get_nstep()
                 write(iulog,*)
 !             endif
-	           call ncd_pio_closefile(nfid(t))
+             call ncd_pio_closefile(nfid(t))
              if (.not.if_stop .and. (tape(t)%ntimes/=tape(t)%mfilt)) then
                 call ncd_pio_openfile (nfid(t), trim(locfnh(t)), ncd_write)
              end if
