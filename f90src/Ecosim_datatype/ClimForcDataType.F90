@@ -139,7 +139,7 @@ implicit none
   real(r8),target,allocatable ::  tsai_day_pft(:,:,:)                    !interpolated daily sai for different pft used in prescribed phenology, [m2/m2]
   real(r8),target,allocatable ::  height_top_mon_pft(:,:,:,:)            !monthly canopy top height used in prescribed phenology, [m]
   real(r8),target,allocatable ::  height_bot_mon_pft(:,:,:,:)            !monthly canopy bottom height used in prescribed phenology, [m]
-
+  REAL(R8),target,allocatable ::  NWetDep_col(:,:)                       !atmospheric inorganic N wet deposition, [gN m-2 h-1]
   contains
 !----------------------------------------------------------------------
 
@@ -150,6 +150,7 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(NWetDep_col(JY,JX)); NWetDep_col=0._r8
   allocate(tlai_mon_pft(12,JP,JY,JX));tlai_mon_pft=0._r8
   allocate(tsai_mon_pft(12,JP,JY,JX));tsai_mon_pft=0._r8
   allocate(tlai_day_pft(JP,JY,JX));tlai_day_pft=0._r8
@@ -249,6 +250,7 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
+  call destroy(NWetDep_col)
   call destroy(height_bot_mon_pft)  
   call destroy(height_top_mon_pft)
   call destroy(tlai_mon_pft)
