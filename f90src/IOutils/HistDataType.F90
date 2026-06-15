@@ -251,6 +251,7 @@ implicit none
   real(r8),pointer   :: h1D_CO2_WetDep_FLX_col(:)
   real(r8),pointer   :: h1D_RootN_Fix_col(:)
   real(r8),pointer   :: h1D_AR_WetDep_FLX_col(:)
+  real(r8),pointer   :: h1D_NWetDep_flx_col(:)
   real(r8),pointer   :: h1D_RootXO2_flx_col(:)
   real(r8),pointer   :: h1D_N2O_SEMIS_FLX_col(:)     
   real(r8),pointer   :: h1D_N2_SEMIS_FLX_col(:)      
@@ -536,6 +537,7 @@ implicit none
   real(r8),pointer   :: h2D_Root1stDepz_ptc(:,:) 
   real(r8),pointer   :: h2D_RootPop_pvr(:,:)
   real(r8),pointer   :: h2D_MycoPop_pvr(:,:)
+  real(r8),pointer   :: h2D_MycoBiomC_pvr(:,:)
   real(r8),pointer   :: h2D_RootRadialKond2H2O_pvr(:,:)  
   real(r8),pointer   :: h2D_RootAxialKond2H2O_pvr(:,:)
   real(r8),pointer   :: h2D_VmaxNH4Root_pvr(:,:)
@@ -899,6 +901,7 @@ implicit none
   allocate(this%h1D_CANET_col(beg_col:end_col))           ;this%h1D_CANET_col(:)=spval
   allocate(this%h1D_CanopyEvap_col(beg_col:end_col)) ; this%h1D_CanopyEvap_col(:)=spval
   allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
+  allocate(this%h1D_NWetDep_flx_col(beg_col:end_col)); this%h1D_NWetDep_flx_col(:)=spval
   allocate(this%h1d_fPAR_col(beg_col:end_col));   this%h1d_fPAR_col(:)=spval
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
   allocate(this%h1D_tHeat_col(beg_col:end_col))           ;this%h1D_tHeat_col(:)=spval
@@ -1324,6 +1327,7 @@ implicit none
   allocate(this%h2D_prtUP_PO4_pvr(beg_ptc:end_ptc,1:JZ))  ;this%h2D_prtUP_PO4_pvr(:,:)=spval                                                              
   allocate(this%h2D_DNS_RT_pvr(beg_ptc:end_ptc,1:JZ))     ;this%h2D_DNS_RT_pvr(:,:)=spval
   allocate(this%h2D_RootNonstBConc_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNonstBConc_pvr(:,:)=spval   
+  allocate(this%h2D_MycoBiomC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_MycoBiomC_pvr(:,:)=spval
   allocate(this%h2D_Root1stStrutC_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root1stStrutC_pvr=spval
   allocate(this%h2D_Cyctokinin1stConc_pvr(beg_ptc:end_ptc,1:JZ));  this%h2D_Cyctokinin1stConc_pvr(:,:)=spval
   allocate(this%h2D_Root1stStrutN_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root1stStrutN_pvr=spval
@@ -2201,6 +2205,10 @@ implicit none
     avgflag='A',long_name='Wet deposition Ar flux to soil, '// &
     'from rainfall and irrigation (<0 into atmosphere)',ptr_col=data1d_ptr,&
     default='inactive')            
+
+  data1d_ptr => this%h1D_NWetDep_flx_col(beg_col:end_col)
+  call hist_addfld1d(fname='Ni_WetDep_col',units='gN/m2/hr',&
+    avgflag='A',long_name='Atmospheric wet inorganic N deposition rate',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%h1D_RootXO2_flx_col(beg_col:end_col)
   call hist_addfld1d(fname='RootO2_X_Flx_col',units='gO2/m2/hr',&
@@ -3948,6 +3956,10 @@ implicit none
   call hist_addfld2d(fname='RootC_1st_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Primary root structural biomass C density',ptr_patch=data2d_ptr)       
 
+  data2d_ptr => this%h2D_MycoBiomC_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='MycoBiomC_pvr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Mycorrhizal biomass C density',ptr_patch=data2d_ptr,default='inactive')       
+
   data2d_ptr => this%h2D_Cyctokinin1stConc_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Cyctokinin1stConc_pvr',units='1.e-3gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Primary root cytokinin mean concentration',ptr_patch=data2d_ptr)       
@@ -4293,6 +4305,7 @@ implicit none
       this%h1D_NH3_SEMIS_FLX_col(ncol)         = SurfGasEmiss_all_flx_col(idg_NH3,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_H2_SEMIS_FLX_col(ncol)          = SurfGasEmiss_all_flx_col(idg_H2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_PAR_col(ncol)            = RadPARSolarBeam_col(NY,NX)
+      this%h1D_NWetDep_flx_col(ncol)  = NWetDep_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_VHeatCap_litr_col(ncol)  = VHeatCapacity_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_AR_WetDep_FLX_col(ncol)  = Gas_WetDeposit_flx_col(idg_Ar,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CO2_WetDep_FLX_col(ncol) = Gas_WetDeposit_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4865,6 +4878,7 @@ implicit none
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_Cyctokinin1stConc_pvr(nptc,L) = 0._r8
           this%h2D_Root1stStrutC_pvr(nptc,L)     = 0._r8
+          this%h2D_MycoBiomC_pvr(nptc,L)         = 0._r8
           this%h2D_Root1stStrutN_pvr(nptc,L)     = 0._r8
           this%h2D_Root1stStrutP_pvr(nptc,L)     = 0._r8
           this%h2D_Root2ndStrutC_pvr(nptc,L)     = 0._r8
@@ -4929,6 +4943,7 @@ implicit none
             this%h2D_RootLig1stC_pvr(nptc,L) = Root1stLigStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
 
             DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+              this%h2D_MycoBiomC_pvr(nptc,L) = this%h2D_MycoBiomC_pvr(nptc,L)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
               this%h2D_Cyctokinin1stConc_pvr(nptc,L)=this%h2D_Cyctokinin1stConc_pvr(nptc,L)+Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX)
               this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ,NY,NX)
               this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ,NY,NX)
@@ -4943,6 +4958,7 @@ implicit none
 
             this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)+this%h2D_Root1stStrutC_pvr(nptc,L)
             this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)+this%h2D_Root2ndStrutC_pvr(nptc,L)
+            this%h2D_MycoBiomC_pvr(nptc,L) = this%h2D_MycoBiomC_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutP_pvr(nptc,L) = this%h2D_Root1stStrutP_pvr(nptc,L)/DVOLL
@@ -5172,6 +5188,7 @@ implicit none
   this%h1D_RootLenPerPlant_ptc(nptc)                = 0._r8
   this%h2D_Root1stDepz_ptc(nptc,:)                  = 0._r8
   this%h2D_Root1stStrutC_pvr(nptc,1:JZ)             = 0._r8
+  this%h2D_MycoBiomC_pvr(nptc,1:JZ)                 = 0._R8
   this%h2D_Root1stStrutN_pvr(nptc,1:JZ)             = 0._r8
   this%h2D_Root1stStrutP_pvr(nptc,1:JZ)             = 0._r8
   this%h2D_Root2ndStrutC_pvr(nptc,1:JZ)             = 0._r8
