@@ -1427,7 +1427,7 @@ implicit none
         RLEN=RLEN+Root1stLenPP_rpvr(LL1,NR,NZ)
       ENDDO
     endif
-    
+    LL1=MAX(LL1-1,NGTopRootLayer_pft(NZ))
     D5100: DO LL=LL1,NRoot1stTipLay_raxes(NR,NZ)
       !only distribute over young roots
       IF(LL.LT.NRoot1stTipLay_raxes(NR,NZ))THEN
@@ -1594,7 +1594,7 @@ implicit none
       ENDDO
     ENDDO
     ENDDO
-
+    
     if(FoundRootTipLayer .and. Root1stSinkTip(NR).GT.0._r8)THEN
       !reached last root layer
       Root1stTipUpdateFlag(NR)=.true.      
