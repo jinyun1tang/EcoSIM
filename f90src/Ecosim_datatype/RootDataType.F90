@@ -97,6 +97,7 @@ module RootDataType
   real(sp),target,allocatable ::  PSIRootTurg_vr(:,:,:,:,:)                      !root turgor water potential , [Mpa]
   real(sp),target,allocatable ::  RootSinkWeight_pvr(:,:,:,:)                     !Root nonst element sink profile, [d-2]
   real(sp),target,allocatable ::  Root2ndSinkWeight_pvr(:,:,:,:,:)                 !Secondary root nonstructural sink profile,[d-2]
+  real(sp),target,allocatable :: Root1stTipSinkWeight_pft(:,:,:)                 !primary root tip nonst element sink, [d-2]
   real(sp),target,allocatable ::  Root1stSinkWeight_pvr(:,:,:,:)                 !primary root nonstrucal sink profile, [d-2]
   real(sp),target,allocatable ::  trcg_rootml_pvr(:,:,:,:,:,:)                   !root gaseous tracer content [g d-2]
   real(sp),target,allocatable ::  trcs_rootml_pvr(:,:,:,:,:,:)                   !root dissolved gaseous tracer content [g d-2]
@@ -243,6 +244,7 @@ contains
   allocate(PSIRootTurg_vr(jroots,JZ,JP,JY,JX));PSIRootTurg_vr=0._sp
   allocate(RootSinkWeight_pvr(JZ,JP,JY,JX)); RootSinkWeight_pvr=0._sp
   allocate(Root2ndSinkWeight_pvr(JZ,jroots,JP,JY,JX));Root2ndSinkWeight_pvr=0._sp
+  allocate(Root1stTipSinkWeight_pft(JP,JY,JX)); Root1stTipSinkWeight_pft=0._sp
   allocate(Root1stSinkWeight_pvr(JZ,JP,JY,JX)); Root1stSinkWeight_pvr=0._sp
   allocate(trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcg_rootml_pvr =0._sp
   allocate(trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX)); trcs_rootml_pvr =0._sp
@@ -378,6 +380,7 @@ contains
   call destroy(PSIRootTurg_vr)
   call destroy(RootSinkWeight_pvr)
   call destroy(Root2ndSinkWeight_pvr)
+  call destroy(Root1stTipSinkWeight_pft)
   call destroy(Root1stSinkWeight_pvr)
   call destroy(trcg_rootml_pvr)
   call destroy(trcs_rootml_pvr)

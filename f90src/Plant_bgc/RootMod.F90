@@ -1,7 +1,7 @@
 module RootMod
   use data_kind_mod,       only: r8 => DAT_KIND_R8, yearIJ_type
   use minimathmod,         only: safe_adb,  AZMAX1, AZMIN1, AZERO, sfexp
-  use EcoSIMCtrlMod,       only: lsoilCompaction,llignification
+  use EcoSIMCtrlMod,       only: lsoilCompaction,llignification,lcoarseroot
   use DebugToolMod,        only: PrintInfo
   use abortutils,          only: endrun
   use PlantNonstElmDynMod, only: RepleteLowSeaStorByRoot
@@ -382,7 +382,7 @@ implicit none
     !coarse roots, 45-60% volume as water 
 
     check2ndGrothRoot=N.EQ.ipltroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) &
-      .and. TotPopuRoot1stLen>0._r8 .and. CoarseVol > 0._r8 .and. llignification
+      .and. TotPopuRoot1stLen>0._r8 .and. CoarseVol > 0._r8 .and. lcoarseroot
     
     if(check2ndGrothRoot)then
 
@@ -1246,6 +1246,7 @@ implicit none
   ELSE
     FracRoot1stCSinkL=1.0_r8
   ENDIF
+!  write(977,*)yearIJ%I*1000+yearIJ%J/24.,NR,FracRoot1stCSinkL,L
   !
   !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
   !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
@@ -1267,7 +1268,7 @@ implicit none
   !     iPlantPhenolType_pft=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
   !     fRootGrowPSISense=growth function of root water potential
   !
-  if(llignification)then
+  if(lcoarseroot)then
     Rmaint1st_CO2 = AZMAX1(RmSpecPlant*Root1stActStructElms_rpvr(ielmn,L,NR,NZ))*TFN6_vr(L)
   else
     Rmaint1st_CO2 = AZMAX1(RmSpecPlant*RootMyco1stElm_raxs(ielmn,NR,NZ))*TFN6_vr(L)
@@ -1780,10 +1781,11 @@ implicit none
     !if the plant has deep roots, aka taproot 
   !grow the maturation zone
   IF(RootSinkC_vr(N,L).GT.ZERO4Groth_pft(NZ))THEN
-    FracRoot1stCSinkL=AZMAX1(Root1stSink_pvr(L,NR)/RootSinkC_vr(N,L),1.e-2_r8)
+    FracRoot1stCSinkL=AZMAX1(Root1stSink_pvr(L,NR)/RootSinkC_vr(N,L),1.e-4_r8)
   ELSE
     FracRoot1stCSinkL=1.0_r8
   ENDIF
+!  write(978,*)yearIJ%I*1000+yearIJ%J/24.,NR,FracRoot1stCSinkL,L
 
   !apply nutrient limitation to growth respiraiton
   DMRespEff = 1._r8-StalkBiomGrowthYld_pft(NZ)       ![gC CO2/gC nonst]
@@ -1794,10 +1796,15 @@ implicit none
   if(isclose(FNP,0._r8))return  
 
   !Do maintenance respiration, including linigified and non-lignified biomass 
-  if(FoundRootTipLayer)then
-    Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stLigStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)
+  if(llignification)then
+    if(FoundRootTipLayer)then
+      Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stLigStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)
+    else
+      Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)+Root1stLigStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)
+    endif
   else
-    Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)+Root1stLigStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)
+    !no explicit lignification, but lump thickening and lignification together
+    Rmaint1st_CO2 = RmSpecPlant*TFN6_vr(L)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)*resp_downreg)  
   endif
 
   if(iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu)THEN
@@ -1848,69 +1855,79 @@ implicit none
     !total O2-limited nonst C required for thickening
     RootMycoNonstC4Thick_Oltd = RootMycoNonstC4Thick_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
     RThickCO2_Oltd            = RThickCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ)
-      
-    !----------------------------------------
-    !lignification rate
-    f_stress = stress4lignif(NZ,RAutoRootO2Limter_rpvr(N,L,NZ),Nutstress4GrossResp,fRootGrowPSISense)
-    K_ligmax = KLigMax_pft(NZ)*(1._r8+f_stress)
-    !respiration quotient of lignification, gC-CO2 per gC lignified
-    CO2Qt_lig = (1._r8-Yld_lignif)/Yld_lignif
-    !
-    !carry-over C mass from active zone for biomass, a function of available energy and active zone C.
-    Rlignif_OUltd = K_ligmax*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
-    !relative increase in biomass, (rho_lig-rho_act)/rho_act, extra C biomass needed for converting 1 vol C-act to C-lig
-    alpha_fill    = (CRootActVolPerMassC_pft(NZ)-CRootLigVolPerMassC_pft(NZ))/CRootLigVolPerMassC_pft(NZ)
-    !
-    !CO2 flux required for lignification = condensed C * CO2_quotient_lig
-    RligCO2_OUltd = Rlignif_OUltd*alpha_fill*CO2Qt_lig
-    !
-    !amount of active zone C to be lignified
-    Rlignif_Oltd = K_ligmax*safe_adb(RGrowCO2_Oltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_Oltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
-    !
-    !lignification is a compression and filling process that does not change the bulk volume
-    RligCO2_Oltd = Rlignif_Oltd*alpha_fill*CO2Qt_lig
-    !
-    !downscale when C-limited 
-    !O2-unlimited
-    RCO2_meta_OUltd= RligCO2_OUltd+RThickCO2_OUltd
-    if(RCO2_meta_OUltd .GT. RGrowCO2_OUltd)then
-      scal            = RGrowCO2_OUltd/RCO2_meta_OUltd
-      RligCO2_OUltd   = RligCO2_OUltd*scal
-      RThickCO2_OUltd = RThickCO2_OUltd*scal
-      Rlignif_OUltd   = Rlignif_OUltd*scal
-    endif
-    !
-    !O2-limited
-    RCO2_meta_Oltd=RligCO2_Oltd + RThickCO2_Oltd
-    if(RCO2_meta_Oltd .GT. RGrowCO2_Oltd)then
-      !then scale down
-      scal           = RGrowCO2_Oltd/RCO2_meta_Oltd
-      RligCO2_Oltd   = RligCO2_Oltd*scal
-      RThickCO2_Oltd = RThickCO2_Oltd*scal
-
-      !active-C converted into lignifed-C
-      Rlignif_Oltd   = Rlignif_Oltd*scal
-    endif
-
-    !summarize and substract CO2
-    RCO2T1st_OUltd = AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)+RThickCO2_OUltd+RligCO2_OUltd
-    RCO2T1st_Oltd  = AMIN1(Rmaint1st_CO2,RNonstCO2_Oltd)+RThickCO2_Oltd+RligCO2_Oltd  
-    RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T1st_Oltd
-
-    !total nonst C required for lignification
-    !CHyOz + O2 -> (Y_lig)C+(1-Y_lig)CO2
-    RootMycoNonstC4Lig_OUltd   = RligCO2_OUltd/(1._r8-Yld_lignif)
-    RootMycoNonstC4Lig_Oltd    = RligCO2_Oltd/(1._r8-Yld_lignif)
     
-    !Nonst converted into lignified C
-    RootMycoNonst4Lig_OUltd(ielmc) = RootMycoNonstC4Lig_OUltd*Yld_lignif
-    RootMycoNonst4Lig_OUltd(ielmn) = -Rlignif_OUltd*(rNCStalk_pft(NZ)-rNCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
-    RootMycoNonst4Lig_OUltd(ielmp) = -Rlignif_OUltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+    if(llignification)then
+      !computing lignification rate
+      !----------------------------------------
+      !lignification rate
+      f_stress = stress4lignif(NZ,RAutoRootO2Limter_rpvr(N,L,NZ),Nutstress4GrossResp,fRootGrowPSISense)
+      K_ligmax = KLigMax_pft(NZ)*(1._r8+f_stress)
+      !respiration quotient of lignification, gC-CO2 per gC lignified
+      CO2Qt_lig = (1._r8-Yld_lignif)/Yld_lignif
+      !
+      !carry-over C mass from active zone for biomass, a function of available energy and active zone C.
+      Rlignif_OUltd = K_ligmax*safe_adb(RGrowCO2_OUltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_OUltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
+      !relative increase in biomass, (rho_lig-rho_act)/rho_act, extra C biomass needed for converting 1 vol C-act to C-lig
+      alpha_fill    = (CRootActVolPerMassC_pft(NZ)-CRootLigVolPerMassC_pft(NZ))/CRootLigVolPerMassC_pft(NZ)
+      !
+      !CO2 flux required for lignification = condensed C * CO2_quotient_lig
+      RligCO2_OUltd = Rlignif_OUltd*alpha_fill*CO2Qt_lig
+      !
+      !amount of active zone C to be lignified
+      Rlignif_Oltd = K_ligmax*safe_adb(RGrowCO2_Oltd*Root1stActStructElms_rpvr(ielmc,L,NR,NZ),RGrowCO2_Oltd+KLigMM_pft(NZ)*Root1stActStructElms_rpvr(ielmc,L,NR,NZ))
+      !
+      !lignification is a compression and filling process that does not change the bulk volume
+      RligCO2_Oltd = Rlignif_Oltd*alpha_fill*CO2Qt_lig
+      !
+      !downscale when C-limited 
+      !O2-unlimited
+      RCO2_meta_OUltd= RligCO2_OUltd+RThickCO2_OUltd
+      if(RCO2_meta_OUltd .GT. RGrowCO2_OUltd)then
+        scal            = RGrowCO2_OUltd/RCO2_meta_OUltd
+        RligCO2_OUltd   = RligCO2_OUltd*scal
+        RThickCO2_OUltd = RThickCO2_OUltd*scal
+        Rlignif_OUltd   = Rlignif_OUltd*scal
+      endif
+      !
+      !O2-limited
+      RCO2_meta_Oltd=RligCO2_Oltd + RThickCO2_Oltd
+      if(RCO2_meta_Oltd .GT. RGrowCO2_Oltd)then
+        !then scale down
+        scal           = RGrowCO2_Oltd/RCO2_meta_Oltd
+        RligCO2_Oltd   = RligCO2_Oltd*scal
+        RThickCO2_Oltd = RThickCO2_Oltd*scal
 
-    RootMycoNonst4Lig_Oltd(ielmc) = RootMycoNonstC4Lig_Oltd*Yld_lignif
-    RootMycoNonst4Lig_Oltd(ielmn) = -Rlignif_Oltd*(rNCStalk_pft(NZ)-rNCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
-    RootMycoNonst4Lig_Oltd(ielmp) = -Rlignif_Oltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+        !active-C converted into lignifed-C
+        Rlignif_Oltd   = Rlignif_Oltd*scal
+      endif
 
+      !summarize and substract CO2
+      RCO2T1st_OUltd                       = AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)+RThickCO2_OUltd+RligCO2_OUltd
+      RCO2T1st_Oltd                        = AMIN1(Rmaint1st_CO2,RNonstCO2_Oltd)+RThickCO2_Oltd+RligCO2_Oltd
+      RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T1st_Oltd
+
+      !total nonst C required for lignification
+      !CHyOz + O2 -> (Y_lig)C+(1-Y_lig)CO2
+      RootMycoNonstC4Lig_OUltd   = RligCO2_OUltd/(1._r8-Yld_lignif)
+      RootMycoNonstC4Lig_Oltd    = RligCO2_Oltd/(1._r8-Yld_lignif)
+      
+      !Nonst converted into lignified C
+      RootMycoNonst4Lig_OUltd(ielmc) = RootMycoNonstC4Lig_OUltd*Yld_lignif
+      RootMycoNonst4Lig_OUltd(ielmn) = -Rlignif_OUltd*(rNCStalk_pft(NZ)-rNCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+      RootMycoNonst4Lig_OUltd(ielmp) = -Rlignif_OUltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+
+      RootMycoNonst4Lig_Oltd(ielmc) = RootMycoNonstC4Lig_Oltd*Yld_lignif
+      RootMycoNonst4Lig_Oltd(ielmn) = -Rlignif_Oltd*(rNCStalk_pft(NZ)-rNCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+      RootMycoNonst4Lig_Oltd(ielmp) = -Rlignif_Oltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
+
+    else
+      !summarize and substract CO2
+      RCO2T1st_OUltd                       = AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)+RThickCO2_OUltd
+      RCO2T1st_Oltd                        = AMIN1(Rmaint1st_CO2,RNonstCO2_Oltd)+RThickCO2_Oltd
+      RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T1st_Oltd
+      RootMycoNonstC4Lig_Oltd              = 0._r8
+      RootMycoNonst4Lig_Oltd               = 0._r8
+    endif
 
     !summarize NonstC for growth: thickening+lignification
     RootMycoDemand = RootMycoNonst4Thick_Oltd(ielmc) + RootMycoNonstC4Lig_Oltd*Yld_lignif
@@ -1975,6 +1992,7 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
+
 !  if(I>=140)write(433,*)mass_finale(ielmc),'thick111dm',mass_finale(ielmc)-mass_inital(ielmc)+RCO2T1st_Oltd+RootMycoNonst4Grow_Oltd(ielmc),&
 !    'RCO2T1st_Oltd=',RCO2T1st_Oltd,RCO2PotGroth_Oltd,RootMycoNonst4Grow_Oltd(ielmc)
 !  if(I>=140)write(434,*)'mss1',mass1(ielmc),mass2(ielmc),mass3(ielmc),RootMycoNonst4Thick_Oltd(ielmc)  
@@ -2008,7 +2026,8 @@ implicit none
   ENDDO
   !
   !maintenance deficit is still more than maitenance paid from remobilization
-  IF(-RCO2PotGroth_Oltd.GT.ZERO4Groth_pft(NZ))then  
+  
+  IF(llignification .and. -RCO2PotGroth_Oltd.GT.ZERO4Groth_pft(NZ))then  
     !remobilize from the lignified roots    
     dRCO2MaintDef_Oltd  = -RCO2PotGroth_Oltd
     dRCO2MaintDef_OUltd = -RCO2PotGroth_OUltd
@@ -2530,7 +2549,9 @@ implicit none
 !----------------------------------------------------------------------------------------------------
   subroutine RemobPrimeActRoots(N,L,NZ,NR,RCO2PotGroth_Oltd,RCO2PotGroth_OUltd,Root1stcylc,RCO2T1st_OUltd,&
     RCO2T1st_Oltd,Root1stNetGrowthElms,litrflxt,RootTipZone)
-
+  ! 
+  !Description:
+  !primary roots remobilization
   implicit none
   integer , intent(in)    :: N,L,NZ,NR
   real(r8), intent(inout) :: RCO2PotGroth_Oltd                        !O2-limited potential growth respiration
@@ -2563,7 +2584,7 @@ implicit none
     k_fine_comp                => pltpar%k_fine_comp                   ,& !input  :fine litter complex id
     iroot                      => pltpar%iroot                         ,& !input  :group id of plant root litter
     RootMyco1stElm_raxs        => plt_biom%RootMyco1stElm_raxs         ,& !inoput :root layer primary axes structrual element, [g d-2]    
-    Root1stActStructElms_rpvr  => plt_biom%Root1stActStructElms_rpvr   ,& !input  :
+    Root1stActStructElms_rpvr  => plt_biom%Root1stActStructElms_rpvr   ,& !input  :root layer active zone element in primary axes, [g d-2]
     FracRootElmAllocm          => plt_allom%FracRootElmAllocm          ,& !input  :root element woody/fine fraction in biomass,[-]
     FracWoodStalkElmAlloc2Litr => plt_allom%FracWoodStalkElmAlloc2Litr ,& !input  :stalk element woody/fine fraction in biomass,[-]
     PlantElmAllocMat4Litr      => plt_soilchem%PlantElmAllocMat4Litr   ,& !input  :litter kinetic fraction, [-]
@@ -2614,7 +2635,7 @@ implicit none
   !     Root1stStrutRemob(ielmc),Root1stStrutRemob(ielmn),Root1stStrutRemob(ielmp)=remobilization of C,N,P from senescing root
   !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
   !
-  if(.not.llignification)then
+  if(.not.lcoarseroot)then
     !insufficient energy for maintenance
     IF(-RCO2PotGroth_OUltd.GT.0.0_r8)THEN
       IF(-RCO2PotGroth_OUltd.LT.RootMyco1stElm_raxs(ielmc,NR,NZ)*RCCE(ielmc))THEN
@@ -3468,6 +3489,7 @@ implicit none
     RootMyco2ndSinkC_rpvr      => plt_rbgc%RootMyco2ndSinkC_rpvr        ,& !input  :fine root/myco carbon sink, [gC d-2 h-1]
     Root2ndSinkWeight_pvr      => plt_morph%Root2ndSinkWeight_pvr       ,& !output :Secondary root nonst element sink profile, [d-2]
     Root1stSinkWeight_pvr      => plt_morph%Root1stSinkWeight_pvr       ,& !output :primary root nonst element sink profile, [d-2]
+    Root1stTipSinkWeight_pft   => plt_morph%Root1stTipSinkWeight_pft    ,& !output :primary root tip nonst element sink, [d-2]
     RootNutUptakeN_pft         => plt_rbgc%RootNutUptakeN_pft           ,& !inoput :total N uptake by plant roots, [gN d-h2 h-1]
     flag2ndGrowth_pvr          => plt_morph%flag2ndGrowth_pvr           ,& !inoput  :flag for secondary growth of primary roots, [-]    
     RootNutUptakeP_pft         => plt_rbgc%RootNutUptakeP_pft           ,& !inoput :total P uptake by plant roots, [gP d-h2 h-1]
@@ -3634,7 +3656,7 @@ implicit none
             !lignification is on (assuming 2nd growth is modeled together with lignification)
             checkCoarseRootLay= is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) .and. &
                 RootAge_rpvr(L,NR,NZ)>RootMatureAge_pft(NZ) .and. RootEffDepz.LT.Root1stDepz_raxes(NR,NZ) .and. &
-                Root1stDepz_raxes(NR,NZ)>15._r8*Root1stTipRadius .and. llignification
+                Root1stDepz_raxes(NR,NZ)>15._r8*Root1stTipRadius .and. lcoarseroot
 
             if(checkCoarseRootLay)then
               fctyok=enh_cyto*Cytokinin1stConc_rpvr(L,NR,NZ)/(Km_cyto+Cytokinin1stConc_rpvr(L,NR,NZ)*(1._r8+Cytokinin1stConc_rpvr(L,NR,NZ)/Ki_cyto))          
@@ -3676,7 +3698,7 @@ implicit none
                 RootSinkC_vr(N,L)          = RootSinkC_vr(N,L)+Root1stSinkTip(NR)
               endif
             ENDIF
-!            write(1114,*)(((yearIJ%I*1000)*10+L)*10+Ltip)*10+yearIJ%J/24.,Root1stSink_pvr(L,NR),Root2ndSink_pvr(N,L,NR),Root1stSinkTip(NR),Root1stDepz_raxes(NR,NZ)-CumSoilThickness_vr(L-1)
+
           ELSE
             if(Root2ndSink_pvr(ipltroot,L,NR).GT.0._r8)then
               !mycorrhizae
@@ -3705,14 +3727,19 @@ implicit none
   ENDDO D4995
 
   Root1stSinkWeight_pvr(:,NZ)=0._r8
+  Root1stTipSinkWeight_pft(NZ) = 0._r8
   if(RootSinkC(ipltroot).GT.0._r8)then    
     DO L=NU,MaxSoilLays4Root_pft(NZ)
       DO NR=1,NumPrimeRootAxes_pft(NZ)
         Ltip=NRoot1stTipLay_raxes(NR,NZ)  
         Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)+Root1stSink_pvr(L,NR)
-        if(L==Ltip)Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)+Root1stSinkTip(NR)
+        if(L.eq.Ltip)then
+          Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)+Root1stSinkTip(NR)
+          Root1stTipSinkWeight_pft(NZ) = Root1stTipSinkWeight_pft(NZ)+Root1stSinkTip(NR)
+        endif
       ENDDO
       Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)/RootSinkC(ipltroot)
+      if(L.EQ.LTip)Root1stTipSinkWeight_pft(NZ)=Root1stTipSinkWeight_pft(NZ)/RootSinkC(ipltroot)
       !write(9013,*)yearIJ%I*1000+yearIJ%J/24.,L,Root1stSinkWeight_pvr(L,NZ),Root2ndSinkWeight_pvr(L,ipltroot,NZ),RootSinkC(ipltroot)
     ENDDO   
   endif   

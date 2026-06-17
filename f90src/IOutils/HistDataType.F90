@@ -442,6 +442,7 @@ implicit none
   real(r8),pointer   :: h1D_LeafAreaSunlit_ptc(:)
   real(r8),pointer   :: h1D_fClump_ptc(:)
   real(r8),pointer   :: h1D_SURF_LITRf_N_FLX_ptc(:) 
+  real(r8),pointer   :: h1D_Root1stTipSinkWt_ptc(:)
   real(r8),pointer   :: h1D_SHOOT_P_ptc(:)     
   real(r8),pointer   :: h1D_LEAF_P_ptc(:)      
   real(r8),pointer   :: h1D_Petole_P_ptc(:)    
@@ -901,6 +902,7 @@ implicit none
   allocate(this%h1D_CANET_col(beg_col:end_col))           ;this%h1D_CANET_col(:)=spval
   allocate(this%h1D_CanopyEvap_col(beg_col:end_col)) ; this%h1D_CanopyEvap_col(:)=spval
   allocate(this%h1D_PAR_col(beg_col:end_col))             ;this%h1D_PAR_col(:)=spval
+  allocate(this%h1D_Root1stTipSinkWt_ptc(beg_ptc:end_ptc)); this%h1D_Root1stTipSinkWt_ptc(:)=spval
   allocate(this%h1D_NWetDep_flx_col(beg_col:end_col)); this%h1D_NWetDep_flx_col(:)=spval
   allocate(this%h1d_fPAR_col(beg_col:end_col));   this%h1d_fPAR_col(:)=spval
   allocate(this%h1D_tSWC_col(beg_col:end_col))            ;this%h1D_tSWC_col(:)=spval
@@ -2887,6 +2889,11 @@ implicit none
     long_name='Live plant shoot P',ptr_patch=data1d_ptr,&
     default='inactive')            
 
+  data1d_ptr => this%h1D_Root1stTipSinkWt_ptc(beg_ptc:end_ptc)    
+  call hist_addfld1d(fname='Root1stTipSinkwt_pft',units='-',avgflag='A',&
+    long_name='Primary root Tip Sink weight',ptr_patch=data1d_ptr,&
+    default='inactive')            
+
   data1d_ptr => this%h1D_Plant_P_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='Plant_P_pft',units='gP/m2',avgflag='A',&
     long_name='Plant P',ptr_patch=data1d_ptr,&
@@ -4784,7 +4791,7 @@ implicit none
         this%h1D_RootNodule_N_ptc(nptc)     = RootNoduleElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STORED_N_ptc(nptc)         = SeasonalNonstElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_TreeRingRadius_ptc(nptc)   = TreeRingAveRadius_pft(NZ,NY,NX)
-       
+        this%h1D_Root1stTipSinkWt_ptc(nptc) = Root1stTipSinkWeight_pft(NZ,NY,NX)
         this%h1D_SHOOT_P_ptc(nptc)          = ShootElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_P_ptc(nptc)          = (ShootElms_pft(ielmp,NZ,NY,NX) &
           +RootElms_pft(ielmp,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)        
@@ -5155,6 +5162,7 @@ implicit none
   this%h1D_STORED_N_ptc(nptc)         =  0._r8
   this%h1D_TreeRingRadius_ptc(nptc)   =  0._r8
   this%h1D_SHOOT_P_ptc(nptc)          =  0._r8
+  this%h1D_Root1stTipSinkWt_ptc(nptc) =  0._r8
   this%h1D_Plant_P_ptc(nptc)          =  0._r8      
   this%h1D_stomatal_stress_ptc(nptc) =  0._r8
   this%h1D_LEAF_P_ptc(nptc)          =  0._r8
