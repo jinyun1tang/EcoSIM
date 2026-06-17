@@ -356,6 +356,7 @@ implicit none
     LeafRubiscoCperm2LA_pft(NZ,NY,NX)          = plt_biom%LeafRubiscoCperm2LA_pft(NZ)
     LeafPEPCperm2LA_pft(NZ,NY,NX)              = plt_biom%LeafPEPCperm2LA_pft(NZ)
     SpecificLeafArea_pft(NZ,NY,NX)             = plt_biom%SpecificLeafArea_pft(NZ)
+    Root1stTipSinkWeight_pft(NZ,NY,NX)         = plt_morph%Root1stTipSinkWeight_pft(NZ)
     DO L=1,NK_col(NY,NX)
       RootSinkWeight_pvr(L,NZ,NY,NX)                    = plt_morph%RootSinkWeight_pvr(L,NZ)
       Root1stSinkWeight_pvr(L,NZ,NY,NX)                 = plt_morph%Root1stSinkWeight_pvr(L,NZ)
