@@ -165,7 +165,7 @@ contains
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ,llignification
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_fincl3,hist_yrclose, lmicrobeMLdiag,&
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test,lcoarseroot
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -197,6 +197,7 @@ contains
   soichem_model         = .true.
   microbial_model       = .true.
   llignification        = .false.
+  lcoarseroot           = .false.
   disp_planttrait       = .false.
   ref_date              = '18000101000000'   !place holder for future
   start_date            = '18000101000000'   !start date of the simulation, differ from the forcing date
