@@ -1925,6 +1925,7 @@ implicit none
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif  
 
+
   if(flag=='read')then
     dat2pr => datip_2d(1:npfts,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='doInitLeafOut_brch', dim1name='pft',dim2name='nbranches',&
@@ -5206,20 +5207,54 @@ implicit none
        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)    
   endif  
 
+  
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)    
-    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
-       dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
+    call restartvar(ncid, flag, varname='GasHydroLoss_cumflx_col', dim1name='column',&
+       dim2name='gastrcs',long_name='cumulative gas loss via hydrological pathway', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,GasHydroLoss_cumflx_col,datrc_2d) 
   else
     !print*,'UCH4G'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,SurfGasEmiss_flx_col,datrc_2d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GasHydroLoss_cumflx_col,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)          
-    call restartvar(ncid, flag, varname='SurfGasEmiss_flx_col', dim1name='column',&
-       dim2name='gastrcs',long_name='total soil gas flux', units='g d-2', &
+    call restartvar(ncid, flag, varname='GasHydroLoss_cumflx_col', dim1name='column',&
+       dim2name='gastrcs',long_name='cumulative gas loss via hydrological pathway', units='g d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
+       fill_value=spval)    
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrc_1d        
+    call restartvar(ncid, flag, varname='Hydroloss_NH4_cumflx_col', dim1name='column',&
+       long_name='cumulative NH4 loss via hydrological pathway', units='gN d-2', &
+       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+       fill_value=spval)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,Hydroloss_NH4_cumflx_col,datrc_1d) 
+  else    
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Hydroloss_NH4_cumflx_col,datrc_1d) 
+    datpr1 => datrc_1d          
+    call restartvar(ncid, flag, varname='Hydroloss_NH4_cumflx_col', dim1name='column',&
+       long_name='cumulative NH4 loss via hydrological pathway', units='gN d-2', &
+       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+       fill_value=spval)    
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrc_1d        
+    call restartvar(ncid, flag, varname='Hydroloss_NO3_cumflx_col', dim1name='column',&
+       long_name='cumulative NO3 loss via hydrological pathway', units='gN d-2', &
+       interpinic_flag='skip', data=datpr1, missing_value=spval, &
+       fill_value=spval)    
+    call cpcol(flag,NHW,NHE,NVN,NVS,Hydroloss_NO3_cumflx_col,datrc_1d) 
+  else
+    
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Hydroloss_NO3_cumflx_col,datrc_1d) 
+    datpr1 => datrc_1d          
+    call restartvar(ncid, flag, varname='Hydroloss_NO3_cumflx_col', dim1name='column',&
+       long_name='cumulative NO3 loss via hydrological pathway', units='gN d-2', &
+       interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
 
@@ -5238,7 +5273,6 @@ implicit none
        long_name='total CO2 flux from fire', units='g d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-
   endif  
 
   if(flag=='read')then

@@ -287,6 +287,9 @@ contains
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
+      Hydroloss_NH4_cumflx_col(NY,NX)=Hydroloss_NH4_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NH4,NY,NX)++trcnuts_hydrloss_flx_col(ids_NH4B,NY,NX)
+      Hydroloss_NO3_cumflx_col(NY,NX)=Hydroloss_NO3_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NO3,NY,NX)++trcnuts_hydrloss_flx_col(ids_NO3B,NY,NX)
+
       DO idg=idg_beg,idg_NH3        
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX) &

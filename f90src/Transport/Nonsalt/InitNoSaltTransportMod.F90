@@ -526,7 +526,7 @@ module InitNoSaltTransportMod
     trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
       +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)*dts_HeatWatTP
   ENDDO
-  NWetDep_col(NY,NX)=Rain2SoilSurf_col(NY,NX)*(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
+  NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+Rain2SoilSurf_col(NY,NX)*(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
 
   trcn_AquaAdv_flxM_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
