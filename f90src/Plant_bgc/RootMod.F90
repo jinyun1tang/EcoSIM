@@ -80,18 +80,24 @@ implicit none
 !
   call PrintInfo('beg '//subname)
   !  call RootCheck(I,J,NZ,'head')
-!  call SumRootBiome(yearIJ,NZ,mass_inital)
+  call SumRootBiome(yearIJ,NZ,mass_inital)
   !first add newly acquired nutrients
   call SummarizeRootSink(yearIJ,NZ,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,Root1stSinkTip,RootSinkC)
 
 !  call SumRootBiome(yearIJ,NZ,mass_inital)
 !  call SumRootBiome(yearIJ,NZ,mass_finale)
 !  call SumRootAR(NZ);call SumLitfallBlg(NZ)
-!  tmpval=plt_bgcr%RootAutoCO2_pft(NZ)
+!  write(423,*)NZ,'root',yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
+!     plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'afrsinkc',mass_finale(ielmc),mass_inital(ielmc),&
+!     plt_bgcr%RootAutoCO2_pft(NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)
+
   call RootBiochemistry(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr,Root1stSinkTip,RootSinkC)
 
 !  call SumRootBiome(yearIJ,NZ,mass_finale) 
 !  call SumRootAR(NZ);call SumLitfallBlg(NZ)
+!  write(423,*)NZ,'root',yearIJ%I*1000+yearIJ%J/24.,mass_finale(ielmc)-mass_inital(ielmc)- &
+!     plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'afrootbgc',mass_finale(ielmc),mass_inital(ielmc),&
+!     plt_bgcr%RootAutoCO2_pft(NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)
   !
   !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
   !     GERMINATION)
@@ -1726,7 +1732,7 @@ implicit none
   real(r8) :: mass1(NumPlantChemElms),mass2(NumPlantChemElms),mass3(NumPlantChemElms)
   real(r8) :: RCO2_meta_Oltd,RCO2_meta_OUltd
   real(r8) :: RootMycoDemand
-  real(r8) :: f_stress, K_ligmax
+  real(r8) :: f_stress, K_ligmax,errC
   integer  :: NE,L1,N1
 
   character(len=*), parameter :: subname='SecondaryGrowthZone'
@@ -1815,10 +1821,12 @@ implicit none
   respscal=VMXC*fTgrowRootP_vr(L,NZ)*Nutstress4GrossResp*GrainFillDowreg_brch(MainBranchNum_pft(NZ),NZ) &
     *fRootGrowPSISense*rNCStalk_pft(NZ)/rNCRoot_pft(NZ)
 
-  RNonstCO2_OUltd=AZMAX1(FracRoot1stCSinkL*RootMycoNonstElms_rpvr(ielmc,N,L,NZ))*respscal
+  RNonstCO2_OUltd=AZMAX1(AMIN1(FracRoot1stCSinkL*respscal,1._r8)*RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
 
   !apply oxygen dependence
   RNonstCO2_Oltd               = AMIN1(RNonstCO2_OUltd*RAutoRootO2Limter_rpvr(N,L,NZ),RootMycoNonstElms_rpvr(ielmc,N,L,NZ))
+
+!  write(433,*)RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RCO2T1st_Oltd,'xxxx',DMRespEff
 
   !diagnose growth respiraiton
   RCO2PotGroth_OUltd           = RNonstCO2_OUltd-Rmaint1st_CO2        !excessive CO2-resp O2-unlimited
@@ -1921,9 +1929,19 @@ implicit none
       RootMycoNonst4Lig_Oltd(ielmp) = -Rlignif_Oltd*(rPCStalk_pft(NZ)-rPCLigRoot_pft(NZ)*CRootActVolPerMassC_pft(NZ)/CRootLigVolPerMassC_pft(NZ))
 
     else
+      !O2-limited
+      RCO2_meta_Oltd=RThickCO2_Oltd
+      if(RCO2_meta_Oltd .GT. RGrowCO2_Oltd)then
+        !then scale down
+        scal           = RGrowCO2_Oltd/RCO2_meta_Oltd
+        RligCO2_Oltd   = RligCO2_Oltd*scal
+        RThickCO2_Oltd = RThickCO2_Oltd*scal
+      endif
+
       !summarize and substract CO2
       RCO2T1st_OUltd                       = AMIN1(Rmaint1st_CO2,RNonstCO2_OUltd)+RThickCO2_OUltd
       RCO2T1st_Oltd                        = AMIN1(Rmaint1st_CO2,RNonstCO2_Oltd)+RThickCO2_Oltd
+!      write(433,*)RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RCO2T1st_Oltd,'xxxx',AMIN1(Rmaint1st_CO2,RNonstCO2_Oltd),RThickCO2_Oltd,RCO2PotGroth_Oltd
       RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2T1st_Oltd
       RootMycoNonstC4Lig_Oltd              = 0._r8
       RootMycoNonst4Lig_Oltd               = 0._r8
@@ -1971,10 +1989,12 @@ implicit none
       Root1stActStructElms_rpvr(ielmp,L,NR,NZ) = Root1stActStructElms_rpvr(ielmp,L,NR,NZ)-Rlignif_Oltd*rPCStalk_pft(NZ)
       Root1stLigStructElms_rpvr(ielmp,L,NR,NZ) = Root1stLigStructElms_rpvr(ielmp,L,NR,NZ)+Rlignif_Oltd*rPCStalk_pft(NZ)+RootMycoNonst4Lig_Oltd(ielmp)
     endif
+!    write(433,*)RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootMycoNonst4Thick_Oltd(ielmc)
     !apply the thickening
     DO NE=1,NumPlantChemElms
       RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)-RootMycoNonst4Thick_Oltd(NE))
     ENDDO
+!    write(433,*)RootMycoNonstElms_rpvr(ielmc,N,L,NZ),RootMycoNonst4Thick_Oltd(ielmc)
   else
     !potential growth is zero due to maintenance deficit
     RootMycoNonst4Thick_Oltd(:)=0._r8
@@ -1992,9 +2012,9 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
-
-!  if(I>=140)write(433,*)mass_finale(ielmc),'thick111dm',mass_finale(ielmc)-mass_inital(ielmc)+RCO2T1st_Oltd+RootMycoNonst4Grow_Oltd(ielmc),&
-!    'RCO2T1st_Oltd=',RCO2T1st_Oltd,RCO2PotGroth_Oltd,RootMycoNonst4Grow_Oltd(ielmc)
+!  errC=mass_finale(ielmc)-mass_inital(ielmc)+RCO2T1st_Oltd+RootMycoNonst4Grow_Oltd(ielmc)
+!  write(433,*)mass_finale(ielmc),mass_inital(ielmc),'thick111dm',errC,'RCO2T1st_Oltd=',RCO2T1st_Oltd,RCO2PotGroth_Oltd,RootMycoNonst4Grow_Oltd(ielmc),L,NR,yearIJ%I*1000+yearIJ%J/24.
+!  if(abs(errC)>1.e-4)stop
 !  if(I>=140)write(434,*)'mss1',mass1(ielmc),mass2(ielmc),mass3(ielmc),RootMycoNonst4Thick_Oltd(ielmc)  
 
   Root1stNetGrowthElms(:)  = RootMycoNonst4Thick_Oltd(:)
@@ -2055,9 +2075,11 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
-!  if(I>=140)write(434,*)'mss2',mass1(ielmc),mass2(ielmc),mass3(ielmc),Root1stNetGrowthElms(ielmc)    
-!  if(I>=140)write(433,*)mass_finale(ielmc),'thick',mass_finale(ielmc)-mass_inital(ielmc)+RCO2T1st_Oltd+litrflxt(ielmc),'co2',RCO2T1st_Oltd,litrflxt(ielmc),&
-!    'groth',Root1stNetGrowthElms(ielmc),RootMycoNonst4Grow_Oltd(ielmc)
+  errC=mass_finale(ielmc)-mass_inital(ielmc)+RCO2T1st_Oltd+litrflxt(ielmc)
+!  if(I>=140)write(434,*)yearIJ%I*1000+yearIJ%J/24.,RootMycoNonstElms_rpvr(ielmc,N,L,NZ),'mss2',mass1(ielmc),mass2(ielmc),mass3(ielmc),Root1stNetGrowthElms(ielmc)    
+!  write(433,*)yearIJ%I*1000+yearIJ%J/24.,RootMycoNonstElms_rpvr(ielmc,N,L,NZ),mass_finale(ielmc),'thick',errC,'co2',RCO2T1st_Oltd,litrflxt(ielmc),&
+!    'groth',Root1stNetGrowthElms(ielmc),RootMycoNonst4Grow_Oltd(ielmc),L,NR
+  if(abs(errC)>1.e-4)call endrun(trim(mod_filename)//' at line',__LINE__)           
   call PrintInfo('end '//subname)  
   end associate
   end subroutine SecondaryGrowthZone
@@ -3434,7 +3456,7 @@ implicit none
   REAL(R8) :: CRootSinkProf(JZ1,MaxNumRootAxes)  !fraction profile of fine roots in soil
   real(r8) :: dSapFlow
   real(r8), parameter :: enh_sap  = 0.2_r8         !sap-based adjustment factor, moderate value [0.2-0.4], > 1.0 agressive 
-  real(r8), parameter :: enh_cyto = 0.05_r8        !
+  real(r8), parameter :: enh_cyto = 0.1_r8         !
   real(r8), parameter :: Km_cyto  = 2.4e-4_r8     !20nM
   real(r8), parameter :: Ki_cyto = 1.2e-3_r8  
   real(r8) :: fctyok
