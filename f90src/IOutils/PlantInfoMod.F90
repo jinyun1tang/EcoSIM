@@ -717,6 +717,7 @@ implicit none
   TCChill4Seed_pft(NZ,NY,NX)             = TCChill4Seed_tab(loc)
   VRNLI                                  = VRNLI_tab(loc)
   VRNXI                                  = VRNXI_tab(loc)
+  enh_cyto_pft(NZ,NY,NX)                 = enh_cyto_tab(Loc)
   rLen2WidthLeaf_pft(NZ,NY,NX)           = rLen2WidthLeaf_tab(loc)
   NonstCMinConc2InitBranch_pft(NZ,NY,NX) = NonstCMinConc2InitBranch_tab(loc)
 
@@ -1195,6 +1196,10 @@ implicit none
   call writefixl(nu_plt,id,'GFILL','Grain filling rate at 25 oC [gC seed-1 h-1]',GrainFillRate25C_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'WTSTDI','Mass of dead standing biomass at planting [gC m-2]',StandingDeadInitC_pft(NZ,NY,NX),100)
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
+    id=addone(id)
+    call writefixl(nu_plt,id,'CYTOS','Cytokinin sensitivity of corase root thickening [0-1]',enh_cyto_pft(NZ,NY,NX),100)    
+  endif
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------
@@ -1716,6 +1721,7 @@ implicit none
   call ncd_getvar(pft_nfid, 'GRDM', SeedCMass_tab)
   call ncd_getvar(pft_nfid, 'GRW2L',SeedWidth2LenRatio_tab)
   call ncd_getvar(pft_nfid, 'GFILL',GrainFillRate25C_tab)
+  call ncd_getvar(pft_nfid, 'CYTOS',enh_cyto_tab)
   call ncd_getvar(pft_nfid, 'WTSTDI',StandingDeadInitC_tab)
   call ncd_getvar(pft_nfid, 'RRAD1M',Root1stMaxRadius_tab)
   call ncd_getvar(pft_nfid, 'RRAD2M',Root2ndMaxRadius_tab)

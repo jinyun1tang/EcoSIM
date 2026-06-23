@@ -83,6 +83,7 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stRadius_pvr(:,:,:,:,:)                   !root layer diameter primary axes, [m]
   real(sp),target,allocatable ::  Root1stRadius_rpvr(:,:,:,:,:)                  !root layer diameter for each primary axes, [m]
   real(sp),target,allocatable ::  RootCRRadius0_rpvr(:,:,:,:,:)                     !initial radius for root that may undergo secondary growth, [m]
+  real(sp),target,allocatable ::  fctyok_scalar_rpvr(:,:,:,:,:)                  !cytokinin scalar for corase root sink, [-]
   real(sp),target,allocatable ::  RootPoreVol_pvr(:,:,:,:,:)                     !root layer volume air, [m2 d-2]
   real(sp),target,allocatable ::  Root1stDepz_raxes(:,:,:,:)                     !root layer depth, [m]
   real(sp),target,allocatable ::  Root2ndRadius_rpvr(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
@@ -228,6 +229,7 @@ contains
   allocate(RootArea2ndPP_pvr(jroots,JZ,JP,JY,JX));RootArea2ndPP_pvr=0._sp
   allocate(RootVH2O_pvr(jroots,JZ,JP,JY,JX));RootVH2O_pvr=0._sp
   allocate(Root1stRadius_pvr(jroots,JZ,JP,JY,JX));Root1stRadius_pvr=0._sp
+  allocate(fctyok_scalar_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); fctyok_scalar_rpvr=0._SP
   allocate(Root1stRadius_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); Root1stRadius_rpvr=0._sp
   allocate(RootCRRadius0_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootCRRadius0_rpvr=0._sp
   allocate(RootPoreVol_pvr(jroots,JZ,JP,JY,JX));RootPoreVol_pvr=0._sp
@@ -365,6 +367,7 @@ contains
   call destroy(RootVH2O_pvr)
   call destroy(Root1stRadius_pvr)
   call destroy(Root1stRadius_rpvr)
+  CALL destroy(fctyok_scalar_rpvr)
   call destroy(RootCRRadius0_rpvr)
   call destroy(RootPoreVol_pvr)
   call destroy(Root1stDepz_raxes)
