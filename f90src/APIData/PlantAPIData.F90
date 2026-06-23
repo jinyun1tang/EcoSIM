@@ -221,6 +221,7 @@ implicit none
   real(r8) :: CanopyLeafArea_col                      !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_col                            !grid canopy stem area, [m2 d-2]
   real(r8) :: CanopyHeight_col                        !canopy height , [m]
+  REAL(R8), POINTER :: enh_cyto_pft(:)                 => null() !cytokinin sensitivity of corase root thickening, [-]
   real(r8), pointer :: tlai_day_pft(:)                 => null() !prescribed leaf area, [m2 m-2]
   real(r8), pointer :: tsai_day_pft(:)                 => null() !prescribed stem area, [m2 m-2]
   real(r8), pointer :: PARTS_brch(:,:,:)               => null() !fraction of C allocated to each morph unit,                                 [-]
@@ -300,7 +301,7 @@ implicit none
   real(r8), pointer :: CanopyHeightDead_pft(:)        => null() !canopy height for standing dead, [m]
   real(r8), pointer :: StalkHeight_pft(:)              => null() !stalk height/length, [m]
   real(r8), pointer :: StemSpecVolume_pft(:)               => null()  !stalk specific volume, [m3 gC-1]  
-  real(r8), pointer :: TreeRingAveRadius_pft(:)        => null() !tree ring radius,[m]
+  real(r8), pointer :: StalkAveRadius_pft(:)        => null() !main stalk radius,[m]
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground),[-]
   integer,  pointer :: iPlantNfixType_pft(:)          => null() !N2 fixation type,[-]
   integer,  pointer :: Myco_pft(:)                    => null() !mycorrhizal type (no or yes),[-]
@@ -345,6 +346,7 @@ implicit none
   real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
+  real(r8), pointer :: fctyok_scalar_rpvr(:,:,:)      => null() !cytokinin scalar for corase root sink, [-]
   REAL(R8), POINTER :: NumAxesPerPrimRoot_pft(:)      => null() !primary root axes number, [d-2]
   real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)       => null() !root layer number axes,               [d-2]
@@ -2080,6 +2082,7 @@ implicit none
   allocate(this%RootPoreVol_pvr(jroots,JZ1,JP1));this%RootPoreVol_pvr=spval
   allocate(this%RootVH2O_pvr(jroots,JZ1,JP1));this%RootVH2O_pvr=spval
   allocate(this%Root1stXNumL_pvr(JZ1,JP1));this%Root1stXNumL_pvr=spval
+  allocate(this%fctyok_scalar_rpvr(JZ1,MaxNumRootAxes,JP1)); this%fctyok_scalar_rpvr=spval
   allocate(this%Root2ndXNumL_rpvr(jroots,JZ1,JP1));this%Root2ndXNumL_rpvr=spval
   allocate(this%Root2ndVH2O_rpvr(jroots,JZ1,MaxNumRootAxes,JP1)); this%Root2ndVH2O_rpvr=0._r8
   allocate(this%Root1stVH2O_rpvr(JZ1,MaxNumRootAxes,JP1)); this%Root1stVH2O_rpvr=0._r8
@@ -2159,6 +2162,7 @@ implicit none
   allocate(this%NRoot1stTipLay_raxes(MaxNumRootAxes,JP1));this%NRoot1stTipLay_raxes=0
   allocate(this%PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP1));this%PARTS_brch=spval
   allocate(this%tlai_day_pft(JP1)); this%tlai_day_pft=spval
+  allocate(this%enh_cyto_pft(JP1)); this%enh_cyto_pft=spval
   allocate(this%tsai_day_pft(JP1)); this%tsai_day_pft=spval
   allocate(this%ShootNodeNum_brch(MaxNumBranches,JP1));this%ShootNodeNum_brch=spval
   allocate(this%ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP1));this%ShootNodeNumAtInitFloral_brch=spval
@@ -2199,7 +2203,7 @@ implicit none
   allocate(this%CanopyStalkSurfArea_lbrch(NumCanopyLayers1,MaxNumBranches,JP1));this%CanopyStalkSurfArea_lbrch=spval
   allocate(this%CanopySurfAreaProfDead_pft(NumCanopyLayers1,JP1)); this%CanopySurfAreaProfDead_pft=spval
   allocate(this%StandDeadSurfArea_pft(JP1)); this%StandDeadSurfArea_pft=spval
-  allocate(this%TreeRingAveRadius_pft(JP1));this%TreeRingAveRadius_pft=spval
+  allocate(this%StalkAveRadius_pft(JP1));this%StalkAveRadius_pft=spval
   allocate(this%MaxSoilLays4Root_pft(JP1));this%MaxSoilLays4Root_pft=0
   allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval

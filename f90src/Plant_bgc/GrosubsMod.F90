@@ -382,6 +382,7 @@ module grosubsMod
     CanopyLeafCLyr_pft          => plt_biom%CanopyLeafCLyr_pft            ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemSurfAreaZ_pft     => plt_morph%CanopyStemSurfAreaZ_pft      ,& !output :plant canopy layer stem surface area, [m2 d-2]
     Root1stXNumL_pvr            => plt_morph%Root1stXNumL_pvr             ,& !output :root layer number primary axes, [d-2]
+    StalkAveRadius_pft          => plt_morph%StalkAveRadius_pft           ,& !input  :main stalk radius,[m]        
     NumAxesPerPrimRoot_pft      => plt_morph%NumAxesPerPrimRoot_pft       ,& !output :primary root axes number, [d-2]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr            ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr            => plt_rbgc%RootCO2Autor_pvr              ,& !output :root respiration constrained by O2, [g d-2 h-1]
@@ -391,6 +392,7 @@ module grosubsMod
     RootRespPotent_pvr          => plt_rbgc%RootRespPotent_pvr             & !output :root respiration unconstrained by O2, [g d-2 h-1]
   )
   call PrintInfo('beg '//subname)
+  StalkAveRadius_pft(NZ) = 0._r8
   D2: DO L=1,NumCanopyLayers1
     CanopyLeafAreaZ_pft(L,NZ)     = 0._r8
     CanopyLeafCLyr_pft(L,NZ)      = 0._r8

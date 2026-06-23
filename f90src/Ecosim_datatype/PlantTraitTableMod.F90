@@ -21,6 +21,7 @@ module PlantTraitTableMod
   integer, target, allocatable :: iPlant2ndGrothPattern_tab(:)
   integer, target, allocatable :: iPlantGrainType_tab(:)
   integer, target, allocatable :: Myco_tab(:)
+  real(r8), target,allocatable :: enh_cyto_tab(:)
   real(r8), target, allocatable :: PlantInitThermoAdaptZone_tab(:)
   real(r8), target, allocatable :: VmaxRubCarboxyRef_tab(:)
   real(r8), target, allocatable :: VmaxRubOxyRef_tab(:)
@@ -163,6 +164,7 @@ module PlantTraitTableMod
   allocate(XKO2_tab(npfts));XKO2_tab=0.0_r8
   allocate(RootMatureAge_tab(npfts)); RootMatureAge_tab=0._r8
   allocate(Km4PEPCarboxy_tab(npfts));Km4PEPCarboxy_tab=0.0_r8
+  allocate(enh_cyto_tab(npfts)); enh_cyto_tab=0._r8
   allocate(LeafRubisco2Protein_tab(npfts));LeafRubisco2Protein_tab=0.0_r8
   allocate(LeafPEP2Protein_tab(npfts));LeafPEP2Protein_tab=0.0_r8
   allocate(SpecChloryfilAct_tab(npfts));SpecChloryfilAct_tab=0.0_r8
@@ -312,6 +314,7 @@ module PlantTraitTableMod
   call destroy(TCChill4Seed_tab)
   call destroy(VRNLI_tab)
   call destroy(VRNXI_tab)
+  call destroy(enh_cyto_tab)
   call destroy(rLen2WidthLeaf_tab)
   call destroy(NonstCMinConc2InitBranch_tab)
   call destroy(GROUPX_tab)

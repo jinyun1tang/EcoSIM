@@ -28,7 +28,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  StandDeadSurfArea_pft(:,:,:)               !surface area of standing dead, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeightDead_pft(:,:,:)                !standing dead plant canopy height, [m]
   real(r8),target,allocatable ::  StalkHeight_pft(:,:,:)                     !pft stalk height, [m]
-  real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
+  real(r8),target,allocatable ::  StalkAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
@@ -81,6 +81,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  KLigMM_pft(:,:,:)                          !Half saturation parameter for coarse root lignification, [h-1]
   real(r8),target,allocatable ::  rPCReserve_pft(:,:,:)                      !reserve P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCHusk_pft(:,:,:)                         !husk P:C ratio, [g g-1]
+  REAL(r8),target,allocatable ::  enh_cyto_pft(:,:,:)                        !cytokinin sensitivity of coarse root thickening
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
@@ -221,7 +222,7 @@ contains
   allocate(CanopyHeightDead_pft(JP,JY,JX)); CanopyHeightDead_pft=0._r8
   allocate(StandDeadSurfArea_pft(JP,JY,JX)); StandDeadSurfArea_pft=0._r8
   allocate(StalkHeight_pft(JP,JY,JX)); StalkHeight_pft=0._r8
-  allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
+  allocate(StalkAveRadius_pft(JP,JY,JX)); StalkAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
@@ -276,6 +277,7 @@ contains
   allocate(rPCReserve_pft(JP,JY,JX));    rPCReserve_pft=0._r8
   allocate(rPCHusk_pft(JP,JY,JX));    rPCHusk_pft=0._r8
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
+  allocate(enh_cyto_pft(JP,JY,JX));  enh_cyto_pft=0._r8
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
   allocate(rProteinC2RootN_pft(JP,JY,JX)); rProteinC2RootN_pft=0._r8
@@ -411,6 +413,7 @@ contains
   call destroy(LeafStalkAreaAct_pft)
   call destroy(CanopyStemSurfArea_pft)
   call destroy(CanopyHeightDead_pft)
+  call destroy(enh_cyto_pft)
   call destroy(StandDeadSurfArea_pft)
   call destroy(CanopyHeightLive_pft)
   call destroy(StalkHeight_pft)
