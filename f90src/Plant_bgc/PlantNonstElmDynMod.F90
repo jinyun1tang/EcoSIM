@@ -264,7 +264,7 @@ module PlantNonstElmDynMod
   real(r8) :: mass_finale(NumPlantChemElms)
 
   associate(                                                           &
-    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft       ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                          ,& !input  :current soil surface layer number, [-]
     Myco_pft                  => plt_morph%Myco_pft                   ,& !input  :mycorrhizal type (no or yes),[-]
     ZERO                      => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
@@ -425,7 +425,7 @@ module PlantNonstElmDynMod
   DO  NR=1,NumPrimeRootAxes_pft(NZ)
     L1=NRoot1stTipLay_raxes(NR,NZ)    
     DO L=NU,MaxSoilLays4Root_pft(NZ)    
-      RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)  
+      RootMycoActiveBiomC_pvr(ipltroot,L,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)  
     ENDDO
   ENDDO
 
@@ -510,7 +510,6 @@ module PlantNonstElmDynMod
   ELSE
     PTSHTR=ShootRootNonstElmConduts_pft(NZ)
   ENDIF
-!  write(1109,*)CanopyNonstElms_brch(ielmc,1,NZ),I*1000+J/24.,RootSinkWeight_pvr(2:3,NZ),PTSHTR,GrothPART2LeafPetole
 
   PTSHTR=AMIN1(PTSHTR,1._r8)
   

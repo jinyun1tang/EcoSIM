@@ -348,6 +348,7 @@ implicit none
   real(r8),pointer   :: h2D_SoilBulkStress_vr(:,:)
   real(r8),pointer   :: h2D_RootNonstBConc_pvr(:,:)   
   real(r8),pointer   :: h2D_Root1stStrutC_pvr(:,:)
+  real(r8),pointer   :: h2D_Cytok_scalar_pvr(:,:)
   real(r8),pointer   :: h2D_Cyctokinin1stConc_pvr(:,:) 
   real(r8),pointer   :: h2D_Root1stStrutN_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stStrutP_pvr(:,:)
@@ -365,6 +366,7 @@ implicit none
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)      
   real(r8),pointer   :: h1D_MycorrizhalBiomC_ptc(:)
   real(r8),pointer   :: h1D_Root1stStrutC_ptc(:)
+  real(r8),pointer   :: h1D_Root1stStrutN_ptc(:)  
   real(r8),pointer   :: h1D_Root2ndStrutC_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTC_ptc(:)
   real(r8),pointer   :: h1D_ROOT_NONSTN_ptc(:)
@@ -1096,6 +1098,7 @@ implicit none
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_MycorrizhalBiomC_ptc(beg_ptc:end_ptc));        this%h1D_MycorrizhalBiomC_ptc(:) = spval
   allocate(this%h1D_Root1stStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root1stStrutC_ptc(:)=spval
+  allocate(this%h1D_Root1stStrutN_ptc(beg_ptc:end_ptc)); this%h1D_Root1stStrutN_ptc(:)=spval
   allocate(this%h1D_Root2ndStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root2ndStrutC_ptc(:)=spval
 
   allocate(this%h1D_ROOT_NONSTN_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTN_ptc(:)=spval
@@ -1335,6 +1338,7 @@ implicit none
   allocate(this%h2D_RootNonstBConc_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootNonstBConc_pvr(:,:)=spval   
   allocate(this%h2D_MycoBiomC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_MycoBiomC_pvr(:,:)=spval
   allocate(this%h2D_Root1stStrutC_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root1stStrutC_pvr=spval
+  allocate(this%h2D_Cytok_scalar_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_Cytok_scalar_pvr(:,:)=spval
   allocate(this%h2D_Cyctokinin1stConc_pvr(beg_ptc:end_ptc,1:JZ));  this%h2D_Cyctokinin1stConc_pvr(:,:)=spval
   allocate(this%h2D_Root1stStrutN_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root1stStrutN_pvr=spval
   allocate(this%h2D_Root1stStrutP_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root1stStrutP_pvr=spval
@@ -2576,6 +2580,10 @@ implicit none
   call hist_addfld1d(fname='Root1stBiomC_pft',units='gC/m2',avgflag='A',&
     long_name='Primary root structural C',ptr_patch=data1d_ptr)                  
 
+  data1d_ptr => this%h1D_Root1stStrutN_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='Root1stBiomN_pft',units='gN/m2',avgflag='A',&
+    long_name='Primary root structural N',ptr_patch=data1d_ptr)                  
+
   data1d_ptr => this%h1D_Root2ndStrutC_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Root2ndBiomC_pft',units='gC/m2',avgflag='A',&
     long_name='Secondary root structural C',ptr_patch=data1d_ptr)                  
@@ -2865,7 +2873,7 @@ implicit none
 
   data1d_ptr => this%h1D_TreeRingRadius_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='TreeRingRadius_pft',units='m',avgflag='I',&
-    long_name='Mean tree ring radius',ptr_patch=data1d_ptr,&
+    long_name='Mean main stalk radius',ptr_patch=data1d_ptr,&
     default='inactive')            
 
   data1d_ptr => this%h1D_HVST_N_FLX_ptc(beg_ptc:end_ptc)      
@@ -3981,7 +3989,11 @@ implicit none
 
   data2d_ptr => this%h2D_Cyctokinin1stConc_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Cyctokinin1stConc_pvr',units='1.e-3gC/m3',type2d='levsoi',avgflag='A',&
-    long_name='Primary root cytokinin mean concentration',ptr_patch=data2d_ptr)       
+    long_name='Primary root cytokinin mean concentration',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_Cytok_scalar_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='Cytok_scalar_pvr',units='-',type2d='levsoi',avgflag='A',&
+    long_name='Cytokinin scalar for corase root thickening',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootNonstBConc_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootNonstBConc_pvr',units='g/gC',type2d='levsoi',avgflag='A',&
@@ -4804,7 +4816,7 @@ implicit none
         this%h1D_ROOT_N_ptc(nptc)           = RootElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_RootNodule_N_ptc(nptc)     = RootNoduleElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_STORED_N_ptc(nptc)         = SeasonalNonstElms_pft(ielmn,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_TreeRingRadius_ptc(nptc)   = TreeRingAveRadius_pft(NZ,NY,NX)
+        this%h1D_TreeRingRadius_ptc(nptc)   = StalkAveRadius_pft(NZ,NY,NX)
         this%h1D_Root1stTipSinkWt_ptc(nptc) = Root1stTipSinkWeight_pft(NZ,NY,NX)
         this%h1D_SHOOT_P_ptc(nptc)          = ShootElms_pft(ielmp,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Plant_P_ptc(nptc)          = (ShootElms_pft(ielmp,NZ,NY,NX) &
@@ -4893,11 +4905,13 @@ implicit none
         this%h1D_RootAbsorbAreaPP_pft(nptc)=0._r8
         this%h1D_MycorrizhalBiomC_ptc(nptc) = 0._r8
         this%h1D_Root1stStrutC_ptc(nptc)=0._r8
+        this%h1D_Root1stStrutN_ptc(nptc)=0._r8
         this%h1D_Root2ndStrutC_ptc(nptc)=0._r8
         DO L=1,JZ
           this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)-RootCO2Autor_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
           this%h2D_Cyctokinin1stConc_pvr(nptc,L) = 0._r8
+          this%h2D_Cytok_scalar_pvr(nptc,L)      = 0._r8
           this%h2D_Root1stStrutC_pvr(nptc,L)     = 0._r8
           this%h2D_MycoBiomC_pvr(nptc,L)         = 0._r8
           this%h2D_Root1stStrutN_pvr(nptc,L)     = 0._r8
@@ -4964,21 +4978,26 @@ implicit none
             this%h2D_RootLig1stC_pvr(nptc,L) = Root1stLigStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
 
             DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
-              this%h2D_MycoBiomC_pvr(nptc,L) = this%h2D_MycoBiomC_pvr(nptc,L)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
-              this%h2D_Cyctokinin1stConc_pvr(nptc,L)=this%h2D_Cyctokinin1stConc_pvr(nptc,L)+Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX)
-              this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ,NY,NX)
-              this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ,NY,NX)
-              this%h2D_Root1stStrutP_pvr(nptc,L) = this%h2D_Root1stStrutP_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmp,L,NR,NZ,NY,NX)
-              this%h2D_Root2ndStrutC_pvr(nptc,L) = this%h2D_Root2ndStrutC_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
-              this%h2D_Root2ndStrutN_pvr(nptc,L) = this%h2D_Root2ndStrutN_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)
-              this%h2D_Root2ndStrutP_pvr(nptc,L) = this%h2D_Root2ndStrutP_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
-              this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc) + RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
+              this%h2D_MycoBiomC_pvr(nptc,L)         = this%h2D_MycoBiomC_pvr(nptc,L)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
+              this%h2D_Cyctokinin1stConc_pvr(nptc,L) = this%h2D_Cyctokinin1stConc_pvr(nptc,L)+Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX)
+              this%h2D_Cytok_scalar_pvr(nptc,L)      = this%h2D_Cytok_scalar_pvr(nptc,L)+fctyok_scalar_rpvr(L,NR,NZ,NY,NX)
+              this%h2D_Root1stStrutC_pvr(nptc,L)     = this%h2D_Root1stStrutC_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ,NY,NX)
+              this%h2D_Root1stStrutN_pvr(nptc,L)     = this%h2D_Root1stStrutN_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmn,L,NR,NZ,NY,NX)
+              this%h2D_Root1stStrutP_pvr(nptc,L)     = this%h2D_Root1stStrutP_pvr(nptc,L) + RootMyco1stStrutElms_rpvr(ielmp,L,NR,NZ,NY,NX)
+              this%h2D_Root2ndStrutC_pvr(nptc,L)     = this%h2D_Root2ndStrutC_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ,NY,NX)
+              this%h2D_Root2ndStrutN_pvr(nptc,L)     = this%h2D_Root2ndStrutN_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmn,ipltroot,L,NR,NZ,NY,NX)
+              this%h2D_Root2ndStrutP_pvr(nptc,L)     = this%h2D_Root2ndStrutP_pvr(nptc,L) + RootMyco2ndStrutElms_rpvr(ielmp,ipltroot,L,NR,NZ,NY,NX)
+              this%h1D_MycorrizhalBiomC_ptc(nptc)    = this%h1D_MycorrizhalBiomC_ptc(nptc) + RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
             ENDDO
             
-            if(NumPrimeRootAxes_pft(NZ,NY,NX).GT.0)this%h2D_Cyctokinin1stConc_pvr(nptc,L)=AZERO(this%h2D_Cyctokinin1stConc_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
+            if(NumPrimeRootAxes_pft(NZ,NY,NX).GT.0)THEN
+              this%h2D_Cyctokinin1stConc_pvr(nptc,L) = AZERO(this%h2D_Cyctokinin1stConc_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
+              this%h2D_Cytok_scalar_pvr(nptc,L)      = AZERO(this%h2D_Cytok_scalar_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
+            ENDIF
 
             this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)+this%h2D_Root1stStrutC_pvr(nptc,L)
-            this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)+this%h2D_Root2ndStrutC_pvr(nptc,L)
+            this%h1D_Root1stStrutN_ptc(nptc) = this%h1D_Root1stStrutN_ptc(nptc)+this%h2D_Root1stStrutN_pvr(nptc,L) 
+            this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)+this%h2D_Root2ndStrutC_pvr(nptc,L)            
             this%h2D_MycoBiomC_pvr(nptc,L) = this%h2D_MycoBiomC_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutC_pvr(nptc,L) = this%h2D_Root1stStrutC_pvr(nptc,L)/DVOLL
             this%h2D_Root1stStrutN_pvr(nptc,L) = this%h2D_Root1stStrutN_pvr(nptc,L)/DVOLL
@@ -4991,6 +5010,7 @@ implicit none
         this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_Root1stStrutN_ptc(nptc) = this%h1D_Root1stStrutN_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       ENDDO 
       this%h1d_fPAR_col(ncol)=safe_adb(this%h1d_fPAR_col(ncol),RadPARSolarBeam_col(NY,NX))
@@ -5006,6 +5026,7 @@ implicit none
 
   this%h1D_Root2ndStrutC_ptc(nptc)          = 0._r8
   this%h1D_Root1stStrutC_ptc(nptc)          = 0._r8
+  this%h1D_Root1stStrutN_ptc(nptc)          = 0._r8
   this%h1D_MycorrizhalBiomC_ptc(nptc)        = 0._r8
   this%h1D_ShootRootXferC_ptc(nptc)          = 0._r8
   this%h1D_ShootRootXferN_ptc(nptc)          = 0._r8
@@ -5217,5 +5238,6 @@ implicit none
   this%h2D_Root2ndStrutN_pvr(nptc,1:JZ)             = 0._r8
   this%h2D_Root2ndStrutP_pvr(nptc,1:JZ)             = 0._r8
   this%h2D_Cyctokinin1stConc_pvr(nptc,1:JZ)         = 0._R8
+  this%h2D_Cytok_scalar_pvr(nptc,1:JZ)              = 0._R8
   end subroutine ZeroPlantHistVars
 end module HistDataType

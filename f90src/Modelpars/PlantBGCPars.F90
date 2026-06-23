@@ -245,7 +245,7 @@ module PlantBGCPars
   ZPLFD                       = 1.0_r8-ZPLFM
   ZPGRM                       = 0.75_r8
   ZPGRD                       = 1.0_r8-ZPGRM
-  resp_downreg                = 0.05_r8
+  resp_downreg                = 0.1_r8
   k_ligMM                     = 0.1_r8*VMXC
   k_ligmax                    = 0.005_r8
   Yld_lignif                  = 0.62_r8
