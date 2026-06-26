@@ -250,8 +250,8 @@ implicit none
     DO NY=NVN,NVS
       !==========================================
       !temporary set TEST values, assuming trees
-      NZ=1
-      PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
+      !NZ=1
+      !PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
       !==========================================
 
       CanopyLeafArea_col(NY,NX) = 0._r8
@@ -265,6 +265,7 @@ implicit none
           CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
         endif
         
+        PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
         !tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
         !tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
         !CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
@@ -312,6 +313,7 @@ implicit none
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopuLive_pft(NZ,NY,NX)
+          RootAbsorbLenPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)
 
           !the following two are fillers, which will be updated later
           Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8

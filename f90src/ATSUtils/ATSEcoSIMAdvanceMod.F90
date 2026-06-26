@@ -58,6 +58,7 @@ implicit none
   use PlantMod
   use WthrMod
   use PlantInfoMod
+  use InitPlantMod
   !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
@@ -127,6 +128,7 @@ implicit none
     !ET variable set in SetHourlyDiagnostics unclear if a clone is
     !needed as with SetHourlyAccumulators
     QVegET_col(NY,NX) = 0._r8
+    a_Transpiration(NY) = 0._r8
     call SetHourlyAccumulatorsATS(NY,NX)
     NK_col(NY,NX) = a_NL(NY)
     Myco_pft(1,NY,NX) = 1
@@ -196,6 +198,7 @@ implicit none
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0 !This is percentage of Soil void that is micropores (100% for now)
       !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
       PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)/1.0e6
+      ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = -1.0*PSISM1_vr(L,NY,NX) !needed for root uptake
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
       !AREA3(L,NY,NX)              = a_AREA3(L,NY)
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
@@ -310,6 +313,9 @@ implicit none
     !loop over npfts and fill snow on canopy variables
     if (ldo_sp_mode) then
       DO NZ=1,num_pfts
+        CanopyHeightLive_pft(NZ,NY,NX) = 17.0
+        tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
+        tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
         SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
         iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
         TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
@@ -318,11 +324,28 @@ implicit none
         ! based on that mapping
         DATAPI(NZ,NY,NX) = a_PFT(NY,NZ)
         call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
-       
+        
+        !Set cuticle resistances scaled from pft trait file
+        H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+        CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
+        
+        ATCA_col(NY,NX)                 = 6.0_r8
+        ENGYX_pft(NZ,NY,NX)             = 0._r8
+        DeltaTKC_pft(NZ,NY,NX)          = 0._r8
+        TdegCCanopy_pft(NZ,NY,NX)       = ATCA_col(NY,NX)
+        TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
+        TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
+        TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
+        fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
+        !PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
+        PSICanopy_pft(NZ,NY,NX)         = -2.0_r8
+        PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+        PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
       enddo
     endif
   ENDDO
 
+  
   !Run precribe phenology interpolation which sets necessary variables
   !To do the phenology
   if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
@@ -447,10 +470,10 @@ implicit none
 
     !Sum over PFTs for total transpiration and canopy evap
     !and canopy on snow
-    do NP=1,npfts
-      a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NP,NY,NX)
-      a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NP,NY,NX)
-      !a_CanSnow(NP,NY) = SnowOnCanopy_pft(NP,NY,NX)
+    do NZ=1,num_pfts
+      a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NZ,NY,NX)
+      a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NZ,NY,NX)
+      a_CanSnow(NZ,NY) = SnowOnCanopy_pft(NZ,NY,NX)
     enddo
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation

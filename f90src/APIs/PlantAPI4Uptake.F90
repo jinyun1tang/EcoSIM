@@ -6,6 +6,7 @@ module PlantAPI4Uptake
   use EcoSiMParDataMod, only: micpar, pltpar
   use SoilPhysDataType, only: SurfAlbedo_col
   use MiniMathMod,      only: AZMAX1
+  use EcoSIMCtrlMod,    only: ats_cpl_mode
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -174,6 +175,7 @@ implicit none
         plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ) = Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)
         plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)
+        plt_morph%RootAbsorbLenPerPlant_pvr(N,L,NZ)=RootAbsorbLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO
     ENDDO
     !variables updated from surface energy calculation
