@@ -70,9 +70,9 @@ contains
   call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
   a_MFrac=data3D(:,:,:)
   
-  data_ptr = state%canopy_snow%data
-  call c_f_pointer(data_ptr, data2D, [num_pfts, num_cols])
-  a_CanSnow=data2D(:,:)
+  !data_ptr = state%canopy_snow%data
+  !call c_f_pointer(data_ptr, data2D, [num_pfts, num_cols])
+  !a_CanSnow=data2D(:,:)
   
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -299,8 +299,8 @@ contains
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   data(:) = surf_snow_depth
   
-  call c_f_pointer(state%canopy_snow%data, data2D, [num_pfts, num_cols])
-  data2D(:,:) = a_CanSnow
+  !call c_f_pointer(state%canopy_snow%data, data2D, [num_pfts, num_cols])
+  !data2D(:,:) = a_CanSnow
 
   end subroutine EcoSIM2ATSData
 

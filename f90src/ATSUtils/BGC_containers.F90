@@ -170,8 +170,6 @@ module BGCContainers_module
      type (BGCVectorDouble) :: evaporation_litter
      type (BGCVectorDouble) :: evaporation_snow
      type (BGCVectorDouble) :: sublimation_snow
-     type (BGCMatrixDouble) :: snow_temperature
-     type (BGCMatrixDouble) :: canopy_snow
      type (BGCTensorDouble) :: mole_fraction
   end type BGCState
 

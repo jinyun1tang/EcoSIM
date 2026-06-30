@@ -316,7 +316,7 @@ implicit none
         CanopyHeightLive_pft(NZ,NY,NX) = 17.0
         tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
         tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
-        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
+        SnowOnCanopy_pft(NZ,NY,NX) = 0.0_r8 !zeroing while a_CanSnow is being redesigned
         iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
         TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
        
@@ -473,7 +473,7 @@ implicit none
     do NZ=1,num_pfts
       a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NZ,NY,NX)
       a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NZ,NY,NX)
-      a_CanSnow(NZ,NY) = SnowOnCanopy_pft(NZ,NY,NX)
+      !a_CanSnow(NZ,NY) = SnowOnCanopy_pft(NZ,NY,NX)
     enddo
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation

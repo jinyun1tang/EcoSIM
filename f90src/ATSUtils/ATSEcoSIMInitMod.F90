@@ -130,9 +130,14 @@ implicit none
       SoiBulkDensityt0_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilBulkDensity_vr(L,NY,NX)=a_BKDSI(L,NY)/1.0e3_r8
       SoilFracAsMicP_vr(L,NY,NX) = 1.0
-      CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
-      CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
-      CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
+          
+      !CSoilOrgM_vr(ielmc,L,NY,NX)=a_CORGC(L,NY)
+      !CSoilOrgM_vr(ielmn,L,NY,NX)=a_CORGN(L,NY)
+      !CSoilOrgM_vr(ielmp,L,NY,NX)=a_CORGP(L,NY)
+      
+      CSoilOrgM_vr(ielmc,L,NY,NX)=0.0_r8
+      CSoilOrgM_vr(ielmn,L,NY,NX)=0.0_r8
+      CSoilOrgM_vr(ielmp,L,NY,NX)=0.0_r8
 
     ENDDO
   ENDDO
