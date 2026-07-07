@@ -191,6 +191,7 @@ implicit none
     RootStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)              = plt_biom%RootStrutElms_pft(1:NumPlantChemElms,NZ)
     PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ,NY,NX)       = plt_rbgc%PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ)
     CanopyLeafArea_pft(NZ,NY,NX)                                = plt_morph%CanopyLeafArea_pft(NZ)
+    CanopyLeafAreaMax_pft(NZ,NY,NX)                             = plt_morph%CanopyLeafAreaMax_pft(NZ)
     ShootNoduleElms_pft(1:NumPlantChemElms,NZ,NY,NX)            = plt_biom%ShootNoduleElms_pft(1:NumPlantChemElms,NZ)
     TotEndVegE_pft(1:NumPlantChemElms,NZ,NY,NX)                 = plt_biom%TotEndVegE_pft(1:NumPlantChemElms,NZ)        
     TotBegVegE_pft(1:NumPlantChemElms,NZ,NY,NX)                 = plt_biom%TotBegVegE_pft(1:NumPlantChemElms,NZ)        
@@ -644,6 +645,7 @@ implicit none
         RootCO2Autor_vr(L,NY,NX)                                   = RootCO2Autor_vr(L,NY,NX)+RootCO2Autor_pvr(N,L,NZ,NY,NX)
       ENDDO
       SapFlowVlinear_pvr(L,NZ,NY,NX) = plt_ew%SapFlowVlinear_pvr(L,NZ)
+      CRootLumenArea_pvr(L,NZ,NY,NX)   = plt_morph%CRootLumenArea_pvr(L,NZ)        
       RootCO2Ar2Soil_vr(L,NY,NX)     = RootCO2Ar2Soil_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2Soil_pvr(L,NZ)
       RootCO2Ar2Root_vr(L,NY,NX)     = RootCO2Ar2Root_vr(L,NY,NX)+plt_rbgc%RootCO2Ar2RootX_pvr(L,NZ)
       do idg=idg_beg,idg_NH3
@@ -667,6 +669,7 @@ implicit none
         RootAge_rpvr(L,NR,NZ,NY,NX)          = plt_morph%RootAge_rpvr(L,NR,NZ)
         RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ)
         Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ) 
+        CRootLumenArea_rpvr(L,NR,NZ,NY,NX)   = plt_morph%CRootLumenArea_rpvr(L,NR,NZ)    
         DO N=1,Myco_pft(NZ,NY,NX)
           RootMyco2ndSinkC_rpvr(N,L,NR,NZ,NY,NX)  = plt_rbgc%RootMyco2ndSinkC_rpvr(N,L,NR,NZ)           
           RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ,NY,NX) = plt_biom%RootMyco2ndStrutElms_rpvr(1:NumPlantChemElms,N,L,NR,NZ)
@@ -709,7 +712,7 @@ implicit none
     KmPO4Root_pft(2,NZ,NY,NX)        = plt_rbgc%KmPO4Root_pft(2,NZ)
     CMinPO4Root_pft(2,NZ,NY,NX)      = plt_rbgc%CMinPO4Root_pft(2,NZ)
     RootRadialResist_pft(2,NZ,NY,NX) = plt_morph%RootRadialResist_pft(2,NZ)
-    RootAxialResist_pft(2,NZ,NY,NX)  = plt_morph%RootAxialResist_pft(2,NZ)
+    Root2ndAxialResist_pft(2,NZ,NY,NX)  = plt_morph%Root2ndAxialResist_pft(2,NZ)
     CRootActVolPerMassC_pft(NZ,NY,NX)= plt_morph%CRootActVolPerMassC_pft(NZ)
     DO N=1,Myco_pft(NZ,NY,NX)
       RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ,NY,NX) = plt_biom%RootMycoNonstElms_pft(1:NumPlantChemElms,N,NZ)
@@ -748,6 +751,15 @@ implicit none
   character(len=*), parameter :: subname='PlantAPISend'
 
   call PrintInfo('beg '//subname)
+  IF((ALAT_col(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT_col(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN   
+    DO NZ=1,NP0_col(NY,NX)
+      plt_morph%lreset_laimax_pft(NZ)=.true.      
+    ENDDO
+  ELSE
+    DO NZ=1,NP0_col(NY,NX)
+      plt_morph%lreset_laimax_pft(NZ)=.false.      
+    ENDDO    
+  endif
   plt_site%NY=NY;plt_site%NX=NX
   plt_site%DazCurrYear=DazCurrYear
   I1=I+1;if(I1>DazCurrYear)I1=1  
@@ -930,14 +942,16 @@ implicit none
     plt_morph%SeedWidth2LenRatio_pft(NZ)  = SeedWidth2LenRatio_pft(NZ,NY,NX)
     plt_pheno%GrainFillRate25C_pft(NZ)    = GrainFillRate25C_pft(NZ,NY,NX)
     plt_biom%StandingDeadInitC_pft(NZ)    = StandingDeadInitC_pft(NZ,NY,NX)
-
+    plt_morph%StalkAxialResist_pft(NZ) =StalkAxialResist_pft(NZ,NY,NX)
+    plt_morph%RootSingleVesselRstaxial_pft(NZ)  = RootSingleVesselRstaxial_pft(NZ,NY,NX)
+    plt_morph%RootSingleVesselArea_pft(NZ)    = RootSingleVesselArea_pft(NZ,NY,NX)
     !initial root values
     DO N=1,Myco_pft(NZ,NY,NX)
       plt_morph%Root1stMaxRadius_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%Root2ndMaxRadius_pft(N,NZ) = Root2ndMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%RootPorosity_pft(N,NZ)     = RootPorosity_pft(N,NZ,NY,NX)
       plt_morph%RootRadialResist_pft(N,NZ) = RootRadialResist_pft(N,NZ,NY,NX)
-      plt_morph%RootAxialResist_pft(N,NZ)  = RootAxialResist_pft(N,NZ,NY,NX)
+      plt_morph%Root2ndAxialResist_pft(N,NZ)  = Root2ndAxialResist_pft(N,NZ,NY,NX)
       plt_rbgc%VmaxNH4Root_pft(N,NZ)       = VmaxNH4Root_pft(N,NZ,NY,NX)
       plt_rbgc%KmNH4Root_pft(N,NZ)         = KmNH4Root_pft(N,NZ,NY,NX)
       plt_rbgc%CMinNH4Root_pft(N,NZ)       = CMinNH4Root_pft(N,NZ,NY,NX)
@@ -967,6 +981,8 @@ implicit none
     plt_allom%rNCLeaf_pft(NZ)              = rNCLeaf_pft(NZ,NY,NX)
     plt_allom%rNCSheath_pft(NZ)            = rNCSheath_pft(NZ,NY,NX)
     plt_allom%rNCStalk_pft(NZ)             = rNCStalk_pft(NZ,NY,NX)
+    plt_allom%rECLiveCRoot_pft(:,NZ)         = rECLiveCRoot_pft(:,NZ,NY,NX)
+    plt_allom%rECDeadCRoot_pft(:,NZ)       = rECDeadCRoot_pft(:,NZ,NY,NX)
     plt_allom%rNCReserve_pft(NZ)           = rNCReserve_pft(NZ,NY,NX)
     plt_allom%rNCHusk_pft(NZ)              = rNCHusk_pft(NZ,NY,NX)
     plt_allom%rNCEar_pft(NZ)               = rNCEar_pft(NZ,NY,NX)
@@ -1211,8 +1227,9 @@ implicit none
     plt_distb%jHarvstType_pft(NZ)         = jHarvstType_pft(NZ,I,NY,NX)
 
     plt_distb%THIN_pft(NZ)                = THIN_pft(NZ,I,NY,NX)
-    plt_morph%CanopyStemSurfArea_pft(NZ)      = CanopyStemSurfArea_pft(NZ,NY,NX)
+    plt_morph%CanopyStemSurfArea_pft(NZ)  = CanopyStemSurfArea_pft(NZ,NY,NX)
     plt_morph%CanopyLeafArea_pft(NZ)      = CanopyLeafArea_pft(NZ,NY,NX)
+    plt_morph%CanopyLeafAreaMax_pft(NZ)   = CanopyLeafAreaMax_pft(NZ,NY,NX)
 
     plt_photo%O2I_pft(NZ)                      = O2I_pft(NZ,NY,NX)
     plt_photo%LeafIntracellularCO2_pft(NZ) = LeafIntracellularCO2_pft(NZ,NY,NX)
@@ -1425,6 +1442,7 @@ implicit none
 
     DO L=1,NK_col(NY,NX)
       plt_morph%Root1stXNumL_pvr(L,NZ) = Root1stXNumL_pvr(L,NZ,NY,NX)    
+      plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)      
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_biom%RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ) = RootMycoNonstElms_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
         plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ,NY,NX)
@@ -1500,6 +1518,7 @@ implicit none
         plt_morph%RootAge_rpvr(L,NR,NZ)         = RootAge_rpvr(L,NR,NZ,NY,NX)
         plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ) = RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX)
         plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX))
+        plt_morph%CRootLumenArea_rpvr(L,NR,NZ)   = CRootLumenArea_rpvr(L,NR,NZ,NY,NX)
         DO N=1,Myco_pft(NZ,NY,NX)
           plt_morph%Root2ndLen_rpvr(N,L,NR,NZ)      = Root2ndLen_rpvr(N,L,NR,NZ,NY,NX)
           plt_morph%Root2ndXNum_rpvr(N,L,NR,NZ)     = Root2ndXNum_rpvr(N,L,NR,NZ,NY,NX)

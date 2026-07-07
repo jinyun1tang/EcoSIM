@@ -35,7 +35,7 @@ module RootDataType
   real(sp),target,allocatable ::  rPCRootr_pft(:,:,:)                             !root P:C ratio, [g g-1]
   real(sp),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
   real(sp),target,allocatable ::  RootRadialResist_pft(:,:,:,:)                  !root radial resistivity, [MPa h m-2]
-  real(sp),target,allocatable ::  RootAxialResist_pft(:,:,:,:)                   !root axial resistivity, [MPa h m-4]
+  real(sp),target,allocatable ::  Root2ndAxialResist_pft(:,:,:,:)                   !root axial resistivity, [MPa h m-4]
   real(sp),target,allocatable ::  ShootRootNonstElmConduts_pft(:,:,:)           !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(sp),target,allocatable ::  VmaxNH4Root_pft(:,:,:,:)                       !maximum root NH4 uptake rate, [g m-2 h-1]
   real(sp),target,allocatable ::  KmNH4Root_pft(:,:,:,:)                         !Km for root NH4 uptake, [g m-3]
@@ -65,6 +65,8 @@ module RootDataType
   real(sp),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
   real(sp),target,allocatable ::  Root1stLenPP_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
   real(sp),target,allocatable ::  RootAge_rpvr(:,:,:,:,:)                        !root age, [h]
+  real(sp),target,allocatable ::  CRootLumenArea_rpvr(:,:,:,:,:)                 !coarse roots lumen area for root axes, [m2]    
+  real(sp),target,allocatable ::  CRootLumenArea_pvr(:,:,:,:)                    !coarse roots lumen area , [m2]    
   real(sp),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(sp),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(sp),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:)                    !root layer number primary axes, [d-2]
@@ -184,7 +186,7 @@ contains
   allocate(RootAtmGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX));RootAtmGasConductance_rpvr=0._sp
   allocate(RootPorosity_pft(jroots,JP,JY,JX));   RootPorosity_pft=0._sp
   allocate(RootRadialResist_pft(jroots,JP,JY,JX));   RootRadialResist_pft=0._sp
-  allocate(RootAxialResist_pft(jroots,JP,JY,JX));   RootAxialResist_pft=0._sp
+  allocate(Root2ndAxialResist_pft(jroots,JP,JY,JX));   Root2ndAxialResist_pft=0._sp
   allocate(ShootRootNonstElmConduts_pft(JP,JY,JX));    ShootRootNonstElmConduts_pft=0._sp
   allocate(VmaxNH4Root_pft(jroots,JP,JY,JX)); VmaxNH4Root_pft=0._sp
   allocate(KmNH4Root_pft(jroots,JP,JY,JX)); KmNH4Root_pft=0._sp
@@ -214,6 +216,8 @@ contains
   allocate(RootLenPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenPerPlant_pvr=0._sp
   allocate(Root1stLenPP_rpvr(JZ,MaxNumRootAxes,JP,JY,JX));Root1stLenPP_rpvr=0._sp
   allocate(RootAge_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootAge_rpvr=0._sp
+  allocate(CRootLumenArea_pvr(JZ,JP,JY,JX)); CRootLumenArea_pvr=0._sp  
+  allocate(CRootLumenArea_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); CRootLumenArea_rpvr=0._sp
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._sp
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._sp
   allocate(Root1stXNumL_pvr(JZ,JP,JY,JX));Root1stXNumL_pvr=0._sp
@@ -321,7 +325,7 @@ contains
   call destroy(rPCRootr_pft)
   call destroy(RootPorosity_pft)
   call destroy(RootRadialResist_pft)
-  call destroy(RootAxialResist_pft)
+  call destroy(Root2ndAxialResist_pft)
   call destroy(ShootRootNonstElmConduts_pft)
   call destroy(VmaxNH4Root_pft)
   call destroy(KmNH4Root_pft)
@@ -351,6 +355,8 @@ contains
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLenPP_rpvr)
   call destroy(RootAge_rpvr)
+  call destroy(CRootLumenArea_pvr)
+  call destroy(CRootLumenArea_rpvr)
   call destroy(Root2ndLen_rpvr)
   call destroy(RootLenDensPerPlant_pvr)
   call destroy(Root1stXNumL_pvr)

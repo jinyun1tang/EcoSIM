@@ -1316,8 +1316,7 @@ implicit none
     type1d_out     =  tape(t)%hlist(f)%field%type1d_out
     hpindex        =  tape(t)%hlist(f)%field%hpindex
     field          => esmptr_rs(hpindex)%ptr
-    call PrintInfo('beg '//subname)
-    if(lverb)print*,tape(t)%hlist(f)%field%name
+    call PrintInfo('beg '//subname)    
     ! set variables to check weights when allocate all pfts
 
        ! For data defined on the pft, col, and landunit we need to check if a point is active

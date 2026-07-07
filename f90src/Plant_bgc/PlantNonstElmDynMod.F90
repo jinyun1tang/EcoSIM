@@ -2,8 +2,9 @@ module PlantNonstElmDynMod
   use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use DebugToolMod,  only: PrintInfo,DebugPrint
-  use PlantMathFuncMod, only : ExchFluxLimiter
+  use PlantMathFuncMod, only : ExchFluxLimiter,is_plant_woody_vascular
   USE minimathmod, only : AZERO
+  use EcoSIMCtrlMod
   use ElmIDMod
   use PlantBGCPars
   use PlantAPIData  
@@ -328,6 +329,7 @@ module PlantNonstElmDynMod
   real(r8) :: ZPOOLB
   real(r8) :: ZPOOLD,EPOOLD
   REAL(R8) :: RootSinkWeight_vr(JZ1),BranchSinkWeight_pft(JP1)
+  REAL(R8) :: ROOTACTBIOMS_vr(JZ1)
   real(r8) :: CPOOLT
   real(r8) :: NonstElmRootE,NonstElmBrchE
   real(r8) :: NonstElmGradt,NonstElmGradt1(JZ1)
@@ -343,12 +345,15 @@ module PlantNonstElmDynMod
   real(r8) :: WTRTLR
   real(r8) :: XFRE
   real(r8) :: ZTOL
+  logical :: found_coarse
   real(r8) :: RPlantRootH2OUptk_vr(JZ1)
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: RootDepzMean,PSIOsmo,PSITurg
   real(r8) :: CPOLT(JZ1),CCPOLT
   associate(                                                                   &
+    iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]  
+    iPlant2ndGrothPattern_pft     => plt_pheno%iPlant2ndGrothPattern_pft      ,& !input  :plant expression of secondary growth, [-]        
     NU                            => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
     Myco_pft                      => plt_morph%Myco_pft                       ,& !input  :mycorrhizal type (no or yes),[-]
     RootMyco2ndStrutElms_rpvr     => plt_biom%RootMyco2ndStrutElms_rpvr       ,& !input  :root layer element secondary axes, [g d-2]
@@ -356,8 +361,10 @@ module PlantNonstElmDynMod
     FracRootElmAllocm             => plt_allom%FracRootElmAllocm              ,& !input  :C woody fraction in root,[-]
     RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs             ,& !input  :root C primary axes, [g d-2]
     Root1stDepz_raxes             => plt_morph%Root1stDepz_raxes              ,& !input  :root layer depth, [m]    
-    Root1stActStructElms_rpvr     => plt_biom%Root1stActStructElms_rpvr       ,& !inoput :root layer active zone element in primary axes, [g d-2]
+    RootMyco1stStrutElms_rpvr     => plt_biom%RootMyco1stStrutElms_rpvr       ,& !input  :root layer element primary axes, [g d-2]    
+    Root1stActStructElms_rpvr     => plt_biom%Root1stActStructElms_rpvr       ,& !input :root layer active zone element in primary axes, [g d-2]
     CanopyLeafSheathC_brch        => plt_biom%CanopyLeafSheathC_brch          ,& !input  :plant branch leaf + sheath C, [g d-2]
+    fctyok_scalar_rpvr            => plt_morph%fctyok_scalar_rpvr             ,& !input :cytokinin scalar for corase root sink, [-]    
     CumSoilThickness_vr           => plt_site%CumSoilThickness_vr             ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]    
     RootElms_pft                  => plt_biom%RootElms_pft                    ,& !input  :plant root element mass, [g d-2]
     PlantPopuLive_pft             => plt_site%PlantPopuLive_pft               ,& !input  :plant population, [d-2]    
@@ -368,14 +375,16 @@ module PlantNonstElmDynMod
     RootCO2Autor_pvr              => plt_rbgc%RootCO2Autor_pvr                ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !input  :root total water potential, [Mpa]    
     DistRootEffDepz_pvr           => plt_morph%DistRootEffDepz_pvr            ,& !input  :Effective shoot-root transport depth, [m]    
-    SapFlowVlinear_pvr            => plt_ew%SapFlowVlinear_pvr                ,& !input  :Sap flow mean linear velocity, [m h-1]    
+    SapFlowVlinear_pvr            => plt_ew%SapFlowVlinear_pvr                ,& !input  :Sap flow mean linear velocity along 1st root axes, [m h-1]    
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !input  :root turgor water potential, [Mpa]    
-    Transpiration_pft             => plt_ew%Transpiration_pft                 ,& !input  :canopy transpiration, [m3 d-2 h-1]    
+    Root1stLigStructElms_rpvr     => plt_biom%Root1stLigStructElms_rpvr       ,& !inoput :root layer lignified zone element in primary axes, [g d-2]        
+    Transpiration_pft             => plt_ew%Transpiration_pft                 ,& !input  :canopy transpiration (<0 into atmosphere), [m3 d-2 h-1]    
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !input  :root osmotic water potential, [Mpa]    
     TKS_vr                        => plt_ew%TKS_vr                            ,& !input  :mean annual soil temperature, [K]    
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]    
     DLYR3                         => plt_site%DLYR3                           ,& !input  :vertical thickness of soil layer, [m]    
     OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]    
+    Root1stRadius_rpvr            => plt_morph%Root1stRadius_rpvr             ,& !input  :root layer radius for each primary axes, [m]            
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     flag2ndGrowth_pvr             => plt_morph%flag2ndGrowth_pvr              ,& !input  :flag for secondary growth of primary roots, [-]        
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
@@ -384,7 +393,6 @@ module PlantNonstElmDynMod
     NMaxRootBotLayer_pft          => plt_morph%NMaxRootBotLayer_pft           ,& !input  :maximum soil layer number for all root axes, [-]    
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     fRootTube_rpvr                => plt_morph%fRootTube_rpvr                 ,& !input  :fraction of root for transport,[-]
-    RPlantRootH2OUptk_pvr         => plt_ew%RPlantRootH2OUptk_pvr             ,& !input  :whole population root water uptake, [m3 d-2 h-1]    
     NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft             ,& !input  :soil layer at planting depth, [-]    
     RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !inoput :root layer structural C, [gC d-2]
     PopuRootMycoC_pvr             => plt_biom%PopuRootMycoC_pvr               ,& !inoput :root layer C, [gC d-2]
@@ -421,17 +429,49 @@ module PlantNonstElmDynMod
     ENDDO D5450    
   ENDDO D5445
   
-  !recognizing that non-elongation zone mostly serves as strorage and highway for resource transport to the tip.
-  DO  NR=1,NumPrimeRootAxes_pft(NZ)
-    L1=NRoot1stTipLay_raxes(NR,NZ)    
-    DO L=NU,MaxSoilLays4Root_pft(NZ)    
-      RootMycoActiveBiomC_pvr(ipltroot,L,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)  
+  !add root tip, when the root tip layer has no coarse roots
+  if(lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
+    ROOTACTBIOMS_vr(:) = 0._R8    
+    DO  NR=1,NumPrimeRootAxes_pft(NZ) 
+      found_coarse=.false.
+      DO L=MaxSoilLays4Root_pft(NZ),NU,-1
+        !primary roots are not coarse
+        if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
+          ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)        
+          L1=NRoot1stTipLay_raxes(NR,NZ)  
+          ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L1,NR,NZ)  
+        else
+          found_coarse=.true.
+          if(L.LT.NGTopRootLayer_pft(NZ))then
+            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)
+            !coarse root enhancement to seeding layer
+            L1=NGTopRootLayer_pft(NZ)
+            ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)*(1._r8/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))-1._r8)
+          else
+            !coarse roots enhancement
+            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))
+          endif
+          DO N=2,Myco_pft(NZ)
+            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
+          ENDDO
+       endif   
+      ENDDO
+    ENDDO    
+  else
+    DO  NR=1,NumPrimeRootAxes_pft(NZ)
+      L1=NRoot1stTipLay_raxes(NR,NZ)        
+      !because growth only occurs at the root tip for non-woody vascular plants or when coarse roots are not modeled
+      DO L=NU,MaxSoilLays4Root_pft(NZ)
+        RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)          
+      ENDDO    
     ENDDO
-  ENDDO
+    ROOTACTBIOMS_vr(:) = RootMycoActiveBiomC_pvr(ipltroot,:,NZ)
+  endif
 
   DO L=NU,MaxSoilLays4Root_pft(NZ)
     DO NR=1,NumPrimeRootAxes_pft(NZ)
       PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+      !call DebugPrint('PopuRootMycoC_pvr(ipltroot,L,NZ)',PopuRootMycoC_pvr(ipltroot,L,NZ))
     ENDDO
   ENDDO
 
@@ -521,22 +561,21 @@ module PlantNonstElmDynMod
       ELSE
         BranchSinkWeight_pft(NB)=1.0_r8
       ENDIF
- !     IF(NB.eq.1)write(1122,*)I*1000+J/24.,RootMycoNonstElms_rpvr(ielmc,ipltroot,2:3,NZ)
-
+ 
       !Roots at different depths are generally "wired" to the shoot (the source) like spokes 
       !on a wheel or branches on a river. They do not typically exchange carbon directly with each other deep underground.
       NonstElmGradt1=0._R8
       D415: DO L=NU,MaxSoilLays4Root_pft(NZ)
-        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC
-        WTRTLX       = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)*FracRootElmAllocm(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS
-        WTLSBB       = AZMAX1(WTLSBX,FSNK*WTRTLX)
-        WTRTLR       = AZMAX1(WTRTLX,FSNK*WTLSBX)
+        WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC  !root-layer supported canpopy, never become zero 
+        WTRTLX       = ROOTACTBIOMS_vr(L)*FracRootElmAllocm(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS                      !canopy-linked root, can be zero 
+        WTLSBB       = AZMAX1(WTLSBX,FSNK*WTRTLX) !never zero, increase with canopy C biomass
+        WTRTLR       = AZMAX1(WTRTLX,FSNK*WTLSBX) !never zero, increase with root C biomass
         TwoCompMassC = WTLSBB+WTRTLR
         IF(TwoCompMassC.GT.ZERO4Groth_pft(NZ))THEN
           CPOOLBranch   = AZMAX1(CanopyNonstElms_brch(ielmc,NB,NZ)*RootSinkWeight_pvr(L,NZ))
           CPOOLRootS    = AZMAX1(RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
           CPOOLT        = CPOOLRootS+CPOOLBranch
-          NonstElmGradt1(L) = (CPOOLBranch*WTRTLR-CPOOLRootS*WTLSBB)/TwoCompMassC
+          NonstElmGradt1(L) = (CPOOLBranch*WTRTLR-CPOOLRootS*WTLSBB)/TwoCompMassC !>0 to roots
           XFRE          = PTSHTR*NonstElmGradt1(L)
 
           call ExchFluxLimiter(CanopyNonstElms_brch(ielmc,NB,NZ),RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ),XFRE)
@@ -555,7 +594,7 @@ module PlantNonstElmDynMod
               NonstElmGradt = (NonstElmBrchE*CPOOLRootS-NonstElmRootE*CPOOLBranch)/CPOOLT         !
 
               XFRE          = PTSHTR*NonstElmGradt !
-              if(Transpiration_pft(NZ)<0._r8 .and. PTSHTR>0._r8)then
+              if(Transpiration_pft(NZ)<0._r8 .and. PTSHTR>0._r8)then !transpiration into air
                 !transpiration enhancement of daytime flux from root to shoots
                 XFRE  =XFRE - PTSHTR*AMIN1(SapFlowVlinear_pvr(L,NZ)/(DistRootEffDepz_pvr(L,NZ)*PTSHTR),10._r8)*NonstElmRootE*CPOOLBranch/CPOOLT !
               endif
@@ -570,6 +609,7 @@ module PlantNonstElmDynMod
           ENDIF
         ENDIF
       ENDDO D415
+      
     ENDIF
   ENDDO D310
 

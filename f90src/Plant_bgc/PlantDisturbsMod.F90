@@ -103,6 +103,8 @@ module PlantDisturbsMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine RemoveDeadAnnual(yearIJ,NZ)
+  !
+  !remove annual plant biomass 
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
