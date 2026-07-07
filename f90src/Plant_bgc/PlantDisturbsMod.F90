@@ -97,6 +97,8 @@ module PlantDisturbsMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine RemoveDeadAnnual(yearIJ,NZ)
+  !
+  !remove annual plant biomass 
   use LitterFallMod, only : SetDeadPlant
   use InitPlantMod,  only : InitPlantPhenoMorphoBio,InitRootMychorMorphoBio  
   implicit none

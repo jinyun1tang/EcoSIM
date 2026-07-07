@@ -8,6 +8,7 @@ module PlantMathFuncMod
   use DebugToolMod
   use EcoSimConst
   use MiniMathMod
+  use MiniFuncMod
   use ElmIDMod
 implicit none
   character(len=*), parameter, private :: mod_filename=&
@@ -352,7 +353,7 @@ contains
   end subroutine ExchFluxLimiter
 !----------------------------------------------------------------------------------------------------
 
-  subroutine advect_remap_mass_loss(n, xr, c, ur, dt, c_new, xL, lost_mass)
+  subroutine advect_remap_mass_loss(n, dt, xr, c, Areas, ur, c_new, xL, lost_mass)
     !--------------------------------------------------------------------
     ! Conservative 1D advect-remap with proportional mass loss at right boundary
     ! Workspace arrays must be preallocated by the caller (no allocate/deallocate here).
@@ -361,6 +362,7 @@ contains
     !   n   - number of cells
     !   xr  - right-edge locations of each cell (size n), strictly increasing
     !   c   - cell-average concentration in each cell (size n)
+    !   areas - cross-section area of each cell (size n)
     !   ur  - velocities at right-edge of each cell (size n), nonnegative
     !   dt  - time step (positive)
     !   xL  - left boundary (default 0.0 in caller)
@@ -374,74 +376,74 @@ contains
     !   dx, m, m_kept, frac_kept : real(r8), size n
     !   M_star, M_on_fixed : real(r8), size n+1
     !--------------------------------------------------------------------
-    implicit none
+  implicit none
 
-    integer, intent(in) :: n
-    real(r8), intent(in) :: xr(n), c(n), ur(n), dt 
-    real(r8), optional, intent(in):: xL
-    real(r8), intent(out) :: c_new(n)
-    real(r8), optional, intent(out) :: lost_mass
-    character(len=*), parameter :: subname='advect_remap_mass_loss'
-    ! workspace arrays provided by caller (no allocate/deallocate here)
-    real(r8)  :: xE(n+1), xE_star(n+1)
-    real(r8)  :: dx(n), m(n), m_kept(n), frac_kept(n)
-    real(r8)  :: M_star(n+1), M_on_fixed(n+1)
-    
-    ! local scalars
-    integer :: i
-    real(r8) :: xR_most
-    real(r8) :: total_initial, total_kept
-    real(r8) :: a, b, w_star, inside_left, inside_right, overlap, frac
-    real(r8) :: dt_res,dt_loc
-    logical :: lhalf
-    real(r8), parameter :: tiny = 1.0e-14_r8
+  integer, intent(in) :: n
+  real(r8), intent(in) :: areas(n),xr(n), c(n), ur(n), dt 
+  real(r8), optional, intent(in):: xL
+  real(r8), intent(out) :: c_new(n)
+  real(r8), optional, intent(out) :: lost_mass
+  character(len=*), parameter :: subname='advect_remap_mass_loss'
+  ! workspace arrays provided by caller (no allocate/deallocate here)
+  real(r8)  :: xE(n+1), xE_star(n+1)
+  real(r8)  :: dx(n), m(n), m_kept(n), frac_kept(n)
+  real(r8)  :: M_star(n+1), M_on_fixed(n+1)
+  
+  ! local scalars
+  integer :: i
+  real(r8) :: xR_most
+  real(r8) :: total_initial, total_kept
+  real(r8) :: a, b, w_star, inside_left, inside_right, overlap, frac
+  real(r8) :: dt_res,dt_loc
+  logical :: lhalf
+  real(r8), parameter :: tiny = 1.0e-14_r8
 
-    call PrintInfo('beg '//subname)
-    ! Basic checks (lightweight)
-    if (n <= 0) then
-       if(present(lost_mass))lost_mass = 0._r8
-       return
-    end if
-    if (dt <= 0._r8) then
-       call endrun('Error: dt must be positive.  in '//trim(mod_filename)//' at line',__LINE__)                    
-    end if
+  call PrintInfo('beg '//subname)
+  ! Basic checks (lightweight)
+  if (n <= 0) then
+      if(present(lost_mass))lost_mass = 0._r8
+      return
+  end if
+  if (dt <= 0._r8) then
+      call endrun('Error: dt must be positive.  in '//trim(mod_filename)//' at line',__LINE__)                    
+  end if
 
-    do i = 2, n
-       if (xr(i) <= xr(i-1)) then
-          call endrun('Error: xr must be strictly increasing.  in '//trim(mod_filename)//' at line',__LINE__)                              
-       end if
-    end do
-    do i = 1, n
-       if (ur(i) < 0._r8) then
-          call endrun('Error: ur must be nonnegative.  in '//trim(mod_filename)//' at line',__LINE__)                    
-       end if
-    end do
+  do i = 2, n
+      if (xr(i) <= xr(i-1)) then
+        call endrun('Error: xr must be strictly increasing.  in '//trim(mod_filename)//' at line',__LINE__)                              
+      end if
+  end do
+  do i = 1, n
+      if (ur(i) < 0._r8) then
+        call endrun('Error: ur must be nonnegative.  in '//trim(mod_filename)//' at line',__LINE__)                    
+      end if
+  end do
 
-    ! rightmost fixed boundary
-    xR_most = xr(n)
+  ! rightmost fixed boundary
+  xR_most = xr(n)
 
-    ! fixed edges: xE(1) = xL, xE(2:n+1) = xr(1:n)
-    if(present(xL))then
-      xE(1) = xL
-    else
-      xE(1) = 0._r8
-    endif
-    do i = 1, n
-       xE(i+1) = xr(i)
-    end do
+  ! fixed edges: xE(1) = xL, xE(2:n+1) = xr(1:n)
+  if(present(xL))then
+    xE(1) = xL
+  else
+    xE(1) = 0._r8
+  endif
+  do i = 1, n
+      xE(i+1) = xr(i)
+  end do
 
-    ! compute dx and masses
-    total_initial = 0._r8
-    do i = 1, n
-       dx(i) = xE(i+1) - xE(i)
-       if (dx(i) <= 0._r8) then
-          write(iulog,*)xE(i+1), xE(i), i
-          call endrun('Error: non-positive cell width encountered.  in '//trim(mod_filename)//' at line',__LINE__)                    
-       end if
-    end do
-    m = c * dx
-    total_initial = total_initial + sum(m)
-
+  ! compute dx and masses
+  total_initial = 0._r8
+  do i = 1, n
+      dx(i) = xE(i+1) - xE(i)
+      if (dx(i) <= 0._r8) then
+        write(iulog,*)xE(i+1), xE(i), i
+        call endrun('Error: non-positive cell width encountered.  in '//trim(mod_filename)//' at line',__LINE__)                    
+      end if
+  end do
+  m = c * dx * Areas * 1.e6_r8
+  total_initial = total_initial + sum(m)
+  
   dt_res=dt; dt_loc=dt  
   DO
     ! compute moved edges (left edge fixed velocity = 0)
@@ -503,16 +505,17 @@ contains
     ! interpolate M_star back to fixed edges xE -> M_on_fixed
     call interp_linear_clamped(n+1, xE_star, M_star, n+1, xE, M_on_fixed, 0._r8, total_kept)
 
-    ! new cell masses and concentrations
+    ! new cell masses and concentrations'
+    
     do i = 1, n
-       m(i) = M_on_fixed(i+1) - M_on_fixed(i)    ! reuse m for new masses
-       call DebugPrint('dx',dx(i))
-       c_new(i) = m(i) / dx(i)
+       m(i) = M_on_fixed(i+1) - M_on_fixed(i)    ! reuse m for new masses       
+       c_new(i) = m(i)/ (dx(i)*areas(i))
     end do
     dt_res=dt_res-dt_loc
     if(dt_res<dt*1.e-2_r8)exit
     dt_loc=dt_res
   enddo  
+  c_new=c_new*1.e-6_r8
   call PrintInfo('end '//subname)
   end subroutine advect_remap_mass_loss
 
@@ -599,5 +602,100 @@ contains
   
   ans = iphenotype .EQ.iphenotyp_coldecid .OR. iphenotype.EQ.iphenotyp_coldroutdecid
   end function is_cold_deciduos
+
+!--------------------------------------------------------------------
+
+  SUBROUTINE solve_root_diffusion_step(N, dt, c_init, lumen_areas, layer_thicknesses, &
+                                        d_effective, c_next)
+  ! ======================================================================
+  ! Solves vertical diffusion of cytokinin inside root plumbing for one timestep.
+  ! Uses the Implicit Backward Euler method with an integrated Thomas Algorithm.
+  ! Permanent Zero-Flux boundary condition applied at the top (Layer 1).
+  ! ======================================================================
+  INTEGER, INTENT(IN) :: N                                 ! Number of vertical layers
+  REAL(r8), INTENT(IN) :: dt                                   ! Timestep size (hour)  
+  REAL(r8), DIMENSION(N), INTENT(IN) :: c_init                 ! Initial concentration (mg/m3)
+  REAL(r8), DIMENSION(N), INTENT(IN) :: lumen_areas            ! Cumulative lumen area (m2)
+  REAL(r8), DIMENSION(N), INTENT(IN) :: layer_thicknesses      ! Thickness of each layer (m)
+  REAL(r8), dimension(N),INTENT(IN) :: d_effective                          ! Diffusivity constant (m2/hour)
+  REAL(r8), DIMENSION(N), INTENT(OUT) :: c_next                ! Output updated concentration (mg/m3)
+  character(len=*), parameter :: subname='solve_root_diffusion_step'
+  ! Local Variables for Tridiagonal Matrix: A(i)*C(i-1) + B(i)*C(i) + C(i)*C(i+1) = D(i)
+  REAL, DIMENSION(N) :: a_diag, b_diag, c_diag, d_rhs
+  REAL, DIMENSION(N) :: lumen_volumes
+  REAL :: dz_lower, dz_upper, area_lower, area_upper
+  REAL :: gamma_lower, gamma_upper
+  INTEGER :: i
+
+  ! Local variables for the Thomas Algorithm solver
+  REAL, DIMENSION(N) :: c_prime, d_prime
+  REAL :: m
+
+  call PrintInfo('beg '//subname)
+  if(N==0)return
+
+  ! 1. Calculate layer volumes for mass tracking (Volume = Area * Thickness)
+  lumen_volumes = lumen_areas * layer_thicknesses
+
+  ! 2. Initialize tridiagonal vectors to zero
+  a_diag = 0.0
+  b_diag = 0.0
+  c_diag = 0.0
+  
+  ! Populate RHS vector with initial mass (Concentration * Volume)
+  d_rhs  = c_init * lumen_volumes
+
+  ! 3. Construct the Matrix Coefficients
+  DO i = 1, N
+    ! Set the initial diagonal component with the current layer volume anchor
+    b_diag(i) = b_diag(i) + lumen_volumes(i)
+
+    ! --- LOWER INTERFACE (Between layer i and i+1) ---
+    IF (i < N) THEN
+      ! Node distance and boundary interface area
+      dz_lower = 0.5 * (layer_thicknesses(i) + layer_thicknesses(i+1))
+      area_lower = Harmonicmean_safe(lumen_areas(i), lumen_areas(i+1))
+      
+      gamma_lower = dt * d_effective(I) * area_lower / dz_lower
+      
+      b_diag(i)   = b_diag(i)   + gamma_lower
+      c_diag(i)   = c_diag(i)   - gamma_lower  ! Interaction with i+1
+      a_diag(i+1) = a_diag(i+1) - gamma_lower  ! Interaction of i+1 back with i
+    END IF
+
+    ! --- UPPER INTERFACE (Between layer i and i-1) ---
+    IF (i > 1) THEN
+      dz_upper = 0.5 * (layer_thicknesses(i) + layer_thicknesses(i-1))
+      area_upper = Harmonicmean_safe(lumen_areas(i),lumen_areas(i-1))
+      
+      gamma_upper = dt * d_effective(I) * area_upper / dz_upper
+      
+      b_diag(i)   = b_diag(i)   + gamma_upper
+      ! Interaction of i back with i-1 handled symmetrically via lower loop setup
+    END IF
+
+    ! NOTE: Skipping the i=1 upper interface calculation inherently forces the 
+    ! diffusive flux out of the top layer to 0.0 (Perfect Zero-Flux).
+  END DO
+  
+  ! 4. Execute Thomas Algorithm (Forward Elimination Phase)
+  c_prime(1) = c_diag(1) / b_diag(1)
+  d_prime(1) = d_rhs(1)  / b_diag(1)
+
+  DO i = 2, N
+    m = b_diag(i) - a_diag(i) * c_prime(i-1)
+    IF (i < N) c_prime(i) = c_diag(i) / m
+    d_prime(i) = (d_rhs(i) - a_diag(i) * d_prime(i-1)) / m
+  END DO
+
+  ! 5. Execute Thomas Algorithm (Back Substitution Phase)
+  c_next(N) = d_prime(N)
+  DO i = N-1, 1, -1
+    c_next(i) = d_prime(i) - c_prime(i) * c_next(i+1)
+  END DO
+  call PrintInfo('end '//subname)
+  END SUBROUTINE solve_root_diffusion_step
+
+ 
 
 end module PlantMathFuncMod

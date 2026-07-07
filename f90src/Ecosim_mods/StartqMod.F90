@@ -4,7 +4,7 @@ module StartqMod
   use DebugToolMod,     only : PrintInfo
   use UnitMod,          only : units
   use EcoSiMParDataMod, only : pltpar
-  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots
+  use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots,Rax_ref
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -509,7 +509,7 @@ module StartqMod
   KmPO4Root_pft(imycorrhz,NZ,NY,NX)        = KmPO4Root_pft(1,NZ,NY,NX)
   CMinPO4Root_pft(imycorrhz,NZ,NY,NX)      = CMinPO4Root_pft(1,NZ,NY,NX)
   RootRadialResist_pft(imycorrhz,NZ,NY,NX) = 1.0E+04
-  RootAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12 
+  Root2ndAxialResist_pft(imycorrhz,NZ,NY,NX)  = 1.0E+12 
   !
   !     RootPoreTortu4Gas_pft=tortuosity for gas transport
   !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -542,25 +542,31 @@ module StartqMod
   integer, intent(in) :: NZ, NY, NX
   character(len=*), parameter :: subname='InitPlantPhenoMorphoBio'
   integer :: K,L,M,N,NB
-
+  real(r8) :: NumVessels
   call PrintInfo('beg '//subname)
   !
   !     INITIALIZE PLANT PHENOLOGY
   !
   !     PP=population (grid cell-1)
   !
-  PlantPopuLive_pft(NZ,NY,NX)           = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-  PlantPopuDead_pft(NZ,NY,NX)           = PlantPopuLive_pft(NZ,NY,NX)
-  doInitPlant_pft(NZ,NY,NX)             = ifalse
-  isPlantShootAlive_pft(NZ,NY,NX)       = iTrue
-  isPlantRootAlive_pft(NZ,NY,NX)        = iTrue
-  BranchNumber_pft(NZ,NY,NX)            = 0
-  NumOfBranches_pft(NZ,NY,NX)           = 0
-  HypocotHeight_pft(NZ,NY,NX)           = 0._r8
-  CanopyHeightLive_pft(NZ,NY,NX)        = 0._r8
-  Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX) = 0._r8
-  Days4FalseBreak_pft(NZ,NY,NX)         = 0
-
+  CanopyLeafAreaMAX_pft(NZ,NY,NX)           = 0._R8
+  PlantPopuLive_pft(NZ,NY,NX)               = PPX_pft(NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  PlantPopuDead_pft(NZ,NY,NX)               = PlantPopuLive_pft(NZ,NY,NX)
+  doInitPlant_pft(NZ,NY,NX)                 = ifalse
+  isPlantShootAlive_pft(NZ,NY,NX)           = iTrue
+  isPlantRootAlive_pft(NZ,NY,NX)            = iTrue
+  BranchNumber_pft(NZ,NY,NX)                = 0
+  NumOfBranches_pft(NZ,NY,NX)               = 0
+  HypocotHeight_pft(NZ,NY,NX)               = 0._r8
+  CanopyHeightLive_pft(NZ,NY,NX)            = 0._r8
+  Cytokinin2ndConc_rpvr(:,:,:,NZ,NY,NX)     = 0._r8
+  Days4FalseBreak_pft(NZ,NY,NX)             = 0
+  RootSingleVesselRstAxial_pft(NZ,NY,NX)    = AlphaVesselAxialResist_pft(NZ,NY,NX)*Rax_ref*(1.e-6_r8/RootVesselRadius_pft(NZ,NY,NX))**4
+  RootSingleVesselArea_pft(NZ,NY,NX)        = PICON*RootVesselRadius_pft(NZ,NY,NX)**2
+  NumVessels                                = 0.2_r8*PICON*Root2ndMaxRadius_pft(ipltroot,NZ,NY,NX)**2/RootSingleVesselArea_pft(NZ,NY,NX)
+  Root2ndAxialResist_pft(ipltroot,NZ,NY,NX) = RootSingleVesselRstAxial_pft(NZ,NY,NX)/NumVessels
+    
+  CRootLumenArea_pvr(:,NZ,NY,NX)            = 0.2_r8*PICON*Root1stMaxRadius_pft(ipltroot,NZ,NY,NX)**2/RootSingleVesselArea_pft(NZ,NY,NX)
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)                = iTrue
     EnablePlantLeafOut_brch(NB,NZ,NY,NX)           = iTrue

@@ -442,7 +442,7 @@ module UptakesMod
     Myco_pft                   => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
     NU                         => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
     NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
-    RootAxialResist_pft        => plt_morph%RootAxialResist_pft      ,& !input  :root axial resistivity, [MPa h m-4]    
+    Root2ndAxialResist_pft        => plt_morph%Root2ndAxialResist_pft      ,& !input  :root axial resistivity, [MPa h m-4]    
     RootRadialResist_pft       => plt_morph%RootRadialResist_pft     ,& !input  :root radial resistivity, [MPa h m-1]        
     PlantPopuLive_pft          => plt_site%PlantPopuLive_pft         ,& !input  :plant population, [d-2]
     PopuRootMycoC_pvr          => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
@@ -467,7 +467,7 @@ module UptakesMod
       FracSoilLBy1stRoots_pvr(L,NZ)=1.0_r8
     ENDDO
     if(ats_cpl_mode)then
-        RootAxialResist_pft(N,NZ) = 500.0_r8
+        Root2ndAxialResist_pft(N,NZ) = 500.0_r8
         RootRadialResist_pft(N,NZ) = 400000.0_r8
         DO N=1,Myco_pft(NZ)
             !test vals
@@ -965,7 +965,7 @@ module UptakesMod
             RootH2OUptkStress_pvr(N,L,NZ) = AZMAX1(psi_H2O_flx)
             
             !if psi_H2O_flx >0, AMIN1 ensures it cannot fill more than available air-space
-            !if psi_H2O_flx <0, AMAX1 ensures it cannot talke more than available water
+            !if psi_H2O_flx <0, AMAX1 ensures it cannot take more than available water
 
             RPlantRootH2OUptk_pvr(N,L,NZ) = AMAX1(AZMIN1(-WatAvail4Uptake_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)), &
               AMIN1(psi_H2O_flx, AirMicPore4Fill_vr(L)*FracPRoot4Uptake_pvr(N,L,NZ)))
@@ -1154,7 +1154,7 @@ module UptakesMod
   real(r8) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)   !secondary root axial resistance for water uptake,[MPa h m-3]      
   real(r8) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)   !primary root axial resistance for water uptake,[MPa h m-3]      
   real(r8) :: FRADW 
-  real(r8) :: FRAD1   !relative radius of the primary roots with respect to 
+  real(r8) :: FRAD1   !total transport vessels in primary roots
   real(r8) :: FRAD2
   real(r8) :: DTransptTube, AreaTranspt
   real(r8) :: RSSL,Root2ndSurfArea
@@ -1172,6 +1172,7 @@ module UptakesMod
     NU                          => plt_site%NU                               ,& !input  :current soil surface layer number, [-]
     PSICanopy_pft               => plt_ew%PSICanopy_pft                      ,& !input  :canopy total water potential, [Mpa]
     RootAge_rpvr                => plt_morph%RootAge_rpvr                    ,& !inoput :root age,[h]
+    RootSingleVesselRstaxial_pft   => plt_morph%RootSingleVesselRstaxial_pft       ,& !input  :axial resistance for a single 1-m water transport vessel, [MPa h m-4]
     RootMatureAge_pft           => plt_morph%RootMatureAge_pft               ,& !input : Root maturation age, [h]
     PlantPopuLive_pft           => plt_site%PlantPopuLive_pft                ,& !input  :plant population, [d-2]
     Root1stRadius_pvr           => plt_morph%Root1stRadius_pvr               ,& !input  :root layer diameter primary axes, [m]
@@ -1180,13 +1181,16 @@ module UptakesMod
     Root2ndEffLen4uptk_rpvr     => plt_morph%Root2ndEffLen4uptk_rpvr         ,& !input  :Layer effective root length four resource uptake, [m]
     Root2ndRadius_rpvr          => plt_morph%Root2ndRadius_rpvr              ,& !input  :root layer diameter secondary axes, [m]
     Root2ndXNumL_rpvr           => plt_morph%Root2ndXNumL_rpvr               ,& !input  :root layer number axes, [d-2]
-    RootAxialResist_pft         => plt_morph%RootAxialResist_pft             ,& !input  :root axial resistivity, [MPa h m-4]
+    StalkAxialResist_pft        => plt_morph%StalkAxialResist_pft            ,& !input  :Stalk axial resistivity, [MPa h m-4]
+    Root2ndAxialResist_pft         => plt_morph%Root2ndAxialResist_pft             ,& !input  :Root axial resistivity, [MPa h m-4]
     RootRadialResist_pft        => plt_morph%RootRadialResist_pft            ,& !input  :root radial resistivity, [MPa h m-1]    
+    RootSingleVesselArea_pft          => plt_morph%RootSingleVesselArea_pft              ,& !input  :Single root vessel cross section area, [m2]
     RootLenDensPerPlant_pvr     => plt_morph%RootLenDensPerPlant_pvr         ,& !input  :root layer length density, [m m-3]
     RootAbsorbLenPerPlant_pvr   => plt_morph%RootAbsorbLenPerPlant_pvr       ,& !input  :total absorptive root length per plant in layer, [m p-1]
     THETW_vr                    => plt_soilchem%THETW_vr                     ,& !input  :volumetric water content, [m3 m-3]
     VLMicP_vr                   => plt_soilchem%VLMicP_vr                    ,& !input  :total volume in micropores, [m3 d-2]
     VLSoilPoreMicP_vr           => plt_soilchem%VLSoilPoreMicP_vr            ,& !input  :volume of soil layer, [m3 d-2]
+    CRootLumenArea_pvr          => plt_morph%CRootLumenArea_pvr              ,& !input  :coarse roots lumen area for coarse root, [m2]       
     VLWatMicPM_vr               => plt_site%VLWatMicPM_vr                    ,& !input  :soil micropore water content, [m3 d-2]
     ZERO                        => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
@@ -1211,7 +1215,7 @@ module UptakesMod
   CanopyHeight4WatUptake_pft(NZ) = 0.80_r8*CanopyHeightLive_pft(NZ)
   PSIGravCanopyHeight            = mGravAccelerat*CanopyHeight4WatUptake_pft(NZ)
   !
-  !Hagen-Poiseuille law of stalk xylem vessels
+  !Hagen-Poiseuille law of stalk xylem/tracheid vessels
   FRADW                          = 1.0E+04_r8*(AMAX1(0.5_r8,1.0_r8+PSICanopy_pft(NZ)/EMODW))**4
   !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
@@ -1262,26 +1266,20 @@ module UptakesMod
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
         !
         !     FRAD1,FRAD2=primary,secondary root radius relative to maximum, poisuelle flow conductance scalar
-        !     secondary radius from PFT file Root2ndMaxRadius_pft at which RootAxialResist_pft is defined
-        !     Root1stRadius_pvr,Root2ndRadius_rpvr=primary,secondary root radius
-        !     RootAxialResist_pft=axial resistivity from PFT file, [MPa h m-4], consistent with the Hagen-Poiseuille equation, N_vessel r_vessel^4 of vessels
-        !     DPTHZ=depth of primary root from surface
+        !     secondary radius from PFT file Root2ndMaxRadius_pft at which Root2ndAxialResist_pft is defined
         !     Root1stAxialResist_rvr,Root2ndAxialResist_rvr=axial resistance of primary,secondary roots,[MPa h d2 m-3] =[MPa h m-1]=[]*m
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
-        if(Root1stRadius_pvr(N,L,NZ) > 2.e-3_r8)then !2mm as corase root criterion
-          !coarse roots
-          DTransptTube = AMIN1(ZSTX,AMAX1(FSTK*Root1stRadius_pvr(N,L,NZ),Root1stMaxRadius1_pft(N,NZ)))
-          AreaTranspt  = 2._r8*Root1stRadius_pvr(N,L,NZ)*DTransptTube-DTransptTube**2
-          FRAD1        = (AreaTranspt/Root1stRadius_pvr(N,L,NZ))**2*(Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
-        else
-          FRAD1        = AMAX1((Root1stRadius_pvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4,1.e-12_r8)
-        endif      
 
-        FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
-        StalkAxialResist            = RootAxialResist_pft(ipltroot,NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ))
-        Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootAxialResist_pft(N,NZ)*CumSoilThickMidL_vr(L)/(FRAD1*Root1stXNumL_pvr(L,NZ))                    
-        Root2ndAxialResist_rvr(N,L) = RootAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
+        FRAD1                         = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
+        if(N.eq.ipltroot)then
+          FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
+        else
+          FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
+        endif
+        StalkAxialResist            = StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ))
+        Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
+        Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !

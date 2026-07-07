@@ -1732,7 +1732,7 @@ module PlantBranchMod
   call DebugPrint('beg '//subname//' NZ',NZ)
   !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
   !
-  !   HypocotHeight_pft=hypocotyledon height
+  !   HypocotHeight_pft=hypocotyledon height, it emerges from the seeding depth, gradually upwards, and eventually getting out of the soil, i.e. HypocotHeight_pft(NZ).GE.SeedDepth_pft(NZ).
   !   SeedDepth_pft=seeding depth
   !   LeafArea_node=node leaf area
   !   PetoleLength_node=PetolSheth length

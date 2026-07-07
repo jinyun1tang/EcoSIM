@@ -221,6 +221,8 @@ implicit none
   real(r8) :: CanopyLeafArea_col                      !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_col                            !grid canopy stem area, [m2 d-2]
   real(r8) :: CanopyHeight_col                        !canopy height , [m]
+  real(r8), pointer :: StalkAxialResist_pft(:)         => null() !stalk axial resistance per m for water transport, [MPa h m-4]
+  real(r8), pointer :: RootSingleVesselArea_pft(:)               => null() !
   REAL(R8), POINTER :: enh_cyto_pft(:)                 => null() !cytokinin sensitivity of corase root thickening, [-]
   real(r8), pointer :: tlai_day_pft(:)                 => null() !prescribed leaf area, [m2 m-2]
   real(r8), pointer :: tsai_day_pft(:)                 => null() !prescribed stem area, [m2 m-2]
@@ -248,6 +250,8 @@ implicit none
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
+  real(r8), pointer :: CRootLumenArea_rpvr(:,:,:)      => null() !coarse roots lumen area for root axes, [m2]  
+  real(r8), pointer :: CRootLumenArea_pvr(:,:)       => null() !coarse roots lumen area, [m2]    
   real(r8), pointer :: Root1stDepz_raxes(:,:)          => null() !root layer depth,                                                           [m]
   real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
@@ -301,6 +305,8 @@ implicit none
   real(r8), pointer :: CanopyHeightDead_pft(:)        => null() !canopy height for standing dead, [m]
   real(r8), pointer :: StalkHeight_pft(:)              => null() !stalk height/length, [m]
   real(r8), pointer :: StemSpecVolume_pft(:)               => null()  !stalk specific volume, [m3 gC-1]  
+  real(r8), pointer :: CanopyLeafAreaMAX_pft(:)       => null() !running maximum leaf area, [m2 d-2]  
+  logical, pointer  :: lreset_laimax_pft(:)   => null() !toggle to reset laimax for woody vascular plants, [-]
   real(r8), pointer :: StalkAveRadius_pft(:)        => null() !main stalk radius,[m]
   integer , pointer :: iPlantGrainType_pft(:)        => null() !grain type (below or above-ground),[-]
   integer,  pointer :: iPlantNfixType_pft(:)          => null() !N2 fixation type,[-]
@@ -342,8 +348,10 @@ implicit none
   real(r8), pointer :: RootRaidus_rpft(:,:)           => null() !root internal radius,                 [m]
   real(r8), pointer :: Root1stMaxRadius_pft(:,:)      => null() !maximum radius of primary roots,      [m]
   real(r8), pointer :: Root2ndMaxRadius_pft(:,:)      => null() !maximum radius of secondary roots,    [m]
+  real(r8), pointer :: RootSingleVesselRstaxial_pft(:)       => null() !axial resistance for a single 1 m water transport vessel [MPa h m-4]
+  real(r8), pointer :: RootVesselRadius_pft(:)        => null() !typical radius of the water transport vessel in primary roots, [m]  
   real(r8), pointer :: RootRadialResist_pft(:,:)      => null() !root radial resistivity,              [MPa h m-2]
-  real(r8), pointer :: RootAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
+  real(r8), pointer :: Root2ndAxialResist_pft(:,:)       => null() !root axial resistivity,               [MPa h m-4]
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
   real(r8), pointer :: fctyok_scalar_rpvr(:,:,:)      => null() !cytokinin scalar for corase root sink, [-]
@@ -514,6 +522,8 @@ implicit none
   real(r8), pointer :: rPCReserve_pft(:)                => null()  !reserve P:C ratio,                                       [gP gC-1]
   real(r8), pointer :: rPCGrain_pft(:)                      => null()  !grain P:C ratio,                                         [gP gP-1]
   real(r8), pointer :: rNCStalk_pft(:)                  => null()  !stalk N:C ratio,                                         [gN gC-1]
+  real(r8), pointer :: rECLiveCRoot_pft(:,:)           => null()   ! element:C ratio of live coarse root, [gE gC-1]
+  real(r8), pointer :: rECDeadCRoot_pft(:,:)           => null()   ! element:C ratio of dead coarse root, [gE gC-1]
   real(r8), pointer :: rNCLigRoot_pft(:)               => null()  !NC ratio of lignified root, [gN gC-1]
   real(r8), pointer :: rPCLigRoot_pft(:)               => null()  !PC ratio of lignified root, [gP gC-1]    
   real(r8), pointer :: FracLeafShethElmAlloc2Litr(:,:)  => null()  !woody element allocation, [-]
@@ -1411,6 +1421,8 @@ implicit none
   allocate(this%rNCGrain_pft(JP1));this%rNCGrain_pft=spval
   allocate(this%rPCStalk_pft(JP1));this%rPCStalk_pft=spval
   allocate(this%rNCStalk_pft(JP1));this%rNCStalk_pft=spval
+  allocate(this%rECDeadCRoot_pft(NumPlantChemElms,JP1));    this%rECDeadCRoot_pft=spval
+  allocate(this%rECLiveCRoot_pft(NumPlantChemElms,JP1)); this%rECLiveCRoot_pft=spval
   allocate(this%rNCLigRoot_pft(JP1));this%rNCLigRoot_pft=spval
   allocate(this%rPCLigRoot_pft(JP1)); this%rPCLigRoot_pft=spval
   allocate(this%rPCGrain_pft(JP1));this%rPCGrain_pft=spval
@@ -2125,6 +2137,8 @@ implicit none
   allocate(this%flag2ndGrowth_pvr(JZ1,MaxNumRootAxes,JP1));this%flag2ndGrowth_pvr=.false.
   allocate(this%RootAge_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootAge_rpvr=spval
   allocate(this%Root2ndLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndLen_rpvr=spval
+  allocate(this%CRootLumenArea_pvr(JZ1,JP1)); this%CRootLumenArea_pvr=0._r8
+  allocate(this%CRootLumenArea_rpvr(JZ1,MaxNumRootAxes,JP1)); this%CRootLumenArea_rpvr=0._r8
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
@@ -2163,6 +2177,8 @@ implicit none
   allocate(this%PARTS_brch(NumOfPlantMorphUnits,MaxNumBranches,JP1));this%PARTS_brch=spval
   allocate(this%tlai_day_pft(JP1)); this%tlai_day_pft=spval
   allocate(this%enh_cyto_pft(JP1)); this%enh_cyto_pft=spval
+  allocate(this%RootSingleVesselArea_pft(JP1));this%RootSingleVesselArea_pft=spval
+  allocate(this%StalkAxialResist_pft(JP1));this%StalkAxialResist_pft=spval
   allocate(this%tsai_day_pft(JP1)); this%tsai_day_pft=spval
   allocate(this%ShootNodeNum_brch(MaxNumBranches,JP1));this%ShootNodeNum_brch=spval
   allocate(this%ShootNodeNumAtInitFloral_brch(MaxNumBranches,JP1));this%ShootNodeNumAtInitFloral_brch=spval
@@ -2204,6 +2220,8 @@ implicit none
   allocate(this%CanopySurfAreaProfDead_pft(NumCanopyLayers1,JP1)); this%CanopySurfAreaProfDead_pft=spval
   allocate(this%StandDeadSurfArea_pft(JP1)); this%StandDeadSurfArea_pft=spval
   allocate(this%StalkAveRadius_pft(JP1));this%StalkAveRadius_pft=spval
+  allocate(this%CanopyLeafAreaMAX_pft(JP1)); this%CanopyLeafAreaMAX_pft=spval
+  allocate(this%lreset_laimax_pft(JP1)); this%lreset_laimax_pft=.false.
   allocate(this%MaxSoilLays4Root_pft(JP1));this%MaxSoilLays4Root_pft=0
   allocate(this%SetNumberSeeds_brch(MaxNumBranches,JP1));this%SetNumberSeeds_brch=spval
   allocate(this%ClumpFactor_pft(JP1));this%ClumpFactor_pft=spval
@@ -2214,7 +2232,9 @@ implicit none
   allocate(this%Root2ndXSecArea_pft(jroots,JP1));this%Root2ndXSecArea_pft=spval
   allocate(this%Root1stXSecArea_pft(jroots,JP1));this%Root1stXSecArea_pft=spval
   allocate(this%RootRadialResist_pft(jroots,JP1));this%RootRadialResist_pft=spval
-  allocate(this%RootAxialResist_pft(jroots,JP1));this%RootAxialResist_pft=spval
+  allocate(this%RootSingleVesselRstaxial_pft(JP1));      this%RootSingleVesselRstaxial_pft=spval
+  allocate(this%RootVesselRadius_pft(JP1));      this%RootVesselRadius_pft=spval
+  allocate(this%Root2ndAxialResist_pft(jroots,JP1));this%Root2ndAxialResist_pft=spval
   allocate(this%iPlantGrainType_pft(JP1));this%iPlantGrainType_pft=0
   end subroutine plt_morph_init
 
