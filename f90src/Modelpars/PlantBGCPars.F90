@@ -41,7 +41,7 @@ module PlantBGCPars
   real(r8) :: RSMY_stomaCO2                       !minimum stomatal resistance for CO2 uptake (h m-1)
   real(r8) :: C4KI_pepcarboxy                     !nonstructural C inhibition constant on PEP carboxylase (uM)
   real(r8) :: Hours4ConiferSpringDeharden         !hours to full dehardening of conifers in spring (h)
-  real(r8) :: RCytoK(2)                           !cytokinin production efficiency, [1.e-4 gC CK gC-CO2]
+  real(r8) :: RCytoK(2)                           !cytokinin production efficiency, [1.e-3 gC CK gC-resp CO2]
   real(r8) :: kDCytof(2)                          !cytoknin decay rates during production in fine roots and mycorrhizae [h-1]
   real(r8) :: kDCytoC                             !cytoknin decay rates during transport and at thickening sites in coarse roots [h-1]
   real(r8) :: ELEC3                               !e- requirement for CO2 fixn by rubisco,        [umol e- umol CO2]
@@ -112,9 +112,9 @@ module PlantBGCPars
   real(r8) :: k_ligmax                            !maxinum lignification rate when converting active coarse root into nonactive coarse root, [h-1]
   real(r8) :: k_ligMM                             !half saturation constant for lignification MM kinetics, [gC h-1]
   !terminate [label for varaible parsing]
-  integer, parameter :: ibackward=1  !index for backward scattering in canopy radiation
-  integer, parameter :: iforward =2  !index for forward scattering in canopy radiation
-
+  integer, parameter :: ibackward=1               !index for backward scattering in canopy radiation
+  integer, parameter :: iforward =2               !index for forward scattering in canopy radiation
+  real(r8), parameter :: Rax_ref =7.11e11_r8      !reference lumen vessel axial resistance for 1 um radius and 1 m length, [MPa h m-4]
   real(r8) :: CURV2                               !2xCURV, [-]
   real(r8) :: CURV4                               !4XCURV, [-]
   real(r8) :: ZPLFD                               !1-ZPLFM, [-]
@@ -255,9 +255,9 @@ module PlantBGCPars
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
   RootElonZoneLenz            =0.03_r8
-  kDCytof = (/0.69_r8,0.3_r8/)
-  kDCytoC = 0.175_r8
-  RCytoK = (/1.e-4_r8,1.e-3_r8/) !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
+  kDCytof = (/0.036_r8,0.011_r8/)*0.5_r8       
+  kDCytoC = 0.011_r8*0.5_r8
+  RCytoK = (/1.e-4_r8,1.e-5_r8/)         !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3
   BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3

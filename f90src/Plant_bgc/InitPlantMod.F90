@@ -534,7 +534,7 @@ module InitPlantMod
     Root1stXSecArea_pft       => plt_morph%Root1stXSecArea_pft       ,& !output :root cross-sectional area primary axes, [m2]
     Root2ndSpecLen_pft        => plt_morph%Root2ndSpecLen_pft        ,& !output :specific root length secondary axes, [m g-1]
     Root2ndXSecArea_pft       => plt_morph%Root2ndXSecArea_pft       ,& !output :root cross-sectional area secondary axes, [m2]
-    RootAxialResist_pft       => plt_morph%RootAxialResist_pft       ,& !output :root axial resistivity, [MPa h m-4]
+    Root2ndAxialResist_pft       => plt_morph%Root2ndAxialResist_pft       ,& !output :root axial resistivity, [MPa h m-4]
     RootPoreTortu4Gas_pft     => plt_morph%RootPoreTortu4Gas_pft     ,& !output :power function of root porosity used to calculate root gaseous diffusivity, [-]
     RootRadialResist_pft      => plt_morph%RootRadialResist_pft      ,& !output :root radial resistivity, [MPa h m-2]
     RootRaidus_rpft           => plt_morph%RootRaidus_rpft            & !output :root internal radius, [m]
@@ -559,7 +559,7 @@ module InitPlantMod
 !     VmaxNH4Root_pft,KmNH4Root_pft,CMinNH4Root_pft=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     VmaxNO3Root_pft,KmNO3Root_pft,CminNO3Root_pft=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
 !     VmaxPO4Root_pft,KmPO4Root_pft,CMinPO4Root_pft=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
-!     RootRadialResist_pft,RootAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
+!     RootRadialResist_pft,Root2ndAxialResist_pft=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SeedDepth_pft(NZ)=PlantinDepz_pft(NZ)+SoilSurfDepZ_col
   DO L=NU,NL
@@ -592,8 +592,8 @@ module InitPlantMod
   VmaxPO4Root_pft(2,NZ)      = VmaxPO4Root_pft(ipltroot,NZ)
   KmPO4Root_pft(2,NZ)        = KmPO4Root_pft(ipltroot,NZ)
   CMinPO4Root_pft(2,NZ)      = CMinPO4Root_pft(ipltroot,NZ)
-  RootRadialResist_pft(2,NZ) = 1.0E+04_r8
-  RootAxialResist_pft(2,NZ)  = 1.0E+12_r8
+  RootRadialResist_pft(2,NZ) = 1.0E+04_r8            !mycorrhizae
+  Root2ndAxialResist_pft(2,NZ)  = 1.0E+12_r8            !mycorrhizae
 !
 !     RootPoreTortu4Gas_pft=tortuosity for gas transport
 !     RootRaidus_rpft=path length for radial diffusion within root (m)
@@ -646,7 +646,8 @@ module InitPlantMod
     CPOOL3_node                       => plt_photo%CPOOL3_node                        ,& !output :minimum sink strength for nonstructural C transfer, [g d-2]
     CPOOL4_node                       => plt_photo%CPOOL4_node                        ,& !output :leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
     CanPBranchHeight                  => plt_morph%CanPBranchHeight                   ,& !output :branch height, [m]
-    CanopyHeightLive_pft                  => plt_morph%CanopyHeightLive_pft                   ,& !output :canopy height, [m]
+    CanopyLeafAreaMAX_pft             => plt_morph%CanopyLeafAreaMAX_pft              ,& !output :running maximum leaf area, [m2 d-2]    
+    CanopyHeightLive_pft              => plt_morph%CanopyHeightLive_pft               ,& !output :canopy height, [m]
     CanopyLeafAreaZ_pft               => plt_morph%CanopyLeafAreaZ_pft                ,& !output :canopy layer leaf area, [m2 d-2]
     CanopyLeafArea_lnode              => plt_morph%CanopyLeafArea_lnode               ,& !output :layer/node/branch leaf area, [m2 d-2]
     CanopyLeafArea_pft                => plt_morph%CanopyLeafArea_pft                 ,& !output :plant canopy leaf area, [m2 d-2]
@@ -694,6 +695,7 @@ module InitPlantMod
   !     PP=population (grid cell-1)
   !
   call PrintInfo('beg '//subname)
+  CanopyLeafAreaMAX_pft(NZ) = 0._R8
   plt_pheno%Days4FalseBreak_pft(NZ)  = 0
   plt_pheno%doInitPlant_pft(NZ)      = ifalse
   plt_pheno%isPlantShootAlive_pft(NZ) = iTrue
