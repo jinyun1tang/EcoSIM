@@ -133,7 +133,9 @@ implicit none
     NK_col(NY,NX) = a_NL(NY)
     Myco_pft(1,NY,NX) = 1
     NP0_col(NY,NX) = 1
-
+    DO L=a_NU(NY),a_NL(NY)
+      a_SSWS(L,NY) = 0.0_r8
+    enddo
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
@@ -294,10 +296,10 @@ implicit none
     CanopyHeightLive_pft(1,NY,NX) = 17.0
     tlai_day_pft(1,NY,NX) = a_LAI(NY)
     tsai_day_pft(1,NY,NX) = a_SAI(NY)
-    irootType_col(NY,NX) = a_VEG(NY)
+    irootType_col(NY,NX) = a_PFT(NY,1)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
     !Fill number of plants from npfts
-    if(irootType_col(NY,NX).EQ.0.0)then
+    if(a_PFT(NY,1).EQ.0.0)then
       NP0_col(NY,NX) = 0
       NP_col(NY,NX) = 0
     else
@@ -484,7 +486,9 @@ implicit none
     !  a_TS(LS,L) = TKSnow1_snvr(LS,NY,NX)
     !ENDDO
     DO L=NU_col(NY,NX),NL_col(NY,NX)
-        a_SSWS(L,NY) = RPlantRootH2OUptk_pvr(1,L,1,NY,NX)
+      DO NZ=1,num_pfts
+        a_SSWS(L,NY) = a_SSWS(L,NY) + RPlantRootH2OUptk_pvr(1,L,NZ,NY,NX)
+      ENDDO
     ENDDO
   ENDDO
 

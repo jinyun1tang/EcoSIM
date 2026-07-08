@@ -68,7 +68,7 @@ contains
 
   data_ptr = state%mole_fraction%data
   call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
-  a_MFrac=data3D(:,:,:)
+  !a_MFrac=data3D(:,:,:)
   
   !data_ptr = state%canopy_snow%data
   !call c_f_pointer(data_ptr, data2D, [num_pfts, num_cols])
@@ -136,7 +136,7 @@ contains
   data_ptr = state%subsurface_water_source%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_SSWS = data2D(:,:)
-
+  
   data_ptr = state%subsurface_energy_source%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_SSES = data2D(:,:)

@@ -57,10 +57,13 @@ subroutine EcoSIM_Setup(properties, state, sizes, num_iterations,&
   type (BGCState), intent(inout) :: state
   !type (BGCAuxiliaryData), intent(inout) :: aux_data
   type (BGCProperties), intent(in) :: properties
-  integer, intent(inout) :: num_columns
-  integer, intent(inout) :: num_iterations
-  integer, intent(inout) :: ncells_per_col_
-
+  !integer, intent(inout) :: num_columns
+  !integer, intent(inout) :: num_iterations
+  !integer, intent(inout) :: ncells_per_col_
+  integer(c_int), VALUE :: num_columns
+  integer(c_int), VALUE :: num_iterations
+  integer(c_int), VALUE :: ncells_per_col_
+  
   call ATS2EcoSIMData(num_columns, state, properties, sizes)
 
   call Init_EcoSIM(sizes)

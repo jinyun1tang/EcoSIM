@@ -303,7 +303,7 @@ implicit none
       !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
       !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
       if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr,PerPlantRootC_vr,PerPlantRootLen_vr)
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr,PerPlantRootLen_vr)
       endif
       !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
       !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
