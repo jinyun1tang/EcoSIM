@@ -523,7 +523,7 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft      ,& !input  :number of structural root axes,[-]
     Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :Root layer primary axes Active zone structrual element, [g d-2]    
     Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]    
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
@@ -545,14 +545,14 @@ implicit none
   DO NE=1,NumPlantChemElms
     DO L=1,MaxNumRootLays
       DO N=1,Myco_pft(NZ)
-        RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
+        RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumStructuralRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
         RootMycoNonstElms_pft(NE,N,NZ) = RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
-        massr2nd1(NE)                  = massr2nd1(NE)+sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))
+        massr2nd1(NE)                  = massr2nd1(NE)+sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumStructuralRootAxes_pft(NZ),NZ))
       ENDDO  
-      Root1stActStruct_pvr(NE,L,NZ) = SUM(Root1stActStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
-      Root1stLigStruct_pvr(NE,L,NZ) = SUM(Root1stLigStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
-      massr1st1(NE)=massr1st1(NE)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))        
-      RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
+      Root1stActStruct_pvr(NE,L,NZ) = SUM(Root1stActStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+      Root1stLigStruct_pvr(NE,L,NZ) = SUM(Root1stLigStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+      massr1st1(NE)=massr1st1(NE)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))        
+      RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
     ENDDO
     
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
@@ -560,7 +560,7 @@ implicit none
     
     RootElms_pft(NE,NZ) = massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     if(RootElms_pft(NE,NZ)<0._r8)then
-      write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumPrimeRootAxes_pft(NZ)
+    write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumStructuralRootAxes_pft(NZ)
     endif
     !add reserve to struct
     RootNoduleElms_pft(NE,NZ)=0._r8

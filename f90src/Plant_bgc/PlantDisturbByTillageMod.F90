@@ -269,7 +269,7 @@ contains
     XCORP                     => plt_distb%XCORP                      ,& !input  :factor for surface litter incorporation and soil mixing,[-]
     SolarNoonHour_col         => plt_site%SolarNoonHour_col           ,& !input  :time of solar noon, [h]
     PPX_pft                   => plt_site%PPX_pft                     ,& !inoput :plant population, [plants m-2]
-    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft       ,& !input: root primary axis number,[-]      
+    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft       ,& !input: number of structural root axes,[-]      
     isPlantRootAlive_pft      => plt_pheno%isPlantRootAlive_pft       ,& !output :flag to detect root system death,[-]
     isPlantShootAlive_pft     => plt_pheno%isPlantShootAlive_pft      ,& !output :flag to detect canopy death,[-]
     iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft       ,& !output :day of harvest,[-]
@@ -314,7 +314,7 @@ contains
           jHarvstType_pft(NZ)       = jharvtyp_terminate
           iDayPlantHarvest_pft(NZ)  = yearIJ%I
           iYearPlantHarvest_pft(NZ) = iYearCurrent
-          NumPrimeRootAxes_pft(NZ)  = 0._r8
+          NumStructuralRootAxes_pft(NZ)  = 0._r8
           DO NR=1,MaxNumRootAxes
             RootSegBaseDepth_raxes(NR,NZ) = 0._r8
             Root1stDepz_raxes(NR,NZ)      = 0._r8
@@ -352,7 +352,7 @@ contains
     icwood                     => pltpar%icwood                         ,& !input  :group id of coarse woody litter
     iPlantNfixType_pft         => plt_morph%iPlantNfixType_pft          ,& !input  :N2 fixation type,[-]
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft          ,& !input  :soil layer at planting depth, [-]
-    NumPrimeRootAxes_pft       => plt_morph%NumPrimeRootAxes_pft        ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft       => plt_morph%NumStructuralRootAxes_pft        ,& !input  :number of structural root axes,[-]
     trcg_rootml_pvr            => plt_rbgc%trcg_rootml_pvr              ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr            => plt_rbgc%trcs_rootml_pvr              ,& !inoput :root aqueous content, [g d-2]
     RootMycoNonstElms_rpvr     => plt_biom%RootMycoNonstElms_rpvr       ,& !inoput :root layer nonstructural element, [g d-2]
@@ -372,7 +372,7 @@ contains
     RootCO2Autor_pvr           => plt_rbgc%RootCO2Autor_pvr             ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootRespPotent_pvr         => plt_rbgc%RootRespPotent_pvr           ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr         => plt_rbgc%RootCO2EmisPot_pvr           ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
-    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :root layer length primary axes, [m d-2]
+    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :primary root axis length in soil layer, [m d-2]
     RootVH2O_pvr               => plt_morph%RootVH2O_pvr                ,& !inoput :root layer volume water, [m2 d-2]
     RootSAreaPerPlant_pvr      => plt_morph%RootSAreaPerPlant_pvr       ,& !inoput :root layer area per plant, [m p-1]
     RootPoreVol_pvr            => plt_morph%RootPoreVol_pvr             ,& !inoput :root layer volume air, [m2 d-2]
@@ -395,7 +395,7 @@ contains
   XHVST1=1._r8-XHVST
   if(XHVST1<=1.e-10_r8)return
 
-  DO NR=1,NumPrimeRootAxes_pft(NZ)    
+  DO NR=1,NumStructuralRootAxes_pft(NZ)    
     DO NE=1,NumPlantChemElms
       RootMyco1stElm_raxs(NE,NR,NZ)=RootMyco1stElm_raxs(NE,NR,NZ)*XHVST
     ENDDO    
@@ -409,7 +409,7 @@ contains
             *PlantElmAllocMat4Litr(NE,inonstruct,M,NZ)*RootMycoNonstElms_rpvr(NE,N,L,NZ)
         ENDDO
 
-        DO NR=1,NumPrimeRootAxes_pft(NZ)
+        DO NR=1,NumStructuralRootAxes_pft(NZ)
           DO NE=1,NumPlantChemElms
             LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XHVST1 &
               *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*FracRootElmAllocm(NE,k_woody_comp)
@@ -422,7 +422,7 @@ contains
       
       if(N==ipltroot)then
         DO M=1,jsken
-          DO NR=1,NumPrimeRootAxes_pft(NZ)
+          DO NR=1,NumStructuralRootAxes_pft(NZ)
             DO NE=1,NumPlantChemElms
               LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XHVST1 &
                 *PlantElmAllocMat4Litr(NE,icwood,M,NZ)*RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*FracRootElmAllocm(NE,k_woody_comp)
@@ -466,7 +466,7 @@ contains
       !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
       !
       if(N==ipltroot)THEN
-        DO NR=1,NumPrimeRootAxes_pft(NZ)
+        DO NR=1,NumStructuralRootAxes_pft(NZ)
           Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
           DO NE=1,NumPlantChemElms
             RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*XHVST
@@ -477,7 +477,7 @@ contains
         Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*XHVST        
       ENDIF  
 
-      D8960: DO NR=1,NumPrimeRootAxes_pft(NZ)
+      D8960: DO NR=1,NumStructuralRootAxes_pft(NZ)
         DO NE=1,NumPlantChemElms
           RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ) = RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)*XHVST
         ENDDO

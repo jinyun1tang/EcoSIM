@@ -1150,7 +1150,7 @@ implicit none
   id=addone(id)
   call writefixl(nu_plt,id,'VRNXI','Hours of senescence conditions (temp or water) required for autumn leafoff [h]',VRNXI,100)
   id=addone(id)
-  call writefixl(nu_plt,id,'PB','Nonstructural C concentration needed for branching [gC nonst/gC structl]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),100)
+  call writefixl(nu_plt,id,'PB','Nonstructural C concentration needed for shoot branching [gC nonst/gC structl]',NonstCMinConc2InitBranch_pft(NZ,NY,NX),100)
   id=addone(id)
   call writefixl(nu_plt,id,'GROUPX','Maturity group, node number (on top of XTLI) required for floral initiation [-]',GROUPX_pft(NZ,NY,NX),100)
   id=addone(id)
@@ -1230,10 +1230,10 @@ implicit none
   call writefixl(nu_plt,id,'PORT','Primary/fine root air porosity [m3 m-3]',RootPorosity_pft(1,NZ,NY,NX),105)
 
   if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
-    id=addone(id)
-    call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
-    id=addone(id)
-    call writefixl(nu_plt,id,'KLGMM','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
+!    id=addone(id)
+!    call writefixl(nu_plt,id,'KLGMAX','Maximum lignification rate of coarse roots [h-1]',KLigMax_pft(NZ,NY,NX),105)
+!    id=addone(id)
+!    call writefixl(nu_plt,id,'KLGMM','Half saturation parameter for coarse roots lignification [h-1]',KLigMM_pft(NZ,NY,NX),105)
     id=addone(id)
     call writefixl(nu_plt,id,'ROOTMAGE','Root age to trigger secondary growth [h]', RootMatureAge_pft(NZ,NY,NX),105)
     id=addone(id)

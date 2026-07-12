@@ -794,7 +794,7 @@ module StartqMod
   !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
   !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
   !
-  NumPrimeRootAxes_pft(NZ,NY,NX) = 0
+  NumStructuralRootAxes_pft(NZ,NY,NX) = 0
   RootNH4Uptake_pft(NZ,NY,NX)    = 0._r8
   RootNO3Uptake_pft(NZ,NY,NX)    = 0._r8
   RootH2PO4Uptake_pft(NZ,NY,NX)  = 0._r8

@@ -993,7 +993,7 @@ module InitPlantMod
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !output :root total water potential, [Mpa]
     RootPoreVol_pvr               => plt_morph%RootPoreVol_pvr                ,& !output :root layer volume air, [m2 d-2]
     RootVH2O_pvr                  => plt_morph%RootVH2O_pvr                   ,& !output :root space volume occupied by water in each layer, [m2 d-2]   
-    NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !output :root primary axis number,[-]
+    NumStructuralRootAxes_pft          => plt_morph%NumStructuralRootAxes_pft           ,& !output :number of structural root axes,[-]
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !output :root turgor water potential, [Mpa]
     Root1stTransptArea_pvr        => plt_morph%Root1stTransptArea_pvr         ,& !output :transport area by 1st order root, [m2 d-2]         
     Root1stRadius_pvr             => plt_morph%Root1stRadius_pvr              ,& !output :root layer diameter primary axes, [m]
@@ -1010,7 +1010,7 @@ module InitPlantMod
   !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
   !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
   !
-  NumPrimeRootAxes_pft(NZ)=0
+  NumStructuralRootAxes_pft(NZ)=0
   plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
   plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
   plt_rbgc%RootH2PO4Uptake_pft(NZ) = 0._r8

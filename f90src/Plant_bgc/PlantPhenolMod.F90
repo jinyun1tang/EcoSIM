@@ -274,13 +274,13 @@ module PlantPhenolMod
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
     ShootNodeNumAtPlanting_pft   => plt_morph%ShootNodeNumAtPlanting_pft    ,& !input  :number of nodes in seed, [-]
     ShootNodeNum_brch            => plt_morph%ShootNodeNum_brch             ,& !input  :shoot node number, [-]
-    isPlantBranchAlive_brch       => plt_pheno%isPlantBranchAlive_brch        ,& !inoput :flag to detect branch death, [-]
-    NumPrimeRootAxes_pft         => plt_morph%NumPrimeRootAxes_pft          ,& !inoput :root primary axis number,[-]
+    isPlantBranchAlive_brch      => plt_pheno%isPlantBranchAlive_brch       ,& !inoput :flag to detect branch death, [-]
+    NumStructuralRootAxes_pft         => plt_morph%NumStructuralRootAxes_pft          ,& !inoput :number of structural root axes,[-]
     NumOfBranches_pft            => plt_morph%NumOfBranches_pft             ,& !inoput :number of branches,[-]
     BranchNumber_pft             => plt_morph%BranchNumber_pft              ,& !inoput :main branch numeric id,[-]
     MatureGroup_brch             => plt_pheno%MatureGroup_brch              ,& !output :branch level plant maturity group, [-]
-    isPlantRootAlive_pft          => plt_pheno%isPlantRootAlive_pft           ,& !output :flag to detect root system death,[-]
-    isPlantShootAlive_pft         => plt_pheno%isPlantShootAlive_pft          ,& !output :flag to detect canopy death,[-]
+    isPlantRootAlive_pft         => plt_pheno%isPlantRootAlive_pft          ,& !output :flag to detect root system death,[-]
+    isPlantShootAlive_pft        => plt_pheno%isPlantShootAlive_pft         ,& !output :flag to detect canopy death,[-]
     Hours4Leafout_brch           => plt_pheno%Hours4Leafout_brch            ,& !output :heat requirement for spring leafout/dehardening, [h]
     BranchNumerID_brch           => plt_morph%BranchNumerID_brch             & !output :branch meric id, [-]
   )
@@ -354,14 +354,14 @@ module PlantPhenolMod
       !     SeasonalNonstElms_pft: non-structural carbon
       !     root axis initialization      
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN !water condition met
-        IF(NumPrimeRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-          .GT.NumPrimeRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
+        IF(NumStructuralRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
+          .GT.NumStructuralRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
 
-          checkRootInitializer= (NumPrimeRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &                  !storage/seed 
+          checkRootInitializer= (NumStructuralRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &                  !storage/seed 
             .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinCon2InitRoot_pft(NZ) .AND. NonstCMinCon2InitRoot_pft(NZ).GT.0.0_r8) !plant status
 
           IF(checkRootInitializer)THEN
-            NumPrimeRootAxes_pft(NZ) = MIN(MaxNumRootAxes,NumPrimeRootAxes_pft(NZ)+1)
+            NumStructuralRootAxes_pft(NZ) = MIN(MaxNumRootAxes,NumStructuralRootAxes_pft(NZ)+1)
             isPlantRootAlive_pft(NZ)  = iTrue
           ENDIF
         ENDIF

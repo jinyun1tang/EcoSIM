@@ -239,7 +239,7 @@ implicit none
   real(r8), pointer :: SeedWidth2LenRatio_pft(:)       => null() !Seed width to length ratio, assuming prolate spheroid  
   real(r8), pointer :: RootPoreTortu4Gas_pft(:,:)      => null() !power function of root porosity used to calculate root gaseous diffusivity, [-]
   logical,  pointer :: flag2ndGrowth_pvr(:,:,:)        => null() !flag for secondary growth of primary roots, [-]  
-  real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)        => null() !root layer length primary axes,                                             [m d-2]
+  real(r8), pointer :: Root1stLenPP_rpvr(:,:,:)        => null() !primary root axis length in soil layer,                                             [m d-2]
   real(r8), pointer :: Root2ndLen_rpvr(:,:,:,:)        => null() !root layer length secondary axes,                                           [m d-2]
   real(r8), pointer :: RootAge_rpvr(:,:,:)             => null() !root age, [h]
   real(r8), pointer :: RootTotLenPerPlant_pvr(:,:,:)   => null() !total root length per plant,                                                [m p-1]
@@ -247,6 +247,7 @@ implicit none
   real(r8), pointer :: RootLenPerPlant_pvr(:,:,:)      => null() !fine root length per plant, [m p-1]
   real(r8), pointer :: Root2ndEffLen4uptk_rpvr(:,:,:)  => null() !Layer effective root length four resource uptake, [m]
   real(r8), pointer :: DistRootEffDepz_pvr(:,:)        => null() !Effective shoot-root transport depth, [m]
+  real(r8), pointer :: RootSinkScalar_pvr(:,:,:)       => null() !root sink scalar to account for the missing of intermediate size roots, [0-1]      
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
@@ -314,7 +315,7 @@ implicit none
   integer,  pointer :: MainBranchNum_pft(:)           => null() !number of main branch,[-]
   integer,  pointer :: MaxSoilLays4Root_pft(:)            => null() !maximum soil layer number for all root axes,[-]
   integer,  pointer :: NMaxRootBotLayer_pft(:)         => null() !maximum soil layer number for all root axes, [-]
-  integer,  pointer :: NumPrimeRootAxes_pft(:)             => null() !root primary axis number,[-]
+  integer,  pointer :: NumStructuralRootAxes_pft(:)             => null() !number of structural root axes,[-]
   real(r8), pointer :: RootMatureAge_pft(:)           => null() !Root age to trigger secondary growth, [h]
   integer,  pointer :: NumCogrowthNode_pft(:)         => null() !number of concurrently growing nodes,[-]
   integer,  pointer :: BranchNumber_pft(:)            => null() !main branch numeric id,[-]
@@ -355,7 +356,9 @@ implicit none
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
   real(r8), pointer :: fctyok_scalar_rpvr(:,:,:)      => null() !cytokinin scalar for corase root sink, [-]
-  REAL(R8), POINTER :: NumAxesPerPrimRoot_pft(:)      => null() !primary root axes number, [d-2]
+  REAL(R8), POINTER :: NumAxesPerStructRootAxis_pft(:)      => null() !primary root axes number per structural root axis, [d-2]
+  real(r8), pointer :: NumAxesPerStructRootAxPO_pft(:)   =>null() !population primary root axes number on one structrual axis, [d-2]      
+  real(r8), pointer :: NumPrimeRootAxesPerPlant_pft(:)   => null() !number of primary root axesr per plant, [d-2]      
   real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)       => null() !root layer number axes,               [d-2]
   real(r8), pointer :: Root2ndVH2O_rpvr(:,:,:,:)      => null()  !water-occupied 2nd root volume, [m3 m-3]    
@@ -2131,6 +2134,7 @@ implicit none
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
   allocate(this%Root2ndEffLen4uptk_rpvr(jroots,JZ1,JP1));this%Root2ndEffLen4uptk_rpvr=spval
   allocate(this%DistRootEffDepz_pvr(JZ1,JP1)); this%DistRootEffDepz_pvr=spval
+  allocate(this%RootSinkScalar_pvr(JZ1,MaxNumRootAxes,JP1)); this%RootSinkScalar_pvr=spval
   allocate(this%Root1stSpecLen_pft(jroots,JP1));this%Root1stSpecLen_pft=spval
   allocate(this%Root2ndSpecLen_pft(jroots,JP1));this%Root2ndSpecLen_pft=spval
   allocate(this%Root1stLenPP_rpvr(JZ1,MaxNumRootAxes,JP1));this%Root1stLenPP_rpvr=spval
@@ -2150,7 +2154,9 @@ implicit none
   allocate(this%Root2ndSinkWeight_pvr(JZ1,jroots,JP1));this%Root2ndSinkWeight_pvr=0._r8
   allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
   allocate(this%Root1stTipSinkWeight_pft(JP1)); this%Root1stTipSinkWeight_pft=0._r8
-  allocate(this%NumAxesPerPrimRoot_pft(JP1)); this%NumAxesPerPrimRoot_pft=0._r8
+  allocate(this%NumAxesPerStructRootAxis_pft(JP1)); this%NumAxesPerStructRootAxis_pft=0._r8
+  allocate(this%NumAxesPerStructRootAxPO_pft(JP1)); this%NumAxesPerStructRootAxPO_pft=0._r8 
+  allocate(this%NumPrimeRootAxesPerPlant_pft(JP1)); this%NumPrimeRootAxesPerPlant_pft=0._r8
   allocate(this%Radius95pctMature_pft(JP1)); this%Radius95pctMature_pft=0._r8
   allocate(this%CanopyHeightLive_pft(JP1));this%CanopyHeightLive_pft=spval
   allocate(this%CanopyHeightDead_pft(JP1)); this%CanopyHeightDead_pft=spval
@@ -2162,7 +2168,7 @@ implicit none
   allocate(this%CanopyLeafArea_pft(JP1));this%CanopyLeafArea_pft=spval
   allocate(this%MainBranchNum_pft(JP1));this%MainBranchNum_pft=0
   allocate(this%NMaxRootBotLayer_pft(JP1));this%NMaxRootBotLayer_pft=0
-  allocate(this%NumPrimeRootAxes_pft(JP1));this%NumPrimeRootAxes_pft=0
+  allocate(this%NumStructuralRootAxes_pft(JP1));this%NumStructuralRootAxes_pft=0
   allocate(this%RootMatureAge_pft(JP1)); this%RootMatureAge_pft=0._r8
   allocate(this%RootSegAges_raxes(1:pltpar%NMaxRootSegs,1:MaxNumRootAxes,JP1));this%RootSegAges_raxes=0._r8     
   allocate(this%NActiveRootSegs_raxes(1:MaxNumRootAxes,JP1));this%NActiveRootSegs_raxes=0

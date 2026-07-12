@@ -10,7 +10,7 @@ module RootDataType
   implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
-  integer,target,allocatable ::  NumPrimeRootAxes_pft(:,:,:)                     !root primary axis number, [-]
+  integer,target,allocatable ::  NumStructuralRootAxes_pft(:,:,:)                     !number of structural root axes, [-]
   real(sp),target,allocatable::  RootShootExch_pvr(:,:,:,:,:)                    !Root-shoot nonstrucal element exchange, [g d-2 h-1]
   integer,target,allocatable ::  NRoot1stTipLay_raxes(:,:,:,:)                   !maximum soil layer number for root axes, [-]
   integer,target,allocatable ::  isPlantRootAlive_pft(:,:,:)                      !flag to detect root system death , [-]
@@ -63,7 +63,7 @@ module RootDataType
   real(sp),target,allocatable ::  RootTotLenPerPlant_pvr(:,:,:,:,:)              !root layer length per plant, including root hair [m p-1]
   real(sp),target,allocatable ::  RootAbsorbLenPerPlant_pvr(:,:,:,:,:)           !total absorptive root length per plant in layer, [m p-1]
   real(sp),target,allocatable ::  RootLenPerPlant_pvr(:,:,:,:,:)                 !root layer length per plant, excluding root hair [m p-1]       
-  real(sp),target,allocatable ::  Root1stLenPP_rpvr(:,:,:,:,:)                   !root layer length primary axes, [m d-2]
+  real(sp),target,allocatable ::  Root1stLenPP_rpvr(:,:,:,:,:)                   !primary root axis length in soil layer, [m d-2]
   real(sp),target,allocatable ::  RootAge_rpvr(:,:,:,:,:)                        !root age, [h]
   real(sp),target,allocatable ::  CRootLumenArea_rpvr(:,:,:,:,:)                 !coarse roots lumen area for root axes, [m2]    
   real(sp),target,allocatable ::  CRootLumenArea_pvr(:,:,:,:)                    !coarse roots lumen area , [m2]    
@@ -161,7 +161,7 @@ contains
   allocate(Nutruptk_fProtC_rpvr(jroots,JZ,JP,JY,JX));Nutruptk_fProtC_rpvr=0._sp
   allocate(RootMycoMassElm_vr(NumPlantChemElms,jroots,JZ,JY,JX)); RootMycoMassElm_vr =0._sp
   allocate(RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ,JP,JY,JX)); RootMycoMassElm_pvr=0._sp
-  allocate(NumPrimeRootAxes_pft(JP,JY,JX));      NumPrimeRootAxes_pft=0
+  allocate(NumStructuralRootAxes_pft(JP,JY,JX));      NumStructuralRootAxes_pft=0
   allocate(NRoot1stTipLay_raxes(MaxNumRootAxes,JP,JY,JX));  NRoot1stTipLay_raxes=1  !set to one to avoid numerical failure
   allocate(isPlantRootAlive_pft(JP,JY,JX));    isPlantRootAlive_pft=iFalse
   allocate(irootType_col(JY,JX));  irootType_col=1  !set to one to avoid numerical failure
@@ -303,7 +303,7 @@ contains
   call destroy(RootAtmGasConductance_rpvr)
   call destroy(RootMycoMassElm_pvr)
   call destroy(RootMycoMassElm_vr)
-  call destroy(NumPrimeRootAxes_pft)
+  call destroy(NumStructuralRootAxes_pft)
   call destroy(NRoot1stTipLay_raxes)
   call destroy(irootType_col)
   call destroy(isPlantRootAlive_pft)

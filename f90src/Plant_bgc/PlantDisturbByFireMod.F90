@@ -406,7 +406,7 @@ contains
     PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr  ,& !input  :litter kinetic fraction, [-]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !input  :root layer nonstructural element, [g d-2]
     THIN_pft                  => plt_distb%THIN_pft                  ,& !input  :thinning of plant population, [-]
-    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft      ,& !input  :number of structural root axes,[-]
     DCORP                     => plt_distb%DCORP                     ,& !input  :soil mixing fraction with tillage, [-]
     FracRootElmAllocm         => plt_allom%FracRootElmAllocm         ,& !input  :C woody fraction in root,[-]
     k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
@@ -445,7 +445,7 @@ contains
 
     call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
     !
-    D3960: DO NR=1,NumPrimeRootAxes_pft(NZ)
+    D3960: DO NR=1,NumStructuralRootAxes_pft(NZ)
       if(N.eq.ipltroot)THEN
         DO NE=1,NumPlantChemElms
           HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
