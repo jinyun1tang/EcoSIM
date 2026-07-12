@@ -255,8 +255,8 @@ module PlantBGCPars
   C4KI_pepcarboxy             = 5.0E+06_r8
   Hours4ConiferSpringDeharden = 276.9_r8
   RootElonZoneLenz            =0.03_r8
-  kDCytof = (/0.036_r8,0.011_r8/)*0.5_r8       
-  kDCytoC = 0.011_r8*0.5_r8
+  kDCytof = (/0.036_r8,0.011_r8/)*0.75_r8
+  kDCytoC = 0.011_r8*0.75_r8
   RCytoK = (/1.e-4_r8,1.e-5_r8/)         !the actual magnitude is 3 orders smaller, here just to maintain the contrast between fine roots and mycorrhizae
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3

@@ -237,11 +237,6 @@ module RootGasMod
         !fine root has lower conductance
         RTCRA = RTCR1
       ENDIF
-!      if(N==1)then
-!      write(9914,*)'root',I*1000+J/24.,L,RTCRA,RTCR1,RTCR2,Root1stXNumL_pvr(L,NZ),Root1stTransptArea_pvr(N,L,NZ)
-!      else
-!      write(9915,*)'myco',I*1000+J/24.,L,RTCRA,RTCR1,RTCR2,Root1stXNumL_pvr(L,NZ),Root1stTransptArea_pvr(N,L,NZ)    
-!      endif
     ELSE
       RTCRA=0.0_r8
     ENDIF

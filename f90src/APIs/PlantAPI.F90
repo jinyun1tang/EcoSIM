@@ -250,7 +250,7 @@ implicit none
     NMaxRootBotLayer_pft(NZ,NY,NX)       = plt_morph%NMaxRootBotLayer_pft(NZ)
     BranchNumber_pft(NZ,NY,NX)          = plt_morph%BranchNumber_pft(NZ)
     NumOfBranches_pft(NZ,NY,NX)         = plt_morph%NumOfBranches_pft(NZ)
-    NumPrimeRootAxes_pft(NZ,NY,NX)      = plt_morph%NumPrimeRootAxes_pft(NZ)
+    NumStructuralRootAxes_pft(NZ,NY,NX)      = plt_morph%NumStructuralRootAxes_pft(NZ)
     MaxSoilLays4Root_pft(NZ,NY,NX)          = plt_morph%MaxSoilLays4Root_pft(NZ)
     NGTopRootLayer_pft(NZ,NY,NX)        = plt_morph%NGTopRootLayer_pft(NZ)
     MainBranchNum_pft(NZ,NY,NX)         = plt_morph%MainBranchNum_pft(NZ)
@@ -1213,7 +1213,7 @@ implicit none
     plt_morph%NGTopRootLayer_pft(NZ)  = NGTopRootLayer_pft(NZ,NY,NX)
     plt_pheno%doInitPlant_pft(NZ)     = doInitPlant_pft(NZ,NY,NX)
     plt_morph%NMaxRootBotLayer_pft(NZ) = NMaxRootBotLayer_pft(NZ,NY,NX)
-    plt_morph%NumPrimeRootAxes_pft(NZ)     = NumPrimeRootAxes_pft(NZ,NY,NX)
+    plt_morph%NumStructuralRootAxes_pft(NZ)     = NumStructuralRootAxes_pft(NZ,NY,NX)
     plt_morph%MainBranchNum_pft(NZ)   = MainBranchNum_pft(NZ,NY,NX)
     plt_morph%NumOfBranches_pft(NZ)   = NumOfBranches_pft(NZ,NY,NX)
 

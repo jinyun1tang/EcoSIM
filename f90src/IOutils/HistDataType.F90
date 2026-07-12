@@ -662,6 +662,7 @@ implicit none
   real(r8),pointer   :: h2D_RootH2OUptkStress_pvr(:,:)
   real(r8),pointer   :: h2D_RootH2OUptk_pvr(:,:)
   real(r8),pointer   :: h2D_RootAct1stC_pvr(:,:)
+  real(r8),pointer   :: h2D_NonstC_conc_pvr(:,:)
   real(r8),pointer   :: h2D_RootLig1stC_pvr(:,:)
   real(r8),pointer   :: h2D_RootShootExchC_pvr(:,:)
   real(r8),pointer   :: h2D_RootShootExchN_pvr(:,:)
@@ -678,6 +679,7 @@ implicit none
   real(r8),pointer   :: h2D_RootNutupk_fProtC_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stSArea4GasTP_pvr(:,:)
   real(r8),pointer   :: h2D_RootProteinC_pvr(:,:)
+  real(r8),pointer   :: h2D_Root1stLenPP_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stAxesNumL_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndAxesNumL_pvr(:,:)
   REAL(R8),pointer   :: h2D_RootKond2H2O_pvr(:,:)
@@ -1316,6 +1318,7 @@ implicit none
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptk_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootH2OUptk_pvr(:,:)=spval
   allocate(this%h2D_RootAct1stC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootAct1stC_pvr(:,:)=spval
+  allocate(this%h2D_NonstC_conc_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_NonstC_conc_pvr(:,:)=spval
   allocate(this%h2D_RootLig1stC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootLig1stC_pvr(:,:)=spval
   allocate(this%h2D_RootShootExchC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchC_pvr(:,:)=spval
   allocate(this%h2D_RootShootExchN_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchN_pvr(:,:)=spval
@@ -1349,6 +1352,7 @@ implicit none
   allocate(this%h2D_Root2ndStrutP_pvr(beg_ptc:end_ptc,1:JZ)) ;this%h2D_Root2ndStrutP_pvr=spval
   allocate(this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root2ndAxesNumL_pvr=spval
   allocate(this%h2D_RootKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootKond2H2O_pvr=spval
+  allocate(this%h2D_Root1stLenPP_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_Root1stLenPP_pvr=spval
   allocate(this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root1stAxesNumL_pvr=spval
   allocate(this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_pvr=spval
   allocate(this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_fRootGrowPSISense_pvr=spval
@@ -3933,6 +3937,10 @@ implicit none
   call hist_addfld2d(fname='RootLig1stC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
     long_name='Lignified zone C in primary roots',ptr_patch=data2d_ptr)
 
+  data2d_ptr => this%h2D_NonstC_conc_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='NonstC_conc_pvr',units='gC nonst gC struct-1',type2d='levsoi',avgflag='A',&
+    long_name='Nonstructural C concentration',ptr_patch=data2d_ptr)
+
   data2d_ptr => this%h2D_SapFlowVlinear_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='SapFlowVlinear_pvr',units='m h-1',type2d='levsoi',avgflag='A',&
     long_name='Lumen area normalized mean linear sap flow velocity along the vessels of coarse roots',ptr_patch=data2d_ptr)
@@ -4029,6 +4037,10 @@ implicit none
   data2d_ptr => this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='#',type2d='levsoi',avgflag='A',&
     long_name='Primary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_Root1stLenPP_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='Root1stLenPP_pvr',units='m (plant)-1',type2d='levsoi',avgflag='A',&
+    long_name='Primary root length in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root2nd_AxesNumL_pvr',units='1/d2',type2d='levsoi',avgflag='A',&
@@ -4848,7 +4860,7 @@ implicit none
         this%h1D_LEAF_NC_ptc(nptc)      = safe_adb(LeafStrutElms_pft(ielmn,NZ,NY,NX)+CanopyNonstElms_pft(ielmn,NZ,NY,NX),&
                                                  LeafStrutElms_pft(ielmc,NZ,NY,NX)+CanopyNonstElms_pft(ielmc,NZ,NY,NX))
         this%h1D_RootMaintDef_CO2_pft(nptc) = sum(RootMaintDef_CO2_pvr(ipltroot,1:JZ,NZ,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
-        this%h1D_NumPrimeRootAxes_ptc(nptc) = NumPrimeRootAxes_pft(NZ,NY,NX)
+        this%h1D_NumPrimeRootAxes_ptc(nptc)      = NumStructuralRootAxes_pft(NZ,NY,NX)
 
         IF(NumOfBranches_pft(NZ,NY,NX)>0)then
           DO K=1,MaxNodesPerBranch
@@ -4901,7 +4913,7 @@ implicit none
         this%h1D_RootAR_ptc(nptc)          = 0._r8
         this%h1D_RootLenPerPlant_ptc(nptc) = 0._r8
         if(IsPlantActive_pft(NZ,NY,NX).EQ.iTrue .and. PlantPopuLive_pft(NZ,NY,NX) .GT. ZEROS(NY,NX))then
-          DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+          DO NR=1,NumStructuralRootAxes_pft(NZ,NY,NX)
             this%h2D_Root1stDepz_ptc(nptc,NR)      = Root1stDepz_raxes(NR,NZ,NY,NX)
           ENDDO
         else
@@ -4929,6 +4941,7 @@ implicit none
           this%h2D_Root2ndStrutP_pvr(nptc,L)     = 0._r8
           this%h2D_RootAct1stC_pvr(nptc,L)       = 0._r8
           this%h2D_RootLig1stC_pvr(nptc,L)       = 0._r8
+          this%h2D_NonstC_conc_pvr(nptc,L)       = RootNonstructElmConc_rpvr(ielmc,ipltroot,L,NZ,NY,NX)
           if(DVOLL>1.e-8_r8)then
             this%h2d_RootPop_pvr(nptc,L)=PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
             this%h2D_MycoPop_pvr(nptc,L)=PopuRootMycoC_pvr(imycorrhz,L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)  
@@ -4984,8 +4997,9 @@ implicit none
 
             this%h2D_RootAct1stC_pvr(nptc,L) = Root1stActStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_RootLig1stC_pvr(nptc,L) = Root1stLigStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
-
-            DO NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
+            this%h2D_Root1stLenPP_pvr(nptc,L)=0._r8
+            DO NR=1,NumStructuralRootAxes_pft(NZ,NY,NX)
+              this%h2D_Root1stLenPP_pvr(nptc,L)=this%h2D_Root1stLenPP_pvr(nptc,L)+Root1stLenPP_rpvr(L,NR,NZ,NY,NX)
               this%h2D_CRootLumenArea_pvr(nptc,L)    = this%h2D_CRootLumenArea_pvr(nptc,L)+CRootLumenArea_rpvr(L,NR,NZ,NY,NX)
               this%h2D_MycoBiomC_pvr(nptc,L)         = this%h2D_MycoBiomC_pvr(nptc,L)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
               this%h2D_Cytokinin1stConc_pvr(nptc,L)  = this%h2D_Cytokinin1stConc_pvr(nptc,L)+Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX)
@@ -4999,10 +5013,11 @@ implicit none
               this%h1D_MycorrizhalBiomC_ptc(nptc)    = this%h1D_MycorrizhalBiomC_ptc(nptc) + RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
             ENDDO
             
-            if(NumPrimeRootAxes_pft(NZ,NY,NX).GT.0)THEN
-              this%h2D_Cytokinin1stConc_pvr(nptc,L) = AZERO(this%h2D_Cytokinin1stConc_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
-              this%h2D_Cytok_scalar_pvr(nptc,L)     = AZERO(this%h2D_Cytok_scalar_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
-              this%h2D_CRootLumenArea_pvr(nptc,L)   = AZERO(this%h2D_CRootLumenArea_pvr(nptc,L)/NumPrimeRootAxes_pft(NZ,NY,NX))
+            if(NumStructuralRootAxes_pft(NZ,NY,NX).GT.0)THEN
+              this%h2D_Root1stLenPP_pvr(nptc,L)     = this%h2D_Root1stLenPP_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX)
+              this%h2D_Cytokinin1stConc_pvr(nptc,L) = AZERO(this%h2D_Cytokinin1stConc_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
+              this%h2D_Cytok_scalar_pvr(nptc,L)     = AZERO(this%h2D_Cytok_scalar_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
+              this%h2D_CRootLumenArea_pvr(nptc,L)   = AZERO(this%h2D_CRootLumenArea_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
             ENDIF
 
             this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)+this%h2D_Root1stStrutC_pvr(nptc,L)
@@ -5079,12 +5094,13 @@ implicit none
   this%h2D_Root1stRadius_rpvr(nptc,1:JZ)  = 0._r8
   this%h2D_RootNonstBConc_pvr(nptc,1:JZ)  = 0._r8
   this%h2D_Root1stAxesNumL_pvr(nptc,1:JZ) = 0._r8
+  this%h2D_Root1stLenPP_pvr(nptc,1:JZ)    = 0._r8
   this%h2D_Root2ndAxesNumL_pvr(nptc,1:JZ) = 0._r8
   this%h2D_RootKond2H2O_pvr(nptc,1:JZ)    = 0._r8
 
   this%h2D_RootAct1stC_pvr(nptc,1:JZ)    = 0._r8
   this%h2D_RootLig1stC_pvr(nptc,1:JZ)    = 0._r8 
-
+  this%h2D_NonstC_conc_pvr(nptc,1:JZ)    = 0._r8
   this%h1D_ROOT_NONSTC_ptc(nptc)  = 0._r8
   this%h1D_ROOT_NONSTN_ptc(nptc)  = 0._r8
   this%h1D_ROOT_NONSTP_ptc(nptc)  = 0._r8

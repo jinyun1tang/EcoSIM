@@ -182,7 +182,7 @@ module NutUptakeMod
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr ,& !input  :root layer element secondary axes, [g d-2]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
     NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft     ,& !input  :maximum soil layer number for all root axes,[-]
-    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft     ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft     ,& !input  :number of structural root axes,[-]
     trcs_deadroot2soil_pvr    => plt_rbgc%trcs_deadroot2soil_pvr    ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]
     trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr           ,& !inoput :root gas content, [g d-2]
     trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr           ,& !inoput :root aqueous content, [g d-2]
@@ -256,9 +256,9 @@ module NutUptakeMod
 
           call RootExudates(I,J,N,L,NZ)
           if(N==ipltroot)then
-            RootMyMassC=sum(Root1stActStructElms_rpvr(ielmc,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+            RootMyMassC=sum(Root1stActStructElms_rpvr(ielmc,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
           else
-            RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumPrimeRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
+            RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
           endif  
           !
           !     NUTRIENT UPTAKE

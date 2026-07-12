@@ -377,6 +377,7 @@ module PlantNonstElmDynMod
     DistRootEffDepz_pvr           => plt_morph%DistRootEffDepz_pvr            ,& !input  :Effective shoot-root transport depth, [m]    
     SapFlowVlinear_pvr            => plt_ew%SapFlowVlinear_pvr                ,& !input  :Sap flow mean linear velocity along 1st root axes, [m h-1]    
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !input  :root turgor water potential, [Mpa]    
+    RootSinkScalar_pvr            => plt_morph%RootSinkScalar_pvr             ,& !input  :root sink scalar to account for the missing of intermediate size roots, [0-1]    
     Root1stLigStructElms_rpvr     => plt_biom%Root1stLigStructElms_rpvr       ,& !inoput :root layer lignified zone element in primary axes, [g d-2]        
     Transpiration_pft             => plt_ew%Transpiration_pft                 ,& !input  :canopy transpiration (<0 into atmosphere), [m3 d-2 h-1]    
     PSIRootOSMO_vr                => plt_ew%PSIRootOSMO_vr                    ,& !input  :root osmotic water potential, [Mpa]    
@@ -389,7 +390,7 @@ module PlantNonstElmDynMod
     flag2ndGrowth_pvr             => plt_morph%flag2ndGrowth_pvr              ,& !input  :flag for secondary growth of primary roots, [-]        
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
-    NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft          => plt_morph%NumStructuralRootAxes_pft           ,& !input  :number of structural root axes,[-]
     NMaxRootBotLayer_pft          => plt_morph%NMaxRootBotLayer_pft           ,& !input  :maximum soil layer number for all root axes, [-]    
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     fRootTube_rpvr                => plt_morph%fRootTube_rpvr                 ,& !input  :fraction of root for transport,[-]
@@ -420,7 +421,7 @@ module PlantNonstElmDynMod
     D5450: DO L=NU,MaxSoilLays4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ) = 0._r8
       PopuRootMycoC_pvr(N,L,NZ)       = 0._r8
-      D5460: DO NR=1,NumPrimeRootAxes_pft(NZ)
+      D5460: DO NR=1,NumStructuralRootAxes_pft(NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
         PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)           
       ENDDO D5460
@@ -430,46 +431,28 @@ module PlantNonstElmDynMod
   ENDDO D5445
   
   !add root tip, when the root tip layer has no coarse roots
-  if(lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
-    ROOTACTBIOMS_vr(:) = 0._R8    
-    DO  NR=1,NumPrimeRootAxes_pft(NZ) 
-      found_coarse=.false.
-      DO L=MaxSoilLays4Root_pft(NZ),NU,-1
-        !primary roots are not coarse
-        if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
-          ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)        
-          L1=NRoot1stTipLay_raxes(NR,NZ)  
-          ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L1,NR,NZ)  
-        else
-          found_coarse=.true.
-          if(L.LT.NGTopRootLayer_pft(NZ))then
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)
-            !coarse root enhancement to seeding layer
-            L1=NGTopRootLayer_pft(NZ)
-            ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)*(1._r8/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))-1._r8)
-          else
-            !coarse roots enhancement
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))
-          endif
-          DO N=2,Myco_pft(NZ)
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
-          ENDDO
-       endif   
-      ENDDO
-    ENDDO    
-  else
-    DO  NR=1,NumPrimeRootAxes_pft(NZ)
-      L1=NRoot1stTipLay_raxes(NR,NZ)        
-      !because growth only occurs at the root tip for non-woody vascular plants or when coarse roots are not modeled
-      DO L=NU,MaxSoilLays4Root_pft(NZ)
-        RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)          
-      ENDDO    
+
+  ROOTACTBIOMS_vr(:) = RootMycoActiveBiomC_pvr(ipltroot,:,NZ)
+  DO  NR=1,NumStructuralRootAxes_pft(NZ) 
+    found_coarse=.false.
+    DO L=MaxSoilLays4Root_pft(NZ),NU,-1
+      !primary roots are not coarse
+      if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
+        L1=NRoot1stTipLay_raxes(NR,NZ)  
+        RootMycoActiveBiomC_pvr(ipltroot,L1,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+        ROOTACTBIOMS_vr(L1)                     = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)*RootSinkScalar_pvr(L,NR,NZ)
+      else
+        !coarse roots enhancement
+        found_coarse=.true.          
+        RootMycoActiveBiomC_pvr(ipltroot,L,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+        ROOTACTBIOMS_vr(L)                     = ROOTACTBIOMS_vr(L)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)*RootSinkScalar_pvr(L,NR,NZ)
+      endif        
     ENDDO
-    ROOTACTBIOMS_vr(:) = RootMycoActiveBiomC_pvr(ipltroot,:,NZ)
-  endif
+  ENDDO    
+
 
   DO L=NU,MaxSoilLays4Root_pft(NZ)
-    DO NR=1,NumPrimeRootAxes_pft(NZ)
+    DO NR=1,NumStructuralRootAxes_pft(NZ)
       PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
       !call DebugPrint('PopuRootMycoC_pvr(ipltroot,L,NZ)',PopuRootMycoC_pvr(ipltroot,L,NZ))
     ENDDO
