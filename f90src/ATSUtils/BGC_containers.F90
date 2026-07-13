@@ -181,7 +181,6 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: thermal_conductivity
      type (BGCMatrixDouble) :: volume
      type (BGCMatrixDouble) :: depth
-     type (BGCMatrixDouble) :: depth_c
      type (BGCMatrixDouble) :: dz
      type (BGCMatrixDouble) :: plant_wilting_factor
      type (BGCMatrixDouble) :: rooting_depth_fraction

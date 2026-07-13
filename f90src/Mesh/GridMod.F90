@@ -177,6 +177,8 @@ contains
   bounds%begc=1;bounds%endc=bounds%ncols
   bounds%begp=1;bounds%endp=bounds%npfts
 
+  if (associated(bounds%icol)) deallocate(bounds%icol)
+  if (associated(bounds%ipft)) deallocate(bounds%ipft)
   allocate(bounds%icol(JY,JX))
   allocate(bounds%ipft(JP,JY,JX))
 

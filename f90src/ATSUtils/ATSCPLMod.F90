@@ -44,7 +44,6 @@ contains
   type(c_ptr), pointer :: cptr_temp, ptr1
   real(r8), target :: target_val
   real(r8), pointer :: ptr(:,:)
-  real(r8), pointer :: temp_array(:,:)
   integer :: ncol, nvar, size_col, num_cols, size_col_pad, num_components
   integer :: j1,j2,j3,i,j
   integer :: test_rows, test_columns
@@ -60,8 +59,6 @@ contains
   num_pfts = sizes%num_pfts
   
   size_col_pad = size_col+30
-
-  allocate(temp_array(size_col, num_cols))
   
   call c_f_string_ptr(props%pft_file, f_string_buffer)
   ecosim_pft_file_path = trim(f_string_buffer)
