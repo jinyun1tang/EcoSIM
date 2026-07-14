@@ -81,7 +81,8 @@ module PlantTraitTableMod
   real(r8), target, allocatable :: RootVesselRadius_tab(:)
   real(r8), target, allocatable :: RootRadialResist_tab(:)
   real(r8), target, allocatable :: ShutRutNonstElmntConducts_tab(:)
-  real(r8), target, allocatable :: RootBranchFreq_tab(:)
+  real(r8), target, allocatable :: FineRootBranchFreq_tab(:)
+  real(r8), target, allocatable :: MediumRootBranchFreq_tab(:)
   real(r8), target, allocatable :: VmaxNH4Root_tab(:)
   real(r8), target, allocatable :: KmNH4Root_tab(:)
   real(r8), target, allocatable :: CMinNH4Root_tab(:)
@@ -221,7 +222,8 @@ module PlantTraitTableMod
   allocate(RootVesselRadius_tab(npfts));  RootVesselRadius_tab=0._r8
   allocate(RootRadialResist_tab(npfts));RootRadialResist_tab=0._r8
   allocate(ShutRutNonstElmntConducts_tab(npfts));ShutRutNonstElmntConducts_tab=0._r8
-  allocate(RootBranchFreq_tab(npfts));RootBranchFreq_tab=0._r8
+  allocate(FineRootBranchFreq_tab(npfts));FineRootBranchFreq_tab=0._r8
+  allocate(MediumRootBranchFreq_tab(npfts)); MediumRootBranchFreq_tab=0._r8
   allocate(VmaxNH4Root_tab(npfts));VmaxNH4Root_tab=0._r8
   allocate(KmNH4Root_tab(npfts));KmNH4Root_tab=0._r8
   allocate(CMinNH4Root_tab(npfts));CMinNH4Root_tab=0._r8
@@ -356,7 +358,8 @@ module PlantTraitTableMod
   call destroy(RootVesselRadius_tab)
   call destroy(RootRadialResist_tab)
   call destroy(ShutRutNonstElmntConducts_tab)
-  call destroy(RootBranchFreq_tab)
+  call destroy(FineRootBranchFreq_tab)
+  call destroy(MediumRootBranchFreq_tab)
   call destroy(VmaxNH4Root_tab)
   call destroy(KmNH4Root_tab)
   call destroy(CMinNH4Root_tab)

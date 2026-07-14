@@ -251,13 +251,16 @@ implicit none
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
+  real(r8), pointer :: RootMediumXNum_rpvr(:,:,:)      => null() !number of medium root axes in soil layer, [# d-2]
   real(r8), pointer :: CRootLumenArea_rpvr(:,:,:)      => null() !coarse roots lumen area for root axes, [m2]  
-  real(r8), pointer :: CRootLumenArea_pvr(:,:)       => null() !coarse roots lumen area, [m2]    
-  real(r8), pointer :: Root1stDepz_raxes(:,:)          => null() !root layer depth,                                                           [m]
+  real(r8), pointer :: CRootLumenArea_pvr(:,:)         => null() !coarse roots lumen area, [m2]    
+  real(r8), pointer :: MRootLumenArea_pvr(:,:)         => null() !medium roots lumen area, [m2]
+  real(r8), pointer :: Root1stDepz_raxes(:,:)           => null() !root layer depth,                                                           [m]
   real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
-  real(r8), pointer :: RootBranchFreq_pft(:)           => null() !root brancing frequency,                                                    [m-1]
+  real(r8), pointer :: FineRootBranchFreq_pft(:)           => null() !Fine root brancing frequency,                                                    [m-1]
+  real(r8), pointer :: MediumRootBranchFreq_pft(:)     => null() !Medium root branch frequency, [m-1]
   real(r8), pointer :: HypocotHeight_pft(:)            => null() !cotyledon height,                                                           [m]
   real(r8), pointer :: CanopyHeight4WatUptake_pft(:)   => null() !canopy height,                                                              [m]
   real(r8), pointer :: CanopyHeightZ_col(:)            => null() !canopy layer height,                                                        [m]
@@ -357,6 +360,8 @@ implicit none
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
   real(r8), pointer :: fctyok_scalar_rpvr(:,:,:)      => null() !cytokinin scalar for corase root sink, [-]
   REAL(R8), POINTER :: NumAxesPerStructRootAxis_pft(:)      => null() !primary root axes number per structural root axis, [d-2]
+  real(r8), pointer :: RootMediumLength_rpvr(:,:,:)        => null()      !root layer length for medium size axes, [m d-2]  
+  real(r8), pointer :: RootMediumRadius_rpvr(:,:,:)    => null() !root layer radius for medium size axes, [m]
   real(r8), pointer :: NumAxesPerStructRootAxPO_pft(:)   =>null() !population primary root axes number on one structrual axis, [d-2]      
   real(r8), pointer :: NumPrimeRootAxesPerPlant_pft(:)   => null() !number of primary root axesr per plant, [d-2]      
   real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
@@ -576,6 +581,7 @@ implicit none
   real(r8), pointer :: CanopyNodulNonstElms_pft(:,:)        => null()    !canopy nodule nonstructural element,                [g d-2]
   real(r8), pointer :: CanopyNoduleNonstCConc_pft(:)        => null()    !nodule nonstructural C,                             [gC d-2]
   real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)       => null()    !root layer structural C,                            [gC d-2]
+  real(r8), pointer :: RootMediumStructElms_rpvr(:,:,:,:)   => null()    !root layer medium size root structrual elements,    [g d-2]
   real(r8), pointer :: PopuRootMycoC_pvr(:,:,:)             => null()    !root layer C,                                       [gC d-2]
   real(r8), pointer :: RootProteinC_pvr(:,:,:)              => null()    !root layer protein C,                               [gC d-2]
   real(r8), pointer :: RootProteinConc_rpvr(:,:,:)          => null()    !root layer protein C concentration,                 [g g-1]
@@ -1523,6 +1529,7 @@ implicit none
   allocate(this%CanopyNoduleNonstCConc_pft(JP1));this%CanopyNoduleNonstCConc_pft=spval
   allocate(this%RootProteinConc_rpvr(jroots,JZ1,JP1));this%RootProteinConc_rpvr=spval
   allocate(this%RootProteinC_pvr(jroots,JZ1,JP1));this%RootProteinC_pvr=0._r8
+  allocate(this%RootMediumStructElms_rpvr(NumPlantChemElms,JZ1,MaxNumRootAxes,JP1)); this%RootMediumStructElms_rpvr=spval
   allocate(this%RootMycoActiveBiomC_pvr(jroots,JZ1,JP1));this%RootMycoActiveBiomC_pvr=spval
   allocate(this%RootMycoMassElm_pvr(NumPlantChemElms,jroots,JZ1,JP1)); this%RootMycoMassElm_pvr = 0._r8
   allocate(this%PopuRootMycoC_pvr(jroots,JZ1,JP1));this%PopuRootMycoC_pvr=spval
@@ -2107,7 +2114,8 @@ implicit none
   allocate(this%SeedCMass_pft(JP1));this%SeedCMass_pft=spval
   allocate(this%SeedWidth2LenRatio_pft(JP1));this%SeedWidth2LenRatio_pft=spval
   allocate(this%totRootLenDens_vr(JZ1));this%totRootLenDens_vr=spval
-  allocate(this%RootBranchFreq_pft(JP1));this%RootBranchFreq_pft=spval
+  allocate(this%FineRootBranchFreq_pft(JP1));this%FineRootBranchFreq_pft=spval
+  allocate(this%MediumRootBranchFreq_pft(JP1)); this%MediumRootBranchFreq_pft=spval
   allocate(this%ClumpFactorInit_pft(JP1));this%ClumpFactorInit_pft=spval
   allocate(this%ClumpFactorNow_pft(JP1));this%ClumpFactorNow_pft=spval
   allocate(this%HypocotHeight_pft(JP1));this%HypocotHeight_pft=spval
@@ -2142,8 +2150,10 @@ implicit none
   allocate(this%RootAge_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootAge_rpvr=spval
   allocate(this%Root2ndLen_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndLen_rpvr=spval
   allocate(this%CRootLumenArea_pvr(JZ1,JP1)); this%CRootLumenArea_pvr=0._r8
+  allocate(this%MRootLumenArea_pvr(JZ1,JP1)); this%MRootLumenArea_pvr=0._r8
   allocate(this%CRootLumenArea_rpvr(JZ1,MaxNumRootAxes,JP1)); this%CRootLumenArea_rpvr=0._r8
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
+  allocate(this%RootMediumXNum_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootMediumXNum_rpvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
   allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval
@@ -2154,6 +2164,8 @@ implicit none
   allocate(this%Root2ndSinkWeight_pvr(JZ1,jroots,JP1));this%Root2ndSinkWeight_pvr=0._r8
   allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
   allocate(this%Root1stTipSinkWeight_pft(JP1)); this%Root1stTipSinkWeight_pft=0._r8
+  allocate(this%RootMediumRadius_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumRadius_rpvr=0._r8
+  allocate(this%RootMediumLength_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumLength_rpvr=0._r8
   allocate(this%NumAxesPerStructRootAxis_pft(JP1)); this%NumAxesPerStructRootAxis_pft=0._r8
   allocate(this%NumAxesPerStructRootAxPO_pft(JP1)); this%NumAxesPerStructRootAxPO_pft=0._r8 
   allocate(this%NumPrimeRootAxesPerPlant_pft(JP1)); this%NumPrimeRootAxesPerPlant_pft=0._r8
