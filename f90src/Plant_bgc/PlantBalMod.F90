@@ -708,7 +708,7 @@ implicit none
   else
     err_rel=1.e-10_r8
   endif
-  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3 .or. NY==1 .and. NX==1 .and. I==181)then      
     write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
     write(888,*)'NY, NX=',NY,NX,header
     write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)

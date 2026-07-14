@@ -521,7 +521,7 @@ module PlantDisturbsMod
     HarvestElmnt2Litr(NE)       = LeafElmntHarv2Litr(NE)+PetolShethElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
 
-  if(yearIJ%I>=225 .and. .false.)then
+  if(yearIJ%I>=181)then
     write(798,*)('-',NE=1,100)
     write(798,*)yearIJ%I*1000+yearIJ%J/24.,NZ,TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc),HarvestElmnt2Litr(ielmc)
     NE=ielmc
@@ -529,9 +529,10 @@ module PlantDisturbsMod
     write(798,*)'st',plt_biom%ShootNonstElms_pft(NE,NZ),plt_biom%ShootLeafElms_pft(NE,NZ),plt_biom%ShootFineNonLeafElms_pft(NE,NZ),&
       plt_biom%ShootWoodyElms_pft(NE,NZ),plt_biom%StandDeadStrutElms_pft(NE,NZ)
     write(798,*)plt_biom%CanopyNonstElms_pft(NE,NZ),plt_biom%ShootNoduleElms_pft(NE,NZ)
+    write(798,*)'totrm, litr=',TotalElmntRemoval(ielmc),TotalElmnt2Litr(ielmc)
   endif
 
-  IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed .and. iHarvstType_pft(NZ).NE.iharvtyp_fire)THEN
+  IF(jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)THEN
    !not do harvest and reseed
     DO NE=1,NumPlantChemElms  
       PlantElmDistLoss_pft(NE,NZ) = PlantElmDistLoss_pft(NE,NZ)+TotalElmntRemoval(NE)-TotalElmnt2Litr(NE)
