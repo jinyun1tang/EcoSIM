@@ -496,8 +496,8 @@ module grosubsMod
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
       NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)/NumStructuralRootAxes_pft(NZ)
     elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
-      !for woody vascular, **(1/1.4)
-      NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,(RootBiomCPerPlant_pft(NZ)/NumStructuralRootAxes_pft(NZ))**0.7143_r8)
+      !for woody vascular, structural root axes is counted by one
+      NumAxesPerStructRootAxis_pft(NZ) = 1._r8
     else
       !for herbaceous plant, **(1./0.95) 
       NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)/NumStructuralRootAxes_pft(NZ)
