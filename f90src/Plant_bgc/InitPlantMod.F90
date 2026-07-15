@@ -193,7 +193,8 @@ module InitPlantMod
   character(len=*), parameter :: subname='PlantLitterFraction'
   integer :: N,M
   real(r8) :: CNOPC(4),CPOPC(4)
-  REAL(R8) :: CNOPCT,CPOPCT
+  REAL(R8) :: CNOPCT,CPOPCT,litter_sum
+  character(len=256) :: msg
 
   associate(                                                             &
     MatureGroup_pft             => plt_pheno%MatureGroup_pft            ,& !input  :acclimated plant maturity group, [-]
@@ -373,6 +374,18 @@ module InitPlantMod
   PlantElmAllocMat4Litr(ielmc,icwood,icarbhyro,NZ) = 0.045_r8
   PlantElmAllocMat4Litr(ielmc,icwood,icellulos,NZ) = 0.660_r8
   PlantElmAllocMat4Litr(ielmc,icwood,ilignin,NZ)   = 0.295_r8
+  !
+  !     Validate that carbon litter fractions across kinetic components sum to one.
+  !
+  D95: DO N=0,NumLitterGroups
+    litter_sum = SUM(PlantElmAllocMat4Litr(ielmc,N,1:jsken,NZ))
+    IF(.not.isclose(litter_sum,1.0_r8))THEN
+      write(msg,'(A,I0,A,I0,A,ES16.8)') &
+        'Error: PlantElmAllocMat4Litr C fractions for PFT ',NZ, &
+        ', litter group ',N,' sum to ',litter_sum
+      call endrun(trim(msg)//' in '//trim(mod_filename),__LINE__)
+    ENDIF
+  ENDDO D95
   !
   !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
   !

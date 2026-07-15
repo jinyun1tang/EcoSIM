@@ -2,6 +2,7 @@ module StartqMod
   use data_kind_mod,    only : r8 => DAT_KIND_R8
   use minimathmod,      only : AZMAX1, isclose
   use DebugToolMod,     only : PrintInfo
+  use abortutils,       only : endrun
   use UnitMod,          only : units
   use EcoSiMParDataMod, only : pltpar
   use PlantBGCPars,     only : BlkDActCoarseRoots,BlkDLigCoarseRoots
@@ -190,7 +191,8 @@ module StartqMod
   integer, intent(in) :: NZ,NY,NX
   integer :: N,M
   real(r8) :: CNOPC(jskenc),CPOPC(jskenc)
-  REAL(R8) :: CNOPCT,CPOPCT
+  REAL(R8) :: CNOPCT,CPOPCT,litter_sum
+  character(len=256) :: msg
 
   associate(                                   &
     iprotein        => pltpar%iprotein,        &
@@ -358,6 +360,18 @@ module StartqMod
   PlantElmAllocMat4Litr(ielmc,icwood,icarbhyro,NZ,NY,NX) = 0.045_r8
   PlantElmAllocMat4Litr(ielmc,icwood,icellulos,NZ,NY,NX) = 0.660_r8
   PlantElmAllocMat4Litr(ielmc,icwood,ilignin,NZ,NY,NX)   = 0.295_r8
+!
+!     Validate that carbon litter fractions across kinetic components sum to one.
+!
+  D95: DO N=0,NumLitterGroups
+    litter_sum = SUM(PlantElmAllocMat4Litr(ielmc,N,1:jskenc,NZ,NY,NX))
+    IF(.not.isclose(litter_sum,1.0_r8))THEN
+      write(msg,'(A,I0,A,I0,A,I0,A,I0,A,ES16.8)') &
+        'Error: PlantElmAllocMat4Litr C fractions for PFT ',NZ, &
+        ', NY ',NY,', NX ',NX,', litter group ',N,' sum to ',litter_sum
+      call endrun(trim(msg)//' in '//trim(mod_filename),__LINE__)
+    ENDIF
+  ENDDO D95
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
