@@ -88,25 +88,12 @@ module PlantDisturbsMod
   !prepare for disturbance
   CALL SumPlantBiomStates(yearIJ,NZ,subname)
 
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE)      
 
   call RemoveBiomByHarvest(yearIJ,NZ)
   !
   !     REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
   !
   call RemoveBiomByTillage(yearIJ,NZ)
-
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE1)        
-
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,tvegE1(ielmc)-tvegE(ielmc),tvegE1(ielmc),tvegE(ielmc),&
-    'af rm by tillage'//subname,'TVEGEEEEEEE'
-
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,CanopyNonstElmRemoval(ielmc) &
-    +LeafElmntRemoval(ielmc)+PetoleShethElmntRemoval(ielmc)+WoodyElmntRemoval(ielmc) &
-    +StandeadElmntRemoval(ielmc),'abglost',&
-    plt_distb%PlantElmDistLoss_pft(ielmc,NZ),plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'af rm by tillage'//subname            
-
   !
   call PrintInfo('end '//subname)
   end subroutine RemoveBiomByMgmt
@@ -307,7 +294,6 @@ module PlantDisturbsMod
     ZERO4LeafVar_pft        => plt_biom%ZERO4LeafVar_pft          & !output :threshold zero for leaf calculation, [-]
   )
   call PrintInfo('beg '//subname)
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE,canopyE,RootE)      
 
   call StageDisturbances(yearIJ,NZ)
 
@@ -318,41 +304,12 @@ module PlantDisturbsMod
   !  
   call RemoveBiomByMgmt(yearIJ,NZ)  
 
-
   IF(iHarvstType_pft(NZ).GE.iharvtyp_none)THEN
     !
     CALL RemoveStandingDead(yearIJ,NZ)
-
-call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)      
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)then
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'totoa',tvegE1(ielmc)-tvegE(ielmc),tvegE1(ielmc),tvegE(ielmc),'af RemoveStandi'//subname    
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'canopy',canopyE1(ielmc)-canopyE(ielmc),canopyE(ielmc),canopyE1(ielmc),'af RemoveStandi'//subname    
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'rooot',RootE1(ielmc)-RootE(ielmc),RootE(ielmc),RootE1(ielmc),'af RemoveStandi'//subname    
-  endif  
-
-    if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,CanopyNonstElmRemoval(ielmc) &
-      +LeafElmntRemoval(ielmc)+PetoleShethElmntRemoval(ielmc)+WoodyElmntRemoval(ielmc) &
-      +StandeadElmntRemoval(ielmc)+plt_distb%PlantElmDistLoss_pft(ielmc,NZ)+plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-      plt_distb%PlantElmDistLoss_pft(ielmc,NZ),plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-      plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),StandeadElmntRemoval(ielmc),'af rmdead'//subname                
   
     !
     call PlantDisturbance(yearIJ,NZ)
-
-call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)      
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)then
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'totoa',tvegE1(ielmc)-tvegE(ielmc),tvegE1(ielmc),tvegE(ielmc),'af PlantDisturban'//subname    
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'canopy',canopyE1(ielmc)-canopyE(ielmc),canopyE(ielmc),canopyE1(ielmc),'af PlantDisturbani'//subname    
-    write(374,*)yearIJ%I*1000+yearIJ%J/24.,'rooot',RootE1(ielmc)-RootE(ielmc),RootE(ielmc),RootE1(ielmc),'af PlantDisturbani'//subname    
-  endif  
-
-    if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,CanopyNonstElmRemoval(ielmc) &
-      +LeafElmntRemoval(ielmc)+PetoleShethElmntRemoval(ielmc)+WoodyElmntRemoval(ielmc) &
-      +StandeadElmntRemoval(ielmc)+plt_distb%PlantElmDistLoss_pft(ielmc,NZ)+plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-      plt_distb%PlantElmDistLoss_pft(ielmc,NZ),plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-      plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),StandeadElmntRemoval(ielmc),'af disturb'//subname                
-  
-!    if(plt_site%NX.eq.1 .AND. NZ.EQ.2)call CheckPlantBalanceZ(yearIJ,NZ,subname//' aft rmdead')         
 
     ZERO4Groth_pft(NZ)   = ZERO*PlantPopuLive_pft(NZ)
     ZERO4Uptk_pft(NZ)    = ZERO*PlantPopuLive_pft(NZ)/AREA3(NU)
@@ -390,41 +347,19 @@ call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)
   StandeadElmntOffEcosystem(1:NumPlantChemElms)  = 0._r8
   CanopyNonstElm2Litr(1:NumPlantChemElms)        = 0._r8
 
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE)      
+
 
   call ApplyDisturbanceBiomRemoval(yearIJ,NZ,CanopyNonstElm2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
 
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE1)    
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,tvegE1-tvegE,'af ApplyDisturbanceBiomRemoval'//subname
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,CanopyNonstElmRemoval(ielmc) &
-    +LeafElmntRemoval(ielmc)+PetoleShethElmntRemoval(ielmc)+WoodyElmntRemoval(ielmc) &
-    +StandeadElmntRemoval(ielmc)+plt_distb%PlantElmDistLoss_pft(ielmc,NZ)+plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-    StandeadElmntRemoval(ielmc),plt_distb%PlantElmDistLoss_pft(ielmc,NZ),plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'af ApplyDisturbanceBiomRemoval'//subname                
-
   !     TOTAL C,N,P REMOVAL FROM DISTURBANCE
   call AbvgBiomRemovalByDisturb(yearIJ,NZ,CanopyNonstElm2Litr,HarvestAbgElmnt2Litr,TotalAbgElmnt2Litr)
   !
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE1)    
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,tvegE1-tvegE,'af AbvgBiomRemovalByDistu'//subname
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,CanopyNonstElmRemoval(ielmc) &
-    +LeafElmntRemoval(ielmc)+PetoleShethElmntRemoval(ielmc)+WoodyElmntRemoval(ielmc) &
-    +StandeadElmntRemoval(ielmc)+plt_distb%PlantElmDistLoss_pft(ielmc,NZ)+plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-    StandeadElmntRemoval(ielmc),plt_distb%PlantElmDistLoss_pft(ielmc,NZ),plt_bgcr%LitrfallElms_pft(ielmc,NZ),&
-    plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'af AbvgBiomRemovalByDistu'//subname                
-
   !     ABOVE-GROUND LitrFall FROM HARVESTING
   !
   call LiterfallByDisturbance(yearIJ,NZ,HarvestAbgElmnt2Litr,TotalAbgElmnt2Litr,CanopyNonstElm2Litr,&
     NonstructElmntOffEcosystem,LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,&
     WoodyElmntOffEcosystem,StandeadElmntOffEcosystem)
-
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE1)    
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,tvegE1-tvegE,'af LiterfallByDisturbance'//subname
-  if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,plt_bgcr%LitrfallAbvgElms_pft(ielmc,NZ),&
-    plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),'af LiterfallByDisturbance'//subname      
-
 
   call PrintInfo('end '//subname)
   end subroutine PlantDisturbance
@@ -518,7 +453,6 @@ call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)
       !
     ELSE
       !
-      if(plt_site%NX.eq.1 .AND. NZ.EQ.2)write(374,*)yearIJ%I*1000+yearIJ%J/24.,TotalAbgElmnt2Litr(ielmc)
       call AbvGrndLiterFallByFire(yearIJ,NZ,CanopyNonstElm2Litr,StandeadElmntOffEcosystem, &
         FineNonleafElmOffEcosystem,LeafElmnt2Litr,LeafElmntOffEcosystem,NonstructElmntOffEcosystem,&
         WoodyElmntOffEcosystem,WoodyElmnt2Litr,StandeadElmnt2Litr,PetolShethElmntHarv2Litr,&
@@ -594,7 +528,7 @@ call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)
     HarvestAbgElmnt2Litr(NE) = LeafElmntHarv2Litr(NE)+PetolShethElmntHarv2Litr(NE)+WoodyElmntHarv2Litr(NE)+StandeadElmntHarv2Litr(NE)
   ENDDO
 
-  if(yearIJ%I>=181 .and. plt_site%NX.eq.1 .AND. NZ.EQ.2)then
+  if(yearIJ%I>=181 .and. .false.)then
     write(374,*)('-',NE=1,100)
     write(374,*)yearIJ%I*1000+yearIJ%J/24.,NZ,TotalAbgElmntRemoval(ielmc),TotalAbgElmnt2Litr(ielmc),HarvestAbgElmnt2Litr(ielmc),'ttl litr hav',PlantElmDistLoss_pft(ielmc,NZ),&
       TotalAbgElmntRemoval(ielmc)-TotalAbgElmnt2Litr(ielmc),TotalAbgElmntRemoval(ielmc)-TotalAbgElmnt2Litr(ielmc)+PlantElmDistLoss_pft(ielmc,NZ)
@@ -843,7 +777,6 @@ call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
   !
   call PrintInfo('beg '//subname)
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE)      
 
   IF((iHarvstType_pft(NZ).GE.iharvtyp_none .AND. yearIJ%J.EQ.INT(SolarNoonHour_col)              &     !time to do harvest
     .AND. iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &     !neither grazing nor herbivory
@@ -1999,8 +1932,6 @@ call SumPlantBiome(yearIJ,NZ,subname,tvegE1,canopyE1,RootE1)
   I=yearIJ%I;J=yearIJ%J
   call PrintInfo('beg '//subname)
   
-  call SumPlantBiome(yearIJ,NZ,subname,tvegE)     
-
   D9835: DO NB=1,NumOfBranches_pft(NZ)
 
     CALL CutBranchLeaves(yearIJ,NB,NZ,LeafCafCut_brch,LeafCB4Cut_brch,FracIntnodeNotHvsted,FracNodeNotHvsted)
