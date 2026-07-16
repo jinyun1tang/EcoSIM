@@ -68,9 +68,9 @@ module grosubsMod
     NP                           => plt_site%NP                           ,& !input  :current number of plant species,[-]
     NP0                          => plt_site%NP0                          ,& !input  :intitial number of plant species,[-]
     ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]    
-    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft          ,& !input  :plant population, [d-2]    
+    PlantPopuLive_pft            => plt_site%PlantPopuLive_pft            ,& !input  :plant population, [d-2]    
     StalkHeight_pft              => plt_morph%StalkHeight_pft             ,& !inoput :stalk height/length, [m]
-    CanopyHeightLive_pft             => plt_morph%CanopyHeightLive_pft             & !inoput :canopy height, [m]
+    CanopyHeightLive_pft         => plt_morph%CanopyHeightLive_pft         & !inoput :canopy height, [m]
   )
   call PrintInfo('beg '//subname)
   !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -87,16 +87,14 @@ module grosubsMod
   !
   !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
   !
-
   D9985: DO NZ=1,NP
     !    
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
       !      
-!      if(yearIJ%I>=235 .and. NZ==2)call CheckPlantBalanceZ(yearIJ,NZ,'aft growone')      
       call RemoveBiomassByDisturbance(yearIJ,NZ)
-      
+
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
       
@@ -306,17 +304,15 @@ module grosubsMod
       !
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
-    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bfRootBGC'
+    
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
-    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'afRootBGC'
-
+    
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
-    !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'afxfer'    
+    
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
   ENDIF
-  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'af'//subname   
-!  if(yearIJ%I>=118.and.yearIJ%J==12 .AND. NZ==1)call CheckPlantBalanceZ(yearIJ,NZ,'exit'//subname)
+
   !
   call PrintInfo('end '//subname)  
   end associate
@@ -430,7 +426,7 @@ module grosubsMod
     FracRootElmAllocm(ielmc,k_fine_comp)          = 1.0_r8
   ELSE
     !tree
-    FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)         = 1.0_r8
+    FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp) = 1.0_r8
     FracWoodStalkElmAlloc2Litr(ielmc,k_fine_comp) = AMIN1(SQRT(CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ)),1._r8)
     FracRootElmAllocm(ielmc,k_fine_comp)          = AMIN1((CanopySapwoodC_pft(NZ)/StalkStrutElms_pft(ielmc,NZ))**(1._r8/6),1._R8)
   ENDIF
