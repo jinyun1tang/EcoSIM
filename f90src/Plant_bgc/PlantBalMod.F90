@@ -29,13 +29,17 @@ implicit none
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
-  subroutine SumPlantBiome(yearIJ,NZ,header,vegE)
+  subroutine SumPlantBiome(yearIJ,NZ,header,tvegE,canopyE,RootE)
 
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   character(len=*), intent(in) :: header
-  real(r8),optional, intent(out) :: vegE(NumPlantChemElms)
+  real(r8),optional, intent(out) :: tvegE(NumPlantChemElms)
+  real(r8),optional, intent(out) :: canopyE(NumPlantChemElms)
+  real(r8),optional, intent(out) :: RootE(NumPlantChemElms)
+
+  real(r8) :: tvegE1(NumPlantChemElms),canopyE1(NumPlantChemElms),RootE1(NumPlantChemElms)
   integer :: L,K,N,NE,NB,M
   real(r8) :: root1st,root2nd
 
@@ -58,11 +62,12 @@ implicit none
     LitrfallBlgrElms_pft     => plt_bgcr%LitrfallBlgrElms_pft       ,& !output :belowground plant element LitrFall, [g d-2 h-1]
     GrossResp_pft            => plt_bgcr%GrossResp_pft               & !output :total plant respiration, [gC d-2 ]
   )
-  if(present(vegE))then
-    call SumPlantBiomStates(yearIJ,NZ,header,vegE)
-  else
-    call SumPlantBiomStates(yearIJ,NZ,header)
-  endif  
+
+  call SumPlantBiomStates(yearIJ,NZ,header,tvegE=tvegE1,canopyE=canopyE1,RootE=RootE1)
+
+  if(present(tvegE))tvegE=tvegE1
+  if(present(canopyE))canopyE=canopyE1
+  if(present(RootE))RootE=RootE1
 
   call SumRootAR(NZ)
   
@@ -306,26 +311,29 @@ implicit none
   END associate
   end subroutine SumCanopyBiome
 !----------------------------------------------------------------------------------------------------
-  subroutine SumPlantBiomStates(yearIJ,NZ,header,tvegE)
+  subroutine SumPlantBiomStates(yearIJ,NZ,header,tvegE,canopyE,RootE)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   character(len=*),intent(in) :: header
   real(r8), optional, intent(out) :: tvegE(NumPlantChemElms)
-  real(r8) :: canopyE(NumPlantChemElms)
-  real(r8) :: RootE(NumPlantChemElms)
+  real(r8), optional, intent(out) :: canopyE(NumPlantChemElms)
+  real(r8), optional, intent(out) :: RootE(NumPlantChemElms)
+
+  real(r8) :: tvegE1(NumPlantChemElms)
+  real(r8) :: canopyE1(NumPlantChemElms)
+  real(r8) :: RootE1(NumPlantChemElms)
+
 !     begin_execution
   
-  if(present(tvegE))then
-    call SumCanopyBiome(yearIJ,NZ,canopyE)
 
-     call SumRootBiome(yearIJ,NZ,RootE)
-     tvegE=canopyE+RootE+plt_biom%SeasonalNonstElms_pft(:,NZ)
-  else
-    call SumCanopyBiome(yearIJ,NZ)
+  call SumCanopyBiome(yearIJ,NZ,canopyE1)
 
-    call SumRootBiome(yearIJ,NZ)
-  endif  
+  call SumRootBiome(yearIJ,NZ,RootE1)
+
+  if(present(tvegE))tvegE=canopyE1+RootE1+plt_biom%SeasonalNonstElms_pft(:,NZ)
+  if(present(canopyE))canopyE=canopyE1
+  if(present(rootE))RootE=RootE1
 
   END subroutine SumPlantBiomStates
 
@@ -552,7 +560,7 @@ implicit none
     
     RootElms_pft(NE,NZ) = massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     if(RootElms_pft(NE,NZ)<0._r8)then
-    write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumPrimeRootAxes_pft(NZ)
+      write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumPrimeRootAxes_pft(NZ)
     endif
     !add reserve to struct
     RootNoduleElms_pft(NE,NZ)=0._r8
@@ -694,7 +702,7 @@ implicit none
 
     balE(NE)=TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ) &
       -NodulInfectElms_pft(NE,NZ)-Soil2RootMycoExudE_pft(NE,NZ) &
-      +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)+FireLossE_pft(NE,NZ)    
+      +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)
   ENDDO
 
   dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
@@ -708,7 +716,7 @@ implicit none
   else
     err_rel=1.e-10_r8
   endif
-  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
+  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3 .or. NY==1 .and. NX==1 .and. I==181)then      
     write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
     write(888,*)'NY, NX=',NY,NX,header
     write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
