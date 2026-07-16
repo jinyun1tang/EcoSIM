@@ -87,7 +87,6 @@ module grosubsMod
   !
   !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
   !
-  if(plt_site%NX.eq.1)write(374,*)'----------------------------'
   D9985: DO NZ=1,NP
     !    
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
