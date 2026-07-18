@@ -1252,7 +1252,7 @@ implicit none
   id=addone(id)  
   call writefixl(nu_plt,id,'RSRR','Radial resistcance per m2 root surface area for water uptake [MPa h m-1]',RootRadialResist_pft(1,NZ,NY,NX),105)
   id=addone(id)
-  call writefixl(nu_plt,id,'ARSRA','Axial resistance correcting factor from lumen to actual vessel [-]',AlphaVesselAxialResist_pft(NZ,NY,NX),105)
+  call writefixl(nu_plt,id,'ARSRA','Axial hydraulic resistance correcting factor from lumen to actual vessel [-]',AlphaVesselAxialResist_pft(NZ,NY,NX),105)
   id=addone(id)
   call writefixl(nu_plt,id,'RVSR','Root vessel mean radius [m]',RootVesselRadius_pft(NZ,NY,NX),105)
   id=addone(id)

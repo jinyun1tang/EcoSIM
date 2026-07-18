@@ -429,44 +429,23 @@ module PlantNonstElmDynMod
     ENDDO D5450    
   ENDDO D5445
   
-  !add root tip, when the root tip layer has no coarse roots
-  if(lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
-    ROOTACTBIOMS_vr(:) = 0._R8    
-    DO  NR=1,NumPrimeRootAxes_pft(NZ) 
-      found_coarse=.false.
-      DO L=MaxSoilLays4Root_pft(NZ),NU,-1
-        !primary roots are not coarse
-        if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
-          ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)        
-          L1=NRoot1stTipLay_raxes(NR,NZ)  
-          ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L1,NR,NZ)  
-        else
-          found_coarse=.true.
-          if(L.LT.NGTopRootLayer_pft(NZ))then
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)
-            !coarse root enhancement to seeding layer
-            L1=NGTopRootLayer_pft(NZ)
-            ROOTACTBIOMS_vr(L1) = ROOTACTBIOMS_vr(L1)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)*(1._r8/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))-1._r8)
-          else
-            !coarse roots enhancement
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,ipltroot,L,NR,NZ)/(1._r8-fctyok_scalar_rpvr(L,NR,NZ))
-          endif
-          DO N=2,Myco_pft(NZ)
-            ROOTACTBIOMS_vr(L) = ROOTACTBIOMS_vr(L)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
-          ENDDO
-       endif   
-      ENDDO
-    ENDDO    
-  else
-    DO  NR=1,NumPrimeRootAxes_pft(NZ)
-      L1=NRoot1stTipLay_raxes(NR,NZ)        
-      !because growth only occurs at the root tip for non-woody vascular plants or when coarse roots are not modeled
-      DO L=NU,MaxSoilLays4Root_pft(NZ)
-        RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)=RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)          
-      ENDDO    
+  ROOTACTBIOMS_vr(:) = RootMycoActiveBiomC_pvr(ipltroot,:,NZ)
+  DO  NR=1,NumPrimeRootAxes_pft(NZ)
+    found_coarse=.false.
+    DO L=MaxSoilLays4Root_pft(NZ),NU,-1
+      !primary roots are not coarse
+      if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
+        L1=NRoot1stTipLay_raxes(NR,NZ)  
+        RootMycoActiveBiomC_pvr(ipltroot,L1,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+        ROOTACTBIOMS_vr(L1)                     = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+      else
+        !coarse roots enhancement
+        found_coarse=.true.          
+        RootMycoActiveBiomC_pvr(ipltroot,L,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+        ROOTACTBIOMS_vr(L)                     = ROOTACTBIOMS_vr(L)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+      endif        
     ENDDO
-    ROOTACTBIOMS_vr(:) = RootMycoActiveBiomC_pvr(ipltroot,:,NZ)
-  endif
+  ENDDO    
 
   DO L=NU,MaxSoilLays4Root_pft(NZ)
     DO NR=1,NumPrimeRootAxes_pft(NZ)

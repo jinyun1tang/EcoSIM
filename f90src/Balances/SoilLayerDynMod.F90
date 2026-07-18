@@ -1548,10 +1548,8 @@ implicit none
         ENDDO
       ENDDO
     ENDDO
-!
-!     ROOTS (why return?) 05/21/2022, jyt
-!
-    return
+   RETURN
+   !some new formula should be devised for radius
     DO NZ=1,NP_col(NY,NX)
       IF(RootMycoActiveBiomC_pvr(ipltroot,L0,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX) &
         .AND.RootMycoActiveBiomC_pvr(ipltroot,L1,NZ,NY,NX).GT.ZERO4Groth_pft(NZ,NY,NX))THEN
@@ -1560,10 +1558,11 @@ implicit none
         ELSE
           FRO=AMIN1(0.5,FO*CumSoilThickMidL_vr(L0,NY,NX)/CumSoilThickMidL_vr(L1,NY,NX))
         ENDIF
+        FRO=AMIN1(FRO,1._R8)
 
         DO  NR=1,NumPrimeRootAxes_pft(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
-            FXWTRT1E                                       = FRO*RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)
+            FXWTRT1E                                     = FRO*RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)
             RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,L1,NR,NZ,NY,NX)+FXWTRT1E
             RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX) = RootMyco1stStrutElms_rpvr(NE,L0,NR,NZ,NY,NX)-FXWTRT1E
           ENDDO  
