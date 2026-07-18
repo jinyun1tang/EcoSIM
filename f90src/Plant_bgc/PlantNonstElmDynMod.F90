@@ -390,6 +390,7 @@ module PlantNonstElmDynMod
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
     NumPrimeRootAxes_pft          => plt_morph%NumPrimeRootAxes_pft           ,& !input  :root primary axis number,[-]
+    StalkAveRadius_pft            => plt_morph%StalkAveRadius_pft             ,& !input  :main stalk radius,[m]        
     NMaxRootBotLayer_pft          => plt_morph%NMaxRootBotLayer_pft           ,& !input  :maximum soil layer number for all root axes, [-]    
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     fRootTube_rpvr                => plt_morph%fRootTube_rpvr                 ,& !input  :fraction of root for transport,[-]
@@ -531,7 +532,9 @@ module PlantNonstElmDynMod
   ENDIF
 
   PTSHTR=AMIN1(PTSHTR,1._r8)
-  
+  if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
+    PTSHTR = PTSHTR *AMAX1(StalkAveRadius_pft(NZ)/dmax,1._r8)
+  endif
   D310: DO NB=1,NumOfBranches_pft(NZ)
     !exchange between branch NB and all root layers
     IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN

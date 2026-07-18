@@ -390,6 +390,7 @@ implicit none
   real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)   
   real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_RootAct1stC_ptc(:)
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:) 
   real(r8),pointer   :: h1D_MainBranchNodeNumber_ptc(:)
   real(r8),pointer   :: h1D_ShootNodeNumber_ptc(:)
@@ -1053,6 +1054,7 @@ implicit none
   allocate(this%h1D_TreeRingRadius_ptc(beg_ptc:end_ptc));this%h1D_TreeRingRadius_ptc(:)=spval
   allocate(this%h1D_HVST_N_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_N_FLX_ptc(:)=spval
   allocate(this%h1D_NH3can_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_NH3can_FLX_ptc(:)=spval
+  allocate(this%h1D_RootAct1stC_ptc(beg_ptc:end_ptc)) ; this%h1D_RootAct1stC_ptc(:)=spval
   allocate(this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_C_ptc(:)=spval
   allocate(this%h1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_N_ptc(:)=spval
   allocate(this%h1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)) ;this%h1D_PLANT_BALANCE_P_ptc(:)=spval
@@ -2659,6 +2661,10 @@ implicit none
   data1d_ptr => this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='Plant_BALANCE_C_pft',units='gC/m2',avgflag='A',&
     long_name='Cumulative plant C conservation error',ptr_patch=data1d_ptr)                  
+
+  data1d_ptr => this%h1D_RootAct1stC_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='Root1ActC_pft',units='gC/m2',avgflag='A',&
+    long_name='Primary root active C biomass',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STANDING_DEAD_C_pft',units='gC/m2',avgflag='A',&
@@ -4920,6 +4926,7 @@ implicit none
         this%h1D_Root1stStrutC_ptc(nptc)=0._r8
         this%h1D_Root1stStrutN_ptc(nptc)=0._r8
         this%h1D_Root2ndStrutC_ptc(nptc)=0._r8
+        this%h1D_RootAct1stC_ptc(nptc)=0._r8
         DO L=1,JZ
           this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)-RootCO2Autor_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4987,7 +4994,7 @@ implicit none
             endif
             this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
             this%h2D_RootKond2H2O_pvr(nptc,L)= safe_adb(1._r8,RootResist4H2O_pvr(ipltroot,L,NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX))*1.e7/3600._r8
-
+            this%h1D_RootAct1stC_ptc(nptc) = this%h1D_RootAct1stC_ptc(nptc)+Root1stActStruct_pvr(ielmc,L,NZ,NY,NX)
             this%h2D_RootAct1stC_pvr(nptc,L) = Root1stActStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_RootLig1stC_pvr(nptc,L) = Root1stLigStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_Root1stLenPP_pvr(nptc,L)=0._r8
@@ -5090,7 +5097,7 @@ implicit none
   this%h2D_Root1stLenPP_pvr(nptc,1:JZ)    = 0._r8
   this%h2D_Root2ndAxesNumL_pvr(nptc,1:JZ) = 0._r8
   this%h2D_RootKond2H2O_pvr(nptc,1:JZ)    = 0._r8
-
+  this%h1D_RootAct1stC_ptc(nptc) = 0._r8
   this%h2D_RootAct1stC_pvr(nptc,1:JZ)    = 0._r8
   this%h2D_RootLig1stC_pvr(nptc,1:JZ)    = 0._r8 
 

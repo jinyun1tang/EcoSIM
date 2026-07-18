@@ -119,7 +119,7 @@ module PlantBGCPars
   real(r8) :: CURV4                               !4XCURV, [-]
   real(r8) :: ZPLFD                               !1-ZPLFM, [-]
   real(r8) :: ZPGRD                               !1-ZPGRM, [-]
-
+  real(r8), parameter :: dmax = 0.015_r8              !Eco-evolutionary responses of species distributions to climate change [m]  
   type, public :: plant_bgc_par_type
   integer :: inonstruct                  !group id of plant nonstructural litter
   integer :: ifoliar                     !group id of plant foliar litter

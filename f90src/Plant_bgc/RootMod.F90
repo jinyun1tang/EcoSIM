@@ -16,7 +16,6 @@ implicit none
   private
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
-  real(r8), parameter :: dmax = 0.015_r8              !Eco-evolutionary responses of species distributions to climate change [m]  
 
   public :: RootBGCModel
   contains
