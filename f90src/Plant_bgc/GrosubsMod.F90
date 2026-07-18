@@ -4,7 +4,7 @@ module grosubsMod
 ! module for plant biological transformations
   use minimathmod,         only: safe_adb, AZMAX1,real_truncate
   use data_kind_mod,       only: r8 => DAT_KIND_R8,yearIJ_type
-  use EcoSIMCtrlMod,       only: lverb
+  use EcoSIMCtrlMod,       only: lverb,lcoarseroot
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
   use PlantNonstElmDynMod, only: PlantNonstElmTransfer
@@ -492,12 +492,17 @@ module grosubsMod
   !     WTRT,PP=root mass,PFT population
   !here it tries to enforce the Shinozaki's pipe model (1964), to some extent (Jinyun Tang)
   RootBiomCPerPlant_pft(NZ)  = AMAX1(dscal*RootBiomCPerPlant_pft(NZ),RootElms_pft(ielmc,NZ)/PlantPopuLive_pft(NZ))
+  
   IF(NumStructuralRootAxes_pft(NZ).GT.0)THEN
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
       NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)/NumStructuralRootAxes_pft(NZ)
     elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
-      !for woody vascular, structural root axes is counted by one
-      NumAxesPerStructRootAxis_pft(NZ) = 1._r8
+      if(lcoarseroot)then
+        !for woody vascular, structural root axes is counted by one
+        NumAxesPerStructRootAxis_pft(NZ) = 1._r8
+      else
+        NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)/NumStructuralRootAxes_pft(NZ)
+      endif
     else
       !for herbaceous plant, **(1./0.95) 
       NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)/NumStructuralRootAxes_pft(NZ)
