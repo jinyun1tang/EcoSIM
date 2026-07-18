@@ -1091,7 +1091,7 @@ implicit none
     IF(L.LE.NRoot1stTipLay_raxes(NR,NZ) .AND. .not.FoundRootAxesTip(N,NR))THEN
 
       !call SumRootBiome(yearIJ,NZ,mass_inital)
-      if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) .and. &
+      if(lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)) .and. &
         Root1stLenPP_rpvr(L,NR,NZ).GT.0._r8 .and. N.eq.ipltroot)then    
         call GrowMediumRootAxes(yearIJ,N,L,NR,NZ,RootSinkC_vr,RootMSink_pvr)
 
@@ -1123,7 +1123,7 @@ implicit none
       FoundPrimaryRootsLayer=N.EQ.ipltroot .and. Root1stAxesTipDepz2Surf_pft(NR,NZ).GT.CumSoilThickness_vr(L-1)
       
       IF(FoundPrimaryRootsLayer)THEN 
-        if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
+        if(lcoarseroot.and.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
           call GrowWoodyStructuralRootAxes(yearIJ,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSink_pvr,Root2ndSink_pvr,&
             Root1stSinkTip,RootSinkC_vr,fRootGrowPSISense,TFN6_vr,fdLext1st,RespElongWatSens,DMRespEff,CNRTW,CPRTW,&
             Root1stTipUpdateFlag,FoundRootAxesTip)
@@ -2109,8 +2109,7 @@ implicit none
 !----------------------------------------------------------------------------------------------------
 
   subroutine StructuralRootElongation(yearIJ,N,NR,L,Lnext,NZ,Nutstress4GrossResp,Root1stSinkTip,RootSinkC_vr,&
-    fRootGrowPSISense,TFN6_vr,fdLext1st_mech,RespElongWatSens,DMRespEff,CNRTW,CPRTW,&
-    litrflxt,RCO2flxt)
+    fRootGrowPSISense,TFN6_vr,fdLext1st_mech,RespElongWatSens,DMRespEff,CNRTW,CPRTW,litrflxt,RCO2flxt)
   !
   !Do elongation of the primary roots  
   implicit none

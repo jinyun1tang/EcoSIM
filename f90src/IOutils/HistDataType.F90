@@ -390,6 +390,7 @@ implicit none
   real(r8),pointer   :: h1D_SURF_LITRf_C_FLX_ptc(:)
   real(r8),pointer   :: h1D_AUTO_RESP_FLX_ptc(:)   
   real(r8),pointer   :: h1D_HVST_C_FLX_ptc(:)      
+  real(r8),pointer   :: h1D_RootAct1stC_ptc(:)
   real(r8),pointer   :: h1D_PLANT_BALANCE_C_ptc(:) 
   real(r8),pointer   :: h1D_MainBranchNodeNumber_ptc(:)
   real(r8),pointer   :: h1D_ShootNodeNumber_ptc(:)
@@ -1000,6 +1001,7 @@ implicit none
   allocate(this%h1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc));this%h1D_SURF_LITRf_C_FLX_ptc(:)=spval
   allocate(this%h1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))   ;this%h1D_AUTO_RESP_FLX_ptc(:)=spval
   allocate(this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc))      ;this%h1D_HVST_C_FLX_ptc(:)=spval
+  allocate(this%h1D_RootAct1stC_ptc(beg_ptc:end_ptc)) ; this%h1D_RootAct1stC_ptc(:)=spval
   allocate(this%h1D_MainBranchNodeNumber_ptc(beg_ptc:end_ptc));this%h1D_MainBranchNodeNumber_ptc(:)=spval
   allocate(this%h1D_ShootNodeNumber_ptc(beg_ptc:end_ptc)) ;this%h1D_ShootNodeNumber_ptc(:)=spval
   allocate(this%h1D_STANDING_DEAD_C_ptc(beg_ptc:end_ptc)) ;this%h1D_STANDING_DEAD_C_ptc(:)=spval
@@ -2657,6 +2659,10 @@ implicit none
   data1d_ptr => this%h1D_HVST_C_FLX_ptc(beg_ptc:end_ptc)      
   call hist_addfld1d(fname='HVST_C_FLX_pft',units='gC/m2/hr',avgflag='A',&
     long_name='Plant C harvest',ptr_patch=data1d_ptr,default='inactive')                  
+
+  data1d_ptr => this%h1D_RootAct1stC_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='Root1ActC_pft',units='gC/m2',avgflag='A',&
+    long_name='Primary root active C biomass',ptr_patch=data1d_ptr) 
 
   data1d_ptr => this%h1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='Plant_BALANCE_C_pft',units='gC/m2',avgflag='A',&
@@ -4926,6 +4932,7 @@ implicit none
         this%h1D_Root1stStrutC_ptc(nptc)=0._r8
         this%h1D_Root1stStrutN_ptc(nptc)=0._r8
         this%h1D_Root2ndStrutC_ptc(nptc)=0._r8
+        this%h1D_RootAct1stC_ptc(nptc)=0._r8
         DO L=1,JZ
           this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)-RootCO2Autor_pvr(ipltroot,L,NZ,NY,NX)
           DVOLL                                  = DLYR_3D(3,L,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -4960,7 +4967,7 @@ implicit none
             this%h2D_CO2_rootconduct_pvr(nptc,L)   = RootAtmGasConductance_rpvr(idg_CO2,ipltroot,L,NZ,NY,NX)
             this%h2D_fTRootGro_pvr(nptc,L)         = fTgrowRootP_vr(L,NZ,NY,NX)
             this%h2D_fRootGrowPSISense_pvr(nptc,L) = fRootGrowPSISense_pvr(ipltroot,L,NZ,NY,NX)
-
+            this%h1D_RootAct1stC_ptc(nptc) = this%h1D_RootAct1stC_ptc(nptc)+Root1stActStruct_pvr(ielmc,L,NZ,NY,NX)
             this%h2D_RootAbsorbAreaPP_pvr(nptc,L)  = RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)
             this%h1D_RootAbsorbAreaPP_pft(nptc)    = this%h1D_RootAbsorbAreaPP_pft(nptc)+RootSAreaPerPlant_pvr(ipltroot,L,NZ,NY,NX)
             this%h2D_ROOT_OSTRESS_pvr(nptc,L)      = RAutoRootO2Limter_rpvr(ipltroot,L,NZ,NY,NX)
@@ -5048,7 +5055,7 @@ implicit none
   implicit none
   class(histdata_type) :: this
   integer, intent(in) :: nptc
-
+  this%h1D_RootAct1stC_ptc(nptc) = 0._r8
   this%h1D_Root2ndStrutC_ptc(nptc)          = 0._r8
   this%h1D_Root1stStrutC_ptc(nptc)          = 0._r8
   this%h1D_Root1stStrutN_ptc(nptc)          = 0._r8

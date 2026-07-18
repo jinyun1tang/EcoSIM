@@ -450,7 +450,6 @@ module PlantNonstElmDynMod
     ENDDO
   ENDDO    
 
-
   DO L=NU,MaxSoilLays4Root_pft(NZ)
     DO NR=1,NumStructuralRootAxes_pft(NZ)
       PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
