@@ -257,6 +257,7 @@ implicit none
   real(r8), pointer :: MRootLumenArea_pvr(:,:)         => null() !medium roots lumen area, [m2]
   real(r8), pointer :: Root1stDepz_raxes(:,:)           => null() !root layer depth,                                                           [m]
   real(r8), pointer :: Root1stAxesTipDepz2Surf_pft(:,:)   => null() !plant primary depth relative to column surface, [m] 
+  real(r8), pointer :: Root1stLenLoc_rpvr(:,:,:)       => null() !local structrual root length in layer, [m]    
   real(r8), pointer :: ClumpFactorInit_pft(:)          => null() !initial clumping factor for self-shading in canopy layer,                   [-]
   real(r8), pointer :: ClumpFactorNow_pft(:)           => null() !clumping factor for self-shading in canopy layer at current LAI,            [-]
   real(r8), pointer :: FineRootBranchFreq_pft(:)           => null() !Fine root brancing frequency,                                                    [m-1]
@@ -2137,6 +2138,7 @@ implicit none
 
   allocate(this%Root1stDepz_raxes(MaxNumRootAxes,JP1));this%Root1stDepz_raxes=spval
   allocate(this%Root1stAxesTipDepz2Surf_pft(MaxNumRootAxes,JP1)); this%Root1stAxesTipDepz2Surf_pft=spval
+  allocate(this%Root1stLenLoc_rpvr(JZ1,MaxNumRootAxes,JP1)); this%Root1stLenLoc_rpvr=spval
   allocate(this%RootTotLenPerPlant_pvr(jroots,JZ1,JP1));this%RootTotLenPerPlant_pvr=spval
   allocate(this%RootAbsorbLenPerPlant_pvr(jroots,JZ1,JP1));this%RootAbsorbLenPerPlant_pvr=0._r8
   allocate(this%RootLenPerPlant_pvr(jroots,JZ1,JP1));this%RootLenPerPlant_pvr=0._r8
