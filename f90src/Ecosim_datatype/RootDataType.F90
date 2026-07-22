@@ -68,13 +68,16 @@ module RootDataType
   real(sp),target,allocatable ::  RootAge_rpvr(:,:,:,:,:)                        !root age, [h]
   real(sp),target,allocatable ::  CRootLumenArea_rpvr(:,:,:,:,:)                 !coarse roots lumen area for root axes, [m2]    
   real(sp),target,allocatable ::  CRootLumenArea_pvr(:,:,:,:)                    !coarse roots lumen area , [m2]    
+  real(sp),target,allocatable ::  NumMediumRootAxes_pvr(:,:,:,:)                 !Number of medium size root axes in layer, [d-2]
   real(sp),target,allocatable ::  MRootLumenArea_pvr(:,:,:,:)                    !medium roots lumen area, [m2]
   real(sp),target,allocatable ::  Root2ndLen_rpvr(:,:,:,:,:,:)                   !root layer length secondary axes, [m d-2]
   real(sp),target,allocatable ::  RootLenDensPerPlant_pvr(:,:,:,:,:)             !root length density in soil layers, [m m-3]
   real(sp),target,allocatable ::  Root1stXNumL_pvr(:,:,:,:)                    !root layer number primary axes, [d-2]
   real(sp),target,allocatable ::  Root2ndXNumL_rpvr(:,:,:,:,:)                     !root layer number axes, [d-2]
+  real(sp),target,allocatable ::  CytokininMRConc_rpvr(:,:,:,:,:)                !cytokinin concentration in medium roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  Cytokinin2ndConc_rpvr(:,:,:,:,:,:)             !cytokinin concentration in fine roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  Cytokinin1stConc_rpvr(:,:,:,:,:)               !cytokinin concentration in primary roots, [gC m-3 H2O]
+  real(sp),target,allocatable ::  RootMediumLength_pvr(:,:,:,:)                  !Medium size root length, [m]
   real(sp),target,allocatable ::  RootMediumXNum_rpvr(:,:,:,:,:)                 !number of medium root axes in soil layer, [# d-2]
   real(sp),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(sp),target,allocatable ::  RootMyco1stSinkC_rpvr(:,:,:,:,:)               !primary root C sink, [gC d-2 h-1]
@@ -229,9 +232,12 @@ contains
   allocate(Root2ndLen_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndLen_rpvr=0._sp
   allocate(RootLenDensPerPlant_pvr(jroots,JZ,JP,JY,JX));RootLenDensPerPlant_pvr=0._sp
   allocate(Root1stXNumL_pvr(JZ,JP,JY,JX));Root1stXNumL_pvr=0._sp
+  allocate(NumMediumRootAxes_pvr(JZ,JP,JY,JX)); NumMediumRootAxes_pvr=0._sp
   allocate(Root2ndXNumL_rpvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_rpvr=0._sp
+  allocate(RootMediumLength_pvr(JZ,JP,JY,JX)); RootMediumLength_pvr=0._sp
   allocate(RootMediumXNum_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootMediumXNum_rpvr=0._sp
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._sp
+  allocate(CytokininMRConc_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); CytokininMRConc_rpvr=0._sp
   allocate(Cytokinin1stConc_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); Cytokinin1stConc_rpvr=0._sp
   allocate(Cytokinin2ndConc_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Cytokinin2ndConc_rpvr=0._sp
   allocate(RootMyco2ndSinkC_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndSinkC_rpvr=0._sp
@@ -368,14 +374,16 @@ contains
   call destroy(RootLenPerPlant_pvr)
   call destroy(Root1stLenPP_rpvr)
   call destroy(RootAge_rpvr)
-  call destroy(CRootLumenArea_pvr)
   call destroy(MRootLumenArea_pvr)
+  call destroy(CRootLumenArea_pvr)
+  call destroy(NumMediumRootAxes_pvr)
   call destroy(CRootLumenArea_rpvr)
   call destroy(Root2ndLen_rpvr)
   call destroy(RootLenDensPerPlant_pvr)
   call destroy(Root1stXNumL_pvr)
   call destroy(Root2ndXNumL_rpvr)
   call destroy(Root2ndXNum_rpvr)
+  call destroy(CytokininMRConc_rpvr)
   call destroy(Cytokinin1stConc_rpvr)
   call destroy(Cytokinin2ndConc_rpvr)
   call destroy(RootMyco2ndSinkC_rpvr)
@@ -421,6 +429,7 @@ contains
   call destroy(PopuRootMycoC_pvr)
   call destroy(RootNodulStrutElms_rpvr)
   call destroy(RootMediumXNum_rpvr)
+  call destroy(RootMediumLength_pvr)
   call destroy(RootMediumRadius_rpvr)
   call destroy(RootMediumLength_rpvr)
   call destroy(RootMediumStructElms_rpvr)

@@ -1151,12 +1151,14 @@ module UptakesMod
   logical , intent(out) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 
   character(len=*), parameter :: subname='CalcPlantHydroResistance in '//trim(mod_filename)
-  real(r8) :: RootRadialResist_rvr(pltpar%jroots,JZ1)     !radial root resistance for water uptake, [MPa h m-3]    
-  real(r8) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)   !secondary root axial resistance for water uptake,[MPa h m-3]      
-  real(r8) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)   !primary root axial resistance for water uptake,[MPa h m-3]      
+  real(r8) :: RootRadialResist_rvr(pltpar%jroots,JZ1)      !radial root resistance for water uptake, [MPa h m-3]    
+  real(r8) :: Root2ndAxialResist_rvr(pltpar%jroots,JZ1)    !secondary root axial resistance for water uptake,[MPa h m-3]      
+  real(r8) :: Root1stAxialResist_rvr(pltpar%jroots,JZ1)    !primary root axial resistance for water uptake,[MPa h m-3]      
+  real(r8) :: RootMediumAxialResist_rvr(pltpar%jroots,JZ1) !medium size root axial resistance for water uptake, [MPa h m-3]
   real(r8) :: FRADW 
   real(r8) :: FRAD1   !total transport vessels in primary roots
   real(r8) :: FRAD2
+  real(r8) :: FRADM   !medium roots xylem/tracheid vessels
   real(r8) :: DTransptTube, AreaTranspt
   real(r8) :: RSSL,Root2ndSurfArea
   real(r8) :: StalkAxialResist     ![kg H2O m-5 h-1] =[m-2 h-1 H2O]
@@ -1198,6 +1200,7 @@ module UptakesMod
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
     ZEROS2                      => plt_site%ZEROS2                           ,& !input  :threshold zero for numerical stability,[-]
     CdH2ORootxSoil_pft          => plt_ew%CdH2ORootxSoil_pft                 ,& !output :total root and soil conductance for plant root water uptake, [mH2O h-1 d-2 MPa-1]
+    RootMediumLength_pvr        => plt_morph%RootMediumLength_pvr            ,& !input  :root layer mean length for medium size axes, [m d-2]              
     RootResist4H2O_pvr          => plt_ew%RootResist4H2O_pvr                 ,& !output :total root (axial+radial) resistance for water uptake,[MPa h m-3]
     RootRadialKond2H2O_pvr      => plt_ew%RootRadialKond2H2O_pvr             ,& !output :radial root conductance for water uptake, [m5 H2O h-1 MPa-1]
     RootAxialKond2H2O_pvr       => plt_ew%RootAxialKond2H2O_pvr              ,& !output :axial root conductance for water uptake, [m3 H2O h-1 MPa-1]
@@ -1273,7 +1276,8 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
-        FRAD1                         = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
+        FRAD1 = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
+        FRADM = MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
@@ -1281,6 +1285,11 @@ module UptakesMod
         endif
         StalkAxialResist            = StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
+        if(FRADM.GT.0._r8)then
+          RootMediumAxialResist_rvr(N,L)=0.5_r8*RootSingleVesselRstaxial_pft(NZ)*RootMediumLength_pvr(L,NZ)/FRADM
+        ELSE
+          RootMediumAxialResist_rvr(N,L)=0._r8
+        endif
         Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
@@ -1290,8 +1299,8 @@ module UptakesMod
         !     CdH2ORootxSoil=total soil+root conductance for all layers
         ! assuming all roots work in parallel
         RootRadialKond2H2O_pvr(N,L,NZ) = 1._r8/RootRadialResist_rvr(N,L)
-        RootAxialKond2H2O_pvr(N,L,NZ)  = DLYR3(L)**2/(Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L))     !plant size-scaled axial root conductance to H2O
-        RootResist4H2O_pvr(N,L,NZ)     = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)
+        RootAxialKond2H2O_pvr(N,L,NZ)  = DLYR3(L)**2/(Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)+RootMediumAxialResist_rvr(N,L))     !plant size-scaled axial root conductance to H2O
+        RootResist4H2O_pvr(N,L,NZ)     = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+Root2ndAxialResist_rvr(N,L)+RootMediumAxialResist_rvr(N,L)
         SoilRootResist4H2O_pvr(N,L)    = SoilResist4H2O_rvr(N,L)+RootResist4H2O_pvr(N,L,NZ)
         CdH2ORootxSoil_pft(NZ)         = CdH2ORootxSoil_pft(NZ)+1.0_r8/SoilRootResist4H2O_pvr(N,L)   !assume different root layers work in parallel
       ENDIF
