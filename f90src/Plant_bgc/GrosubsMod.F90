@@ -379,6 +379,7 @@ module grosubsMod
     CanopyLeafCLyr_pft             => plt_biom%CanopyLeafCLyr_pft                ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemSurfAreaZ_pft        => plt_morph%CanopyStemSurfAreaZ_pft          ,& !output :plant canopy layer stem surface area, [m2 d-2]
     Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr                 ,& !output :root layer number primary axes, [d-2]
+    NumMediumRootAxes_pvr          => plt_morph%NumMediumRootAxes_pvr            ,& !inoput :Number of medium size root axes in layer, [d-2]    
     StalkAveRadius_pft             => plt_morph%StalkAveRadius_pft               ,& !input  :main stalk radius,[m]        
     NumAxesPerStructRootAxis_pft   => plt_morph%NumAxesPerStructRootAxis_pft     ,& !output :primary root axes number, [d-2]
     NumAxesPerStructRootAxPO_pft   => plt_morph%NumAxesPerStructRootAxPO_pft     ,& !output :population primary root axes number on one structrual axis, [d-2]    
@@ -400,6 +401,7 @@ module grosubsMod
 
 
   D6: DO L=1,NK
+    NumMediumRootAxes_pvr(L,NZ) = 0._r8
     Root1stXNumL_pvr(L,NZ)      = 0._r8  
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
