@@ -369,6 +369,7 @@ implicit none
       fTgrowRootP_vr(L,NZ,NY,NX)                             = plt_pheno%fTgrowRootP_vr(L,NZ)
       RootN2Fix_vr(L,NY,NX)                                  = RootN2Fix_vr(L,NY,NX)+RootN2Fix_pvr(L,NZ,NY,NX)      
       DO NE=1,NumPlantChemElms
+        RootMedStruct_pvr(NE,L,NZ,NY,NX)         = plt_biom%RootMedStruct_pvr(NE,L,NZ)
         Root1stActStruct_pvr(NE,L,NZ,NY,NX)      = plt_biom%Root1stActStruct_pvr(NE,L,NZ)   
         Root1stLigStruct_pvr(NE,L,NZ,NY,NX)      = plt_biom%Root1stLigStruct_pvr(NE,L,NZ)   
 

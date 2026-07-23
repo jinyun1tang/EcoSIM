@@ -588,6 +588,7 @@ implicit none
   real(r8), pointer :: CanopyNoduleNonstCConc_pft(:)        => null()    !nodule nonstructural C,                             [gC d-2]
   real(r8), pointer :: RootMycoActiveBiomC_pvr(:,:,:)       => null()    !root layer structural C,                            [gC d-2]
   real(r8), pointer :: RootMediumStructElms_rpvr(:,:,:,:)   => null()    !root layer medium size root structrual elements,    [g d-2]
+  real(r8), pointer :: RootMedStruct_pvr(:,:,:)             => null()    !root layer element biomass for medium size roots, [g d-2]      
   real(r8), pointer :: PopuRootMycoC_pvr(:,:,:)             => null()    !root layer C,                                       [gC d-2]
   real(r8), pointer :: RootProteinC_pvr(:,:,:)              => null()    !root layer protein C,                               [gC d-2]
   real(r8), pointer :: RootProteinConc_rpvr(:,:,:)          => null()    !root layer protein C concentration,                 [g g-1]
@@ -1568,6 +1569,7 @@ implicit none
   allocate(this%CanopyNodulNonstElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%CanopyNodulNonstElms_brch=spval
   allocate(this%LeafPetoNonstElmConc_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafPetoNonstElmConc_brch=spval
   allocate(this%RootStrutElms_pft(NumPlantChemElms,JP1));this%RootStrutElms_pft=spval
+  allocate(this%RootMedStruct_pvr(NumPlantChemElms,JZ1,JP1));this%RootMedStruct_pvr=0._r8
   allocate(this%Root1stActStruct_pvr(NumPlantChemElms,JZ1,JP1)); this%Root1stActStruct_pvr=0._r8
   allocate(this%Root1stLigStruct_pvr(NumPlantChemElms,JZ1,JP1)); this%Root1stLigStruct_pvr=0._r8
   allocate(this%StandDeadStrutElmsBeg_pft(NumPlantChemElms,JP1));this%StandDeadStrutElmsBeg_pft=spval

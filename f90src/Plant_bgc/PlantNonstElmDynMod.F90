@@ -1,9 +1,8 @@
 module PlantNonstElmDynMod
-  use minimathmod,   only: safe_adb, AZMAX1, AZMIN1
+  use minimathmod,   only: safe_adb, AZMAX1, AZMIN1,isclose,AZERO
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use DebugToolMod,  only: PrintInfo,DebugPrint
   use PlantMathFuncMod, only : ExchFluxLimiter,is_plant_woody_vascular
-  USE minimathmod, only : AZERO
   use EcoSIMCtrlMod
   use ElmIDMod
   use PlantBGCPars
@@ -384,13 +383,14 @@ module PlantNonstElmDynMod
     TKS_vr                        => plt_ew%TKS_vr                            ,& !input  :mean annual soil temperature, [K]    
     ZERO                          => plt_site%ZERO                            ,& !input  :threshold zero for numerical stability, [-]    
     DLYR3                         => plt_site%DLYR3                           ,& !input  :vertical thickness of soil layer, [m]    
+    RootMediumStructElms_rpvr     => plt_biom%RootMediumStructElms_rpvr       ,& !inoput :root layer element for medium size root axes, [g d-2]    
     OrganOsmoPsi0pt_pft           => plt_ew%OrganOsmoPsi0pt_pft               ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]    
     Root1stRadius_rpvr            => plt_morph%Root1stRadius_rpvr             ,& !input  :root layer radius for each primary axes, [m]            
     k_fine_comp                   => pltpar%k_fine_comp                       ,& !input  :fine litter complex id
     flag2ndGrowth_pvr             => plt_morph%flag2ndGrowth_pvr              ,& !input  :flag for secondary growth of primary roots, [-]        
     NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes           ,& !input  :maximum soil layer number for root axes, [-]
     MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft           ,& !input  :maximum soil layer number for all root axes,[-]
-    NumStructuralRootAxes_pft          => plt_morph%NumStructuralRootAxes_pft           ,& !input  :number of structural root axes,[-]
+    NumStructuralRootAxes_pft     => plt_morph%NumStructuralRootAxes_pft      ,& !input  :number of structural root axes,[-]
     NMaxRootBotLayer_pft          => plt_morph%NMaxRootBotLayer_pft           ,& !input  :maximum soil layer number for all root axes, [-]    
     NumOfBranches_pft             => plt_morph%NumOfBranches_pft              ,& !input  :number of branches,[-]
     fRootTube_rpvr                => plt_morph%fRootTube_rpvr                 ,& !input  :fraction of root for transport,[-]
@@ -440,20 +440,23 @@ module PlantNonstElmDynMod
       if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
         L1=NRoot1stTipLay_raxes(NR,NZ)  
         RootMycoActiveBiomC_pvr(ipltroot,L1,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
-        ROOTACTBIOMS_vr(L1)                     = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)*RootSinkScalar_pvr(L,NR,NZ)
+        ROOTACTBIOMS_vr(L1)                     = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
       else
         !coarse roots enhancement
         found_coarse=.true.          
         RootMycoActiveBiomC_pvr(ipltroot,L,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
-        ROOTACTBIOMS_vr(L)                     = ROOTACTBIOMS_vr(L)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)*RootSinkScalar_pvr(L,NR,NZ)
+        ROOTACTBIOMS_vr(L)                     = ROOTACTBIOMS_vr(L)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
       endif        
+      if(lcoarseroot .and. RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8)then
+        ROOTACTBIOMS_vr(L)  = ROOTACTBIOMS_vr(L) + RootMediumStructElms_rpvr(ielmc,L,NR,NZ)
+      endif
     ENDDO
+
   ENDDO    
 
   DO L=NU,MaxSoilLays4Root_pft(NZ)
     DO NR=1,NumStructuralRootAxes_pft(NZ)
-      PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
-      !call DebugPrint('PopuRootMycoC_pvr(ipltroot,L,NZ)',PopuRootMycoC_pvr(ipltroot,L,NZ))
+      PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)      
     ENDDO
   ENDDO
 
@@ -547,6 +550,7 @@ module PlantNonstElmDynMod
       !Roots at different depths are generally "wired" to the shoot (the source) like spokes 
       !on a wheel or branches on a river. They do not typically exchange carbon directly with each other deep underground.
       NonstElmGradt1=0._R8
+      
       D415: DO L=NU,MaxSoilLays4Root_pft(NZ)
         WTLSBX       = CanopyLeafSheathC_brch(NB,NZ)*FracLeafShethElmAlloc2Litr(ielmc,k_fine_comp)*RootSinkWeight_pvr(L,NZ)*FWTC  !root-layer supported canpopy, never become zero 
         WTRTLX       = ROOTACTBIOMS_vr(L)*FracRootElmAllocm(ielmc,k_fine_comp)*BranchSinkWeight_pft(NB)*FWTS                      !canopy-linked root, can be zero 
@@ -559,24 +563,24 @@ module PlantNonstElmDynMod
           CPOOLT        = CPOOLRootS+CPOOLBranch
           NonstElmGradt1(L) = (CPOOLBranch*WTRTLR-CPOOLRootS*WTLSBB)/TwoCompMassC !>0 to roots
           XFRE          = PTSHTR*NonstElmGradt1(L)
-
+          
           call ExchFluxLimiter(CanopyNonstElms_brch(ielmc,NB,NZ),RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ),XFRE)
 
           ShootRootXferElm_pft(ielmc,NZ)              = ShootRootXferElm_pft(ielmc,NZ)+XFRE
           CanopyNonstElms_brch(ielmc,NB,NZ)           = CanopyNonstElms_brch(ielmc,NB,NZ)-XFRE
           RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ)+XFRE
           RootShootExch_pvr(ielmc,L,NZ)               = RootShootExch_pvr(ielmc,L,NZ)+XFRE
-          !
+
           !N & P tranfer based on stoichiometry ratio
           IF(CPOOLT.GT.ZERO4Groth_pft(NZ))THEN
             DO NE=2,NumPlantChemElms
               NonstElmBrchE = AZMAX1(CanopyNonstElms_brch(NE,NB,NZ)*RootSinkWeight_pvr(L,NZ))
               NonstElmRootE = AZMAX1(RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)*BranchSinkWeight_pft(NB))
               !compute potential gradient flow, the gradient is based on nonstructural N/C ratios, shoots to roots (when > 0), 
-              NonstElmGradt = (NonstElmBrchE*CPOOLRootS-NonstElmRootE*CPOOLBranch)/CPOOLT         !
+              NonstElmGradt = (NonstElmBrchE*CPOOLRootS-NonstElmRootE*CPOOLBranch)/CPOOLT         !                            
+              XFRE          = PTSHTR*NonstElmGradt !              
 
-              XFRE          = PTSHTR*NonstElmGradt !
-              if(Transpiration_pft(NZ)<0._r8 .and. PTSHTR>0._r8)then !transpiration into air
+              if(Transpiration_pft(NZ).LT.0._r8 .and. DistRootEffDepz_pvr(L,NZ).GT.0._r8)then !transpiration into air
                 !transpiration enhancement of daytime flux from root to shoots
                 XFRE  =XFRE - PTSHTR*AMIN1(SapFlowVlinear_pvr(L,NZ)/(DistRootEffDepz_pvr(L,NZ)*PTSHTR),10._r8)*NonstElmRootE*CPOOLBranch/CPOOLT !
               endif
