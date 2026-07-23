@@ -366,6 +366,7 @@ implicit none
   real(r8),pointer   :: h1D_HUSK_C_ptc(:)       
   real(r8),pointer   :: h1D_GRAIN_C_ptc(:)      
   real(r8),pointer   :: h1D_MycorrizhalBiomC_ptc(:)
+  real(r8),pointer   :: h1D_RootMeDStrutC_ptc(:)
   real(r8),pointer   :: h1D_Root1stStrutC_ptc(:)
   real(r8),pointer   :: h1D_Root1stStrutN_ptc(:)  
   real(r8),pointer   :: h1D_Root2ndStrutC_ptc(:)
@@ -662,6 +663,7 @@ implicit none
   real(r8),pointer   :: h2D_PSI_RT_pvr(:,:)     
   real(r8),pointer   :: h2D_RootH2OUptkStress_pvr(:,:)
   real(r8),pointer   :: h2D_RootH2OUptk_pvr(:,:)
+  real(r8),pointer   :: h2D_RootMedC_pvr(:,:)
   real(r8),pointer   :: h2D_RootAct1stC_pvr(:,:)
   real(r8),pointer   :: h2D_NonstC_conc_pvr(:,:)
   real(r8),pointer   :: h2D_RootLig1stC_pvr(:,:)
@@ -681,6 +683,9 @@ implicit none
   real(r8),pointer   :: h2D_Root1stSArea4GasTP_pvr(:,:)
   real(r8),pointer   :: h2D_RootProteinC_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stLenPP_pvr(:,:)
+  real(r8),pointer   :: h2D_Rootmedlength_pvr(:,:)  
+  real(r8),pointer   :: h2D_RootmedRadius_pvr(:,:)  
+  real(r8),pointer   :: h2D_RootMedAxesNumL_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stAxesNumL_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndAxesNumL_pvr(:,:)
   REAL(R8),pointer   :: h2D_RootKond2H2O_pvr(:,:)
@@ -1103,6 +1108,7 @@ implicit none
   allocate(this%h1D_ROOT_NONSTC_ptc(beg_ptc:end_ptc))     ;this%h1D_ROOT_NONSTC_ptc(:)=spval
   allocate(this%h1D_MycorrizhalBiomC_ptc(beg_ptc:end_ptc));        this%h1D_MycorrizhalBiomC_ptc(:) = spval
   allocate(this%h1D_Root1stStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root1stStrutC_ptc(:)=spval
+  allocate(this%h1D_RootMeDStrutC_ptc(beg_ptc:end_ptc)); this%h1D_RootMeDStrutC_ptc(:)=spval
   allocate(this%h1D_Root1stStrutN_ptc(beg_ptc:end_ptc)); this%h1D_Root1stStrutN_ptc(:)=spval
   allocate(this%h1D_Root2ndStrutC_ptc(beg_ptc:end_ptc)); this%h1D_Root2ndStrutC_ptc(:)=spval
 
@@ -1320,6 +1326,7 @@ implicit none
   allocate(this%h2D_RootH2OUptkStress_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootH2OUptkStress_pvr(:,:)=spval
   allocate(this%h2D_RootH2OUptk_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootH2OUptk_pvr(:,:)=spval
   allocate(this%h2D_RootAct1stC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootAct1stC_pvr(:,:)=spval
+  allocate(this%h2D_RootMedC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootMedC_pvr(:,:)=spval
   allocate(this%h2D_NonstC_conc_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_NonstC_conc_pvr(:,:)=spval
   allocate(this%h2D_RootLig1stC_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootLig1stC_pvr(:,:)=spval
   allocate(this%h2D_RootShootExchC_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootShootExchC_pvr(:,:)=spval
@@ -1355,7 +1362,10 @@ implicit none
   allocate(this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root2ndAxesNumL_pvr=spval
   allocate(this%h2D_RootKond2H2O_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootKond2H2O_pvr=spval
   allocate(this%h2D_Root1stLenPP_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_Root1stLenPP_pvr=spval
+  allocate(this%h2D_Rootmedlength_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Rootmedlength_pvr=spval
+  allocate(this%h2D_RootmedRadius_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootmedRadius_pvr=spval
   allocate(this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root1stAxesNumL_pvr=spval
+  allocate(this%h2D_RootMedAxesNumL_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_RootMedAxesNumL_pvr=spval
   allocate(this%h2D_fTRootGro_pvr(beg_ptc:end_ptc,1:JZ)) ; this%h2D_fTRootGro_pvr=spval
   allocate(this%h2D_fRootGrowPSISense_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_fRootGrowPSISense_pvr=spval
   allocate(this%h3D_PARTS_ptc(beg_ptc:end_ptc,1:NumOfPlantMorphUnits,1:MaxNumBranches));this%h3D_PARTS_ptc(:,:,:)=spval
@@ -2587,6 +2597,10 @@ implicit none
   data1d_ptr => this%h1D_Root1stStrutC_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Root1stBiomC_pft',units='gC/m2',avgflag='A',&
     long_name='Primary root structural C',ptr_patch=data1d_ptr)                  
+
+  data1d_ptr => this%h1D_RootMeDStrutC_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='RootMedBiomC_pft',units='gC/m2',avgflag='A',&
+    long_name='Medium size root structural C',ptr_patch=data1d_ptr)                  
 
   data1d_ptr => this%h1D_Root1stStrutN_ptc(beg_ptc:end_ptc)
   call hist_addfld1d(fname='Root1stBiomN_pft',units='gN/m2',avgflag='A',&
@@ -3939,6 +3953,10 @@ implicit none
   call hist_addfld2d(fname='RootAct1stC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
     long_name='Active zone C in primary roots',ptr_patch=data2d_ptr)
 
+  data2d_ptr => this%h2D_RootMedC_pvr(beg_ptc:end_ptc,1:JZ)
+  call hist_addfld2d(fname='RootMedC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
+    long_name='Medium size root biomass C',ptr_patch=data2d_ptr)
+
   data2d_ptr => this%h2D_RootLig1stC_pvr(beg_ptc:end_ptc,1:JZ)
   call hist_addfld2d(fname='RootLig1stC_pvr',units='gC m-3',type2d='levsoi',avgflag='A',&
     long_name='Lignified zone C in primary roots',ptr_patch=data2d_ptr)
@@ -4043,6 +4061,18 @@ implicit none
   data2d_ptr => this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='#',type2d='levsoi',avgflag='A',&
     long_name='Primary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_Rootmedlength_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='RootMed_length_pvr',units='m',type2d='levsoi',avgflag='A',&
+    long_name='Mean medium size root length',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootmedRadius_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='RootMed_radius_pvr',units='m',type2d='levsoi',avgflag='A',&
+    long_name='Mean medium size root radius',ptr_patch=data2d_ptr,default='inactive')       
+
+  data2d_ptr => this%h2D_RootMedAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='RootMed_AxesNumL_pvr',units='#',type2d='levsoi',avgflag='A',&
+    long_name='Medium size root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stLenPP_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root1stLenPP_pvr',units='m (plant)-1',type2d='levsoi',avgflag='A',&
@@ -4930,6 +4960,7 @@ implicit none
         this%h1D_RootAbsorbAreaPP_pft(nptc)=0._r8
         this%h1D_MycorrizhalBiomC_ptc(nptc) = 0._r8
         this%h1D_Root1stStrutC_ptc(nptc)=0._r8
+        this%h1D_RootMeDStrutC_ptc(nptc)=0._r8
         this%h1D_Root1stStrutN_ptc(nptc)=0._r8
         this%h1D_Root2ndStrutC_ptc(nptc)=0._r8
         this%h1D_RootAct1stC_ptc(nptc)=0._r8
@@ -4994,18 +5025,23 @@ implicit none
             this%h2D_Root1stSinkWeight_pvr(nptc,L)=Root1stSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)*1.e3_r8
             this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
-            if(PlantPopuLive_pft(NZ,NY,NX)>0._r8)then
+            this%h2D_Rootmedlength_pvr(nptc,L) = RootMediumLength_pvr(L,NZ,NY,NX)            
+            if(PlantPopuLive_pft(NZ,NY,NX).GT.0._r8)then
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
+              this%h2D_RootMedAxesNumL_pvr(nptc,L)=NumMediumRootAxes_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
             else
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= 0._r8
+              this%h2D_RootMedAxesNumL_pvr(nptc,L)=0._r8
             endif
             this%h2D_Root2ndAxesNumL_pvr(nptc,L)= Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX)
             this%h2D_RootKond2H2O_pvr(nptc,L)= safe_adb(1._r8,RootResist4H2O_pvr(ipltroot,L,NZ,NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX))*1.e7/3600._r8
-
+            this%h2D_RootMedC_pvr(nptc,L) = RootMedStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_RootAct1stC_pvr(nptc,L) = Root1stActStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_RootLig1stC_pvr(nptc,L) = Root1stLigStruct_pvr(ielmc,L,NZ,NY,NX)/DVOLL
             this%h2D_Root1stLenPP_pvr(nptc,L)=0._r8
+            this%h2D_RootmedRadius_pvr(nptc,L)=0._r8
             DO NR=1,NumStructuralRootAxes_pft(NZ,NY,NX)
+              this%h2D_RootmedRadius_pvr(nptc,L)=this%h2D_RootmedRadius_pvr(nptc,L)+RootMediumRadius_rpvr(L,NR,NZ,NY,NX)                        
               this%h2D_Root1stLenPP_pvr(nptc,L)=this%h2D_Root1stLenPP_pvr(nptc,L)+Root1stLenPP_rpvr(L,NR,NZ,NY,NX)
               this%h2D_CRootLumenArea_pvr(nptc,L)    = this%h2D_CRootLumenArea_pvr(nptc,L)+CRootLumenArea_rpvr(L,NR,NZ,NY,NX)
               this%h2D_MycoBiomC_pvr(nptc,L)         = this%h2D_MycoBiomC_pvr(nptc,L)+RootMyco2ndStrutElms_rpvr(ielmc,imycorr_arbu,L,NR,NZ,NY,NX)
@@ -5021,12 +5057,13 @@ implicit none
             ENDDO
             
             if(NumStructuralRootAxes_pft(NZ,NY,NX).GT.0)THEN
+              this%h2D_RootmedRadius_pvr(nptc,L)=this%h2D_RootmedRadius_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX)
               this%h2D_Root1stLenPP_pvr(nptc,L)     = this%h2D_Root1stLenPP_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX)
               this%h2D_Cytokinin1stConc_pvr(nptc,L) = AZERO(this%h2D_Cytokinin1stConc_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
               this%h2D_Cytok_scalar_pvr(nptc,L)     = AZERO(this%h2D_Cytok_scalar_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
               this%h2D_CRootLumenArea_pvr(nptc,L)   = AZERO(this%h2D_CRootLumenArea_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
             ENDIF
-
+            this%h1D_RootMeDStrutC_ptc(nptc) = this%h1D_RootMeDStrutC_ptc(nptc)+RootMedStruct_pvr(ielmc,L,NZ,NY,NX)
             this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)+this%h2D_Root1stStrutC_pvr(nptc,L)
             this%h1D_Root1stStrutN_ptc(nptc) = this%h1D_Root1stStrutN_ptc(nptc)+this%h2D_Root1stStrutN_pvr(nptc,L) 
             this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)+this%h2D_Root2ndStrutC_pvr(nptc,L)            
@@ -5041,6 +5078,7 @@ implicit none
         ENDDO        
         this%h1D_RootAR_ptc(nptc)=this%h1D_RootAR_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_MycorrizhalBiomC_ptc(nptc)=this%h1D_MycorrizhalBiomC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+        this%h1D_RootMeDStrutC_ptc(nptc) = this%h1D_RootMeDStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Root1stStrutC_ptc(nptc) = this%h1D_Root1stStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Root1stStrutN_ptc(nptc) = this%h1D_Root1stStrutN_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
         this%h1D_Root2ndStrutC_ptc(nptc) = this%h1D_Root2ndStrutC_ptc(nptc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -5056,6 +5094,7 @@ implicit none
   class(histdata_type) :: this
   integer, intent(in) :: nptc
   this%h1D_RootAct1stC_ptc(nptc) = 0._r8
+  this%h1D_RootMeDStrutC_ptc(nptc)=0._r8
   this%h1D_Root2ndStrutC_ptc(nptc)          = 0._r8
   this%h1D_Root1stStrutC_ptc(nptc)          = 0._r8
   this%h1D_Root1stStrutN_ptc(nptc)          = 0._r8
@@ -5105,6 +5144,7 @@ implicit none
   this%h2D_Root2ndAxesNumL_pvr(nptc,1:JZ) = 0._r8
   this%h2D_RootKond2H2O_pvr(nptc,1:JZ)    = 0._r8
 
+  this%h2D_RootMedC_pvr(nptc,1:JZ) = 0._r8
   this%h2D_RootAct1stC_pvr(nptc,1:JZ)    = 0._r8
   this%h2D_RootLig1stC_pvr(nptc,1:JZ)    = 0._r8 
   this%h2D_NonstC_conc_pvr(nptc,1:JZ)    = 0._r8

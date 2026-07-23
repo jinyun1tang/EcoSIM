@@ -3,7 +3,7 @@ module RootDataType
 !
 !!
 ! data types of plant characteristics
-  use data_kind_mod, only : sp => DAT_KIND_R8
+  use data_kind_mod, only : sp => DAT_KIND_r8
   use GridConsts
   use ElmIDMod
   use TracerIDMod
@@ -29,8 +29,9 @@ module RootDataType
   real(sp),target,allocatable ::  Root1stXSecArea_pft(:,:,:,:)                   !root cross-sectional area primary axes, [m2]
   real(sp),target,allocatable ::  Root2ndXSecArea_pft(:,:,:,:)                   !root  cross-sectional area  secondary axes, [m2]
   real(sp),target,allocatable ::  fTgrowRootP_vr(:,:,:,:)                        !root layer temperature growth functiom, [-]
-  real(r8),target,allocatable ::  Root1stActStruct_pvr(:,:,:,:,:)                    !active zone of primary roots, [g d-2]
-  real(r8),target,allocatable ::  Root1stLigStruct_pvr(:,:,:,:,:)                    !lignifed primary root biomass, [g d-2]      
+  real(sp),target,allocatable ::  Root1stActStruct_pvr(:,:,:,:,:)                    !active zone of primary roots, [g d-2]
+  REAL(sp),target,allocatable ::  RootMedStruct_pvr(:,:,:,:,:)                    !root layer element biomass for medium size roots, [g d-2]    
+  real(sp),target,allocatable ::  Root1stLigStruct_pvr(:,:,:,:,:)                    !lignifed primary root biomass, [g d-2]      
   real(sp),target,allocatable ::  rNCRoot_pft(:,:,:)                             !root N:C ratio, [g g-1]
   real(sp),target,allocatable ::  rPCRootr_pft(:,:,:)                             !root P:C ratio, [g g-1]
   real(sp),target,allocatable ::  RootPorosity_pft(:,:,:,:)                      !root porosity, [m3 m-3]
@@ -188,8 +189,9 @@ contains
   allocate(Root1stXSecArea_pft(jroots,JP,JY,JX)); Root1stXSecArea_pft=0._sp
   allocate(Root2ndXSecArea_pft(jroots,JP,JY,JX)); Root2ndXSecArea_pft=0._sp
   allocate(fTgrowRootP_vr(JZ,JP,JY,JX));  fTgrowRootP_vr=0._sp
-  allocate(Root1stActStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stActStruct_pvr=0._r8  
-  allocate(Root1stLigStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stLigStruct_pvr=0._r8  
+  allocate(RootMedStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX)); RootMedStruct_pvr=0._sp
+  allocate(Root1stActStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stActStruct_pvr=0._sp  
+  allocate(Root1stLigStruct_pvr(NumPlantChemElms,JZ,JP,JY,JX));Root1stLigStruct_pvr=0._sp  
   allocate(rNCRoot_pft(JP,JY,JX));     rNCRoot_pft=0._sp
   allocate(rPCRootr_pft(JP,JY,JX));     rPCRootr_pft=0._sp
   allocate(RootAtmGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ,JP,JY,JX));RootAtmGasConductance_rpvr=0._sp
@@ -241,7 +243,7 @@ contains
   allocate(Cytokinin1stConc_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); Cytokinin1stConc_rpvr=0._sp
   allocate(Cytokinin2ndConc_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Cytokinin2ndConc_rpvr=0._sp
   allocate(RootMyco2ndSinkC_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));RootMyco2ndSinkC_rpvr=0._sp
-  allocate(RootMyco1stSinkC_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootMyco1stSinkC_rpvr=0._r8
+  allocate(RootMyco1stSinkC_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootMyco1stSinkC_rpvr=0._sp
   allocate(Root2ndEffLen4uptk_rpvr(jroots,JZ,JP,JY,JX));Root2ndEffLen4uptk_rpvr=0._sp
   allocate(RootSAreaPerPlant_pvr(jroots,JZ,JP,JY,JX));RootSAreaPerPlant_pvr=0._sp
   allocate(RootArea1stPP_pvr(jroots,JZ,JP,JY,JX));RootArea1stPP_pvr=0._sp
@@ -309,6 +311,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
+  call destroy(RootMedStruct_pvr)
   call destroy(Root1stActStruct_pvr)
   call destroy(Root1stLigStruct_pvr)
   call destroy(RootRadialKond2H2O_pvr)
