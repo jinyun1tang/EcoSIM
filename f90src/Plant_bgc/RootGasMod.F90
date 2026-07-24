@@ -1,6 +1,7 @@
 module RootGasMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux,isclose
+  use EcoSIMCtrlMod, only : lcoarseroot
   use DebugToolMod
   use EcosimConst
   use EcoSIMSolverPar
@@ -92,7 +93,7 @@ module RootGasMod
   real(r8) :: trcg_rootml_beg(idg_beg:idg_NH3)
   real(r8) :: trcs_rootml_beg(idg_beg:idg_NH3)
   real(r8) :: dtrc_err(idg_beg:idg_NH3)
-  real(r8) :: X,tcopy,trcs0
+  real(r8) :: X,tcopy,trcs0,RTCRM,condC,condM
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB
   real(r8) :: oscal=1._r8        !assuming O2 is close to half saturation constant
   integer  :: idg
@@ -138,8 +139,12 @@ module RootGasMod
     RootPorosity_pft             => plt_morph%RootPorosity_pft              ,& !input  :root porosity, [m3 m-3]
     Root1stXNumL_pvr             => plt_morph%Root1stXNumL_pvr              ,& !input  :root layer number primary axes, [d-2]
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
+    RootMediumXNum_pvr           => plt_morph%RootMediumXNum_pvr            ,& !inoput :Number of medium size root axes in layer, [d-2]    
     Root1stTransptArea_pvr       => plt_morph%Root1stTransptArea_pvr        ,& !input  :transport area by 1st order root, [-] 
+    RootFineFrac2Med_pvr         => plt_morph%RootFineFrac2Med_pvr          ,& !input :fraction of fine roots that are associated with medium roots, [-]        
+    RootMedTransptArea_pvr       => plt_morph%RootMedTransptArea_pvr        ,& !input  :transport area by medisum size roots, [-]
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
+    RootMediumLength_pvr         => plt_morph%RootMediumLength_pvr          ,& !input  :within layer mean length for medium size root axes, [m d-2]              
     RootO2Uptk_pvr               => plt_rbgc%RootO2Uptk_pvr                 ,& !inoput :aqueous O2 flux from roots to root water, [g d-2 h-1]
     RAutoRootO2Limter_rpvr       => plt_rbgc%RAutoRootO2Limter_rpvr         ,& !inoput :O2 constraint to root respiration (0-1), [-]
     REcoUptkSoilO2M_vr           => plt_rbgc%REcoUptkSoilO2M_vr             ,& !inoput :total O2 sink, [g d-2 t-1]
@@ -190,7 +195,7 @@ module RootGasMod
     RTVLWB = RootVH2O_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
 
     DO idg=idg_beg,idg_NH3
-      if(idg==idg_CO2 .or. idg==idg_O2)then
+      if(idg.eq.idg_CO2 .or. idg.eq.idg_O2)then
         RGasTranspFlxPrev(idg)  = RGasTranspFlxPrev_vr(idg,L)*dts_gas*FOXYX    
       else
         RGasTranspFlxPrev(idg)  = 0._r8
@@ -227,15 +232,31 @@ module RootGasMod
       !primary roots conductance scalar[m]
       RTCR1 = AMAX1(PlantPopuLive_pft(NZ),Root1stXNumL_pvr(L,NZ))*Root1stTransptArea_pvr(N,L,NZ)/CumSoilThickMidL_vr(L)
       !
+      if(lcoarseroot .and. RootMediumLength_pvr(L,NZ).GT.0._r8 .and. RootMedTransptArea_pvr(N,L,NZ).GT.0._r8)then
+        RTCRM=AMAX1(PlantPopuLive_pft(NZ),RootMediumXNum_pvr(L,NZ))*RootMedTransptArea_pvr(N,L,NZ)/RootMediumLength_pvr(L,NZ)
+      else
+        RTCRM=0._r8
+      endif
+
       !secondary roots conductance scalar, [m]
       RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
       
       IF(RTCR2.GT.RTCR1)THEN
         !consider the relationship between primary and secondary roots as serial, so the resistance adds up
-        RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
+        if(RTCRM.GT.0._R8 .and. RootFineFrac2Med_pvr(L,NZ).GT.0._r8)THEN                    
+          condM=1._r8/(1._r8/(RTCR2*RootFineFrac2Med_pvr(L,NZ))+1._r8/RTCRM)
+          condC=RTCR2*(1._r8-RootFineFrac2Med_pvr(L,NZ))          
+          RTCRA = 1._r8/(1._r8/RTCR1+ 1./(condC+condM))        
+        ELSE
+          RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
+        ENDIF
       ELSE
         !fine root has lower conductance
-        RTCRA = RTCR1
+        if(RTCRM.GT.0._r8)then
+          RTCRA = 1._r8/(1._r8/RTCR1+1._r8/RTCRM)
+        else
+          RTCRA = RTCR1
+        endif  
       ENDIF
     ELSE
       RTCRA=0.0_r8
@@ -323,7 +344,7 @@ module RootGasMod
           tcopy=trc_solml_loc(idg_O2)
           call fixEXConsumpFlux(trc_solml_loc(idg_O2),ROXYLX)
           do idg=idg_beg,idg_end
-            if(idg==idg_O2)then
+            if(idg.eq.idg_O2)then
               trcaqu_conc_soi_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),&
                 AZMAX1(trc_solml_loc(idg_O2)/VLWatMicPMO))
             else
@@ -571,7 +592,7 @@ module RootGasMod
 
             call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
 
-            if(idg==idg_O2)then
+            if(idg.eq.idg_O2)then
               !oxygen is consumed inside roots
               call fixEXConsumpFlux(trcs_rootml_loc(idg),ROxyRoot2Uptk)   
             else
@@ -618,9 +639,9 @@ module RootGasMod
 
       dtrc_err(idg)=trcg_rootml_beg(idg)+trcs_rootml_beg(idg)-trcg_rootml_loc(idg)-trcs_rootml_loc(idg) &
         +trcg_air2root_flx_pvr(idg,N,L,NZ)
-      if(idg==idg_O2)then
+      if(idg.eq.idg_O2)then
         dtrc_err(idg)=dtrc_err(idg)-RootO2Uptk_pvr(N,L,NZ)
-      elseif(idg==idg_CO2)then
+      elseif(idg.eq.idg_CO2)then
         dtrc_err(idg)=dtrc_err(idg)+RCO2Emis2Root_rpvr(N,L,NZ)
       else
         dtrc_err(idg)=dtrc_err(idg)+RootUptkSoiSol_pvr(idg,N,L,NZ)

@@ -359,9 +359,11 @@ implicit none
     SpecificLeafArea_pft(NZ,NY,NX)             = plt_biom%SpecificLeafArea_pft(NZ)
     Root1stTipSinkWeight_pft(NZ,NY,NX)         = plt_morph%Root1stTipSinkWeight_pft(NZ)
     DO L=1,NK_col(NY,NX)
+      RootFineFrac2Med_pvr(L,NZ,NY,NX)                  = plt_morph%RootFineFrac2Med_pvr(L,NZ)
       RootMediumLength_pvr(L,NZ,NY,NX)                  = plt_morph%RootMediumLength_pvr(L,NZ)
       RootSinkWeight_pvr(L,NZ,NY,NX)                    = plt_morph%RootSinkWeight_pvr(L,NZ)
       Root1stSinkWeight_pvr(L,NZ,NY,NX)                 = plt_morph%Root1stSinkWeight_pvr(L,NZ)
+      RootMSinkWeight_pvr(L,NZ,NY,NX)                   = plt_morph%RootMSinkWeight_pvr(L,NZ)
       Root2ndSinkWeight_pvr(L,1:pltpar%jroots,NZ,NY,NX) = plt_morph%Root2ndSinkWeight_pvr(L,1:pltpar%jroots,NZ)
       RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX) = plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ)
       RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ,NY,NX) = plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ)
@@ -540,7 +542,7 @@ implicit none
         DOM_MicP_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_vr(idom_doc:idom_dop,K,L)
         DOM_MicP_drib_vr(idom_doc:idom_dop,K,L,NY,NX)=plt_soilchem%DOM_MicP_drib_vr(idom_doc:idom_dop,K,L)
       ENDDO
-      NumMediumRootAxes_pvr(L,NZ,NY,NX) = plt_morph%NumMediumRootAxes_pvr(L,NZ)
+      RootMediumXNum_pvr(L,NZ,NY,NX) = plt_morph%RootMediumXNum_pvr(L,NZ)
       Root1stXNumL_pvr(L,NZ,NY,NX)    = plt_morph%Root1stXNumL_pvr(L,NZ)
       DO NE=1,NumPlantChemElms
         RootShootExch_pvr(NE,L,NZ,NY,NX) = plt_bgcr%RootShootExch_pvr(NE,L,NZ)
@@ -641,6 +643,7 @@ implicit none
         RootH2OUptkStress_pvr(N,L,NZ,NY,NX)                        = plt_ew%RootH2OUptkStress_pvr(N,L,NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)                      = plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)
         Root1stTransptArea_pvr(N,L,NZ,NY,NX)                       = plt_morph%Root1stTransptArea_pvr(N,L,NZ)
+        RootMedTransptArea_pvr(N,L,NZ,NY,NX)                       = plt_morph%RootMedTransptArea_pvr(N,L,NZ)  
         PopuRootMycoC_pvr(N,L,NZ,NY,NX)                            = AZMAX1(plt_biom%PopuRootMycoC_pvr(N,L,NZ))
         RootResist4H2O_pvr(N,L,NZ,NY,NX)                           = plt_ew%RootResist4H2O_pvr(N,L,NZ)
         RootProteinC_pvr(N,L,NZ,NY,NX)                             = plt_biom%RootProteinC_pvr(N,L,NZ)
@@ -678,7 +681,7 @@ implicit none
         RootAge_rpvr(L,NR,NZ,NY,NX)          = plt_morph%RootAge_rpvr(L,NR,NZ)
         RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ)
         Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ)
-        CytokininMRConc_rpvr(L,NR,NZ,NY,NX) = plt_rbgc%CytokininMRConc_rpvr(L,NR,NZ) 
+        CytokininMRConc_rpvr(L,NR,NZ,NY,NX)  = plt_rbgc%CytokininMRConc_rpvr(L,NR,NZ) 
         CRootLumenArea_rpvr(L,NR,NZ,NY,NX)   = plt_morph%CRootLumenArea_rpvr(L,NR,NZ)    
         DO N=1,Myco_pft(NZ,NY,NX)
           RootMyco2ndSinkC_rpvr(N,L,NR,NZ,NY,NX)  = plt_rbgc%RootMyco2ndSinkC_rpvr(N,L,NR,NZ)           
@@ -1319,6 +1322,7 @@ implicit none
     DO L=1,NK_col(NY,NX)
       plt_rbgc%GroSrcRootStress_pvr(L,NZ)  = GroSrcRootStress_pvr(L,NZ,NY,NX)
       plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_pvr(L,NZ) = RootFineFrac2Med_pvr(L,NZ,NY,NX)  
       DO K=1,jcplx
         DO N=1,Myco_pft(NZ,NY,NX)
           DO NE=1,NumPlantChemElms
@@ -1453,7 +1457,7 @@ implicit none
     ENDDO
 
     DO L=1,NK_col(NY,NX)
-      plt_morph%NumMediumRootAxes_pvr(L,NZ)=NumMediumRootAxes_pvr(L,NZ,NY,NX)
+      plt_morph%RootMediumXNum_pvr(L,NZ)=RootMediumXNum_pvr(L,NZ,NY,NX)
       plt_morph%Root1stXNumL_pvr(L,NZ) = Root1stXNumL_pvr(L,NZ,NY,NX)    
       plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)      
       plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)  
@@ -1494,6 +1498,7 @@ implicit none
         plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)    = RAutoRootO2Limter_rpvr(N,L,NZ,NY,NX)
         plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)   = RootMycoActiveBiomC_pvr(N,L,NZ,NY,NX)
         plt_morph%Root1stTransptArea_pvr(N,L,NZ)   = Root1stTransptArea_pvr(N,L,NZ,NY,NX)
+        plt_morph%RootMedTransptArea_pvr(N,L,NZ)   = RootMedTransptArea_pvr(N,L,NZ,NY,NX)
         plt_biom%PopuRootMycoC_pvr(N,L,NZ)         = PopuRootMycoC_pvr(N,L,NZ,NY,NX)
         plt_biom%RootProteinC_pvr(N,L,NZ)          = RootProteinC_pvr(N,L,NZ,NY,NX)
 
@@ -1535,6 +1540,7 @@ implicit none
         plt_morph%RootAge_rpvr(L,NR,NZ)         = RootAge_rpvr(L,NR,NZ,NY,NX)
         plt_rbgc%RootMyco1stSinkC_rpvr(L,NR,NZ) = RootMyco1stSinkC_rpvr(L,NR,NZ,NY,NX)
         plt_rbgc%Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ,NY,NX))
+        plt_rbgc%CytokininMRConc_rpvr(L,NR,NZ)  = CytokininMRConc_rpvr(L,NR,NZ,NY,NX)   
         plt_morph%CRootLumenArea_rpvr(L,NR,NZ)   = CRootLumenArea_rpvr(L,NR,NZ,NY,NX)
         plt_morph%RootMediumXNum_rpvr(L,NR,NZ) = RootMediumXNum_rpvr(L,NR,NZ,NY,NX)
         DO N=1,Myco_pft(NZ,NY,NX)

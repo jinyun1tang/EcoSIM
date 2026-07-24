@@ -537,6 +537,7 @@ module PlantNonstElmDynMod
   ENDIF
 
   PTSHTR=AMIN1(PTSHTR,1._r8)
+  if(isclose(PTSHTR,0._r8))return
   
   D310: DO NB=1,NumOfBranches_pft(NZ)
     !exchange between branch NB and all root layers

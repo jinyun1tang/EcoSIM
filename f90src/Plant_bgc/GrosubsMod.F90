@@ -359,7 +359,7 @@ module grosubsMod
     TKC_pft                        => plt_ew%TKC_pft                             ,& !input  :canopy temperature, [K]
     TKS_vr                         => plt_ew%TKS_vr                              ,& !input  :mean annual soil temperature, [K]
     TempOffset_pft                 => plt_pheno%TempOffset_pft                   ,& !input  :adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft        ,& !input  :number of structural root axes,[-]    
+    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft        ,& !input  :number of structural root axes per plant,[-]    
     ZERO4Groth_pft                 => plt_biom%ZERO4Groth_pft                    ,& !input  :threshold zero for plang growth calculation, [-]
     iPlantRootProfile_pft          => plt_pheno%iPlantRootProfile_pft            ,& !input  :plant growth type (vascular, non-vascular),[-]
     iPlantTurnoverPattern_pft      => plt_pheno%iPlantTurnoverPattern_pft        ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
@@ -379,11 +379,11 @@ module grosubsMod
     CanopyLeafCLyr_pft             => plt_biom%CanopyLeafCLyr_pft                ,& !output :canopy layer leaf C, [g d-2]
     CanopyStemSurfAreaZ_pft        => plt_morph%CanopyStemSurfAreaZ_pft          ,& !output :plant canopy layer stem surface area, [m2 d-2]
     Root1stXNumL_pvr               => plt_morph%Root1stXNumL_pvr                 ,& !output :root layer number primary axes, [d-2]
-    NumMediumRootAxes_pvr          => plt_morph%NumMediumRootAxes_pvr            ,& !inoput :Number of medium size root axes in layer, [d-2]    
+    RootMediumXNum_pvr             => plt_morph%RootMediumXNum_pvr               ,& !inoput :Number of medium size root axes in layer, [d-2]    
     StalkAveRadius_pft             => plt_morph%StalkAveRadius_pft               ,& !input  :main stalk radius,[m]        
-    NumAxesPerStructRootAxis_pft   => plt_morph%NumAxesPerStructRootAxis_pft     ,& !output :primary root axes number, [d-2]
-    NumAxesPerStructRootAxPO_pft   => plt_morph%NumAxesPerStructRootAxPO_pft     ,& !output :population primary root axes number on one structrual axis, [d-2]    
-    NumPrimeRootAxesPerPlant_pft   => plt_morph%NumPrimeRootAxesPerPlant_pft     ,& !output :number of primary root axesr per plant, [d-2]    
+    Num1stAxesPerStructRootX_pft   => plt_morph%Num1stAxesPerStructRootX_pft     ,& !output :number of primary root axes per structural root axis, [d-2]
+    Num1stAxesPerStructRootXPOP_pft=> plt_morph%Num1stAxesPerStructRootXPOP_pft  ,& !output :population primary root axes number on one structrual axis, [d-2]    
+    Num1stRootAxesPP_pft           => plt_morph%Num1stRootAxesPP_pft             ,& !output :number of primary root axesr per plant, [d-2]    
     Root2ndXNumL_rpvr              => plt_morph%Root2ndXNumL_rpvr                ,& !output :root layer number axes, [d-2]
     RootCO2Autor_pvr               => plt_rbgc%RootCO2Autor_pvr                  ,& !output :root respiration constrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr             => plt_rbgc%RootCO2EmisPot_pvr                ,& !output :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
@@ -401,7 +401,7 @@ module grosubsMod
 
 
   D6: DO L=1,NK
-    NumMediumRootAxes_pvr(L,NZ) = 0._r8
+    RootMediumXNum_pvr(L,NZ) = 0._r8
     Root1stXNumL_pvr(L,NZ)      = 0._r8  
     D9: DO N=1,Myco_pft(NZ)    
       RootProteinC_pvr(N,L,NZ)   = 0._r8
@@ -497,24 +497,24 @@ module grosubsMod
   
   IF(NumStructuralRootAxes_pft(NZ).GT.0)THEN
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)THEN
-      NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)/NumStructuralRootAxes_pft(NZ)
+      Num1stAxesPerStructRootX_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.833_r8)/NumStructuralRootAxes_pft(NZ)
     elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
       if(lcoarseroot)then
         !for woody vascular, structural root axes is counted by one
-        NumAxesPerStructRootAxis_pft(NZ) = 1._r8
+        Num1stAxesPerStructRootX_pft(NZ) = 1._r8
       else
-        NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)/NumStructuralRootAxes_pft(NZ)
+        Num1stAxesPerStructRootX_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)/NumStructuralRootAxes_pft(NZ)
       endif
     else
       !for herbaceous plant, **(1./0.95) 
-      NumAxesPerStructRootAxis_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)/NumStructuralRootAxes_pft(NZ)
+      Num1stAxesPerStructRootX_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**1.053_r8)/NumStructuralRootAxes_pft(NZ)
     endif
   else
-    NumAxesPerStructRootAxis_pft(NZ) = 1._r8
+    Num1stAxesPerStructRootX_pft(NZ) = 1._r8
   ENDIF
-  NumAxesPerStructRootAxPO_pft(NZ) = NumAxesPerStructRootAxis_pft(NZ)*PlantPopuLive_pft(NZ)
-  NumPrimeRootAxesPerPlant_pft(NZ) = NumAxesPerStructRootAxis_pft(NZ)*PlantPopuLive_pft(NZ)*NumStructuralRootAxes_pft(NZ) 
-!  write(134,*)I*1000+J/24.,NumAxesPerStructRootAxis_pft(NZ),RootBiomCPerPlant_pft(NZ),NumStructuralRootAxes_pft(NZ),PlantPopuLive_pft(NZ) 
+  Num1stAxesPerStructRootXPOP_pft(NZ) = Num1stAxesPerStructRootX_pft(NZ)*PlantPopuLive_pft(NZ)
+  Num1stRootAxesPP_pft(NZ)            = Num1stAxesPerStructRootX_pft(NZ)*NumStructuralRootAxes_pft(NZ)
+
   !
   !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
   !     FROM CANOPY TURGOR
