@@ -123,11 +123,11 @@ implicit none
     else
       IsPlantActive_pft(NZ,NY,NX)=iFalse
     endif
-    plt_morph%StalkAxialResist_pft(NZ)      = StalkAxialResist_pft(NZ,NY,NX)
+    plt_morph%StalkAxialResist_pft(NZ)         = StalkAxialResist_pft(NZ,NY,NX)
     plt_morph%RootSingleVesselRstaxial_pft(NZ) = RootSingleVesselRstaxial_pft(NZ,NY,NX)
-    plt_morph%RootSingleVesselArea_pft(NZ)        = RootSingleVesselArea_pft(NZ,NY,NX)
-    plt_ew%ETCanopy_CumYr_pft(NZ)           = ETCanopy_CumYr_pft(NZ,NY,NX)
-    plt_ew%ENGYX_pft(NZ)                    = ENGYX_pft(NZ,NY,NX)
+    plt_morph%RootSingleVesselArea_pft(NZ)     = RootSingleVesselArea_pft(NZ,NY,NX)
+    plt_ew%ETCanopy_CumYr_pft(NZ)              = ETCanopy_CumYr_pft(NZ,NY,NX)
+    plt_ew%ENGYX_pft(NZ)                       = ENGYX_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)        = 1
     plt_morph%LeafStalkAreaAct_pft(NZ)      = LeafStalkAreaAct_pft(NZ,NY,NX)      !pft leaf+stalk area
     plt_morph%HypocotHeight_pft(NZ)         = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
@@ -158,8 +158,11 @@ implicit none
     ENDDO
 
     DO L=1,NK_col(NY,NX)
-      plt_morph%Root1stXNumL_pvr(L,NZ)  = Root1stXNumL_pvr(L,NZ,NY,NX)    
-      plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)            
+      plt_morph%Root1stXNumL_pvr(L,NZ)     = Root1stXNumL_pvr(L,NZ,NY,NX)
+      plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_pvr(L,NZ) = RootFineFrac2Med_pvr(L,NZ,NY,NX)
+      plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
+      plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)  
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)

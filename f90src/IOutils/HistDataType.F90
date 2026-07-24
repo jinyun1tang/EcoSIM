@@ -476,6 +476,7 @@ implicit none
   real(r8),pointer   :: h2D_ROOTNLim_rpvr(:,:)
   real(r8),pointer   :: h2D_ROOTPLim_rpvr(:,:)  
   real(r8),pointer   :: h2D_RootNonstC_rpvr(:,:)
+  real(r8),pointer   :: h2D_RootMSinkWeight_pvr(:,:)
   real(r8),pointer   :: h2D_RootSinkWeight_pvr(:,:)
   real(r8),pointer   :: h2D_Root2ndSinkWeight_pvr(:,:)
   real(r8),pointer   :: h2D_Root1stSinkWeight_pvr(:,:)
@@ -1339,6 +1340,7 @@ implicit none
   allocate(this%h2D_ROOTNLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTNLim_rpvr(:,:)=spval
   allocate(this%h2D_ROOTPLim_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_ROOTPLim_rpvr(:,:)=spval
   allocate(this%h2D_RootNonstC_rpvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootNonstC_rpvr(:,:)=spval
+  allocate(this%h2D_RootMSinkWeight_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootMSinkWeight_pvr(:,:)=spval
   allocate(this%h2D_RootSinkWeight_pvr(beg_ptc:end_ptc,1:JZ)); this%h2D_RootSinkWeight_pvr(:,:)=spval
   allocate(this%h2D_Root2ndSinkWeight_pvr(beg_ptc:end_ptc,1:JZ));this%h2D_Root2ndSinkWeight_pvr(:,:)=spval
   allocate(this%h2D_Root1stSinkWeight_pvr(beg_ptc:end_ptc,1:jz));this%h2D_Root1stSinkWeight_pvr(:,:)=spval
@@ -3997,6 +3999,10 @@ implicit none
   call hist_addfld2d(fname='RootSinkWeight_pvr',units='d-2',type2d='levsoi',avgflag='A',&
     long_name='Root nonstructural allocation weight profile for each pft',ptr_patch=data2d_ptr)       
 
+  data2d_ptr => this%h2D_RootMSinkWeight_pvr(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='RootMedSinkWeight_pvr',units='d-2',type2d='levsoi',avgflag='A',&
+    long_name='Medium size root nonstructural allocation weight profile for each pft',ptr_patch=data2d_ptr)       
+
   data2d_ptr => this%h2D_Root2ndSinkWeight_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root2ndSinkWeight_pvr',units='d-2',type2d='levsoi',avgflag='A',&
     long_name='Root nonstructural allocation weight for fine roots of each pft',ptr_patch=data2d_ptr,default='inactive')       
@@ -4059,7 +4065,7 @@ implicit none
     long_name='Secondary root structural biomass P density',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='#',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='Root1st_AxesNumL_pvr',units='# plant-1',type2d='levsoi',avgflag='A',&
     long_name='Primary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Rootmedlength_pvr(beg_ptc:end_ptc,1:JZ) 
@@ -4067,16 +4073,16 @@ implicit none
     long_name='Mean medium size root length',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootmedRadius_pvr(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='RootMed_radius_pvr',units='m',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='RootMed_radius_pvr',units='mm',type2d='levsoi',avgflag='A',&
     long_name='Mean medium size root radius',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootMedAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='RootMed_AxesNumL_pvr',units='#',type2d='levsoi',avgflag='A',&
+  call hist_addfld2d(fname='RootMed_AxesNumL_pvr',units='# plant-1',type2d='levsoi',avgflag='A',&
     long_name='Medium size root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stLenPP_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root1stLenPP_pvr',units='m (plant)-1',type2d='levsoi',avgflag='A',&
-    long_name='Primary root length in soil layer',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Mean primary root axes length in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root2ndAxesNumL_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='Root2nd_AxesNumL_pvr',units='1/d2',type2d='levsoi',avgflag='A',&
@@ -5021,6 +5027,7 @@ implicit none
             this%h2D_ROOTPLim_rpvr(nptc,L) = ROOTPLim_rpvr(ipltroot,L,NZ,NY,NX)
             this%h2D_RootNonstC_rpvr(nptc,L)=RootMycoNonstElms_rpvr(ielmc,ipltroot,L,NZ,NY,NX)
             this%h2D_RootSinkWeight_pvr(nptc,L)=RootSinkWeight_pvr(L,NZ,NY,NX)
+            this%h2D_RootMSinkWeight_pvr(nptc,L)=RootMSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root2ndSinkWeight_pvr(nptc,L)=Root2ndSinkWeight_pvr(L,ipltroot,NZ,NY,NX)
             this%h2D_Root1stSinkWeight_pvr(nptc,L)=Root1stSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)*1.e3_r8
@@ -5028,7 +5035,7 @@ implicit none
             this%h2D_Rootmedlength_pvr(nptc,L) = RootMediumLength_pvr(L,NZ,NY,NX)            
             if(PlantPopuLive_pft(NZ,NY,NX).GT.0._r8)then
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
-              this%h2D_RootMedAxesNumL_pvr(nptc,L)=NumMediumRootAxes_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
+              this%h2D_RootMedAxesNumL_pvr(nptc,L)=RootMediumXNum_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
             else
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= 0._r8
               this%h2D_RootMedAxesNumL_pvr(nptc,L)=0._r8
@@ -5057,7 +5064,7 @@ implicit none
             ENDDO
             
             if(NumStructuralRootAxes_pft(NZ,NY,NX).GT.0)THEN
-              this%h2D_RootmedRadius_pvr(nptc,L)=this%h2D_RootmedRadius_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX)
+              this%h2D_RootmedRadius_pvr(nptc,L)=this%h2D_RootmedRadius_pvr(nptc,L)*1.e3_r8/NumStructuralRootAxes_pft(NZ,NY,NX)
               this%h2D_Root1stLenPP_pvr(nptc,L)     = this%h2D_Root1stLenPP_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX)
               this%h2D_Cytokinin1stConc_pvr(nptc,L) = AZERO(this%h2D_Cytokinin1stConc_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
               this%h2D_Cytok_scalar_pvr(nptc,L)     = AZERO(this%h2D_Cytok_scalar_pvr(nptc,L)/NumStructuralRootAxes_pft(NZ,NY,NX))
@@ -5137,6 +5144,7 @@ implicit none
   this%h2D_ROOTPLim_rpvr(nptc,1:JZ)       = 0._r8
   this%h2D_RootNonstC_rpvr(nptc,1:JZ)     = 0._r8
   this%h2D_RootSinkWeight_pvr(nptc,1:JZ)  = 0._r8
+  this%h2D_RootMSinkWeight_pvr(nptc,1:JZ) = 0._r8
   this%h2D_Root1stRadius_rpvr(nptc,1:JZ)  = 0._r8
   this%h2D_RootNonstBConc_pvr(nptc,1:JZ)  = 0._r8
   this%h2D_Root1stAxesNumL_pvr(nptc,1:JZ) = 0._r8

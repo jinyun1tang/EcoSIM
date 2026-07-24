@@ -252,6 +252,7 @@ implicit none
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
   real(r8), pointer :: RootMediumXNum_rpvr(:,:,:)      => null() !number of medium root axes in soil layer, [# d-2]
+  real(r8), pointer :: RootFineFrac2Med_pvr(:,:)       => null() !fraction of fine roots that are associated with medium roots, [-]
   real(r8), pointer :: CRootLumenArea_rpvr(:,:,:)      => null() !coarse roots lumen area for root axes, [m2]  
   real(r8), pointer :: CRootLumenArea_pvr(:,:)         => null() !coarse roots lumen area, [m2]    
   real(r8), pointer :: MRootLumenArea_pvr(:,:)         => null() !medium roots lumen area, [m2]
@@ -332,8 +333,10 @@ implicit none
   real(r8), pointer :: RootSinkWeight_pvr(:,:)        => null() !Root nonst element sink profile, [d-2]
   real(r8), pointer :: Root2ndSinkWeight_pvr(:,:,:)   => null() !Secondary root nonst element sink profile, [d-2]
   real(r8), pointer :: Root1stSinkWeight_pvr(:,:)     => null() !primary root nonst element sink profile, [d-2]
+  real(r8), pointer :: RootMSinkWeight_pvr(:,:)       => null() !medium size roots nonst element sink profile, [d-2]
   real(r8), pointer :: Root1stTipSinkWeight_pft(:)     => null() !primary root tip nonst element sink, [d-2]
   real(r8), pointer :: Root1stTransptArea_pvr(:,:,:)        => null()    !root cross section area for water/gas transport,    [g d-2]  
+  real(r8), pointer :: RootMedTransptArea_pvr(:,:,:)  => null()  !transport area by medisum size roots, [-]
   integer,  pointer :: KLeafNumber_brch(:,:)          => null() !leaf number,                                 [-]
   real(r8), pointer :: RootSegAges_raxes(:,:,:)        => null()   !age of different active root segments, [h]
   integer , pointer :: NActiveRootSegs_raxes(:,:)       => null()   !number of active root segments, [-]
@@ -361,14 +364,14 @@ implicit none
   real(r8), pointer :: totRootLenDens_vr(:)           => null() !total root length density,            [m m-3]
   real(r8), pointer :: Root1stXNumL_pvr(:,:)          => null() !root layer number primary axes,       [d-2]
   real(r8), pointer :: fctyok_scalar_rpvr(:,:,:)      => null() !cytokinin scalar for corase root sink, [-]
-  REAL(R8), POINTER :: NumAxesPerStructRootAxis_pft(:)      => null() !primary root axes number per structural root axis, [d-2]
+  REAL(R8), POINTER :: Num1stAxesPerStructRootX_pft(:)      => null() !primary root axes number per structural root axis, [d-2]
   REAL(R8), POINTER :: NumMediumRootAxes_rpvr(:,:,:)         => null() ! Number of medium size root axes in layer for structrual axes, [d-2]
-  REAL(R8), POINTER :: NumMediumRootAxes_pvr(:,:)          => null() ! Number of medium size root axes in layer, [d-2]      
+  REAL(R8), POINTER :: RootMediumXNum_pvr(:,:)          => null() ! Number of medium size root axes in layer, [d-2]      
   real(r8), pointer :: RootMediumLength_rpvr(:,:,:)        => null()      !root layer length for medium size axes, [m d-2]  
   real(r8), pointer :: RootMediumLength_pvr(:,:)      => null() !  !root layer mean length for medium size axes, [m d-2]  
   real(r8), pointer :: RootMediumRadius_rpvr(:,:,:)    => null() !root layer radius for medium size axes, [m]
-  real(r8), pointer :: NumAxesPerStructRootAxPO_pft(:)   =>null() !population primary root axes number on one structrual axis, [d-2]      
-  real(r8), pointer :: NumPrimeRootAxesPerPlant_pft(:)   => null() !number of primary root axesr per plant, [d-2]      
+  real(r8), pointer :: Num1stAxesPerStructRootXPOP_pft(:)   =>null() !population primary root axes number on one structrual axis, [d-2]      
+  real(r8), pointer :: Num1stRootAxesPP_pft(:)   => null() !number of primary root axesr per plant, [d-2]      
   real(r8), pointer :: Radius95pctMature_pft(:)       => null() !Critical radius where the woody radius is considered 95% mature, [m]
   real(r8), pointer :: Root2ndXNumL_rpvr(:,:,:)       => null() !root layer number axes,               [d-2]
   real(r8), pointer :: Root2ndVH2O_rpvr(:,:,:,:)      => null()  !water-occupied 2nd root volume, [m3 m-3]    
@@ -2108,6 +2111,8 @@ implicit none
   subroutine plt_morph_init(this)
   implicit none
   class(plant_morph_type) :: this
+
+  allocate(this%RootMedTransptArea_pvr(jroots,JZ1,JP1)); this%RootMedTransptArea_pvr=spval
   allocate(this%Root1stTransptArea_pvr(jroots,JZ1,JP1)); this%Root1stTransptArea_pvr=spval
   allocate(this%RootSAreaPerPlant_pvr(jroots,JZ1,JP1));this%RootSAreaPerPlant_pvr=0._r8
   allocate(this%RootLenDensPerPlant_pvr(jroots,JZ1,JP1));this%RootLenDensPerPlant_pvr=spval
@@ -2169,6 +2174,7 @@ implicit none
   allocate(this%CRootLumenArea_rpvr(JZ1,MaxNumRootAxes,JP1)); this%CRootLumenArea_rpvr=0._r8
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
   allocate(this%RootMediumXNum_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootMediumXNum_rpvr=0._r8
+  allocate(this%RootFineFrac2Med_pvr(JZ1,JP1)); this%RootFineFrac2Med_pvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
   allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval
@@ -2177,16 +2183,17 @@ implicit none
   allocate(this%NGTopRootLayer_pft(JP1));this%NGTopRootLayer_pft=0;
   allocate(this%RootSinkWeight_pvr(JZ1,JP1)); this%RootSinkWeight_pvr=0._r8
   allocate(this%Root2ndSinkWeight_pvr(JZ1,jroots,JP1));this%Root2ndSinkWeight_pvr=0._r8
+  allocate(this%RootMSinkWeight_pvr(JZ1,JP1));this%RootMSinkWeight_pvr=0._r8
   allocate(this%Root1stSinkWeight_pvr(JZ1,JP1));this%Root1stSinkWeight_pvr=0._r8
   allocate(this%Root1stTipSinkWeight_pft(JP1)); this%Root1stTipSinkWeight_pft=0._r8
   allocate(this%RootMediumRadius_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumRadius_rpvr=0._r8
   allocate(this%NumMediumRootAxes_rpvr(JZ1,MaxNumRootAxes,JP1));this%NumMediumRootAxes_rpvr=0._r8
-  allocate(this%NumMediumRootAxes_pvr(JZ1,JP1)); this%NumMediumRootAxes_pvr=0._r8
+  allocate(this%RootMediumXNum_pvr(JZ1,JP1)); this%RootMediumXNum_pvr=0._r8
   allocate(this%RootMediumLength_pvr(JZ1,JP1)); this%RootMediumLength_pvr=0._r8
   allocate(this%RootMediumLength_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumLength_rpvr=0._r8
-  allocate(this%NumAxesPerStructRootAxis_pft(JP1)); this%NumAxesPerStructRootAxis_pft=0._r8
-  allocate(this%NumAxesPerStructRootAxPO_pft(JP1)); this%NumAxesPerStructRootAxPO_pft=0._r8 
-  allocate(this%NumPrimeRootAxesPerPlant_pft(JP1)); this%NumPrimeRootAxesPerPlant_pft=0._r8
+  allocate(this%Num1stAxesPerStructRootX_pft(JP1)); this%Num1stAxesPerStructRootX_pft=0._r8
+  allocate(this%Num1stAxesPerStructRootXPOP_pft(JP1)); this%Num1stAxesPerStructRootXPOP_pft=0._r8 
+  allocate(this%Num1stRootAxesPP_pft(JP1)); this%Num1stRootAxesPP_pft=0._r8
   allocate(this%Radius95pctMature_pft(JP1)); this%Radius95pctMature_pft=0._r8
   allocate(this%CanopyHeightLive_pft(JP1));this%CanopyHeightLive_pft=spval
   allocate(this%CanopyHeightDead_pft(JP1)); this%CanopyHeightDead_pft=spval

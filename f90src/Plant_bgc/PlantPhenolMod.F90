@@ -275,7 +275,7 @@ module PlantPhenolMod
     ShootNodeNumAtPlanting_pft   => plt_morph%ShootNodeNumAtPlanting_pft    ,& !input  :number of nodes in seed, [-]
     ShootNodeNum_brch            => plt_morph%ShootNodeNum_brch             ,& !input  :shoot node number, [-]
     isPlantBranchAlive_brch      => plt_pheno%isPlantBranchAlive_brch       ,& !inoput :flag to detect branch death, [-]
-    NumStructuralRootAxes_pft         => plt_morph%NumStructuralRootAxes_pft          ,& !inoput :number of structural root axes,[-]
+    NumStructuralRootAxes_pft    => plt_morph%NumStructuralRootAxes_pft     ,& !inoput :number of structural root axes per plant,[-]
     NumOfBranches_pft            => plt_morph%NumOfBranches_pft             ,& !inoput :number of branches,[-]
     BranchNumber_pft             => plt_morph%BranchNumber_pft              ,& !inoput :main branch numeric id,[-]
     MatureGroup_brch             => plt_pheno%MatureGroup_brch              ,& !output :branch level plant maturity group, [-]

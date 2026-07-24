@@ -1243,7 +1243,7 @@ implicit none
     id=addone(id)
     call writefixl(nu_plt,id,'R95MAT','Critical radius where the woody root is considered 95% mature [m]', Radius95pctMature_pft(NZ,NY,NX),105)
     id=addone(id)    
-    call writefixl(nu_plt,id,'MRTFQ','Medium root branching frequency on structrual roots [m-1]', MediumRootBranchFreq_pft(NZ,NY,NX),105)    
+    call writefixl(nu_plt,id,'MRTFQ','Medium root branching frequency on structrual roots [# m-1]', MediumRootBranchFreq_pft(NZ,NY,NX),105)    
   else
     id=addone(id)
     call writefixl(nu_plt,id,'PhiMean','The mean lumen area fraction found in the seminal roots of non-tree roots, [m2/m2]', xylemPhi_mean_pft(NZ,NY,NX),105)      
@@ -1262,7 +1262,7 @@ implicit none
     'nonstructural elemental concentrations [h-1]',ShootRootNonstElmConduts_pft(NZ,NY,NX),105)
   !as a rule of thumb, RTFQ often takes the value of .  
   id=addone(id)
-  call writefixl(nu_plt,id,'RTFQ','Square root of (fine root branching frequency on 1st roots) X (root hair frequency on fine roots) [m-1]',FineRootBranchFreq_pft(NZ,NY,NX),105)
+  call writefixl(nu_plt,id,'RTFQ','Square root of (fine root branching frequency on 1st roots) X (root hair frequency on fine roots) [# m-1]',FineRootBranchFreq_pft(NZ,NY,NX),105)
   end subroutine Root_trait_disp
 
 !------------------------------------------------------------------------------------------

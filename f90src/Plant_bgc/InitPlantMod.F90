@@ -993,9 +993,10 @@ module InitPlantMod
     PSIRoot_pvr                   => plt_ew%PSIRoot_pvr                       ,& !output :root total water potential, [Mpa]
     RootPoreVol_pvr               => plt_morph%RootPoreVol_pvr                ,& !output :root layer volume air, [m2 d-2]
     RootVH2O_pvr                  => plt_morph%RootVH2O_pvr                   ,& !output :root space volume occupied by water in each layer, [m2 d-2]   
-    NumStructuralRootAxes_pft          => plt_morph%NumStructuralRootAxes_pft           ,& !output :number of structural root axes,[-]
+    NumStructuralRootAxes_pft     => plt_morph%NumStructuralRootAxes_pft      ,& !output :number of structural root axes,[-]
     PSIRootTurg_vr                => plt_ew%PSIRootTurg_vr                    ,& !output :root turgor water potential, [Mpa]
     Root1stTransptArea_pvr        => plt_morph%Root1stTransptArea_pvr         ,& !output :transport area by 1st order root, [m2 d-2]         
+    RootMedTransptArea_pvr        => plt_morph%RootMedTransptArea_pvr         ,& !output  :transport area by medisum size roots, [-]        
     Root1stRadius_pvr             => plt_morph%Root1stRadius_pvr              ,& !output :root layer diameter primary axes, [m]
     Root2ndRadius_rpvr            => plt_morph%Root2ndRadius_rpvr             ,& !output :root layer diameter secondary axes, [m]
     RootN2Fix_pvr                 => plt_bgcr%RootN2Fix_pvr                   ,& !output :root N2 fixation, [gN d-2 h-1]
@@ -1043,8 +1044,9 @@ module InitPlantMod
       RootVH2O_pvr(N,L,NZ)                                     = 0._r8
       Root1stRadius_pvr(N,L,NZ)                                = Root1stMaxRadius_pft(N,NZ)
       Root2ndRadius_rpvr(N,L,NZ)                               = Root2ndMaxRadius_pft(N,NZ)
-      Root1stTransptArea_pvr(N,L,NZ)                           = PICON*Root1stMaxRadius_pft(N,NZ)**2      
-      plt_morph%RootSAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
+      Root1stTransptArea_pvr(N,L,NZ)                           = PICON*Root1stMaxRadius_pft(N,NZ)**2  
+      RootMedTransptArea_pvr(N,L,NZ)                           = 0._r8    
+      plt_morph%RootSAreaPerPlant_pvr(N,L,NZ)                  = 0._r8
       plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)                = 1.0E-03
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8

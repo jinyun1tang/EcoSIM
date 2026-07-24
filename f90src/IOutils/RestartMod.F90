@@ -3139,6 +3139,22 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:JZ)
+    call restartvar(ncid, flag, varname='RootFineFrac2Med_pvr', dim1name='pft',dim2name='levsoi',&
+     long_name='Fraction of fine roots attached to medium roots', units='m', &
+     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_pvr,datrp_2d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft) 
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_pvr,datrp_2d,&
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)   
+    datpr2 => datrp_2d(1:npfts,1:JZ)
+    call restartvar(ncid, flag, varname='RootFineFrac2Med_pvr', dim1name='pft',dim2name='levsoi',&
+     long_name='Fraction of fine roots attached to medium roots', units='m', &
+     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
+  endif
+
+  if(flag=='read')then
+    datpr2 => datrp_2d(1:npfts,1:JZ)
     call restartvar(ncid, flag, varname='RootMediumLength_pvr', dim1name='pft',dim2name='levsoi',&
      long_name='Medium size root mean length', units='m', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
@@ -3717,6 +3733,23 @@ implicit none
 
     if(flag=='read')then
       datpr2 => datrp_2d(1:npfts,1:JZ)
+      call restartvar(ncid, flag, varname='RootMediumXNum_pvr', dim1name='pft',&
+      dim2name='levsoi',long_name='soil layer root/myco number medium axes', units='# d-2', &
+      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMediumXNum_pvr,datrp_2d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft) 
+    else
+
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMediumXNum_pvr,datrp_2d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft)   
+      datpr2 => datrp_2d(1:npfts,1:JZ)
+      call restartvar(ncid, flag, varname='RootMediumXNum_pvr', dim1name='pft',&
+      dim2name='levsoi',long_name='soil layer root/myco number medium axes', units='# d-2', &
+      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
+    endif  
+
+    if(flag=='read')then
+      datpr2 => datrp_2d(1:npfts,1:JZ)
       call restartvar(ncid, flag, varname='Root1stXNumL_pvr', dim1name='pft',&
       dim2name='levsoi',long_name='soil layer root/myco number primary axes', units='# d-2', &
       interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)   
@@ -3833,6 +3866,23 @@ implicit none
       dim3name='levsoi',long_name='root layer volume water', units='m2 d-2', &
       interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
     endif  
+
+    if(flag=='read')then
+      datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
+      call restartvar(ncid, flag, varname='RootMedTransptArea_pvr', dim1name='pft',dim2name='rootyps',&
+      dim3name='levsoi',long_name='soil layer medium size root cross section area for gas/water transport', units='m2 d-2', &
+      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMedTransptArea_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft) 
+    else
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootMedTransptArea_pvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft)   
+      datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
+      call restartvar(ncid, flag, varname='RootMedTransptArea_pvr', dim1name='pft',dim2name='rootyps',&
+      dim3name='levsoi',long_name='soil layer medium size cross section area for gas/water transport', units='m2 d-2', &
+      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
+    endif  
+
 
     if(flag=='read')then
       datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
