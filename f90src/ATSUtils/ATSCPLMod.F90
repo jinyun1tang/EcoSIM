@@ -178,6 +178,10 @@ contains
   !Even though the technical size of the dataset is num_cols x n_cells 
   call c_f_pointer(props%plant_functional_type%data, data2D, [num_cols, size_col])
   a_PFT = data2D(:,:)
+  
+  data_ptr = state%canopy_snow%data
+  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  a_CanSnow=data2D(:,:)
 
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
@@ -299,6 +303,9 @@ contains
   !call c_f_pointer(state%canopy_snow%data, data2D, [num_pfts, num_cols])
   !data2D(:,:) = a_CanSnow
 
+  call c_f_pointer(state%canopy_snow%data, data2D, [num_cols, size_col])
+  data2D(:,:) = a_CanSnow
+  
   end subroutine EcoSIM2ATSData
 
 !------------------------------------------------------------------------------------------

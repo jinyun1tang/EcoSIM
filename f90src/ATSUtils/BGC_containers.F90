@@ -157,6 +157,7 @@ module BGCContainers_module
      type (BGCMatrixDouble) :: bulk_density
      type (BGCMatrixDouble) :: subsurface_water_source
      type (BGCMatrixDouble) :: subsurface_energy_source
+     type (BGCMatrixDouble) :: canopy_snow
      type (BGCVectorDouble) :: surface_energy_source
      type (BGCVectorDouble) :: surface_water_source
      type (BGCVectorDouble) :: snow_depth

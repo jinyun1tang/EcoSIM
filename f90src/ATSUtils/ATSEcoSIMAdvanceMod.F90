@@ -88,7 +88,7 @@ implicit none
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
-  real(r8) :: THETF
+  real(r8) :: THETF, flux_per_area
   type(yearIJ_type) :: yearIJ
 
   !associate( RPlantRootH2OUptk_pvr     => plt_ew%RPlantRootH2OUptk_pvr         & !inoput :root water uptake, [m3 d-2 h-1]
@@ -318,7 +318,7 @@ implicit none
         CanopyHeightLive_pft(NZ,NY,NX) = 17.0
         tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
         tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
-        SnowOnCanopy_pft(NZ,NY,NX) = 0.0_r8 !zeroing while a_CanSnow is being redesigned
+        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NY,NZ)
         iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
         TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
        
@@ -446,7 +446,9 @@ implicit none
     !As EcoSIM is an hourly model, the conversion is done in ATS
     !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
     !surf_e_source(NY) = (HeatFlx2Grnd_col(NY,1)-HeatFlowSno2SoiByWat_col(NY,1)) / (column_area(NY))
-    surf_e_source(NY) = MIN(HeatFlx2Grnd_col(NY,1) / (column_area(NY)), surf_e_max)
+    !surf_e_source(NY) = MIN(HeatFlx2Grnd_col(NY,1) / (column_area(NY)), surf_e_max)
+    flux_per_area = HeatFlx2Grnd_col(NY,1) / column_area(NY)
+    surf_e_source(NY) = SIGN(MIN(ABS(flux_per_area), surf_e_max), flux_per_area)
 
     
     dTexp = surf_e_source(NY)/heat_capacity
@@ -475,7 +477,7 @@ implicit none
     do NZ=1,num_pfts
       a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NZ,NY,NX)
       a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NZ,NY,NX)
-      !a_CanSnow(NZ,NY) = SnowOnCanopy_pft(NZ,NY,NX)
+      a_CanSnow(NY,NZ) = SnowOnCanopy_pft(NZ,NY,NX)
     enddo
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
