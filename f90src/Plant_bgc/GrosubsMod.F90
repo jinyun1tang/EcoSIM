@@ -79,8 +79,8 @@ module grosubsMod
   !     INITIALIZE SENESCENCE ARRAYS
   DO NZ=1,NP0
     CanopyHeight_copy(NZ)                  = CanopyHeightLive_pft(NZ)
-    CanopyHeightLive_pft(NZ)                   = 0._r8
-    StalkHeight_pft(NZ)                    = 0._r8
+    CanopyHeightLive_pft(NZ)               = 0._r8
+    StalkHeight_pft(NZ)                    = 0._r8    
     plt_rbgc%canopy_growth_pft(NZ)         = 0._r8
     plt_biom%RootMycoMassElm_pvr(:,:,:,NZ) = 0._r8
   ENDDO  
@@ -101,10 +101,11 @@ module grosubsMod
     ENDIF  
     
     call AccumulateStates(yearIJ,NZ)
-
+    !call CheckPlantBalanceZ(yearIJ,NZ,header=subname)
   ENDDO D9985
   !
   call Live2DeadTransformation(yearIJ)     
+  !call CheckPlantBalanceZ(yearIJ,NZ=1,header=subname//'L2DEAD')  
   !
   call PrintInfo('end '//subname)
   end associate
@@ -501,7 +502,7 @@ module grosubsMod
     elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
       if(lcoarseroot)then
         !for woody vascular, structural root axes is counted by one
-        Num1stAxesPerStructRootX_pft(NZ) = 1._r8
+        Num1stAxesPerStructRootX_pft(NZ) = AMIN1(1._R8,AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)/NumStructuralRootAxes_pft(NZ))
       else
         Num1stAxesPerStructRootX_pft(NZ) = AMAX1(1.0_r8,RootBiomCPerPlant_pft(NZ)**0.7143_r8)/NumStructuralRootAxes_pft(NZ)
       endif

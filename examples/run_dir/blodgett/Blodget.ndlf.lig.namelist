@@ -13,19 +13,20 @@ clm_factor_in='NO'
 soil_mgmt_in='NO'
 lcoarseroot=.true.
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2023.nc'
-!idebug_day=315
+!idebug_day=2
 lsoilCompaction=.false.
-lverbose=.false.
+!lverbose=.true.
 plantOM4Heat=.true.
 disp_planttrait=.true.
 plant_model=.true.
+!llignification=.true.
 microbial_model=.true.
 soichem_model=.true.
 !set up output variable lists
 !set up the first year of simulation
 start_date  = '19410101000000'
 grid_mode=1    !enable lateral runoff
-continue_run=.false.
+continue_run=.true.
 !set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
 forc_periods=2012,2015,18,2012,2022,1,2012,2022,0
 
@@ -43,9 +44,10 @@ hist_fincl1='ECO_RA_col','ECO_RH_col','ECO_NPP_col', 'Root_AR_col','ECO_HR_CO2_c
   'RUB_ACTVN_pft','RootNutUptk_fClim_pvr','RootNutUptk_fNlim_pvr','RootNutUptk_fPlim_pvr','RootNutUptk_fProtC_pvr',
   'HR_CO2_vr','Root_OXYSTRESS_pvr','Decomp_OStress_vr','Decomp_OStress_LITR','GasXSurfConduct_col','CO2_DIF_FLX_col',
   'CO2_PLTROOT_FLX_col','TreeRingRadius_pft','RootLDS_pvr','RootKond2H2O_pvr','Growth_Stage_pft','PSI_vr','MycoArbuBiomC_pft',
-  'VcMax25C_RUBISCO_pft','VoMax25C_RUBISCO_pft','JMax25C_photo_pft','ShootRoot_XFER_C_pft','ShootRoot_XFER_N_pft',
+  'VcMax25C_RUBISCO_pft','VoMax25C_RUBISCO_pft','JMax25C_photo_pft','ShootRoot_XFER_C_pft','ShootRoot_XFER_N_pft','CRootLumenArea_pvr',
   'MicPFlo_vr','MacPFlo_vr','dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','RootNonstC_pvr','Root1stRadius_pvr','ShootRoot_XFER_C_pft',
-  'Root2nd_AxesNumL_pvr','Root1st_AxesNumL_pvr','RootShootCX_pvr','Root1stTipSinkwt_pft','Cytok_scalar_pvr','Cyctokinin1stConc_pvr'
+  'Root2nd_AxesNumL_pvr','Root1st_AxesNumL_pvr','RootShootCX_pvr','Root1stTipSinkwt_pft','Cytok_scalar_pvr','Cytokinin1stConc_pvr',
+  'Root1stLenPP_pvr','RootMed_AxesNumL_pvr','RootMed_length_pvr','RootMed_radius_pvr'
 !hist_fincl2='TEMP_vr' !,'CO2_SEMIS_FLX_col','Root_AR_col','ECO_HR_CO2_col','ECO_RADSW_col'
 !hist_fincl2='ECO_GPP_col','ECO_NPP_col'
 hist_nhtfrq=-24 !, 0
@@ -59,7 +61,7 @@ hist_nhtfrq=-24 !, 0
 rest_opt='nyears'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
-stop_n= 82             !this shall overwrite what is set in forc_periods
+stop_n=  40 !82            !this shall overwrite what is set in forc_periods
 stop_option='nyears' !run by nyears, nmonths, ndays,
 diag_frq=1
 diag_opt='nsteps'

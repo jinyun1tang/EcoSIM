@@ -4009,7 +4009,7 @@ implicit none
 
   data2d_ptr => this%h2D_Root1stSinkWeight_pvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root1stSinkWeight_pvr',units='d-2',type2d='levsoi',avgflag='A',&
-    long_name='Root nonstructural allocation weight for primary roots of each pft',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Root nonstructural allocation weight for primary roots of each pft (excluding tip)',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Root1stRadius_rpvr(beg_ptc:end_ptc,1:JZ)  
   call hist_addfld2d(fname='Root1stRadius_pvr',units='mm',type2d='levsoi',avgflag='A',&
@@ -4070,7 +4070,7 @@ implicit none
 
   data2d_ptr => this%h2D_Rootmedlength_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootMed_length_pvr',units='m',type2d='levsoi',avgflag='A',&
-    long_name='Mean medium size root length',ptr_patch=data2d_ptr,default='inactive')       
+    long_name='Mean length of medium size root axes',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootmedRadius_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootMed_radius_pvr',units='mm',type2d='levsoi',avgflag='A',&
