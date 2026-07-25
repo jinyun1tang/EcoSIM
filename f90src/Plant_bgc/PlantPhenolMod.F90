@@ -341,7 +341,7 @@ module PlantPhenolMod
         ENDIF
       ENDIF
       !
-      !     ADD AXIS TO ROOT IF PLANT GROWTH STAGE, ROOT NON-STRUCTURAL C
+      !     ADD STRUCTURAL AXIS TO ROOT IF PLANT GROWTH STAGE, ROOT NON-STRUCTURAL C
       !     CONCENTRATION PERMIT
       !
       !     PR=nonstructural C concentration needed for root branching
@@ -357,8 +357,8 @@ module PlantPhenolMod
         IF(NumStructuralRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumStructuralRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
 
-          checkRootInitializer= (NumStructuralRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &                  !storage/seed 
-            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinCon2InitRoot_pft(NZ) .AND. NonstCMinCon2InitRoot_pft(NZ).GT.0.0_r8) !plant status
+          checkRootInitializer= (NumStructuralRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &              !storage/seed 
+            .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinCon2InitRoot_pft(NZ) .AND. NonstCMinCon2InitRoot_pft(NZ).GT.0.0_r8)  !plant status
 
           IF(checkRootInitializer)THEN
             NumStructuralRootAxes_pft(NZ) = MIN(MaxNumRootAxes,NumStructuralRootAxes_pft(NZ)+1)

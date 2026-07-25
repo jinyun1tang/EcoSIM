@@ -81,6 +81,7 @@ implicit none
         DO NZ=1,NP_col(NY,NX)
           !
           Call ReSeedPlants(yearIJ%I,yearIJ%J,NZ)
+          !call CheckPlantBalanceZ(yearIJ,NZ=1,header=subname//'reseed')  
         ENDDO
 
         call ExitPlantBalance(yearIJ,NP_col(NY,NX))
