@@ -341,7 +341,7 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
     rPlantThermoAdaptZone_pft(NZ,NY,NX)        = plt_pheno%rPlantThermoAdaptZone_pft(NZ)
-
+    PTSHTR_pft(NZ,NY,NX)                       = plt_bgcr%PTSHTR_pft(NZ)
     if(plt_distb%iHarvstType_pft(NZ).GT.0)then
       CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)    
       iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)

@@ -12,6 +12,9 @@ module PlantBGCPars
   __FILE__
 !
 !
+  real(r8), parameter :: dmax = 0.015_r8          !Eco-evolutionary responses of species distributions to climate change [m]    
+  real(r8) :: Aphol_ref                           !reference area for phloem transport, [m2]
+  real(r8) :: L0_phol                             !effective distance for phloem transport when PTSHTR is defined [m]
   real(r8) :: FracHour4LeafoffRemob(0:5)          !allocation parameter, [-]
   real(r8) :: PART2LEAF_MIN                       !minimum fraction of growth allocated to leaf, [-]
   real(r8) :: PART2PETOL_MIN                      !minimum fraction of growth allocated to PetolSheth, [-]
@@ -261,25 +264,29 @@ module PlantBGCPars
   BlkDensFineRoots      = 0.05_r8        !gC cm-3, ~ 0.1 g cm-3
   BlkDActCoarseRoots    = 0.20_r8        !gC m-3, ~ 0.4 g cm-3
   BlkDLigCoarseRoots    = 0.24_r8        !gC m-3, ~ 0.48 g cm-3
-  FSTK                  = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
-  ZSTX                  = 1.0E-03_r8     !one mm
-  FRTX                  = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
-  SETC                  = 1.0E-02_r8
-  SETN                  = 1.0E-03_r8
-  SETP                  = 1.0E-04_r8
-  SLA2                  = -0.33_r8
-  SSL2                  = -0.50_r8
-  SNL2                  = -0.67_r8
-  CNMX                  = 0.20_r8
-  CPMX                  = 0.020_r8
-  CNMN                  = 0.050_r8
-  CPMN                  = 0.005_r8
-  EN2F                  = 0.20_r8
-  VMXO                  = 0.125_r8
-  SPNDLK                = 0.01_r8
-  SPNDL                 = 5.0E-04_r8
-  CCNGR                 = 2.5E-01_r8
-  CCNGB                 = 6.0E-04_r8
+
+  FSTK     = 0.05_r8        !ratio of sapwood width to stalk radius, contributing to xylem/phloem transport at the outer portion of the stalk
+  ZSTX     = 1.0E-03_r8     !one mm
+  FRTX     = 1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
+  Aphol_ref = (2._r8*dmax-AMIN1(ZSTX,FSTK*dmax))*AMIN1(ZSTX,FSTK*dmax)
+  L0_phol   = 2._r8 !m
+  SETC     = 1.0E-02_r8
+  SETN     = 1.0E-03_r8
+  SETP     = 1.0E-04_r8
+  SLA2     = -0.33_r8
+  SSL2     = -0.50_r8
+  SNL2     = -0.67_r8
+  CNMX     = 0.20_r8
+  CPMX     = 0.020_r8
+  CNMN     = 0.050_r8
+  CPMN     = 0.005_r8
+  EN2F     = 0.20_r8
+  VMXO     = 0.125_r8
+  SPNDLK   = 0.01_r8
+  SPNDL    = 5.0E-04_r8
+  CCNGR    = 2.5E-01_r8
+  CCNGB    = 6.0E-04_r8
+
   NodulBiomCatInfection = 1.0E-03_r8
   CZKM                  = 2.5E-03_r8
   CPKM                  = 2.5E-04_r8

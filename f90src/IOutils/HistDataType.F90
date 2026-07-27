@@ -108,7 +108,8 @@ implicit none
   real(r8),pointer   :: h1D_Qdrain_col(:)            
   real(r8),pointer   :: h1D_tPREC_P_col(:)     
   real(r8),pointer   :: h1D_SnowCanopy_col(:)
-  real(r8),pointer   :: h1D_fSnowCan_pft(:)
+  real(r8),pointer   :: h1D_fSnowCan_ptc(:)
+  real(r8),pointer   :: h1D_PTSHTR_ptc(:)
   real(r8),pointer   :: h1D_tMICRO_P_col(:)    
   real(r8),pointer   :: h1D_tSoilOrgC_col(:)
   real(r8),pointer   :: h1D_tSoilOrgN_col(:)
@@ -970,7 +971,8 @@ implicit none
   allocate(this%h1D_CdH2ORootxSoil_ptc(beg_ptc:end_ptc)) ;this%h1D_CdH2ORootxSoil_ptc(:)=spval
   allocate(this%h1D_TRANSPN_ptc(beg_ptc:end_ptc))         ;this%h1D_TRANSPN_ptc(:)=spval
   allocate(this%h1D_QTRANSP_col(beg_col:end_col)); this%h1D_QTRANSP_col(:)=spval
-  allocate(this%h1D_fSnowCan_pft(beg_ptc:end_ptc));this%h1D_fSnowCan_pft(:)=spval
+  allocate(this%h1D_fSnowCan_ptc(beg_ptc:end_ptc));this%h1D_fSnowCan_ptc(:)=spval
+  allocate(this%h1D_PTSHTR_ptc(beg_ptc:end_ptc)); this%h1D_PTSHTR_ptc(:)=spval
   allocate(this%h1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NH4_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))    ;this%h1D_NO3_UPTK_FLX_ptc(:)=spval
   allocate(this%h1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))     ;this%h1D_N2_FIXN_FLX_ptc(:)=spval
@@ -2376,9 +2378,13 @@ implicit none
     long_name='Canopy nonstructural P concentration',ptr_patch=data1d_ptr,&
     default='inactive')            
 
-  data1d_ptr => this%h1D_fSnowCan_pft(beg_ptc:end_ptc)  
+  data1d_ptr => this%h1D_fSnowCan_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='fSnowCanopy_pft',units='-',avgflag='A',&
     long_name='Canopy covered by snow',ptr_patch=data1d_ptr)          
+
+  data1d_ptr => this%h1D_PTSHTR_ptc(beg_ptc:end_ptc)  
+  call hist_addfld1d(fname='PTSHTR_pft',units='h-1',avgflag='A',&
+    long_name='Root-shoot C coupling rate',ptr_patch=data1d_ptr)          
 
   data1d_ptr => this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='CanNonstBConc_pft',units='g',avgflag='A',&
@@ -4069,8 +4075,8 @@ implicit none
     long_name='Primary root axes number in soil layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_Rootmedlength_pvr(beg_ptc:end_ptc,1:JZ) 
-  call hist_addfld2d(fname='RootMed_length_pvr',units='m',type2d='levsoi',avgflag='A',&
-    long_name='Mean length of medium size root axes',ptr_patch=data2d_ptr,default='inactive')       
+  call hist_addfld2d(fname='RootMed_length_pvr',units='m root m-2',type2d='levsoi',avgflag='A',&
+    long_name='Total length of medium size root axes in layer',ptr_patch=data2d_ptr,default='inactive')       
 
   data2d_ptr => this%h2D_RootmedRadius_pvr(beg_ptc:end_ptc,1:JZ) 
   call hist_addfld2d(fname='RootMed_radius_pvr',units='mm',type2d='levsoi',avgflag='A',&
@@ -4750,8 +4756,9 @@ implicit none
         if (PlantPopuLive_pft(NZ,NY,NX) .LE. 0._r8)then
           call this%ZeroPlantHistVars(nptc)
           cycle
-        endif       
-        this%h1D_fSnowCan_pft(nptc)     = fSnowCanopy_pft(NZ,NY,NX)
+        endif  
+        this%h1D_PTSHTR_ptc(nptc) = PTSHTR_pft(NZ,NY,NX)
+        this%h1D_fSnowCan_ptc(nptc)     = fSnowCanopy_pft(NZ,NY,NX)
         this%h1D_ROOT_NONSTC_ptc(nptc)  = RootMycoNonstElms_pft(ielmc,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTN_ptc(nptc)  = RootMycoNonstElms_pft(ielmn,ipltroot,NZ,NY,NX)
         this%h1D_ROOT_NONSTP_ptc(nptc)  = RootMycoNonstElms_pft(ielmp,ipltroot,NZ,NY,NX)
@@ -5032,7 +5039,7 @@ implicit none
             this%h2D_Root1stSinkWeight_pvr(nptc,L)=Root1stSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)*1.e3_r8
             this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
-            this%h2D_Rootmedlength_pvr(nptc,L) = RootMediumLength_pvr(L,NZ,NY,NX)            
+            this%h2D_Rootmedlength_pvr(nptc,L) = RootMediumLength_pvr(L,NZ,NY,NX)*RootMediumXNum_pvr(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)            
             if(PlantPopuLive_pft(NZ,NY,NX).GT.0._r8)then
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)
               this%h2D_RootMedAxesNumL_pvr(nptc,L)=RootMediumXNum_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)

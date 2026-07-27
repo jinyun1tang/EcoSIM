@@ -696,6 +696,28 @@ contains
   call PrintInfo('end '//subname)
   END SUBROUTINE solve_root_diffusion_step
 
- 
+ !--------------------------------------------------------------------
+  pure function smoothstep(v_on, v_full, v)result(ans)
+  implicit none
 
+  real(r8), intent(in) :: v_on
+  real(r8), intent(in) :: v_full
+  real(r8), intent(in) :: v
+  real(r8) :: x
+  real(r8) :: ans
+
+  if (v_full <= v_on) then
+    if (v >= v_full) then
+      ans = 1._r8
+    else
+      ans = 0._r8
+    endif
+    return
+  endif
+
+  x = (v - v_on) / (v_full - v_on)
+  x = max(0._r8, min(1._r8, x))
+  ans = x * x * (3._r8 - 2._r8 * x)
+
+  end function smoothstep
 end module PlantMathFuncMod

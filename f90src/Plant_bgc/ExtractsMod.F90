@@ -167,7 +167,7 @@ module ExtractsMod
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
-    PlantPopuLive_pft       => plt_site%PlantPopuLive_pft        ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft          ,& !input  :plant population, [d-2]
     RCO2Emis2Root_rpvr        => plt_rbgc%RCO2Emis2Root_rpvr         ,& !input  :aqueous CO2 flux from roots to root water, [g d-2 h-1]
     RootH1PO4DmndBand_pvr     => plt_rbgc%RootH1PO4DmndBand_pvr      ,& !input  :HPO4 demand in band by each root population, [g d-2 h-1]
     RootH1PO4DmndSoil_pvr     => plt_rbgc%RootH1PO4DmndSoil_pvr      ,& !input  :HPO4 demand in non-band by each root population, [g d-2 h-1]
@@ -211,7 +211,7 @@ module ExtractsMod
     trcs_Soil2plant_uptake_vr => plt_rbgc%trcs_Soil2plant_uptake_vr   & !inoput :total root-soil solute flux non-band, [g d-2 h-1]
   )
   call PrintInfo('beg '//subname)
-  DO L=NU,MaxNumRootLays
+  DO L=NU,MIN(MaxNumRootLays+1,plt_site%NK)
     DO N=1,Myco_pft(NZ)  
       !
       !     TOTAL ROOT DENSITY
@@ -246,10 +246,10 @@ module ExtractsMod
       DO idg=idg_beg,idg_NH3
         trcg_air2root_flx_vr(idg,L)=trcg_air2root_flx_vr(idg,L)+trcg_air2root_flx_pvr(idg,N,L,NZ)
       ENDDO
-      RootO2_TotSink_vr(L)      = RootO2_TotSink_vr(L) + RootO2_TotSink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
-      RootCO2Emis2Root_vr(L)    = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_rpvr(N,L,NZ)
-      RootCO2Emis2Root_pvr(L,NZ)=RootCO2Emis2Root_pvr(L,NZ)+RCO2Emis2Root_rpvr(N,L,NZ)
-      RUptkRootO2_vr(L)      = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
+      RootO2_TotSink_vr(L)       = RootO2_TotSink_vr(L) + RootO2_TotSink_pvr(N,L,NZ)  !total O2 uptake by roots to support root autotrophic respiraiton
+      RootCO2Emis2Root_vr(L)     = RootCO2Emis2Root_vr(L)+RCO2Emis2Root_rpvr(N,L,NZ)
+      RootCO2Emis2Root_pvr(L,NZ) = RootCO2Emis2Root_pvr(L,NZ)+RCO2Emis2Root_rpvr(N,L,NZ)
+      RUptkRootO2_vr(L)          = RUptkRootO2_vr(L)+RootO2Uptk_pvr(N,L,NZ)
 
       !(>0) uptake from soil into roots
       DO idg=idg_beg,idg_end
@@ -291,6 +291,7 @@ module ExtractsMod
       REcoH1PO4DmndBand_vr(L) = REcoH1PO4DmndBand_vr(L)+RootH1PO4DmndBand_pvr(N,L,NZ)
     ENDDO
   ENDDO
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine TotalGasandSoluteUptake
