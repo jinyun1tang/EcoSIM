@@ -169,19 +169,20 @@ implicit none
   INTEGER, optional, INTENT(IN) :: NZ1
   integer :: NZ ,L,N,idg,K
   real(r8) :: trcg(idg_beg:idg_NH3)
-  associate(                                         &
-    trcg_rootml_pvr  => plt_rbgc%trcg_rootml_pvr    ,& !input  :root gas content, [g d-2]
-    trcs_rootml_pvr  => plt_rbgc%trcs_rootml_pvr    ,& !input  :root aqueous content, [g d-2]
-    Myco_pft         => plt_morph%Myco_pft          ,& !input  :mycorrhizal type (no or yes),[-]
+  associate(                                                 &
+    trcg_rootml_pvr      => plt_rbgc%trcg_rootml_pvr        ,& !input  :root gas content, [g d-2]
+    trcs_rootml_pvr      => plt_rbgc%trcs_rootml_pvr        ,& !input  :root aqueous content, [g d-2]
+    Myco_pft             => plt_morph%Myco_pft              ,& !input  :mycorrhizal type (no or yes),[-]
+    NK                   => plt_site%NK                     ,& !input  : total layers with roots,  can be set to NL_col
     MaxSoilLays4Root_pft => plt_morph%MaxSoilLays4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
-    trcg_root_vr     => plt_rbgc%trcg_root_vr        & !inoput :total root internal gas flux, [g d-2 h-1]
+    trcg_root_vr         => plt_rbgc%trcg_root_vr            & !inoput :total root internal gas flux, [g d-2 h-1]
   )
   trcg_root_vr(idg_beg:idg_NH3,:)   = 0._r8
 
   trcg(:)=0._r8
   IF(present(NZ1))THEN
     NZ=NZ1
-    DO L=1,MaxSoilLays4Root_pft(NZ)
+    DO L=1,MIN(MaxSoilLays4Root_pft(NZ)+1,NK)
       DO N=1,Myco_pft(NZ)  
         DO idg=idg_beg,idg_NH3
           trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -194,7 +195,7 @@ implicit none
   ELSE
     DO NZ=1,plt_site%NP  
 
-      DO L=1,MaxSoilLays4Root_pft(NZ)
+      DO L=1,MIN(MaxSoilLays4Root_pft(NZ)+1,NK)
         DO N=1,Myco_pft(NZ)  
           DO idg=idg_beg,idg_NH3
             trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        

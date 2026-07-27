@@ -341,7 +341,7 @@ module PlantNonstElmDynMod
   real(r8) :: TwoCompMassC
   real(r8) :: RootByBranchNB
   real(r8) :: CanopyByRootL,CanopyActVNB
-  real(r8) :: RootActVL
+  real(r8) :: RootActVL,PTSHTR_scal,RootEffDepthMean
   real(r8) :: XFRE
   real(r8) :: ZTOL
   logical :: found_coarse
@@ -349,8 +349,10 @@ module PlantNonstElmDynMod
   real(r8) :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
   real(r8) :: RootDepzMean,PSIOsmo,PSITurg
+  real(r8) :: Leff_phol
   real(r8) :: CPOLT(JZ1),CCPOLT,DTransptTube,AreaTranspt
   associate(                                                                   &
+    CanopyHeight4WatUptake_pft    => plt_morph%CanopyHeight4WatUptake_pft     ,& !input  :canopy height, [m]  
     iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]  
     iPlant2ndGrothPattern_pft     => plt_pheno%iPlant2ndGrothPattern_pft      ,& !input  :plant expression of secondary growth, [-]        
     NU                            => plt_site%NU                              ,& !input  :current soil surface layer number, [-]
@@ -403,6 +405,7 @@ module PlantNonstElmDynMod
     CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch            ,& !inoput :branch nonstructural element, [g d-2]
     CanopyLeafSheathC_pft         => plt_biom%CanopyLeafSheathC_pft           ,& !inoput :canopy leaf + sheath C, [g d-2]
     RootSinkWeight_pvr            => plt_morph%RootSinkWeight_pvr             ,& !output :Root nonst element sink profile, [d-2]
+    PTSHTR_pft                    => plt_bgcr%PTSHTR_pft                      ,& !ouptut :root-shoot coupling conductance, [h-1]
     ECO_ER_col                    => plt_bgcr%ECO_ER_col                      ,& !inoput :ecosystem respiration, [g d-2 h-1]
     RootShootExch_pvr             => plt_bgcr%RootShootExch_pvr               ,& !inoput :Root-shoot nonstrucal element exchange, [g d-2 h-1]
     ShootRootXferElm_pft          => plt_bgcr%ShootRootXferElm_pft            ,& !inoput :shoot-root nonstructural element transfer, [ g d-2 h-1]
@@ -453,7 +456,6 @@ module PlantNonstElmDynMod
         ROOTACTBIOMS_vr(L)  = ROOTACTBIOMS_vr(L) + RootMediumStructElms_rpvr(ielmc,L,NR,NZ)
       endif
     ENDDO
-
   ENDDO    
 
   DO L=NU,MaxSoilLays4Root_pft(NZ)
@@ -461,6 +463,7 @@ module PlantNonstElmDynMod
       PopuRootMycoC_pvr(ipltroot,L,NZ)  = PopuRootMycoC_pvr(ipltroot,L,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)      
     ENDDO
   ENDDO
+
 
   !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT
   !
@@ -538,16 +541,23 @@ module PlantNonstElmDynMod
   ELSE
     PTSHTR=ShootRootNonstElmConduts_pft(NZ)
   ENDIF
-  if(isclose(PTSHTR,0._r8))return
 
-  if(.not.lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
+  if(lcoarseroot .and. is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then
+    RootEffDepthMean = 0._r8
+    DO L=NU,MaxSoilLays4Root_pft(NZ)  
+      RootEffDepthMean = RootEffDepthMean+(DistRootEffDepz_pvr(L,NZ)-CanopyHeight4WatUptake_pft(NZ))*RootSinkWeight_pvr(L,NZ)
+    ENDDO
+
     !enlargement of phloem transport area
     DTransptTube = AMIN1(ZSTX,AMAX1(FSTK*StalkAveRadius_pft(NZ),Root1stMaxRadius1_pft(ipltroot,NZ)))
     AreaTranspt  = 2._r8*AMAX1(StalkAveRadius_pft(NZ),Root1stMaxRadius1_pft(ipltroot,NZ))*DTransptTube-DTransptTube**2
-    PTSHTR       = PTSHTR*AreaTranspt/AMIN1(ZSTX,Root1stMaxRadius1_pft(ipltroot,NZ))**2
+    Leff_phol    = 0.5_r8 * CanopyHeight4WatUptake_pft(NZ) + 0.3_r8 * RootEffDepthMean
+    PTSHTR_scal  = (AreaTranspt/Aphol_ref)*(L0_phol/Leff_phol)
+    PTSHTR       = PTSHTR*PTSHTR_scal
   endif  
   PTSHTR=AMIN1(PTSHTR,1._r8)
-
+  PTSHTR_pft(NZ)=PTSHTR
+  if(isclose(PTSHTR,0._r8))return
   
   D310: DO NB=1,NumOfBranches_pft(NZ)
     !exchange between branch NB and all root layers

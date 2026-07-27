@@ -161,33 +161,33 @@ module NutUptakeMod
   integer  :: N,L,idg
 
 !     begin_execution
-  associate(                                                         &
-    THETW_vr                  => plt_soilchem%THETW_vr              ,& !input  :volumetric water content, [m3 m-3]
-    VLSoilPoreMicP_vr         => plt_soilchem%VLSoilPoreMicP_vr     ,& !input  :volume of soil layer, [m3 d-2]
-    ZEROS2                    => plt_site%ZEROS2                    ,& !input  :threshold zero for numerical stability,[-]
-    NU                        => plt_site%NU                        ,& !input  :current soil surface layer number, [-]
-    NK                        => plt_site%NK                        ,& !input  :current hydrologically active layer, [-]
-    ZERO                      => plt_site%ZERO                      ,& !input  :threshold zero for numerical stability, [-]
-    ZERO4Groth_pft            => plt_biom%ZERO4Groth_pft            ,& !input  :threshold zero for plang growth calculation, [-]
-    RAutoRootO2Limter_rpvr    => plt_rbgc%RAutoRootO2Limter_rpvr    ,& !input  :O2 constraint to root respiration (0-1), [-]
-    RootRespPotent_pvr        => plt_rbgc%RootRespPotent_pvr        ,& !input  :root respiration unconstrained by O2, [g d-2 h-1]
-    RootTotLenPerPlant_pvr    => plt_morph%RootTotLenPerPlant_pvr   ,& !input  :root layer length per plant, [m p-1]
-    trcs_solml_vr             => plt_soilchem%trcs_solml_vr         ,& !input  :aqueous tracer, [g d-2]
-    trcg_gasml_vr             => plt_soilchem%trcg_gasml_vr         ,& !input  :gas layer mass, [g d-2]
-    Myco_pft                  => plt_morph%Myco_pft                 ,& !input  :mycorrhizal type (no or yes),[-]
-    RootAbsorbLenPerPlant_pvr => plt_morph%RootAbsorbLenPerPlant_pvr,& !input  :root layer length density, [m m-3]
-    PopuRootMycoC_pvr         => plt_biom% PopuRootMycoC_pvr        ,& !input  :root layer C, [gC d-2]
-    RootVH2O_pvr              => plt_morph%RootVH2O_pvr             ,& !input  :root layer volume water, [m2 d-2]
-    Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr ,& !inoput :root layer active zone element in primary axes, [g d-2]
-    RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr ,& !input  :root layer element secondary axes, [g d-2]
-    RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr    ,& !input  :root layer nonstructural element, [g d-2]
-    NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft     ,& !input  :maximum soil layer number for all root axes,[-]
-    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft     ,& !input  :number of structural root axes,[-]
-    trcs_deadroot2soil_pvr    => plt_rbgc%trcs_deadroot2soil_pvr    ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]
-    trcg_rootml_pvr           => plt_rbgc%trcg_rootml_pvr           ,& !inoput :root gas content, [g d-2]
-    trcs_rootml_pvr           => plt_rbgc%trcs_rootml_pvr           ,& !inoput :root aqueous content, [g d-2]
-    RootCO2Ar2Soil_pvr        => plt_rbgc%RootCO2Ar2Soil_pvr        ,& !inoput :root respiration released to soil, [gC d-2 h-1]
-    RootO2Dmnd4Resp_pvr       => plt_rbgc%RootO2Dmnd4Resp_pvr        & !output :root O2 demand from respiration, [g d-2 h-1]
+  associate(                                                                &
+    THETW_vr                     => plt_soilchem%THETW_vr                  ,& !input  :volumetric water content, [m3 m-3]
+    VLSoilPoreMicP_vr            => plt_soilchem%VLSoilPoreMicP_vr         ,& !input  :volume of soil layer, [m3 d-2]
+    ZEROS2                       => plt_site%ZEROS2                        ,& !input  :threshold zero for numerical stability,[-]
+    NU                           => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
+    NK                           => plt_site%NK                            ,& !input  :current hydrologically active layer, [-]
+    ZERO                         => plt_site%ZERO                          ,& !input  :threshold zero for numerical stability, [-]
+    ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                ,& !input  :threshold zero for plang growth calculation, [-]
+    RAutoRootO2Limter_rpvr       => plt_rbgc%RAutoRootO2Limter_rpvr        ,& !input  :O2 constraint to root respiration (0-1), [-]
+    RootRespPotent_pvr           => plt_rbgc%RootRespPotent_pvr            ,& !input  :root respiration unconstrained by O2, [g d-2 h-1]
+    RootTotLenPerPlant_pvr       => plt_morph%RootTotLenPerPlant_pvr       ,& !input  :root layer length per plant, [m p-1]
+    trcs_solml_vr                => plt_soilchem%trcs_solml_vr             ,& !input  :aqueous tracer, [g d-2]
+    trcg_gasml_vr                => plt_soilchem%trcg_gasml_vr             ,& !input  :gas layer mass, [g d-2]
+    Myco_pft                     => plt_morph%Myco_pft                     ,& !input  :mycorrhizal type (no or yes),[-]
+    RootAbsorbLenPerPlant_pvr    => plt_morph%RootAbsorbLenPerPlant_pvr    ,& !input  :root layer length density, [m m-3]
+    PopuRootMycoC_pvr            => plt_biom% PopuRootMycoC_pvr            ,& !input  :root layer C, [gC d-2]
+    RootVH2O_pvr                 => plt_morph%RootVH2O_pvr                 ,& !input  :root layer volume water, [m2 d-2]
+    Root1stActStructElms_rpvr    => plt_biom%Root1stActStructElms_rpvr     ,& !inoput :root layer active zone element in primary axes, [g d-2]
+    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr     ,& !input  :root layer element secondary axes, [g d-2]
+    RootMycoNonstElms_rpvr       => plt_biom%RootMycoNonstElms_rpvr        ,& !input  :root layer nonstructural element, [g d-2]
+    NMaxRootBotLayer_pft         => plt_morph%NMaxRootBotLayer_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    NumStructuralRootAxes_pft    => plt_morph%NumStructuralRootAxes_pft    ,& !input  :number of structural root axes,[-]
+    trcs_deadroot2soil_pvr       => plt_rbgc%trcs_deadroot2soil_pvr        ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]
+    trcg_rootml_pvr              => plt_rbgc%trcg_rootml_pvr               ,& !inoput :root gas content, [g d-2]
+    trcs_rootml_pvr              => plt_rbgc%trcs_rootml_pvr               ,& !inoput :root aqueous content, [g d-2]
+    RootCO2Ar2Soil_pvr           => plt_rbgc%RootCO2Ar2Soil_pvr            ,& !inoput :root respiration released to soil, [gC d-2 h-1]
+    RootO2Dmnd4Resp_pvr          => plt_rbgc%RootO2Dmnd4Resp_pvr            & !output :root O2 demand from respiration, [g d-2 h-1]
   )
 
   call PrintInfo('beg '//subname)
@@ -198,6 +198,7 @@ module NutUptakeMod
   RootCO2ArB       = 0._r8
 
 !  dmass0=sum(trcs_solml_vr(idg_O2,NU:plt_site%NL))+sum(trcg_gasml_vr(idg_O2,NU:plt_site%NL))
+!  write(904,*)I*1000+J/24.,dmass0,'beg'
   
   D950: DO L=NU,NK
     IF(VLSoilPoreMicP_vr(L).GT.ZEROS2 .AND. THETW_vr(L).GT.ZERO .AND. L<=NMaxRootBotLayer_pft(NZ)) then
@@ -222,7 +223,7 @@ module NutUptakeMod
 
           !partition the gas for local uptake 
           DO idg=idg_beg,idg_end
-            if(idg/=idg_O2)then
+            if(idg.NE.idg_O2)then
               trc_solml_loc(idg)=trcs_solml_vr(idg,L)*FracPRoot4Uptake(N,L,NZ)
             endif
           enddo
@@ -288,21 +289,20 @@ module NutUptakeMod
       ENDDO D955      
     ELSE
       D956: DO N  = 1, Myco_pft(NZ)          
-        IF(L==NMaxRootBotLayer_pft(NZ)+1)THEN  
+        IF(L.EQ.NMaxRootBotLayer_pft(NZ)+1)THEN  
           RAutoRootO2Limter_rpvr(N,L,NZ) = RAutoRootO2Limter_rpvr(N,L-1,NZ)
         ELSE
           RAutoRootO2Limter_rpvr(N,L,NZ) = 0._r8
         ENDIF                      
-        RootCO2ArB=RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
-        RootCO2Ar2Soil_pvr(L,NZ)=RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+        RootCO2ArB               = RootCO2ArB-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
+        RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         DO idg=idg_beg,idg_NH3
           trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
           trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcs_rootml_pvr(idg,N,L,NZ)
           trcg_rootml_pvr(idg,N,L,NZ)      = 0._r8
           trcs_rootml_pvr(idg,N,L,NZ)      = 0._r8
         ENDDO
-      ENDDO D956
-      
+      ENDDO D956      
     ENDIF
   ENDDO D950
   

@@ -648,7 +648,7 @@ module RootGasMod
       endif 
     ENDDO    
     dtrc_err(idg_NH3)=dtrc_err(idg_NH3)+RootUptkSoiSol_pvr(idg_NH3B,N,L,NZ)
-    
+
     !check mass conservation error
     !
     ! O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO'
