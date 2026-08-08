@@ -748,6 +748,7 @@ implicit none
   real(r8), pointer :: FracBiomHarvsted(:,:,:)      => null()  !harvest efficiency,                                           [-]
   real(r8), pointer :: CanopyCutProxy_pft(:)   => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   real(r8), pointer :: FireLossE_pft(:,:)        => null() !plant element lost by fire, [g d-2 h-1]
+  real(r8), pointer :: RootLost2Fire_pft(:,:)     => null() !plant root biomass lost by fire, [g d-2 h-1]
   real(r8), pointer :: THIN_pft(:)                  => null()  !thinning of plant population,                                 [-]
   real(r8), pointer :: CH4ByFire_CumYr_pft(:)       => null()  !plant CH4 emission from fire,                                 [g d-2 ]
   real(r8), pointer :: CO2ByFire_CumYr_pft(:)       => null()  !plant CO2 emission from fire,                                 [g d-2 ]
@@ -1266,6 +1267,7 @@ implicit none
   allocate(this%CH4ByFire_CumYr_pft(JP1));this%CH4ByFire_CumYr_pft=spval
   allocate(this%CO2ByFire_CumYr_pft(JP1));this%CO2ByFire_CumYr_pft=spval
   allocate(this%FireLossE_pft(NumPlantChemElms,JP1)); this%FireLossE_pft=spval
+  allocate(this%RootLost2Fire_pft(NumPlantChemElms,JP1)); this%RootLost2Fire_pft=spval
   allocate(this%PlantElmDistLoss_pft(NumPlantChemElms,JP1)); this%PlantElmDistLoss_pft=spval
   allocate(this%N2ObyFire_CumYr_pft(JP1));this%N2ObyFire_CumYr_pft=spval
   allocate(this%NH3byFire_CumYr_pft(JP1));this%NH3byFire_CumYr_pft=spval

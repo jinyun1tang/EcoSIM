@@ -414,6 +414,7 @@ implicit none
     SSXferElms_pft         => plt_bgcr%SSXferElms_pft         ,& !inoput :flux export from seasonal storage, [g h-1 d-2] 
     SSXfer2ShootElms_pft   => plt_bgcr%SSXfer2ShootElms_pft   ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]            
     PlantElmDistLoss_pft   => plt_distb%PlantElmDistLoss_pft  ,& !ouput  :plant element loss due to disturbance, [g d-2 h-1]
+    RootLost2Fire_pft      => plt_distb%RootLost2Fire_pft     ,& !inoput :plant root biomass lost by fire, [g d-2 h-1]    
     LitrfallElms_pvr       => plt_bgcr%LitrfallElms_pvr       ,& !output :plant LitrFall element, [g d-2 h-1]
     LitrFallElms_brch      => plt_bgcr%LitrFallElms_brch      ,& !inoput :litterfall from the branch, [g d-2 h-1]        
     GPP_brch               => plt_rbgc%GPP_brch               ,& !output :GPP over branch, [gC d-2 h-1]    
@@ -487,6 +488,7 @@ implicit none
     CanopyGrosRCO2_pft(NZ)                                      = 0._r8
     CanopyResp_brch(:,NZ)                                       = 0._r8
     PlantElmDistLoss_pft(1:NumPlantChemElms,NZ)                 = 0._r8
+    RootLost2Fire_pft(1:NumPlantChemElms,NZ)                    = 0._R8
     Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)               = 0._r8
     NodulInfectElms_pft(1:NumPlantChemElms,NZ)                  = 0._r8
     CO2FixCL_pft(NZ)                                            = 0._r8
@@ -517,6 +519,7 @@ implicit none
   real(r8) :: massr2nd1(NumPlantChemElms)
   real(r8) :: massnonst1(NumPlantChemElms)
   associate(                                                          &
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft         , & !inoput :plant population, [d-2]  
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft      ,& !input  :maximum soil layer number for all root axes, [-]    
@@ -568,7 +571,7 @@ implicit none
       RootNoduleElms_pft(NE,NZ) = RootNoduleElms_pft(NE,NZ)+sum(RootNodulStrutElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))+sum(RootNodulNonstElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))
     endif      
   ENDDO
-
+  IF(PlantPopuLive_pft(NZ).LE.0.0_r8)NumPrimeRootAxes_pft(NZ)  = 0
   if(present(massroot))massroot=RootElms_pft(:,NZ)+RootNoduleElms_pft(:,NZ)
 
   end associate

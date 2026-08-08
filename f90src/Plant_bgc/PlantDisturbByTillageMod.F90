@@ -1,6 +1,7 @@
 module PlantDisturbByTillageMod
   use data_kind_mod, only : r8 => DAT_KIND_R8, yearIJ_type
   use PlantBalMod, only : SumRootBiome
+  use PlantDebugMod
   use DebugToolMod
   use PlantAPIData
   use ElmIDMod
@@ -314,7 +315,7 @@ contains
           jHarvstType_pft(NZ)       = jharvtyp_terminate
           iDayPlantHarvest_pft(NZ)  = yearIJ%I
           iYearPlantHarvest_pft(NZ) = iYearCurrent
-          NumPrimeRootAxes_pft(NZ)  = 0._r8
+          
           DO NR=1,MaxNumRootAxes
             RootSegBaseDepth_raxes(NR,NZ) = 0._r8
             Root1stDepz_raxes(NR,NZ)      = 0._r8
@@ -323,6 +324,7 @@ contains
       ENDIF
     ENDIF
   ENDIF
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine RemoveBiomByTillage
@@ -420,7 +422,7 @@ contains
         ENDDO
       ENDDO D6385
       
-      if(N==ipltroot)then
+      if(N.eq.ipltroot)then
         DO M=1,jsken
           DO NR=1,NumPrimeRootAxes_pft(NZ)
             DO NE=1,NumPlantChemElms
@@ -465,13 +467,13 @@ contains
       !     RootSAreaPerPlant_pvr=root surface area per plant
       !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
       !
-      if(N==ipltroot)THEN
+      if(N.eq.ipltroot)THEN
         DO NR=1,NumPrimeRootAxes_pft(NZ)
           Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
           DO NE=1,NumPlantChemElms
-            RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*XHVST            
+            RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)+Root1stLigStructElms_rpvr(NE,L,NR,NZ)
           ENDDO
         ENDDO  
         Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*XHVST        

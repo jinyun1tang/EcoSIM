@@ -8,7 +8,7 @@ module grosubsMod
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
   use PlantNonstElmDynMod, only: PlantNonstElmTransfer
-  use PlantDebugMod,       only: PrintRootTracer
+  use PlantDebugMod 
   use DebugToolMod,        only: PrintInfo
   use EcosimConst
   use PlantBGCPars
@@ -92,9 +92,9 @@ module grosubsMod
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
-      !      
-      call RemoveBiomassByDisturbance(yearIJ,NZ)
 
+      call RemoveBiomassByDisturbance(yearIJ,NZ)
+     
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
       

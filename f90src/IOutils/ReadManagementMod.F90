@@ -533,6 +533,8 @@ implicit none
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
   if(ntopou==0)return
   if(first_topou)ntopou=1  
+  !
+  !fire disturbance to soil  
   pair_end = index(fire_event_entry, ',')  
   DO NTOPO=1,ntopou
     call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
@@ -558,7 +560,7 @@ implicit none
   ENDDO  
   call ncd_pio_closefile(soilmgmt_nfid)
 
-  !    
+  !fire disturbance to plants    
   call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
 
   DO NTOPO=1,ntopou

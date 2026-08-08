@@ -6,6 +6,7 @@ module PlantDisturbsMod
   use minimathmod,        only: isclose, AZMAX1
   use EcoSIMCtrlDataType, only: DazCurrYear
   use PlantBalMod,        only: SumPlantBranchBiome,SumPlantBiomStates,SumRootBiome,CheckPlantBalanceZ,SumPlantBiome,SumLitfallBlg
+  use PlantDebugMod
   use ElmIDMod
   use EcosimConst
   use PlantAPIData
@@ -87,13 +88,13 @@ module PlantDisturbsMod
 
   !prepare for disturbance
   CALL SumPlantBiomStates(yearIJ,NZ,subname)
-
-
+  !
   call RemoveBiomByHarvest(yearIJ,NZ)
   !
   !     REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
   !
   call RemoveBiomByTillage(yearIJ,NZ)
+!  IF(NZ.EQ.2)call MassBalCheck(yearIJ,NZ,opt='exit',checktype='c',iut=992,info=subname//'1')  
   !
   call PrintInfo('end '//subname)
   end subroutine RemoveBiomByMgmt
@@ -256,7 +257,7 @@ module PlantDisturbsMod
       ENDIF
     ENDIF
   ELSEIF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-    call RemoveStandDeadByGrazing(yearIJ%I,yearIJ%J,NZ,FracStdeadLeft,FHVSH)
+    call RemoveStandDeadByGrazing(yearIJ,NZ,FracStdeadLeft,FHVSH)
   ELSE
     FracStdeadLeft = 1.0_r8
     FHVSH          = 1.0_r8
@@ -302,15 +303,15 @@ module PlantDisturbsMod
   !     iHarvstType_pft=harvest type:0=none,1=grain,2=all above-ground
   !                       ,3=pruning,4=grazing,5=fire,6=herbivory
   !  
+  
   call RemoveBiomByMgmt(yearIJ,NZ)  
-
+  
   IF(iHarvstType_pft(NZ).GE.iharvtyp_none)THEN
     !
     CALL RemoveStandingDead(yearIJ,NZ)
-  
     !
     call PlantDisturbance(yearIJ,NZ)
-
+  
     ZERO4Groth_pft(NZ)   = ZERO*PlantPopuLive_pft(NZ)
     ZERO4Uptk_pft(NZ)    = ZERO*PlantPopuLive_pft(NZ)/AREA3(NU)
     ZERO4LeafVar_pft(NZ) = ZERO*PlantPopuLive_pft(NZ)*1.0E+06_r8
@@ -354,6 +355,7 @@ module PlantDisturbsMod
 
   !     TOTAL C,N,P REMOVAL FROM DISTURBANCE
   call AbvgBiomRemovalByDisturb(yearIJ,NZ,CanopyNonstElm2Litr,HarvestAbgElmnt2Litr,TotalAbgElmnt2Litr)
+!  if(NZ.EQ.2)call CheckPlantBalanceZ(yearIJ,NZ,header=subname//'aftAbvgBiomRemovalByDisturb')       
   !
   !     ABOVE-GROUND LitrFall FROM HARVESTING
   !
@@ -551,7 +553,7 @@ module PlantDisturbsMod
     !
     !     C,N,P REMOVED FROM GRAZING
     !  
-    CALL AbvgBiomRemovalByGrazing(yearIJ%I,yearIJ%J,NZ,TotalAbgElmnt2Litr,TotalAbgElmntRemoval)
+    CALL AbvgBiomRemovalByGrazing(yearIJ,NZ,TotalAbgElmnt2Litr,TotalAbgElmntRemoval)
     !
   ELSE
     ! 
@@ -892,7 +894,8 @@ module PlantDisturbsMod
     !     EFIRE=combustion  of N,P relative to C
     !
     !
-    IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo .AND. iHarvstType_pft(NZ).NE.iharvtyp_allabvg)THEN
+    IF(iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo &
+      .AND. iHarvstType_pft(NZ).NE.iharvtyp_allabvg)THEN
       !
       FracLeftThin=1.0_r8-THIN_pft(NZ)
       DO NR=1,NumPrimeRootAxes_pft(NZ)        
@@ -901,9 +904,10 @@ module PlantDisturbsMod
         ENDDO        
       ENDDO
       !
+
       D3985: DO N=1,Myco_pft(NZ)
         D3980: DO L=NU,MaxNumRootLays
-          !
+          !          
           CALL RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
 
           call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
@@ -2193,6 +2197,7 @@ module PlantDisturbsMod
   call PrintInfo('beg '//subname)
   if(N.EQ.ipltroot)then
     DO NR=1,NumPrimeRootAxes_pft(NZ)
+      
       DO NE=1,NumPlantChemElms        
         Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*FracLeftThin
@@ -2226,7 +2231,6 @@ module PlantDisturbsMod
   RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
   RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*FracLeftThin
   RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*FracLeftThin
-  RootCO2Autor_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ)*FracLeftThin
   !
   !     NODULE LitrFall AND STATE VARIABLES DURING HARVESTING
   !
@@ -2236,7 +2240,7 @@ module PlantDisturbsMod
   !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
   !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
   !
-  IF(is_plant_N2fix(iPlantNfixType_pft(NZ)).AND.N.EQ.ipltroot)THEN
+  IF(N.EQ.ipltroot .and. is_plant_N2fix(iPlantNfixType_pft(NZ)) .AND. is_root_N2fix(iPlantNfixType_pft(NZ)))THEN
     DO NE=1,NumPlantChemElms
       D3395: DO M=1,jsken
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+ &
