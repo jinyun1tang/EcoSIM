@@ -199,7 +199,7 @@ implicit none
       DO NZ=1,NP_col(NY,NX)
         DO M=1,366
           iHarvstType_pft(NZ,M,NY,NX)                                   = -1
-          jHarvstType_pft(NZ,M,NY,NX)                                   = 0
+          jHarvstType_pft(NZ,M,NY,NX)                                   = 0     !do not terminate
           CanopyCutProxy_pft(NZ,M,NY,NX)                               = 1.0E+06_r8
           THIN_pft(NZ,M,NY,NX)                                          = -1.0_r8
           FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,M,NY,NX)        = 1.0_r8
@@ -333,7 +333,7 @@ implicit none
                   D580: DO IDYG=IDYS+1,IDYE-1
                     iHarvstType_pft(NZ,IDYG,NY,NX)    = ICUT
                     jHarvstType_pft(NZ,IDYG,NY,NX)    = JCUT
-                    CanopyCutProxy_pft(NZ,IDYG,NY,NX) = HCUT
+                    CanopyCutProxy_pft(NZ,IDYG,NY,NX) = HCUT !impact height by disturbance, mostly
                     THIN_pft(NZ,IDYG,NY,NX)           = PCUT
                     
                     FracBiomHarvsted(iHarvst_pft,iplthvst_leaf,NZ,IDYG,NY,NX)        = ECUT11

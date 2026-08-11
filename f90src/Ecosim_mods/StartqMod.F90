@@ -59,6 +59,7 @@ module StartqMod
     D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP_col(NY,NX))
       D9985: DO NZ=NZ1Q,NZ2X
+        FireReSet_pft(NZ,NY,NX)=ifalse
         IF(IsPlantActive_pft(NZ,NY,NX).EQ.iFalse)THEN
 
           call InitShootGrowth(NZ,NY,NX)
@@ -904,17 +905,6 @@ module StartqMod
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 !
-!     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
-!     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     CanopyLeafSheathC_brch=C in leaves+PetolSheths (g)
-!     FDM-dry matter fraction (g DM C g FM C-1)
-!     CanopyBiomWater_pft,WatHeldOnCanopy_pft=water volume in,on canopy (m3)
-!     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
-!     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
-!     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
-!     RootMycoActiveBiomC_pvr,WTRTD=total root C mass (g)
-!     RootProteinC_pvr=total root protein C mass (g)
-!     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   SeedPlantedElm_pft(ielmc,NZ,NY,NX)    = SeedCMass_pft(NZ,NY,NX)*PlantPopuLive_pft(NZ,NY,NX)
 

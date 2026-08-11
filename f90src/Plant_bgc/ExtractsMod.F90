@@ -4,7 +4,7 @@ module ExtractsMod
 !     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
-  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use data_kind_mod, only: r8 => DAT_KIND_R8,yearIJ_type
   use minimathmod,   only: AZMAX1
   use PlantBalMod,   only: SumPlantRootGas
   use PlantDebugMod, only: PrintRootTracer
@@ -23,14 +23,16 @@ module ExtractsMod
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
-  SUBROUTINE extracts(I,J)
+  SUBROUTINE extracts(YEARIJ)
 !     execution begins here
   implicit none
 
-  integer, intent(in) :: I, J
+  TYPE(yearIJ_type), intent(in) :: yearIJ
+  integer  :: I, J
   character(len=*), parameter :: subname='extracts'
   integer :: NZ,L
 
+  I=yearIJ%I;J=yearIJ%J
   call PrintInfo('beg '//subname)
 
   call ExtractLitterfall()

@@ -1322,10 +1322,11 @@ module UptakesMod
   associate(                                                               &
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     OrganOsmoPsi0pt_pft         => plt_ew%OrganOsmoPsi0pt_pft             ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
-    CanopyHeightLive_pft            => plt_morph%CanopyHeightLive_pft             ,& !input  :canopy height, [m]
+    CanopyHeightLive_pft        => plt_morph%CanopyHeightLive_pft         ,& !input  :canopy height, [m]
     CanopyNonstElmConc_pft      => plt_biom%CanopyNonstElmConc_pft        ,& !input  :canopy nonstructural element concentration, [g d-2]
     FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
-    MaxSoilLays4Root_pft            => plt_morph%MaxSoilLays4Root_pft             ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft        => plt_morph%MaxSoilLays4Root_pft         ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxNumRootLays              => plt_site%MaxNumRootLays                ,& !input  :maximum root layer number,[-]    
     Myco_pft                    => plt_morph%Myco_pft                     ,& !input  :mycorrhizal type (no or yes),[-]
     NGTopRootLayer_pft          => plt_morph%NGTopRootLayer_pft           ,& !input  :soil layer at planting depth, [-]
     NU                          => plt_site%NU                            ,& !input  :current soil surface layer number, [-]
@@ -1397,7 +1398,7 @@ module UptakesMod
   DeltaTKC_pft(NZ)       = 0.0_r8
 
   DO N=1,Myco_pft(NZ)
-    DO  L=NU,MaxSoilLays4Root_pft(NZ)
+    DO  L=NU,MaxNumRootLays
       PSIRoot_pvr(N,L,NZ)              = TotalSoilPSIMPa_vr(L)
       if(ldo_sp_mode)then
         CCPOLT =0.4_r8
@@ -1408,9 +1409,9 @@ module UptakesMod
       RootH2OUptkStress_pvr(N,L,NZ)   = 0._r8
       call update_osmo_turg_pressure(PSIRoot_pvr(N,L,NZ),CCPOLT,OrganOsmoPsi0pt_pft(NZ),TKS_vr(L),&
         PSIRootOSMO_vr(N,L,NZ),PSIRootTurg_vr(N,L,NZ))
-
     enddo
   ENDDO
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine HandleBareSoil

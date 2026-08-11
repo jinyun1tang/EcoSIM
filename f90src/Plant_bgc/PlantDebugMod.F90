@@ -12,7 +12,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
   public :: PrintRootTracer, PrintRootBiomass
-  public :: MassBalCheck
+  public :: RootMassBalCheck
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ implicit none
   end subroutine PrintRootBiomass
 
 !----------------------------------------------------------------------------------------------------
-  subroutine MassBalCheck(yearIJ,NZ,opt,checktype,iut,info,id)
+  subroutine RootMassBalCheck(yearIJ,NZ,opt,checktype,iut,info,id)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
@@ -68,6 +68,7 @@ implicit none
   integer, intent(in) :: iut                  !
   character(len=*), intent(in) :: info
   integer, optional, intent(in) :: id
+  character(len=*), parameter :: subname='MassBalCheck'
   real(r8), save :: tmpval
   real(r8), save :: mass_inital(NumPlantChemElms)
   real(r8) :: mass_finale(NumPlantChemElms)
@@ -78,7 +79,7 @@ implicit none
     call SumRootBiome(yearIJ,NZ,mass_inital)
     call SumRootAR(NZ);call SumLitfallBlg(NZ);
     tmpval=-plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+ &
-      plt_distb%RootLost2Fire_pft(ielmc,NZ)
+      plt_distb%RootLost2Fire_pft(ielmc,NZ)-plt_bgcr%Xfer2RootsC_pft(NZ)
   else
     id_loc=0
     if(present(id))id_loc=id
@@ -86,14 +87,18 @@ implicit none
     call SumRootBiome(yearIJ,NZ,mass_finale)
     call SumRootAR(NZ);call SumLitfallBlg(NZ);
     masserr=mass_finale(ielmc)-mass_inital(ielmc)- &
-        plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+plt_distb%RootLost2Fire_pft(ielmc,NZ)-tmpval
+        plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+plt_distb%RootLost2Fire_pft(ielmc,NZ) &
+        -tmpval-plt_bgcr%Xfer2RootsC_pft(NZ)
+
     write(iut,*)yearIJ%I*1000+yearIJ%J/24.,masserr,'mass',mass_finale(ielmc)-mass_inital(ielmc),mass_finale(ielmc),mass_inital(ielmc),'flux',&
-        tmpval,-plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+plt_distb%RootLost2Fire_pft(ielmc,NZ),info,id_loc,&
+        tmpval,-plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+&
+        plt_distb%RootLost2Fire_pft(ielmc,NZ)-plt_bgcr%Xfer2RootsC_pft(NZ),info,id_loc,&
         plt_morph%NumPrimeRootAxes_pft(NZ)    
-    !write(iut,*)'flux',-plt_bgcr%RootAutoCO2_pft(NZ),plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ),plt_distb%RootLost2Fire_pft(ielmc,NZ),&
+!    write(iut,*)'plt_biom%SeasonalNonstElms_pft',plt_biom%SeasonalNonstElms_pft(:,NZ)
+    write(iut,*)'plt_biom%RootElmsBeg_pft',plt_biom%RootElmsBeg_pft(:,NZ)
       
     if(abs(masserr)>1.e-8_r8)call endrun(trim(mod_filename)//' at line',__LINE__)               
   endif
-  end subroutine MassBalCheck
+  end subroutine RootMassBalCheck
   ![tail]
 end module PlantDebugMod

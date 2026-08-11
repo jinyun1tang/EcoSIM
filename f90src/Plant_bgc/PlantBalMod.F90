@@ -440,6 +440,7 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    plt_rbgc%NH3Dep2Can_brch(:,NZ) = 0._R8  
     RLeafAppear_pft(NZ) = 0._r8
     RNodeInitiate_pft(NZ) = 0._r8
     SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
@@ -462,6 +463,7 @@ implicit none
     plt_biom%LeafPEPCperm2LA_pft(NZ)             = 0._r8
     plt_biom%SpecificLeafArea_pft(NZ)            = 0._r8
     plt_biom%LeafProteinCperm2LA_pft(NZ)         = 0._r8
+    plt_bgcr%Xfer2RootsC_pft(NZ)                 = 0._R8
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
@@ -571,7 +573,7 @@ implicit none
       RootNoduleElms_pft(NE,NZ) = RootNoduleElms_pft(NE,NZ)+sum(RootNodulStrutElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))+sum(RootNodulNonstElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))
     endif      
   ENDDO
-  IF(PlantPopuLive_pft(NZ).LE.0.0_r8)NumPrimeRootAxes_pft(NZ)  = 0
+  
   if(present(massroot))massroot=RootElms_pft(:,NZ)+RootNoduleElms_pft(:,NZ)
 
   end associate
@@ -607,6 +609,7 @@ implicit none
       plt_biom%TotBegVegE_pft(NE,NZ)            = plt_biom%TotEndVegE_pft(NE,NZ)
       plt_biom%RootNoduleElmsBeg_pft(NE,NZ)     = plt_biom%RootNoduleElms_pft(NE,NZ)
       plt_distb%FireLossE_pft(NE,NZ)            = 0._r8
+      plt_bgcr%NH3Dep2Can_pft(NZ)               = 0._r8
     ENDDO
 
   ENDDO
@@ -707,7 +710,7 @@ implicit none
       -NodulInfectElms_pft(NE,NZ)-Soil2RootMycoExudE_pft(NE,NZ) &
       +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)
   ENDDO
-
+  
   dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
   balE(ielmc)=balE(ielmc)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   
   balE(ielmn)=balE(ielmn)-RootNutUptakeN_pft(NZ)-CanopyN2Fix_pft(NZ)-RootN2Fix_pft(NZ)-NH3Dep2Can_pft(NZ)             

@@ -14,7 +14,7 @@ module PlantDisturbByFireMod
   public :: StageRootRemovalByFire
   public :: AbvGrndLiterFallByFire
   public :: AbvgBiomRemovalByFire
-  public :: ApplyBiomRemovalByFire
+  public :: ShootBiomRemovalByFire
   public :: InitPlantFireMod
   public :: RootRemovalLbyFire
   real(r8) :: EFIRE(2,5:5) !emission efficiency of N and P along with C loss due to fire
@@ -47,6 +47,7 @@ contains
     THETW_vr             => plt_soilchem%THETW_vr            & !input  :volumetric water content, [m3 m-3]
   )
   call PrintInfo('beg '//subname)
+  
   !soil too wet, or insufficient soil organic matter or not  or not fire disturbance 
   IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.itill_fire)THEN
     FracLeftThin              = 1.0_r8
@@ -261,9 +262,9 @@ contains
   end subroutine AbvGrndLiterFallByFire
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AbvgBiomRemovalByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
+  subroutine AbvgBiomRemovalByFire(yearIJ,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)
@@ -308,7 +309,7 @@ contains
   end subroutine AbvgBiomRemovalByFire
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
+  subroutine ShootBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
     StandeadElmntRemoval,CanopyNonstElmRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
     FineNonleafElmntRemoval,CanopyNonstElm2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
@@ -336,7 +337,7 @@ contains
   real(r8), intent(out) :: FineNonleafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: StandeadElmnt2Litr(NumPlantChemElms)
-  character(len=*), parameter :: subname='ApplyBiomRemovalByFire'
+  character(len=*), parameter :: subname='ShootBiomRemovalByFire'
 
 
   associate(                                         &
@@ -389,7 +390,7 @@ contains
 
   call PrintInfo('end '//subname)
   end associate
-  end subroutine ApplyBiomRemovalByFire
+  end subroutine ShootBiomRemovalByFire
 !----------------------------------------------------------------------------------------------------
   subroutine RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
 

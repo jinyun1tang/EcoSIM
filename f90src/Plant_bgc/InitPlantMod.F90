@@ -19,6 +19,7 @@ module InitPlantMod
   public :: StartPlants
   public :: InitPlantPhenoMorphoBio
   public :: InitRootMychorMorphoBio
+  public :: ApplySeedBank
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -832,7 +833,7 @@ module InitPlantMod
   plt_biom%ShootNoduleElms_pft(:,NZ)                      = 0._r8
   CanopyLeafArea_pft(NZ)                                  = 0._r8
   plt_biom%RootBiomCPerPlant_pft(NZ)                      = 0._r8
-  CanopyStemSurfArea_pft(NZ)                                  = 0._r8
+  CanopyStemSurfArea_pft(NZ)                              = 0._r8
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantPhenoMorphoBio
@@ -871,7 +872,7 @@ module InitPlantMod
   )
 !
 !     INITIALIZE MASS BALANCE CHECKS
-!
+!  
   IF(.not.is_restart().AND.is_first_year)THEN
     GrossCO2Fix_pft(NZ)                                   = 0._r8
     SurfLitrfalStrutElms_CumYr_pft(1:NumPlantChemElms,NZ) = 0._r8
@@ -996,7 +997,6 @@ module InitPlantMod
     Root1stTransptArea_pvr        => plt_morph%Root1stTransptArea_pvr         ,& !output :transport area by 1st order root, [m2 d-2]         
     Root1stRadius_pvr             => plt_morph%Root1stRadius_pvr              ,& !output :root layer diameter primary axes, [m]
     Root2ndRadius_rpvr            => plt_morph%Root2ndRadius_rpvr             ,& !output :root layer diameter secondary axes, [m]
-    RootN2Fix_pvr                 => plt_bgcr%RootN2Fix_pvr                   ,& !output :root N2 fixation, [gN d-2 h-1]
     RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !output :root layer protein C, [gC d-2]
     RootProteinConc_rpvr          => plt_biom%RootProteinConc_rpvr             & !output :root layer protein C concentration, [g g-1]
   )
@@ -1009,11 +1009,7 @@ module InitPlantMod
   !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
   !
   NumPrimeRootAxes_pft(NZ)=0
-  plt_rbgc%RootNH4Uptake_pft(NZ)   = 0._r8
-  plt_rbgc%RootNO3Uptake_pft(NZ)   = 0._r8
-  plt_rbgc%RootH2PO4Uptake_pft(NZ) = 0._r8
-  plt_rbgc%RootHPO4Uptake_pft(NZ)  = 0._r8
-  plt_rbgc%RootN2Fix_pft(NZ)       = 0._r8
+
   DO NR=1,MaxNumRootAxes
     plt_morph%RootSegBaseDepth_raxes(NR,NZ)                = SeedDepth_pft(NZ)
     plt_morph%Root1stDepz_raxes(NR,NZ)                     = SeedDepth_pft(NZ)
@@ -1031,7 +1027,7 @@ module InitPlantMod
       plt_biom%RootNonstructElmConc_rpvr(1:NumPlantChemElms,N,L,NZ) = 0._r8
       RootProteinConc_rpvr(N,L,NZ)                                  = RootProteinCMax_pft(NZ)
       plt_biom%RootMycoActiveBiomC_pvr(N,L,NZ)                     = 0._r8
-      plt_biom% PopuRootMycoC_pvr(N,L,NZ)=0._r8
+      plt_biom%PopuRootMycoC_pvr(N,L,NZ)=0._r8
       RootProteinC_pvr(N,L,NZ)                                 = 0._r8
 
       plt_morph%Root2ndXNumL_rpvr(N,L,NZ)                      = 0._r8
@@ -1044,6 +1040,7 @@ module InitPlantMod
       Root1stTransptArea_pvr(N,L,NZ)                           = PICON*Root1stMaxRadius_pft(N,NZ)**2      
       plt_morph%RootSAreaPerPlant_pvr(N,L,NZ)                   = 0._r8
       plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ)                = 1.0E-03
+
       plt_rbgc%RootNutUptake_pvr(ids_NH4B:ids_nuts_end,N,L,NZ) = 0._r8
       plt_rbgc%RootO2Dmnd4Resp_pvr(N,L,NZ)                     = 0._r8
       plt_rbgc%RootNH4DmndSoil_pvr(N,L,NZ)                     = 0._r8
@@ -1054,6 +1051,7 @@ module InitPlantMod
       plt_rbgc%RootH1PO4DmndSoil_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH2PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
       plt_rbgc%RootH1PO4DmndBand_pvr(N,L,NZ)                   = 0._r8
+      
       DO idg=idg_beg,idg_NH3
         trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcg_rootml_pvr(idg,N,L,NZ)
         trcs_deadroot2soil_pvr(idg,L,NZ) = trcs_deadroot2soil_pvr(idg,L,NZ) + trcs_rootml_pvr(idg,N,L,NZ)
@@ -1064,8 +1062,7 @@ module InitPlantMod
       CCO2P                                             = 0.030*EXP(-2.621_r8-0.0317_r8*ATCA)*CO2EI
       plt_rbgc%trcg_air2root_flx_pvr(idg_CO2,N,L,NZ)    = 0._r8
       plt_rbgc%trcg_Root_gas2aqu_flx_vr(idg_CO2,N,L,NZ) = 0._r8
-      plt_rbgc%RootUptkSoiSol_pvr(idg_CO2,N,L,NZ)       = 0._r8
-      plt_rbgc%RCO2Emis2Root_rpvr(N,L,NZ)                = 0._r8
+      
       COXYA                                             = COXYE
       COXYP                                             = 0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA)*OXYE
       plt_rbgc%RAutoRootO2Limter_rpvr(N,L,NZ)=1.0
@@ -1085,12 +1082,8 @@ module InitPlantMod
       plt_morph%RootAge_rpvr(L,NR,NZ)                                = 0._r8
     ENDDO  
 
-!    D6400: DO K=1,pltpar%NumOfPlantLitrCmplxs
-!      plt_bgcr%LitrfallElms_pvr(1:NumPlantChemElms,1:jsken,K,L,NZ)=0._r8
-!    ENDDO D6400
     plt_biom%RootNodulNonstElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
     plt_biom%RootNodulStrutElms_rpvr(1:NumPlantChemElms,L,NZ) = 0._r8
-    RootN2Fix_pvr(L,NZ)                                       = 0._r8
 
   ENDDO D20
 
@@ -1098,7 +1091,68 @@ module InitPlantMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitRootMychorMorphoBio
+!----------------------------------------------------------------------------------------------------
+  subroutine ApplySeedBank(NZ,I,RootC)
+  implicit none
+  integer, intent(in) :: NZ
+  integer, intent(in) :: I
+  real(r8),intent(in) :: RootC
 
+  character(len=*), parameter :: subname='ApplySeedBank'
+  integer :: NE
+  associate(                                                 &
+    rNCGrain_pft          => plt_allom%rNCGrain_pft          ,& !input  :grain N:C ratio, [g g-1]
+    rPCGrain_pft          => plt_allom%rPCGrain_pft          ,& !input  :grain P:C ratio, [gP gP-1]
+    AREA3                 => plt_site%AREA3                  ,& !input  :soil cross section area, [m2]
+    NU                    => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
+    PPatSeeding_pft       => plt_site%PPatSeeding_pft        ,& !input  :plant population at seeding, [plants d-2]
+    iYearCurrent          => plt_site%iYearCurrent           ,& !input  :current year,[-]
+    PPX_pft               => plt_site%PPX_pft                ,& !output :plant population, [plants m-2]
+    FireReSet_pft         => plt_pheno%FireReSet_pft         ,& !output :flag to skill startq for fire rejuvenation    
+    PlantElmDistLoss_pft  => plt_distb%PlantElmDistLoss_pft  ,& !inoput :plant loss to disturbance,    [g d-2 h-1]       
+    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft      ,& !output :plant population, [d-2]
+    PlantPopuDead_pft     => plt_site%PlantPopuDead_pft      ,& !output :live+standing dead plant population, [d-2]
+    iYearPlanting_pft     => plt_distb%iYearPlanting_pft     ,& !input  :year of planting,[-]    
+    iDayPlanting_pft      => plt_distb%iDayPlanting_pft      ,& !input  :day of planting,[-]    
+    SeedCMass_pft         => plt_morph%SeedCMass_pft         ,& !input  :grain size at seeding, [g]
+    Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       ,& !inoput :total NBP, [g d-2]    
+    doInitPlant_pft       => plt_pheno%doInitPlant_pft       ,& !inoput :PFT initialization flag:0=no,1=yes,[-]    
+    SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft  ,& !output :plant stored nonstructural element at current step, [g d-2]
+    IsPlantActive_pft     => plt_pheno%IsPlantActive_pft     ,& !output :flag for living pft, [-]    
+    SeedPlantedElm_pft    => plt_biom%SeedPlantedElm_pft      & !output :plant stored nonstructural C at planting, [gC d-2]
+  )
+  call PrintInfo('beg '//subname)
+  PPX_pft(NZ)                = PPatSeeding_pft(NZ)
+  PlantPopuLive_pft(NZ)      = PPatSeeding_pft(NZ)*AREA3(NU)
+  PlantPopuDead_pft(NZ)      = PlantPopuLive_pft(NZ)
+
+  IsPlantActive_pft(NZ)      = iTrue
+  SeedPlantedElm_pft(:,NZ)   = 0._r8
+  SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)
+
+  if(SeedPlantedElm_pft(ielmc,NZ).LE.SeasonalNonstElms_pft(ielmc,NZ))THEN
+    !reseed 
+    SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedPlantedElm_pft(ielmc,NZ)
+    SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedPlantedElm_pft(ielmc,NZ)
+    DO NE=1,NumPlantChemElms
+      PlantElmDistLoss_pft(NE,NZ)  = PlantElmDistLoss_pft(NE,NZ)+SeasonalNonstElms_pft(NE,NZ)
+    ENDDO
+    SeasonalNonstElms_pft(:,NZ)  = SeedPlantedElm_pft(:,NZ)
+    
+    iYearPlanting_pft(NZ)        = iYearCurrent+1
+    iDayPlanting_pft(NZ)         = 1
+    Eco_NBP_CumYr_col = Eco_NBP_CumYr_col+SeedPlantedElm_pft(ielmc,NZ)
+  else
+    SeedPlantedElm_pft(:,NZ)=0._r8
+  endif  
+  FireReSet_pft(NZ)= iTrue
+  call InitPlantPhenoMorphoBio(NZ)
+
+!  plt_morph%HypocotHeight_pft(NZ)=plt_morph%SeedDepth_pft(NZ)
+  write(9900+NZ,*)I*1000,subname,NZ
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine ApplySeedBank
 !----------------------------------------------------------------------------------------------------
   subroutine InitSeedMorphoBio(NZ)
 

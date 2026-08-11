@@ -396,6 +396,7 @@ implicit none
   real(r8), pointer :: PhotoPeriodSens_pft(:)        => null()     !difference between current and critical daylengths used to calculate  phenological progress, [h]
   integer,  pointer :: iEmbryophyteType_pft(:)       => null()      !plant embrophyte 
   integer,  pointer :: iPlantStateLive_pft(:)            => null()  !flag for species death, [-]
+  integer,  pointer :: FireReSet_pft(:)              => null()      !flag to skill startq for fire rejuvenation, [-]  
   integer,  pointer :: iMaintPlantTrait_pft(:)          => null()   !flag for maintaining or reset plant traits, [-]    
   integer,  pointer :: IsPlantActive_pft(:)              => null()  !flag for living pft, [-]
   integer,  pointer :: isPlantBranchAlive_brch(:,:)       => null()  !flag to detect branch death,                      [-]
@@ -791,6 +792,7 @@ implicit none
   real(r8), pointer :: LitrfallElms_pvr(:,:,:,:,:)         => null()  !plant LitrFall element,                      [g d-2 h-1]
   real(r8), pointer :: SSXferElms_pft(:,:)                 => null()  !export flux from the seasonal storage, [g h-1 d-2]
   real(r8), pointer :: SSXfer2ShootElms_pft(:,:)           => null()  !flux export from seasonal storage to shoot, [g h-1 d-2]          
+  real(r8), pointer :: Xfer2RootsC_pft(:)                  => null()  !carbon transfer from other nonstructural source to roots, [gC d-2 h-1]
   real(r8), pointer :: LitrFallElms_brch(:,:,:)            => null()  !litterfall from the branch, [g d-2 h-1]  
   real(r8), pointer :: RootMaintDef_CO2_pvr(:,:,:)         => null()  !plant root maintenance respiraiton deficit as CO2, [g d-2 h-1]  
   real(r8), pointer :: REcoO2DmndResp_vr(:)                => null()  !total root + microbial O2 uptake,            [g d-2 h-1]
@@ -989,7 +991,7 @@ implicit none
   allocate(this%Cytokinin1stConc_rpvr(JZ1,MaxNumRootAxes,JP1)); this%Cytokinin1stConc_rpvr=0._r8
   allocate(this%RootOUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootOUlmNutUptake_pvr=spval
   allocate(this%RootCUlmNutUptake_pvr(ids_nutb_beg+1:ids_nuts_end,jroots,JZ1,JP1));this%RootCUlmNutUptake_pvr=spval
-  allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=spval
+  allocate(this%NH3Dep2Can_brch(MaxNumBranches,JP1));this%NH3Dep2Can_brch=0._r8
   allocate(this%GPP_brch(MaxNumBranches,JP1)); this%GPP_brch=spval
   allocate(this%RNodeInitiate_pft(JP1));this%RNodeInitiate_pft=spval   
   allocate(this%RLeafAppear_pft(JP1));this%RLeafAppear_pft=spval     
@@ -1215,7 +1217,7 @@ implicit none
   allocate(this%Nutruptk_fNlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fNlim_rpvr=0._r8
   allocate(this%Nutruptk_fPlim_rpvr(jroots,JZ1,JP1));this%Nutruptk_fPlim_rpvr=0._r8
   allocate(this%Nutruptk_fProtC_rpvr(jroots,JZ1,JP1));this%Nutruptk_fProtC_rpvr=0._r8
-  allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=spval
+  allocate(this%NH3Dep2Can_pft(JP1));this%NH3Dep2Can_pft=0._r8
   allocate(this%tRootMycoExud2Soil_vr(NumPlantChemElms,1:jcplx,JZ1));this%tRootMycoExud2Soil_vr=spval
   allocate(this%RootN2Fix_pvr(JZ1,JP1));this%RootN2Fix_pvr=0._r8
   allocate(this%RCO2Nodule_pvr(JZ1,JP1)); this%RCO2Nodule_pvr=0._r8
@@ -1238,6 +1240,7 @@ implicit none
   allocate(this%LitrfallElms_pft(NumPlantChemElms,JP1));this%LitrfallElms_pft=spval
   allocate(this%SSXfer2ShootElms_pft(NumPlantChemElms,JP1));this%SSXfer2ShootElms_pft=spval
   allocate(this%SSXferElms_pft(NumPlantChemElms,JP1));this%SSXferElms_pft=spval
+  allocate(this%Xfer2RootsC_pft(JP1));this%Xfer2RootsC_pft=0._r8
   allocate(this%LitrfallElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ1,JP1));this%LitrfallElms_pvr=spval
   allocate(this%LitrFallElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LitrFallElms_brch=spval
   allocate(this%LitrfallAbvgElms_pft(NumPlantChemElms,JP1)); this%LitrfallAbvgElms_pft=spval
@@ -2009,6 +2012,7 @@ implicit none
   allocate(this%IsPlantActive_pft(JP1));this%IsPlantActive_pft=0
   allocate(this%iMaintPlantTrait_pft(JP1)); this%iMaintPlantTrait_pft=0
   allocate(this%iPlantStateLive_pft(JP1));this%iPlantStateLive_pft=0
+  allocate(this%FireReSet_pft(JP1)); this%FireReSet_pft=ifalse
   allocate(this%NetCumElmntFlx2Plant_pft(NumPlantChemElms,JP1));this%NetCumElmntFlx2Plant_pft=spval
   allocate(this%MatureGroup_brch(MaxNumBranches,JP1));this%MatureGroup_brch=spval
   allocate(this%isPlantShootAlive_pft(JP1));this%isPlantShootAlive_pft=0

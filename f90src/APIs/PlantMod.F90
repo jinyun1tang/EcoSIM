@@ -57,7 +57,7 @@ implicit none
 
         CALL ROOTUPTAKES(yearIJ)
         
-        call extracts(yearIJ%I,yearIJ%J)
+        call extracts(yearIJ)
         
         call PlantUPtakeAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       else
@@ -67,7 +67,7 @@ implicit none
         call EnterPlantBalance(yearIJ,NP_col(NY,NX))
 
         !Phenological update, determine living/active branches      
-        CALL PhenologyUpdate(yearIJ%I,yearIJ%J)
+        CALL PhenologyUpdate(yearIJ)
 
         !Predict uptake fluxes of nutrients and O2        
         CALL ROOTUPTAKES(yearIJ)
@@ -76,13 +76,10 @@ implicit none
         CALL GROWPLANTS(yearIJ)
 
         !aggregate varaibles
-        CALL EXTRACTs(yearIJ%I,yearIJ%J)
-
-        DO NZ=1,NP_col(NY,NX)
-          !
-          Call ReSeedPlants(yearIJ%I,yearIJ%J,NZ)
-        ENDDO
-
+        CALL EXTRACTs(yearIJ)
+        
+        Call ReSeedPlants(yearIJ,NP_col(NY,NX))
+        
         call ExitPlantBalance(yearIJ,NP_col(NY,NX))
 
         call PlantAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
