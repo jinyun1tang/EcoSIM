@@ -1,6 +1,7 @@
 module PlantDisturbByTillageMod
   use data_kind_mod, only : r8 => DAT_KIND_R8, yearIJ_type
   use PlantBalMod, only : SumRootBiome
+  use PlantDebugMod
   use DebugToolMod
   use PlantAPIData
   use ElmIDMod
@@ -44,7 +45,7 @@ contains
     k_woody_comp                => pltpar%k_woody_comp                    ,& !input  :woody litter complex id
     iYearCurrent                => plt_site%iYearCurrent                  ,& !input  :current year,[-]
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
-    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft           ,& !input  :plant population, [d-2]
+    PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col               ,& !inoput :total subsurface water flux, [m3 d-2]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !inoput :canopy water content, [m3 d-2]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
@@ -257,6 +258,7 @@ contains
   integer :: L,K,M,N,NR,NE,NB
   real(r8) :: XHVST
   REAL(R8) :: APSILT
+  logical :: time_check, plant_check,till_check
 
 !     begin_execution
   associate(                                                           &
@@ -291,17 +293,20 @@ contains
   !     iSoilDisturbType_col=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
   !     XHVST=fraction of PFT remaining after disturbance
   !
-  IF(yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. (iPlantTurnoverPattern_pft(NZ).EQ.0 &
-    .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))) &
-    .AND. (yearIJ%I.NE.iDayPlanting_pft(NZ) .OR. iYearCurrent.NE.iYearPlanting_pft(NZ)))THEN
-
+  time_check=yearIJ%J.EQ.INT(SolarNoonHour_col) .AND. (yearIJ%I.NE.iDayPlanting_pft(NZ) .OR. iYearCurrent.NE.iYearPlanting_pft(NZ))
+  !only for grass
+  plant_check=(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))
+  till_check = (iSoilDisturbType_col.GT.0 .AND. iSoilDisturbType_col.LE.20)
+  IF(time_check .AND. plant_check .and. till_check)THEN
+    !why only affect species other than the first?
     IF(iSoilDisturbType_col.LE.10 .OR. NZ.NE.1)THEN
       IF(yearIJ%I.GT.iDayPlanting_pft(NZ) .OR. iYearCurrent.GT.iYearPlanting_pft(NZ))THEN
-        XHVST                   = XCORP
-        PPX_pft(NZ)             = PPX_pft(NZ)*XHVST
+        XHVST                 = XCORP
+        PPX_pft(NZ)           = PPX_pft(NZ)*XHVST
+        
         PlantPopuLive_pft(NZ) = PlantPopuLive_pft(NZ)*XHVST
         PlantPopuDead_pft(NZ) = PlantPopuDead_pft(NZ)*XHVST
-
+        
         call RemoveShootByTillage(yearIJ,NZ,XHVST)
 
         ! LitrFall FROM ROOTS DURING TILLAGE
@@ -312,9 +317,7 @@ contains
           isPlantShootAlive_pft(NZ) = iFalse
           iPlantStateLive_pft(NZ)   = iFalse
           jHarvstType_pft(NZ)       = jharvtyp_terminate
-          iDayPlantHarvest_pft(NZ)  = yearIJ%I
-          iYearPlantHarvest_pft(NZ) = iYearCurrent
-          NumPrimeRootAxes_pft(NZ)  = 0._r8
+          
           DO NR=1,MaxNumRootAxes
             RootSegBaseDepth_raxes(NR,NZ) = 0._r8
             Root1stDepz_raxes(NR,NZ)      = 0._r8
@@ -323,6 +326,7 @@ contains
       ENDIF
     ENDIF
   ENDIF
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine RemoveBiomByTillage
@@ -420,7 +424,7 @@ contains
         ENDDO
       ENDDO D6385
       
-      if(N==ipltroot)then
+      if(N.eq.ipltroot)then
         DO M=1,jsken
           DO NR=1,NumPrimeRootAxes_pft(NZ)
             DO NE=1,NumPlantChemElms
@@ -465,13 +469,13 @@ contains
       !     RootSAreaPerPlant_pvr=root surface area per plant
       !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
       !
-      if(N==ipltroot)THEN
+      if(N.eq.ipltroot)THEN
         DO NR=1,NumPrimeRootAxes_pft(NZ)
           Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
           DO NE=1,NumPlantChemElms
-            RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*XHVST            
+            RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)+Root1stLigStructElms_rpvr(NE,L,NR,NZ)
           ENDDO
         ENDDO  
         Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*XHVST        
@@ -546,6 +550,7 @@ contains
     ENDDO D6400
     SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)*XHVST
   ENDDO
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine RemoveRootsByTillage

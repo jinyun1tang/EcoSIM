@@ -414,6 +414,7 @@ implicit none
     SSXferElms_pft         => plt_bgcr%SSXferElms_pft         ,& !inoput :flux export from seasonal storage, [g h-1 d-2] 
     SSXfer2ShootElms_pft   => plt_bgcr%SSXfer2ShootElms_pft   ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]            
     PlantElmDistLoss_pft   => plt_distb%PlantElmDistLoss_pft  ,& !ouput  :plant element loss due to disturbance, [g d-2 h-1]
+    RootLost2Fire_pft      => plt_distb%RootLost2Fire_pft     ,& !inoput :plant root biomass lost by fire, [g d-2 h-1]    
     LitrfallElms_pvr       => plt_bgcr%LitrfallElms_pvr       ,& !output :plant LitrFall element, [g d-2 h-1]
     LitrFallElms_brch      => plt_bgcr%LitrFallElms_brch      ,& !inoput :litterfall from the branch, [g d-2 h-1]        
     GPP_brch               => plt_rbgc%GPP_brch               ,& !output :GPP over branch, [gC d-2 h-1]    
@@ -439,6 +440,7 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    plt_rbgc%NH3Dep2Can_brch(:,NZ) = 0._R8  
     RLeafAppear_pft(NZ) = 0._r8
     RNodeInitiate_pft(NZ) = 0._r8
     SSXfer2ShootElms_pft(:,NZ)                  = 0._r8
@@ -461,6 +463,7 @@ implicit none
     plt_biom%LeafPEPCperm2LA_pft(NZ)             = 0._r8
     plt_biom%SpecificLeafArea_pft(NZ)            = 0._r8
     plt_biom%LeafProteinCperm2LA_pft(NZ)         = 0._r8
+    plt_bgcr%Xfer2RootsC_pft(NZ)                 = 0._R8
     D1: DO L=0,MaxNumRootLays
       DO K=1,pltpar%NumOfPlantLitrCmplxs
         DO M=1,jsken
@@ -487,6 +490,7 @@ implicit none
     CanopyGrosRCO2_pft(NZ)                                      = 0._r8
     CanopyResp_brch(:,NZ)                                       = 0._r8
     PlantElmDistLoss_pft(1:NumPlantChemElms,NZ)                 = 0._r8
+    RootLost2Fire_pft(1:NumPlantChemElms,NZ)                    = 0._R8
     Soil2RootMycoExudE_pft(1:NumPlantChemElms,NZ)               = 0._r8
     NodulInfectElms_pft(1:NumPlantChemElms,NZ)                  = 0._r8
     CO2FixCL_pft(NZ)                                            = 0._r8
@@ -517,6 +521,7 @@ implicit none
   real(r8) :: massr2nd1(NumPlantChemElms)
   real(r8) :: massnonst1(NumPlantChemElms)
   associate(                                                          &
+    PlantPopuLive_pft         => plt_site%PlantPopuLive_pft         , & !inoput :plant population, [d-2]  
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NMaxRootBotLayer_pft      => plt_morph%NMaxRootBotLayer_pft      ,& !input  :maximum soil layer number for all root axes, [-]    
@@ -568,7 +573,7 @@ implicit none
       RootNoduleElms_pft(NE,NZ) = RootNoduleElms_pft(NE,NZ)+sum(RootNodulStrutElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))+sum(RootNodulNonstElms_rpvr(NE,NU:NMaxRootBotLayer_pft(NZ),NZ))
     endif      
   ENDDO
-
+  
   if(present(massroot))massroot=RootElms_pft(:,NZ)+RootNoduleElms_pft(:,NZ)
 
   end associate
@@ -604,6 +609,7 @@ implicit none
       plt_biom%TotBegVegE_pft(NE,NZ)            = plt_biom%TotEndVegE_pft(NE,NZ)
       plt_biom%RootNoduleElmsBeg_pft(NE,NZ)     = plt_biom%RootNoduleElms_pft(NE,NZ)
       plt_distb%FireLossE_pft(NE,NZ)            = 0._r8
+      plt_bgcr%NH3Dep2Can_pft(NZ)               = 0._r8
     ENDDO
 
   ENDDO
@@ -704,7 +710,7 @@ implicit none
       -NodulInfectElms_pft(NE,NZ)-Soil2RootMycoExudE_pft(NE,NZ) &
       +LitrfallElms_pft(NE,NZ)+PlantElmDistLoss_pft(NE,NZ)-SeedPlantedElm_pft(NE,NZ)
   ENDDO
-
+  
   dGPP=sum(plt_rbgc%GPP_brch(:,NZ))
   balE(ielmc)=balE(ielmc)-GrossCO2Fix_pft(NZ)-GrossResp_pft(NZ)   
   balE(ielmn)=balE(ielmn)-RootNutUptakeN_pft(NZ)-CanopyN2Fix_pft(NZ)-RootN2Fix_pft(NZ)-NH3Dep2Can_pft(NZ)             

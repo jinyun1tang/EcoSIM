@@ -8,7 +8,7 @@ module grosubsMod
   use EcoSiMParDataMod,    only: pltpar
   use RootMod,             only: RootBGCModel
   use PlantNonstElmDynMod, only: PlantNonstElmTransfer
-  use PlantDebugMod,       only: PrintRootTracer
+  use PlantDebugMod 
   use DebugToolMod,        only: PrintInfo
   use EcosimConst
   use PlantBGCPars
@@ -88,11 +88,11 @@ module grosubsMod
   !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
   !
   D9985: DO NZ=1,NP
-    !    
+    !      
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
-      !      
+
       call RemoveBiomassByDisturbance(yearIJ,NZ)
 
       !   RESET DEAD BRANCHES
@@ -288,7 +288,7 @@ module grosubsMod
   )
 
   call PrintInfo('beg '//subname)
-  !write(1114,*)yearIJ%I*1000+yearIJ%J/24.,1,2,0.0,plt_biom%RootMycoNonstElms_rpvr(ielmc,1,2,NZ),'bf'//subname   
+
   IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     BegRemoblize        = 0
     
@@ -296,19 +296,19 @@ module grosubsMod
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
     !
     !     CALCULATE GROWTH OF EACH BRANCH
-
     DO  NB=1,NumOfBranches_pft(NZ)
       !
       call GrowOneBranch(yearIJ,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
-        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,GrothPART2LeafPetole,BegRemoblize)
+        TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,&
+        GrothPART2LeafPetole,BegRemoblize)
       !
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
-    
+ 
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
-    
+
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
-    
+
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
   ENDIF
@@ -543,7 +543,7 @@ module grosubsMod
     CanopyNodulStrutElms_brch => plt_biom%CanopyNodulStrutElms_brch  ,& !input  :branch nodule structural element, [g d-2]
     CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch ,& !input  :plant canopy layer branch stem area, [m2 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch     ,& !input  :plant branch leaf + sheath C, [g d-2]
-    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
     RootH2PO4Uptake_pft       => plt_rbgc%RootH2PO4Uptake_pft        ,& !input  :total root uptake of PO4, [g d-2 h-1]

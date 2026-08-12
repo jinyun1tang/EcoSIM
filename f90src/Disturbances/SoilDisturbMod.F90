@@ -68,7 +68,8 @@ module SoilDisturbMod
   )
 
   call PrintInfo('beg '//subname)
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr .OR. iSoilDisturbType_col(I,NY,NX).EQ.itill_fire))THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. &
+    (iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr .OR. iSoilDisturbType_col(I,NY,NX).EQ.itill_fire))THEN
     IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_fire)THEN
       !fire
       iResetSoilProf_col(NY,NX) = itrue

@@ -14,7 +14,7 @@ module PlantDisturbByFireMod
   public :: StageRootRemovalByFire
   public :: AbvGrndLiterFallByFire
   public :: AbvgBiomRemovalByFire
-  public :: ApplyBiomRemovalByFire
+  public :: ShootBiomRemovalByFire
   public :: InitPlantFireMod
   public :: RootRemovalLbyFire
   real(r8) :: EFIRE(2,5:5) !emission efficiency of N and P along with C loss due to fire
@@ -47,6 +47,7 @@ contains
     THETW_vr             => plt_soilchem%THETW_vr            & !input  :volumetric water content, [m3 m-3]
   )
   call PrintInfo('beg '//subname)
+  
   !soil too wet, or insufficient soil organic matter or not  or not fire disturbance 
   IF(THETW_vr(L).GT.VolMaxSoilMoist4Fire .OR. CSoilOrgM_vr(ielmc,L).LE.FORGC .OR. iSoilDisturbType_col.NE.itill_fire)THEN
     FracLeftThin              = 1.0_r8
@@ -56,8 +57,8 @@ contains
       *AMIN1(1.0_r8,(CSoilOrgM_vr(ielmc,L)-FORGC)/(orgcden-FORGC))
 
     FFIRE(ielmc) = FracBiomHarvsted(iHarvst_col,iplthvst_stalk,NZ)
-    FFIRE(ielmn) = FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ))
-    FFIRE(ielmp) = FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ))
+    FFIRE(ielmn) = FFIRE(ielmc)*EFIRE(1,iHarvstType_pft(NZ)) !N
+    FFIRE(ielmp) = FFIRE(ielmc)*EFIRE(2,iHarvstType_pft(NZ)) !P
   ENDIF
   call PrintInfo('end '//subname)
   end associate
@@ -89,6 +90,7 @@ contains
     CH4ByFire_CumYr_pft  => plt_distb%CH4ByFire_CumYr_pft,       & !inoput :plant CH4 emission from fire, [g d-2 ]
     CO2ByFire_CumYr_pft  => plt_distb%CO2ByFire_CumYr_pft,       & !inoput :plant CO2 emission from fire, [g d-2 ]
     PlantElmDistLoss_pft => plt_distb%PlantElmDistLoss_pft      ,& !inoput :plant loss to disturbance,    [g d-2 h-1]       
+    RootLost2Fire_pft    => plt_distb%RootLost2Fire_pft         ,& !inoput :plant root biomass lost by fire, [g d-2 h-1]
     FireLossE_pft        => plt_distb%FireLossE_pft      ,       & !inoput :plant element lost by fire, [g d-2 h-1]
     Eco_NBP_CumYr_col    => plt_bgcr%Eco_NBP_CumYr_col           & !inoput :total NBP, >0 into ecosystem,  [g d-2]
   )
@@ -111,6 +113,7 @@ contains
   !
   FireLossE_pft(:,NZ)        = FireLossE_pft(:,NZ)+dFireE(:)
   PlantElmDistLoss_pft(:,NZ) = PlantElmDistLoss_pft(:,NZ)+dFireE(:)
+  RootLost2Fire_pft(:,NZ)    = RootLost2Fire_pft(:,NZ) +dFireE(:)
   !
   !should CO2 be removed here?
   Eco_NBP_CumYr_col       = Eco_NBP_CumYr_col-dCH4
@@ -259,9 +262,9 @@ contains
   end subroutine AbvGrndLiterFallByFire
 
 !----------------------------------------------------------------------------------------------------
-  subroutine AbvgBiomRemovalByFire(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
+  subroutine AbvgBiomRemovalByFire(yearIJ,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)
@@ -306,7 +309,7 @@ contains
   end subroutine AbvgBiomRemovalByFire
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ApplyBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
+  subroutine ShootBiomRemovalByFire(I,J,NZ,EHVST21,EHVST22, EHVST23, EHVST24,&
     StandeadElmntRemoval,CanopyNonstElmRemoval,LeafElmntRemoval,WoodyElmntRemoval,&
     FineNonleafElmntRemoval,CanopyNonstElm2Litr,NonstructElmntOffEcosystem,&
     LeafElmntOffEcosystem,FineNonleafElmOffEcosystem,WoodyElmntOffEcosystem,&
@@ -334,7 +337,7 @@ contains
   real(r8), intent(out) :: FineNonleafElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: WoodyElmnt2Litr(NumPlantChemElms)
   real(r8), intent(out) :: StandeadElmnt2Litr(NumPlantChemElms)
-  character(len=*), parameter :: subname='ApplyBiomRemovalByFire'
+  character(len=*), parameter :: subname='ShootBiomRemovalByFire'
 
 
   associate(                                         &
@@ -387,7 +390,7 @@ contains
 
   call PrintInfo('end '//subname)
   end associate
-  end subroutine ApplyBiomRemovalByFire
+  end subroutine ShootBiomRemovalByFire
 !----------------------------------------------------------------------------------------------------
   subroutine RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
 
@@ -434,7 +437,9 @@ contains
   ENDIF
   !
   XHVST1 = 1._r8-FracLeftThin
-  XFFIRE = 1._r8-FFIRE(:)
+
+  !fraction to litter after fire
+  XFFIRE = 1._r8-FFIRE(:) 
 
   D3385: DO M=1,jsken
     !nonstructural root biomass
@@ -450,50 +455,41 @@ contains
         DO NE=1,NumPlantChemElms
           HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
             *FracRootElmAllocm(NE,k_woody_comp)
-
-          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)      
-
+          LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)      
         ENDDO
         call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)        
 
+        !woody roots
         DO NE=1,NumPlantChemElms
           HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(Root1stLigStructElms_rpvr(NE,L,NR,NZ))
+          LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
+        ENDDO
+        call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)      
+
+        DO NE=1,NumPlantChemElms
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
+            *FracRootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
 
         ENDDO
-        call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)      
+        call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)            
       ENDIF
 
       DO NE=1,NumPlantChemElms
-        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ) &
-          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
-          *FracRootElmAllocm(NE,k_woody_comp)
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+          *FracRootElmAllocm(NE,k_fine_comp)
         LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)     
       ENDDO
 
-      !woody roots
       call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
-
-      if(N.EQ.ipltroot)THEN
-        DO NE=1,NumPlantChemElms
-          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
-            *AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ))*FracRootElmAllocm(NE,k_fine_comp)
-          LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
-
-        ENDDO
-        call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)              
-      ENDIF
-
+      !fine roots
       DO NE=1,NumPlantChemElms
-        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ) &
-          *AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ))*FracRootElmAllocm(NE,k_fine_comp)
-        LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
-
+        HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(NE,N,L,NR,NZ)) &
+          *FracRootElmAllocm(NE,k_woody_comp)
+        LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
       ENDDO
 
-      !fine roots
       CALL RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
-
     enddo D3960
   ENDDO D3385
   

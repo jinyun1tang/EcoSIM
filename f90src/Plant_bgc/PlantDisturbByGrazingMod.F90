@@ -1,5 +1,5 @@
 module PlantDisturbByGrazingMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8,yearIJ_type
   use minimathmod, only : isclose,AZMAX1
   use ElmIDMod
   use EcosimConst
@@ -25,10 +25,10 @@ contains
 ![header]
 !------------------------------------------------------------------------------------------
 
-  subroutine AbvgBiomRemovalByGrazing(I,J,NZ,TotalElmnt2Litr,TotalElmntRemoval)
+  subroutine AbvgBiomRemovalByGrazing(yearIJ,NZ,TotalElmnt2Litr,TotalElmntRemoval)
   
   implicit none
-  integer, intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), intent(in) :: TotalElmntRemoval(NumPlantChemElms)  
   real(r8), intent(in) :: TotalElmnt2Litr(NumPlantChemElms)  
@@ -74,9 +74,9 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveStandDeadByGrazing(I,J,NZ,FracStdeadLeft,FHVSH)
+  subroutine RemoveStandDeadByGrazing(yearIJ,NZ,FracStdeadLeft,FHVSH)
   implicit none
-  integer,  intent(in) :: I,J
+  type(yearIJ_type), intent(in) :: yearIJ
   integer,  intent(in) :: NZ
   real(r8), intent(out) :: FracStdeadLeft  !fraction of remaining C after harvest
   real(r8), intent(out) :: FHVSH  !
@@ -97,8 +97,8 @@ contains
     FracStdeadLeft   = AZMAX1(1._r8-HarvestedStdeadC/StandDeadStrutElms_pft(ielmc,NZ))
     FHVSH  = FracStdeadLeft
   ELSE
-    FracStdeadLeft=1.0_r8
-    FHVSH=1.0_r8
+    FracStdeadLeft = 1.0_r8
+    FHVSH          = 1.0_r8
   ENDIF
   end associate  
   end subroutine RemoveStandDeadByGrazing

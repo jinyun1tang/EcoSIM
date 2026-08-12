@@ -58,7 +58,7 @@ implicit none
 
   call PrintInfo('beg '//subname)
   I1=I+1;if(I1>DazCurrYear)I1=1
-  NumActivePlants_col(NY,NX)                          = plt_site%NumActivePlants
+  NumActivePlants_col(NY,NX)                          = sum(plt_pheno%IsPlantActive_pft(1:NP0_col(NY,NX)))
   PlantPopu_col(NY,NX)                                = plt_site%PlantPopu_col
   ECO_ER_col(NY,NX)                                   = plt_bgcr%ECO_ER_col
   Eco_NBP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_NBP_CumYr_col
@@ -340,7 +340,7 @@ implicit none
     ZERO4Uptk_pft(NZ,NY,NX)                    = plt_rbgc%ZERO4Uptk_pft(NZ)
     ZERO4LeafVar_pft(NZ,NY,NX)                 = plt_biom%ZERO4LeafVar_pft(NZ)
     rPlantThermoAdaptZone_pft(NZ,NY,NX)        = plt_pheno%rPlantThermoAdaptZone_pft(NZ)
-
+    FireReSet_pft(NZ,NY,NX)                    = plt_pheno%FireReSet_pft(NZ)
     if(plt_distb%iHarvstType_pft(NZ).GT.0)then
       CanopyCutProxy_pft(NZ,I,NY,NX)            = plt_distb%CanopyCutProxy_pft(NZ)    
       iHarvstType_pft(NZ,I,NY,NX)                = plt_distb%iHarvstType_pft(NZ)
@@ -1171,7 +1171,7 @@ implicit none
     plt_pheno%rPlantThermoAdaptZone_pft(NZ) = rPlantThermoAdaptZone_pft(NZ,NY,NX)
     plt_pheno%HighTempLimitSeed_pft(NZ)     = HighTempLimitSeed_pft(NZ,NY,NX)
     plt_ew%Transpiration_pft(NZ)            = Transpiration_pft(NZ,NY,NX)
-
+    plt_pheno%FireReSet_pft(NZ)             = FireReSet_pft(NZ,NY,NX)                   
     plt_biom%CanopyMassC_pft(NZ)          = CanopyMassC_pft(NZ,NY,NX)           
     plt_biom%CanopyNoduleNonstCConc_pft(NZ) = CanopyNoduleNonstCConc_pft(NZ,NY,NX)
     plt_biom%RootBiomCPerPlant_pft(NZ)      = RootBiomCPerPlant_pft(NZ,NY,NX)
