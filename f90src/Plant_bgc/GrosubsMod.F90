@@ -88,15 +88,12 @@ module grosubsMod
   !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
   !
   D9985: DO NZ=1,NP
-    !  
-!    if(NZ.EQ.1 .AND. yearIJ%I>=225 .and.  yearIJ%I<=226)call RootMassBalCheck(yearIJ,NZ,opt='enter',checktype='c',iut=990,info=subname//' 1')    
-    
+    !      
     IF(IsPlantActive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZEROS)THEN      
       !
       call GrowOnePlant(yearIJ,NZ,CanopyHeight_copy)
 
       call RemoveBiomassByDisturbance(yearIJ,NZ)
-!      if(NZ.EQ.1 .AND. yearIJ%I>=225 .and.  yearIJ%I<=226)call RootMassBalCheck(yearIJ,NZ,opt='exit',checktype='c',iut=990,info=subname//' 3')     
 
       !   RESET DEAD BRANCHES
       call ResetDeadPlant(yearIJ,NZ)
@@ -299,7 +296,6 @@ module grosubsMod
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
     !
     !     CALCULATE GROWTH OF EACH BRANCH
-!    if(NZ.EQ.1 .AND. yearIJ%I>=225 .and.  yearIJ%I<=226)call RootMassBalCheck(yearIJ,NZ,opt='exit',checktype='c',iut=990,info=subname//' 0')    
     DO  NB=1,NumOfBranches_pft(NZ)
       !
       call GrowOneBranch(yearIJ,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
@@ -308,8 +304,7 @@ module grosubsMod
       !
       IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
     ENDDO
-!    if(NZ.EQ.1 .AND. yearIJ%I>=225 .and.  yearIJ%I<=226)call RootMassBalCheck(yearIJ,NZ,opt='exit',checktype='c',iut=990,info=subname//' 1')    
-
+ 
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
     call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)

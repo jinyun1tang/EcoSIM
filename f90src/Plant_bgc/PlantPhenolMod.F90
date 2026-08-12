@@ -82,8 +82,6 @@ module PlantPhenolMod
 
         call root_shoot_branching(I,J,NZ)
         
-        !write(9900+NZ,*)I*1000+J/24.,subname,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0, doInitPlant_pft(NZ).EQ.itrue,'go4'
-
         IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0 .OR. doInitPlant_pft(NZ).EQ.itrue)THEN          
           call Emerged_plant_Phenology(I,J,NZ)
         ENDIF        
@@ -122,7 +120,6 @@ module PlantPhenolMod
   call PrintInfo('beg '//subname)
     
   call CalcPhenolEnvfactor(I,J,NZ,TFNP,WFNG,OFNG)
-  !write(9900+NZ,*)I*1000+J/24.,NumOfBranches_pft(NZ),subname,'go4ranch_specific_phenology'
 
   D2010: DO NB=1,NumOfBranches_pft(NZ)
 
@@ -305,30 +302,21 @@ module PlantPhenolMod
   ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
   ! CONCENTRATION PERMIT
   !  
-  !write(9900+NZ,*)I*1000+J/24.,doInitPlant_pft(NZ).EQ.ifalse,subname,PlantPopuLive_pft(NZ)
-
   IF(doInitPlant_pft(NZ).EQ.ifalse)THEN
     !plant initialized
-    !write(9900+NZ,*)I*1000+J/24.,subname//'XXX',J.EQ.1 .AND. PlantPopuLive_pft(NZ).GT.0.0_r8
 
     IF(J.EQ.1 .AND. PlantPopuLive_pft(NZ).GT.0.0_r8)THEN
       !first hour of the day, population > 0
-      !write(9900+NZ,*)I*1000+J/24.,PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion,&
-!        PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ),subname,PSIMin4LeafExpansion,'PSIMin4LeafExpansion',&
-!        plt_morph%MaxSoilLays4Root_pft(NZ)
 
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN
         IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .OR. iPlantCalendar_brch(ipltcal_InitFloral,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
           !perennial plant or flower not initiated for annual plant 
-          !write(9900+NZ,*)I*1000+J/24.,subname,NZ,NumOfBranches_pft(NZ).EQ.0, SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8,'brchtest',NumOfBranches_pft(NZ)
 
           IF((NumOfBranches_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &
             .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinConc2InitBranch_pft(NZ) &
             .AND. NonstCMinConc2InitBranch_pft(NZ).GT.0.0_r8))THEN
 
             D120: DO NB=1,MaxNumBranches
-              !write(9900+NZ,*)I*1000+J/24.,isPlantBranchAlive_brch(NB,NZ).EQ.iFalse,subname,NZ,'NB',NB,&
-!                ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ),isPlantBranchAlive_brch(NB,NZ).EQ.iFalse,BranchNumber_pft(NZ)
 
               IF(isPlantBranchAlive_brch(NB,NZ).EQ.iFalse)THEN
                 BranchNumber_new=BranchNumber_pft(NZ)+NumCogrowthNode_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ)
@@ -551,12 +539,8 @@ module PlantPhenolMod
   ! Root1stDepz_raxes=primary root depth,avoid plant the seed at the grid interface
   ! VHeatCapCanopy_pft,WTSHT,WatHeldOnCanopy_pft=canopy heat capacity,mass,water content
   !
-  !write(9900+NZ,*)I*1000+J/24.,subname,iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ)
-
+  
   IF(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).EQ.0)THEN
-    !write(9900+NZ,*)I*1000+J/24.,CanopyLeafArea_pft(NZ),CanopyStemSurfArea_pft(NZ),HypocotHeight_pft(NZ),NZ,&
-!      'MainBranchNum_pft(NZ)',MainBranchNum_pft(NZ),subname
-
     ShootArea = CanopyLeafArea_pft(NZ)+CanopyStemSurfArea_pft(NZ)
     CanopyChk = (HypocotHeight_pft(NZ)+1.e-3_r8.GT.SeedDepth_pft(NZ)).AND.(ShootArea.GT.ZERO4LeafVar_pft(NZ))
     RootChk   = Root1stDepz_raxes(1,NZ).GT.(SeedDepth_pft(NZ)+1.e-8_r8)
@@ -601,9 +585,7 @@ module PlantPhenolMod
   !           DayLenthPrev,DLYN=daylength of previous,current day
   !           Hours4LenthenPhotoPeriod_brch,Hours4ShortenPhotoPeriod_brch
   !            =hourly counter for lengthening,shortening photoperiods
-  !
-  !write(9900+NZ,*)I*1000+J/24.,subname,NZ,isPlantBranchAlive_brch(NB,NZ).EQ.iTrue, doInitPlant_pft(NZ).EQ.itrue,'go4leafout'
-  
+  !  
   IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue .OR. doInitPlant_pft(NZ).EQ.itrue)THEN
     IF(DayLenthCurrent.GE.DayLenthPrev)THEN
       Hours4LenthenPhotoPeriod_brch(NB,NZ)=Hours4LenthenPhotoPeriod_brch(NB,NZ)+1.0_r8
@@ -811,7 +793,6 @@ module PlantPhenolMod
       doPlantLeaveOff_brch(NB,NZ) = iTrue
     ENDIF
   ENDIF
-  !write(9900+NZ,*)I*1000+J/24.,subname,Hours4Leafout_brch(NB,NZ),NZ,DayLenthCurrent.GE.DayLenthPrev
   !
   !   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayer_pftSHORTENINGTopRootLayer_pftPHOTOPERIODS
   !

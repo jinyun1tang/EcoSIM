@@ -103,7 +103,6 @@ module PlantBranchMod
   I=yearIJ%I;J=yearIJ%J
   
   IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'1'
     !correct the higest growing leaf node
     DO K=MaxNodesPerBranch1,0,-1
       if(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.1.e-6_r8)then
@@ -198,9 +197,7 @@ module PlantBranchMod
     !
     call SenescenceBranch(NZ,NB,RCCE)
     !
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'2'    
     call RemobilizeBranch(I,J,NZ,NB,BegRemoblize,LRemob_brch,RCCC,RCCN,RCCP,RMxess_brch)
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'3'    
     !
     !   DEATH IF MAIN STALK OF TREE DIES
     !
@@ -215,7 +212,6 @@ module PlantBranchMod
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
     call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
     !
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'4'
     call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
     !
     !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
@@ -235,9 +231,7 @@ module PlantBranchMod
     !
     call ResetBranchPhenology(I,J,NB,NZ)
     !   
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'5'
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
-    !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),NZ,subname//'6'
 
     call ResetBranchPhenology(I,J,NB,NZ)
     !
@@ -2738,11 +2732,8 @@ module PlantBranchMod
   RemobChk       = Hours4LeafOff_brch(NB,NZ).LT.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ)
   LeafOutChk     = Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ).GE.HourReq4LeafOut_brch(NB,NZ)
   AnnualPlantChk = iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. doInitPlant_pft(NZ).EQ.ifalse
-  !write(9900+NZ,*)I*1000+J/24.,'go4DevelopMainBranch',NZ,AnnualPlantChk,PlantingChk.AND.RemobChk,'leafout',Hours4Leafout_brch(MainBranchNum_pft(NZ),NZ),&
-!    HourReq4LeafOut_brch(NB,NZ),LeafOutChk,RemobChk,plt_biom%SeasonalNonstElms_pft(ielmc,NZ)
 
   IF(AnnualPlantChk .OR. (PlantingChk.AND.RemobChk) .OR. (LeafOutChk.AND.RemobChk))THEN
-!    write(9900+NZ,*)'oh go DevelopMainBranch',AnnualPlantChk, (PlantingChk.AND.RemobChk), (LeafOutChk.AND.RemobChk)
     !
     ! RESET TIME COUNTER
     !
@@ -2792,7 +2783,6 @@ module PlantBranchMod
       ENDDO
     ENDIF
   ENDIF
-  !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),subname//'0'
   !
   ! TRANSFER LEAF AND STALK NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   ! IN PERENNIALS AFTER GRAIN FILL IN DETERMINATES, AFTER AUTUMNIZ'N
@@ -2801,7 +2791,6 @@ module PlantBranchMod
   IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
     call SeasonStoreShootTransfer(I,J,NB,NZ)
   ENDIF
-  !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),subname//'1'  
   !
   !   TRANSFER NON-STRUCTURAL C,N,P FROM LEAVES AND ROOTS TO RESERVES
   !   IN STALKS DURING GRAIN FILL IN ANNUALS OR BETWEEN STALK RESERVES
@@ -2828,7 +2817,6 @@ module PlantBranchMod
   !   REPLENISH BRANCH NON-STRUCTURAL POOL FROM
   !   SEASONAL STORAGE POOL 
   !
-  !write(9900+NZ,*)I*1000+J/24.,plt_biom%CanopyNonstElms_brch(ielmc,NB,NZ),subname//'2'  
   call RepleteSeaStoreByStalk(I,J,NB,NZ)
 
   !

@@ -559,7 +559,6 @@ module PlantDisturbsMod
   ELSE
     ! 
     IF(iHarvstType_pft(NZ).EQ.iharvtyp_fire)THEN
-      write(9900+NZ,*)yearIJ%I*1000+yearIJ%J/24.,subname,NZ
       !
       !     C,N,P LOST AS GAS IF FIRE
       !      
