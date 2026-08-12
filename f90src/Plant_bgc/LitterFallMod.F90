@@ -89,16 +89,17 @@ implicit none
   end subroutine ResetDeadPlant
 
 !----------------------------------------------------------------------------------------------------
-  subroutine ReSeedPlants(I,J,NZ)
+  subroutine ReSeedPlants(yearIJ,NP)
   !
   !Description:
   !Re-Seed plants if there is non-zero storage (sort of seed bank)
   !
   use InitPlantMod, only: InitPlantPhenoMorphoBio
   implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NZ
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NP
   logical :: reseed_check
+  integer :: NZ
   character(len=*), parameter :: subname='ReSeedPlants'
   associate(                                                  &
     rNCGrain_pft          => plt_allom%rNCGrain_pft          ,& !input  :grain N:C ratio, [g g-1]
@@ -114,21 +115,23 @@ implicit none
   )
   call PrintInfo('beg '//subname)
 
-  reseed_check=doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ)
-  if(doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ))then
+  DO NZ=1,NP
+    reseed_check=doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ)
+    if(doReSeed_pft(NZ) .and. SeasonalNonstElms_pft(ielmc,NZ) .GT. ZERO4Groth_pft(NZ))then
 
-    IsPlantActive_pft(NZ) = iFalse
+      IsPlantActive_pft(NZ) = iFalse
 
-    call InitPlantPhenoMorphoBio(NZ)
-    
-    !if(CanopySeedNumX_pft(NZ)>0._r8)then
-      SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmc,NZ)
-      SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmn,NZ)
-      SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmp,NZ)
-      SeasonalNonstElms_pft(:,NZ) = SeasonalNonstElms_pft(:,NZ)+SeedPlantedElm_pft(:,NZ)
-      CanopySeedNumX_pft(NZ)=0._r8
-    !endif
-  endif  
+      call InitPlantPhenoMorphoBio(NZ)
+      
+      !if(CanopySeedNumX_pft(NZ)>0._r8)then
+        SeedPlantedElm_pft(ielmc,NZ) = SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmc,NZ)
+        SeedPlantedElm_pft(ielmn,NZ) = rNCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmn,NZ)
+        SeedPlantedElm_pft(ielmp,NZ) = rPCGrain_pft(NZ)*SeedCMass_pft(NZ)*PlantPopuLive_pft(NZ)-SeasonalNonstElms_pft(ielmp,NZ)
+        SeasonalNonstElms_pft(:,NZ) = SeasonalNonstElms_pft(:,NZ)+SeedPlantedElm_pft(:,NZ)
+        CanopySeedNumX_pft(NZ)=0._r8
+      !endif
+    endif  
+  ENDDO
   call PrintInfo('end '//subname)
 
   end associate

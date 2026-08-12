@@ -285,15 +285,27 @@ implicit none
 
   if(flag=='read')then  
     dat1pr => datip_1d
+    call restartvar(ncid, flag, varname='FireReSet_pft', dim1name='pft',&
+       long_name='flag for pft reset due to fire', units='none', interpinic_flag='skip', &
+       data=dat1pr, missing_value=ispval, fill_value=ispval)    
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FireReSet_pft,datip_1d,NumActivePlants=NumActivePlants_col)
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FireReSet_pft,datip_1d,NumActivePlants=NumActivePlants_col)
+    dat1pr => datip_1d
+    call restartvar(ncid, flag, varname='FireReSet_pft', dim1name='pft',&
+       long_name='flag for pft reset due to fire', units='none', interpinic_flag='skip', &
+       data=dat1pr, missing_value=ispval, fill_value=ispval)    
+  endif  
+
+  if(flag=='read')then  
+    dat1pr => datip_1d
     call restartvar(ncid, flag, varname='iYearPlanting_pft', dim1name='pft',&
        long_name='year of planting', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)    
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iYearPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iYearPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col)
   else
     !print*,'iYearPlanting_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iYearPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iYearPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col)
     dat1pr => datip_1d
     call restartvar(ncid, flag, varname='iYearPlanting_pft', dim1name='pft',&
        long_name='year of planting', units='none', interpinic_flag='skip', &
@@ -305,12 +317,10 @@ implicit none
     call restartvar(ncid, flag, varname='iDayPlanting_pft', dim1name='pft',&
        long_name='day of planting', units='none', interpinic_flag='skip', &
        data=dat1pr, missing_value=ispval, fill_value=ispval)    
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iDayPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iDayPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col)
   else
     !print*,'iDayPlanting_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iDayPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,iDayPlanting_pft,datip_1d,NumActivePlants=NumActivePlants_col)
     dat1pr => datip_1d
     call restartvar(ncid, flag, varname='iDayPlanting_pft', dim1name='pft',&
        long_name='day of planting', units='none', interpinic_flag='skip', &
@@ -1132,6 +1142,40 @@ implicit none
     call restartvar(ncid, flag, varname='Days4FalseBreak_pft', dim1name='pft',&
      long_name='Accumulated days to singifying false breakout of plants', units='# d-2', &
      interpinic_flag='skip', data=dat1pr, missing_value=ispval, fill_value=ispval)        
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='SeedCMass_pft', dim1name='pft',&
+     long_name='grain C at planting', units='gC seed-1', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeedCMass_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    !print*,'PP'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeedCMass_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)    
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='SeedCMass_pft', dim1name='pft',&
+     long_name='grain C at planting', units='gC seed-1', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+  endif  
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='PPatSeeding_pft', dim1name='pft',&
+     long_name='plant seeding population', units='# d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PPatSeeding_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)  
+  else
+    !print*,'PP'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PPatSeeding_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)    
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='PPatSeeding_pft', dim1name='pft',&
+     long_name='plant seeding population', units='# d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
   endif  
 
   if(flag=='read')then
@@ -2492,12 +2536,10 @@ implicit none
     call restartvar(ncid, flag, varname='SeasonalNonstElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant stored nonstructural element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)     
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col &
-      ,IsPlantActive_pft=IsPlantActive_pft)   
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col)   
   else
     !print*,'NonStrutElms_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)     
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col)     
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='SeasonalNonstElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='plant stored nonstructural element', units='g d-2', &

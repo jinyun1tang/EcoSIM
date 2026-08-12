@@ -71,7 +71,7 @@ implicit none
   !     DepzCorp_col=intensity (fire) or depth (tillage,drainage) of disturbance
   !
   kk=1
-  do while(len_trim(tillf(kk))>0)
+  do while(len_trim(tillf(kk)).GT.0)
 
     read(tillf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
     LPY=0
@@ -86,13 +86,14 @@ implicit none
       print*,tillf(kk)
       print*,idy1,idy2,idy3,IPLOW,DPLOW
     endif
+    
     D8995: DO NX=NH1,NH2
       D8990: DO NY=NV1,NV2
         iSoilDisturbType_col(IDY,NY,NX) = IPLOW
         DepzCorp_col(IDY,NY,NX)         = DPLOW
       ENDDO D8990
     ENDDO D8995
-    if(kk==ntill)exit
+    if(kk.eq.ntill)exit
     kk=kk+1    
   enddo
   end subroutine ReadTillageFile
@@ -533,6 +534,8 @@ implicit none
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
   if(ntopou==0)return
   if(first_topou)ntopou=1  
+  !
+  !fire disturbance to soil  
   pair_end = index(fire_event_entry, ',')  
   DO NTOPO=1,ntopou
     call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
@@ -553,12 +556,11 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
       start = (/1,ntopou/),count = (/len(firef),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-
     call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2,'nfire')
   ENDDO  
   call ncd_pio_closefile(soilmgmt_nfid)
 
-  !    
+  !fire disturbance to plants    
   call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
 
   DO NTOPO=1,ntopou
