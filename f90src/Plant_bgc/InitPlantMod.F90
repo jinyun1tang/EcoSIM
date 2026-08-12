@@ -1139,17 +1139,16 @@ module InitPlantMod
     ENDDO
     SeasonalNonstElms_pft(:,NZ)  = SeedPlantedElm_pft(:,NZ)
     
-    iYearPlanting_pft(NZ)        = iYearCurrent+1
-    iDayPlanting_pft(NZ)         = 1
     Eco_NBP_CumYr_col = Eco_NBP_CumYr_col+SeedPlantedElm_pft(ielmc,NZ)
   else
     SeedPlantedElm_pft(:,NZ)=0._r8
   endif  
+  !the following is only for natural plants
+  iYearPlanting_pft(NZ)        = iYearCurrent+1
+  iDayPlanting_pft(NZ)         = 1  
   FireReSet_pft(NZ)= iTrue
   call InitPlantPhenoMorphoBio(NZ)
-
-!  plt_morph%HypocotHeight_pft(NZ)=plt_morph%SeedDepth_pft(NZ)
-  write(9900+NZ,*)I*1000,subname,NZ
+  
   call PrintInfo('end '//subname)
   end associate
   end subroutine ApplySeedBank
