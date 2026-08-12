@@ -1100,26 +1100,27 @@ module InitPlantMod
 
   character(len=*), parameter :: subname='ApplySeedBank'
   integer :: NE
-  associate(                                                 &
-    rNCGrain_pft          => plt_allom%rNCGrain_pft          ,& !input  :grain N:C ratio, [g g-1]
-    rPCGrain_pft          => plt_allom%rPCGrain_pft          ,& !input  :grain P:C ratio, [gP gP-1]
-    AREA3                 => plt_site%AREA3                  ,& !input  :soil cross section area, [m2]
-    NU                    => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
-    PPatSeeding_pft       => plt_site%PPatSeeding_pft        ,& !input  :plant population at seeding, [plants d-2]
-    iYearCurrent          => plt_site%iYearCurrent           ,& !input  :current year,[-]
-    PPX_pft               => plt_site%PPX_pft                ,& !output :plant population, [plants m-2]
-    FireReSet_pft         => plt_pheno%FireReSet_pft         ,& !output :flag to skill startq for fire rejuvenation    
-    PlantElmDistLoss_pft  => plt_distb%PlantElmDistLoss_pft  ,& !inoput :plant loss to disturbance,    [g d-2 h-1]       
-    PlantPopuLive_pft     => plt_site%PlantPopuLive_pft      ,& !output :plant population, [d-2]
-    PlantPopuDead_pft     => plt_site%PlantPopuDead_pft      ,& !output :live+standing dead plant population, [d-2]
-    iYearPlanting_pft     => plt_distb%iYearPlanting_pft     ,& !input  :year of planting,[-]    
-    iDayPlanting_pft      => plt_distb%iDayPlanting_pft      ,& !input  :day of planting,[-]    
-    SeedCMass_pft         => plt_morph%SeedCMass_pft         ,& !input  :grain size at seeding, [g]
-    Eco_NBP_CumYr_col     => plt_bgcr%Eco_NBP_CumYr_col       ,& !inoput :total NBP, [g d-2]    
-    doInitPlant_pft       => plt_pheno%doInitPlant_pft       ,& !inoput :PFT initialization flag:0=no,1=yes,[-]    
-    SeasonalNonstElms_pft => plt_biom%SeasonalNonstElms_pft  ,& !output :plant stored nonstructural element at current step, [g d-2]
-    IsPlantActive_pft     => plt_pheno%IsPlantActive_pft     ,& !output :flag for living pft, [-]    
-    SeedPlantedElm_pft    => plt_biom%SeedPlantedElm_pft      & !output :plant stored nonstructural C at planting, [gC d-2]
+  associate(                                                       &
+    rNCGrain_pft             => plt_allom%rNCGrain_pft            ,& !input  :grain N:C ratio, [g g-1]
+    rPCGrain_pft             => plt_allom%rPCGrain_pft            ,& !input  :grain P:C ratio, [gP gP-1]
+    AREA3                    => plt_site%AREA3                    ,& !input  :soil cross section area, [m2]
+    NU                       => plt_site%NU                       ,& !input  :current soil surface layer number, [-]
+    PPatSeeding_pft          => plt_site%PPatSeeding_pft          ,& !input  :plant population at seeding, [plants d-2]
+    iYearCurrent             => plt_site%iYearCurrent             ,& !input  :current year,[-]
+    iPlantPhenolPattern_pft  => plt_pheno%iPlantPhenolPattern_pft ,& !input  :plant growth habit: annual or perennial,[-]    
+    PPX_pft                  => plt_site%PPX_pft                  ,& !output :plant population, [plants m-2]
+    FireReSet_pft            => plt_pheno%FireReSet_pft           ,& !output :flag to skill startq for fire rejuvenation    
+    PlantElmDistLoss_pft     => plt_distb%PlantElmDistLoss_pft    ,& !inoput :plant loss to disturbance,    [g d-2 h-1]       
+    PlantPopuLive_pft        => plt_site%PlantPopuLive_pft        ,& !output :plant population, [d-2]
+    PlantPopuDead_pft        => plt_site%PlantPopuDead_pft        ,& !output :live+standing dead plant population, [d-2]
+    iYearPlanting_pft        => plt_distb%iYearPlanting_pft       ,& !input  :year of planting,[-]    
+    iDayPlanting_pft         => plt_distb%iDayPlanting_pft        ,& !input  :day of planting,[-]    
+    SeedCMass_pft            => plt_morph%SeedCMass_pft           ,& !input  :grain size at seeding, [g]
+    Eco_NBP_CumYr_col        => plt_bgcr%Eco_NBP_CumYr_col        ,& !inoput :total NBP, [g d-2]    
+    doInitPlant_pft          => plt_pheno%doInitPlant_pft         ,& !inoput :PFT initialization flag:0=no,1=yes,[-]    
+    SeasonalNonstElms_pft    => plt_biom%SeasonalNonstElms_pft    ,& !output :plant stored nonstructural element at current step, [g d-2]
+    IsPlantActive_pft        => plt_pheno%IsPlantActive_pft       ,& !output :flag for living pft, [-]    
+    SeedPlantedElm_pft       => plt_biom%SeedPlantedElm_pft        & !output :plant stored nonstructural C at planting, [gC d-2]
   )
   call PrintInfo('beg '//subname)
   PPX_pft(NZ)                = PPatSeeding_pft(NZ)
@@ -1144,8 +1145,14 @@ module InitPlantMod
     SeedPlantedElm_pft(:,NZ)=0._r8
   endif  
   !the following is only for natural plants
-  iYearPlanting_pft(NZ)        = iYearCurrent+1
-  iDayPlanting_pft(NZ)         = 1  
+  IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual)then  
+    iDayPlanting_pft(NZ)                                  = -1E+06
+    iYearPlanting_pft(NZ)                                 = -1E+06
+    doInitPlant_pft(NZ)                                   = itrue  
+  else
+    iYearPlanting_pft(NZ)        = iYearCurrent+1
+    iDayPlanting_pft(NZ)         = 1 
+  endif 
   FireReSet_pft(NZ)= iTrue
   call InitPlantPhenoMorphoBio(NZ)
   
