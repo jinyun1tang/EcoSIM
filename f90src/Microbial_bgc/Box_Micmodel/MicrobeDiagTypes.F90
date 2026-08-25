@@ -366,10 +366,10 @@ type, public :: Cumlate_Flux_Diag_type
 
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_micf_init(this,jcplx,NumMicbFunGrupsPerCmplx)
+  subroutine nit_micf_init(this,jcplx)
   implicit none
   class(Microbe_Flux_type) :: this
-  integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
+  integer, intent(in) :: jcplx
   integer :: ndbiomcp
   integer :: NumMicrobAutoTrophCmplx
   integer :: NumHetetr1MicCmplx
@@ -488,11 +488,11 @@ type, public :: Cumlate_Flux_Diag_type
 
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_mics_init(this, jcplx,NumMicbFunGrupsPerCmplx)
+  subroutine nit_mics_init(this, jcplx)
 
   implicit none
   class(Microbe_State_type) :: this
-  integer, intent(in) :: jcplx,NumMicbFunGrupsPerCmplx
+  integer, intent(in) :: jcplx
   integer :: NumMicrobAutoTrophCmplx,NumHetetr1MicCmplx
   NumMicrobAutoTrophCmplx=micpar%NumMicrobAutoTrophCmplx
   NumHetetr1MicCmplx=micpar%NumHetetr1MicCmplx

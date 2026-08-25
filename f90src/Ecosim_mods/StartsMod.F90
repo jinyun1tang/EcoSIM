@@ -348,7 +348,7 @@ module StartsMod
   real(r8) :: TORGL(JZ)
   real(r8) :: VMINL
   real(r8) :: VORGC,XS
-  real(r8) :: VSolidSoil !volume of solid soil in one m3 volume
+  real(r8) :: VSolidSoil !volume of solid soil in one m3 volume, including mineral and organic particles
 ! begin_execution
 ! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 ! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)

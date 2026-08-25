@@ -6,7 +6,7 @@ module SoilLayerDynMod
   use PlantMgmtDataType, only: NP_col
   use minimathmod,       only: AZMAX1
   use UnitMod,           only: units
-  use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts
+  use EcoSIMConfig,      only: ndbiomcp => NumDeadMicrbCompts,NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use PlantTraitDataType, only : Myco_pft
   use SoilPhysParaMod   , only : IsPondLayer
   use NumericalAuxMod
@@ -1159,7 +1159,7 @@ implicit none
 
   IF(IFLGL(L,iTopLayGrow).EQ.isl_undef)THEN
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGrupsPerCmplx
+      DO  N=1,NumMicbHFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
@@ -1170,7 +1170,7 @@ implicit none
         enddo
       enddo
     ENDDO
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbAFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
@@ -1355,7 +1355,7 @@ implicit none
 
   IF(IFLGL(L,iTopLayGrow).EQ.isl_undef)THEN
     DO  K=1,jcplx
-       DO N=1,NumMicbFunGrupsPerCmplx
+       DO N=1,NumMicbHFunGrupsPerCmplx
         DO M=1,nlbiomcp
           DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
@@ -1367,7 +1367,7 @@ implicit none
       enddo
     ENDDO
 
-    DO N=1,NumMicbFunGrupsPerCmplx
+    DO N=1,NumMicbAFunGrupsPerCmplx
       DO M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)
@@ -1485,7 +1485,7 @@ implicit none
     ENDIF
 
     DO  K=1,jcplx
-      DO  N=1,NumMicbFunGrupsPerCmplx
+      DO  N=1,NumMicbHFunGrupsPerCmplx
         DO  M=1,nlbiomcp
           DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)          
@@ -1499,7 +1499,7 @@ implicit none
       enddo
     ENDDO
 
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbAFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           MID=micpar%get_micb_id(M,NGL)

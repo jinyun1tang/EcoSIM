@@ -103,6 +103,9 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)  
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
+  real(r8),pointer   :: h1D_RadPAR_Grnd_col(:)
+  real(r8),pointer   :: h1D_RadPAR2Soil_col(:)
+  real(r8),pointer   :: h1D_RadPAR2LitR_col(:)
   real(r8),pointer   :: h1D_Qinfl2soi_col(:)   
   real(r8),pointer   :: h1D_QTRANSP_col(:)
   real(r8),pointer   :: h1D_Qdrain_col(:)            
@@ -777,6 +780,9 @@ implicit none
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
   allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
   allocate(this%h1D_RadSW_Grnd_col(beg_col:end_col)); this%h1D_RadSW_Grnd_col(:)=spval
+  allocate(this%h1D_RadPAR_Grnd_col(beg_col:end_col)); this%h1D_RadPAR_Grnd_col(:)=spval
+  allocate(this%h1D_RadPAR2Soil_col(beg_col:end_col)); this%h1D_RadPAR2Soil_col(:)=spval
+  allocate(this%h1D_RadPAR2LitR_col(beg_col:end_col)); this%h1D_RadPAR2LitR_col(:)=spval
   allocate(this%h1D_CanSWRad_col(beg_col:end_col)); this%h1D_CanSWRad_col(:)=spval
   allocate(this%h1D_Qinfl2soi_col(beg_col:end_col))     ;this%h1D_Qinfl2soi_col(:)=spval
   allocate(this%h1D_Qdrain_col(beg_col:end_col))       ; this%h1D_Qdrain_col(:)=spval
@@ -1677,6 +1683,18 @@ implicit none
   data1d_ptr => this%h1D_RadSW_Grnd_col(beg_col:end_col)
   call hist_addfld1d(fname='RadSW_Grnd_col',units='W/m2',avgflag='A',&
     long_name='Shortwave Radiation onto the ground',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%h1D_RadPAR_Grnd_col(beg_col:end_col)
+  call hist_addfld1d(fname='RadPAR_Grnd_col',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR Radiation onto the ground',ptr_col=data1d_ptr)
+
+  data1d_ptr => this%h1D_RadPAR2Soil_col(beg_col:end_col)
+  call hist_addfld1d(fname='RadPAR2Soil_col',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR Radiation onto exposed soil',ptr_col=data1d_ptr)
+
+  data1d_ptr => this%h1D_RadPAR2LitR_col(beg_col:end_col)
+  call hist_addfld1d(fname='RadPAR2LitR_col',units='umol m-2 s-1',avgflag='A',&
+    long_name='PAR Radiation onto litter',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_CanSWRad_col(beg_col:end_col)
   call hist_addfld1d(fname='RadSW_Canopy_col',units='W/m2',avgflag='A',&
@@ -4211,6 +4229,9 @@ implicit none
 
       this%h1D_CanSWRad_col(ncol)         = MJ2W*RadSW_Canopy_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RadSW_Grnd_col(ncol)       = MJ2W*RadSWGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_RadPAR_Grnd_col(ncol)      = RadPARGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_RadPAR2Soil_col(ncol)      = RadPAR2Soil_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_RadPAR2LitR_col(ncol)      = RadPAR2LitR_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qinfl2soi_col(ncol)        = m2mm*Qinflx2Soil_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_Qdrain_col(ncol)           = m2mm*QDrain_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
 

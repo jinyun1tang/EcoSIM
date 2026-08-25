@@ -1,11 +1,12 @@
 set(BOX_MODEL_SOURCES
   MicrobMathFuncMod.F90
+  CyanoBacteriaMod.F90  
   MicAutoCplxFGMod.F90
   MicBGCFGMod.F90
   MicFluxTypeMod.F90
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90
-  MicrobeDiagTypes.F90
+  MicrobeDiagTypes.F90  
 )
 
 include(add_ecosim_library)

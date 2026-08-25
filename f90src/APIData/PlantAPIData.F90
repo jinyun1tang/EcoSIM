@@ -180,6 +180,7 @@ implicit none
   real(r8) :: RadSWSolarBeam_col             !shortwave radiation in solar beam, [MJ m-2 h-1]
   real(r8) :: FracSWRad2Grnd_col             !fraction of radiation intercepted by ground surface, [-]
   real(r8) :: RadSWGrnd_col                  !radiation intercepted by ground surface, [MJ m-2 h-1]
+  real(r8) :: RadPARGrnd_col                 !PAR radiation reaching the ground, [umol m-2 s-1]
   real(r8) :: SineGrndSlope_col              !sine of slope, [-]
   real(r8) :: GroundSurfaceAzimuth_col          !azimuth of slope, [-]
   real(r8) :: CosineGrndSlope_col            !cosine of slope, [-]

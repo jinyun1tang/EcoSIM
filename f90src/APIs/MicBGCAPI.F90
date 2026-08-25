@@ -12,8 +12,10 @@ module MicBGCAPI
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
+  use abortutils,           only: endrun  
+  use MicrobialDiagMod, only: SumMicbGroup  
+  use SoilPARAttenuationMod
   use DebugToolMod
-  use abortutils,           only: endrun
   use NumericalAuxMod
   use EcoSIMSolverPar  
   use TracerIDMod
@@ -32,6 +34,8 @@ module MicBGCAPI
   use MicrobialDataType
   use IrrigationDataType
   use SoilHeatDataType
+  use SurfSoilDataType, only : FracSurfSnoFree_col, FracSurfBareSoil_col
+  use CanopyDataType, only : RadPARGrnd_col, RadPAR2Soil_col, RadPAR2LitR_col
 implicit none
   save
   private
@@ -88,6 +92,12 @@ implicit none
   real(r8) :: dOrGM(1:NumPlantChemElms)
   real(r8) :: tdOrGM(1:NumPlantChemElms)
   integer :: L,NX,NY
+  real(r8) :: SOMCL !mass of SOC in layer, [gC d-2]
+  real(r8) :: kSoil,tau
+  real(r8) :: PAR_RAD,RadPAR2LitR_lyr,RadPAR2Soil_lyr !PAR [umol m-2 s-1]
+  real(r8) :: micBE(NumPlantChemElms)
+  real(r8), parameter :: k_litr = 250._r8  ![1/m]
+  real(r8), parameter :: k_cyanoC=0.1_r8      ![m2 gC-1]
   character(len=*), parameter :: subname='MicrobeModel'
 
 !   begin_execution
@@ -99,20 +109,41 @@ implicit none
 !       VOLWZ=water volume used to calculate aqueous microbial
 !       concentrations that drive microbial density effects on
 !       decomposition
+       !PAR radiation to Soil surface
+       RadPAR2Soil_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
+       !PAR radiation to litter surface
+       RadPAR2LitR_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)
+
+       !incoming PAR
+       RadPAR2Soil_lyr = RadPAR2Soil_col(NY,NX);RadPAR2LitR_lyr = RadPAR2LitR_col(NY,NX)
+       PAR_RAD         = RadPAR2LitR_lyr
       D998: DO L=0,NL_col(NY,NX)
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+
           IF(L.EQ.0 .OR. L.GE.NU_col(NY,NX))THEN
              call sumMicBiomLayL(L,NY,NX,OrGM_beg)
-             call MicBGC1Layer(I,J,L,NY,NX)
+             call MicBGC1Layer(I,J,L,NY,NX,PAR_RAD)
              call sumMicBiomLayL(L,NY,NX,dOrGM)
              dOrGM  = dOrGM-OrGM_beg
              tdOrGM = tdOrGM+dOrGM
+             if(L.eq.0)then
+               call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)
+               tau = k_litr  * DLYR_3D(3,L,NY,NX)+k_cyanoC*MicbE(ielmc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+               RadPAR2LitR_lyr=RadPAR2LitR_lyr*(1._r8-exp(-tau))/tau             
+             else
+               call CalcKSoilPAR(SAND_vr(L,NY,NX), CLAY_vr(L,NY,NX), VLSoilMicPMass_vr(L,NY,NX), SoilOrgM_vr(ielmc,L,NY,NX), DLYR_3D(3,L,NY,NX),kSoil)
+               call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)               
+               TAU=kSoil* DLYR_3D(3,L,NY,NX)+k_cyanoC*MicbE(ielmc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+               RadPAR2LitR_lyr=RadPAR2LitR_lyr*(1._r8-exp(-tau))/tau
+               RadPAR2Soil_lyr=RadPAR2Soil_lyr*(1._r8-exp(-tau))/tau               
+             endif
+             PAR_RAD=RadPAR2LitR_lyr+RadPAR2Soil_lyr             
           ELSE
             trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
             RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
             Micb_N2Fixation_vr(L,NY,NX)                        = 0.0_r8
           ENDIF
-  
+
         ELSE
           trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
           RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
@@ -138,13 +169,14 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MicBGC1Layer(I,J,L,NY,NX)
+  subroutine MicBGC1Layer(I,J,L,NY,NX,PAR_rad)
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
+  real(r8),intent(in) :: PAR_rad
   type(Cumlate_Flux_Diag_type) :: naqfdiag
 
-  micfor%L=L
+  micfor%L=L;micfor%PAR_rad=PAR_rad
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
   
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
@@ -162,11 +194,11 @@ implicit none
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
   character(len=*), parameter :: subname='MicAPISend'
-  integer :: NumMicbFunGrupsPerCmplx, jcplx, k_POM, k_humus, idom, K,KL
+  integer ::  jcplx, k_POM, k_humus, idom, K,KL
   integer :: ndbiomcp, nlbiomcp, NumMicrobAutoTrophCmplx, NumHetetr1MicCmplx,NE
   
   call PrintInfo('beg '//subname)
-  NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
+  
   jcplx                   = micpar%jcplx
 
   ndbiomcp              = micpar%ndbiomcp
@@ -423,7 +455,7 @@ implicit none
   type(Microbe_Diag_type), intent(in) :: nmicdiag
   character(len=*), parameter :: subname='MicAPIRecv'
   logical :: litrM
-  integer :: NumMicbFunGrupsPerCmplx, jcplx, NumMicrobAutoTrophCmplx
+  integer :: jcplx, NumMicrobAutoTrophCmplx
   integer :: NE,idom,K,idg,KL,NN
 
   call PrintInfo('beg '//subname)
@@ -431,7 +463,7 @@ implicit none
   litrM=micfor%litrM
 
   NumMicrobAutoTrophCmplx = micpar%NumMicrobAutoTrophCmplx
-  NumMicbFunGrupsPerCmplx=micpar%NumMicbFunGrupsPerCmplx
+  
   jcplx=micpar%jcplx
 
   if(litrM)then

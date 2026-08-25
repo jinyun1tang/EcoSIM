@@ -29,7 +29,7 @@ module MicBGCMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
 
-  integer :: jcplx,NumMicbFunGrupsPerCmplx,jsken,ndbiomcp,nlbiomcp
+  integer :: jcplx,NumMicbHFunGrupsPerCmplx,NumMicbAFunGrupsPerCmplx,jsken,ndbiomcp,nlbiomcp
   integer, pointer :: JGniA(:)
   integer, pointer :: JGnfA(:)
   integer, pointer :: JGniH(:)
@@ -48,7 +48,8 @@ module MicBGCMod
   implicit none
 
   jcplx =micpar%jcplx
-  NumMicbFunGrupsPerCmplx  =micpar%NumMicbFunGrupsPerCmplx
+  NumMicbHFunGrupsPerCmplx  =micpar%NumMicbHFunGrupsPerCmplx
+  NumMicbAFunGrupsPerCmplx  =micpar%NumMicbAFunGrupsPerCmplx  
   jsken =micpar%jsken
   ndbiomcp = micpar%ndbiomcp
   nlbiomcp = micpar%nlbiomcp
@@ -92,8 +93,8 @@ module MicBGCMod
 
 ! begin_execution
   call PrintInfo('beg '//subname)
-  call nmicf%Init(jcplx,NumMicbFunGrupsPerCmplx)
-  call nmics%Init(jcplx,NumMicbFunGrupsPerCmplx)
+  call nmicf%Init(jcplx)
+  call nmics%Init(jcplx)
   call ncplxf%Init()
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
@@ -220,7 +221,7 @@ module MicBGCMod
     ENDDO
 
     !add live heterotrophic biomass     
-    DO N=1,NumMicbFunGrupsPerCmplx
+    DO N=1,NumMicbHFunGrupsPerCmplx
       if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
       DO NGL=JGniH(n),JGnfH(n)
         DO nlb=1,micpar%nlbiomcp
@@ -238,7 +239,7 @@ module MicBGCMod
   ENDDO
 
   !add live autotrophic biomass
-  DO N=1,NumMicbFunGrupsPerCmplx
+  DO N=1,NumMicbAFunGrupsPerCmplx
     if(.not.micpar%is_activeMicrbFungrpAutor(N))cycle
     DO NGL=JGniA(N),JGnfA(N)
       DO nlb=1,micpar%nlbiomcp
@@ -481,7 +482,7 @@ module MicBGCMod
   D890: DO K = 1, jcplx
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       ! the omb complexes, three biomass components, labile, recalcitrant and reserve
-      D895: DO N=1,NumMicbFunGrupsPerCmplx
+      D895: DO N=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(n),JGnfH(n)
           MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
           IF(mBiomeHeter(ielmc,MID1,K).GT.ZEROS)THEN
@@ -518,7 +519,7 @@ module MicBGCMod
   ENDDO D890
 
 ! the abstract complex
-  DO N=1,NumMicbFunGrupsPerCmplx
+  DO N=1,NumMicbAFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
@@ -559,7 +560,7 @@ module MicBGCMod
     TOMEK(:,K)        = 0.0_r8
     tMaxNActMicrbK(K) = 0.0_r8
     tMaxPActMicrbK(K) = 0.0_r8
-    D685: DO N=1,NumMicbFunGrupsPerCmplx
+    D685: DO N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         if(OMActHeter(NGL,K)>ZEROS)THEN
           TOMEK(ielmc,K)    = TOMEK(ielmc,K)+OMActHeter(NGL,K)
@@ -575,7 +576,7 @@ module MicBGCMod
   ENDDO D690
   
   TOMEAutoK(:)      = 0._r8
-  DO N=1,NumMicbFunGrupsPerCmplx
+  DO N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       if(OMActAutor(NGL)>ZEROS)then
         TOMEAutoK(ielmc)  = TOMEAutoK(ielmc)+OMActAutor(NGL)
@@ -881,7 +882,7 @@ module MicBGCMod
   !heterotrophs
   D760: DO K=1,KL
 
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       if(.not.is_activeMicrbFungrpHeter(N))cycle
       call GetMicrobDensFactorHeter(N,K,micfor, micstt, ORGCL,SPOMK,RMOMK)
 
@@ -892,7 +893,7 @@ module MicBGCMod
 
 ! Autotrophic microbes
   
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     IF(.not.is_activeMicrbFungrpAutor(N))cycle
 
     call GetMicrobDensFactorAutor(N,micfor, micstt, ORGCL,SPOMK,RMOMK)
@@ -904,7 +905,7 @@ module MicBGCMod
 
   !summarize microbial activity as a proxy for hydrolysis
   DO  K=1,KL
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         nmicdiag%ROQC4HeterMicActCmpK(K)=nmicdiag%ROQC4HeterMicActCmpK(K)+nmicf%ROQC4HeterMicrobAct(NGL,K)
       enddo
@@ -1163,7 +1164,7 @@ module MicBGCMod
 !     BulkSOMC=total SOC in each K
 !     XOMCZ,XOMNZ,XOMPZ=total microbial C,N,P transfer for all K
 !
-          D850: DO N=1,NumMicbFunGrupsPerCmplx
+          D850: DO N=1,NumMicbHFunGrupsPerCmplx
             DO  M=1,nlbiomcp
               DO NGL=JGniH(N),JGnfH(N)
                 MID=micpar%get_micb_id(M,NGL)
@@ -1199,7 +1200,7 @@ module MicBGCMod
     DO idom=idom_beg,idom_end
       DOM(idom,K)=DOM(idom,K)+XferDOMK(idom,K)
     ENDDO
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       DO  M=1,nlbiomcp
         do NGL=JGniH(N),JGnfH(N)
           MID=micpar%get_micb_id(M,NGL)        
@@ -1664,7 +1665,7 @@ module MicBGCMod
         FORC(K)=0.0_r8
       ENDIF
     ENDIF
-    D1685: DO N=1,NumMicbFunGrupsPerCmplx
+    D1685: DO N=1,NumMicbAFunGrupsPerCmplx
       if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
@@ -1730,7 +1731,7 @@ module MicBGCMod
     ENDDO D575
 
     N1=1; N2=NumHetetr1MicCmplx
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       if(micpar%is_anaerobic_hetr(N))then
         DO NGL=JGniH(N),JGnfH(N)
           DOM(idom_acetate,K) = DOM(idom_acetate,K)+RAcettProdHeter(NGL,K)
@@ -1764,7 +1765,7 @@ module MicBGCMod
 !   
 !     MICROBIAL DECOMPOSITION PRODUCTS
 !
-    D570: DO N=1,NumMicbFunGrupsPerCmplx
+    D570: DO N=1,NumMicbHFunGrupsPerCmplx
       if(.not.is_activeMicrbFungrpHeter(N))cycle
       DO NGL=JGniH(N),JGnfH(N)
         TDOMUptkHeter(idom_doc,K)     = TDOMUptkHeter(idom_doc,K)+RMetabDOCUptkHeter(NGL,K)
@@ -1846,7 +1847,7 @@ module MicBGCMod
 
   D550: DO K=1,jcplx
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
-      DO  N=1,NumMicbFunGrupsPerCmplx
+      DO  N=1,NumMicbHFunGrupsPerCmplx
         if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
         DO NGL=JGniH(N),JGnfH(N)
           D540: DO M=1,2
@@ -2121,7 +2122,7 @@ module MicBGCMod
   )
   D650: DO K=1,KL
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
-      DO N=1,NumMicbFunGrupsPerCmplx
+      DO N=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(N),JGnfH(N)
           naqfdiag%tRNH4MicrbImobilSoil   = naqfdiag%tRNH4MicrbImobilSoil+RNH4imobilSoilHeter(NGL,K)
           naqfdiag%tRNO3MicrbImobilSoil   = naqfdiag%tRNO3MicrbImobilSoil+RNO3imobilSoilHeter(NGL,K)
@@ -2161,7 +2162,7 @@ module MicBGCMod
     ENDIF
   ENDDO D650
 
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         naqfdiag%tRNH4MicrbImobilSoil   = naqfdiag%tRNH4MicrbImobilSoil+RNH4TransfSoilAutor(NGL)
@@ -2204,7 +2205,7 @@ module MicBGCMod
 ! tRCO2GrothAutor=total CO2 uptake by autotrophs, ammonia oxidizer
 ! nitrite oxidizer, and hydrogenotrophic methanogens,
 ! all of which involves CO2 for both energy and C biomass.
-  D645: DO N=1,NumMicbFunGrupsPerCmplx
+  D645: DO N=1,NumMicbAFunGrupsPerCmplx
     IF(micpar%is_CO2_autotroph(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         naqfdiag%tRCO2GrothAutor=naqfdiag%tRCO2GrothAutor+RCO2XumpAutor(NGL)
@@ -2235,7 +2236,7 @@ module MicBGCMod
 !
   RCO2NetUptkMicb = naqfdiag%tRCO2GrothAutor-naqfdiag%tRCO2MicrbProd-naqfdiag%tRNOxMicrbRedux
   RCH4UptkAutor   = -naqfdiag%tRCH4MicrbProd
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     if(N.eq.mid_AutoAeroCH4OxiBacter)then
       DO NGL=JGniA(N),JGnfA(N)
         !use CH4 for both energy and biomass
@@ -2285,7 +2286,7 @@ module MicBGCMod
       REcoDOMProd(NE,K)=REcoDOMProd(NE,K)+RHydlysSorptOM(NE,K)
     ENDDO
     REcoDOMProd(idom_acetate,K)=REcoDOMProd(idom_acetate,K)+RHydlysSorptOM(idom_acetate,K)
-    D670: DO N=1,NumMicbFunGrupsPerCmplx
+    D670: DO N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         REcoDOMProd(idom_doc,K)     = REcoDOMProd(idom_doc,K)-RMetabDOCUptkHeter(NGL,K)
         REcoDOMProd(idom_don,K)     = REcoDOMProd(idom_don,K)-DOMuptk4GrothHeter(ielmn,NGL,K)

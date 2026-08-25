@@ -104,6 +104,7 @@ module MicAutoCPLXMod
     call AMONC10Catabolism(I,J,N,RMOMK,TOMEAutoK(ielmc),micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)    
   elseif (N.eq.mid_AutoAMOANME2D)then
     call AMOANME2dCatabolism(I,J,N,RMOMK,TOMEAutoK(ielmc),VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
+    
   ENDIF
 
   IF(micpar%is_aerobic_autor(N))then
@@ -1594,6 +1595,7 @@ module MicAutoCPLXMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine NitriteOxidizerCatabolism
+
 !------------------------------------------------------------------------------------------
 
   subroutine H2MethanogensCatabolism(I,J,N,RMOMK,TOMEAutoKC,micfor,micstt,naqfdiag,nmicf,nmics,micflx,nmicdiag)
@@ -2465,13 +2467,13 @@ module MicAutoCPLXMod
     mid_AutoH2GenoCH4GenArchea     => micpar%mid_AutoH2GenoCH4GenArchea ,   &
     JGniA                          => micpar%JGniA,                         &
     JGnfA                          => micpar%JGnfA,                         &
-    NumMicbFunGrupsPerCmplx        => micpar%NumMicbFunGrupsPerCmplx,       &
+    NumMicbAFunGrupsPerCmplx       => micpar%NumMicbAFunGrupsPerCmplx,      &
     icarbhyro                      => micpar%icarbhyro,                     &
     iprotein                       => micpar%iprotein,                      &
     k_POM                          => micpar%k_POM,                         &
     is_activeMicrbFungrpAutor      => micpar%is_activeMicrbFungrpAutor      &
   )
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
         DO  M=1,2

@@ -1,6 +1,6 @@
 module MicrobialDataType
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use EcoSIMConfig,  only: jcplx => jcplxc, nlbiomcp=>NumLiveMicrbCompts, NumMicbFunGrupsPerCmplx=> NumMicbFunGrupsPerCmplx
+  use EcoSIMConfig,  only: jcplx => jcplxc, nlbiomcp=>NumLiveMicrbCompts 
   use ElmIDMod,      only: NumPlantChemElms
   use abortutils,    only: destroy
   use GridConsts

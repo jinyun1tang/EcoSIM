@@ -428,7 +428,8 @@ module SurfaceRadiationMod
   real(r8) :: DGAZI
   real(r8) :: SolarAzimuthAngle,CosineSunInclAngle,cosGroundIncidentSolarAngle
   integer  :: NZ,N
-  real(r8) :: FRadPARbyLeafT,RadSW2Ground,LAIEff
+  real(r8) :: FRadPARbyLeafT,LAIEff
+  real(r8) :: RadSW2Ground,RadPAR2Ground
   !     begin_execution
   associate(                                                               &
     ZEROS                        => plt_site%ZEROS                        ,& !input  :threshold zero for numerical stability,[-]
@@ -461,6 +462,7 @@ module SurfaceRadiationMod
     RadPARCanopyAbsorption_pft   => plt_rad%RadPARCanopyAbsorption_pft    ,& !output :canopy absorbed PAR, [umol m-2 s-1]
     FracPARads2Canopy_pft        => plt_rad%FracPARads2Canopy_pft         ,& !output :fraction of incoming PAR absorbed by canopy, [-]
     RadSWGrnd_col                => plt_rad%RadSWGrnd_col                 ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
+    RadPARGrnd_col               => plt_rad%RadPARGrnd_col                ,& !output :PAR radiation reaching the ground, [umol m-2 s-1]
     ClumpFactorNow_pft           => plt_morph%ClumpFactorNow_pft           & !output :clumping factor for self-shading in canopy layer at current LAI, [-]
   )
 
@@ -521,28 +523,34 @@ module SurfaceRadiationMod
 
       if(ldo_radiation_test)then
         RadSW2Ground=ABS(cosGroundIncidentSolarAngle)*RadSWDirect_col
+        RadPAR2Ground=ABS(cosGroundIncidentSolarAngle)*RadDirectPAR_col
         D121: DO N=1,NumOfSkyAzimuthSects1
           RadSW2Ground=RadSW2Ground+ABS(OMEGA2Ground(N))*RadSWDiffus_col
+          RadPAR2Ground=RadPAR2Ground+ABS(OMEGA2Ground(N))*RadPARDiffus_col
         ENDDO D121
       else
         call MultiCanopyLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsecLive_lpft,StemAreaZsecLive_lpft,SurfAreaZsecDead_lpft,&
-          SolarAzimuthAngle,CosineSunInclAngle,cosGroundIncidentSolarAngle,RadSW2Ground)
+          SolarAzimuthAngle,CosineSunInclAngle,cosGroundIncidentSolarAngle,RadSW2Ground,RadPAR2Ground)
       endif
       !     RADIATION AT GROUND SURFACE IF NO CANOPY
     ELSE
       !plug in lake radiation below, direct beam
       RadSW2Ground=ABS(cosGroundIncidentSolarAngle)*RadSWDirect_col
+      RadPAR2Ground=ABS(cosGroundIncidentSolarAngle)*RadDirectPAR_col
       D120: DO N=1,NumOfSkyAzimuthSects1
         RadSW2Ground=RadSW2Ground+ABS(OMEGA2Ground(N))*RadSWDiffus_col
+        RadPAR2Ground=RadPAR2Ground+ABS(OMEGA2Ground(N))*RadPARDiffus_col
       ENDDO D120
 
     ENDIF
     RadSWGrnd_col=RadSW2Ground*AREA3(NU)
+    RadPARGrnd_col=RadPAR2Ground*AREA3(NU)
     !
     !     IF NO RADIATION
     !
   ELSE
     RadSWGrnd_col=0.0_r8
+    RadPARGrnd_col=0._r8
   ENDIF
   !
   !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
@@ -574,7 +582,7 @@ module SurfaceRadiationMod
 
 !----------------------------------------------------------------------------------------------------
   subroutine MultiCanopyLayerRadiation(I,J,DepthSurfWatIce,LeafAreaZsecLive_lpft,StemAreaZsecLive_lpft,SurfAreaZsecDead_lpft,&
-    SolarAzimuthAngle,CosineSunInclAngle,cosGroundIncidentSolarAngle,RadSW2Ground)
+    SolarAzimuthAngle,CosineSunInclAngle,cosGroundIncidentSolarAngle,RadSW2Ground,RadPAR2Ground)
   !
   !Description:
   ! Model multiple canopy layer radiation using bidirectional reflectance distribution function.
@@ -590,6 +598,7 @@ module SurfaceRadiationMod
   real(r8), intent(in) :: CosineSunInclAngle
   real(r8), intent(in) :: cosGroundIncidentSolarAngle
   real(r8), intent(out):: RadSW2Ground                !radiation reaching the ground
+  real(r8), intent(out):: RadPAR2Ground               !PAR radiation reaching the ground
   character(len=*), parameter :: subname='MultiCanopyLayerRadiation'
 
   integer :: NB,NZ,L,K,M,N,NN
@@ -670,7 +679,7 @@ module SurfaceRadiationMod
   call RadiationAtGround(cosGroundIncidentSolarAngle, RadSWDiffusL,RadPARDiffusL, &
     TAU_DirectSunLit(1),TAU_RDiffusTransmitance(1),                               &
     RadSWFwdScat2NextL(1),RadPARFwdScat2NextL(1),                                 &
-    RadSWBakScat2NextL(0),RadPARBakScat2NextL(0),RadSW2Ground)  
+    RadSWBakScat2NextL(0),RadPARBakScat2NextL(0),RadSW2Ground,RadPAR2Ground)
   !
   !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
   !
@@ -1221,7 +1230,8 @@ module SurfaceRadiationMod
     RadSWDiffusL,RadPARDiffusL,                                   &
     TAU_DirectSunLit1,TAU_RDiffusTransmitance1,                   &
     RadSWFwdScat2NextL1,RadPARFwdScat2NextL1                     ,&
-    RadSWBakScat2NextL0,RadPARBakScat2NextL0,RadSW2Ground)
+    RadSWBakScat2NextL0,RadPARBakScat2NextL0,                     &
+    RadSW2Ground,RadPAR2Ground)
   implicit none
   real(r8), intent(in)  :: cosGroundIncidentSolarAngle          !
   real(r8), intent(in)  :: RadSWDiffusL,RadPARDiffusL        !diffuse radiation and PAR radiation off the canopy
@@ -1229,11 +1239,11 @@ module SurfaceRadiationMod
   real(r8), intent(in)  :: RadSWFwdScat2NextL1,RadPARFwdScat2NextL1          !incoming radiation off the canopy
   real(r8), intent(out) :: RadSWBakScat2NextL0,RadPARBakScat2NextL0          !reflected radiation at the ground
   real(r8), intent(out) :: RadSW2Ground          !incident radiation onto ground
+  real(r8), intent(out) :: RadPAR2Ground         !incident PAR radiation onto ground
 
   character(len=*), parameter :: subname='RadiationAtGround'
   real(r8) :: RADSG,RADYG  
   real(r8) :: RAPSG,RAPYG
-  real(r8) :: RadPAR2Ground  
   real(r8) :: THETW1
   real(r8) :: SnowpackAlbedo,GrndAlbedo
   real(r8) :: FracGrndBySnow

@@ -1,6 +1,6 @@
 module InitSOMBGCMOD
   use data_kind_mod,    only : r8 => DAT_KIND_R8
-  use EcoSIMConfig,     only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts
+  use EcoSIMConfig,     only : nlbiomcp => NumLiveMicrbCompts, ndbiomcp=> NumDeadMicrbCompts, NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use MicrobialDiagMod, only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
   use minimathmod,      only : AZMAX1,safe_adb
   use EcoSiMParDataMod, only : micpar
@@ -251,7 +251,7 @@ module InitSOMBGCMOD
 !     complex is because complex 5 is shared by all the other complexes
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
-    D8990: DO N=1,NumMicbFunGrupsPerCmplx
+    D8990: DO N=1,NumMicbHFunGrupsPerCmplx
 
       D8991: DO M=1,nlbiomcp
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
@@ -269,7 +269,8 @@ module InitSOMBGCMOD
         OSCX (KK)    = OSCX(KK)+OME1(ielmc)
         OSNX (KK)    = OSNX(KK)+OME1(ielmn)
         OSPX (KK)    = OSPX(KK)+OME1(ielmp)
-        D8992: DO NN = 1, NumMicbFunGrupsPerCmplx
+
+        D8992: DO NN = 1, NumMicbAFunGrupsPerCmplx
           tglds=JGnfA(NN)-JGniA(NN)+1._r8
           do NGL=JGniA(NN),JGnfA(NN)
             MID=micpar%get_micb_id(M,NGL)
@@ -757,7 +758,7 @@ module InitSOMBGCMOD
 
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
 
-  DO N=1,NumMicbFunGrupsPerCmplx
+  DO N=1,NumMicbHFunGrupsPerCmplx
     
     DO M=1,nlbiomcp
       OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
@@ -772,7 +773,7 @@ module InitSOMBGCMOD
         ENDDO
       ENDDO
 
-      DO NN = 1, NumMicbFunGrupsPerCmplx
+      DO NN = 1, NumMicbAFunGrupsPerCmplx
         tglds=JGnfA(NN)-JGniA(NN)+1._r8
         do NGL=JGniA(NN),JGnfA(NN)
           MID=micpar%get_micb_id(M,NGL)

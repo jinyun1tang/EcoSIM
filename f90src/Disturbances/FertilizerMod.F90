@@ -3,6 +3,7 @@ module FertilizerMod
   use EcoSIMCtrlMod, only: lverb
   use DebugToolMod,  only: PrintInfo
   use abortutils,    only: iulog
+  use EcoSIMConfig,  only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use SurfLitterDataType
   use EcoSimSumDataType
   use FertilizerDataType
@@ -297,7 +298,7 @@ implicit none
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      D2960: DO N=1,NumMicbFunGrupsPerCmplx
+      D2960: DO N=1,NumMicbHFunGrupsPerCmplx
         tglds=JGnfH(N)-JGnfH(N)+1
         D2961: DO M=1,nlbiomcp
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
@@ -315,7 +316,7 @@ implicit none
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
-          D2962: DO NN=1,NumMicbFunGrupsPerCmplx
+          D2962: DO NN=1,NumMicbAFunGrupsPerCmplx
             tglds=JGnfA(N)-JGniA(N)+1
             DO NGL=JGniA(NN),JGnfA(NN)
               MID=micpar%get_micb_id(M,NGL)

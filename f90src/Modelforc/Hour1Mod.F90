@@ -7,7 +7,7 @@ module Hour1Mod
   use FertilizerMod,     only: ApplyFertilizerAtNoon
   use EcoSIMConfig,      only: jcplx=>jcplxc, nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
-  use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
+  use EcoSIMConfig,      only: do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
   use MicrobialDiagMod,  only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
