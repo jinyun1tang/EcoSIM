@@ -215,14 +215,14 @@ contains
   this%FG_guilds_heter(this%mid_HeterAnaerobN2Fixer)    = NumGuild_Heter_Anaer_N2Fixer
   this%FG_guilds_heter(this%mid_fermentor)              = NumGuild_Heter_Anaer_Fermentor
   this%FG_guilds_heter(this%mid_HeterAcetoCH4GenArchea) = NumGuild_Heter_AcetoMethanogen
-  this%FG_guilds_heter(this%mid_HeterMixtCynoBacter)         = NumGuild_Mixor_CYNO_Bacter
+  this%FG_guilds_heter(this%mid_HeterMixtCynoBacter)    = NumGuild_Mixor_CYNO_Bacter
 
   this%FG_guilds_autor(this%mid_AutoH2GenoCH4GenArchea) = NumGuild_Autor_H2genMethanogen
   this%FG_guilds_autor(this%mid_AutoAmmoniaOxidBacter)  = NumGuild_Autor_AmoniaOxidBact
   this%FG_guilds_autor(this%mid_AutoNitriteOxidBacter)  = NumGuild_Autor_NitritOxidBact
   this%FG_guilds_autor(this%mid_AutoAeroCH4OxiBacter)   = NumGuild_Autor_AerobMethOxid
   this%FG_guilds_autor(this%mid_AutoAMOANME2D)          = NumGuild_Autor_ANMO_ANME2d
-  this%FG_guilds_autor(this%mid_AutoAMONC10)            = NumGuild_Mixor_CYNO_Bacter
+  this%FG_guilds_autor(this%mid_AutoAMONC10)            = NumGuild_Autor_ANMO_ANMENC10
 
   call this%Initallocate()
 
@@ -244,7 +244,6 @@ contains
   this%is_activeMicrbFungrpAutor(this%mid_AutoH2GenoCH4GenArchea) = .true.
   this%is_activeMicrbFungrpAutor(this%mid_AutoAMOANME2D)          = .true.
   this%is_activeMicrbFungrpAutor(this%mid_AutoAMONC10)            = .true.
-  this%is_activeMicrbFungrpAutor(this%mid_HeterMixtCynoBacter)             = .true.
 
   this%is_activeMicrbFungrpHeter(this%mid_HeterAerobBacter)       = .true.
   this%is_activeMicrbFungrpHeter(this%mid_Facult_DenitBacter)     = .true.
@@ -253,6 +252,7 @@ contains
   this%is_activeMicrbFungrpHeter(this%mid_HeterAcetoCH4GenArchea) = .true.
   this%is_activeMicrbFungrpHeter(this%mid_HeterAerobN2Fixer)      = .true.
   this%is_activeMicrbFungrpHeter(this%mid_HeterAnaerobN2Fixer)    = .true.
+  this%is_activeMicrbFungrpHeter(this%mid_HeterMixtCynoBacter)    = .true.
 
   this%is_CO2_autotroph(this%mid_AutoAmmoniaOxidBacter)  = .true.
   this%is_CO2_autotroph(this%mid_AutoNitriteOxidBacter)  = .true.

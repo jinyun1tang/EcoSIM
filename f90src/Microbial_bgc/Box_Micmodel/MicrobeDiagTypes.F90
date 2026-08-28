@@ -171,7 +171,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RNOxReduxRespDenitUlm(:,:)
   real(r8),allocatable :: ROQC4HeterMicrobAct(:,:)
   real(r8),allocatable :: RCO2ProdHeter(:,:)
-  real(r8),allocatable :: RAcettProdHeter(:,:)
+  real(r8),allocatable :: RCO2FixCyano(:,:)
+  real(r8),allocatable :: RAcetateProdHeter(:,:)
   real(r8),allocatable :: RCH4ProdHeter(:,:)
   real(r8),allocatable :: RSMetaOxidSoilAutor(:)
   real(r8),allocatable :: RSMetaOxidBandAutor(:)
@@ -290,7 +291,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: TOMEK(:,:)                     !total elemental biomass in complex K
   real(r8),allocatable :: FSBSTHeter(:,:)                !limitation of primary substrate for heterotrophs, [0->1, less limitation]              
   real(r8),allocatable :: FSBSTAutor(:)                  !limitation of primary substrate for autotrophs, [0->1, less limitation]              
-  real(r8),allocatable :: ROQC4HeterMicActCmpK(:)        !microbial activity in hydrolysis of organic complex
+  real(r8),allocatable :: ROQC4HeterMicActCmpK(:)        !microbial activity to trigger hydrolysis of organic complex
   real(r8),allocatable :: RHydrolysisScalCmpK(:)         !scalar for solid-organic matter hydrolysis, [0->1, faster]
   contains
     procedure, public :: Init => mic_diag_init
@@ -421,7 +422,8 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RNOxReduxRespDenitUlm(NumHetetr1MicCmplx,1:jcplx));this%RNOxReduxRespDenitUlm=spval
   allocate(this%NonstX2stBiomHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%NonstX2stBiomHeter=spval
   allocate(this%RCO2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCO2ProdHeter=spval
-  allocate(this%RAcettProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcettProdHeter=spval
+  allocate(this%RCO2FixCyano(micpar%JGniH(micpar%mid_HeterMixtCynoBacter):micpar%JGnfH(micpar%mid_HeterMixtCynoBacter),1:jcplx));this%RCO2FixCyano=spval
+  allocate(this%RAcetateProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RAcetateProdHeter=spval
   allocate(this%RCH4ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RCH4ProdHeter=spval
   allocate(this%RH1PO4imobilSoilHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilSoilHeter=spval
   allocate(this%RH1PO4imobilBandHeter(NumHetetr1MicCmplx,1:jcplx));this%RH1PO4imobilBandHeter=spval
@@ -584,7 +586,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%ROQC4HeterMicrobAct      = 0._r8
   this%NonstX2stBiomHeter       = 0._r8
   this%RCO2ProdHeter            = 0._r8
-  this%RAcettProdHeter          = 0._r8
+  this%RCO2FixCyano             = 0._r8
+  this%RAcetateProdHeter          = 0._r8
   this%RCH4ProdHeter            = 0._r8
   this%RSMetaOxidSoilAutor          = 0._r8
   this%RSMetaOxidBandAutor          = 0._r8
@@ -696,7 +699,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%ROQC4HeterMicrobAct)
   call destroy(this%NonstX2stBiomHeter)
   call destroy(this%RCO2ProdHeter)
-  call destroy(this%RAcettProdHeter)
+  call destroy(this%RCO2FixCyano)
+  call destroy(this%RAcetateProdHeter)
   call destroy(this%RCH4ProdHeter)
   call destroy(this%RSMetaOxidSoilAutor)
   call destroy(this%RSMetaOxidBandAutor)

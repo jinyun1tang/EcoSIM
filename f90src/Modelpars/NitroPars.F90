@@ -100,11 +100,11 @@ module NitroPars
 
   real(r8) :: EN2X           !growth respiration efficiency for aerobic N2 fixation, [-]
   real(r8) :: EN2Y           !growth respiration efficiency for anaerobic N2 fixation, [-]
-  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-], 1g E/(1gE+biom)
+  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-], 1gC Energy/(1gC Energy+1gC biom)
   real(r8) :: EH4X           !growth respiration efficiency for aerobic Ch4 oxidizer, [-]
   real(r8) :: EO2G           !growth respiration efficiency for fungi, [-]
-  real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-]
-  real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-]
+  real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-], 1gC Energy/(1gC Energy+1gC biom)
+  real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-], 1gC Energy/(1gC Energy+1gC biom)
   real(r8) :: ENOX           !growth respiration efficiency for denitrifiers (anaerobic), [-]
   real(r8) :: EO2A           !growth respiration efficiency for aerobic bacteria (acetate), [-]
   real(r8) :: TSORP          !sorption rate constant for OHC, [h-1]
