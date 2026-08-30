@@ -373,6 +373,7 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
   set(NETCDF_C_LIBS "-lhdf5_hl -lhdf5 -lz -ldl -lm")
 
   #Original version
+  set(NETCDF_C_LIBS "-lhdf5_hl -lhdf5 -lz -ldl -lm")  
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
     env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env "CPPFLAGS=-D_GNU_SOURCE -I${PROJECT_BINARY_DIR}/include"
     env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=-L${PROJECT_BINARY_DIR}/lib

@@ -874,7 +874,7 @@ module RedistMod
       ELSE
         VLsoiAirP_vr(L,NY,NX)=0.0_r8
       ENDIF
-
+      ENGY                = VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
       TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapSolidSoil_vr(L,NY,NX)
       TVOLW               = TVOLW+VLWatMicP_vr(L,NY,NX)

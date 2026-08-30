@@ -114,7 +114,7 @@ module NitroPars
   real(r8) :: RMOM           !specific maintenance respiration, [g C g-1 N h-1]
   real(r8) :: SPORC(2)       !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
   real(r8) :: SPOMC(2)       !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
-  real(r8) :: EN2F(7)        !N fixation yield from C oxidation, [g N g-1 C]
+  real(r8) :: EN2F(8)        !N fixation yield from C oxidation, [g N g-1 C]
   real(r8) :: EFIRE(2,21:22) !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
   contains
 
@@ -223,7 +223,7 @@ module NitroPars
   EO2A       = 1._r8/(1._r8+GO2A/EOMC)
   EN2D       = 1._r8/(1._r8+GN3CX/EOMH)
 
-  EN2F  = (/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y/)
+  EN2F  = (/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y,EN2X/)
   EFIRE = reshape((/1.0_r8,1.0_r8,0.917_r8,0.167_r8/),shape(EFIRE))
 
   end subroutine initNitroPars

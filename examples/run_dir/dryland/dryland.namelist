@@ -6,7 +6,7 @@
 case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'
 do_regression_test=.false.
-pft_file_in='../../../input_data/ecosim_pftpar_20260520.nc'
+pft_file_in='../../../input_data/ecosim_pftpar_20260722.nc'
 grid_file_in='../../../examples/inputs/dryland_maize/dryland_grid_20230221.nc'
 pft_mgmt_in='../../../examples/inputs/dryland_maize/dryland_pft_20230509.nc'
 soil_mgmt_in='../../../examples/inputs/dryland_maize/dryland_soilmgmt_20230210.nc'
@@ -52,7 +52,7 @@ hist_nhtfrq=-24
 
 !namelist for timer
 &ecosim_time
-rest_opt='nyears'  !'ndays','nmonths','nyears'
+rest_opt='nmonths'  !'ndays','nmonths','nyears'
 rest_frq=1
 delta_time=3600.
 stop_option='nyears' !run by nyears, nmonths, ndays,

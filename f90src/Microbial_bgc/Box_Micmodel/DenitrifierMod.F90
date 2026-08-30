@@ -304,7 +304,7 @@ module DenitrifierMod
     RDN2T                         = RNO2ReduxHeterSoil(NGL,K)+RNO2ReduxHeterBand(NGL,K)
     RGOM2X                        = eQNO2toOxy*RDN2X
     RNOxDOCReduxRespDenitLim2     = eQNO2toOxy*RDN2T*FODC
-    RNOxDOCReduxRespDenitLim2     = eQNO2toOxy*RDN2T*(1._r8-FODC)
+    RNOxAcetReduxRespDenitLim2    = eQNO2toOxy*RDN2T*(1._r8-FODC)
     RNO2DmndReduxSoilHeter(NGL,K) = VMXD2S
     RNO2DmndReduxBandHeter(NGL,K) = VMXD2B
     !
@@ -345,6 +345,7 @@ module DenitrifierMod
     ELSE
       FVMXDX=0.0_r8
     ENDIF
+    
     VMXD1S                           = VMXDXS*FVMXDX
     OQCZ1                            = AZMAX1(OQCZ2-RNOxDOCReduxRespDenitLim2)   !maximum available DOC for oxidation by N2O
     OQAZ1                            = AZMAX1(OQAZ2-RNOxAcetReduxRespDenitLim2)   !maximum available DOC for oxidation by N2O

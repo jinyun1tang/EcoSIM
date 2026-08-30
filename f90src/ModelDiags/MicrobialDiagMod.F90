@@ -99,7 +99,6 @@ module MicrobialDiagMod
       enddo
     enddo DC100
   ENDDO DK100
-!  write(*,*)'OMC',ORGM(ielmc)
 
   DK200: DO K=1,jcplx1
     !add microbial residual
@@ -451,6 +450,9 @@ module MicrobialDiagMod
   logical, optional, intent(in) :: isauto
   logical :: isauto_loc
   integer :: K,NE,M,MID,NGL
+  character(len=*), parameter :: subname='SumMicbGroup'
+
+  call PrintInfo('beg '//subname)
   if(present(isauto))then
     isauto_loc=isauto
   else
@@ -476,13 +478,14 @@ module MicrobialDiagMod
     ENDDO
 
   else
-    if(igroup /= micpar%mid_HeterAerobBacter  .and. &
-       igroup /= micpar%mid_Facult_DenitBacter  .and. &
-       igroup /= micpar%mid_Aerob_Fungi         .and. &
-       igroup /= micpar%mid_fermentor           .and. &
-       igroup /= micpar%mid_HeterAcetoCH4GenArchea .and. &
+    if(igroup /= micpar%mid_HeterAerobBacter        .and. &
+       igroup /= micpar%mid_Facult_DenitBacter      .and. &
+       igroup /= micpar%mid_Aerob_Fungi             .and. &
+       igroup /= micpar%mid_fermentor               .and. &
+       igroup /= micpar%mid_HeterAcetoCH4GenArchea  .and. &
        igroup /= micpar%mid_HeterAerobN2Fixer       .and. &
-       igroup /= micpar%mid_HeterAnaerobN2Fixer) then
+       igroup /= micpar%mid_HeterAnaerobN2Fixer     .and. &
+       igroup /= micpar%mid_HeterMixtCynoBacter) then
       call endrun('undefined heterotroph group in '//trim(mod_filename),__LINE__)
     endif
     
@@ -496,8 +499,9 @@ module MicrobialDiagMod
         enddo
       enddo  
     enddo    
-
   endif
+
+  call PrintInfo('end '//subname)
   end subroutine SumMicbGroup
 
 !------------------------------------------------------------------------------------------

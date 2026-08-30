@@ -1461,7 +1461,8 @@ implicit none
 
       dlitrfall=plt_bgcr%LitrfallBlgrElms_pft(:,NZ)
       call SumRootBiome(yearIJ,NZ,mass_finale)
-      dmassN=mass_finale(ielmn)-mass_inital(ielmn)+litrflxt(ielmn)
+ !     if(yearIJ%I>=133)write(*,*)yearIJ%I*1000+yearIJ%J,mass_finale(ielmn),mass_inital(ielmn),litrflxt(ielmn)
+ !     dmassN=mass_finale(ielmn)-mass_inital(ielmn)+litrflxt(ielmn)
       !      call SumRootAR(NZ);call SumLitfallBlg(NZ); dlitrfall=dlitrfall-plt_bgcr%LitrfallBlgrElms_pft(:,NZ)
       if(.false.)write(426,*)'1stroot',yearIJ%I*1000+yearIJ%J/24.,NR*10+L,mass_finale(ielmn)-mass_inital(ielmn)+ &
         litrflxt(ielmn),'afnod',mass_finale(ielmn),mass_inital(ielmn),dlitrfall(ielmn),litrflxt(ielmn)
@@ -5262,7 +5263,8 @@ implicit none
   RootSinkC_vr               = 0._R8
   Root1stSink_pvr            = 0._r8
   Root2ndSink_pvr            = 0._r8
-  Root1stSinkTip             = 0._r8
+  RootMSink_pvr              = 0._r8  
+  Root1stSinkTip             = 0._r8  
   RootSinkC                  = 0._r8
   RCO2flx                    = 0._r8
   fRootTube_rpvr             = 0._r8
@@ -5398,7 +5400,7 @@ implicit none
             IF(DistRootEffDepz.GT.ZERO)THEN
               !fine root conductance for nonstructural biomass transport
               FineRootCd4NonstTP = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
-              !
+              !     
               IF(RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. FineRootCd4NonstTP.GT.ZERO4Groth_pft(NZ))then
                 if(RMPholeResist_vr(L,NR).GT.0._r8)then
                   MediumRootCd4NonstTP = RootMediumXNum_rpvr(L,NR,NZ)/RMPholeResist_vr(L,NR)
@@ -5410,7 +5412,6 @@ implicit none
                 endif
               else
                 MediumRootCd4NonstTP = 0._r8
-                RootMSink_pvr(L,NR)  = 0._r8
                 fUSE4MR_pvr(L,NR)    = 1.e-4_r8
               endif  
                
@@ -5489,7 +5490,7 @@ implicit none
         if(L.eq.Ltip)then
           Root1stTipSinkWeight_pft(NZ) = Root1stTipSinkWeight_pft(NZ)+Root1stSinkTip(NR)
         endif
-        RootMSinkWeight_pvr(L,NZ) =RootMSinkWeight_pvr(L,NZ)+ RootMSink_pvr(L,NR)
+        RootMSinkWeight_pvr(L,NZ) =RootMSinkWeight_pvr(L,NZ)+ AZMAX1(RootMSink_pvr(L,NR))
       ENDDO
       RootMSinkWeight_pvr(L,NZ) =RootMSinkWeight_pvr(L,NZ)/RootSinkC(ipltroot)
       Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)/RootSinkC(ipltroot)

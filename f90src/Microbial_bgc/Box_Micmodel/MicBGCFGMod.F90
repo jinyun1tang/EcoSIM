@@ -3079,9 +3079,11 @@ module MicBGCMod
   !     FCN,FCP=limitation from N,P
   ! gross respiration equals to maintenance+respiraiton for N-fixation + growth respiraiton
   CGOMX     = AMIN1(RMaintRespHeter,RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter-Resp4NFixHeter(NGL,K))/ECHZHeter(NGL,K)
+  
   if(N.eq.micpar%mid_HeterMixtCynoBacter .and. RGrowthRespHeter.GT.0._r8)then
     CGOMX=CGOMX-RCO2FixCyano(NGL,K)
   endif
+
   CGOMD     = RNOxDOCReduxRespDenitLim(NGL,K)/ENOX
   AGOMD     = RNOxAcetReduxRespDenitLim(NGL,K)/ENOX
   CDOMuptk1 = CDOMuptk1+CGOMX !DOC used for growth

@@ -138,7 +138,6 @@ module InitSOMBGCMOD
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
-!    write(*,*)K,L,CNOSCT(K),CPOSCT(K)    
   ENDDO D975
 
   D990: DO K=micpar%NumOfLitrCmplxs+1,jcplx
@@ -399,7 +398,7 @@ module InitSOMBGCMOD
   call sumORGMLayL(L,NY,NX,ORGM)
 
   SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=ORGM(1:NumPlantChemElms)
-
+  
   ORGCX_vr(L,NY,NX)=SoilOrgM_vr(ielmc,L,NY,NX)
 
   call sumLitrOMLayL(L,NY,NX,litrOM)

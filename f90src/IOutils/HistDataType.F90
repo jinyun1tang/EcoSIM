@@ -5060,6 +5060,7 @@ implicit none
             this%h2D_Root1stSinkWeight_pvr(nptc,L)=Root1stSinkWeight_pvr(L,NZ,NY,NX)
             this%h2D_Root1stRadius_rpvr(nptc,L)=Root1stRadius_pvr(ipltroot,L,NZ,NY,NX)*1.e3_r8
             this%h2D_RootNonstBConc_pvr(nptc,L)=sum(RootNonstructElmConc_rpvr(1:NumPlantChemElms,ipltroot,L,NZ,NY,NX))
+            
             this%h2D_Rootmedlength_pvr(nptc,L) = RootMediumLength_pvr(L,NZ,NY,NX)*RootMediumXNum_pvr(L,NZ,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)            
             if(PlantPopuLive_pft(NZ,NY,NX).GT.0._r8)then
               this%h2D_Root1stAxesNumL_pvr(nptc,L)= Root1stXNumL_pvr(L,NZ,NY,NX)/PlantPopuLive_pft(NZ,NY,NX)

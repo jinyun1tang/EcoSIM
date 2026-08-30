@@ -308,8 +308,8 @@ contains
 
   CNRH = (/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
   CPRH = (/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
-  OMCF = (/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
-  OMCA = (/0.6_r8,0.2_r8,0.05_r8,0.025_r8,0.1_r8,0.025_r8,0.0_r8/)*0.1_r8
+  OMCF = (/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8,0.015_r8/)
+  OMCA = (/0.6_r8,0.2_r8,0.05_r8,0.025_r8,0.1_r8,0.025_r8/)*0.1_r8
 
   OMCI(1:NumLiveMicrbCompts,:)=OMCI1
 
@@ -338,6 +338,8 @@ contains
   !set stoichiometry of heterotrophs
   D95: DO K=1,this%jcplx
     DO  N=1,this%NumMicbHFunGrupsPerCmplx
+      !the set up of rNCOMC and rPCOMC may be 
+      !set up based on external input
       IF(N.EQ.this%mid_Aerob_Fungi)THEN
         !Fungi      
         DO NGL=this%JGniH(n),this%JGnfH(n)
@@ -376,6 +378,7 @@ contains
   ENDDO D95
 
   !set stoichiometry of autotrophs
+  !the following may also be set based on external input
   DO  N=1,this%NumMicbAFunGrupsPerCmplx
     do NGL=this%JGniA(n),this%JGnfA(n)
       rNCOMCAutor(ibiom_kinetic,NGL) = 0.225_r8
