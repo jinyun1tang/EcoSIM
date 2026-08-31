@@ -2056,8 +2056,9 @@ implicit none
 
           ! Write history output.  Always output land and ocean runoff on xy grid.
           call PrintInfo(varname)
+!          write(*,*)varname          
           if (numdims == 1) then
-             if(lverb)print*,hist1do(beg1d_out:end1d_out)
+!             print*,hist1do(beg1d_out:end1d_out)
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=hist1do, ncid=nfid(t), nt=nt)
           else

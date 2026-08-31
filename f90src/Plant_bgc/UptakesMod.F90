@@ -1314,7 +1314,7 @@ module UptakesMod
       ENDIF
     enddo
   ENDDO D3880
-  CdH2ORootxSoil = CdH2ORootxSoil_pft(NZ)
+  CdH2ORootxSoil = AZMAX1(CdH2ORootxSoil_pft(NZ))
   call PrintInfo('end '//subname)
   end associate
   end subroutine CalcPlantHydroResistance
