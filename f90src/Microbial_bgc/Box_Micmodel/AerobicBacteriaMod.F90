@@ -10,7 +10,8 @@ module AerobicBacteriaMod
   use TracerIDMod
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: AerobicHeterO2Uptake, StageFuncGuild
+  use MicrobMathFuncMod,    only: AerobicHeterO2Uptake, CalcRespMaintHeter, &
+                                  StageFuncGuild
 
   implicit none
 
@@ -25,14 +26,14 @@ module AerobicBacteriaMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobicHeteroBactCatabolism(I,J,N,K,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
+  subroutine AerobicHeteroBactCatabolism(I,J,N,K,RMOMK,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   !
   !Description
   !catabolism of aerobic heterotrophs
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: N,K
-
+  real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
@@ -117,6 +118,8 @@ module AerobicBacteriaMod
 
     !prepare trait parameters
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA(NGL,K),micfor,naqfdiag,nmicdiag,nmics)
+
+    call CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     OXKX  = OXKM
     IF(RO2EcoDmndPrev.GT.ZEROS)THEN

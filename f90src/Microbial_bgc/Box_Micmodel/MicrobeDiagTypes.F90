@@ -29,7 +29,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: TFNO2X           !total relative demand of NO2 in non-banded soil by Microbes
     real(r8) :: TFN2OX           !total relative demand of N2O in non-banded soil by Microbes
     real(r8) :: TFP14X           !total relative demand of H1PO4 in non-banded soil by Microbes
-    real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes
+    real(r8) :: TFPO4X           !total relative demand of H2PO4 in non-banded soil by Microbes    
     real(r8) :: tRespGrossHeter    !total gross respiration by heterotrophs
     real(r8) :: tRespGrossHeterUlm !total gross respiration by heterotrophs unlimited by O2
 !fluxes
@@ -133,6 +133,8 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: RO2UptkHeterG(:)      !complex summed O2 uptake 
   real(r8),allocatable :: Resp4NFixHeter(:,:)
   real(r8),allocatable :: RespGrossHeter(:,:)
+  real(r8),allocatable :: RGrowthRespHeter(:,:)
+  real(r8),allocatable :: RMaintRespHeter(:,:)
   real(r8),allocatable :: RO2Dmnd4RespHeter(:,:)
   real(r8),allocatable :: RO2DmndHeter(:,:)
   real(r8),allocatable :: RO2DmndHeterG(:)   !complex summed O2 demand
@@ -184,6 +186,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8),allocatable :: FOQA(:,:)
   REAL(R8),allocatable :: FGOCP(:,:)
   REAL(R8),allocatable :: FGOAP(:,:)  
+  real(r8),allocatable :: fPhotoR(:,:)
   real(r8),allocatable :: XferBiomeHeterK(:,:,:,:)
   real(r8),allocatable :: RH1PO4imobilSoilHeter(:,:)
   real(r8),allocatable :: RH1PO4imobilBandHeter(:,:)
@@ -383,6 +386,8 @@ type, public :: Cumlate_Flux_Diag_type
 
   allocate(this%Resp4NFixHeter(NumHetetr1MicCmplx,1:jcplx));this%Resp4NFixHeter=spval
   allocate(this%RespGrossHeter(NumHetetr1MicCmplx,1:jcplx));this%RespGrossHeter=spval
+  allocate(this%RGrowthRespHeter(NumHetetr1MicCmplx,1:jcplx));this%RGrowthRespHeter=spval
+  allocate(this%RMaintRespHeter(NumHetetr1MicCmplx,1:jcplx));this%RMaintRespHeter=spval
   allocate(this%RO2Dmnd4RespHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2Dmnd4RespHeter=spval
   allocate(this%RO2DmndHeter(NumHetetr1MicCmplx,1:jcplx));this%RO2DmndHeter=spval
   allocate(this%RO2DmndHeterG(NumHetetr1MicCmplx));this%RO2DmndHeterG=spval
@@ -443,6 +448,7 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%RGOAP=spval
   allocate(this%FGOCP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOCP=spval
   allocate(this%FGOAP(1:NumHetetr1MicCmplx,1:jcplx));this%FGOAP=spval  
+  allocate(this%fPhotoR(micpar%JGniH(micpar%mid_HeterMixtCynoBacter):micpar%JGnfH(micpar%mid_HeterMixtCynoBacter),1:jcplx)); this%fPhotoR=spval
   allocate(this%RO2UptkAutor(NumMicrobAutoTrophCmplx));this%RO2UptkAutor=spval
   allocate(this%Resp4NFixAutor(NumMicrobAutoTrophCmplx));this%Resp4NFixAutor=spval
   allocate(this%RespGrossAutor(NumMicrobAutoTrophCmplx));this%RespGrossAutor=spval
@@ -543,6 +549,8 @@ type, public :: Cumlate_Flux_Diag_type
   this%RO2UptkHeterG                    = 0._r8
   this%Resp4NFixHeter                   = 0._r8
   this%RespGrossHeter                   = 0._r8
+  this%RGrowthRespHeter                 = 0._r8
+  this%RMaintRespHeter                  = 0._r8
   this%RO2Dmnd4RespHeter                = 0._r8
   this%RO2DmndHeter                     = 0._r8
   this%RO2DmndHeterG                    = 0._r8
@@ -603,6 +611,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%RGOCP                    = 0._r8
   this%RGOAP                    = 0._r8
   this%FGOAP                    = 0._r8
+  this%fPhotoR                  = 0._r8
   this%RO2UptkAutor                     = 0._r8
   this%Resp4NFixAutor                   = 0._r8
   this%RespGrossAutor                   = 0._r8
@@ -658,6 +667,8 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RO2UptkHeter)
   call destroy(this%Resp4NFixHeter)
   call destroy(this%RespGrossHeter)
+  call destroy(this%RGrowthRespHeter)
+  call destroy(this%RMaintRespHeter)
   call destroy(this%RO2Dmnd4RespHeter)
   call destroy(this%RO2DmndHeter)
   call destroy(this%RO2DmndHeterG)

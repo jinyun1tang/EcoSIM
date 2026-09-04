@@ -516,6 +516,8 @@ implicit none
   real(r8),pointer   :: h2D_Ar_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_O2_Gas_ppmv_vr(:,:)
   real(r8),pointer   :: h2D_NH3_Gas_ppmv_vr(:,:)
+  real(r8),pointer   :: h2D_cyanoBactC_vr(:,:)
+
   real(r8),pointer   :: h2D_AeroHrBactC_vr(:,:)   
   real(r8),pointer   :: h2D_AeroHrFungC_vr(:,:)   
   real(r8),pointer   :: h2D_faculDenitC_vr(:,:)  
@@ -616,6 +618,7 @@ implicit none
   real(r8),pointer   :: h2D_AeroHrFungE_litr_col(:,:) 
   real(r8),pointer   :: h2D_faculDenitE_litr_col(:,:) 
   real(r8),pointer   :: h2D_fermentorE_litr_col(:,:) 
+  real(r8),pointer   :: h2D_cyanoBactC_litr_col(:,:)
   real(r8),pointer   :: h2D_acetometgE_litr_col(:,:) 
   real(r8),pointer   :: h2D_aeroN2fixE_litr_col(:,:) 
   real(r8),pointer   :: h2D_anaeN2FixE_litr_col(:,:)  
@@ -1207,6 +1210,7 @@ implicit none
   allocate(this%h2D_N2O_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_N2O_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_NH3_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_NH3_Gas_ppmv_vr(:,:)=spval
   allocate(this%h2D_O2_Gas_ppmv_vr(beg_col:end_col,1:JZ)); this%h2D_O2_Gas_ppmv_vr(:,:)=spval
+  allocate(this%h2D_cyanoBactC_vr(beg_col:end_col,1:JZ)); this%h2D_cyanoBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrBactC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrBactC_vr(:,:)=spval
   allocate(this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)); this%h2D_AeroHrFungC_vr(:,:)=spval
   allocate(this%h2D_faculDenitC_vr(beg_col:end_col,1:JZ)); this%h2D_faculDenitC_vr(:,:)=spval
@@ -1305,6 +1309,7 @@ implicit none
   allocate(this%h2D_AeroHrFungE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_AeroHrFungE_litr_col(:,:)=spval
   allocate(this%h2D_faculDenitE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_faculDenitE_litr_col(:,:)=spval
   allocate(this%h2D_fermentorE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_fermentorE_litr_col(:,:)=spval
+  allocate(this%h2D_cyanoBactC_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_cyanoBactC_litr_col(:,:)=spval
   allocate(this%h2D_acetometgE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_acetometgE_litr_col(:,:)=spval
   allocate(this%h2D_aeroN2fixE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_aeroN2fixE_litr_col(:,:)=spval
   allocate(this%h2D_anaeN2FixE_litr_col(beg_col:end_col,1:NumPlantChemElms)); this%h2D_anaeN2FixE_litr_col(:,:)=spval
@@ -3456,6 +3461,10 @@ implicit none
   call hist_addfld2d(fname='Aerobic_HetrBacterC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Aerobic bacteria C profile',ptr_col=data2d_ptr,default='inactive')       
 
+  data2d_ptr =>  this%h2D_cyanoBactC_vr(beg_col:end_col,1:JZ)
+  call hist_addfld2d(fname='CynoBacterC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
+    long_name='Mixtrophic cyanobacteria C profile',ptr_col=data2d_ptr)
+
   data2d_ptr =>  this%h2D_AeroHrFungC_vr(beg_col:end_col,1:JZ)
   call hist_addfld2d(fname='Aerobic_HetrFungiC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='Aerobic fungi C profile',ptr_col=data2d_ptr,default='inactive')       
@@ -3809,6 +3818,10 @@ implicit none
   data2d_ptr =>  this%h2D_fermentorE_litr_col(beg_col:end_col,1:NumPlantChemElms)
   call hist_addfld2d(fname='FermentorE_litr',units='g/m2',type2d='elements',avgflag='A',&
     long_name='Fermentor elemental biomass in litter',ptr_col=data2d_ptr,default='inactive')       
+
+  data2d_ptr =>  this%h2D_cyanoBactC_litr_col(beg_col:end_col,1:NumPlantChemElms)
+  call hist_addfld2d(fname='CynoBacterE_litr',units='g/m2',type2d='elements',avgflag='A',&
+    long_name='Cynobacterial elemental biomass in litter',ptr_col=data2d_ptr,default='inactive')
 
   data2d_ptr =>  this%h2D_acetometgE_litr_col(beg_col:end_col,1:NumPlantChemElms)
   call hist_addfld2d(fname='Acetic_methanogenE_litr',units='g/m2',type2d='elements',avgflag='A',&
@@ -4447,6 +4460,9 @@ implicit none
       call SumMicbGroup(0,NY,NX,micpar%mid_fermentor,MicbE)
       this%h2D_fermentorE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)  !fermentor
 
+      call SumMicbGroup(0,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)
+      this%h2D_cyanoBactC_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)  !cyanobacteria
+
       call SumMicbGroup(0,NY,NX,micpar%mid_HeterAcetoCH4GenArchea,MicbE)
       this%h2D_acetometgE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)  !acetogenic methanogen
 
@@ -4613,6 +4629,9 @@ implicit none
         this%h2D_ElectricConductivity_vr(ncol,L) = ElectricConductivity_vr(L,NY,NX)
         
         this%h2D_HydCondSoil_vr(ncol,L) = HydCondSoil_3D(3,L,NY,NX)
+
+        call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)
+        this%h2D_cyanoBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL
 
         !aerobic heterotropic bacteria
         call SumMicbGroup(L,NY,NX,micpar%mid_HeterAerobBacter,MicbE)

@@ -9,7 +9,7 @@ module FermenterMod
   use EcosimConst
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: StageFuncGuild
+  use MicrobMathFuncMod,    only: CalcRespMaintHeter, StageFuncGuild
 
   implicit none
 
@@ -24,7 +24,7 @@ module FermenterMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetogFermentCatabolism(N,K,micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
+  subroutine AcetogFermentCatabolism(N,K,RMOMK,micfor,micstt,naqfdiag,ncplxs,nmicf,nmics,micflx,nmicdiag)
   !
   !Description:
   !Fermentation and acetogenic N2 fixers
@@ -34,7 +34,7 @@ module FermenterMod
   !it can be fermenters or anaerobic N2 fixers
   implicit none
   integer, intent(in) :: N,K
-
+  real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(Cumlate_Flux_Diag_type), INTENT(INOUT) :: naqfdiag
@@ -102,6 +102,8 @@ module FermenterMod
     IF(OMActHeter(NGL,K).LE.0.0_r8)cycle
     !prepare trait parameters
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA(NGL,K),micfor,naqfdiag,nmicdiag,nmics)
+
+    call CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     GH2X = RGASC*1.E-3_r8*TKS*LOG((AMAX1(1.0E-05_r8,CH2GS)/H2KI)**4)
     GH2F = GH2X/GlucoseC    !

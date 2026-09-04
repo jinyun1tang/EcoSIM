@@ -110,16 +110,14 @@ implicit none
 !       VOLWZ=water volume used to calculate aqueous microbial
 !       concentrations that drive microbial density effects on
 !       decomposition
-      !PAR radiation to Soil surface
-      RadPAR2Soil_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
-      !PAR radiation to litter surface
-      RadPAR2LitR_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)
-
+      
       !incoming PAR
-      RadPAR2Soil_lyr = RadPAR2Soil_col(NY,NX);RadPAR2LitR_lyr = RadPAR2LitR_col(NY,NX)
-      PAR_RAD         = RadPAR2LitR_lyr
+      RadPAR2Soil_lyr = RadPAR2Soil_col(NY,NX)
+      RadPAR2LitR_lyr = RadPAR2LitR_col(NY,NX)
+      PAR_RAD         = RadPAR2LitR_lyr*FracSurfByLitR_col(NY,NX)+RadPAR2Soil_lyr*(1._r8-FracSurfByLitR_col(NY,NX))
 
       D998: DO L=0,NL_col(NY,NX)
+        
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
           IF(L.EQ.0 .OR. L.GE.NU_col(NY,NX))THEN
@@ -145,7 +143,6 @@ implicit none
               endif
               PAR_RAD=RadPAR2LitR_lyr+RadPAR2Soil_lyr   
              endif
-
           ELSE
             trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
             RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
@@ -185,6 +182,7 @@ implicit none
   type(Cumlate_Flux_Diag_type) :: naqfdiag
 
   micfor%L=L;micfor%PAR_rad=PAR_rad
+  
   call MicAPISend(I,J,L,NY,NX,micfor,micstt,micflx)
   
   call SoilBGCOneLayer(I,J,micfor,micstt,micflx,naqfdiag,nmicdiag)
@@ -261,7 +259,7 @@ implicit none
     micfor%PSISoilMatricP = PSISoilMatricP_vr(L,NY,NX)
   endif  
 
-  if (micfor%TKS<Tref)then
+  if (micfor%TKS.LT.Tref)then
     micfor%PSISoilMatricP  = LtHeatIceMelt*(micfor%TKS-Tref)/micfor%TKS
   endif
   
@@ -405,7 +403,7 @@ implicit none
   micstt%CNOSC(1:jsken,1:KL)                            = CNOSC_vr(1:jsken,1:KL,L,NY,NX)
   micstt%CPOSC(1:jsken,1:KL)                            = CPOSC_vr(1:jsken,1:KL,L,NY,NX)
   micstt%mBiomeHeter(1:NumPlantChemElms,1:NumLiveHeterBioms,1:KL)=mBiomeHeter_vr(1:NumPlantChemElms,1:NumLiveHeterBioms,1:KL,L,NY,NX)
-
+  
   micstt%mBiomeAutor(1:NumPlantChemElms,1:NumLiveAutoBioms)=mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)
 
   micflx%RNO2DmndSoilChemoPrev=RNO2DmndSoilChemo_vr(L,NY,NX)

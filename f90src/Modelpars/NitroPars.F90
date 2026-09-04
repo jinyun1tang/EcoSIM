@@ -98,24 +98,26 @@ module NitroPars
   real(r8) :: GN2X         !free energy yields of redox reactions for N2-NH3, [kJ g-1 N]
   real(r8) :: EN2D         !growth respiraiton efficiency for AMO ANME-2D, [-]
 
-  real(r8) :: EN2X           !growth respiration efficiency for aerobic N2 fixation, [-]
-  real(r8) :: EN2Y           !growth respiration efficiency for anaerobic N2 fixation, [-]
-  real(r8) :: EO2X           !growth respiration efficiency for aerobic bacteria (DOC), [-], 1gC Energy/(1gC Energy+1gC biom)
-  real(r8) :: EH4X           !growth respiration efficiency for aerobic Ch4 oxidizer, [-]
-  real(r8) :: EO2G           !growth respiration efficiency for fungi, [-]
-  real(r8) :: EO2D           !growth respiration efficiency for denitrifiers (aerobic), [-], 1gC Energy/(1gC Energy+1gC biom)
-  real(r8) :: ENFX           !growth respiration efficiency for diazotrophs, [-], 1gC Energy/(1gC Energy+1gC biom)
-  real(r8) :: ENOX           !growth respiration efficiency for denitrifiers (anaerobic), [-]
-  real(r8) :: EO2A           !growth respiration efficiency for aerobic bacteria (acetate), [-]
-  real(r8) :: TSORP          !sorption rate constant for OHC, [h-1]
-  real(r8) :: HSORP          !sorption volume coefficient for OHC, [-]
-  real(r8) :: SPOHC          !specific decomposition rate constant for adsorbed SOC, [g subs. C g-1 micr. C]
-  real(r8) :: SPOHA          !specific decomposition rate constant for adsorbed acetate, [g subs. C g-1 micr. C]
-  real(r8) :: RMOM           !specific maintenance respiration, [g C g-1 N h-1]
-  real(r8) :: SPORC(2)       !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
-  real(r8) :: SPOMC(2)       !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
-  real(r8) :: EN2F(8)        !N fixation yield from C oxidation, [g N g-1 C]
-  real(r8) :: EFIRE(2,21:22) !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
+  real(r8) :: EN2X            !growth respiration efficiency for aerobic N2 fixation, [-]
+  real(r8) :: EN2Y            !growth respiration efficiency for anaerobic N2 fixation, [-]
+  real(r8) :: EO2X            !growth respiration efficiency for aerobic bacteria (DOC), [-], 1gC Energy/(1gC Energy+1gC biom)
+  real(r8) :: EH4X            !growth respiration efficiency for aerobic Ch4 oxidizer, [-]
+  real(r8) :: EO2G            !growth respiration efficiency for fungi, [-]
+  real(r8) :: EO2D            !growth respiration efficiency for denitrifiers (aerobic), [-], 1gC Energy/(1gC Energy+1gC biom)
+  real(r8) :: ENFX            !growth respiration efficiency for diazotrophs, [-], 1gC Energy/(1gC Energy+1gC biom)
+  real(r8) :: ENOX            !growth respiration efficiency for denitrifiers (anaerobic), [-]
+  real(r8) :: EO2A            !growth respiration efficiency for aerobic bacteria (acetate), [-]
+  real(r8) :: TSORP           !sorption rate constant for OHC, [h-1]
+  real(r8) :: HSORP           !sorption volume coefficient for OHC, [-]
+  real(r8) :: SPOHC           !specific decomposition rate constant for adsorbed SOC, [g subs. C g-1 micr. C]
+  real(r8) :: SPOHA           !specific decomposition rate constant for adsorbed acetate, [g subs. C g-1 micr. C]
+  real(r8) :: RMOM            !specific maintenance respiration, [g C g-1 N h-1]
+  real(r8) :: SPORC(2)        !specific decomposition rate constant microbial residue,  [g C g-1 N h-1]
+  real(r8) :: SPOMC(2)        !specific decomposition rate constant microbial biomass,  [g C g-1 N h-1]
+  real(r8) :: EN2F(8)         !N fixation yield from C oxidation, [g N g-1 C]
+  real(r8) :: EFIRE(2,21:22)  !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
+  real(r8) :: CyanoInocC      !inoculation cyanobacteria biomass [gC m-2]
+  real(r8) :: CyanoInoc_depth !inocoluation depth of cyanobacteria, [m]
   contains
 
   subroutine initNitroPars
@@ -127,7 +129,8 @@ module NitroPars
   FMN  = 5.0E-03_r8
   H2KI = 1.0_r8
   OAKI = 12._r8
-  
+  CyanoInoc_depth = 1.e-3_r8   ![1mm]
+  CyanoInocC = 1.e-2_r8        ![gC m-2]
   if(.not.ReadPars())then
     DCKI          = 2.5_r8
     RCCX          = 0.833_r8

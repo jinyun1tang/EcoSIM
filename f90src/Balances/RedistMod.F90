@@ -1354,7 +1354,8 @@ module RedistMod
       PrecHeat_col(NY,NX)          = PrecHeat_col(NY,NX) + HRAINR
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
-    call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+    
+    if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)

@@ -10,7 +10,8 @@ module MethanogenMod
   use EcosimConst,          only: RGASC
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: CalcRespMaint, StageAutotroph, StageFuncGuild
+  use MicrobMathFuncMod,    only: CalcRespMaintAutor, CalcRespMaintHeter, &
+                                  StageAutotroph, StageFuncGuild
 
   implicit none
 
@@ -25,9 +26,10 @@ module MethanogenMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetoMethanogenCatabolism(N,K,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
+  subroutine AcetoMethanogenCatabolism(N,K,RMOMK,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   implicit none
   integer, intent(in) :: N,K
+  real(r8), intent(in) :: RMOMK(2)
 
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
@@ -85,6 +87,8 @@ module MethanogenMod
     WatStressMicb=real_truncate(EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8)),1.e-3_r8)
     !prepare parameters
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA,micfor,naqfdiag,nmicdiag,nmics)
+
+    call CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     GOMX = RGASC*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
     GOMM = GOMX/24.0_r8
@@ -211,7 +215,7 @@ module MethanogenMod
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     !Use catabolic reaction: CO2(aq)+4H2(aq) -> CH4 + 2H2O, 8/12=0.667, 1.5=12/8,
     !to drive anabolic reaction: CO2(aq)+2H2(aq) -> CH2O + H2O,

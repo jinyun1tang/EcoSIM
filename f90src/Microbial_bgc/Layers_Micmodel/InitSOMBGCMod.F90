@@ -64,7 +64,7 @@ module InitSOMBGCMOD
 !------------------------------------------------------------------------------------------
 
   subroutine InitSOMVars(L,NY,NX,FCX)
-
+  use NitroPars, only : CyanoInocC
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in) :: FCX
@@ -72,7 +72,7 @@ module InitSOMBGCMOD
   real(r8), parameter :: DCKR=0.25_r8
   real(r8), parameter :: DCKM=2.5E+04_r8
 
-  integer :: K,M,KK,N,NGL,NN
+  integer :: K,M,KK,N,NGL,NN,KL
   real(r8) :: OC,ON,OP,X
   real(r8) :: OME1(1:NumPlantChemElms)
   real(r8) :: FOSCI,FOSNI,FOSPI
@@ -92,24 +92,25 @@ module InitSOMBGCMOD
   integer  :: MID,NE
   ! begin_execution
 
-  associate(                                               &
-    rNCOMC_ave            => micpar%rNCOMC_ave,            &
-    rPCOMC_ave            => micpar%rPCOMC_ave,            &
-    nlbiomcp              => micpar%nlbiomcp,              &
-    k_humus               => micpar%k_humus,               &
-    mid_HeterAerobBacter  => micpar%mid_HeterAerobBacter  ,&    
-    OHCK                  => micpar%OHCK,                  &
-    OMCK                  => micpar%OMCK,                  &
-    OQCK                  => micpar%OQCK,                  &
-    ORCK                  => micpar%ORCK,                  &
-    ORCI                  => micpar%ORCI,                  &
-    OMCI                  => micpar%OMCI,                  &
-    CNRH                  => micpar%CNRH,                  &
-    CPRH                  => micpar%CPRH,                  &
-    CNOFC                 => micpar%CNOFC,                 &
-    CPOFC                 => micpar%CPOFC,                 &
-    OMCF                  => micpar%OMCF,                  &
-    OMCA                  => micpar%OMCA                   &
+  associate(                                                   &
+    rNCOMC_ave              => micpar%rNCOMC_ave,              &
+    rPCOMC_ave              => micpar%rPCOMC_ave,              &
+    nlbiomcp                => micpar%nlbiomcp,                &
+    k_humus                 => micpar%k_humus,                 &
+    mid_HeterAerobBacter    => micpar%mid_HeterAerobBacter,    &
+    mid_HeterMixtCynoBacter => micpar%mid_HeterMixtCynoBacter, &
+    OHCK                    => micpar%OHCK,                    &
+    OMCK                    => micpar%OMCK,                    &
+    OQCK                    => micpar%OQCK,                    &
+    ORCK                    => micpar%ORCK,                    &
+    ORCI                    => micpar%ORCI,                    &
+    OMCI                    => micpar%OMCI,                    &
+    CNRH                    => micpar%CNRH,                    &
+    CPRH                    => micpar%CPRH,                    &
+    CNOFC                   => micpar%CNOFC,                   &
+    CPOFC                   => micpar%CPOFC,                   &
+    OMCF                    => micpar%OMCF,                    &
+    OMCA                    => micpar%OMCA                     &
   )
 
   D975: DO K=1,micpar%NumOfLitrCmplxs
@@ -226,8 +227,9 @@ module InitSOMBGCMOD
           OSCM(K)=AMIN1(FCX,1._r8)*CORGCX(K)*VGeomLayer_vr(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ENDIF
-      X=1.0_r8
-      KK=micpar%k_humus
+
+      X  = 1.0_r8
+      KK = micpar%k_humus
       IF(TOSCI.GT.ZEROS(NY,NX))THEN
         FOSCI = AMIN1(1.0_r8,OSCI(KK)/TOSCI)
         FOSNI = AMIN1(1.0_r8,OSCI(KK)*CNOSCT(KK)/TOSNI)
@@ -251,7 +253,7 @@ module InitSOMBGCMOD
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbHFunGrupsPerCmplx
-
+      
       D8991: DO M=1,nlbiomcp
         OME1(ielmc) = AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
         OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
@@ -262,7 +264,7 @@ module InitSOMBGCMOD
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms
             mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
-          ENDDO
+          ENDDO                
         ENDDO
 
         OSCX (KK)    = OSCX(KK)+OME1(ielmc)
@@ -284,6 +286,43 @@ module InitSOMBGCMOD
         ENDDO D8992
       ENDDO D8991
     ENDDO D8990
+
+    !for cyanobacteria
+    if(L.eq.0)then
+      N=mid_HeterMixtCynoBacter
+      KL=micpar%NumOfLitrCmplxs  
+      tglds=JGnfH(N)-JGniH(N)+1._r8
+
+      DO M=1,nlbiomcp      
+        OME1(ielmc)=CyanoInocC*OMCI(M,K)/KL
+        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K))
+        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K))
+
+        DO NGL=JGniH(N),JGnfH(N)
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+          ENDDO                
+        ENDDO
+      ENDDO
+    elseif(L.eq.NU_col(NY,NX))then
+      N=mid_HeterMixtCynoBacter
+      KL=jcplx
+      tglds=JGnfH(N)-JGniH(N)+1._r8
+
+      DO M=1,nlbiomcp
+        OME1(ielmc) = CyanoInocC*OMCI(M,K)/KL
+        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K))
+        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K))
+
+        DO NGL=JGniH(N),JGnfH(N)
+          MID=micpar%get_micb_id(M,NGL)
+          DO NE=1,NumPlantChemElms
+            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+          ENDDO                
+        ENDDO
+      ENDDO
+    endif
     !
     !     MICROBIAL RESIDUE C, N AND P
     !
@@ -729,6 +768,7 @@ module InitSOMBGCMOD
     CORGPX(k_POM)   = 0.0_r8
     CORGPX(k_humus) = 0.0_r8
   ENDIF
+  
   call PrintInfo('end InitLitterProfile')
   end associate
   end subroutine InitLitterProfile

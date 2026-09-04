@@ -401,7 +401,7 @@ module MicrobMathFuncMod
   end associate
   end subroutine StageAutotroph
 !------------------------------------------------------------------------------------------
-  subroutine CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+  subroutine CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
   implicit none
   integer, intent(in) :: I,J,NGL
   real(r8), intent(in) :: RMOMK(2)  !effect of low microbial C concentration on maintenance respiration
@@ -410,7 +410,7 @@ module MicrobMathFuncMod
   type(micfluxtype), intent(inout) :: micflx
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
-  character(len=*),parameter :: subname='CalcRespMaint'
+  character(len=*),parameter :: subname='CalcRespMaintAutor'
   REAL(R8) :: FPH,RMOMX
   integer :: MID1
 
@@ -442,6 +442,49 @@ module MicrobMathFuncMod
   RMaintRespAutor(NGL)      = RMaintDmndAutor(ibiom_kinetic,NGL)+RMaintDmndAutor(ibiom_struct,NGL)
   call PrintInfo('end '//subname)
   end associate
-  end subroutine CalcRespMaint
+  end subroutine CalcRespMaintAutor
+!------------------------------------------------------------------------------------------
+
+  subroutine CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+  implicit none
+  integer, intent(in) :: NGL,K
+  real(r8), intent(in) :: RMOMK(2)  !effect of low microbial C concentration on maintenance respiration
+  type(micforctype), intent(in) :: micfor
+  type(micsttype), intent(in) :: micstt
+  type(micfluxtype), intent(inout) :: micflx
+  type(Microbe_State_type), intent(inout) :: nmics
+  type(Microbe_Flux_type), intent(inout) :: nmicf
+  character(len=*),parameter :: subname='CalcRespMaintHeter'
+  REAL(R8) :: FPH,RMOMX
+  integer :: MID1
+
+  associate(                                             &
+    OMN2                 => nmics%OMN2,                  &
+    TempMaintRHeter      => nmics%TempMaintRHeter,       &
+    RMaintDmndHeter      => nmicf%RMaintDmndHeter,       &
+    RMaintRespHeter      => nmicf%RMaintRespHeter,       &
+    pH                   => micfor%pH,                   &
+    mBiomeHeter          => micstt%mBiomeHeter           &
+  )
+  call PrintInfo('beg '//subname)
+
+  !     RMOMK=effect of low microbial C concentration on mntc respn
+
+  FPH                                  = 1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
+  RMOMX                                = RMOM*TempMaintRHeter(NGL,K)*FPH
+  MID1                                 = micpar%get_micb_id(ibiom_kinetic,NGL)
+  RMaintDmndHeter(ibiom_kinetic,NGL,K) = mBiomeHeter(ielmn,MID1,K)*RMOMX*RMOMK(ibiom_kinetic)
+  RMaintDmndHeter(ibiom_struct,NGL,K)  = OMN2(NGL,K)*RMOMX*RMOMK(ibiom_struct)
+  !
+  !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
+  !
+  !     RMaintRespHeter=total maintenance respiration
+  !     RGrowthRespHeter=growth respiration
+  !     RMaintDefcitcitHeter=senescence respiration
+  !
+  RMaintRespHeter(NGL,K)      = RMaintDmndHeter(ibiom_kinetic,NGL,K)+RMaintDmndHeter(ibiom_struct,NGL,K)
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine CalcRespMaintHeter
 
 end module MicrobMathFuncMod

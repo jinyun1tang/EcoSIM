@@ -14,7 +14,8 @@ module CyanoBacteriaMod
   use EcoSIMSolverPar
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: AerobicHeterO2Uptake, StageFuncGuild
+  use MicrobMathFuncMod,    only: AerobicHeterO2Uptake, CalcRespMaintHeter, &
+                                  StageFuncGuild
   implicit none
 
   private
@@ -26,11 +27,12 @@ module CyanoBacteriaMod
 
   contains
 !------------------------------------------------------------------------------------------
-  subroutine CyanoBacteriaCatabolism(I,J,N,K,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
+  subroutine CyanoBacteriaCatabolism(I,J,N,K,RMOMK,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx,nmicdiag)
   !
 
   implicit none
   integer, intent(in) :: I,J,N,K
+  real(r8), intent(in) :: RMOMK(2)
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
@@ -40,23 +42,21 @@ module CyanoBacteriaMod
   type(OMCplx_State_type), intent(inout) :: ncplxs
   type(Microbe_Diag_type), intent(inout) :: nmicdiag
   character(len=*), parameter :: subname='CyanoBacteriaCatabolism'
-  real(r8), parameter :: theta_cyno=0.8_r8 !light-scattering efficiency within the EPS matrix and phycobilisome antenna size
-  real(r8), parameter :: Pmax_cyano=0.03_r8 ![h-1], [0.01-0.06]
-  real(r8), parameter :: alpha_cyno=3.e-4   ![umol photon m-2 s-1]
-  real(r8), parameter :: K_low_photo=6.e-3  ![h-1]
+
+  real(r8), parameter :: K_low_photo= 6.e-3_r8   ![h-1]
   integer :: NGL
   real(r8) :: EO2Q
   real(r8) :: fBIOM
-  real(r8) :: I_k,x,fPAR,xCO2,r_photo,f_low_photo
+  real(r8) :: fPAR,xCO2,r_photo,f_low_photo
   real(r8) :: RPhotoResp
   real(r8) :: RGOMP,RHeterRespUlm
-  real(r8) :: FPhotoResp
+  
   real(r8) :: FSBSTC,FSBSTA
   real(r8) :: RGOCY,RGOCZ,RGOAZ
   real(r8) :: RGOCX,RGOAX
   real(r8) :: OXKX,FOXYX
   real(r8) :: WatStressMicb
-
+  real(r8) :: f_cyno_heter
   associate(                                                               &
     OMActHeter             => nmics%OMActHeter,                            &
     FBiomStoiScalarHeter   => nmics%FBiomStoiScalarHeter,                  &
@@ -87,11 +87,13 @@ module CyanoBacteriaMod
     FOQA                   => nmicf%FOQA,                                  &
     FGOCP                  => nmicf%FGOCP,                                 &
     FGOAP                  => nmicf%FGOAP,                                 &
+    fPhotoR                => nmicf%fPhotoR,                               &
     RespGrossHeter         => nmicf%RespGrossHeter,                        &
     RAcetateProdHeter      => nmicf%RAcetateProdHeter,                     &
     RO2DmndHetert          => micflx%RO2DmndHetert,                        &
     RDOCUptkHeter          => micflx%RDOCUptkHeter,                        &
     RAcetateUptkHeter      => micflx%RAcetateUptkHeter,                    &
+    RMaintRespHeter        => nmicf%RMaintRespHeter,                       &    
     tRGOXP                 => micflx%tRGOXP,                               &
     tRGOZP                 => micflx%tRGOZP,                               &
     RDOMEcoDmndPrev        => micfor%RDOMEcoDmndPrev,                      &
@@ -112,12 +114,20 @@ module CyanoBacteriaMod
   )
   call PrintInfo('beg '//subname)
 
+  !reduction of heterotrophic rate compared to actual heterotrophs
+  f_cyno_heter=0.1_r8
+  if(PAR_rad.LE.ZEROS)then
+    f_cyno_heter=0.01_r8
+  endif
+
   DO NGL=micpar%JGniH(N),micpar%JGnfH(N)
+
     IF(OMActHeter(NGL,K).LE.0.0_r8)cycle
 
     !prepare trait parameters
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA(NGL,K),micfor,naqfdiag,nmicdiag,nmics)
 
+    call CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     OXKX  = OXKM
     IF(RO2EcoDmndPrev.GT.ZEROS)THEN
@@ -132,13 +142,12 @@ module CyanoBacteriaMod
 
     !photosynthesis
     !6CO2 + 6H2O + light -> (CH2O)6 + 6O2
+
     if(PAR_rad.GT.ZEROS)then
-      I_k=Pmax_cyano/alpha_cyno
-      x = AMAX1(PAR_rad,0.0_r8)/I_k
-      fPAR = (x + 1._r8 - sqrt((x + 1._r8)**2 - 4._r8*theta_cyno*x))/(2._r8*theta_cyno)
-      fPAR = AMIN1(1.0_r8,AMAX1(0.0_r8,fPAR))
+
+      fPAR=fPAR_func(PAR_rad)
       xCO2 = CCO2S/(CCO2S+CCKM)
-      r_photo=Pmax_cyano*fPAR*xCO2*GrowthEnvScalHeter(NGL,K)
+      r_photo=fPAR*xCO2*GrowthEnvScalHeter(NGL,K)
       RCO2FixCyano(NGL,K) = r_photo * fBIOM
 
       !photosynthate respiraiton
@@ -151,12 +160,13 @@ module CyanoBacteriaMod
       RCO2FixCyano(NGL,K) = 0._r8
       RPhotoResp          = 0._r8
     endif
+
     !grow on DOC and acetate
     FSBSTC            = CDOM(idom_doc,K)/(CDOM(idom_doc,K)+OQKM)
     FSBSTA            = CDOM(idom_acetate,K)/(CDOM(idom_acetate,K)+OQKA)
     FSBSTHeter(NGL,K) = FOCA(K)*FSBSTC+FOAA(K)*FSBSTA
 
-    RGOCY  = fBIOM*VMXO*GrowthEnvScalHeter(NGL,K)*f_low_photo
+    RGOCY  = fBIOM*VMXO*GrowthEnvScalHeter(NGL,K)*f_low_photo*f_cyno_heter
     RGOCZ  = RGOCY*FSBSTC*FOCA(K)  !MM uptake of DOC
     RGOAZ  = RGOCY*FSBSTA*FOAA(K)  !MM uptake of acetate
 
@@ -174,17 +184,15 @@ module CyanoBacteriaMod
     tRGOZP = tRGOZP+RGOCZ+RGOAZ            !potential C oxidation without C and O2 limitation
     IF(RGOMP.GT.ZEROS)THEN
       FGOCP(NGL,K) = RGOCP(NGL,K)/RGOMP
-      FGOAP(NGL,K) = RGOAP(NGL,K)/RGOMP
-      FPhotoResp   = RPhotoResp/RGOMP
+      FGOAP(NGL,K) = RGOAP(NGL,K)/RGOMP      
     ELSE
       FGOCP(NGL,K) = 1.0_r8
-      FGOAP(NGL,K) = 0.0_r8
-      FPhotoResp   = 0.0_r8
+      FGOAP(NGL,K) = 0.0_r8      
     ENDIF
 
     RO2Dmnd4RespHeter(NGL,K) = 2.667_r8*(RHeterRespUlm-RCO2FixCyano(NGL,K))         !external O2 demand
     RO2DmndHeter(NGL,K)      = RO2Dmnd4RespHeter(NGL,K)
-    ECHZHeter(NGL,K)         = EO2Q*(FGOCP(NGL,K)+FPhotoResp)+EO2A*FGOAP(NGL,K)
+    ECHZHeter(NGL,K)         = EO2Q*FGOCP(NGL,K)+EO2A*FGOAP(NGL,K)
 
     !make a copy for flux limiter
     RO2DmndHetert(NGL,K)       = RO2DmndHeter(NGL,K)
@@ -195,6 +203,13 @@ module CyanoBacteriaMod
 
     ROQC4HeterMicrobAct(NGL,K) = RGOCY*OxyLimterHeter(NGL,K) !C demand for oxidation
     RespGrossHeter(NGL,K)      = RPhotoResp+RHeterRespUlm*OxyLimterHeter(NGL,K)
+    
+    IF(RespGrossHeter(NGL,K).GT.0._R8)THEN
+      fPhotoR(NGL,K)   = RPhotoResp/RespGrossHeter(NGL,K) 
+    ELSE
+      fPhotoR(NGL,K)   = 0._R8
+    ENDIF  
+
     RCO2ProdHeter(NGL,K)       = RespGrossHeter(NGL,K)-RCO2FixCyano(NGL,K)
     RAcetateProdHeter(NGL,K)   = 0.0_r8
     RCH4ProdHeter(NGL,K)       = 0.0_r8
@@ -208,5 +223,20 @@ module CyanoBacteriaMod
   end associate
 
   end subroutine CyanoBacteriaCatabolism
+!------------------------------------------------------------------------------------------
+  function fPAR_func(PAR_RAD)result(ans)
+  implicit none
+  real(r8), intent(in) :: PAR_RAD                ![umol photon m-2 s-1]
+  real(r8), parameter :: alpha_cyno = 1.1e-4_r8  ! [h-1] / [umol photon m-2 s-1]
+  real(r8), parameter :: beta_cyno  = 3.3e-4_r8  ! inverse [PAR]
+  real(r8), parameter :: gamma_cyno = 1.5e-3_r8  ! inverse [PAR]
+
+  real(r8) :: ans   !photosynthesis rate [h-1]
+
+
+  ans = alpha_cyno * PAR_rad * (1._r8 - beta_cyno*PAR_rad) &
+        / (1._r8 + gamma_cyno*PAR_rad)
+
+  end function fPAR_func
 
   end module CyanoBacteriaMod

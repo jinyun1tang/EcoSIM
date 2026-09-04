@@ -10,7 +10,7 @@ module MethanotrophMod
   use EcoSimConst
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: CalcRespMaint, StageAutotroph
+  use MicrobMathFuncMod,    only: CalcRespMaintAutor, StageAutotroph
 
   implicit none
 
@@ -114,7 +114,7 @@ module MethanotrophMod
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     IF(RCH4EcoDmndPrev.GT.ZEROS)THEN
       FCH4X=AMAX1(FMN,RCH4MetaDmndAutorPrev(NGL)/RCH4EcoDmndPrev)
@@ -299,7 +299,7 @@ module MethanotrophMod
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     IF(RCH4EcoDmndPrev.GT.ZEROS)THEN
       FCH4X=AMAX1(FMN,RCH4MetaDmndAutorPrev(NGL)/RCH4EcoDmndPrev)
@@ -440,7 +440,7 @@ module MethanotrophMod
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     IF(RCH4EcoDmndPrev.GT.ZEROS)THEN
       FCH4X=AMAX1(FMN,RCH4MetaDmndAutorPrev(NGL)/RCH4EcoDmndPrev)

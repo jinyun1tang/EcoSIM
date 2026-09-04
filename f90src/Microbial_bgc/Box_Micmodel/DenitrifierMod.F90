@@ -34,6 +34,7 @@ module DenitrifierMod
   !Denitrifiers do not use acetate (which is not right)
   !the reduction of NO2 into NO is not considered
   !Ref: The microbial nitrogen-cycling network, Kuypers et al., 2018
+  !maintenance respiration is computed in aerobicBacteria module. 
   implicit none
   integer, intent(in) :: N,K
   real(r8), intent(in) :: VOLWZ            !volume of water to support biogeochemistry
@@ -44,6 +45,7 @@ module DenitrifierMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_State_type),intent(inout) :: ncplxs
   type(micfluxtype), intent(inout) :: micflx
+  character(len=*), parameter :: subname='HeteroDenitrificCatabolism'
   integer :: NGL
   real(r8) :: FNO3S,FNO3B
   real(r8) :: FNO2S,FNO2B

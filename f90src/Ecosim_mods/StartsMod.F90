@@ -514,7 +514,7 @@ module StartsMod
       !
       HBAconst_vr(L,NY,NX)=AMAX1(HBAmin_vr(L,NY,NX)*exp(-0.035_r8*SolidOMPercent_vr(L,NY,NX)),0.5_r8)
       
-    ELSEIF(L==0)THEN 
+    ELSEIF(L.eq.0)THEN 
     
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
         VHeatCapacity_vr(0,NY,NX)=cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
@@ -921,6 +921,7 @@ module StartsMod
       ENDDO
       !volume of litter layer
       VLitR_col(NY,NX)           = VLitR0*ppmc*AREA_3D(3,L,NY,NX)
+      
       VGeomLayer_vr(L,NY,NX)     = VLitR_col(NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)     = VLSoilPoreMicP_vr(L,NY,NX)

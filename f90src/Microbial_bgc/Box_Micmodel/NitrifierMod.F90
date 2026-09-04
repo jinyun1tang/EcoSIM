@@ -8,7 +8,7 @@ module NitrifierMod
   use minimathmod,          only: AZMAX1
   use NitroPars
   use MicrobeDiagTypes
-  use MicrobMathFuncMod,    only: CalcRespMaint, StageAutotroph
+  use MicrobMathFuncMod,    only: CalcRespMaintAutor, StageAutotroph
 
   implicit none
 
@@ -265,7 +265,7 @@ module NitrifierMod
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     FNH4S=VLNH4
     FNHBS=VLNHB
@@ -444,7 +444,7 @@ module NitrifierMod
 
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
 
-    call CalcRespMaint(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
+    call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
     FNH4S=VLNH4
     FNHBS=VLNHB
