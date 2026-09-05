@@ -289,39 +289,12 @@ module InitSOMBGCMOD
 
     !for cyanobacteria
     if(L.eq.0)then
-      N=mid_HeterMixtCynoBacter
-      KL=micpar%NumOfLitrCmplxs  
-      tglds=JGnfH(N)-JGniH(N)+1._r8
+      KL=micpar%NumOfLitrCmplxs
+      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
 
-      DO M=1,nlbiomcp      
-        OME1(ielmc)=CyanoInocC*OMCI(M,K)/KL
-        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K))
-        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K))
-
-        DO NGL=JGniH(N),JGnfH(N)
-          MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElms
-            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
-          ENDDO                
-        ENDDO
-      ENDDO
     elseif(L.eq.NU_col(NY,NX))then
-      N=mid_HeterMixtCynoBacter
       KL=jcplx
-      tglds=JGnfH(N)-JGniH(N)+1._r8
-
-      DO M=1,nlbiomcp
-        OME1(ielmc) = CyanoInocC*OMCI(M,K)/KL
-        OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K))
-        OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K))
-
-        DO NGL=JGniH(N),JGnfH(N)
-          MID=micpar%get_micb_id(M,NGL)
-          DO NE=1,NumPlantChemElms
-            mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
-          ENDDO                
-        ENDDO
-      ENDDO
+      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
     endif
     !
     !     MICROBIAL RESIDUE C, N AND P
@@ -446,6 +419,31 @@ module InitSOMBGCMOD
 
   end associate
   end subroutine InitSOMVars
+!------------------------------------------------------------------------------------------
+  subroutine InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+  implicit none
+  integer, intent(in) :: K,L,NY,NX,KL
+  real(r8), intent(in) :: CyanoInocC
+  integer :: N,M,NGL,MID,NE
+  real(r8) :: OME1(1:NumPlantChemElms)
+  real(r8) :: tglds
+
+  N = micpar%mid_HeterMixtCynoBacter
+  tglds = JGnfH(N)-JGniH(N)+1._r8
+
+  DO M=1,micpar%nlbiomcp
+    OME1(ielmc) = CyanoInocC*micpar%OMCI(M,K)/KL
+    OME1(ielmn) = AZMAX1(OME1(ielmc)*micpar%rNCOMC_ave(M,N,K))
+    OME1(ielmp) = AZMAX1(OME1(ielmc)*micpar%rPCOMC_ave(M,N,K))
+
+    DO NGL=JGniH(N),JGnfH(N)
+      MID=micpar%get_micb_id(M,NGL)
+      DO NE=1,NumPlantChemElms
+        mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine InoculateCyanoBacter
 
 !------------------------------------------------------------------------------------------
   subroutine InitSurfResiduKinetiComponent(L,NY,NX)
