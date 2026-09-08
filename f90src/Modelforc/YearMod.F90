@@ -85,6 +85,7 @@
         Eco_NPP_CumYr_col(NY,NX)          = 0._r8
         Eco_AutoR_CumYr_col(NY,NX)        = 0._r8
         EcoHavstElmnt_CumYr_col(:,NY,NX)  = 0._r8
+        CumDryDepoC_col(NY,NX)=0._r8
         NetNH4Mineralize_CumYr_col(NY,NX) = 0._r8
         NetPO4Mineralize_CumYr_col(NY,NX) = 0._r8
         HoursTooLowPsiCan_pft(:,NY,NX)    = 0._r8

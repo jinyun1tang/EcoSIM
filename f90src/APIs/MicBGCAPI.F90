@@ -97,7 +97,7 @@ implicit none
   real(r8) :: PAR_RAD,RadPAR2LitR_lyr,RadPAR2Soil_lyr !PAR [umol m-2 s-1]
   real(r8) :: micBE(NumPlantChemElms)
   real(r8) :: attn
-  real(r8), parameter :: k_litr = 250._r8  ![1/m]
+  real(r8), parameter :: k_litr = 250._r8     ![1/m]
   real(r8), parameter :: k_cyanoC=0.1_r8      ![m2 gC-1]
   character(len=*), parameter :: subname='MicrobeModel'
 
@@ -112,11 +112,13 @@ implicit none
 !       decomposition
       
       !incoming PAR
+      PAR_RAD_vr(:,NY,NX) = 0._r8
       RadPAR2Soil_lyr = RadPAR2Soil_col(NY,NX)
       RadPAR2LitR_lyr = RadPAR2LitR_col(NY,NX)
       PAR_RAD         = RadPAR2LitR_lyr*FracSurfByLitR_col(NY,NX)+RadPAR2Soil_lyr*(1._r8-FracSurfByLitR_col(NY,NX))
-
+      PAR_RAD         = PAR_RAD/AREA_3D(3,NU_col(NY,NX),NY,NX)
       D998: DO L=0,NL_col(NY,NX)
+        PAR_RAD_vr(L,NY,NX) = PAR_RAD
         
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
@@ -141,12 +143,14 @@ implicit none
                 RadPAR2LitR_lyr=RadPAR2LitR_lyr*attn
                 RadPAR2Soil_lyr=RadPAR2Soil_lyr*attn
               endif
-              PAR_RAD=RadPAR2LitR_lyr+RadPAR2Soil_lyr   
+              PAR_RAD = RadPAR2LitR_lyr+RadPAR2Soil_lyr
+              PAR_RAD = PAR_RAD/AREA_3D(3,NU_col(NY,NX),NY,NX)
              endif
           ELSE
             trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
             RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8
             Micb_N2Fixation_vr(L,NY,NX)                        = 0.0_r8
+            PAR_RAD_vr(L,NY,NX)=0._r8
           ENDIF
 
         ELSE

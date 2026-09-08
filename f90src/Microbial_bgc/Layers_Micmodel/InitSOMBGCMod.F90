@@ -4,6 +4,7 @@ module InitSOMBGCMOD
   use MicrobialDiagMod, only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
   use minimathmod,      only : AZMAX1,safe_adb
   use EcoSiMParDataMod, only : micpar
+  use EcosimBGCFluxType, only : CumDryDepoC_col
   use DebugToolMod
   use MicrobialDataType
   use SOMDataType
@@ -31,6 +32,7 @@ module InitSOMBGCMOD
   public :: InitSOMConsts
   public :: InitSOMBGC
   public :: DestructSOMBGC
+  public :: ApplyBioAerosol
   public :: MicrobeByLitterFall
   contains
 !------------------------------------------------------------------------------------------
@@ -240,16 +242,16 @@ module InitSOMBGCMOD
         FOSPI = 0.0_r8
       ENDIF
     ENDIF
-!
-!     MICROBIAL C, N AND P
-!
-!     OMC,OMN,OMP=microbial C,N,P
-!     OMCI=microbial biomass content in litter
-!     OMCF,OMCA=hetero,autotrophic biomass composition in litter
-!     rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
-!     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!     The reason that initialization of complex-5 microbes is repated for each
-!     complex is because complex 5 is shared by all the other complexes
+    !
+    !     MICROBIAL C, N AND P
+    !
+    !     OMC,OMN,OMP=microbial C,N,P
+    !     OMCI=microbial biomass content in litter
+    !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
+    !     rNCOMC,rPCOMC=maximum N:C and P:C ratios in microbial biomass
+    !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
+    !     The reason that initialization of complex-5 microbes is repated for each
+    !     complex is because complex 5 is shared by all the other complexes
     mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbHFunGrupsPerCmplx
@@ -288,11 +290,11 @@ module InitSOMBGCMOD
     ENDDO D8990
 
     !for cyanobacteria
-    if(L.eq.0)then
+    if(L.eq.0 .and. OSCM(K).GT.0._r8)then
       KL=micpar%NumOfLitrCmplxs
       call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
 
-    elseif(L.eq.NU_col(NY,NX))then
+    elseif(L.eq.NU_col(NY,NX) .and. OSCM(K).GT.0._r8)then
       KL=jcplx
       call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
     endif
@@ -772,18 +774,18 @@ module InitSOMBGCMOD
   end subroutine InitLitterProfile
 !------------------------------------------------------------------------------------------
 
-  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,mscal)
   !
   !seeding microbes added through litterfall
   implicit none
   integer, intent(in) :: I,J,K
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: OSCMK
-
+  real(r8),optional,intent(in) :: mscal
   integer :: M,N,NGL,MID,NE,NN
   real(r8) :: FOSCI,FOSNI,FOSPI,tglds
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8), parameter :: scal=0.01_r8    !scalar for incoming microbial biomass associated with litterfall.
+  real(r8) :: scal    !scalar for incoming microbial biomass associated with litterfall, [1%].
   associate(                         &
     rNCOMC_ave => micpar%rNCOMC_ave, &
     rPCOMC_ave => micpar%rPCOMC_ave, &
@@ -793,6 +795,11 @@ module InitSOMBGCMOD
     OMCA       => micpar%OMCA        &
   )
 
+  if(present(mscal))then
+    scal=mscal
+  else
+    scal=0.01_r8 !microbial biomass fraction of the incoming organic matter, [1%] 
+  endif
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
 
   DO N=1,NumMicbHFunGrupsPerCmplx
@@ -824,6 +831,31 @@ module InitSOMBGCMOD
   
   end associate
   end subroutine MicrobeByLitterFall
+!------------------------------------------------------------------------------------------
+  subroutine ApplyBioAerosol(I,J,NY,NX)
+  !
+  !apply bio-aerosol, made up by OM and
+  !microbes
+  !for simplicity, it is added to complex
+  !fine litter.
+  implicit none
+  integer, intent(in) :: I,J
+  integer, intent(in) :: NY,NX
+  real(r8) :: OSCMK
+  integer :: K,KL
+  character(len=*), parameter :: subname='ApplyBioAerosol'
+
+  KL=1
+  K=micpar%k_fine_comp
+  OSCMK=3.e-4_r8*AREA_3D(3,NU_col(NY,NX),NY,NX) !assuming dry decomposition rate, [1.e-7 gC m-2 h-1], and 5% as microbial biomass C
+
+  call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,mscal=1.e-2_r8)
+  !assuming 2.5% as cyanobacteria
+  call InoculateCyanoBacter(K,0,NY,NX,KL,CyanoInocC=OSCMK*0.025_r8*1.e-2_r8)
+
+  CumDryDepoC_col(NY,NX)=CumDryDepoC_col(NY,NX)+OSCMK
+
+  end subroutine ApplyBioAerosol
 
 !------------------------------------------------------------------------------------------
 
