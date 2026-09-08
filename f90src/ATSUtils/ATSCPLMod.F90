@@ -67,10 +67,6 @@ contains
   call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
   !a_MFrac=data3D(:,:,:)
   
-  !data_ptr = state%canopy_snow%data
-  !call c_f_pointer(data_ptr, data2D, [num_pfts, num_cols])
-  !a_CanSnow=data2D(:,:)
-  
   data_ptr = state%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP=data2D(:,:)
@@ -176,11 +172,14 @@ contains
  
   !This dataset must be flipped due to there only being num_cols x num_pfts values
   !Even though the technical size of the dataset is num_cols x n_cells 
-  call c_f_pointer(props%plant_functional_type%data, data2D, [num_cols, size_col])
+  !call c_f_pointer(props%plant_functional_type%data, data2D, [num_cols, size_col])
+  
+  !need to test flipping back due to the new dataset creation on ATS side
+  call c_f_pointer(props%plant_functional_type%data, data2D, [size_col,num_cols])
   a_PFT = data2D(:,:)
   
   data_ptr = state%canopy_snow%data
-  call c_f_pointer(data_ptr, data2D, [num_cols, size_col])
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_CanSnow=data2D(:,:)
 
   atm_n2 = props%atm_n2
@@ -299,11 +298,8 @@ contains
 
   call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
   data(:) = surf_snow_depth
-  
-  !call c_f_pointer(state%canopy_snow%data, data2D, [num_pfts, num_cols])
-  !data2D(:,:) = a_CanSnow
 
-  call c_f_pointer(state%canopy_snow%data, data2D, [num_cols, size_col])
+  call c_f_pointer(state%canopy_snow%data, data2D, [size_col, num_cols])
   data2D(:,:) = a_CanSnow
   
   end subroutine EcoSIM2ATSData

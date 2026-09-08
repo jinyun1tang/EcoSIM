@@ -293,13 +293,13 @@ implicit none
 
     !Fill in column-wise values needed for prescribed phenology
     !CanopyHeight_col(NY,NX) = 17.0
-    CanopyHeightLive_pft(1,NY,NX) = 17.0
+    !CanopyHeightLive_pft(1,NY,NX) = 17.0
     tlai_day_pft(1,NY,NX) = a_LAI(NY)
     tsai_day_pft(1,NY,NX) = a_SAI(NY)
-    irootType_col(NY,NX) = a_PFT(NY,1)
+    !irootType_col(NY,NX) = a_PFT(NY,1)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
     !Fill number of plants from npfts
-    if(a_PFT(NY,1).EQ.0.0)then
+    if(a_PFT(1,NY).EQ.0.0)then
       NP0_col(NY,NX) = 0
       NP_col(NY,NX) = 0
     else
@@ -315,34 +315,37 @@ implicit none
     !loop over npfts and fill snow on canopy variables
     if (ldo_sp_mode) then
       DO NZ=1,num_pfts
-        CanopyHeightLive_pft(NZ,NY,NX) = 17.0
-        tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
-        tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
-        SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NY,NZ)
-        iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
-        TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
-       
-        !Load the PFT array from ATS and fill the plant traits 
-        ! based on that mapping
-        DATAPI(NZ,NY,NX) = a_PFT(NY,NZ)
-        call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
+        if (a_PFT(NZ,NY) .GT. 0.0) then
+            call root_canopy_mapping(a_PFT(NZ,NY), irootType_col(NY,NX), CanopyHeightLive_pft(NZ,NY,NX))
+            CanopyHeight_col(NY,NX) = CanopyHeightLive_pft(NZ,NY,NX)
+            tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
+            tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
+            SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
+            !iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
+            TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
         
-        !Set cuticle resistances scaled from pft trait file
-        H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
-        CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
-        
-        ATCA_col(NY,NX)                 = 6.0_r8
-        ENGYX_pft(NZ,NY,NX)             = 0._r8
-        DeltaTKC_pft(NZ,NY,NX)          = 0._r8
-        TdegCCanopy_pft(NZ,NY,NX)       = ATCA_col(NY,NX)
-        TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
-        TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
-        TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
-        fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
-        !PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
-        PSICanopy_pft(NZ,NY,NX)         = -2.0_r8
-        PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
-        PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+            !Load the PFT array from ATS and fill the plant traits 
+            ! based on that mapping
+            DATAPI(NZ,NY,NX) = a_PFT(NZ,NY)
+            call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
+            
+            !Set cuticle resistances scaled from pft trait file
+            H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
+            CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
+            
+            ATCA_col(NY,NX)                 = 6.0_r8
+            ENGYX_pft(NZ,NY,NX)             = 0._r8
+            DeltaTKC_pft(NZ,NY,NX)          = 0._r8
+            TdegCCanopy_pft(NZ,NY,NX)       = ATCA_col(NY,NX)
+            TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
+            TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
+            TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
+            fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
+            !PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
+            PSICanopy_pft(NZ,NY,NX)         = -2.0_r8
+            PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+            PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+        endif
       enddo
     endif
   ENDDO
@@ -477,7 +480,7 @@ implicit none
     do NZ=1,num_pfts
       a_Transpiration(NY) = a_Transpiration(NY) + Transpiration_pft(NZ,NY,NX)
       a_EvapCan(NY)  = a_EvapCan(NY) + VapXAir2Canopy_pft(NZ,NY,NX)
-      a_CanSnow(NY,NZ) = SnowOnCanopy_pft(NZ,NY,NX)
+      a_CanSnow(NZ,NY) = SnowOnCanopy_pft(NZ,NY,NX)
     enddo
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
@@ -498,5 +501,43 @@ implicit none
   
   !end associate
   end subroutine RunEcoSIMSurfaceBalance
+  
+  subroutine root_canopy_mapping(plant_id, root_id, canopy_height)
+      implicit none
+  
+      ! Arguments
+      integer, intent(in)  :: plant_id
+      integer, intent(out) :: root_id
+      real(r8), intent(out) :: canopy_height
+      integer :: canopy_id
+  
+      !Needleleaf Evergreen
+      if (plant_id .EQ. 19.0_r8) then
+          root_id = 1
+          canopy_id = 5
+          canopy_height = 30.0_r8
+      else if (plant_id .EQ. 22.0_r8) then
+          root_id = 1
+          canopy_id = 4
+          canopy_height = 17.0_r8
+      else if (plant_id .EQ. 23.0_r8) then
+          root_id = 5
+          canopy_id = 4
+          canopy_height = 17.0_r8
+      else if (plant_id .EQ. 68.0_r8) then
+          root_id = 3
+          canopy_id = 3
+          canopy_height = 2.0_r8
+      else if (plant_id .EQ. 77.0_r8) then
+          root_id = 6
+          canopy_id = 2
+          canopy_height = 1.0_r8
+      else
+          root_id = 1
+          canopy_id = 1
+          canopy_height = 17.0_r8
+      end if
+  
+  end subroutine root_canopy_mapping
 
 end module ATSEcoSIMAdvanceMod
