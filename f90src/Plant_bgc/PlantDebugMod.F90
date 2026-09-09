@@ -93,7 +93,7 @@ implicit none
     write(iut,*)yearIJ%I*1000+yearIJ%J/24.,masserr,'mass',mass_finale(ielmc)-mass_inital(ielmc),mass_finale(ielmc),mass_inital(ielmc),'flux',&
         tmpval,-plt_bgcr%RootAutoCO2_pft(NZ)+plt_bgcr%LitrfallBlgrElms_pft(ielmc,NZ)+&
         plt_distb%RootLost2Fire_pft(ielmc,NZ)-plt_bgcr%Xfer2RootsC_pft(NZ),info,id_loc,&
-        plt_morph%NumPrimeRootAxes_pft(NZ)    
+        plt_morph%NumStructuralRootAxes_pft(NZ)    
 !    write(iut,*)'plt_biom%SeasonalNonstElms_pft',plt_biom%SeasonalNonstElms_pft(:,NZ)
     write(iut,*)'plt_biom%RootElmsBeg_pft',plt_biom%RootElmsBeg_pft(:,NZ)
       

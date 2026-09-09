@@ -356,15 +356,8 @@ module PlantPhenolMod
       !     SeasonalNonstElms_pft: non-structural carbon
       !     root axis initialization      
       IF(PSIRootTurg_vr(ipltroot,NGTopRootLayer_pft(NZ),NZ).GT.PSIMin4LeafExpansion)THEN !water condition met
-<<<<<<< HEAD
-        shootCheck=ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
-          .GT.NumPrimeRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ)
-
-        IF(NumPrimeRootAxes_pft(NZ).EQ.0 .OR. shootCheck)THEN
-=======
         IF(NumStructuralRootAxes_pft(NZ).EQ.0 .OR. ShootNodeNum_brch(MainBranchNum_pft(NZ),NZ) &
           .GT.NumStructuralRootAxes_pft(NZ)/FracGroth2Node_pft(NZ)+ShootNodeNumAtPlanting_pft(NZ))THEN
->>>>>>> 0c75112a (prepare for implementing new root model for woody-vascular plants)
 
           checkRootInitializer= (NumStructuralRootAxes_pft(NZ).EQ.0 .AND. SeasonalNonstElms_pft(ielmc,NZ).GT.0.0_r8) &              !storage/seed 
             .OR. (CanopyNonstElmConc_pft(ielmc,NZ).GT.NonstCMinCon2InitRoot_pft(NZ) .AND. NonstCMinCon2InitRoot_pft(NZ).GT.0.0_r8)  !plant status

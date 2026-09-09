@@ -1354,6 +1354,7 @@ module UptakesMod
     RootNonstructElmConc_rpvr      => plt_biom%RootNonstructElmConc_rpvr         ,& !input  :root layer nonstructural C concentration, [g g-1]
     ShootElms_pft                  => plt_biom%ShootElms_pft                     ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     SnowDepth                      => plt_ew%SnowDepth                           ,& !input  :snowpack depth, [m]
+    MaxNumRootLays                 => plt_site%MaxNumRootLays                    ,& !input  :maximum root layer number,[-]
     TKS_vr                         => plt_ew%TKS_vr                              ,& !input  :mean annual soil temperature, [K]
     TKSnow                         => plt_ew%TKSnow                              ,& !input  :snow temperature, [K]
     TairK                          => plt_ew%TairK                               ,& !input  :air temperature, [K]

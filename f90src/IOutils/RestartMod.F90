@@ -1175,6 +1175,11 @@ implicit none
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PPatSeeding_pft', dim1name='pft',&
      long_name='plant seeding population', units='# d-2', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
+  endif
+        
+  if(flag=='read')then
+    datpr1 => datrp_1d   
     call restartvar(ncid, flag, varname='CanopyLeafAreaMAX_pft', dim1name='pft',&
      long_name='Maximum canopy leaf area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
