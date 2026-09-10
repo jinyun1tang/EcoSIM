@@ -1,6 +1,7 @@
 set(LAYERS_SOURCES
   InitSOMBGCMod.F90
 	SoilBGCNLayMod.F90
+  SoilPARAttenuationMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(Layers_Micmodel ${LAYERS_SOURCES})

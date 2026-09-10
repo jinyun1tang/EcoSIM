@@ -105,6 +105,7 @@ implicit none
   plt_rad%RadPARDiffus_col         = RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col          = RadSWDirect_col(NY,NX)
   plt_rad%RadDirectPAR_col         = RadDirectPAR_col(NY,NX)
+  plt_rad%RadPARGrnd_col           = RadPARGrnd_col(NY,NX)
   plt_site%SoilSurfRoughness_col = SoilSurfRoughness_col(NY,NX)
   plt_ew%VcumWatSnow_col           = VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col           = VcumIceSnow_col(NY,NX)
@@ -204,6 +205,7 @@ implicit none
   RadDirectPAR_col(NY,NX)    = plt_rad%RadDirectPAR_col
   RadPARDiffus_col(NY,NX)    = plt_rad%RadPARDiffus_col
   RadSWGrnd_col(NY,NX)       = plt_rad%RadSWGrnd_col
+  RadPARGrnd_col(NY,NX)      = plt_rad%RadPARGrnd_col
   FracSWRad2Grnd_col(NY,NX)  = plt_rad%FracSWRad2Grnd_col
   RadSWSolarBeam_col(NY,NX)  = plt_rad%RadSWSolarBeam_col
   RadPARSolarBeam_col(NY,NX) = plt_rad%RadPARSolarBeam_col

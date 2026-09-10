@@ -38,6 +38,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)            !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfallElms_pvr(:,:,:,:,:,:,:)            !plant LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !Hourly net primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable :: PTSHTR_pft(:,:,:)                               !root-shoot coupling conductance, [h-1]
   real(r8),target,allocatable ::  cumNPP_pft(:,:,:)                              !cumulative net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration  <0 into atmosphere, [m d-2]
   real(r8),target,allocatable ::  CanopyRespC_CumYr_pft(:,:,:)                   !total autotrophic respiration, [g d-2 ]
@@ -195,6 +196,7 @@ module PlantDataRateType
   allocate(LitrfallElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfallElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
   allocate(cumNPP_pft(JP,JY,JX)); cumNPP_pft=0._r8
+  allocate(PTSHTR_pft(JP,JY,JX)); PTSHTR_pft=0._r8
   allocate(ETCanopy_CumYr_pft(JP,JY,JX));    ETCanopy_CumYr_pft=0._r8
   allocate(CanopyRespC_CumYr_pft(JP,JY,JX));    CanopyRespC_CumYr_pft=0._r8
   allocate(EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_CumYr_pft=0._r8
@@ -299,6 +301,7 @@ module PlantDataRateType
   subroutine DestructPlantRates
   use abortutils, only : destroy
   implicit none
+  call destroy(PTSHTR_pft)
   call destroy(TotBegVegE_pft)
   call destroy(TotEndVegE_pft)
   call destroy(trcs_deadroot2soil_vr)

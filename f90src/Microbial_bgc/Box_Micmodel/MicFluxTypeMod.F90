@@ -161,12 +161,12 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,NumMicbFunGrupsPerCmplx
+  integer :: jcplx
   integer :: NumHetetr1MicCmplx, NumMicrobAutoTrophCmplx,NPH
   NPH=60
   jcplx                   = micpar%jcplx
 
-  NumMicbFunGrupsPerCmplx = micpar%NumMicbFunGrupsPerCmplx
+
   NumHetetr1MicCmplx      = micpar%NumHetetr1MicCmplx
   NumMicrobAutoTrophCmplx   = micpar%NumMicrobAutoTrophCmplx
 
@@ -271,7 +271,7 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx,JG,NumMicbFunGrupsPerCmplx
+  integer :: jcplx,JG
 
   this%tRNH4MicrbImobilSoil = 0._r8
   this%tRNO3MicrbImobilSoil = 0._r8

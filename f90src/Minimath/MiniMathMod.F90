@@ -663,9 +663,9 @@ module minimathmod
   real(r8), intent(in) :: a
   real(r8) :: ans
 
-  if(a>30._r8)then
-    ans=1.e14_r8 !return a large number
-  elseif(a<-30)then
+  if(a>35._r8)then
+    ans=1.e15_r8 !return a large number
+  elseif(a<-35._r8)then
     ans=1.e-15_r8
   else
     ans=exp(a)

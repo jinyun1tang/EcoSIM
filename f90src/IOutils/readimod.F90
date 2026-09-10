@@ -616,9 +616,9 @@ module readiMod
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
-!        RSC_vr(k_fine_comp,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_comp,0,NY,NX))
-!        RSN_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_comp,0,NY,NX))
-!        RSP_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_comp,0,NY,NX))
+        RSC_vr(k_fine_comp,0,NY,NX)     = AMAX1(1.00E-06_r8,RSC_vr(k_fine_comp,0,NY,NX))
+        RSN_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_comp,0,NY,NX))
+        RSP_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_comp,0,NY,NX))
 
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
         !
@@ -735,8 +735,8 @@ module readiMod
           SatHydroCondHrzn_vr(L,NY,NX) = 0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           CCLAY_vr(L,NY,NX)            = AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
           !convert from Kg to g C (C is input as kgC/Mg soil, N and P are input as g/Mg soil)
-          CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8
-          COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from kg C to g C
+          CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8  !from kg C to g C
+          COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NY,NX)*1.0E+03_r8         !from kg C to g C
           CORGCI_vr(L,NY,NX)           = CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)
           ! soil texture is reported based on mass basis soley for mineral component of the soil

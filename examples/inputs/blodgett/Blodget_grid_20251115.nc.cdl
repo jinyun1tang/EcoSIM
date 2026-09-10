@@ -463,7 +463,7 @@ data:
 
  RCHGWTG = 0 ;
 
- RCHGDG = 1 ;
+ RCHGDG = 0 ;
 
  DHI =
   1 ;

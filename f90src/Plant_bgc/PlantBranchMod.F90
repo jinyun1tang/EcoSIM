@@ -1727,13 +1727,13 @@ module PlantBranchMod
     CanopyLeafAreaZ_pft       => plt_morph%CanopyLeafAreaZ_pft        ,& !inoput :canopy layer leaf area, [m2 d-2]
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch        ,& !output :branch sapwood C, [gC d-2]
     KLowestGroLeafNode_brch   => plt_pheno%KLowestGroLeafNode_brch    ,& !output :leaf growth stage counter, [-]
-    TreeRingAveRadius_pft     => plt_morph%TreeRingAveRadius_pft      ,& !output :tree ring radius,[m]
+    StalkAveRadius_pft     => plt_morph%StalkAveRadius_pft      ,& !output :main stalk radius,[m]
     CanopyStalkSurfArea_lbrch => plt_morph%CanopyStalkSurfArea_lbrch   & !output :plant canopy layer branch stem area, [m2 d-2]
   )
   call DebugPrint('beg '//subname//' NZ',NZ)
   !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
   !
-  !   HypocotHeight_pft=hypocotyledon height
+  !   HypocotHeight_pft=hypocotyledon height, it emerges from the seeding depth, gradually upwards, and eventually getting out of the soil, i.e. HypocotHeight_pft(NZ).GE.SeedDepth_pft(NZ).
   !   SeedDepth_pft=seeding depth
   !   LeafArea_node=node leaf area
   !   PetoleLength_node=PetolSheth length
@@ -1918,10 +1918,8 @@ module PlantBranchMod
       !
       StalkRadius=SQRT(StemSpecVolume_pft(NZ)*(AZMAX1(StalkStrutElms_brch(ielmc,NB,NZ))/PlantPopuLive_pft(NZ))/(PICON*StalkNodeHeight_brch(K1,NB,NZ)))
       
-      IF(NB.EQ.MainBranchNum_pft(NZ) .AND.  is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))THEN
-        TreeRingAveRadius_pft(NZ)=StalkRadius
-      ENDIF
-
+      IF(NB.EQ.MainBranchNum_pft(NZ))StalkAveRadius_pft(NZ)=StalkRadius
+      
       !assume stalk is cylindrical
       StalkSurfArea = PICON*StalkNodeHeight_brch(K1,NB,NZ)*StalkRadius*PlantPopuLive_pft(NZ)
 

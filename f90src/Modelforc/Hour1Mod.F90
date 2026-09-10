@@ -7,13 +7,14 @@ module Hour1Mod
   use FertilizerMod,     only: ApplyFertilizerAtNoon
   use EcoSIMConfig,      only: jcplx=>jcplxc, nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
-  use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
+  use EcoSIMConfig,      only: do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
   use MicrobialDiagMod,  only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
   use HydrologyDiagMod , only: DiagWaterTBLDepz
+  use InitSOMBGCMOD,    only : ApplyBioAerosol
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -200,6 +201,8 @@ module Hour1Mod
 !
       call PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
 !
+      call ApplyBioAerosol(I,J,NY,NX)
+!
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !
       LWRadCanGPrev_col(NY,NX)    = LWRadCanG_col(NY,NX)
@@ -350,7 +353,7 @@ module Hour1Mod
       HydroSubsDOPFlx_col(NY,NX)     = 0._r8
       HydroSubsDIPFlx_col(NY,NX)     = 0._r8
       SurfRunoffPotentM_col(:,NY,NX) = 0._r8
-
+      trcnuts_hydrloss_flx_col(:,NY,NX)=0._r8
       DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
       trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)  = 0._r8

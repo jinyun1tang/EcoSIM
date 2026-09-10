@@ -7,6 +7,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename = &
   __FILE__
 
+  real(r8),target,allocatable :: PAR_RAD_vr(:,:,:)                             !vertically-resolved PAR radiation,  [umol photon m-2 s-1]
   real(r8),target,allocatable ::  SLOPE_col(:,:,:)                             !slope	in four directions, [o]
   real(r8),target,allocatable ::  SoilSurfDepZ_col(:,:)                        !depth of soil surface, [m]
   real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity,[m3 d-2]
@@ -59,6 +60,7 @@ contains
   allocate(LOGWiltPoint_vr(0:JZ,JY,JX));    LOGWiltPoint_vr=0._r8
   allocate(PSD_vr(0:JZ,JY,JX));    PSD_vr=0._r8
   allocate(FCD_vr(0:JZ,JY,JX));    FCD_vr=0._r8
+  allocate(PAR_RAD_vr(0:JZ,JY,JX)); PAR_RAD_vr=0._r8
   allocate(SRP_vr(0:JZ,JY,JX));    SRP_vr=0._r8
   allocate(FSLOPE_2DH(2,JY,JX));    FSLOPE_2DH=0._r8
   allocate(VLMicPt0_col(0:JZ,JY,JX));  VLMicPt0_col=0._r8
@@ -97,6 +99,7 @@ contains
   call destroy(LOGWiltPoint_vr)
   call destroy(PSD_vr)
   call destroy(FCD_vr)
+  call destroy(PAR_RAD_vr)
   call destroy(SRP_vr)
   call destroy(FSLOPE_2DH)
   call destroy(VLMicPt0_col)

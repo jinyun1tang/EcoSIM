@@ -34,6 +34,7 @@ module MicForcTypeMod
   real(r8) :: THETW
   real(r8) :: pH
   real(r8) :: ZERO
+  real(r8) :: PAR_rad              !PAR radiation [umol photon m-2 s-1]
   real(r8) :: SoilMicPMassLayer
   real(r8) :: VLSoilPoreMicP
   real(r8) :: TScal4Difsvity

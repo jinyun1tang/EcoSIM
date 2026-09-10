@@ -287,6 +287,9 @@ contains
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
+      Hydroloss_NH4_cumflx_col(NY,NX)=Hydroloss_NH4_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NH4,NY,NX)++trcnuts_hydrloss_flx_col(ids_NH4B,NY,NX)
+      Hydroloss_NO3_cumflx_col(NY,NX)=Hydroloss_NO3_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NO3,NY,NX)++trcnuts_hydrloss_flx_col(ids_NO3B,NY,NX)
+
       DO idg=idg_beg,idg_NH3        
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX) &
@@ -306,9 +309,9 @@ contains
           tracer_rootmass_err=tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
 
-        if(idg==idg_O2)then
+        if(idg.eq.idg_O2)then
           tracer_rootmass_err = tracer_rootmass_err-RootO2_TotSink_col(NY,NX)
-        elseif(idg==idg_CO2)then
+        elseif(idg.eq.idg_CO2)then
           tracer_rootmass_err = tracer_rootmass_err+RootCO2Ar2Root_col(NY,NX)
         endif
 
@@ -331,11 +334,11 @@ contains
             write(111,*)'surf all emis    =',SurfGasEmiss_all_flx_col(idg,NY,NX)          
             write(111,*)'surf emis        =',SurfGasEmiss_flx_col(idg,NY,NX), SurfGasEmiss_all_flx_col(idg,NY,NX) -SurfGasEmiss_flx_col(idg,NY,NX)                      
             write(111,*)'GasHydroloss     =',GasHydroLoss_flx_col(idg,NY,NX)
-            if(idg==idg_N2)then
+            if(idg.eq.idg_N2)then
               write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
-            elseif(idg==idg_CO2)then
+            elseif(idg.eq.idg_CO2)then
               write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX),-RootCO2AutorPrev_col(NY,NX)  
-            elseif(idg==idg_NH3)then
+            elseif(idg.eq.idg_NH3)then
               write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX)
             else
               write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
