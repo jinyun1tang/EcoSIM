@@ -22,13 +22,14 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  CanopyStalkSurfArea_lbrch(:,:,:,:,:)       !Canopy stem layer area, [m2 d-2]
   real(r8),target,allocatable ::  CanopySurfAreaProfDead_pft(:,:,:,:)        !standing dead canopy surface area profile, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_pft(:,:,:)                  !Canopy leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanopyLeafAreaMAX_pft(:,:,:)               !running maximum leaf area index, [m2 d-2]
   real(r8),target,allocatable ::  LeafStalkAreaAct_pft(:,:,:)                   !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemSurfArea_pft(:,:,:)                  !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeightLive_pft(:,:,:)                !live pft canopy height, [m]
   real(r8),target,allocatable ::  StandDeadSurfArea_pft(:,:,:)               !surface area of standing dead, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeightDead_pft(:,:,:)                !standing dead plant canopy height, [m]
   real(r8),target,allocatable ::  StalkHeight_pft(:,:,:)                     !pft stalk height, [m]
-  real(r8),target,allocatable ::  TreeRingAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
+  real(r8),target,allocatable ::  StalkAveRadius_pft(:,:,:)               !pft tree ring mean radius, [m]
   real(r8),target,allocatable ::  CanopyLeafAareZ_col(:,:,:)                 !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyStemAareZ_col(:,:,:)                 !total stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyLeafArea_col(:,:)                    !grid level plant canopy leaf area, [m2 d-2]
@@ -64,6 +65,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PlantPopuLive_pft(:,:,:)                   !live plant population, [d-2]
   real(r8),target,allocatable ::  PlantPopuDead_pft(:,:,:)                   !standing dead plant population, [d-2]
   real(r8),target,allocatable ::  StalkNodeVertLength_brch(:,:,:,:,:)        !Dead internode height, [m]
+  REAL(r8),target,allocatable ::  rECDeadCRoot_pft(:,:,:,:)                  ! element:C ratio of dead coarse root, [gE gC-1]
+  real(r8),target,allocatable ::  rECLiveCRoot_pft(:,:,:,:)                  ! element:C ratio of live coarse root, [gE gC-1]
   real(r8),target,allocatable ::  rNCLeaf_pft(:,:,:)                            !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCLeaf_pft(:,:,:)                            !maximum leaf P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rNCSheath_pft(:,:,:)                           !sheath N:C ratio, [g g-1]
@@ -81,6 +84,8 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  KLigMM_pft(:,:,:)                          !Half saturation parameter for coarse root lignification, [h-1]
   real(r8),target,allocatable ::  rPCReserve_pft(:,:,:)                      !reserve P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCHusk_pft(:,:,:)                         !husk P:C ratio, [g g-1]
+  real(r8),target,allocatable ::  StalkAxialResist_pft(:,:,:)                !stalk axial resistance per m for water transport, [MPa h m-4]
+  REAL(r8),target,allocatable ::  enh_cyto_pft(:,:,:)                        !cytokinin sensitivity of coarse root thickening
   real(r8),target,allocatable ::  rPCEar_pft(:,:,:)                          !ear P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCGrain_pft(:,:,:)                            !grain P:C ratio, [g g-1]
   real(r8),target,allocatable ::  rPCNoduler_pft(:,:,:)                       !nodule P:C ratio, [g g-1]
@@ -98,6 +103,10 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [# m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [# m-2]
+  real(r8), target, allocatable :: RootSingleVesselRstaxial_pft(:,:,:)          !axial resistance for a single 1 m water transport vessel [MPa h m-4]
+  real(r8), target, allocatable :: AlphaVesselAxialResist_pft(:,:,:)         !axial resistance corrector for a single 1 m water transport vessel [-]  
+  real(r8), target, allocatable :: RootVesselRadius_pft(:,:,:)               !typical radius of the water transport vessel in primary roots, [m]
+  real(r8), target, allocatable :: RootSingleVesselArea_pft(:,:,:)                  !single root vessel cross section area, [m2]
   integer,target,allocatable ::   NumActivePlants_col(:,:)                        !number of active PFT
   real(r8),target,allocatable ::  PlantPopu_col(:,:)                         !total plant population, [d-2]
   real(r8),target,allocatable ::  PPatSeeding_pft(:,:,:)                     !plant population at seeding, [m-2]
@@ -215,13 +224,14 @@ contains
   allocate(CanopySurfAreaProfDead_pft(NumCanopyLayers,JP,JY,JX));CanopySurfAreaProfDead_pft=0._r8
   allocate(iPlantSnowIntercepType_pft(JP,JY,JX)); iPlantSnowIntercepType_pft=0
   allocate(CanopyLeafArea_pft(JP,JY,JX));    CanopyLeafArea_pft=0._r8
+  allocate(CanopyLeafAreaMAX_pft(JP,JY,JX)); CanopyLeafAreaMAX_pft=0._r8
   allocate(LeafStalkAreaAct_pft(JP,JY,JX));    LeafStalkAreaAct_pft=0._r8
   allocate(CanopyStemSurfArea_pft(JP,JY,JX));    CanopyStemSurfArea_pft=0._r8
   allocate(CanopyHeightLive_pft(JP,JY,JX));       CanopyHeightLive_pft=0._r8
   allocate(CanopyHeightDead_pft(JP,JY,JX)); CanopyHeightDead_pft=0._r8
   allocate(StandDeadSurfArea_pft(JP,JY,JX)); StandDeadSurfArea_pft=0._r8
   allocate(StalkHeight_pft(JP,JY,JX)); StalkHeight_pft=0._r8
-  allocate(TreeRingAveRadius_pft(JP,JY,JX)); TreeRingAveRadius_pft=0._r8
+  allocate(StalkAveRadius_pft(JP,JY,JX)); StalkAveRadius_pft=0._r8
   allocate(CanopyLeafAareZ_col(NumCanopyLayers,JY,JX));    CanopyLeafAareZ_col=0._r8
   allocate(CanopyStemAareZ_col(NumCanopyLayers,JY,JX));    CanopyStemAareZ_col=0._r8
   allocate(CanopyLeafArea_col(JY,JX));       CanopyLeafArea_col=0._r8
@@ -257,6 +267,8 @@ contains
   allocate(CanopySeedNumX_pft(JP,JY,JX));     CanopySeedNumX_pft=0._r8  
   allocate(PlantPopuLive_pft(JP,JY,JX));       PlantPopuLive_pft=0._r8
   allocate(PlantPopuDead_pft(JP,JY,JX)); PlantPopuDead_pft=0._r8
+  allocate(rECDeadCRoot_pft(NumPlantChemElms,JP,JY,JX)); rECDeadCRoot_pft=0._r8
+  allocate(rECLiveCRoot_pft(NumPlantChemElms,JP,JY,JX)); rECLiveCRoot_pft=0._r8
   allocate(StalkNodeVertLength_brch(0:MaxNodesPerBranch,MaxNumBranches,JP,JY,JX));StalkNodeVertLength_brch=0._r8
   allocate(rNCLeaf_pft(JP,JY,JX));     rNCLeaf_pft=0._r8
   allocate(rPCLeaf_pft(JP,JY,JX));     rPCLeaf_pft=0._r8
@@ -276,6 +288,8 @@ contains
   allocate(rPCReserve_pft(JP,JY,JX));    rPCReserve_pft=0._r8
   allocate(rPCHusk_pft(JP,JY,JX));    rPCHusk_pft=0._r8
   allocate(rPCEar_pft(JP,JY,JX));    rPCEar_pft=0._r8
+  allocate(StalkAxialResist_pft(JP,JY,JX)); StalkAxialResist_pft=0._r8
+  allocate(enh_cyto_pft(JP,JY,JX));  enh_cyto_pft=0._r8
   allocate(rPCGrain_pft(JP,JY,JX));     rPCGrain_pft=0._r8
   allocate(rPCNoduler_pft(JP,JY,JX));     rPCNoduler_pft=0._r8
   allocate(rProteinC2RootN_pft(JP,JY,JX)); rProteinC2RootN_pft=0._r8
@@ -292,6 +306,10 @@ contains
   allocate(PPI_pft(JP,JY,JX));      PPI_pft=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
+  allocate(RootSingleVesselArea_pft(JP,JY,JX)); RootSingleVesselArea_pft=0._r8
+  allocate(RootSingleVesselRstaxial_pft(JP,JY,JX)); RootSingleVesselRstaxial_pft=0._R8
+  allocate(AlphaVesselAxialResist_pft(JP,JY,JX)); AlphaVesselAxialResist_pft=0._R8  
+  allocate(RootVesselRadius_pft(JP,JY,JX)); RootVesselRadius_pft=0._r8
   allocate(NumActivePlants_col(JY,JX));       NumActivePlants_col=0
   allocate(PlantPopu_col(JY,JX));         PlantPopu_col=0._r8
   allocate(PPatSeeding_pft(JP,JY,JX));      PPatSeeding_pft=0._r8
@@ -407,10 +425,13 @@ contains
   call destroy(FracWoodStalkElmAlloc2Litr)
   call destroy(CanopySurfAreaProfDead_pft)
   call destroy(CanopyStalkSurfArea_lbrch)
+  call destroy(CanopyLeafAreaMAX_pft)
   call destroy(CanopyLeafArea_pft)
   call destroy(LeafStalkAreaAct_pft)
   call destroy(CanopyStemSurfArea_pft)
   call destroy(CanopyHeightDead_pft)
+  call destroy(enh_cyto_pft)
+  call destroy(StalkAxialResist_pft)
   call destroy(StandDeadSurfArea_pft)
   call destroy(CanopyHeightLive_pft)
   call destroy(StalkHeight_pft)
@@ -448,6 +469,8 @@ contains
   call destroy(CanopySeedNum_pft)
   call destroy(CanopySeedNumX_pft)  
   call destroy(PlantPopuLive_pft)
+  call destroy(rECDeadCRoot_pft)
+  call destroy(rECLiveCRoot_pft)
   call destroy(StalkNodeVertLength_brch)
   call destroy(PARTS_brch)
   call destroy(rNCLeaf_pft)
@@ -484,6 +507,10 @@ contains
   call destroy(PPI_pft)
   call destroy(StandingDeadInitC_pft)
   call destroy(PPX_pft)
+  call destroy(RootSingleVesselArea_pft)
+  call destroy(RootSingleVesselRstaxial_pft)
+  call destroy(AlphaVesselAxialResist_pft)  
+  call destroy(RootVesselRadius_pft)
   call destroy(NumActivePlants_col)
   call destroy(PlantPopu_col)
   call destroy(PPatSeeding_pft)

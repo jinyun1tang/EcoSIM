@@ -8,7 +8,7 @@ module MicrobialDiagMod
   use abortutils,       only: endrun
   use minimathmod,      only: safe_adb, AZMAX1,AZERO
   use EcoSiMParDataMod, only: micpar
-  use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts    
+  use EcoSIMConfig , only : ndbiomcp => NumDeadMicrbCompts,NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx        
   use DebugToolMod
   use SoilWaterDataType
   use SurfLitterDataType
@@ -75,7 +75,7 @@ module MicrobialDiagMod
   endif  
   
   !add autotrophic microbes
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
@@ -88,7 +88,7 @@ module MicrobialDiagMod
 
   DK100: DO K=1,jcplx1
     !add heterotrophic microbes
-    DC100: DO  N=1,NumMicbFunGrupsPerCmplx
+    DC100: DO  N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -99,7 +99,6 @@ module MicrobialDiagMod
       enddo
     enddo DC100
   ENDDO DK100
-!  write(*,*)'OMC',ORGM(ielmc)
 
   DK200: DO K=1,jcplx1
     !add microbial residual
@@ -199,7 +198,7 @@ module MicrobialDiagMod
   OMSolid  = 0._r8
   OMSorb   = 0._r8
   !add autotrophic microbes
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
@@ -212,7 +211,7 @@ module MicrobialDiagMod
 
   DO K=1,micpar%NumOfLitrCmplxs
     !add live heterotrophic microbes
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -275,7 +274,7 @@ module MicrobialDiagMod
   DOM_macp=0._r8
 
   !add autotrophic microbes
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
@@ -288,7 +287,7 @@ module MicrobialDiagMod
 
   DO  K=micpar%NumOfLitrCmplxs+1,jcplx
    !sumup heterotrophic microbes
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -355,7 +354,7 @@ module MicrobialDiagMod
   endif
 
   !add autotrophic microbes
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
@@ -369,7 +368,7 @@ module MicrobialDiagMod
   !add heterotrophs
   DO K=1,jcplx1
     !add heterotrophic microbes
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       DO NGL=JGniH(N),JGnfH(N)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -401,7 +400,7 @@ module MicrobialDiagMod
   L  = 0
   NE=ielmc
   !autotrophs
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     do NGL=JGniA(n),JGnfA(n)
       DO  M=1,nlbiomcp
         MID=micpar%get_micb_id(M,NGL)
@@ -411,7 +410,7 @@ module MicrobialDiagMod
   enddo
   !live microbes
   DO K=1,micpar%NumOfLitrCmplxs
-    DO  N=1,NumMicbFunGrupsPerCmplx
+    DO  N=1,NumMicbHFunGrupsPerCmplx
       do NGL=JGniH(n),JGnfH(n)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -451,6 +450,9 @@ module MicrobialDiagMod
   logical, optional, intent(in) :: isauto
   logical :: isauto_loc
   integer :: K,NE,M,MID,NGL
+  character(len=*), parameter :: subname='SumMicbGroup'
+
+  call PrintInfo('beg '//subname)
   if(present(isauto))then
     isauto_loc=isauto
   else
@@ -476,13 +478,14 @@ module MicrobialDiagMod
     ENDDO
 
   else
-    if(igroup /= micpar%mid_HeterAerobBacter  .and. &
-       igroup /= micpar%mid_Facult_DenitBacter  .and. &
-       igroup /= micpar%mid_Aerob_Fungi         .and. &
-       igroup /= micpar%mid_fermentor           .and. &
-       igroup /= micpar%mid_HeterAcetoCH4GenArchea .and. &
+    if(igroup /= micpar%mid_HeterAerobBacter        .and. &
+       igroup /= micpar%mid_Facult_DenitBacter      .and. &
+       igroup /= micpar%mid_Aerob_Fungi             .and. &
+       igroup /= micpar%mid_fermentor               .and. &
+       igroup /= micpar%mid_HeterAcetoCH4GenArchea  .and. &
        igroup /= micpar%mid_HeterAerobN2Fixer       .and. &
-       igroup /= micpar%mid_HeterAnaerobN2Fixer) then
+       igroup /= micpar%mid_HeterAnaerobN2Fixer     .and. &
+       igroup /= micpar%mid_HeterMixtCynoBacter) then
       call endrun('undefined heterotroph group in '//trim(mod_filename),__LINE__)
     endif
     
@@ -496,8 +499,9 @@ module MicrobialDiagMod
         enddo
       enddo  
     enddo    
-
   endif
+
+  call PrintInfo('end '//subname)
   end subroutine SumMicbGroup
 
 !------------------------------------------------------------------------------------------

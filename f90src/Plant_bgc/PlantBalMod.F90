@@ -169,19 +169,20 @@ implicit none
   INTEGER, optional, INTENT(IN) :: NZ1
   integer :: NZ ,L,N,idg,K
   real(r8) :: trcg(idg_beg:idg_NH3)
-  associate(                                         &
-    trcg_rootml_pvr  => plt_rbgc%trcg_rootml_pvr    ,& !input  :root gas content, [g d-2]
-    trcs_rootml_pvr  => plt_rbgc%trcs_rootml_pvr    ,& !input  :root aqueous content, [g d-2]
-    Myco_pft         => plt_morph%Myco_pft          ,& !input  :mycorrhizal type (no or yes),[-]
+  associate(                                                 &
+    trcg_rootml_pvr      => plt_rbgc%trcg_rootml_pvr        ,& !input  :root gas content, [g d-2]
+    trcs_rootml_pvr      => plt_rbgc%trcs_rootml_pvr        ,& !input  :root aqueous content, [g d-2]
+    Myco_pft             => plt_morph%Myco_pft              ,& !input  :mycorrhizal type (no or yes),[-]
+    NK                   => plt_site%NK                     ,& !input  : total layers with roots,  can be set to NL_col
     MaxSoilLays4Root_pft => plt_morph%MaxSoilLays4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
-    trcg_root_vr     => plt_rbgc%trcg_root_vr        & !inoput :total root internal gas flux, [g d-2 h-1]
+    trcg_root_vr         => plt_rbgc%trcg_root_vr            & !inoput :total root internal gas flux, [g d-2 h-1]
   )
   trcg_root_vr(idg_beg:idg_NH3,:)   = 0._r8
 
   trcg(:)=0._r8
   IF(present(NZ1))THEN
     NZ=NZ1
-    DO L=1,MaxSoilLays4Root_pft(NZ)
+    DO L=1,MIN(MaxSoilLays4Root_pft(NZ)+1,NK)
       DO N=1,Myco_pft(NZ)  
         DO idg=idg_beg,idg_NH3
           trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -194,7 +195,7 @@ implicit none
   ELSE
     DO NZ=1,plt_site%NP  
 
-      DO L=1,MaxSoilLays4Root_pft(NZ)
+      DO L=1,MIN(MaxSoilLays4Root_pft(NZ)+1,NK)
         DO N=1,Myco_pft(NZ)  
           DO idg=idg_beg,idg_NH3
             trcg_root_vr(idg,L)=trcg_root_vr(idg,L)+trcs_rootml_pvr(idg,N,L,NZ)+trcg_rootml_pvr(idg,N,L,NZ)        
@@ -515,6 +516,7 @@ implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NZ
   real(r8), optional, intent(out) :: massroot(NumPlantChemElms)  
+  character(len=*), parameter :: subname='SumRootBiome'
 
   integer :: NE,N,L
   real(r8) :: massr1st1(NumPlantChemElms)
@@ -528,7 +530,9 @@ implicit none
     MaxNumRootLays            => plt_site%MaxNumRootLays             ,& !input  :maximum root layer number,[-]
     MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
-    NumPrimeRootAxes_pft      => plt_morph%NumPrimeRootAxes_pft      ,& !input  :root primary axis number,[-]
+    NumStructuralRootAxes_pft => plt_morph%NumStructuralRootAxes_pft ,& !input  :number of structural root axes,[-]
+    RootMediumStructElms_rpvr => plt_biom%RootMediumStructElms_rpvr  ,& !inoput :root layer element for medium size root axes, [g d-2]
+    RootMedStruct_pvr         => plt_biom%RootMedStruct_pvr          ,& !inoput :root layer element biomass for medium size roots, [g d-2]    
     Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :Root layer primary axes Active zone structrual element, [g d-2]    
     Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]    
     RootNodulStrutElms_rpvr   => plt_biom%RootNodulStrutElms_rpvr    ,& !input  :root layer nodule element, [g d-2]
@@ -544,20 +548,22 @@ implicit none
     Root1stLigStruct_pvr      => plt_biom%Root1stLigStruct_pvr       ,& !output :lignifed primary root biomass, [g d-2]    
     RootMycoMassElm_pvr       => plt_biom%RootMycoMassElm_pvr         & !output :root biomass in chemical elements, [g d-2]
   )
+  call PrintInfo('beg '//subname)
   massr1st1=0._r8;massr2nd1=0._r8
   RootElms_pft(:,NZ)=0._r8
   RootMycoNonstElms_pft(:,:,NZ)=0._r8
   DO NE=1,NumPlantChemElms
     DO L=1,MaxNumRootLays
       DO N=1,Myco_pft(NZ)
-        RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
+        RootMycoMassElm_pvr(NE,N,L,NZ) = sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumStructuralRootAxes_pft(NZ),NZ))+RootMycoNonstElms_rpvr(NE,N,L,NZ)
         RootMycoNonstElms_pft(NE,N,NZ) = RootMycoNonstElms_pft(NE,N,NZ)+RootMycoNonstElms_rpvr(NE,N,L,NZ)
-        massr2nd1(NE)                  = massr2nd1(NE)+sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumPrimeRootAxes_pft(NZ),NZ))
+        massr2nd1(NE)                  = massr2nd1(NE)+sum(RootMyco2ndStrutElms_rpvr(NE,N,L,1:NumStructuralRootAxes_pft(NZ),NZ))
       ENDDO  
-      Root1stActStruct_pvr(NE,L,NZ) = SUM(Root1stActStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
-      Root1stLigStruct_pvr(NE,L,NZ) = SUM(Root1stLigStructElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
-      massr1st1(NE)=massr1st1(NE)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))        
-      RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumPrimeRootAxes_pft(NZ),NZ))
+      RootMedStruct_pvr(NE,L,NZ)    = SUM(RootMediumStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+      Root1stActStruct_pvr(NE,L,NZ) = SUM(Root1stActStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+      Root1stLigStruct_pvr(NE,L,NZ) = SUM(Root1stLigStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+      massr1st1(NE)=massr1st1(NE)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))+RootMedStruct_pvr(NE,L,NZ)        
+      RootMycoMassElm_pvr(NE,ipltroot,L,NZ)= RootMycoMassElm_pvr(NE,ipltroot,L,NZ)+sum(RootMyco1stStrutElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))+RootMedStruct_pvr(NE,L,NZ)        
     ENDDO
     
     RootStrutElms_pft(NE,NZ)=massr1st1(NE)+massr2nd1(NE)
@@ -565,7 +571,7 @@ implicit none
     
     RootElms_pft(NE,NZ) = massr1st1(NE)+massr2nd1(NE)+massnonst1(NE)
     if(RootElms_pft(NE,NZ)<0._r8)then
-      write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumPrimeRootAxes_pft(NZ)
+    write(945,*)yearIJ%I*1000+yearIJ%J/24., massr1st1(NE),massr2nd1(NE),massnonst1(NE),'NZ',NZ,NE,NumStructuralRootAxes_pft(NZ)
     endif
     !add reserve to struct
     RootNoduleElms_pft(NE,NZ)=0._r8
@@ -575,7 +581,7 @@ implicit none
   ENDDO
   
   if(present(massroot))massroot=RootElms_pft(:,NZ)+RootNoduleElms_pft(:,NZ)
-
+  call PrintInfo('end '//subname)
   end associate
   end subroutine SumRootBiome
 
@@ -610,6 +616,7 @@ implicit none
       plt_biom%RootNoduleElmsBeg_pft(NE,NZ)     = plt_biom%RootNoduleElms_pft(NE,NZ)
       plt_distb%FireLossE_pft(NE,NZ)            = 0._r8
       plt_bgcr%NH3Dep2Can_pft(NZ)               = 0._r8
+      plt_bgcr%SurfLitrfallElms_pft(NE,NZ)      = 0._r8
     ENDDO
 
   ENDDO
@@ -760,12 +767,12 @@ implicit none
     write(888,*)iYearCurrent*1000+I+J/24.,NZ,'balN',balE(NE),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
     write(888,*)'NY,NX=',plt_site%NY,plt_site%NX,header
     write(888,*)'endN, begN        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
-    write(888,*)'rootN             =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
-    write(888,*)'shootN            =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
-    write(888,*)'sstoreN           =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
-    write(888,*)'ssteadN           =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
-    write(888,*)'ShootNodulN       =',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
-    write(888,*)'RootNoduleN       =',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
+    write(888,*)'end/begrootN      =',RootElms_pft(NE,NZ),RootElmsBeg_pft(NE,NZ),RootElms_pft(NE,NZ)-RootElmsBeg_pft(NE,NZ)
+    write(888,*)'end/begshootN     =',ShootElms_pft(NE,NZ),ShootElmsBeg_pft(NE,NZ),ShootElms_pft(NE,NZ)-ShootElmsBeg_pft(NE,NZ)
+    write(888,*)'end/begsstoreN    =',SeasonalNonstElms_pft(NE,NZ),SeasonalNonstElmsbeg_pft(NE,NZ),SeasonalNonstElms_pft(NE,NZ)-SeasonalNonstElmsbeg_pft(NE,NZ)
+    write(888,*)'end/begssteadN    =',StandDeadStrutElms_pft(NE,NZ),StandDeadStrutElmsBeg_pft(NE,NZ),StandDeadStrutElms_pft(NE,NZ)-StandDeadStrutElmsBeg_pft(NE,NZ)
+    write(888,*)'end/begShootNodulN=',ShootNoduleElms_pft(NE,NZ),ShootNoduleElmsBeg_pft(NE,NZ),ShootNoduleElms_pft(NE,NZ)-ShootNoduleElmsBeg_pft(NE,NZ)
+    write(888,*)'end/begRootNoduleN=',RootNoduleElms_pft(NE,NZ),RootNoduleElmsBeg_pft(NE,NZ),RootNoduleElms_pft(NE,NZ)-RootNoduleElmsBeg_pft(NE,NZ)    
     write(888,*)'nodulinfectN      =',NodulInfectElms_pft(NE,NZ)
     write(888,*)'rootexudN         =',Soil2RootMycoExudE_pft(NE,NZ)
     write(888,*)'litfallN, abg,blg =',LitrfallElms_pft(NE,NZ),LitrfallAbvgElms_pft(NE,NZ),LitrfallBlgrElms_pft(NE,NZ)

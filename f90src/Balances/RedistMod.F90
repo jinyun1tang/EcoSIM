@@ -8,6 +8,7 @@ module RedistMod
   use MiniFuncMod,       only: gOC_to_m3_OM
   use TracerPropMod,     only: MolecularWeight
   use BalancesMod,       only: SummarizeTracers
+  use EcoSIMConfig, only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use DebugToolMod
   use LateralTranspMod 
   use MicrobialDiagMod
@@ -611,7 +612,7 @@ module RedistMod
 !
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
-      DO  NO=1,NumMicbFunGrupsPerCmplx
+      DO  NO=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(NO),JGnfH(NO)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
@@ -625,7 +626,7 @@ module RedistMod
       enddo
     ENDDO D9280
 
-    DO  NO=1,NumMicbFunGrupsPerCmplx
+    DO  NO=1,NumMicbAFunGrupsPerCmplx
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -873,7 +874,7 @@ module RedistMod
       ELSE
         VLsoiAirP_vr(L,NY,NX)=0.0_r8
       ENDIF
-
+      ENGY                = VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
       TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapSolidSoil_vr(L,NY,NX)
       TVOLW               = TVOLW+VLWatMicP_vr(L,NY,NX)
@@ -1353,7 +1354,8 @@ module RedistMod
       PrecHeat_col(NY,NX)          = PrecHeat_col(NY,NX) + HRAINR
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
-    call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+    
+    if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
@@ -1402,7 +1404,7 @@ module RedistMod
 !
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
-      DO  N=1,NumMicbFunGrupsPerCmplx
+      DO  N=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(N),JGnfH(N)
           !litter layer
           REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert_vr(NGL,K,0,NY,NX)
@@ -1425,7 +1427,7 @@ module RedistMod
     ENDIF
   ENDDO
 
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       !litter layer
       RCH4EcoDmnd_vr(0,NY,NX)               = RCH4EcoDmnd_vr(0,NY,NX)+RCH4MetaDmndAutor_vr(NGL,0,NY,NX)

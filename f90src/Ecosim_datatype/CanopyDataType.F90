@@ -78,6 +78,9 @@ module CanopyDataType
   real(r8),target,allocatable ::  TAU_DirectSunLit(:,:,:)                 !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                    !fraction of radiation intercepted by ground surface, [-]
   real(r8),target,allocatable ::  RadSWGrnd_col(:,:)                         !shortwave radiation incident on ground surface, [MJ h-1]
+  real(r8),target,allocatable ::  RadPARGrnd_col(:,:)                        !ground PAR, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadPAR2Soil_col(:,:)                       !PAR to exposed soil, [umol m-2 s-1]
+  real(r8),target,allocatable ::  RadPAR2LitR_col(:,:)                       !PAR to litter, [umol m-2 s-1]
   real(r8),target,allocatable ::  LWRadCanGPrev_col(:,:)                     !longwave radiation emitted by canopy, [MJ h-1]
   real(r8),target,allocatable ::  LWRadGrnd_col(:,:)                         !longwave radiation emitted by ground surface, [MJ m-2 h-1]
   real(r8),target,allocatable ::  WatHeldOnCanopy_col(:,:)                   !canopy held water content, [m3 d-2]
@@ -302,6 +305,9 @@ module CanopyDataType
   allocate(TAU_DirectSunLit(NumCanopyLayers+1,JY,JX));   TAU_DirectSunLit=0._r8
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
   allocate(RadSWGrnd_col(JY,JX));        RadSWGrnd_col=0._r8
+  allocate(RadPARGrnd_col(JY,JX));       RadPARGrnd_col=0._r8
+  allocate(RadPAR2Soil_col(JY,JX));      RadPAR2Soil_col=0._r8
+  allocate(RadPAR2LitR_col(JY,JX));      RadPAR2LitR_col=0._r8
   allocate(LWRadCanGPrev_col(JY,JX));      LWRadCanGPrev_col=0._r8
   allocate(LWRadGrnd_col(JY,JX));      LWRadGrnd_col=0._r8
   allocate(SnowOnCanopy_col(JY,JX)); SnowOnCanopy_col=0._r8
@@ -505,6 +511,9 @@ module CanopyDataType
   call destroy(TAU_DirectSunLit)
   call destroy(FracSWRad2Grnd_col)
   call destroy(RadSWGrnd_col)
+  call destroy(RadPARGrnd_col)
+  call destroy(RadPAR2Soil_col)
+  call destroy(RadPAR2LitR_col)
   call destroy(LWRadCanGPrev_col)
   call destroy(LWRadGrnd_col)
   call destroy(WatHeldOnCanopy_col)

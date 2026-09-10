@@ -204,7 +204,7 @@ module ncdio_pio
 
   type, public :: file_desc_t
     integer(i4) :: fh
-    character(len=128) :: filename
+    character(len=256) :: filename
   end type file_desc_t
 
   type, public :: Var_desc_t

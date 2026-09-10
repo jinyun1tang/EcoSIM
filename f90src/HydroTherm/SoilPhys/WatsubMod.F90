@@ -195,6 +195,11 @@ module WatsubMod
       DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
         DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
       ENDDO
+      !PAR radiation to Soil surface
+      RadPAR2Soil_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
+      !PAR radiation to litter surface
+      RadPAR2LitR_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)
+      
     ENDDO  
   ENDDO
   call PrintInfo('end '//subname)
