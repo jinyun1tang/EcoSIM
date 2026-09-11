@@ -1016,10 +1016,13 @@ implicit none
     Root1stLenLoc_rpvr             => plt_morph%Root1stLenLoc_rpvr               ,& !input :local structrual root length in layer, [m]        
     RootMRProdCytok_rpvr           => plt_rbgc%RootMRProdCytok_rpvr              ,& !input  :cytokinin production rate due to medium roots metabolism, [gC CK h-1]    
     Num1stAxesPerStructRootXPOP_pft=> plt_morph%Num1stAxesPerStructRootXPOP_pft  ,& !output :population primary root axes number on one structrual axis, [d-2]        
+    RootCO2Autor_pvr               => plt_rbgc%RootCO2Autor_pvr                  ,& !inoput :root respiration constrained by O2, [g d-2 h-1]    
     CytokininMRConc_rpvr           => plt_rbgc%CytokininMRConc_rpvr              ,& !output :cytokinin concentration in medium size roots, [gC m-3 H2O]    
     RootMediumStructElms_rpvr      => plt_biom%RootMediumStructElms_rpvr         ,& !inoput :root layer element for medium size root axes, [g d-2]
     RootMyco1stElm_raxs            => plt_biom%RootMyco1stElm_raxs               ,& !inoput :root layer primary axes structrual element, [g d-2]
     RootMycoNonstElms_rpvr         => plt_biom%RootMycoNonstElms_rpvr            ,& !inoput :root layer nonstructural element, [g d-2]    
+    RootCO2EmisPot_pvr             => plt_rbgc%RootCO2EmisPot_pvr                ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]    
+    RootRespPotent_pvr             => plt_rbgc%RootRespPotent_pvr                ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]    
     RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !inoput :Number of medium size root axes in layer for structrual axes, [d-2]
     RootMediumXNum_pvr             => plt_morph%RootMediumXNum_pvr               ,& !inoput :Number of medium size root axes in layer, [d-2]
     RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !inoput :total length for medium size root for axis NR, [m d-2]    
@@ -1032,6 +1035,8 @@ implicit none
 
   IF(RootSinkC_vr(N,L).GT.ZERO4Groth_pft(NZ))THEN
     FracRootMCSinkL=RootMSink_pvr(L,NR)/RootSinkC_vr(N,L)    
+  else
+    return  
   ENDIF  
   !obtain the number of medium roots in layer L along axis NR
   RootMediumXNum_rpvr(L,NR,NZ) = fUSE4MR_pvr(L,NR)*MediumRootBranchFreq_pft(NZ)*Root1stLenLoc_rpvr(L,NR,NZ)*Num1stAxesPerStructRootXPOP_pft(NZ)
@@ -1091,10 +1096,11 @@ implicit none
 
   RCO2TMR_OUltd = AMIN1(RmaintMR_CO2,RNonstCO2_OUltd)+RGrowCO2_OUltd
   RCO2TMR_Oltd  = AMIN1(RmaintMR_CO2,RNonstCO2_Oltd)+RGrowCO2_Oltd
-  RCO2TMR_Oltd  = AMIN1(RCO2TMR_Oltd,AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)))
+  RCO2TMR_Oltd  = AMIN1(RCO2TMR_Oltd,AZMAX1(RootMycoNonstElms_rpvr(ielmc,N,L,NZ)))   !>0
+
   !take CO2 respiration from nonst C
   RootMycoNonstElms_rpvr(ielmc,N,L,NZ) = RootMycoNonstElms_rpvr(ielmc,N,L,NZ)-RCO2TMR_Oltd
-  
+
   !Consume nonstrucal elements for growth: elongation+thickening
   DO NE=1,NumPlantChemElms  
     RootMycoNonst4Grow_Oltd(NE)       = AMIN1(RootMycoNonstElms_rpvr(NE,N,L,NZ),RootMycoNonst4Grow_Oltd(NE))
@@ -1103,10 +1109,15 @@ implicit none
   
   ! net growth=positive growth - senescence
   RootMRNetGrowthElms = RootMycoNonst4Grow_Oltd
+  !has maitenance deficit
   if(-RPotCO2GrothMR_Oltd.GT.0._r8)then
-    call RemobilizeMediumRoots(yearIJ,N,L,NR,NZ,RPotCO2GrothMR_Oltd,RPotCO2GrothMR_OUltd,RCO2TMR_OUltd,RCO2TMR_Oltd,&
+    call RemobilizeMediumRoots(yearIJ,N,L,NR,NZ,RPotCO2GrothMR_Oltd,RPotCO2GrothMR_OUltd,RCO2TMR_Oltd,RCO2TMR_OUltd,&
       RootMRNetGrowthElms,litrflxt)
   endif
+
+  RootRespPotent_pvr(N,L,NZ) = RootRespPotent_pvr(N,L,NZ)+RCO2TMR_OUltd
+  RootCO2EmisPot_pvr(N,L,NZ) = RootCO2EmisPot_pvr(N,L,NZ)+RCO2TMR_Oltd
+  RootCO2Autor_pvr(N,L,NZ)   = RootCO2Autor_pvr(N,L,NZ)-RCO2TMR_Oltd
 
   IF(RootMRNetGrowthElms(ielmc).LT.0.0_r8)THEN              
     call WithDrawMediumRoots(N,NZ,L,NR,RootMRNetGrowthElms,litrflxt)    
@@ -1134,16 +1145,16 @@ implicit none
   end associate
   end subroutine GrowMediumRootAxes
 !----------------------------------------------------------------------------------------------------
-  subroutine RemobilizeMediumRoots(yearIJ,N,L,NR,NZ,RPotCO2GrothMR_Oltd,RPotCO2GrothMR_OUltd,RCO2TMR_OUltd,RCO2TMR_Oltd,&
+  subroutine RemobilizeMediumRoots(yearIJ,N,L,NR,NZ,RPotCO2GrothMR_Oltd,RPotCO2GrothMR_OUltd,RCO2TMR_Oltd,RCO2TMR_OUltd,&
     RootMRNetGrowthElms,litrflxt)
 
   !do remobilization under negative growth  
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in)    :: N,L,NR,NZ
-  real(r8),intent(inout) :: RPotCO2GrothMR_Oltd
+  real(r8),intent(inout) :: RPotCO2GrothMR_Oltd   !potential growth respiration, < 0 meaning in deficiency
   real(r8),intent(inout) :: RPotCO2GrothMR_OUltd
-  real(r8),intent(inout) :: RCO2TMR_Oltd
+  real(r8),intent(inout)  :: RCO2TMR_Oltd
   real(r8),intent(inout) :: RCO2TMR_OUltd
   real(r8),intent(inout) :: litrflxt(NumPlantChemElms)
   real(r8), intent(inout) :: RootMRNetGrowthElms(NumPlantChemElms)  
@@ -1154,7 +1165,7 @@ implicit none
   real(r8) :: CCC,CNC,CPC
   real(r8) :: Frac2Senes1
   real(r8) :: RCCC,RCCN,RCCP
-  real(r8) :: RCO2MDefMRStructPayoff_Oltd
+  real(r8) :: RCO2MDefMRStructPayoff_Oltd  !>0
   real(r8) :: RCO2MDefMRStructPayoff_OUltd
   real(r8) :: RCCE(NumPlantChemElms)
   real(r8) :: dsenecE,dlitrfall
@@ -1216,8 +1227,10 @@ implicit none
   IF(-RPotCO2GrothMR_Oltd.GT.0.0_r8)THEN
     !maintenance deficit is less than remobilizable C.
     IF(-RPotCO2GrothMR_Oltd.LT.RootMediumStructElms_rpvr(ielmc,L,NR,NZ)*RCCC)THEN
+      !deficit is paid off
       RCO2MDefMRStructPayoff_Oltd = -RPotCO2GrothMR_Oltd
     ELSE
+      !deficit is partially paid off
       RCO2MDefMRStructPayoff_Oltd = AZMAX1(RootMediumStructElms_rpvr(ielmc,L,NR,NZ)*RCCC)*RAutoRootO2Limter_rpvr(N,L,NZ)
     ENDIF
     !offset some CO2
@@ -1269,10 +1282,17 @@ implicit none
       RootMRNetGrowthElms(NE)=RootMRNetGrowthElms(NE)-RootMRKill(NE)
     ENDDO 
 
+    RootMRcylc(ielmc)=RootMRcylc(ielmc)-RCO2MDefMRStructPayoff_Oltd
+
     DO NE=1,NumPlantChemElms
       RootMycoNonstElms_rpvr(NE,N,L,NZ) = AZMAX1(RootMycoNonstElms_rpvr(NE,N,L,NZ)+RootMRcylc(NE))
     ENDDO 
   endif
+
+  ! add CO2 respiraiton from remobilization  
+  RCO2TMR_Oltd      = RCO2TMR_Oltd+RCO2MDefMRStructPayoff_Oltd
+  RCO2TMR_OUltd      = RCO2TMR_OUltd+RCO2MDefMRStructPayoff_OUltd
+
   call PrintInfo('end '//subname)
   end associate
 
@@ -2418,7 +2438,7 @@ implicit none
   !withdraw fine roots
   call Withdraw2ndRoots(N,NZ,L,NR,RootNetGrowthElms,litrflxt)
 
-  IF(RootNetGrowthElms(ielmc).LT.0.0_r8)THEN    
+  IF(any(RootNetGrowthElms.LT.0.0_r8))THEN    
 
     !remove secondary roots and offset some of the negative growth
     DO NE=1,NumPlantChemElms
@@ -4157,7 +4177,7 @@ implicit none
     ELSE
       RCO2MDef1stStructPayoff_Oltd=0._r8
     ENDIF
-
+    
     IF(RCO2MDef1stStructPayoff_Oltd.GT.0.0_r8 .AND. RootMyco1stElm_raxs(ielmc,NR,NZ).GT.ZERO4Groth_pft(NZ))THEN
       !remobilization upon starvation-induced root retreat
       DO NE=1,NumPlantChemElms
@@ -4804,10 +4824,10 @@ implicit none
         if(RootMediumXNum_pvr(L,NZ).GT.0._r8)then
           !medium size roots
           LumenFraction = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-sfexp(-3._r8*RootMediumRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))
-          sap_area_root = GetCoarseRootXylemSecArea(dmax,RootMediumRadius_rpvr(L,NR,NZ))*RootMediumXNum_rpvr(L,NR,NZ)        
+          sap_area_root = GetCoarseRootXylemSecArea(dmax,RootMediumRadius_rpvr(L,NR,NZ))
           MRootLumenArea_rpvr(L,NR,NZ) = sap_area_root*LumenFraction
           RootMediumVH2O_rpvr(L,NR,NZ) = MRootLumenArea_rpvr(L,NR,NZ)*RootMediumLength_rpvr(L,NR,NZ)
-          MRootLumenArea_pvr(L,NZ)     = MRootLumenArea_pvr(L,NZ)+MRootLumenArea_rpvr(L,NR,NZ)
+          MRootLumenArea_pvr(L,NZ)     = MRootLumenArea_pvr(L,NZ)+MRootLumenArea_rpvr(L,NR,NZ)*RootMediumXNum_rpvr(L,NR,NZ)
           RootMediumLength_pvr(L,NZ)   = RootMediumLength_pvr(L,NZ)+RootMediumLength_rpvr(L,NR,NZ)/RootMediumXNum_pvr(L,NZ)
         else
           MRootLumenArea_rpvr(L,NR,NZ) = 0._r8

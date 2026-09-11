@@ -1277,8 +1277,8 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
-        FRAD1 = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
-        FRADM = MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(N)
+        FRAD1 = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ)
+        FRADM = MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ)
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
