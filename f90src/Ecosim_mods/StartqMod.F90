@@ -581,7 +581,7 @@ module StartqMod
   NumVessels                                = 0.2_r8*PICON*Root2ndMaxRadius_pft(ipltroot,NZ,NY,NX)**2/RootSingleVesselArea_pft(NZ,NY,NX)
   Root2ndAxialResist_pft(ipltroot,NZ,NY,NX) = RootSingleVesselRstAxial_pft(NZ,NY,NX)/NumVessels
     
-  CRootLumenArea_pvr(:,NZ,NY,NX)            = 0.2_r8*PICON*Root1stMaxRadius_pft(ipltroot,NZ,NY,NX)**2/RootSingleVesselArea_pft(NZ,NY,NX)
+  CRootLumenArea_pvr(:,NZ,NY,NX)            = 0.2_r8*PICON*Root1stMaxRadius_pft(ipltroot,NZ,NY,NX)**2
   D10: DO NB=1,MaxNumBranches
     doInitLeafOut_brch(NB,NZ,NY,NX)                = iTrue
     EnablePlantLeafOut_brch(NB,NZ,NY,NX)           = iTrue

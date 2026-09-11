@@ -490,6 +490,8 @@ contains
       ENDDO
 
       CALL RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
+
+      !to add medium roots for woody vascular trees
     enddo D3960
   ENDDO D3385
   
