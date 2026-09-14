@@ -159,6 +159,9 @@ implicit none
   real(r8), pointer :: LeafAreaSunlit_pft(:)                => null()   !leaf irradiated surface area, [m2 d-2]    
   real(r8), pointer :: PARSunlit_pft(:)                     => null()   !PAR absorbed by sunlit leaf, [umol m-2 s-1]
   real(r8), pointer :: PARSunsha_pft(:)                     => null()   !PAR absorbed by sun-shaded leaf, [umol m-2 s-1]
+  real(r8), pointer :: DynCi2CaRatio_pft(:) => null() !dynamic intracellular-to-canopy CO2 ratio, [-]
+  real(r8), pointer :: CO2Intra_pft(:) => null() !leaf-area-weighted intracellular CO2 sum, [umol mol-1 m2 d-2]
+  real(r8), pointer :: CO2IntraScal_pft(:) => null() !intracellular CO2 leaf-area weight, [m2 d-2]
   real(r8), pointer :: CH2OSunlit_pft(:)                    => null()   !carbon fixation by sun-lit leaf, [gC d-2 h-1]
   real(r8), pointer :: CH2OSunsha_pft(:)                    => null()   !carbon fixation by sun-shaded leaf, [gC d-2 h-1]    
 
@@ -1961,6 +1964,9 @@ implicit none
   allocate(this%LeafAreaSunlit_pft(JP1)); this%LeafAreaSunlit_pft=0._r8
   allocate(this%PARSunlit_pft(JP1));this%PARSunlit_pft=0._r8
   allocate(this%PARSunsha_pft(JP1));this%PARSunsha_pft=0._r8
+  allocate(this%DynCi2CaRatio_pft(JP1));this%DynCi2CaRatio_pft=0._r8
+  allocate(this%CO2Intra_pft(JP1));this%CO2Intra_pft=0._r8
+  allocate(this%CO2IntraScal_pft(JP1));this%CO2IntraScal_pft=0._r8
   allocate(this%CH2OSunlit_pft(JP1));this%CH2OSunlit_pft=0._r8
   allocate(this%CH2OSunsha_pft(JP1));this%CH2OSunsha_pft=0._r8
   allocate(this%CO2CuticleResist_pft(JP1));this%CO2CuticleResist_pft=spval
@@ -2018,6 +2024,9 @@ implicit none
   class(plant_photosyns_type) :: this
 
 
+  call destroy(this%DynCi2CaRatio_pft)
+  call destroy(this%CO2Intra_pft)
+  call destroy(this%CO2IntraScal_pft)
   end subroutine plt_photo_destroy
 
 !------------------------------------------------------------------------

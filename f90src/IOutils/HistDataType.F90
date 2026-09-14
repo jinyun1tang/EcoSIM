@@ -331,7 +331,7 @@ implicit none
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:)
   real(r8),pointer   :: h1D_STOML_Min_RSC_CO2_ptc(:)
   real(r8),pointer   :: h1D_Km_CO2_carboxy_ptc(:)
-  real(r8),pointer   :: h1D_Ci_mesophyll_ptc(:)
+  real(r8),pointer   :: h1D_DynCi2CaRatio_ptc(:)
   real(r8),pointer   :: h1D_BLYR_RSC_CO2_ptc(:) 
   real(r8),pointer   :: h1D_CAN_CO2_ptc(:)      
   real(r8),pointer   :: h1D_O2L_ptc(:)
@@ -967,7 +967,7 @@ implicit none
   allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))   ;this%h1D_STOML_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_STOML_Min_RSC_CO2_ptc(beg_ptc:end_ptc));this%h1D_STOML_Min_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)); this%h1D_Km_CO2_carboxy_ptc(:)=spval
-  allocate(this%h1D_Ci_mesophyll_ptc(beg_ptc:end_ptc)); this%h1D_Ci_mesophyll_ptc(:)=spval
+  allocate(this%h1D_DynCi2CaRatio_ptc(beg_ptc:end_ptc));this%h1D_DynCi2CaRatio_ptc(:)=spval
   allocate(this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc))    ;this%h1D_BLYR_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_CAN_CO2_ptc(beg_ptc:end_ptc))         ;this%h1D_CAN_CO2_ptc(:)=spval
   allocate(this%h1D_O2L_ptc(beg_ptc:end_ptc)); this%h1D_O2L_ptc(:)=spval
@@ -2435,9 +2435,9 @@ implicit none
   call hist_addfld1d(fname='Km_CO2_carboxy_pft',units='uM',avgflag='A',&
     long_name='MM parameter for CO2 carboxylation by Rubisco',ptr_patch=data1d_ptr,default='inactive')      
 
-  data1d_ptr => this%h1D_Ci_mesophyll_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='Ci_mesophyll_pft',units='uM',avgflag='A',&
-    long_name='Intracellular CO2 concentration for photosynthesis',ptr_patch=data1d_ptr,default='inactive')      
+  data1d_ptr => this%h1D_DynCi2CaRatio_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='DynCi2CaRatio_pft',units='1',avgflag='A',&
+    long_name='Dynamic intracellular-to-canopy CO2 ratio',ptr_patch=data1d_ptr)
 
   data1d_ptr => this%h1D_BLYR_RSC_CO2_ptc(beg_ptc:end_ptc) 
   call hist_addfld1d(fname='BLYR_RSC_CO2_pft',units='s/m',avgflag='A',&
@@ -4851,7 +4851,8 @@ implicit none
         this%h1D_STOML_RSC_CO2_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=CanopyMinStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_Km_CO2_carboxy_ptc(nptc)= Km4RubiscoCarboxy_pft(NZ,NY,NX)
-        this%h1D_Ci_mesophyll_ptc(nptc)  = LeafIntracellularCO2_pft(NZ,NY,NX)
+        this%h1D_DynCi2CaRatio_ptc(nptc) = DynCi2CaRatio_pft(NZ,NY,NX)
+
         this%h1D_BLYR_RSC_CO2_ptc(nptc)  = RawCanopy2Atm_pft(NZ,NY,NX)*1.34_r8*secs1hour
         this%h1D_CAN_CO2_ptc(nptc)       = CanopyGasCO2_pft(NZ,NY,NX)
         this%h1D_O2L_ptc(nptc)           = O2L_pft(NZ,NY,NX)
@@ -5253,7 +5254,7 @@ implicit none
   this%h1D_STOML_RSC_CO2_ptc(nptc) = 0._r8
   this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=0._r8
   this%h1D_Km_CO2_carboxy_ptc(nptc)= 0._r8
-  this%h1D_Ci_mesophyll_ptc(nptc)  = 0._r8
+  this%h1D_DynCi2CaRatio_ptc(nptc) = 0._r8
   this%h1D_BLYR_RSC_CO2_ptc(nptc)  =0._r8
   this%h1D_CAN_CO2_ptc(nptc)       = 0._r8
   this%h1D_O2L_ptc(nptc)           = 0._r8

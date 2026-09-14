@@ -121,6 +121,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  SnowOnCanopy_pft(:,:,:)                    !canopy held snow [m3 d-2]
   real(r8),target,allocatable ::  WatHeldOnCanopy_pft(:,:,:)                 !canopy held water content, [m3 d-2]
   real(r8),target,allocatable ::  TKC_pft(:,:,:)                             !canopy temperature after energy iteration, [K]
+  real(r8),target,allocatable ::  DynCi2CaRatio_pft(:,:,:)                   !dynamic Ci:Ca ratio, [-]
   real(r8),target,allocatable ::  TdegCCanopy_pft(:,:,:)                     !canopy temperature, [oC]
   real(r8),target,allocatable ::  DeltaTKC_pft(:,:,:)                        !change in canopy temperature, [K]
   real(r8),target,allocatable ::  TKCanopy_pft(:,:,:)                        !canopy temperature during canopy energy iteration, [K]
@@ -217,6 +218,7 @@ module CanopyDataType
   allocate(LAI_col(JY,JX)); LAI_col=0._r8
   allocate(PARSunlit_pft(JP,JY,JX));PARSunlit_pft=0._r8
   allocate(PARSunsha_pft(JP,JY,JX));PARSunsha_pft=0._r8
+  allocate(DynCi2CaRatio_pft(JP,JY,JX));DynCi2CaRatio_pft=0._r8
   allocate(CH2OSunlit_pft(JP,JY,JX));CH2OSunlit_pft=0._r8
   allocate(CH2OSunsha_pft(JP,JY,JX));CH2OSunsha_pft=0._r8
   ALLOCATE(SpecificLeafArea_pft(JP,JY,JX)); SpecificLeafArea_pft=0._r8
@@ -344,6 +346,7 @@ module CanopyDataType
   allocate(SnowOnCanopy_pft(JP,JY,JX)); SnowOnCanopy_pft=0._r8
   allocate(SnowIntcptByCanopy_pft(JP,JY,JX)); SnowIntcptByCanopy_pft=0._r8
   allocate(TKC_pft(JP,JY,JX));      TKC_pft=0._r8
+
   allocate(TdegCCanopy_pft(JP,JY,JX));      TdegCCanopy_pft=0._r8
   allocate(DeltaTKC_pft(JP,JY,JX));     DeltaTKC_pft=0._r8
   allocate(TKCanopy_pft(JP,JY,JX));     TKCanopy_pft=0._r8
@@ -464,6 +467,7 @@ module CanopyDataType
   call destroy(O2I_pft)
   call destroy(LeafIntracellularCO2_pft)
   call destroy(AirConc_pft)
+  call destroy(DynCi2CaRatio_pft)
   call destroy(DiffCO2Atmos2Intracel_pft)
   call destroy(CanopyGasCO2_pft)
   call destroy(aquCO2Intraleaf_pft)
