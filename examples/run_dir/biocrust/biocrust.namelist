@@ -12,7 +12,7 @@ pft_mgmt_in='NO'
 clm_hour_file_in='../../../examples/inputs/biocrust/BareSoil_clim_20250203.nc'
 clm_factor_in='NO'
 soil_mgmt_in='NO'
-atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
+atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2025.nc'
 
 lverbose=.false.
 disp_planttrait = .true.
