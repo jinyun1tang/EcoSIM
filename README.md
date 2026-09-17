@@ -6,8 +6,7 @@ A biogeochemical modeling library spins off the ecosys model.
 
 Before submitting your PR:
 - Search for existing PRs to prevent duplicating efforts
-
-- Test your changes:
+- Rebase your change with main branch & Test your changes:
 -Create separate PRs for each feature or fix:
  - Avoid combining unrelated changes in a single PR
  - For intricate features, consider opening a feature request first to discuss and align expectations
