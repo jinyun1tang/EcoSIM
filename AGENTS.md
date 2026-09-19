@@ -46,6 +46,10 @@ take precedence over repository guidance.
 
 ## Scientific and input conventions
 
+- When asked to evaluate a plant-trait `.desc` file (including
+  `*.plant_trait.desc.*`), read `python_tools/AGENTS.md` and use the relevant
+  skills under `python_tools/.agents/skills/`, starting with
+  `ecosim-plant-trait-sanity-check/SKILL.md`. Treat the `.desc` file as read-only.
 - Track units explicitly: distinguish carbon mass from dry mass, per-individual
   quantities from per-area quantities, and per-area values from grid-cell totals.
   Check the actual equations when comments and metadata disagree.
