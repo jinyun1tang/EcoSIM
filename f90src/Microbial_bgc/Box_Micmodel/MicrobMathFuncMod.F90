@@ -299,7 +299,7 @@ module MicrobMathFuncMod
     WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
   ENDIF
 
-  WSensGroHeter(NGL,K)=real_truncate(WatStressMicb,1.e-3_r8)
+  WSensGroHeter(NGL,K)=WatStressMicb
   TSensGroHeter(NGL,K)=TSensGrowth
 
   GrowthEnvScalHeter(NGL,K) = WSensGroHeter(NGL,K)*TSensGroHeter(NGL,K)

@@ -103,6 +103,7 @@ implicit none
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)  
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
   real(r8),pointer   :: h1D_CumDryDepoOM_col(:)
+  real(r8),pointer   :: h1D_cyanoBactC_col(:)
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
   real(r8),pointer   :: h1D_RadPAR_Grnd_col(:)
   real(r8),pointer   :: h1D_RadPAR2Soil_col(:)
@@ -785,6 +786,7 @@ implicit none
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
   allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
   allocate(this%h1D_CumDryDepoOM_col(beg_col:end_col)); this%h1D_CumDryDepoOM_col(:)=spval
+  allocate(this%h1D_cyanoBactC_col(beg_col:end_col)); this%h1D_cyanoBactC_col(:)=spval
   allocate(this%h1D_RadSW_Grnd_col(beg_col:end_col)); this%h1D_RadSW_Grnd_col(:)=spval
   allocate(this%h1D_RadPAR_Grnd_col(beg_col:end_col)); this%h1D_RadPAR_Grnd_col(:)=spval
   allocate(this%h1D_RadPAR2Soil_col(beg_col:end_col)); this%h1D_RadPAR2Soil_col(:)=spval
@@ -1692,6 +1694,10 @@ implicit none
   data1d_ptr => this%h1D_CumDryDepoOM_col(beg_col:end_col)
   call hist_addfld1d(fname='CumDryDepoOM_col',units='gC/m2',avgflag='I',&
     long_name='Dry deposition C to ground',ptr_col=data1d_ptr)
+
+  data1d_ptr => this%h1D_cyanoBactC_col(beg_col:end_col)
+  call hist_addfld1d(fname='CynoBacterC_col',units='gC/m2',avgflag='A',&
+    long_name='Mixotrophic cyanobacteria C in surface litter and soil column',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_RadSW_Grnd_col(beg_col:end_col)
   call hist_addfld1d(fname='RadSW_Grnd_col',units='W/m2',avgflag='A',&
@@ -4474,6 +4480,7 @@ implicit none
 
       call SumMicbGroup(0,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)
       this%h2D_cyanoBactC_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)  !cyanobacteria
+      this%h1D_cyanoBactC_col(ncol) = MicbE(ielmc)
 
       call SumMicbGroup(0,NY,NX,micpar%mid_HeterAcetoCH4GenArchea,MicbE)
       this%h2D_acetometgE_litr_col(ncol,1:NumPlantChemElms) = MicbE/AREA_3D(3,NU_col(NY,NX),NY,NX)  !acetogenic methanogen
@@ -4644,7 +4651,7 @@ implicit none
 
         call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)
         this%h2D_cyanoBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL
-
+        this%h1D_cyanoBactC_col(ncol) = this%h1D_cyanoBactC_col(ncol)+MicbE(ielmc)
         !aerobic heterotropic bacteria
         call SumMicbGroup(L,NY,NX,micpar%mid_HeterAerobBacter,MicbE)
         this%h2D_AeroHrBactC_vr(ncol,L) = MicbE(ielmc)/DVOLL   
@@ -4755,6 +4762,7 @@ implicit none
           this%h2D_RootMassP_vr(ncol,L)     = RootMycoMassElm_vr(ielmp,ipltroot,L,NY,NX)/DVOLL                
         endif
       ENDDO
+      this%h1D_cyanoBactC_col(ncol) = this%h1D_cyanoBactC_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_aero_col(ncol) = this%h1D_RCH4Oxi_aero_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
       this%h1D_RCH4Oxi_anmo_col(ncol) = this%h1D_RCH4Oxi_anmo_col(ncol)/AREA_3D(3,NU_col(NY,NX),NY,NX)      
 
