@@ -7,10 +7,9 @@ module InitPlantMod
   use EcoSIMConfig
   use PlantAPIData
   use TracerIDMod
+  use ElmIDMod
   use PlantMathFuncMod
   use PlantBGCPars
-
-  use PlantMathFuncMod
   implicit none
 
   private
@@ -20,6 +19,7 @@ module InitPlantMod
   public :: InitPlantPhenoMorphoBio
   public :: InitRootMychorMorphoBio
   public :: ApplySeedBank
+  public :: SeedDeposition
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
@@ -1248,5 +1248,49 @@ module InitPlantMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitSeedMorphoBio
+!----------------------------------------------------------------------------------------------------
+  subroutine SeedDeposition(I,SeedCDeposition_pft_1d,PPmax_pft_1d,NP_col)
+  implicit none
+  INTEGER, INTENT(IN) :: I
+  real(r8), intent(in) :: SeedCDeposition_pft_1d(:)  !input: seeding C array for all PFTs at current grid, [gC m-2]
+  real(r8), intent(in) :: PPmax_pft_1d(:)            !input: maximum plant population, [# m-2]
+  integer, intent(in) :: NP_col                      !input: number of pts
+  integer :: NZ                !PFT index
+  integer :: NE                                     !element index
+  REAL(R8) :: dSeedPlantedElm_pft(NumPlantChemElms)
+  
+  associate(                                                  &
+    AREA3                  => plt_site%AREA3                 ,& !soil area
+    NU                     => plt_site%NU                    ,& !current soil surface layer
+    SeedPlantedElm_pft     => plt_biom%SeedPlantedElm_pft    ,& !seeded plant elements
+    SeasonalNonstElms_pft  => plt_biom%SeasonalNonstElms_pft ,& !seasonal non-structural elements
+    PPatSeeding_pft        => plt_site%PPatSeeding_pft       ,& !plant population at seeding
+    PPX_pft                => plt_site%PPX_pft               ,& !output :plant population, [plants m-2]        
+    PlantPopuLive_pft      => plt_site%PlantPopuLive_pft     ,& !live plant population
+    SeedCMass_pft          => plt_morph%SeedCMass_pft        ,& !seed carbon mass
+    rNCGrain_pft           => plt_allom%rNCGrain_pft         ,& !grain N:C ratio
+    rPCGrain_pft           => plt_allom%rPCGrain_pft          &  !grain P:C ratio
+    )
+
+    DO NZ=1,NP_col
+      IF(SeedCDeposition_pft_1d(NZ) > 0._r8 .and. PPmax_pft_1d(NZ)>0._r8)then
+        !update seeding population, update seeding planting mass
+        
+        dSeedPlantedElm_pft(ielmc) = AREA3(NU)*SeedCDeposition_pft_1d(NZ)
+        dSeedPlantedElm_pft(ielmn) = rNCGrain_pft(NZ)*dSeedPlantedElm_pft(ielmc)
+        dSeedPlantedElm_pft(ielmp) = rPCGrain_pft(NZ)*dSeedPlantedElm_pft(ielmc)
+
+        DO NE=1,NumPlantChemElms
+          SeedPlantedElm_pft(NE,NZ)=SeedPlantedElm_pft(NE,NZ)+dSeedPlantedElm_pft(NE)
+          SeasonalNonstElms_pft(NE,NZ)=SeasonalNonstElms_pft(NE,NZ)+dSeedPlantedElm_pft(NE)
+        ENDDO
+        !update population
+        PPatSeeding_pft(NZ)   = AMIN1(PPatSeeding_pft(NZ)+SeedCDeposition_pft_1d(NZ)/SeedCMass_pft(NZ),PPmax_pft_1d(NZ))
+        PlantPopuLive_pft(NZ) = PPatSeeding_pft(NZ)*AREA3(NU)
+        PPX_pft(NZ)           = PPatSeeding_pft(NZ)
+      endif
+    ENDDO
+  end associate
+  end subroutine SeedDeposition  
   ![tail]
   end module InitPlantMod

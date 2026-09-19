@@ -1,7 +1,7 @@
 module PlantAPI
 !
 ! interface to integrate the plant model
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
   use EcoSiMParDataMod, only: micpar, pltpar
   use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
   use MiniMathMod,      only: AZMAX1,safe_adb
@@ -264,6 +264,7 @@ implicit none
     TempOffset_pft(NZ,NY,NX)                            = plt_pheno%TempOffset_pft(NZ)
     PlantO2Stress_pft(NZ,NY,NX)                         = plt_pheno%PlantO2Stress_pft(NZ)
     PPX_pft(NZ,NY,NX)                                   = plt_site%PPX_pft(NZ)
+    PPatSeeding_pft(NZ,NY,NX)                           = plt_site%PPatSeeding_pft(NZ)     
     PlantPopuLive_pft(NZ,NY,NX)                         = plt_site%PlantPopuLive_pft(NZ)
     PlantPopuDead_pft(NZ,NY,NX)                         = plt_site%PlantPopuDead_pft(NZ)
     PPI_pft(NZ,NY,NX)                                   = plt_site%PPI_pft(NZ)
@@ -755,18 +756,20 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine PlantAPISend(I,J,NY,NX)
+  subroutine PlantAPISend(yearIJ,NY,NX)
   !
   !DESCRIPTION
   !Send data to plant model
   use PlantAPIData, only : plt_rad
   use EcoSIMConfig, only : jsken=>jskenc,jcplx => jcplxc
   implicit none
-  integer, intent(in) :: I,J,NY,NX
-  integer :: K,L,M,N,NB,NZ,NR,I1,NE,ids
+  type(yearIJ_type), intent(in) :: yearIJ
+  integer, intent(in) :: NY,NX
+  integer :: K,L,M,N,NB,NZ,NR,I1,NE,ids,I
   character(len=*), parameter :: subname='PlantAPISend'
 
   call PrintInfo('beg '//subname)
+  I=yearIJ%I
   IF((ALAT_col(NY,NX).GE.0.0_r8.AND.I.EQ.1) .OR. (ALAT_col(NY,NX).LT.0.0_r8.AND.I.EQ.1))THEN   
     DO NZ=1,NP0_col(NY,NX)
       plt_morph%lreset_laimax_pft(NZ)=.true.      
@@ -1218,7 +1221,6 @@ implicit none
     plt_allom%RootProteinCMax_pft(NZ) = RootProteinCMax_pft(NZ,NY,NX)
     plt_photo%H2OCuticleResist_pft(NZ)      = H2OCuticleResist_pft(NZ,NY,NX)
     plt_morph%ClumpFactor_pft(NZ)           = ClumpFactor_pft(NZ,NY,NX)
-
     plt_site%PPI_pft(NZ)               = PPI_pft(NZ,NY,NX)
     plt_site%PPX_pft(NZ)               = PPX_pft(NZ,NY,NX)
     plt_distb%O2ByFire_CumYr_pft(NZ)   = O2ByFire_CumYr_pft(NZ,NY,NX)

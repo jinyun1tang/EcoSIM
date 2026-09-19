@@ -7,7 +7,8 @@ module PlantInfoMod
   use minimathmod,   only: isLeap
   use abortutils,    only: endrun, iulog
   use DebugToolMod,  only: PrintInfo
-  use PlantTraitTableMod  
+  use StringToolsMod, only: count_delimited_items
+  use PlantTraitTableMod
   use netcdf
   use ncdio_pio  
   use GridConsts
@@ -129,6 +130,7 @@ implicit none
     DO NY=NVN,NVS
       DO NZ=1,NP_col(NY,NX)
         PlantinDepz_pft(NZ,NY,NX)=1.e-6_r8
+        PPmax_pft(NZ,NY,NX)=0._r8
       ENDDO
     ENDDO
   ENDDO
@@ -159,7 +161,11 @@ implicit none
             cycle
           endif
           read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-          read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+          if(count_delimited_items(tstr, ' ').eq.4)then
+            read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX),PPmax_pft(NZ,NY,NX)          
+          else
+            read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+          endif
           PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),1.e-6_r8)
           LPY=0
           if(isLeap(iyr) .and. IMO.GT.2)LPY=1

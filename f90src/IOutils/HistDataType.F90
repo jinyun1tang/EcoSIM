@@ -102,7 +102,7 @@ implicit none
   real(r8),pointer   :: h1D_SUR_DIP_FLX_col(:)  
   real(r8),pointer   :: h1D_SUB_DIP_FLX_col(:)  
   real(r8),pointer   :: h1D_HeatFlx2Grnd_col(:)  
-  real(r8),pointer   :: h1D_CumDryDepoC_col(:)
+  real(r8),pointer   :: h1D_CumDryDepoOM_col(:)
   real(r8),pointer   :: h1D_RadSW_Grnd_col(:)  
   real(r8),pointer   :: h1D_RadPAR_Grnd_col(:)
   real(r8),pointer   :: h1D_RadPAR2Soil_col(:)
@@ -784,7 +784,7 @@ implicit none
   allocate(this%h1D_SUR_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUR_DIP_FLX_col(:)=spval
   allocate(this%h1D_SUB_DIP_FLX_col(beg_col:end_col))   ;this%h1D_SUB_DIP_FLX_col(:)=spval
   allocate(this%h1D_HeatFlx2Grnd_col(beg_col:end_col))     ;this%h1D_HeatFlx2Grnd_col(:)=spval
-  allocate(this%h1D_CumDryDepoC_col(beg_col:end_col)); this%h1D_CumDryDepoC_col(:)=spval
+  allocate(this%h1D_CumDryDepoOM_col(beg_col:end_col)); this%h1D_CumDryDepoOM_col(:)=spval
   allocate(this%h1D_RadSW_Grnd_col(beg_col:end_col)); this%h1D_RadSW_Grnd_col(:)=spval
   allocate(this%h1D_RadPAR_Grnd_col(beg_col:end_col)); this%h1D_RadPAR_Grnd_col(:)=spval
   allocate(this%h1D_RadPAR2Soil_col(beg_col:end_col)); this%h1D_RadPAR2Soil_col(:)=spval
@@ -1689,8 +1689,8 @@ implicit none
   call hist_addfld1d(fname='HeatFlx2Grnd_col',units='MJ/m2/hr',avgflag='A',&
     long_name='Heat flux into the ground',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%h1D_CumDryDepoC_col(beg_col:end_col)
-  call hist_addfld1d(fname='CumDryDepoC_col',units='gC/m2',avgflag='I',&
+  data1d_ptr => this%h1D_CumDryDepoOM_col(beg_col:end_col)
+  call hist_addfld1d(fname='CumDryDepoOM_col',units='gC/m2',avgflag='I',&
     long_name='Dry deposition C to ground',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_RadSW_Grnd_col(beg_col:end_col)
@@ -4251,7 +4251,7 @@ implicit none
       this%h1D_SUR_DIP_FLX_col(ncol)      = HydroSufDIPFlx_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_SUB_DIP_FLX_col(ncol)      = HydroSubsDIPFlx_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)  
       this%h1D_HeatFlx2Grnd_col(ncol)     = HeatFlx2Grnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_CumDryDepoC_col(ncol) = CumDryDepoC_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      this%h1D_CumDryDepoOM_col(ncol) = CumDryDepoOM_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_CanSWRad_col(ncol)         = MJ2W*RadSW_Canopy_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RadSW_Grnd_col(ncol)       = MJ2W*RadSWGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RadPAR_Grnd_col(ncol)      = RadPARGrnd_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)

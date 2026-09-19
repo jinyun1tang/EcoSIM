@@ -490,18 +490,18 @@ module MicBGCMod
       ! the omb complexes, three biomass components, labile, recalcitrant and reserve
       D895: DO N=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(n),JGnfH(n)
-          MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
+          MID1=micpar%get_micb_id(iLbiom_kinetic,NGL)
           
           IF(mBiomeHeter(ielmc,MID1,K).GT.ZEROS)THEN
             rCNBiomeActHeter(ielmn,NGL,K)=AZMAX1(mBiomeHeter(ielmn,MID1,K)/mBiomeHeter(ielmc,MID1,K))
             rCNBiomeActHeter(ielmp,NGL,K)=AZMAX1(mBiomeHeter(ielmp,MID1,K)/mBiomeHeter(ielmc,MID1,K))
           ELSE
-            rCNBiomeActHeter(ielmn,NGL,K)=rNCOMC(ibiom_kinetic,NGL,K)
-            rCNBiomeActHeter(ielmp,NGL,K)=rPCOMC(ibiom_kinetic,NGL,K)
+            rCNBiomeActHeter(ielmn,NGL,K)=rNCOMC(iLbiom_kinetic,NGL,K)
+            rCNBiomeActHeter(ielmp,NGL,K)=rPCOMC(iLbiom_kinetic,NGL,K)
           ENDIF
-          OMActHeter(NGL,K)           = AZMAX1(mBiomeHeter(ielmc,MID1,K)/FL(ibiom_kinetic))
-          FCN(NGL,K)                  = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActHeter(ielmn,NGL,K)/rNCOMC(ibiom_kinetic,NGL,K))))
-          FCP(NGL,K)                  = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActHeter(ielmp,NGL,K)/rPCOMC(ibiom_kinetic,NGL,K))))
+          OMActHeter(NGL,K)           = AZMAX1(mBiomeHeter(ielmc,MID1,K)/FL(iLbiom_kinetic))
+          FCN(NGL,K)                  = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActHeter(ielmn,NGL,K)/rNCOMC(iLbiom_kinetic,NGL,K))))
+          FCP(NGL,K)                  = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActHeter(ielmp,NGL,K)/rPCOMC(iLbiom_kinetic,NGL,K))))
           FBiomStoiScalarHeter(NGL,K) = AMIN1(FCN(NGL,K),FCP(NGL,K))
 
 !       TOTAL BIOMASS
@@ -511,8 +511,8 @@ module MicBGCMod
           IF(N.EQ.mid_Facult_DenitBacter)THEN
             TotBiomNO2Consumers=TotBiomNO2Consumers+OMActHeter(NGL,K)
           ENDIF
-          MID2=micpar%get_micb_id(ibiom_struct,NGL)
-          OMC2(NGL,K)=AZMAX1(AMIN1(OMActHeter(NGL,K)*FL(ibiom_struct),mBiomeHeter(ielmc,MID2,K)))
+          MID2=micpar%get_micb_id(iLbiom_struct,NGL)
+          OMC2(NGL,K)=AZMAX1(AMIN1(OMActHeter(NGL,K)*FL(iLbiom_struct),mBiomeHeter(ielmc,MID2,K)))
           IF(mBiomeHeter(ielmc,MID2,K).GT.ZEROS)THEN
             FOM2(NGL,K)=AZMAX1(OMC2(NGL,K)/mBiomeHeter(ielmc,MID2,K))
             OMN2(NGL,K)=AZMAX1(FOM2(NGL,K)*mBiomeHeter(ielmn,MID2,K))
@@ -529,17 +529,17 @@ module MicBGCMod
   DO N=1,NumMicbAFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
-        MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
+        MID1=micpar%get_micb_id(iLbiom_kinetic,NGL)
         IF(mBiomeAutor(ielmc,MID1).GT.ZEROS)THEN
           rCNBiomeActAutor(ielmn,NGL)=AZMAX1(mBiomeAutor(ielmn,MID1)/mBiomeAutor(ielmc,MID1))
           rCNBiomeActAutor(ielmp,NGL)=AZMAX1(mBiomeAutor(ielmp,MID1)/mBiomeAutor(ielmc,MID1))
         ELSE
-          rCNBiomeActAutor(ielmn,NGL)=rNCOMCAutor(ibiom_kinetic,NGL)
-          rCNBiomeActAutor(ielmp,NGL)=rPCOMCAutor(ibiom_kinetic,NGL)
+          rCNBiomeActAutor(ielmn,NGL)=rNCOMCAutor(iLbiom_kinetic,NGL)
+          rCNBiomeActAutor(ielmp,NGL)=rPCOMCAutor(iLbiom_kinetic,NGL)
         ENDIF
-        OMActAutor(NGL)           = AZMAX1(mBiomeAutor(ielmc,MID1)/FL(ibiom_kinetic))
-        FCNAutor(NGL)             = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActAutor(ielmn,NGL)/rNCOMCAutor(ibiom_kinetic,NGL))))
-        FCPAutor(NGL)             = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActAutor(ielmp,NGL)/rPCOMCAutor(ibiom_kinetic,NGL))))
+        OMActAutor(NGL)           = AZMAX1(mBiomeAutor(ielmc,MID1)/FL(iLbiom_kinetic))
+        FCNAutor(NGL)             = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActAutor(ielmn,NGL)/rNCOMCAutor(iLbiom_kinetic,NGL))))
+        FCPAutor(NGL)             = AMIN1(1.0_r8,AMAX1(0.50_r8,SQRT(rCNBiomeActAutor(ielmp,NGL)/rPCOMCAutor(iLbiom_kinetic,NGL))))
         FBiomNutStoiScalAutor(NGL) = AMIN1(FCNAutor(NGL),FCPAutor(NGL))
       !
       !       TOTAL BIOMASS
@@ -551,8 +551,8 @@ module MicBGCMod
           TotBiomNO2Consumers=TotBiomNO2Consumers+OMActAutor(NGL)
         ENDIF
 
-        MID2           = micpar%get_micb_id(ibiom_struct,NGL)
-        OMC2Autor(NGL) = AZMAX1(AMIN1(OMActAutor(NGL)*FL(ibiom_struct),mBiomeAutor(ielmc,MID2)))
+        MID2           = micpar%get_micb_id(iLbiom_struct,NGL)
+        OMC2Autor(NGL) = AZMAX1(AMIN1(OMActAutor(NGL)*FL(iLbiom_struct),mBiomeAutor(ielmc,MID2)))
         IF(mBiomeAutor(ielmc,MID2).GT.ZEROS)THEN
           FOM2Autor(NGL)=AZMAX1(OMC2Autor(NGL)/mBiomeAutor(ielmc,MID2))
           OMN2Autor(NGL)=AZMAX1(FOM2Autor(NGL)*mBiomeAutor(ielmn,MID2))
@@ -576,8 +576,8 @@ module MicBGCMod
           DO NE=2,NumPlantChemElms
             TOMEK(NE,K)    = TOMEK(NE,K)+OMActHeter(NGL,K)*rCNBiomeActHeter(NE,NGL,K)
           ENDDO
-          tMaxNActMicrbK(K) = tMaxNActMicrbK(K)+OMActHeter(NGL,K)*rNCOMC(ibiom_kinetic,NGL,K)   !maximum total N in active micb
-          tMaxPActMicrbK(K) = tMaxPActMicrbK(K)+OMActHeter(NGL,K)*rPCOMC(ibiom_kinetic,NGL,K)   !maximum total P in active micb
+          tMaxNActMicrbK(K) = tMaxNActMicrbK(K)+OMActHeter(NGL,K)*rNCOMC(iLbiom_kinetic,NGL,K)   !maximum total N in active micb
+          tMaxPActMicrbK(K) = tMaxPActMicrbK(K)+OMActHeter(NGL,K)*rPCOMC(iLbiom_kinetic,NGL,K)   !maximum total P in active micb
         ENDIF
       ENDDO
     ENDDO D685
@@ -1824,7 +1824,7 @@ module MicBGCMod
           RCO2ProdHeter(NGL,K) = RCO2ProdHeter(NGL,K)+Resp4NFixHeter(NGL,K)
           NetCAssimhr = NetCAssimhr+CGROMC
           GrosAssimhr = GrosAssimhr+DOMuptk4GrothHeter(ielmc,NGL,K)
-          MID3        = micpar%get_micb_id(ibiom_reserve,NGL)
+          MID3        = micpar%get_micb_id(iLbiom_reserve,NGL)
 
           D555: DO M = 1, 2
             DO NE=1,NumPlantChemElms
@@ -2591,8 +2591,8 @@ module MicBGCMod
   ! update may be needed, May 17th, 2023, jyt.
   FNH4S     = VLNH4
   FNHBS     = VLNHB
-  MID3      = micpar%get_micb_id(ibiom_reserve,NGL)
-  RINHP     = (mBiomeHeter(ielmc,MID3,K)*rNCOMC(ibiom_reserve,NGL,K)-mBiomeHeter(ielmn,MID3,K))
+  MID3      = micpar%get_micb_id(iLbiom_reserve,NGL)
+  RINHP     = (mBiomeHeter(ielmc,MID3,K)*rNCOMC(iLbiom_reserve,NGL,K)-mBiomeHeter(ielmn,MID3,K))
   RNiDemand = RNiDemand+RINHP
   
   IF(RINHP.GT.0.0_r8)THEN
@@ -2680,8 +2680,8 @@ module MicBGCMod
   !
   FH2PS     = VLPO4
   FH2PB     = VLPOB
-  MID3      = micpar%get_micb_id(ibiom_reserve,NGL)
-  RIPOP     = (mBiomeHeter(ielmc,MID3,K)*rPCOMC(ibiom_reserve,NGL,K)-mBiomeHeter(ielmp,MID3,K))
+  MID3      = micpar%get_micb_id(iLbiom_reserve,NGL)
+  RIPOP     = (mBiomeHeter(ielmc,MID3,K)*rPCOMC(iLbiom_reserve,NGL,K)-mBiomeHeter(ielmp,MID3,K))
   RPiDemand = RPiDemand+RIPOP
   !immobilization
   IF(RIPOP.GT.0.0_r8)THEN
@@ -2958,8 +2958,8 @@ module MicBGCMod
   !     RN2FixHeter=N2 fixation rate, [gN d-2 h-1]
   !
   IF(N.EQ.mid_HeterAerobN2Fixer .OR. N.EQ.mid_HeterAnaerobN2Fixer .or. N.eq.mid_HeterMixtCynoBacter)THEN
-    MID3  = micpar%get_micb_id(ibiom_reserve,NGL)
-    RGN2P = AZMAX1(mBiomeHeter(ielmc,MID3,K)*rNCOMC(ibiom_reserve,NGL,K)-mBiomeHeter(ielmn,MID3,K))/EN2F(N)
+    MID3  = micpar%get_micb_id(iLbiom_reserve,NGL)
+    RGN2P = AZMAX1(mBiomeHeter(ielmc,MID3,K)*rNCOMC(iLbiom_reserve,NGL,K)-mBiomeHeter(ielmn,MID3,K))/EN2F(N)
     IF(RGrowthRespHeter(NGL,K).GT.ZEROS)THEN
       Resp4NFixHeter(NGL,K)=AMIN1(RGrowthRespHeter(NGL,K)*RGN2P/(RGrowthRespHeter(NGL,K)+RGN2P) &
         *CZ2GS/(CZ2GS+ZFKM),OMGR*mBiomeHeter(ielmc,MID3,K))
@@ -3119,7 +3119,7 @@ module MicBGCMod
   !     FL=partitioning between labile and resistant microbial components
   !     OMC,OMN,OMP=nonstructural microbial C,N,P
   !
-  MID3  = micpar%get_micb_id(ibiom_reserve,NGL)
+  MID3  = micpar%get_micb_id(iLbiom_reserve,NGL)
   CGOMZ = GrowthEnvScalHeter(NGL,K)*OMGR*AZMAX1(mBiomeHeter(ielmc,MID3,K))
   
   ! M=1:labile, 2, recalcitrant
@@ -3146,17 +3146,17 @@ module MicBGCMod
     !     R3OMC,R3OMN,RkillRecycOMHeter=microbial C,N,P recycling
     !
 
-    MID1=micpar%get_micb_id(ibiom_kinetic,NGL)
+    MID1=micpar%get_micb_id(iLbiom_kinetic,NGL)
 
     IF(mBiomeHeter(ielmc,MID3,K).GT.ZEROS .AND. mBiomeHeter(ielmc,MID1,K).GT.ZEROS)THEN
       CCC=AZMAX1(AMIN1(1.0_r8 &
-        ,mBiomeHeter(ielmn,MID3,K)/(mBiomeHeter(ielmn,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rNCOMC(ibiom_reserve,NGL,K)) &
-        ,mBiomeHeter(ielmp,MID3,K)/(mBiomeHeter(ielmp,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rPCOMC(ibiom_reserve,NGL,K))))
+        ,mBiomeHeter(ielmn,MID3,K)/(mBiomeHeter(ielmn,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rNCOMC(iLbiom_reserve,NGL,K)) &
+        ,mBiomeHeter(ielmp,MID3,K)/(mBiomeHeter(ielmp,MID3,K)+mBiomeHeter(ielmc,MID3,K)*rPCOMC(iLbiom_reserve,NGL,K))))
       CXC  = mBiomeHeter(ielmc,MID3,K)/mBiomeHeter(ielmc,MID1,K)
       C3C  = 1.0_r8/(1.0_r8+CXC/CKC)
 
-      CNC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmn,MID3,K)/rNCOMC(ibiom_reserve,NGL,K))))
-      CPC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmp,MID3,K)/rPCOMC(ibiom_reserve,NGL,K))))
+      CNC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmn,MID3,K)/rNCOMC(iLbiom_reserve,NGL,K))))
+      CPC  = AZMAX1(AMIN1(1.0_r8,mBiomeHeter(ielmc,MID3,K)/(mBiomeHeter(ielmc,MID3,K)+mBiomeHeter(ielmp,MID3,K)/rPCOMC(iLbiom_reserve,NGL,K))))
       RCCC = RCCZ+AMAX1(CCC,C3C)*RCCY
       RCCN = CNC*RCCX
       RCCP = CPC*RCCQ

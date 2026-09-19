@@ -715,12 +715,14 @@ implicit none
   integer , allocatable :: idatav(:)
   real(r8), allocatable ::fdatav(:)
   integer :: year,J,II,JJ,I,irec
-
+  integer, parameter :: iHourly=2
+  integer, parameter :: iDaily=1
+  
   IWTHR=get_forc_step_type(yeari)
   
   LYR=0
 
-  if(IWTHR==1)then
+  if(IWTHR==iDaily)then
    !open file
     call ncd_pio_openfile(clm_nfid, clm_day_file_in, ncd_nowrite)
 
@@ -731,7 +733,9 @@ implicit none
       if(year==yeari)exit
     enddo
     ngrid=get_dim_len(clm_nfid,'ngrid')
-
+    if(ngrid/=1)then
+      call endrun("ngrid > 1 in "//mod_filename,__LINE__)
+    endif
     allocate(idatav(ngrid))
     allocate(fdatav(ngrid))
     allocate(fdatam1(ngrid,366))
@@ -760,7 +764,15 @@ implicit none
     call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
     call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
     call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); iFlagRaiseZ0GbyVeg=idatav(1)
-
+    
+    call check_var(clm_nfid, 'DRYDEPOC', vardesc, readvar)
+    if(readvar)then
+      !dry deposition is provided, now (year,day,ngrid)
+      call ncd_getvar(clm_nfid,'DRYDEPOC',irec,fdatam1)
+      DryDepoOMC(:) = fdatam1(:,1)  ! extract first (only) grid cell
+    else
+      DryDepoOMC=0._r8
+    endif
     !fill in day 366
     if (.not. isLeap(yeari))then
       I=365
@@ -776,8 +788,8 @@ implicit none
     deallocate(fdatav)
     deallocate(idatav)
 
-  elseif(IWTHR==2)then
-
+  elseif(IWTHR==iHourly)then
+    !hourly data
     call ncd_pio_openfile(clm_nfid, clm_hour_file_in, ncd_nowrite)
 
     nyears=get_dim_len(clm_nfid, 'year')
@@ -789,10 +801,13 @@ implicit none
     ! while the climate data may be for multiple grid, only the first grid of the data
     ! read is assigned to current climate arrays
     ngrid=get_dim_len(clm_nfid,'ngrid')
-
+    if(ngrid/=1)then
+      call endrun("ngrid > 1 in "//mod_filename,__LINE__)
+    endif
     allocate(fdatam(ngrid,24,366))
     allocate(idatav(ngrid))
     allocate(fdatav(ngrid))
+    allocate(fdatam1(ngrid,366))    
     I=365
     if(isleap(yeari))I=366
 
@@ -807,6 +822,15 @@ implicit none
       call ncd_getvar(clm_nfid,'PATM',irec,fdatam); call reshape2(PBOT_hrly,fdatam)
     else
       PBOT_hrly=1.01325E+02_r8
+    endif
+
+    call check_var(clm_nfid, 'DRYDEPOC', vardesc, readvar)
+    if(readvar)then
+      !dry deposition is provided, now (year,day,ngrid)
+      call ncd_getvar(clm_nfid,'DRYDEPOC',irec,fdatam1)
+      DryDepoOMC(:) = fdatam1(1,:)  ! extract first (only) grid cell
+    else
+      DryDepoOMC=0._r8
     endif
 
     call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
@@ -864,6 +888,7 @@ implicit none
     deallocate(fdatam)
     deallocate(fdatav)
     deallocate(idatav)
+    deallocate(fdatam1)    
   endif
   call ncd_pio_closefile(clm_nfid)
   end subroutine ReadClimNC

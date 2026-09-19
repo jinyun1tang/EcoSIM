@@ -15,7 +15,7 @@ module EcosysWarmingMod
   use GridDataType,     only: CumDepz2LayBottom_vr, NU_col, NL_col
   use abortutils,       only : endrun,iulog  
   use DebugToolMod,     only : PrintInfo
-  use StrToolsMod  
+  use StringToolsMod
   use EcoSimConst  
   implicit none
   private

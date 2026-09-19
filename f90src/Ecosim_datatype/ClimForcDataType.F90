@@ -32,6 +32,7 @@ implicit none
   real(r8) :: RAIN(366)                         !daily precipitation, [mm d-1 ]
   real(r8) :: WIND(366)                         !daily wind travel, [m d-1]
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
+  real(r8) :: DryDepoOMC(366)                   !dry deposition of organic C, [gC/day/m2]
 
   real(r8) :: TMP_hrly(24,366)                   !hourly air temperature, [oC]
   real(r8) :: SWRad_hrly(24,366)                !hourly solar radiation, [MJ m-2 h-1]
@@ -48,7 +49,7 @@ implicit none
   real(r8) :: DWIND(12)                         !change factor for wind speed, [-]
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
-
+  
   real(r8),target,allocatable ::  srad_scalar_col(:,:)     !solar radiation scalar due to open top chamber
   real(r8),target,allocatable ::  EMS_Modify_Scalar_col(:,:)      !emissivity scalar due to open top chamber
   real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
@@ -140,6 +141,14 @@ implicit none
   real(r8),target,allocatable ::  height_top_mon_pft(:,:,:,:)            !monthly canopy top height used in prescribed phenology, [m]
   real(r8),target,allocatable ::  height_bot_mon_pft(:,:,:,:)            !monthly canopy bottom height used in prescribed phenology, [m]
   REAL(R8),target,allocatable ::  NWetDep_col(:,:)                       !atmospheric inorganic N wet deposition, [gN m-2 h-1]
+  real(r8),target,allocatable :: f_aerosol_DOM_col(:,:)                  !fraction of bioaerosol C as dissolved organic matter [0-1]
+  real(r8),target,allocatable :: f_aerosol_DeadMB_col(:,:)               !fraction of bioaerosol C as dead microbial biomass [0-1]
+  real(r8),target,allocatable :: f_aerosol_LiveMB_col(:,:)               !fraction of bioaerosol C as live microbial biomass [0-1]
+  real(r8),target,allocatable :: f_aerosol_DeadNMB_col(:,:)              !fraction of bioaerosol C as dead nonmicrobial biomass [0-1]
+  real(r8),target,allocatable :: f_aerosol_LichB_col(:,:)                !fraction of bioaerosol C as lichen spore, [0-1]
+  real(r8),target,allocatable :: f_aerosol_MossB_col(:,:)                !fraction of bioaerosol C as moss spore, [0-1]
+  real(r8),target,allocatable :: SeedCDeposition_pft(:,:,:)              !seed C deposition for each PFT, [gC m-2]
+
   contains
 !----------------------------------------------------------------------
 
@@ -150,6 +159,13 @@ implicit none
   if(len(trim(warming_exp))>10)then
     allocate(TKS_ref_vr(8784,JZ,JY,JX));TKS_ref_vr=0._r8
   endif
+  allocate(f_aerosol_DOM_col(JY,JX));f_aerosol_DOM_col=0._r8
+  allocate(f_aerosol_DeadMB_col(JY,JX));f_aerosol_DeadMB_col=0._r8
+  allocate(f_aerosol_LiveMB_col(JY,JX));f_aerosol_LiveMB_col=0._r8
+  allocate(f_aerosol_DeadNMB_col(JY,JX));f_aerosol_DeadNMB_col=0._r8
+  allocate(f_aerosol_LichB_col(JY,JX));f_aerosol_LichB_col=0._r8
+  allocate(f_aerosol_MossB_col(JY,JX));f_aerosol_MossB_col=0._r8
+  allocate(SeedCDeposition_pft(JP,JY,JX));SeedCDeposition_pft=0._r8
   allocate(NWetDep_col(JY,JX)); NWetDep_col=0._r8
   allocate(tlai_mon_pft(12,JP,JY,JX));tlai_mon_pft=0._r8
   allocate(tsai_mon_pft(12,JP,JY,JX));tsai_mon_pft=0._r8
@@ -250,6 +266,13 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
+  call destroy(f_aerosol_DOM_col)
+  call destroy(f_aerosol_DeadMB_col)
+  call destroy(f_aerosol_LiveMB_col)
+  call destroy(f_aerosol_DeadNMB_col)
+  call destroy(f_aerosol_MossB_col)
+  call destroy(f_aerosol_LichB_col)
+  call destroy(SeedCDeposition_pft)
   call destroy(NWetDep_col)
   call destroy(height_bot_mon_pft)  
   call destroy(height_top_mon_pft)
