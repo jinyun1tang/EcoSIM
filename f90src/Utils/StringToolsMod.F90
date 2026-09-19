@@ -354,7 +354,9 @@ contains
   !> @details
   !>   Parses a delimited string (e.g., "item1,item2,item3" with delimiter ',')
   !>   and counts the number of items. An empty string returns 0.
-  !>   Consecutive delimiters are treated as separating empty items.
+  !>   A space or tab delimiter counts whitespace-separated fields, ignoring
+  !>   leading/trailing whitespace and treating runs of spaces/tabs as one separator.
+  !>   Other consecutive delimiters are treated as separating empty items.
   !>
   !> @param[in] input_string The string to be parsed.
   !> @param[in] delimiter The delimiter character (e.g., ',', ';', ' ').
@@ -370,6 +372,7 @@ contains
     INTEGER :: i
     INTEGER :: item_count
     INTEGER :: string_len
+    LOGICAL :: in_item
 
     ! --- Implementation ---
 
@@ -378,6 +381,20 @@ contains
 
     ! Get trimmed length of input string
     string_len = LEN_TRIM(input_string)
+
+    IF (delimiter == ' ' .OR. delimiter == ACHAR(9)) THEN
+      in_item = .FALSE.
+      DO i = 1, string_len
+        IF (input_string(i:i) == ' ' .OR. input_string(i:i) == ACHAR(9)) THEN
+          in_item = .FALSE.
+        ELSE IF (.NOT. in_item) THEN
+          item_count = item_count + 1
+          in_item = .TRUE.
+        END IF
+      END DO
+      count_delimited_items = item_count
+      RETURN
+    END IF
 
     ! If string is empty, return 0
     IF (string_len == 0) THEN

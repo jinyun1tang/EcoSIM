@@ -120,10 +120,9 @@ implicit none
   logical  :: readvar
   integer  :: NH1,NV1,NH2,NV2,NS
   integer :: NTOPO,NY,NX,NZ
-  real(r8) :: DY
   type(Var_desc_t) :: vardesc
-  character(len=128) :: pft_pltinfo(JP),tstr
-  integer :: LPY,IDX,IMO,IYR,IDY
+  character(len=128) :: pft_pltinfo(JP),tstr,date_str
+  integer :: LPY,IDX,IMO,IYR,IDY,ierr,ic
 
   call PrintInfo('beg '//subname)
   DO NX=NHW,NHE
@@ -157,14 +156,31 @@ implicit none
         DO NZ=1,MIN(NS,NP_col(NY,NX))
           if(PlantPopuLive_pft(NZ,NY,NX).GT.1.e-2_r8)cycle          
           tstr=trim(pft_pltinfo(NZ))
+          !List-directed input also permits commas between planting values.
+          do ic=1,len_trim(tstr)
+            if(tstr(ic:ic)==',')tstr(ic:ic)=' '
+          enddo
           if (tstr .EQ. "") then
             cycle
           endif
-          read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-          if(count_delimited_items(tstr, ' ').eq.4)then
-            read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX),PPmax_pft(NZ,NY,NX)          
-          else
-            read(tstr,*)DY,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+          select case(count_delimited_items(tstr, ' '))
+          case(3)
+            read(tstr,*,iostat=ierr)date_str,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
+          case(4)
+            read(tstr,*,iostat=ierr)date_str,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX),PPmax_pft(NZ,NY,NX)
+          case default
+            ierr=1
+          end select
+          if(ierr==0)then
+            if(len_trim(date_str)==8.and.verify(trim(date_str),'0123456789')==0)then
+              read(date_str,'(I2,I2,I4)',iostat=ierr)IDX,IMO,IYR
+            else
+              ierr=1
+            endif
+          endif
+          if(ierr/=0)then
+            call endrun('Invalid planting record (expected DDMMYYYY population depth [maximum population]): '// &
+              trim(tstr)//' in '//subname,__LINE__)
           endif
           PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),1.e-6_r8)
           LPY=0
