@@ -2,6 +2,7 @@ module SoilPhysParaMod
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only: micpar
   use DebugToolMod,     only: PrintInfo,DebugPrint
+  use abortutils, only : endrun
   USE SoilWaterDataType
   use SoilPropertyDataType
   USE SoilPhysDataType
@@ -68,7 +69,8 @@ implicit none
     !     PSISoilMatric=matric water potential
     !
   ELSEIF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-    call ComputePSIPond(N3,N2,N1,FracSoiPAsIce_vr(N3,N2,N1),FracSoiPAsWat_vr(N3,N2,N1),THETA1,PSISoilMatric)
+    call ComputePSIPond(N3,N2,N1,FracSoiPAsIce_vr(N3,N2,N1),FracSoiPAsWat_vr(N3,N2,N1),&
+      THETA1,PSISoilMatric,TKSoil1_vr(N3,N2,N1))
   ELSE
     THETA1        = POROS_vr(N3,N2,N1)
     PSISoilMatric = PSISE_vr(N3,N2,N1)
@@ -79,13 +81,15 @@ implicit none
   end subroutine CalcSoilWatPotential
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputePSIPond(L,NY,NX,ThetafI,ThetafW,ThetaW,PSI)
+  subroutine ComputePSIPond(L,NY,NX,ThetafI,ThetafW,ThetaW,PSI,TKS)
   implicit none
   integer, intent(in) :: L,NY,NX
   real(r8), intent(in) :: ThetafI
   real(r8), intent(inout) :: ThetafW
   real(r8), intent(inout) :: ThetaW
   real(r8), intent(out) :: PSI
+  real(r8), optional, intent(in) :: TKS   !temperature [K]
+
   real(r8) :: FCX,WPX,FCLX,WPLX,PSDX,FCDX
   character(len=*), parameter :: subname='ComputePSIPond'
 
@@ -94,12 +98,19 @@ implicit none
   WPX  = WPI*ThetafI
 
   IF(ThetafW.LT.FCX)THEN
-    !less than field capacity
+    !less than field capacity, but nonzero water
     FCLX = LOG(FCX)
-    WPLX = LOG(WPX)
-    PSDX = LOGPOROS_vr(L,NY,NX)-FCLX
-    FCDX = FCLX-WPLX
-    PSI=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+(FCLX-LOG(ThetafW))*LOGPSIMND_col(NY,NX)/FCDX))
+    WPLX = LOG(WPX)    
+    if(ThetafW.GT.ZEROS2(NY,NX))then
+      FCDX = FCLX-WPLX
+      PSI=AMAX1(PSIHY,-EXP(LOGPSIFLD_col(NY,NX)+(FCLX-LOG(ThetafW))*LOGPSIMND_col(NY,NX)/FCDX))
+    else
+      if(.not.present(TKS))then
+        call endrun('TKS is not input to '//trim(subname)//' in '//trim(mod_filename)//' at line',__LINE__)        
+      endif  
+      !pure ice
+      PSI=LtHeatIceMelt*(TKS-TFice)/TFice
+    endif
   ELSE IF(ThetafW.LT.POROS_vr(L,NY,NX)-DTHETW .and. FCX > 0._r8 .and. WPX >0._r8)THEN  
     !more than field capacity
     FCLX = LOG(FCX)
