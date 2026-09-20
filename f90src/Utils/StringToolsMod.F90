@@ -1,4 +1,4 @@
-module StrToolsMod
+module StringToolsMod
 implicit none
 
   private
@@ -11,6 +11,7 @@ implicit none
   public :: extract_number_and_unit
   public :: is_substring_present
   public :: to_lower_string
+  public :: count_delimited_items
 contains
 
   SUBROUTINE parse_var_val_string(input_string, var_array, val_array, num_pairs_found)
@@ -343,4 +344,75 @@ contains
     is_substring_present = (pos /= 0)
     
   END FUNCTION is_substring_present
-end module StrToolsMod
+
+!------------------------------------------------------------------------------------------
+
+  INTEGER FUNCTION count_delimited_items(input_string, delimiter)
+  !
+  !Description
+  !> @brief Counts the number of items separated by a specified delimiter.
+  !> @details
+  !>   Parses a delimited string (e.g., "item1,item2,item3" with delimiter ',')
+  !>   and counts the number of items. An empty string returns 0.
+  !>   A space or tab delimiter counts whitespace-separated fields, ignoring
+  !>   leading/trailing whitespace and treating runs of spaces/tabs as one separator.
+  !>   Other consecutive delimiters are treated as separating empty items.
+  !>
+  !> @param[in] input_string The string to be parsed.
+  !> @param[in] delimiter The delimiter character (e.g., ',', ';', ' ').
+  !> @return The number of items found, or 0 if input_string is empty.
+
+    IMPLICIT NONE
+
+    ! --- Arguments ---
+    CHARACTER(LEN=*), INTENT(IN) :: input_string
+    CHARACTER(LEN=1), INTENT(IN) :: delimiter
+
+    ! --- Local Variables ---
+    INTEGER :: i
+    INTEGER :: item_count
+    INTEGER :: string_len
+    LOGICAL :: in_item
+
+    ! --- Implementation ---
+
+    ! Initialize count
+    item_count = 0
+
+    ! Get trimmed length of input string
+    string_len = LEN_TRIM(input_string)
+
+    IF (delimiter == ' ' .OR. delimiter == ACHAR(9)) THEN
+      in_item = .FALSE.
+      DO i = 1, string_len
+        IF (input_string(i:i) == ' ' .OR. input_string(i:i) == ACHAR(9)) THEN
+          in_item = .FALSE.
+        ELSE IF (.NOT. in_item) THEN
+          item_count = item_count + 1
+          in_item = .TRUE.
+        END IF
+      END DO
+      count_delimited_items = item_count
+      RETURN
+    END IF
+
+    ! If string is empty, return 0
+    IF (string_len == 0) THEN
+      count_delimited_items = 0
+      RETURN
+    END IF
+
+    ! Count items: at least 1 item in non-empty string, plus 1 for each delimiter
+    item_count = 1
+
+    DO i = 1, string_len
+      IF (input_string(i:i) == delimiter) THEN
+        item_count = item_count + 1
+      END IF
+    END DO
+
+    count_delimited_items = item_count
+
+  END FUNCTION count_delimited_items
+
+end module StringToolsMod

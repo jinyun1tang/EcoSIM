@@ -4,7 +4,7 @@ module InitSOMBGCMOD
   use MicrobialDiagMod, only : sumorgmlayl,sumLitrOMLayL, sumMicBiomLayL
   use minimathmod,      only : AZMAX1,safe_adb
   use EcoSiMParDataMod, only : micpar
-  use EcosimBGCFluxType, only : CumDryDepoC_col
+  use EcosimBGCFluxType, only : CumDryDepoOM_col
   use DebugToolMod
   use MicrobialDataType
   use SOMDataType
@@ -32,8 +32,8 @@ module InitSOMBGCMOD
   public :: InitSOMConsts
   public :: InitSOMBGC
   public :: DestructSOMBGC
-  public :: ApplyBioAerosol
   public :: MicrobeByLitterFall
+  public :: InoculateCyanoBacter
   contains
 !------------------------------------------------------------------------------------------
 
@@ -196,8 +196,8 @@ module InitSOMBGCMOD
     TOSPK(K) = ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
 !   based on aerobic heterotrophs
 
-    TOSNK(K)=TOSNK(K)+OMCI(ibiom_kinetic,K)*rNCOMC_ave(ibiom_kinetic,mid_HeterAerobBacter,K)+OMCI(ibiom_struct,K)*rNCOMC_ave(ibiom_struct,mid_HeterAerobBacter,K)
-    TOSPK(K)=TOSPK(K)+OMCI(ibiom_kinetic,K)*rPCOMC_ave(ibiom_kinetic,mid_HeterAerobBacter,K)+OMCI(ibiom_struct,K)*rPCOMC_ave(ibiom_struct,mid_HeterAerobBacter,K)
+    TOSNK(K)=TOSNK(K)+OMCI(iLbiom_kinetic,K)*rNCOMC_ave(iLbiom_kinetic,mid_HeterAerobBacter,K)+OMCI(iLbiom_struct,K)*rNCOMC_ave(iLbiom_struct,mid_HeterAerobBacter,K)
+    TOSPK(K)=TOSPK(K)+OMCI(iLbiom_kinetic,K)*rPCOMC_ave(iLbiom_kinetic,mid_HeterAerobBacter,K)+OMCI(iLbiom_struct,K)*rPCOMC_ave(iLbiom_struct,mid_HeterAerobBacter,K)
 
     TOSCI   = TOSCI+OSCI(K)*TOSCK(K)
     TOSNI   = TOSNI+OSCI(K)*TOSNK(K)
@@ -422,13 +422,18 @@ module InitSOMBGCMOD
   end associate
   end subroutine InitSOMVars
 !------------------------------------------------------------------------------------------
-  subroutine InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+  subroutine InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC,add_to_existing)
   implicit none
   integer, intent(in) :: K,L,NY,NX,KL
   real(r8), intent(in) :: CyanoInocC
+  logical, optional, intent(in) :: add_to_existing
   integer :: N,M,NGL,MID,NE
   real(r8) :: OME1(1:NumPlantChemElms)
   real(r8) :: tglds
+  logical :: additive
+
+  additive=.false.
+  if(present(add_to_existing))additive=add_to_existing
 
   N = micpar%mid_HeterMixtCynoBacter
   tglds = JGnfH(N)-JGniH(N)+1._r8
@@ -441,7 +446,11 @@ module InitSOMBGCMOD
     DO NGL=JGniH(N),JGnfH(N)
       MID=micpar%get_micb_id(M,NGL)
       DO NE=1,NumPlantChemElms
-        mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+        if(additive)then
+          mBiomeHeter_vr(NE,MID,K,L,NY,NX)=mBiomeHeter_vr(NE,MID,K,L,NY,NX)+OME1(NE)/tglds
+        else
+          mBiomeHeter_vr(NE,MID,K,L,NY,NX)=OME1(NE)/tglds
+        endif
       ENDDO
     ENDDO
   ENDDO
@@ -831,31 +840,6 @@ module InitSOMBGCMOD
   
   end associate
   end subroutine MicrobeByLitterFall
-!------------------------------------------------------------------------------------------
-  subroutine ApplyBioAerosol(I,J,NY,NX)
-  !
-  !apply bio-aerosol, made up by OM and
-  !microbes
-  !for simplicity, it is added to complex
-  !fine litter.
-  implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: NY,NX
-  real(r8) :: OSCMK
-  integer :: K,KL
-  character(len=*), parameter :: subname='ApplyBioAerosol'
-
-  KL=1
-  K=micpar%k_fine_comp
-  OSCMK=3.e-4_r8*AREA_3D(3,NU_col(NY,NX),NY,NX) !assuming dry decomposition rate, [1.e-7 gC m-2 h-1], and 5% as microbial biomass C
-
-  call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,mscal=1.e-2_r8)
-  !assuming 2.5% as cyanobacteria
-  call InoculateCyanoBacter(K,0,NY,NX,KL,CyanoInocC=OSCMK*0.025_r8*1.e-2_r8)
-
-  CumDryDepoC_col(NY,NX)=CumDryDepoC_col(NY,NX)+OSCMK
-
-  end subroutine ApplyBioAerosol
 
 !------------------------------------------------------------------------------------------
 

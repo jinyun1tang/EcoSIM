@@ -5010,7 +5010,11 @@ implicit none
   endif
   !  
   sapAreaLeafMax = huber_cef*CanopyLeafAreaMax_pft(NZ)
-  sapAreaLeaf    = sapAreaLeafMax*(1._r8-exp(-sapAreaGeom/sapAreaLeafMax))
+  if(sapAreaLeafMax.GT.1.e-5_r8)then
+    sapAreaLeaf    = sapAreaLeafMax*(1._r8-sfexp(-sapAreaGeom/sapAreaLeafMax))
+  else
+    sapAreaLeaf    = sapAreaLeafMax
+  endif
   call PrintInfo('end '//subname)
   end associate
 

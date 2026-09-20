@@ -172,6 +172,26 @@ module readiMod
 
 !------------------------------------------------------------------------------------------
 
+  subroutine read_aerosol_vars(loc,varname,var_val)
+  implicit none
+  integer, intent(in) :: loc
+  character(len=*), intent(in) :: varname
+  real(r8), intent(out) :: var_val
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+
+  call check_var(grid_nfid, varname, vardesc, readvar)
+  if(readvar)then
+    !Read the optional bioaerosol carbon fraction.
+    call ncd_getvar(grid_nfid,varname,loc,var_val)
+  else
+    var_val=0._r8
+  endif
+
+  end subroutine read_aerosol_vars
+
+!------------------------------------------------------------------------------------------
+
   subroutine readsiteNC(NHW,NHE,NVN,NVS)
 
   implicit none
@@ -184,6 +204,7 @@ module readiMod
   integer :: IETYPG
   integer :: ierr,jj,loc
   integer :: iWaterTabelMode
+  real(r8) :: fMoss,fLich,fLiveMB,fDeadMB,fDeadNMB,fDOM
 !
 ! READ SITE DATA
 !
@@ -233,6 +254,12 @@ module readiMod
   call ncd_getvar(grid_nfid,'DHI',loc,DHI(1:NHE))
   call ncd_getvar(grid_nfid,'DVI',loc,DVI(1:NVS))
 
+  call read_aerosol_vars(loc,'fAeroDOM',fDOM)
+  call read_aerosol_vars(loc,'fAeroDeadMB',fDeadMB)
+  call read_aerosol_vars(loc,'fAeroLiveMB',fLiveMB)
+  call read_aerosol_vars(loc,'fAeroMoss',fMoss)
+  call read_aerosol_vars(loc,'fAeroLich',fLich)
+  call read_aerosol_vars(loc,'fAeroDeadNMB',fDeadNMB)
   if(lverb)then
     write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
@@ -271,6 +298,14 @@ module readiMod
   
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
+      !Partition bioaerosol carbon among organic matter and live biomass.
+      f_aerosol_DOM_col(NY,NX)     = fDOM     !dissolved organic matter
+      f_aerosol_DeadMB_col(NY,NX)  = fDeadMB  !dead microbial biomass
+      f_aerosol_DeadNMB_col(NY,NX) = fDeadNMB !dead nonmicrobial biomass
+      f_aerosol_LiveMB_col(NY,NX)  = fLiveMB  !live microbial biomass
+      f_aerosol_MossB_col(NY,NX)   = fMoss    !live moss
+      f_aerosol_LichB_col(NY,NX)   = fLich    !live lichen
+
       ALAT_col(NY,NX)             = ALATG
       PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
       ALTI_col(NY,NX)             = ALTIG

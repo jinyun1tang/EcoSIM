@@ -10,14 +10,17 @@ module PlantMod
   use PlantDebugMod,     only: PrintRootTracer
   use LitterFallMod,     only: ReSeedPlants
   use DebugToolMod,      only: PrintInfo
+  use InitPlantMod,      only: SeedDeposition  
   use PlantAPI4Uptake
   use TracerIDMod
   use GridDataType
   use PlantDataRateType
   use SoilBGCDataType
   use EcoSimSumDataType
-  use PlantAPIData  
+  use PlantAPIData
   use PlantAPI
+  use ClimForcDataType
+  use PlantTraitDataType
   use PlantCanAPI
   use ExtractsMod
   use PlantBalMod
@@ -35,9 +38,11 @@ implicit none
   !run the plant biogeochemistry model
   !
   implicit none
-  type(yearIJ_type), intent(in) :: yearIJ  
+  type(yearIJ_type), intent(in) :: yearIJ
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1,tvegE(NumPlantChemElms)
+  real(r8) :: SeedCDeposition_1d(JP1), PPmax_1d(JP1)
+
   integer :: NY,NX,NZ
   character(len=*), parameter :: subname='PlantModel'
 333   FORMAT(A8)
@@ -62,9 +67,15 @@ implicit none
         call PlantUPtakeAPIRecv(yearIJ%I,yearIJ%J,NY,NX)
       else
       
-        call  PlantAPISend(yearIJ%I,yearIJ%J,NY,NX)
+        call  PlantAPISend(yearIJ,NY,NX)
 
         call EnterPlantBalance(yearIJ,NP_col(NY,NX))
+
+        if(yearIJ%J.eq.1) then          
+          SeedCDeposition_1d = SeedCDeposition_pft(:,NY,NX)
+          PPmax_1d = PPmax_pft(:,NY,NX)
+          call SeedDeposition(yearIJ%I,SeedCDeposition_1d,PPmax_1d,NP_col(NY,NX))          
+        endif
 
         !Phenological update, determine living/active branches      
         CALL PhenologyUpdate(yearIJ)

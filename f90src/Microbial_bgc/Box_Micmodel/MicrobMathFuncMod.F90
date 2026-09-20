@@ -7,7 +7,7 @@ module MicrobMathFuncMod
   use MicStateTraitTypeMod, only: micsttype
   use EcoSiMParDataMod,     only: micpar
   use DebugToolMod,         only: PrintInfo
-  use ElmIDMod,             only: ielmc, ielmn, ibiom_kinetic, ibiom_struct
+  use ElmIDMod,             only: ielmc, ielmn, iLbiom_kinetic, iLbiom_struct
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type, &
                                   Microbe_Flux_type, Microbe_State_type
   use minimathmod,          only: AZMAX1, safe_adb, fixEXConsumpFlux, &
@@ -299,7 +299,7 @@ module MicrobMathFuncMod
     WatStressMicb=EXP(0.2_r8*AMAX1(PSISoilMatricP,-500._r8))
   ENDIF
 
-  WSensGroHeter(NGL,K)=real_truncate(WatStressMicb,1.e-3_r8)
+  WSensGroHeter(NGL,K)=WatStressMicb
   TSensGroHeter(NGL,K)=TSensGrowth
 
   GrowthEnvScalHeter(NGL,K) = WSensGroHeter(NGL,K)*TSensGroHeter(NGL,K)
@@ -427,11 +427,11 @@ module MicrobMathFuncMod
   )
   call PrintInfo('beg '//subname)
 
-  MID1                   = micpar%get_micb_id(ibiom_kinetic,NGL)
+  MID1                   = micpar%get_micb_id(iLbiom_kinetic,NGL)
   FPH                    = 1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX                  = RMOM*TSensMaintRAutor(NGL)*FPH
-  RMaintDmndAutor(ibiom_kinetic,NGL) = mBiomeAutor(ielmn,MID1)*RMOMX*RMOMK(ibiom_kinetic)
-  RMaintDmndAutor(ibiom_struct,NGL)  = OMN2Autor(NGL)*RMOMX*RMOMK(ibiom_struct)
+  RMaintDmndAutor(iLbiom_kinetic,NGL) = mBiomeAutor(ielmn,MID1)*RMOMX*RMOMK(iLbiom_kinetic)
+  RMaintDmndAutor(iLbiom_struct,NGL)  = OMN2Autor(NGL)*RMOMX*RMOMK(iLbiom_struct)
   !
   !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
   !
@@ -439,7 +439,7 @@ module MicrobMathFuncMod
   !     RGrowthRespAutor=growth respiration
   !     RMaintDefcitcitAutor=senescence respiration
   !
-  RMaintRespAutor(NGL)      = RMaintDmndAutor(ibiom_kinetic,NGL)+RMaintDmndAutor(ibiom_struct,NGL)
+  RMaintRespAutor(NGL)      = RMaintDmndAutor(iLbiom_kinetic,NGL)+RMaintDmndAutor(iLbiom_struct,NGL)
   call PrintInfo('end '//subname)
   end associate
   end subroutine CalcRespMaintAutor
@@ -472,9 +472,9 @@ module MicrobMathFuncMod
 
   FPH                                  = 1.0_r8+AZMAX1(0.25_r8*(6.5_r8-PH))
   RMOMX                                = RMOM*TempMaintRHeter(NGL,K)*FPH
-  MID1                                 = micpar%get_micb_id(ibiom_kinetic,NGL)
-  RMaintDmndHeter(ibiom_kinetic,NGL,K) = mBiomeHeter(ielmn,MID1,K)*RMOMX*RMOMK(ibiom_kinetic)
-  RMaintDmndHeter(ibiom_struct,NGL,K)  = OMN2(NGL,K)*RMOMX*RMOMK(ibiom_struct)
+  MID1                                 = micpar%get_micb_id(iLbiom_kinetic,NGL)
+  RMaintDmndHeter(iLbiom_kinetic,NGL,K) = mBiomeHeter(ielmn,MID1,K)*RMOMX*RMOMK(iLbiom_kinetic)
+  RMaintDmndHeter(iLbiom_struct,NGL,K)  = OMN2(NGL,K)*RMOMX*RMOMK(iLbiom_struct)
   !
   !     MICROBIAL MAINTENANCE AND GROWTH RESPIRATION
   !
@@ -482,7 +482,7 @@ module MicrobMathFuncMod
   !     RGrowthRespHeter=growth respiration
   !     RMaintDefcitcitHeter=senescence respiration
   !
-  RMaintRespHeter(NGL,K)      = RMaintDmndHeter(ibiom_kinetic,NGL,K)+RMaintDmndHeter(ibiom_struct,NGL,K)
+  RMaintRespHeter(NGL,K)      = RMaintDmndHeter(iLbiom_kinetic,NGL,K)+RMaintDmndHeter(iLbiom_struct,NGL,K)
   call PrintInfo('end '//subname)
   end associate
   end subroutine CalcRespMaintHeter

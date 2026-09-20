@@ -10,10 +10,12 @@ implicit none
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: NumPlantChemElms=3   !totally three elements
   ! IDS for microbial biomass components
-  integer, parameter :: ibiom_kinetic = 1
-  integer, parameter :: ibiom_struct  = 2
-  integer, parameter :: ibiom_reserve = 3
-
+  integer, parameter :: iLbiom_kinetic = 1 !live kinetic biomass 
+  integer, parameter :: iLbiom_struct  = 2 !live structural biomas
+  integer, parameter :: iLbiom_reserve = 3 !live reserve biomass
+  
+  integer, parameter :: iDbiom_labile  = 1
+  integer, parameter :: iDbiom_recalc  = 2
 ! erosion model options
   integer, parameter :: ieros_noaction       = -1
   integer, parameter :: ieros_frzthawelv     = 0

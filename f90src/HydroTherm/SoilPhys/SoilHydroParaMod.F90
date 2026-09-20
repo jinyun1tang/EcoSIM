@@ -74,8 +74,7 @@ contains
 
       !not significant soil mass, but have significant ice, for (partially) frozen ponding water 
     ELSE IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-
-      call ComputePSIPond(L,NY,NX,THETI_vr(L,NY,NX),THETW_vr(L,NY,NX),THETW1,PSISoilMatricP_vr(L,NY,NX))
+      call ComputePSIPond(L,NY,NX,THETI_vr(L,NY,NX),THETW_vr(L,NY,NX),THETW1,PSISoilMatricP_vr(L,NY,NX),TKS_vr(L,NY,NX))
 
     ELSE
       PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)

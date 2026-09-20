@@ -410,17 +410,17 @@ module MicAutoCPLXMod
     !     RCCZ,RCCY=min, max C recycling fractions
     !     RCCX,RCCQ=max N,P recycling fractions
     !
-    MID1=micpar%get_micb_id(ibiom_kinetic,NGL);MID3=micpar%get_micb_id(ibiom_reserve,NGL)
+    MID1=micpar%get_micb_id(iLbiom_kinetic,NGL);MID3=micpar%get_micb_id(iLbiom_reserve,NGL)
     IF(mBiomeAutor(ielmc,MID3).GT.ZEROS.AND.mBiomeAutor(ielmc,MID1).GT.ZEROS)THEN
       CCC=AZMAX1(AMIN1(1.0_r8 &
-        ,mBiomeAutor(ielmn,MID3)/(mBiomeAutor(ielmn,MID3)+mBiomeAutor(ielmc,MID3)*rNCOMCAutor(ibiom_reserve,NGL)) &
-        ,mBiomeAutor(ielmp,MID3)/(mBiomeAutor(ielmp,MID3)+mBiomeAutor(ielmc,MID3)*rPCOMCAutor(ibiom_reserve,NGL))))
+        ,mBiomeAutor(ielmn,MID3)/(mBiomeAutor(ielmn,MID3)+mBiomeAutor(ielmc,MID3)*rNCOMCAutor(iLbiom_reserve,NGL)) &
+        ,mBiomeAutor(ielmp,MID3)/(mBiomeAutor(ielmp,MID3)+mBiomeAutor(ielmc,MID3)*rPCOMCAutor(iLbiom_reserve,NGL))))
       CXC = mBiomeAutor(ielmc,MID3)/mBiomeAutor(ielmc,MID1)
       C3C = 1.0_r8/(1.0_r8+CXC/CKC)
       CNC = AZMAX1(AMIN1(1.0_r8 &
-        ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmn,MID3)/rNCOMCAutor(ibiom_reserve,NGL))))
+        ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmn,MID3)/rNCOMCAutor(iLbiom_reserve,NGL))))
       CPC=AZMAX1(AMIN1(1.0_r8 &
-        ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmp,MID3)/rPCOMCAutor(ibiom_reserve,NGL))))
+        ,mBiomeAutor(ielmc,MID3)/(mBiomeAutor(ielmc,MID3)+mBiomeAutor(ielmp,MID3)/rPCOMCAutor(iLbiom_reserve,NGL))))
       RCCC = RCCZ+AMAX1(CCC,C3C)*RCCY
       RCCN = CNC*RCCX
       RCCP = CPC*RCCQ
@@ -442,7 +442,7 @@ module MicAutoCPLXMod
     !     FL=partitioning between labile and resistant microbial components
     !     OMC,OMN,OMP=nonstructural microbial C,N,P
     !
-    MID3  = micpar%get_micb_id(ibiom_reserve,NGL)
+    MID3  = micpar%get_micb_id(iLbiom_reserve,NGL)
     CGOMZ = GrowthEnvScalAutor(NGL)*OMGR*AZMAX1(mBiomeAutor(ielmc,MID3))
 
     DO M = 1, 2
@@ -875,8 +875,8 @@ module MicAutoCPLXMod
 
     FNH4S=VLNH4
     FNHBS=VLNHB
-    MID3=micpar%get_micb_id(ibiom_reserve,NGL)
-    RNetNH4MinPotent=mBiomeAutor(ielmc,MID3)*rNCOMCAutor(ibiom_reserve,NGL)-mBiomeAutor(ielmn,MID3)
+    MID3=micpar%get_micb_id(iLbiom_reserve,NGL)
+    RNetNH4MinPotent=mBiomeAutor(ielmc,MID3)*rNCOMCAutor(iLbiom_reserve,NGL)-mBiomeAutor(ielmn,MID3)
     IF(RNetNH4MinPotent.GT.0.0_r8)THEN
       CNH4X                    = AZMAX1(CNH4S-Z4MN)
       CNH4Y                    = AZMAX1(CNH4B-Z4MN)
@@ -955,8 +955,8 @@ module MicAutoCPLXMod
 !
     FH2PS=VLPO4
     FH2PB=VLPOB
-    MID3=micpar%get_micb_id(ibiom_reserve,NGL)
-    RNetH2PO4MinPotent=(mBiomeAutor(ielmc,MID3)*rPCOMCAutor(ibiom_reserve,NGL)-mBiomeAutor(ielmp,MID3))
+    MID3=micpar%get_micb_id(iLbiom_reserve,NGL)
+    RNetH2PO4MinPotent=(mBiomeAutor(ielmc,MID3)*rPCOMCAutor(iLbiom_reserve,NGL)-mBiomeAutor(ielmp,MID3))
     IF(RNetH2PO4MinPotent.GT.0.0)THEN
       CH2PX=AZMAX1(CH2P4-HPMN)
       CH2PY=AZMAX1(CH2P4B-HPMN)
@@ -1325,7 +1325,7 @@ module MicAutoCPLXMod
         CGROMC             = DOMuptk4GrothAutor(ielmc,NGL)-RespGrossAutor(NGL)-RNOxReduxRespAutorLim(NGL)-Resp4NFixAutor(NGL)
         RGrowthCAutor(NGL) = CGROMC
         RCO2ProdAutor(NGL) = RCO2ProdAutor(NGL)+Resp4NFixAutor(NGL)
-        MID3               = micpar%get_micb_id(ibiom_reserve,NGL)
+        MID3               = micpar%get_micb_id(iLbiom_reserve,NGL)
 
         if(N.eq.mid_AutoAMONC10)then
           !environmental CO2 is assimilated for C biomass
