@@ -207,14 +207,14 @@
 !     begin_execution
   associate(                                                             &
     RIB                         => plt_ew%RIB                           ,& !input  :Richardson number for calculating boundary layer resistance, [-]
-    RawIsoTCanopy2Atm_pft   => plt_ew%RawIsoTCanopy2Atm_pft     ,& !input  :canopy isothermal boundary later resistance, [h m-1]
+    RawIsoTCanopy2Atm_pft       => plt_ew%RawIsoTCanopy2Atm_pft         ,& !input  :canopy isothermal boundary later resistance, [h m-1]
     TairK                       => plt_ew%TairK                         ,& !input  :air temperature, [K]
     TKCanopy_pft                => plt_ew%TKCanopy_pft                  ,& !input  :canopy temperature, [K]
     CO2E                        => plt_site%CO2E                        ,& !input  :atmospheric CO2 concentration, [umol mol-1]
     CanopyLeafArea_pft          => plt_morph%CanopyLeafArea_pft         ,& !input  :plant canopy leaf area, [m2 d-2]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]
     NetCO2Flx2Canopy_col        => plt_bgcr%NetCO2Flx2Canopy_col        ,& !input  :total net canopy CO2 exchange, [g d-2 h-1]
-    SineSunInclinationAngle_col        => plt_rad%SineSunInclinationAngle_col         ,& !input  :sine of solar angle, [-]
+    SineSunInclinationAngle_col => plt_rad%SineSunInclinationAngle_col  ,& !input  :sine of solar angle, [-]
     CanopyCi2CaRatio_pft        => plt_photo%CanopyCi2CaRatio_pft       ,& !input  :Ci:Ca ratio, [-]
     H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft       ,& !input  :maximum stomatal resistance to vapor, [s h-1]
     CanopyGasCO2_pft            => plt_photo%CanopyGasCO2_pft           ,& !inoput :canopy gaesous CO2 concentration, [umol mol-1]

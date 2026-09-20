@@ -7,6 +7,7 @@
   use SurfLitterDataType, only: XTillCorp_col
   use abortutils,         only: iulog
   use DebugToolMod,       only: PrintInfo
+  use DepositionMod,     only : ApplyBioAerosol
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -72,6 +73,8 @@
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       SolarNoonHour_col(NY,NX) = SolarNoonHourYM_col(NY,NX)+ eot
+
+      call ApplyBioAerosol(I,12,NY,NX)
     ENDDO
   ENDDO    
 

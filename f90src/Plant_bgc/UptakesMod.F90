@@ -1277,14 +1277,14 @@ module UptakesMod
         !     Root2ndEffLen4uptk_rpvr=Layer effective root length four resource uptake, [m]
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
-        FRAD1 = CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ)
-        FRADM = MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ)
+        FRAD1 = AZMAX1(CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._r8)
+        FRADM = AZMAX1(MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._R8)
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**4
         endif
-        StalkAxialResist            = StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ))
+        StalkAxialResist            = AZMAX1(StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ)))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
         if(FRADM.GT.0._r8)then
           RootMediumAxialResist_rvr(N,L)=0.5_r8*RootSingleVesselRstaxial_pft(NZ)*RootMediumLength_pvr(L,NZ)/FRADM

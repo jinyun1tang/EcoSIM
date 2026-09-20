@@ -14,7 +14,6 @@ module Hour1Mod
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
   use HydrologyDiagMod , only: DiagWaterTBLDepz
-  use InitSOMBGCMOD,    only : ApplyBioAerosol
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -200,8 +199,6 @@ module Hour1Mod
       if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
       call PlantCanopyRadsModel(I,J,NY,NX,DepthSurfWatIce)
-!
-      call ApplyBioAerosol(I,J,NY,NX)
 !
       if(lverb)write(*,*)'RESET HOURLY INDICATORS'
 !

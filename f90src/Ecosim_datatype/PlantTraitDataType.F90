@@ -101,6 +101,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  MatureGroup_pft(:,:,:)                     !acclimated plant maturity group, [-]
   real(r8),target,allocatable ::  GROUPX_pft(:,:,:)                          !initial plant maturity group, [-]
   real(r8),target,allocatable ::  PPI_pft(:,:,:)                             !initial plant population, [# m-2]
+  real(r8),target,allocatable ::  PPmax_pft(:,:,:)                            !maximum plant population, [# m-2]
   real(r8),target,allocatable ::  StandingDeadInitC_pft(:,:,:)               !initial standing dead C, [g C m-2]
   real(r8),target,allocatable ::  PPX_pft(:,:,:)                             !plant population, [# m-2]
   real(r8), target, allocatable :: RootSingleVesselRstaxial_pft(:,:,:)          !axial resistance for a single 1 m water transport vessel [MPa h m-4]
@@ -304,6 +305,7 @@ contains
   allocate(MatureGroup_pft(JP,JY,JX));   MatureGroup_pft=0._r8
   allocate(GROUPX_pft(JP,JY,JX));   GROUPX_pft=0._r8
   allocate(PPI_pft(JP,JY,JX));      PPI_pft=0._r8
+  allocate(PPmax_pft(JP,JY,JX));    PPmax_pft=0._r8
   allocate(StandingDeadInitC_pft(JP,JY,JX));   StandingDeadInitC_pft=0._r8
   allocate(PPX_pft(JP,JY,JX));      PPX_pft=0._r8
   allocate(RootSingleVesselArea_pft(JP,JY,JX)); RootSingleVesselArea_pft=0._r8
@@ -505,6 +507,7 @@ contains
   call destroy(MatureGroup_pft)
   call destroy(GROUPX_pft)
   call destroy(PPI_pft)
+  call destroy(PPmax_pft)
   call destroy(StandingDeadInitC_pft)
   call destroy(PPX_pft)
   call destroy(RootSingleVesselArea_pft)

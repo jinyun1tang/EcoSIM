@@ -406,6 +406,30 @@ variables:
 		RSPmL:FillValue = -999.9 ;
 		RSPmL:long_name = "Initial manure litter P" ;
 		RSPmL:units = "gP m-2" ;
+	float fAeroLiveMB(ngrid) ;
+	    fAeroLiveMB:FillValue = -999.9 ;
+		fAeroLiveMB:long_name = "Fraction of bioaerosol depsoition C for live microbes" ;
+		fAeroLiveMB:units ="gC biomass/gC deposition" ;
+	float fAeroDeadMB(ngrid) ;
+	    fAeroDeadMB:FillValue = -999.9 ;
+		fAeroDeadMB:long_name = "Fraction of bioaerosol depsoition C for dead microbes" ;
+		fAeroDeadMB:units ="gC biomass/gC deposition" ;
+	float fAeroMoss(ngrid) ;
+	    fAeroMoss:FillValue = -999.9 ;
+		fAeroMoss:long_name = "Fraction of bioaerosol depsoition C for moss" ;
+		fAeroMoss:units ="gC biomass/gC deposition" ;
+	float fAeroLich(ngrid) ;
+	    fAeroLich:FillValue = -999.9 ;
+		fAeroLich:long_name = "Fraction of bioaerosol depsoition C for lichen" ;
+		fAeroLich:units ="gC biomass/gC deposition" ;
+	float fAeroDeadNMB(ngrid) ;
+	    fAeroDeadNMB:FillValue = -999.9 ;
+		fAeroDeadNMB:long_name = "Fraction of bioaerosol depsoition C for dead non microbes" ;
+		fAeroDeadNMB:units ="gC biomass/gC deposition" ;
+	float fAeroDOM(ngrid) ;
+	    fAeroDOM:FillValue = -999.9 ;
+		fAeroDOM:long_name = "Fraction of bioaerosol depsoition C for dissolvable organic matter" ;
+		fAeroDOM:units ="gC biomass/gC deposition" ;
 	int NHW ;
 	int NHE ;
 	int NVN ;
@@ -435,7 +459,7 @@ data:
 
  ZNH3EG = 0.005 ;
 
- IETYPG = 62 ;
+ IETYPG = 22 ;
 
  IERSNG = 0 ;
 
@@ -714,6 +738,18 @@ data:
 
  RSPmL =
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -999 ;
+
+ fAeroLiveMB = 0.1 ;
+
+ fAeroDeadMB = 0.6 ;
+
+ fAeroMoss = 0.01 ;
+
+ fAeroLich = 0.01 ;
+
+ fAeroDeadNMB = 0.08 ;
+
+ fAeroDOM = 0.2 ;
 
  NHW = 1 ;
 

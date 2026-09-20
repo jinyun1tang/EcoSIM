@@ -393,7 +393,7 @@ implicit none
   associate(                                                   &
     Myco_pft               => plt_morph%Myco_pft              ,& !input  :mycorrhizal type (no or yes),[-]
     NU                     => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
-    MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft   => plt_morph%MaxSoilLays4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
     MaxNumRootLays         => plt_site%MaxNumRootLays         ,& !input  :maximum root layer number,[-]
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr       ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     CO2NetFix_pft          => plt_bgcr%CO2NetFix_pft          ,& !output :canopy net CO2 exchange, [gC d-2 h-1]
@@ -431,6 +431,8 @@ implicit none
     trcs_deadroot2soil_pvr => plt_rbgc%trcs_deadroot2soil_pvr ,& !inoput :gases released to soil upong dying roots, [g d-2 h-1]    
     RNodeInitiate_pft      => plt_rbgc%RNodeInitiate_pft      ,& !inoput :node initiation rate, [h-1]
     RLeafAppear_pft        => plt_rbgc%RLeafAppear_pft        ,& !inoput :leaf appearing rate, [h-1]
+    CO2Intra_pft           => plt_photo%CO2Intra_pft          ,& !inoput :leaf-area-weighted intracellular CO2 sum, [umol mol-1 m2 d-2]
+    CO2IntraScal_pft       => plt_photo%CO2IntraScal_pft      ,& !inoput :intracellular CO2 leaf-area weight, [m2 d-2]
     fNCLFW_brch            => plt_pheno%fNCLFW_brch           ,& !output : NC ratio of growing leaf on branch, [gN/gC]
     fPCLFW_brch            => plt_pheno%fPCLFW_brch           ,& !output : PC ratio of growing leaf on branch, [gP/gC]
     fNCLFW_pft             => plt_pheno%fNCLFW_pft            ,& !output : NC ratio of growing leaf, [gN/gC]
@@ -441,6 +443,8 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    CO2Intra_pft(NZ) = 0._R8
+    CO2IntraScal_pft(NZ) = 0._R8
     plt_rbgc%NH3Dep2Can_brch(:,NZ) = 0._R8  
     RLeafAppear_pft(NZ) = 0._r8
     RNodeInitiate_pft(NZ) = 0._r8
@@ -694,10 +698,15 @@ implicit none
     RootN2Fix_pft             => plt_rbgc%RootN2Fix_pft              ,& !input  :total root N2 fixation, [gN d-2 h-1]    
     SurfLitrfallElms_pft      => plt_bgcr%SurfLitrfallElms_pft       ,& !input :surface litterfall, [g d-2 h-1]    
     CanopyN2Fix_pft           => plt_rbgc%CanopyN2Fix_pft            ,& !input  :total canopy N2 fixation, [gN d-2 h-1]        
+    CanopyCi2CaRatio_pft      => plt_photo%CanopyCi2CaRatio_pft      ,& !input  :prior Ci:Ca ratio, [-]
+    CanopyGasCO2_pft          => plt_photo%CanopyGasCO2_pft          ,& !inoput :canopy gaesous CO2 concentration, [umol mol-1]
+    DynCi2CaRatio_pft         => plt_photo%DynCi2CaRatio_pft         ,& !output :dynamic Ci:Ca ratio, [-]
     SeedPlantedElm_pft        => plt_biom%SeedPlantedElm_pft         ,& !input  :seed biomass at planting, [g d-2] 
     iDayPlantHarvest_pft      => plt_distb%iDayPlantHarvest_pft      ,& !input  : day of plant harvest,[-]
     LitrfallAbvgElms_pft      => plt_bgcr%LitrfallAbvgElms_pft       ,& !input  :aboveground plant element LitrFall, [g d-2 h-1]
     LitrfallBlgrElms_pft      => plt_bgcr%LitrfallBlgrElms_pft       ,& !input  :belowground plant element LitrFall, [g d-2 h-1]
+    CO2Intra_pft              => plt_photo%CO2Intra_pft              ,& !inoput :leaf-area-weighted intracellular CO2 sum, [umol mol-1 m2 d-2]
+    CO2IntraScal_pft          => plt_photo%CO2IntraScal_pft          ,& !inoput :intracellular CO2 leaf-area weight, [m2 d-2]
     FireLossE_pft             => plt_distb%FireLossE_pft             ,& !input  :plant element lost by fire, [g d-2 h-1]
     TotBegVegE_pft            => plt_biom%TotBegVegE_pft             ,& !Input  :total vegetation carbon at the beginning of the time step,[g d-2]
     TotEndVegE_pft            => plt_biom%TotEndVegE_pft              & !output :total vegetation carbon at the end of the time step,[g d-2]
@@ -705,6 +714,12 @@ implicit none
 
   call PrintInfo('beg '//subname)
   
+  ! Preserve the weighted sum for the Ci history diagnostic.
+  IF(CO2IntraScal_pft(NZ).GT.1.E-5_R8.AND.CanopyGasCO2_pft(NZ).GT.0._r8)THEN
+    DynCi2CaRatio_pft(NZ)=(CO2Intra_pft(NZ)/CO2IntraScal_pft(NZ))/CanopyGasCO2_pft(NZ)
+  ELSE
+    DynCi2CaRatio_pft(NZ)=  CanopyCi2CaRatio_pft(NZ)
+  ENDIF
   call SumPlantBiome(yearIJ,NZ,header)
 
   I=yearIJ%I; J=yearIJ%J  
