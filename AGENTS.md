@@ -87,6 +87,12 @@ take precedence over repository guidance.
   build and a focused test or short simulation exercising the modified process.
   Input-only changes need schema/value checks; documentation-only changes do not
   require compiling the model.
+- To screen the example cases after a Fortran change, use the
+  `ecosim-smoke-run` skill (`.agents/skills/ecosim-smoke-run/`, also exposed at
+  `.claude/skills/` and `.codex/skills/`). It runs each example for a few
+  simulated days in a scratch mirror and checks exit status, steps completed,
+  and output for NaN/Inf. A pass means the model ran and produced finite
+  numbers; it is not evidence of scientific correctness.
 - Inspect `regression-tests/Makefile` before running its targets. It provides
   `mtest` and `rtest`; verify the executable path and required data first. Do not
   update regression baselines merely to make a changed result pass.
