@@ -215,8 +215,8 @@ module DenitrifierMod
     OQCZ3  = AZMAX1(DOM(idom_doc,K)*FOQC(NGL,K)-RGOCP(NGL,K)*OxyLimterHeter(NGL,K))  !maximum DOC available for oxidation by NO3(-)
     OQAZ3  = AZMAX1(DOM(idom_acetate,K)*FOQA(NGL,K)-RGOAP(NGL,K)*OxyLimterHeter(NGL,K))
     OQCD3  = (OQCZ3+OQAZ3)/eQNO3toOxy     !NO3-N demand for DOC oxidation
-    OQCD3S = OQCD3*FNO3S          !NO3-N-soil demand for DOC oxidation
-    OQCD3B = OQCD3*FNO3B          !NO3-N-band demand for DOC oxidation
+    OQCD3S = OQCD3*FNO3S                  !NO3-N-soil demand for DOC oxidation
+    OQCD3B = OQCD3*FNO3B                  !NO3-N-band demand for DOC oxidation
     FODC   = safe_adb(OQCZ3,OQCZ3+OQAZ3)
     ZNO3SX                        = ZNO3S*FNO3
     ZNO3BX                        = ZNO3B*FNB3
@@ -227,9 +227,9 @@ module DenitrifierMod
     RNO3ReduxHeterBand(NGL,K)     = AZMAX1(AMIN1(RNO3UptkBand,OQCD3B))   !NO3-N-band demand for DOC oxidation
     RDNOX                         = RNO3UptkSoil+RNO3UptkBand
     RDNOT                         = RNO3ReduxHeterSoil(NGL,K)+RNO3ReduxHeterBand(NGL,K)
-    RGOM3X                        = eQNO3toOxy*RDNOX      !NO3-N supported potential DOC oxidation
-    RNOxDOCReduxRespDenitLim3     = eQNO3toOxy*RDNOT*FODC      !NO3-N supported actual DOC oxidation
-    RNOxAcetReduxRespDenitLim3    = eQNO3toOxy*RDNOT*(1._r8-FODC)      !NO3-N supported actual acetate oxidation
+    RGOM3X                        = eQNO3toOxy*RDNOX                     !NO3-N supported potential DOC oxidation
+    RNOxDOCReduxRespDenitLim3     = eQNO3toOxy*RDNOT*FODC                !NO3-N supported actual DOC oxidation
+    RNOxAcetReduxRespDenitLim3    = eQNO3toOxy*RDNOT*(1._r8-FODC)        !NO3-N supported actual acetate oxidation
     !
     !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
     !     POPULATIONS
@@ -293,7 +293,7 @@ module DenitrifierMod
     OQCZ2                         = AZMAX1(OQCZ3-RNOxDOCReduxRespDenitLim3)  !maximum available DOC for oxidation by NO2(-)
     OQAZ2                         = AZMAX1(OQAZ3-RNOxAcetReduxRespDenitLim3)
     FODC                          = safe_adb(OQCZ2,OQCZ2+OQAZ2)
-    OQCD2                         = OQCZ2/eQNO2toOxy
+    OQCD2                         = (OQCZ2+OQAZ2)/eQNO2toOxy
     OQCD2S                        = OQCD2*FNO3S
     OQCD2B                        = OQCD2*FNO3B
     ZNO2SX                        = (ZNO2S+RNO3ReduxHeterSoil(NGL,K))*FNO2
@@ -352,7 +352,7 @@ module DenitrifierMod
     OQCZ1                            = AZMAX1(OQCZ2-RNOxDOCReduxRespDenitLim2)   !maximum available DOC for oxidation by N2O
     OQAZ1                            = AZMAX1(OQAZ2-RNOxAcetReduxRespDenitLim2)   !maximum available DOC for oxidation by N2O
     FODC                             = safe_adb(OQCZ1,OQCZ1+OQAZ1)
-    OQCD1                            = OQCZ1/eQN2OtoOxy
+    OQCD1                            = (OQCZ1+OQAZ1)/eQN2OtoOxy
     Z2OSX                            = (Z2OS+RDN2T)*FN2O
     RDN2OX                           = AZMAX1(AMIN1(Z2OSX,VMXD1S))
     RN2OReduxHeter(NGL,K)            = AZMAX1(AMIN1(VMXD1S,OQCD1,Z2OSX))

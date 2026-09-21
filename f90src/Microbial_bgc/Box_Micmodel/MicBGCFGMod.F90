@@ -1938,8 +1938,15 @@ module MicBGCMod
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(OMCplx_Flux_type), intent(inout) :: ncplxf
   type(micfluxtype), intent(inout) :: micflx
+
   integer  :: K,M,N,NGL,NE,idom
+  real(r8) :: NC10NO2ReduxSoil, NC10NO2ReduxBand
+  real(r8) :: NH4toN2OSoil, NH4toN2OBand
 !     begin_execution
+  NC10NO2ReduxSoil = 0._r8
+  NC10NO2ReduxBand = 0._r8
+  NH4toN2OSoil     = 0._r8
+  NH4toN2OBand     = 0._r8
   associate(                                                       &
     DOMuptk4GrothHeter        => nmicf%DOMuptk4GrothHeter,         &
     RMetabDOCUptkHeter        => nmicf%RMetabDOCUptkHeter,         &
@@ -2041,6 +2048,7 @@ module MicBGCMod
     RNO3MicbReliz2Soil        => micflx%RNO3MicbReliz2Soil,        &
     REcoDOMProd               => micflx%REcoDOMProd                &
   )
+  
   D650: DO K=1,KL
     IF(.not.litrm .OR. (K.NE.k_POM .AND. K.NE.k_humus))THEN
       DO N=1,NumMicbHFunGrupsPerCmplx
@@ -2108,10 +2116,34 @@ module MicBGCMod
         naqfdiag%tRNOxMicrbRedux      = naqfdiag%tRNOxMicrbRedux+RNOxReduxRespAutorLim(NGL)
         naqfdiag%tRO2MicrbUptk        = naqfdiag%tRO2MicrbUptk+RO2UptkAutor(NGL)
         naqfdiag%TReduxNO3Soil        = naqfdiag%TReduxNO3Soil+RNO3UptkAutor(NGL)
-        naqfdiag%TNitNO2Redux2N2OSoil = naqfdiag%TNitNO2Redux2N2OSoil+RNOxReduxAutorSoil(NGL)*1.5_r8 !NO2(-) -> N2O from aerobic denitrification
-        naqfdiag%TNitNO2Redux2N2OBand = naqfdiag%TNitNO2Redux2N2OBand+RNOxReduxAutorBand(NGL)*1.5_r8 !NO2(-) -> N2O from aerobic denitrification
-        naqfdiag%TReduxNO2toN2OSoil        = naqfdiag%TReduxNO2toN2OSoil+RNOxReduxAutorSoil(NGL)*1.5_r8
-        naqfdiag%TReduxNO2toN2OBand   = naqfdiag%TReduxNO2toN2OBand+RNOxReduxAutorBand(NGL)*1.5_r8
+        
+        IF(N.EQ.mid_AutoAmmoniaOxidBacter)THEN
+          !Nitrite-N consumed in NO2 -> N2O.
+          naqfdiag%TReduxNO2toN2OSoil = naqfdiag%TReduxNO2toN2OSoil &
+            +RNOxReduxAutorSoil(NGL)
+          naqfdiag%TReduxNO2toN2OBand = naqfdiag%TReduxNO2toN2OBand &
+            +RNOxReduxAutorBand(NGL)
+
+          !Additional ammonia-N incorporated into N2O.
+          NH4toN2OSoil = NH4toN2OSoil+0.5_r8*RNOxReduxAutorSoil(NGL)
+          NH4toN2OBand = NH4toN2OBand+0.5_r8*RNOxReduxAutorBand(NGL)
+
+          !Total nitrifier N2O-N production, including ammonia-N.
+          naqfdiag%TNitNO2Redux2N2OSoil = naqfdiag%TNitNO2Redux2N2OSoil &
+            +1.5_r8*RNOxReduxAutorSoil(NGL)
+          naqfdiag%TNitNO2Redux2N2OBand = naqfdiag%TNitNO2Redux2N2OBand &
+            +1.5_r8*RNOxReduxAutorBand(NGL)
+
+        ELSEIF(N.EQ.mid_AutoAMONC10)THEN
+          !NC10: NO2-N consumed equals N2-N produced.
+          NC10NO2ReduxSoil = NC10NO2ReduxSoil+RNOxReduxAutorSoil(NGL)
+          NC10NO2ReduxBand = NC10NO2ReduxBand+RNOxReduxAutorBand(NGL)
+
+        ELSEIF(N.EQ.mid_AutoAMOANME2D)THEN
+          !ANME-2d: NO3-N consumed equals NO2-N produced.
+          naqfdiag%TReduxNO3Soil = naqfdiag%TReduxNO3Soil+RNOxReduxAutorSoil(NGL)
+          naqfdiag%TReduxNO3Band = naqfdiag%TReduxNO3Band+RNOxReduxAutorBand(NGL)
+        ENDIF
 
       ENDDO
     ENDIF
@@ -2170,28 +2202,20 @@ module MicBGCMod
         RCH4MetaDmndAutor(NGL) = RCH4MetaDmndAutor(NGL)+DOMuptk4GrothAutor(ielmc,NGL)
         TRDOM2DIE(ielmc)       = TRDOM2DIE(ielmc)-RGrowthCAutor(NGL)
       ENDDO
-    elseif(N.eq.mid_AutoAMONC10)then
-      !use CO2 from the environment for carbon biomass
-      !CO2 is released from CH4 oxidation and taken up for biomass
-      RCO2NetUptkMicb  = RCO2NetUptkMicb+RGrowthCAutor(NGL)-RSMetaOxidSoilAutor(NGL)
-      RCH4UptkAutor    = RCH4UptkAutor+RSMetaOxidSoilAutor(NGL)
-      TRDOM2DIE(ielmc) = TRDOM2DIE(ielmc)-RGrowthCAutor(NGL)
-    elseif (N.eq.mid_AutoAMOANME2D)then  
-      !CO2 is released from CH4 oxidation
-      !CH4 is taken up for catabolic and anabolic reactions
-      RCO2NetUptkMicb         = RCO2NetUptkMicb-RSMetaOxidSoilAutor(NGL)
-      RCH4UptkAutor           = RCH4UptkAutor+RSMetaOxidSoilAutor(NGL)
-      RCH4MetaDmndAutor(NGL)  = RCH4MetaDmndAutor(NGL)+RGrowthCAutor(NGL)
-      TRDOM2DIE(ielmc)        = TRDOM2DIE(ielmc)-RGrowthCAutor(NGL)
+    elseif(N.eq.mid_AutoAMONC10 .or. N.eq.mid_AutoAMOANME2D)then
+      DO NGL=JGniA(N),JGnfA(N)
+        RCH4UptkAutor    = RCH4UptkAutor+RSMetaOxidSoilAutor(NGL)
+        TRDOM2DIE(ielmc) = TRDOM2DIE(ielmc)-RGrowthCAutor(NGL)
+      ENDDO
     ENDIF
   ENDDO
 
   !>0. microbial uptake
   RH2NetUptkMicb  = RH2UptkAutor-naqfdiag%TProdH2
   RO2UptkMicb     = naqfdiag%tRO2MicrbUptk
-  RN2NetUptkMicb  = -naqfdiag%TReduxN2OtoN2
+  RN2NetUptkMicb  = -naqfdiag%TReduxN2OtoN2-NC10NO2ReduxSoil-NC10NO2ReduxBand
   RN2ONetUptkMicb = -naqfdiag%TReduxNO2toN2OSoil-naqfdiag%TReduxNO2toN2OBand-RN2OProdSoilChemo &
-    -RN2OProdBandChemo+naqfdiag%TReduxN2OtoN2
+    -RN2OProdBandChemo-NH4toN2OSoil-NH4toN2OBand+naqfdiag%TReduxN2OtoN2
 !
   D655: DO K=1,jcplx
     D660: DO M=1,jsken
@@ -2252,12 +2276,14 @@ module MicBGCMod
 
   RNH4MicbReliz2Soil=-naqfdiag%tRNH4MicrbImobilSoil
   RNO3MicbReliz2Soil=-naqfdiag%tRNO3MicrbImobilSoil-naqfdiag%TReduxNO3Soil+RNO3ProdSoilChemo
-  RNO2MicbReliz2Soil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2toN2OSoil-RNO2ReduxSoilChemo
+  RNO2MicbReliz2Soil=+naqfdiag%TReduxNO3Soil-naqfdiag%TReduxNO2toN2OSoil &
+    -NC10NO2ReduxSoil-RNO2ReduxSoilChemo
   RH2PO4MicbReliz2Soil=-naqfdiag%tRH2PO4MicrbImobilSoil
   RH1PO4MicbReliz2Soil=-naqfdiag%tRH1PO4MicrbImobilSoil     !< 0 uptake
   RNH4MicbReliz2Band=-naqfdiag%tRNH4MicrbImobilBand
   RNO3MicbReliz2Band=-naqfdiag%tRNO3MicrbImobilBand-naqfdiag%TReduxNO3Band+RNO3ProdBandChemo
-  RNO2MicbReliz2Band=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2toN2OBand-RNO2ReduxBandChemo
+  RNO2MicbReliz2Band=naqfdiag%TReduxNO3Band-naqfdiag%TReduxNO2toN2OBand &
+    -NC10NO2ReduxBand-RNO2ReduxBandChemo
 
   !mid_AutoAmmoniaOxidBacter=1, mid_AutoNitriteOxidBacter=2, mid_AutoAeroCH4OxiBacter=3
   DO NGL=JGniA(mid_AutoAmmoniaOxidBacter),JGnfA(mid_AutoAmmoniaOxidBacter)

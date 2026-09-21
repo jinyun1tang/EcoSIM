@@ -331,7 +331,7 @@ module MethanotrophMod
 
     !band-soil
     IF(CNO2B.GT.ZERO)THEN
-      VMX2B=VMAX*FNO2B*CNO2B/(CNO2B+Z3KM)
+      VMX2B=VMAX*FNO2B*CNO2B/(CNO2B+Z2KM)
     ELSE
       VMX2B=0.0_r8
     ENDIF

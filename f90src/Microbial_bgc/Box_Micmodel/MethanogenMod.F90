@@ -133,7 +133,7 @@ module MethanogenMod
     RespGrossHeter(NGL,K)   = RGOMP
     RCO2ProdHeter(NGL,K)    = 0.50_r8*RespGrossHeter(NGL,K)
     RAcetateProdHeter(NGL,K)  = 0.0_r8
-    RCH4ProdHeter(NGL,K)    = AZMAX1(RespGrossHeter(NGL,K)-RespGrossHeter(NGL,K))
+    RCH4ProdHeter(NGL,K)    = AZMAX1(RespGrossHeter(NGL,K)-RCO2ProdHeter(NGL,K))
     RO2Uptk4RespHeter(NGL,K)= RO2Dmnd4RespHeter(NGL,K)
     RH2ProdHeter(NGL,K)     = 0.0_r8
   ENDDO
