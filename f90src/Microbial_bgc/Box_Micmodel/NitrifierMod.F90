@@ -446,9 +446,6 @@ module NitrifierMod
 
     call CalcRespMaintAutor(I,J,NGL,RMOMK,micfor,micstt,micflx,nmicf,nmics)
 
-    FNH4S=VLNH4
-    FNHBS=VLNHB
-
     IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
       FNO2=AMAX1(FMN,RNO2XupAutorPrev(NGL)/RNO2EcoUptkSoilPrev)
     ELSE
@@ -474,7 +471,6 @@ module NitrifierMod
     !     TFNG=temperature+water limitation, FBiomNutStoiScalAutorr=N,P limitation
     !     XCO2=aqueous CO2 limitation, OMA=active biomass
     !     OMA=active biomass
-    !     FNH4S,FNHBS=fractions of NH4 in non-band, band
     !     CNO2S,CNO2B=NO2 concentration in non-band, band
     !     ZNKM=Km for NO2 uptake
     !     FNO2,FNB2=fractions of total NO2 demand in non-band, band
@@ -487,8 +483,8 @@ module NitrifierMod
 
     VMAX=GrowthEnvScalAutor(NGL)*FBiomNutStoiScalAutor(NGL)*XCO2*OMActAutor(NGL)*VMXNO2Oxi
     ECHZAutor(NGL)  = EO2X
-    FCN2S           = FNH4S*CNO2S/(CNO2S+ZNKM)
-    FCN2B           = FNHBS*CNO2B/(CNO2B+ZNKM)
+    FCN2S           = VLNO3*CNO2S/(CNO2S+ZNKM)
+    FCN2B           = VLNOB*CNO2B/(CNO2B+ZNKM)
     FSBSTAutor(NGL) = FCN2S+FCN2B
     VMX2S           = VMAX*FCN2S
     VMX2B           = VMAX*FCN2B
