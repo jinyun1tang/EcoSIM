@@ -1,6 +1,6 @@
 module NutUptakeMod
 
-  use data_kind_mod, only: r8 => DAT_KIND_R8
+  use data_kind_mod, only: r8 => DAT_KIND_R8,yearIJ_type
   use minimathmod,   only: safe_adb, vapsat, AZMAX1,dssign
   use TracerPropMod, only: gas_solubility
   use DebugToolMod, only : PrintInfo
@@ -23,26 +23,28 @@ module NutUptakeMod
   contains
   ![header]
 !----------------------------------------------------------------------------------------------------
-  subroutine PlantNutientO2Uptake(I,J,NZ,FDMP, PathLen_pvr,FineRootRadius,FracPRoot4Uptake,&
+  subroutine PlantNutientO2Uptake(yearIJ,NZ,FDMP, PathLen_pvr,FineRootRadius,FracPRoot4Uptake,&
     FracMinRoot4Uptake_rpvr,FracSoiLayByPrimRoot,RootEffLen4Absorption_pvr)
   !
   !DESCRIPTION
   !doing plant population level nutrient, and O2 uptake
   implicit none
-  integer, intent(in) :: I,J,NZ
+  type(yearIJ_type),intent(in) :: yearIJ
+  integer, intent(in) :: NZ
   real(r8), intent(in):: FDMP
   real(r8), intent(in) :: PathLen_pvr(pltpar%jroots,JZ1),FineRootRadius(pltpar%jroots,JZ1),FracPRoot4Uptake(pltpar%jroots,JZ1,JP1)
   real(r8), intent(in) :: FracMinRoot4Uptake_rpvr(pltpar%jroots,JZ1,JP1)
   real(r8), intent(in) :: FracSoiLayByPrimRoot(JZ1,JP1)
   real(r8), intent(in) :: RootEffLen4Absorption_pvr(pltpar%jroots,JZ1)    ! [m]
   
+  integer :: I,J
   real(r8)  :: PopPlantO2Uptake,PopPlantO2Demand
 
   associate(                                           &
     ZERO4Groth_pft    => plt_biom%ZERO4Groth_pft      ,& !input  :threshold zero for plang growth calculation, [-]
     PlantO2Stress_pft => plt_pheno%PlantO2Stress_pft   & !output :plant O2 stress indicator, [-]
   )
-
+  I=yearIJ%I;J=yearIJ%J
   call FoliarNutrientInterception(NZ,FDMP)
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
