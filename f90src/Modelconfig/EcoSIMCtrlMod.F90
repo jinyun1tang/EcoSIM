@@ -9,6 +9,7 @@ implicit none
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
   logical :: lmicrobeMLdiag = .false.
+  logical :: LMacPoreOff          =.false.     !turnoff macropore, by default on
   integer :: idebug_day           = -1         !specify the day being debugged
   integer :: idebug_year          = -1         !specify the year being debugged
   integer :: iselect_plantZ       = -1

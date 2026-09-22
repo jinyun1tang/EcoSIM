@@ -2070,7 +2070,6 @@ module WatsubMod
     endif
   ELSE
     WaterMacpFlow   = 0.0_r8        
-    !IF(VLairMacP1_vr(N6,N5,N4).LE.0.0_r8)LInvalidMacP=.true.
   ENDIF
 
   IF(WaterMacpFlow.GT.0.0_r8)THEN
