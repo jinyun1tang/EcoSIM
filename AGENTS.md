@@ -29,6 +29,15 @@ take precedence over repository guidance.
 - `build/` and `local/`: generated build/install products.
 - `3rd-partylibs/`: third-party dependency submodules.
 
+## Knowledge documents and user preferences
+
+- Save generated EcoSIM process explanations, code walkthroughs, and similar
+  knowledge documents (including HTML guides) under `ecosim_knowledge/` by
+  default, unless the user specifies another destination. This is a persistent
+  user preference for future requests.
+- Keep relative source links valid from that directory when creating or moving
+  a document.
+
 ## Working with model code
 
 - Inspect `git status` before editing. Preserve existing user changes, untracked
