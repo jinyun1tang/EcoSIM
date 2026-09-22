@@ -642,7 +642,7 @@ module WatsubMod
   real(r8) :: TKLX
   real(r8) :: WatDarcyFlowMicP,HeatByDarcyFlowMicP,WaterMacpFlow
   real(r8) :: HeatByFlowMacP,HeatByWatFlowMicP,HFLWS,THETA1,THETAL  
-  logical  :: LInvalidMacP     !disable macropore?
+  logical  :: LInvalidMacP     !to disable/enable macropore
   logical  :: checkLayerSrc,checkLayerTgt
 
   !     begin_execution
@@ -659,11 +659,11 @@ module WatsubMod
   
   !If waterlevel is fixed, like shallow lake, without considering the change
   !of water depth due to hydrological fluxes 
-  
+  LInvalidMacP=.false.  !macropore flow enabled when false
+
   DO NX=NHW,NHE    !sweep from west to east
     DO NY=NVN,NVS  !sweep from north to south
 
-      LInvalidMacP=.false.
       D4400: DO L=1,NL_col(NY,NX)  !sweep from top to bottom
         N1=NX;N2=NY;N3=L
         !
@@ -2014,17 +2014,19 @@ module WatsubMod
   real(r8), intent(out) :: HeatByFlowMacP   ! >0, flux into dst, 
   real(r8), intent(out) :: WaterMacpFlow
   logical, intent(inout) :: LInvalidMacP   !==1, dest grid invalid
-
   real(r8) :: FLWHX,PSISH1,PSISHL
+  character(len=*), parameter :: subname='MacropXgridFLow'
   !     PSISH1,PSISHL=macropore total water potl in source,destination
   !     DLYR=layer thickness
   !     VLWatMacP1,VOLPH1=macropore water,air content
 
   HeatByFlowMacP = 0._r8
   WaterMacpFlow  = 0._r8
-  LInvalidMacP   = .true.
+
   if(fixWaterLevel)return
+
   IF(VLMacP1_vr(N3,N2,N1).GT.ZEROS2(N2,N1) .AND. VLMacP1_vr(N6,N5,N4).GT.ZEROS2(N5,N4) .AND. (.not.LInvalidMacP))THEN
+    !macropore flow is on
     PSISH1=PSIGrav_vr(N3,N2,N1)+mGravAccelerat*DLYR_3D(3,N3,N2,N1)*(AMIN1(1.0_r8,&
       AZMAX1(VLWatMacP1_vr(N3,N2,N1)/VLMacP1_vr(N3,N2,N1)))-0.5_r8)
     PSISHL=PSIGrav_vr(N6,N5,N4)+mGravAccelerat*DLYR_3D(3,N6,N5,N4)*(AMIN1(1.0_r8,&
@@ -2037,7 +2039,7 @@ module WatsubMod
     !     dts_HeatWatTP=time step of flux calculations
     !     VOLW2,VOLP1=water,air contents of source,destination micropores
     !     HeatByFlowMacP=convective heat flux from micropore water flux
-    !
+    ! from (N3,N2,N1) to (N6,N5,N4)
     FLWHX=AVCNHL_3D(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA_3D(N,N3,N2,N1)*dts_HeatWatTP
     IF(N.NE.iVerticalDirection)THEN
       !horizontal direction
@@ -2064,8 +2066,8 @@ module WatsubMod
       WaterMacpFlow=0._r8
     endif
   ELSE
-    WaterMacpFlow   = 0.0_r8
-    IF(VLairMacP1_vr(N6,N5,N4).LE.0.0_r8)LInvalidMacP=.true.
+    WaterMacpFlow   = 0.0_r8        
+    !IF(VLairMacP1_vr(N6,N5,N4).LE.0.0_r8)LInvalidMacP=.true.
   ENDIF
 
   IF(WaterMacpFlow.GT.0.0_r8)THEN
@@ -2294,7 +2296,7 @@ module WatsubMod
   IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN
     PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)-0.03_r8*PSISoilOsmotic_vr(N3,N2,N1) &
-      +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)            &
+      +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-TargetWaterTBL            &
       -AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))))
 
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD

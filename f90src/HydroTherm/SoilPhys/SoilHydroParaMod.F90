@@ -350,6 +350,7 @@ contains
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
     !ExtWaterTablet0_col=external water table depth, [m]
+
     IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
@@ -362,6 +363,8 @@ contains
     ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
       !CO2CompenPoint_nodeetely dry
       THETW_vr(L,NY,NX)=0.0_r8
+    ELSE
+      THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)      
     ENDIF
 
     IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
