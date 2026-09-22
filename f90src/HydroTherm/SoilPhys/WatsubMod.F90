@@ -969,8 +969,7 @@ module WatsubMod
               IF(checkActiveFlow)THEN                  
                 ! IF NO WATER TABLE
                 IF((IDWaterTable_col(N2,N1).EQ.0 .OR. N.EQ.iVerticalDirection) .AND. .not.isclose(Recharg2WTBLScal,0.0_r8))THEN    
-                  !vertical flow or lateral drainage
-                  !if(N.NE.iVerticalDirection .and. N1==2)write(1011,*)I*1000+J/24.,direcs(N),N3,N2,N1,N6,N5,N4
+                  !vertical flow or lateral drainage                  
                   call VertBoundaryDrainM(I,J,N,N1,N2,N3,M4,M5,M6,RainEkReducedKsat(NY,NX),XN,RechargDist2WTBL,Recharg2WTBLScal)
                   !
                   !lateral flow
@@ -1073,8 +1072,6 @@ module WatsubMod
       Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP_col(NY,NX)+Qinfl2MacP_col(NY,NX)
       Qinflx2SoilM_col(NY,NX) = Qinflx2SoilM_col(NY,NX)+Qinfl2MicP_col(NY,NX)+Qinfl2MacP_col(NY,NX)
 
-!      if(NX==6)write(994,*)'infl=',WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX),WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX),&
-!        WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)+WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)            
       D95851: DO L=NUM_col(NY,NX),NL_col(NY,NX) !from top to bottom
 
         N1=NX;N2=NY;N3=L
@@ -1117,15 +1114,11 @@ module WatsubMod
                 WatNetFlow2MicptX_3DM_vr(N3,N2,N1) = WatNetFlow2MicptX_3DM_vr(N3,N2,N1)+WaterFlow2MicptX_3D(N,N3,N2,N1)-WaterFlow2MicptX_3D(N,N6,N5,N4)
                 WatNetFlow2Macpt_3DM_vr(N3,N2,N1)  = WatNetFlow2Macpt_3DM_vr(N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)
 
-                !if(N6.EQ.1+NL_col(NY,NX))WRITE(1001,*)I*1000+J/24.,N2,N1,WaterFlow2Micpt_3D(N,N6,N5,N4),WaterFlow2Macpt_3D(N,N6,N5,N4)
-                !IF(N3.EQ.NUM_col(NY,NX) .AND. N.EQ.iVerticalDirection)write(994,*)I*1000+J/24.,'infl',N1,WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
               endif
               THeatFlow2Soil_3DM_vr(N3,N2,N1)    = THeatFlow2Soil_3DM_vr(N3,N2,N1)+HeatFlow2Soili_3D(N,N3,N2,N1)-HeatFlow2Soili_3D(N,N6,N5,N4)
 
               if(N.NE.iVerticalDirection)then     
-                !if(N1==6 .and. J==3 .AND. M==24)then
-!                   write(994,*)I*1000+J/24.,M,direcs(N),N3,N2,N1,WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
-                !endif
+
                 CHECKGRID=(N1.GT.NHW .AND. N1.LT.NHE) .AND. (N2.GT.NVN .AND. N2.LT.NVS) .OR.                      & !innter grid
                   (N.EQ.iWestEastDirection .AND. N1.GT.NHW .AND. N1.LT.NHE .AND. (N2.EQ.NVN .OR. N2.EQ.NVS)) .OR. & !north/south boundary
                   (N.EQ.iNorthSouthDirection .AND. N2.GT.NVN .AND. N2.LT.NVS .AND. (N1.EQ.NHW .OR. N1.EQ.NHE))      !west/east boundary
@@ -1134,7 +1127,7 @@ module WatsubMod
                   (N.EQ.iNorthSouthDirection .AND. NY.EQ.NVN .AND. NVN.LT.NVS)) THEN !northern boundary 
                   QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)
                   QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)                        
-                  !write(917,*)I*1000+J/24.,M,QLaterFlow2Cell_col(N2,N1),N2,N1,direcs(N),N3,N2,N1
+                  
                 ELSEIF((N.EQ.iWestEastDirection .AND. NX.EQ.NHE .AND. NHW.LT.NHE) .OR. & !eastern boundary
                   (N.EQ.iNorthSouthDirection .AND. NY.EQ.NVS .AND. NVN.LT.NVS)) THEN !southern boundary 
                   QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
@@ -1144,7 +1137,7 @@ module WatsubMod
                     +WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)
                   QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4) &
                     +WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)                 
-                  !write(917,*)I*1000+J/24.,M,QLaterFlow2Cell_col(N2,N1),N2,N1,'inner',direcs(N),N3,N2,N1
+                  
                 ENDIF
               endif
             ENDIF

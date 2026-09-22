@@ -298,9 +298,12 @@ contains
   subroutine SetColdRunSoilStates(I,J,L,NY,NX)
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
+  character(len=*), parameter :: subname='SetColdRunSoilStates'
 
-! restart is defined as simulation starting from a previous run
+  ! restart is defined as simulation starting from a previous run
   IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
+    !when either field capacity or wilting point is not provided, both are recomputed 
+    !for consistency.
     !calculating FC or WP
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       FieldCapacity_vr(L,NY,NX)=0.2576_r8-0.20_r8*CSAND_vr(L,NY,NX) &
