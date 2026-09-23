@@ -6,7 +6,14 @@ module RootGasMod
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use TracerIDMod
   implicit none
 

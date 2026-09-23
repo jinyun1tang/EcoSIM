@@ -3,7 +3,13 @@ module PlantDisturbByGrazingMod
   use minimathmod, only : isclose,AZMAX1
   use ElmIDMod
   use EcosimConst
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
   use PlantBGCPars
 implicit none
   private

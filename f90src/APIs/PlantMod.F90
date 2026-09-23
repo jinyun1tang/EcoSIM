@@ -17,7 +17,8 @@ module PlantMod
   use PlantDataRateType
   use SoilBGCDataType
   use EcoSimSumDataType
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
   use PlantAPI
   use ClimForcDataType
   use PlantTraitDataType

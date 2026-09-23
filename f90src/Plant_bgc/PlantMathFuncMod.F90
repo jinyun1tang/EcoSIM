@@ -4,7 +4,9 @@ module PlantMathFuncMod
   ! code for small functions used by plant processes
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: endrun, iulog
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantEnergyWaterAPIData, only : plt_ew
   use DebugToolMod
   use EcoSimConst
   use MiniMathMod

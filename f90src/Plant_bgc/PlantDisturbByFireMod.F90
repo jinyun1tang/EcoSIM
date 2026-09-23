@@ -1,7 +1,15 @@
 module PlantDisturbByFireMod
   use data_kind_mod, only : r8 => DAT_KIND_R8,yearIJ_type
   use ElmIDMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantBGCPars
   use EcoSimConst
   use PlantMathFuncMod
