@@ -158,7 +158,7 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
-    NPXS,NPYS,continue_run,restart_out,lsoilCompaction,&
+    NPXS,NPYS,continue_run,restart_out,lsoilCompaction,LMacPoreOff,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
@@ -215,6 +215,7 @@ contains
   do_year              = -1
   do_doy               = 0
   do_layer             = 1
+  LMacPoreOff          = .false.
   salt_model           = .false.
   laddband             = .false.
   do_regression_test   = .false.

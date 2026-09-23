@@ -298,9 +298,12 @@ contains
   subroutine SetColdRunSoilStates(I,J,L,NY,NX)
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
+  character(len=*), parameter :: subname='SetColdRunSoilStates'
 
-! restart is defined as simulation starting from a previous run
+  ! restart is defined as simulation starting from a previous run
   IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
+    !when either field capacity or wilting point is not provided, both are recomputed 
+    !for consistency.
     !calculating FC or WP
     IF(CSoilOrgM_vr(ielmc,L,NY,NX).LT.FORGW)THEN
       FieldCapacity_vr(L,NY,NX)=0.2576_r8-0.20_r8*CSAND_vr(L,NY,NX) &
@@ -347,6 +350,7 @@ contains
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
     !ExtWaterTablet0_col=external water table depth, [m]
+
     IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
@@ -359,16 +363,20 @@ contains
     ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
       !CO2CompenPoint_nodeetely dry
       THETW_vr(L,NY,NX)=0.0_r8
+    ELSE
+      THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)      
     ENDIF
 
     IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
     ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
     ELSEIF(isclose(THI_vr(L,NY,NX),0._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
     ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
       THETI_vr(L,NY,NX)=0.0_r8
+    ELSE
+      THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
     ENDIF
 
   !in a cold run, set it

@@ -486,11 +486,11 @@ module StartsMod
           THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)
         ENDIF
         IF(THI_vr(L,NY,NX).GT.1.0_r8)THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(isclose(THI_vr(L,NY,NX),1.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(isclose(THI_vr(L,NY,NX),0.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
           THETI_vr(L,NY,NX)=0.0_r8
         ELSE
