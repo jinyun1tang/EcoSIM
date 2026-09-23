@@ -230,6 +230,7 @@ implicit none
     RadPARCanopyAbsorption_pft(NZ,NY,NX) = plt_rad%RadPARCanopyAbsorption_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)         = plt_morph%ClumpFactorNow_pft(NZ)
     FracPARads2Canopy_pft(NZ,NY,NX)      = plt_rad%FracPARads2Canopy_pft(NZ)
+    FracPARads2LiveCanopy_pft(NZ,NY,NX)  = plt_rad%FracPARads2LiveCanopy_pft(NZ)
     StomatalStress_pft(NZ,NY,NX)         = plt_biom%StomatalStress_pft(NZ)
     Eco_RadSW_col(NY,NX)                 = Eco_RadSW_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)

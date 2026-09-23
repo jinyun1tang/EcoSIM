@@ -212,7 +212,8 @@ implicit none
   real(r8), pointer :: RadSWLeafTransmitance_pft(:)  => null() !canopy shortwave transmissivity,                   [-]
   real(r8), pointer :: RadPARLeafTransmitance_pft(:) => null() !canopy PAR transmissivity,                         [-]
   real(r8), pointer :: RadPARCanopyAbsorption_pft(:)     => null() !canopy absorbed PAR,                               [umol m-2 s-1]
-  real(r8), pointer :: FracPARads2Canopy_pft(:)  => null() !fraction of incoming PAR absorbed by canopy,       [-]
+  real(r8), pointer :: FracPARads2Canopy_pft(:)     => null() !fraction of incoming PAR absorbed by total canopy, [-]
+  real(r8), pointer :: FracPARads2LiveCanopy_pft(:) => null() !fraction of incoming PAR absorbed by live canopy,  [-]
   real(r8), pointer :: RadTotPARAbsorption_zsec(:,:,:,:)      => null()     !direct incoming PAR,                           [umol m-2 s-1]
   real(r8), pointer :: RadDifPARAbsorption_zsec(:,:,:,:)   => null()  !diffuse incoming PAR,                             [umol m-2 s-1]
   contains
@@ -224,6 +225,7 @@ implicit none
   real(r8) :: LeafStalkAreaAll_col                       !stalk area of combined, each PFT canopy,[m^2 d-2]
   real(r8) :: CanopyLeafArea_col                      !grid canopy leaf area, [m2 d-2]
   real(r8) :: StemArea_col                            !grid canopy stem area, [m2 d-2]
+  real(r8) :: StandDeadSurfArea_col                   !grid canopy standing-dead surface area, [m2 d-2]
   real(r8) :: CanopyHeight_col                        !canopy height , [m]
   real(r8), pointer :: StalkAxialResist_pft(:)         => null() !stalk axial resistance per m for water transport, [MPa h m-4]
   real(r8), pointer :: RootSingleVesselArea_pft(:)               => null() !
@@ -1930,7 +1932,8 @@ implicit none
   allocate(this%RadPARLeafTransmitance_pft(JP1))
   allocate(this%RadSWLeafTransmitance_pft(JP1))
   allocate(this%RadPARCanopyAbsorption_pft(JP1))
-  allocate(this%FracPARads2Canopy_pft(JP1))
+  allocate(this%FracPARads2Canopy_pft(JP1));     this%FracPARads2Canopy_pft=0._r8
+  allocate(this%FracPARads2LiveCanopy_pft(JP1)); this%FracPARads2LiveCanopy_pft=0._r8
   end subroutine plt_rad_init
 !------------------------------------------------------------------------
   subroutine plt_rad_destroy(this)
@@ -2129,6 +2132,8 @@ implicit none
   subroutine plt_morph_init(this)
   implicit none
   class(plant_morph_type) :: this
+
+  this%StandDeadSurfArea_col = 0._r8
 
   allocate(this%RootMedTransptArea_pvr(jroots,JZ1,JP1)); this%RootMedTransptArea_pvr=spval
   allocate(this%Root1stTransptArea_pvr(jroots,JZ1,JP1)); this%Root1stTransptArea_pvr=spval

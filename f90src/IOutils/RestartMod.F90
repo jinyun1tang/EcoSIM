@@ -791,6 +791,22 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='FracPARads2LiveCanopy_pft', dim1name='pft',&
+     long_name='fraction of incoming PAR absorbed by live canopy', units='none', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FracPARads2LiveCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,FracPARads2LiveCanopy_pft,datrp_1d, &
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='FracPARads2LiveCanopy_pft', dim1name='pft',&
+     long_name='fraction of incoming PAR absorbed by live canopy', units='none', &
+     interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+  endif
+
+  if(flag=='read')then
+    datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='SeedTempSens_pft', dim1name='pft',&
      long_name='seed temperature sensitivity', units='1/oC', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)     

@@ -927,7 +927,8 @@ module InitPlantMod
     VHeatCapCanopy_pft      => plt_ew%VHeatCapCanopy_pft       ,& !output :canopy heat capacity, [MJ d-2 K-1]
     DeltaTKC_pft            => plt_ew%DeltaTKC_pft             ,& !output :change in canopy temperature, [K]
     ENGYX_pft               => plt_ew%ENGYX_pft                ,& !output :canopy heat storage from previous time step, [MJ d-2]
-    FracPARads2Canopy_pft   => plt_rad%FracPARads2Canopy_pft   ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       ,& !output :fraction of incoming PAR absorbed by total canopy, [-]
+    FracPARads2LiveCanopy_pft => plt_rad%FracPARads2LiveCanopy_pft   ,& !output :fraction of incoming PAR absorbed by live canopy, [-]
     PSICanopyTurg_pft       => plt_ew%PSICanopyTurg_pft        ,& !output :plant canopy turgor water potential, [MPa]
     TKGroth_pft             => plt_pheno%TKGroth_pft           ,& !output :canopy growth temperature, [K]
     Transpiration_pft       => plt_ew%Transpiration_pft        ,& !output :canopy transpiration, [m2 d-2 h-1]
@@ -954,7 +955,8 @@ module InitPlantMod
   PSICanopyOsmo_pft(NZ)     = OrganOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)     = AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))
   Transpiration_pft(NZ)     = 0._r8
-  FracPARads2Canopy_pft(NZ) = 0._r8
+  FracPARads2Canopy_pft(NZ)     = 0._r8
+  FracPARads2LiveCanopy_pft(NZ) = 0._r8
   FDM                       = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ)   = ppmc*CanopyLeafSheathC_pft(NZ)/FDM
   VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))

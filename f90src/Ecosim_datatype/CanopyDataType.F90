@@ -73,7 +73,8 @@ module CanopyDataType
   real(r8),target,allocatable ::  LWRadCanopy_pft(:,:,:)                     !canopy longwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadSWCanopyAbsorption_pft(:,:,:)                   !canopy absorbed shortwave radiation , [MJ d-2 h-1]
   real(r8),target,allocatable ::  RadPARCanopyAbsorption_pft(:,:,:)                  !canopy absorbed PAR , [umol m-2 s-1]
-  real(r8),target,allocatable ::  FracPARads2Canopy_pft(:,:,:)               !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8),target,allocatable ::  FracPARads2Canopy_pft(:,:,:)               !fraction of incoming PAR absorbed by total canopy, [-]
+  real(r8),target,allocatable ::  FracPARads2LiveCanopy_pft(:,:,:)           !fraction of incoming PAR absorbed by live canopy, [-]
   real(r8),target,allocatable ::  TAU_DirectSunSha(:,:,:)                         !fraction of radiation transmitted by canopy layer, [-]
   real(r8),target,allocatable ::  TAU_DirectSunLit(:,:,:)                 !fraction of radiation intercepted by canopy layer, [-]
   real(r8),target,allocatable ::  FracSWRad2Grnd_col(:,:)                    !fraction of radiation intercepted by ground surface, [-]
@@ -302,7 +303,8 @@ module CanopyDataType
   allocate(LWRadCanopy_pft(JP,JY,JX));    LWRadCanopy_pft=0._r8
   allocate(RadSWCanopyAbsorption_pft(JP,JY,JX));     RadSWCanopyAbsorption_pft=0._r8
   allocate(RadPARCanopyAbsorption_pft(JP,JY,JX));     RadPARCanopyAbsorption_pft=0._r8
-  allocate(FracPARads2Canopy_pft(JP,JY,JX));    FracPARads2Canopy_pft=0._r8
+  allocate(FracPARads2Canopy_pft(JP,JY,JX));        FracPARads2Canopy_pft=0._r8
+  allocate(FracPARads2LiveCanopy_pft(JP,JY,JX));    FracPARads2LiveCanopy_pft=0._r8
   allocate(TAU_DirectSunSha(NumCanopyLayers+1,JY,JX));   TAU_DirectSunSha=0._r8
   allocate(TAU_DirectSunLit(NumCanopyLayers+1,JY,JX));   TAU_DirectSunLit=0._r8
   allocate(FracSWRad2Grnd_col(JY,JX));       FracSWRad2Grnd_col=0._r8
@@ -511,6 +513,7 @@ module CanopyDataType
   call destroy(RadSWCanopyAbsorption_pft)
   call destroy(RadPARCanopyAbsorption_pft)
   call destroy(FracPARads2Canopy_pft)
+  call destroy(FracPARads2LiveCanopy_pft)
   call destroy(TAU_DirectSunSha)
   call destroy(TAU_DirectSunLit)
   call destroy(FracSWRad2Grnd_col)

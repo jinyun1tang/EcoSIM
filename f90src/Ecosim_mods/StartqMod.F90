@@ -152,7 +152,8 @@ module StartqMod
   PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)     = 0._r8
-  FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
+  FracPARads2Canopy_pft(NZ,NY,NX)     = 0._r8
+  FracPARads2LiveCanopy_pft(NZ,NY,NX) = 0._r8
 
   call PrintInfo('end '//subname)
   end associate

@@ -96,6 +96,7 @@ module SurfaceRadiationMod
     CanopyHeight_col            => plt_morph%CanopyHeight_col        ,& !input  :canopy height , [m]
     StemArea_col                => plt_morph%StemArea_col            ,& !input  :grid canopy stem area, [m2 d-2]
     CanopyLeafArea_col          => plt_morph%CanopyLeafArea_col      ,& !input  :grid canopy leaf area, [m2 d-2]
+    StandDeadSurfArea_col       => plt_morph%StandDeadSurfArea_col   ,& !input  :grid canopy standing-dead area, [m2 d-2]
     RawIsoTSurf2CanopyHScal_col => plt_ew%RawIsoTSurf2CanopyHScal_col,& !output :scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
     RawIsoTAtm2CanopySinkZ_col  => plt_ew%RawIsoTAtm2CanopySinkZ_col ,& !output :isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
     RawCanopyH2SinkZ_col        => plt_ew%RawCanopyH2SinkZ_col       ,& !output :isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
@@ -110,7 +111,7 @@ module SurfaceRadiationMod
   !     SnowDepth,DepthSurfWatIce=snowpack,surface water depths
   !     ZWind=reference height for wind speed
   !
-  ARLSC=CanopyLeafArea_col+StemArea_col
+  ARLSC=CanopyLeafArea_col+StemArea_col+StandDeadSurfArea_col
 !  IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO .AND. CanopyHeight_col.GE.DepthSurfWatIce-ZERO)THEN
   IF(ARLSC.GT.ZEROS .AND. CanopyHeight_col.GE.SnowDepth-ZERO)then 
     !
@@ -199,6 +200,7 @@ module SurfaceRadiationMod
     CanopyHeight_col           => plt_morph%CanopyHeight_col           ,& !inoput :canopy height , [m]
     CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col          ,& !output :canopy layer height, [m]
     ZERO4Groth_pft             => plt_biom%ZERO4Groth_pft              ,& !input  :threshold zero for plang growth calculation, [-]        
+    StandDeadSurfArea_col      => plt_morph%StandDeadSurfArea_col      ,& !output :grid canopy standing-dead area, [m2 d-2]
     StandDeadSurfArea_pft      => plt_morph%StandDeadSurfArea_pft      ,& !output :standing dead surface area, [m]    
     CanopySurfAreaProfDead_pft => plt_morph%CanopySurfAreaProfDead_pft ,& !output  :standing dead canopy surface area profile, [m2 d-2]    
     StandDeadStrutElms_pft     => plt_biom%StandDeadStrutElms_pft       & !output :standing dead element, [g d-2]    
@@ -255,7 +257,8 @@ module SurfaceRadiationMod
   DO L= 1, NumCanopyLayers1
     SLAProfileZ(L)=CanopyLeafAareZ_col(L)+CanopyStemAareZ_col(L)+CanopySurfAreaProfDeadZ_col(L) 
   ENDDO
-  SLA = CanopyLeafArea_col+StemArea_col+SUM(StandDeadSurfArea_pft(1:NP))
+  StandDeadSurfArea_col=SUM(StandDeadSurfArea_pft(1:NP))
+  SLA = CanopyLeafArea_col+StemArea_col+StandDeadSurfArea_col
 
   call DeriveCanopyHeightZ(SLA, CanopyHeight_col,SLAProfileZ,CanopyHeightZ_col)
 
@@ -452,6 +455,7 @@ module SurfaceRadiationMod
     SolarNoonHour_col            => plt_site%SolarNoonHour_col            ,& !input  :time of solar noon, [h]
     SineSunInclinationAngle_col  => plt_rad%SineSunInclinationAngle_col   ,& !input  :sine of solar inclination angle, [-]
     LeafStalkAreaAct_pft         => plt_morph%LeafStalkAreaAct_pft        ,& !input  :plant leaf+stem/stalk area, [m2 d-2]    
+    StandDeadSurfAreaAct_pft     => plt_morph%StandDeadSurfAreaAct_pft    ,& !input  :standing-dead surface area, [m2 d-2]
     LeafStalkAreaAll_col         => plt_morph%LeafStalkAreaAll_col        ,& !input  :stalk area of combined, each PFT canopy,[m^2 d-2]
     BulkFactor4Snow_col          => plt_ew%BulkFactor4Snow_col            ,& !input  :grid bulking factor for canopy snow interception effect on radiation, [m2 (m3 SWE)-1]
     fSnowCanopy_col              => plt_ew%fSnowCanopy_col                ,& !input  :fraction snow covered canopy, [-]
@@ -467,7 +471,8 @@ module SurfaceRadiationMod
     RadSWSolarBeam_col           => plt_rad%RadSWSolarBeam_col            ,& !output :shortwave radiation in solar beam, [MJ m-2 h-1]
     RadPARSolarBeam_col          => plt_rad%RadPARSolarBeam_col           ,& !output :PAR radiation in solar beam, [umol m-2 s-1]
     RadPARCanopyAbsorption_pft   => plt_rad%RadPARCanopyAbsorption_pft    ,& !output :canopy absorbed PAR, [umol m-2 s-1]
-    FracPARads2Canopy_pft        => plt_rad%FracPARads2Canopy_pft         ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2Canopy_pft        => plt_rad%FracPARads2Canopy_pft         ,& !output :fraction of incoming PAR absorbed by total canopy, [-]
+    FracPARads2LiveCanopy_pft    => plt_rad%FracPARads2LiveCanopy_pft     ,& !output :fraction of incoming PAR absorbed by live canopy, [-]
     RadSWGrnd_col                => plt_rad%RadSWGrnd_col                 ,& !output :radiation intercepted by ground surface, [MJ m-2 h-1]
     RadPARGrnd_col               => plt_rad%RadPARGrnd_col                ,& !output :PAR radiation reaching the ground, [umol m-2 s-1]
     ClumpFactorNow_pft           => plt_morph%ClumpFactorNow_pft           & !output :clumping factor for self-shading in canopy layer at current LAI, [-]
@@ -581,11 +586,13 @@ module SurfaceRadiationMod
     ENDIF
 
     D145: DO NZ=1,NP
-      FracPARads2Canopy_pft(NZ) = FRadPARbyLeafT*LeafStalkAreaAct_pft(NZ)/LeafStalkAreaAll_col
+      FracPARads2Canopy_pft(NZ) = FRadPARbyLeafT*(LeafStalkAreaAct_pft(NZ)+StandDeadSurfAreaAct_pft(NZ))/LeafStalkAreaAll_col
+      FracPARads2LiveCanopy_pft(NZ) = FRadPARbyLeafT*LeafStalkAreaAct_pft(NZ)/LeafStalkAreaAll_col
     ENDDO D145
   ELSE
     D146: DO NZ=1,NP
       FracPARads2Canopy_pft(NZ)=0.0_r8
+      FracPARads2LiveCanopy_pft(NZ) = 0._R8
     ENDDO D146
   ENDIF
   call PrintInfo('end '//subname)

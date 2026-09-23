@@ -208,6 +208,7 @@ implicit none
     plt_ew%SnowOnCanopy_pft(NZ)            = SnowOnCanopy_pft(NZ,NY,NX)
     plt_ew%WatHeldOnCanopy_pft(NZ)         = WatHeldOnCanopy_pft(NZ,NY,NX)     !water held by canopy surface
     plt_rad%FracPARads2Canopy_pft(NZ)      = FracPARads2Canopy_pft(NZ,NY,NX)
+    plt_rad%FracPARads2LiveCanopy_pft(NZ)  = FracPARads2LiveCanopy_pft(NZ,NY,NX)
     plt_ew%HeatXAir2PCan_pft(NZ)           = HeatXAir2PCan_pft(NZ,NY,NX)
     plt_rad%RadPARCanopyAbsorption_pft(NZ) = RadPARCanopyAbsorption_pft(NZ,NY,NX)      !computed from surface energy module
     plt_rad%RadSWCanopyAbsorption_pft(NZ)  = RadSWCanopyAbsorption_pft(NZ,NY,NX)       !computed from surface energy module

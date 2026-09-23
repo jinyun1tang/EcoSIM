@@ -57,7 +57,8 @@ contains
     LeafProteinC_node           => plt_biom%LeafProteinC_node             ,& !inoput :layer leaf protein C, [g d-2]
     StructInternodeElms_brch    => plt_biom%StructInternodeElms_brch      ,& !inoput :internode C, [g d-2]
     CanopyLeafSheathC_pft       => plt_biom%CanopyLeafSheathC_pft         ,& !inoput :canopy leaf + sheath C, [g d-2]
-    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by total canopy, [-]
+    FracPARads2LiveCanopy_pft   => plt_rad%FracPARads2LiveCanopy_pft      ,& !inoput :fraction of incoming PAR absorbed by live canopy, [-]
     CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft            ,& !inoput :canopy active stalk C, [g d-2]
     isPlantBranchAlive_brch     => plt_pheno%isPlantBranchAlive_brch      ,& !inoput :flag to detect branch death, [-]
     MaxNumRootAxes              => pltpar%MaxNumRootAxes                  ,& !input  : maximum number root axes,[-]
@@ -95,7 +96,8 @@ contains
   !     VHeatCapCanopy_pft=canopy heat capacity
 
   XHVST1                    = 1._r8-XHVST
-  FracPARads2Canopy_pft(NZ) = FracPARads2Canopy_pft(NZ)*XHVST
+  FracPARads2Canopy_pft(NZ)     = FracPARads2Canopy_pft(NZ)*XHVST
+  FracPARads2LiveCanopy_pft(NZ) = FracPARads2LiveCanopy_pft(NZ)*XHVST
   VHeatCapCanopy_pft(NZ)    = VHeatCapCanopy_pft(NZ)*XHVST
   CanopyLeafSheathC_pft(NZ) = 0._r8
   CanopySapwoodC_pft(NZ)    = 0._r8
