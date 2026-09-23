@@ -100,6 +100,7 @@ message("-- CXX compiler is ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
 message("-- Fortran compiler is ${CMAKE_Fortran_COMPILER} (${CMAKE_Fortran_COMPILER_ID})")
 
 set_up_compilers()
+include(build_timing)
 
 if (BGC)
   set (ECOSIM_BGC 1)
