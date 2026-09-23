@@ -659,7 +659,6 @@ module WatsubMod
   
   !If waterlevel is fixed, like shallow lake, without considering the change
   !of water depth due to hydrological fluxes 
-  LInvalidMacP=.false.  !macropore flow enabled when false
 
   DO NX=NHW,NHE    !sweep from west to east
     DO NY=NVN,NVS  !sweep from north to south
@@ -741,7 +740,7 @@ module WatsubMod
                 KSatRedusByRainKinetEnergy(NY,NX),PredDarcyFlowMax,WatDarcyFlowMicP,&
                 HeatByDarcyFlowMicP,PSISV1,PSISVL)          
                 
-              call MacropXgridFLow(N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LInvalidMacP)
+              call MacropXgridFLow(N,N1,N2,N3,N4,N5,N6,WaterMacpFlow,HeatByFlowMacP,LMacPoreOff)
 
               call WaterVaporXgridFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,ConvectVapFlux,HeatByConvectVapFlux)
           

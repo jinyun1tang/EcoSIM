@@ -872,7 +872,7 @@ module UptakesMod
         endif
         !
         VapXAir2Canopy_pft(NZ)=VapXAir2CanopyLiq_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
-        EX                    = EX-VapXAir2CanopyLiq_pft(NZ)                        !demand for transpiration
+        EX                    = EX-VapXAir2Canopy_pft(NZ)                        !demand for transpiration
       ELSE
         VapXAir2Canopy_pft(NZ)    = 0._r8
         VapXAir2CanopyLiq_pft(NZ) = 0.0_r8
