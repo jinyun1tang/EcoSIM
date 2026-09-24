@@ -62,6 +62,7 @@ module SurfaceRadiationMod
     !do prescribed phenolgoy mode
     call SetCanopyProfile(I,J,LeafAreaZsecLive_lpft,StemAreaZsecLive_lpft)
     SurfAreaZsecDead_lpft=0._r8
+    plt_morph%StandDeadSurfAreaAct_pft=0._r8
   else
     call DeriveCanopyHeightProfile(I,J,SurfAreaZsecDead_lpft)
 

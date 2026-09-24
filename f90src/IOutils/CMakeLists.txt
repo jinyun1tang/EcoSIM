@@ -3,7 +3,18 @@ set(IOUTILS_SOURCES
     ForcWriterMod.F90
   	ClimReadMod.F90
     PlantInfoMod.F90
-	  HistDataType.F90
+    HistDataType.F90
+    HistData/HistAllocateColumn.F90
+    HistData/HistAllocatePlant.F90
+    HistData/HistAllocateProfile.F90
+    HistData/HistRegisterColumn.F90
+    HistData/HistRegisterPlant.F90
+    HistData/HistRegisterSoilBGC.F90
+    HistData/HistRegisterSoilPhysRoot.F90
+    HistData/HistUpdate.F90
+    HistData/HistUpdateColumn.F90
+    HistData/HistUpdateSoil.F90
+    HistData/HistUpdatePlant.F90
     MicrobeInfoMod.F90
     HistFileMod.F90
     restUtilMod.F90

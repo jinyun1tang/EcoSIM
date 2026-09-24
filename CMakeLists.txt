@@ -1,6 +1,6 @@
 # NOTE: this is the old CMake file for compiling with a UNIX Makefile
-# Minimum CMake version, determined by hdf5.
-cmake_minimum_required (VERSION 3.5)
+# Fortran submodule dependency scanning requires CMake 3.12.
+cmake_minimum_required (VERSION 3.12)
 
 # Version numbers.
 set (ECOSIM_MAJOR_VERSION 0)

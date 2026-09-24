@@ -205,7 +205,8 @@ write_timing_summary() {
   if [ -f "$ECOSIM_BUILD_TIMING_LOG" ]; then
     "$timing_python" "$timing_script" report --log "$ECOSIM_BUILD_TIMING_LOG" \
       --run-id "$ECOSIM_BUILD_RUN_ID" > "$timing_summary"
-    cat "$timing_summary"
+    # Keep per-command details in the file; print only the phase summary.
+    sed '/^Compile\/link steps, slowest first:/,$d' "$timing_summary"
     echo "Timing summary: $timing_summary"
   fi
   return "$build_status"
