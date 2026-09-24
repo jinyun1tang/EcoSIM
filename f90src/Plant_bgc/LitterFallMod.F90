@@ -566,6 +566,11 @@ implicit none
 !     RESET STATE VARIABLES OF DEAD ROOTS
 !
 !
+    ! Clear cytokinin for all layers and axes when the entire root system dies.
+    plt_rbgc%Cytokinin2ndConc_rpvr(:,:,:,NZ) = 0._r8
+    plt_rbgc%CytokininMRConc_rpvr(:,:,NZ)    = 0._r8
+    plt_rbgc%Cytokinin1stConc_rpvr(:,:,NZ)   = 0._r8
+
     D8870: DO NR=1,NumStructuralRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays       
         RootMyco1stStrutElms_rpvr(1:NumPlantChemElms,L,NR,NZ) = 0._r8
