@@ -1,6 +1,6 @@
 ---
 name: ecosim-smoke-run
-description: "Run every EcoSIM example case for a few simulated days in an isolated scratch mirror and report which ones fail. Use when asked to smoke-test, sanity-check, or regression-screen the example cases after a Fortran change, to verify a build still runs end to end, or to check example namelists for startup and early-timestep failures. Also use before opening a PR that touches f90src/."
+description: "Run every EcoSIM example case for 20 simulated days by default in an isolated scratch mirror and report which ones fail. Use when asked to smoke-test, sanity-check, or regression-screen the example cases after a Fortran change, to verify a build still runs end to end, or to check example namelists for startup and early-timestep failures. Also use before opening a PR that touches f90src/."
 ---
 
 # EcoSIM Example Smoke Run
@@ -34,13 +34,16 @@ cmake --build build/<configuration> --parallel 8
 Then run the smoke test from the repository root:
 
 ```bash
-.agents/skills/ecosim-smoke-run/scripts/run_smoke.sh            # all cases, 10 days
+.agents/skills/ecosim-smoke-run/scripts/run_smoke.sh            # all cases, 20 days
 .agents/skills/ecosim-smoke-run/scripts/run_smoke.sh -d 2       # faster screen
 .agents/skills/ecosim-smoke-run/scripts/run_smoke.sh biocrust dryland   # subset
 ```
 
-Options: `-d DAYS` (default 10), `-b BUILD_DIR` (default: newest under `build/`),
+Options: `-d DAYS` (default 20), `-b BUILD_DIR` (default: newest under `build/`),
 `-o WORKDIR` (default: a `mktemp -d`), `-t CPU_SECS` per-case cap (default 1800).
+
+The default run must complete 480 hourly steps (20 days x 24 hours). Use
+`-d DAYS` when the user explicitly requests a different duration.
 
 ### Excluded namelists
 
@@ -72,7 +75,7 @@ To re-scan existing output without re-running:
 python3 .agents/skills/ecosim-smoke-run/scripts/check_history.py <dir-with-h0-files>
 ```
 
-Reference run: all 17 namelists across 13 case directories pass at 10 days in
+Historical 10-day reference run: all 17 namelists across 13 case directories pass at 10 days in
 roughly 45 s total on an arm64 Mac. That count includes `dryland2`, which is
 now excluded (see above), so expect 16 rows from a compliant run.
 

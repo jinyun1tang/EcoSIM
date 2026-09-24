@@ -7,7 +7,7 @@
 # Usage:
 #   run_smoke.sh [-d DAYS] [-b BUILD_DIR] [-o WORKDIR] [-t CPU_SECS] [case ...]
 #
-#   -d DAYS       simulated days per case            (default 10)
+#   -d DAYS       simulated days per case            (default 20)
 #   -b BUILD_DIR  build configuration directory      (default: autodetect newest)
 #   -o WORKDIR    scratch directory to run in        (default: mktemp -d)
 #   -t CPU_SECS   per-case CPU-time cap              (default 1800)
@@ -17,7 +17,7 @@
 
 set -uo pipefail
 
-DAYS=10
+DAYS=20
 BUILD_DIR=""
 WORKDIR=""
 CPU_CAP=1800
