@@ -224,6 +224,8 @@ implicit none
 !  call SumRootAR(NZ);call SumLitfallBlg(NZ)
 !  tmpval=plt_bgcr%LitrfallBlgrElms_pft(ielmn,NZ)
   plt_morph%RootMediumVH2O_rpvr(:,:,NZ)  = 0._r8
+  ! Production is a current-hour rate; skipped growth must not reuse the previous rate.
+  plt_rbgc%RootMRProdCytok_rpvr(:,:,NZ) = 0._r8
   D5010: DO N=1,Myco_pft(NZ)
     D5000: DO L=NU,MaxNumRootLays+1
 
@@ -4727,12 +4729,15 @@ implicit none
   real(r8), parameter :: phi_min =0.4_r8  
   real(r8), parameter :: phi_max =0.7_r8  !asymptotic limit of the conductive area fraction, [m2/m2]
   real(r8), parameter :: R_cri = 0.05     !Critical radius where the woody radius is considered 95% mature, [m]
-  real(r8) :: LumenFraction
+  real(r8) :: LumenFraction, SingleMRootLumenArea
+  real(r8) :: MediumRootCount(JZ1), MediumMass, MediumMassLeft, MediumInMass, ExportMass
+  real(r8) :: FineVolume, FineMass, FineMassLeft, FineExport, FlowVolume
+  real(r8), parameter :: dtCyto = 1._r8 !hourly cytokinin update, [h]
   real(r8) :: Cytokinin1stConc_copy(JZ1)
   real(r8) :: d_effective_hourly(JZ1)
   real(r8) :: d_water_hourly
   integer  :: NU_loc
-  real(r8) :: lumenVol,sap_area,sap_area_root,sapAreaLeaf
+  real(r8) :: sap_area,sap_area_root,sapAreaLeaf
   real(r8) :: Xe(JZ1),lumenVolC,lumenVolM
   real(r8) :: Root2ndSinkT,QH2OMediumRoots,fMR
   real(r8) :: Root2ndCumSinkProf(JZ1),fMR_numer(JZ1),fMR_denorm(JZ1)
@@ -4757,10 +4762,9 @@ implicit none
     Root1stRadius_rpvr             => plt_morph%Root1stRadius_rpvr               ,& !input  :root layer radius for each primary axes, [m]
     NGTopRootLayer_pft             => plt_morph%NGTopRootLayer_pft               ,& !input  :soil layer at planting depth, [-]
     MaxSoilLays4Root_pft           => plt_morph%MaxSoilLays4Root_pft             ,& !input  :maximum soil layer number for all root axes,[-]
-    RootMediumXNum_pvr             => plt_morph%RootMediumXNum_pvr               ,& !input  :Number of medium size root axes in layer, [d-2]    
     Root2ndProdCytok_rpvr          => plt_rbgc%Root2ndProdCytok_rpvr             ,& !input  :cytokinin production rate due to fine root/myco elongation, [gC CK h-1]
     RootMRProdCytok_rpvr           => plt_rbgc%RootMRProdCytok_rpvr              ,& !input  :cytokinin production rate due to medium roots metabolism, [gC CK h-1]
-    RootMediumVH2O_rpvr            => plt_morph%RootMediumVH2O_rpvr              ,& !input  :water-occupied medium root volume, [m3 H2O m-3]    
+    RootMediumVH2O_rpvr            => plt_morph%RootMediumVH2O_rpvr              ,& !output :population medium-root lumen volume for axis NR, [m3 H2O]
     Root2ndVH2O_rpvr               => plt_morph%Root2ndVH2O_rpvr                 ,& !input  :water-occupied 2nd root volume, [m3 H2O m-3]
     Root1stVH2O_rpvr               => plt_morph%Root1stVH2O_rpvr                 ,& !input  :water-occupied 1st root volume, [m3 H2O m-3]
     xylemPhi_min_pft               => plt_morph%xylemPhi_min_pft                 ,& !input  :the fraction found in the youngest xylem that as lumen for tree, [m2/m2]
@@ -4768,14 +4772,14 @@ implicit none
     xylemPhi_mean_pft              => plt_morph%xylemPhi_mean_pft                ,& !input  :the mean are fraction found in the root xylem as lumen for non-tree roots, [m2/m2]
     RootSinkScalar_pvr             => plt_morph%RootSinkScalar_pvr               ,& !input  :root sink scalar to account for the missing of intermediate size roots, [0-1]
     RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !input  :total medium root length in layer for for axis NR, [m d-2]      
-    RootMediumLength_pvr           => plt_morph%RootMediumLength_pvr             ,& !input  :within layer mean length for medium size root axes, [m d-2]          
+    RootMediumLength_pvr           => plt_morph%RootMediumLength_pvr             ,& !output :within layer mean length of individual medium roots, [m]
     SapFlowVLinear_rpvr            => plt_ew%SapFlowVLinear_rpvr                 ,& !output :linear sap flow for primary root axis normalized by lumen area, [m h-1]
     Cytokinin2ndConc_rpvr          => plt_rbgc%Cytokinin2ndConc_rpvr             ,& !output :cytokinin concentration in fine roots, [gC m-3 H2O]
     Cytokinin1stConc_rpvr          => plt_rbgc%Cytokinin1stConc_rpvr             ,& !output :cytokinin concentration in corase roots, [gC m-3 H2O]
     CytokininMRConc_rpvr           => plt_rbgc%CytokininMRConc_rpvr              ,& !output :cytokinin concentration in medium size roots, [gC m-3 H2O]
     CRootLumenArea_rpvr            => plt_morph%CRootLumenArea_rpvr              ,& !output :coarse roots lumen area for root axes, [m2]    
     CRootLumenArea_pvr             => plt_morph%CRootLumenArea_pvr               ,& !output :roots lumen area for coarse root, [m2]    
-    MRootLumenArea_rpvr            => plt_morph%MRootLumenArea_rpvr              ,& !output :Medium size roots lumen area for root axes, [m2]
+    MRootLumenArea_rpvr            => plt_morph%MRootLumenArea_rpvr              ,& !output :population medium-root lumen area for axis NR, [m2]
     RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !inoput :Number of medium size root axes in layer for structrual axes, [d-2]    
     RootFineFrac2Med_pvr           => plt_morph%RootFineFrac2Med_pvr             ,& !output :fraction of fine roots that are associated with medium roots, [-]
     MRootLumenArea_pvr             => plt_morph%MRootLumenArea_pvr               ,& !output :Lumen area for medium size root, [m2]
@@ -4787,6 +4791,13 @@ implicit none
   call PrintInfo('beg '//subname)
   
   !fine roots and mycorrhizae are assumed to functioning in parallel
+  MRootLumenArea_rpvr(:,:,NZ) = 0._r8
+  RootMediumVH2O_rpvr(:,:,NZ) = 0._r8
+  MRootLumenArea_pvr(:,NZ) = 0._r8
+  RootMediumLength_pvr(:,NZ) = 0._r8
+  RootFineFrac2Med_pvr(:,NZ) = 0._r8
+  QH2Oroots_rpvr = 0._r8
+  MediumRootCount = 0._r8
   if(NumStructuralRootAxes_pft(NZ).EQ.0)return
   !1. compute the water flux and linear sapflow for each NR, assuming no compressibility
   !2. compute fine root cytokinin net production 
@@ -4796,8 +4807,6 @@ implicit none
   SapFlowVlinear_pvr(:,NZ) = 0._r8
   tlumenArea(:)            = 0._r8
   CRootLumenArea_pvr(:,NZ)  = 0._r8
-  MRootLumenArea_pvr(:,NZ) = 0._r8
-  RootMediumLength_pvr(:,NZ)=0._r8
   if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then          
     !sum up the total sink strength
     Root2ndSinkT = sum(Root2ndSink_pvr(ipltroot,NU:MaxSoilLays4Root_pft(NZ),:))
@@ -4833,14 +4842,18 @@ implicit none
         !Both candidate sapwood areas represent the population; retain a per-plant lumen-area floor.
         CRootLumenArea_rpvr(L,NR,NZ) = AMAX1(sap_area*LumenFraction,1.E-9_R8*PlantPopuLive_pft(NZ)) &
           /RootSinkScalar_pvr(L,NR,NZ)
-        if(RootMediumXNum_pvr(L,NZ).GT.0._r8)then
+        if(RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. &
+           RootMediumLength_rpvr(L,NR,NZ).GT.0._r8)then
           !medium size roots
           LumenFraction = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-sfexp(-3._r8*RootMediumRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))
           sap_area_root = GetCoarseRootXylemSecArea(dmax,RootMediumRadius_rpvr(L,NR,NZ))
-          MRootLumenArea_rpvr(L,NR,NZ) = sap_area_root*LumenFraction
-          RootMediumVH2O_rpvr(L,NR,NZ) = MRootLumenArea_rpvr(L,NR,NZ)*RootMediumLength_rpvr(L,NR,NZ)
-          MRootLumenArea_pvr(L,NZ)     = MRootLumenArea_pvr(L,NZ)+MRootLumenArea_rpvr(L,NR,NZ)*RootMediumXNum_rpvr(L,NR,NZ)
-          RootMediumLength_pvr(L,NZ)   = RootMediumLength_pvr(L,NZ)+RootMediumLength_rpvr(L,NR,NZ)/RootMediumXNum_pvr(L,NZ)
+          SingleMRootLumenArea = sap_area_root*LumenFraction
+          !Count and total length already include the population; apply each only once.
+          MRootLumenArea_rpvr(L,NR,NZ) = SingleMRootLumenArea*RootMediumXNum_rpvr(L,NR,NZ)
+          RootMediumVH2O_rpvr(L,NR,NZ) = SingleMRootLumenArea*RootMediumLength_rpvr(L,NR,NZ)
+          MRootLumenArea_pvr(L,NZ)     = MRootLumenArea_pvr(L,NZ)+MRootLumenArea_rpvr(L,NR,NZ)
+          RootMediumLength_pvr(L,NZ)   = RootMediumLength_pvr(L,NZ)+RootMediumLength_rpvr(L,NR,NZ)
+          MediumRootCount(L)          = MediumRootCount(L)+RootMediumXNum_rpvr(L,NR,NZ)
         else
           MRootLumenArea_rpvr(L,NR,NZ) = 0._r8
           RootMediumVH2O_rpvr(L,NR,NZ) = 0._r8
@@ -4876,6 +4889,12 @@ implicit none
       SapFlowVlinear_pvr(L,NZ)     = SapFlowVlinear_pvr(L,NZ)+Root1stVH2O_rpvr(L,NR,NZ)
     ENDDO  
   ENDDO DNR100
+
+  DO L=NU_loc,MaxSoilLays4Root_pft(NZ)
+    if(MediumRootCount(L).GT.0._r8)then
+      RootMediumLength_pvr(L,NZ)=RootMediumLength_pvr(L,NZ)/MediumRootCount(L)
+    endif
+  ENDDO
   
   DO L=MaxSoilLays4Root_pft(NZ),NU_loc,-1
     IF(.not.isclose(tlumenArea(L),0._r8))then
@@ -4893,36 +4912,53 @@ implicit none
     !make a copy
     DO L=MaxSoilLays4Root_pft(NZ),NU_loc,-1      
       L1=MIN(L+1,NK)            
-      if(Root1stVH2O_rpvr(L,NR,NZ).GT.0._r8 .and. CRootLumenArea_rpvr(L,NR,NZ).GT.0._r8)then
-        if(MRootLumenArea_rpvr(L,NR,NZ).GT.0._r8 .and. RootMediumVH2O_rpvr(L,NR,NZ).GT.0._r8)then
-          !there is medium roots, so fine roots cytokinin flux is passed into medium size roots then to coarse roots
-          lumenVolM=MRootLumenArea_rpvr(L,NR,NZ)*DLYR3(L)        
-          lumenVolC=CRootLumenArea_rpvr(L,NR,NZ)*DLYR3(L)   
-          !add fine root production from current layer
-          fMR           = RootMediumLength_rpvr(L,NR,NZ)/(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ))
-          fMR_numer(L)  = fMR_numer(L)+RootMediumLength_rpvr(L,NR,NZ)
-          fMR_denorm(L) = fMR_denorm(L)+RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ)
-          QH2OMediumRoots=0._r8
-          DO N=1,Myco_pft(NZ)
-            QH2OMediumRoots               = QH2OMediumRoots+QH2Oroots_rpvr(N,L,NR)*fMR
-            CytokininMRConc_rpvr(L,NR,NZ) = CytokininMRConc_rpvr(L,NR,NZ)+fMR*Cytokinin2ndConc_rpvr(N,L,NR,NZ)*QH2Oroots_rpvr(N,L,NR)/lumenVolM
-            Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ)+(1._r8-fMR)*Cytokinin2ndConc_rpvr(N,L,NR,NZ)*QH2Oroots_rpvr(N,L,NR)/lumenVolC
-          ENDDO
-          CytokininMRConc_rpvr(L,NR,NZ) = CytokininMRConc_rpvr(L,NR,NZ)+RootMRProdCytok_rpvr(L,NR,NZ)/RootMediumVH2O_rpvr(L,NR,NZ)
-          !decay
-          CytokininMRConc_rpvr(L,NR,NZ)=AZMAX1(CytokininMRConc_rpvr(L,NR,NZ)*sfexp(-kDCytof(1)))
-
-          !pass it to coarse roots
-          Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ)+CytokininMRConc_rpvr(L,NR,NZ)*QH2OMediumRoots/lumenVolC
-        else
-          lumenVol=CRootLumenArea_rpvr(L,NR,NZ)*DLYR3(L)        
-          !add fine root production from current layer
-          DO N=1,Myco_pft(NZ)
-            Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ)+Cytokinin2ndConc_rpvr(N,L,NR,NZ)*QH2Oroots_rpvr(N,L,NR)/lumenVol
-          ENDDO
-        endif  
-        Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ))
+      lumenVolC=CRootLumenArea_rpvr(L,NR,NZ)*DLYR3(L)
+      lumenVolM=RootMediumVH2O_rpvr(L,NR,NZ)
+      fMR=0._r8
+      if(lumenVolM.GT.0._r8)then
+        !The routing fraction is geometric, including when water flow is zero.
+        !DLYR3(L) as an approximation for coarse-root length
+        fMR = RootMediumLength_rpvr(L,NR,NZ)/(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ))
+        fMR_numer(L)  = fMR_numer(L)+RootMediumLength_rpvr(L,NR,NZ)
+        fMR_denorm(L) = fMR_denorm(L)+RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ)
       endif
+      QH2OMediumRoots=0._r8
+      MediumInMass=0._r8
+      if(lumenVolC.GT.0._r8)then
+        DO N=1,Myco_pft(NZ)
+          QH2OMediumRoots = QH2OMediumRoots+QH2Oroots_rpvr(N,L,NR)*fMR
+          FineVolume = Root2ndVH2O_rpvr(N,L,NR,NZ)
+          FlowVolume = AZMAX1(QH2Oroots_rpvr(N,L,NR))*dtCyto
+          FineExport = 0._r8
+          if(FineVolume.GT.0._r8 .and. FlowVolume.GT.0._r8)then
+            !Production and decay were applied in DNR100. Debit each donor once.
+            FineMass = AZMAX1(Cytokinin2ndConc_rpvr(N,L,NR,NZ))*FineVolume
+            FineMassLeft = FineMass*(FineVolume/(FineVolume+FlowVolume))
+            FineExport = FineMass-FineMassLeft
+            Cytokinin2ndConc_rpvr(N,L,NR,NZ) = FineMassLeft/FineVolume
+          endif
+          !Split the same exported mass; without medium roots fMR is zero.
+          MediumInMass = MediumInMass+fMR*FineExport
+          Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ) &
+            +(1._r8-fMR)*FineExport/lumenVolC
+        ENDDO
+      endif
+      if(lumenVolM.GT.0._r8)then
+        !Population mass after sources and decay; local metabolism continues at zero flow.
+        MediumMass = AMAX1(0._r8,CytokininMRConc_rpvr(L,NR,NZ)*lumenVolM+MediumInMass &
+          +RootMRProdCytok_rpvr(L,NR,NZ)*dtCyto)*sfexp(-kDCytof(1)*dtCyto)
+        if(QH2OMediumRoots.GT.0._r8 .and. lumenVolC.GT.0._r8)then
+          !Implicit well-mixed outflow: export cannot exceed the donor inventory.
+          MediumMassLeft = MediumMass*(lumenVolM/(lumenVolM+QH2OMediumRoots*dtCyto))
+          ExportMass = MediumMass-MediumMassLeft
+          MediumMass = MediumMassLeft
+          Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ)+ExportMass/lumenVolC
+        endif
+        CytokininMRConc_rpvr(L,NR,NZ)=MediumMass/lumenVolM
+      else
+        CytokininMRConc_rpvr(L,NR,NZ)=0._r8
+      endif
+      Cytokinin1stConc_rpvr(L,NR,NZ) = AZMAX1(Cytokinin1stConc_rpvr(L,NR,NZ))
       CRootLumenArea_rpvr(L,NR,NZ) = CRootLumenArea_rpvr(L,NR,NZ) +1.e-12_r8      
     ENDDO
 
