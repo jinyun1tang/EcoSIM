@@ -1945,6 +1945,7 @@ module PlantDisturbsMod
     PetolShethStrutElms_brch  => plt_biom%PetolShethStrutElms_brch    ,& !input  :branch sheath structural element, [g d-2]
     CanopyCutProxy_pft        => plt_distb%CanopyCutProxy_pft         ,& !input  :harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
     PSICanopy_pft             => plt_ew%PSICanopy_pft                 ,& !input  :canopy total water potential, [Mpa]
+    SapwoodBiomassC_brch     => plt_biom%SapwoodBiomassC_brch      ,& !input  :remaining branch sapwood C, [gC d-2]
     CanopySapwoodC_pft        => plt_biom%CanopySapwoodC_pft          ,& !input  :canopy active stalk C, [g d-2]
     CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft       ,& !input  :canopy leaf + sheath C, [g d-2]
     LeafStrutElms_brch        => plt_biom%LeafStrutElms_brch          ,& !input  :branch leaf structural element mass, [g d-2]
@@ -1954,9 +1955,9 @@ module PlantDisturbsMod
     StemSpecVolume_pft        => plt_morph%StemSpecVolume_pft         ,& !input  :stalk specific volume, [m3 gC-1]        
     iHarvstType_pft           => plt_distb%iHarvstType_pft            ,& !input  :type of harvest,[-]
     CanopyBiomWater_pft       => plt_ew%CanopyBiomWater_pft           ,& !inoput :canopy water content, [m3 d-2]
-    QCanopyWat2Dist_col       => plt_ew%QCanopyWat2Dist_col           ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
+    QCanopyWatLoss2Dist_col       => plt_ew%QCanopyWatLoss2Dist_col           ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
     VHeatCapCanopy_pft        => plt_ew%VHeatCapCanopy_pft            ,& !inoput :canopy heat capacity, [MJ d-2 K-1]
-    HeatCanopy2Dist_col       => plt_ew%HeatCanopy2Dist_col           ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
+    CanopyHeatLoss2Dist_col   => plt_ew%CanopyHeatLoss2Dist_col       ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
     QH2OLoss_lnds             => plt_site%QH2OLoss_lnds               ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
     H2OLoss_CumYr_col         => plt_ew%H2OLoss_CumYr_col             ,& !inoput :total subsurface water flux, [m3 d-2]
     CanopyLeafSheathC_brch    => plt_biom%CanopyLeafSheathC_brch      ,& !output :plant branch leaf + sheath C, [g d-2]
@@ -1993,19 +1994,6 @@ module PlantDisturbsMod
     !
     CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
 
-    VOLWPX              = CanopyBiomWater_pft(NZ)
-    VHeatCapCanopyPrev  = VHeatCapCanopy_pft(NZ)
-    CanopyMassC         = AZMAX1(CanopyLeafSheathC_pft(NZ)+CanopySapwoodC_pft(NZ))
-    FDM                 = get_FDM(PSICanopy_pft(NZ))    !drymatter/water = fdm
-
-    CanopyBiomWater_pft(NZ) = 1.e-6_r8*CanopyMassC/FDM
-    watflx              = VOLWPX-CanopyBiomWater_pft(NZ)
-    QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
-    H2OLoss_CumYr_col   = H2OLoss_CumYr_col+watflx
-
-    VHeatCapCanopy_pft(NZ) = cpw*(CanopyMassC*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
-    QCanopyWat2Dist_col    = QCanopyWat2Dist_col+watflx
-    HeatCanopy2Dist_col    = HeatCanopy2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
     !
     !     RESET PHENOLOGY, GROWTH STAGE IF STALKS ARE CUT
     !
@@ -2038,6 +2026,23 @@ module PlantDisturbsMod
     endif
     
   ENDDO D9835  
+  !Keep pre-harvest PFT totals fixed while allocating removal among branches.
+  !After all branches are cut, update canopy water and heat once per PFT.
+  VOLWPX                    = CanopyBiomWater_pft(NZ)
+  VHeatCapCanopyPrev        = VHeatCapCanopy_pft(NZ)
+  CanopyLeafSheathC_pft(NZ) = SUM(CanopyLeafSheathC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopySapwoodC_pft(NZ)    = SUM(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopyMassC               = AZMAX1(CanopyLeafSheathC_pft(NZ)+CanopySapwoodC_pft(NZ))
+  FDM                       = get_FDM(PSICanopy_pft(NZ))    !drymatter/water = fdm
+
+  CanopyBiomWater_pft(NZ) = 1.e-6_r8*CanopyMassC/FDM
+  watflx              = VOLWPX-CanopyBiomWater_pft(NZ)
+  QH2OLoss_lnds       = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
+  H2OLoss_CumYr_col   = H2OLoss_CumYr_col+watflx
+
+  VHeatCapCanopy_pft(NZ)  = cpw*(CanopyMassC*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
+  QCanopyWatLoss2Dist_col = QCanopyWatLoss2Dist_col+watflx
+  CanopyHeatLoss2Dist_col = CanopyHeatLoss2Dist_col+(VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
   call PrintInfo('end '//subname)
   end associate
   end subroutine CutPlant

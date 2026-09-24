@@ -928,8 +928,8 @@ module InitPlantMod
     CanopyLeafSheathC_pft   => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
     ShootElms_pft           => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     StemSpecVolume_pft      => plt_morph%StemSpecVolume_pft    ,& !input  :stalk specific volume, [m3 gC-1]        
-    HeatCanopy2Dist_col     => plt_ew%HeatCanopy2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
-    QCanopyWat2Dist_col     => plt_ew%QCanopyWat2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
+    CanopyHeatLoss2Dist_col     => plt_ew%CanopyHeatLoss2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
+    QCanopyWatLoss2Dist_col     => plt_ew%QCanopyWatLoss2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
     CanopyBiomWater_pft     => plt_ew%CanopyBiomWater_pft      ,& !output :canopy water content, [m3 d-2]
     PSICanopyOsmo_pft       => plt_ew%PSICanopyOsmo_pft        ,& !output :canopy osmotic water potential, [Mpa]
     PSICanopy_pft           => plt_ew%PSICanopy_pft            ,& !output :canopy total water potential, [Mpa]
@@ -972,8 +972,8 @@ module InitPlantMod
   FDM                       = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ)   = ppmc*CanopyLeafSheathC_pft(NZ)/FDM
   VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
-  QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
-  HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
+  QCanopyWatLoss2Dist_col       = QCanopyWatLoss2Dist_col-CanopyBiomWater_pft(NZ)
+  CanopyHeatLoss2Dist_col       = CanopyHeatLoss2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantHeatWater

@@ -38,7 +38,8 @@ contains
   real(r8) :: XHVST1
   real(r8) :: WVPLT
   integer :: M,NB,NE,K,L,NR
-  real(r8) :: FDM,VOLWPX  
+  real(r8) :: FDM,VOLWPX
+  real(r8) :: VHeatCapCanopyPrev,watflx,heatflx
   real(r8) :: dNonstLitr,dFoliarLitr,dNonFoliar  
   associate(                                                               &
     inonstruct                  => pltpar%inonstruct                      ,& !input  :group id of plant nonstructural litter
@@ -59,6 +60,9 @@ contains
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col               ,& !inoput :total subsurface water flux, [m3 d-2]
+    TKC_pft                    => plt_ew%TKC_pft                        ,& !input  :canopy temperature, [K]
+    QCanopyWatLoss2Dist_col     => plt_ew%QCanopyWatLoss2Dist_col         ,& !inoput :canopy water loss to disturbance, [m3 d-2]
+    CanopyHeatLoss2Dist_col     => plt_ew%CanopyHeatLoss2Dist_col         ,& !inoput :canopy heat loss to disturbance, [MJ d-2]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !inoput :canopy water content, [m3 d-2]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     CMassHCO3BundleSheath_node  => plt_photo%CMassHCO3BundleSheath_node   ,& !inoput :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
@@ -107,12 +111,11 @@ contains
   !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !     VHeatCapCanopy_pft=canopy heat capacity
 
-  XHVST1                    = 1._r8-XHVST
+  XHVST1                        = 1._r8-XHVST
   FracPARads2Canopy_pft(NZ)     = FracPARads2Canopy_pft(NZ)*XHVST
   FracPARads2LiveCanopy_pft(NZ) = FracPARads2LiveCanopy_pft(NZ)*XHVST
-  VHeatCapCanopy_pft(NZ)    = VHeatCapCanopy_pft(NZ)*XHVST
-  CanopyLeafSheathC_pft(NZ) = 0._r8
-  CanopySapwoodC_pft(NZ)    = 0._r8
+  VHeatCapCanopyPrev           = VHeatCapCanopy_pft(NZ)
+  VHeatCapCanopy_pft(NZ)       = VHeatCapCanopyPrev*XHVST
   !
   !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
   !
@@ -201,8 +204,6 @@ contains
 
       !summarize C mass after tillage
       CanopyLeafSheathC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
-      CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ)+CanopyLeafSheathC_brch(NB,NZ)
-      CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
 
       D8970: DO K=0,MaxNodesPerBranch1
         IF(K.NE.0)THEN
@@ -233,6 +234,8 @@ contains
       ENDDO D8970
     ENDIF
   ENDDO D8975
+  CanopyLeafSheathC_pft(NZ) = SUM(CanopyLeafSheathC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopySapwoodC_pft(NZ)    = SUM(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))  
   !
   !     PSICanopy_pft=canopy water potential
   !     CanopyBiomWater_pft=water volume in canopy
@@ -243,8 +246,13 @@ contains
 
   FDM                     = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ) = ppmc*WVPLT/FDM
-  QH2OLoss_lnds           = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
-  H2OLoss_CumYr_col       = H2OLoss_CumYr_col+VOLWPX-CanopyBiomWater_pft(NZ)
+  !Record this PFT's losses once, preserving earlier disturbance contributions.
+  watflx                  = VOLWPX-CanopyBiomWater_pft(NZ)
+  heatflx                 = (VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
+  QH2OLoss_lnds           = QH2OLoss_lnds+watflx
+  H2OLoss_CumYr_col       = H2OLoss_CumYr_col+watflx
+  QCanopyWatLoss2Dist_col = QCanopyWatLoss2Dist_col+watflx
+  CanopyHeatLoss2Dist_col = CanopyHeatLoss2Dist_col+heatflx
   !
   !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
   !

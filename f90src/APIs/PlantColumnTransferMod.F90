@@ -70,8 +70,8 @@ contains
   StandingDeadStrutElms_col(1:NumPlantChemElms,NY,NX) = plt_biom%StandingDeadStrutElms_col(1:NumPlantChemElms)
   H2OLoss_CumYr_col(NY,NX)                            = plt_ew%H2OLoss_CumYr_col
   StemArea_col(NY,NX)                                 = plt_morph%StemArea_col
-  HeatCanopy2Dist_col(NY,NX)                          = plt_ew%HeatCanopy2Dist_col
-  HeatCanopy2Dist_col(NY,NX)                          = plt_ew%HeatCanopy2Dist_col
+  CanopyHeatLoss2Dist_col(NY,NX)                          = plt_ew%CanopyHeatLoss2Dist_col
+  QCanopyWatLoss2Dist_col(NY,NX)                          = plt_ew%QCanopyWatLoss2Dist_col
   CanopyLeafArea_col(NY,NX)                           = plt_morph%CanopyLeafArea_col
   Eco_NetRad_col(NY,NX)                               = plt_rad%Eco_NetRad_col
   Eco_Heat_Latent_col(NY,NX)                          = plt_ew%Eco_Heat_Latent_col
@@ -340,8 +340,8 @@ contains
   plt_ew%CanopyHeatStor_col                              = CanopyHeatStor_col(NY,NX)
   plt_bgcr%Canopy_NEE_col                                = Canopy_NEE_col(NY,NX)
   plt_distb%FERT(1:20)                                   = FERT(1:20,I1,NY,NX)
-  plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
-  plt_ew%HeatCanopy2Dist_col                             = HeatCanopy2Dist_col(NY,NX)
+  plt_ew%CanopyHeatLoss2Dist_col                             = CanopyHeatLoss2Dist_col(NY,NX)
+  plt_ew%QCanopyWatLoss2Dist_col                             = QCanopyWatLoss2Dist_col(NY,NX)
   DO  L=1,NumCanopyLayers
     plt_morph%CanopyStemAareZ_col(L) = CanopyStemAareZ_col(L,NY,NX)
     plt_biom%tCanLeafC_clyr(L)         = tCanLeafC_clyr(L,NY,NX)
