@@ -2174,13 +2174,19 @@ module PlantDisturbsMod
   character(len=*), parameter :: subname='HarvstUpdateRootStateL'
   integer :: NE,NR,M
   associate(                                                          &
-    NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft      ,& !input  :number of structural root axes,[-]
+    NumStructuralRootAxes_pft => plt_morph%NumStructuralRootAxes_pft ,& !input  :number of structural root axes,[-]
     inonstruct                => pltpar%inonstruct                   ,& !input  :group id of plant nonstructural litter
     iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     PlantElmAllocMat4Litr     => plt_soilchem%PlantElmAllocMat4Litr  ,& !input  :litter kinetic fraction, [-]
     k_fine_comp               => pltpar%k_fine_comp                  ,& !input  :fine litter complex id
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !inoput :root layer element primary axes, [g d-2]
+    RootMediumStructElms_rpvr => plt_biom%RootMediumStructElms_rpvr  ,& !inoput :medium root structural C/N/P, [g d-2]
+    RootMedStruct_pvr         => plt_biom%RootMedStruct_pvr          ,& !output :layer medium root structural C/N/P, [g d-2]
+    RootMediumLength_rpvr     => plt_morph%RootMediumLength_rpvr     ,& !inoput :total medium root length, [m d-2]
+    RootMediumXNum_rpvr       => plt_morph%RootMediumXNum_rpvr       ,& !inoput :medium root axis count, [d-2]
+    RootMediumXNum_pvr        => plt_morph%RootMediumXNum_pvr        ,& !output :layer medium root axis count, [d-2]
+    RootMediumLength_pvr      => plt_morph%RootMediumLength_pvr      ,& !output :layer mean medium root length, [m]
     Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :root layer active zone element in primary axes, [g d-2]
     Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !inoput :root layer element secondary axes, [g d-2]
@@ -2218,12 +2224,25 @@ module PlantDisturbsMod
   if(N.EQ.ipltroot)then
     DO NR=1,NumStructuralRootAxes_pft(NZ)
       DO NE=1,NumPlantChemElms        
+        RootMediumStructElms_rpvr(NE,L,NR,NZ) = RootMediumStructElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*FracLeftThin
         RootMyco1stStrutElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)+Root1stLigStructElms_rpvr(NE,L,NR,NZ)
       ENDDO
+      !Thin total length and axis count together; surviving root radius is unchanged.
+      RootMediumLength_rpvr(L,NR,NZ) = RootMediumLength_rpvr(L,NR,NZ)*FracLeftThin
+      RootMediumXNum_rpvr(L,NR,NZ)   = RootMediumXNum_rpvr(L,NR,NZ)*FracLeftThin
       Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracLeftThin        
     ENDDO
+    !Refresh layer totals once for plant roots, not again for mycorrhizae.
+    DO NE=1,NumPlantChemElms
+      RootMedStruct_pvr(NE,L,NZ)=SUM(RootMediumStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+    ENDDO
+    RootMediumXNum_pvr(L,NZ)=SUM(RootMediumXNum_rpvr(L,1:NumStructuralRootAxes_pft(NZ),NZ))
+    RootMediumLength_pvr(L,NZ)=0._r8
+    IF(RootMediumXNum_pvr(L,NZ).GT.0._r8)THEN
+      RootMediumLength_pvr(L,NZ)=SUM(RootMediumLength_rpvr(L,1:NumStructuralRootAxes_pft(NZ),NZ))/RootMediumXNum_pvr(L,NZ)
+    ENDIF
     Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*FracLeftThin      
   ENDIF
 
