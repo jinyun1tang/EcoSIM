@@ -4751,7 +4751,7 @@ implicit none
     PlantPopuLive_pft              => plt_site%PlantPopuLive_pft                 ,& !input  :plant population, [d-2]
     iPlant2ndGrothPattern_pft      => plt_pheno%iPlant2ndGrothPattern_pft        ,& !input  :plant expression of secondary growth, [-]
     Radius95pctMature_pft          => plt_morph%Radius95pctMature_pft            ,& !input  :Critical radius where the woody radius is considered 95% mature, [m]
-    Num1stAxesPerStructRootX_pft   => plt_morph%Num1stAxesPerStructRootX_pft     ,& !input  :primary root axes number, [d-2]
+    Num1stAxesPerStructRootXPOP_pft   => plt_morph%Num1stAxesPerStructRootXPOP_pft     ,& !input  :population primary root axes number, [d-2]
     SapFlowVlinear_pvr             => plt_ew%SapFlowVlinear_pvr                  ,& !output :Sap flow mean linear velocity, [m h-1]
     CumSoilThickness_vr            => plt_site%CumSoilThickness_vr               ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     Root1stRadius_rpvr             => plt_morph%Root1stRadius_rpvr               ,& !input  :root layer radius for each primary axes, [m]
@@ -4795,8 +4795,8 @@ implicit none
   NU_loc                   = NU
   SapFlowVlinear_pvr(:,NZ) = 0._r8
   tlumenArea(:)            = 0._r8
-  CRootLumenArea_pvr(:,:)  = 0._r8
-  MRootLumenArea_pvr(:,:) = 0._r8
+  CRootLumenArea_pvr(:,NZ)  = 0._r8
+  MRootLumenArea_pvr(:,NZ) = 0._r8
   RootMediumLength_pvr(:,NZ)=0._r8
   if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then          
     !sum up the total sink strength
@@ -4824,13 +4824,15 @@ implicit none
       
       if(is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))then        
         LumenFraction = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-sfexp(-3._r8*Root1stRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))
-        sap_area_root = GetCoarseRootXylemSecArea(dmax,Root1stRadius_rpvr(L,NR,NZ))*Num1stAxesPerStructRootX_pft(NZ)
+        sap_area_root = GetCoarseRootXylemSecArea(dmax,Root1stRadius_rpvr(L,NR,NZ))*Num1stAxesPerStructRootXPOP_pft(NZ)
         if(Root1stRadius_rpvr(L,NR,NZ)<dmax)then
           sap_area = sap_area_root
         else
           sap_area = AMIN1(sapAreaLeaf*Root2ndCumSinkProf(L)/Root2ndSinkT, sap_area_root)
         endif
-        CRootLumenArea_rpvr(L,NR,NZ) = AMAX1(sap_area*LumenFraction,1.E-9_R8)/RootSinkScalar_pvr(L,NR,NZ)
+        !Both candidate sapwood areas represent the population; retain a per-plant lumen-area floor.
+        CRootLumenArea_rpvr(L,NR,NZ) = AMAX1(sap_area*LumenFraction,1.E-9_R8*PlantPopuLive_pft(NZ)) &
+          /RootSinkScalar_pvr(L,NR,NZ)
         if(RootMediumXNum_pvr(L,NZ).GT.0._r8)then
           !medium size roots
           LumenFraction = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-sfexp(-3._r8*RootMediumRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))
@@ -4844,7 +4846,7 @@ implicit none
           RootMediumVH2O_rpvr(L,NR,NZ) = 0._r8
         endif
       else        
-        CRootLumenArea_rpvr(L,NR,NZ) = PICON*Root1stRadius_rpvr(L,NR,NZ)**2*Num1stAxesPerStructRootX_pft(NZ)*xylemPhi_mean_pft(NZ)
+        CRootLumenArea_rpvr(L,NR,NZ) = PICON*Root1stRadius_rpvr(L,NR,NZ)**2*Num1stAxesPerStructRootXPOP_pft(NZ)*xylemPhi_mean_pft(NZ)
         MRootLumenArea_rpvr(L,NR,NZ) = 0._r8
       endif     
 
@@ -5005,12 +5007,14 @@ implicit none
   associate(                                                              &
     CanopyLeafAreaMAX_pft      => plt_morph%CanopyLeafAreaMAX_pft        ,& !input  :running maximum leaf area, [m2 d-2]
     lreset_laimax_pft          => plt_morph%lreset_laimax_pft            ,& !input  :toggle to reset max leaf area, [-]
+    PlantPopuLive_pft          => plt_site%PlantPopuLive_pft             ,& !input  :live population in grid cell, [d-2]
     StalkAveRadius_pft         => plt_morph%StalkAveRadius_pft           ,& !input  :main stalk radius,[m]    
     CanopyLeafArea_pft         => plt_morph%CanopyLeafArea_pft            & !input  :plant canopy leaf area, [m2 d-2]
   )
   call PrintInfo('beg '//subname)
   DTransportTube = AMIN1(ZSTX,FSTK*StalkAveRadius_pft(NZ))
-  sapAreaGeom    = PICON*(2._r8*StalkAveRadius_pft(NZ)*DTransportTube-DTransportTube**2)
+  !Match the population basis of CanopyLeafAreaMAX_pft before applying the nonlinear area limit.
+  sapAreaGeom    = PICON*(2._r8*StalkAveRadius_pft(NZ)*DTransportTube-DTransportTube**2)*PlantPopuLive_pft(NZ)
 
   !obtain the running maximum of leaf area
   if(lreset_laimax_pft(NZ))then
