@@ -32,9 +32,11 @@ take precedence over repository guidance.
 ## Knowledge documents and user preferences
 
 - Save generated EcoSIM process explanations, code walkthroughs, and similar
-  knowledge documents (including HTML guides) under `ecosim_knowledge/` by
-  default, unless the user specifies another destination. This is a persistent
-  user preference for future requests.
+  knowledge documents under `ecosim_knowledge/` by default, unless the user
+  specifies another destination. This is a persistent user preference for
+  future requests.
+- Write HTML files to `ecosim_knowledge/` only when the user explicitly asks
+  for an HTML format.
 - Keep relative source links valid from that directory when creating or moving
   a document.
 
