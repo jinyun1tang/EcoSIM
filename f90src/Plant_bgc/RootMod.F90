@@ -2242,8 +2242,11 @@ implicit none
 
     !carbon required for thickening
     !CHyOz+ O2 -> (Yld_thick)C + (1-Yld_thick)CO2
-    !O2-unlimited biomass production
-    RootMycoNonst4Thick_OUltd(ielmc) = TwoPiCON*Root1stRadius_rpvr(L,NR,NZ)*Root1stLenPP_rpvr(L,NR,NZ)*dR1stExp/CRootActVolPerMassC_pft(NZ)
+    !Radius, length, and radial expansion are per root; demand is for the population.
+    !The axis count already includes PlantPopuLive_pft, so apply it only once.
+    RootMycoNonst4Thick_OUltd(ielmc) = TwoPiCON*Root1stRadius_rpvr(L,NR,NZ) &
+      *Root1stLenPP_rpvr(L,NR,NZ)*dR1stExp*Num1stAxesPerStructRootXPOP_pft(NZ) &
+      /CRootActVolPerMassC_pft(NZ)
     RootMycoNonst4Thick_OUltd(ielmn) = RootMycoNonst4Thick_OUltd(ielmc)*rECLiveCRoot_pft(ielmn,NZ)
     RootMycoNonst4Thick_OUltd(ielmp) = RootMycoNonst4Thick_OUltd(ielmc)*rECLiveCRoot_pft(ielmp,NZ)  
     !
@@ -2267,6 +2270,8 @@ implicit none
       scal           = RGrowCO2_Oltd/RCO2_meta_Oltd
       RligCO2_Oltd   = RligCO2_Oltd*scal
       RThickCO2_Oltd = RThickCO2_Oltd*scal
+      RootMycoNonstC4Thick_Oltd = RootMycoNonstC4Thick_Oltd*scal
+      RootMycoNonst4Thick_Oltd=RootMycoNonst4Thick_Oltd*scal
     endif
 
     !summarize and substract CO2
