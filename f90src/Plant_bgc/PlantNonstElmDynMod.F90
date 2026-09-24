@@ -1031,7 +1031,7 @@ module PlantNonstElmDynMod
     CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
 
     DO NE=2,NumPlantChemElms
-      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(NE,NB,NZ))
       WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FracCanopyCinStalk)
       !achor for seasonal storage is root, achor for stalkrsv is sap
       NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT

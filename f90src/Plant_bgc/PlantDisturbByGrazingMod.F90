@@ -321,6 +321,7 @@ contains
   !     GrazingUnMetLeafC=grazing requirement unmet by stalk,reserve
   !
   TotStalkC=StalkStrutElms_pft(ielmc,NZ)+StalkRsrvElms_pft(ielmc,NZ)
+
   IF(TotStalkC.GT.GrazedPhytoStalkC_pft+GrazingUnMetLeafC)THEN
     GrazingDmndStalkC = GrazedPhytoStalkC_pft*StalkStrutElms_pft(ielmc,NZ)/TotStalkC+GrazingUnMetLeafC
     GrazedDmndStalkC  = AMIN1(StalkStrutElms_pft(ielmc,NZ),GrazingDmndStalkC)
@@ -417,7 +418,7 @@ contains
   real(r8), intent(out) :: CanopyNodulStrutElmAfhvst(NumPlantChemElms)  !canopy nodule structural element after harvest
   real(r8) :: HarvestedCanopyNoduleC
   real(r8) :: HarvestedCanopyNonstC_brch
-  real(r8) :: FracSheath_brch  
+  real(r8) :: FracSheath_brch,fracHavested  
   integer  :: NE
   associate(                                                         &
     CanopyLeafSheathC_pft     => plt_biom%CanopyLeafSheathC_pft,     &
@@ -433,8 +434,9 @@ contains
     IF(CanopyNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       HarvestedCanopyNonstC_brch  = AZMAX1(GrazedCanopyNonstC)*FracSheath_brch
       CanopyNonstElmAfhvst_brch(ielmc) = AZMAX1(CanopyNonstElmCopy_brch(ielmc)-HarvestedCanopyNonstC_brch)
+      fracHavested=AMIN1(HarvestedCanopyNonstC_brch/CanopyNonstElmCopy_brch(ielmc),1._R8)
       DO NE=2,NumPlantChemElms
-        CanopyNonstElmAfhvst_brch(NE)=CanopyNonstElmCopy_brch(NE)*(1._r8-HarvestedCanopyNonstC_brch/CanopyNonstElms_brch(ielmc,NB,NZ))
+        CanopyNonstElmAfhvst_brch(NE)=CanopyNonstElmCopy_brch(NE)*(1._r8-fracHavested)
       ENDDO
     ELSE
       CanopyNonstElmAfhvst_brch(:)=0._r8
@@ -443,12 +445,13 @@ contains
     IF(CanopyNodulNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       HarvestedCanopyNoduleC=AZMAX1(GrazedCanopyNoduleC)*FracSheath_brch
       CanopyNodulNonstElmAfhvst(ielmc)=AZMAX1(CanopyNodulNonstElmCopy_brch(ielmc)-HarvestedCanopyNoduleC)
+      fracHavested=AMIN1(HarvestedCanopyNoduleC/CanopyNodulNonstElmCopy_brch(ielmc),1._R8)
       DO NE=2,NumPlantChemElms
-        CanopyNodulNonstElmAfhvst(NE)=CanopyNodulNonstElmCopy_brch(NE)*AZMAX1(1._r8-HarvestedCanopyNoduleC/CanopyNodulNonstElms_brch(ielmc,NB,NZ))
+        CanopyNodulNonstElmAfhvst(NE)=CanopyNodulNonstElmCopy_brch(NE)*(1._r8-fracHavested)
       ENDDO
-
+      
       DO NE=1,NumPlantChemElms
-        CanopyNodulStrutElmAfhvst(NE)=CanopyNodulStrutElms_brch(NE,NB,NZ)*(1._r8-HarvestedCanopyNoduleC/CanopyNodulNonstElmCopy_brch(NE))
+        CanopyNodulStrutElmAfhvst(NE)=CanopyNodulStrutElms_brch(NE,NB,NZ)*(1._r8-fracHavested)
       ENDDO
     ELSE
       CanopyNodulNonstElmAfhvst(:)=0._r8

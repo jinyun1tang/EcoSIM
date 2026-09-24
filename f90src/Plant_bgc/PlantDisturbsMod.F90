@@ -746,10 +746,10 @@ module PlantDisturbsMod
   real(r8) :: FracLeftThin
   real(r8) :: XHVST1
   REAL(R8) :: LeafLayerC_brch(NumCanopyLayers1,JP1,JP1)
-  real(r8) :: ARLFY !leaf area left after removal
-  real(r8) :: ARLFR  
+  real(r8) :: LeafArea2Remove !leaf area left after removal
+  real(r8) :: LeafAreaRemoved  
   real(r8) :: APSILT
-  real(r8) :: FHVSH
+  real(r8) :: FHVSH,fracL2rm
   real(r8) :: HarvestedLeafC,HarvestedShethC,HarvestedEarC,HarvestedGrainC,GrazedCanopyNonstC
   real(r8) :: HarvestedStalkC,HarvestedStalkRsrvC
   real(r8) :: HarvestedPetoleC
@@ -822,7 +822,7 @@ module PlantDisturbsMod
     !          iHarvstType_pft=3:reduction of clumping factor
     !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
     !     CanopyLeafArea_col,CanopyLeafAareZ_col=leaf area of combined canopy, canopy layer
-    !     ARLFR,ARLFY=leaf area harvested,remaining
+    !     LeafAreaRemoved,LeafArea2Remove=leaf area harvested,remaining
     !     ZL=height to bottom of each canopy layer
     !
     !neither grazing nor herbivory
@@ -849,24 +849,26 @@ module PlantDisturbsMod
 
       !remove leaf area
       IF(iHarvstType_pft(NZ).LE.iharvtyp_allabvg .AND. CanopyCutProxy_pft(NZ).LT.0.0_r8)THEN
-        !leaf area left in column
-        ARLFY = (1._r8-ABS(CanopyCutProxy_pft(NZ)))*CanopyLeafArea_col
-        ARLFR = 0._r8
-
+        !leaf area left in column, now CanopyCutProxy_pft is the fraction removed
+        LeafArea2Remove = ABS(CanopyCutProxy_pft(NZ))*CanopyLeafArea_col
+        LeafAreaRemoved = 0._r8
+        CanopyCutProxy_pft(NZ)=0._r8
         !find the cut height due to leaf area removal
-        D9875: DO L=1,NumCanopyLayers1
+        D9875: DO L=NumCanopyLayers1,1,-1
           IF(CanopyHeightZ_col(L).GT.CanopyHeightZ_col(L-1) & !canopy height L is meaningful
             .AND. CanopyLeafAareZ_col(L).GT.ZEROS           & !leaf area in L is meaningful
-            .AND. ARLFR.LT.ARLFY)THEN                         !
-            IF(ARLFR+CanopyLeafAareZ_col(L).GT.ARLFY)THEN     !if still has not reach the amount of remaining leaf area
-              !update the canopy height after cut
-              CanopyCutProxy_pft(NZ)=CanopyHeightZ_col(L-1)+((ARLFY-ARLFR)/CanopyLeafAareZ_col(L))&
-                *(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))
+            .AND. LeafAreaRemoved.LT.LeafArea2Remove)THEN     !removal goal not met
+             
+            IF(LeafAreaRemoved+CanopyLeafAareZ_col(L).GE.LeafArea2Remove)THEN    
+              !reached the layer layer for removal
+              !fraction of layer L to be removed
+              fracL2rm= (LeafArea2Remove-LeafAreaRemoved)/CanopyLeafAareZ_col(L)
+              !cut criterion is converted into height
+              CanopyCutProxy_pft(NZ)=CanopyHeightZ_col(L)-fracL2rm*(CanopyHeightZ_col(L)-CanopyHeightZ_col(L-1))
+              EXIT
             ENDIF
-          ELSE
-            CanopyCutProxy_pft(NZ)=0._r8
           ENDIF
-          ARLFR=ARLFR+CanopyLeafAareZ_col(L)
+          LeafAreaRemoved=LeafAreaRemoved+CanopyLeafAareZ_col(L)
         ENDDO D9875
       ENDIF
       HarvestedLeafC      = 0._r8
@@ -1739,15 +1741,17 @@ module PlantDisturbsMod
         IF((iHarvstType_pft(NZ).NE.iharvtyp_grazing .AND. iHarvstType_pft(NZ).NE.iharvtyp_herbivo) &
           .OR. HvestedLeafCLayer_brch.GT.0.0_r8)THEN
 
-          !grazing or herbivory
-          IF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
+          !grazing or herbivory          
+          IF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN            
             IF(LeafLayerElms_node(ielmc,L,K,NB,NZ).GT.HvestedLeafCLayer_brch)THEN
+              !leaf C in node is greater than harvest demand
               FrcLeafMassLeft=AZMAX1(AMIN1(1.0_r8,(LeafLayerElms_node(ielmc,L,K,NB,NZ)-HvestedLeafCLayer_brch) &
                 /LeafLayerElms_node(ielmc,L,K,NB,NZ)))
               FHVSH=FrcLeafMassLeft
             ELSE
-              FrcLeafMassLeft = 1.0_r8
-              FHVSH           = 1.0_r8
+              !leaf C in node is harvest demand
+              FrcLeafMassLeft = 0.0_r8
+              FHVSH           = 0.0_r8
             ENDIF
           ENDIF
           !
