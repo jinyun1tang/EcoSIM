@@ -358,7 +358,7 @@ contains
   subroutine advect_remap_mass_loss(n, dt, xr, c, Areas, ur, c_new, xL, lost_mass)
     !--------------------------------------------------------------------
     ! Conservative 1D advect-remap with proportional mass loss at right boundary
-    ! Workspace arrays must be preallocated by the caller (no allocate/deallocate here).
+    ! Workspace arrays are local automatic arrays.
     !
     ! Inputs:
     !   n   - number of cells
@@ -367,15 +367,15 @@ contains
     !   areas - cross-section area of each cell (size n)
     !   ur  - velocities at right-edge of each cell (size n), nonnegative
     !   dt  - time step (positive)
-    !   xL  - left boundary (default 0.0 in caller)
+    !   xL  - left boundary (defaults to 0.0 when omitted)
     !
     ! Outputs:
     !   c_new    - updated cell-average concentration (size n)
     !   lost_mass- total mass lost this step
     !
-    ! Workspace (caller provides arrays):
+    ! Local workspace:
     !   xE, xE_star : real(r8), size n+1
-    !   dx, m, m_kept, frac_kept : real(r8), size n
+    !   dx, m : real(r8), size n
     !   M_star, M_on_fixed : real(r8), size n+1
     !--------------------------------------------------------------------
   implicit none
@@ -386,16 +386,15 @@ contains
   real(r8), intent(out) :: c_new(n)
   real(r8), optional, intent(out) :: lost_mass
   character(len=*), parameter :: subname='advect_remap_mass_loss'
-  ! workspace arrays provided by caller (no allocate/deallocate here)
+  ! local workspace arrays
   real(r8)  :: xE(n+1), xE_star(n+1)
-  real(r8)  :: dx(n), m(n), m_kept(n), frac_kept(n)
+  real(r8)  :: dx(n), m(n)
   real(r8)  :: M_star(n+1), M_on_fixed(n+1)
   
   ! local scalars
   integer :: i
   real(r8) :: xR_most
-  real(r8) :: total_initial, total_kept
-  real(r8) :: a, b, w_star, inside_left, inside_right, overlap, frac
+  real(r8) :: total_initial
   real(r8) :: dt_res,dt_loc
   logical :: lhalf
   real(r8), parameter :: tiny = 1.0e-14_r8
@@ -474,38 +473,15 @@ contains
       end if
     end do
 
-    ! compute kept mass per moved cell via overlap with [xL, xR_most]
-    total_kept = 0._r8
-    do i = 1, n
-       a = xE_star(i)
-       b = xE_star(i+1)
-       w_star = b - a
-       if (w_star <= 0._r8) then
-          frac_kept(i) = 0._r8
-          m_kept(i) = 0._r8
-       else
-          inside_left = max(a, xL)
-          inside_right = min(b, xR_most)
-          overlap = inside_right - inside_left
-          if (overlap < 0._r8) overlap = 0._r8
-          frac = overlap / w_star
-          if (frac < 0._r8) frac = 0._r8
-          if (frac > 1.0d0) frac = 1.0d0
-          frac_kept(i) = frac
-          m_kept(i) = m(i) * frac
-       end if
-       total_kept = total_kept + m_kept(i)
-    end do
-    if(present(lost_mass))lost_mass = total_initial - total_kept
-
-    ! build cumulative M_star on moved mesh edges
+    ! Remap the full mass on the displaced mesh. Sampling at the fixed
+    ! domain edges accounts for boundary outflow exactly once; clipping
+    ! masses before interpolation would apply the overlap fraction twice.
     M_star(1) = 0._r8
     do i = 1, n
-       M_star(i+1) = M_star(i) + m_kept(i)
+       M_star(i+1) = M_star(i) + m(i)
     end do
 
-    ! interpolate M_star back to fixed edges xE -> M_on_fixed
-    call interp_linear_clamped(n+1, xE_star, M_star, n+1, xE, M_on_fixed, 0._r8, total_kept)
+    call interp_linear_clamped(n+1, xE_star, M_star, n+1, xE, M_on_fixed, 0._r8, M_star(n+1))
 
     ! new cell masses and concentrations'
     
@@ -517,6 +493,8 @@ contains
     if(dt_res<dt*1.e-2_r8)exit
     dt_loc=dt_res
   enddo  
+  ! Include outflow from every substep, using the existing internal mass scale.
+  if(present(lost_mass))lost_mass = total_initial - sum(m)
   c_new=c_new*1.e-6_r8
   call PrintInfo('end '//subname)
   end subroutine advect_remap_mass_loss
@@ -612,7 +590,7 @@ contains
   ! ======================================================================
   ! Solves vertical diffusion of cytokinin inside root plumbing for one timestep.
   ! Uses the Implicit Backward Euler method with an integrated Thomas Algorithm.
-  ! Permanent Zero-Flux boundary condition applied at the top (Layer 1).
+  ! Zero-flux boundary conditions at both ends of the root profile.
   ! ======================================================================
   INTEGER, INTENT(IN) :: N                                 ! Number of vertical layers
   REAL(r8), INTENT(IN) :: dt                                   ! Timestep size (hour)  
@@ -623,15 +601,14 @@ contains
   REAL(r8), DIMENSION(N), INTENT(OUT) :: c_next                ! Output updated concentration (mg/m3)
   character(len=*), parameter :: subname='solve_root_diffusion_step'
   ! Local Variables for Tridiagonal Matrix: A(i)*C(i-1) + B(i)*C(i) + C(i)*C(i+1) = D(i)
-  REAL, DIMENSION(N) :: a_diag, b_diag, c_diag, d_rhs
-  REAL, DIMENSION(N) :: lumen_volumes
-  REAL :: dz_lower, dz_upper, area_lower, area_upper
-  REAL :: gamma_lower, gamma_upper
+  REAL(r8), DIMENSION(N) :: a_diag, b_diag, c_diag, d_rhs
+  REAL(r8), DIMENSION(N) :: lumen_volumes
+  REAL(r8) :: area_interface, gamma_interface
   INTEGER :: i
 
   ! Local variables for the Thomas Algorithm solver
-  REAL, DIMENSION(N) :: c_prime, d_prime
-  REAL :: m
+  REAL(r8), DIMENSION(N) :: c_prime, d_prime
+  REAL(r8) :: m
 
   call PrintInfo('beg '//subname)
   if(N==0)return
@@ -639,47 +616,27 @@ contains
   ! 1. Calculate layer volumes for mass tracking (Volume = Area * Thickness)
   lumen_volumes = lumen_areas * layer_thicknesses
 
-  ! 2. Initialize tridiagonal vectors to zero
-  a_diag = 0.0
-  b_diag = 0.0
-  c_diag = 0.0
-  
-  ! Populate RHS vector with initial mass (Concentration * Volume)
+  ! 2. Initialize storage terms and off-diagonal coefficients.
+  a_diag = 0._r8
+  b_diag = lumen_volumes
+  c_diag = 0._r8
   d_rhs  = c_init * lumen_volumes
 
-  ! 3. Construct the Matrix Coefficients
-  DO i = 1, N
-    ! Set the initial diagonal component with the current layer volume anchor
-    b_diag(i) = b_diag(i) + lumen_volumes(i)
+  ! 3. Assemble each interface once. The two half-layer diffusion
+  ! resistances act in series through a shared interface area.
+  ! Use the same conductance in both rows to conserve cytokinin mass.
+  DO i = 1, N-1
+    area_interface = Harmonicmean_safe(lumen_areas(i), lumen_areas(i+1))
+    gamma_interface = dt * area_interface * Harmonicmean_safe( &
+      d_effective(i)/layer_thicknesses(i), d_effective(i+1)/layer_thicknesses(i+1))
 
-    ! --- LOWER INTERFACE (Between layer i and i+1) ---
-    IF (i < N) THEN
-      ! Node distance and boundary interface area
-      dz_lower = 0.5 * (layer_thicknesses(i) + layer_thicknesses(i+1))
-      area_lower = Harmonicmean_safe(lumen_areas(i), lumen_areas(i+1))
-      
-      gamma_lower = dt * d_effective(I) * area_lower / dz_lower
-      
-      b_diag(i)   = b_diag(i)   + gamma_lower
-      c_diag(i)   = c_diag(i)   - gamma_lower  ! Interaction with i+1
-      a_diag(i+1) = a_diag(i+1) - gamma_lower  ! Interaction of i+1 back with i
-    END IF
-
-    ! --- UPPER INTERFACE (Between layer i and i-1) ---
-    IF (i > 1) THEN
-      dz_upper = 0.5 * (layer_thicknesses(i) + layer_thicknesses(i-1))
-      area_upper = Harmonicmean_safe(lumen_areas(i),lumen_areas(i-1))
-      
-      gamma_upper = dt * d_effective(I) * area_upper / dz_upper
-      
-      b_diag(i)   = b_diag(i)   + gamma_upper
-      ! Interaction of i back with i-1 handled symmetrically via lower loop setup
-    END IF
-
-    ! NOTE: Skipping the i=1 upper interface calculation inherently forces the 
-    ! diffusive flux out of the top layer to 0.0 (Perfect Zero-Flux).
+    b_diag(i)   = b_diag(i)   + gamma_interface
+    b_diag(i+1) = b_diag(i+1) + gamma_interface
+    c_diag(i)   = c_diag(i)   - gamma_interface
+    a_diag(i+1) = a_diag(i+1) - gamma_interface
   END DO
-  
+  ! No exterior interfaces: both boundary fluxes are zero.
+
   ! 4. Execute Thomas Algorithm (Forward Elimination Phase)
   c_prime(1) = c_diag(1) / b_diag(1)
   d_prime(1) = d_rhs(1)  / b_diag(1)
