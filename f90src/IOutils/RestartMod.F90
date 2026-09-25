@@ -116,6 +116,9 @@ implicit none
   real(r8),pointer :: datpr4(:,:,:,:),datpr5(:,:,:,:,:)
   integer :: ncols, npfts
   integer :: ic,ip,sz3,sz4,sz5,sz2
+  integer :: routing_varid
+  type(var_desc_t) :: routing_vardesc
+  logical :: has_category_routing
 
 ! execution begins here
   NHW = bounds%NHW;NVN = bounds%NVN
@@ -3196,19 +3199,33 @@ implicit none
   endif
 
   if(flag=='read')then
-    datpr2 => datrp_2d(1:npfts,1:JZ)
-    call restartvar(ncid, flag, varname='RootFineFrac2Med_pvr', dim1name='pft',dim2name='levsoi',&
-     long_name='Fraction of fine roots attached to medium roots', units='m', &
-     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_pvr,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft) 
+    call ncd_inqvid(ncid,'RootFineFrac2Med_rpvr',routing_varid,routing_vardesc,readvar=has_category_routing)
+    if(has_category_routing)then
+      datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
+      call restartvar(ncid, flag, varname='RootFineFrac2Med_rpvr', dim1name='pft',dim2name='rootyps',&
+        dim3name='levsoi',long_name='Fraction of fine-root axes attached to medium roots by root category', units='-', &
+        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_rpvr,datrp_3d,NumActivePlants=NumActivePlants_col,&
+        IsPlantActive_pft=IsPlantActive_pft)
+    else
+      ! Older restarts store one shared fraction. Retain it for both categories
+      ! until the next root update recomputes the count-weighted fractions.
+      datpr2 => datrp_2d(1:npfts,1:JZ)
+      call restartvar(ncid, flag, varname='RootFineFrac2Med_pvr', dim1name='pft',dim2name='levsoi',&
+        long_name='Fraction of fine roots attached to medium roots', units='-', &
+        interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
+      DO N=1,pltpar%jroots
+        call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_rpvr(N,:,:,:,:),datrp_2d,&
+          NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+      ENDDO
+    endif
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_pvr,datrp_2d,&
-      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)   
-    datpr2 => datrp_2d(1:npfts,1:JZ)
-    call restartvar(ncid, flag, varname='RootFineFrac2Med_pvr', dim1name='pft',dim2name='levsoi',&
-     long_name='Fraction of fine roots attached to medium roots', units='m', &
-     interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,RootFineFrac2Med_rpvr,datrp_3d,&
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    datpr3 => datrp_3d(1:npfts,1:pltpar%jroots,1:JZ)
+    call restartvar(ncid, flag, varname='RootFineFrac2Med_rpvr', dim1name='pft',dim2name='rootyps',&
+      dim3name='levsoi',long_name='Fraction of fine-root axes attached to medium roots by root category', units='-', &
+      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
   endif
 
   if(flag=='read')then

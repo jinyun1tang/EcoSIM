@@ -168,7 +168,7 @@ implicit none
     DO L=1,NK_col(NY,NX)
       plt_morph%Root1stXNumL_pvr(L,NZ)     = Root1stXNumL_pvr(L,NZ,NY,NX)
       plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)
-      plt_morph%RootFineFrac2Med_pvr(L,NZ) = RootFineFrac2Med_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_rpvr(:,L,NZ) = RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)
       plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
       plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)  
       DO N=1,Myco_pft(NZ,NY,NX)

@@ -51,7 +51,7 @@ module RootGasMod
 
   !local variables
   logical :: chkActiveUptk
-  integer :: M,MX  
+  integer :: M,MX,NR
   real(r8) :: B,C
   real(r8) :: trcg_rootml_loc(idg_beg:idg_NH3)     !vol gaseous mass volatile in roots
   real(r8) :: trcs_rootml_loc(idg_beg:idg_NH3)     !vol aqueous mass volatile in roots
@@ -74,7 +74,7 @@ module RootGasMod
   real(r8) :: RGasTranspFlxPrev(idg_beg:idg_NH3)       !diagnosed increment gas flux
   real(r8) :: ROXYLX
   real(r8) :: RGas_DisolvSoil_flx(idg_beg:idg_end)     !gas dissolution into aqueous concentration in soil
-  real(r8) :: RTCR1,RTCR2
+  real(r8) :: RTCR1,RTCR2,fMedium,SurvivingFineRootLength
   real(r8) :: RTCRA                                    !root conductance scalar for gas transport between atmosphere and root inner space [m]
   real(r8) :: RTARRX
   real(r8) :: RootCO2Prod_tscaled                      !root CO2 gas efflux due to root respiration at time step for gas flux calculations
@@ -140,6 +140,9 @@ module RootGasMod
     RootPoreVol_pvr              => plt_morph%RootPoreVol_pvr               ,& !input  :root layer volume air, [m2 d-2]
     RootAbsorbLenPerPlant_pvr    => plt_morph%RootAbsorbLenPerPlant_pvr     ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr            => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
+    Root2ndLen_rpvr              => plt_morph%Root2ndLen_rpvr               ,& !input  :population fine-root length per structural axis, [m]
+    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr       ,& !input  :fine-root structural C/N/P per axis, [g]
+    NumStructuralRootAxes_pft    => plt_morph%NumStructuralRootAxes_pft     ,& !input  :number of active structural-root groups, [-]
     Root2ndRadius_rpvr           => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft              => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
     RootVH2O_pvr                 => plt_morph%RootVH2O_pvr                  ,& !input  :root space volume occupied by water in each layer, [m2 d-2]   
@@ -148,7 +151,7 @@ module RootGasMod
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
     RootMediumXNum_pvr           => plt_morph%RootMediumXNum_pvr            ,& !inoput :Number of medium size root axes in layer, [d-2]    
     Root1stTransptArea_pvr       => plt_morph%Root1stTransptArea_pvr        ,& !input  :transport area by 1st order root, [-] 
-    RootFineFrac2Med_pvr         => plt_morph%RootFineFrac2Med_pvr          ,& !input :fraction of fine roots that are associated with medium roots, [-]        
+    RootFineFrac2Med_rpvr         => plt_morph%RootFineFrac2Med_rpvr          ,& !fine-axis-count-weighted medium-root routing by category, [-]
     RootMedTransptArea_pvr       => plt_morph%RootMedTransptArea_pvr        ,& !input  :transport area by medisum size roots, [-]
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
     RootMediumLength_pvr         => plt_morph%RootMediumLength_pvr          ,& !input  :within layer mean length for medium size root axes, [m d-2]              
@@ -239,32 +242,41 @@ module RootGasMod
       !primary roots conductance scalar[m]
       RTCR1 = AMAX1(PlantPopuLive_pft(NZ),Root1stXNumL_pvr(L,NZ))*Root1stTransptArea_pvr(N,L,NZ)/CumSoilThickMidL_vr(L)
       !
-      if(lcoarseroot .and. RootMediumLength_pvr(L,NZ).GT.0._r8 .and. RootMedTransptArea_pvr(N,L,NZ).GT.0._r8)then
-        RTCRM=AMAX1(PlantPopuLive_pft(NZ),RootMediumXNum_pvr(L,NZ))*RootMedTransptArea_pvr(N,L,NZ)/RootMediumLength_pvr(L,NZ)
-      else
-        RTCRM=0._r8
+      RTCRM = 0._r8
+      fMedium = 0._r8
+      ! Absent or disabled medium roots leave the direct primary-fine pathway.
+      if(lcoarseroot .and. RootMediumLength_pvr(L,NZ).GT.0._r8 .and. RootMediumXNum_pvr(L,NZ).GT.0._r8)then
+        fMedium = RootFineFrac2Med_rpvr(N,L,NZ)
+        if(RootMedTransptArea_pvr(N,L,NZ).GT.0._r8)then
+          RTCRM=AMAX1(PlantPopuLive_pft(NZ),RootMediumXNum_pvr(L,NZ))*RootMedTransptArea_pvr(N,L,NZ)/RootMediumLength_pvr(L,NZ)
+        endif
       endif
 
-      !secondary roots conductance scalar, [m]
-      RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2)/(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
-      
-      IF(RTCR2.GT.RTCR1)THEN
-        !consider the relationship between primary and secondary roots as serial, so the resistance adds up
-        if(RTCRM.GT.0._R8 .and. RootFineFrac2Med_pvr(L,NZ).GT.0._r8)THEN                    
-          condM=1._r8/(1._r8/(RTCR2*RootFineFrac2Med_pvr(L,NZ))+1._r8/RTCRM)
-          condC=RTCR2*(1._r8-RootFineFrac2Med_pvr(L,NZ))          
-          RTCRA = 1._r8/(1._r8/RTCR1+ 1./(condC+condM))        
-        ELSE
-          RTCRA = RTCR1*RTCR2/(RTCR1+RTCR2)
-        ENDIF
-      ELSE
-        !fine root has lower conductance
-        if(RTCRM.GT.0._r8)then
-          RTCRA = 1._r8/(1._r8/RTCR1+1._r8/RTCRM)
-        else
-          RTCRA = RTCR1
-        endif  
-      ENDIF
+      SurvivingFineRootLength = 0._r8
+      DO NR=1,NumStructuralRootAxes_pft(NZ)
+        if(RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ).GT.ZERO4Groth_pft(NZ))then
+          SurvivingFineRootLength = SurvivingFineRootLength+AZMAX1(Root2ndLen_rpvr(N,L,NR,NZ))
+        endif
+      ENDDO
+
+      RTCR2 = 0._r8
+      if(Root2ndXNumL_rpvr(N,L,NZ).GT.0._r8 .and. Root2ndEffLen4uptk_rpvr(N,L,NZ).GT.0._r8)then
+        RTCR2 = (Root2ndXNumL_rpvr(N,L,NZ)*PICON*Root2ndRadius_rpvr(N,L,NZ)**2) &
+          /(FracSoiLayByPrimRoot_pvr(L,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ))
+      endif
+      if(Root2ndXNumL_rpvr(N,L,NZ).GT.0._r8 .or. SurvivingFineRootLength.GT.0._r8)then
+        ! A zero count alone does not prove that fine-root tissue is absent.
+        ! Keep the fine-root pathway closed if surviving tissue has no conducting axes.
+        condC = RTCR2*(1._r8-fMedium)
+        condM = SeriesConductance(RTCR2*fMedium,RTCRM)
+        RTCRA = SeriesConductance(RTCR1,condC+condM)
+      elseif(RTCRM.GT.0._r8)then
+        ! Neither fine-root axes nor surviving length: retain the primary-medium pathway.
+        RTCRA = SeriesConductance(RTCR1,RTCRM)
+      else
+        ! Primary roots themselves retain a gas pathway when lateral roots are absent.
+        RTCRA = RTCR1
+      endif
     ELSE
       RTCRA=0.0_r8
     ENDIF
@@ -670,5 +682,19 @@ module RootGasMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootSoilGasExchange
+!----------------------------------------------------------------------------------------------------
+  pure function SeriesConductance(a,b) result(g)
+  implicit none
+  real(r8), intent(in) :: a,b
+  real(r8) :: g,small,large
+
+  ! A closed segment closes its series pathway; avoid products and reciprocal overflow.
+  g = 0._r8
+  if(a.GT.0._r8 .and. b.GT.0._r8)then
+    small = MIN(a,b)
+    large = MAX(a,b)
+    g = small/(1._r8+small/large)
+  endif
+  end function SeriesConductance
   ![tail]
 end module RootGasMod

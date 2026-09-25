@@ -52,7 +52,7 @@ contains
   integer :: NB,NR,K,L,M,N,NE
 
     DO L=1,NK_col(NY,NX)
-      RootFineFrac2Med_pvr(L,NZ,NY,NX)                  = plt_morph%RootFineFrac2Med_pvr(L,NZ)
+      RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)                  = plt_morph%RootFineFrac2Med_rpvr(:,L,NZ)
       RootMediumLength_pvr(L,NZ,NY,NX)                  = plt_morph%RootMediumLength_pvr(L,NZ)
       RootSinkWeight_pvr(L,NZ,NY,NX)                    = plt_morph%RootSinkWeight_pvr(L,NZ)
       Root1stSinkWeight_pvr(L,NZ,NY,NX)                 = plt_morph%Root1stSinkWeight_pvr(L,NZ)
@@ -239,7 +239,7 @@ contains
     DO L=1,NK_col(NY,NX)
       plt_rbgc%GroSrcRootStress_pvr(L,NZ)  = GroSrcRootStress_pvr(L,NZ,NY,NX)
       plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
-      plt_morph%RootFineFrac2Med_pvr(L,NZ) = RootFineFrac2Med_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_rpvr(:,L,NZ) = RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)
       DO K=1,jcplx
         DO N=1,Myco_pft(NZ,NY,NX)
           DO NE=1,NumPlantChemElms

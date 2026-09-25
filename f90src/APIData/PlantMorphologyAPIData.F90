@@ -42,7 +42,7 @@ module PlantMorphologyAPIData
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
   real(r8), pointer :: RootMediumXNum_rpvr(:,:,:)      => null() !number of medium root axes in soil layer, [# d-2]
-  real(r8), pointer :: RootFineFrac2Med_pvr(:,:)       => null() !fraction of fine roots that are associated with medium roots, [-]
+  real(r8), pointer :: RootFineFrac2Med_rpvr(:,:,:)       => null() !fine-axis-count-weighted fraction attached to medium roots, by root category, [-]
   real(r8), pointer :: CRootLumenArea_rpvr(:,:,:)      => null() !coarse roots lumen area for root axes, [m2]
   real(r8), pointer :: CRootLumenArea_pvr(:,:)         => null() !coarse roots lumen area, [m2]
   real(r8), pointer :: MRootLumenArea_pvr(:,:)         => null() !medium roots lumen area, [m2]
@@ -258,7 +258,7 @@ contains
   allocate(this%CRootLumenArea_rpvr(JZ1,MaxNumRootAxes,JP1)); this%CRootLumenArea_rpvr=0._r8
   allocate(this%Root2ndXNum_rpvr(jroots,JZ1,MaxNumRootAxes,JP1));this%Root2ndXNum_rpvr=0._r8
   allocate(this%RootMediumXNum_rpvr(JZ1,MaxNumRootAxes,JP1)); this%RootMediumXNum_rpvr=0._r8
-  allocate(this%RootFineFrac2Med_pvr(JZ1,JP1)); this%RootFineFrac2Med_pvr=0._r8
+  allocate(this%RootFineFrac2Med_rpvr(jroots,JZ1,JP1)); this%RootFineFrac2Med_rpvr=0._r8
   allocate(this%iPlantNfixType_pft(JP1));this%iPlantNfixType_pft=0
   allocate(this%Myco_pft(JP1));this%Myco_pft=0
   allocate(this%CanopyHeight4WatUptake_pft(JP1));this%CanopyHeight4WatUptake_pft=spval
@@ -390,5 +390,6 @@ contains
   class(plant_morph_type) :: this
 
   if(associated(this%RootMediumMeanLength_rpvr))deallocate(this%RootMediumMeanLength_rpvr)
+  if(associated(this%RootFineFrac2Med_rpvr))deallocate(this%RootFineFrac2Med_rpvr)
   end subroutine plt_morph_destroy
 end module PlantMorphologyAPIData
