@@ -94,7 +94,7 @@ module NoduleBGCMod
   call PrintInfo('beg '//subname)
 !     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
-  CanopyN2Fix_pft(NZ)=0._r8
+  
   IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
     !
     !     INITIAL INFECTION
