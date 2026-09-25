@@ -39,6 +39,9 @@ take precedence over repository guidance.
   future requests.
 - Write HTML files to `ecosim_knowledge/` only when the user explicitly asks
   for an HTML format.
+- Inside `ecosim_knowledge/`, stage and commit only HTML files and the content
+  they reference (images, CSS, data files they load). Leave everything else
+  there untracked, including `.DS_Store` and intermediate or scratch files.
 - Keep relative source links valid from that directory when creating or moving
   a document.
 
