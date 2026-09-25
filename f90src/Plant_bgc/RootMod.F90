@@ -347,7 +347,9 @@ implicit none
     Root1stLenPP_rpvr              => plt_morph%Root1stLenPP_rpvr                ,& !input  :length per primary root axis in soil layer, [m]
     Root2ndXNum_rpvr               => plt_morph%Root2ndXNum_rpvr                 ,& !inoput :secondary root axes per structural axis, [d-2]
     Root2ndXNumL_rpvr              => plt_morph%Root2ndXNumL_rpvr                ,& !output :root layer number axes, [d-2]
-    RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !input :population medium-root axes per structural group, [-]
+    RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !inoput :population medium-root axes per structural group, [-]
+    RootMediumXNum_pvr             => plt_morph%RootMediumXNum_pvr               ,& !output :surviving population medium-root axes in layer, [-]
+    RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !input :population medium-root length per structural group, [m d-2]
     RootMediumRadius_rpvr          => plt_morph%RootMediumRadius_rpvr            ,& !inoput :root layer radius for medium size axes, [m]    
     NGTopRootLayer_pft             => plt_morph%NGTopRootLayer_pft               ,& !input  :soil layer at planting depth, [-]
     Num1stAxesPerStructRootX_pft           => plt_morph%Num1stAxesPerStructRootX_pft             ,& !input :primary axes per structural-root group per plant, [-]
@@ -435,6 +437,12 @@ implicit none
         TotAbsorbRootVolPP       = TotAbsorbRootVolPP+AreaTranspt*Root1stLenPP_rpvr(L,NR,NZ)*Num1stAxesPerStructRootX_pft(NZ)
       endif      
       Root1stTransptArea_pvr(N,L,NZ)=Root1stTransptArea_pvr(N,L,NZ)+AreaTranspt
+      ! Counts are assigned before withdrawal during growth. Remove dead axes
+      ! before deriving the geometry used by gas transport in the next timestep.
+      if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).LE.0._r8 .or. &
+         RootMediumLength_rpvr(L,NR,NZ).LE.0._r8)then
+        RootMediumXNum_rpvr(L,NR,NZ) = 0._r8
+      endif
       if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8 .and. &
          RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8)then
         DTransptTube                   = AMIN1(ZSTX,AMAX1(FSTK*RootMediumRadius_rpvr(L,NR,NZ),Root1stMaxRadius1_pft(ipltroot,NZ)))
@@ -450,6 +458,9 @@ implicit none
     Root1stTransptArea_pvr(N,L,NZ)=Root1stTransptArea_pvr(N,L,NZ)/NumStructuralRootAxes_pft(NZ)
   endif
 
+  ! Use the same surviving axes for layer count and mean transport area.
+  ! The mycorrhizal diagnostic must not overwrite the plant medium-root count.
+  if(N.EQ.ipltroot)RootMediumXNum_pvr(L,NZ) = MediumTransptAxisCount
   if(MediumTransptAxisCount.GT.0._r8)then
     RootMedTransptArea_pvr(N,L,NZ) = RootMedTransptArea_pvr(N,L,NZ)/MediumTransptAxisCount
   endif
