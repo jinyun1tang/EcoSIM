@@ -347,7 +347,7 @@ implicit none
     Root1stLenPP_rpvr              => plt_morph%Root1stLenPP_rpvr                ,& !input  :length per primary root axis in soil layer, [m]
     Root2ndXNum_rpvr               => plt_morph%Root2ndXNum_rpvr                 ,& !inoput :secondary root axes per structural axis, [d-2]
     Root2ndXNumL_rpvr              => plt_morph%Root2ndXNumL_rpvr                ,& !output :root layer number axes, [d-2]
-    RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !inoput :population medium-root axes per structural group, [-]
+    RootMediumXNum_rpvr            => plt_morph%RootMediumXNum_rpvr              ,& !input :population medium-root axes per structural group, including growth initiation, [-]
     RootMediumXNum_pvr             => plt_morph%RootMediumXNum_pvr               ,& !output :surviving population medium-root axes in layer, [-]
     RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !input :population medium-root length per structural group, [m d-2]
     RootMediumRadius_rpvr          => plt_morph%RootMediumRadius_rpvr            ,& !inoput :root layer radius for medium size axes, [m]    
@@ -437,13 +437,10 @@ implicit none
         TotAbsorbRootVolPP       = TotAbsorbRootVolPP+AreaTranspt*Root1stLenPP_rpvr(L,NR,NZ)*Num1stAxesPerStructRootX_pft(NZ)
       endif      
       Root1stTransptArea_pvr(N,L,NZ)=Root1stTransptArea_pvr(N,L,NZ)+AreaTranspt
-      ! Counts are assigned before withdrawal during growth. Remove dead axes
-      ! before deriving the geometry used by gas transport in the next timestep.
-      if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).LE.0._r8 .or. &
-         RootMediumLength_rpvr(L,NR,NZ).LE.0._r8)then
-        RootMediumXNum_rpvr(L,NR,NZ) = 0._r8
-      endif
+      ! Keep per-group counts: their minimum value seeds future medium-root growth.
+      ! Only existing tissue contributes to the layer count and transport area.
       if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8 .and. &
+         RootMediumLength_rpvr(L,NR,NZ).GT.0._r8 .and. &
          RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8)then
         DTransptTube                   = AMIN1(ZSTX,AMAX1(FSTK*RootMediumRadius_rpvr(L,NR,NZ),Root1stMaxRadius1_pft(ipltroot,NZ)))
         AreaTranspt                    = PICON*(2._r8*RootMediumRadius_rpvr(L,NR,NZ)*DTransptTube-DTransptTube**2)
@@ -4839,6 +4836,7 @@ implicit none
     xylemPhi_max_pft               => plt_morph%xylemPhi_max_pft                 ,& !input  :asymptotic limit fraction of the xyxlem area as lumen for tree, [m2/m2]
     xylemPhi_mean_pft              => plt_morph%xylemPhi_mean_pft                ,& !input  :the mean are fraction found in the root xylem as lumen for non-tree roots, [m2/m2]
     RootSinkScalar_pvr             => plt_morph%RootSinkScalar_pvr               ,& !input  :root sink scalar to account for the missing of intermediate size roots, [0-1]
+    RootMediumStructElms_rpvr      => plt_biom%RootMediumStructElms_rpvr         ,& !input :medium-root structural elements, [g d-2]
     RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !input  :total medium root length in layer for for axis NR, [m d-2]      
     RootMediumLength_pvr           => plt_morph%RootMediumLength_pvr             ,& !output :within layer mean length of individual medium roots, [m]
     SapFlowVLinear_rpvr            => plt_ew%SapFlowVLinear_rpvr                 ,& !output :linear sap flow for primary root axis normalized by lumen area, [m h-1]
@@ -4911,7 +4909,9 @@ implicit none
         !Both candidate sapwood areas represent the population; retain a per-plant lumen-area floor.
         CRootLumenArea_rpvr(L,NR,NZ) = AMAX1(sap_area*LumenFraction,1.E-9_R8*PlantPopuLive_pft(NZ)) &
           /RootSinkScalar_pvr(L,NR,NZ)
-        if(RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. &
+        ! Match the living-tissue filter used for the gas-transport geometry.
+        if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8 .and. &
+           RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. &
            RootMediumLength_rpvr(L,NR,NZ).GT.0._r8)then
           !medium size roots
           LumenFraction = xylemPhi_min_pft(NZ)+(xylemPhi_max_pft(NZ)-xylemPhi_min_pft(NZ))*(1._r8-sfexp(-3._r8*RootMediumRadius_rpvr(L,NR,NZ)/Radius95pctMature_pft(NZ)))

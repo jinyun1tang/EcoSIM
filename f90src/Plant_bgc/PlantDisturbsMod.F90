@@ -2244,10 +2244,20 @@ module PlantDisturbsMod
     DO NE=1,NumPlantChemElms
       RootMedStruct_pvr(NE,L,NZ)=SUM(RootMediumStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))
     ENDDO
-    RootMediumXNum_pvr(L,NZ)=SUM(RootMediumXNum_rpvr(L,1:NumStructuralRootAxes_pft(NZ),NZ))
+    ! Per-group counts can include axes reserved for growth initiation.
+    ! Rebuild transport totals from surviving medium-root tissue only.
+    RootMediumXNum_pvr(L,NZ)=0._r8
     RootMediumLength_pvr(L,NZ)=0._r8
+    DO NR=1,NumStructuralRootAxes_pft(NZ)
+      IF(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8 .and. &
+         RootMediumLength_rpvr(L,NR,NZ).GT.0._r8 .and. &
+         RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8)THEN
+        RootMediumXNum_pvr(L,NZ)=RootMediumXNum_pvr(L,NZ)+RootMediumXNum_rpvr(L,NR,NZ)
+        RootMediumLength_pvr(L,NZ)=RootMediumLength_pvr(L,NZ)+RootMediumLength_rpvr(L,NR,NZ)
+      ENDIF
+    ENDDO
     IF(RootMediumXNum_pvr(L,NZ).GT.0._r8)THEN
-      RootMediumLength_pvr(L,NZ)=SUM(RootMediumLength_rpvr(L,1:NumStructuralRootAxes_pft(NZ),NZ))/RootMediumXNum_pvr(L,NZ)
+      RootMediumLength_pvr(L,NZ)=RootMediumLength_pvr(L,NZ)/RootMediumXNum_pvr(L,NZ)
     ENDIF
     Root1stXNumL_pvr(L,NZ)        = Root1stXNumL_pvr(L,NZ)*FracLeftThin      
   ENDIF
