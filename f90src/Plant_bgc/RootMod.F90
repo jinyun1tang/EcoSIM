@@ -4986,8 +4986,10 @@ implicit none
       fMR=0._r8
       if(lcoarseroot .and. lumenVolM.GT.0._r8)then
         !The local routing fraction is geometric, including when water flow is zero.
-        !DLYR3(L) as an approximation for coarse-root length
-        fMR = RootMediumLength_rpvr(L,NR,NZ)/(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ))
+        !Approximate primary length by layer thickness times the population axis count,
+        !matching the population lengths used for fine-root branching.
+        fMR = RootMediumLength_rpvr(L,NR,NZ) &
+          /(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*Num1stAxesPerStructRootXPOP_pft(NZ))
       endif
       ! Match the fine-axis weighting used for water uptake and layer conductance.
       ! Groups without medium roots still contribute their fine axes to the denominator.
@@ -5571,11 +5573,13 @@ implicit none
                 ! Both lengths refer to an individual root; the mean is refreshed above.
                 IF(MediumRootCd4NonstTP.GT.0._r8 .and. &
                    RootMediumMeanLength_rpvr(L,NR,NZ).GT.Root2ndTipLen4uptk)then
-                  ! Both pathway fractions use population lengths: medium roots and layer thickness times population.
+                  !Use the same population lengths as fine-root branching and cytokinin routing:
+                  !medium-root length and layer thickness times the population primary-axis count.
                   CMFR = 1._r8/(1._r8/MediumRootCd4NonstTP &
-                    +(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ)) &
+                    +(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*Num1stAxesPerStructRootXPOP_pft(NZ)) &
                     /(FineRootCd4NonstTP*RootMediumLength_rpvr(L,NR,NZ)))
-                  CFR  = FineRootCd4NonstTP*DLYR3(L)*PlantPopuLive_pft(NZ)/(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ))
+                  CFR  = FineRootCd4NonstTP*DLYR3(L)*Num1stAxesPerStructRootXPOP_pft(NZ) &
+                    /(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*Num1stAxesPerStructRootXPOP_pft(NZ))
                   Root2ndSink_pvr(N,L,NR)=(1._r8-fctyok)/(1._r8/PrimaryRootCd4NonstTP+1._r8/(CMFR+CFR))
                 else                  
                   Root2ndSink_pvr(N,L,NR)=(1._r8-fctyok)*PrimaryRootCd4NonstTP*FineRootCd4NonstTP/(PrimaryRootCd4NonstTP+FineRootCd4NonstTP)  
