@@ -31,6 +31,8 @@ take precedence over repository guidance.
 
 ## Knowledge documents and user preferences
 
+- When asked to commit a fix or change, commit locally only. Do not push or
+  otherwise update a remote unless the user explicitly says "commit to remote".
 - Save generated EcoSIM process explanations, code walkthroughs, and similar
   knowledge documents under `ecosim_knowledge/` by default, unless the user
   specifies another destination. This is a persistent user preference for
@@ -42,6 +44,12 @@ take precedence over repository guidance.
 
 ## Working with model code
 
+- When a code review identifies an issue, trace the same underlying problem
+  through related equations, variables, callers, and downstream consumers
+  before reporting it. Group confirmed instances sharing a root cause or
+  requiring a coordinated fix into one finding, listing the affected sites
+  and the full scope of the recommended correction. Keep independent issues
+  separate and distinguish confirmed effects from unverified concerns.
 - Inspect `git status` before editing. Preserve existing user changes, untracked
   inputs, simulation outputs, and restart files; do not clean or reset them.
 - Trace callers and CMake source lists to establish the active implementation.
