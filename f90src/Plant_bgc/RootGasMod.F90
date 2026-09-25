@@ -248,7 +248,7 @@ module RootGasMod
       if(lcoarseroot .and. RootMediumLength_pvr(L,NZ).GT.0._r8 .and. RootMediumXNum_pvr(L,NZ).GT.0._r8)then
         fMedium = RootFineFrac2Med_rpvr(N,L,NZ)
         if(RootMedTransptArea_pvr(N,L,NZ).GT.0._r8)then
-          RTCRM=AMAX1(PlantPopuLive_pft(NZ),RootMediumXNum_pvr(L,NZ))*RootMedTransptArea_pvr(N,L,NZ)/RootMediumLength_pvr(L,NZ)
+          RTCRM=RootMediumXNum_pvr(L,NZ)*RootMedTransptArea_pvr(N,L,NZ)/RootMediumLength_pvr(L,NZ)
         endif
       endif
 
