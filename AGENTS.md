@@ -54,6 +54,9 @@ take precedence over repository guidance.
   submodules unless that is part of the requested work.
 - Treat `python_tools` changes as submodule changes, separate from root-repository
   changes. Do not automatically commit, update submodule pointers, or publish work.
+- Preserve staged changes inside `python_tools`. Do not edit files with staged
+  changes or alter their index entries (including staging, unstaging, or committing)
+  unless the user explicitly requests updates to those staged contents.
 
 ## Scientific and input conventions
 
