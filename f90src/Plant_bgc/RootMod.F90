@@ -292,6 +292,7 @@ implicit none
     ENDDO
   ENDDO
 
+  call plt_morph%RefreshMediumRootMeanLength(NZ)
   call CytoKininDynamics(yearIJ%I,yearIJ%J,NZ,Root2ndSink_pvr)
 
   call PrintInfo('end '//subname)
@@ -342,12 +343,12 @@ implicit none
     RootMatureAge_pft              => plt_morph%RootMatureAge_pft                ,& !input : Root maturation age, [h]
     NumStructuralRootAxes_pft      => plt_morph%NumStructuralRootAxes_pft        ,& !input  :number of structural root axes,[-]
     FracRootElmAllocm              => plt_allom%FracRootElmAllocm                ,& !input  :C woody/soft fraction in root,[-]
-    Root1stLenPP_rpvr              => plt_morph%Root1stLenPP_rpvr                ,& !input  :primary root axis length in soil layer, [m d-2]
-    Root2ndXNum_rpvr               => plt_morph%Root2ndXNum_rpvr                 ,& !input  :secondary root axes per structural axis, [d-2]
-    Root2ndXNumL_rpvr              => plt_morph%Root2ndXNumL_rpvr                ,& !input  :root layer number axes, [d-2]
+    Root1stLenPP_rpvr              => plt_morph%Root1stLenPP_rpvr                ,& !input  :length per primary root axis in soil layer, [m]
+    Root2ndXNum_rpvr               => plt_morph%Root2ndXNum_rpvr                 ,& !inoput :secondary root axes per structural axis, [d-2]
+    Root2ndXNumL_rpvr              => plt_morph%Root2ndXNumL_rpvr                ,& !output :root layer number axes, [d-2]
     RootMediumRadius_rpvr          => plt_morph%RootMediumRadius_rpvr            ,& !inoput :root layer radius for medium size axes, [m]    
     NGTopRootLayer_pft             => plt_morph%NGTopRootLayer_pft               ,& !input  :soil layer at planting depth, [-]
-    Num1stRootAxesPP_pft           => plt_morph%Num1stRootAxesPP_pft             ,& !input :number of primary root axesr per plant, [d-2]
+    Num1stAxesPerStructRootX_pft           => plt_morph%Num1stAxesPerStructRootX_pft             ,& !input :primary axes per structural-root group per plant, [-]
     Root2ndLen_rpvr                => plt_morph%Root2ndLen_rpvr                  ,& !input :population secondary root length, [m d-2]
     RootMyco2ndStrutElms_rpvr      => plt_biom%RootMyco2ndStrutElms_rpvr         ,& !input :secondary root structural elements, [g d-2]
     Root2ndVH2O_rpvr               => plt_morph%Root2ndVH2O_rpvr                 ,& !output :water-occupied secondary root volume
@@ -381,15 +382,24 @@ implicit none
   !Derive fine-root geometry from surviving state, including after withdrawal.
   TotRoot2ndPopuC = 0._r8
   TotPopuRoot2ndLlenAxes = 0._r8
-  ! Rebuild the total after growth/retreat instead of retaining incremental counts.
-  Root2ndXNumL_rpvr(N,L,NZ) = SUM(Root2ndXNum_rpvr(N,L,1:NumStructuralRootAxes_pft(NZ),NZ))
   Root2ndVH2O_rpvr(N,L,:,NZ) = 0._r8
   DO NR=1,NumStructuralRootAxes_pft(NZ)
+    ! Mortality may shorten roots after their counts were set during growth.
+    ! Retain surviving tips only; this refresh must not create new axes.
+    IF(RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ).LE.ZERO4Groth_pft(NZ) .OR. &
+       Root2ndLen_rpvr(N,L,NR,NZ).LE.0._r8)THEN
+      Root2ndXNum_rpvr(N,L,NR,NZ) = 0._r8
+    ELSE
+      Root2ndXNum_rpvr(N,L,NR,NZ) = MIN(AZMAX1(Root2ndXNum_rpvr(N,L,NR,NZ)), &
+        Root2ndLen_rpvr(N,L,NR,NZ)/Root2ndTipLen4uptk)
+    ENDIF
     TotRoot2ndPopuC = TotRoot2ndPopuC+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
     TotPopuRoot2ndLlenAxes = TotPopuRoot2ndLlenAxes+Root2ndLen_rpvr(N,L,NR,NZ)
     Root2ndVH2O_rpvr(N,L,NR,NZ) = AZERO(Root2ndXSecArea_pft(N,NZ)*Root2ndLen_rpvr(N,L,NR,NZ) &
       *(1._r8-RootPorosity_pft(N,NZ)))
   ENDDO
+  ! Sum the corrected counts before effective lengths and cytokinin water routing.
+  Root2ndXNumL_rpvr(N,L,NZ) = SUM(Root2ndXNum_rpvr(N,L,1:NumStructuralRootAxes_pft(NZ),NZ))
   !
   CoarseRoot1stTotC              = 0._r8
   FineRoot1stTotc                = 0._r8
@@ -401,6 +411,7 @@ implicit none
   RootMedTransptArea_pvr(N,L,NZ) = 0._R8
 
   DO NR=1,NumStructuralRootAxes_pft(NZ)
+    ! Each NR contributes its own primary-axis count; the NR loop sums groups.
     ! TotRoot1stLlenAxesPP = total primary root length per plant
     ! TotRoot1stPopuC      = total primary root C mass for whole population
     if(N.EQ.ipltroot)then
@@ -413,12 +424,12 @@ implicit none
       !active secondary growth
       if(flag2ndGrowth_pvr(L,NR,NZ) .and. Root1stLenPP_rpvr(L,NR,NZ).GT.0._r8)then
         CoarseRoot1stTotC          = CoarseRoot1stTotC+RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)
-        TotCoarseRoot1stLlenAxesPP = TotCoarseRoot1stLlenAxesPP+Root1stLenPP_rpvr(L,NR,NZ)*Num1stRootAxesPP_pft(NZ)
+        TotCoarseRoot1stLlenAxesPP = TotCoarseRoot1stLlenAxesPP+Root1stLenPP_rpvr(L,NR,NZ)*Num1stAxesPerStructRootX_pft(NZ)
       else
         FineRoot1stTotc          = FineRoot1stTotc+RootMyco1stStrutElms_rpvr(ielmc,L,NR,NZ)
-        TotFineRoot1stLlenAxesPP = TotFineRoot1stLlenAxesPP+Root1stLenPP_rpvr(L,NR,NZ)*Num1stRootAxesPP_pft(NZ)
+        TotFineRoot1stLlenAxesPP = TotFineRoot1stLlenAxesPP+Root1stLenPP_rpvr(L,NR,NZ)*Num1stAxesPerStructRootX_pft(NZ)
         !assume cylindrical
-        TotAbsorbRootVolPP       = TotAbsorbRootVolPP+AreaTranspt*Root1stLenPP_rpvr(L,NR,NZ)*Num1stRootAxesPP_pft(NZ)
+        TotAbsorbRootVolPP       = TotAbsorbRootVolPP+AreaTranspt*Root1stLenPP_rpvr(L,NR,NZ)*Num1stAxesPerStructRootX_pft(NZ)
       endif      
       Root1stTransptArea_pvr(N,L,NZ)=Root1stTransptArea_pvr(N,L,NZ)+AreaTranspt
       if(RootMediumStructElms_rpvr(ielmc,L,NR,NZ).GT.0._r8)then
@@ -4660,7 +4671,7 @@ implicit none
       Root2ndXNumL_rpvr(NN,LL-1,NZ) = SUM(Root2ndXNum_rpvr(NN,LL-1,1:plt_morph%NumStructuralRootAxes_pft(NZ),NZ))
       Root2ndXNumL_rpvr(NN,LL,NZ) = SUM(Root2ndXNum_rpvr(NN,LL,1:plt_morph%NumStructuralRootAxes_pft(NZ),NZ))
 
-      XFRW = FracRootSinkL*RootProteinC_pvr(NN,L,NZ)
+      XFRW = FracRootSinkL*RootProteinC_pvr(NN,LL,NZ)
       XFRW = AMAX1(AMIN1(RootProteinC_pvr(NN,LL,NZ),XFRW),-RootProteinC_pvr(NN,LL-1,NZ))*scalp
       RootProteinC_pvr(NN,LL,NZ)    = RootProteinC_pvr(NN,LL,NZ)-XFRW
       RootProteinC_pvr(NN,LL-1,NZ)  = RootProteinC_pvr(NN,LL-1,NZ)+XFRW
@@ -5125,10 +5136,11 @@ implicit none
     NumStructuralRootAxes_pft  => plt_morph%NumStructuralRootAxes_pft   ,& !input  :number of structural root axes,[-]        
     iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft   ,& !input  :plant expression of secondary growth, [-]    
     iPlantRootProfile_pft      => plt_pheno%iPlantRootProfile_pft       ,& !input  :plant growth type (vascular, non-vascular),[-]    
-    RootMediumLength_rpvr      => plt_morph%RootMediumLength_rpvr       ,& !input  :root layer length for medium size axes, [m d-2]  
+    RootMediumMeanLength_rpvr  => plt_morph%RootMediumMeanLength_rpvr   ,& !input  :mean medium-root length per structural axis, [m]
     RootMediumXNum_rpvr        => plt_morph%RootMediumXNum_rpvr         ,& !input  :number of medium root axes in soil layer, [# d-2]    
     RootMediumRadius_rpvr      => plt_morph%RootMediumRadius_rpvr        & !input  :root layer radius for medium size axes, [m d-2]      
   )
+  call plt_morph%RefreshMediumRootMeanLength(NZ)
   RMPholeResist_vr=0._r8
   if(.not.lcoarseroot .or. .not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ)))return
 
@@ -5137,7 +5149,7 @@ implicit none
       if(RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8)then
         DTransptTube           = AMIN1(ZSTX,AMAX1(FSTK*RootMediumRadius_rpvr(L,NR,NZ),Root1stMaxRadius1_pft(ipltroot,NZ)))
         AreaTranspt            = 2._r8*AMAX1(RootMediumRadius_rpvr(L,NR,NZ),Root1stMaxRadius1_pft(ipltroot,NZ))*DTransptTube-DTransptTube**2
-        RMPholeResist_vr(L,NR) = AMAX1(0.5_r8*RootMediumLength_rpvr(L,NR,NZ)/RootMediumXNum_rpvr(L,NR,NZ),Root2ndTipLen4uptk)/AreaTranspt       
+        RMPholeResist_vr(L,NR) = AMAX1(0.5_r8*RootMediumMeanLength_rpvr(L,NR,NZ),Root2ndTipLen4uptk)/AreaTranspt
       endif
     enddo
   enddo
@@ -5351,6 +5363,7 @@ implicit none
     RootMyco1stSinkC_rpvr          => plt_rbgc%RootMyco1stSinkC_rpvr             ,& !input  :primary root C sink, [gC d-2 h-1]
     RootMyco2ndSinkC_rpvr          => plt_rbgc%RootMyco2ndSinkC_rpvr             ,& !input  :fine root/myco carbon sink, [gC d-2 h-1]
     Root2ndSinkWeight_pvr          => plt_morph%Root2ndSinkWeight_pvr            ,& !output :Secondary root nonst element sink profile, [d-2]
+    RootMediumMeanLength_rpvr      => plt_morph%RootMediumMeanLength_rpvr        ,& !input  :mean medium-root length per structural axis, [m]
     RootMediumLength_rpvr          => plt_morph%RootMediumLength_rpvr            ,& !input  :root layer length for medium size axes, [m d-2]      
     Root1stSinkWeight_pvr          => plt_morph%Root1stSinkWeight_pvr            ,& !output :primary root nonst element sink profile, [d-2]
     RootMSinkWeight_pvr            => plt_morph%RootMSinkWeight_pvr              ,& !output :medium size roots nonst element sink profile, [d-2]
@@ -5510,6 +5523,7 @@ implicit none
               !fine root conductance for nonstructural biomass transport
               FineRootCd4NonstTP = safe_adb(Root2ndXNum_rpvr(N,L,NR,NZ)*Root2ndRadius_rpvr(N,L,NZ)**2,Root2ndEffLen4uptk_rpvr(N,L,NZ))
               !     
+              MediumRootCd4NonstTP = 0._r8
               IF(RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. FineRootCd4NonstTP.GT.ZERO4Groth_pft(NZ))then
                 if(RMPholeResist_vr(L,NR).GT.0._r8)then
                   MediumRootCd4NonstTP = RootMediumXNum_rpvr(L,NR,NZ)/RMPholeResist_vr(L,NR)
@@ -5525,9 +5539,13 @@ implicit none
               endif  
                
               IF(FineRootCd4NonstTP.GT.ZERO4Groth_pft(NZ))THEN
-                IF(RootMediumLength_rpvr(L,NR,NZ).GT.Root2ndTipLen4uptk)then
-                  !fine root defined,
-                  CMFR = 1._r8/(1._r8/MediumRootCd4NonstTP+(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L))/(FineRootCd4NonstTP*RootMediumLength_rpvr(L,NR,NZ)))
+                ! Both lengths refer to an individual root; the mean is refreshed above.
+                IF(MediumRootCd4NonstTP.GT.0._r8 .and. &
+                   RootMediumMeanLength_rpvr(L,NR,NZ).GT.Root2ndTipLen4uptk)then
+                  ! Both pathway fractions use population lengths: medium roots and layer thickness times population.
+                  CMFR = 1._r8/(1._r8/MediumRootCd4NonstTP &
+                    +(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ)) &
+                    /(FineRootCd4NonstTP*RootMediumLength_rpvr(L,NR,NZ)))
                   CFR  = FineRootCd4NonstTP*DLYR3(L)*PlantPopuLive_pft(NZ)/(RootMediumLength_rpvr(L,NR,NZ)+DLYR3(L)*PlantPopuLive_pft(NZ))
                   Root2ndSink_pvr(N,L,NR)=(1._r8-fctyok)/(1._r8/PrimaryRootCd4NonstTP+1._r8/(CMFR+CFR))
                 else                  

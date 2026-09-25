@@ -570,6 +570,7 @@ implicit none
     plt_rbgc%Cytokinin2ndConc_rpvr(:,:,:,NZ) = 0._r8
     plt_rbgc%CytokininMRConc_rpvr(:,:,NZ)    = 0._r8
     plt_rbgc%Cytokinin1stConc_rpvr(:,:,NZ)   = 0._r8
+    plt_morph%RootMediumMeanLength_rpvr(:,:,NZ) = 0._r8
 
     D8870: DO NR=1,NumStructuralRootAxes_pft(NZ)
       DO L=NU,MaxNumRootLays       

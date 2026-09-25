@@ -2239,6 +2239,7 @@ module PlantDisturbsMod
       RootMediumXNum_rpvr(L,NR,NZ)   = RootMediumXNum_rpvr(L,NR,NZ)*FracLeftThin
       Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracLeftThin        
     ENDDO
+    call plt_morph%RefreshMediumRootMeanLength(NZ)
     !Refresh layer totals once for plant roots, not again for mycorrhizae.
     DO NE=1,NumPlantChemElms
       RootMedStruct_pvr(NE,L,NZ)=SUM(RootMediumStructElms_rpvr(NE,L,1:NumStructuralRootAxes_pft(NZ),NZ))

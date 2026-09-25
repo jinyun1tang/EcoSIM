@@ -158,6 +158,7 @@ module PlantMorphologyAPIData
   REAL(R8), POINTER :: NumMediumRootAxes_rpvr(:,:,:)         => null() ! Number of medium size root axes in layer for structrual axes, [d-2]
   REAL(R8), POINTER :: RootMediumXNum_pvr(:,:)          => null() ! Number of medium size root axes in layer, [d-2]
   real(r8), pointer :: RootMediumLength_rpvr(:,:,:)        => null()      !root layer length for medium size axes, [m d-2]
+  real(r8), pointer :: RootMediumMeanLength_rpvr(:,:,:) => null() !derived mean medium-root length per layer/structural axis, [m]; internal only
   real(r8), pointer :: RootMediumLength_pvr(:,:)      => null() !root layer mean length of individual medium roots, [m]
   real(r8), pointer :: RootMediumRadius_rpvr(:,:,:)    => null() !root layer radius for medium size axes, [m]
   real(r8), pointer :: Num1stAxesPerStructRootXPOP_pft(:)   =>null() !population primary root axes number on one structrual axis, [d-2]
@@ -181,6 +182,7 @@ module PlantMorphologyAPIData
   contains
     procedure, public :: Init    => plt_morph_init
     procedure, public :: Destroy => plt_morph_destroy
+    procedure, public :: RefreshMediumRootMeanLength => plt_morph_refresh_medium_root_mean_length
   end type plant_morph_type
 
 
@@ -273,6 +275,7 @@ contains
   allocate(this%RootMediumXNum_pvr(JZ1,JP1)); this%RootMediumXNum_pvr=0._r8
   allocate(this%RootMediumLength_pvr(JZ1,JP1)); this%RootMediumLength_pvr=0._r8
   allocate(this%RootMediumLength_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumLength_rpvr=0._r8
+  allocate(this%RootMediumMeanLength_rpvr(JZ1,MaxNumRootAxes,JP1));this%RootMediumMeanLength_rpvr=0._r8
   allocate(this%Num1stAxesPerStructRootX_pft(JP1)); this%Num1stAxesPerStructRootX_pft=0._r8
   allocate(this%Num1stAxesPerStructRootXPOP_pft(JP1)); this%Num1stAxesPerStructRootXPOP_pft=0._r8
   allocate(this%Num1stRootAxesPP_pft(JP1)); this%Num1stRootAxesPP_pft=0._r8
@@ -363,9 +366,29 @@ contains
   allocate(this%iPlantGrainType_pft(JP1));this%iPlantGrainType_pft=0
   end subroutine plt_morph_init
 
+  subroutine plt_morph_refresh_medium_root_mean_length(this,NZ)
+  implicit none
+  class(plant_morph_type), intent(inout) :: this
+  integer, intent(in) :: NZ
+  integer :: L,NR
+
+  ! Derived from population totals; recompute before use, including after restart.
+  this%RootMediumMeanLength_rpvr(:,:,NZ) = 0._r8
+  DO NR=1,this%NumStructuralRootAxes_pft(NZ)
+    DO L=1,SIZE(this%RootMediumLength_rpvr,1)
+      IF(this%RootMediumXNum_rpvr(L,NR,NZ).GT.0._r8 .and. &
+         this%RootMediumLength_rpvr(L,NR,NZ).GT.0._r8)THEN
+        this%RootMediumMeanLength_rpvr(L,NR,NZ) = &
+          this%RootMediumLength_rpvr(L,NR,NZ)/this%RootMediumXNum_rpvr(L,NR,NZ)
+      ENDIF
+    ENDDO
+  ENDDO
+  end subroutine plt_morph_refresh_medium_root_mean_length
+
   subroutine plt_morph_destroy(this)
   implicit none
   class(plant_morph_type) :: this
 
+  if(associated(this%RootMediumMeanLength_rpvr))deallocate(this%RootMediumMeanLength_rpvr)
   end subroutine plt_morph_destroy
 end module PlantMorphologyAPIData
