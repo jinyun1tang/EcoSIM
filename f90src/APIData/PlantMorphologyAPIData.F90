@@ -41,7 +41,7 @@ module PlantMorphologyAPIData
   real(r8), pointer :: Root1stSpecLen_pft(:,:)         => null() !specific root length primary axes,                                          [m g-1]
   real(r8), pointer :: Root2ndSpecLen_pft(:,:)         => null() !specific root length secondary axes,                                        [m g-1]
   real(r8), pointer :: Root2ndXNum_rpvr(:,:,:,:)       => null() !root layer number secondary axes,                                           [d-2]
-  real(r8), pointer :: RootMediumXNum_rpvr(:,:,:)      => null() !number of medium root axes in soil layer, [# d-2]
+  real(r8), pointer :: RootMediumXNum_rpvr(:,:,:)      => null() !living population medium-root axes by layer and structural-root group, [# d-2]
   real(r8), pointer :: RootFineFrac2Med_rpvr(:,:,:)       => null() !fine-axis-count-weighted fraction attached to medium roots, by root category, [-]
   real(r8), pointer :: CRootLumenArea_rpvr(:,:,:)      => null() !coarse roots lumen area for root axes, [m2]
   real(r8), pointer :: CRootLumenArea_pvr(:,:)         => null() !coarse roots lumen area, [m2]

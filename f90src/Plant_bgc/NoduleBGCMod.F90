@@ -715,14 +715,16 @@ module NoduleBGCMod
         NoduleMaintStructC_Oltd=0._r8
         IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RCCC.GT.ZERO)THEN
           !Background decay and maintenance must not consume the same structural C.
-          NoduleRemobilizableC=AZMAX1(RootNodulStrutElms_rpvr(ielmc,L,NZ)-NoduleElmDecayLoss(ielmc))*RCCC
-          NoduleMaintStructC_OUltd=AMIN1(RSNDLM,NoduleRemobilizableC)
+          NoduleRemobilizableC     = AZMAX1(RootNodulStrutElms_rpvr(ielmc,L,NZ)-NoduleElmDecayLoss(ielmc))*RCCC
+          NoduleMaintStructC_OUltd = AMIN1(RSNDLM,NoduleRemobilizableC)
+
           !Apply the physiological oxygen factor to structural respiration as for other roots.
           NoduleMaintStructC_Oltd=AMIN1(RSNDL,NoduleRemobilizableC)*RAutoRootO2Limter_rpvr(ipltroot,L,NZ)
+
           !Derive all actual C/N/P losses, litter, and recycling from this one payment.
-          NodulELmLoss2Senes(ielmc)=NoduleMaintStructC_Oltd/RCCC
-          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmn,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
-          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmp,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmc) = NoduleMaintStructC_Oltd/RCCC
+          NodulELmLoss2Senes(ielmn) = NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmn,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmp) = NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmp,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
 
           NodulELmSenes2Litr(ielmc)=NodulELmLoss2Senes(ielmc)*(1.0_r8-RCCC)
           NodulELmSenes2Litr(ielmn)=NodulELmLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)

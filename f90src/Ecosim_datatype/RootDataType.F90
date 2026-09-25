@@ -80,7 +80,7 @@ module RootDataType
   real(sp),target,allocatable ::  Cytokinin1stConc_rpvr(:,:,:,:,:)               !cytokinin concentration in primary roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  RootMediumLength_pvr(:,:,:,:)                  !Medium size root length, [m]
   real(sp),target,allocatable ::  RootFineFrac2Med_rpvr(:,:,:,:,:)                  !fine-axis-count-weighted fraction attached to medium roots, by root category, [-]
-  real(sp),target,allocatable ::  RootMediumXNum_rpvr(:,:,:,:,:)                 !number of medium root axes in soil layer, [# d-2]
+  real(sp),target,allocatable ::  RootMediumXNum_rpvr(:,:,:,:,:)                 !living population medium-root axes by layer and structural-root group, [# d-2]
   real(sp),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(sp),target,allocatable ::  RootMyco1stSinkC_rpvr(:,:,:,:,:)               !primary root C sink, [gC d-2 h-1]
   real(sp),target,allocatable ::  RootMyco2ndSinkC_rpvr(:,:,:,:,:,:)             !fine root/myco carbon sink, [gC d-2 h-1]
