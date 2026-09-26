@@ -124,7 +124,8 @@ module PlantBranchMod
     ENDDO
     KHiestGroLeafNode_brch(NB,NZ)=MAX(KHiestGroLeafNode_brch(NB,NZ),1)
     
-    call CalcPartitionCoeff(I,J,NB,NZ,PART,LRemob_brch,BegRemoblize)
+    call CalcPartitionCoeff(I,J,NB,NZ,PART, &
+      BegRemoblize=BegRemoblize,LRemob_brch=LRemob_brch)
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       GrothPART2LeafPetole=PART(ibrch_leaf)+PART(ibrch_petole)
@@ -244,8 +245,6 @@ module PlantBranchMod
     call ResetBranchPhenology(I,J,NB,NZ)
     !   
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
-
-    call ResetBranchPhenology(I,J,NB,NZ)
     !
     !   CANOPY N2 FIXATION (CYANOBACTERIA)
     !
@@ -307,7 +306,7 @@ module PlantBranchMod
         XFRE(ielmn)=AMAX1(XFRN1,10.0_r8*XFRP1)
         XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
         DO NE=2,NumPlantChemElms
-          call ExchFluxLimiter(LeafStrutElms_brch(NE,NB,NZ),CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
+          call ExchFluxLimiter(LeafElmntNode_brch(NE,K,NB,NZ) ,CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
           LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
           LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
           CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -561,7 +560,7 @@ module PlantBranchMod
   real(r8) :: PARTS
   real(r8) :: PARTX
   real(r8) :: TOTAL
-  logical :: check_perennial,check_annual,check_decidous
+  logical :: check_perennial,check_annual,check_cold_deciduous,check_drought_deciduous
   real(r8) :: PSILY(0:3)
   real(r8), parameter :: FPART1=1.00_r8
   real(r8), parameter :: FPART2=0.40_r8
@@ -742,10 +741,17 @@ module PlantBranchMod
   !     LRemob_brch,BegRemoblize=remobilization flags
   !     FLGZ=control rate of remobilization
   !
+  ! IFLGZ and IFLGY in grosub.f: phenological eligibility and hourly activation.
+  ! Define both outputs even when an eligible deciduous branch has no trigger.
+  BegRemoblize = ifalse
+  LRemob_brch  = ifalse
   check_annual    = (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)
   check_perennial = (iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
     Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ))
-  check_decidous=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+  check_cold_deciduous = iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. &
+    iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid
+  check_drought_deciduous = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .OR. &
+    iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid
 
   IF(check_perennial .OR. check_annual)THEN 
     !set remobilization true
@@ -754,10 +760,10 @@ module PlantBranchMod
       !annual plant or evergreen perennial
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(check_decidous .AND. TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN           !chill temperature in effect 
+    ELSEIF(check_cold_deciduous .AND. TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN           !chill temperature in effect
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(check_decidous .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN !drought stress in effect
+    ELSEIF(check_drought_deciduous .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN !drought stress in effect
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ENDIF
@@ -769,8 +775,6 @@ module PlantBranchMod
       PART(ibrch_petole) = 0._r8
     ENDIF
   ELSE
-    BegRemoblize                = ifalse
-    LRemob_brch                 = ifalse
     HoursDoingRemob_brch(NB,NZ) = 0._r8
   ENDIF
   !
