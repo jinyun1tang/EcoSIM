@@ -2378,17 +2378,19 @@ module PlantBranchMod
 !    iPlantCalendar_brch(ipltcal_Emerge)=emergence date
 !
   call DebugPrint('beg '//subname//' NZ',NZ)
-  IF((EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial) & !perrenial
+  IF((EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. &
+    iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial) & !perrenial
     .AND. (Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)))THEN
-      ! branch is ready to do leaf out
+    ! branch is ready to do leaf out
     MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
-    ShootNodeNumAtInitFloral_brch(NB,NZ)         = ShootNodeNum_brch(NB,NZ)
-    ShootNodeNumAtAnthesis_brch(NB,NZ)             = 0._r8
+    ShootNodeNumAtAnthesis_brch(NB,NZ)           = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
+    ! Start each perennial reproductive cycle with no failed grain-fill hours.
+    HourFailGrainFill_brch(NB,NZ)               = 0._r8
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       HoursTooLowPsiCan_pft(NZ)=0._r8
@@ -2422,7 +2424,6 @@ module PlantBranchMod
         NumOfLeaves_brch(NB,NZ)       = 0._r8
         KLeafNumber_brch(NB,NZ)       = 1
         KHiestGroLeafNode_brch(NB,NZ) = 1
-        HourFailGrainFill_brch(NB,NZ) = 0._r8
         D5330: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dFall= PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracLeafShethElmAlloc2Litr(NE,k_woody_comp) &
@@ -2496,6 +2497,8 @@ module PlantBranchMod
         ENDDO D6340
       ENDIF
     ENDIF
+    ! Use the new season's node count after any turnover-specific reset.
+    ShootNodeNumAtInitFloral_brch(NB,NZ) = ShootNodeNum_brch(NB,NZ)
   ENDIF
   !
   !   SPRING OR FALL FLAG RESET
