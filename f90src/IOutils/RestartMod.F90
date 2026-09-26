@@ -78,7 +78,13 @@ implicit none
 
   if (flag=='read')then
     call restFile_getfile(fnamer,path)
-    call restFile_read( bounds, fnamer)    
+    call restFile_read( bounds, fnamer)
+    ! DAY resets daily accumulators before the checkpoint is read. At midnight
+    ! the saved sum belongs to yesterday; intraday restarts must retain it.
+    call etimer%get_curr_date(yr,mon,day,tod)
+    if(plant_model.and.tod==0)then
+      SeasonalNonstCDayAve_pft(:,bounds%NVN:bounds%NVS,bounds%NHW:bounds%NHE)=0._r8
+    endif
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
     write(rdate,'(i4.4,"-",i2.2,"-",i2.2,"-",i6.6)') yr,mon,day,tod
@@ -119,6 +125,9 @@ implicit none
   integer :: routing_varid
   type(var_desc_t) :: routing_vardesc
   logical :: has_category_routing
+  integer :: daily_storage_varid
+  type(var_desc_t) :: daily_storage_vardesc
+  logical :: has_daily_storage
 
 ! execution begins here
   NHW = bounds%NHW;NVN = bounds%NVN
@@ -1145,6 +1154,32 @@ implicit none
      long_name='plant stem area', units='m2 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
   endif  
+
+  ! Preserve the partial daily mean used by the annual false-break test.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'SeasonalNonstCDayAve_pft',daily_storage_varid,daily_storage_vardesc,&
+      readvar=has_daily_storage)
+    datrp_1d=0._r8
+    if(has_daily_storage)then
+      datpr1 => datrp_1d
+      call restartvar(ncid, flag, varname='SeasonalNonstCDayAve_pft', dim1name='pft',&
+        long_name='Accumulated hourly seasonal storage C divided by 24 for the current day', units='gC d-2', &
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    else if(plant_model)then
+      ! Legacy checkpoints cannot reconstruct the hours preceding an intraday restart.
+      write(iulog,*) 'Restart lacks SeasonalNonstCDayAve_pft; using zero. ',&
+        'An intraday restart may change the first false-break daily test.'
+    endif
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstCDayAve_pft,datrp_1d,&
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SeasonalNonstCDayAve_pft,datrp_1d,&
+      NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='SeasonalNonstCDayAve_pft', dim1name='pft',&
+      long_name='Accumulated hourly seasonal storage C divided by 24 for the current day', units='gC d-2', &
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+  endif
 
   if(flag=='read')then
     dat1pr => datip_1d
