@@ -432,6 +432,8 @@ contains
   )
   IF(CanopyLeafSheathC_pft(NZ).GT.ZERO4LeafVar_pft(NZ))THEN
     FracSheath_brch=AZMAX1(CanopyLeafSheathC_brch(NB,NZ))/CanopyLeafSheathC_pft(NZ)
+    !
+    !there is nonstructural carbon pool to remove
     IF(CanopyNonstElms_brch(ielmc,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
       HarvestedCanopyNonstC_brch  = AZMAX1(GrazedCanopyNonstC)*FracSheath_brch
       CanopyNonstElmAfhvst_brch(ielmc) = AZMAX1(CanopyNonstElmCopy_brch(ielmc)-HarvestedCanopyNonstC_brch)

@@ -666,6 +666,7 @@ implicit none
   IF(RootSinkC_vr(N,L).GT.ZERO4Groth_pft(NZ))THEN
     FracRoot2ndCSinkL=Root2ndSink_pvr(N,L,NR)/RootSinkC_vr(N,L)
   ELSE
+    !used to initialize fine root growth
     FracRoot2ndCSinkL=1.0_r8
   ENDIF  
   !
