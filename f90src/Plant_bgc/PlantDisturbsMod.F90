@@ -1432,10 +1432,15 @@ module PlantDisturbsMod
   ENDDO
 
   IF(iHarvstType_pft(NZ).EQ.iharvtyp_grazing .OR. iHarvstType_pft(NZ).EQ.iharvtyp_herbivo)THEN
-    !Grazing
+    !Fallback for depleted C pools: remove reserves with the actual host tissue.
+    FrcLeafMassLeft=1._r8
+    IF(LeafCB4Cut_brch+PetolShethCB4Hvst_brch.GT.ZERO4Groth_pft(NZ))THEN
+      FrcLeafMassLeft=AZMAX1(AMIN1(1._r8,(LeafCafCut_brch+PetolShethCAfHvst_brch) &
+        /(LeafCB4Cut_brch+PetolShethCB4Hvst_brch)))
+    ENDIF
     call CutBranchNonstalByGrazing(I,J,NB,NZ,GrazedCanopyNonstC,CanopyNonstElmCopy_brch,&
       GrazedCanopyNoduleC,CanopyNodulNonstElmCopy_brch,CanopyNonstElmAfhvst_brch,CanopyNodulNonstElmAfhvst,&
-      CanopyNodulStrutElmAfhvst)  
+      CanopyNodulStrutElmAfhvst,FrcLeafMassLeft)
   ELSE
     IF(LeafCB4Cut_brch+PetolShethCB4Hvst_brch.GT.ZERO4Groth_pft(NZ))THEN
       FrcLeafMassLeft=AZMAX1(AMIN1(1.0_r8,(LeafCafCut_brch+PetolShethCAfHvst_brch)/(LeafCB4Cut_brch+PetolShethCB4Hvst_brch)))
