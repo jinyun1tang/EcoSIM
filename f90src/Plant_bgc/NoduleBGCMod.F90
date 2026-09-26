@@ -166,8 +166,9 @@ module NoduleBGCMod
     !     FCNPF=N,P constraint to bacterial activity
     !     WFNG=growth function of canopy water potential
     !
+    !Cap the temperature- and water-adjusted demand against available nonstructural C.
     RespNonst_Oltd=AZMAX1(AMIN1(CanopyNodulNonstElms_brch(ielmc,NB,NZ),&
-      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ))*FCNPF*fTCanopyGroth_pft(NZ)*WFNG)*SPNDLI
+      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTCanopyGroth_pft(NZ)*WFNG))*SPNDLI
 
     !     CPOOLNX=CanopyNodulNonstElms_brch(ielmc,NB,NZ)
     !     VMXOX=VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTCanopyGroth_pft(NZ)*WFNG
@@ -589,9 +590,10 @@ module NoduleBGCMod
         !     fRootGrowPSISense=growth function of root water potential
 !
         CPOOLNX         = RootNodulNonstElms_rpvr(ielmc,L,NZ)
+        !Cap the adjusted demand before applying the physiological oxygen factor below.
         RespNonst_OUltd = AZMAX1(AMIN1(RootNodulNonstElms_rpvr(ielmc,L,NZ) &
-          ,VMXO*RootNodulStrutElms_rpvr(ielmc,L,NZ))*FCNPF*fTgrowRootP_vr(L,NZ) &
-          *fRootGrowPSISense_pvr(ipltroot,L,NZ))*SPNDLI
+          ,VMXO*RootNodulStrutElms_rpvr(ielmc,L,NZ)*FCNPF*fTgrowRootP_vr(L,NZ) &
+          *fRootGrowPSISense_pvr(ipltroot,L,NZ)))*SPNDLI
         !
         !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
         !
