@@ -164,6 +164,7 @@ implicit none
     iPlantPhenolPattern_pft => plt_pheno%iPlantPhenolPattern_pft  ,& !input  :plant growth habit: annual or perennial,[-]
     jHarvstType_pft         => plt_distb%jHarvstType_pft          ,& !input  :flag for stand replacing disturbance,[-]
     CanopyBiomWater_pft     => plt_ew%CanopyBiomWater_pft         ,& !inoput :canopy water content, [m3 d-2]
+    QCanopyWatLoss2Dist_col => plt_ew%QCanopyWatLoss2Dist_col     ,& !inoput :timestep canopy water loss to disturbance, [m3 d-2]
     H2OLoss_CumYr_col       => plt_ew%H2OLoss_CumYr_col           ,& !inoput :total subsurface water flux, [m3 d-2]
     NumOfBranches_pft       => plt_morph%NumOfBranches_pft        ,& !inoput :number of branches,[-]
     QH2OLoss_lnds           => plt_site%QH2OLoss_lnds             ,& !inoput :total subsurface water loss flux over the landscape, [m3 d-2]
@@ -188,6 +189,8 @@ implicit none
     HypocotHeight_pft(NZ)   = 0._r8
     QH2OLoss_lnds           = QH2OLoss_lnds+CanopyBiomWater_pft(NZ)
     H2OLoss_CumYr_col       = H2OLoss_CumYr_col+CanopyBiomWater_pft(NZ)
+    ! Record the same loss in the timestep balance before clearing the pool.
+    QCanopyWatLoss2Dist_col = QCanopyWatLoss2Dist_col+CanopyBiomWater_pft(NZ)
     CanopyBiomWater_pft(NZ) = 0._r8
     !
     !     RESET LIVING FLAGS
