@@ -80,6 +80,7 @@ contains
     StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)         = plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)
     SeasonalNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)          = plt_biom%SeasonalNonstElms_pft(1:NumPlantChemElms,NZ)
     SeasonalNonstCDayAve_pft(NZ,NY,NX)                          = plt_biom%SeasonalNonstCDayAve_pft(NZ)
+    Days4FalseBreak_pft(NZ,NY,NX)                              = plt_pheno%Days4FalseBreak_pft(NZ)
     ShootElms_pft(1:NumPlantChemElms,NZ,NY,NX)                  = plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)
     LeafStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)              = plt_biom%LeafStrutElms_pft(1:NumPlantChemElms,NZ)
     PetolShethStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)        = plt_biom%PetolShethStrutElms_pft(1:NumPlantChemElms,NZ)
@@ -286,6 +287,7 @@ contains
     plt_biom%CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ)       = CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%SeasonalNonstElms_pft(1:NumPlantChemElms,NZ)          = SeasonalNonstElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%SeasonalNonstCDayAve_pft(NZ)                         = SeasonalNonstCDayAve_pft(NZ,NY,NX)
+    plt_pheno%Days4FalseBreak_pft(NZ)                            = Days4FalseBreak_pft(NZ,NY,NX)
     plt_biom%ShootElms_pft(1:NumPlantChemElms,NZ)                 = ShootElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ)        = StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
 

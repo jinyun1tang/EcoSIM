@@ -161,11 +161,16 @@ module PlantDisturbsMod
 
   IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .and. checkDroughtDeciduos)THEN
     SeasonalNonstCDayAve_pft(NZ)=SeasonalNonstCDayAve_pft(NZ)+SeasonalNonstElms_pft(ielmc,NZ)/24._r8
-    if(eval_annual_false_break_death(yearIJ,NZ))then
-      Days4FalseBreak_pft(NZ)=Days4FalseBreak_pft(NZ)+1._r8
+    !Evaluate the completed daily mean and count consecutive qualifying days.
+    if(yearIJ%J.EQ.24)then
+      if(eval_annual_false_break_death(yearIJ,NZ))then
+        Days4FalseBreak_pft(NZ)=Days4FalseBreak_pft(NZ)+1
+      else
+        Days4FalseBreak_pft(NZ)=0
+      endif
     endif
     
-    if(Days4FalseBreak_pft(NZ).GE.Days2CallFalseBreak)then
+    if(yearIJ%J.EQ.24 .and. Days4FalseBreak_pft(NZ).GE.Days2CallFalseBreak)then
       !add CanopyNonstElms_brch to below ground litter at layer NGTopRootLayer_pft(NZ)
 
       DO M=1,jsken
