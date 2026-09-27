@@ -128,6 +128,9 @@ implicit none
   integer :: daily_storage_varid
   type(var_desc_t) :: daily_storage_vardesc
   logical :: has_daily_storage
+  integer :: senesc_varid
+  type(var_desc_t) :: senesc_vardesc
+  logical :: has_senesc_snapshot
   type(var_desc_t) :: single_grain_vardesc
   logical :: has_single_grain
   character(len=64) :: single_grain_varname
@@ -3154,10 +3157,58 @@ implicit none
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
   endif
 
+  ! Senescence snapshots are needed between leaf appearances, including across restarts.
+  if(plant_model)then
+    if(flag=='read')then
+      call ncd_inqvid(ncid,'LeafSenescInitialElms_brch',senesc_varid,senesc_vardesc,readvar=has_senesc_snapshot)
+      datrp_3d=-1._r8
+      if(has_senesc_snapshot)then
+        datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
+        call restartvar(ncid, flag, varname='LeafSenescInitialElms_brch', dim1name='pft',dim2name='elmnts',&
+          dim3name='nbranches',long_name='Initial senescing leaf C/N/P mass; -1 means unset', units='g d-2', &
+          interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+      else
+        ! Old files have no initial mass snapshot. Capture current tissue at the next senescence call.
+        write(iulog,*) 'Restart lacks LeafSenescInitialElms_brch; senescence will restart from current tissue.'
+      endif
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LeafSenescInitialElms_brch,datrp_3d,&
+        NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    else
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LeafSenescInitialElms_brch,datrp_3d,&
+        NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+      datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
+      call restartvar(ncid, flag, varname='LeafSenescInitialElms_brch', dim1name='pft',dim2name='elmnts',&
+        dim3name='nbranches',long_name='Initial senescing leaf C/N/P mass; -1 means unset', units='g d-2', &
+        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+    endif
+    if(flag=='read')then
+      call ncd_inqvid(ncid,'PetolSenescInitialElms_brch',senesc_varid,senesc_vardesc,readvar=has_senesc_snapshot)
+      datrp_3d=-1._r8
+      if(has_senesc_snapshot)then
+        datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
+        call restartvar(ncid, flag, varname='PetolSenescInitialElms_brch', dim1name='pft',dim2name='elmnts',&
+          dim3name='nbranches',long_name='Initial senescing sheath/petiole C/N/P mass; -1 means unset', units='g d-2', &
+          interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+      else
+        ! Old files have no initial mass snapshot. Capture current tissue at the next senescence call.
+        write(iulog,*) 'Restart lacks PetolSenescInitialElms_brch; senescence will restart from current tissue.'
+      endif
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PetolSenescInitialElms_brch,datrp_3d,&
+        NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    else
+      if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PetolSenescInitialElms_brch,datrp_3d,&
+        NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+      datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
+      call restartvar(ncid, flag, varname='PetolSenescInitialElms_brch', dim1name='pft',dim2name='elmnts',&
+        dim3name='nbranches',long_name='Initial senescing sheath/petiole C/N/P mass; -1 means unset', units='g d-2', &
+        interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)
+    endif
+  endif
+
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafElmntRemobFlx_brch', dim1name='pft',dim2name='elmnts',&
-     dim3name='nbranches',long_name='element translocated from leaf during senescence', units='g d-2 h-1', &
+     dim3name='nbranches',long_name='Cached remobilizable leaf element mass', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
     call cppft(flag,NHW,NHE,NVN,NVS,NP_col,LeafElmntRemobFlx_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
@@ -3167,14 +3218,14 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='LeafElmntRemobFlx_brch', dim1name='pft',dim2name='elmnts',&
-     dim3name='nbranches',long_name='element translocated from leaf during senescence', units='g d-2 h-1', &
+     dim3name='nbranches',long_name='Cached remobilizable leaf element mass', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval)  
   endif  
 
   if(flag=='read')then
     datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='PetolShethChemElmRemobFlx_brch', dim1name='pft',dim2name='elmnts',&
-     dim3name='nbranches',long_name='element translocated from sheath during senescence', units='g d-2 h-1', &
+     dim3name='nbranches',long_name='Cached remobilizable sheath element mass', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
     call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PetolShethChemElmRemobFlx_brch,datrp_3d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
@@ -3184,7 +3235,7 @@ implicit none
       IsPlantActive_pft=IsPlantActive_pft)   
     datpr3 => datrp_3d(1:npfts,1:NumPlantChemElms,1:MaxNumBranches)
     call restartvar(ncid, flag, varname='PetolShethChemElmRemobFlx_brch', dim1name='pft',dim2name='elmnts',&
-     dim3name='nbranches',long_name='element translocated from sheath during senescence', units='g d-2 h-1', &
+     dim3name='nbranches',long_name='Cached remobilizable sheath element mass', units='g d-2', &
      interpinic_flag='skip', data=datpr3, missing_value=spval, fill_value=spval) 
   endif  
 

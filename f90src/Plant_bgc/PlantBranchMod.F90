@@ -3945,8 +3945,10 @@ module PlantBranchMod
     CanPBranchHeight               => plt_morph%CanPBranchHeight                ,& !output :branch height, [m]
     StalkNodeVertLength_brch       => plt_morph%StalkNodeVertLength_brch        ,& !output :internode height, [m]
     LeafAreaDying_brch             => plt_morph%LeafAreaDying_brch              ,& !output :branch leaf area, [m2 d-2]
-    PetolShethChemElmRemobFlx_brch => plt_pheno%PetolShethChemElmRemobFlx_brch  ,& !output :element translocated from sheath during senescence, [g d-2 h-1]
-    LeafElmntRemobFlx_brch         => plt_pheno%LeafElmntRemobFlx_brch           & !output :element translocated from leaf during senescence, [g d-2 h-1]
+    LeafSenescInitialElms_brch     => plt_pheno%LeafSenescInitialElms_brch      ,& !inoput :initial senescing leaf C/N/P mass, [g d-2]
+    PetolSenescInitialElms_brch    => plt_pheno%PetolSenescInitialElms_brch     ,& !inoput :initial senescing sheath/petiole C/N/P mass, [g d-2]
+    PetolShethChemElmRemobFlx_brch => plt_pheno%PetolShethChemElmRemobFlx_brch  ,& !output :cached remobilizable sheath element mass, [g d-2]
+    LeafElmntRemobFlx_brch         => plt_pheno%LeafElmntRemobFlx_brch           & !output :cached remobilizable leaf element mass, [g d-2]
   )
 
   call DebugPrint('beg '//subname//' NZ',NZ)
@@ -3963,13 +3965,16 @@ module PlantBranchMod
       !   WGLF,WGLFN,WGLFP=node leaf C,N,P mass
       !   LeafArea_node=node leaf area
       !
-      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
+      ! Cache the complete donor and its recyclable portion together. A negative snapshot
+      ! marks initialization or a legacy restart, whose original snapshot cannot be recovered.
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue .OR. ANY(LeafSenescInitialElms_brch(:,NB,NZ).LT.0._r8))THEN
 
         LeafAreaDying_brch(NB,NZ)=AZMAX1(LeafArea_node(K,NB,NZ))
+        LeafSenescInitialElms_brch(:,NB,NZ)=MAX(0._r8,LeafElmntNode_brch(:,K,NB,NZ))
 
         IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            LeafElmntRemobFlx_brch(NE,NB,NZ) = AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*RCCE(NE)
+            LeafElmntRemobFlx_brch(NE,NB,NZ) = LeafSenescInitialElms_brch(NE,NB,NZ)*MAX(0._r8,MIN(1._r8,RCCE(NE)))
           ENDDO
         ELSE
           LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=0._r8
@@ -3980,7 +3985,20 @@ module PlantBranchMod
       !
       !       RSpecKillLeafPetol,FSNCL=fraction of lowest leaf to be remobilized
       !
-      RSpecKillLeaf=AMIN1(RSpecKillLeafPetol,1.0_R8)
+      ! Apply one fraction of the initial tissue to C/N/P, recycling, litter, and geometry.
+      ! Bound it by every remaining donor pool; other processes may change tissue stoichiometry.
+      RSpecKillLeaf=MAX(0._r8,MIN(1._r8,RSpecKillLeafPetol))
+      IF(LeafSenescInitialElms_brch(ielmc,NB,NZ).LE.ZERO4Groth_pft(NZ))RSpecKillLeaf=0._r8
+      DO NE=1,NumPlantChemElms
+        IF(LeafSenescInitialElms_brch(NE,NB,NZ).GT.0._r8)THEN
+          RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafElmntNode_brch(NE,K,NB,NZ))/LeafSenescInitialElms_brch(NE,NB,NZ), &
+            MAX(0._r8,LeafStrutElms_brch(NE,NB,NZ))/LeafSenescInitialElms_brch(NE,NB,NZ))
+        ENDIF
+      ENDDO
+      IF(LeafAreaDying_brch(NB,NZ).GT.0._r8) &
+        RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafArea_node(K,NB,NZ))/LeafAreaDying_brch(NB,NZ))
+      IF(LeafAreaDying_brch(NB,NZ).GT.0._r8) &
+        RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafAreaLive_brch(NB,NZ))/LeafAreaDying_brch(NB,NZ))
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !       TO FRACTIONS SET IN 'STARTQ'
@@ -3992,7 +4010,7 @@ module PlantBranchMod
       !       FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
       !
       DO NE=1,NumPlantChemElms
-        LeafEKill(NE)=RSpecKillLeaf*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))
+        LeafEKill(NE)=RSpecKillLeaf*LeafSenescInitialElms_brch(NE,NB,NZ)
         LeafEcycl(NE)=RSpecKillLeaf*LeafElmntRemobFlx_brch(NE,NB,NZ)
       ENDDO  
 
@@ -4018,13 +4036,13 @@ module PlantBranchMod
       !       CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
       !       CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
       !     canopy nonstructural Carbon/nutrient is not stored in leaves
-      LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
-      LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
+      LeafAreaLive_brch(NB,NZ) = MAX(0._r8,LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ))
+      LeafArea_node(K,NB,NZ)   = MAX(0._r8,LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ))
       LeafProteinC_node(K,NB,NZ) = AZMAX1(LeafProteinC_node(K,NB,NZ)-AMAX1(LeafEKill(ielmn)*rProteinC2LeafN_pft(NZ),LeafEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
 
       DO NE=1,NumPlantChemElms
-        LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-LeafEKill(NE)
-        LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-LeafEKill(NE)
+        LeafStrutElms_brch(NE,NB,NZ)   = MAX(0._r8,LeafStrutElms_brch(NE,NB,NZ)-LeafEKill(NE))
+        LeafElmntNode_brch(NE,K,NB,NZ) = MAX(0._r8,LeafElmntNode_brch(NE,K,NB,NZ)-LeafEKill(NE))
         CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+LeafEcycl(NE)
       ENDDO
       !
@@ -4037,17 +4055,22 @@ module PlantBranchMod
       !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing PetolSheth
       !
 
-      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
+      ! Cache the complete donor and its recyclable portion together. A negative snapshot
+      ! marks initialization or a legacy restart, whose original snapshot cannot be recovered.
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue .OR. ANY(PetolSenescInitialElms_brch(:,NB,NZ).LT.0._r8))THEN
         CanPBranchHeight(NB,NZ)=AZMAX1(PetoleLength_node(K,NB,NZ))
+        PetolSenescInitialElms_brch(:,NB,NZ)=MAX(0._r8,PetolShethElmntNode_brch(:,K,NB,NZ))
         !
         IF(PetolShethElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            PetolShethChemElmRemobFlx_brch(NE,NB,NZ) = PetolShethElmntNode_brch(NE,K,NB,NZ)*RCCE(NE)
+            PetolShethChemElmRemobFlx_brch(NE,NB,NZ) = PetolSenescInitialElms_brch(NE,NB,NZ)*MAX(0._r8,MIN(1._r8,RCCE(NE)))
           ENDDO
         ELSE
           PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=0._r8
         ENDIF
         
+      ENDIF
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
         DO NE=1,NumPlantChemElms
           SenecStalkStrutElms_brch(NE,NB,NZ)=SenecStalkStrutElms_brch(NE,NB,NZ)+StructInternodeElms_brch(NE,K,NB,NZ)
         ENDDO
@@ -4059,7 +4082,18 @@ module PlantBranchMod
       !
       !       RSpecKillPetol=fraction of lowest PetolSheth to be remobilized
       !
-      RSpecKillPetol=AMIN1(1._r8,RSpecKillLeafPetol)
+      ! Apply one fraction of the initial tissue to C/N/P, recycling, litter, and geometry.
+      ! Bound it by every remaining donor pool; other processes may change tissue stoichiometry.
+      RSpecKillPetol=MAX(0._r8,MIN(1._r8,RSpecKillLeafPetol))
+      IF(PetolSenescInitialElms_brch(ielmc,NB,NZ).LE.ZERO4Groth_pft(NZ))RSpecKillPetol=0._r8
+      DO NE=1,NumPlantChemElms
+        IF(PetolSenescInitialElms_brch(NE,NB,NZ).GT.0._r8)THEN
+          RSpecKillPetol=MIN(RSpecKillPetol,MAX(0._r8,PetolShethElmntNode_brch(NE,K,NB,NZ))/PetolSenescInitialElms_brch(NE,NB,NZ), &
+            MAX(0._r8,PetolShethStrutElms_brch(NE,NB,NZ))/PetolSenescInitialElms_brch(NE,NB,NZ))
+        ENDIF
+      ENDDO
+      IF(CanPBranchHeight(NB,NZ).GT.0._r8) &
+        RSpecKillPetol=MIN(RSpecKillPetol,MAX(0._r8,PetoleLength_node(K,NB,NZ))/CanPBranchHeight(NB,NZ))
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !       TO FRACTIONS SET IN 'STARTQ'
@@ -4073,7 +4107,7 @@ module PlantBranchMod
       !       FWODSN,FWODSP=N,P woody fraction in PetolSheth:0=woody,1=non-woody
       !
       DO NE=1,NumPlantChemElms
-        PetolEKill(NE) = RSpecKillPetol*AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ))
+        PetolEKill(NE) = RSpecKillPetol*PetolSenescInitialElms_brch(NE,NB,NZ)
         PetolECycl(NE) = RSpecKillPetol*PetolShethChemElmRemobFlx_brch(NE,NB,NZ)
       ENDDO
       D6305: DO M=1,jsken
@@ -4104,7 +4138,7 @@ module PlantBranchMod
         PetolShethElmntNode_brch(NE,K,NB,NZ) = AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ)-PetolEKill(NE))
         CanopyNonstElms_brch(NE,NB,NZ)       = CanopyNonstElms_brch(NE,NB,NZ)+PetolECycl(NE)
       ENDDO
-      PetoleLength_node(K,NB,NZ)   = PetoleLength_node(K,NB,NZ)-RSpecKillPetol*CanPBranchHeight(NB,NZ)
+      PetoleLength_node(K,NB,NZ)   = MAX(0._r8,PetoleLength_node(K,NB,NZ)-RSpecKillPetol*CanPBranchHeight(NB,NZ))
       PetoleProteinC_node(K,NB,NZ) = AZMAX1(PetoleProteinC_node(K,NB,NZ)-AMAX1(PetolEKill(ielmn)*rProteinC2LeafN_pft(NZ),PetolEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
     ENDIF
   ENDIF

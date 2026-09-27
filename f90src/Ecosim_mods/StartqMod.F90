@@ -636,7 +636,9 @@ module StartqMod
   EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)           = 0._r8
   CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
   LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = 0._r8
+  LeafSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = -1._r8
   PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
+  PetolSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = -1._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   
   D25: DO NB=1,MaxNumBranches

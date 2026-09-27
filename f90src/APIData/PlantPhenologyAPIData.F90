@@ -15,8 +15,10 @@ module PlantPhenologyAPIData
   real(r8), pointer :: PlantO2Stress_pft(:)               => null()     !plant O2 stress indicator,                                           [-]
   real(r8), pointer :: NonstCMinConc2InitBranch_pft(:)    => null()     !branch nonstructural C content required for new branch,              [gC gC-1]
   real(r8), pointer :: NonstCMinCon2InitRoot_pft(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
-  real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:)      => null()    !element translocated from leaf during senescence,                     [g d-2 h-1]
-  real(r8), pointer :: PetolShethChemElmRemobFlx_brch(:,:,:) => null()    !element translocated from sheath during senescence,                   [g d-2 h-1]
+  real(r8), pointer :: LeafElmntRemobFlx_brch(:,:,:)      => null()    !cached remobilizable leaf element mass, [g d-2]
+  real(r8), pointer :: LeafSenescInitialElms_brch(:,:,:) => null() !initial senescing leaf C/N/P mass; -1 means unset, [g d-2]
+  real(r8), pointer :: PetolShethChemElmRemobFlx_brch(:,:,:) => null()    !cached remobilizable sheath element mass, [g d-2]
+  real(r8), pointer :: PetolSenescInitialElms_brch(:,:,:) => null() !initial senescing sheath/petiole C/N/P mass; -1 means unset, [g d-2]
   real(r8), pointer :: TC4LeafOut_pft(:)                  => null()     !threshold temperature for spring leafout/dehardening,                [oC]
   real(r8), pointer :: TCGroth_pft(:)                     => null()     !canopy growth temperature,                                           [oC]
   real(r8), pointer :: TC4LeafOff_pft(:)                  => null()     !threshold temperature for autumn leafoff/hardening,                  [oC]
@@ -118,7 +120,9 @@ contains
   allocate(this%TC4LeafOff_pft(JP1));this%TC4LeafOff_pft=spval
   allocate(this%HoursTooLowPsiCan_pft(JP1));this%HoursTooLowPsiCan_pft=spval
   allocate(this%LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafElmntRemobFlx_brch=spval
+  allocate(this%LeafSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%LeafSenescInitialElms_brch=-1._r8
   allocate(this%PetolShethChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetolShethChemElmRemobFlx_brch=spval
+  allocate(this%PetolSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP1));this%PetolSenescInitialElms_brch=-1._r8
   allocate(this%fNCLFW_pft(JP1)); this%fNCLFW_pft=0._r8
   allocate(this%fPCLFW_pft(JP1)); this%fPCLFW_pft=0._r8
   allocate(this%fTgrowRootP_vr(JZ1,JP1));this%fTgrowRootP_vr=spval

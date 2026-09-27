@@ -26,8 +26,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)               !HPO4 demand in non-band by each root population, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH1PO4DmndBand_pvr(:,:,:,:,:)               !HPO4 demand in band by each root population, [g d-2 h-1]
-  real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)              !element translocated from leaf during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  PetolShethChemElmRemobFlx_brch(:,:,:,:,:)         !element translocated from sheath during senescence, [g d-2 h-1]
+  real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)              !cached remobilizable leaf element mass, [g d-2]
+  real(r8),target,allocatable :: LeafSenescInitialElms_brch(:,:,:,:,:) !initial senescing leaf C/N/P mass; -1 means unset, [g d-2]
+  real(r8),target,allocatable ::  PetolShethChemElmRemobFlx_brch(:,:,:,:,:)         !cached remobilizable sheath element mass, [g d-2]
+  real(r8),target,allocatable :: PetolSenescInitialElms_brch(:,:,:,:,:) !initial senescing sheath/petiole C/N/P mass; -1 means unset, [g d-2]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                         !total gross CO2 fixation, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_CumYr_pft(:,:,:)                   !cumulative total gross CO2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  LitrfallElms_pft(:,:,:,:)                  !total plant element LitrFall , [g d-2 ]
@@ -184,7 +186,9 @@ module PlantDataRateType
   allocate(RootH1PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndSoil_pvr=0._r8
   allocate(RootH1PO4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndBand_pvr=0._r8
   allocate(LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
+  allocate(LeafSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafSenescInitialElms_brch=-1._r8
   allocate(PetolShethChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolShethChemElmRemobFlx_brch=0._r8
+  allocate(PetolSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolSenescInitialElms_brch=-1._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
   allocate(GrossCO2Fix_CumYr_pft(JP,JY,JX)); GrossCO2Fix_CumYr_pft=0._r8
   allocate(LitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_CumYr_pft=0._r8
@@ -329,7 +333,9 @@ module PlantDataRateType
   call destroy(RootH1PO4DmndSoil_pvr)
   call destroy(RootH1PO4DmndBand_pvr)
   call destroy(LeafElmntRemobFlx_brch)
+  call destroy(LeafSenescInitialElms_brch)
   call destroy(PetolShethChemElmRemobFlx_brch)
+  call destroy(PetolSenescInitialElms_brch)
   call destroy(GrossCO2Fix_pft)
   call destroy(GrossCO2Fix_CumYr_pft)
   call destroy(LitrfalStrutElms_CumYr_pft)

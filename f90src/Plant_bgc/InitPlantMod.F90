@@ -645,7 +645,7 @@ module InitPlantMod
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]
     NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]
     PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
-    PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
+    PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :cached remobilizable sheath element mass, [g d-2]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     isPlantBranchAlive_brch           => plt_pheno%isPlantBranchAlive_brch            ,& !input  :flag to detect branch death, [-]
     Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
@@ -772,7 +772,9 @@ module InitPlantMod
   plt_biom%EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)               = 0._r8
   plt_biom%CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)       = 0._r8
   plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)         = 0._r8
+  plt_pheno%LeafSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)         = -1._r8
   plt_pheno%PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = 0._r8
+  plt_pheno%PetolSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = -1._r8
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)        = 0._r8
   plt_morph%NActiveRootSegs_raxes(:,NZ) = 0
   plt_morph%IndRootSegBase_raxes(:,NZ)   = 1
