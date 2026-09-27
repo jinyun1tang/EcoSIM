@@ -1329,9 +1329,9 @@ module NutUptakeMod
   !     RESPIRATION CONSTRAINT ON UPTAKE FROM NON-STRUCTURAL C
   !
   !     RootCO2EmisPot_pvr=total respiration from CPOOLR
-  !     FCUP=limitation to active uptake respiration from CPOOLR
+  !     FCUP=measures C-limitation for nutrient uptake, using potential respiration as metric
   !     CPOOLR=nonstructural C content
-  !
+  !C demand
   IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)/RootCO2EmisPot_pvr(N,L,NZ)))
   ELSE
