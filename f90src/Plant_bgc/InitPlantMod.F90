@@ -698,6 +698,7 @@ module InitPlantMod
     SetNumberSeeds_brch               => plt_morph%SetNumberSeeds_brch                ,& !output :branch grain number, [d-2]
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     Cytokinin2ndConc_rpvr             => plt_rbgc%Cytokinin2ndConc_rpvr               ,& !output :cytokinin concentration in fine roots, [gC m-3 H2O]    
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
@@ -738,6 +739,7 @@ module InitPlantMod
     ReprodNodeNumNormByMatrgrp_brch(NB,NZ)        = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)          = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)      = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ)           = 0._r8
     Hours4LenthenPhotoPeriod_brch(NB,NZ)          = 0._r8
     Hours4ShortenPhotoPeriod_brch(NB,NZ)          = 0._r8
     Hours4Leafout_brch(NB,NZ)                     = Hours4LenthenPhotoPeriod_brch(NB,NZ)

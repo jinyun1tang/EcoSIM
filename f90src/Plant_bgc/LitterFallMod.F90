@@ -720,6 +720,7 @@ implicit none
     Prep4Literfall_brch               => plt_pheno%Prep4Literfall_brch                ,& !output :branch phenology flag, [-]
     RubiscoActivity_brch              => plt_photo%RubiscoActivity_brch               ,& !output :branch down-regulation of CO2 fixation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
     EnablePlantLeafOut_brch           => plt_pheno%EnablePlantLeafOut_brch            ,& !output :branch phenology flag, [-]
@@ -740,6 +741,7 @@ implicit none
       KHiestGroLeafNode_brch(NB,NZ)            = 1
       TotalNodeNumNormByMatgrp_brch(NB,NZ)     = 0.0_r8
       TotReproNodeNumNormByMatrgrp_brch(NB,NZ) = 0.0_r8
+      dReproNodeNumNormByMatG_brch(NB,NZ)      = 0._r8
       Hours4Leafout_brch(NB,NZ)                = 0.0_r8
       Hours4LeafOff_brch(NB,NZ)                = 0.0_r8
       Hours4LenthenPhotoPeriod_brch(NB,NZ)     = 0.0_r8

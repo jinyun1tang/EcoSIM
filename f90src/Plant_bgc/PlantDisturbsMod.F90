@@ -1005,6 +1005,7 @@ module PlantDisturbsMod
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     ShootNodeNumAtInitFloral_brch     => plt_morph%ShootNodeNumAtInitFloral_brch      ,& !output :shoot node number at floral initiation, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
     HourFailGrainFill_brch            => plt_pheno%HourFailGrainFill_brch             ,& !output :flag to detect physiological maturity from grain fill, [-]
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch         & !output :leaf number at floral initiation, [-]
@@ -1034,6 +1035,7 @@ module PlantDisturbsMod
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ)          = 0._r8
     HourFailGrainFill_brch(NB,NZ)                = 0._r8
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
@@ -1048,6 +1050,7 @@ module PlantDisturbsMod
           LeafNumberAtFloralInit_brch(NBX,NZ)        = 0._r8
           TotalNodeNumNormByMatgrp_brch(NBX,NZ)      = 0._r8
           TotReproNodeNumNormByMatrgrp_brch(NBX,NZ)  = 0._r8
+          dReproNodeNumNormByMatG_brch(NBX,NZ)       = 0._r8
           HourFailGrainFill_brch(NBX,NZ)             = 0._r8
           iPlantCalendar_brch(ipltcal_Emerge,NBX,NZ) = I
           D3015: DO M=2,NumGrowthStages

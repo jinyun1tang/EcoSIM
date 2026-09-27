@@ -56,6 +56,7 @@ module PlantPhenolMod
   character(len=*), parameter :: subname='PhenologyUpdate'
 ! begin_execution
   associate(                                                                   &
+    dReproNodeNumNormByMatG_brch  => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     doInitPlant_pft               => plt_pheno%doInitPlant_pft                ,& !input  :PFT initialization flag:0=no,1=yes,[-]
     IsPlantActive_pft             => plt_pheno%IsPlantActive_pft              ,& !input  :flag for living pft, [-]
     iPlantCalendar_brch           => plt_pheno%iPlantCalendar_brch            ,& !input  :plant growth stage, [-]
@@ -67,6 +68,8 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
   I=yearIJ%I; J=yearIJ%J
+  ! Clear the hourly increment even when a PFT or branch skips development.
+  dReproNodeNumNormByMatG_brch(:,:) = 0._r8
   D9985: DO NZ=1,NP
 
     IF(DATAP(NZ).NE.'NO')THEN

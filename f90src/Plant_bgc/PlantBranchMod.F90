@@ -2343,6 +2343,7 @@ module PlantBranchMod
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                ,& !output :plant growth stage, [-]
     HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft              ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
@@ -2387,6 +2388,7 @@ module PlantBranchMod
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ)          = 0._r8
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
     ! Start each perennial reproductive cycle with no failed grain-fill hours.
