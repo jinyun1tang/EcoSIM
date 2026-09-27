@@ -60,7 +60,7 @@ module PlantBranchMod
   real(r8), intent(in) :: TurgEff4LeafPetolExpansion
   real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: GrothPART2LeafPetole !new growth allocated to leaf and PetolSheth
-  integer, intent(out) :: BegRemoblize
+  integer, intent(out) :: BegRemoblize !phenological eligibility of this branch
   character(len=*), parameter :: subname='GrowOneBranch'
   integer :: I,J,K
   real(r8) :: YCO2Gro_brch                     !respiraiton ratio of canopy growth, 1./YCO2Gro_brch, total biomass required to give 1 unit of CO2 respiration
@@ -102,18 +102,25 @@ module PlantBranchMod
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
-    SineSunInclAnglNxtHour_col => plt_rad%SineSunInclAnglNxtHour_col   ,& !input  :sine of solar angle next hour, [-]
     ZERO                       => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     MainBranchNum_pft          => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
     isPlantBranchAlive_brch    => plt_pheno%isPlantBranchAlive_brch    ,& !inoput :flag to detect branch death, [-]
     canopy_growth_pft          => plt_rbgc%canopy_growth_pft           ,& !inoput :canopy structural C growth rate, [gC d-2 h-1]
     KHiestGroLeafNode_brch     => plt_pheno%KHiestGroLeafNode_brch     ,& !inoput :leaf growth stage counter, [-]    
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches, [-]
+    SapwoodBiomassC_brch       => plt_biom%SapwoodBiomassC_brch        ,& !input  :branch sapwood C, [gC d-2]
+    CanopySapwoodC_pft         => plt_biom%CanopySapwoodC_pft          ,& !output :canopy sapwood C, [gC d-2]
+    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft       ,& !output :canopy leaf + sheath C, [gC d-2]
     CanopyLeafSheathC_brch     => plt_biom%CanopyLeafSheathC_brch       & !output :plant branch leaf + sheath C, [g d-2]
   )
   call PrintInfo('beg '//subname)
   stop_flag=.false.
   I=yearIJ%I;J=yearIJ%J
-  
+
+  ! Define outputs even for dead branches; these are consumed by GrowOnePlant.
+  BegRemoblize = ifalse
+  GrothPART2LeafPetole = 0._r8
+
   IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
     !correct the higest growing leaf node
     DO K=MaxNodesPerBranch1,0,-1
@@ -225,32 +232,24 @@ module PlantBranchMod
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
     call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
     !
-    call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
-    !
-    !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
-    !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
-    !
-    !     SineSunInclinationAngle_col=sine of solar angle
-    !     LeafAreaZsec_brch=leaf node surface area in canopy layer
-    !     LeafArea_node,CanopyLeafArea_lnode=leaf node surface area in canopy layer
-    !     ZC,DPTHS=canopy,snowpack height
-    !     CLASS=leaf inclination class
-    !
-    IF(SineSunInclAnglNxtHour_col.GT.0.0_r8)THEN
-      call LeafClassAllocation(NB,NZ)
-    ENDIF
-    !
     call GrainFillOnBranch(I,J,NB,NZ,Growth_brch(:,ibrch_grain),Growth_brch(ielmc,ibrch_stalk))
-    !
     call ResetBranchPhenology(I,J,NB,NZ)
-    !   
+    !
+    ! Seasonal turnover can clear leaves or remove stalk biomass. Build geometry
+    ! once, after these removals, so layer totals and heights use surviving organs.
+    call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
+    ! Keep angular profiles consistent even when a seasonal reset occurs at night.
+    call LeafClassAllocation(NB,NZ)
+    ! Refresh the biomass denominators used by the following reserve transfers.
+    CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
+    CanopyLeafSheathC_pft(NZ)=SUM(CanopyLeafSheathC_brch(1:NumOfBranches_pft(NZ),NZ))
+    CanopySapwoodC_pft(NZ)=SUM(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+    !
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
     !
     !   CANOPY N2 FIXATION (CYANOBACTERIA)
     !
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WaterStress4Groth)
-
-    CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
 
   ENDIF
   
@@ -1755,6 +1754,7 @@ module PlantBranchMod
   !   PetoleLength_node=PetolSheth length
   !
   KLowestGroLeafNode_brch(NB,NZ)=0;LeafLength=0._r8
+  IF(NB.EQ.MainBranchNum_pft(NZ))StalkAveRadius_pft(NZ)=0._r8
   
   IF(HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     !plant not emerged yet
@@ -2568,6 +2568,7 @@ module PlantBranchMod
     SSXferElms_pft               => plt_bgcr%SSXferElms_pft                 ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]    
     SSXfer2ShootElms_pft         => plt_bgcr%SSXfer2ShootElms_pft           ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]        
     LitrFallElms_brch            => plt_bgcr%LitrFallElms_brch              ,& !inoput :litterfall from the branch, [g d-2 h-1]    
+    StalkNodeHeight_brch         => plt_morph%StalkNodeHeight_brch          ,& !inoput :cumulative node height, [m]
     StalkNodeVertLength_brch     => plt_morph%StalkNodeVertLength_brch      ,& !inoput :internode height, [m]
     PotentialSeedSites_brch      => plt_morph%PotentialSeedSites_brch       ,& !inoput :branch potential grain number, [d-2]
     SetNumberSeeds_brch          => plt_morph%SetNumberSeeds_brch           ,& !inoput :branch grain number, [d-2]
@@ -2666,6 +2667,7 @@ module PlantBranchMod
       ENDDO
       D2010: DO K=0,MaxNodesPerBranch1  
         StalkNodeVertLength_brch(K,NB,NZ)=RSpecLiterFall1*StalkNodeVertLength_brch(K,NB,NZ)
+        StalkNodeHeight_brch(K,NB,NZ)=RSpecLiterFall1*StalkNodeHeight_brch(K,NB,NZ)
       ENDDO D2010
     ENDIF
 

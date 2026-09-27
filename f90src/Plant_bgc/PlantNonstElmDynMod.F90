@@ -639,14 +639,14 @@ module PlantNonstElmDynMod
   end subroutine ShootRootElmTransfer  
 
 !----------------------------------------------------------------------------------------------------
-  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC,BegRemoblize)
+  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC,BegRemoblizePlant)
   !
   !DESCRIPTION
   !transfer of nonstructural C/N/P 
   !
   implicit none
   integer,  intent(in) :: I,J,NZ
-  integer,  intent(in) :: BegRemoblize
+  integer,  intent(in) :: BegRemoblizePlant !main-branch eligibility for root seasonal storage
   real(r8), intent(in):: GrothPART2LeafPetole  !rate modifier for root-shoot nonstrucal material exchange 
   real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: RootSinkC(pltpar%jroots)
@@ -675,7 +675,7 @@ module PlantNonstElmDynMod
   !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   !     IN PERENNIALS
   !
-  IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
+  IF(BegRemoblizePlant.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
   !

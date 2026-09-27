@@ -270,7 +270,8 @@ module grosubsMod
   character(len=*), parameter :: subname='GrowOnePlant'
   real(r8)  :: CanopyN2Fix_pft(JP1)
   integer  :: NB,NE,KK
-  integer  :: BegRemoblize
+  integer  :: BegRemoblizeBranch !phenological eligibility of the current branch
+  integer  :: BegRemoblizePlant  !main-branch eligibility controls root seasonal storage
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT    !main branch growth allocated to leaf and PetolSheth
@@ -301,7 +302,8 @@ module grosubsMod
   call PrintInfo('beg '//subname)
 
   IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
-    BegRemoblize        = 0
+    BegRemoblizePlant = ifalse
+    PTRT = 0._r8
     
     call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
@@ -311,14 +313,19 @@ module grosubsMod
       !
       call GrowOneBranch(yearIJ,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,&
-        GrothPART2LeafPetole,BegRemoblize)
+        GrothPART2LeafPetole,BegRemoblizeBranch)
       !
-      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
+      ! Use the main branch as the representative plant phenology for root storage.
+      ! Other branches retain their own eligibility for branch-local transfers.
+      IF(NB.EQ.MainBranchNum_pft(NZ))THEN
+        PTRT = GrothPART2LeafPetole
+        BegRemoblizePlant = BegRemoblizeBranch
+      ENDIF
     ENDDO
  
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
-    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
+    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblizePlant)
 
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
