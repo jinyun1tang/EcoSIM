@@ -644,7 +644,7 @@ module StartqMod
     CanopyLeafSheathC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
     SetNumberSeeds_brch(NB,NZ,NY,NX)     = 0._r8
-    GrainSeedBiomCMean_brch(NB,NZ,NY,NX) = 0._r8
+    SingleGrainMeanBiomC_brch(NB,NZ,NY,NX) = 0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)       = 0._r8
     NH3Dep2Can_brch(NB,NZ,NY,NX)         = 0._r8
     LeafAreaDying_brch(NB,NZ,NY,NX)      = 0._r8

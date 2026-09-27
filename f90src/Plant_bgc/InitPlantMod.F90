@@ -784,7 +784,7 @@ module InitPlantMod
     plt_biom%CanopyLeafSheathC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
     SetNumberSeeds_brch(NB,NZ)                 = 0._r8
-    plt_allom%GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
+    plt_allom%SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
     LeafAreaLive_brch(NB,NZ)                 = 0._r8
     plt_rbgc%NH3Dep2Can_brch(NB,NZ)          = 0._r8
     LeafAreaDying_brch(NB,NZ)                = 0._r8

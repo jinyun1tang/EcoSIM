@@ -2057,8 +2057,9 @@ module PlantBranchMod
   real(r8) :: Reserve2GrainCMax,Reserve2GrainE(NumPlantChemElms)
   real(r8) :: FGRNX
   real(r8) :: GRMXB
-  real(r8) :: GROLM
-  real(r8) :: GROLC
+  real(r8) :: GrainFillRateMax
+  real(r8) :: GrainFillRate
+  real(r8) :: GrainCRemaining                   !unfilled grain carbon capacity, [gC d-2]
   real(r8) :: SeedSET
   integer :: NE
 ! begin_execution
@@ -2086,7 +2087,7 @@ module PlantBranchMod
     iPlantGrainType_pft          => plt_morph%iPlantGrainType_pft           ,& !input  :grain type (below or above-ground),[-]
     GrainStrutElms_brch          => plt_biom%GrainStrutElms_brch            ,& !inoput :branch grain structural element mass, [g d-2]
     StalkRsrvElms_brch           => plt_biom%StalkRsrvElms_brch             ,& !inoput :branch reserve element mass, [g d-2]
-    GrainSeedBiomCMean_brch      => plt_allom%GrainSeedBiomCMean_brch       ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch      => plt_allom%SingleGrainMeanBiomC_brch       ,& !inoput :potential carbon mass per grain, [gC seed-1]
     HourFailGrainFill_brch       => plt_pheno%HourFailGrainFill_brch        ,& !inoput :flag to detect physiological maturity from grain fill, [-]
     iPlantCalendar_brch          => plt_pheno%iPlantCalendar_brch           ,& !inoput :plant growth stage, [-]
     PotentialSeedSites_brch      => plt_morph%PotentialSeedSites_brch       ,& !inoput :branch potential grain number, [d-2]
@@ -2161,13 +2162,13 @@ module PlantBranchMod
     !
     !     GRMX=maximum individual seed size from PFT file (g)
     !     dReproNodeNumNormByMatG_brch=change in reproductive node number normalized for maturity group
-    !     GrainSeedBiomCMean_brch=individual seed size
+    !     SingleGrainMeanBiomC_brch=individual seed size
     !     SET=seed set limited by nonstructural C,N,P
     !
     IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0 &
       .AND.iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
       GRMXB                          = SeedCMassMax_pft(NZ)
-      GrainSeedBiomCMean_brch(NB,NZ) = AMIN1(SeedCMassMax_pft(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
+      SingleGrainMeanBiomC_brch(NB,NZ) = AMIN1(SeedCMassMax_pft(NZ),SingleGrainMeanBiomC_brch(NB,NZ) &
         +GRMXB*AMAX1(0.50_r8,SeedSET**0.25_r8)*dReproNodeNumNormByMatG_brch(NB,NZ))
     ENDIF
   ENDIF
@@ -2178,39 +2179,41 @@ module PlantBranchMod
   !
   !   iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
   !   WTGRB=total seed C mass
-  !   GrainSeedBiomCMean_brch=individual seed size
+  !   SingleGrainMeanBiomC_brch=individual seed size
   !   SetNumberSeeds_brch=seed set number
-  !   GROLM=maximum grain fill rate
   !   GrainFillRate25C_pft=grain filling rate at 25 oC from PFT file
   !   fTCanopyGroth_pft=temperature function for canopy growth
   !   fTgrowRootP_vr=temperature function for root growth
   !
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-    IF(GrainStrutElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SetNumberSeeds_brch(NB,NZ))THEN
-      GROLM=0._r8
+    GrainCRemaining = AZMAX1(SingleGrainMeanBiomC_brch(NB,NZ)*SetNumberSeeds_brch(NB,NZ) &
+      -GrainStrutElms_brch(ielmc,NB,NZ))
+    IF(GrainCRemaining.LE.0._r8)THEN
+      GrainFillRateMax=0._r8
     ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTCanopyGroth_pft(NZ)))
+      GrainFillRateMax=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTCanopyGroth_pft(NZ)))
     ELSE
       !seed/storage belowground 
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
+      GrainFillRateMax=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
     ENDIF
+    ! Limit this hourly transfer to the remaining sink before applying C/N/P constraints.
+    GrainFillRateMax = AMIN1(GrainFillRateMax,GrainCRemaining)
 !
 !     GRAIN FILL RATE MAY BE CONSTRAINED BY HIGH GRAIN C:N OR C:P
 !
 !     WTGRB,WTGRBN,WTGRBP=total seed C,N,P mass
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
 !     CNGR,CPGR=maximum N:C,P:C ratios in grain from PFT file
-!     GROLM,GROLC=maximum,actual grain fill rate
 !     Reserve2GrainCMax,Reserve2GrainE(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
     IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*rNCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ) &
       .OR. GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM*rPCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
-      GROLC=0._r8
+      GrainFillRate=0._r8
     ELSE
-      GROLC=GROLM
+      GrainFillRate=GrainFillRateMax
     ENDIF
-    Reserve2GrainCMax     = AMIN1(GROLM,StalkRsrvElms_brch(ielmc,NB,NZ))
-    Reserve2GrainE(ielmc) = AMIN1(GROLC,StalkRsrvElms_brch(ielmc,NB,NZ))
+    Reserve2GrainCMax     = AMIN1(GrainFillRateMax,StalkRsrvElms_brch(ielmc,NB,NZ))
+    Reserve2GrainE(ielmc) = AMIN1(GrainFillRate,StalkRsrvElms_brch(ielmc,NB,NZ))
     !
     !     GRAIN N OR P FILL RATE MAY BE LIMITED BY C:N OR C:P RATIOS
     !     OF STALK RESERVES
@@ -2360,7 +2363,7 @@ module PlantBranchMod
     LeafProteinC_node                 => plt_biom%LeafProteinC_node                   ,& !output :layer leaf protein C, [g d-2]
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
-    GrainSeedBiomCMean_brch           => plt_allom%GrainSeedBiomCMean_brch            ,& !output :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch           => plt_allom%SingleGrainMeanBiomC_brch            ,& !output :potential carbon mass per grain, [gC seed-1]
     SenecStalkStrutElms_brch          => plt_biom%SenecStalkStrutElms_brch            ,& !output :branch stalk structural element, [g d-2]
     StructInternodeElms_brch          => plt_biom%StructInternodeElms_brch            ,& !output :internode chemical element, [g d-2]
     StalkNodeHeight_brch              => plt_morph%StalkNodeHeight_brch               ,& !output :internode height, [m]
@@ -2417,7 +2420,7 @@ module PlantBranchMod
     !     StalkNodeVertLength_brch,StalkNodeHeight_brch=stalk height,stalk internode length
     !     SetNumberSeeds_brch=seed set number
     !     PotentialSeedSites_brch=potential number of seed set sites
-    !     GrainSeedBiomCMean_brch=individual seed size
+    !     SingleGrainMeanBiomC_brch=individual seed size
     !
     IF(EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial &
       .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
@@ -2477,7 +2480,7 @@ module PlantBranchMod
       
       PotentialSeedSites_brch(NB,NZ) = 0._r8
       SetNumberSeeds_brch(NB,NZ)     = 0._r8
-      GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
+      SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
       IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
         D6345: DO M=1,jsken
           DO NE=1,NumPlantChemElms
@@ -2558,7 +2561,7 @@ module PlantBranchMod
     HuskStrutElms_brch           => plt_biom%HuskStrutElms_brch             ,& !inoput :branch husk structural element mass, [g d-2]
     SeasonalNonstElms_pft        => plt_biom%SeasonalNonstElms_pft          ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     StructInternodeElms_brch     => plt_biom%StructInternodeElms_brch       ,& !inoput :internode chemical element, [g d-2]
-    GrainSeedBiomCMean_brch      => plt_allom%GrainSeedBiomCMean_brch       ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch      => plt_allom%SingleGrainMeanBiomC_brch       ,& !inoput :potential carbon mass per grain, [gC seed-1]
     Prep4Literfall_brch          => plt_pheno%Prep4Literfall_brch           ,& !inoput :branch phenology flag, [-]
     Hours4LiterfalAftMature_brch => plt_pheno%Hours4LiterfalAftMature_brch  ,& !inoput :branch phenology flag, [h]
     LitrfallElms_pvr             => plt_bgcr%LitrfallElms_pvr               ,& !inoput :plant LitrFall element, [g d-2 h-1]
@@ -2637,7 +2640,8 @@ module PlantBranchMod
     ENDDO
     PotentialSeedSites_brch(NB,NZ) = RSpecLiterFall1*PotentialSeedSites_brch(NB,NZ)
     SetNumberSeeds_brch(NB,NZ)     = RSpecLiterFall1*SetNumberSeeds_brch(NB,NZ)
-    GrainSeedBiomCMean_brch(NB,NZ) = RSpecLiterFall1*GrainSeedBiomCMean_brch(NB,NZ)
+    ! Partial removal changes grain number, not the size potential of surviving grains.
+    IF(RSpecLiterFall1.LE.0._r8) SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
     !
     !     STALKS BECOME LitrFall IN GRASSES AT END OF SEASON
     !

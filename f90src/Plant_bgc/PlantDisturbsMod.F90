@@ -1289,7 +1289,7 @@ module PlantDisturbsMod
     EarStrutElms_brch       => plt_biom%EarStrutElms_brch         ,& !inoput :branch ear structural chemical element mass, [g d-2]
     PotentialSeedSites_brch => plt_morph%PotentialSeedSites_brch  ,& !inoput :branch potential grain number, [d-2]
     SetNumberSeeds_brch       => plt_morph%SetNumberSeeds_brch        ,& !inoput :branch grain number, [d-2]
-    GrainSeedBiomCMean_brch => plt_allom%GrainSeedBiomCMean_brch  ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch => plt_allom%SingleGrainMeanBiomC_brch  ,& !inoput :potential carbon mass per grain, [gC seed-1]
     HuskStrutElms_brch      => plt_biom%HuskStrutElms_brch         & !inoput :branch husk structural element mass, [g d-2]
   )
 
@@ -1381,7 +1381,8 @@ module PlantDisturbsMod
 
   PotentialSeedSites_brch(NB,NZ) = FracGrainNotHvsted*PotentialSeedSites_brch(NB,NZ)
   SetNumberSeeds_brch(NB,NZ)         = FracGrainNotHvsted*SetNumberSeeds_brch(NB,NZ)
-  GrainSeedBiomCMean_brch(NB,NZ) = FracGrainNotHvsted*GrainSeedBiomCMean_brch(NB,NZ)
+  ! Partial removal changes grain number, not the size potential of surviving grains.
+  IF(FracGrainNotHvsted.LE.0._r8) SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
   call PrintInfo('end '//subname)
   end associate
   END subroutine CutBranchReprodOrgans

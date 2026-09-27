@@ -953,7 +953,7 @@ implicit none
     CanopyNonstElms_brch       => plt_biom%CanopyNonstElms_brch         ,& !output :branch nonstructural element, [g d-2]
     CanopyStalkSurfArea_lbrch      => plt_morph%CanopyStalkSurfArea_lbrch       ,& !output :plant canopy layer branch stem area, [m2 d-2]
     EarStrutElms_brch          => plt_biom%EarStrutElms_brch            ,& !output :branch ear structural chemical element mass, [g d-2]
-    GrainSeedBiomCMean_brch    => plt_allom%GrainSeedBiomCMean_brch     ,& !output :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch    => plt_allom%SingleGrainMeanBiomC_brch     ,& !output :potential carbon mass per grain, [gC seed-1]
     GrainStrutElms_brch        => plt_biom%GrainStrutElms_brch          ,& !output :branch grain structural element mass, [g d-2]
     HuskStrutElms_brch         => plt_biom%HuskStrutElms_brch           ,& !output :branch husk structural element mass, [g d-2]
     StalkNodeVertLength_brch   => plt_morph%StalkNodeVertLength_brch    ,& !output :internode height, [m]
@@ -995,7 +995,7 @@ implicit none
 !     iPlantPhenolPattern_pft=growth habit:0=annual,1=perennial from PFT file
 !     SetNumberSeeds_brch=seed set number
 !     PotentialSeedSites_brch=potential number of seed set sites
-!     GrainSeedBiomCMean_brch=individual seed size
+!     SingleGrainMeanBiomC_brch=individual seed size
 !     CPOOL3_node,CPOOL4_node=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CMassCO2BundleSheath_node,CMassHCO3BundleSheath_node=aqueous CO2,HCO3-C mass in bundle sheath
 !     LeafProteinC_node=leaf protein mass
@@ -1020,7 +1020,7 @@ implicit none
   CanopyLeafSheathC_brch(NB,NZ)                       = 0._r8
   PotentialSeedSites_brch(NB,NZ)                      = 0._r8
   SetNumberSeeds_brch(NB,NZ)                            = 0._r8
-  GrainSeedBiomCMean_brch(NB,NZ)                      = 0._r8
+  SingleGrainMeanBiomC_brch(NB,NZ)                      = 0._r8
   LeafAreaLive_brch(NB,NZ)                            = 0._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,NB,NZ)  = 0._r8
 

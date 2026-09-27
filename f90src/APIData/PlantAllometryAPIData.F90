@@ -47,7 +47,7 @@ module PlantAllometryAPIData
   real(r8), pointer :: rNCSheath_pft(:)                     => null()  !sheath N:C ratio,                                        [g g-1]
   real(r8), pointer :: rPCStalk_pft(:)                  => null()  !stalk P:C ratio,                                         [g g-1]
   real(r8), pointer :: rNCLeaf_pft(:)                      => null()  !maximum leaf N:C ratio,                                  [g g-1]
-  real(r8), pointer :: GrainSeedBiomCMean_brch(:,:)     => null()  !maximum grain C during grain fill,                       [g d-2]
+  real(r8), pointer :: SingleGrainMeanBiomC_brch(:,:)     => null()  !potential carbon mass per grain, [gC seed-1]
   real(r8), pointer :: FracGroth2Node_pft(:)            => null()  !parameter for allocation of growth to nodes,             [-]
   real(r8), pointer ::RootProteinCMax_pft(:)      => null()  !reference root protein N, [gN g-1]
 
@@ -68,7 +68,7 @@ contains
 
   allocate(this%RootProteinCMax_pft(JP1));this%RootProteinCMax_pft=spval
   allocate(this%FracGroth2Node_pft(JP1));this%FracGroth2Node_pft=spval
-  allocate(this%GrainSeedBiomCMean_brch(MaxNumBranches,JP1));this%GrainSeedBiomCMean_brch=spval
+  allocate(this%SingleGrainMeanBiomC_brch(MaxNumBranches,JP1));this%SingleGrainMeanBiomC_brch=spval
   allocate(this%NoduGrowthYield_pft(JP1));this%NoduGrowthYield_pft=spval
   allocate(this%RootBiomGrosYld_pft(JP1));this%RootBiomGrosYld_pft=spval
   allocate(this%rPCRootr_pft(JP1));this%rPCRootr_pft=spval
@@ -120,7 +120,7 @@ contains
   class(plant_allometry_type) :: this
 
 !  if(allocated(FracGroth2Node_pft))deallocate(FracGroth2Node_pft)
-!  if(allocated(GrainSeedBiomCMean_brch))deallocate(GrainSeedBiomCMean_brch)
+!  if(allocated(SingleGrainMeanBiomC_brch))deallocate(SingleGrainMeanBiomC_brch)
 !  if(allocated(NoduGrowthYield_pft))deallocate(NoduGrowthYield_pft)
 !  if(allocated(RootBiomGrosYld_pft))deallocate(RootBiomGrosYld_pft)
 !  if(allocated(rPCRootr_pft))deallocate(rPCRootr_pft)

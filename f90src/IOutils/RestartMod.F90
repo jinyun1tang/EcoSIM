@@ -128,6 +128,9 @@ implicit none
   integer :: daily_storage_varid
   type(var_desc_t) :: daily_storage_vardesc
   logical :: has_daily_storage
+  type(var_desc_t) :: single_grain_vardesc
+  logical :: has_single_grain
+  character(len=64) :: single_grain_varname
 
 ! execution begins here
   NHW = bounds%NHW;NVN = bounds%NVN
@@ -3063,18 +3066,22 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GrainSeedBiomCMean_brch', dim1name='pft',dim2name='nbranches',&
-     long_name='maximum grain C during grain fill', units='g d-2', &
+    ! Accept the old restart field name without changing its per-grain values.
+    single_grain_varname = 'SingleGrainMeanBiomC_brch'
+    call check_var(ncid,trim(single_grain_varname),single_grain_vardesc,has_single_grain,print_err=.false.)
+    if(.not.has_single_grain) single_grain_varname = 'GrainSeedBiomCMean_brch'
+    call restartvar(ncid, flag, varname=trim(single_grain_varname), dim1name='pft',dim2name='nbranches',&
+     long_name='Potential carbon mass per grain', units='gC seed-1', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,GrainSeedBiomCMean_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SingleGrainMeanBiomC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
   else
-    !print*,'GrainSeedBiomCMean_brch'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,GrainSeedBiomCMean_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
+    !print*,'SingleGrainMeanBiomC_brch'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SingleGrainMeanBiomC_brch,datrp_2d,NumActivePlants=NumActivePlants_col,&
       IsPlantActive_pft=IsPlantActive_pft) 
     datpr2 => datrp_2d(1:npfts,1:MaxNumBranches)
-    call restartvar(ncid, flag, varname='GrainSeedBiomCMean_brch', dim1name='pft',dim2name='nbranches',&
-     long_name='maximum grain C during grain fill', units='g d-2', &
+    call restartvar(ncid, flag, varname='SingleGrainMeanBiomC_brch', dim1name='pft',dim2name='nbranches',&
+     long_name='Potential carbon mass per grain', units='gC seed-1', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
 
   endif  

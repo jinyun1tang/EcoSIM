@@ -89,7 +89,7 @@ contains
     HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch            ,& !inoput :branch husk structural element mass, [g d-2]
     StalkRsrvElms_brch          => plt_biom%StalkRsrvElms_brch            ,& !inoput :branch reserve element mass, [g d-2]
     CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch     ,& !inoput :branch nodule structural element, [g d-2]
-    GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch      ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch     => plt_allom%SingleGrainMeanBiomC_brch      ,& !inoput :potential carbon mass per grain, [gC seed-1]
     ShootElms_brch              => plt_biom%ShootElms_brch                ,& !inoput :branch shoot structural element mass, [g d-2]
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch           ,& !inoput :branch stalk structural element mass, [g d-2]
     LeafLayerElms_node          => plt_biom%LeafLayerElms_node            ,& !inoput :layer leaf element, [g d-2]
@@ -199,7 +199,8 @@ contains
 
       PotentialSeedSites_brch(NB,NZ) = PotentialSeedSites_brch(NB,NZ)*XHVST
       SetNumberSeeds_brch(NB,NZ)     = SetNumberSeeds_brch(NB,NZ)*XHVST
-      GrainSeedBiomCMean_brch(NB,NZ) = GrainSeedBiomCMean_brch(NB,NZ)*XHVST
+      ! Partial removal changes grain number, not the size potential of surviving grains.
+      IF(XHVST.LE.0._r8) SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
       LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
 
       !summarize C mass after tillage
