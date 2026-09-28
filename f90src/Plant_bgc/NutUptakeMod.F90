@@ -269,11 +269,14 @@ module NutUptakeMod
           trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
 
           call RootExudates(I,J,N,L,NZ)
+          ! Carbon basis for NH4/NO3 capacity diagnostics: population secondary
+          ! fine-root/mycorrhizal structural C plus nonstructural C in this layer.
+          RootMyMassC=sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumStructuralRootAxes_pft(NZ),NZ)) &
+            +RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
           if(N==ipltroot)then
-            RootMyMassC=sum(Root1stActStructElms_rpvr(ielmc,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-          else
-            RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-          endif  
+            ! Plant roots also include active primary-root structural C.
+            RootMyMassC=RootMyMassC+sum(Root1stActStructElms_rpvr(ielmc,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+          endif
           !
           !     NUTRIENT UPTAKE
           !
