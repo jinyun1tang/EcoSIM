@@ -5788,8 +5788,9 @@ implicit none
       ENDDO
       RootMSinkWeight_pvr(L,NZ) =RootMSinkWeight_pvr(L,NZ)/RootSinkC(ipltroot)
       Root1stSinkWeight_pvr(L,NZ)=Root1stSinkWeight_pvr(L,NZ)/RootSinkC(ipltroot)
-      if(L.EQ.LTip)Root1stTipSinkWeight_pft(NZ)=Root1stTipSinkWeight_pft(NZ)/RootSinkC(ipltroot)      
-    ENDDO   
+    ENDDO
+    if(Root1stTipSinkWeight_pft(NZ).GT.0._r8) &
+      Root1stTipSinkWeight_pft(NZ)=Root1stTipSinkWeight_pft(NZ)/RootSinkC(ipltroot)
   endif   
   
 !  call SumRootBiome(yearIJ,NZ,mass_finale)
