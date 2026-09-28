@@ -1,6 +1,7 @@
 module RootGasMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux,isclose, symmetric_flux_limiter
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1
+  use minimathmod,   only: fixEXConsumpFlux,isclose, symmetric_flux_limiter
   use EcoSIMCtrlMod, only : lcoarseroot
   use DebugToolMod
   use EcosimConst
@@ -518,6 +519,82 @@ module RootGasMod
             ENDIF
           ENDIF
 
+          ! Couple soil O2 uptake to donor-limited phase exchange. The pools
+          ! already include external forcing, so it must not enter the budget again.
+          O2PhaseExchangeRate=0._r8
+          if(FracAirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min) &
+            O2PhaseExchangeRate=FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
+          O2SoilUptakeRequested=ROxySoil2Uptk
+          call LimitSoilOxygenUptake(trc_solml_loc(idg_O2),trc_gasml_loc(idg_O2), &
+            VOLWAqueous(idg_O2),VLsoiAirPMM,O2PhaseExchangeRate,ROxySoil2Uptk,RGas_DisolvSoil_flx(idg_O2))
+
+          if(O2SoilUptakeRequested.GT.0._r8 .and. ROxySoil2Uptk.LT.O2SoilUptakeRequested)then
+            ! A negative inside-root uptake transfers soil O2 into root water.
+            ! Reduce that transfer with its soil supply; retain independent root supply.
+            if(ROxyRoot2Uptk.LT.0._r8)ROxyRoot2Uptk=ROxyRoot2Uptk*(ROxySoil2Uptk/O2SoilUptakeRequested)
+          endif
+          RSoilSolute2Roots(idg_O2)=ROxySoil2Uptk
+          !
+          !     GAS TRANSFER THROUGH ROOTS
+          !
+          IF(N.EQ.ipltroot .AND. RootPoreVol_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
+            RUPNTX=RSoilSolute2Roots(idg_NH3)+RSoilSolute2Roots(idg_NH3B)
+            !
+            !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN ROOTS
+            !     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
+            !     CALCULATED FROM SOLUBILITIES, AND TRANSFER COEFFICIENT
+            !
+            trcs_maxRootml_loc(idg_CO2) = AZMAX1(trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled)
+            trcs_maxRootml_loc(idg_NH3) = AZMAX1(trcs_rootml_loc(idg_NH3)+RUPNTX)
+            trcs_maxRootml_loc(idg_O2)  = AZMAX1(trcs_rootml_loc(idg_O2)-ROxyRoot2Uptk)
+            DO idg=idg_beg,idg_NH3
+              if(idg/=idg_CO2 .and. idg/=idg_NH3 .and. idg/=idg_O2)then
+                trcs_maxRootml_loc(idg)=AZMAX1(trcs_rootml_loc(idg)+RSoilSolute2Roots(idg))
+              endif
+
+              Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg))*DisolvedGasVolume(idg) &
+                -trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ))/(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
+
+              !>0._r8 atmosphere into roots, <0._r8 roots into atmosphere, assuming specific rate 1/hr
+              trcg_air2root_flx_loc(idg)=RootAtmGasConductance_rpvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
+            enddo
+          ELSE
+            Root_gas2sol_flx(idg_beg:idg_NH3)      = 0.0_r8
+            trcg_air2root_flx_loc(idg_beg:idg_NH3) = 0.0_r8
+          ENDIF
+          !
+          !     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS'
+          !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
+          !
+          !Release autotrophic respiration CO2 into roots
+          trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
+
+          DO idg=idg_beg,idg_NH3
+            dtrc_err(idg)=trcg_rootml_loc(idg)+trcs_rootml_loc(idg)
+            Root_gas2sol_flx(idg)=AMAX1(AMIN1(trcg_rootml_loc(idg),Root_gas2sol_flx(idg)),-trcs_rootml_loc(idg))
+
+            trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)
+            trcs_rootml_loc(idg) = trcs_rootml_loc(idg)+Root_gas2sol_flx(idg)
+
+            call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
+
+            if(idg.eq.idg_O2)then
+              ! Root withdrawal supports respiration and any reverse flow to soil.
+              ! Limit both together before crediting the soil compartment.
+              call LimitRootOxygenUptake(trcs_rootml_loc(idg),ROxyRoot2Uptk,ROxySoil2Uptk)
+            elseif(idg.NE.idg_NH3)then
+              !non-O2 gases are added to the root inside.
+              call fixEXConsumpFlux(trcs_rootml_loc(idg),RSoilSolute2Roots(idg),-1)
+            endif
+          ENDDO
+
+          ! Both soil NH3 compartments exchange with the same root aqueous pool.
+          ! Include all inflows before sharing the donor budget among outflows.
+          call LimitRootAmmoniaExchange(trcs_rootml_loc(idg_NH3), &
+            RSoilSolute2Roots(idg_NH3),RSoilSolute2Roots(idg_NH3B))
+          RSoilSolute2Roots(idg_O2)=ROxySoil2Uptk
+
+          ! Soil phase exchange and pool updates use the accepted root transfers.
           !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN SOIL
           !     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
           !     CALCULATED FROM SOLUBILITIES, AND TRANSFER COEFFICIENTS
@@ -525,14 +602,12 @@ module RootGasMod
           !     RSoilSolute2Roots=root aqueous gas uptake
           !     ROXYLX=soil net O2 aqueous flux
 
-          !gas disolution into soil
-          O2PhaseExchangeRate=0._r8
+          !gas dissolution into soil
           IF(FracAirFilledSoilPoreM_vr(M,L).GT.AirFillPore_Min)THEN
             DiffusivitySolutEffP         = FracPRoot4Uptake(N,L,NZ)*DiffusivitySolutEffM_vr(M,L)
             RGas_DisolvSoil_flx(idg_CO2) = DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),trc_gasml_loc(idg_CO2))*VOLWAqueous(idg_CO2) &
               -(AMAX1(ZEROS,trc_solml_loc(idg_CO2))-RSoilSolute2Roots(idg_CO2))*VLsoiAirPMM)/(VOLWAqueous(idg_CO2)+VLsoiAirPMM)
 
-            O2PhaseExchangeRate=DiffusivitySolutEffP
 
             IF(N.EQ.ipltroot)THEN
               DO idg=idg_beg,idg_NH3-1
@@ -575,17 +650,10 @@ module RootGasMod
           ELSE
             RGas_DisolvSoil_flx(idg_beg:idg_end)=0.0_r8
           ENDIF
-          ! Couple soil O2 uptake to donor-limited phase exchange. The pools
-          ! already include external forcing, so it must not enter the budget again.
-          O2SoilUptakeRequested=ROxySoil2Uptk
+          ! Recalculate O2 phase exchange if the root donor reduced release to soil.
+          ! Positive soil uptake was already limited before the root budget update.
           call LimitSoilOxygenUptake(trc_solml_loc(idg_O2),trc_gasml_loc(idg_O2), &
             VOLWAqueous(idg_O2),VLsoiAirPMM,O2PhaseExchangeRate,ROxySoil2Uptk,RGas_DisolvSoil_flx(idg_O2))
-
-          if(O2SoilUptakeRequested.GT.0._r8 .and. ROxySoil2Uptk.LT.O2SoilUptakeRequested)then
-            ! A negative inside-root uptake transfers soil O2 into root water.
-            ! Reduce that transfer with its soil supply; retain independent root supply.
-            if(ROxyRoot2Uptk.LT.0._r8)ROxyRoot2Uptk=ROxyRoot2Uptk*(ROxySoil2Uptk/O2SoilUptakeRequested)
-          endif
           RSoilSolute2Roots(idg_O2)=ROxySoil2Uptk
           !
           !     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
@@ -606,62 +674,6 @@ module RootGasMod
             trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RSoilSolute2Roots(idg)
           enddo
           !
-          !     GAS TRANSFER THROUGH ROOTS
-          !
-          IF(N.EQ.ipltroot .AND. RootPoreVol_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
-            RUPNTX=RSoilSolute2Roots(idg_NH3)+RSoilSolute2Roots(idg_NH3B)
-            !
-            !     GAS EXCHANGE BETWEEN GASEOUS AND AQUEOUS PHASES IN ROOTS
-            !     DURING ROOT UPTAKE DEPENDING ON CONCENTRATION DIFFERENCES
-            !     CALCULATED FROM SOLUBILITIES, AND TRANSFER COEFFICIENT
-            !
-            trcs_maxRootml_loc(idg_CO2) = AZMAX1(trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled)
-            trcs_maxRootml_loc(idg_NH3) = AZMAX1(trcs_rootml_loc(idg_NH3)+RUPNTX)
-            trcs_maxRootml_loc(idg_O2)  = AZMAX1(trcs_rootml_loc(idg_O2)-ROxyRoot2Uptk)
-            DO idg=idg_beg,idg_NH3
-              if(idg/=idg_CO2 .and. idg/=idg_NH3 .and. idg/=idg_O2)then
-                trcs_maxRootml_loc(idg)=AZMAX1(trcs_rootml_loc(idg)+RSoilSolute2Roots(idg))
-              endif
-              
-              Root_gas2sol_flx(idg)=AMAX1(-trcs_maxRootml_loc(idg),DFGP*(AMAX1(ZERO4Groth_pft(NZ),trcg_rootml_loc(idg))*DisolvedGasVolume(idg) &
-                -trcs_maxRootml_loc(idg)*RootPoreVol_pvr(N,L,NZ))/(DisolvedGasVolume(idg)+RootPoreVol_pvr(N,L,NZ)))
-
-              !>0._r8 atmosphere into roots, <0._r8 roots into atmosphere, assuming specific rate 1/hr
-              trcg_air2root_flx_loc(idg)=RootAtmGasConductance_rpvr(idg,N,L,NZ)*(AtmGasc(idg)-trcg_gcon_loc(idg))
-            enddo
-          ELSE
-            Root_gas2sol_flx(idg_beg:idg_NH3)      = 0.0_r8
-            trcg_air2root_flx_loc(idg_beg:idg_NH3) = 0.0_r8
-          ENDIF
-          !
-          !     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS'
-          !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
-          !          
-          !releas autotrophic respiration CO2 into roots
-          trcs_rootml_loc(idg_CO2) = trcs_rootml_loc(idg_CO2)+RootCO2Prod_tscaled
-
-          DO idg=idg_beg,idg_NH3
-            dtrc_err(idg)=trcg_rootml_loc(idg)+trcs_rootml_loc(idg)
-            Root_gas2sol_flx(idg)=AMAX1(AMIN1(trcg_rootml_loc(idg),Root_gas2sol_flx(idg)),-trcs_rootml_loc(idg))
-
-            trcg_rootml_loc(idg) = trcg_rootml_loc(idg)-Root_gas2sol_flx(idg)
-            trcs_rootml_loc(idg) = trcs_rootml_loc(idg)+Root_gas2sol_flx(idg)
-
-            call fixEXConsumpFlux(trcg_rootml_loc(idg),trcg_air2root_flx_loc(idg),-1)
-
-            if(idg.eq.idg_O2)then
-              !oxygen is consumed inside roots
-              call fixEXConsumpFlux(trcs_rootml_loc(idg),ROxyRoot2Uptk)   
-            else
-              !non-O2 gases are added to the root inside.
-              call fixEXConsumpFlux(trcs_rootml_loc(idg),RSoilSolute2Roots(idg),-1)
-            endif
-          ENDDO
-
-          !NH3 taken up from banded soil is added to inside root concentration          
-          call fixEXConsumpFlux(trcs_rootml_loc(idg_NH3),RSoilSolute2Roots(idg_NH3B),-1)
-
-          !
           !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
           !
           DO idg=idg_beg,idg_end
@@ -677,7 +689,7 @@ module RootGasMod
           !
           ! ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
           !
-          ! RootO2Uptk_pvr=root O2 uptake from root
+          ! RootO2Uptk_pvr=root O2 uptake from root internal
           ! REcoUptkSoilO2M_vr=total O2 uptake from soil by all microbial,root popns
           ! Root CO2 emission includes actual CO2 production from respiration and flux exchange with soil
           RCO2Emis2Root_rpvr(N,L,NZ)   = RCO2Emis2Root_rpvr(N,L,NZ)+RootCO2Prod_tscaled+RSoilSolute2Roots(idg_CO2)
@@ -720,6 +732,41 @@ module RootGasMod
   call PrintInfo('end '//subname)
   end associate
   end subroutine RootSoilGasExchange
+!----------------------------------------------------------------------------------------------------
+  pure subroutine LimitRootOxygenUptake(aqueous_mass,root_uptake,soil_uptake)
+  ! Positive uptake withdraws O2 from the named donor. Negative soil uptake
+  ! is release from roots to soil; the sum of both uptakes is respiration.
+  ! Phase exchange has already supplied/removed O2 from root water.
+  implicit none
+  real(r8), intent(inout) :: aqueous_mass,root_uptake,soil_uptake
+  real(r8) :: requested
+
+  requested=root_uptake
+  if(requested.GT.0._r8)then
+    root_uptake=MIN(requested,MAX(0._r8,aqueous_mass))
+    if(soil_uptake.LT.0._r8)soil_uptake=soil_uptake*(root_uptake/requested)
+  endif
+  aqueous_mass=MAX(0._r8,aqueous_mass-root_uptake)
+  end subroutine LimitRootOxygenUptake
+!----------------------------------------------------------------------------------------------------
+  pure subroutine LimitRootAmmoniaExchange(aqueous_mass,nonband_uptake,band_uptake)
+  ! Positive flux enters roots. Both soil compartments share one aqueous donor
+  ! after root phase exchange, including incoming NH3 from either compartment.
+  ! Scale only outgoing transfers, preserving their relative shares and making
+  ! the accepted transfers independent of the order of the soil compartments.
+  implicit none
+  real(r8), intent(inout) :: aqueous_mass,nonband_uptake,band_uptake
+  real(r8) :: available,outgoing,scale
+
+  available=MAX(0._r8,aqueous_mass)+MAX(0._r8,nonband_uptake)+MAX(0._r8,band_uptake)
+  outgoing=-MIN(0._r8,nonband_uptake)-MIN(0._r8,band_uptake)
+  if(outgoing.GT.available)then
+    scale=available/outgoing
+    if(nonband_uptake.LT.0._r8)nonband_uptake=nonband_uptake*scale
+    if(band_uptake.LT.0._r8)band_uptake=band_uptake*scale
+  endif
+  aqueous_mass=MAX(0._r8,available+MIN(0._r8,nonband_uptake)+MIN(0._r8,band_uptake))
+  end subroutine LimitRootAmmoniaExchange
 !----------------------------------------------------------------------------------------------------
   pure subroutine LimitSoilOxygenUptake(aqueous_mass,gas_mass,soluble_volume,air_volume, &
     exchange_rate,uptake,exchange)
