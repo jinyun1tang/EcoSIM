@@ -149,9 +149,11 @@ module NitrifierMod
     VMXD4S = VMXDXS*FVMXDX
     VMXD4B = VMXDXB*FVMXDX
 
-    !update NO2 production due to NH3 oxidation by O2
-    ZNO2SX                  = ZNO2S+RTotNH3OxidSoilAutor
-    ZNO2BX                  = ZNO2B+RTotNH3OxidBandAutor
+    !Guild share of existing NO2 plus current-hour aerobic NH3 oxidation.
+    !The production totals are fixed before the loop to avoid counting
+    !NH3 consumed by denitrification below as new NO2 production.
+    ZNO2SX                  = AZMAX1(ZNO2S+RTotNH3OxidSoilAutor)*FNO2
+    ZNO2BX                  = AZMAX1(ZNO2B+RTotNH3OxidBandAutor)*FNB2
     RNOxReduxAutorSoil(NGL) = AZMAX1(AMIN1(VMXD4S,ZNO2SX)) !NO2-> N2O
     RNOxReduxAutorBand(NGL) = AZMAX1(AMIN1(VMXD4B,ZNO2BX))
 

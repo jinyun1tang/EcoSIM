@@ -11,7 +11,7 @@ module MicrobMathFuncMod
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type, &
                                   Microbe_Flux_type, Microbe_State_type
   use minimathmod,          only: AZMAX1, safe_adb, fixEXConsumpFlux, &
-                                  real_truncate, SubstrateDribbling
+                                  real_truncate
   use NitroPars,            only: BIOS, FMN, ORAD, RMOM
   implicit none
 
@@ -103,7 +103,6 @@ module MicrobMathFuncMod
   real(r8) :: VOLPOX
   real(r8) :: X
   real(r8) :: VOLWPM,VOLOXM
-  real(r8) :: dsignO2,dribbling_flx
   ! begin_execution
   associate(                                                 &
     OxyLimterHeter         => nmics%OxyLimterHeter,          &
@@ -167,7 +166,6 @@ module MicrobMathFuncMod
       !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
 !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
 !
-      dribbling_flx=0._r8
       D420: DO M=1,NPH
         !
         !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
@@ -205,8 +203,10 @@ module MicrobMathFuncMod
             RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMAX, ZEROS)
           endif
 
-          !apply the uptake
-          call SubstrateDribbling(RMPOX,dribbling_flx,OXYS1)
+          !Credit only O2 present in the aqueous donor during this substep.
+          !O2 supplied by dissolution below is available in the next substep.
+          RMPOX = MIN(MAX(0._r8,RMPOX),MAX(0._r8,OXYS1))
+          OXYS1 = OXYS1-RMPOX
 
           !apply dissolution-volatilization
           IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN

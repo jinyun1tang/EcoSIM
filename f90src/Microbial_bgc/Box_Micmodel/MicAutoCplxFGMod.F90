@@ -1,7 +1,7 @@
 module MicAutoCPLXMod
 ! USES:
   use data_kind_mod,        only: r8 => DAT_KIND_R8
-  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux, SubstrateDribbling
+  use minimathmod,          only: safe_adb, AZMAX1, fixEXConsumpFlux
   use MicForcTypeMod,       only: micforctype
   use MicFluxTypeMod,       only: micfluxtype
   use MicStateTraitTypeMod, only: micsttype
@@ -565,7 +565,6 @@ module MicAutoCPLXMod
   real(r8) :: RRADO,RMPOX,ROXDFQ
   real(r8) :: THETW1,VOLWOX
   real(r8) :: VOLPOX
-  real(r8) :: dribbling_flx
   real(r8) :: X,VOLOXM
   real(r8) :: VOLWPM
 
@@ -653,7 +652,6 @@ module MicAutoCPLXMod
             !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
         !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
         !
-        dribbling_flx=0._r8
         DO  M=1,NPH
           !
           !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
@@ -691,9 +689,10 @@ module MicAutoCPLXMod
               RMPOX=TranspBasedsubstrateUptake(COXYS1,DIFOX, OXKX, RUPMX, ZEROS)
             ENDIF
 
-            !apply the uptake flux
-            !apply the uptake
-            call SubstrateDribbling(RMPOX,dribbling_flx,OXYS1)
+            !Credit only O2 present in the aqueous donor during this substep.
+            !O2 supplied by dissolution below is available in the next substep.
+            RMPOX = MIN(MAX(0._r8,RMPOX),MAX(0._r8,OXYS1))
+            OXYS1 = OXYS1-RMPOX
 
             !apply volatilization-dissolution
             IF(THETPM(M).GT.AirFillPore_Min.AND.VOLPOX.GT.ZEROS)THEN
