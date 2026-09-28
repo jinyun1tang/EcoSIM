@@ -1582,7 +1582,7 @@ module MicBGCMod
       ENDIF
     ENDIF
     D1685: DO N=1,NumMicbAFunGrupsPerCmplx
-      if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
+      if(.not.micpar%is_activeMicrbFungrpAutor(N))cycle
       D1680: DO M=1,ndbiomcp
         DO NGL=JGniA(N),JGnfA(N)
           DO NE=1,NumPlantChemElms
@@ -1689,13 +1689,14 @@ module MicBGCMod
         TDOMUptkHeter(idom_dop,K)     = TDOMUptkHeter(idom_dop,K)+DOMuptk4GrothHeter(ielmp,NGL,K)
         TDOMUptkHeter(idom_acetate,K) = TDOMUptkHeter(idom_acetate,K)+RMetabAcetUptkHeter(NGL,K)        
       enddo
-      D565: DO M=1,ndbiomcp
-        DO NE=1,NumPlantChemElms
-          OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RCCMEHeter(NE,M,K)+RCCMEAutor(NE,M,K)
-        ENDDO
-      ENDDO D565
-
     ENDDO D570
+
+    !These totals already include all contributing guilds; apply once per complex.
+    D565: DO M=1,ndbiomcp
+      DO NE=1,NumPlantChemElms
+        OMBioResdu(NE,M,K)=OMBioResdu(NE,M,K)+RCCMEHeter(NE,M,K)+RCCMEAutor(NE,M,K)
+      ENDDO
+    ENDDO D565
 
   ENDDO D590
   end associate
@@ -2798,7 +2799,7 @@ module MicBGCMod
       CNH4Y                    = AZMAX1(CNH4BU-Z4MN)
       RNH4DmndLitrHeter(NGL,K) = AMIN1(RINHPR,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
-      ZNH4M                      = Z4MN*VLWatMicP
+      ZNH4M                      = Z4MN*VOLWU
       RNH4imobilLitrHeter(NGL,K) = AMIN1(AttenfNH4Heter(NGL,K)*AZMAX1((ZNH4TU-ZNH4M)),RNH4DmndLitrHeter(NGL,K))
     ELSE
       RNH4DmndLitrHeter(NGL,K)   = 0.0_r8
@@ -2831,9 +2832,9 @@ module MicBGCMod
     IF(RINOPR.GT.0.0_r8)THEN
       CNO3X                    = AZMAX1(CNO3SU-ZOMN)
       CNO3Y                    = AZMAX1(CNO3BU-ZOMN)
-      RNO3DmndLitrHeter(NGL,K) = AMAX1(RINOPR,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*ZOMX) &
+      RNO3DmndLitrHeter(NGL,K) = AMIN1(RINOPR,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
-      ZNO3M                      = ZOMN*VLWatMicP
+      ZNO3M                      = ZOMN*VOLWU
       RNO3imobilLitrHeter(NGL,K) = AMIN1(AttenfNO3Heter(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RNO3DmndLitrHeter(NGL,K))
     ELSE
       RNO3DmndLitrHeter(NGL,K)   = 0._r8
@@ -3258,7 +3259,6 @@ module MicBGCMod
 
         RMaintDefLitrfal2HumOMHeter(NE,M,NGL,K)   = RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)*EHUM
         RMaintDefLitrfal2ResduOMHeter(NE,M,NGL,K) = RMaintDefcitLitrfalOMHeter(NE,M,NGL,K)-RMaintDefLitrfal2HumOMHeter(NE,M,NGL,K)
-        RCCMEheter(NE,M,K)                        = RCCMEheter(NE,M,K)+RkillLitrfal2ResduOMHeter(NE,M,NGL,K)+RMaintDefLitrfal2ResduOMHeter(NE,M,NGL,K)
 
       ENDDO
     ENDDO D730
@@ -3274,6 +3274,16 @@ module MicBGCMod
 
     ENDDO D720
   ENDIF
+
+  !Ordinary mortality contributes residue even without a maintenance deficit.
+  !Accumulate each guild once, including any maintenance-deficit residue.
+  DO M=1,2
+    DO NE=1,NumPlantChemElms
+      RCCMEHeter(NE,M,K)=RCCMEHeter(NE,M,K) &
+        +RkillLitrfal2ResduOMHeter(NE,M,NGL,K) &
+        +RMaintDefLitrfal2ResduOMHeter(NE,M,NGL,K)
+    ENDDO
+  ENDDO
   call PrintInfo('end '//subname)
   end associate
   end subroutine GatherHetertrophAnabolicFlux

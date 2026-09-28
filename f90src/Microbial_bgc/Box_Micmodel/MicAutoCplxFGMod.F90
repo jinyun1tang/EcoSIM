@@ -809,12 +809,26 @@ module MicAutoCPLXMod
    VLNH4                 => micfor%VLNH4,                &
    VLNHB                 => micfor%VLNHB,                &
    VLWatMicP             => micfor%VLWatMicP,            &
+   VOLWU                 => micfor%VOLWU,                & ! Underlying-soil water volume
    VLNO3                 => micfor%VLNO3,                &
    VLNOB                 => micfor%VLNOB,                &
    VLPO4                 => micfor%VLPO4,                &
    VLPOB                 => micfor%VLPOB,                &
    litrm                 => micfor%litrm,                &
    mBiomeAutor           => micstt%mBiomeAutor,          &
+   ! Underlying-soil pools and concentrations for supplemental litter uptake.
+   ZNH4TU                => micstt%ZNH4TU, &
+   ZNO3TU                => micstt%ZNO3TU, &
+   H2P4TU                => micstt%H2P4TU, &
+   H1P4TU                => micstt%H1P4TU, &
+   CNH4SU                => micstt%CNH4SU, &
+   CNH4BU                => micstt%CNH4BU, &
+   CNO3SU                => micstt%CNO3SU, &
+   CNO3BU                => micstt%CNO3BU, &
+   CH2P4U                => micstt%CH2P4U, &
+   CH2P4BU               => micstt%CH2P4BU, &
+   CH1P4U                => micstt%CH1P4U, &
+   CH1P4BU               => micstt%CH1P4BU, &
    ZNH4S                 => micstt%ZNH4S,                &
    ZNH4B                 => micstt%ZNH4B,                &
    ZNO3S                 => micstt%ZNO3S,                &
@@ -1032,15 +1046,16 @@ module MicAutoCPLXMod
 !     RNH4imobilLitrHeter=substrate-limited NH4 mineraln-immobiln
 !     NetNH4Mineralize=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
+    ! These transfers are charged to the underlying soil, not the litter pool.
     IF(litrm)THEN
       RNetNH4MinPotentLitr=RNetNH4MinPotent-RNH4TransfSoilAutor(NGL)-RNO3TransfSoilAutor(NGL)
       IF(RNetNH4MinPotentLitr.GT.0.0_r8)THEN
-        CNH4X=AZMAX1(CNH4S-Z4MN)
-        CNH4Y=AZMAX1(CNH4B-Z4MN)
+        CNH4X=AZMAX1(CNH4SU-Z4MN)
+        CNH4Y=AZMAX1(CNH4BU-Z4MN)
         RNH4UptkLitrAutor(NGL)=AMIN1(RNetNH4MinPotentLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*Z4MX) &
             *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
-        ZNH4M=Z4MN*VLWatMicP
-        RNH4TransfLitrAutor(NGL)=AMIN1(AttenfNH4Autor(NGL)*AZMAX1((ZNH4T-ZNH4M)),RNH4UptkLitrAutor(NGL))
+        ZNH4M=Z4MN*VOLWU
+        RNH4TransfLitrAutor(NGL)=AMIN1(AttenfNH4Autor(NGL)*AZMAX1((ZNH4TU-ZNH4M)),RNH4UptkLitrAutor(NGL))
       ELSE
         RNH4UptkLitrAutor(NGL)=0.0_r8
         RNH4TransfLitrAutor(NGL)=RNetNH4MinPotentLitr
@@ -1053,7 +1068,7 @@ module MicAutoCPLXMod
 !
 !     RNetNO3DmndLitr=NH4 mineralization (-ve) or immobilization (+ve) demand
 !     NU=surface layer number
-!     CNO3S,CNO3B=aqueous NO3 concentrations in non-band, band
+!     CNO3SU,CNO3BU=aqueous NO3 concentrations in non-band, band
 !     ZOMX,ZOMN,ZOKU=parameters for max NO3 uptake rate,
 !     minimum NO3 concentration and Km for NO3 uptake
 !     RNO3DmndLitrHeter_col=microbially limited NO3 demand
@@ -1061,7 +1076,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FNO3S,FNO3B=fractions of NO3 in non-band, band
 !     RNO3imobilLitrHeter=substrate-unlimited NO3 immobiln
-!     VLWatMicP=water content
+!     VOLWU=water content
 !     ZNO3M=NO3 not available for uptake
 !     AttenfNO3Heter=fraction of biological NO3 demand
 !     RNO3imobilLitrHeter=substrate-limited NO3 immobiln
@@ -1069,12 +1084,12 @@ module MicAutoCPLXMod
 !
       RNetNO3DmndLitr=AZMAX1(RNetNH4MinPotentLitr-RNH4TransfLitrAutor(NGL))
       IF(RNetNO3DmndLitr.GT.0.0_r8)THEN
-        CNO3X=AZMAX1(CNO3S-ZOMN)
-        CNO3Y=AZMAX1(CNO3B-ZOMN)
-        RNO3UptkLitrAutor(NGL)=AMAX1(RNetNO3DmndLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*ZOMX) &
+        CNO3X=AZMAX1(CNO3SU-ZOMN)
+        CNO3Y=AZMAX1(CNO3BU-ZOMN)
+        RNO3UptkLitrAutor(NGL)=AMIN1(RNetNO3DmndLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*ZOMX) &
             *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
-        ZNO3M=ZOMN*VLWatMicP
-        RNO3TransfLitrAutor(NGL)=AMIN1(AttenfNO3Autor(NGL)*AZMAX1((ZNO3T-ZNO3M)),RNO3UptkLitrAutor(NGL))
+        ZNO3M=ZOMN*VOLWU
+        RNO3TransfLitrAutor(NGL)=AMIN1(AttenfNO3Autor(NGL)*AZMAX1((ZNO3TU-ZNO3M)),RNO3UptkLitrAutor(NGL))
       ELSE
         RNO3UptkLitrAutor(NGL)=0.0_r8
         RNO3TransfLitrAutor(NGL)=RNetNO3DmndLitr
@@ -1087,7 +1102,7 @@ module MicAutoCPLXMod
 !
 !     RNetH2PO4MinPotentLitr=H2PO4 mineralization (-ve) or immobilization (+ve) demand
 !     NU=surface layer number
-!     CH2P4,CH2P4B=aqueous H2PO4 concentrations in non-band, band
+!     CH2P4U,CH2P4BU=aqueous H2PO4 concentrations in non-band, band
 !     HPMX,HPMN,HPKU=parameters for max H2PO4 uptake rate,
 !     minimum H2PO4 concentration and Km for H2PO4 uptake
 !     RH2PO4DmndLitrHeter=microbially limited H2PO4 demand
@@ -1095,7 +1110,7 @@ module MicAutoCPLXMod
 !     TFNG=temp+water stress
 !     FH2PS,FH2PB=fractions of H2PO4 in non-band, band
 !     RH2PO4DmndLitrHeter=substrate-unlimited H2PO4 mineraln-immobiln
-!     VLWatMicP=water content
+!     VOLWU=water content
 !     H2P4M=H2PO4 not available for uptake
 !     AttenfH2PO4Heter=fractions of biological H2PO4 demand
 !     RH2PO4imobilLitrHeter=substrate-limited H2PO4 mineraln-immobiln
@@ -1103,12 +1118,12 @@ module MicAutoCPLXMod
 !
       RNetH2PO4MinPotentLitr=RNetH2PO4MinPotent-RH2PO4TransfSoilAutor(NGL)
       IF(RNetH2PO4MinPotentLitr.GT.0.0_r8)THEN
-        CH2PX=AZMAX1(CH2P4-HPMN)
-        CH2PY=AZMAX1(CH2P4B-HPMN)
+        CH2PX=AZMAX1(CH2P4U-HPMN)
+        CH2PY=AZMAX1(CH2P4BU-HPMN)
         RH2PO4UptkLitrAutor(NGL)=AMIN1(RNetH2PO4MinPotentLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
             *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
-        H2P4M=HPMN*VLWatMicP
-        RH2PO4TransfLitrAutor(NGL)=AMIN1(AttenfH2PO4Autor(NGL)*AZMAX1((H2P4T-H2P4M)),RH2PO4UptkLitrAutor(NGL))
+        H2P4M=HPMN*VOLWU
+        RH2PO4TransfLitrAutor(NGL)=AMIN1(AttenfH2PO4Autor(NGL)*AZMAX1((H2P4TU-H2P4M)),RH2PO4UptkLitrAutor(NGL))
       ELSE
         RH2PO4UptkLitrAutor(NGL)=0.0_r8
         RH2PO4TransfLitrAutor(NGL)=RNetH2PO4MinPotentLitr
@@ -1121,7 +1136,7 @@ module MicAutoCPLXMod
       !
       !     RNetH1PO4DmndLitr=HPO4 mineralization (-ve) or immobilization (+ve) demand
       !     NU=surface layer number
-      !     CH1P4,CH1P4B=aqueous HPO4 concentrations in non-band, band
+      !     CH1P4U,CH1P4BU=aqueous HPO4 concentrations in non-band, band
       !     HPMX,HPMN,HPKU=parameters for max HPO4 uptake rate,
       !     minimum HPO4 concentration and Km for HPO4 uptake
       !     RH1PO4DmndLitrHeter_col=microbially limited HPO4 demand
@@ -1129,7 +1144,7 @@ module MicAutoCPLXMod
       !     TFNG=temp+water stress
       !     FH1PS,FH1PB=fractions of HPO4 in non-band, band
       !     RH1PO4DmndLitrHeter_col=substrate-unlimited HPO4 mineraln-immobiln
-      !     VLWatMicP=water content
+      !     VOLWU=water content
       !     H1P4M=HPO4 not available for uptake
       !     AttenfH1PO4Heter=fraction of biological HPO4 demand
       !     RH1PO4imobilLitrHeter=substrate-limited HPO4 minereraln-immobiln
@@ -1139,12 +1154,12 @@ module MicAutoCPLXMod
       FH1PB = VLPOB
       RNetH1PO4DmndLitr=0.1_r8*AZMAX1(RNetH2PO4MinPotentLitr-RH2PO4TransfLitrAutor(NGL))
       IF(RNetH1PO4DmndLitr.GT.0.0_r8)THEN
-        CH1PX=AZMAX1(CH1P4-HPMN)
-        CH1PY=AZMAX1(CH1P4B-HPMN)
+        CH1PX=AZMAX1(CH1P4U-HPMN)
+        CH1PY=AZMAX1(CH1P4BU-HPMN)
         RH1PO4UptkLitrAutor(NGL)=AMIN1(RNetH1PO4DmndLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
             *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
-        H1P4M=HPMN*VLWatMicP
-        RH1PO4TransfLitrAutor(NGL)=AMIN1(AttenfH1PO4Autor(NGL)*AZMAX1((H1P4T-H1P4M)),RH1PO4UptkLitrAutor(NGL))
+        H1P4M=HPMN*VOLWU
+        RH1PO4TransfLitrAutor(NGL)=AMIN1(AttenfH1PO4Autor(NGL)*AZMAX1((H1P4TU-H1P4M)),RH1PO4UptkLitrAutor(NGL))
       ELSE
         RH1PO4UptkLitrAutor(NGL)=0.0_r8
         RH1PO4TransfLitrAutor(NGL)=RNetH1PO4DmndLitr
