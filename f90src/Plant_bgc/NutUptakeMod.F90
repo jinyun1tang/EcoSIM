@@ -297,7 +297,10 @@ module NutUptakeMod
           ENDIF
           RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)      
         else
-          RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8                      
+          RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8
+          ! Absorptive geometry can disappear after respiration was calculated.
+          ! Release previous-hour CO2 even though uptake is now inactive.
+          RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         ENDIF
       ENDDO D955      
     ELSE

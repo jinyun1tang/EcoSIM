@@ -321,7 +321,12 @@ module RootGasMod
       !
       !     AQUEOUS GAS DIFFUSIVITY THROUGH SOIL WATER TO ROOT
       !
-      if(isclose(VLWatMicPM_vr(M,L),0._r8))cycle
+      if(isclose(VLWatMicPM_vr(M,L),0._r8))then
+        ! Previous-hour respiration has already produced this CO2.
+        ! Route this hydrological substep's share directly to soil.
+        RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)+RootCO2Prod_tscaled*NPT
+        cycle
+      endif
       VLWatMicPMO = VLWatMicPM_vr(M,L)*FOXYX
       VLWatMicPMM = VLWatMicPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
       VLsoiAirPMM = VLsoiAirPM_vr(M,L)*FracPRoot4Uptake(N,L,NZ)
