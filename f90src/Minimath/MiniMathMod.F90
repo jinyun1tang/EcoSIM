@@ -25,6 +25,7 @@ module minimathmod
   public :: fixEXConsumpFlux
   public :: yearday,isletter
   public :: dssign
+  public :: symmetric_flux_limiter
   public :: flux_mass_limiter
   public :: AZERO,AZERO1  
   public :: SubstrateLimit
@@ -525,6 +526,18 @@ module minimathmod
   end function isletter
 
 ! ----------------------------------------------------------------------
+
+  pure elemental function symmetric_flux_limiter(flux,reference_flux)result(ans)
+  ! Bound flux to [-abs(reference_flux),abs(reference_flux)]. Both arguments
+  ! have the same units. The reference sign does not change the bounds;
+  ! the flux retains its direction. Donor mass availability is handled separately.
+  implicit none
+  real(r8), intent(in) :: flux,reference_flux
+  real(r8) :: ans
+
+  ans=MIN(ABS(reference_flux),MAX(-ABS(reference_flux),flux))
+  end function symmetric_flux_limiter
+!------------------------------------------------------------------------------------------
 
   function flux_mass_limiter(flux,massa,massb)result(ans)
   !

@@ -1,6 +1,6 @@
 module RootGasMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux,isclose
+  use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1,fixEXConsumpFlux,isclose, symmetric_flux_limiter
   use EcoSIMCtrlMod, only : lcoarseroot
   use DebugToolMod
   use EcosimConst
@@ -366,6 +366,17 @@ module RootGasMod
             if(idg.eq.idg_O2)then
               trcaqu_conc_soi_loc(idg_O2)=AMIN1(AtmGasc(idg_O2)*GasSolbility_vr(idg_O2,L),&
                 AZMAX1(trc_solml_loc(idg_O2)/VLWatMicPMO))
+            elseif(idg.eq.idg_NH3)then
+              ! NH3 masses belong to separate nonband and fertilizer-band pools.
+              ! Use their own water volumes; conductance and transpiration already
+              ! carry the corresponding compartment fractions.
+              trcaqu_conc_soi_loc(idg)=0._r8
+              if(VLWatMicPMA.GT.0._r8) &
+                trcaqu_conc_soi_loc(idg)=AZMAX1(trc_solml_loc(idg)/VLWatMicPMA)
+            elseif(idg.eq.idg_NH3B)then
+              trcaqu_conc_soi_loc(idg)=0._r8
+              if(VLWatMicPMB.GT.0._r8) &
+                trcaqu_conc_soi_loc(idg)=AZMAX1(trc_solml_loc(idg)/VLWatMicPMB)
             else
               trcaqu_conc_soi_loc(idg)=AZMAX1(trc_solml_loc(idg)/VLWatMicPMM)
             endif            
@@ -528,20 +539,26 @@ module RootGasMod
 
               IF(VOLWAqueous(idg_NH3)+VOLPNH3.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GA               = trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
-                RGas_DisolvSoil_flx(idg_NH3) = AMIN1(RSoilSolute2Roots(idg_NH3),AMAX1(-RSoilSolute2Roots(idg_NH3) &
-                  ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GA)*VOLWAqueous(idg_NH3) &
+                RGas_DisolvSoil_flx(idg_NH3) = DiffusivitySolutEffP &
+                  *(AMAX1(ZERO4Groth_pft(NZ),ZH3GA)*VOLWAqueous(idg_NH3) &
                   -(AMAX1(ZEROS,trc_solml_loc(idg_NH3))-RSoilSolute2Roots(idg_NH3))*VOLPNH3) &
-                  /(VOLWAqueous(idg_NH3)+VOLPNH3)))
+                  /(VOLWAqueous(idg_NH3)+VOLPNH3)
+                ! Root efflux is negative; use its magnitude to bound phase exchange.
+                RGas_DisolvSoil_flx(idg_NH3) = symmetric_flux_limiter( &
+                  RGas_DisolvSoil_flx(idg_NH3),RSoilSolute2Roots(idg_NH3))
               ELSE
                 RGas_DisolvSoil_flx(idg_NH3)=0.0_r8
               ENDIF
 
               IF(VOLWAqueous(idg_NH3B)+VOLPNH3B.GT.ZERO4Groth_pft(NZ))THEN
                 ZH3GB                     = trc_gasml_loc(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
-                RGas_DisolvSoil_flx(idg_NH3B) = AMIN1(RSoilSolute2Roots(idg_NH3B),AMAX1(-RSoilSolute2Roots(idg_NH3B) &
-                  ,DiffusivitySolutEffP*(AMAX1(ZERO4Groth_pft(NZ),ZH3GB)*VOLWAqueous(idg_NH3B)   &
-                  -(AMAX1(ZEROS,trc_solml_loc(idg_NH3B))-RSoilSolute2Roots(idg_NH3B))*VOLPNH3B)  &
-                  /(VOLWAqueous(idg_NH3B)+VOLPNH3B)))
+                RGas_DisolvSoil_flx(idg_NH3B) = DiffusivitySolutEffP &
+                  *(AMAX1(ZERO4Groth_pft(NZ),ZH3GB)*VOLWAqueous(idg_NH3B) &
+                  -(AMAX1(ZEROS,trc_solml_loc(idg_NH3B))-RSoilSolute2Roots(idg_NH3B))*VOLPNH3B) &
+                  /(VOLWAqueous(idg_NH3B)+VOLPNH3B)
+                ! Root efflux is negative; use its magnitude to bound phase exchange.
+                RGas_DisolvSoil_flx(idg_NH3B) = symmetric_flux_limiter( &
+                  RGas_DisolvSoil_flx(idg_NH3B),RSoilSolute2Roots(idg_NH3B))
               ELSE
                 RGas_DisolvSoil_flx(idg_NH3B)=0.0_r8
               ENDIF
