@@ -364,7 +364,7 @@ contains
   real(r8),intent(in) :: XHVST
 
   character(len=*), parameter :: subname='RemoveRootsByTillage'
-  real(r8) :: XHVST1
+  real(r8) :: XHVST1,FracGeometryLeft
   integer :: L,N,M,NE,NR,idg
 
   associate(                                                             &
@@ -401,7 +401,7 @@ contains
     RootCO2Autor_pvr           => plt_rbgc%RootCO2Autor_pvr             ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootRespPotent_pvr         => plt_rbgc%RootRespPotent_pvr           ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr         => plt_rbgc%RootCO2EmisPot_pvr           ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
-    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :primary root axis length in soil layer, [m d-2]
+    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :primary root length per axis in soil layer, [m]
     RootVH2O_pvr               => plt_morph%RootVH2O_pvr                ,& !inoput :root layer volume water, [m2 d-2]
     RootSAreaPerPlant_pvr      => plt_morph%RootSAreaPerPlant_pvr       ,& !inoput :root layer area per plant, [m p-1]
     RootPoreVol_pvr            => plt_morph%RootPoreVol_pvr             ,& !inoput :root layer volume air, [m2 d-2]
@@ -423,6 +423,10 @@ contains
   call PrintInfo('beg '//subname)
   XHVST1=1._r8-XHVST
   if(XHVST1<=1.e-10_r8)return
+  ! XHVST also reduces plant population in the caller. Surviving plants keep
+  ! their per-axis/per-plant dimensions; only complete removal clears them.
+  FracGeometryLeft=0._r8
+  IF(XHVST.GT.0._r8)FracGeometryLeft=1._r8
 
   DO NR=1,NumStructuralRootAxes_pft(NZ)    
     DO NE=1,NumPlantChemElms
@@ -496,7 +500,7 @@ contains
       !
       if(N==ipltroot)THEN
         DO NR=1,NumStructuralRootAxes_pft(NZ)
-          Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
+          Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracGeometryLeft
           DO NE=1,NumPlantChemElms
             Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*XHVST            
@@ -521,11 +525,11 @@ contains
       PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*XHVST
       RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*XHVST
       Root2ndXNumL_rpvr(N,L,NZ)       = Root2ndXNumL_rpvr(N,L,NZ)*XHVST
-      RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*XHVST
-      RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
+      RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*FracGeometryLeft
+      RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracGeometryLeft
       RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*XHVST
       RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*XHVST
-      RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*XHVST
+      RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*FracGeometryLeft
       RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*XHVST
       RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*XHVST
       RootCO2Autor_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ)*XHVST

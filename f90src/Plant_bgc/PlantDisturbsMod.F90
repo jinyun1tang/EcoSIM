@@ -943,7 +943,9 @@ module PlantDisturbsMod
           !          
           CALL RootRemovalLbyFire(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
 
-          call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
+          call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1, &
+            PopulationThinning=iHarvstType_pft(NZ).NE.iharvtyp_fire .and. &
+              jHarvstType_pft(NZ).NE.jharvtyp_tmareseed)
 
         ENDDO D3980
       ENDDO D3985
@@ -2175,20 +2177,23 @@ module PlantDisturbsMod
     DO L=NU,MaxNumRootLays
       call RootRemovalL4Annual(yearIJ,N,L,NZ,FracLeftThin,XHVST1)
 
-      call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)            
+      call HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1,PopulationThinning=.false.)
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
   end associate
   end subroutine TerminateRoots4Annuals
 !----------------------------------------------------------------------------------------------------
-  subroutine HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1)            
+  subroutine HarvstUpdateRootStateL(yearIJ,N,L,NZ,FracLeftThin,XHVST1,PopulationThinning)
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ  
 
   integer,  intent(in) :: N,L,NZ
   real(r8), intent(in) :: FracLeftThin    !fraction of biomass remaining alive after removal
   real(r8), intent(in) :: XHVST1          !fraction of biomass removed
+
+  logical, intent(in) :: PopulationThinning !whole plants removed, rather than damage to surviving roots
+  real(r8) :: FracGeometryLeft              !remaining per-axis/per-plant dimensions
 
   character(len=*), parameter :: subname='HarvstUpdateRootStateL'
   integer :: NE,NR,M
@@ -2209,7 +2214,7 @@ module PlantDisturbsMod
     Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :root layer active zone element in primary axes, [g d-2]
     Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !inoput :root layer element secondary axes, [g d-2]
-    Root1stLenPP_rpvr         => plt_morph%Root1stLenPP_rpvr         ,& !inoput :primary root axis length in soil layer, [m d-2]
+    Root1stLenPP_rpvr         => plt_morph%Root1stLenPP_rpvr         ,& !inoput :primary root length per axis in soil layer, [m]
     Root2ndLen_rpvr           => plt_morph%Root2ndLen_rpvr           ,& !inoput :root layer length secondary axes, [m d-2]
     RootMycoNonstElms_rpvr    => plt_biom%RootMycoNonstElms_rpvr     ,& !inoput :root layer nonstructural element, [g d-2]
     Root2ndXNum_rpvr          => plt_morph%Root2ndXNum_rpvr          ,& !inoput :root layer number secondary axes, [d-2]
@@ -2239,6 +2244,11 @@ module PlantDisturbsMod
   !     RootRespPotent_pvr,RootCO2EmisPot_pvr,RootCO2Autor_pvr unlimited by O2,nonstructural C
   !    
   call PrintInfo('beg '//subname)
+  ! Population totals below already account for the removed plants. Do not
+  ! shorten the roots of each survivor a second time. Complete removal still
+  ! clears geometry; tissue damage retains its layer-specific reduction.
+  FracGeometryLeft=FracLeftThin
+  IF(PopulationThinning .and. FracLeftThin.GT.0._r8)FracGeometryLeft=1._r8
 
   if(N.EQ.ipltroot)then
     DO NR=1,NumStructuralRootAxes_pft(NZ)
@@ -2251,7 +2261,7 @@ module PlantDisturbsMod
       !Thin total length and axis count together; surviving root radius is unchanged.
       RootMediumLength_rpvr(L,NR,NZ) = RootMediumLength_rpvr(L,NR,NZ)*FracLeftThin
       RootMediumXNum_rpvr(L,NR,NZ)   = RootMediumXNum_rpvr(L,NR,NZ)*FracLeftThin
-      Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracLeftThin        
+      Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracGeometryLeft
     ENDDO
     call plt_morph%RefreshMediumRootMeanLength(NZ)
     !Refresh layer totals once for plant roots, not again for mycorrhizae.
@@ -2292,11 +2302,11 @@ module PlantDisturbsMod
   PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*FracLeftThin
   RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*FracLeftThin
   Root2ndXNumL_rpvr(N,L,NZ)       = Root2ndXNumL_rpvr(N,L,NZ)*FracLeftThin
-  RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*FracLeftThin
-  RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracLeftThin
+  RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*FracGeometryLeft
+  RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracGeometryLeft
   RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*FracLeftThin
   RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*FracLeftThin
-  RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*FracLeftThin
+  RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*FracGeometryLeft
   RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*FracLeftThin
   RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*FracLeftThin
   !
