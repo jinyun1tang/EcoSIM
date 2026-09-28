@@ -19,7 +19,7 @@ implicit none
   type, public  :: PlantSoluteUptakeConfig_type
     real(r8) :: SolAdvFlx  
     real(r8) :: SolDifusFlx    
-    real(r8) :: UptakeRateMax   
+    real(r8) :: UptakePerPlantRateMax
     real(r8) :: O2Stress        
     real(r8) :: PlantPopulation 
     real(r8) :: CAvailStress    
@@ -182,7 +182,7 @@ contains
   !
   !DESCRIPTION
   ! Solve uptake from soil-solution supply and root uptake capacity.
-  ! The caller already includes C availability and nutrient feedback in UptakeRateMax.
+  ! The caller already includes C availability and nutrient feedback in UptakePerPlantRateMax.
   ! Both quadratic solutions retain these constraints and soil transport/concentration limits.
   ! SoluteMassMax is a separate population-level available-mass cap.
   ! Output rates are per grid cell [g N or g P cell-1 h-1].
@@ -201,36 +201,36 @@ contains
   real(r8), intent(out) :: PltUptake_OSl    !approximate C-unlimited diagnostic, obtained by rescaling actual uptake; may exceed the mass cap
   real(r8), intent(out) :: PltUptake_OSCl   !actual uptake with O2, C/nutrient feedback, soil supply, and available-mass constraints
   logical, optional, intent(in) :: ldebug
-  real(r8) :: UptakeRateMax_Ol   !caller C/nutrient-constrained capacity multiplied by O2Stress, [g element plant-1 h-1]
+  real(r8) :: UptakePerPlantRateMax_Ol   !caller C/nutrient-constrained capacity multiplied by O2Stress, [g element plant-1 h-1]
   real(r8) :: X, Y, B, C, BP, CP, delta
   real(r8) :: Uptake, Uptake_Ol
   logical :: lldebug
   ! Inputs apply to one root/mycorrhizal population, soil layer, and band/nonband zone.
   ! Solute mass is expressed as g N or g P. The available-mass cap is used for the hourly uptake step.
-  associate(                                                     &
-    SolAdvFlx       => PlantSoluteUptakeConfig%SolAdvFlx       , & !input :advective water flow per plant (q), [m3 plant-1 h-1]
-    SolDifusFlx     => PlantSoluteUptakeConfig%SolDifusFlx     , & !input :diffusive transport conductance per plant (D), [m3 plant-1 h-1]
-    UptakeRateMax   => PlantSoluteUptakeConfig%UptakeRateMax   , & !input :uptake capacity before O2 limitation; caller includes C/nutrient feedback, [g element plant-1 h-1]
-    O2Stress        => PlantSoluteUptakeConfig%O2Stress        , & !input :remaining uptake-capacity fraction under O2 limitation, 0=no capacity, 1=unlimited, [-]
-    PlantPopulation => PlantSoluteUptakeConfig%PlantPopulation , & !input :live plant count converting per-plant uptake to grid-cell uptake, [plants cell-1]
-    CAvailStress    => PlantSoluteUptakeConfig%CAvailStress    , & !input :carbon-availability factor (FCUP); positive on entry, 1=no C limitation, [-]
-    SoluteMassMax   => PlantSoluteUptakeConfig%SoluteMassMax   , & !input :available solute allocated to this population after competition and minimum-concentration reserve, [g element cell-1]
-    SoluteConc      => PlantSoluteUptakeConfig%SoluteConc      , & !input :bulk soil-solution concentration in the selected zone (C), [g element m-3]
-    SoluteKM        => PlantSoluteUptakeConfig%SoluteKM        , & !input :Michaelis-Menten uptake half-saturation parameter (K), [g element m-3]
-    SoluteConcMin   => PlantSoluteUptakeConfig%SoluteConcMin     & !input :minimum soil-solution concentration for uptake (Cm), [g element m-3]
+  associate(                                                                     &
+    SolAdvFlx               => PlantSoluteUptakeConfig%SolAdvFlx               , & !input :advective water flow per plant (q), [m3 plant-1 h-1]
+    SolDifusFlx             => PlantSoluteUptakeConfig%SolDifusFlx             , & !input :diffusive transport conductance per plant (D), [m3 plant-1 h-1]
+    UptakePerPlantRateMax   => PlantSoluteUptakeConfig%UptakePerPlantRateMax   , & !input :uptake capacity before O2 limitation; caller includes C/nutrient feedback, [g element plant-1 h-1]
+    O2Stress                => PlantSoluteUptakeConfig%O2Stress                , & !input :remaining uptake-capacity fraction under O2 limitation, 0=no capacity, 1=unlimited, [-]
+    PlantPopulation         => PlantSoluteUptakeConfig%PlantPopulation         , & !input :live plant count converting per-plant uptake to grid-cell uptake, [plants cell-1]
+    CAvailStress            => PlantSoluteUptakeConfig%CAvailStress            , & !input :carbon-availability factor (FCUP); positive on entry, 1=no C limitation, [-]
+    SoluteMassMax           => PlantSoluteUptakeConfig%SoluteMassMax           , & !input :available solute allocated to this population after competition and minimum-concentration reserve, [g element cell-1]
+    SoluteConc              => PlantSoluteUptakeConfig%SoluteConc              , & !input :bulk soil-solution concentration in the selected zone (C), [g element m-3]
+    SoluteKM                => PlantSoluteUptakeConfig%SoluteKM                , & !input :Michaelis-Menten uptake half-saturation parameter (K), [g element m-3]
+    SoluteConcMin           => PlantSoluteUptakeConfig%SoluteConcMin             & !input :minimum soil-solution concentration for uptake (Cm), [g element m-3]
   )
   lldebug=.false.
   if(present(ldebug))lldebug=ldebug
 
-  UptakeRateMax_Ol=UptakeRateMax*O2Stress
+  UptakePerPlantRateMax_Ol=UptakePerPlantRateMax*O2Stress
 
   X=(SolDifusFlx+SolAdvFlx)*SoluteConc
   Y=SolDifusFlx*SoluteConcMin
 
   ! Solve with O2 limitation and caller C/nutrient constraints, before the available-mass cap.
   ! For u^2+B*u+C=0, C=0 gives delta=B*B and the selected root u=0 because B<=0.
-  B     = -AZMAX1(UptakeRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
-  C     = AZMAX1(X-Y)*UptakeRateMax_Ol
+  B     = -AZMAX1(UptakePerPlantRateMax_Ol+X-Y+SolDifusFlx*SoluteKM)
+  C     = AZMAX1(X-Y)*UptakePerPlantRateMax_Ol
   delta = B*B-4.0_r8*C
 
   if(delta<0._r8)then
@@ -240,8 +240,8 @@ contains
   endif
 
   ! Solve without O2 limitation; retain caller C/nutrient constraints and soil-solution supply.
-  BP    = -AZMAX1(UptakeRateMax+X-Y+SolDifusFlx*SoluteKM)
-  CP    = AZMAX1(X-Y)*UptakeRateMax
+  BP    = -AZMAX1(UptakePerPlantRateMax+X-Y+SolDifusFlx*SoluteKM)
+  CP    = AZMAX1(X-Y)*UptakePerPlantRateMax
   delta = BP*BP-4.0_r8*CP
   if(delta<0._r8)then
     Uptake=0._r8

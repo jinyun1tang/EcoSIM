@@ -603,7 +603,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNO3
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNO3
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNO3X
@@ -660,16 +660,16 @@ module NutUptakeMod
     ZNOBM = CminNO3Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NO3B,L)
     ZNOBX = AZMAX1(FNOBX*(trcs_solml_vr(ids_NO3B,L)-ZNOBM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
-    PlantSoluteUptakeConfig%SolAdvFlx       = RMFNOB
-    PlantSoluteUptakeConfig%SolDifusFlx     = DIFNOB
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
-    PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
-    PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3B,L)
-    PlantSoluteUptakeConfig%SoluteMassMax   = ZNOBX
-    PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM        = KmNO3Root_pft(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin         = CminNO3Root_pft(N,NZ)
+    PlantSoluteUptakeConfig%SolAdvFlx             = RMFNOB
+    PlantSoluteUptakeConfig%SolDifusFlx           = DIFNOB
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax = UPMXP
+    PlantSoluteUptakeConfig%O2Stress              = RAutoRootO2Limter_rpvr(N,L,NZ)
+    PlantSoluteUptakeConfig%SoluteConc            = trc_solcl_vr(ids_NO3B,L)
+    PlantSoluteUptakeConfig%SoluteMassMax         = ZNOBX
+    PlantSoluteUptakeConfig%CAvailStress          = FCUP
+    PlantSoluteUptakeConfig%PlantPopulation       = PlantPopuLive_pft(NZ)
+    PlantSoluteUptakeConfig%SoluteKM              = KmNO3Root_pft(N,NZ)
   
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
       RootCUlmNutUptake_pvr(ids_NO3B,N,L,NZ),RootNutUptake_pvr(ids_NO3B,N,L,NZ))
@@ -793,7 +793,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNH4
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNH4
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNH4X
@@ -855,7 +855,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNHB
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNHB
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNHBX
@@ -965,7 +965,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH1P
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH1P
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1POX
@@ -1025,7 +1025,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH1B
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1PXB
@@ -1126,7 +1126,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
       PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2P
       PlantSoluteUptakeConfig%SolDifusFlx     = DIFH2P
-      PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+      PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
       PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
       PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4,L)
       PlantSoluteUptakeConfig%SoluteMassMax   = H2POX
@@ -1188,7 +1188,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH2B
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H2PXB
