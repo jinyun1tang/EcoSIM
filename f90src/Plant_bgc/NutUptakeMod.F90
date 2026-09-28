@@ -1530,14 +1530,16 @@ module NutUptakeMod
           DO NE=1,NumPlantChemElms
             REcoDOMProd_vr(NE,K,L)=REcoDOMProd_vr(NE,K,L)-DOM_uptk(NE)
           ENDDO
-
-          DO N=1,Myco_pft(NZ)
-            DO NE=1,NumPlantChemElms
-              Soil2RootMycoExudE_pft(NE,NZ)     = Soil2RootMycoExudE_pft(NE,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
-              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
-            ENDDO
-          ENDDO
         endif
+
+        ! Opposing root/mycorrhizal exchanges can cancel in the soil budget.
+        ! Apply each population's transfer even when the net soil flux is zero.
+        DO N=1,Myco_pft(NZ)
+          DO NE=1,NumPlantChemElms
+            Soil2RootMycoExudE_pft(NE,NZ)     = Soil2RootMycoExudE_pft(NE,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
+            RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
+          ENDDO
+        ENDDO
       ENDDO D295
       
     endif
