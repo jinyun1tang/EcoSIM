@@ -297,6 +297,8 @@ module NutUptakeMod
           ENDIF
           RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)      
         else
+          ! Inactive absorptive roots must not compete for next-hour soil O2.
+          RootO2Dmnd4Resp_pvr(N,L,NZ) = 0._r8
           RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8
           ! Absorptive geometry can disappear after respiration was calculated.
           ! Release previous-hour CO2 even though uptake is now inactive.
@@ -305,6 +307,8 @@ module NutUptakeMod
       ENDDO D955      
     ELSE
       D956: DO N  = 1, Myco_pft(NZ)          
+        ! Dry or out-of-root-zone layers contribute no current uptake demand.
+        RootO2Dmnd4Resp_pvr(N,L,NZ) = 0._r8
         IF(L.EQ.NMaxRootBotLayer_pft(NZ)+1)THEN  
           RAutoRootO2Limter_rpvr(N,L,NZ) = RAutoRootO2Limter_rpvr(N,L-1,NZ)
         ELSE
@@ -342,9 +346,14 @@ module NutUptakeMod
   plt_rbgc%RAutoRootO2Limter_rpvr     = 0.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr        = 0.0_r8
   plt_rbgc%RootNutUptake_pvr          = 0.0_r8
-  ! Clear capacity diagnostics even when nutrient uptake is skipped below.
+  ! Clear uptake diagnostics even when nutrient uptake is skipped below.
+  ! Keep previous O2 demand until GetUptakeCapcity computes active-root shares.
   plt_rbgc%VmaxNH4Root_pvr            = 0._r8
   plt_rbgc%VmaxNO3Root_pvr            = 0._r8
+  plt_bgcr%Nutruptk_fClim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fNlim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fPlim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fProtC_rpvr       = 0._r8
   plt_rbgc%RootOUlmNutUptake_pvr      = 0.0_r8
   plt_rbgc%RootNH4DmndBand_pvr        = 0.0_r8
   plt_rbgc%RootNO3DmndSoil_pvr        = 0.0_r8

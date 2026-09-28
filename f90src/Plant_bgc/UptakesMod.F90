@@ -22,6 +22,7 @@ module UptakesMod
   use PlantSoilChemistryAPIData, only : plt_soilchem
   use PlantBiomassAPIData, only : plt_biom
   use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantMathFuncMod
   use ElmIDMod, only : itrue
   implicit none
@@ -226,6 +227,9 @@ module UptakesMod
         call PlantNutientO2Uptake(yearIJ,NZ,FDMP,RadialMeanLen_rvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
           FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
       endif    
+    ELSE
+      ! This PFT skips all root uptake, so discard its previous O2 demand.
+      plt_rbgc%RootO2Dmnd4Resp_pvr(:,:,NZ) = 0._r8
     ENDIF
 
   ENDDO
