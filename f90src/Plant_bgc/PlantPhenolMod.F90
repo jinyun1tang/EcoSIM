@@ -448,6 +448,7 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8
+  CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoilLays4Root_pft(NZ)   = NMaxRootBotLayer_pft(NZ)
   NGTopRootLayer_pft(NZ) = MIN(MaxSoilLays4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))
