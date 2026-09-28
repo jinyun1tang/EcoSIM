@@ -341,12 +341,12 @@ module RootGasMod
         VOLWAqueous(idg_NH3B) = VOLWAqueous(idg_NH3B)*trcs_VLN_vr(ids_NH4B,L)
 
         do idg = idg_beg, idg_NH3
-          DifAqueVolatile(idg)=(THETM*SolDifc_tscaled(idg)+GasDifc_tscaled(idg)*POROQ*FracAirFilledSoilPoreM_vr(M,L)**2/(VLSoilMicP_vr(L)*GasSolbility_vr(idg,L)))*RTARRX
+          DifAqueVolatile(idg)=(THETM*SolDifc_tscaled(idg)+GasDifc_tscaled(idg) &
+            *POROQ*FracAirFilledSoilPoreM_vr(M,L)**2/(VLSoilMicP_vr(L)*GasSolbility_vr(idg,L)))*RTARRX
         enddo
-
-        
+        DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3)
         DifAqueVolatile(idg_NH3)  = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4,L)
-        DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3)*trcs_VLN_vr(ids_NH4B,L)
+        DifAqueVolatile(idg_NH3B) = DifAqueVolatile(idg_NH3B)*trcs_VLN_vr(ids_NH4B,L)
 
         VOLPNH3  = VLsoiAirPMM*trcs_VLN_vr(ids_NH4,L)
         VOLPNH3B = VLsoiAirPMM*trcs_VLN_vr(ids_NH4B,L)
@@ -560,7 +560,6 @@ module RootGasMod
             trc_gasml_loc(idg)  = trc_gasml_loc(idg)-RGas_DisolvSoil_flx(idg)+RGasTranspFlxPrev(idg)
           ENDDO
 
-          trc_gasml_loc(idg_NH3)  = trc_gasml_loc(idg_NH3)-RGas_DisolvSoil_flx(idg_NH3B)
           call fixEXConsumpFlux(trc_gasml_loc(idg_NH3),RGas_DisolvSoil_flx(idg_NH3B))
 
           !aqueous concentrations in soil
