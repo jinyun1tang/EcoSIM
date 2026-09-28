@@ -511,6 +511,8 @@ module MicAutoCPLXMod
     IF(RMaintDefcitcitAutor(NGL).GT.ZEROS.AND.RMaintRespAutor(NGL).GT.ZEROS.AND.RCCC.GT.ZERO)THEN
       FRM=RMaintDefcitcitAutor(NGL)/RMaintRespAutor(NGL)
       DO  M=1,2
+        !Cap C/N/P withdrawal by this compartment's own donor pools.
+        MID=micpar%get_micb_id(M,NGL)
         RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBiomeAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
         RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBiomeAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
         RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBiomeAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
@@ -1116,7 +1118,9 @@ module MicAutoCPLXMod
 !     RH2PO4imobilLitrHeter=substrate-limited H2PO4 mineraln-immobiln
 !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
-      RNetH2PO4MinPotentLitr=RNetH2PO4MinPotent-RH2PO4TransfSoilAutor(NGL)
+      !Subtract all P already exchanged with litter before tapping topsoil.
+      RNetH2PO4MinPotentLitr=RNetH2PO4MinPotent-RH2PO4TransfSoilAutor(NGL) &
+        -RH2PO4TransfBandAutor(NGL)-RH1PO4TransfSoilAutor(NGL)-RH1PO4TransfBandAutor(NGL)
       IF(RNetH2PO4MinPotentLitr.GT.0.0_r8)THEN
         CH2PX=AZMAX1(CH2P4U-HPMN)
         CH2PY=AZMAX1(CH2P4BU-HPMN)

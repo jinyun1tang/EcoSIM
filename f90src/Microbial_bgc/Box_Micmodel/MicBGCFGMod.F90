@@ -1720,6 +1720,7 @@ module MicBGCMod
     Resp4NFixHeter                 => nmicf%Resp4NFixHeter,                 &
     RespGrossHeter                 => nmicf%RespGrossHeter,                 &
     RNOxDOCReduxRespDenitLim       => nmicf%RNOxDOCReduxRespDenitLim,       &
+    RNOxAcetReduxRespDenitLim      => nmicf%RNOxAcetReduxRespDenitLim,      &
     RNO3imobilSoilHeter            => nmicf%RNO3imobilSoilHeter,            &
     RCO2ProdHeter                  => nmicf%RCO2ProdHeter,                  &
     RH2PO4imobilSoilHeter          => nmicf%RH2PO4imobilSoilHeter,          &
@@ -1821,7 +1822,9 @@ module MicBGCMod
           !     RNH4imobilLitrHeter,RNO3imobilLitrHeter =substrate-limited NH4,NO3 mineraln-immobiln
           !     RH2PO4imobilLitrHeter,RH1PO4imobilLitrHeter=substrate-limited H2PO4,HPO4 mineraln-immobiln
           !
-          CGROMC               = DOMuptk4GrothHeter(ielmc,NGL,K)-RespGrossHeter(NGL,K)-RNOxDOCReduxRespDenitLim(NGL,K)-Resp4NFixHeter(NGL,K)
+          !Both denitrification substrates contribute uptake and respiratory C loss.
+          CGROMC = DOMuptk4GrothHeter(ielmc,NGL,K)-RespGrossHeter(NGL,K) &
+            -RNOxDOCReduxRespDenitLim(NGL,K)-RNOxAcetReduxRespDenitLim(NGL,K)-Resp4NFixHeter(NGL,K)
           RCO2ProdHeter(NGL,K) = RCO2ProdHeter(NGL,K)+Resp4NFixHeter(NGL,K)
           NetCAssimhr = NetCAssimhr+CGROMC
           GrosAssimhr = GrosAssimhr+DOMuptk4GrothHeter(ielmc,NGL,K)
@@ -2862,7 +2865,9 @@ module MicBGCMod
     !     RH2PO4imobilLitrHeter=substrate-limited H2PO4 mineraln-immobiln
     !     NetPO4Mineralize=total H2PO4 net mineraln (-ve) or immobiln (+ve)
     !
-    RIPOPR=RIPOP-RH2PO4imobilSoilHeter(NGL,K)
+    !Subtract all P already exchanged with litter before tapping topsoil.
+    RIPOPR=RIPOP-RH2PO4imobilSoilHeter(NGL,K)-RH2PO4imobilBandHeter(NGL,K) &
+      -RH1PO4imobilSoilHeter(NGL,K)-RH1PO4imobilBandHeter(NGL,K)
     !immobilization by tapping into top soil layer
     IF(RIPOPR.GT.0.0_r8)THEN
       CH2PX                      = AZMAX1(CH2P4U-HPMN)
@@ -3114,7 +3119,8 @@ module MicBGCMod
   tROMT     = tROMT+RMaintRespHeter(NGL,K)
   tGROMO    = tGROMO+RespGrossHeter(NGL,K)
 
-  DOMuptk4GrothHeter(ielmc,NGL,K) = CGOMX+CGOMD
+  !Total organic C uptake includes acetate used for denitrification.
+  DOMuptk4GrothHeter(ielmc,NGL,K) = CGOMX+CGOMD+AGOMD
   if(N.eq.micpar%mid_HeterMixtCynoBacter .and. RGrowthRespHeter(NGL,K).GT.0._r8)then
     DOMuptk4GrothHeter(ielmc,NGL,K) = DOMuptk4GrothHeter(ielmc,NGL,K)+RCO2FixCyano(NGL,K)
   endif
