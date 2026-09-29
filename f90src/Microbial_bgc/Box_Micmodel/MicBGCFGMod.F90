@@ -1152,7 +1152,6 @@ module MicBGCMod
 !     begin_execution
   associate(                                            &
     RDOMSorp             => ncplxf%RDOMSorp,            & !DOM transfer from solution to sorbed pools; positive adsorption, negative desorption
-    TDOMUptkHeter        => ncplxf%TDOMUptkHeter,       & !Total heterotrophic DOM uptake by species and complex K
     BulkSOMC             => ncplxs%BulkSOMC,            & !Colonized solid, residue and sorbed C summed for each complex K; not referenced here
     FOCA                 => ncplxs%FOCA,                & !DOC fraction of DOC plus acetate in each substrate complex [-]
     FOAA                 => ncplxs%FOAA,                & !Acetate-C fraction of DOC plus acetate in each substrate complex [-]
@@ -1171,7 +1170,6 @@ module MicBGCMod
 !     VLWatMicPM=soil water content, FracBulkSOMC=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     TCGOQC,TDOMUptkHeter,TDOMUptkHeter,TCGOAC=total uptake of DOC,DON,DOP,acetate
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !     TSORP,HSORP=sorption rate constant and coefficient for OHC
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
@@ -1185,7 +1183,9 @@ module MicBGCMod
         AECX=AEC
       ENDIF
       DO idom=idom_beg,idom_end
-        OQEX(idom) = AMAX1(ZEROS,DOM(idom,K)-TDOMUptkHeter(idom,K))  !free DOM
+        !RedistDecompProduct already debited microbial uptake via SubstrateDribbling.
+        !Use the remaining dissolved pool for DOC, DON, DOP, and acetate sorption.
+        OQEX(idom) = AMAX1(ZEROS,DOM(idom,K))                       !free DOM
         OHEX(idom) = AMAX1(ZEROS,SorbedOM(idom,K))                   !adsorbed DOM
       ENDDO
 
