@@ -1249,17 +1249,19 @@ module MicAutoCPLXMod
   end subroutine GatherAutotrophRespiration
 !------------------------------------------------------------------------------------------
 
-  subroutine AutotrophAnabolicUpdate(micfor,micstt,nmicf,nmicdiag)
+  subroutine AutotrophAnabolicUpdate(micfor,micstt,nmicf,nmicdiag,micflx)
 
   implicit none
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(Microbe_Flux_type), intent(inout) :: nmicf
   type(Microbe_Diag_type), intent(inout) :: nmicdiag    
+  type(micfluxtype), intent(inout) :: micflx
   character(len=*), parameter :: subname='AutotrophAnabolicUpdate'
 
   real(r8) :: CGROMC   !C for microbial biomass growth
   integer :: N,M,NGL,MID,MID3,NE
+  real(r8) :: ReserveSupply,MineralTransfer(4),PreviousMineralTransfer
   associate(                                                                &
     DOMuptk4GrothAutor             => nmicf%DOMuptk4GrothAutor,             & !Guild elemental uptake; C source is CO2 or CH4 according to functional group
     NonstX2stBiomAutor             => nmicf%NonstX2stBiomAutor,             & !C/N/P transfer from guild reserves into kinetic and structural biomass
@@ -1313,6 +1315,37 @@ module MicAutoCPLXMod
   DO  N=1,NumMicbAFunGrupsPerCmplx
     IF(is_activeMicrbFungrpAutor(N))THEN
       DO NGL=JGniA(N),JGnfA(N)
+        !Reconcile reserve withdrawals before crediting structural biomass.
+        MID3=micpar%get_micb_id(iLbiom_reserve,NGL)
+        DO NE=ielmn,ielmp
+          ReserveSupply=DOMuptk4GrothAutor(NE,NGL) &
+            +SUM(RkillRecycOMAutor(NE,1:2,NGL))+SUM(RMaintDefcitRecycOMAutor(NE,1:2,NGL))
+          IF(NE.EQ.ielmn)THEN
+            ReserveSupply=ReserveSupply+RN2FixAutor(NGL)
+            IF(litrm)ReserveSupply=ReserveSupply+RNH4TransfLitrAutor(NGL)+RNO3TransfLitrAutor(NGL)
+            MineralTransfer=[RNH4TransfSoilAutor(NGL),RNH4TransfBandAutor(NGL),RNO3TransfSoilAutor(NGL),RNO3TransfBandAutor(NGL)]
+          ELSE
+            IF(litrm)ReserveSupply=ReserveSupply+RH2PO4TransfLitrAutor(NGL)+RH1PO4TransfLitrAutor(NGL)
+            MineralTransfer=[RH2PO4TransfSoilAutor(NGL),RH2PO4TransfBandAutor(NGL),RH1PO4TransfSoilAutor(NGL),RH1PO4TransfBandAutor(NGL)]
+          ENDIF
+          PreviousMineralTransfer=SUM(MineralTransfer)
+          call LimitReserveNutrientTransfers(mBiomeAutor(NE,MID3),ReserveSupply, &
+            NonstX2stBiomAutor(NE,1:2,NGL),MineralTransfer)
+          IF(NE.EQ.ielmn)THEN
+            RNH4TransfSoilAutor(NGL)=MineralTransfer(1)
+            RNH4TransfBandAutor(NGL)=MineralTransfer(2)
+            RNO3TransfSoilAutor(NGL)=MineralTransfer(3)
+            RNO3TransfBandAutor(NGL)=MineralTransfer(4)
+            micflx%NetNH4Mineralize=micflx%NetNH4Mineralize+SUM(MineralTransfer)-PreviousMineralTransfer
+          ELSE
+            RH2PO4TransfSoilAutor(NGL)=MineralTransfer(1)
+            RH2PO4TransfBandAutor(NGL)=MineralTransfer(2)
+            RH1PO4TransfSoilAutor(NGL)=MineralTransfer(3)
+            RH1PO4TransfBandAutor(NGL)=MineralTransfer(4)
+            micflx%NetPO4Mineralize=micflx%NetPO4Mineralize+SUM(MineralTransfer)-PreviousMineralTransfer
+          ENDIF
+        ENDDO
+
         DO  M=1,2
           MID=micpar%get_micb_id(M,NGL)
           DO NE=1,NumPlantChemElms

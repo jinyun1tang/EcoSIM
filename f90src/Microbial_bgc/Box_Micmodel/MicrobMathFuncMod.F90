@@ -23,6 +23,31 @@ module MicrobMathFuncMod
   contains
 !------------------------------------------------------------------------
 
+  subroutine LimitReserveNutrientTransfers(Reserve,Supply,GrowthTransfer,MineralTransfer)
+  !Growth and mineralization share one reserve donor. Call immediately before
+  !updating biomass so transfers also respect any intervening priming exchange.
+  !Supply includes organic uptake, fixation, recycling and underlying-soil fluxes.
+  !Positive mineral uptake has already passed donor/competition limits: retain it.
+  !Reduce release proportionally across compartments; never invent extra uptake.
+  implicit none
+  real(r8), intent(in) :: Reserve,Supply
+  real(r8), intent(inout) :: GrowthTransfer(:),MineralTransfer(:)
+  real(r8) :: Available,Growth,Release,Scale
+
+  Available=MAX(0._r8,Reserve+Supply+SUM(MAX(0._r8,MineralTransfer)))
+  Growth=SUM(GrowthTransfer)
+  IF(Growth.GT.Available)THEN
+    GrowthTransfer=GrowthTransfer*(Available/Growth)
+  ENDIF
+  Available=MAX(0._r8,Available-SUM(GrowthTransfer))
+  Release=SUM(MAX(0._r8,-MineralTransfer))
+  IF(Release.GT.Available)THEN
+    Scale=Available/Release
+    WHERE(MineralTransfer.LT.0._r8)MineralTransfer=MineralTransfer*Scale
+  ENDIF
+  end subroutine LimitReserveNutrientTransfers
+!------------------------------------------------------------------------
+
   subroutine ReserveDenitrifMaintenance(MaintDemand,PrimaryResp,DenitResp, &
     AerobicRespFrac,DenitRespFrac,FracDenitResp4Maint,MaintDeficit)
   !

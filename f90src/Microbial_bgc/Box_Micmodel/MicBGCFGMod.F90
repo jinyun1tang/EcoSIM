@@ -137,7 +137,7 @@ module MicBGCMod
 
   call RDOMSorption(KL,micfor,micstt,nmicf,ncplxf,ncplxs)
 
-  call AutotrophAnabolicUpdate(micfor,micstt,nmicf,nmicdiag)
+  call AutotrophAnabolicUpdate(micfor,micstt,nmicf,nmicdiag,micflx)
 
   call HeterotrophAnabolicUpdate(I,J,micfor,micstt,nmicf,micflx)
   
@@ -1719,6 +1719,7 @@ module MicBGCMod
   integer  :: K,M,N,NGL,MID3,MID,NE
   real(r8) ::CGROMC,dmassC
 !     begin_execution
+  real(r8) :: ReserveSupply,MineralTransfer(4),PreviousMineralTransfer
   associate(                                                                &
     DOMuptk4GrothHeter             => nmicf%DOMuptk4GrothHeter,             & !Guild elemental uptake; C includes DOC, acetate and cyanobacterial CO2 fixation
     NonstX2stBiomHeter             => nmicf%NonstX2stBiomHeter,             & !C/N/P transfer from reserves into kinetic/structural biomass by guild and complex
@@ -1773,6 +1774,37 @@ module MicBGCMod
       DO  N=1,NumMicbHFunGrupsPerCmplx
         if(.not.micpar%is_activeMicrbFungrpHeter(N))cycle
         DO NGL=JGniH(N),JGnfH(N)
+          !Reconcile reserve withdrawals before crediting structural biomass.
+          MID3=micpar%get_micb_id(iLbiom_reserve,NGL)
+          DO NE=ielmn,ielmp
+            ReserveSupply=DOMuptk4GrothHeter(NE,NGL,K) &
+              +SUM(RkillRecycOMHeter(NE,1:2,NGL,K))+SUM(RMaintDefcitRecycOMHeter(NE,1:2,NGL,K))
+            IF(NE.EQ.ielmn)THEN
+              ReserveSupply=ReserveSupply+RN2FixHeter(NGL,K)
+              IF(litrm)ReserveSupply=ReserveSupply+RNH4imobilLitrHeter(NGL,K)+RNO3imobilLitrHeter(NGL,K)
+              MineralTransfer=[RNH4imobilSoilHeter(NGL,K),RNH4imobilBandHeter(NGL,K),RNO3imobilSoilHeter(NGL,K),RNO3imobilBandHeter(NGL,K)]
+            ELSE
+              IF(litrm)ReserveSupply=ReserveSupply+RH2PO4imobilLitrHeter(NGL,K)+RH1PO4imobilLitrHeter(NGL,K)
+              MineralTransfer=[RH2PO4imobilSoilHeter(NGL,K),RH2PO4imobilBandHeter(NGL,K),RH1PO4imobilSoilHeter(NGL,K),RH1PO4imobilBandHeter(NGL,K)]
+            ENDIF
+            PreviousMineralTransfer=SUM(MineralTransfer)
+            call LimitReserveNutrientTransfers(mBiomeHeter(NE,MID3,K),ReserveSupply, &
+              NonstX2stBiomHeter(NE,1:2,NGL,K),MineralTransfer)
+            IF(NE.EQ.ielmn)THEN
+              RNH4imobilSoilHeter(NGL,K)=MineralTransfer(1)
+              RNH4imobilBandHeter(NGL,K)=MineralTransfer(2)
+              RNO3imobilSoilHeter(NGL,K)=MineralTransfer(3)
+              RNO3imobilBandHeter(NGL,K)=MineralTransfer(4)
+              micflx%NetNH4Mineralize=micflx%NetNH4Mineralize+SUM(MineralTransfer)-PreviousMineralTransfer
+            ELSE
+              RH2PO4imobilSoilHeter(NGL,K)=MineralTransfer(1)
+              RH2PO4imobilBandHeter(NGL,K)=MineralTransfer(2)
+              RH1PO4imobilSoilHeter(NGL,K)=MineralTransfer(3)
+              RH1PO4imobilBandHeter(NGL,K)=MineralTransfer(4)
+              micflx%NetPO4Mineralize=micflx%NetPO4Mineralize+SUM(MineralTransfer)-PreviousMineralTransfer
+            ENDIF
+          ENDDO
+
           D540: DO M=1,2
             MID=micpar%get_micb_id(M,NGL)     
             DO NE=1,NumPlantChemElms     
@@ -1855,19 +1887,6 @@ module MicBGCMod
             +RH2PO4imobilSoilHeter(NGL,K)+RH2PO4imobilBandHeter(NGL,K)+RH1PO4imobilSoilHeter(NGL,K) &
             +RH1PO4imobilBandHeter(NGL,K)
          
-          !fix negative microbial N  by immobilization
-          if(mBiomeHeter(ielmn,MID3,K)<0._r8)then
-            RNH4imobilSoilHeter(NGL,K) = RNH4imobilSoilHeter(NGL,K)-mBiomeHeter(ielmn,MID3,K)
-            NetNH4Mineralize           = NetNH4Mineralize-mBiomeHeter(ielmn,MID3,K)
-            mBiomeHeter(ielmn,MID3,K)  = 0._r8
-          endif        
-
-          !fix negative P biomass by immobilization
-          if(mBiomeHeter(ielmp,MID3,K)<0._r8)then
-            RH2PO4imobilSoilHeter(NGL,K) = RH2PO4imobilSoilHeter(NGL,K)-mBiomeHeter(ielmp,MID3,K)
-            NetPO4Mineralize             = NetPO4Mineralize-mBiomeHeter(ielmp,MID3,K)
-            mBiomeHeter(ielmp,MID3,K)    = 0._r8
-          endif  
           IF(litrm)THEN
             mBiomeHeter(ielmn,MID3,K)=mBiomeHeter(ielmn,MID3,K)+RNH4imobilLitrHeter(NGL,K)+RNO3imobilLitrHeter(NGL,K)
             mBiomeHeter(ielmp,MID3,K)=mBiomeHeter(ielmp,MID3,K)+RH2PO4imobilLitrHeter(NGL,K)+RH1PO4imobilLitrHeter(NGL,K)
