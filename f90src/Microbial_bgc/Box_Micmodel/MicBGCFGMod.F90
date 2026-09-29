@@ -3032,6 +3032,7 @@ module MicBGCMod
   real(r8) :: CGOMZ
   real(r8) :: SPOMX
   real(r8) :: FracMaintDeficit
+  real(r8) :: AvailableBiomass(NumPlantChemElms)
 !     begin_execution
   associate(                                                                    &
     rCNBiomeActHeter                 => nmics%rCNBiomeActHeter,                 &
@@ -3206,7 +3207,7 @@ module MicBGCMod
     MID   = micpar%get_micb_id(M,NGL)
     SPOMX = SQRT(GrowthEnvScalHeter(NGL,K))*SPOMC(M)*SPOMK(M)
     DO NE=1,NumPlantChemElms
-      RKillOMHeter(NE,M,NGL,K)=AZMAX1(mBiomeHeter(NE,MID,K)*SPOMX)
+      RKillOMHeter(NE,M,NGL,K)=AZMAX1(AMIN1(mBiomeHeter(NE,MID,K),mBiomeHeter(NE,MID,K)*SPOMX))
 
       RkillRecycOMHeter(NE,M,NGL,K)= RKillOMHeter(NE,M,NGL,K)*RCCE(NE)
 
@@ -3247,9 +3248,11 @@ module MicBGCMod
     FracMaintDeficit=RMaintDefcitcitHeter/RMaintRespHeter(NGL,K)
     D730: DO M=1,2
       MID                                    = micpar%get_micb_id(M,NGL)
-      RMaintDefcitKillOMHeter(ielmc,M,NGL,K) = AMIN1(mBiomeHeter(ielmc,MID,K),AZMAX1(FracMaintDeficit*RMaintDmndHeter(M,NGL,K)/RCCC))
-      RMaintDefcitKillOMHeter(ielmn,M,NGL,K) = AMIN1(mBiomeHeter(ielmn,MID,K),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)))
-      RMaintDefcitKillOMHeter(ielmp,M,NGL,K) = AMIN1(mBiomeHeter(ielmp,MID,K),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmp,NGL,K)))
+      !Ordinary mortality and starvation share this compartment's donor pools.
+      AvailableBiomass=MAX(0._r8,mBiomeHeter(1:NumPlantChemElms,MID,K)-RKillOMHeter(1:NumPlantChemElms,M,NGL,K))
+      RMaintDefcitKillOMHeter(ielmc,M,NGL,K) = AMIN1(AvailableBiomass(ielmc),AZMAX1(FracMaintDeficit*RMaintDmndHeter(M,NGL,K)/RCCC))
+      RMaintDefcitKillOMHeter(ielmn,M,NGL,K) = AMIN1(AvailableBiomass(ielmn),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmn,NGL,K)))
+      RMaintDefcitKillOMHeter(ielmp,M,NGL,K) = AMIN1(AvailableBiomass(ielmp),AZMAX1(RMaintDefcitKillOMHeter(ielmc,M,NGL,K)*rCNBiomeActHeter(ielmp,NGL,K)))
         
       DO NE=1,NumPlantChemElms
         RMaintDefcitRecycOMHeter(NE,M,NGL,K)   = RMaintDefcitKillOMHeter(NE,M,NGL,K)*RCCE(NE)

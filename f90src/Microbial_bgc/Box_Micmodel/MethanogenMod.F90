@@ -162,7 +162,9 @@ module MethanogenMod
   type(Microbe_Diag_type), intent(inout) :: nmicdiag
   character(len=*), parameter :: subname='H2MethanogensCatabolism'
   real(r8) :: GH2X,GH2H
-  real(r8) :: H2GSX
+  real(r8) :: H2GSX       !Remaining shared H2 supply, including fermentation
+  real(r8) :: RespPerCatabolicC,H2PerCatabolicC,H2PerGrowthRespC
+  real(r8) :: RVOXMaxH2,GrowthC,H2Demand
   real(r8) :: VMAX
   REAL(R8) :: XCO2
   real(r8) :: RGOMP,RVOXP,GH2C
@@ -190,6 +192,7 @@ module MethanogenMod
     CCO2S                  => micstt%CCO2S,                 &
     H2GS                   => micstt%H2GS,                  &
     RH2UptkAutor           => nmicdiag%RH2UptkAutor,        &
+    RMaintRespAutor        => micflx%RMaintRespAutor,        &
     RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &
   )
   !     begin_execution
@@ -211,6 +214,10 @@ module MethanogenMod
   call PrintInfo('beg '//subname)
   XCO2         = CCO2S/(CCO2S+CCKM)
   RH2UptkAutor = 0.0_r8
+  !0.111 gH2 per gC fermented: C6H12O6 + 2H2O -> 2C2H4O2 + 4H2 + 2CO2.
+  H2GSX = AZMAX1(H2GS+0.111_r8*naqfdiag%tCResp4H2Prod)
+  !TODO: add an explicit H2 competition factor to allocate this supply among guilds.
+  !Until then, guilds draw sequentially from the shared remaining H2GSX budget.
   DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle
     call StageAutotroph(NGL,N,TOMEAutoKC,micfor,nmics,nmicdiag)
@@ -227,18 +234,28 @@ module MethanogenMod
     !biomass yield as measured based on C, using respiration CH2O +2H2 -> CH4 + H2O for energy
     ECHZAutor(NGL)  = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
     VMAX            = OMActAutor(NGL)*VMXCH4gH2*GrowthEnvScalAutor(NGL)*FBiomNutStoiScalAutor(NGL)*XCO2
-    !0.111 is the stoichiometry from fermentation, C6H12O6 + 2H2O-> 2(C2H4O2)+ 4H2 + 2CO2, 8/72=0.111
-    H2GSX           = AZMAX1(H2GS+0.111_r8*naqfdiag%tCResp4H2Prod)
     FSBSTAutor(NGL) = CH2GS/(CH2GS+H2KM)
 
-    !first CO2 is partitioned into CH4 (catabolic) and CH2O (anabolic for respiration)
-    !CO2+2H2 -> CH2O+H2O, 3CO2+H2->3CH2O+H2O potential C for respiration
-    !CH2O +2H2-> CH4 + H2O
-    !RGOMP is based on H2-driven methanogen respiration, which is used to support growth + (growth/maint resp)
-    !assuming all electrons/reducing power are produced during catabolic reaction, so no more H2 is needed for biomass growth computed with RGOMP
-    !H2 uptake rate
-    RVOXP = AMIN1(1.5_r8*H2GSX/(1._r8+0.5_r8*ECH2*ECHZAutor(NGL)),VMAX*FSBSTAutor(NGL))
-    RGOMP = RVOXP*ECH2*ECHZAutor(NGL)
+    !For catabolic rate P=RVOXP, R=RespPerCatabolicC*P is respiration.
+    !Methane C is P+R; growth C is MAX(0,R-maintenance)*(1/ECHZ-1).
+    !Use the same H2:C factors as the methane and later biomass flux updates.
+    RespPerCatabolicC = ECH2*ECHZAutor(NGL)
+    H2PerCatabolicC   = 0.667_r8*(1._r8+RespPerCatabolicC)
+    H2PerGrowthRespC  = 0.333_r8*(1._r8/ECHZAutor(NGL)-1._r8)
+
+    !Solve the H2 budget on the maintenance-only or growth branch.
+    RVOXMaxH2 = H2GSX/H2PerCatabolicC
+    IF(RespPerCatabolicC*RVOXMaxH2.GT.RMaintRespAutor(NGL))THEN
+      RVOXMaxH2 = (H2GSX+H2PerGrowthRespC*RMaintRespAutor(NGL)) &
+        /(H2PerCatabolicC+H2PerGrowthRespC*RespPerCatabolicC)
+    ENDIF
+    RVOXP = AZMAX1(AMIN1(RVOXMaxH2,VMAX*FSBSTAutor(NGL)))
+    RGOMP = RVOXP*RespPerCatabolicC
+    GrowthC = AZMAX1(RGOMP-RMaintRespAutor(NGL))*(1._r8/ECHZAutor(NGL)-1._r8)
+    H2Demand = 0.667_r8*(RVOXP+RGOMP)+0.333_r8*GrowthC
+    !Reserve both methane and biomass demand before considering the next guild.
+    !Biomass H2 is added to RH2UptkAutor later in AutotrophAnabolicUpdate.
+    H2GSX = AZMAX1(H2GSX-H2Demand)
 
     RO2Dmnd4GrossRespAutor(NGL) = 0.0_r8
     RO2MetaDmndAutor(NGL)       = 0.0_r8

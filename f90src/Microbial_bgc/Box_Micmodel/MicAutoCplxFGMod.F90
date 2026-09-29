@@ -334,6 +334,7 @@ module MicAutoCPLXMod
   real(r8) :: CGOMZ
   real(r8) :: SPOMX
   real(r8) :: FRM
+  real(r8) :: AvailableBiomass(NumPlantChemElms)
 !     begin_execution
   associate(                                                                    &
     rCNBiomeActAutor                 => nmics%rCNBiomeActAutor,                 &
@@ -396,8 +397,10 @@ module MicAutoCPLXMod
     CGOMX = AMIN1(RMaintRespAutor(NGL),RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor(NGL)-Resp4NFixAutor(NGL))/ECHZAutor(NGL)
     CGOMD = RNOxReduxRespAutorLim(NGL)/ENOX         !CO2 synthesis due to NO2(-) reduction by NH3
 
-    !total C uptake, which could be CO2, or CH4, depending on the type of organism
-    !for aerobic methanotrophs, the following equals to CH4 uptake for maintenance+growth respiraiton+biomass
+    !C entering the biomass/respiration pathway, supplied by CO2 or CH4.
+    !For aerobic methanotrophs, this is CH4 uptake for maintenance and growth.
+    !For H2 methanogens, this is CO2-derived C entering the biomass/respiration
+    !pathway; it excludes direct CO2-to-CH4 conversion represented by RVOXP.
     DOMuptk4GrothAutor(ielmc,NGL)=CGOMX+CGOMD
 
     !
@@ -472,7 +475,7 @@ module MicAutoCPLXMod
       SPOMX = SQRT(GrowthEnvScalAutor(NGL))*SPOMC(M)*SPOMK(M)
       
       DO NE=1,NumPlantChemElms
-        RKillOMAutor(NE,M,NGL)=AZMAX1(mBiomeAutor(NE,MID)*SPOMX)
+        RKillOMAutor(NE,M,NGL)=AZMAX1(AMIN1(mBiomeAutor(NE,MID),mBiomeAutor(NE,MID)*SPOMX))
             
         RkillRecycOMAutor(NE,M,NGL)=RKillOMAutor(NE,M,NGL)*RCCE(NE)
 
@@ -513,9 +516,11 @@ module MicAutoCPLXMod
       DO  M=1,2
         !Cap C/N/P withdrawal by this compartment's own donor pools.
         MID=micpar%get_micb_id(M,NGL)
-        RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(mBiomeAutor(ielmc,MID),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
-        RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(mBiomeAutor(ielmn,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
-        RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(mBiomeAutor(ielmp,MID),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
+        !Ordinary mortality and starvation share this compartment's donor pools.
+        AvailableBiomass=MAX(0._r8,mBiomeAutor(1:NumPlantChemElms,MID)-RKillOMAutor(1:NumPlantChemElms,M,NGL))
+        RMaintDefcitKillOMAutor(ielmc,M,NGL)=AMIN1(AvailableBiomass(ielmc),AZMAX1(FRM*RMaintDmndAutor(M,NGL)/RCCC))
+        RMaintDefcitKillOMAutor(ielmn,M,NGL)=AMIN1(AvailableBiomass(ielmn),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmn,NGL)))
+        RMaintDefcitKillOMAutor(ielmp,M,NGL)=AMIN1(AvailableBiomass(ielmp),AZMAX1(RMaintDefcitKillOMAutor(ielmc,M,NGL)*rCNBiomeActAutor(ielmp,NGL)))
         DO NE=1,NumPlantChemElms
           RMaintDefcitRecycOMAutor(NE,M,NGL)   = RMaintDefcitKillOMAutor(NE,M,NGL)*RCCE(NE)
           RMaintDefcitLitrfalOMAutor(NE,M,NGL) = AZMAX1(RMaintDefcitKillOMAutor(NE,M,NGL)-RMaintDefcitRecycOMAutor(NE,M,NGL))
@@ -1351,15 +1356,14 @@ module MicAutoCPLXMod
         elseif(N.EQ.mid_AutoAMOANME2D)then
           !recyle some CO2
           RCO2ProdAutor(NGL)=RCO2ProdAutor(NGL)-CGROMC
-        elseif(N.eq.mid_AutoH2GenoCH4GenArchea .or. N.eq.mid_AutoNitriteOxidBacter .or. N.eq.mid_AutoAmmoniaOxidBacter)then
-          !for H2-methanogen, CO2 is used for CH4 and biomass
-          ! for NH3/NO2 oxidizer, some CO2 is first converted into CH2O and respired, and some is fixed right away
-          RCO2XumpAutor(NGL)= DOMuptk4GrothAutor(ielmc,NGL)          
-
-          if(N.eq.mid_AutoH2GenoCH4GenArchea)then
-            !CO2 + 2H2 -> CH2O + 2H2O, 4/12=0.333
-            nmicdiag%RH2UptkAutor=nmicdiag%RH2UptkAutor+0.333_r8*CGROMC
-          endif  
+        elseif(N.eq.mid_AutoH2GenoCH4GenArchea)then
+          !CO2 supplies carbon for both methane production and biomass growth.
+          RCO2XumpAutor(NGL)=nmicf%RCH4ProdAutor(NGL)+CGROMC
+          !Additional H2 consumed in biomass synthesis: CO2 + 2H2 -> CH2O + H2O.
+          nmicdiag%RH2UptkAutor=nmicdiag%RH2UptkAutor+0.333_r8*CGROMC
+        elseif(N.eq.mid_AutoNitriteOxidBacter .or. N.eq.mid_AutoAmmoniaOxidBacter)then
+          !For NH3/NO2 oxidizers, CO2 supports both respiration and biomass growth.
+          RCO2XumpAutor(NGL)=DOMuptk4GrothAutor(ielmc,NGL)
         endif
 
         DO M=1,2
