@@ -1722,7 +1722,6 @@ module MicBGCMod
   associate(                                                                &
     DOMuptk4GrothHeter             => nmicf%DOMuptk4GrothHeter,             & !Guild elemental uptake; C includes DOC, acetate and cyanobacterial CO2 fixation
     NonstX2stBiomHeter             => nmicf%NonstX2stBiomHeter,             & !C/N/P transfer from reserves into kinetic/structural biomass by guild and complex
-    Resp4NFixHeter                 => nmicf%Resp4NFixHeter,                 & !Respiration-C cost of heterotrophic N2 fixation
     RespGrossHeter                 => nmicf%RespGrossHeter,                 & !Gross respiration C equivalent from the primary heterotrophic pathway
     RNOxDOCReduxRespDenitLim       => nmicf%RNOxDOCReduxRespDenitLim,       & !DOC-C respiration supported by realized denitrification
     RNOxAcetReduxRespDenitLim      => nmicf%RNOxAcetReduxRespDenitLim,      & !Acetate-C respiration supported by realized denitrification
@@ -1829,8 +1828,10 @@ module MicBGCMod
           !
           !Both denitrification substrates contribute uptake and respiratory C loss.
           CGROMC = DOMuptk4GrothHeter(ielmc,NGL,K)-RespGrossHeter(NGL,K) &
-            -RNOxDOCReduxRespDenitLim(NGL,K)-RNOxAcetReduxRespDenitLim(NGL,K)-Resp4NFixHeter(NGL,K)
-          RCO2ProdHeter(NGL,K) = RCO2ProdHeter(NGL,K)+Resp4NFixHeter(NGL,K)
+            -RNOxDOCReduxRespDenitLim(NGL,K)-RNOxAcetReduxRespDenitLim(NGL,K)
+          !N2 fixation redirects part of existing growth respiration; its
+          !cost already reduces growth-associated uptake in the anabolic flux.
+          !RespGrossHeter and catabolic products include that respiration.
           NetCAssimhr = NetCAssimhr+CGROMC
           GrosAssimhr = GrosAssimhr+DOMuptk4GrothHeter(ielmc,NGL,K)
           MID3        = micpar%get_micb_id(iLbiom_reserve,NGL)
