@@ -105,39 +105,39 @@ module MicrobMathFuncMod
   real(r8) :: VOLWPM,VOLOXM
   ! begin_execution
   associate(                                                 &
-    OxyLimterHeter         => nmics%OxyLimterHeter,          &
-    OMActHeter             => nmics%OMActHeter,              &
-    RO2UptkHeter           => nmicf%RO2UptkHeter,            &
-    RespGrossHeter         => nmicf%RespGrossHeter,          &
-    RO2DmndHeter           => nmicf%RO2DmndHeter,            &
-    O2_irrig_conc          => micfor%O2_irrig_conc,          &
-    O2_rain_conc           => micfor%O2_rain_conc,           &
-    COXYE                  => micfor%COXYE,                  &
-    RO2GasXchangePrev      => micfor%RO2GasXchangePrev,      &
-    RO2AquaXchangePrev     => micfor%RO2AquaXchangePrev,     &
-    Irrig2LitRSurf_col     => micfor%Irrig2LitRSurf_col,     &
-    Rain2LitRSurf          => micfor%Rain2LitRSurf,          &
-    litrm                  => micfor%litrm,                  &
-    O2AquaDiffusvity       => micfor%O2AquaDiffusvity,       &
-    VLSoilPoreMicP         => micfor%VLSoilPoreMicP,         &
-    VLSoilMicP             => micfor%VLSoilMicP,             &
-    ZERO                   => micfor%ZERO,                   &
-    ZEROS                  => micfor%ZEROS,                  &
-    VLsoiAirPM             => micfor%VLsoiAirPM,             &
-    VLWatMicP              => micfor%VLWatMicP,              &
-    VLWatMicPM             => micfor%VLWatMicPM,             &
-    THETPM                 => micfor%THETPM,                 &
-    DiffusivitySolutEff    => micfor%DiffusivitySolutEff,    &
-    FILM                   => micfor%FILM,                   &
-    TortMicPM              => micfor%TortMicPM,              &
-    OXYG                   => micstt%OXYG,                   &
-    OXYS                   => micstt%OXYS,                   &
-    COXYS                  => micstt%COXYS,                  &
-    O2GSolubility          => micstt%O2GSolubility,          &
-    COXYG                  => micstt%COXYG,                  &
-    RNO2DmndReduxSoilHeter => micflx%RNO2DmndReduxSoilHeter, &
-    RNO2DmndReduxBandHeter => micflx%RNO2DmndReduxBandHeter, &
-    REcoUptkSoilO2M        => micflx%REcoUptkSoilO2M         &
+    OxyLimterHeter         => nmics%OxyLimterHeter,          & !Actual/potential O2 uptake ratio; 1 means no O2 restriction [-]
+    OMActHeter             => nmics%OMActHeter,              & !Active microbial C biomass by heterotrophic guild and complex K
+    RO2UptkHeter           => nmicf%RO2UptkHeter,            & !Realized total O2 uptake by heterotrophic guild and complex
+    RespGrossHeter         => nmicf%RespGrossHeter,          & !Gross respiration C equivalent from the primary heterotrophic pathway; not referenced here
+    RO2DmndHeter           => nmicf%RO2DmndHeter,            & !Total guild O2 demand before O2 limitation
+    O2_irrig_conc          => micfor%O2_irrig_conc,          & !Dissolved O2 concentration in irrigation water
+    O2_rain_conc           => micfor%O2_rain_conc,           & !Dissolved O2 concentration in rainwater
+    COXYE                  => micfor%COXYE,                  & !Atmospheric gas-phase O2 concentration
+    RO2GasXchangePrev      => micfor%RO2GasXchangePrev,      & !Previous-hour gaseous O2 exchange; negated when applied as a supply
+    RO2AquaXchangePrev     => micfor%RO2AquaXchangePrev,     & !Previous-hour aqueous O2 exchange; negated when applied as a supply
+    Irrig2LitRSurf_col     => micfor%Irrig2LitRSurf_col,     & !Irrigation water input to surface litter, carrying dissolved O2
+    Rain2LitRSurf          => micfor%Rain2LitRSurf,          & !Rainwater input to surface litter, carrying dissolved O2
+    litrm                  => micfor%litrm,                  & !True for the surface litter layer
+    O2AquaDiffusvity       => micfor%O2AquaDiffusvity,       & !Aqueous O2 diffusivity before transport-substep scaling
+    VLSoilPoreMicP         => micfor%VLSoilPoreMicP,         & !Layer micropore volume used in water and aerobic-uptake calculations
+    VLSoilMicP             => micfor%VLSoilMicP,             & !Bulk volume associated with the layer micropore domain
+    ZERO                   => micfor%ZERO,                   & !Small dimensionless or concentration threshold used by the routine
+    ZEROS                  => micfor%ZEROS,                  & !Small mass or flux threshold used by the routine
+    VLsoiAirPM             => micfor%VLsoiAirPM,             & !Soil air volume at each outer transport substep M
+    VLWatMicP              => micfor%VLWatMicP,              & !Layer micropore water volume used for nutrient donor thresholds; not referenced here
+    VLWatMicPM             => micfor%VLWatMicPM,             & !Micropore water volume at each outer transport substep M
+    THETPM                 => micfor%THETPM,                 & !Air-filled soil pore fraction at each outer transport substep M [-]
+    DiffusivitySolutEff    => micfor%DiffusivitySolutEff,    & !Gas-water exchange coefficient at each transport substep M
+    FILM                   => micfor%FILM,                   & !Water-film thickness for microbial O2 diffusion at transport substep M
+    TortMicPM              => micfor%TortMicPM,              & !Aqueous diffusion tortuosity factor at transport substep M [-]
+    OXYG                   => micstt%OXYG,                   & !Gas-phase O2 donor pool
+    OXYS                   => micstt%OXYS,                   & !Dissolved O2 donor pool
+    COXYS                  => micstt%COXYS,                  & !Dissolved O2 concentration; not referenced here
+    O2GSolubility          => micstt%O2GSolubility,          & !Equilibrium aqueous-to-gas O2 concentration ratio [-]
+    COXYG                  => micstt%COXYG,                  & !Soil gas-phase O2 concentration
+    RNO2DmndReduxSoilHeter => micflx%RNO2DmndReduxSoilHeter, & !Potential nonband NO2-N reduction demand used for competition; not referenced here
+    RNO2DmndReduxBandHeter => micflx%RNO2DmndReduxBandHeter, & !Potential fertilizer-band NO2-N reduction demand used for competition; not referenced here
+    REcoUptkSoilO2M        => micflx%REcoUptkSoilO2M         & !Accumulated microbial O2 uptake in each outer transport substep M
   )
 
   IF(RO2DmndHeter(NGL,K).GT.ZEROS .AND. FOXYX.GT.ZERO)THEN
@@ -264,26 +264,26 @@ module MicrobMathFuncMod
   type(Microbe_State_type), intent(inout):: nmics
   real(r8) :: WatStressMicb
   associate(                                                 &
-    PSISoilMatricP         => micfor%PSISoilMatricP,         &
-    ZEROS                  => micfor%ZEROS,                  &
-    RDOMEcoDmndPrev        => micfor%RDOMEcoDmndPrev,        &
-    RAcetateEcoDmndPrev    => micfor%RAcetateEcoDmndPrev,    &
-    RAcetateUptkHeterPrev  => micfor%RAcetateUptkHeterPrev,  &
-    mid_Aerob_Fungi        => micpar%mid_Aerob_Fungi,        &
-    mid_Facult_DenitBacter => micpar%mid_Facult_DenitBacter, &
-    GrowthEnvScalHeter     => nmics%GrowthEnvScalHeter,      &
-    FracHeterBiomOfActK    => nmics%FracHeterBiomOfActK,     &
-    RDOCUptkHeterPrev      => micfor%RDOCUptkHeterPrev,      &
-    FracOMActHeter         => nmics%FracOMActHeter,          &
-    OMActHeter             => nmics%OMActHeter,              &
-    TempMaintRHeter        => nmics%TempMaintRHeter,         &
-    TOMEK                  => nmicdiag%TOMEK          ,      &
-    FracNO2ReduxHeter      => nmics%FracNO2ReduxHeter,       &
-    WSensGroHeter          => nmics%WSensGroHeter         ,  &
-    TSensGroHeter          => nmics%TSensGroHeter         ,  &
-    TSensMaintR            => nmicdiag%TSensMaintR,          &
-    TotBiomNO2Consumers    => nmicdiag%TotBiomNO2Consumers,  &
-    TSensGrowth            => nmicdiag%TSensGrowth           &
+    PSISoilMatricP         => micfor%PSISoilMatricP,         & !Soil matric water potential controlling microbial water stress
+    ZEROS                  => micfor%ZEROS,                  & !Small mass or flux threshold used by the routine
+    RDOMEcoDmndPrev        => micfor%RDOMEcoDmndPrev,        & !Previous-hour ecosystem DOC demand in each complex; competition denominator
+    RAcetateEcoDmndPrev    => micfor%RAcetateEcoDmndPrev,    & !Previous-hour ecosystem acetate demand in each complex; competition denominator
+    RAcetateUptkHeterPrev  => micfor%RAcetateUptkHeterPrev,  & !Previous-hour guild acetate uptake/demand used for competition
+    mid_Aerob_Fungi        => micpar%mid_Aerob_Fungi,        & !Functional-group identifier for aerobic fungi
+    mid_Facult_DenitBacter => micpar%mid_Facult_DenitBacter, & !Functional-group identifier for facultative denitrifying bacteria
+    GrowthEnvScalHeter     => nmics%GrowthEnvScalHeter,      & !Temperature and water-potential multiplier on heterotrophic growth [-]
+    FracHeterBiomOfActK    => nmics%FracHeterBiomOfActK,     & !Guild fraction of active heterotrophic biomass in complex K [-]
+    RDOCUptkHeterPrev      => micfor%RDOCUptkHeterPrev,      & !Previous-hour guild DOC uptake/demand used for competition
+    FracOMActHeter         => nmics%FracOMActHeter,          & !Guild/complex fraction of total active microbial C in the layer [-]
+    OMActHeter             => nmics%OMActHeter,              & !Active microbial C biomass by heterotrophic guild and complex K
+    TempMaintRHeter        => nmics%TempMaintRHeter,         & !Guild temperature multiplier on heterotrophic maintenance [-]
+    TOMEK                  => nmicdiag%TOMEK          ,      & !Total active heterotrophic C/N/P in each substrate complex K
+    FracNO2ReduxHeter      => nmics%FracNO2ReduxHeter,       & !Guild share of active nitrite-consuming biomass for competition [-]
+    WSensGroHeter          => nmics%WSensGroHeter         ,  & !Guild soil-water-potential multiplier on heterotrophic growth [-]
+    TSensGroHeter          => nmics%TSensGroHeter         ,  & !Guild temperature multiplier on heterotrophic growth [-]
+    TSensMaintR            => nmicdiag%TSensMaintR,          & !Layer temperature response for microbial maintenance [-]
+    TotBiomNO2Consumers    => nmicdiag%TotBiomNO2Consumers,  & !Active C summed over staged nitrite-competing microbial groups
+    TSensGrowth            => nmicdiag%TSensGrowth           & !Layer temperature response for microbial growth [-]
   )
 
   ! WatStressMicb=water potential (PSISoilMatricP_vr) effect on microbial respiration
@@ -356,20 +356,20 @@ module MicrobMathFuncMod
   real(r8) :: WatStressMicb
 
   associate(                                             &
-    PSISoilMatricP      => micfor%PSISoilMatricP,        &
-    OMActAutor          => nmics%OMActAutor,             &
-    FracOMActAutor      => nmics%FracOMActAutor,         &
-    FracNO2XupAutor     => nmics%FracNO2XupAutor,        &
-    FracAutorBiomOfActK => nmics%FracAutorBiomOfActK,    &
-    ZEROS               => micfor%ZEROS,                 &
-    TSensMaintRAutor    => nmics%TSensMaintRAutor,       &
-    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,     &
-    TotBiomNO2Consumers => nmicdiag%TotBiomNO2Consumers, &
-    TotActMicrobiom     => nmicdiag%TotActMicrobiom,     &
-    WSensGroAutor       => nmics%WSensGroAutor,          &
-    TSensGroAutor       => nmics%TSensGroAutor,          &
-    TSensGrowth         => nmicdiag%TSensGrowth,         &
-    TSensMaintR         => nmicdiag%TSensMaintR          &
+    PSISoilMatricP      => micfor%PSISoilMatricP,        & !Soil matric water potential controlling microbial water stress
+    OMActAutor          => nmics%OMActAutor,             & !Active microbial C biomass by autotrophic guild
+    FracOMActAutor      => nmics%FracOMActAutor,         & !Guild fraction of total active microbial C in the layer [-]
+    FracNO2XupAutor     => nmics%FracNO2XupAutor,        & !Staged autotrophic nitrite-competition weight [-]
+    FracAutorBiomOfActK => nmics%FracAutorBiomOfActK,    & !Guild fraction of active biomass in the autotrophic assemblage [-]
+    ZEROS               => micfor%ZEROS,                 & !Small mass or flux threshold used by the routine
+    TSensMaintRAutor    => nmics%TSensMaintRAutor,       & !Guild temperature multiplier on autotrophic maintenance [-]
+    GrowthEnvScalAutor  => nmics%GrowthEnvScalAutor,     & !Temperature and water-potential multiplier on autotrophic growth [-]
+    TotBiomNO2Consumers => nmicdiag%TotBiomNO2Consumers, & !Active C summed over staged nitrite-competing microbial groups
+    TotActMicrobiom     => nmicdiag%TotActMicrobiom,     & !Layer total active microbial C across heterotrophs and autotrophs
+    WSensGroAutor       => nmics%WSensGroAutor,          & !Guild soil-water-potential multiplier on autotrophic growth [-]
+    TSensGroAutor       => nmics%TSensGroAutor,          & !Guild temperature multiplier on autotrophic growth [-]
+    TSensGrowth         => nmicdiag%TSensGrowth,         & !Layer temperature response for microbial growth [-]
+    TSensMaintR         => nmicdiag%TSensMaintR          & !Layer temperature response for microbial maintenance [-]
   )
   !replace with trait specific parameterization
   WatStressMicb           = EXP(0.2_r8*PSISoilMatricP)
@@ -415,15 +415,15 @@ module MicrobMathFuncMod
   integer :: MID1
 
   associate(                                             &
-    OMActAutor           => nmics%OMActAutor,            &
-    OMN2Autor            => nmics%OMN2Autor,             &
-    TSensMaintRAutor     => nmics%TSensMaintRAutor,      &
-    RMaintDmndAutor      => nmicf%RMaintDmndAutor,       &
-    RMaintRespAutor      => micflx%RMaintRespAutor,      &
-    pH                   => micfor%pH,                   &
-    mBiomeAutor          => micstt%mBiomeAutor,          &
-    JGniA                => micpar%JGniA,                &
-    JGnfA                => micpar%JGnfA                 &
+    OMActAutor           => nmics%OMActAutor,            & !Active microbial C biomass by autotrophic guild; not referenced here
+    OMN2Autor            => nmics%OMN2Autor,             & !Active structural autotrophic N by guild
+    TSensMaintRAutor     => nmics%TSensMaintRAutor,      & !Guild temperature multiplier on autotrophic maintenance [-]
+    RMaintDmndAutor      => nmicf%RMaintDmndAutor,       & !Maintenance-C demand by live biomass compartment and autotrophic guild
+    RMaintRespAutor      => micflx%RMaintRespAutor,      & !Total hourly autotrophic guild maintenance-C demand
+    pH                   => micfor%pH,                   & !Layer pH used in microbial rate and nutrient-speciation responses
+    mBiomeAutor          => micstt%mBiomeAutor,          & !C/N/P pools indexed by element and flattened guild/biomass compartment
+    JGniA                => micpar%JGniA,                & !First guild index for each autotrophic functional group; not referenced here
+    JGnfA                => micpar%JGnfA                 & !Last guild index for each autotrophic functional group; not referenced here
   )
   call PrintInfo('beg '//subname)
 
@@ -459,12 +459,12 @@ module MicrobMathFuncMod
   integer :: MID1
 
   associate(                                             &
-    OMN2                 => nmics%OMN2,                  &
-    TempMaintRHeter      => nmics%TempMaintRHeter,       &
-    RMaintDmndHeter      => nmicf%RMaintDmndHeter,       &
-    RMaintRespHeter      => nmicf%RMaintRespHeter,       &
-    pH                   => micfor%pH,                   &
-    mBiomeHeter          => micstt%mBiomeHeter           &
+    OMN2                 => nmics%OMN2,                  & !Active structural heterotrophic N by guild and complex K
+    TempMaintRHeter      => nmics%TempMaintRHeter,       & !Guild temperature multiplier on heterotrophic maintenance [-]
+    RMaintDmndHeter      => nmicf%RMaintDmndHeter,       & !Maintenance-C demand by live compartment, heterotrophic guild and complex
+    RMaintRespHeter      => nmicf%RMaintRespHeter,       & !Total hourly heterotrophic maintenance-C demand by guild and complex
+    pH                   => micfor%pH,                   & !Layer pH used in microbial rate and nutrient-speciation responses
+    mBiomeHeter          => micstt%mBiomeHeter           & !C/N/P pools indexed by element, flattened guild/compartment and complex K
   )
   call PrintInfo('beg '//subname)
 

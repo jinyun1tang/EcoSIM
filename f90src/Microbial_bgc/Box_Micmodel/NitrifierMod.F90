@@ -53,35 +53,35 @@ module NitrifierMod
   integer  :: NGL
 !     begin_execution
   associate(                                                &
-    FracNO2XupAutor        => nmics%FracNO2XupAutor,        &
-    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &
-    OMActAutor             => nmics%OMActAutor,             &
-    RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      &
-    RNO3UptkAutor          => nmicf%RNO3UptkAutor,          &
-    RNOxReduxAutorSoil     => nmicf%RNOxReduxAutorSoil,     & !NO2 reduction by NH3 in non-band soil
-    RNOxReduxAutorBand     => nmicf%RNOxReduxAutorBand,     & !NO2 reduction by NH3 in banded soil
-    RNOxReduxRespAutorLim  => nmicf%RNOxReduxRespAutorLim,  & !respiration due to NO2
-    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &
-    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &
-    RTotNH3OxidSoilAutor   => nmicf%RTotNH3OxidSoilAutor,   & !NO2 production from NH3
-    RTotNH3OxidBandAutor   => nmicf%RTotNH3OxidBandAutor,   & !NO2 production from NH3 band
-    RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,   &
-    VLNO3                  => micfor%VLNO3,                 &
-    VLNOB                  => micfor%VLNOB,                 &
-    RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,   &
-    ZEROS                  => micfor%ZEROS,                 &
-    ZEROS2                 => micfor%ZEROS2,                &
-    CCO2S                  => micstt%CCO2S,                 &
-    CNO2B                  => micstt%CNO2B,                 &
-    CNO2S                  => micstt%CNO2S,                 &
-    ZNO2B                  => micstt%ZNO2B,                 &
-    ZNO2S                  => micstt%ZNO2S,                 &
-    JGniA                  => micpar%JGniA,                 &
-    JGnfA                  => micpar%JGnfA,                 &
-    RNO2XupAutorPrev       => micflx%RNO2XupAutorPrev,      &
-    RNO2XupAutorBandPrev   => micflx%RNO2XupAutorBandPrev,  &
-    RNO2XupAutor           => micflx%RNO2XupAutor,          &
-    RNO2XupAutorBand       => micflx%RNO2XupAutorBand       &
+    FracNO2XupAutor        => nmics%FracNO2XupAutor,        & !Staged autotrophic nitrite-competition weight [-]
+    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, & !Potential O2 demand supporting autotrophic gross respiration
+    OMActAutor             => nmics%OMActAutor,             & !Active microbial C biomass by autotrophic guild
+    RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      & !Realized O2 uptake attributed to autotrophic gross respiration
+    RNO3UptkAutor          => nmicf%RNO3UptkAutor,          & !Autotrophic nitrate-N reduction bookkeeping; zero for nitrifiers in current code
+    RNOxReduxAutorSoil     => nmicf%RNOxReduxAutorSoil,     & !Nonband NO2-N reduction by NH3 oxidation; contributes to N2O production
+    RNOxReduxAutorBand     => nmicf%RNOxReduxAutorBand,     & !Fertilizer-band NO2-N reduction by NH3 oxidation; contributes to N2O production
+    RNOxReduxRespAutorLim  => nmicf%RNOxReduxRespAutorLim,  & !C-equivalent respiration supported by autotrophic nitrite reduction
+    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    & !Nonband NH3-N oxidation including the added denitrification contribution
+    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    & !Fertilizer-band NH3-N oxidation including the added denitrification contribution
+    RTotNH3OxidSoilAutor   => nmicf%RTotNH3OxidSoilAutor,   & !Ammonia-N oxidation to nitrite summed over nonband nitrifier guilds
+    RTotNH3OxidBandAutor   => nmicf%RTotNH3OxidBandAutor,   & !Ammonia-N oxidation to nitrite summed over fertilizer-band nitrifier guilds
+    RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,   & !Previous-hour ecosystem nonband NO2-N uptake; competition denominator
+    VLNO3                  => micfor%VLNO3,                 & !Nonband fraction for nitrate/nitrite pools and uptake capacity [-]
+    VLNOB                  => micfor%VLNOB,                 & !Fertilizer-band fraction for nitrate/nitrite pools and uptake capacity [-]
+    RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,   & !Previous-hour ecosystem fertilizer-band NO2-N uptake; competition denominator
+    ZEROS                  => micfor%ZEROS,                 & !Small mass or flux threshold used by the routine
+    ZEROS2                 => micfor%ZEROS2,                & !Small water-volume threshold used by the routine
+    CCO2S                  => micstt%CCO2S,                 & !Dissolved CO2-C concentration for substrate saturation
+    CNO2B                  => micstt%CNO2B,                 & !Dissolved NO2-N concentration in fertilizer-band soil
+    CNO2S                  => micstt%CNO2S,                 & !Dissolved NO2-N concentration in nonband soil
+    ZNO2B                  => micstt%ZNO2B,                 & !NO2-N pool in fertilizer-band soil
+    ZNO2S                  => micstt%ZNO2S,                 & !NO2-N pool in nonband soil
+    JGniA                  => micpar%JGniA,                 & !First guild index for each autotrophic functional group
+    JGnfA                  => micpar%JGnfA,                 & !Last guild index for each autotrophic functional group
+    RNO2XupAutorPrev       => micflx%RNO2XupAutorPrev,      & !Previous-hour autotrophic nonband NO2-N redox uptake; reaction depends on functional group; used for competition
+    RNO2XupAutorBandPrev   => micflx%RNO2XupAutorBandPrev,  & !Previous-hour autotrophic fertilizer-band NO2-N redox uptake; reaction depends on functional group; used for competition
+    RNO2XupAutor           => micflx%RNO2XupAutor,          & !Nonband NO2-N consumed in nitrifier denitrification
+    RNO2XupAutorBand       => micflx%RNO2XupAutorBand       & !Fertilizer-band NO2-N consumed in nitrifier denitrification
   )
   !
   !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -219,39 +219,39 @@ module NitrifierMod
 
 !     begin_execution
   associate(                                                &
-    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &
-    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &
-    FSBSTAutor             => nmicdiag%FSBSTAutor,          &
-    FracOMActAutor         => nmics%FracOMActAutor,         &
-    OMActAutor             => nmics%OMActAutor,             &
-    TSensGroAutor          => nmics%TSensGroAutor,          &
-    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &
-    ECHZAutor              => nmicf%ECHZAutor,              &
-    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &
-    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &
-    RespGrossAutor         => nmicf%RespGrossAutor,         &
-    VLNH4                  => micfor%VLNH4,                 &
-    VLNHB                  => micfor%VLNHB,                 &
-    ZEROS                  => micfor%ZEROS,                 &
-    ZEROS2                 => micfor%ZEROS2,                &
-    RNH4EcoDmndSoilPrev    => micfor%RNH4EcoDmndSoilPrev,   &
-    RNH4EcoDmndBandPrev    => micfor%RNH4EcoDmndBandPrev,   &
-    ZNFN0                  => micstt%ZNFN0,                 &
-    CCO2S                  => micstt%CCO2S,                 &
-    ZNFNI                  => micstt%ZNFNI,                 &
-    CNH3S                  => micstt%CNH3S,                 &
-    CNH3B                  => micstt%CNH3B,                 &
-    CNH4S                  => micstt%CNH4S,                 &
-    CNH4B                  => micstt%CNH4B,                 &
-    ZNH4S                  => micstt%ZNH4S,                 &
-    ZNH4B                  => micstt%ZNH4B,                 &
-    JGniA                  => micpar%JGniA,                 &
-    JGnfA                  => micpar%JGnfA,                 &
-    RNH3OxidAutorPrev      => micflx%RNH3OxidAutorPrev,     &
-    RNH3OxidAutorBandPrev  => micflx%RNH3OxidAutorBandPrev, &
-    RNH3OxidAutor          => micflx%RNH3OxidAutor,         &
-    RNH3OxidAutorBand      => micflx%RNH3OxidAutorBand,     &
-    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &
+    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     & !Temperature and water-potential multiplier on autotrophic growth [-]
+    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  & !Combined N/P stoichiometric multiplier on guild metabolic capacity [-]
+    FSBSTAutor             => nmicdiag%FSBSTAutor,          & !Guild primary-substrate saturation diagnostic [-]
+    FracOMActAutor         => nmics%FracOMActAutor,         & !Guild fraction of total active microbial C in the layer [-]
+    OMActAutor             => nmics%OMActAutor,             & !Active microbial C biomass by autotrophic guild
+    TSensGroAutor          => nmics%TSensGroAutor,          & !Guild temperature multiplier on autotrophic growth [-]
+    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, & !Potential O2 demand supporting autotrophic gross respiration
+    ECHZAutor              => nmicf%ECHZAutor,              & !Guild respiration fraction used to convert growth respiration to C uptake [-]
+    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    & !Nonband potential aerobic NH3-N oxidation; O2-limited later
+    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    & !Fertilizer-band potential aerobic NH3-N oxidation; O2-limited later
+    RespGrossAutor         => nmicf%RespGrossAutor,         & !Gross respiration C equivalent by autotrophic guild
+    VLNH4                  => micfor%VLNH4,                 & !Nonband fraction for ammonium/ammonia pools and uptake capacity [-]
+    VLNHB                  => micfor%VLNHB,                 & !Fertilizer-band fraction for ammonium/ammonia pools and uptake capacity [-]
+    ZEROS                  => micfor%ZEROS,                 & !Small mass or flux threshold used by the routine
+    ZEROS2                 => micfor%ZEROS2,                & !Small water-volume threshold used by the routine
+    RNH4EcoDmndSoilPrev    => micfor%RNH4EcoDmndSoilPrev,   & !Previous-hour ecosystem NH4-N demand in nonband soil; competition denominator
+    RNH4EcoDmndBandPrev    => micfor%RNH4EcoDmndBandPrev,   & !Previous-hour ecosystem NH4-N demand in fertilizer-band soil; competition denominator
+    ZNFN0                  => micstt%ZNFN0,                 & !Nitrification-inhibition reference established with fertilizer application
+    CCO2S                  => micstt%CCO2S,                 & !Dissolved CO2-C concentration for substrate saturation
+    ZNFNI                  => micstt%ZNFNI,                 & !Temperature-decaying nitrification-inhibition state used with ZNFN0
+    CNH3S                  => micstt%CNH3S,                 & !Dissolved NH3-N concentration in nonband soil
+    CNH3B                  => micstt%CNH3B,                 & !Dissolved NH3-N concentration in fertilizer-band soil
+    CNH4S                  => micstt%CNH4S,                 & !Dissolved NH4-N concentration in nonband soil
+    CNH4B                  => micstt%CNH4B,                 & !Dissolved NH4-N concentration in fertilizer-band soil
+    ZNH4S                  => micstt%ZNH4S,                 & !NH4-N pool in nonband soil
+    ZNH4B                  => micstt%ZNH4B,                 & !NH4-N pool in fertilizer-band soil
+    JGniA                  => micpar%JGniA,                 & !First guild index for each autotrophic functional group
+    JGnfA                  => micpar%JGnfA,                 & !Last guild index for each autotrophic functional group
+    RNH3OxidAutorPrev      => micflx%RNH3OxidAutorPrev,     & !Previous-hour nonband ammonia-N oxidation by nitrifier guilds; used for competition
+    RNH3OxidAutorBandPrev  => micflx%RNH3OxidAutorBandPrev, & !Previous-hour fertilizer-band ammonia-N oxidation by nitrifier guilds; used for competition
+    RNH3OxidAutor          => micflx%RNH3OxidAutor,         & !Nonband ammonia-N oxidation by nitrifier guilds
+    RNH3OxidAutorBand      => micflx%RNH3OxidAutorBand,     & !Fertilizer-band ammonia-N oxidation by nitrifier guilds
+    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       & !Total autotrophic O2 demand from respiration and substrate oxidation
   )
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -402,35 +402,35 @@ module NitrifierMod
 
 !     begin_execution
   associate(                                                &
-    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &
-    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &
-    FSBSTAutor             => nmicdiag%FSBSTAutor,          &
-    FracNO2XupAutor        => nmics%FracNO2XupAutor,        &
-    OMActAutor             => nmics%OMActAutor,             &
-    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &
-    RespGrossAutor         => nmicf%RespGrossAutor,         &
-    ECHZAutor              => nmicf%ECHZAutor,              &
-    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &
-    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &
-    VLNH4                  => micfor%VLNH4,                 &
-    VLNHB                  => micfor%VLNHB,                 &
-    VLNO3                  => micfor%VLNO3,                 &
-    VLNOB                  => micfor%VLNOB,                 &
-    ZEROS                  => micfor%ZEROS,                 &
-    RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,   &
-    RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,   &
-    JGniA                  => micpar%JGniA,                 &
-    JGnfA                  => micpar%JGnfA,                 &
-    CCO2S                  => micstt%CCO2S,                 &
-    CNO2S                  => micstt%CNO2S,                 &
-    CNO2B                  => micstt%CNO2B,                 &
-    ZNO2S                  => micstt%ZNO2S,                 &
-    ZNO2B                  => micstt%ZNO2B,                 &
-    RNO2XupAutorPrev       => micflx%RNO2XupAutorPrev,      &
-    RNO2XupAutorBandPrev   => micflx%RNO2XupAutorBandPrev,  &
-    RNO2XupAutor           => micflx%RNO2XupAutor,          &
-    RNO2XupAutorBand       => micflx%RNO2XupAutorBand,      &
-    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &
+    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     & !Temperature and water-potential multiplier on autotrophic growth [-]
+    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  & !Combined N/P stoichiometric multiplier on guild metabolic capacity [-]
+    FSBSTAutor             => nmicdiag%FSBSTAutor,          & !Guild substrate-response factor; larger values mean less limitation [-]
+    FracNO2XupAutor        => nmics%FracNO2XupAutor,        & !Staged autotrophic nitrite-competition weight [-]
+    OMActAutor             => nmics%OMActAutor,             & !Active microbial C biomass by autotrophic guild
+    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, & !Potential O2 demand supporting autotrophic gross respiration
+    RespGrossAutor         => nmicf%RespGrossAutor,         & !Gross respiration C equivalent by autotrophic guild
+    ECHZAutor              => nmicf%ECHZAutor,              & !Guild respiration fraction used to convert growth respiration to C uptake [-]
+    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    & !Fertilizer-band NO2-N oxidation to NO3-N
+    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    & !Nonband NO2-N oxidation to NO3-N
+    VLNH4                  => micfor%VLNH4,                 & !Nonband fraction for ammonium/ammonia pools and uptake capacity [-]; not referenced here
+    VLNHB                  => micfor%VLNHB,                 & !Fertilizer-band fraction for ammonium/ammonia pools and uptake capacity [-]; not referenced here
+    VLNO3                  => micfor%VLNO3,                 & !Nonband fraction for nitrate/nitrite pools and uptake capacity [-]
+    VLNOB                  => micfor%VLNOB,                 & !Fertilizer-band fraction for nitrate/nitrite pools and uptake capacity [-]
+    ZEROS                  => micfor%ZEROS,                 & !Small mass or flux threshold used by the routine
+    RNO2EcoUptkSoilPrev    => micfor%RNO2EcoUptkSoilPrev,   & !Previous-hour ecosystem nonband NO2-N uptake; competition denominator
+    RNO2EcoUptkBandPrev    => micfor%RNO2EcoUptkBandPrev,   & !Previous-hour ecosystem fertilizer-band NO2-N uptake; competition denominator
+    JGniA                  => micpar%JGniA,                 & !First guild index for each autotrophic functional group
+    JGnfA                  => micpar%JGnfA,                 & !Last guild index for each autotrophic functional group
+    CCO2S                  => micstt%CCO2S,                 & !Dissolved CO2-C concentration for substrate saturation
+    CNO2S                  => micstt%CNO2S,                 & !Dissolved NO2-N concentration in nonband soil
+    CNO2B                  => micstt%CNO2B,                 & !Dissolved NO2-N concentration in fertilizer-band soil
+    ZNO2S                  => micstt%ZNO2S,                 & !NO2-N pool in nonband soil
+    ZNO2B                  => micstt%ZNO2B,                 & !NO2-N pool in fertilizer-band soil
+    RNO2XupAutorPrev       => micflx%RNO2XupAutorPrev,      & !Previous-hour autotrophic nonband NO2-N redox uptake; reaction depends on functional group; used for competition
+    RNO2XupAutorBandPrev   => micflx%RNO2XupAutorBandPrev,  & !Previous-hour autotrophic fertilizer-band NO2-N redox uptake; reaction depends on functional group; used for competition
+    RNO2XupAutor           => micflx%RNO2XupAutor,          & !Nonband NO2-N uptake for oxidation to NO3-N
+    RNO2XupAutorBand       => micflx%RNO2XupAutorBand,      & !Fertilizer-band NO2-N uptake for oxidation to NO3-N
+    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       & !Total autotrophic O2 demand from respiration and substrate oxidation
   )
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS

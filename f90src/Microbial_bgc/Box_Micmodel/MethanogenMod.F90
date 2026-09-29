@@ -50,32 +50,32 @@ module MethanogenMod
 
 ! begin_execution
   associate(                                            &
-    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
-    OMActHeter           => nmics%OMActHeter,           &
-    GrowthEnvScalHeter   => nmics%GrowthEnvScalHeter,   &
-    FSBSTHeter           => nmicdiag%FSBSTHeter,        &
-    RO2DmndHeter         => nmicf%RO2DmndHeter,         &
-    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
-    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
-    RAcetateProdHeter    => nmicf%RAcetateProdHeter,    &
-    RO2Uptk4RespHeter    => nmicf%RO2Uptk4RespHeter,    &
-    RCO2ProdHeter        => nmicf%RCO2ProdHeter,        &
-    RH2ProdHeter         => nmicf%RH2ProdHeter,         &
-    RCH4ProdHeter        => nmicf%RCH4ProdHeter,        &
-    FOQC                 => nmicf%FOQC,                 &
-    ECHZHeter            => nmicf%ECHZHeter,            &
-    FGOCP                => nmicf%FGOCP,                &
-    RespGrossHeter       => nmicf%RespGrossHeter,       &
-    FGOAP                => nmicf%FGOAP,                &
-    TotActMicrobiom      => nmicdiag%TotActMicrobiom,   &
-    CDOM                 => ncplxs%CDOM,                &
-    DOM                  => micstt%DOM,                 &
-    RO2DmndHetert        => micflx%RO2DmndHetert,       &
-    RDOCUptkHeter        => micflx%RDOCUptkHeter,       &
-    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   &
-    PSISoilMatricP       => micfor%PSISoilMatricP,      &
-    ZERO                 => micfor%ZERO,                &
-    TKS                  => micfor%TKS                  &
+    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, & !Combined N/P stoichiometric multiplier on guild metabolic capacity [-]
+    OMActHeter           => nmics%OMActHeter,           & !Active microbial C biomass by heterotrophic guild and complex K
+    GrowthEnvScalHeter   => nmics%GrowthEnvScalHeter,   & !Temperature and water-potential multiplier on heterotrophic growth [-]
+    FSBSTHeter           => nmicdiag%FSBSTHeter,        & !Guild substrate-response factor; larger values mean less limitation [-]
+    RO2DmndHeter         => nmicf%RO2DmndHeter,         & !Total guild O2 demand before O2 limitation; zero for this anaerobic pathway
+    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    & !Potential O2 demand supporting heterotrophic gross respiration; zero for this anaerobic pathway
+    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  & !Guild activity proxy for substrate hydrolysis, with DOC concentration unconstrained
+    RAcetateProdHeter    => nmicf%RAcetateProdHeter,    & !Acetate-C production by heterotrophic guild and complex
+    RO2Uptk4RespHeter    => nmicf%RO2Uptk4RespHeter,    & !Realized O2 uptake attributed to heterotrophic gross respiration; zero for this anaerobic pathway
+    RCO2ProdHeter        => nmicf%RCO2ProdHeter,        & !CO2-C production by heterotrophic guild and complex
+    RH2ProdHeter         => nmicf%RH2ProdHeter,         & !H2 production by heterotrophic guild and complex
+    RCH4ProdHeter        => nmicf%RCH4ProdHeter,        & !CH4-C production by heterotrophic guild and complex
+    FOQC                 => nmicf%FOQC,                 & !Guild share of DOC demand used to allocate the donor pool [-]
+    ECHZHeter            => nmicf%ECHZHeter,            & !Guild respiration fraction used to convert growth respiration to C uptake [-]
+    FGOCP                => nmicf%FGOCP,                & !DOC-supported fraction of total primary guild respiration [-]
+    RespGrossHeter       => nmicf%RespGrossHeter,       & !Gross respiration C equivalent from the primary heterotrophic pathway
+    FGOAP                => nmicf%FGOAP,                & !Acetate-supported fraction of total primary guild respiration [-]
+    TotActMicrobiom      => nmicdiag%TotActMicrobiom,   & !Layer total active microbial C across heterotrophs and autotrophs
+    CDOM                 => ncplxs%CDOM,                & !Dissolved substrate concentrations by DOM species and complex K
+    DOM                  => micstt%DOM,                 & !Dissolved organic pools by species (DOC, DON, DOP, acetate) and complex K
+    RO2DmndHetert        => micflx%RO2DmndHetert,       & !Guild O2 demand retained for substrate-competition accounting; zero for this anaerobic pathway
+    RDOCUptkHeter        => micflx%RDOCUptkHeter,       & !Potential DOC uptake used in guild substrate-competition accounting
+    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   & !Potential acetate uptake used in guild substrate-competition accounting
+    PSISoilMatricP       => micfor%PSISoilMatricP,      & !Soil matric water potential controlling microbial water stress
+    ZERO                 => micfor%ZERO,                & !Small dimensionless or concentration threshold used by the routine
+    TKS                  => micfor%TKS                  & !Layer absolute temperature [K]
   )
   !
   !     GOMX=acetate effect on energy yield
@@ -174,26 +174,26 @@ module MethanogenMod
   integer  :: NGL
 
   associate(                                                &
-    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &
-    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &
-    FSBSTAutor             => nmicdiag%FSBSTAutor,          &
-    OMActAutor             => nmics%OMActAutor,             &
-    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &
-    RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      &
-    RespGrossAutor         => nmicf%RespGrossAutor,         &
-    RO2UptkAutor           => nmicf%RO2UptkAutor,           &
-    RCO2ProdAutor          => nmicf%RCO2ProdAutor,          &
-    RCH4ProdAutor          => nmicf%RCH4ProdAutor,          &
-    ECHZAutor              => nmicf%ECHZAutor,              &
-    JGniA                  => micpar%JGniA,                 &
-    JGnfA                  => micpar%JGnfA,                 &
-    TKS                    => micfor%TKS,                   &
-    CH2GS                  => micstt%CH2GS,                 &
-    CCO2S                  => micstt%CCO2S,                 &
-    H2GS                   => micstt%H2GS,                  &
-    RH2UptkAutor           => nmicdiag%RH2UptkAutor,        &
-    RMaintRespAutor        => micflx%RMaintRespAutor,        &
-    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &
+    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &  !Temperature and water-potential multiplier on autotrophic growth [-]
+    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &  !Combined N/P stoichiometric multiplier on guild metabolic capacity [-]
+    FSBSTAutor             => nmicdiag%FSBSTAutor,          &  !Dissolved H2 concentration saturation factor for methanogenesis [-]
+    OMActAutor             => nmics%OMActAutor,             &  !Active microbial C biomass by autotrophic guild
+    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &  !Potential O2 demand supporting autotrophic gross respiration; zero for this anaerobic pathway
+    RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      &  !Realized O2 uptake attributed to autotrophic gross respiration; zero for this anaerobic pathway
+    RespGrossAutor         => nmicf%RespGrossAutor,         &  !Gross respiration C equivalent by autotrophic guild
+    RO2UptkAutor           => nmicf%RO2UptkAutor,           &  !Realized total O2 uptake by autotrophic guild; zero for this anaerobic pathway
+    RCO2ProdAutor          => nmicf%RCO2ProdAutor,          &  !CO2-C production by autotrophic guild; not referenced here
+    RCH4ProdAutor          => nmicf%RCH4ProdAutor,          &  !CH4-C production by autotrophic guild
+    ECHZAutor              => nmicf%ECHZAutor,              &  !Guild respiration fraction used to convert growth respiration to C uptake [-]
+    JGniA                  => micpar%JGniA,                 &  !First guild index for each autotrophic functional group; not referenced here
+    JGnfA                  => micpar%JGnfA,                 &  !Last guild index for each autotrophic functional group; not referenced here
+    TKS                    => micfor%TKS,                   &  !Layer absolute temperature [K]
+    CH2GS                  => micstt%CH2GS,                 &  !Dissolved H2 concentration used in energy-yield and saturation calculations
+    CCO2S                  => micstt%CCO2S,                 &  !Dissolved CO2-C concentration for substrate saturation
+    H2GS                   => micstt%H2GS,                  &  !Dissolved H2 donor pool
+    RH2UptkAutor           => nmicdiag%RH2UptkAutor,        &  !Accumulated H2 uptake for methane production; biomass H2 is added later
+    RMaintRespAutor        => micflx%RMaintRespAutor,        & !Total hourly autotrophic guild maintenance-C demand
+    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &  !Total autotrophic O2 demand from respiration and substrate oxidation; zero for this anaerobic pathway
   )
   !     begin_execution
   !

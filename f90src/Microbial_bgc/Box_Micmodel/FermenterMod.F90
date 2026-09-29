@@ -56,36 +56,36 @@ module FermenterMod
 
   ! begin_execution
   associate(                                            &
-    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, &
-    OMActHeter           => nmics%OMActHeter,           &
-    FSBSTHeter           => nmicdiag%FSBSTHeter,        &
-    GrowthEnvScalHeter   => nmics%GrowthEnvScalHeter,   &
-    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    &
-    RO2DmndHeter         => nmicf%RO2DmndHeter,         &
-    ECHZHeter            => nmicf%ECHZHeter,            &
-    FOQC                 => nmicf%FOQC,                 &
-    FOQA                 => nmicf%FOQA,                 &
-    RCH4ProdHeter        => nmicf%RCH4ProdHeter,        &
-    RO2Uptk4RespHeter    => nmicf%RO2Uptk4RespHeter,    &
-    RCO2ProdHeter        => nmicf%RCO2ProdHeter,        &
-    RespGrossHeter       => nmicf%RespGrossHeter,       &
-    RH2ProdHeter         => nmicf%RH2ProdHeter,         &
-    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  &
-    RAcetateProdHeter    => nmicf%RAcetateProdHeter,    &
-    TotActMicrobiom      => nmicdiag%TotActMicrobiom,   &
-    FGOCP                => nmicf%FGOCP,                &
-    FGOAP                => nmicf%FGOAP,                &
-    TKS                  => micfor%TKS,                 &
-    PSISoilMatricP       => micfor%PSISoilMatricP,      &
-    ZERO                 => micfor%ZERO,                &
-    DOM                  => micstt%DOM,                 &
-    CH2GS                => micstt%CH2GS,               &
-    COXYS                => micstt%COXYS,               &
-    RO2DmndHetert        => micflx%RO2DmndHetert,       &
-    RDOCUptkHeter        => micflx%RDOCUptkHeter,       &
-    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   &
-    mid_fermentor        => micpar%mid_fermentor,       &
-    CDOM                 => ncplxs%CDOM                 &
+    FBiomStoiScalarHeter => nmics%FBiomStoiScalarHeter, & !Combined N/P stoichiometric multiplier on guild metabolic capacity [-]
+    OMActHeter           => nmics%OMActHeter,           & !Active microbial C biomass by heterotrophic guild and complex K
+    FSBSTHeter           => nmicdiag%FSBSTHeter,        & !Guild substrate-response factor; larger values mean less limitation [-]
+    GrowthEnvScalHeter   => nmics%GrowthEnvScalHeter,   & !Temperature and water-potential multiplier on heterotrophic growth [-]
+    RO2Dmnd4RespHeter    => nmicf%RO2Dmnd4RespHeter,    & !Potential O2 demand supporting heterotrophic gross respiration; zero for this anaerobic pathway
+    RO2DmndHeter         => nmicf%RO2DmndHeter,         & !Total guild O2 demand before O2 limitation; zero for this anaerobic pathway
+    ECHZHeter            => nmicf%ECHZHeter,            & !Guild respiration fraction used to convert growth respiration to C uptake [-]
+    FOQC                 => nmicf%FOQC,                 & !Guild share of DOC demand used to allocate the donor pool [-]
+    FOQA                 => nmicf%FOQA,                 & !Guild share of acetate demand used to allocate the donor pool [-]
+    RCH4ProdHeter        => nmicf%RCH4ProdHeter,        & !CH4-C production by heterotrophic guild and complex
+    RO2Uptk4RespHeter    => nmicf%RO2Uptk4RespHeter,    & !Realized O2 uptake attributed to heterotrophic gross respiration; zero for this anaerobic pathway
+    RCO2ProdHeter        => nmicf%RCO2ProdHeter,        & !CO2-C production by heterotrophic guild and complex
+    RespGrossHeter       => nmicf%RespGrossHeter,       & !Gross respiration C equivalent from the primary heterotrophic pathway
+    RH2ProdHeter         => nmicf%RH2ProdHeter,         & !H2 production by heterotrophic guild and complex
+    ROQC4HeterMicrobAct  => nmicf%ROQC4HeterMicrobAct,  & !Guild activity proxy for substrate hydrolysis, with DOC concentration unconstrained
+    RAcetateProdHeter    => nmicf%RAcetateProdHeter,    & !Acetate-C production by heterotrophic guild and complex
+    TotActMicrobiom      => nmicdiag%TotActMicrobiom,   & !Layer total active microbial C across heterotrophs and autotrophs
+    FGOCP                => nmicf%FGOCP,                & !DOC-supported fraction of total primary guild respiration [-]
+    FGOAP                => nmicf%FGOAP,                & !Acetate-supported fraction of total primary guild respiration [-]
+    TKS                  => micfor%TKS,                 & !Layer absolute temperature [K]
+    PSISoilMatricP       => micfor%PSISoilMatricP,      & !Soil matric water potential controlling microbial water stress; not referenced here
+    ZERO                 => micfor%ZERO,                & !Small dimensionless or concentration threshold used by the routine
+    DOM                  => micstt%DOM,                 & !Dissolved organic pools by species (DOC, DON, DOP, acetate) and complex K
+    CH2GS                => micstt%CH2GS,               & !Dissolved H2 concentration used in energy-yield and saturation calculations
+    COXYS                => micstt%COXYS,               & !Dissolved O2 concentration
+    RO2DmndHetert        => micflx%RO2DmndHetert,       & !Guild O2 demand retained for substrate-competition accounting; zero for this anaerobic pathway
+    RDOCUptkHeter        => micflx%RDOCUptkHeter,       & !Potential DOC uptake used in guild substrate-competition accounting
+    RAcetateUptkHeter    => micflx%RAcetateUptkHeter,   & !Potential acetate uptake used in guild substrate-competition accounting
+    mid_fermentor        => micpar%mid_fermentor,       & !Functional-group identifier for fermenters
+    CDOM                 => ncplxs%CDOM                 & !Dissolved substrate concentrations by DOM species and complex K
   )
 
   !
