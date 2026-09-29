@@ -50,10 +50,23 @@ module NitrifierMod
   real(r8) :: VMXD4S
   real(r8) :: VMXD4B
   real(r8) :: ZNO2SX,ZNO2BX,XCO2
+  real(r8) :: FNH4,FNB4,NH4AvailSoil,NH4AvailBand
+  real(r8) :: NH4RemainingSoil,NH4RemainingBand
   integer  :: NGL
 !     begin_execution
   associate(                                                &
     FracNO2XupAutor        => nmics%FracNO2XupAutor,        & !Staged autotrophic nitrite-competition weight [-]
+    FracOMActAutor        => nmics%FracOMActAutor,        & !Guild fraction of active microbial C; fallback NH4 competition weight [-]
+    RNH4EcoDmndSoilPrev    => micfor%RNH4EcoDmndSoilPrev,  & !Previous-hour ecosystem nonband NH4-N demand
+    RNH4EcoDmndBandPrev    => micfor%RNH4EcoDmndBandPrev,  & !Previous-hour ecosystem fertilizer-band NH4-N demand
+    VLNH4                 => micfor%VLNH4,               & !Nonband NH4 fraction used in fallback competition [-]
+    VLNHB                 => micfor%VLNHB,               & !Fertilizer-band NH4 fraction used in fallback competition [-]
+    ZNH4S                 => micstt%ZNH4S,               & !Nonband NH4-N donor pool before microbial uptake
+    ZNH4B                 => micstt%ZNH4B,               & !Fertilizer-band NH4-N donor pool before microbial uptake
+    RNH3OxidAutorPrev      => micflx%RNH3OxidAutorPrev,    & !Previous-hour nonband NH4-N oxidation demand used for competition
+    RNH3OxidAutorBandPrev  => micflx%RNH3OxidAutorBandPrev,& !Previous-hour fertilizer-band NH4-N oxidation demand used for competition
+    RNH3OxidAutor          => micflx%RNH3OxidAutor,        & !Potential nonband NH4-N demand from aerobic oxidation plus denitrification
+    RNH3OxidAutorBand      => micflx%RNH3OxidAutorBand,    & !Potential fertilizer-band NH4-N demand from aerobic oxidation plus denitrification
     RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, & !Potential O2 demand supporting autotrophic gross respiration
     OMActAutor             => nmics%OMActAutor,             & !Active microbial C biomass by autotrophic guild
     RO2Uptk4RespAutor      => nmicf%RO2Uptk4RespAutor,      & !Realized O2 uptake attributed to autotrophic gross respiration
@@ -80,8 +93,8 @@ module NitrifierMod
     JGnfA                  => micpar%JGnfA,                 & !Last guild index for each autotrophic functional group
     RNO2XupAutorPrev       => micflx%RNO2XupAutorPrev,      & !Previous-hour autotrophic nonband NO2-N redox uptake; reaction depends on functional group; used for competition
     RNO2XupAutorBandPrev   => micflx%RNO2XupAutorBandPrev,  & !Previous-hour autotrophic fertilizer-band NO2-N redox uptake; reaction depends on functional group; used for competition
-    RNO2XupAutor           => micflx%RNO2XupAutor,          & !Nonband NO2-N consumed in nitrifier denitrification
-    RNO2XupAutorBand       => micflx%RNO2XupAutorBand       & !Fertilizer-band NO2-N consumed in nitrifier denitrification
+    RNO2XupAutor           => micflx%RNO2XupAutor,          & !Potential nonband NO2-N demand for nitrifier denitrification
+    RNO2XupAutorBand       => micflx%RNO2XupAutorBand       & !Potential fertilizer-band NO2-N demand for nitrifier denitrification
   )
   !
   !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -93,6 +106,9 @@ module NitrifierMod
   !
   RTotNH3OxidSoilAutor = SUM(RSMetaOxidSoilAutor(JGniA(N):JGnfA(N)))
   RTotNH3OxidBandAutor = SUM(RSMetaOxidBandAutor(JGniA(N):JGnfA(N)))
+  !Aerobic oxidation has already spent part of each compartment's donor pool.
+  NH4RemainingSoil = MAX(0._r8,ZNH4S-RTotNH3OxidSoilAutor)
+  NH4RemainingBand = MAX(0._r8,ZNH4B-RTotNH3OxidBandAutor)
   XCO2                 = CCO2S/(CCO2S+CCKM)
   DO NGL=JGniA(N),JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8 .or. RO2Dmnd4GrossRespAutor(NGL).LE.0.0_r8)cycle
@@ -109,6 +125,21 @@ module NitrifierMod
     ENDIF
     naqfdiag%TFNO2X=naqfdiag%TFNO2X+FNO2
     naqfdiag%TFNO2B=naqfdiag%TFNO2B+FNB2
+
+    !Reuse the NH4 allocation used by aerobic ammonia oxidation; denitrification
+    !can spend only the remainder of that allocation, in the same compartment.
+    IF(RNH4EcoDmndSoilPrev.GT.ZEROS)THEN
+      FNH4=AMAX1(FMN,RNH3OxidAutorPrev(NGL)/RNH4EcoDmndSoilPrev)
+    ELSE
+      FNH4=AMAX1(FMN,VLNH4*FracOMActAutor(NGL))
+    ENDIF
+    IF(RNH4EcoDmndBandPrev.GT.ZEROS)THEN
+      FNB4=AMAX1(FMN,RNH3OxidAutorBandPrev(NGL)/RNH4EcoDmndBandPrev)
+    ELSE
+      FNB4=AMAX1(FMN,VLNHB*FracOMActAutor(NGL))
+    ENDIF
+    NH4AvailSoil=MAX(0._r8,MIN(NH4RemainingSoil,FNH4*ZNH4S-RSMetaOxidSoilAutor(NGL)))
+    NH4AvailBand=MAX(0._r8,MIN(NH4RemainingBand,FNB4*ZNH4B-RSMetaOxidBandAutor(NGL)))
     !
     !     NO2 REDUCTION FROM SPECIFIC REDUCTION RATE, ENERGY YIELD,
     !     ACTIVE NITRIFIER BIOMASS, TEMPERATURE, AQUEOUS NO2 AND CO2
@@ -154,8 +185,12 @@ module NitrifierMod
     !NH3 consumed by denitrification below as new NO2 production.
     ZNO2SX                  = AZMAX1(ZNO2S+RTotNH3OxidSoilAutor)*FNO2
     ZNO2BX                  = AZMAX1(ZNO2B+RTotNH3OxidBandAutor)*FNB2
-    RNOxReduxAutorSoil(NGL) = AZMAX1(AMIN1(VMXD4S,ZNO2SX)) !NO2-> N2O
-    RNOxReduxAutorBand(NGL) = AZMAX1(AMIN1(VMXD4B,ZNO2BX))
+    !Two units of NO2-N require one unit of NH4-N. Limit the reaction before
+    !deriving respiration, biomass supply, and N2O production from its rate.
+    RNOxReduxAutorSoil(NGL) = AZMAX1(AMIN1(VMXD4S,ZNO2SX,2._r8*NH4AvailSoil))
+    RNOxReduxAutorBand(NGL) = AZMAX1(AMIN1(VMXD4B,ZNO2BX,2._r8*NH4AvailBand))
+    NH4RemainingSoil=MAX(0._r8,NH4RemainingSoil-0.5_r8*RNOxReduxAutorSoil(NGL))
+    NH4RemainingBand=MAX(0._r8,NH4RemainingBand-0.5_r8*RNOxReduxAutorBand(NGL))
 
     !total NO2 reduced
     RDNOT                      = RNOxReduxAutorSoil(NGL)+RNOxReduxAutorBand(NGL)
@@ -171,6 +206,10 @@ module NitrifierMod
     RNO3UptkAutor(NGL)         = 0.0_r8              !currently no NO3 reduction by nitrifiers
     RNO2XupAutor(NGL)          = VMXD4S
     RNO2XupAutorBand(NGL)      = VMXD4B
+    !Include both pathways in next hour's NH4 competition demand. Keep these
+    !potential demands separate from the donor-limited realized oxidation above.
+    RNH3OxidAutor(NGL)         = RNH3OxidAutor(NGL)+0.5_r8*VMXD4S
+    RNH3OxidAutorBand(NGL)     = RNH3OxidAutorBand(NGL)+0.5_r8*VMXD4B
 
     !NH4 oxidation by NO2(-), NH3+2NO2(-) -> 1.5N2O+2OH(-)+0.5H2O
     !NH4 -> N2O, 2NO2-> N2O
