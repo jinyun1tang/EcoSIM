@@ -1489,17 +1489,22 @@ module MicBGCMod
         RHydlysSorptOM(ielmc,K)        = SorbedOM(ielmc,K)*dHyd
         RHydlysSorptOM(ielmn,K)        = AZERO(SorbedOM(ielmn,K))*dHyd/FCNK(K)
         RHydlysSorptOM(ielmp,K)        = AZERO(SorbedOM(ielmp,K))*dHyd/FCPK(K)
-        RHydlysSorptOM(idom_acetate,K) = AZERO(SorbedOM(idom_acetate,K))*AZMAX1(AMIN1(1._r8,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS/BulkSOMC(K)))
 
         DO NE=1,NumPlantChemElms
           RHydlysSorptOM(NE,K) = AMIN1(SorbedOM(NE,K),RHydlysSorptOM(NE,K))
           tRHydlySoprtOM(NE)   = tRHydlySoprtOM(NE)+RHydlysSorptOM(NE,K)
         ENDDO
       ELSE
-        DO idom=idom_beg,idom_end
-          RHydlysSorptOM(idom,K)=0.0_r8
+        DO NE=1,NumPlantChemElms
+          RHydlysSorptOM(NE,K)=0.0_r8
         ENDDO
       ENDIF
+      !Acetate has its own donor and hydrolysis rate; it does not require
+      !sorbed DOC. Retain its existing rate law without DOC product inhibition.
+      RHydlysSorptOM(idom_acetate,K) = AZERO(SorbedOM(idom_acetate,K)) &
+        *AZMAX1(AMIN1(1._r8,SPOHA*ROQC4HeterMicActCmpK(K)*DFNS/BulkSOMC(K)))
+      !The elemental C diagnostic includes both DOC-C and acetate-C release.
+      tRHydlySoprtOM(ielmc) = tRHydlySoprtOM(ielmc)+RHydlysSorptOM(idom_acetate,K)
     ELSE
 
       DO idom=idom_beg,idom_end          
