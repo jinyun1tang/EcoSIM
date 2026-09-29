@@ -2938,12 +2938,14 @@ module MicBGCMod
   character(len=*), parameter :: subname='GatherHeterotrophRespiration'
   integer :: MID3,MID1
   REAL(R8) :: FPH,RMOMX
-  real(r8) :: RGN2P
+  real(r8) :: RGN2P,DenitResp,FracDenitResp4Maint
 !     begin_execution
   associate(                                                   &
     TempMaintRHeter         => nmics%TempMaintRHeter,          & !Guild temperature multiplier on heterotrophic maintenance [-]; not referenced here
     OMN2                    => nmics%OMN2,                     & !Active structural heterotrophic N by guild and complex K; not referenced here
     Resp4NFixHeter          => nmicf%Resp4NFixHeter,           & !Respiration-C cost of heterotrophic N2 fixation
+    RNOxDOCReduxRespDenitLim => nmicf%RNOxDOCReduxRespDenitLim, & !DOC-C respiration supported by denitrification
+    RNOxAcetReduxRespDenitLim => nmicf%RNOxAcetReduxRespDenitLim, & !Acetate-C respiration supported by denitrification
     RespGrossHeter          => nmicf%RespGrossHeter,           & !Gross respiration C equivalent from the primary heterotrophic pathway
     RMaintRespHeter         => nmicf%RMaintRespHeter,          & !Total hourly heterotrophic maintenance-C demand by guild and complex
     RMaintDmndHeter         => nmicf%RMaintDmndHeter,          & !Maintenance-C demand by live compartment, heterotrophic guild and complex; not referenced here
@@ -2971,7 +2973,13 @@ module MicBGCMod
   !
   !
   RGrowthRespHeter(NGL,K) = AZMAX1(RespGrossHeter(NGL,K)-RMaintRespHeter(NGL,K))
-  RMaintDefcitcitHeter    = AZMAX1(RMaintRespHeter(NGL,K)-RespGrossHeter(NGL,K))
+  !
+  !Keep primary growth respiration separate; reserve denitrification energy
+  !for any remaining maintenance before its growth uptake is calculated below.
+  !
+  DenitResp=RNOxDOCReduxRespDenitLim(NGL,K)+RNOxAcetReduxRespDenitLim(NGL,K)
+  call ReserveDenitrifMaintenance(RMaintRespHeter(NGL,K),RespGrossHeter(NGL,K), &
+    DenitResp,EO2X,ENOX,FracDenitResp4Maint,RMaintDefcitcitHeter)
   !
   !     N2 FIXATION: N=(6) AEROBIC, (7) ANAEROBIC
   !     FROM GROWTH RESPIRATION, FIXATION ENERGY REQUIREMENT,
@@ -3028,6 +3036,7 @@ module MicBGCMod
 
   real(r8) :: RCCC,RCCN,RCCP  
   real(r8) :: CGOMX,CGOMD,AGOMD
+  real(r8) :: DenitResp,FracDenitResp4Maint,MaintDOC,MaintAcet
   real(r8) :: CGOXC              !DOC+acetate uptake flux, [gC d-2 h-1]
   real(r8) :: CGOMZ
   real(r8) :: SPOMX
@@ -3113,8 +3122,15 @@ module MicBGCMod
     CGOMX = AMIN1(RMaintRespHeter(NGL,K),RespGrossHeter(NGL,K))+Resp4NFixHeter(NGL,K)+(RGrowthRespHeter(NGL,K)-Resp4NFixHeter(NGL,K))/ECHZHeter(NGL,K)    
   endif
 
-  CGOMD     = RNOxDOCReduxRespDenitLim(NGL,K)/ENOX
-  AGOMD     = RNOxAcetReduxRespDenitLim(NGL,K)/ENOX
+  DenitResp=RNOxDOCReduxRespDenitLim(NGL,K)+RNOxAcetReduxRespDenitLim(NGL,K)
+  call ReserveDenitrifMaintenance(RMaintRespHeter(NGL,K),RespGrossHeter(NGL,K), &
+    DenitResp,EO2X,ENOX,FracDenitResp4Maint)
+  !Reserve maintenance proportionally from DOC and acetate respiration. Only
+  !the remaining respiration earns growth-associated substrate uptake.
+  MaintDOC=RNOxDOCReduxRespDenitLim(NGL,K)*FracDenitResp4Maint
+  MaintAcet=RNOxAcetReduxRespDenitLim(NGL,K)*FracDenitResp4Maint
+  CGOMD=MaintDOC+(RNOxDOCReduxRespDenitLim(NGL,K)-MaintDOC)/ENOX
+  AGOMD=MaintAcet+(RNOxAcetReduxRespDenitLim(NGL,K)-MaintAcet)/ENOX
   CDOMuptk1 = CDOMuptk1+CGOMX !DOC used for growth
   CDOMuptk2 = CDOMuptk2+CGOMD !DOC used for denitrifcation
   tROMT     = tROMT+RMaintRespHeter(NGL,K)

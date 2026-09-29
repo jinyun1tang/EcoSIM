@@ -23,6 +23,42 @@ module MicrobMathFuncMod
   contains
 !------------------------------------------------------------------------
 
+  subroutine ReserveDenitrifMaintenance(MaintDemand,PrimaryResp,DenitResp, &
+    AerobicRespFrac,DenitRespFrac,FracDenitResp4Maint,MaintDeficit)
+  !
+  !Description:
+  !Maintenance demand retains its existing aerobic respiratory-C basis.
+  !The yield relation (1/eta-1)=energy yield/growth energy cost converts
+  !denitrification respiration to that basis using EO2X and ENOX, which
+  !share EOMC. This leaves the primary pathway's maintenance convention intact.
+  implicit none
+  real(r8), intent(in) :: MaintDemand,PrimaryResp,DenitResp
+  real(r8), intent(in) :: AerobicRespFrac,DenitRespFrac
+  real(r8), intent(out) :: FracDenitResp4Maint !Fraction of denitrification respiration reserved for maintenance
+  real(r8), optional, intent(out) :: MaintDeficit !Remaining demand in primary respiratory-C units
+  real(r8) :: RemainingDemand,DenitMaintYield,DenitMaintSupply
+
+  RemainingDemand     = AZMAX1(MaintDemand-PrimaryResp)
+  FracDenitResp4Maint = 0._r8
+
+  IF(RemainingDemand.GT.0._r8 .AND. DenitResp.GT.0._r8)THEN
+    IF(AerobicRespFrac.GT.0._r8 .AND. AerobicRespFrac.LT.1._r8 &
+      .AND. DenitRespFrac.GT.0._r8 .AND. DenitRespFrac.LT.1._r8)THEN
+      DenitMaintYield  = (1._r8/DenitRespFrac-1._r8)/(1._r8/AerobicRespFrac-1._r8)
+      DenitMaintSupply = DenitResp*DenitMaintYield
+      IF(DenitMaintSupply.GE.RemainingDemand)THEN
+        FracDenitResp4Maint = RemainingDemand/DenitMaintSupply
+        RemainingDemand     = 0._r8
+      ELSE
+        FracDenitResp4Maint = 1._r8
+        RemainingDemand     = AZMAX1(RemainingDemand-DenitMaintSupply)
+      ENDIF
+    ENDIF
+  ENDIF
+  IF(PRESENT(MaintDeficit))MaintDeficit=RemainingDemand
+  end subroutine ReserveDenitrifMaintenance
+!------------------------------------------------------------------------
+
   subroutine MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
   !
   !the physiological temperature dependence of microbes

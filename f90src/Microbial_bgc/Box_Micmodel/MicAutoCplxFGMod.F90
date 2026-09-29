@@ -328,6 +328,7 @@ module MicAutoCPLXMod
   integer :: M,K,MID3,MID,MID1,NE,idom,NGL
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
+  real(r8) :: FracDenitResp4Maint,MaintDenitResp
   real(r8) :: CXC,RCCE(NumPlantChemElms)
   real(r8) :: CGOXC
   real(r8) :: C3C,CNC,CPC
@@ -395,7 +396,11 @@ module MicAutoCPLXMod
     !potential growth respiraiton-respiraiton for N2-fixation 
     DOMuptk4GrothAutor(idom_beg:idom_end,NGL)=0._r8
     CGOMX = AMIN1(RMaintRespAutor(NGL),RespGrossAutor(NGL))+Resp4NFixAutor(NGL)+(RGrowthRespAutor(NGL)-Resp4NFixAutor(NGL))/ECHZAutor(NGL)
-    CGOMD = RNOxReduxRespAutorLim(NGL)/ENOX         !CO2 synthesis due to NO2(-) reduction by NH3
+    call ReserveDenitrifMaintenance(RMaintRespAutor(NGL),RespGrossAutor(NGL), &
+      RNOxReduxRespAutorLim(NGL),EO2X,ENOX,FracDenitResp4Maint)
+    !CO2 supplies maintenance respiration plus uptake for the remaining growth.
+    MaintDenitResp=RNOxReduxRespAutorLim(NGL)*FracDenitResp4Maint
+    CGOMD=MaintDenitResp+(RNOxReduxRespAutorLim(NGL)-MaintDenitResp)/ENOX
 
     !C entering the biomass/respiration pathway, supplied by CO2 or CH4.
     !For aerobic methanotrophs, this is CH4 uptake for maintenance and growth.
@@ -1189,11 +1194,12 @@ module MicAutoCPLXMod
   type(Microbe_State_type), intent(inout) :: nmics
   type(Microbe_Flux_type), intent(inout) :: nmicf
   character(len=*), parameter :: subname='GatherAutotrophRespiration'
-  real(r8) :: RGN2P
+  real(r8) :: RGN2P,FracDenitResp4Maint
   integer  :: NGL
 !     begin_execution
   associate(                                             &
     OMActAutor           => nmics%OMActAutor,            & !Active microbial C biomass by autotrophic guild
+    RNOxReduxRespAutorLim => nmicf%RNOxReduxRespAutorLim, & !C-equivalent respiration supported by nitrifier denitrification
     RespGrossAutor       => nmicf%RespGrossAutor,        & !Gross respiration C equivalent by autotrophic guild
     Resp4NFixAutor       => nmicf%Resp4NFixAutor,        & !Autotrophic respiration-C cost of N2 fixation (currently set to zero)
     RN2FixAutor          => nmicf%RN2FixAutor,           & !Autotrophic guild N2 fixation flux (set to zero in current respiration gathering)
@@ -1214,7 +1220,10 @@ module MicAutoCPLXMod
   DO NGL=JGniA(N),JGnfA(N)
     IF(OMActAutor(NGL).LE.0.0_r8)cycle      
     RGrowthRespAutor(NGL)     = AZMAX1(RespGrossAutor(NGL)-RMaintRespAutor(NGL))
-    RMaintDefcitcitAutor(NGL) = AZMAX1(RMaintRespAutor(NGL)-RespGrossAutor(NGL))
+    !Primary growth respiration remains separate from the denitrification
+    !pathway; both can supply maintenance on the same reference energy basis.
+    call ReserveDenitrifMaintenance(RMaintRespAutor(NGL),RespGrossAutor(NGL), &
+      RNOxReduxRespAutorLim(NGL),EO2X,ENOX,FracDenitResp4Maint,RMaintDefcitcitAutor(NGL))
     !
     !     N2 FIXATION: N=(6) AEROBIC, (7) ANAEROBIC
     !     FROM GROWTH RESPIRATION, FIXATION ENERGY REQUIREMENT,
