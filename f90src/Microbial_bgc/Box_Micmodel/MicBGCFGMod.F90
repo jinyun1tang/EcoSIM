@@ -2638,8 +2638,9 @@ module MicBGCMod
     RINHX                      = AMIN1(RINHP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*Z4MX)
     RNH4DmndSoilHeter(NGL,K)   = FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
     RNH4DmndBandHeter(NGL,K)   = FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
-    ZNH4M                      = Z4MN*VOLWU*FNH4S
-    ZNHBM                      = Z4MN*VOLWU*FNHBS
+    !Local donor thresholds use this layer; VOLWU is for underlying-soil access.
+    ZNH4M                      = Z4MN*VLWatMicP*FNH4S
+    ZNHBM                      = Z4MN*VLWatMicP*FNHBS
     RNH4imobilSoilHeter(NGL,K) = AMIN1(FNH4X*AZMAX1((ZNH4S-ZNH4M)),RNH4DmndSoilHeter(NGL,K))
     RNH4imobilBandHeter(NGL,K) = AMIN1(FNB4X*AZMAX1((ZNH4B-ZNHBM)),RNH4DmndBandHeter(NGL,K))
     !mineralization  (<0._r8)
@@ -2681,8 +2682,8 @@ module MicBGCMod
     RINOX                      = AMIN1(RINOP,BIOA*OMActHeter(NGL,K)*GrowthEnvScalHeter(NGL,K)*ZOMX)
     RNO3DmndSoilHeter(NGL,K)   = FNO3S*RINOX*CNO3X/(CNO3X+ZOKU)
     RNO3DmndBandHeter(NGL,K)   = FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
-    ZNO3M                      = ZOMN*VOLWU*FNO3S
-    ZNOBM                      = ZOMN*VOLWU*FNO3B
+    ZNO3M                      = ZOMN*VLWatMicP*FNO3S
+    ZNOBM                      = ZOMN*VLWatMicP*FNO3B
     RNO3imobilSoilHeter(NGL,K) = AMIN1(FNO3X*AZMAX1((ZNO3S-ZNO3M)),RNO3DmndSoilHeter(NGL,K))
     RNO3imobilBandHeter(NGL,K) = AMIN1(FNB3X*AZMAX1((ZNO3B-ZNOBM)),RNO3DmndBandHeter(NGL,K))
     !mineralization, 
