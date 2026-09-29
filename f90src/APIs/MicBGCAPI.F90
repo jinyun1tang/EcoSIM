@@ -515,7 +515,8 @@ implicit none
   ROQC4HeterMicActCmpK_vr(1:KL,L,NY,NX)          = nmicdiag%ROQC4HeterMicActCmpK(1:KL)
   RHydrolysisScalCmpK_vr(1:KL,L,NY,NX) = nmicdiag%RHydrolysisScalCmpK(1:KL)
   trcs_RMicbUptake_vr(idg_CO2,L,NY,NX) = micflx%RCO2NetUptkMicb
-  trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) = naqfdiag%tCH4OxiANMO+naqfdiag%tCH4OxiAero-naqfdiag%tCH4ProdAceto-naqfdiag%tCH4ProdH2
+  !Net CH4 uptake includes aerobic biomass/respiration demand as well as oxidation.
+  trcs_RMicbUptake_vr(idg_CH4,L,NY,NX) = micflx%RCH4UptkAutor
   trcs_RMicbUptake_vr(idg_H2,L,NY,NX)  = micflx%RH2NetUptkMicb
   trcs_RMicbUptake_vr(idg_O2,L,NY,NX)  = micflx%RO2UptkMicb
   trcs_RMicbUptake_vr(idg_N2,L,NY,NX)  = micflx%RN2NetUptkMicb+micflx%MicrbN2Fix

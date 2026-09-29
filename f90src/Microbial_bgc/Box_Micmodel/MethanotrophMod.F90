@@ -53,39 +53,41 @@ module MethanotrophMod
   real(r8) :: VMAX1,VOLWCH
   real(r8) :: RVOXP1
   real(r8) :: VMAX,FCH4X
-  real(r8) :: pscal
+  real(r8) :: RespPerOxidC,GrowthPerRespC
+  real(r8) :: MaintRemaining,CH4Available,OxidMaxCH4,GrowthC1
   REAL(R8) :: VOLWPM
 
   associate(                                                &
-    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &
-    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &
-    FSBSTAutor             => nmicdiag%FSBSTAutor,          &
-    OMActAutor             => nmics%OMActAutor,             &
-    FracOMActAutor         => nmics%FracOMActAutor,         &
-    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &
-    RespGrossAutor         => nmicf%RespGrossAutor,         &
-    ECHZAutor              => nmicf%ECHZAutor,              &
-    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &
-    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &
-    CCH4E                  => micfor%CCH4E,                 &
-    VLsoiAirPM             => micfor%VLsoiAirPM,            &
-    VLWatMicPM             => micfor%VLWatMicPM,            &
-    ZEROS2                 => micfor%ZEROS2,                &
-    ZEROS                  => micfor%ZEROS,                 &
-    THETPM                 => micfor%THETPM,                &
-    DiffusivitySolutEff    => micfor%DiffusivitySolutEff,   &
-    litrm                  => micfor%litrm,                 &
-    JGniA                  => micpar%JGniA,                 &
-    JGnfA                  => micpar%JGnfA,                 &
-    CCH4G                  => micstt%CCH4G,                 &
-    CH4S                   => micstt%CH4S,                  &
-    RCH4MetaDmndAutor      => micflx%RCH4MetaDmndAutor,     &
-    RCH4MetaDmndAutorPrev  => micflx%RCH4MetaDmndAutorPrev, &
-    CH4AquaSolubility      => micstt%CH4AquaSolubility,     &
-    RCH4EcoDmndPrev        => micfor%RCH4EcoDmndPrev,       &
-    RCH4PhysexchPrev       => micfor%RCH4PhysexchPrev,      &
-    RCH4GasXchangePrev     => micfor%RCH4GasXchangePrev,    &
-    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &
+    GrowthEnvScalAutor     => nmics%GrowthEnvScalAutor,     &                !Guild growth response to temperature and soil water potential [-]
+    FBiomNutStoiScalAutor  => nmics%FBiomNutStoiScalAutor,  &                !Guild nutrient-status multiplier on metabolic capacity [-]
+    FSBSTAutor             => nmicdiag%FSBSTAutor,          &                !CH4 concentration saturation factor for the current gas substep [-]
+    OMActAutor             => nmics%OMActAutor,             &                !Active microbial C biomass of each guild
+    FracOMActAutor         => nmics%FracOMActAutor,         &                !Guild fraction of total active microbial C; fallback competition share [-]
+    RO2Dmnd4GrossRespAutor => nmicf%RO2Dmnd4GrossRespAutor, &                !Potential O2 demand from gross respiration alone (2.667*R)
+    RespGrossAutor         => nmicf%RespGrossAutor,         &                !Guild gross respiration R; later reduced by O2 limitation
+    ECHZAutor              => nmicf%ECHZAutor,              &                !Respiration fraction eta; set to EH4X for aerobic methanotrophs [-]
+    RSMetaOxidSoilAutor    => nmicf%RSMetaOxidSoilAutor,    &                !Direct CH4-C oxidation P, excluding biomass/respiration-pathway uptake
+    RSMetaOxidBandAutor    => nmicf%RSMetaOxidBandAutor,    &                !Fertilizer-band oxidation counterpart; set to zero for this CH4 pathway
+    CCH4E                  => micfor%CCH4E,                 &                !Atmospheric CH4-C concentration used for surface-litter gas supply
+    VLsoiAirPM             => micfor%VLsoiAirPM,            &                !Soil air volume at each outer transport substep M
+    VLWatMicPM             => micfor%VLWatMicPM,            &                !Micropore water volume at each outer transport substep M
+    ZEROS2                 => micfor%ZEROS2,                &                !Small water-volume threshold for enabling the CH4 substep calculation
+    ZEROS                  => micfor%ZEROS,                 &                !Small threshold for demand competition and gas-exchange calculations
+    THETPM                 => micfor%THETPM,                &                !Air-filled soil pore fraction at each outer transport substep M [-]
+    DiffusivitySolutEff    => micfor%DiffusivitySolutEff,   &                !Gas-water exchange coefficient at each outer transport substep M
+    litrm                  => micfor%litrm,                 &                !True for surface litter; selects atmospheric gas supply and its rate cap
+    JGniA                  => micpar%JGniA,                 &                !First guild index for each functional group N
+    JGnfA                  => micpar%JGnfA,                 &                !Last guild index for each functional group N
+    CCH4G                  => micstt%CCH4G,                 &                !Soil gas-phase CH4-C concentration
+    CH4S                   => micstt%CH4S,                  &                !Layer dissolved CH4-C pool before allocation among competing guilds
+    RMaintRespAutor        => micflx%RMaintRespAutor,       &                !Hourly guild maintenance C demand; counted once across gas substeps
+    RCH4MetaDmndAutor      => micflx%RCH4MetaDmndAutor,     &                !Guild CH4 demand: P here; biomass/respiration uptake added in aggregation
+    RCH4MetaDmndAutorPrev  => micflx%RCH4MetaDmndAutorPrev, &                !Previous-hour guild CH4 demand used to calculate its competition share
+    CH4AquaSolubility      => micstt%CH4AquaSolubility,     &                !Equilibrium aqueous-to-gas CH4 concentration ratio [-]
+    RCH4EcoDmndPrev        => micfor%RCH4EcoDmndPrev,       &                !Previous-hour ecosystem CH4 demand; competition-share denominator
+    RCH4PhysexchPrev       => micfor%RCH4PhysexchPrev,      &                !Previous-hour net aqueous CH4-C transport; positive supplies this layer
+    RCH4GasXchangePrev     => micfor%RCH4GasXchangePrev,    &                !Previous-hour net gaseous CH4-C transport; positive supplies this layer
+    RO2MetaDmndAutor       => micflx%RO2MetaDmndAutor       &                !Total potential O2 demand from direct CH4 oxidation plus gross respiration
   )
 !     begin_execution
 !
@@ -123,6 +125,8 @@ module MethanotrophMod
     ENDIF
 
     ECHZAutor(NGL) = EH4X
+    RespPerOxidC   = ECHO*ECHZAutor(NGL)
+    GrowthPerRespC = 1._r8/ECHZAutor(NGL)-1._r8
     VMAX           = GrowthEnvScalAutor(NGL)*FBiomNutStoiScalAutor(NGL)*OMActAutor(NGL)*VMXCH4OxiAero
     RCH4L1         = RCH4PhysexchPrev*dts_gas*FCH4X
     RCH4F1         = RCH4GasXchangePrev*dts_gas*FCH4X
@@ -168,16 +172,20 @@ module MethanotrophMod
           CCH4S1          = safe_adb(CH4S1,VLWatMicPM(M))
           FSBSTAutor(NGL) = CCH4S1/(CCH4S1+CCK4)
 
-          !CH4->CH2O->CO2
-          !RVOXP1 CH4 used to produce energy
-          !ECHO: carbon yield,
-          !ECHZAutor(NGL): respiration ratio
-          !CH4 is oxidized to generate energy RVOXP1, which supports the production of RGOMP1
-          RVOXP1=AMIN1(CH4S1*0.9999_r8/(1.0_r8+ECHO*ECHZAutor(NGL)),VMAX1*FSBSTAutor(NGL))
-
-          !the respiration yield of CH2O
-          RGOMP1 = RVOXP1*ECHO*ECHZAutor(NGL)
-          CH4S1  = CH4S1-RVOXP1-RGOMP1
+          !Reserve CH4 for direct oxidation, respiration, and retained biomass.
+          !Only respiration beyond the remaining hourly maintenance demand
+          !supports growth; do not grant the full maintenance allowance each substep.
+          MaintRemaining = MAX(0._r8,RMaintRespAutor(NGL)-RGOMP)
+          CH4Available = 0.9999_r8*CH4S1
+          OxidMaxCH4 = CH4Available/(1._r8+RespPerOxidC)
+          IF(RespPerOxidC*OxidMaxCH4.GT.MaintRemaining)THEN
+            OxidMaxCH4 = (CH4Available+GrowthPerRespC*MaintRemaining) &
+              /(1._r8+RespPerOxidC+GrowthPerRespC*RespPerOxidC)
+          ENDIF
+          RVOXP1 = MAX(0._r8,AMIN1(OxidMaxCH4,VMAX1*FSBSTAutor(NGL)))
+          RGOMP1 = RVOXP1*RespPerOxidC
+          GrowthC1 = MAX(0._r8,RGOMP1-MaintRemaining)*GrowthPerRespC
+          CH4S1 = CH4S1-RVOXP1-RGOMP1-GrowthC1
           !dissolution-vaporization
           IF(THETPM(M).GT.AirFillPore_Min)THEN
             RCHDF=DiffusivitySolutEff(M)*(AMAX1(ZEROS,CH4G1)*VOLWCH-CH4S1*VLsoiAirPM(M))/VOLWPM
@@ -197,17 +205,10 @@ module MethanotrophMod
     RVOXPB = 0.0_r8
     !
     !     O2 DEMAND FROM CH4 OXIDATION
-    ! CH4 taken up is partitioned into RVOXP and RGOMP/ECHZAutor(NGL)
-    ! RGOMP/ECHZAutor(NGL) is partitioned into growth + maintenance respiraiton + growth
-    ! with growth = growth respiration*(1/ECHZAutor(NGL)-1).
-    ! thus the uptake for growth is growth respiration/ECHZAutor(NGL),
-    ! so the total upatke is RVOXP + maintenance + uptake for growth
-    ! note maintenance + growth_resp/ECHZAutor(NGL) = gross_resp/ECHZAutor(NGL)+(1-/ECHZAutor(NGL))*maintenance
-    ! < gross_resp/ECHZAutor(NGL), meaning the model does not have exact stoichiometry balance.
-    !     RO2Dmnd4RespHeter=O2 demand from respiration
-    !     ROXYP=O2 demand from respiration + CH4 oxidation
-    !CH4+O2  -> CH2O + H2O, RGOXP*ECHO
-    !CH2O+O2 -> CO2 + 2H2O, RGOMP as CO2
+    !The CH4 budget above includes RVOXP+RGOMP+retained growth C.
+    !Subsequent O2 limitation scales oxidation and respiration down; the shared
+    !anabolic calculation then recomputes growth using the hourly maintenance.
+    !The existing O2 demand uses direct oxidation and gross respiration below.
     RO2Dmnd4GrossRespAutor(NGL) = 2.667_r8*RGOMP
     RO2MetaDmndAutor(NGL)       = RO2Dmnd4GrossRespAutor(NGL)+5.333_r8*RVOXP
     RCH4MetaDmndAutor(NGL)      = RVOXPA
@@ -251,42 +252,42 @@ module MethanotrophMod
   integer :: NGL
 
   associate(                                              &
-   GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &
-   FBiomNutStoiScalAutor => nmics%FBiomNutStoiScalAutor,  &
-   FracOMActAutor        => nmics%FracOMActAutor,         &
-   RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,   &
-   RNO2XupAutorPrev      => micflx%RNO2XupAutorPrev,      &
-   RNO2XupAutorBandPrev  => micflx%RNO2XupAutorBandPrev,  &
-   RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,   &
-   RNO2XupAutor          => micflx%RNO2XupAutor,          &
-   RNO2XupAutorBand      => micflx%RNO2XupAutorBand,      &
-   FracNO2XupAutor       => nmics%FracNO2XupAutor,        &
-   FSBSTAutor            => nmicdiag%FSBSTAutor,          &
-   OMActAutor            => nmics%OMActAutor,             &
-   RCH4MetaDmndAutor     => micflx%RCH4MetaDmndAutor,     &
-   RCH4MetaDmndAutorPrev => micflx%RCH4MetaDmndAutorPrev, &
-   RCH4EcoDmndPrev       => micfor%RCH4EcoDmndPrev,       &
-   RNOxReduxAutorSoil    => nmicf%RNOxReduxAutorSoil,     & !NO2(-) reduction by N2
-   RNOxReduxAutorBand    => nmicf%RNOxReduxAutorBand,     & !NO2(-) reduction by N2
-   RSMetaOxidSoilAutor   => nmicf%RSMetaOxidSoilAutor,    &
-   COXYS                 => micstt%COXYS,                 &
-   ZEROS                 => micfor%ZEROS,                 &
-   CCO2S                 => micstt%CCO2S,                 &
-   RespGrossAutor        => nmicf%RespGrossAutor,         &
-   RCO2ProdAutor         => nmicf%RCO2ProdAutor,          &
-   ECHZAutor             => nmicf%ECHZAutor,              &
-   VLNO3                 => micfor%VLNO3,                 &
-   VLNOB                 => micfor%VLNOB,                 &
-   ZERO                  => micfor%ZERO,                  &
-   JGniA                 => micpar%JGniA,                 &
-   JGnfA                 => micpar%JGnfA,                 &
-   TKS                   => micfor%TKS,                   &
-   CCH4S                 => micstt%CCH4S,                 &
-   ZNO2B                 => micstt%ZNO2B,                 &
-   ZNO2S                 => micstt%ZNO2S,                 &
-   CNO2B                 => micstt%CNO2B,                 &
-   CNO2S                 => micstt%CNO2S,                 &
-   CH4S                  => micstt%CH4S                   &
+   GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &                 !Guild growth response to temperature and soil water potential [-]
+   FBiomNutStoiScalAutor => nmics%FBiomNutStoiScalAutor,  &                 !Guild nutrient-status multiplier on metabolic capacity [-]
+   FracOMActAutor        => nmics%FracOMActAutor,         &                 !Guild fraction of total active microbial C; fallback competition share [-]
+   RNO2EcoUptkSoilPrev   => micfor%RNO2EcoUptkSoilPrev,   &                 !Previous-hour ecosystem nonband nitrite-N uptake; competition denominator
+   RNO2XupAutorPrev      => micflx%RNO2XupAutorPrev,      &                 !Previous-hour guild nonband nitrite-N uptake; competition numerator
+   RNO2XupAutorBandPrev  => micflx%RNO2XupAutorBandPrev,  &                 !Previous-hour guild band nitrite-N uptake; competition numerator
+   RNO2EcoUptkBandPrev   => micfor%RNO2EcoUptkBandPrev,   &                 !Previous-hour ecosystem band nitrite-N uptake; competition denominator
+   RNO2XupAutor          => micflx%RNO2XupAutor,          &                 !Guild nonband nitrite-N uptake for methane oxidation
+   RNO2XupAutorBand      => micflx%RNO2XupAutorBand,      &                 !Guild fertilizer-band nitrite-N uptake for methane oxidation
+   FracNO2XupAutor       => nmics%FracNO2XupAutor,        &                 !Staged guild nitrite-competition weight used when previous uptake is negligible
+   FSBSTAutor            => nmicdiag%FSBSTAutor,          &                 !Shared substrate-saturation diagnostic; not used in this routine
+   OMActAutor            => nmics%OMActAutor,             &                 !Active microbial C biomass of each guild
+   RCH4MetaDmndAutor     => micflx%RCH4MetaDmndAutor,     &                 !Guild CH4-C oxidation demand used in subsequent competition accounting
+   RCH4MetaDmndAutorPrev => micflx%RCH4MetaDmndAutorPrev, &                 !Previous-hour guild CH4 demand used to calculate its competition share
+   RCH4EcoDmndPrev       => micfor%RCH4EcoDmndPrev,       &                 !Previous-hour ecosystem CH4 demand; competition-share denominator
+   RNOxReduxAutorSoil    => nmicf%RNOxReduxAutorSoil,     &                 !Nonband NO2-N reduction to N2-N coupled to CH4 oxidation
+   RNOxReduxAutorBand    => nmicf%RNOxReduxAutorBand,     &                 !Fertilizer-band NO2-N reduction to N2-N coupled to CH4 oxidation
+   RSMetaOxidSoilAutor   => nmicf%RSMetaOxidSoilAutor,    &                 !Total CH4-C oxidation supported by band and nonband acceptor reduction
+   COXYS                 => micstt%COXYS,                 &                 !Dissolved O2 concentration used to inhibit anaerobic methane oxidation
+   ZEROS                 => micfor%ZEROS,                 &                 !Small threshold for previous-demand competition denominators
+   CCO2S                 => micstt%CCO2S,                 &                 !Dissolved CO2-C concentration used for the CO2 saturation factor
+   RespGrossAutor        => nmicf%RespGrossAutor,         &                 !Gross respiration C equivalent, equal to CH4-C oxidized in this pathway
+   RCO2ProdAutor         => nmicf%RCO2ProdAutor,          &                 !Catabolic CO2-C release; environmental CO2 for biomass is debited separately
+   ECHZAutor             => nmicf%ECHZAutor,              &                 !Energy-dependent respiration fraction eta, bounded between EO2X and 1 [-]
+   VLNO3                 => micfor%VLNO3,                 &                 !Nonband soil fraction used to partition electron-acceptor uptake capacity [-]
+   VLNOB                 => micfor%VLNOB,                 &                 !Fertilizer-band fraction used to partition electron-acceptor uptake capacity [-]
+   ZERO                  => micfor%ZERO,                  &                 !Small electron-acceptor concentration threshold for enabling uptake
+   JGniA                 => micpar%JGniA,                 &                 !First guild index for each functional group N
+   JGnfA                 => micpar%JGnfA,                 &                 !Last guild index for each functional group N
+   TKS                   => micfor%TKS,                   &                 !Layer absolute temperature in the methane-dependent energy calculation [K]
+   CCH4S                 => micstt%CCH4S,                 &                 !Dissolved CH4-C concentration for saturation and energy-yield calculations
+   ZNO2B                 => micstt%ZNO2B,                 &                 !Fertilizer-band nitrite-N donor pool available for competition-weighted uptake
+   ZNO2S                 => micstt%ZNO2S,                 &                 !Nonband nitrite-N donor pool available for competition-weighted uptake
+   CNO2B                 => micstt%CNO2B,                 &                 !Fertilizer-band dissolved nitrite-N concentration for uptake saturation
+   CNO2S                 => micstt%CNO2S,                 &                 !Nonband dissolved nitrite-N concentration for uptake saturation
+   CH4S                  => micstt%CH4S                   &                 !Layer dissolved CH4-C pool before competition-weighted donor allocation
   )
   call PrintInfo('beg '//subname)
   FNO2S = VLNO3
@@ -395,42 +396,42 @@ module MethanotrophMod
   integer :: NGL
 
   associate(                                              &
-   GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &
-   FBiomNutStoiScalAutor => nmics%FBiomNutStoiScalAutor,  &
-   FSBSTAutor            => nmicdiag%FSBSTAutor,          &
-   FracOMActAutor        => nmics%FracOMActAutor,         &
-   OMActAutor            => nmics%OMActAutor,             &
-   RespGrossAutor        => nmicf%RespGrossAutor,         &
-   RCO2ProdAutor         => nmicf%RCO2ProdAutor,          &
-   RNO3XupAutor          => micflx%RNO3XupAutor    ,      &
-   RNO3XupAutorBand      => micflx%RNO3XupAutorBand,      &
-   RNO3XupAutorPrev      => micflx%RNO3XupAutorPrev,      &
-   RNO3XupAutorBandPrev  => micflx%RNO3XupAutorBandPrev,  &
-   RNO3EcoDmndSoilPrev   => micfor%RNO3EcoDmndSoilPrev,   &
-   RNO3EcoDmndBandPrev   => micfor%RNO3EcoDmndBandPrev,   &
-   RSMetaOxidSoilAutor   => nmicf%RSMetaOxidSoilAutor,    &
-   RCH4MetaDmndAutor     => micflx%RCH4MetaDmndAutor,     &
-   RCH4MetaDmndAutorPrev => micflx%RCH4MetaDmndAutorPrev, &
-   RCH4EcoDmndPrev       => micfor%RCH4EcoDmndPrev,       &
-   RNOxReduxAutorSoil    => nmicf%RNOxReduxAutorSoil,     & !NO3(-) reduction by NO2(-)
-   RNOxReduxAutorBand    => nmicf%RNOxReduxAutorBand,     & !NO3(-) reduction by NO2(-)
-   ECHZAutor             => nmicf%ECHZAutor,              & !respiraiton efficiency
-   COXYS                 => micstt%COXYS,                 &
-   CCO2S                 => micstt%CCO2S,                 &
-   JGniA                 => micpar%JGniA,                 &
-   JGnfA                 => micpar%JGnfA,                 &
-   TKS                   => micfor%TKS,                   &
-   ZEROS                 => micfor%ZEROS,                 &
-   ZEROS2                => micfor%ZEROS2,                &
-   VLNO3                 => micfor%VLNO3,                 &
-   VLNOB                 => micfor%VLNOB,                 &
-   ZERO                  => micfor%ZERO,                  &
-   CCH4S                 => micstt%CCH4S,                 &
-   CH4S                  => micstt%CH4S,                  &
-   CNO3B                 => micstt%CNO3B,                 &
-   CNO3S                 => micstt%CNO3S,                 &
-   ZNO3B                 => micstt%ZNO3B,                 &
-   ZNO3S                 => micstt%ZNO3S                  &
+   GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,     &                 !Guild growth response to temperature and soil water potential [-]
+   FBiomNutStoiScalAutor => nmics%FBiomNutStoiScalAutor,  &                 !Guild nutrient-status multiplier on metabolic capacity [-]
+   FSBSTAutor            => nmicdiag%FSBSTAutor,          &                 !Shared substrate-saturation diagnostic; not used in this routine
+   FracOMActAutor        => nmics%FracOMActAutor,         &                 !Guild fraction of total active microbial C; fallback competition share [-]
+   OMActAutor            => nmics%OMActAutor,             &                 !Active microbial C biomass of each guild
+   RespGrossAutor        => nmicf%RespGrossAutor,         &                 !Gross respiration C equivalent, equal to CH4-C oxidized in this pathway
+   RCO2ProdAutor         => nmicf%RCO2ProdAutor,          &                 !Catabolic CO2-C production; biomass C is reassimilated in the later update
+   RNO3XupAutor          => micflx%RNO3XupAutor    ,      &                 !Guild nonband nitrate-N uptake for methane oxidation
+   RNO3XupAutorBand      => micflx%RNO3XupAutorBand,      &                 !Guild fertilizer-band nitrate-N uptake for methane oxidation
+   RNO3XupAutorPrev      => micflx%RNO3XupAutorPrev,      &                 !Previous-hour guild nonband nitrate-N uptake; competition numerator
+   RNO3XupAutorBandPrev  => micflx%RNO3XupAutorBandPrev,  &                 !Previous-hour guild band nitrate-N uptake; competition numerator
+   RNO3EcoDmndSoilPrev   => micfor%RNO3EcoDmndSoilPrev,   &                 !Previous-hour ecosystem nonband nitrate-N demand; competition denominator
+   RNO3EcoDmndBandPrev   => micfor%RNO3EcoDmndBandPrev,   &                 !Previous-hour ecosystem band nitrate-N demand; competition denominator
+   RSMetaOxidSoilAutor   => nmicf%RSMetaOxidSoilAutor,    &                 !Total CH4-C oxidation supported by band and nonband acceptor reduction
+   RCH4MetaDmndAutor     => micflx%RCH4MetaDmndAutor,     &                 !Guild CH4-C oxidation demand used in subsequent competition accounting
+   RCH4MetaDmndAutorPrev => micflx%RCH4MetaDmndAutorPrev, &                 !Previous-hour guild CH4 demand used to calculate its competition share
+   RCH4EcoDmndPrev       => micfor%RCH4EcoDmndPrev,       &                 !Previous-hour ecosystem CH4 demand; competition-share denominator
+   RNOxReduxAutorSoil    => nmicf%RNOxReduxAutorSoil,     &                 !Nonband NO3-N reduction to NO2-N coupled to CH4 oxidation
+   RNOxReduxAutorBand    => nmicf%RNOxReduxAutorBand,     &                 !Fertilizer-band NO3-N reduction to NO2-N coupled to CH4 oxidation
+   ECHZAutor             => nmicf%ECHZAutor,              &                 !Energy-dependent respiration fraction eta, bounded between EO2X and 1 [-]
+   COXYS                 => micstt%COXYS,                 &                 !Dissolved O2 concentration used to inhibit anaerobic methane oxidation
+   CCO2S                 => micstt%CCO2S,                 &                 !Dissolved CO2-C concentration; alias not used in this routine
+   JGniA                 => micpar%JGniA,                 &                 !First guild index for each functional group N
+   JGnfA                 => micpar%JGnfA,                 &                 !Last guild index for each functional group N
+   TKS                   => micfor%TKS,                   &                 !Layer absolute temperature in the methane-dependent energy calculation [K]
+   ZEROS                 => micfor%ZEROS,                 &                 !Small threshold for previous-demand competition denominators
+   ZEROS2                => micfor%ZEROS2,                &                 !Small water-volume threshold for the rate-inhibition calculation
+   VLNO3                 => micfor%VLNO3,                 &                 !Nonband soil fraction used to partition electron-acceptor uptake capacity [-]
+   VLNOB                 => micfor%VLNOB,                 &                 !Fertilizer-band fraction used to partition electron-acceptor uptake capacity [-]
+   ZERO                  => micfor%ZERO,                  &                 !Small electron-acceptor concentration threshold for enabling uptake
+   CCH4S                 => micstt%CCH4S,                 &                 !Dissolved CH4-C concentration for saturation and energy-yield calculations
+   CH4S                  => micstt%CH4S,                  &                 !Layer dissolved CH4-C pool before competition-weighted donor allocation
+   CNO3B                 => micstt%CNO3B,                 &                 !Fertilizer-band dissolved nitrate-N concentration for uptake saturation
+   CNO3S                 => micstt%CNO3S,                 &                 !Nonband dissolved nitrate-N concentration for uptake saturation
+   ZNO3B                 => micstt%ZNO3B,                 &                 !Fertilizer-band nitrate-N donor pool available for competition-weighted uptake
+   ZNO3S                 => micstt%ZNO3S                  &                 !Nonband nitrate-N donor pool available for competition-weighted uptake
   )
   call PrintInfo('beg '//subname)
   FNO3S = VLNO3
