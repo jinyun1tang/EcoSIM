@@ -207,6 +207,8 @@ module InitSOMBGCMOD
     OSPX(K) = 0.0_r8
   ENDDO D995
 
+  mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
+
   D8995: DO K=1,jcplx
     IF(L.EQ.0)THEN
       OSCM(K) = AMIN1(DCKR,1._r8)*CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)
@@ -252,7 +254,6 @@ module InitSOMBGCMOD
     !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
     !     The reason that initialization of complex-5 microbes is repated for each
     !     complex is because complex 5 is shared by all the other complexes
-    mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbHFunGrupsPerCmplx
       
