@@ -171,7 +171,6 @@ module MicAutoCPLXMod
 ! begin_execution
   associate(                                                   &
     FracOMActAutor          => nmics%FracOMActAutor,           & !Guild fraction of total active microbial C in the layer [-]
-    FracAutorBiomOfActK     => nmics%FracAutorBiomOfActK,      & !Guild fraction of active biomass in the autotrophic assemblage [-]
     AttenfNH4Autor          => micflx%AttenfNH4Autor,          & !Litter-microbial share of NH4-N uptake from underlying soil [-]
     AttenfNO3Autor          => micflx%AttenfNO3Autor,          & !Litter-microbial share of NO3-N uptake from underlying soil [-]
     AttenfH1PO4Autor        => micflx%AttenfH1PO4Autor,        & !Litter-microbial share of HPO4-P uptake from underlying soil [-]
@@ -276,26 +275,28 @@ module MicAutoCPLXMod
   ! previous hour in surface litter, labels as for soil layers above
   !
   !litter layer
+  !All litter complexes and autotrophs tap the same underlying-soil pool.
+  !Use their shared layer biomass denominator when previous demand is absent.
   IF(litrm)THEN
     IF(RNH4EcoDmndLitrPrev.GT.ZEROS)THEN
       AttenfNH4Autor(NGL)=AMAX1(FMN,RNH4UptkLitrAutorPrev(NGL)/RNH4EcoDmndLitrPrev)
     ELSE
-      AttenfNH4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfNH4Autor(NGL)=AMAX1(FMN,FracOMActAutor(NGL))
     ENDIF
     IF(RNO3EcoDmndLitrPrev.GT.ZEROS)THEN
       AttenfNO3Autor(NGL)=AMAX1(FMN,RNO3UptkLitrAutorPrev(NGL)/RNO3EcoDmndLitrPrev)
     ELSE
-      AttenfNO3Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfNO3Autor(NGL)=AMAX1(FMN,FracOMActAutor(NGL))
     ENDIF
     IF(RH2PO4EcoDmndLitrPrev.GT.ZEROS)THEN
       AttenfH2PO4Autor(NGL)=AMAX1(FMN,RH2PO4UptkLitrAutorPrev(NGL)/RH2PO4EcoDmndLitrPrev)
     ELSE
-      AttenfH2PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfH2PO4Autor(NGL)=AMAX1(FMN,FracOMActAutor(NGL))
     ENDIF
     IF(RH1PO4EcoDmndLitrPrev.GT.ZEROS)THEN
       AttenfH1PO4Autor(NGL)=AMAX1(FMN,RH1PO4UptkLitrAutorPrev(NGL)/RH1PO4EcoDmndLitrPrev)
     ELSE
-      AttenfH1PO4Autor(NGL)=AMAX1(FMN,FracAutorBiomOfActK(NGL))
+      AttenfH1PO4Autor(NGL)=AMAX1(FMN,FracOMActAutor(NGL))
     ENDIF
   ENDIF
   !top soil layer
@@ -797,6 +798,7 @@ module MicAutoCPLXMod
   real(r8) :: ZNOBM
   integer :: MID3,NGL
 
+  real(r8) :: LitrPotential(2),LitrUptake(2) !Nonband and band soil fluxes
 !     begin_execution
   associate(                                             &
    GrowthEnvScalAutor    => nmics%GrowthEnvScalAutor,    & !Temperature and water-potential multiplier on autotrophic growth [-]
@@ -1061,18 +1063,18 @@ module MicAutoCPLXMod
 !
     ! These transfers are charged to the underlying soil, not the litter pool.
     IF(litrm)THEN
-      RNetNH4MinPotentLitr=RNetNH4MinPotent-RNH4TransfSoilAutor(NGL)-RNO3TransfSoilAutor(NGL)
-      IF(RNetNH4MinPotentLitr.GT.0.0_r8)THEN
-        CNH4X=AZMAX1(CNH4SU-Z4MN)
-        CNH4Y=AZMAX1(CNH4BU-Z4MN)
-        RNH4UptkLitrAutor(NGL)=AMIN1(RNetNH4MinPotentLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*Z4MX) &
-            *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
-        ZNH4M=Z4MN*VOLWU
-        RNH4TransfLitrAutor(NGL)=AMIN1(AttenfNH4Autor(NGL)*AZMAX1((ZNH4TU-ZNH4M)),RNH4UptkLitrAutor(NGL))
-      ELSE
-        RNH4UptkLitrAutor(NGL)=0.0_r8
-        RNH4TransfLitrAutor(NGL)=RNetNH4MinPotentLitr
-      ENDIF
+      RNetNH4MinPotentLitr=RNetNH4MinPotent-RNH4TransfSoilAutor(NGL)-RNO3TransfSoilAutor(NGL) &
+        -RNH4TransfBandAutor(NGL)-RNO3TransfBandAutor(NGL)
+
+      call LitterSoilNutrientUptake(1,RNetNH4MinPotentLitr, &
+        BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*Z4MX, &
+        Z4KU,Z4MN,AttenfNH4Autor(NGL), &
+        micflx%RNH4UptkLitrBandAutorPrev(NGL),nmics%FracOMActAutor(NGL),micfor,LitrPotential,LitrUptake)
+      RNH4UptkLitrAutor(NGL)=LitrPotential(1)
+      micflx%RNH4UptkLitrBandAutor(NGL)=LitrPotential(2)
+      RNH4TransfLitrAutor(NGL)=SUM(LitrUptake)
+      micflx%tRNH4MicrbImobilSoil=micflx%tRNH4MicrbImobilSoil+LitrUptake(1)
+      micflx%tRNH4MicrbImobilBand=micflx%tRNH4MicrbImobilBand+LitrUptake(2)
       NetNH4Mineralize=NetNH4Mineralize+RNH4TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF NO3 IN SURFACE RESIDUE FROM
@@ -1096,17 +1098,16 @@ module MicAutoCPLXMod
 !     NetNH4Mineralize=total NH4+NO3 net mineraln (-ve) or immobiln (+ve)
 !
       RNetNO3DmndLitr=AZMAX1(RNetNH4MinPotentLitr-RNH4TransfLitrAutor(NGL))
-      IF(RNetNO3DmndLitr.GT.0.0_r8)THEN
-        CNO3X=AZMAX1(CNO3SU-ZOMN)
-        CNO3Y=AZMAX1(CNO3BU-ZOMN)
-        RNO3UptkLitrAutor(NGL)=AMIN1(RNetNO3DmndLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*ZOMX) &
-            *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
-        ZNO3M=ZOMN*VOLWU
-        RNO3TransfLitrAutor(NGL)=AMIN1(AttenfNO3Autor(NGL)*AZMAX1((ZNO3TU-ZNO3M)),RNO3UptkLitrAutor(NGL))
-      ELSE
-        RNO3UptkLitrAutor(NGL)=0.0_r8
-        RNO3TransfLitrAutor(NGL)=RNetNO3DmndLitr
-      ENDIF
+
+      call LitterSoilNutrientUptake(2,RNetNO3DmndLitr, &
+        BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*ZOMX, &
+        ZOKU,ZOMN,AttenfNO3Autor(NGL), &
+        micflx%RNO3UptkLitrBandAutorPrev(NGL),nmics%FracOMActAutor(NGL),micfor,LitrPotential,LitrUptake)
+      RNO3UptkLitrAutor(NGL)=LitrPotential(1)
+      micflx%RNO3UptkLitrBandAutor(NGL)=LitrPotential(2)
+      RNO3TransfLitrAutor(NGL)=SUM(LitrUptake)
+      micflx%tRNO3MicrbImobilSoil=micflx%tRNO3MicrbImobilSoil+LitrUptake(1)
+      micflx%tRNO3MicrbImobilBand=micflx%tRNO3MicrbImobilBand+LitrUptake(2)
       NetNH4Mineralize=NetNH4Mineralize+RNO3TransfLitrAutor(NGL)
 !
 !     MINERALIZATION-IMMOBILIZATION OF H2PO4 IN SURFACE RESIDUE FROM
@@ -1132,17 +1133,16 @@ module MicAutoCPLXMod
       !Subtract all P already exchanged with litter before tapping topsoil.
       RNetH2PO4MinPotentLitr=RNetH2PO4MinPotent-RH2PO4TransfSoilAutor(NGL) &
         -RH2PO4TransfBandAutor(NGL)-RH1PO4TransfSoilAutor(NGL)-RH1PO4TransfBandAutor(NGL)
-      IF(RNetH2PO4MinPotentLitr.GT.0.0_r8)THEN
-        CH2PX=AZMAX1(CH2P4U-HPMN)
-        CH2PY=AZMAX1(CH2P4BU-HPMN)
-        RH2PO4UptkLitrAutor(NGL)=AMIN1(RNetH2PO4MinPotentLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
-            *(FH2PS*CH2PX/(CH2PX+HPKU)+FH2PB*CH2PY/(CH2PY+HPKU))
-        H2P4M=HPMN*VOLWU
-        RH2PO4TransfLitrAutor(NGL)=AMIN1(AttenfH2PO4Autor(NGL)*AZMAX1((H2P4TU-H2P4M)),RH2PO4UptkLitrAutor(NGL))
-      ELSE
-        RH2PO4UptkLitrAutor(NGL)=0.0_r8
-        RH2PO4TransfLitrAutor(NGL)=RNetH2PO4MinPotentLitr
-      ENDIF
+
+      call LitterSoilNutrientUptake(3,RNetH2PO4MinPotentLitr, &
+        BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX, &
+        HPKU,HPMN,AttenfH2PO4Autor(NGL), &
+        micflx%RH2PO4UptkLitrBandAutorPrev(NGL),nmics%FracOMActAutor(NGL),micfor,LitrPotential,LitrUptake)
+      RH2PO4UptkLitrAutor(NGL)=LitrPotential(1)
+      micflx%RH2PO4UptkLitrBandAutor(NGL)=LitrPotential(2)
+      RH2PO4TransfLitrAutor(NGL)=SUM(LitrUptake)
+      micflx%tRH2PO4MicrbImobilSoil=micflx%tRH2PO4MicrbImobilSoil+LitrUptake(1)
+      micflx%tRH2PO4MicrbImobilBand=micflx%tRH2PO4MicrbImobilBand+LitrUptake(2)
       NetPO4Mineralize=NetPO4Mineralize+RH2PO4TransfLitrAutor(NGL)
       !
       !     MINERALIZATION-IMMOBILIZATION OF HPO4 IN SURFACE RESIDUE FROM
@@ -1168,17 +1168,16 @@ module MicAutoCPLXMod
       FH1PS = VLPO4
       FH1PB = VLPOB
       RNetH1PO4DmndLitr=0.1_r8*AZMAX1(RNetH2PO4MinPotentLitr-RH2PO4TransfLitrAutor(NGL))
-      IF(RNetH1PO4DmndLitr.GT.0.0_r8)THEN
-        CH1PX=AZMAX1(CH1P4U-HPMN)
-        CH1PY=AZMAX1(CH1P4BU-HPMN)
-        RH1PO4UptkLitrAutor(NGL)=AMIN1(RNetH1PO4DmndLitr,BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX) &
-            *(FH1PS*CH1PX/(CH1PX+HPKU)+FH1PB*CH1PY/(CH1PY+HPKU))
-        H1P4M=HPMN*VOLWU
-        RH1PO4TransfLitrAutor(NGL)=AMIN1(AttenfH1PO4Autor(NGL)*AZMAX1((H1P4TU-H1P4M)),RH1PO4UptkLitrAutor(NGL))
-      ELSE
-        RH1PO4UptkLitrAutor(NGL)=0.0_r8
-        RH1PO4TransfLitrAutor(NGL)=RNetH1PO4DmndLitr
-      ENDIF
+
+      call LitterSoilNutrientUptake(4,RNetH1PO4DmndLitr, &
+        BIOA*OMActAutor(NGL)*GrowthEnvScalAutor(NGL)*HPMX, &
+        HPKU,HPMN,AttenfH1PO4Autor(NGL), &
+        micflx%RH1PO4UptkLitrBandAutorPrev(NGL),nmics%FracOMActAutor(NGL),micfor,LitrPotential,LitrUptake)
+      RH1PO4UptkLitrAutor(NGL)=LitrPotential(1)
+      micflx%RH1PO4UptkLitrBandAutor(NGL)=LitrPotential(2)
+      RH1PO4TransfLitrAutor(NGL)=SUM(LitrUptake)
+      micflx%tRH1PO4MicrbImobilSoil=micflx%tRH1PO4MicrbImobilSoil+LitrUptake(1)
+      micflx%tRH1PO4MicrbImobilBand=micflx%tRH1PO4MicrbImobilBand+LitrUptake(2)
       NetPO4Mineralize=NetPO4Mineralize+RH1PO4TransfLitrAutor(NGL)
     ENDIF
   ENDDO
@@ -1309,7 +1308,7 @@ module MicAutoCPLXMod
     NumMicbAFunGrupsPerCmplx       => micpar%NumMicbAFunGrupsPerCmplx,      & !Number of autotrophic functional groups
     icarbhyro                      => micpar%icarbhyro,                     & !Carbohydrate/second solid-component index
     iprotein                       => micpar%iprotein,                      & !Protein/first solid-component index
-    k_POM                          => micpar%k_POM,                         & !Particulate-organic-matter complex index
+    k_humus                        => micpar%k_humus,                       & !Humus complex receiving humified microbial C/N/P
     is_activeMicrbFungrpAutor      => micpar%is_activeMicrbFungrpAutor      & !Activation flags for autotrophic functional groups
   )
   call PrintInfo('beg '//subname)
@@ -1361,9 +1360,9 @@ module MicAutoCPLXMod
 !
           IF(.not.litrm)THEN
             DO NE=1,NumPlantChemElms
-              SolidOM(NE,iprotein,k_POM)=SolidOM(NE,iprotein,k_POM)+ElmAllocmatMicrblitr2POM(1) &
+              SolidOM(NE,iprotein,k_humus)=SolidOM(NE,iprotein,k_humus)+ElmAllocmatMicrblitr2POM(1) &
                 *(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefLitrfal2HumOMAutor(NE,M,NGL))
-              SolidOM(NE,icarbhyro,k_POM)=SolidOM(NE,icarbhyro,k_POM)+ElmAllocmatMicrblitr2POM(2)&
+              SolidOM(NE,icarbhyro,k_humus)=SolidOM(NE,icarbhyro,k_humus)+ElmAllocmatMicrblitr2POM(2)&
                 *(RkillLitrfal2HumOMAutor(NE,M,NGL)+RMaintDefLitrfal2HumOMAutor(NE,M,NGL))
             ENDDO
           ELSE

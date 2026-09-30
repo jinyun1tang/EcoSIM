@@ -5003,6 +5003,9 @@ implicit none
   real(r8),pointer :: datpr4(:,:,:,:),datpr5(:,:,:,:,:)
   integer :: sz3,sz4,sz5
   integer :: ncols, npfts  
+  integer :: litter_band_varid
+  type(var_desc_t) :: litter_band_vardesc
+  logical :: has_litter_band_demand
   integer :: ndoms
   ncols = bounds%ncols
   npfts = bounds%npfts
@@ -8418,6 +8421,30 @@ implicit none
       dim3name='nomcomplx',long_name='microbial NH4 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RNH4DmndLitrBandHeter_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+      call restartvar(ncid, flag, varname='RNH4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+        dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndLitrBandHeter_col,datrc_3d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RNH4DmndLitrBandHeter_col=0._r8
+    endif
+  else
+    !print*,'RNH4DmndLitrBandHeter_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4DmndLitrBandHeter_col,datrc_3d)
+    datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+    call restartvar(ncid, flag, varname='RNH4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+      dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8435,6 +8462,30 @@ implicit none
       dim3name='nomcomplx',long_name='microbial NO3 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RNO3DmndLitrBandHeter_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+      call restartvar(ncid, flag, varname='RNO3DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+        dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndLitrBandHeter_col,datrc_3d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RNO3DmndLitrBandHeter_col=0._r8
+    endif
+  else
+    !print*,'RNO3DmndLitrBandHeter_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3DmndLitrBandHeter_col,datrc_3d)
+    datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+    call restartvar(ncid, flag, varname='RNO3DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+      dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8452,6 +8503,78 @@ implicit none
       dim3name='nomcomplx',long_name='microbial PO4 demand in surface litter', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
       fill_value=spval)      
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RH1PO4DmndLitrHeter_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+      call restartvar(ncid, flag, varname='RH1PO4DmndLitrHeter_col', dim1name='column',dim2name='hetrmicb',&
+        dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying nonband soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4DmndLitrHeter_col,datrc_3d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RH1PO4DmndLitrHeter_col=0._r8
+    endif
+  else
+    !print*,'RH1PO4DmndLitrHeter_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4DmndLitrHeter_col,datrc_3d)
+    datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+    call restartvar(ncid, flag, varname='RH1PO4DmndLitrHeter_col', dim1name='column',dim2name='hetrmicb',&
+      dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying nonband soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RH1PO4DmndLitrBandHeter_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+      call restartvar(ncid, flag, varname='RH1PO4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+        dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4DmndLitrBandHeter_col,datrc_3d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RH1PO4DmndLitrBandHeter_col=0._r8
+    endif
+  else
+    !print*,'RH1PO4DmndLitrBandHeter_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4DmndLitrBandHeter_col,datrc_3d)
+    datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+    call restartvar(ncid, flag, varname='RH1PO4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+      dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RH2PO4DmndLitrBandHeter_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+      call restartvar(ncid, flag, varname='RH2PO4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+        dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndLitrBandHeter_col,datrc_3d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RH2PO4DmndLitrBandHeter_col=0._r8
+    endif
+  else
+    !print*,'RH2PO4DmndLitrBandHeter_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4DmndLitrBandHeter_col,datrc_3d)
+    datpr3 => datrc_3d(1:ncols,1:NumHetetr1MicCmplx,1:jcplx)
+    call restartvar(ncid, flag, varname='RH2PO4DmndLitrBandHeter_col', dim1name='column',dim2name='hetrmicb',&
+      dim3name='nomcomplx',long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr3, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8760,6 +8883,30 @@ implicit none
       long_name='total autotrophic microbial NH4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)        
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RNH4UptkLitrBandAutor_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+      call restartvar(ncid, flag, varname='RNH4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+        long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrBandAutor_col,datrc_2d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RNH4UptkLitrBandAutor_col=0._r8
+    endif
+  else
+    !print*,'RNH4UptkLitrBandAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNH4UptkLitrBandAutor_col,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+    call restartvar(ncid, flag, varname='RNH4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8777,6 +8924,30 @@ implicit none
       long_name='total autotrophic microbial NO3 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RNO3UptkLitrBandAutor_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+      call restartvar(ncid, flag, varname='RNO3UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+        long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrBandAutor_col,datrc_2d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RNO3UptkLitrBandAutor_col=0._r8
+    endif
+  else
+    !print*,'RNO3UptkLitrBandAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RNO3UptkLitrBandAutor_col,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+    call restartvar(ncid, flag, varname='RNO3UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8794,6 +8965,30 @@ implicit none
       long_name='total autotrophic microbial H2PO4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RH2PO4UptkLitrBandAutor_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+      call restartvar(ncid, flag, varname='RH2PO4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+        long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrBandAutor_col,datrc_2d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RH2PO4UptkLitrBandAutor_col=0._r8
+    endif
+  else
+    !print*,'RH2PO4UptkLitrBandAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH2PO4UptkLitrBandAutor_col,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+    call restartvar(ncid, flag, varname='RH2PO4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then
@@ -8811,6 +9006,30 @@ implicit none
       long_name='total autotrophic microbial H1PO4 demand in surface litte', &
       units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
       fill_value=spval)            
+  endif
+
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'RH1PO4UptkLitrBandAutor_col',litter_band_varid,litter_band_vardesc, &
+      readvar=has_litter_band_demand)
+    if(has_litter_band_demand)then
+      datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+      call restartvar(ncid, flag, varname='RH1PO4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+        long_name='Litter microbial nutrient demand on underlying band soil', &
+        units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+        fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrBandAutor_col,datrc_2d)
+    else
+      !Older restart files charged all supplemental uptake to nonband soil.
+      RH1PO4UptkLitrBandAutor_col=0._r8
+    endif
+  else
+    !print*,'RH1PO4UptkLitrBandAutor_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RH1PO4UptkLitrBandAutor_col,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:NumMicrobAutoTrophCmplx)
+    call restartvar(ncid, flag, varname='RH1PO4UptkLitrBandAutor_col', dim1name='column',dim2name='automicb',&
+      long_name='Litter microbial nutrient demand on underlying band soil', &
+      units='g d-2 h-1', interpinic_flag='skip', data=datpr2, missing_value=spval, &
+      fill_value=spval)
   endif  
 
   if(flag=='read')then

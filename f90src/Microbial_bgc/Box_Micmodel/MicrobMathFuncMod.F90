@@ -23,6 +23,7 @@ module MicrobMathFuncMod
   contains
 !------------------------------------------------------------------------
 
+
   subroutine LimitReserveNutrientTransfers(Reserve,Supply,GrowthTransfer,MineralTransfer)
   !Growth and mineralization share one reserve donor. Call immediately before
   !updating biomass so transfers also respect any intervening priming exchange.
@@ -46,6 +47,46 @@ module MicrobMathFuncMod
     WHERE(MineralTransfer.LT.0._r8)MineralTransfer=MineralTransfer*Scale
   ENDIF
   end subroutine LimitReserveNutrientTransfers
+!------------------------------------------------------------------------
+
+  subroutine LitterSoilNutrientUptake(Nutrient,Demand,Capacity,KM,CMin, &
+    NonbandShare,PrevBandDemand,BiomShare,micfor,Potential,Uptake)
+  !
+  !Description:  
+  !Paired uptake from the soil beneath litter. Positive flux immobilizes nutrient;
+  !negative demand releases it. No compartment can borrow the other's allocation.
+  !
+  implicit none
+  integer, intent(in) :: Nutrient !1 NH4, 2 NO3, 3 H2PO4, 4 HPO4
+  real(r8), intent(in) :: Demand,Capacity,KM,CMin,NonbandShare,PrevBandDemand,BiomShare
+  type(micforctype), intent(in) :: micfor
+  real(r8), intent(out) :: Potential(2),Uptake(2) !Nonband, fertilizer band
+  real(r8) :: Frac(2),Share(2),ExcessConc(2),Available(2),FracSum
+
+  Potential = 0._r8
+  Uptake    = 0._r8
+  Frac      = MAX(0._r8,micfor%LitrSoilNutFrac(:,Nutrient))
+  FracSum   = SUM(Frac)
+  IF(FracSum.LE.0._r8)RETURN
+  Frac=Frac/FracSum
+  IF(Demand.LE.0._r8)THEN
+    Uptake=Demand*Frac
+    RETURN
+  ENDIF
+
+  IF(micfor%VOLWU.LE.micfor%ZEROS)RETURN
+  Share(1)=MIN(1._r8,MAX(0._r8,NonbandShare))
+  IF(micfor%LitrSoilBandDemandPrev(Nutrient).GT.micfor%ZEROS)THEN
+    Share(2)=MIN(1._r8,MAX(FMN,PrevBandDemand/micfor%LitrSoilBandDemandPrev(Nutrient)))
+  ELSE
+    Share(2)=MIN(1._r8,MAX(FMN,BiomShare))
+  ENDIF
+
+  ExcessConc = MAX(0._r8,micfor%LitrSoilNutConc(:,Nutrient)-CMin)
+  Potential  = MIN(Demand,MAX(0._r8,Capacity))*Frac*ExcessConc/(ExcessConc+KM)
+  Available  = MAX(0._r8,micfor%LitrSoilNutPool(:,Nutrient)-CMin*micfor%VOLWU*Frac)
+  Uptake     = MIN(Potential,Share*Available)
+  end subroutine LitterSoilNutrientUptake
 !------------------------------------------------------------------------
 
   subroutine ReserveDenitrifMaintenance(MaintDemand,PrimaryResp,DenitResp, &

@@ -385,8 +385,13 @@ module InitSOMBGCMOD
   RH1PO4DmndBandHeter_vr(:,:,L,NY,NX)    = 0.0_r8
   IF(L.EQ.0)THEN
     RNH4DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RNH4DmndLitrBandHeter_col(:,:,NY,NX)   = 0.0_r8
     RNO3DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RNO3DmndLitrBandHeter_col(:,:,NY,NX)   = 0.0_r8
     RH2PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
+    RH2PO4DmndLitrBandHeter_col(:,:,NY,NX) = 0.0_r8
+    RH1PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
+    RH1PO4DmndLitrBandHeter_col(:,:,NY,NX) = 0.0_r8
   ENDIF
 
   RO2MetaDmndAutor_vr(:,L,NY,NX)       = 0.0_r8
@@ -405,8 +410,13 @@ module InitSOMBGCMOD
 
   IF(L.EQ.0)THEN
     RNH4UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RNH4UptkLitrBandAutor_col(:,NY,NX)   = 0.0_r8
     RNO3UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RNO3UptkLitrBandAutor_col(:,NY,NX)   = 0.0_r8
     RH2PO4UptkLitrAutor_col(:,NY,NX) = 0.0_r8
+    RH2PO4UptkLitrBandAutor_col(:,NY,NX) = 0.0_r8
+    RH1PO4UptkLitrAutor_col(:,NY,NX) = 0.0_r8
+    RH1PO4UptkLitrBandAutor_col(:,NY,NX) = 0.0_r8
   ENDIF
   
   call sumORGMLayL(L,NY,NX,ORGM)

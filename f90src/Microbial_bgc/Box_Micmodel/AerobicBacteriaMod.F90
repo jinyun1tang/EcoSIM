@@ -188,7 +188,9 @@ module AerobicBacteriaMod
     ! RDOCUptkHeter,RAcetateUptkHeter=DOC,DOA demand from DOC,DOA oxidation
     ! ROQC4HeterMicrobAct=microbial respiration used to represent microbial activity
     ! CH2O+O2 -> CO2 + H2O, (32/12.=2.667)
-    ECHZHeter(NGL,K)         = EO2Q*FGOCP(NGL,K)+EO2A*FGOAP(NGL,K)
+    !Respiration-weighted conversion: total uptake is the sum of each
+    !donor's respiration divided by its own respiration fraction.
+    ECHZHeter(NGL,K)         = 1._r8/(FGOCP(NGL,K)/EO2Q+FGOAP(NGL,K)/EO2A)
     RO2Dmnd4RespHeter(NGL,K) = 2.667_r8*RGOMP                 !O2 demand
     RO2DmndHeter(NGL,K)      = RO2Dmnd4RespHeter(NGL,K)
 
