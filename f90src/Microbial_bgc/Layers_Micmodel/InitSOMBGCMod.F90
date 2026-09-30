@@ -440,7 +440,7 @@ module InitSOMBGCMOD
   logical, optional, intent(in) :: add_to_existing
   integer :: N,M,NGL,MID,NE
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8) :: tglds
+  real(r8) :: tglds,tOMCI
   logical :: additive
 
   additive=.false.
@@ -448,9 +448,9 @@ module InitSOMBGCMOD
 
   N = micpar%mid_HeterMixtCynoBacter
   tglds = JGnfH(N)-JGniH(N)+1._r8
-
+  tOMCI=sum(micpar%OMCI(:,K))
   DO M=1,micpar%nlbiomcp
-    OME1(ielmc) = CyanoInocC*micpar%OMCI(M,K)/KL
+    OME1(ielmc) = CyanoInocC*micpar%OMCI(M,K)/(tOMCI*KL)
     OME1(ielmn) = AZMAX1(OME1(ielmc)*micpar%rNCOMC_ave(M,N,K))
     OME1(ielmp) = AZMAX1(OME1(ielmc)*micpar%rPCOMC_ave(M,N,K))
 
@@ -794,17 +794,19 @@ module InitSOMBGCMOD
   end subroutine InitLitterProfile
 !------------------------------------------------------------------------------------------
 
-  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,mscal)
+  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,OME_in,mscal)
   !
   !seeding microbes added through litterfall
   implicit none
   integer, intent(in) :: I,J,K
   integer, intent(in) :: NY,NX
-  real(r8),intent(in) :: OSCMK
+  real(r8),intent(in) :: OSCMK                       !input organic carbon
+  real(r8), intent(out) :: OME_in(NumPlantChemElms)  !summary of total microbial input
   real(r8),optional,intent(in) :: mscal
   integer :: M,N,NGL,MID,NE,NN
-  real(r8) :: FOSCI,FOSNI,FOSPI,tglds
-  real(r8) :: OME1(1:NumPlantChemElms)
+  real(r8) :: FOSCI,FOSNI,FOSPI,tglds,tOMCI,fOMCH,tOMCA
+  real(r8) :: OME1(1:NumPlantChemElms),OSCMKK
+  
   real(r8) :: scal    !scalar for incoming microbial biomass associated with litterfall, [1%].
   associate(                         &
     rNCOMC_ave => micpar%rNCOMC_ave, &
@@ -821,14 +823,16 @@ module InitSOMBGCMOD
     scal=0.01_r8 !microbial biomass fraction of the incoming organic matter, [1%] 
   endif
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
+  OME_in=0._r8; tOMCI=sum(OMCI(:,K))
+  tOMCA=sum(OMCA(:));fOMCH=1._r8/(1._r8+tOMCA)
+  OSCMKK=OSCMK*scal*fOMCH/tOMCI
 
-  DO N=1,NumMicbHFunGrupsPerCmplx
-    
+  DO N=1,NumMicbHFunGrupsPerCmplx    
     DO M=1,nlbiomcp
-      OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
+      OME1(ielmc) = AZMAX1(OSCMKK*OMCI(M,K)*OMCF(N)*FOSCI)
       OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
       OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
-      
+      OME_in=OME_in+OME1
       tglds=JGnfH(N)-JGniH(N)+1._r8
       do NGL=JGniH(N),JGnfH(N)
         MID=micpar%get_micb_id(M,NGL)
@@ -845,6 +849,7 @@ module InitSOMBGCMOD
             mBiomeAutor_vr(NE,MID,0,NY,NX)=mBiomeAutor_vr(NE,MID,0,NY,NX)+OME1(NE)*OMCA(NN)/tglds
           ENDDO
         ENDDO
+        OME_in=OME_in+OME1(:)*OMCA(NN)
       ENDDO
     ENDDO
   ENDDO

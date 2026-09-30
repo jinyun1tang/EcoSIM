@@ -32,6 +32,7 @@ contains
   integer, intent(in) :: I,J
   integer, intent(in) :: NY,NX
   real(r8) :: OSCMK,OSCDep,ODMBC,ODNMB
+  real(r8) :: OME_in(NumPlantChemElms)
   integer :: K,KL,NZ,M
   real(r8), parameter :: CFOSC(4)=(/0.075,0.125,0.550,0.250/)
 
@@ -46,7 +47,8 @@ contains
   !total live microbial C deposition
   OSCMK =OSCDep*f_aerosol_LiveMB_col(NY,NX)
 
-  call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK*0.975_r8,mscal=1._r8)
+  !assuming 97.5% as non-cyanobacteria
+  call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK*0.975_r8,OME_in, mscal=1._r8)
 
   !assuming 2.5% as cyanobacteria
   KL=1

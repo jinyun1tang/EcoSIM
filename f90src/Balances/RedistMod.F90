@@ -1341,10 +1341,10 @@ module RedistMod
       HRAINR                       = (RAINR*cpw+gOC_to_m3_OM(dOM)*cpo)*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
 
-      VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
-      QCanopyWatLoss2Dist_col(NY,NX)   = QCanopyWatLoss2Dist_col(NY,NX)+RAINR
-      CanopyBiomWater_col(NY,NX)         = CanopyBiomWater_col(NY,NX)-RAINR
-      HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
+      VLWatMicP_vr(0,NY,NX)          = VLWatMicP_vr(0,NY,NX)+RAINR
+      QCanopyWatLoss2Dist_col(NY,NX) = QCanopyWatLoss2Dist_col(NY,NX)+RAINR
+      CanopyBiomWater_col(NY,NX)     = CanopyBiomWater_col(NY,NX)-RAINR
+      HeatFLoByWat2LitR_col(NY,NX)   = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR
       dHeat                        = dHeat + HRAINR
@@ -1354,7 +1354,7 @@ module RedistMod
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
     
-    if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+    !if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,OME_in)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
