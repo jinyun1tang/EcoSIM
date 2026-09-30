@@ -81,7 +81,8 @@ contains
   CumDryDepoOM_col(NY,NX)=CumDryDepoOM_col(NY,NX)+OSCDep
 
   !assign seed deposition for lichen and moss
-  SeedCDeposition_pft(:,NY,NX)=0._r8
+  SeedCDeposition_pft(:,NY,NX)=0._r8;
+  !each NZ corresponds to a different pft
   DO NZ=1,NP_col(NY,NX)
     if(DATAP(NZ,NY,NX)(1:4)=='lich')then
       SeedCDeposition_pft(NZ,NY,NX) = DryDepoOMC(I)*f_aerosol_LichB_col(NY,NX)

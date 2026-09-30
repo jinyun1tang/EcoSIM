@@ -90,7 +90,7 @@ module InitSOMBGCMOD
   real(r8) :: OSPX(1:jcplx)
   real(r8) :: litrOM(NumPlantChemElms)
   real(r8) :: ORGM(NumPlantChemElms)
-  real(r8) :: tglds
+  real(r8) :: tglds,tCyanoInocC
   integer  :: MID,NE
   ! begin_execution
 
@@ -291,13 +291,15 @@ module InitSOMBGCMOD
     ENDDO D8990
 
     !for cyanobacteria
+    tCyanoInocC=CyanoInocC*AREA_3D(3,NU_col(NY,NX),NY,NX)    
     if(L.eq.0 .and. OSCM(K).GT.0._r8)then
       KL=micpar%NumOfLitrCmplxs
-      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+
+      call InoculateCyanoBacter(K,L,NY,NX,KL,tCyanoInocC)
 
     elseif(L.eq.NU_col(NY,NX) .and. OSCM(K).GT.0._r8)then
       KL=jcplx
-      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+      call InoculateCyanoBacter(K,L,NY,NX,KL,tCyanoInocC)
     endif
     !
     !     MICROBIAL RESIDUE C, N AND P
