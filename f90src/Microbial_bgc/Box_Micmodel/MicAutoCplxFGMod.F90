@@ -658,8 +658,9 @@ module MicAutoCPLXMod
           ROXYLX = -(RO2AquaXchangePrev+Rain2LitRSurf*O2_rain_conc &
             +Irrig2LitRSurf_col*O2_irrig_conc)*dts_gas*FOXYX
         ENDIF
-        if(OXYG1<=0._r8 .and. ROXYLX>0._r8)ROXYLX=0._r8
         OXYS1=OXYS*FOXYX
+        !Aqueous transport removal depends on the dissolved O2 donor pool.
+        if(OXYS1<=0._r8 .and. ROXYLX>0._r8)ROXYLX=0._r8
         !
             !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
         !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
