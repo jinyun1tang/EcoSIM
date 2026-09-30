@@ -334,7 +334,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use DayMod,          only: day
   use StarteMod,       only: starte
   use StartqMod,       only: startq
-  use StartsMod,       only: starts
+  use StartsMod,       only: starts,InitControlParms
   use WthrMod,         only: PrepHourlyWeather
   use RestartMod,      only: restFile
   use PlantInfoMod,    only: ReadPlantInfo
@@ -385,12 +385,15 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 
   iYearCurrent=frectyp%yearcur
 
+  !  Initialize controlling parameters
+  call InitControlParms
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     
     CALL STARTS(NHW,NHE,NVN,NVS)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
-!   IN 'ROUTS' IF NEEDED
+!   IN 'ROUTS' IF NEEDED      
   ENDIF  
 !
   if(plant_model)then

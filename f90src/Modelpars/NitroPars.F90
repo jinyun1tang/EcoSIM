@@ -154,8 +154,8 @@ module NitroPars
     VMX3AMO2D     = 0.01_R8 
     VMXO          = 0.125_r8
     VMXF          = 0.125_r8
-    VMXCH4gAcet   = 0.125_r8*0.125_r8 !acetoclastic methanogenesis
-    VMXCH4gH2     = 0.125_r8*0.125_r8 !hydrogenotrophic methanogenesis
+    VMXCH4gAcet   = 0.125_r8
+    VMXCH4gH2     = 0.125_r8
     VMXNH3Oxi     = 0.375_r8
     VMXNO2Oxi     = 0.25_r8
     VMXCH4OxiAero = 0.375_r8

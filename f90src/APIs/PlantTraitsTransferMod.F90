@@ -1,10 +1,20 @@
 module PlantTraitsTransferMod
   ! Ordered traits transfers used by PlantAPISend/PlantAPIRecv.
-  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
-  use MiniMathMod,      only: AZMAX1,safe_adb
-  use DebugToolMod,     only: PrintInfo
+  use data_kind_mod,              only: r8 => DAT_KIND_R8, yearIJ_type
+  use EcoSiMParDataMod,           only: micpar,            pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col,    SoilSurfDepZ_col
+  use MiniMathMod,                only: AZMAX1,            safe_adb
+  use DebugToolMod,               only: PrintInfo
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantAllometryAPIData,      only: plt_allom
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
+  use PlantDisturbanceAPIData,    only: plt_distb
+  use PlantRootBGCAPIData,        only: plt_rbgc
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -32,16 +42,6 @@ module PlantTraitsTransferMod
   use SoilBGCDataType
   use PlantMgmtDataType
   use PlantAPICommonData
-  use PlantSiteAPIData, only : plt_site
-  use PlantPhotosynthesisAPIData, only : plt_photo
-  use PlantRadiationAPIData, only : plt_rad
-  use PlantMorphologyAPIData, only : plt_morph
-  use PlantPhenologyAPIData, only : plt_pheno
-  use PlantAllometryAPIData, only : plt_allom
-  use PlantBiomassAPIData, only : plt_biom
-  use PlantEnergyWaterAPIData, only : plt_ew
-  use PlantDisturbanceAPIData, only : plt_distb
-  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
   private
   public :: SendPlantTraits

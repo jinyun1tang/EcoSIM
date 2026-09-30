@@ -1,10 +1,15 @@
 module PlantRootAxisTransferMod
   ! Ordered rootaxis transfers used by PlantAPISend/PlantAPIRecv.
-  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
-  use MiniMathMod,      only: AZMAX1,safe_adb
-  use DebugToolMod,     only: PrintInfo
+  use data_kind_mod,             only: r8 => DAT_KIND_R8, yearIJ_type
+  use EcoSiMParDataMod,          only: micpar,            pltpar
+  use SoilPhysDataType,          only: SurfAlbedo_col,    SoilSurfDepZ_col
+  use MiniMathMod,               only: AZMAX1,            safe_adb
+  use DebugToolMod,              only: PrintInfo
+  use PlantMorphologyAPIData,    only: plt_morph
+  use PlantSoilChemistryAPIData, only: plt_soilchem
+  use PlantBiomassAPIData,       only: plt_biom
+  use PlantBGCRatesAPIData,      only: plt_bgcr
+  use PlantRootBGCAPIData,       only: plt_rbgc
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -32,11 +37,6 @@ module PlantRootAxisTransferMod
   use SoilBGCDataType
   use PlantMgmtDataType
   use PlantAPICommonData
-  use PlantMorphologyAPIData, only : plt_morph
-  use PlantSoilChemistryAPIData, only : plt_soilchem
-  use PlantBiomassAPIData, only : plt_biom
-  use PlantBGCRatesAPIData, only : plt_bgcr
-  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
   private
   public :: ReceivePlantRootAxes

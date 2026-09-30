@@ -195,6 +195,7 @@ contains
       this%h1D_ATM_CO2_col(ncol)          = CO2E_col(NY,NX)
       this%h1D_ATM_CH4_col(ncol)          = CH4E_col(NY,NX)
       this%h1D_NBP_col(ncol)              = Eco_NBP_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      
       this%h1D_ECO_HVST_C_col(ncol)       = EcoHavstElmnt_CumYr_col(ielmc,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_ECO_LAI_col(ncol)          = CanopyLeafArea_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_ECO_SAI_col(ncol)          = StemArea_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -245,8 +246,9 @@ contains
       this%h1D_CH4_SEMIS_FLX_col(ncol)    = SurfGasEmiss_all_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_O2_SEMIS_FLX_col(ncol)     = SurfGasEmiss_all_flx_col(idg_O2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)
       this%h1D_CH4_EBU_flx_col(ncol)      = trcg_ebu_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
-      this%h1D_Ar_EBU_flx_col(ncol)       = trcg_ebu_flx_col(idg_Ar,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
+      this%h1D_Ar_EBU_flx_col(ncol)       = trcg_ebu_flx_col(idg_Ar,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)      
       this%h1D_AR_PLTROOT_flx_col(ncol)   = trcg_air2root_flx_col(idg_Ar,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_Ar)
+      
       this%h1D_CH4_PLTROOT_flx_col(ncol)  = trcg_air2root_flx_col(idg_CH4,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CH4)
       this%h1D_CO2_PLTROOT_flx_col(ncol)  = trcg_air2root_flx_col(idg_CO2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_CO2)
       this%h1D_O2_PLTROOT_flx_col(ncol)   = trcg_air2root_flx_col(idg_O2,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)*GramPerHr2umolPerSec(idg_O2)

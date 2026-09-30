@@ -1,10 +1,21 @@
 module PlantStateTransferMod
   ! Ordered state transfers used by PlantAPISend/PlantAPIRecv.
-  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
-  use MiniMathMod,      only: AZMAX1,safe_adb
-  use DebugToolMod,     only: PrintInfo
+  use data_kind_mod,              only: r8 => DAT_KIND_R8, yearIJ_type
+  use EcoSiMParDataMod,           only: micpar,            pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col,    SoilSurfDepZ_col
+  use MiniMathMod,                only: AZMAX1,            safe_adb, AZERO
+  use DebugToolMod,               only: PrintInfo
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantAllometryAPIData,      only: plt_allom
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
+  use PlantDisturbanceAPIData,    only: plt_distb
+  use PlantBGCRatesAPIData,       only: plt_bgcr
+  use PlantRootBGCAPIData,        only: plt_rbgc
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -32,17 +43,6 @@ module PlantStateTransferMod
   use SoilBGCDataType
   use PlantMgmtDataType
   use PlantAPICommonData
-  use PlantSiteAPIData, only : plt_site
-  use PlantPhotosynthesisAPIData, only : plt_photo
-  use PlantRadiationAPIData, only : plt_rad
-  use PlantMorphologyAPIData, only : plt_morph
-  use PlantPhenologyAPIData, only : plt_pheno
-  use PlantAllometryAPIData, only : plt_allom
-  use PlantBiomassAPIData, only : plt_biom
-  use PlantEnergyWaterAPIData, only : plt_ew
-  use PlantDisturbanceAPIData, only : plt_distb
-  use PlantBGCRatesAPIData, only : plt_bgcr
-  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
   private
   public :: ReceivePlantState
@@ -55,7 +55,7 @@ contains
 
     fNCLFW_pft(NZ,NY,NX) = plt_pheno%fNCLFW_pft(NZ)
     fPCLFW_pft(NZ,NY,NX) = plt_pheno%fPCLFW_pft(NZ)
-    Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+plt_bgcr%GrossCO2Fix_pft(NZ)
+    Eco_GPP_CumYr_col(NY,NX)                            = Eco_GPP_CumYr_col(NY,NX)+AZERO(plt_bgcr%GrossCO2Fix_pft(NZ))
     PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ,NY,NX)= &
       plt_morph%PARTS_brch(1:pltpar%NumOfPlantMorphUnits,1:pltpar%MaxNumBranches,NZ)
     QdewCanopy_CumYr_pft(NZ,NY,NX)                              = QdewCanopy_CumYr_pft(NZ,NY,NX)+plt_ew%QdewCanopy_pft(NZ)

@@ -2,10 +2,18 @@ module PlantAPI4Uptake
 !
 ! interface to integrate the plant model
 ! for prescribed phenology
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
-  use MiniMathMod,      only: AZMAX1
+  use data_kind_mod,              only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,           only: micpar, pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col
+  use MiniMathMod,                only: AZMAX1
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantSoilChemistryAPIData,  only: plt_soilchem
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -33,14 +41,6 @@ module PlantAPI4Uptake
   use SoilBGCDataType
   use PlantMgmtDataType
   use PlantAPICommonData
-  use PlantSiteAPIData, only : plt_site
-  use PlantPhotosynthesisAPIData, only : plt_photo
-  use PlantRadiationAPIData, only : plt_rad
-  use PlantMorphologyAPIData, only : plt_morph
-  use PlantPhenologyAPIData, only : plt_pheno
-  use PlantSoilChemistryAPIData, only : plt_soilchem
-  use PlantBiomassAPIData, only : plt_biom
-  use PlantEnergyWaterAPIData, only : plt_ew
 implicit none
 
   private

@@ -1,10 +1,21 @@
 module PlantColumnTransferMod
   ! Ordered column transfers used by PlantAPISend/PlantAPIRecv.
-  use data_kind_mod,    only: r8 => DAT_KIND_R8,yearIJ_type
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col,SoilSurfDepZ_col
-  use MiniMathMod,      only: AZMAX1,safe_adb
-  use DebugToolMod,     only: PrintInfo
+  use data_kind_mod,             only: r8 => DAT_KIND_R8, yearIJ_type
+  use EcoSiMParDataMod,          only: micpar,            pltpar
+  use SoilPhysDataType,          only: SurfAlbedo_col,    SoilSurfDepZ_col
+  use MiniMathMod,               only: AZMAX1,            safe_adb, AZERO
+  use DebugToolMod,              only: PrintInfo
+  use PlantSiteAPIData,          only: plt_site
+  use PlantRadiationAPIData,     only: plt_rad
+  use PlantMorphologyAPIData,    only: plt_morph
+  use PlantPhenologyAPIData,     only: plt_pheno
+  use PlantSoilChemistryAPIData, only: plt_soilchem
+  use PlantAllometryAPIData,     only: plt_allom
+  use PlantBiomassAPIData,       only: plt_biom
+  use PlantEnergyWaterAPIData,   only: plt_ew
+  use PlantDisturbanceAPIData,   only: plt_distb
+  use PlantBGCRatesAPIData,      only: plt_bgcr
+  use PlantRootBGCAPIData,       only: plt_rbgc
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -32,17 +43,6 @@ module PlantColumnTransferMod
   use SoilBGCDataType
   use PlantMgmtDataType
   use PlantAPICommonData
-  use PlantSiteAPIData, only : plt_site
-  use PlantRadiationAPIData, only : plt_rad
-  use PlantMorphologyAPIData, only : plt_morph
-  use PlantPhenologyAPIData, only : plt_pheno
-  use PlantSoilChemistryAPIData, only : plt_soilchem
-  use PlantAllometryAPIData, only : plt_allom
-  use PlantBiomassAPIData, only : plt_biom
-  use PlantEnergyWaterAPIData, only : plt_ew
-  use PlantDisturbanceAPIData, only : plt_distb
-  use PlantBGCRatesAPIData, only : plt_bgcr
-  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
   private
   public :: ReceivePlantColumns
@@ -61,7 +61,7 @@ contains
   Eco_NBP_CumYr_col(NY,NX)                            = plt_bgcr%Eco_NBP_CumYr_col
   Air_Heat_Latent_store_col(NY,NX)                    = plt_ew%Air_Heat_Latent_store_col
   Air_Heat_Sens_store_col(NY,NX)                      = plt_ew%Air_Heat_Sens_store_col
-  Eco_AutoR_CumYr_col(NY,NX)                          = plt_bgcr%Eco_AutoR_CumYr_col
+  Eco_AutoR_CumYr_col(NY,NX)                          = AZERO(plt_bgcr%Eco_AutoR_CumYr_col)
   LitrFallStrutElms_col(1:NumPlantChemElms,NY,NX)     = plt_bgcr%LitrFallStrutElms_col(1:NumPlantChemElms)
   EcoHavstElmnt_CumYr_col(1:NumPlantChemElms,NY,NX)   = plt_distb%EcoHavstElmnt_CumYr_col(1:NumPlantChemElms)
   WatHeldOnCanopy_col(NY,NX)                          = plt_ew%WatHeldOnCanopy_col
@@ -134,13 +134,13 @@ contains
   ENDDO
 
   DO L=1,NK_col(NY,NX)
-    TWaterPlantRoot2Soil_vr(L,NY,NX)  = plt_ew%TWaterPlantRoot2Soil_vr(L)
+    TWaterPlantRoot2Soil_vr(L,NY,NX)              = plt_ew%TWaterPlantRoot2Soil_vr(L)
     totRootLenDens_vr(L,NY,NX)                    = plt_morph%totRootLenDens_vr(L)
     trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)         = plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)
     trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX) = plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L)
     RootCO2Emis2Root_vr(L,NY,NX)                  = plt_bgcr%RootCO2Emis2Root_vr(L)
     RUptkRootO2_vr(L,NY,NX)                       = plt_bgcr%RUptkRootO2_vr(L)
-    RootO2_TotSink_vr(L,NY,NX)                       = plt_bgcr%RootO2_TotSink_vr(L)
+    RootO2_TotSink_vr(L,NY,NX)                    = plt_bgcr%RootO2_TotSink_vr(L)
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L)
 
     DO  K=1,jcplx
@@ -379,13 +379,13 @@ contains
   ENDDO
 
   DO L=1,NK_col(NY,NX)
-    plt_ew%TWaterPlantRoot2Soil_vr(L) = TWaterPlantRoot2Soil_vr(L,NY,NX)
+    plt_ew%TWaterPlantRoot2Soil_vr(L)                = TWaterPlantRoot2Soil_vr(L,NY,NX)
     plt_morph%totRootLenDens_vr(L)                   = totRootLenDens_vr(L,NY,NX)
     plt_rbgc%trcg_root_vr(idg_beg:idg_NH3,L)         = trcg_root_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_rbgc%trcg_air2root_flx_vr(idg_beg:idg_NH3,L) = trcg_air2root_flx_vr(idg_beg:idg_NH3,L,NY,NX)
     plt_bgcr%RootCO2Emis2Root_vr(L)                  = RootCO2Emis2Root_vr(L,NY,NX)
     plt_bgcr%RUptkRootO2_vr(L)                       = RUptkRootO2_vr(L,NY,NX)
-    plt_bgcr%RootO2_TotSink_vr(L)                       = RootO2_TotSink_vr(L,NY,NX)
+    plt_bgcr%RootO2_TotSink_vr(L)                    = RootO2_TotSink_vr(L,NY,NX)
     DO  K=1,jcplx
       plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)=tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)
     ENDDO

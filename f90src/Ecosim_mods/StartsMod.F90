@@ -67,6 +67,7 @@ module StartsMod
   public :: starts
   public :: set_ecosim_solver
   public :: startsim
+  public :: InitControlParms
   contains
 
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
@@ -88,8 +89,8 @@ module StartsMod
 ! begin_execution
 
   call PrintInfo('beg '//subname)
-  !  Initialize controlling parameters
-  call InitControlParms
+  
+  call InitControlParms  
   !
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
@@ -743,38 +744,9 @@ module StartsMod
   BulkDensLitR=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
   call InitSOMConsts
-  !     NDIM=1
-  !     IF(NHE.GT.NHW)NDIM=NDIM+1
-  !     IF(NVS.GT.NVN)NDIM=NDIM+1
-  !     XDIM=1.0/NDIM
+
   ZERO  = 1.0E-16_r8
   ZERO2 = 1.0E-08_r8
-  TAREA = 0.0_r8  !land scape area
-  !
-  !     INITIALIZE MASS BALANCE CHECKS
-  !
-  CRAIN_lnd           = 0.0_r8
-  HEATIN_lnd          = 0.0_r8
-  SurfGas_lnd(idg_CO2)     = 0.0_r8
-  SurfGas_lnd(idg_O2)      = 0.0_r8
-  SurfGas_lnd(idg_H2)      = 0.0_r8
-  TZIN                = 0.0_r8
-  SurfGas_lnd(idg_N2)      = 0.0_r8
-  TPIN                = 0.0_r8
-  tAmendOrgC_lnd      = 0.0_r8
-  TORGN               = 0.0_r8
-  TORGP               = 0.0_r8
-  QH2OLoss_lnds       = 0.0_r8
-  CEVAP               = 0.0_r8
-  CRUN                = 0.0_r8
-  HeatOut_lnds        = 0.0_r8
-  OXYGOU              = 0.0_r8
-  H2GOU               = 0.0_r8
-  TSedmErossLoss_lnds = 0.0_r8
-  TOMOU_lnds(:)       = 0.0_r8
-  Litrfall_lnds(:)    = 0.0_r8
-  TIONIN              = 0.0_r8
-  TIONOU              = 0.0_r8
   end subroutine InitControlParms
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators()
@@ -1010,7 +982,38 @@ module StartsMod
   end subroutine set_ecosim_solver
 
 !------------------------------------------------------------------------------------------
+  subroutine InitLandScapeVars
+  implicit none
+  TAREA = 0.0_r8  !land scape area
+  !
+  !     INITIALIZE MASS BALANCE CHECKS
+  !
+  CRAIN_lnd           = 0.0_r8
+  HEATIN_lnd          = 0.0_r8
+  SurfGas_lnd(idg_CO2)     = 0.0_r8
+  SurfGas_lnd(idg_O2)      = 0.0_r8
+  SurfGas_lnd(idg_H2)      = 0.0_r8
+  TZIN                = 0.0_r8
+  SurfGas_lnd(idg_N2)      = 0.0_r8
+  TPIN                = 0.0_r8
+  tAmendOrgC_lnd      = 0.0_r8
+  TORGN               = 0.0_r8
+  TORGP               = 0.0_r8
+  QH2OLoss_lnds       = 0.0_r8
+  CEVAP               = 0.0_r8
+  CRUN                = 0.0_r8
+  HeatOut_lnds        = 0.0_r8
+  OXYGOU              = 0.0_r8
+  H2GOU               = 0.0_r8
+  TSedmErossLoss_lnds = 0.0_r8
+  TOMOU_lnds(:)       = 0.0_r8
+  Litrfall_lnds(:)    = 0.0_r8
+  TIONIN              = 0.0_r8
+  TIONOU              = 0.0_r8
 
+  end subroutine InitLandScapeVars  
+
+!------------------------------------------------------------------------------------------
   subroutine startsim(NHW,NHE,NVN,NVS)
   use SoilHydroParaMod, only : ComputeSoilHydroPars
   use SoilPhysParaMod, only : SetDeepSoil
@@ -1033,8 +1036,8 @@ module StartsMod
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo
   enddo
-  !  Initialize controlling parameters
-  call InitControlParms
+
+  call InitLandScapeVars
 
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
