@@ -508,7 +508,7 @@ module MicBGCMod
 !       OMC2=active biomass in recalcitrant fraction
 !
           TotActMicrobiom=TotActMicrobiom+OMActHeter(NGL,K)
-          IF(N.EQ.mid_Facult_DenitBacter)THEN
+          IF(N.EQ.mid_Facult_DenitBacter .AND. micpar%is_activeMicrbFungrpHeter(N))THEN
             TotBiomNO2Consumers=TotBiomNO2Consumers+OMActHeter(NGL,K)
           ENDIF
           MID2=micpar%get_micb_id(iLbiom_struct,NGL)
@@ -547,7 +547,9 @@ module MicBGCMod
       !
         TotActMicrobiom=TotActMicrobiom+OMActAutor(NGL)
 
-        IF(N.EQ.mid_AutoAmmoniaOxidBacter)THEN
+        !All active NO2 consumers share the same layer-wide fallback budget.
+        IF(N.EQ.mid_AutoAmmoniaOxidBacter .OR. N.EQ.micpar%mid_AutoNitriteOxidBacter &
+          .OR. N.EQ.micpar%mid_AutoAMONC10)THEN
           TotBiomNO2Consumers=TotBiomNO2Consumers+OMActAutor(NGL)
         ENDIF
 

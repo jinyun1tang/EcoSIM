@@ -87,6 +87,7 @@ module DenitrifierMod
   associate(                                                         &
     OxyLimterHeter             => nmics%OxyLimterHeter,              & !Actual/potential O2 uptake ratio; 1 means no O2 restriction [-]
     FracOMActHeter             => nmics%FracOMActHeter,              & !Guild/complex fraction of total active microbial C in the layer [-]
+    FracNO2ReduxHeter          => nmics%FracNO2ReduxHeter,           & !Guild/complex share of active nitrite-consuming biomass [-]
     RO2Dmnd4RespHeter          => nmicf%RO2Dmnd4RespHeter,           & !Potential O2 demand supporting heterotrophic gross respiration
     RO2Uptk4RespHeter          => nmicf%RO2Uptk4RespHeter,           & !Realized O2 uptake attributed to heterotrophic gross respiration
     RNO3ReduxHeterSoil         => nmicf%RNO3ReduxHeterSoil,          & !Realized nonband NO3-N reduction to NO2-N by heterotrophic guilds
@@ -241,13 +242,13 @@ module DenitrifierMod
     IF(RNO2EcoUptkSoilPrev.GT.ZEROS)THEN
       FNO2=AMAX1(FMN,RNO2DmndReduxSoilHeterPrev(NGL,K)/RNO2EcoUptkSoilPrev)
     ELSE
-      FNO2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNO3)
+      FNO2=AMAX1(FMN,FracNO2ReduxHeter(NGL,K)*VLNO3)
     ENDIF
 
     IF(RNO2EcoUptkBandPrev.GT.ZEROS)THEN
       FNB2=AMAX1(FMN,RNO2DmndReduxBandHeterPrev(NGL,K)/RNO2EcoUptkBandPrev)
     ELSE
-      FNB2=AMAX1(FMN,FracOMActHeter(NGL,K)*VLNOB)
+      FNB2=AMAX1(FMN,FracNO2ReduxHeter(NGL,K)*VLNOB)
     ENDIF
 
     naqfdiag%TFNO2X=naqfdiag%TFNO2X+FNO2

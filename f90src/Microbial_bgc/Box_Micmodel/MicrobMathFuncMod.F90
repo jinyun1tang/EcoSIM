@@ -448,7 +448,9 @@ module MicrobMathFuncMod
     FracOMActAutor(NGL)=1.0_r8
   ENDIF
 
-  IF(TotBiomNO2Consumers.GT.ZEROS.and.N.eq.micpar%mid_AutoAmmoniaOxidBacter)THEN
+  !Use the same consumer set as StageBGCEnvironCondition's NO2 biomass total.
+  IF(TotBiomNO2Consumers.GT.ZEROS .AND. (N.EQ.micpar%mid_AutoAmmoniaOxidBacter &
+    .OR. N.EQ.micpar%mid_AutoNitriteOxidBacter .OR. N.EQ.micpar%mid_AutoAMONC10))THEN
     FracNO2XupAutor(NGL)=OMActAutor(NGL)/TotBiomNO2Consumers
   ELSE
     FracNO2XupAutor(NGL)=1.0_r8
