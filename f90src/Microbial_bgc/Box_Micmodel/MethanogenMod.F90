@@ -89,7 +89,7 @@ module MethanogenMod
     call StageFuncGuild(N,NGL,K,TotActMicrobiom,FOQC(NGL,K),FOQA,micfor,naqfdiag,nmicdiag,nmics)
 
     call CalcRespMaintHeter(NGL,K,RMOMK,micfor,micstt,micflx,nmicf,nmics)
-
+    !1.E-3 is to convert J into kJ
     GOMX = RGASC*1.E-3_r8*TKS*LOG((AMAX1(ZERO,CDOM(idom_acetate,K))/OAKI))
     GOMM = GOMX/24.0_r8
     ECHZHeter(NGL,K) = AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GC4X+GOMM))/EOMH)))

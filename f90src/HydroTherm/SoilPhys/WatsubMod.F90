@@ -2531,12 +2531,12 @@ module WatsubMod
 !   TFice=frozen temperature
 !   There is freeze-thaw in macropore, it is assumed there is no freezing temperature depression in 
 !   macropores, therefore, water will first freeze in macropores.
-    IF((TK1App.LT.TFICE .AND. VLWatMacP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)) &
-      .OR.(TK1App.GT.TFICE .AND. VLiceMacP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)))THEN
+    IF((TK1App.LT.TFREEZ .AND. VLWatMacP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)) &
+      .OR.(TK1App.GT.TFREEZ .AND. VLiceMacP1_vr(N3,N2,N1).GT.ZERO*VGeomLayer_vr(N3,N2,N1)))THEN
       
       VLHeatCapacityBX     = cpw*VLWatMacP1X+cpi*VLiceMacP1_vr(L,NY,NX)
       !where is the following equation come from?
-      MacPIceHeatFlxFrezPt = VLHeatCapacityBX*(TFICE-TK1App)/((1.0_r8+6.2913E-03_r8*TFICE))*dts_wat 
+      MacPIceHeatFlxFrezPt = VLHeatCapacityBX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*(TFREEZ-TFICE)))*dts_wat 
 !          /(1.0_r8-0._r8*0.10_r8*PSISMX)
 
       !Ice thawed, absorb heat
@@ -2559,7 +2559,7 @@ module WatsubMod
       
       VLHeatCapacityAX     = VHeatCapSolidSoil_vr(N3,N2,N1)+cpw*VLWatMicP1X+cpi*VLiceMicP1_vr(N3,N2,N1)
       if(VLHeatCapacityAX>0._r8)VLHeatCapacityAX=VLHeatCapacityAX+dcpo
-      MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*TFREEZ))*dts_wat
+      MicPIceHeatFlxFrezPt = VLHeatCapacityAX*(TFREEZ-TK1App)/((1.0_r8+6.2913E-03_r8*(TFREEZ-TFice)))*dts_wat
 
       !fusion energy absorb (<0) in thaw
       IF(MicPIceHeatFlxFrezPt.LT.0.0_r8)THEN
