@@ -1,4 +1,4 @@
-module PlantMod
+module PlantTestMod
  use ecosim_log_mod    , only : errMsg => shr_log_errMsg
  use bhistMod           , only : hist_freq_str_len
  use abortutils        , only : endrun
@@ -92,4 +92,4 @@ implicit none
 
 ! ----------------------------------------------------------------------
 
-end module PlantMod
+end module PlantTestMod
