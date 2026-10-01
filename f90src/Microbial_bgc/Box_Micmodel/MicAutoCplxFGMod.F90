@@ -1413,6 +1413,13 @@ module MicAutoCPLXMod
             mBiomeAutor(NE,MID3)=mBiomeAutor(NE,MID3)-NonstX2stBiomAutor(NE,M,NGL)+RkillRecycOMAutor(NE,M,NGL)
           ENDDO
 
+          !TODO: Resolve starvation respiration with pathway-specific redox budgets.
+          !This CO2 release currently has no matching electron-acceptor debit.
+          !Aerobic respiration needs available O2 and consistent demand/uptake;
+          !anaerobic groups need their own substrates and reduced products,
+          !not an O2 charge. Preserve unrespired C in organic pools and avoid
+          !double-counting maintenance already supported by catabolism.
+          !See the corresponding starvation update in MicBGCFGMod.
           !C is respired as CO2 while N and P are recycled.
           mBiomeAutor(ielmn,MID3) = mBiomeAutor(ielmn,MID3)+RMaintDefcitRecycOMAutor(ielmn,M,NGL)
           mBiomeAutor(ielmp,MID3) = mBiomeAutor(ielmp,MID3)+RMaintDefcitRecycOMAutor(ielmp,M,NGL)

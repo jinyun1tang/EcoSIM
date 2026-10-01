@@ -8,7 +8,7 @@ module MicBGCAPI
   use MicStateTraitTypeMod, only: micsttype
   use MicrobeDiagTypes,     only: Cumlate_Flux_Diag_type, Microbe_Diag_type
   use MicForcTypeMod,       only: micforctype
-  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1,real_truncate,isclose,sfexp
+  use minimathmod,          only: AZMAX1,safe_adb,AZERO,AZERO1,real_truncate,isclose,sfexp,attn_func
   use EcoSiMParDataMod,     only: micpar
   use MicBGCMod,            only: SoilBGCOneLayer
   use EcosimConst,          only: LtHeatIceMelt,Tref
@@ -95,6 +95,7 @@ implicit none
   real(r8) :: SOMCL !mass of SOC in layer, [gC d-2]
   real(r8) :: kSoil,tau
   real(r8) :: PAR_RAD,RadPAR2LitR_lyr,RadPAR2Soil_lyr !PAR [umol m-2 s-1]
+  real(r8) :: dPAR_RAD,dRadPAR2LitR_lyr,dRadPAR2Soil_lyr !PAR [umol m-2 s-1]
   real(r8) :: micBE(NumPlantChemElms)
   real(r8) :: attn
   real(r8), parameter :: k_litr = 250._r8     ![1/m]
@@ -115,37 +116,42 @@ implicit none
       PAR_RAD_vr(:,NY,NX) = 0._r8
       RadPAR2Soil_lyr = RadPAR2Soil_col(NY,NX)
       RadPAR2LitR_lyr = RadPAR2LitR_col(NY,NX)
-      PAR_RAD         = RadPAR2LitR_lyr*FracSurfByLitR_col(NY,NX)+RadPAR2Soil_lyr*(1._r8-FracSurfByLitR_col(NY,NX))
+      PAR_RAD         = RadPAR2LitR_lyr+RadPAR2Soil_lyr
       PAR_RAD         = PAR_RAD/AREA_3D(3,NU_col(NY,NX),NY,NX)
       D998: DO L=0,NL_col(NY,NX)
         PAR_RAD_vr(L,NY,NX) = PAR_RAD
         
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
-          IF(L.EQ.0 .OR. L.GE.NU_col(NY,NX))THEN
-             call sumMicBiomLayL(L,NY,NX,OrGM_beg)
-             call MicBGC1Layer(I,J,L,NY,NX,PAR_RAD)
-             call sumMicBiomLayL(L,NY,NX,dOrGM)
-
-             dOrGM  = dOrGM-OrGM_beg
-             tdOrGM = tdOrGM+dOrGM
-             
-             IF(PAR_RAD.GT.0._r8)then              
+          IF(L.EQ.0 .OR. L.GE.NU_col(NY,NX))THEN             
+            IF(PAR_RAD.GT.0._r8)then              
               if(L.eq.0)then
                 call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE)                
                 tau = k_litr  * DLYR_3D(3,L,NY,NX)+k_cyanoC*MicbE(ielmc)/AREA_3D(3,NU_col(NY,NX),NY,NX)                
-                RadPAR2LitR_lyr=RadPAR2LitR_lyr*(1._r8-sfexp(-tau))/tau             
+                attn=attn_func(tau)
+                dRadPAR2LitR_lyr=RadPAR2LitR_lyr*attn
+                dRadPAR2Soil_lyr=0._r8   
+                RadPAR2LitR_lyr=RadPAR2LitR_lyr*sfexp(-tau)
               else
                 call CalcKSoilPAR(SAND_vr(L,NY,NX), CLAY_vr(L,NY,NX), VLSoilMicPMass_vr(L,NY,NX), SoilOrgM_vr(ielmc,L,NY,NX), DLYR_3D(3,L,NY,NX),kSoil)
                 call SumMicbGroup(L,NY,NX,micpar%mid_HeterMixtCynoBacter,MicbE) 
                 TAU=kSoil* DLYR_3D(3,L,NY,NX)+k_cyanoC*MicbE(ielmc)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-                attn=(1._r8-sfexp(-tau))/tau
-                RadPAR2LitR_lyr=RadPAR2LitR_lyr*attn
-                RadPAR2Soil_lyr=RadPAR2Soil_lyr*attn
+                attn=attn_func(tau)
+                dRadPAR2LitR_lyr=RadPAR2LitR_lyr*attn
+                dRadPAR2Soil_lyr=RadPAR2Soil_lyr*attn
+                RadPAR2LitR_lyr=RadPAR2LitR_lyr*sfexp(-tau)
+                RadPAR2Soil_lyr=RadPAR2Soil_lyr*sfexp(-tau)                
               endif
-              PAR_RAD = RadPAR2LitR_lyr+RadPAR2Soil_lyr
-              PAR_RAD = PAR_RAD/AREA_3D(3,NU_col(NY,NX),NY,NX)
-             endif
+              dPAR_RAD = (dRadPAR2LitR_lyr+dRadPAR2Soil_lyr)/AREA_3D(3,NU_col(NY,NX),NY,NX)              
+              PAR_RAD = (RadPAR2LitR_lyr+RadPAR2Soil_lyr)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+            else
+              dPAR_RAD = 0._r8   
+            endif  
+            call sumMicBiomLayL(L,NY,NX,OrGM_beg)
+            call MicBGC1Layer(I,J,L,NY,NX,dPAR_RAD)
+            call sumMicBiomLayL(L,NY,NX,dOrGM)
+            dOrGM  = dOrGM-OrGM_beg
+            tdOrGM = tdOrGM+dOrGM                
           ELSE
             trcs_RMicbUptake_vr(idg_beg:idg_NH3-1,L,NY,NX)     = 0.0_r8
             RNut_MicbRelease_vr(ids_NH4B:ids_nuts_end,L,NY,NX) = 0.0_r8

@@ -1885,6 +1885,13 @@ module MicBGCMod
             DO NE=2,NumPlantChemElms
               mBiomeHeter(NE,MID3,K)=mBiomeHeter(NE,MID3,K)+RMaintDefcitRecycOMHeter(NE,M,NGL,K)
             ENDDO
+            !TODO: Resolve starvation respiration with pathway-specific redox budgets.
+            !This CO2 release currently has no matching electron-acceptor debit.
+            !Aerobic respiration needs available O2 and consistent demand/uptake;
+            !anaerobic groups need their own substrates and reduced products,
+            !not an O2 charge. Preserve unrespired C in organic pools and avoid
+            !double-counting maintenance already supported by catabolism.
+            !See the corresponding starvation update in MicAutoCplxFGMod.
             !respire
             RCO2ProdHeter(NGL,K)=RCO2ProdHeter(NGL,K)+RMaintDefcitRecycOMHeter(ielmc,M,NGL,K)
           ENDDO D555

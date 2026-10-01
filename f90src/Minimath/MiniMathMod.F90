@@ -35,6 +35,7 @@ module minimathmod
   public :: sfexp
   public :: Viscosity_H2O
   public :: VapMass2KPa
+  public :: attn_func
   public :: SubstrateDribbling  
   interface SubstrateDribbling
     module procedure SubstrateDribbling_vec
@@ -170,6 +171,19 @@ module minimathmod
   real(r8) :: ans  !(kPa)
   ans=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat0
+
+!------------------------------------------------------------------------------------------
+  pure function attn_func(tau)result(attn)
+  implicit none
+  real(r8), intent(in) :: tau
+  real(r8) :: attn
+
+  if (tau < 1.e-6_r8) then
+    attn = 1._r8 - 0.5_r8*tau + tau*tau/6._r8
+  else
+    attn = (1._r8-sfexp(-tau))/tau
+  endif  
+  end function attn_func
 
 !------------------------------------------------------------------------------------------
 
