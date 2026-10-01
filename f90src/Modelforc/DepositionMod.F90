@@ -1,7 +1,8 @@
 module DepositionMod
   use data_kind_mod,     only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only : micpar
-  use InitSOMBGCMOD   , only : MicrobeByLitterFall,InoculateCyanoBacter
+  use EcoSiMParDataMod, only: micpar
+  use DebugToolMod,     only: PrintInfo
+  use InitSOMBGCMOD,    only: MicrobeByLitterFall, InoculateCyanoBacter
   use ClimForcDataType
   use EcosimBGCFluxType
   use GridDataType
@@ -38,11 +39,14 @@ contains
 
   character(len=*), parameter :: subname='ApplyBioAerosol'
 
+  call PrintInfo('beg '//subname)
+  IF(DryDepoOMC(I)<=1.e-12_R8)return
+
   !add to fine litter group
   K=micpar%k_fine_comp
 
   !total organic C dry deposition
-  OSCDep=DryDepoOMC(I)*AREA_3D(3,NU_col(NY,NX),NY,NX)
+  OSCDep=DryDepoOMC(I)*AREA_3D(3,NU_col(NY,NX),NY,NX)*fAeroScalar_col(NY,NX)
 
   !total live microbial C deposition
   OSCMK =OSCDep*f_aerosol_LiveMB_col(NY,NX)
@@ -90,7 +94,7 @@ contains
       SeedCDeposition_pft(NZ,NY,NX) = DryDepoOMC(I)*f_aerosol_MossB_col(NY,NX)
     endif
   ENDDO
-
+  call PrintInfo('end '//subname)
   end subroutine ApplyBioAerosol
 
 end module DepositionMod

@@ -28,6 +28,15 @@ add_ecosim_library(ioutils ${IOUTILS_SOURCES})
 #add_library(ioutils OBJECT ${IOUTILS_SOURCES})
 #install(TARGETS ioutils OBJECTS DESTINATION lib)
 
+# HistFileMod.F90 is large enough that -O3 (CMAKE_Fortran_FLAGS_RELEASE) makes
+# gfortran emit a branch/relocation that Apple's integrated assembler cannot
+# encode on arm64 ("addend too big for relocation" / "fixup value out of
+# range"), aborting the Release build. -O1 compiles cleanly and this file is
+# I/O bookkeeping, not a hot loop, so the perf cost is negligible. The
+# trailing flag wins for gfortran, so this appended -O1 overrides the
+# target/directory -O3 for this one source file only.
+set_source_files_properties(HistFileMod.F90 PROPERTIES COMPILE_OPTIONS "-O1")
+
 target_include_directories(ioutils  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
