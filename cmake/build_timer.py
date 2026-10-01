@@ -34,7 +34,7 @@ def step_name(command, phase):
         archives = [arg for arg in command if arg.endswith((".a", ".lib"))]
         if archives:
             return Path(command[0]).name + " " + archives[0]
-    return shlex.join(command)
+    return " ".join(shlex.quote(arg) for arg in command)
 
 
 def append_record(path, record):
