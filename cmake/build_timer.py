@@ -106,7 +106,7 @@ def report(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    sub = parser.add_subparsers(dest="action", required=True)
+    sub = parser.add_subparsers(dest="action")
     run = sub.add_parser("run", help="record one command's elapsed time and exit code")
     run.add_argument("--log")
     run.add_argument("--phase", required=True)
@@ -115,6 +115,8 @@ def main():
     summary.add_argument("--log", required=True)
     summary.add_argument("--run-id")
     args = parser.parse_args()
+    if not args.action:
+        parser.error("an action is required")
     try:
         return run_command(args) if args.action == "run" else report(args)
     except (OSError, ValueError) as error:
