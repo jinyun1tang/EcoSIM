@@ -1648,9 +1648,9 @@ implicit none
             Root2ndSink_pvr,Root1stSinkTip,RootSinkC_vr,fRootGrowPSISense,TFN6_vr,fdLext1st,RespElongWatSens,&
             DMRespEff,CNRTW,CPRTW,Root1stTipUpdateFlag,FoundRootAxesTip,litrflxt,RCO2flxt)
         endif   
-
-        litrflx = litrflx+litrflxt
-        RCO2flx = RCO2flx+RCO2flxt
+        
+        litrflx = litrflx+AZMAX1(litrflxt)
+        RCO2flx = RCO2flx+AZMAX1(RCO2flxt)
       ENDIF
 
       dlitrfall=plt_bgcr%LitrfallBlgrElms_pft(:,NZ)
@@ -5138,12 +5138,13 @@ implicit none
       endif
       if(lumenVolM.GT.0._r8)then
         !Population mass after sources and decay; local metabolism continues at zero flow.
-        MediumMass = AMAX1(0._r8,CytokininMRConc_rpvr(L,NR,NZ)*lumenVolM+MediumInMass &
+        MediumMass = AZMAX1(CytokininMRConc_rpvr(L,NR,NZ)*lumenVolM+MediumInMass &
           +RootMRProdCytok_rpvr(L,NR,NZ)*dtCyto)*sfexp(-kDCytof(1)*dtCyto)
+
         if(QH2OMediumRoots.GT.0._r8 .and. lumenVolC.GT.0._r8)then
           !Implicit well-mixed outflow: export cannot exceed the donor inventory.
-          MediumMassLeft = MediumMass*(lumenVolM/(lumenVolM+QH2OMediumRoots*dtCyto))
-          ExportMass = MediumMass-MediumMassLeft
+          MediumMassLeft = AZMAX1(MediumMass*(lumenVolM/(lumenVolM+QH2OMediumRoots*dtCyto)))
+          ExportMass = AZMAX1(MediumMass-MediumMassLeft)
           MediumMass = MediumMassLeft
           Cytokinin1stConc_rpvr(L,NR,NZ) = Cytokinin1stConc_rpvr(L,NR,NZ)+ExportMass/lumenVolC
         endif

@@ -17,7 +17,7 @@ module minimathmod
   public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
   public :: isLeap,iisleap
-  public :: isnan
+  
   public :: AZMAX1,AZMIN1,AZMAX1t,AZMAX1d,AZMIN1d
   public :: GetMolAirPerm3
   public :: fSiLU
@@ -44,6 +44,7 @@ module minimathmod
   interface AZMAX1
     module procedure AZMAX1_s
     module procedure AZMAX1_d
+    module procedure AZMAX1_v
   end interface AZMAX1
 
   interface AZMIN1
@@ -58,14 +59,6 @@ module minimathmod
 
   contains
 
-   pure function isnan(a)result(ans)
-   implicit none
-   real(r8), intent(in) :: a
-   logical :: ans
-
-   ans=(a/=a)
-   return
-   end function isnan
 !------------------------------------------------------------------------------------------
 
    pure function safe_adb(a,b)result(ans)
@@ -339,6 +332,21 @@ module minimathmod
   ans=AMAX1(0.0_r8,val1,val2)
 
   end function AZMAX1_d
+!------------------------------------------------------------------------------------------
+
+  pure function AZMAX1_v(val1)result(ans)
+  implicit none
+  real(r8), dimension(:), intent(in) :: val1
+  
+  real(r8) :: ans(size(val1))
+  integer :: jj, sz
+  sz = size(val1)
+  DO jj=1,sz
+    ans(jj)=AMAX1(0.0_r8,val1(jj))
+  enddo
+
+  end function AZMAX1_v
+
 
 !------------------------------------------------------------------------------------------
 
@@ -637,7 +645,10 @@ module minimathmod
   end subroutine SubstrateDribbling_scal
 !------------------------------------------------------------------------
   subroutine SubstrateDribbling_vec(n1,n2,demand_flux,dribbling_flx,y)
-
+  
+  !
+  !computing the dribbling flux to meet the non-negative requirement of 
+  !variable y
   implicit none
   integer, intent(in) :: n1,n2
   real(r8), intent(in) :: demand_flux(n1:n2)  !consumption/demand flux

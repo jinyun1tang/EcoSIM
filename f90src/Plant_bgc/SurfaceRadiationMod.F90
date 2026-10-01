@@ -1,7 +1,7 @@
 module SurfaceRadiationMod
 
   use data_kind_mod,      only: r8 => DAT_KIND_R8
-  use minimathmod,        only: AZMAX1,   isnan
+  use minimathmod,        only: AZMAX1
   use PlantBGCPars,       only: iforward, ibackward
   use PrescribePhenolMod, only: SetCanopyProfile
   use EcoSIMCtrlMod,      only: ldo_sp_mode,ldo_radiation_test,etimer
