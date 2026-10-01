@@ -119,7 +119,7 @@ implicit none
       PAR_RAD         = RadPAR2LitR_lyr+RadPAR2Soil_lyr
       PAR_RAD         = PAR_RAD/AREA_3D(3,NU_col(NY,NX),NY,NX)
       D998: DO L=0,NL_col(NY,NX)
-        PAR_RAD_vr(L,NY,NX) = PAR_RAD
+        PAR_RAD_vr(L,NY,NX) = AZMAX1(PAR_RAD)
         
         IF(VLSoilPoreMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
