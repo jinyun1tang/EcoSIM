@@ -7,7 +7,7 @@
 <header><div class="eyebrow">EcoSIM · Process knowledge</div>
 <h1>Cyanobacteria:<br>light, maintenance, and residual growth</h1>
 <p class="lead">EcoSIM represents cyanobacteria as mixotrophic microbes: they fix CO₂ using light, consume dissolved organic carbon and acetate, and can fix N₂. Photosynthetic fixation supplies maintenance first. Carbon left after respiratory costs is available for growth.</p>
-<p class="meta">Implementation snapshot · 29 September 2026 · <code>solphys</code> · base commit <code>55f672e7</code> plus the current, uncommitted cyanobacterial carbon/O₂ corrections in <code>CyanoBacteriaMod.F90</code> and <code>MicBGCFGMod.F90</code>. This document describes that working-tree implementation.</p>
+<p class="meta">Carbon/O₂ guide originally prepared 29 September 2026 · PAR documentation updated 30 September 2026 against <code>f0314ff4</code> · <code>solphys</code>. The light section reflects the incident-PAR and sequential shading implementation in <code>MicBGCAPI.F90</code>.</p>
 <nav aria-label="Contents"><a href="#overview">Overview</a><a href="#state">State &amp; initialization</a><a href="#light">Light &amp; environment</a><a href="#carbon">Carbon allocation</a><a href="#oxygen">Oxygen</a><a href="#nitrogen">N₂ fixation</a><a href="#nutrients">Nutrients &amp; turnover</a><a href="#diagnostics">Diagnostics</a><a href="#parameters">Parameters</a><a href="#explorer">Budget explorer</a><a href="#sources">Source map</a></nav></header>
 <section id="overview"><h2>1. Three coupled resources</h2>
 <div class="cards"><article class="card"><div class="tag">CARBON</div><h3>Two entry routes</h3><p>CO₂ fixation supplies photosynthate. DOC and acetate supply organic C. The organic donor pools are debited separately from photosynthetic input.</p></article><article class="card"><div class="tag">OXYGEN</div><h3>Production and consumption</h3><p>Photosynthetic O₂ supports respiration internally. Only the remaining demand competes for soil O₂; unused photosynthetic O₂ is exported.</p></article><article class="card"><div class="tag">NUTRITION</div><h3>Growth needs N and P</h3><p>N₂ fixation can supplement nitrogen uptake at a carbon cost. Phosphorus must still come from organic or mineral nutrient pools.</p></article></div>
@@ -22,7 +22,7 @@
 <p><code>CyanoInocC</code> defaults to 0.01 g C m⁻² as declared in the parameter module. The separate <code>CyanoInoc_depth = 0.001 m</code> parameter is currently not consumed by the inoculation routine: it does not establish an explicit 1 mm living layer.</p>
 <p class="source">Sources: <a href="../f90src/Modelpars/MicBGCPars.F90">group and guild definitions</a>; <a href="../f90src/Microbial_bgc/Layers_Micmodel/InitSOMBGCMod.F90">inoculation</a>; <a href="../f90src/Microbial_bgc/Box_Micmodel/MicrobMathFuncMod.F90">active biomass and StageFuncGuild</a>.</p></section>
 <section id="light"><h2>3. Light, CO₂, water, and temperature set fixation</h2>
-<p>Let <code>I</code> be layer PAR in μmol photons m⁻² s⁻¹; <code>B</code> the nonnegative product of active C and the N/P stoichiometric multiplier; and <code>E</code> the growth environment multiplier. Carbon fluxes below share the model layer's mass-per-hour basis; they should not be read as per-individual rates or automatically as per-m² output.</p>
+<p>Let <code>I</code> be incident PAR at the layer’s upper interface in μmol photons m⁻² s⁻¹; <code>B</code> the nonnegative product of active C and the N/P stoichiometric multiplier; and <code>E</code> the growth environment multiplier. Carbon fluxes below share the model layer's mass-per-hour basis; they should not be read as per-individual rates or automatically as per-m² output.</p>
 <div class="formula"><pre>fPAR = max(0, α I (1 − β I) / (1 + γ I))
 fCO₂ = CCO2S / (CCO2S + CCKM)
 rphoto = fPAR × fCO₂ × E                       [h⁻¹]
@@ -34,15 +34,27 @@ E = WSensGroHeter × TSensGroHeter
 WSensGroHeter = exp[0.2 × max(PSISoilMatricP, −500)]</pre></div>
 <p>In darkness, fixation is zero. The empirical light function rises and then declines; its nonnegative clipping gives zero at and above roughly 3030 μmol photons m⁻² s⁻¹. This describes the coded parameterization. The CO₂ term is a concentration saturation response, not a separate cap on the available CO₂ mass within this routine. Temperature uses the common microbial growth response. Nutrient status multiplies capacity through <code>min(FCN,FCP)</code>, whose component multipliers are bounded between 0.5 and 1.</p>
 <h3>How PAR is passed through the column</h3>
-<p><code>MicrobeModel</code> starts with litter-covered and exposed-soil PAR weighted by litter cover and divided by cell area. It calls the current layer's microbial model <em>before</em> updating the light passed onward. For an active layer with positive incoming PAR, the update uses:</p>
-<div class="formula"><pre>τ = k × layer thickness + 0.1 × cyanobacterial C / cell area
-attenuation factor = (1 − exp(−τ)) / τ
+<p><code>MicrobeModel</code> processes the column from the surface downward. <code>WatsubMod</code> has already weighted the litter-covered and bare-soil PAR streams by their surface-cover fractions. Their sum, divided by cell area, supplies <code>PAR_RAD_incident</code> to <code>MicBGC1Layer</code>; the microbial caller does not apply those cover fractions again.</p>
+<div class="formula"><pre>A = cell area
+Iincident = (Slitter + Sbare) / A
 
-Litter: k = 250 m⁻¹; update the litter PAR stream.
-Soil:   k = CalcKSoilPAR(...); update both PAR streams.
-Next PAR = (updated litter stream + updated soil stream) / cell area</pre></div>
-<p>The soil coefficient depends on organic C and texture and is bounded between 800 and 10,000 m⁻¹. The cyanobacterial C used for shading is summed after the current layer's biology. The caller carries the factor <code>(1−exp(−τ))/τ</code> forward; it does not use a simple bottom-of-layer <code>exp(−τ)</code> transmission. Subsequent stream summation also differs from the initial litter-cover weighting. These details matter when interpreting depth profiles.</p>
-<p class="source">Sources: <a href="../f90src/Microbial_bgc/Box_Micmodel/CyanoBacteriaMod.F90">fPAR_func and catabolism</a>; <a href="../f90src/APIs/MicBGCAPI.F90">MicrobeModel light-update order</a>; <a href="../f90src/Microbial_bgc/Layers_Micmodel/SoilPARAttenuationMod.F90">CalcKSoilPAR</a>.</p></section>
+1. Run the current layer’s microbial biology using Iincident.
+2. Sum cyanobacterial C after that biological update: Bcyano.
+3. τ = k × layer thickness + k_cyanoC × Bcyano / A
+4. T = sfexp(−τ)                       [exponential transmission]
+
+Litter: Slitter,out = Slitter × T
+        Sbare,out  = Sbare             [bare-soil stream bypasses litter]
+Soil:   Slitter,out = Slitter × T
+        Sbare,out  = Sbare × T
+
+Inext = (Slitter,out + Sbare,out) / A</pre></div>
+<p>The streams <code>Slitter</code> and <code>Sbare</code> above denote the cell-total PAR contributions; division by <code>A</code> produces irradiance per unit area. Litter uses <code>k_litr = 250 m⁻¹</code>. Soil uses <code>CalcKSoilPAR</code>, which depends on organic C and texture and is bounded between 800 and 10,000 m⁻¹. Cyanobacterial self-shading uses <code>k_cyanoC = 0.1 m² g⁻¹ C</code>. The code evaluates transmission with the protected exponential <code>sfexp</code>.</p>
+<p><strong>The current layer receives incoming light before its own attenuation.</strong> Its updated cyanobacterial biomass then determines shading of deeper layers. This is the intended sequential surface-to-depth coupling. The nonnegative <code>PAR_RAD_vr</code> diagnostic records incident PAR for the active layer. Microbial biology still runs at night with zero PAR.</p>
+<h3>Incident, mean, and absorbed light are different quantities</h3>
+<p>For a single attenuating stream with upper-interface irradiance <code>I₀</code>, bottom transmission is <code>I₀ exp(−τ)</code>; the irradiance removed from that stream is <code>I₀[1−exp(−τ)]</code>. A layer mean under uniform exponential attenuation would instead be <code>I₀[1−exp(−τ)]/τ</code> (approaching <code>I₀</code> as τ approaches zero). The current microbial calculation uses incident irradiance, not either of these latter quantities.</p>
+<p>This represents cyanobacterial exposure at the layer’s upper interface. If cyanobacteria were instead represented as distributed throughout a thick layer, their exposure and nonlinear photosynthetic response would need a corresponding depth-distribution assumption. That is a modeling choice to assess for the application, rather than an error in the adopted surface-to-depth update.</p>
+<p class="source">Sources: <a href="../f90src/Microbial_bgc/Box_Micmodel/CyanoBacteriaMod.F90">fPAR_func and catabolism</a>; <a href="../f90src/APIs/MicBGCAPI.F90">MicrobeModel incident PAR and sequential shading</a>; <a href="../f90src/Microbial_bgc/Layers_Micmodel/SoilPARAttenuationMod.F90">CalcKSoilPAR</a>; <a href="../f90src/Minimath/MiniMathMod.F90">sfexp</a>.</p></section>
 <section id="carbon"><h2>4. Maintenance first; growth is the residual</h2>
 <p>Maintenance demand <code>M</code> is calculated before catabolism from kinetic N and active structural N, with compartment factors, temperature, and a pH multiplier. Photosynthetic maintenance respiration is <code>Rph = min(M,P)</code>. If fixation cannot meet maintenance, organic respiration supplies the remaining requirement.</p>
 <div class="formula"><pre>pH multiplier = 1 + max(0, 0.25 × (6.5 − pH))
