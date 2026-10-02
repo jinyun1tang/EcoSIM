@@ -1,4 +1,17 @@
 set(APIDATA_SOURCES
+  PlantSiteAPIData.F90
+  PlantPhotosynthesisAPIData.F90
+  PlantRadiationAPIData.F90
+  PlantMorphologyAPIData.F90
+  PlantPhenologyAPIData.F90
+  PlantSoilChemistryAPIData.F90
+  PlantAllometryAPIData.F90
+  PlantBiomassAPIData.F90
+  PlantEnergyWaterAPIData.F90
+  PlantDisturbanceAPIData.F90
+  PlantBGCRatesAPIData.F90
+  PlantRootBGCAPIData.F90
+  PlantAPICommonData.F90
   PlantAPIData.F90
 )
 

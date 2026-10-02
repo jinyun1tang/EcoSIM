@@ -13,7 +13,16 @@ module UptakesMod
   use EcoSIMSolverPar
   use UptakePars
   use NutUptakeMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantMathFuncMod
   use ElmIDMod, only : itrue
   implicit none
@@ -218,6 +227,9 @@ module UptakesMod
         call PlantNutientO2Uptake(yearIJ,NZ,FDMP,RadialMeanLen_rvr,FineRootRadius_rvr,FracPRoot4Uptake_pvr,&
           FracMinRoot4Uptake_rpvr,FracSoilLBy1stRoots_pvr,RootEffLen4Absorption_pvr)
       endif    
+    ELSE
+      ! This PFT skips all root uptake, so discard its previous O2 demand.
+      plt_rbgc%RootO2Dmnd4Resp_pvr(:,:,NZ) = 0._r8
     ENDIF
 
   ENDDO
@@ -872,7 +884,7 @@ module UptakesMod
         endif
         !
         VapXAir2Canopy_pft(NZ)=VapXAir2CanopyLiq_pft(NZ)+SnoSub2AirCanopy_pft(NZ)
-        EX                    = EX-VapXAir2CanopyLiq_pft(NZ)                        !demand for transpiration
+        EX                    = EX-VapXAir2Canopy_pft(NZ)                        !demand for transpiration
       ELSE
         VapXAir2Canopy_pft(NZ)    = 0._r8
         VapXAir2CanopyLiq_pft(NZ) = 0.0_r8
@@ -1207,7 +1219,7 @@ module UptakesMod
     MRootLumenArea_pvr          => plt_morph%MRootLumenArea_pvr              ,& !input  :medium roots lumen area, [m2]
     VLWatMicPM_vr               => plt_site%VLWatMicPM_vr                    ,& !input  :soil micropore water content, [m3 d-2]
     ZERO                        => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]
-    RootFineFrac2Med_pvr        => plt_morph%RootFineFrac2Med_pvr            ,& !input :fraction of fine roots that are associated with medium roots, [-]    
+    RootFineFrac2Med_rpvr        => plt_morph%RootFineFrac2Med_rpvr            ,& !fine-axis-count-weighted medium-root routing by category, [-]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
     ZEROS2                      => plt_site%ZEROS2                           ,& !input  :threshold zero for numerical stability,[-]
     CdH2ORootxSoil_pft          => plt_ew%CdH2ORootxSoil_pft                 ,& !output :total root and soil conductance for plant root water uptake, [mH2O h-1 d-2 MPa-1]
@@ -1310,9 +1322,9 @@ module UptakesMod
         !     CdH2ORootxSoil=total soil+root conductance for all layers
         ! assuming all roots work in parallel
         RootRadialKond2H2O_pvr(N,L,NZ) = 1._r8/RootRadialResist_rvr(N,L)
-        if(RootFineFrac2Med_pvr(L,NZ).GT.0._R8)THEN
-          condM=1._r8/(Root2ndAxialResist_rvr(N,L)/RootFineFrac2Med_pvr(L,NZ)+RootMediumAxialResist_rvr(N,L))
-          condC=(1._r8-RootFineFrac2Med_pvr(L,NZ))/Root2ndAxialResist_rvr(N,L)
+        if(RootFineFrac2Med_rpvr(N,L,NZ).GT.0._R8)THEN
+          condM=1._r8/(Root2ndAxialResist_rvr(N,L)/RootFineFrac2Med_rpvr(N,L,NZ)+RootMediumAxialResist_rvr(N,L))
+          condC=(1._r8-RootFineFrac2Med_rpvr(N,L,NZ))/Root2ndAxialResist_rvr(N,L)
           RootAxialKond2H2O_pvr(N,L,NZ)  = DLYR3(L)**2/(Root1stAxialResist_rvr(N,L)+1._r8/(condC+condM))     !plant size-scaled axial root conductance to H2O        
           RootResist4H2O_pvr(N,L,NZ)     = RootRadialResist_rvr(N,L)+Root1stAxialResist_rvr(N,L)+1._r8/(condC+condM)
         else

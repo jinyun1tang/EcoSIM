@@ -152,7 +152,8 @@ module StartqMod
   PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
   PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
   Transpiration_pft(NZ,NY,NX)     = 0._r8
-  FracPARads2Canopy_pft(NZ,NY,NX) = 0._r8
+  FracPARads2Canopy_pft(NZ,NY,NX)     = 0._r8
+  FracPARads2LiveCanopy_pft(NZ,NY,NX) = 0._r8
 
   call PrintInfo('end '//subname)
   end associate
@@ -602,6 +603,7 @@ module StartqMod
     ReprodNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX)   = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ,NY,NX)     = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ,NY,NX) = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ,NY,NX)      = 0._r8
     Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)     = 0._r8
     Hours4ShortenPhotoPeriod_brch(NB,NZ,NY,NX)     = 0._r8
     Hours4Leafout_brch(NB,NZ,NY,NX)                = Hours4LenthenPhotoPeriod_brch(NB,NZ,NY,NX)
@@ -634,7 +636,9 @@ module StartqMod
   EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)           = 0._r8
   CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)   = 0._r8
   LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = 0._r8
+  LeafSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)      = -1._r8
   PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = 0._r8
+  PetolSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX) = -1._r8
   SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ,NY,NX)    = 0._r8
   
   D25: DO NB=1,MaxNumBranches
@@ -642,7 +646,7 @@ module StartqMod
     CanopyLeafSheathC_brch(NB,NZ,NY,NX)  = 0._r8
     PotentialSeedSites_brch(NB,NZ,NY,NX) = 0._r8
     SetNumberSeeds_brch(NB,NZ,NY,NX)     = 0._r8
-    GrainSeedBiomCMean_brch(NB,NZ,NY,NX) = 0._r8
+    SingleGrainMeanBiomC_brch(NB,NZ,NY,NX) = 0._r8
     LeafAreaLive_brch(NB,NZ,NY,NX)       = 0._r8
     NH3Dep2Can_brch(NB,NZ,NY,NX)         = 0._r8
     LeafAreaDying_brch(NB,NZ,NY,NX)      = 0._r8

@@ -1,4 +1,10 @@
 set(APIS_SOURCES
+  PlantColumnTransferMod.F90
+  PlantStateTransferMod.F90
+  PlantCanopyTransferMod.F90
+  PlantRootTransferMod.F90
+  PlantRootAxisTransferMod.F90
+  PlantTraitsTransferMod.F90
 	PlantAPI.F90
   PlantCanAPI.F90
   PlantMod.F90

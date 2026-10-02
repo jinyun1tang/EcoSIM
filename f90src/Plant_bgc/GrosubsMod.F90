@@ -12,7 +12,17 @@ module grosubsMod
   use DebugToolMod,        only: PrintInfo
   use EcosimConst
   use PlantBGCPars
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PhotoSynsMod
   use PlantMathFuncMod
   use LitterFallMod
@@ -260,7 +270,8 @@ module grosubsMod
   character(len=*), parameter :: subname='GrowOnePlant'
   real(r8)  :: CanopyN2Fix_pft(JP1)
   integer  :: NB,NE,KK
-  integer  :: BegRemoblize
+  integer  :: BegRemoblizeBranch !phenological eligibility of the current branch
+  integer  :: BegRemoblizePlant  !main-branch eligibility controls root seasonal storage
   real(r8) :: TFN6_vr(JZ1)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW
   real(r8) :: PTRT    !main branch growth allocated to leaf and PetolSheth
@@ -291,7 +302,8 @@ module grosubsMod
   call PrintInfo('beg '//subname)
 
   IF(isPlantShootAlive_pft(NZ).EQ.iTrue .OR. isPlantRootAlive_pft(NZ).EQ.iTrue .and. PlantPopuLive_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
-    BegRemoblize        = 0
+    BegRemoblizePlant = ifalse
+    PTRT = 0._r8
     
     call StagePlantForGrowth(yearIJ%I,yearIJ%J,NZ,TFN6_vr,CNLFW,CPLFW,&
       CNSHW,CPSHW,CNRTW,CPRTW,TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp)
@@ -301,14 +313,19 @@ module grosubsMod
       !
       call GrowOneBranch(yearIJ,NB,NZ,TFN6_vr,CanopyHeight_copy,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WaterStress4Groth,Stomata_Stress,TurgEff4LeafPetolExpansion,TurgEff4CanopyResp,&
-        GrothPART2LeafPetole,BegRemoblize)
+        GrothPART2LeafPetole,BegRemoblizeBranch)
       !
-      IF(NB.EQ.MainBranchNum_pft(NZ))PTRT=GrothPART2LeafPetole
+      ! Use the main branch as the representative plant phenology for root storage.
+      ! Other branches retain their own eligibility for branch-local transfers.
+      IF(NB.EQ.MainBranchNum_pft(NZ))THEN
+        PTRT = GrothPART2LeafPetole
+        BegRemoblizePlant = BegRemoblizeBranch
+      ENDIF
     ENDDO
  
     call RootBGCModel(yearIJ,NZ,TFN6_vr,CNRTW,CPRTW,RootSinkC_vr,RootSinkC)
 
-    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblize)
+    call PlantNonstElmTransfer(yearIJ%I,yearIJ%J,NZ,PTRT,RootSinkC_vr,RootSinkC,BegRemoblizePlant)
 
   else
     plt_morph%RootSinkWeight_pvr(NU:MaxSoilLays4Root_pft(NZ),NZ)=0._r8   
@@ -577,7 +594,7 @@ module grosubsMod
     SapwoodBiomassC_brch      => plt_biom%SapwoodBiomassC_brch       ,& !input  :branch live stalk C, [gC d-2]
     iPlantNfixType_pft        => plt_morph%iPlantNfixType_pft        ,& !input  :N2 fixation type,[-]
     CanopyNodulNonstElms_pft  => plt_biom%CanopyNodulNonstElms_pft   ,& !inoput :canopy nodule nonstructural element, [g d-2]
-    CanopyStemSurfAreaZ_pft   => plt_morph%CanopyStemSurfAreaZ_pft   ,& !inoput :plant canopy layer stem area, [m2 d-2]
+    CanopyStemSurfAreaZ_pft   => plt_morph%CanopyStemSurfAreaZ_pft   ,& !output :plant canopy layer stem area, [m2 d-2]
     PlantExudElm_CumYr_pft    => plt_rbgc%PlantExudElm_CumYr_pft     ,& !inoput :total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
     PlantN2Fix_CumYr_pft      => plt_bgcr%PlantN2Fix_CumYr_pft       ,& !inoput :total plant N2 fixation, [g d-2 ]
     PlantRootSoilElmNetX_pft  => plt_rbgc%PlantRootSoilElmNetX_pft   ,& !inoput :net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
@@ -626,6 +643,8 @@ module grosubsMod
   CanopySeedNum_pft(NZ)    = 0._r8
   CanopyLeafArea_pft(NZ)   = 0._r8
   CanopyStemSurfArea_pft(NZ)   = 0._r8
+  ! Rebuild layer areas here so the result does not depend on an earlier growth reset.
+  CanopyStemSurfAreaZ_pft(:,NZ) = 0._r8
 
   DO NB=1,NumOfBranches_pft(NZ)        
     CanopySapwoodC_pft(NZ)     = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
@@ -639,6 +658,9 @@ module grosubsMod
     ENDDO
   ENDDO
   
+  ! The PFT total and layer profile must describe the same surviving branch geometry.
+  CanopyStemSurfArea_pft(NZ) = SUM(CanopyStemSurfAreaZ_pft(1:NumCanopyLayers1,NZ))
+
   if(CanopySeedNum_pft(NZ)>0._r8)CanopySeedNumX_pft(NZ)=CanopySeedNum_pft(NZ)
   if(CanopyLeafArea_pft(NZ).GT.ZEROs)then
     fNCLFW_pft(NZ)=fNCLFW_pft(NZ)/CanopyLeafArea_pft(NZ)

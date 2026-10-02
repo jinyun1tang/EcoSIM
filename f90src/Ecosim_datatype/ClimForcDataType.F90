@@ -147,6 +147,7 @@ implicit none
   real(r8),target,allocatable :: f_aerosol_DeadNMB_col(:,:)              !fraction of bioaerosol C as dead nonmicrobial biomass [0-1]
   real(r8),target,allocatable :: f_aerosol_LichB_col(:,:)                !fraction of bioaerosol C as lichen spore, [0-1]
   real(r8),target,allocatable :: f_aerosol_MossB_col(:,:)                !fraction of bioaerosol C as moss spore, [0-1]
+  real(r8),target,allocatable :: fAeroScalar_col(:,:)                    !optional per-topounit bioaerosol carbon deposition scalar read from grid file, [-]
   real(r8),target,allocatable :: SeedCDeposition_pft(:,:,:)              !seed C deposition for each PFT, [gC m-2]
 
   contains
@@ -165,6 +166,7 @@ implicit none
   allocate(f_aerosol_DeadNMB_col(JY,JX));f_aerosol_DeadNMB_col=0._r8
   allocate(f_aerosol_LichB_col(JY,JX));f_aerosol_LichB_col=0._r8
   allocate(f_aerosol_MossB_col(JY,JX));f_aerosol_MossB_col=0._r8
+  allocate(fAeroScalar_col(JY,JX));fAeroScalar_col=0._r8
   allocate(SeedCDeposition_pft(JP,JY,JX));SeedCDeposition_pft=0._r8
   allocate(NWetDep_col(JY,JX)); NWetDep_col=0._r8
   allocate(tlai_mon_pft(12,JP,JY,JX));tlai_mon_pft=0._r8
@@ -272,6 +274,7 @@ implicit none
   call destroy(f_aerosol_DeadNMB_col)
   call destroy(f_aerosol_MossB_col)
   call destroy(f_aerosol_LichB_col)
+  call destroy(fAeroScalar_col)
   call destroy(SeedCDeposition_pft)
   call destroy(NWetDep_col)
   call destroy(height_bot_mon_pft)  

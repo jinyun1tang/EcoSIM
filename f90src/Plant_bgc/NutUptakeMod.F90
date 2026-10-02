@@ -8,7 +8,18 @@ module NutUptakeMod
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantMathFuncMod
   use RootGasMod
 
@@ -90,7 +101,7 @@ module NutUptakeMod
     RawCanopy2Atm_pft         => plt_photo%RawCanopy2Atm_pft         ,& !input  :canopy boundary layer resistance, [h m-1]
     LeafAreaLive_brch         => plt_morph%LeafAreaLive_brch         ,& !input  :branch leaf area, [m2 d-2]
     NumOfBranches_pft         => plt_morph%NumOfBranches_pft         ,& !input  :number of branches,[-]
-    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2LiveCanopy_pft => plt_rad%FracPARads2LiveCanopy_pft   ,& !input  :fraction of incoming PAR absorbed by live canopy, [-]
     CanopyLeafArea_pft        => plt_morph%CanopyLeafArea_pft        ,& !input  :plant canopy leaf area, [m2 d-2]
     NH3Dep2Can_brch           => plt_rbgc%NH3Dep2Can_brch             & !output :gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   )
@@ -109,11 +120,11 @@ module NutUptakeMod
   !     CZPOLB,ZPOOLB=nonstplt_rbgc%RUCtural N concentration,content in branch
   !     NH3Dep2Can_brch=NH3 flux between atmosphere and branch
   !     RA,CanPStomaResistH2O_pft=canopy boundary layer,stomatal resistance
-  !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
+  !     FracPARads2LiveCanopy_pft=fraction of radiation received by each live PFT canopy
   !
   SNH3P = gas_solubility(idg_NH3,TdegCCanopy_pft(NZ))
   FNH3P = 1.0E-04_r8*FDMP
-  if(FracPARads2Canopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
+  if(FracPARads2LiveCanopy_pft(NZ).GT.ZERO4Groth_pft(NZ))then
     D105: DO NB=1,NumOfBranches_pft(NZ)
       IF(CanopyLeafSheathC_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) .AND. LeafAreaLive_brch(NB,NZ).GT.ZERO4Groth_pft(NZ) &
         .AND.CanopyLeafArea_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
@@ -121,7 +132,7 @@ module NutUptakeMod
         ZPOOLB                 = AZMAX1(CanopyNonstElms_brch(ielmn,NB,NZ))
         NH3Dep2Can_brch(NB,NZ) = AMIN1(0.1_r8*ZPOOLB &
           ,AMAX1((AtmGasc(idg_NH3)-CNH3P)/(RawCanopy2Atm_pft(NZ)+CanPStomaResistH2O_pft(NZ)) &
-          *FracPARads2Canopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
+          *FracPARads2LiveCanopy_pft(NZ)*AREA3(NU)*LeafAreaLive_brch(NB,NZ)/CanopyLeafArea_pft(NZ),-0.1_r8*ZPOOLB))
         CanopyNonstElms_brch(ielmn,NB,NZ) = CanopyNonstElms_brch(ielmn,NB,NZ)+NH3Dep2Can_brch(NB,NZ)  
       ELSE
         NH3Dep2Can_brch(NB,NZ)=0.0_r8
@@ -258,11 +269,14 @@ module NutUptakeMod
           trc_solml_new(idg)=trc_solml_new(idg)+trc_solml_loc(idg)
 
           call RootExudates(I,J,N,L,NZ)
+          ! Carbon basis for NH4/NO3 capacity diagnostics: population secondary
+          ! fine-root/mycorrhizal structural C plus nonstructural C in this layer.
+          RootMyMassC=sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumStructuralRootAxes_pft(NZ),NZ)) &
+            +RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
           if(N==ipltroot)then
-            RootMyMassC=sum(Root1stActStructElms_rpvr(ielmc,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-          else
-            RootMyMassC= sum(RootMyco2ndStrutElms_rpvr(ielmc,N,L,1:NumStructuralRootAxes_pft(NZ),NZ)) + RootMycoNonstElms_rpvr(ielmc,N,L,NZ)
-          endif  
+            ! Plant roots also include active primary-root structural C.
+            RootMyMassC=RootMyMassC+sum(Root1stActStructElms_rpvr(ielmc,L,1:NumStructuralRootAxes_pft(NZ),NZ))
+          endif
           !
           !     NUTRIENT UPTAKE
           !
@@ -286,11 +300,18 @@ module NutUptakeMod
           ENDIF
           RootCO2Ar=RootCO2Ar-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)      
         else
-          RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8                      
+          ! Inactive absorptive roots must not compete for next-hour soil O2.
+          RootO2Dmnd4Resp_pvr(N,L,NZ) = 0._r8
+          RAutoRootO2Limter_rpvr(N,L,NZ) = 1._r8
+          ! Absorptive geometry can disappear after respiration was calculated.
+          ! Release previous-hour CO2 even though uptake is now inactive.
+          RootCO2Ar2Soil_pvr(L,NZ) = RootCO2Ar2Soil_pvr(L,NZ)-plt_rbgc%RootCO2AutorX_pvr(N,L,NZ)
         ENDIF
       ENDDO D955      
     ELSE
       D956: DO N  = 1, Myco_pft(NZ)          
+        ! Dry or out-of-root-zone layers contribute no current uptake demand.
+        RootO2Dmnd4Resp_pvr(N,L,NZ) = 0._r8
         IF(L.EQ.NMaxRootBotLayer_pft(NZ)+1)THEN  
           RAutoRootO2Limter_rpvr(N,L,NZ) = RAutoRootO2Limter_rpvr(N,L-1,NZ)
         ELSE
@@ -328,6 +349,14 @@ module NutUptakeMod
   plt_rbgc%RAutoRootO2Limter_rpvr     = 0.0_r8
   plt_rbgc%RootNH4DmndSoil_pvr        = 0.0_r8
   plt_rbgc%RootNutUptake_pvr          = 0.0_r8
+  ! Clear uptake diagnostics even when nutrient uptake is skipped below.
+  ! Keep previous O2 demand until GetUptakeCapcity computes active-root shares.
+  plt_rbgc%VmaxNH4Root_pvr            = 0._r8
+  plt_rbgc%VmaxNO3Root_pvr            = 0._r8
+  plt_bgcr%Nutruptk_fClim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fNlim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fPlim_rpvr        = 0._r8
+  plt_bgcr%Nutruptk_fProtC_rpvr       = 0._r8
   plt_rbgc%RootOUlmNutUptake_pvr      = 0.0_r8
   plt_rbgc%RootNH4DmndBand_pvr        = 0.0_r8
   plt_rbgc%RootNO3DmndSoil_pvr        = 0.0_r8
@@ -484,7 +513,7 @@ module NutUptakeMod
   real(r8), intent(in):: FZUP
   real(r8), intent(in):: FSatNutTransporter
   real(r8), intent(in):: PerPlantRootH2OUptake
-  real(r8), intent(in):: RootMyMassC
+  real(r8), intent(in):: RootMyMassC !population-total root/mycorrhizal carbon in this layer, [gC d-2]
   character(len=*), parameter :: subname='UptakeNO3'
 
   real(r8) :: DIFFL
@@ -492,6 +521,7 @@ module NutUptakeMod
   real(r8) :: PATHL
   real(r8) :: RMFNO3,RTKNO3,RTKNOP,RMFNOB,RTKNOB,RTKNPB
   real(r8) :: UPMX,UPMXP
+  real(r8) :: VmaxNO3RootPerPlant !uptake capacity before O2 limitation, [gN plant-1 h-1]
   real(r8) :: ZOSGX,ZNO3M,ZNO3X,ZNOBM,ZNOBX
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
   logical :: ldebug
@@ -501,7 +531,7 @@ module NutUptakeMod
     PlantPopuLive_pft      => plt_site%PlantPopuLive_pft       ,& !input  :plant population, [d-2]
     TortMicPM_vr           => plt_site%TortMicPM_vr            ,& !input  :micropore soil tortuosity, [m3 m-3]
     ZERO                   => plt_site%ZERO                    ,& !input  :threshold zero for numerical stability, [-]
-    RootSAreaPerPlant_pvr  => plt_morph%RootSAreaPerPlant_pvr  ,& !input  :root layer area per plant, [m p-1]
+    RootSAreaPerPlant_pvr  => plt_morph%RootSAreaPerPlant_pvr  ,& !input  :root layer area per plant, [m2 p-1]
     fTgrowRootP_vr         => plt_pheno%fTgrowRootP_vr         ,& !input  :root layer temperature growth functiom, [-]
     RAutoRootO2Limter_rpvr => plt_rbgc%RAutoRootO2Limter_rpvr  ,& !input  :O2 constraint to root respiration (0-1), [-]
     VmaxNO3Root_pft        => plt_rbgc%VmaxNO3Root_pft         ,& !input  :maximum root NO3 uptake rate, [g m-2 h-1]
@@ -544,7 +574,7 @@ module NutUptakeMod
   !     RMFNO3=soil-root convective NO3 flux per plant in non-band
   !     DIFNO3=soil-root NO3 diffusion per plant in non-band
   !
-  VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3Root_pft(N,NZ)*RootSAreaPerPlant_pvr(N,L,NZ) &
+  VmaxNO3RootPerPlant=VmaxNO3Root_pft(N,NZ)*RootSAreaPerPlant_pvr(N,L,NZ) &
       *FSatNutTransporter*fTgrowRootP_vr(L,NZ)*AMIN1(FCUP,FZUP)
 
   IF(trcs_VLN_vr(ids_NO3,L).GT.ZERO.AND.trc_solcl_vr(ids_NO3,L).GT.CminNO3Root_pft(N,NZ))THEN
@@ -561,7 +591,7 @@ module NutUptakeMod
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=VmaxNO3Root_pvr(N,L,NZ)*trcs_VLN_vr(ids_NO3,L)
+    UPMXP=VmaxNO3RootPerPlant*trcs_VLN_vr(ids_NO3,L)
 
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -585,7 +615,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNO3
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNO3
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNO3X
@@ -622,7 +652,7 @@ module NutUptakeMod
     !     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
     !     RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
     !
-    UPMXP=VmaxNO3Root_pvr(N,L,NZ)*trcs_VLN_vr(ids_NO3B,L)
+    UPMXP=VmaxNO3RootPerPlant*trcs_VLN_vr(ids_NO3B,L)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
     !     SOIL = ACTIVE UPTAKE OF NO3 BY ROOT, CONSTRAINED BY COMPETITION
@@ -642,22 +672,27 @@ module NutUptakeMod
     ZNOBM = CminNO3Root_pft(N,NZ)*VLWatMicP_vr(L)*trcs_VLN_vr(ids_NO3B,L)
     ZNOBX = AZMAX1(FNOBX*(trcs_solml_vr(ids_NO3B,L)-ZNOBM))
 
-    PlantSoluteUptakeConfig%SoluteConcMin   = CminNO3Root_pft(N,NZ)
-    PlantSoluteUptakeConfig%SolAdvFlx       = RMFNOB
-    PlantSoluteUptakeConfig%SolDifusFlx     = DIFNOB
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
-    PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
-    PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NO3B,L)
-    PlantSoluteUptakeConfig%SoluteMassMax   = ZNOBX
-    PlantSoluteUptakeConfig%CAvailStress    = FCUP
-    PlantSoluteUptakeConfig%PlantPopulation = PlantPopuLive_pft(NZ)
-    PlantSoluteUptakeConfig%SoluteKM        = KmNO3Root_pft(N,NZ)
+    PlantSoluteUptakeConfig%SoluteConcMin         = CminNO3Root_pft(N,NZ)
+    PlantSoluteUptakeConfig%SolAdvFlx             = RMFNOB
+    PlantSoluteUptakeConfig%SolDifusFlx           = DIFNOB
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax = UPMXP
+    PlantSoluteUptakeConfig%O2Stress              = RAutoRootO2Limter_rpvr(N,L,NZ)
+    PlantSoluteUptakeConfig%SoluteConc            = trc_solcl_vr(ids_NO3B,L)
+    PlantSoluteUptakeConfig%SoluteMassMax         = ZNOBX
+    PlantSoluteUptakeConfig%CAvailStress          = FCUP
+    PlantSoluteUptakeConfig%PlantPopulation       = PlantPopuLive_pft(NZ)
+    PlantSoluteUptakeConfig%SoluteKM              = KmNO3Root_pft(N,NZ)
   
     call SoluteUptakeByPlantRoots(PlantSoluteUptakeConfig,RootNO3DmndBand_pvr(N,L,NZ),RootOUlmNutUptake_pvr(ids_NO3B,N,L,NZ),&
       RootCUlmNutUptake_pvr(ids_NO3B,N,L,NZ),RootNutUptake_pvr(ids_NO3B,N,L,NZ))
 
   ENDIF
-  if(RootMyMassC>1.e-4_r8)VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3Root_pvr(N,L,NZ)/RootMyMassC
+  ! Normalize population capacity by population root/mycorrhizal carbon.
+  if(RootMyMassC>1.e-4_r8)then
+    VmaxNO3Root_pvr(N,L,NZ)=VmaxNO3RootPerPlant*PlantPopuLive_pft(NZ)/RootMyMassC
+  else
+    VmaxNO3Root_pvr(N,L,NZ)=0._r8
+  endif
   call PrintInfo('end '//subname)
   end associate
   end subroutine UptakeNO3
@@ -676,12 +711,13 @@ module NutUptakeMod
   real(r8), intent(in) :: FZUP
   real(r8), intent(in) :: FSatNutTransporter
   real(r8), intent(in) :: PerPlantRootH2OUptake
-  real(r8), intent(in) :: RootMyMassC
+  real(r8), intent(in) :: RootMyMassC !population-total root/mycorrhizal carbon in this layer, [gC d-2]
   real(r8) :: DIFFL
   real(r8) :: DIFNH4,DIFNHB
   real(r8) :: PATHL
   real(r8) :: RMFNH4,RTKNH4,RTKNHP,RMFNHB,RTKNHB,RTKNBP
   real(r8) :: UPMX,UPMXP
+  real(r8) :: VmaxNH4RootPerPlant !uptake capacity before O2 limitation, [gN plant-1 h-1]
   real(r8) :: ZNHBX,ZNSGX,ZNH4M,ZNH4X,ZNHBM
   type(PlantSoluteUptakeConfig_type) :: PlantSoluteUptakeConfig
 ! begin_execution
@@ -726,9 +762,9 @@ module NutUptakeMod
 ! RMFNH4=soil-root convective NH4 flux per plant in non-band
 ! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-  VmaxNH4Root_pvr(N,L,NZ)=VmaxNH4Root_pft(N,NZ)*RootSAreaPerPlant_pvr(N,L,NZ) &
+  VmaxNH4RootPerPlant=VmaxNH4Root_pft(N,NZ)*RootSAreaPerPlant_pvr(N,L,NZ) &
       *FSatNutTransporter*fTgrowRootP_vr(L,NZ)*AMIN1(FCUP,FZUP)
-!  if(L<=3)write(1002,*)I*100+J,L,NZ,VmaxNH4Root_pvr(N,L,NZ),VmaxNH4Root_pft(N,NZ),RootSAreaPerPlant_pvr(N,L,NZ), &
+!  if(L<=3)write(1002,*)I*100+J,L,NZ,VmaxNH4RootPerPlant,VmaxNH4Root_pft(N,NZ),RootSAreaPerPlant_pvr(N,L,NZ), &
 !      FSatNutTransporter,fTgrowRootP_vr(L,NZ),AMIN1(FCUP,FZUP)
   
   IF(trcs_VLN_vr(ids_NH4,L).GT.ZERO.AND.trc_solcl_vr(ids_NH4,L).GT.CMinNH4Root_pft(N,NZ))THEN
@@ -745,7 +781,7 @@ module NutUptakeMod
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
 !
-    UPMXP=VmaxNH4Root_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4,L)
+    UPMXP=VmaxNH4RootPerPlant*trcs_VLN_vr(ids_NH4,L)
 
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -769,7 +805,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNH4
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNH4
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNH4X
@@ -807,7 +843,7 @@ module NutUptakeMod
 !   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
 !   RAutoRootO2Limter_rpvr=constraint by O2 consumption on all biological processes
 !
-    UPMXP=VmaxNH4Root_pvr(N,L,NZ)*trcs_VLN_vr(ids_NH4B,L)
+    UPMXP=VmaxNH4RootPerPlant*trcs_VLN_vr(ids_NH4B,L)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
 !   SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
@@ -831,7 +867,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinNH4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFNHB
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFNHB
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_NH4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = ZNHBX
@@ -844,8 +880,12 @@ module NutUptakeMod
       RootNutUptake_pvr(ids_NH4B,N,L,NZ))
 
   ENDIF
-  !normalize by root dry weight
-  if(RootMyMassC>1.e-4_r8)VmaxNH4Root_pvr(N,L,NZ)=VmaxNH4Root_pvr(N,L,NZ)/RootMyMassC
+  ! Normalize population capacity by population root/mycorrhizal carbon.
+  if(RootMyMassC>1.e-4_r8)then
+    VmaxNH4Root_pvr(N,L,NZ)=VmaxNH4RootPerPlant*PlantPopuLive_pft(NZ)/RootMyMassC
+  else
+    VmaxNH4Root_pvr(N,L,NZ)=0._r8
+  endif
   end associate
   end subroutine UptakeNH4
 
@@ -937,7 +977,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH1P
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH1P
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1POX
@@ -997,7 +1037,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH1B
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H1PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H1PXB
@@ -1098,7 +1138,7 @@ module NutUptakeMod
       PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
       PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2P
       PlantSoluteUptakeConfig%SolDifusFlx     = DIFH2P
-      PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+      PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
       PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
       PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4,L)
       PlantSoluteUptakeConfig%SoluteMassMax   = H2POX
@@ -1160,7 +1200,7 @@ module NutUptakeMod
     PlantSoluteUptakeConfig%SoluteConcMin   = CMinPO4Root_pft(N,NZ)
     PlantSoluteUptakeConfig%SolAdvFlx       = RMFH2B
     PlantSoluteUptakeConfig%SolDifusFlx     = DIFH2B
-    PlantSoluteUptakeConfig%UptakeRateMax   = UPMXP
+    PlantSoluteUptakeConfig%UptakePerPlantRateMax   = UPMXP
     PlantSoluteUptakeConfig%O2Stress        = RAutoRootO2Limter_rpvr(N,L,NZ)
     PlantSoluteUptakeConfig%SoluteConc      = trc_solcl_vr(ids_H2PO4B,L)
     PlantSoluteUptakeConfig%SoluteMassMax   = H2PXB
@@ -1318,9 +1358,9 @@ module NutUptakeMod
   !     RESPIRATION CONSTRAINT ON UPTAKE FROM NON-STRUCTURAL C
   !
   !     RootCO2EmisPot_pvr=total respiration from CPOOLR
-  !     FCUP=limitation to active uptake respiration from CPOOLR
+  !     FCUP=measures C-limitation for nutrient uptake, using potential respiration as metric
   !     CPOOLR=nonstructural C content
-  !
+  !C demand
   IF(RootCO2EmisPot_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ))THEN
     FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*RootMycoNonstElms_rpvr(ielmc,N,L,NZ)/RootCO2EmisPot_pvr(N,L,NZ)))
   ELSE
@@ -1516,14 +1556,16 @@ module NutUptakeMod
           DO NE=1,NumPlantChemElms
             REcoDOMProd_vr(NE,K,L)=REcoDOMProd_vr(NE,K,L)-DOM_uptk(NE)
           ENDDO
-
-          DO N=1,Myco_pft(NZ)
-            DO NE=1,NumPlantChemElms
-              Soil2RootMycoExudE_pft(NE,NZ)     = Soil2RootMycoExudE_pft(NE,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
-              RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
-            ENDDO
-          ENDDO
         endif
+
+        ! Opposing root/mycorrhizal exchanges can cancel in the soil budget.
+        ! Apply each population's transfer even when the net soil flux is zero.
+        DO N=1,Myco_pft(NZ)
+          DO NE=1,NumPlantChemElms
+            Soil2RootMycoExudE_pft(NE,NZ)     = Soil2RootMycoExudE_pft(NE,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
+            RootMycoNonstElms_rpvr(NE,N,L,NZ) = RootMycoNonstElms_rpvr(NE,N,L,NZ)+Soil2RootMycoExudE_pvr(NE,N,K,L,NZ)
+          ENDDO
+        ENDDO
       ENDDO D295
       
     endif

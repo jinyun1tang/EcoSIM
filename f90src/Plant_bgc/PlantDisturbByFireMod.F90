@@ -1,7 +1,15 @@
 module PlantDisturbByFireMod
   use data_kind_mod, only : r8 => DAT_KIND_R8,yearIJ_type
   use ElmIDMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantBGCPars
   use EcoSimConst
   use PlantMathFuncMod
@@ -416,6 +424,7 @@ contains
     k_woody_comp              => pltpar%k_woody_comp                 ,& !input  :woody litter complex id
     RootMyco2ndStrutElms_rpvr => plt_biom%RootMyco2ndStrutElms_rpvr  ,& !input  :root layer element secondary axes, [g d-2]
     RootMyco1stStrutElms_rpvr => plt_biom%RootMyco1stStrutElms_rpvr  ,& !input  :root layer element primary axes, [g d-2]
+    RootMediumStructElms_rpvr => plt_biom%RootMediumStructElms_rpvr ,& !input :medium root structural C/N/P, [g d-2]
     Root1stActStructElms_rpvr => plt_biom%Root1stActStructElms_rpvr  ,& !inoput :Root layer primary axes Active zone structrual element, [g d-2]    
     Root1stLigStructElms_rpvr => plt_biom%Root1stLigStructElms_rpvr  ,& !inoput :root layer lignified zone element in primary axes, [g d-2]        
     iroot                     => pltpar%iroot                        ,& !input  :group id of plant root litter
@@ -452,8 +461,10 @@ contains
     !
     D3960: DO NR=1,NumStructuralRootAxes_pft(NZ)
       if(N.eq.ipltroot)THEN
+        !Active primary and medium roots share the woody/fine litter partition.
         DO NE=1,NumPlantChemElms
-          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,icwood,M,NZ)*(AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
+            +AZMAX1(RootMediumStructElms_rpvr(NE,L,NR,NZ))) &
             *FracRootElmAllocm(NE,k_woody_comp)
           LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)      
         ENDDO
@@ -467,7 +478,8 @@ contains
         call RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)      
 
         DO NE=1,NumPlantChemElms
-          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
+          HarvestedBiomass(NE)=XHVST1*PlantElmAllocMat4Litr(NE,iroot,M,NZ)*(AZMAX1(Root1stActStructElms_rpvr(NE,L,NR,NZ)) &
+            +AZMAX1(RootMediumStructElms_rpvr(NE,L,NR,NZ))) &
             *FracRootElmAllocm(NE,k_fine_comp)
           LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)=LitrfallElms_pvr(NE,M,k_fine_comp,L,NZ)+XFFIRE(NE)*HarvestedBiomass(NE)
 
@@ -491,7 +503,6 @@ contains
 
       CALL RemoveRootByFire(yearIJ,NZ,HarvestedBiomass,FFIRE)
 
-      !to add medium roots for woody vascular trees
     enddo D3960
   ENDDO D3385
   

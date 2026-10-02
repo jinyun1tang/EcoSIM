@@ -982,7 +982,7 @@ contains
   IF((TK1X.LT.TFREEZ .AND. VLWatMicP1_vr(0,NY,NX).GT.ZERO*VGeomLayer_vr(0,NY,NX)) &
     .OR. (TK1X.GT.TFREEZ .AND. VLiceMicP1_vr(0,NY,NX).GT.ZERO*VGeomLayer_vr(0,NY,NX)))THEN
     LitrIceHeatFlxFrezPt = VHeatCapacity1_vr(0,NY,NX)*(TFREEZ-TK1X) &
-      /((1.0_r8+TFREEZ*6.2913E-03_r8)*(1.0_r8-0.10_r8*PSISM1_vr(0,NY,NX)))*dts_wat
+      /((1.0_r8+(TFREEZ-TFICE)*6.2913E-03_r8)*(1.0_r8-0.10_r8*PSISM1_vr(0,NY,NX)))*dts_wat
 
     IF(LitrIceHeatFlxFrezPt.LT.0.0_r8)THEN
       !ice thaw, current temperature above freezing TFREEZ<TK1X

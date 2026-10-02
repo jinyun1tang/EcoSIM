@@ -1,6 +1,6 @@
 # NOTE: this is the old CMake file for compiling with a UNIX Makefile
-# Minimum CMake version, determined by hdf5.
-cmake_minimum_required (VERSION 3.5)
+# Fortran submodule dependency scanning requires CMake 3.12.
+cmake_minimum_required (VERSION 3.12)
 
 # Version numbers.
 set (ECOSIM_MAJOR_VERSION 0)
@@ -100,6 +100,7 @@ message("-- CXX compiler is ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
 message("-- Fortran compiler is ${CMAKE_Fortran_COMPILER} (${CMAKE_Fortran_COMPILER_ID})")
 
 set_up_compilers()
+include(build_timing)
 
 if (BGC)
   set (ECOSIM_BGC 1)

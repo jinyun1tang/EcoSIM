@@ -222,6 +222,7 @@ module RedistMod
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
+  
   Eco_NPP_CumYr_col(NY,NX)         = Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
   Eco_NBP_CumYr_col(NY,NX)         = Eco_NBP_CumYr_col(NY,NX)+Eco_NEE_col(NY,NX) &
     +SurfGasEmiss_all_flx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
@@ -1341,10 +1342,10 @@ module RedistMod
       HRAINR                       = (RAINR*cpw+gOC_to_m3_OM(dOM)*cpo)*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
 
-      VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
-      QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
-      CanopyBiomWater_col(NY,NX)         = CanopyBiomWater_col(NY,NX)-RAINR
-      HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
+      VLWatMicP_vr(0,NY,NX)          = VLWatMicP_vr(0,NY,NX)+RAINR
+      QCanopyWatLoss2Dist_col(NY,NX) = QCanopyWatLoss2Dist_col(NY,NX)+RAINR
+      CanopyBiomWater_col(NY,NX)     = CanopyBiomWater_col(NY,NX)-RAINR
+      HeatFLoByWat2LitR_col(NY,NX)   = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR
       dHeat                        = dHeat + HRAINR
@@ -1354,7 +1355,7 @@ module RedistMod
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
     
-    if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+    !if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,OME_in)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
@@ -1418,9 +1419,13 @@ module RedistMod
           RAcetateEcoDmndK_vr(K,0,NY,NX)        = RAcetateEcoDmndK_vr(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
           !top soil
           REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)+RNH4DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)+RNO3DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH2PO4DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH1PO4DmndLitrBandHeter_col(NGL,K,NY,NX)
         ENDDO
       ENDDO
     ENDIF
@@ -1440,9 +1445,13 @@ module RedistMod
       REcoH1PO4DmndSoil_vr(0,NY,NX)         = REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4UptkSoilAutor_vr(NGL,0,NY,NX)
       !top soil layer
       REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNH4UptkLitrAutor_col(NGL,NY,NX)
+      REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)+RNH4UptkLitrBandAutor_col(NGL,NY,NX)
       REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNO3UptkLitrAutor_col(NGL,NY,NX)
+      REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)+RNO3UptkLitrBandAutor_col(NGL,NY,NX)
       REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH2PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH2PO4UptkLitrBandAutor_col(NGL,NY,NX)
       REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH1PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH1PO4UptkLitrBandAutor_col(NGL,NY,NX)
     ENDDO
   ENDDO
 

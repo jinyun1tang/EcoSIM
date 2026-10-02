@@ -3,7 +3,15 @@
   use DebugToolMod,  only: PrintInfo
   use EcosimConst
   use minimathmod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantBGCRatesAPIData, only : plt_bgcr
   use PlantBGCPars
   use EcoSIMCtrlMod , only : etimer,lverb 
   implicit none
@@ -996,7 +1004,7 @@
     AREA3                       => plt_site%AREA3                         ,& !input  :soil cross section area (vertical plane defined by its normal direction), [m2]
     DiffCO2Atmos2Intracel_pft   => plt_photo%DiffCO2Atmos2Intracel_pft    ,& !input  :gaesous CO2 concentration difference across stomates, [umol m-3]
     H2OCuticleResist_pft        => plt_photo%H2OCuticleResist_pft         ,& !input  :maximum stomatal resistance to vapor, [s h-1]
-    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !input  :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2LiveCanopy_pft   => plt_rad%FracPARads2LiveCanopy_pft      ,& !input  :fraction of incoming PAR absorbed by live canopy, [-]
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     Vmax4RubiscoCarboxy_node    => plt_photo%Vmax4RubiscoCarboxy_node     ,& !output :maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
     RubiscoActivity_brch        => plt_photo%RubiscoActivity_brch         ,& !output :branch down-regulation of CO2 fixation, [-]
@@ -1042,14 +1050,14 @@
 !
 !     RSX,CanopyMinStomaResistH2O_pft=minimum canopy stomatal resistance to CO2,H2O (h m-1)
 !     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
-!     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
+!     FracPARads2LiveCanopy_pft=fraction of radiation received by each live PFT canopy
 !     DiffCO2Atmos2Intracel_pft=difference between atmosph and intercellular CO2 concn (umol m-3)
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
 ! determine minimum canopy stomatal resistance to CO2 based on CO2 gradient
   IF(CH2O.GT.ZERO4Groth_pft(NZ))THEN
-    RSX=FracPARads2Canopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
+    RSX=FracPARads2LiveCanopy_pft(NZ)*DiffCO2Atmos2Intracel_pft(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
     RSX=H2OCuticleResist_pft(NZ)*1.56_r8
   ENDIF

@@ -4,7 +4,13 @@ module PhotoSynsMod
   use PlantBGCPars
   use minimathmod, only : AZMAX1
   use PlantMathFuncMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantBiomassAPIData, only : plt_biom
 implicit none
   private
   character(len=*),private, parameter :: mod_filename = &

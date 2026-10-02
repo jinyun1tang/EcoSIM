@@ -5,7 +5,15 @@ module NoduleBGCMod
   use DebugToolMod,  only: PrintInfo
   use abortutils  ,  only: endrun
   use EcosimConst
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantMathFuncMod
   use PlantBGCPars
   implicit none
@@ -86,7 +94,7 @@ module NoduleBGCMod
   call PrintInfo('beg '//subname)
 !     iPlantNfixType_pft=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
-  CanopyN2Fix_pft(NZ)=0._r8
+  
   IF(is_canopy_N2fix(iPlantNfixType_pft(NZ)))THEN
     !
     !     INITIAL INFECTION
@@ -158,8 +166,9 @@ module NoduleBGCMod
     !     FCNPF=N,P constraint to bacterial activity
     !     WFNG=growth function of canopy water potential
     !
+    !Cap the temperature- and water-adjusted demand against available nonstructural C.
     RespNonst_Oltd=AZMAX1(AMIN1(CanopyNodulNonstElms_brch(ielmc,NB,NZ),&
-      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ))*FCNPF*fTCanopyGroth_pft(NZ)*WFNG)*SPNDLI
+      VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTCanopyGroth_pft(NZ)*WFNG))*SPNDLI
 
     !     CPOOLNX=CanopyNodulNonstElms_brch(ielmc,NB,NZ)
     !     VMXOX=VMXO*CanopyNodulStrutElms_brch(ielmc,NB,NZ)*FCNPF*fTCanopyGroth_pft(NZ)*WFNG
@@ -443,6 +452,8 @@ module NoduleBGCMod
   real(r8) :: NodulELmSenes2Recyc(NumPlantChemElms)
   real(r8) :: RespNonst_OUltd,RXNDLM,RGNDLM
   real(r8) :: RSNDLM
+  real(r8) :: NoduleRemobilizableC !structural C available for respiration after background decay
+  real(r8) :: NoduleMaintStructC_OUltd,NoduleMaintStructC_Oltd !potential/actual structural C respired for maintenance
   real(r8) :: SPNDLI
   real(r8) :: SPNDX
   real(r8) :: WTRTD1,WTNDL1,WTRTDT
@@ -579,9 +590,10 @@ module NoduleBGCMod
         !     fRootGrowPSISense=growth function of root water potential
 !
         CPOOLNX         = RootNodulNonstElms_rpvr(ielmc,L,NZ)
+        !Cap the adjusted demand before applying the physiological oxygen factor below.
         RespNonst_OUltd = AZMAX1(AMIN1(RootNodulNonstElms_rpvr(ielmc,L,NZ) &
-          ,VMXO*RootNodulStrutElms_rpvr(ielmc,L,NZ))*FCNPF*fTgrowRootP_vr(L,NZ) &
-          *fRootGrowPSISense_pvr(ipltroot,L,NZ))*SPNDLI
+          ,VMXO*RootNodulStrutElms_rpvr(ielmc,L,NZ)*FCNPF*fTgrowRootP_vr(L,NZ) &
+          *fRootGrowPSISense_pvr(ipltroot,L,NZ)))*SPNDLI
         !
         !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
         !
@@ -701,10 +713,20 @@ module NoduleBGCMod
         !     NodulELmSenes2Litr(:)=bacterial C,N,P senescence to LitrFall
         !     NodulELmSenes2Recyc(:)=bacterial C,N,P senescence to recycling
         !
-        IF(RSNDL.GT.0.0_r8 .AND. RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RCCC.GT.ZERO)THEN
-          NodulELmLoss2Senes(ielmc)=RSNDL/RCCC
-          NodulELmLoss2Senes(ielmn)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmn,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
-          NodulELmLoss2Senes(ielmp)=NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmp,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
+        NoduleMaintStructC_OUltd=0._r8
+        NoduleMaintStructC_Oltd=0._r8
+        IF(RootNodulStrutElms_rpvr(ielmc,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RCCC.GT.ZERO)THEN
+          !Background decay and maintenance must not consume the same structural C.
+          NoduleRemobilizableC     = AZMAX1(RootNodulStrutElms_rpvr(ielmc,L,NZ)-NoduleElmDecayLoss(ielmc))*RCCC
+          NoduleMaintStructC_OUltd = AMIN1(RSNDLM,NoduleRemobilizableC)
+
+          !Apply the physiological oxygen factor to structural respiration as for other roots.
+          NoduleMaintStructC_Oltd=AMIN1(RSNDL,NoduleRemobilizableC)*RAutoRootO2Limter_rpvr(ipltroot,L,NZ)
+
+          !Derive all actual C/N/P losses, litter, and recycling from this one payment.
+          NodulELmLoss2Senes(ielmc) = NoduleMaintStructC_Oltd/RCCC
+          NodulELmLoss2Senes(ielmn) = NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmn,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
+          NodulELmLoss2Senes(ielmp) = NodulELmLoss2Senes(ielmc)*RootNodulStrutElms_rpvr(ielmp,L,NZ)/RootNodulStrutElms_rpvr(ielmc,L,NZ)
 
           NodulELmSenes2Litr(ielmc)=NodulELmLoss2Senes(ielmc)*(1.0_r8-RCCC)
           NodulELmSenes2Litr(ielmn)=NodulELmLoss2Senes(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
@@ -720,7 +742,8 @@ module NoduleBGCMod
         !
         !     TOTAL NODULE RESPIRATION is added to root respiration
         !
-        RCO2TM                            = AMIN1(Rmaint,RespNonst_OUltd)+RGNDLM+NodulELmSenes2Recyc(ielmc)
+        !Potential respiration uses its own structural payment, independent of oxygen stress.
+        RCO2TM                            = AMIN1(Rmaint,RespNonst_OUltd)+RGNDLM+NoduleMaintStructC_OUltd
         RCO2T                             = AMIN1(Rmaint,RespNonst_Oltd)+NoduleCResp+NodulELmSenes2Recyc(ielmc)
         RootRespPotent_pvr(ipltroot,L,NZ) = RootRespPotent_pvr(ipltroot,L,NZ)+RCO2TM
         RootCO2EmisPot_pvr(ipltroot,L,NZ) = RootCO2EmisPot_pvr(ipltroot,L,NZ)+RCO2T

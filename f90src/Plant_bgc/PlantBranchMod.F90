@@ -10,7 +10,19 @@ module PlantBranchMod
   use DebugToolMod
   use EcosimConst
   use PlantBGCPars
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PhotoSynsMod
   use PlantMathFuncMod
   use NoduleBGCMod  
@@ -48,7 +60,7 @@ module PlantBranchMod
   real(r8), intent(in) :: TurgEff4LeafPetolExpansion
   real(r8), intent(in) :: TurgEff4CanopyResp
   real(r8), intent(out) :: GrothPART2LeafPetole !new growth allocated to leaf and PetolSheth
-  integer, intent(out) :: BegRemoblize
+  integer, intent(out) :: BegRemoblize !phenological eligibility of this branch
   character(len=*), parameter :: subname='GrowOneBranch'
   integer :: I,J,K
   real(r8) :: YCO2Gro_brch                     !respiraiton ratio of canopy growth, 1./YCO2Gro_brch, total biomass required to give 1 unit of CO2 respiration
@@ -90,18 +102,25 @@ module PlantBranchMod
     iPlantCalendar_brch        => plt_pheno%iPlantCalendar_brch        ,& !input  :plant growth stage, [-]
     iPlantTurnoverPattern_pft  => plt_pheno%iPlantTurnoverPattern_pft  ,& !input  :phenologically-driven above-ground turnover: all, foliar only, none,[-]
     iPlant2ndGrothPattern_pft  => plt_pheno%iPlant2ndGrothPattern_pft  ,& !input  :plant expression of secondary growth, [-]                
-    SineSunInclAnglNxtHour_col => plt_rad%SineSunInclAnglNxtHour_col   ,& !input  :sine of solar angle next hour, [-]
     ZERO                       => plt_site%ZERO                        ,& !input  :threshold zero for numerical stability, [-]
     MainBranchNum_pft          => plt_morph%MainBranchNum_pft          ,& !input  :number of main branch,[-]
     isPlantBranchAlive_brch    => plt_pheno%isPlantBranchAlive_brch    ,& !inoput :flag to detect branch death, [-]
     canopy_growth_pft          => plt_rbgc%canopy_growth_pft           ,& !inoput :canopy structural C growth rate, [gC d-2 h-1]
     KHiestGroLeafNode_brch     => plt_pheno%KHiestGroLeafNode_brch     ,& !inoput :leaf growth stage counter, [-]    
+    NumOfBranches_pft         => plt_morph%NumOfBranches_pft          ,& !input  :number of branches, [-]
+    SapwoodBiomassC_brch       => plt_biom%SapwoodBiomassC_brch        ,& !input  :branch sapwood C, [gC d-2]
+    CanopySapwoodC_pft         => plt_biom%CanopySapwoodC_pft          ,& !output :canopy sapwood C, [gC d-2]
+    CanopyLeafSheathC_pft      => plt_biom%CanopyLeafSheathC_pft       ,& !output :canopy leaf + sheath C, [gC d-2]
     CanopyLeafSheathC_brch     => plt_biom%CanopyLeafSheathC_brch       & !output :plant branch leaf + sheath C, [g d-2]
   )
   call PrintInfo('beg '//subname)
   stop_flag=.false.
   I=yearIJ%I;J=yearIJ%J
-  
+
+  ! Define outputs even for dead branches; these are consumed by GrowOnePlant.
+  BegRemoblize = ifalse
+  GrothPART2LeafPetole = 0._r8
+
   IF(isPlantBranchAlive_brch(NB,NZ).EQ.iTrue)THEN
     !correct the higest growing leaf node
     DO K=MaxNodesPerBranch1,0,-1
@@ -112,7 +131,8 @@ module PlantBranchMod
     ENDDO
     KHiestGroLeafNode_brch(NB,NZ)=MAX(KHiestGroLeafNode_brch(NB,NZ),1)
     
-    call CalcPartitionCoeff(I,J,NB,NZ,PART,LRemob_brch,BegRemoblize)
+    call CalcPartitionCoeff(I,J,NB,NZ,PART, &
+      BegRemoblize=BegRemoblize,LRemob_brch=LRemob_brch)
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       GrothPART2LeafPetole=PART(ibrch_leaf)+PART(ibrch_petole)
@@ -212,34 +232,24 @@ module PlantBranchMod
     !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
     call WithdrawNutBranchLeaves(I,J,NB,NZ,CNLFB,CPLFB)
     !
-    call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
-    !
-    !     ALLOCATE LEAF AREA TO INCLINATION CLASSES ACCORDING TO
-    !     DISTRIBUTION ENTERED IN 'READQ' ASSUMING AZIMUTH IS UNIFORM
-    !
-    !     SineSunInclinationAngle_col=sine of solar angle
-    !     LeafAreaZsec_brch=leaf node surface area in canopy layer
-    !     LeafArea_node,CanopyLeafArea_lnode=leaf node surface area in canopy layer
-    !     ZC,DPTHS=canopy,snowpack height
-    !     CLASS=leaf inclination class
-    !
-    IF(SineSunInclAnglNxtHour_col.GT.0.0_r8)THEN
-      call LeafClassAllocation(NB,NZ)
-    ENDIF
-    !
     call GrainFillOnBranch(I,J,NB,NZ,Growth_brch(:,ibrch_grain),Growth_brch(ielmc,ibrch_stalk))
+    call ResetBranchPhenology(I,J,NB,NZ)
     !
-    call ResetBranchPhenology(I,J,NB,NZ)
-    !   
+    ! Seasonal turnover can clear leaves or remove stalk biomass. Build geometry
+    ! once, after these removals, so layer totals and heights use surviving organs.
+    call AllocateLeaf2CanopyLayers(I,J,NB,NZ,CanopyHeight_copy)
+    ! Keep angular profiles consistent even when a seasonal reset occurs at night.
+    call LeafClassAllocation(NB,NZ)
+    ! Refresh the biomass denominators used by the following reserve transfers.
+    CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
+    CanopyLeafSheathC_pft(NZ)=SUM(CanopyLeafSheathC_brch(1:NumOfBranches_pft(NZ),NZ))
+    CanopySapwoodC_pft(NZ)=SUM(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))
+    !
     call BranchElmntTransfer(I,J,NB,NZ,BegRemoblize,WaterStress4Groth,TurgEff4CanopyResp)
-
-    call ResetBranchPhenology(I,J,NB,NZ)
     !
     !   CANOPY N2 FIXATION (CYANOBACTERIA)
     !
     call CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WaterStress4Groth)
-
-    CanopyLeafSheathC_brch(NB,NZ)=AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
 
   ENDIF
   
@@ -295,7 +305,7 @@ module PlantBranchMod
         XFRE(ielmn)=AMAX1(XFRN1,10.0_r8*XFRP1)
         XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
         DO NE=2,NumPlantChemElms
-          call ExchFluxLimiter(LeafStrutElms_brch(NE,NB,NZ),CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
+          call ExchFluxLimiter(LeafElmntNode_brch(NE,K,NB,NZ) ,CanopyNonstElms_brch(NE,NB,NZ),XFRE(NE))
           LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-XFRE(NE)
           LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-XFRE(NE)
           CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+XFRE(NE)
@@ -549,7 +559,7 @@ module PlantBranchMod
   real(r8) :: PARTS
   real(r8) :: PARTX
   real(r8) :: TOTAL
-  logical :: check_perennial,check_annual,check_decidous
+  logical :: check_perennial,check_annual,check_cold_deciduous,check_drought_deciduous
   real(r8) :: PSILY(0:3)
   real(r8), parameter :: FPART1=1.00_r8
   real(r8), parameter :: FPART2=0.40_r8
@@ -730,10 +740,17 @@ module PlantBranchMod
   !     LRemob_brch,BegRemoblize=remobilization flags
   !     FLGZ=control rate of remobilization
   !
+  ! IFLGZ and IFLGY in grosub.f: phenological eligibility and hourly activation.
+  ! Define both outputs even when an eligible deciduous branch has no trigger.
+  BegRemoblize = ifalse
+  LRemob_brch  = ifalse
   check_annual    = (iPlantPhenolPattern_pft(NZ).EQ.iplt_annual .AND. iPlantCalendar_brch(ipltcal_SetSeedNumber,NB,NZ).NE.0)
   check_perennial = (iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial .AND. &
     Hours4LeafOff_brch(NB,NZ).GE.FracHour4LeafoffRemob(iPlantPhenolType_pft(NZ))*HourReq4LeafOff_brch(NB,NZ))
-  check_decidous=(iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid)
+  check_cold_deciduous = iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldecid .OR. &
+    iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid
+  check_drought_deciduous = iPlantPhenolType_pft(NZ).EQ.iphenotyp_drouhtdecidu .OR. &
+    iPlantPhenolType_pft(NZ).EQ.iphenotyp_coldroutdecid
 
   IF(check_perennial .OR. check_annual)THEN 
     !set remobilization true
@@ -742,10 +759,10 @@ module PlantBranchMod
       !annual plant or evergreen perennial
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(check_decidous .AND. TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN           !chill temperature in effect 
+    ELSEIF(check_cold_deciduous .AND. TdegCCanopy_pft(NZ).LT.TCChill4Seed_pft(NZ))THEN           !chill temperature in effect
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
-    ELSEIF(check_decidous .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN !drought stress in effect
+    ELSEIF(check_drought_deciduous .AND. PSICanopy_pft(NZ).LT.PSILY(iPlantRootProfile_pft(NZ)))THEN !drought stress in effect
       LRemob_brch                 = itrue
       HoursDoingRemob_brch(NB,NZ) = HoursDoingRemob_brch(NB,NZ)+1.0_r8
     ENDIF
@@ -757,8 +774,6 @@ module PlantBranchMod
       PART(ibrch_petole) = 0._r8
     ENDIF
   ELSE
-    BegRemoblize                = ifalse
-    LRemob_brch                 = ifalse
     HoursDoingRemob_brch(NB,NZ) = 0._r8
   ENDIF
   !
@@ -1739,6 +1754,7 @@ module PlantBranchMod
   !   PetoleLength_node=PetolSheth length
   !
   KLowestGroLeafNode_brch(NB,NZ)=0;LeafLength=0._r8
+  IF(NB.EQ.MainBranchNum_pft(NZ))StalkAveRadius_pft(NZ)=0._r8
   
   IF(HypocotHeight_pft(NZ).LE.SeedDepth_pft(NZ) .AND. LeafArea_node(0,MainBranchNum_pft(NZ),NZ).GT.0.0_r8)THEN
     !plant not emerged yet
@@ -2041,8 +2057,9 @@ module PlantBranchMod
   real(r8) :: Reserve2GrainCMax,Reserve2GrainE(NumPlantChemElms)
   real(r8) :: FGRNX
   real(r8) :: GRMXB
-  real(r8) :: GROLM
-  real(r8) :: GROLC
+  real(r8) :: GrainFillRateMax
+  real(r8) :: GrainFillRate
+  real(r8) :: GrainCRemaining                   !unfilled grain carbon capacity, [gC d-2]
   real(r8) :: SeedSET
   integer :: NE
 ! begin_execution
@@ -2070,7 +2087,7 @@ module PlantBranchMod
     iPlantGrainType_pft          => plt_morph%iPlantGrainType_pft           ,& !input  :grain type (below or above-ground),[-]
     GrainStrutElms_brch          => plt_biom%GrainStrutElms_brch            ,& !inoput :branch grain structural element mass, [g d-2]
     StalkRsrvElms_brch           => plt_biom%StalkRsrvElms_brch             ,& !inoput :branch reserve element mass, [g d-2]
-    GrainSeedBiomCMean_brch      => plt_allom%GrainSeedBiomCMean_brch       ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch      => plt_allom%SingleGrainMeanBiomC_brch       ,& !inoput :potential carbon mass per grain, [gC seed-1]
     HourFailGrainFill_brch       => plt_pheno%HourFailGrainFill_brch        ,& !inoput :flag to detect physiological maturity from grain fill, [-]
     iPlantCalendar_brch          => plt_pheno%iPlantCalendar_brch           ,& !inoput :plant growth stage, [-]
     PotentialSeedSites_brch      => plt_morph%PotentialSeedSites_brch       ,& !inoput :branch potential grain number, [d-2]
@@ -2145,13 +2162,13 @@ module PlantBranchMod
     !
     !     GRMX=maximum individual seed size from PFT file (g)
     !     dReproNodeNumNormByMatG_brch=change in reproductive node number normalized for maturity group
-    !     GrainSeedBiomCMean_brch=individual seed size
+    !     SingleGrainMeanBiomC_brch=individual seed size
     !     SET=seed set limited by nonstructural C,N,P
     !
     IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0 &
       .AND.iPlantCalendar_brch(ipltcal_SetSeedMass,NB,NZ).EQ.0)THEN
       GRMXB                          = SeedCMassMax_pft(NZ)
-      GrainSeedBiomCMean_brch(NB,NZ) = AMIN1(SeedCMassMax_pft(NZ),GrainSeedBiomCMean_brch(NB,NZ) &
+      SingleGrainMeanBiomC_brch(NB,NZ) = AMIN1(SeedCMassMax_pft(NZ),SingleGrainMeanBiomC_brch(NB,NZ) &
         +GRMXB*AMAX1(0.50_r8,SeedSET**0.25_r8)*dReproNodeNumNormByMatG_brch(NB,NZ))
     ENDIF
   ENDIF
@@ -2162,39 +2179,41 @@ module PlantBranchMod
   !
   !   iPlantCalendar_brch(ipltcal_BeginSeedFill,=start of grain filling and setting max seed size
   !   WTGRB=total seed C mass
-  !   GrainSeedBiomCMean_brch=individual seed size
+  !   SingleGrainMeanBiomC_brch=individual seed size
   !   SetNumberSeeds_brch=seed set number
-  !   GROLM=maximum grain fill rate
   !   GrainFillRate25C_pft=grain filling rate at 25 oC from PFT file
   !   fTCanopyGroth_pft=temperature function for canopy growth
   !   fTgrowRootP_vr=temperature function for root growth
   !
   IF(iPlantCalendar_brch(ipltcal_BeginSeedFill,NB,NZ).NE.0)THEN
-    IF(GrainStrutElms_brch(ielmc,NB,NZ).GE.GrainSeedBiomCMean_brch(NB,NZ)*SetNumberSeeds_brch(NB,NZ))THEN
-      GROLM=0._r8
+    GrainCRemaining = AZMAX1(SingleGrainMeanBiomC_brch(NB,NZ)*SetNumberSeeds_brch(NB,NZ) &
+      -GrainStrutElms_brch(ielmc,NB,NZ))
+    IF(GrainCRemaining.LE.0._r8)THEN
+      GrainFillRateMax=0._r8
     ELSEIF(iPlantGrainType_pft(NZ).EQ.igraintyp_abvgrnd)THEN
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTCanopyGroth_pft(NZ)))
+      GrainFillRateMax=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTCanopyGroth_pft(NZ)))
     ELSE
       !seed/storage belowground 
-      GROLM=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
+      GrainFillRateMax=AZMAX1(GrainFillRate25C_pft(NZ)*SetNumberSeeds_brch(NB,NZ)*SQRT(fTgrowRootP_vr(NGTopRootLayer_pft(NZ),NZ)))
     ENDIF
+    ! Limit this hourly transfer to the remaining sink before applying C/N/P constraints.
+    GrainFillRateMax = AMIN1(GrainFillRateMax,GrainCRemaining)
 !
 !     GRAIN FILL RATE MAY BE CONSTRAINED BY HIGH GRAIN C:N OR C:P
 !
 !     WTGRB,WTGRBN,WTGRBP=total seed C,N,P mass
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
 !     CNGR,CPGR=maximum N:C,P:C ratios in grain from PFT file
-!     GROLM,GROLC=maximum,actual grain fill rate
 !     Reserve2GrainCMax,Reserve2GrainE(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
     IF(GrainStrutElms_brch(ielmn,NB,NZ).LT.ZPGRM*rNCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ) &
       .OR. GrainStrutElms_brch(ielmp,NB,NZ).LT.ZPGRM*rPCGrain_pft(NZ)*GrainStrutElms_brch(ielmc,NB,NZ))THEN
-      GROLC=0._r8
+      GrainFillRate=0._r8
     ELSE
-      GROLC=GROLM
+      GrainFillRate=GrainFillRateMax
     ENDIF
-    Reserve2GrainCMax     = AMIN1(GROLM,StalkRsrvElms_brch(ielmc,NB,NZ))
-    Reserve2GrainE(ielmc) = AMIN1(GROLC,StalkRsrvElms_brch(ielmc,NB,NZ))
+    Reserve2GrainCMax     = AMIN1(GrainFillRateMax,StalkRsrvElms_brch(ielmc,NB,NZ))
+    Reserve2GrainE(ielmc) = AMIN1(GrainFillRate,StalkRsrvElms_brch(ielmc,NB,NZ))
     !
     !     GRAIN N OR P FILL RATE MAY BE LIMITED BY C:N OR C:P RATIOS
     !     OF STALK RESERVES
@@ -2327,6 +2346,7 @@ module PlantBranchMod
     LeafNumberAtFloralInit_brch       => plt_pheno%LeafNumberAtFloralInit_brch        ,& !output :leaf number at floral initiation, [-]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     MatureGroup_brch                  => plt_pheno%MatureGroup_brch                   ,& !output :plant maturity group, [-]
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                ,& !output :plant growth stage, [-]
     HoursTooLowPsiCan_pft             => plt_pheno%HoursTooLowPsiCan_pft              ,& !output :canopy plant water stress indicator, number of hours PSICanopy_pft(< PSILY), [h]
@@ -2343,7 +2363,7 @@ module PlantBranchMod
     LeafProteinC_node                 => plt_biom%LeafProteinC_node                   ,& !output :layer leaf protein C, [g d-2]
     PotentialSeedSites_brch           => plt_morph%PotentialSeedSites_brch            ,& !output :branch potential grain number, [d-2]
     doInitLeafOut_brch                => plt_pheno%doInitLeafOut_brch                 ,& !output :branch phenology flag, [-]
-    GrainSeedBiomCMean_brch           => plt_allom%GrainSeedBiomCMean_brch            ,& !output :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch           => plt_allom%SingleGrainMeanBiomC_brch            ,& !output :potential carbon mass per grain, [gC seed-1]
     SenecStalkStrutElms_brch          => plt_biom%SenecStalkStrutElms_brch            ,& !output :branch stalk structural element, [g d-2]
     StructInternodeElms_brch          => plt_biom%StructInternodeElms_brch            ,& !output :internode chemical element, [g d-2]
     StalkNodeHeight_brch              => plt_morph%StalkNodeHeight_brch               ,& !output :internode height, [m]
@@ -2362,17 +2382,20 @@ module PlantBranchMod
 !    iPlantCalendar_brch(ipltcal_Emerge)=emergence date
 !
   call DebugPrint('beg '//subname//' NZ',NZ)
-  IF((EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial) & !perrenial
+  IF((EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. &
+    iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial) & !perrenial
     .AND. (Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ)))THEN
-      ! branch is ready to do leaf out
+    ! branch is ready to do leaf out
     MatureGroup_brch(NB,NZ)                      = MatureGroup_pft(NZ)
-    ShootNodeNumAtInitFloral_brch(NB,NZ)         = ShootNodeNum_brch(NB,NZ)
-    ShootNodeNumAtAnthesis_brch(NB,NZ)             = 0._r8
+    ShootNodeNumAtAnthesis_brch(NB,NZ)           = 0._r8
     LeafNumberAtFloralInit_brch(NB,NZ)           = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)         = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)     = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ)          = 0._r8
     iPlantCalendar_brch(ipltcal_Emerge,NB,NZ)    = I
     iPlantCalendar_brch(2:NumGrowthStages,NB,NZ) = 0
+    ! Start each perennial reproductive cycle with no failed grain-fill hours.
+    HourFailGrainFill_brch(NB,NZ)               = 0._r8
 
     IF(NB.EQ.MainBranchNum_pft(NZ))THEN
       HoursTooLowPsiCan_pft(NZ)=0._r8
@@ -2397,7 +2420,7 @@ module PlantBranchMod
     !     StalkNodeVertLength_brch,StalkNodeHeight_brch=stalk height,stalk internode length
     !     SetNumberSeeds_brch=seed set number
     !     PotentialSeedSites_brch=potential number of seed set sites
-    !     GrainSeedBiomCMean_brch=individual seed size
+    !     SingleGrainMeanBiomC_brch=individual seed size
     !
     IF(EnablePlantLeafOut_brch(NB,NZ).EQ.iTrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial &
       .AND. Hours4Leafout_brch(NB,NZ).GE.HourReq4LeafOut_brch(NB,NZ))THEN
@@ -2406,7 +2429,6 @@ module PlantBranchMod
         NumOfLeaves_brch(NB,NZ)       = 0._r8
         KLeafNumber_brch(NB,NZ)       = 1
         KHiestGroLeafNode_brch(NB,NZ) = 1
-        HourFailGrainFill_brch(NB,NZ) = 0._r8
         D5330: DO M=1,jsken
           DO NE=1,NumPlantChemElms
             dFall= PlantElmAllocMat4Litr(NE,icwood,M,NZ)*AZMAX1(LeafStrutElms_brch(NE,NB,NZ))*FracLeafShethElmAlloc2Litr(NE,k_woody_comp) &
@@ -2458,7 +2480,7 @@ module PlantBranchMod
       
       PotentialSeedSites_brch(NB,NZ) = 0._r8
       SetNumberSeeds_brch(NB,NZ)     = 0._r8
-      GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
+      SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
       IF(iPlantTurnoverPattern_pft(NZ).EQ.0 .OR. (.not.is_plant_woody_vascular(iPlantRootProfile_pft(NZ),iPlant2ndGrothPattern_pft(NZ))))THEN
         D6345: DO M=1,jsken
           DO NE=1,NumPlantChemElms
@@ -2480,6 +2502,8 @@ module PlantBranchMod
         ENDDO D6340
       ENDIF
     ENDIF
+    ! Use the new season's node count after any turnover-specific reset.
+    ShootNodeNumAtInitFloral_brch(NB,NZ) = ShootNodeNum_brch(NB,NZ)
   ENDIF
   !
   !   SPRING OR FALL FLAG RESET
@@ -2537,13 +2561,14 @@ module PlantBranchMod
     HuskStrutElms_brch           => plt_biom%HuskStrutElms_brch             ,& !inoput :branch husk structural element mass, [g d-2]
     SeasonalNonstElms_pft        => plt_biom%SeasonalNonstElms_pft          ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     StructInternodeElms_brch     => plt_biom%StructInternodeElms_brch       ,& !inoput :internode chemical element, [g d-2]
-    GrainSeedBiomCMean_brch      => plt_allom%GrainSeedBiomCMean_brch       ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch      => plt_allom%SingleGrainMeanBiomC_brch       ,& !inoput :potential carbon mass per grain, [gC seed-1]
     Prep4Literfall_brch          => plt_pheno%Prep4Literfall_brch           ,& !inoput :branch phenology flag, [-]
     Hours4LiterfalAftMature_brch => plt_pheno%Hours4LiterfalAftMature_brch  ,& !inoput :branch phenology flag, [h]
     LitrfallElms_pvr             => plt_bgcr%LitrfallElms_pvr               ,& !inoput :plant LitrFall element, [g d-2 h-1]
     SSXferElms_pft               => plt_bgcr%SSXferElms_pft                 ,& !inoput :export flux from the seasonal storage, [g h-1 d-2]    
     SSXfer2ShootElms_pft         => plt_bgcr%SSXfer2ShootElms_pft           ,& !inoput :flux export from seasonal storage to shoot, [g h-1 d-2]        
     LitrFallElms_brch            => plt_bgcr%LitrFallElms_brch              ,& !inoput :litterfall from the branch, [g d-2 h-1]    
+    StalkNodeHeight_brch         => plt_morph%StalkNodeHeight_brch          ,& !inoput :cumulative node height, [m]
     StalkNodeVertLength_brch     => plt_morph%StalkNodeVertLength_brch      ,& !inoput :internode height, [m]
     PotentialSeedSites_brch      => plt_morph%PotentialSeedSites_brch       ,& !inoput :branch potential grain number, [d-2]
     SetNumberSeeds_brch          => plt_morph%SetNumberSeeds_brch           ,& !inoput :branch grain number, [d-2]
@@ -2616,7 +2641,8 @@ module PlantBranchMod
     ENDDO
     PotentialSeedSites_brch(NB,NZ) = RSpecLiterFall1*PotentialSeedSites_brch(NB,NZ)
     SetNumberSeeds_brch(NB,NZ)     = RSpecLiterFall1*SetNumberSeeds_brch(NB,NZ)
-    GrainSeedBiomCMean_brch(NB,NZ) = RSpecLiterFall1*GrainSeedBiomCMean_brch(NB,NZ)
+    ! Partial removal changes grain number, not the size potential of surviving grains.
+    IF(RSpecLiterFall1.LE.0._r8) SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
     !
     !     STALKS BECOME LitrFall IN GRASSES AT END OF SEASON
     !
@@ -2641,6 +2667,7 @@ module PlantBranchMod
       ENDDO
       D2010: DO K=0,MaxNodesPerBranch1  
         StalkNodeVertLength_brch(K,NB,NZ)=RSpecLiterFall1*StalkNodeVertLength_brch(K,NB,NZ)
+        StalkNodeHeight_brch(K,NB,NZ)=RSpecLiterFall1*StalkNodeHeight_brch(K,NB,NZ)
       ENDDO D2010
     ENDIF
 
@@ -3918,8 +3945,10 @@ module PlantBranchMod
     CanPBranchHeight               => plt_morph%CanPBranchHeight                ,& !output :branch height, [m]
     StalkNodeVertLength_brch       => plt_morph%StalkNodeVertLength_brch        ,& !output :internode height, [m]
     LeafAreaDying_brch             => plt_morph%LeafAreaDying_brch              ,& !output :branch leaf area, [m2 d-2]
-    PetolShethChemElmRemobFlx_brch => plt_pheno%PetolShethChemElmRemobFlx_brch  ,& !output :element translocated from sheath during senescence, [g d-2 h-1]
-    LeafElmntRemobFlx_brch         => plt_pheno%LeafElmntRemobFlx_brch           & !output :element translocated from leaf during senescence, [g d-2 h-1]
+    LeafSenescInitialElms_brch     => plt_pheno%LeafSenescInitialElms_brch      ,& !inoput :initial senescing leaf C/N/P mass, [g d-2]
+    PetolSenescInitialElms_brch    => plt_pheno%PetolSenescInitialElms_brch     ,& !inoput :initial senescing sheath/petiole C/N/P mass, [g d-2]
+    PetolShethChemElmRemobFlx_brch => plt_pheno%PetolShethChemElmRemobFlx_brch  ,& !output :cached remobilizable sheath element mass, [g d-2]
+    LeafElmntRemobFlx_brch         => plt_pheno%LeafElmntRemobFlx_brch           & !output :cached remobilizable leaf element mass, [g d-2]
   )
 
   call DebugPrint('beg '//subname//' NZ',NZ)
@@ -3936,13 +3965,16 @@ module PlantBranchMod
       !   WGLF,WGLFN,WGLFP=node leaf C,N,P mass
       !   LeafArea_node=node leaf area
       !
-      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
+      ! Cache the complete donor and its recyclable portion together. A negative snapshot
+      ! marks initialization or a legacy restart, whose original snapshot cannot be recovered.
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue .OR. ANY(LeafSenescInitialElms_brch(:,NB,NZ).LT.0._r8))THEN
 
         LeafAreaDying_brch(NB,NZ)=AZMAX1(LeafArea_node(K,NB,NZ))
+        LeafSenescInitialElms_brch(:,NB,NZ)=MAX(0._r8,LeafElmntNode_brch(:,K,NB,NZ))
 
         IF(LeafElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            LeafElmntRemobFlx_brch(NE,NB,NZ) = AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))*RCCE(NE)
+            LeafElmntRemobFlx_brch(NE,NB,NZ) = LeafSenescInitialElms_brch(NE,NB,NZ)*MAX(0._r8,MIN(1._r8,RCCE(NE)))
           ENDDO
         ELSE
           LeafElmntRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=0._r8
@@ -3953,7 +3985,20 @@ module PlantBranchMod
       !
       !       RSpecKillLeafPetol,FSNCL=fraction of lowest leaf to be remobilized
       !
-      RSpecKillLeaf=AMIN1(RSpecKillLeafPetol,1.0_R8)
+      ! Apply one fraction of the initial tissue to C/N/P, recycling, litter, and geometry.
+      ! Bound it by every remaining donor pool; other processes may change tissue stoichiometry.
+      RSpecKillLeaf=MAX(0._r8,MIN(1._r8,RSpecKillLeafPetol))
+      IF(LeafSenescInitialElms_brch(ielmc,NB,NZ).LE.ZERO4Groth_pft(NZ))RSpecKillLeaf=0._r8
+      DO NE=1,NumPlantChemElms
+        IF(LeafSenescInitialElms_brch(NE,NB,NZ).GT.0._r8)THEN
+          RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafElmntNode_brch(NE,K,NB,NZ))/LeafSenescInitialElms_brch(NE,NB,NZ), &
+            MAX(0._r8,LeafStrutElms_brch(NE,NB,NZ))/LeafSenescInitialElms_brch(NE,NB,NZ))
+        ENDIF
+      ENDDO
+      IF(LeafAreaDying_brch(NB,NZ).GT.0._r8) &
+        RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafArea_node(K,NB,NZ))/LeafAreaDying_brch(NB,NZ))
+      IF(LeafAreaDying_brch(NB,NZ).GT.0._r8) &
+        RSpecKillLeaf=MIN(RSpecKillLeaf,MAX(0._r8,LeafAreaLive_brch(NB,NZ))/LeafAreaDying_brch(NB,NZ))
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !       TO FRACTIONS SET IN 'STARTQ'
@@ -3965,7 +4010,7 @@ module PlantBranchMod
       !       FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
       !
       DO NE=1,NumPlantChemElms
-        LeafEKill(NE)=RSpecKillLeaf*AZMAX1(LeafElmntNode_brch(NE,K,NB,NZ))
+        LeafEKill(NE)=RSpecKillLeaf*LeafSenescInitialElms_brch(NE,NB,NZ)
         LeafEcycl(NE)=RSpecKillLeaf*LeafElmntRemobFlx_brch(NE,NB,NZ)
       ENDDO  
 
@@ -3991,13 +4036,13 @@ module PlantBranchMod
       !       CNWS,rProteinC2LeafP_pft=protein:N,protein:P ratios from startq.f
       !       CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
       !     canopy nonstructural Carbon/nutrient is not stored in leaves
-      LeafAreaLive_brch(NB,NZ) = LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
-      LeafArea_node(K,NB,NZ)   = LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ)
+      LeafAreaLive_brch(NB,NZ) = MAX(0._r8,LeafAreaLive_brch(NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ))
+      LeafArea_node(K,NB,NZ)   = MAX(0._r8,LeafArea_node(K,NB,NZ)-RSpecKillLeaf*LeafAreaDying_brch(NB,NZ))
       LeafProteinC_node(K,NB,NZ) = AZMAX1(LeafProteinC_node(K,NB,NZ)-AMAX1(LeafEKill(ielmn)*rProteinC2LeafN_pft(NZ),LeafEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
 
       DO NE=1,NumPlantChemElms
-        LeafStrutElms_brch(NE,NB,NZ)   = LeafStrutElms_brch(NE,NB,NZ)-LeafEKill(NE)
-        LeafElmntNode_brch(NE,K,NB,NZ) = LeafElmntNode_brch(NE,K,NB,NZ)-LeafEKill(NE)
+        LeafStrutElms_brch(NE,NB,NZ)   = MAX(0._r8,LeafStrutElms_brch(NE,NB,NZ)-LeafEKill(NE))
+        LeafElmntNode_brch(NE,K,NB,NZ) = MAX(0._r8,LeafElmntNode_brch(NE,K,NB,NZ)-LeafEKill(NE))
         CanopyNonstElms_brch(NE,NB,NZ) = CanopyNonstElms_brch(NE,NB,NZ)+LeafEcycl(NE)
       ENDDO
       !
@@ -4010,17 +4055,22 @@ module PlantBranchMod
       !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing PetolSheth
       !
 
-      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
+      ! Cache the complete donor and its recyclable portion together. A negative snapshot
+      ! marks initialization or a legacy restart, whose original snapshot cannot be recovered.
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue .OR. ANY(PetolSenescInitialElms_brch(:,NB,NZ).LT.0._r8))THEN
         CanPBranchHeight(NB,NZ)=AZMAX1(PetoleLength_node(K,NB,NZ))
+        PetolSenescInitialElms_brch(:,NB,NZ)=MAX(0._r8,PetolShethElmntNode_brch(:,K,NB,NZ))
         !
         IF(PetolShethElmntNode_brch(ielmc,K,NB,NZ).GT.ZERO4Groth_pft(NZ))THEN
           DO NE=1,NumPlantChemElms
-            PetolShethChemElmRemobFlx_brch(NE,NB,NZ) = PetolShethElmntNode_brch(NE,K,NB,NZ)*RCCE(NE)
+            PetolShethChemElmRemobFlx_brch(NE,NB,NZ) = PetolSenescInitialElms_brch(NE,NB,NZ)*MAX(0._r8,MIN(1._r8,RCCE(NE)))
           ENDDO
         ELSE
           PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,NB,NZ)=0._r8
         ENDIF
         
+      ENDIF
+      IF(doRemobilization_brch(NB,NZ).EQ.itrue)THEN
         DO NE=1,NumPlantChemElms
           SenecStalkStrutElms_brch(NE,NB,NZ)=SenecStalkStrutElms_brch(NE,NB,NZ)+StructInternodeElms_brch(NE,K,NB,NZ)
         ENDDO
@@ -4032,7 +4082,18 @@ module PlantBranchMod
       !
       !       RSpecKillPetol=fraction of lowest PetolSheth to be remobilized
       !
-      RSpecKillPetol=AMIN1(1._r8,RSpecKillLeafPetol)
+      ! Apply one fraction of the initial tissue to C/N/P, recycling, litter, and geometry.
+      ! Bound it by every remaining donor pool; other processes may change tissue stoichiometry.
+      RSpecKillPetol=MAX(0._r8,MIN(1._r8,RSpecKillLeafPetol))
+      IF(PetolSenescInitialElms_brch(ielmc,NB,NZ).LE.ZERO4Groth_pft(NZ))RSpecKillPetol=0._r8
+      DO NE=1,NumPlantChemElms
+        IF(PetolSenescInitialElms_brch(NE,NB,NZ).GT.0._r8)THEN
+          RSpecKillPetol=MIN(RSpecKillPetol,MAX(0._r8,PetolShethElmntNode_brch(NE,K,NB,NZ))/PetolSenescInitialElms_brch(NE,NB,NZ), &
+            MAX(0._r8,PetolShethStrutElms_brch(NE,NB,NZ))/PetolSenescInitialElms_brch(NE,NB,NZ))
+        ENDIF
+      ENDDO
+      IF(CanPBranchHeight(NB,NZ).GT.0._r8) &
+        RSpecKillPetol=MIN(RSpecKillPetol,MAX(0._r8,PetoleLength_node(K,NB,NZ))/CanPBranchHeight(NB,NZ))
       !
       !       NON-REMOBILIZABLE C,N,P BECOMES LitrFall ALLOCATED
       !       TO FRACTIONS SET IN 'STARTQ'
@@ -4046,7 +4107,7 @@ module PlantBranchMod
       !       FWODSN,FWODSP=N,P woody fraction in PetolSheth:0=woody,1=non-woody
       !
       DO NE=1,NumPlantChemElms
-        PetolEKill(NE) = RSpecKillPetol*AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ))
+        PetolEKill(NE) = RSpecKillPetol*PetolSenescInitialElms_brch(NE,NB,NZ)
         PetolECycl(NE) = RSpecKillPetol*PetolShethChemElmRemobFlx_brch(NE,NB,NZ)
       ENDDO
       D6305: DO M=1,jsken
@@ -4077,7 +4138,7 @@ module PlantBranchMod
         PetolShethElmntNode_brch(NE,K,NB,NZ) = AZMAX1(PetolShethElmntNode_brch(NE,K,NB,NZ)-PetolEKill(NE))
         CanopyNonstElms_brch(NE,NB,NZ)       = CanopyNonstElms_brch(NE,NB,NZ)+PetolECycl(NE)
       ENDDO
-      PetoleLength_node(K,NB,NZ)   = PetoleLength_node(K,NB,NZ)-RSpecKillPetol*CanPBranchHeight(NB,NZ)
+      PetoleLength_node(K,NB,NZ)   = MAX(0._r8,PetoleLength_node(K,NB,NZ)-RSpecKillPetol*CanPBranchHeight(NB,NZ))
       PetoleProteinC_node(K,NB,NZ) = AZMAX1(PetoleProteinC_node(K,NB,NZ)-AMAX1(PetolEKill(ielmn)*rProteinC2LeafN_pft(NZ),PetolEKill(ielmp)*rProteinC2LeafP_pft(NZ)))
     ENDIF
   ENDIF

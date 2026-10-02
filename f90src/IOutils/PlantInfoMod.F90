@@ -486,6 +486,18 @@ implicit none
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
 
     call SetPlantTraits(nu_plt,pft_changed,NZ,NY,NX,VRNLI,VRNXI)
+
+    ! Drought leaf-out uses PSIMin4LeafOut(2:4) in PlantPhenolMod.
+    IF ((iPlantPhenolType_pft(NZ,NY,NX).EQ.iphenotyp_drouhtdecidu .OR. &
+         iPlantPhenolType_pft(NZ,NY,NX).EQ.4 .OR. &
+         iPlantPhenolType_pft(NZ,NY,NX).EQ.5) .AND. &
+        (iEmbryophyteType_pft(NZ,NY,NX).LT.2 .OR. &
+         iEmbryophyteType_pft(NZ,NY,NX).GT.4)) THEN
+      CALL ENDRUN('Unsupported botanical/phenology combination for '// &
+        TRIM(DATAP(NZ,NY,NX))//': drought leaf-out requires IEBTYP=2:4; '// &
+        TRIM(mod_filename), __LINE__)
+    ENDIF
+
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !

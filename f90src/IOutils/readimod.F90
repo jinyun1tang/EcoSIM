@@ -260,6 +260,7 @@ module readiMod
   call read_aerosol_vars(loc,'fAeroMoss',fMoss)
   call read_aerosol_vars(loc,'fAeroLich',fLich)
   call read_aerosol_vars(loc,'fAeroDeadNMB',fDeadNMB)
+
   if(lverb)then
     write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
@@ -373,6 +374,9 @@ module readiMod
   integer :: NM(JY,JX),ntp,ntopus
   real(r8) :: dat1(1:JZ)
   real(r8) :: corrector,OrgVolFrac
+  real(r8) :: fAeroScalar
+  logical :: readvar_scalar
+  type(Var_desc_t) :: vardesc
 ! begin_execution
   associate(                            &
   k_woody_comp => micpar%k_woody_comp , &
@@ -392,6 +396,8 @@ module readiMod
 
   ntopus=get_dim_len(grid_nfid, 'ntopou')
   if(first_topou)ntopus=1
+  call check_var(grid_nfid, 'fAeroScalar', vardesc, readvar_scalar)
+  fAeroScalar=0._r8
   DO ntp=1,ntopus
     call ncd_getvar(grid_nfid, 'NH1', ntp, NH1)
     call ncd_getvar(grid_nfid, 'NV1', ntp, NV1)
@@ -400,6 +406,11 @@ module readiMod
     call ncd_getvar(grid_nfid, 'ASPX', ntp,ASPX) !clockwise degrees from north
     call ncd_getvar(grid_nfid, 'SL0', ntp,SL0)
     call ncd_getvar(grid_nfid, 'DPTHSX', ntp,initSnowDepth)
+    
+    if(readvar_scalar)then
+      !Read the optional bioaerosol carbon fraction.
+      call ncd_getvar(grid_nfid,'fAeroScalar',ntp,fAeroScalar)      
+    endif
 
 !
 ! OPEN AND READ SOIL FILE
@@ -410,6 +421,7 @@ module readiMod
 !
 !     SURFACE SLOPES AND ASPECTS
 !
+        fAeroScalar_col(NY,NX)=fAeroScalar
         ASP_col(NY,NX)       = ASPX
         SL_col(NY,NX)        = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
@@ -443,11 +455,13 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR_col(NV1,NH1))
-    
+
     NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
     NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
     NM(NV1,NH1)     = MaxNumRootLays_col(NV1,NH1)+NL1
     
+    
+
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI_col(NV1,NH1) = NM(NV1,NH1)+NL2
