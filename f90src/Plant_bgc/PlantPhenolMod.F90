@@ -10,7 +10,16 @@ module PlantPhenolMod
   use PlantDebugMod
   use DebugToolMod
   use EcosimConst
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use PlantMathFuncMod
 
   implicit none
@@ -47,6 +56,7 @@ module PlantPhenolMod
   character(len=*), parameter :: subname='PhenologyUpdate'
 ! begin_execution
   associate(                                                                   &
+    dReproNodeNumNormByMatG_brch  => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     doInitPlant_pft               => plt_pheno%doInitPlant_pft                ,& !input  :PFT initialization flag:0=no,1=yes,[-]
     IsPlantActive_pft             => plt_pheno%IsPlantActive_pft              ,& !input  :flag for living pft, [-]
     iPlantCalendar_brch           => plt_pheno%iPlantCalendar_brch            ,& !input  :plant growth stage, [-]
@@ -58,6 +68,8 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
   I=yearIJ%I; J=yearIJ%J
+  ! Clear the hourly increment even when a PFT or branch skips development.
+  dReproNodeNumNormByMatG_brch(:,:) = 0._r8
   D9985: DO NZ=1,NP
 
     IF(DATAP(NZ).NE.'NO')THEN
@@ -436,6 +448,7 @@ module PlantPhenolMod
   )
   call PrintInfo('beg '//subname)
   plt_bgcr%RootGasLossDisturb_pft(idg_beg:idg_NH3,NZ)=0.0_r8
+  CanopyNodulNonstElms_pft(1:NumPlantChemElms,NZ)=0._r8
   CanopyNonstElms_pft(1:NumPlantChemElms,NZ)=0.0_r8
   MaxSoilLays4Root_pft(NZ)   = NMaxRootBotLayer_pft(NZ)
   NGTopRootLayer_pft(NZ) = MIN(MaxSoilLays4Root_pft(NZ),MAX(NGTopRootLayer_pft(NZ),NU))

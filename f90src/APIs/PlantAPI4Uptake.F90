@@ -2,10 +2,18 @@ module PlantAPI4Uptake
 !
 ! interface to integrate the plant model
 ! for prescribed phenology
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
-  use MiniMathMod,      only: AZMAX1
+  use data_kind_mod,              only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,           only: micpar, pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col
+  use MiniMathMod,                only: AZMAX1
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantSoilChemistryAPIData,  only: plt_soilchem
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -32,7 +40,7 @@ module PlantAPI4Uptake
   use FertilizerDataType
   use SoilBGCDataType
   use PlantMgmtDataType
-  use PlantAPIData
+  use PlantAPICommonData
 implicit none
 
   private
@@ -160,7 +168,7 @@ implicit none
     DO L=1,NK_col(NY,NX)
       plt_morph%Root1stXNumL_pvr(L,NZ)     = Root1stXNumL_pvr(L,NZ,NY,NX)
       plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)
-      plt_morph%RootFineFrac2Med_pvr(L,NZ) = RootFineFrac2Med_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_rpvr(:,L,NZ) = RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)
       plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
       plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)  
       DO N=1,Myco_pft(NZ,NY,NX)
@@ -208,6 +216,7 @@ implicit none
     plt_ew%SnowOnCanopy_pft(NZ)            = SnowOnCanopy_pft(NZ,NY,NX)
     plt_ew%WatHeldOnCanopy_pft(NZ)         = WatHeldOnCanopy_pft(NZ,NY,NX)     !water held by canopy surface
     plt_rad%FracPARads2Canopy_pft(NZ)      = FracPARads2Canopy_pft(NZ,NY,NX)
+    plt_rad%FracPARads2LiveCanopy_pft(NZ)  = FracPARads2LiveCanopy_pft(NZ,NY,NX)
     plt_ew%HeatXAir2PCan_pft(NZ)           = HeatXAir2PCan_pft(NZ,NY,NX)
     plt_rad%RadPARCanopyAbsorption_pft(NZ) = RadPARCanopyAbsorption_pft(NZ,NY,NX)      !computed from surface energy module
     plt_rad%RadSWCanopyAbsorption_pft(NZ)  = RadSWCanopyAbsorption_pft(NZ,NY,NX)       !computed from surface energy module

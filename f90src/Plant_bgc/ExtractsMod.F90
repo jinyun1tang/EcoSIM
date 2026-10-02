@@ -12,7 +12,15 @@ module ExtractsMod
   use DebugToolMod,  only: PrintInfo
   use EcosimConst
   use PlantBGCPars
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
 
   private

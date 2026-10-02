@@ -3,7 +3,13 @@ module PlantDebugMod
   use abortutils, only : endrun
   use PlantBalMod
   use TracerIDMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
 
 implicit none
 

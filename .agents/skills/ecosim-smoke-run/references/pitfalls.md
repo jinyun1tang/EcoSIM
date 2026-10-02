@@ -79,6 +79,13 @@ file living in the run directory rather than under `examples/inputs/`. The
 staging step copies anything referenced by a `'./...'` path; a case added later
 with the same pattern is handled automatically.
 
+That restart is *not* tracked in the repository (`git ls-files
+examples/run_dir/dryland/` lists only the two namelists) -- it only exists if
+someone has run `dryland` out to 2004 locally. So `dryland2` is excluded from
+the smoke run by policy: see "Excluded namelists" in `SKILL.md`. Whether it
+passes or fails depends on the operator's untracked working tree, not on the
+build, so it is not evidence either way.
+
 ## 8. Expected benign output
 
 - `CHECK_VAR: variable <name> is not on initial dataset` — normal when a

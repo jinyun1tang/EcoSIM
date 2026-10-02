@@ -3,7 +3,19 @@ module PlantDisturbByTillageMod
   use PlantBalMod, only : SumRootBiome
   use PlantDebugMod
   use DebugToolMod
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use ElmIDMod
   use PlantMathFuncMod
   implicit none
@@ -26,7 +38,8 @@ contains
   real(r8) :: XHVST1
   real(r8) :: WVPLT
   integer :: M,NB,NE,K,L,NR
-  real(r8) :: FDM,VOLWPX  
+  real(r8) :: FDM,VOLWPX
+  real(r8) :: VHeatCapCanopyPrev,watflx,heatflx
   real(r8) :: dNonstLitr,dFoliarLitr,dNonFoliar  
   associate(                                                               &
     inonstruct                  => pltpar%inonstruct                      ,& !input  :group id of plant nonstructural litter
@@ -47,6 +60,9 @@ contains
     NumOfBranches_pft           => plt_morph%NumOfBranches_pft            ,& !input  :number of branches,[-]
     PlantPopuLive_pft           => plt_site%PlantPopuLive_pft             ,& !input  :plant population, [d-2]
     H2OLoss_CumYr_col           => plt_ew%H2OLoss_CumYr_col               ,& !inoput :total subsurface water flux, [m3 d-2]
+    TKC_pft                    => plt_ew%TKC_pft                        ,& !input  :canopy temperature, [K]
+    QCanopyWatLoss2Dist_col     => plt_ew%QCanopyWatLoss2Dist_col         ,& !inoput :canopy water loss to disturbance, [m3 d-2]
+    CanopyHeatLoss2Dist_col     => plt_ew%CanopyHeatLoss2Dist_col         ,& !inoput :canopy heat loss to disturbance, [MJ d-2]
     CanopyBiomWater_pft         => plt_ew%CanopyBiomWater_pft             ,& !inoput :canopy water content, [m3 d-2]
     SeasonalNonstElms_pft       => plt_biom%SeasonalNonstElms_pft         ,& !inoput :plant stored nonstructural element at current step, [g d-2]
     CMassHCO3BundleSheath_node  => plt_photo%CMassHCO3BundleSheath_node   ,& !inoput :bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
@@ -57,7 +73,8 @@ contains
     LeafProteinC_node           => plt_biom%LeafProteinC_node             ,& !inoput :layer leaf protein C, [g d-2]
     StructInternodeElms_brch    => plt_biom%StructInternodeElms_brch      ,& !inoput :internode C, [g d-2]
     CanopyLeafSheathC_pft       => plt_biom%CanopyLeafSheathC_pft         ,& !inoput :canopy leaf + sheath C, [g d-2]
-    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2Canopy_pft       => plt_rad%FracPARads2Canopy_pft          ,& !inoput :fraction of incoming PAR absorbed by total canopy, [-]
+    FracPARads2LiveCanopy_pft   => plt_rad%FracPARads2LiveCanopy_pft      ,& !inoput :fraction of incoming PAR absorbed by live canopy, [-]
     CanopySapwoodC_pft          => plt_biom%CanopySapwoodC_pft            ,& !inoput :canopy active stalk C, [g d-2]
     isPlantBranchAlive_brch     => plt_pheno%isPlantBranchAlive_brch      ,& !inoput :flag to detect branch death, [-]
     MaxNumRootAxes              => pltpar%MaxNumRootAxes                  ,& !input  : maximum number root axes,[-]
@@ -72,7 +89,7 @@ contains
     HuskStrutElms_brch          => plt_biom%HuskStrutElms_brch            ,& !inoput :branch husk structural element mass, [g d-2]
     StalkRsrvElms_brch          => plt_biom%StalkRsrvElms_brch            ,& !inoput :branch reserve element mass, [g d-2]
     CanopyNodulStrutElms_brch   => plt_biom%CanopyNodulStrutElms_brch     ,& !inoput :branch nodule structural element, [g d-2]
-    GrainSeedBiomCMean_brch     => plt_allom%GrainSeedBiomCMean_brch      ,& !inoput :maximum grain C during grain fill, [g d-2]
+    SingleGrainMeanBiomC_brch     => plt_allom%SingleGrainMeanBiomC_brch      ,& !inoput :potential carbon mass per grain, [gC seed-1]
     ShootElms_brch              => plt_biom%ShootElms_brch                ,& !inoput :branch shoot structural element mass, [g d-2]
     StalkStrutElms_brch         => plt_biom%StalkStrutElms_brch           ,& !inoput :branch stalk structural element mass, [g d-2]
     LeafLayerElms_node          => plt_biom%LeafLayerElms_node            ,& !inoput :layer leaf element, [g d-2]
@@ -94,11 +111,11 @@ contains
   !     FracPARads2Canopy_pft=fraction of radiation received by each PFT canopy
   !     VHeatCapCanopy_pft=canopy heat capacity
 
-  XHVST1                    = 1._r8-XHVST
-  FracPARads2Canopy_pft(NZ) = FracPARads2Canopy_pft(NZ)*XHVST
-  VHeatCapCanopy_pft(NZ)    = VHeatCapCanopy_pft(NZ)*XHVST
-  CanopyLeafSheathC_pft(NZ) = 0._r8
-  CanopySapwoodC_pft(NZ)    = 0._r8
+  XHVST1                        = 1._r8-XHVST
+  FracPARads2Canopy_pft(NZ)     = FracPARads2Canopy_pft(NZ)*XHVST
+  FracPARads2LiveCanopy_pft(NZ) = FracPARads2LiveCanopy_pft(NZ)*XHVST
+  VHeatCapCanopyPrev           = VHeatCapCanopy_pft(NZ)
+  VHeatCapCanopy_pft(NZ)       = VHeatCapCanopyPrev*XHVST
   !
   !     TERMINATE BRANCHES IF TILLAGE IMPLEMENT 10 IS SELECTED
   !
@@ -182,13 +199,12 @@ contains
 
       PotentialSeedSites_brch(NB,NZ) = PotentialSeedSites_brch(NB,NZ)*XHVST
       SetNumberSeeds_brch(NB,NZ)     = SetNumberSeeds_brch(NB,NZ)*XHVST
-      GrainSeedBiomCMean_brch(NB,NZ) = GrainSeedBiomCMean_brch(NB,NZ)*XHVST
+      ! Partial removal changes grain number, not the size potential of surviving grains.
+      IF(XHVST.LE.0._r8) SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
       LeafAreaLive_brch(NB,NZ)       = LeafAreaLive_brch(NB,NZ)*XHVST
 
       !summarize C mass after tillage
       CanopyLeafSheathC_brch(NB,NZ)  = AZMAX1(LeafStrutElms_brch(ielmc,NB,NZ)+PetolShethStrutElms_brch(ielmc,NB,NZ))
-      CanopyLeafSheathC_pft(NZ)       = CanopyLeafSheathC_pft(NZ)+CanopyLeafSheathC_brch(NB,NZ)
-      CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ)+SapwoodBiomassC_brch(NB,NZ)
 
       D8970: DO K=0,MaxNodesPerBranch1
         IF(K.NE.0)THEN
@@ -219,6 +235,8 @@ contains
       ENDDO D8970
     ENDIF
   ENDDO D8975
+  CanopyLeafSheathC_pft(NZ) = SUM(CanopyLeafSheathC_brch(1:NumOfBranches_pft(NZ),NZ))
+  CanopySapwoodC_pft(NZ)    = SUM(SapwoodBiomassC_brch(1:NumOfBranches_pft(NZ),NZ))  
   !
   !     PSICanopy_pft=canopy water potential
   !     CanopyBiomWater_pft=water volume in canopy
@@ -229,8 +247,13 @@ contains
 
   FDM                     = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ) = ppmc*WVPLT/FDM
-  QH2OLoss_lnds           = QH2OLoss_lnds+VOLWPX-CanopyBiomWater_pft(NZ)
-  H2OLoss_CumYr_col       = H2OLoss_CumYr_col+VOLWPX-CanopyBiomWater_pft(NZ)
+  !Record this PFT's losses once, preserving earlier disturbance contributions.
+  watflx                  = VOLWPX-CanopyBiomWater_pft(NZ)
+  heatflx                 = (VHeatCapCanopyPrev-VHeatCapCanopy_pft(NZ))*TKC_pft(NZ)
+  QH2OLoss_lnds           = QH2OLoss_lnds+watflx
+  H2OLoss_CumYr_col       = H2OLoss_CumYr_col+watflx
+  QCanopyWatLoss2Dist_col = QCanopyWatLoss2Dist_col+watflx
+  CanopyHeatLoss2Dist_col = CanopyHeatLoss2Dist_col+heatflx
   !
   !     TERMINATE ROOTS IF TILLAGE IMPLEMENT 10 IS SELECTED
   !
@@ -341,7 +364,7 @@ contains
   real(r8),intent(in) :: XHVST
 
   character(len=*), parameter :: subname='RemoveRootsByTillage'
-  real(r8) :: XHVST1
+  real(r8) :: XHVST1,FracGeometryLeft
   integer :: L,N,M,NE,NR,idg
 
   associate(                                                             &
@@ -378,7 +401,7 @@ contains
     RootCO2Autor_pvr           => plt_rbgc%RootCO2Autor_pvr             ,& !inoput :root respiration constrained by O2, [g d-2 h-1]
     RootRespPotent_pvr         => plt_rbgc%RootRespPotent_pvr           ,& !inoput :root respiration unconstrained by O2, [g d-2 h-1]
     RootCO2EmisPot_pvr         => plt_rbgc%RootCO2EmisPot_pvr           ,& !inoput :root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
-    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :primary root axis length in soil layer, [m d-2]
+    Root1stLenPP_rpvr          => plt_morph%Root1stLenPP_rpvr           ,& !inoput :primary root length per axis in soil layer, [m]
     RootVH2O_pvr               => plt_morph%RootVH2O_pvr                ,& !inoput :root layer volume water, [m2 d-2]
     RootSAreaPerPlant_pvr      => plt_morph%RootSAreaPerPlant_pvr       ,& !inoput :root layer area per plant, [m p-1]
     RootPoreVol_pvr            => plt_morph%RootPoreVol_pvr             ,& !inoput :root layer volume air, [m2 d-2]
@@ -400,6 +423,10 @@ contains
   call PrintInfo('beg '//subname)
   XHVST1=1._r8-XHVST
   if(XHVST1<=1.e-10_r8)return
+  ! XHVST also reduces plant population in the caller. Surviving plants keep
+  ! their per-axis/per-plant dimensions; only complete removal clears them.
+  FracGeometryLeft=0._r8
+  IF(XHVST.GT.0._r8)FracGeometryLeft=1._r8
 
   DO NR=1,NumStructuralRootAxes_pft(NZ)    
     DO NE=1,NumPlantChemElms
@@ -473,7 +500,7 @@ contains
       !
       if(N==ipltroot)THEN
         DO NR=1,NumStructuralRootAxes_pft(NZ)
-          Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*XHVST        
+          Root1stLenPP_rpvr(L,NR,NZ)  = Root1stLenPP_rpvr(L,NR,NZ)*FracGeometryLeft
           DO NE=1,NumPlantChemElms
             Root1stActStructElms_rpvr(NE,L,NR,NZ) = Root1stActStructElms_rpvr(NE,L,NR,NZ)*XHVST
             Root1stLigStructElms_rpvr(NE,L,NR,NZ) = Root1stLigStructElms_rpvr(NE,L,NR,NZ)*XHVST            
@@ -498,11 +525,11 @@ contains
       PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)*XHVST
       RootProteinC_pvr(N,L,NZ)        = RootProteinC_pvr(N,L,NZ)*XHVST
       Root2ndXNumL_rpvr(N,L,NZ)       = Root2ndXNumL_rpvr(N,L,NZ)*XHVST
-      RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*XHVST
-      RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*XHVST
+      RootTotLenPerPlant_pvr(N,L,NZ)  = RootTotLenPerPlant_pvr(N,L,NZ)*FracGeometryLeft
+      RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ)*FracGeometryLeft
       RootPoreVol_pvr(N,L,NZ)         = RootPoreVol_pvr(N,L,NZ)*XHVST
       RootVH2O_pvr(N,L,NZ)            = RootVH2O_pvr(N,L,NZ)*XHVST
-      RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*XHVST
+      RootSAreaPerPlant_pvr(N,L,NZ)   = RootSAreaPerPlant_pvr(N,L,NZ)*FracGeometryLeft
       RootRespPotent_pvr(N,L,NZ)      = RootRespPotent_pvr(N,L,NZ)*XHVST
       RootCO2EmisPot_pvr(N,L,NZ)      = RootCO2EmisPot_pvr(N,L,NZ)*XHVST
       RootCO2Autor_pvr(N,L,NZ)        = RootCO2Autor_pvr(N,L,NZ)*XHVST

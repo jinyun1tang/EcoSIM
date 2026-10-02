@@ -6,7 +6,16 @@ module PlantNonstElmDynMod
   use EcoSIMCtrlMod
   use ElmIDMod
   use PlantBGCPars
-  use PlantAPIData  
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   implicit none
 
   private
@@ -630,14 +639,14 @@ module PlantNonstElmDynMod
   end subroutine ShootRootElmTransfer  
 
 !----------------------------------------------------------------------------------------------------
-  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC,BegRemoblize)
+  subroutine PlantNonstElmTransfer(I,J,NZ,GrothPART2LeafPetole,RootSinkC_vr,RootSinkC,BegRemoblizePlant)
   !
   !DESCRIPTION
   !transfer of nonstructural C/N/P 
   !
   implicit none
   integer,  intent(in) :: I,J,NZ
-  integer,  intent(in) :: BegRemoblize
+  integer,  intent(in) :: BegRemoblizePlant !main-branch eligibility for root seasonal storage
   real(r8), intent(in):: GrothPART2LeafPetole  !rate modifier for root-shoot nonstrucal material exchange 
   real(r8), INTENT(IN) :: RootSinkC_vr(pltpar%jroots,JZ1)
   real(r8), intent(in) :: RootSinkC(pltpar%jroots)
@@ -666,7 +675,7 @@ module PlantNonstElmDynMod
   !     TRANSFER ROOT NON-STRUCTURAL C,N,P TO SEASONAL STORAGE
   !     IN PERENNIALS
   !
-  IF(BegRemoblize.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
+  IF(BegRemoblizePlant.EQ.itrue .AND. iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
     call SeasonStoreRootNonstTransfer(I,J,NZ)
   ENDIF
   !
@@ -1022,7 +1031,7 @@ module PlantNonstElmDynMod
     CPOOLT=WVSTBX+RootElms_pft(ielmc,NZ)
 
     DO NE=2,NumPlantChemElms
-      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(ielmc,NB,NZ))
+      WTRSBX                            = AZMAX1(StalkRsrvElms_brch(NE,NB,NZ))
       WTRVCX                            = AZMAX1(SeasonalNonstElms_pft(NE,NZ)*FracCanopyCinStalk)
       !achor for seasonal storage is root, achor for stalkrsv is sap
       NonstElmGradt                     = (WTRVCX*WVSTBX-WTRSBX*WTRTTX)/CPOOLT

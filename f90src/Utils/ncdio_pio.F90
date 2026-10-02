@@ -781,7 +781,7 @@ module ncdio_pio
   integer :: j
   character(len=*), parameter :: subname=trim(mod_filename)//'::ncd_putvar_real_sp_1d'
   call check_var(ncid, trim(varname), vardesc, readvar)
-
+  
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data, &
      start = (/1,rec/)),trim(subname)//'::'//trim(varname))
 

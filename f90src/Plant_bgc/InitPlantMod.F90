@@ -5,7 +5,19 @@ module InitPlantMod
   use EcoSiMParDataMod, only: pltpar
   use EcosimConst
   use EcoSIMConfig
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantPhotosynthesisAPIData, only : plt_photo
+  use PlantRadiationAPIData, only : plt_rad
+  use PlantMorphologyAPIData, only : plt_morph
+  use PlantPhenologyAPIData, only : plt_pheno
+  use PlantSoilChemistryAPIData, only : plt_soilchem
+  use PlantAllometryAPIData, only : plt_allom
+  use PlantBiomassAPIData, only : plt_biom
+  use PlantEnergyWaterAPIData, only : plt_ew
+  use PlantDisturbanceAPIData, only : plt_distb
+  use PlantBGCRatesAPIData, only : plt_bgcr
+  use PlantRootBGCAPIData, only : plt_rbgc
   use TracerIDMod
   use ElmIDMod
   use PlantMathFuncMod
@@ -633,7 +645,7 @@ module InitPlantMod
     MatureGroup_pft                   => plt_pheno%MatureGroup_pft                    ,& !input  :acclimated plant maturity group, [-]
     NU                                => plt_site%NU                                  ,& !input  :current soil surface layer number, [-]
     PPX_pft                           => plt_site%PPX_pft                             ,& !input  :plant population, [plants m-2]
-    PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :element translocated from sheath during senescence, [g d-2 h-1]
+    PetolShethChemElmRemobFlx_brch    => plt_pheno%PetolShethChemElmRemobFlx_brch     ,& !input  :cached remobilizable sheath element mass, [g d-2]
     ShootNodeNumAtPlanting_pft        => plt_morph%ShootNodeNumAtPlanting_pft         ,& !input  :number of nodes in seed, [-]
     isPlantBranchAlive_brch           => plt_pheno%isPlantBranchAlive_brch            ,& !input  :flag to detect branch death, [-]
     Hours4LenthenPhotoPeriod_brch     => plt_pheno%Hours4LenthenPhotoPeriod_brch      ,& !output :initial heat requirement for spring leafout/dehardening, [h]
@@ -686,6 +698,7 @@ module InitPlantMod
     SetNumberSeeds_brch               => plt_morph%SetNumberSeeds_brch                ,& !output :branch grain number, [d-2]
     StemAreaZsec_brch                 => plt_morph%StemAreaZsec_brch                  ,& !output :stem surface area, [m2 d-2]
     TotReproNodeNumNormByMatrgrp_brch => plt_pheno%TotReproNodeNumNormByMatrgrp_brch  ,& !output :normalized node number during reproductive growth stages, [-]
+    dReproNodeNumNormByMatG_brch      => plt_pheno%dReproNodeNumNormByMatG_brch ,& !output :current hourly reproductive development increment, [h-1]
     TotalNodeNumNormByMatgrp_brch     => plt_pheno%TotalNodeNumNormByMatgrp_brch      ,& !output :normalized node number during vegetative growth stages, [-]
     Cytokinin2ndConc_rpvr             => plt_rbgc%Cytokinin2ndConc_rpvr               ,& !output :cytokinin concentration in fine roots, [gC m-3 H2O]    
     iPlantCalendar_brch               => plt_pheno%iPlantCalendar_brch                 & !output :plant growth stage, [-]
@@ -726,6 +739,7 @@ module InitPlantMod
     ReprodNodeNumNormByMatrgrp_brch(NB,NZ)        = 0._r8
     TotalNodeNumNormByMatgrp_brch(NB,NZ)          = 0._r8
     TotReproNodeNumNormByMatrgrp_brch(NB,NZ)      = 0._r8
+    dReproNodeNumNormByMatG_brch(NB,NZ)           = 0._r8
     Hours4LenthenPhotoPeriod_brch(NB,NZ)          = 0._r8
     Hours4ShortenPhotoPeriod_brch(NB,NZ)          = 0._r8
     Hours4Leafout_brch(NB,NZ)                     = Hours4LenthenPhotoPeriod_brch(NB,NZ)
@@ -758,7 +772,9 @@ module InitPlantMod
   plt_biom%EarStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)               = 0._r8
   plt_biom%CanopyNodulStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)       = 0._r8
   plt_pheno%LeafElmntRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)         = 0._r8
+  plt_pheno%LeafSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)         = -1._r8
   plt_pheno%PetolShethChemElmRemobFlx_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = 0._r8
+  plt_pheno%PetolSenescInitialElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ) = -1._r8
   plt_biom%SenecStalkStrutElms_brch(1:NumPlantChemElms,1:MaxNumBranches,NZ)        = 0._r8
   plt_morph%NActiveRootSegs_raxes(:,NZ) = 0
   plt_morph%IndRootSegBase_raxes(:,NZ)   = 1
@@ -770,7 +786,7 @@ module InitPlantMod
     plt_biom%CanopyLeafSheathC_brch(NB,NZ)   = 0._r8
     PotentialSeedSites_brch(NB,NZ)           = 0._r8
     SetNumberSeeds_brch(NB,NZ)                 = 0._r8
-    plt_allom%GrainSeedBiomCMean_brch(NB,NZ) = 0._r8
+    plt_allom%SingleGrainMeanBiomC_brch(NB,NZ) = 0._r8
     LeafAreaLive_brch(NB,NZ)                 = 0._r8
     plt_rbgc%NH3Dep2Can_brch(NB,NZ)          = 0._r8
     LeafAreaDying_brch(NB,NZ)                = 0._r8
@@ -916,8 +932,8 @@ module InitPlantMod
     CanopyLeafSheathC_pft   => plt_biom%CanopyLeafSheathC_pft  ,& !input  :canopy leaf + sheath C, [g d-2]
     ShootElms_pft           => plt_biom%ShootElms_pft          ,& !input  :canopy shoot structural chemical element mass, [g d-2]
     StemSpecVolume_pft      => plt_morph%StemSpecVolume_pft    ,& !input  :stalk specific volume, [m3 gC-1]        
-    HeatCanopy2Dist_col     => plt_ew%HeatCanopy2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
-    QCanopyWat2Dist_col     => plt_ew%QCanopyWat2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
+    CanopyHeatLoss2Dist_col     => plt_ew%CanopyHeatLoss2Dist_col      ,& !inoput :canopy energy +/- due to disturbance, [MJ /d2]
+    QCanopyWatLoss2Dist_col     => plt_ew%QCanopyWatLoss2Dist_col      ,& !inoput :canopy water +/- due to disturbance, [m3 H2O/d2]
     CanopyBiomWater_pft     => plt_ew%CanopyBiomWater_pft      ,& !output :canopy water content, [m3 d-2]
     PSICanopyOsmo_pft       => plt_ew%PSICanopyOsmo_pft        ,& !output :canopy osmotic water potential, [Mpa]
     PSICanopy_pft           => plt_ew%PSICanopy_pft            ,& !output :canopy total water potential, [Mpa]
@@ -927,7 +943,8 @@ module InitPlantMod
     VHeatCapCanopy_pft      => plt_ew%VHeatCapCanopy_pft       ,& !output :canopy heat capacity, [MJ d-2 K-1]
     DeltaTKC_pft            => plt_ew%DeltaTKC_pft             ,& !output :change in canopy temperature, [K]
     ENGYX_pft               => plt_ew%ENGYX_pft                ,& !output :canopy heat storage from previous time step, [MJ d-2]
-    FracPARads2Canopy_pft   => plt_rad%FracPARads2Canopy_pft   ,& !output :fraction of incoming PAR absorbed by canopy, [-]
+    FracPARads2Canopy_pft     => plt_rad%FracPARads2Canopy_pft       ,& !output :fraction of incoming PAR absorbed by total canopy, [-]
+    FracPARads2LiveCanopy_pft => plt_rad%FracPARads2LiveCanopy_pft   ,& !output :fraction of incoming PAR absorbed by live canopy, [-]
     PSICanopyTurg_pft       => plt_ew%PSICanopyTurg_pft        ,& !output :plant canopy turgor water potential, [MPa]
     TKGroth_pft             => plt_pheno%TKGroth_pft           ,& !output :canopy growth temperature, [K]
     Transpiration_pft       => plt_ew%Transpiration_pft        ,& !output :canopy transpiration, [m2 d-2 h-1]
@@ -954,12 +971,13 @@ module InitPlantMod
   PSICanopyOsmo_pft(NZ)     = OrganOsmoPsi0pt_pft(NZ)+PSICanopy_pft(NZ)
   PSICanopyTurg_pft(NZ)     = AZMAX1(PSICanopy_pft(NZ)-PSICanopyOsmo_pft(NZ))
   Transpiration_pft(NZ)     = 0._r8
-  FracPARads2Canopy_pft(NZ) = 0._r8
+  FracPARads2Canopy_pft(NZ)     = 0._r8
+  FracPARads2LiveCanopy_pft(NZ) = 0._r8
   FDM                       = get_FDM(PSICanopy_pft(NZ))
   CanopyBiomWater_pft(NZ)   = ppmc*CanopyLeafSheathC_pft(NZ)/FDM
   VHeatCapCanopy_pft(NZ)    = cpw*(ShootElms_pft(ielmc,NZ)*StemSpecVolume_pft(NZ)+CanopyBiomWater_pft(NZ))
-  QCanopyWat2Dist_col       = QCanopyWat2Dist_col-CanopyBiomWater_pft(NZ)
-  HeatCanopy2Dist_col       = HeatCanopy2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
+  QCanopyWatLoss2Dist_col       = QCanopyWatLoss2Dist_col-CanopyBiomWater_pft(NZ)
+  CanopyHeatLoss2Dist_col       = CanopyHeatLoss2Dist_col-VHeatCapCanopy_pft(NZ)*TKC_pft(NZ)
   call PrintInfo('end '//subname)
   end associate
   end subroutine InitPlantHeatWater

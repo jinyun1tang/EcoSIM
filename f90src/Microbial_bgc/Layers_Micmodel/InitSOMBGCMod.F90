@@ -90,7 +90,7 @@ module InitSOMBGCMOD
   real(r8) :: OSPX(1:jcplx)
   real(r8) :: litrOM(NumPlantChemElms)
   real(r8) :: ORGM(NumPlantChemElms)
-  real(r8) :: tglds
+  real(r8) :: tglds,tCyanoInocC
   integer  :: MID,NE
   ! begin_execution
 
@@ -207,6 +207,8 @@ module InitSOMBGCMOD
     OSPX(K) = 0.0_r8
   ENDDO D995
 
+  mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
+
   D8995: DO K=1,jcplx
     IF(L.EQ.0)THEN
       OSCM(K) = AMIN1(DCKR,1._r8)*CORGCX(K)*VLSoilMicPMass_vr(L,NY,NX)
@@ -252,7 +254,6 @@ module InitSOMBGCMOD
     !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
     !     The reason that initialization of complex-5 microbes is repated for each
     !     complex is because complex 5 is shared by all the other complexes
-    mBiomeAutor_vr(1:NumPlantChemElms,1:NumLiveAutoBioms,L,NY,NX)=0._r8
 
     D8990: DO N=1,NumMicbHFunGrupsPerCmplx
       
@@ -290,13 +291,15 @@ module InitSOMBGCMOD
     ENDDO D8990
 
     !for cyanobacteria
+    tCyanoInocC=CyanoInocC*AREA_3D(3,NU_col(NY,NX),NY,NX)    
     if(L.eq.0 .and. OSCM(K).GT.0._r8)then
       KL=micpar%NumOfLitrCmplxs
-      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+
+      call InoculateCyanoBacter(K,L,NY,NX,KL,tCyanoInocC)
 
     elseif(L.eq.NU_col(NY,NX) .and. OSCM(K).GT.0._r8)then
       KL=jcplx
-      call InoculateCyanoBacter(K,L,NY,NX,KL,CyanoInocC)
+      call InoculateCyanoBacter(K,L,NY,NX,KL,tCyanoInocC)
     endif
     !
     !     MICROBIAL RESIDUE C, N AND P
@@ -385,8 +388,13 @@ module InitSOMBGCMOD
   RH1PO4DmndBandHeter_vr(:,:,L,NY,NX)    = 0.0_r8
   IF(L.EQ.0)THEN
     RNH4DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RNH4DmndLitrBandHeter_col(:,:,NY,NX)   = 0.0_r8
     RNO3DmndLitrHeter_col(:,:,NY,NX)   = 0.0_r8
+    RNO3DmndLitrBandHeter_col(:,:,NY,NX)   = 0.0_r8
     RH2PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
+    RH2PO4DmndLitrBandHeter_col(:,:,NY,NX) = 0.0_r8
+    RH1PO4DmndLitrHeter_col(:,:,NY,NX) = 0.0_r8
+    RH1PO4DmndLitrBandHeter_col(:,:,NY,NX) = 0.0_r8
   ENDIF
 
   RO2MetaDmndAutor_vr(:,L,NY,NX)       = 0.0_r8
@@ -405,8 +413,13 @@ module InitSOMBGCMOD
 
   IF(L.EQ.0)THEN
     RNH4UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RNH4UptkLitrBandAutor_col(:,NY,NX)   = 0.0_r8
     RNO3UptkLitrAutor_col(:,NY,NX)   = 0.0_r8
+    RNO3UptkLitrBandAutor_col(:,NY,NX)   = 0.0_r8
     RH2PO4UptkLitrAutor_col(:,NY,NX) = 0.0_r8
+    RH2PO4UptkLitrBandAutor_col(:,NY,NX) = 0.0_r8
+    RH1PO4UptkLitrAutor_col(:,NY,NX) = 0.0_r8
+    RH1PO4UptkLitrBandAutor_col(:,NY,NX) = 0.0_r8
   ENDIF
   
   call sumORGMLayL(L,NY,NX,ORGM)
@@ -429,7 +442,7 @@ module InitSOMBGCMOD
   logical, optional, intent(in) :: add_to_existing
   integer :: N,M,NGL,MID,NE
   real(r8) :: OME1(1:NumPlantChemElms)
-  real(r8) :: tglds
+  real(r8) :: tglds,tOMCI
   logical :: additive
 
   additive=.false.
@@ -437,9 +450,9 @@ module InitSOMBGCMOD
 
   N = micpar%mid_HeterMixtCynoBacter
   tglds = JGnfH(N)-JGniH(N)+1._r8
-
+  tOMCI=sum(micpar%OMCI(:,K))
   DO M=1,micpar%nlbiomcp
-    OME1(ielmc) = CyanoInocC*micpar%OMCI(M,K)/KL
+    OME1(ielmc) = CyanoInocC*micpar%OMCI(M,K)/(tOMCI*KL)
     OME1(ielmn) = AZMAX1(OME1(ielmc)*micpar%rNCOMC_ave(M,N,K))
     OME1(ielmp) = AZMAX1(OME1(ielmc)*micpar%rPCOMC_ave(M,N,K))
 
@@ -783,17 +796,19 @@ module InitSOMBGCMOD
   end subroutine InitLitterProfile
 !------------------------------------------------------------------------------------------
 
-  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,mscal)
+  subroutine MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,OME_in,mscal)
   !
   !seeding microbes added through litterfall
   implicit none
   integer, intent(in) :: I,J,K
   integer, intent(in) :: NY,NX
-  real(r8),intent(in) :: OSCMK
+  real(r8),intent(in) :: OSCMK                       !input organic carbon
+  real(r8), intent(out) :: OME_in(NumPlantChemElms)  !summary of total microbial input
   real(r8),optional,intent(in) :: mscal
   integer :: M,N,NGL,MID,NE,NN
-  real(r8) :: FOSCI,FOSNI,FOSPI,tglds
-  real(r8) :: OME1(1:NumPlantChemElms)
+  real(r8) :: FOSCI,FOSNI,FOSPI,tglds,tOMCI,fOMCH,tOMCA
+  real(r8) :: OME1(1:NumPlantChemElms),OSCMKK
+  
   real(r8) :: scal    !scalar for incoming microbial biomass associated with litterfall, [1%].
   associate(                         &
     rNCOMC_ave => micpar%rNCOMC_ave, &
@@ -810,14 +825,16 @@ module InitSOMBGCMOD
     scal=0.01_r8 !microbial biomass fraction of the incoming organic matter, [1%] 
   endif
   FOSCI=1._r8; FOSNI=1._r8; FOSPI=1._r8
+  OME_in=0._r8; tOMCI=sum(OMCI(:,K))
+  tOMCA=sum(OMCA(:));fOMCH=1._r8/(1._r8+tOMCA)
+  OSCMKK=OSCMK*scal*fOMCH/tOMCI
 
-  DO N=1,NumMicbHFunGrupsPerCmplx
-    
+  DO N=1,NumMicbHFunGrupsPerCmplx    
     DO M=1,nlbiomcp
-      OME1(ielmc) = AZMAX1(OSCMK*OMCI(M,K)*OMCF(N)*FOSCI)*scal
+      OME1(ielmc) = AZMAX1(OSCMKK*OMCI(M,K)*OMCF(N)*FOSCI)
       OME1(ielmn) = AZMAX1(OME1(ielmc)*rNCOMC_ave(M,N,K)*FOSNI)
       OME1(ielmp) = AZMAX1(OME1(ielmc)*rPCOMC_ave(M,N,K)*FOSPI)
-      
+      OME_in=OME_in+OME1
       tglds=JGnfH(N)-JGniH(N)+1._r8
       do NGL=JGniH(N),JGnfH(N)
         MID=micpar%get_micb_id(M,NGL)
@@ -834,6 +851,7 @@ module InitSOMBGCMOD
             mBiomeAutor_vr(NE,MID,0,NY,NX)=mBiomeAutor_vr(NE,MID,0,NY,NX)+OME1(NE)*OMCA(NN)/tglds
           ENDDO
         ENDDO
+        OME_in=OME_in+OME1(:)*OMCA(NN)
       ENDDO
     ENDDO
   ENDDO

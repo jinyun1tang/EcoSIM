@@ -1,11 +1,19 @@
 module PlantCanAPI
 
 ! interface to integrate the plant model
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
-  use MiniMathMod,      only: AZMAX1
-  use EcoSIMCtrlMod,    only: ldo_sp_mode
+  use data_kind_mod,              only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,           only: micpar, pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col
+  use MiniMathMod,                only: AZMAX1
+  use EcoSIMCtrlMod,              only: ldo_sp_mode
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantSoilChemistryAPIData,  only: plt_soilchem
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
   use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
@@ -31,7 +39,8 @@ module PlantCanAPI
   use FertilizerDataType
   use SoilBGCDataType
   use PlantMgmtDataType
-  use PlantAPIData
+  use PlantAPICommonData
+
 implicit none
 
   private
@@ -230,6 +239,7 @@ implicit none
     RadPARCanopyAbsorption_pft(NZ,NY,NX) = plt_rad%RadPARCanopyAbsorption_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)         = plt_morph%ClumpFactorNow_pft(NZ)
     FracPARads2Canopy_pft(NZ,NY,NX)      = plt_rad%FracPARads2Canopy_pft(NZ)
+    FracPARads2LiveCanopy_pft(NZ,NY,NX)  = plt_rad%FracPARads2LiveCanopy_pft(NZ)
     StomatalStress_pft(NZ,NY,NX)         = plt_biom%StomatalStress_pft(NZ)
     Eco_RadSW_col(NY,NX)                 = Eco_RadSW_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)

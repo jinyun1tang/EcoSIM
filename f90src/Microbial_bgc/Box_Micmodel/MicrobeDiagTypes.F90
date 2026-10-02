@@ -72,7 +72,7 @@ type, public :: Cumlate_Flux_Diag_type
     real(r8) :: RN2OProdBandChemo
     real(r8) :: RNO3ProdSoilChemo
     real(r8) :: RNO3ProdBandChemo
-    real(r8) :: RNO2ReduxChemo
+    real(r8) :: RNO2ReduxChemo             !DON-N production from chemical nitrite reduction (band + nonband)
 
   contains
     procedure, public :: ZeroOut => nit_aqmf_diag    
@@ -125,7 +125,7 @@ type, public :: Cumlate_Flux_Diag_type
   real(r8) :: RTotNH3OxidSoilAutor
   real(r8) :: RTotNH3OxidBandAutor  
 ! allocatable fluxes
-  real(r8),allocatable :: DOMuptk4GrothHeter(:,:,:)
+  real(r8),allocatable :: DOMUptk4GrothHeter(:,:,:)
   real(r8),allocatable :: RMetabDOCUptkHeter(:,:)
   real(r8),allocatable :: RMetabAcetUptkHeter(:,:)
   real(r8),allocatable :: NonstX2stBiomHeter(:,:,:,:)  !nonstructural biomass export to labile and structural biomass, [g d-2 h-1]
@@ -409,7 +409,7 @@ type, public :: Cumlate_Flux_Diag_type
   allocate(this%RkillLitfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitfalOMHeter=spval
   allocate(this%RkillLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2HumOMHeter=spval
   allocate(this%RkillLitrfal2ResduOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RkillLitrfal2ResduOMHeter=spval
-  allocate(this%DOMuptk4GrothHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%DOMuptk4GrothHeter=spval
+  allocate(this%DOMUptk4GrothHeter(NumPlantChemElms,NumHetetr1MicCmplx,1:jcplx));this%DOMUptk4GrothHeter=spval
   allocate(this%RH2ProdHeter(NumHetetr1MicCmplx,1:jcplx));this%RH2ProdHeter=spval
   allocate(this%RMaintDefcitLitrfalOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefcitLitrfalOMHeter=spval
   allocate(this%RMaintDefLitrfal2HumOMHeter(NumPlantChemElms,2,NumHetetr1MicCmplx,1:jcplx));this%RMaintDefLitrfal2HumOMHeter=spval
@@ -572,7 +572,7 @@ type, public :: Cumlate_Flux_Diag_type
   this%RkillLitfalOMHeter               = 0._r8
   this%RkillLitrfal2HumOMHeter          = 0._r8
   this%RkillLitrfal2ResduOMHeter        = 0._r8
-  this%DOMuptk4GrothHeter               = 0._r8
+  this%DOMUptk4GrothHeter               = 0._r8
   this%RH2ProdHeter                     = 0._r8
   this%RMaintDefLitrfal2HumOMHeter   = 0._r8
   this%RMaintDefLitrfal2ResduOMHeter = 0._r8
@@ -690,7 +690,7 @@ type, public :: Cumlate_Flux_Diag_type
   call destroy(this%RkillLitfalOMHeter)
   call destroy(this%RkillLitrfal2HumOMHeter)
   call destroy(this%RkillLitrfal2ResduOMHeter)
-  call destroy(this%DOMuptk4GrothHeter)
+  call destroy(this%DOMUptk4GrothHeter)
   call destroy(this%RH2ProdHeter)
   call destroy(this%RMaintDefLitrfal2HumOMHeter)
   call destroy(this%RMaintDefLitrfal2ResduOMHeter)

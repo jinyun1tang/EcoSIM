@@ -79,8 +79,8 @@ module RootDataType
   real(sp),target,allocatable ::  Cytokinin2ndConc_rpvr(:,:,:,:,:,:)             !cytokinin concentration in fine roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  Cytokinin1stConc_rpvr(:,:,:,:,:)               !cytokinin concentration in primary roots, [gC m-3 H2O]
   real(sp),target,allocatable ::  RootMediumLength_pvr(:,:,:,:)                  !Medium size root length, [m]
-  real(sp),target,allocatable ::  RootFineFrac2Med_pvr(:,:,:,:)                  !fraction of fine roots that are associated with medium roots, [-]
-  real(sp),target,allocatable ::  RootMediumXNum_rpvr(:,:,:,:,:)                 !number of medium root axes in soil layer, [# d-2]
+  real(sp),target,allocatable ::  RootFineFrac2Med_rpvr(:,:,:,:,:)                  !fine-axis-count-weighted fraction attached to medium roots, by root category, [-]
+  real(sp),target,allocatable ::  RootMediumXNum_rpvr(:,:,:,:,:)                 !living population medium-root axes by layer and structural-root group, [# d-2]
   real(sp),target,allocatable ::  Root2ndXNum_rpvr(:,:,:,:,:,:)                  !root layer number secondary axes, [d-2]
   real(sp),target,allocatable ::  RootMyco1stSinkC_rpvr(:,:,:,:,:)               !primary root C sink, [gC d-2 h-1]
   real(sp),target,allocatable ::  RootMyco2ndSinkC_rpvr(:,:,:,:,:,:)             !fine root/myco carbon sink, [gC d-2 h-1]
@@ -240,7 +240,7 @@ contains
   allocate(RootMediumXNum_pvr(JZ,JP,JY,JX)); RootMediumXNum_pvr=0._sp
   allocate(Root2ndXNumL_rpvr(jroots,JZ,JP,JY,JX));Root2ndXNumL_rpvr=0._sp
   allocate(RootMediumLength_pvr(JZ,JP,JY,JX)); RootMediumLength_pvr=0._sp
-  allocate(RootFineFrac2Med_pvr(JZ,JP,JY,JX)); RootFineFrac2Med_pvr=0._sp
+  allocate(RootFineFrac2Med_rpvr(jroots,JZ,JP,JY,JX)); RootFineFrac2Med_rpvr=0._sp
   allocate(RootMediumXNum_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); RootMediumXNum_rpvr=0._sp
   allocate(Root2ndXNum_rpvr(jroots,JZ,MaxNumRootAxes,JP,JY,JX));Root2ndXNum_rpvr=0._sp
   allocate(CytokininMRConc_rpvr(JZ,MaxNumRootAxes,JP,JY,JX)); CytokininMRConc_rpvr=0._sp
@@ -439,7 +439,7 @@ contains
   call destroy(PopuRootMycoC_pvr)
   call destroy(RootNodulStrutElms_rpvr)
   call destroy(RootMediumXNum_rpvr)
-  call destroy(RootFineFrac2Med_pvr)
+  call destroy(RootFineFrac2Med_rpvr)
   call destroy(RootMediumLength_pvr)
   call destroy(RootMediumRadius_rpvr)
   call destroy(RootMediumLength_rpvr)
