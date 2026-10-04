@@ -41,6 +41,9 @@ def main():
     if command('uname', '-m').strip() != 'x86_64':
         raise RuntimeError('This package requires an x86_64 build host')
     root = Path.cwd()
+    readme = Path(__file__).resolve().with_name('ubuntu_binary.md')
+    if not readme.is_file():
+        raise RuntimeError(f'Binary package README not found: {readme}')
     source = root / 'build/Linux-x86_64-double-Release/local/bin/ecosim.f90.x'
     if not source.is_file() or not os.access(source, os.X_OK):
         raise RuntimeError(f'Installed EcoSIM executable not found: {source}')
@@ -87,7 +90,7 @@ def main():
         command('file', str(binary)),
     ]
     (package / 'build-info.txt').write_text('\n'.join(metadata))
-    shutil.copy2(root / 'ecosim_knowledge/ubuntu_binary.md', package / 'README.md')
+    shutil.copy2(readme, package / 'README.md')
     licenses = package / 'licenses'
     licenses.mkdir()
     shutil.copy2(root / 'LICENSE.txt', licenses / 'EcoSIM-LICENSE.txt')
