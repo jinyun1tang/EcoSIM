@@ -7,7 +7,7 @@ module PlantInfoMod
   use minimathmod,   only: isLeap
   use abortutils,    only: endrun, iulog
   use DebugToolMod,  only: PrintInfo
-  use StringToolsMod, only: count_delimited_items
+  use StringToolsMod, only: count_delimited_items, string_compaction
   use PlantTraitTableMod
   use netcdf
   use ncdio_pio  
@@ -119,10 +119,10 @@ implicit none
   character(len=*), parameter :: subname='readplantinginfo'
   logical  :: readvar
   integer  :: NH1,NV1,NH2,NV2,NS
-  integer :: NTOPO,NY,NX,NZ
+  integer :: NTOPO,NY,NX,NZ,lstr
   type(Var_desc_t) :: vardesc
   character(len=128) :: pft_pltinfo(JP),tstr,date_str
-  integer :: LPY,IDX,IMO,IYR,IDY,ierr,ic
+  integer :: LPY,IDX,IMO,IYR,IDY,ierr
 
   call PrintInfo('beg '//subname)
   DO NX=NHW,NHE
@@ -155,20 +155,20 @@ implicit none
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP_col(NY,NX))
           if(PlantPopuLive_pft(NZ,NY,NX).GT.1.e-2_r8)cycle          
-          tstr=trim(pft_pltinfo(NZ))
-          !List-directed input also permits commas between planting values.
-          do ic=1,len_trim(tstr)
-            if(tstr(ic:ic)==',')tstr(ic:ic)=' '
-          enddo
+          tstr=string_compaction(pft_pltinfo(NZ))
           if (tstr .EQ. "") then
             cycle
           endif
+
           select case(count_delimited_items(tstr, ' '))
           case(3)
+            lstr=3
             read(tstr,*,iostat=ierr)date_str,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX)
           case(4)
+            lstr=4
             read(tstr,*,iostat=ierr)date_str,PPI_pft(NZ,NY,NX),PlantinDepz_pft(NZ,NY,NX),PPmax_pft(NZ,NY,NX)
           case default
+            lstr=0
             ierr=1
           end select
           if(ierr==0)then
@@ -179,6 +179,7 @@ implicit none
             endif
           endif
           if(ierr/=0)then
+            write(iulog,*)'lstr=',lstr
             call endrun('Invalid planting record (expected DDMMYYYY population depth [maximum population]): '// &
               trim(tstr)//' in '//subname,__LINE__)
           endif

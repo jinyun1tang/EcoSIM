@@ -12,6 +12,7 @@ implicit none
   public :: is_substring_present
   public :: to_lower_string
   public :: count_delimited_items
+  public :: string_compaction
 contains
 
   SUBROUTINE parse_var_val_string(input_string, var_array, val_array, num_pairs_found)
@@ -344,6 +345,26 @@ contains
     is_substring_present = (pos /= 0)
     
   END FUNCTION is_substring_present
+
+!------------------------------------------------------------------------------------------
+
+  FUNCTION string_compaction(input_string) RESULT(compacted_string)
+  !> Normalize commas, NUL padding and line endings to spaces before field parsing.
+  !> Preserve string length and other characters; repeated spaces are handled by
+  !> count_delimited_items or list-directed input.
+    IMPLICIT NONE
+    CHARACTER(LEN=*), INTENT(IN) :: input_string
+    CHARACTER(LEN=LEN(input_string)) :: compacted_string
+    INTEGER :: i
+
+    compacted_string = input_string
+    DO i = 1, LEN_TRIM(compacted_string)
+      SELECT CASE(compacted_string(i:i))
+      CASE(',', ACHAR(0), ACHAR(10), ACHAR(13))
+        compacted_string(i:i) = ' '
+      END SELECT
+    END DO
+  END FUNCTION string_compaction
 
 !------------------------------------------------------------------------------------------
 
