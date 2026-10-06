@@ -4,7 +4,7 @@ submodule (HistDataType) HistUpdateColumn
   use EcosimConst, only: natomw, patomw
   use data_const_mod, only: spval  => DAT_CONST_SPVAL
   use MicrobialDiagMod, only: SumMicbGroup, sumDOML, sumMicBiomLayL
-  use MiniMathMod, only: safe_adb, AZMAX1, VapMass2KPa
+  use MiniMathMod, only: safe_adb, AZMAX1, VapMass2KPa,AZERO
   use EcoSiMParDataMod, only: micpar
   use MLDataDiagType, only: AcetConc30cm_col, AcetConc60cm_col, AcetMGC30cm_col, AcetMGC60cm_col, &
     AeroHRBactC30cm_col, AeroHRBactC60cm_col, AeroHRFungC30cm_col, AeroHRFungC60cm_col, AeroMOC30cm_col, &
@@ -76,7 +76,7 @@ contains
         natomw*trcx_solml_vr(idx_NH4,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
       this%h1D_cNO3_LITR_col(ncol)        =  safe_adb(trcs_solml_vr(ids_NO3,0,NY,NX)+&
         trcs_solml_vr(ids_NO2,0,NY,NX),VLSoilMicPMass_vr(0,NY,NX)*million)
-
+      
       this%h1D_ECO_HVST_N_col(ncol)   = EcoHavstElmnt_CumYr_col(ielmn,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_NET_N_MIN_col(ncol)    = -NetNH4Mineralize_CumYr_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_tLITR_P_col(ncol)      = tLitrOM_col(ielmp,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -355,7 +355,8 @@ contains
       this%h1D_RCH4Oxi_ANMO_litr_col(ncol)   = RCH4Oxi_anmo_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RCH4Oxi_ANMO_col(ncol) =    RCH4Oxi_anmo_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_RDen_NO3toNO2_col(ncol) = RDen_NO3toNO2_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
-      this%h1D_RFermen_litr_col(ncol)        = RFerment_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
+      
+      this%h1D_RFermen_litr_col(ncol)        = AZERO(RFerment_vr(0,NY,NX))/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_NH3oxi_litr_col(ncol)         = RNit_NH3toNO2_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_NO2Oxi_litr_col(ncol)         = RNit_NO2toNO3_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_N2Oprod_litr_col(ncol)        = (RDen_NO2toN2O_vr(0,NY,NX)+RN2ONitProd_vr(0,NY,NX) &
@@ -373,6 +374,7 @@ contains
       this%h1D_Decomp_temp_FN_litr_col(ncol)   = TempSensDecomp_vr(0,NY,NX)
       this%h1D_Decomp_moist_FN_litr_col(ncol)  = MoistSensDecomp_vr(0,NY,NX)
       this%h1D_FracLitMix_litr_col(ncol)       = FracLitrMix_vr(0,NY,NX)
+      
       this%h1D_Eco_HR_CO2_litr_col(ncol)       = ECO_HR_CO2_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_TSolidOMActC_litr_col(ncol)     = TSolidOMActC_vr(0,NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX)
       this%h1D_TSolidOMActCDens_litr_col(ncol) = safe_adb(TSolidOMActC_vr(0,NY,NX),TSolidOMC_vr(0,NY,NX))
@@ -386,6 +388,7 @@ contains
       this%h1D_tDON_soil_col(ncol)=0._r8
       this%h1D_tDOP_soil_col(ncol)=0._r8
       this%h1D_tAcetate_soil_col(ncol)=0._r8
+      
       this%h1D_FreeNFix_col(ncol)=Micb_N2Fixation_vr(0,NY,NX)
 
   end procedure update_hist_columns

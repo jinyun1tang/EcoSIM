@@ -78,7 +78,170 @@ Starvation CO₂-C credit = T_C,1 + T_C,2  [currently not returned to C₃]</cod
 <p class="small">Sources: <a href="../f90src/Modelconfig/ElmIDMod.F90">live-compartment enum values</a>; <a href="../f90src/Microbial_bgc/Box_Micmodel/MicBGCFGMod.F90">StageBGCEnvironCondition, GatherHetertrophAnabolicFlux, HeterotrophAnabolicUpdate</a>; <a href="../f90src/Microbial_bgc/Box_Micmodel/MicAutoCplxFGMod.F90">autotrophic allocation and AutotrophAnabolicUpdate</a>; <a href="../f90src/Microbial_bgc/Box_Micmodel/MicrobMathFuncMod.F90">CalcRespMaintHeter and LimitReserveNutrientTransfers</a>.</p>
 </section>
 <section id="community"><span class="num">03 / COMMUNITY INTERACTIONS</span><h2>Competition and cross-feeding occur together</h2>
-<div class="network"><svg viewBox="0 0 1020 380" role="img" aria-labelledby="nettitle netdesc"><title id="nettitle">Main microbial resource connections</title><desc id="netdesc">Organic matter supplies dissolved carbon and nutrients to heterotrophs. Fermentation supplies acetate and hydrogen to methanogens. Methane oxidizers consume methane. Mineral nitrogen cycles connect nitrifiers, denitrifiers and methane oxidizers. Oxygen and nutrient pools connect microbes with plants and transport.</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#477966"/></marker></defs><g fill="none" stroke="#477966" stroke-width="2" marker-end="url(#arrow)"><path d="M240 69 H305"/><path d="M520 69 H575"/><path d="M790 69 H840"/><path d="M420 106 V171"/><path d="M685 106 V171"/><path d="M937 106 V171"/><path d="M520 199 H575"/><path d="M575 220 H520"/><path d="M790 208 H840"/><path d="M340 247 V267 H130 V290"/><path d="M410 290 V247"/><path d="M575 332 H515"/></g><g font-family="system-ui,sans-serif" font-size="17" text-anchor="middle"><g fill="#edf3e8" stroke="#bfd2c0"><rect x="15" y="30" width="225" height="76" rx="9"/><rect x="305" y="30" width="215" height="76" rx="9"/><rect x="575" y="30" width="215" height="76" rx="9"/><rect x="840" y="30" width="165" height="76" rx="9"/><rect x="305" y="171" width="215" height="76" rx="9"/><rect x="575" y="171" width="215" height="76" rx="9"/><rect x="840" y="171" width="165" height="76" rx="9"/><rect x="15" y="290" width="235" height="76" rx="9"/><rect x="305" y="290" width="210" height="76" rx="9"/><rect x="575" y="290" width="430" height="76" rx="9"/></g><g fill="#21352f"><text x="127" y="61">Litter / SOM / residue</text><text x="127" y="86" font-size="14">hydrolysis and desorption</text><text x="412" y="61">DOC + acetate</text><text x="412" y="86" font-size="14">heterotrophic metabolism</text><text x="682" y="61">Fermentation</text><text x="682" y="86" font-size="14">acetate + CO₂ + H₂</text><text x="922" y="61">Methanogenesis</text><text x="922" y="86" font-size="14">CH₄ production</text><text x="412" y="202">C/N/P reserves</text><text x="412" y="227" font-size="14">growth and maintenance</text><text x="682" y="202">Shared mineral N/P</text><text x="682" y="227" font-size="14">uptake and mineralization</text><text x="922" y="202">CH₄ oxidation</text><text x="922" y="227" font-size="14">O₂ / NO₃ / NO₂ routes</text><text x="132" y="321">Mortality → organic pools</text><text x="132" y="346" font-size="14">recycling, residue, humus</text><text x="410" y="321">CO₂ fixation + N₂ fixation</text><text x="410" y="346" font-size="14">community inputs</text><text x="790" y="321">Plants + transport + chemistry + light</text><text x="790" y="346" font-size="14">shared resources and environmental constraints</text></g></g></svg><p class="legend">Conceptual resource map. Arrows indicate connections, not balanced reaction stoichiometry or the order of execution. Fermentation feeds both acetotrophic and hydrogenotrophic methanogenesis.</p></div>
+<figure class="network community-schematic" aria-labelledby="community-caption">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1450" role="img" aria-labelledby="community-title community-desc">
+<title id="community-title">EcoSIM microbial community interactions: carbon, nitrogen, competition and recycling</title>
+<desc id="community-desc">Organic matter releases dissolved substrates shared by heterotrophs. Fermenters produce acetate and hydrogen that feed two methanogenic pathways. Methanogens supply methane to aerobic, nitrate-dependent and nitrite-dependent methane oxidizers. Ammonia and nitrite oxidizers supply oxidized nitrogen to reduction pathways. Shared oxygen and nutrients mediate competition. Cyanobacteria use shared DOC and acetate as well as light-driven CO₂ fixation, producing biomass and photosynthetic oxygen. Moss and lichen are represented through nonvascular plant pathways: photosynthesis supplies plant biomass and turnover supplies litter for microbial decomposition. Cyanobacteria fix carbon and nitrogen; microbial turnover returns residues and humus to organic matter. Arrows summarize implemented resource connections, not balanced reactions or timestep order.</desc>
+<defs><marker id="community-carbon" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#166450"/></marker><marker id="community-nitrogen" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#265b80"/></marker><marker id="community-shared" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#9a4c18"/></marker></defs>
+<style>.cs-panel{fill:#fafcf8;stroke:#d3ded4}.cs-pool{fill:#eaf2e9;stroke:#9dbca9}.cs-guild{fill:#fff;stroke:#9dbca9}.cs-npool{fill:#eaf1f5;stroke:#9fb7ca}.cs-shared{fill:#fcf0e8;stroke:#cba585}.cs-title{font:700 19px system-ui,sans-serif;fill:#21352f}.cs-label{font:650 16px system-ui,sans-serif;fill:#21352f}.cs-note{font:14px system-ui,sans-serif;fill:#526961}.cs-edge{fill:none;stroke-width:2;stroke-linejoin:round}.cs-c{stroke:#166450;marker-end:url(#community-carbon)}.cs-n{stroke:#265b80;marker-end:url(#community-nitrogen)}.cs-s{stroke:#9a4c18;stroke-dasharray:6 5;marker-end:url(#community-shared)}</style>
+<rect x="8" y="8" width="1064" height="736" rx="12" class="cs-panel"/>
+<text x="30" y="40" class="cs-title" text-anchor="start">1  Carbon cross-feeding · products of one guild become substrates for another</text>
+<rect x="30" y="66" width="235" height="72" rx="9" class="cs-pool"/>
+<text x="147.5" y="92" class="cs-label" text-anchor="middle">Litter / SOM / residues</text>
+<text x="147.5" y="115" class="cs-note" text-anchor="middle">Hydrolysis + desorption</text>
+<rect x="320" y="66" width="240" height="72" rx="9" class="cs-pool"/>
+<text x="440.0" y="92" class="cs-label" text-anchor="middle">Dissolved organic C</text>
+<text x="440.0" y="115" class="cs-note" text-anchor="middle">DOC + acetate</text>
+<path d="M265 102H320" class="cs-edge cs-c"/>
+<text x="292" y="88" class="cs-note" text-anchor="middle">release</text>
+<rect x="30" y="192" width="235" height="110" rx="9" class="cs-guild"/>
+<text x="147.5" y="218" class="cs-label" text-anchor="middle">Aerobic bacteria + fungi</text>
+<text x="147.5" y="241" class="cs-note" text-anchor="middle">DOC / acetate + O₂ → CO₂</text>
+<text x="147.5" y="261" class="cs-note" text-anchor="middle">Aerobic N₂ fixers share</text>
+<text x="147.5" y="281" class="cs-note" text-anchor="middle">this organic-C pathway</text>
+<path d="M390 138V163H148V192" class="cs-edge cs-c"/>
+<text x="260" y="180" class="cs-note" text-anchor="middle">shared C uptake</text>
+<rect x="320" y="192" width="240" height="90" rx="9" class="cs-guild"/>
+<text x="440.0" y="218" class="cs-label" text-anchor="middle">Facultative denitrifiers</text>
+<text x="440.0" y="241" class="cs-note" text-anchor="middle">DOC / acetate + O₂ or NOx</text>
+<text x="440.0" y="261" class="cs-note" text-anchor="middle">→ CO₂; N reduction below</text>
+<path d="M440 138V192" class="cs-edge cs-c"/>
+<rect x="620" y="66" width="195" height="90" rx="9" class="cs-guild"/>
+<text x="717.5" y="92" class="cs-label" text-anchor="middle">Fermenters</text>
+<text x="717.5" y="115" class="cs-note" text-anchor="middle">DOC → acetate + H₂ + CO₂</text>
+<text x="717.5" y="135" class="cs-note" text-anchor="middle">Also anaerobic N₂ fixers</text>
+<path d="M560 102H620" class="cs-edge cs-c"/>
+<rect x="620" y="192" width="195" height="90" rx="9" class="cs-guild"/>
+<text x="717.5" y="218" class="cs-label" text-anchor="middle">Acetotrophic</text>
+<text x="717.5" y="241" class="cs-note" text-anchor="middle">methanogens</text>
+<text x="717.5" y="261" class="cs-note" text-anchor="middle">Acetate → CH₄ + CO₂</text>
+<rect x="855" y="192" width="195" height="90" rx="9" class="cs-guild"/>
+<text x="952.5" y="218" class="cs-label" text-anchor="middle">Hydrogenotrophic</text>
+<text x="952.5" y="241" class="cs-note" text-anchor="middle">methanogens</text>
+<text x="952.5" y="261" class="cs-note" text-anchor="middle">H₂ + CO₂ → CH₄</text>
+<path d="M686 156V192" class="cs-edge cs-c"/>
+<text x="657" y="177" class="cs-note" text-anchor="middle">acetate</text>
+<path d="M750 156V174H952V192" class="cs-edge cs-c"/>
+<text x="901" y="164" class="cs-note" text-anchor="middle">H₂ + CO₂</text>
+<rect x="735" y="333" width="200" height="64" rx="9" class="cs-pool"/>
+<text x="835.0" y="359" class="cs-label" text-anchor="middle">Shared methane</text>
+<text x="835.0" y="382" class="cs-note" text-anchor="middle">CH₄ pool</text>
+<path d="M718 282V309H795V333" class="cs-edge cs-c"/>
+<path d="M952 282V309H875V333" class="cs-edge cs-c"/>
+<rect x="30" y="333" width="530" height="64" rx="9" class="cs-guild"/>
+<text x="295.0" y="359" class="cs-label" text-anchor="middle">Methane oxidizers → CO₂</text>
+<text x="295.0" y="382" class="cs-note" text-anchor="middle">Aerobic: O₂  ·  ANME-2d: NO₃  ·  NC10: NO₂</text>
+<path d="M735 367H560" class="cs-edge cs-c"/>
+<text x="647" y="353" class="cs-note" text-anchor="middle">CH₄ uptake</text>
+<path d="M345 138V150H18V495H30" class="cs-edge cs-c"/>
+<rect x="30" y="447" width="330" height="100" rx="9" class="cs-guild"/>
+<text x="195" y="473" class="cs-label" text-anchor="middle">Cyanobacteria (mixotrophs)</text>
+<text x="195" y="496" class="cs-note" text-anchor="middle">Shared DOC / acetate → respiration + biomass</text>
+<text x="195" y="516" class="cs-note" text-anchor="middle">Light-driven CO₂ fixation → biomass</text>
+<text x="195" y="536" class="cs-note" text-anchor="middle">Respiration can consume external O₂</text>
+<rect x="430" y="447" width="230" height="64" rx="9" class="cs-pool"/>
+<text x="545" y="473" class="cs-label" text-anchor="middle">Light + CO₂</text>
+<text x="545" y="496" class="cs-note" text-anchor="middle">Photosynthetic inputs</text>
+<path d="M430 483H360" class="cs-edge cs-c"/>
+<rect x="735" y="447" width="310" height="100" rx="9" class="cs-pool"/>
+<text x="890" y="473" class="cs-label" text-anchor="middle">Cyanobacterial products</text>
+<text x="890" y="496" class="cs-note" text-anchor="middle">Biomass C → organic pools via turnover</text>
+<text x="890" y="516" class="cs-note" text-anchor="middle">Photosynthetic O₂ → respiratory supply</text>
+<text x="890" y="536" class="cs-note" text-anchor="middle">Respiration → CO₂</text>
+<path d="M360 523H690V495H735" class="cs-edge cs-c"/>
+<rect x="30" y="602" width="330" height="100" rx="9" class="cs-guild"/>
+<text x="195" y="628" class="cs-label" text-anchor="middle">Moss + lichen</text>
+<text x="195" y="651" class="cs-note" text-anchor="middle">EcoSIM nonvascular plant pathways</text>
+<text x="195" y="671" class="cs-note" text-anchor="middle">Photosynthesis → plant biomass C</text>
+<text x="195" y="691" class="cs-note" text-anchor="middle">Plant respiration → CO₂</text>
+<rect x="430" y="602" width="230" height="64" rx="9" class="cs-pool"/>
+<text x="545" y="628" class="cs-label" text-anchor="middle">Light + CO₂</text>
+<text x="545" y="651" class="cs-note" text-anchor="middle">Photosynthetic inputs</text>
+<path d="M430 638H360" class="cs-edge cs-c"/>
+<rect x="735" y="602" width="310" height="100" rx="9" class="cs-pool"/>
+<text x="890" y="628" class="cs-label" text-anchor="middle">Plant litter / organic matter</text>
+<text x="890" y="651" class="cs-note" text-anchor="middle">Turnover transfers plant C / N / P</text>
+<text x="890" y="671" class="cs-note" text-anchor="middle">Decomposition → microbial substrates</text>
+<text x="890" y="691" class="cs-note" text-anchor="middle">Feeds litter / SOM pathways above</text>
+<path d="M360 678H690V650H735" class="cs-edge cs-c"/>
+<g transform="translate(0 320)">
+<rect x="8" y="442" width="1064" height="283" rx="12" class="cs-panel"/>
+<text x="30" y="474" class="cs-title" text-anchor="start">2  Nitrogen coupling · nitrification supplies substrates for reduction pathways</text>
+<rect x="30" y="505" width="145" height="64" rx="9" class="cs-npool"/>
+<text x="102.5" y="531" class="cs-label" text-anchor="middle">NH₄</text>
+<text x="102.5" y="554" class="cs-note" text-anchor="middle">Shared ammonium</text>
+<rect x="255" y="505" width="150" height="64" rx="9" class="cs-npool"/>
+<text x="330.0" y="531" class="cs-label" text-anchor="middle">NO₂</text>
+<text x="330.0" y="554" class="cs-note" text-anchor="middle">Shared nitrite</text>
+<rect x="485" y="505" width="150" height="64" rx="9" class="cs-npool"/>
+<text x="560.0" y="531" class="cs-label" text-anchor="middle">NO₃</text>
+<text x="560.0" y="554" class="cs-note" text-anchor="middle">Shared nitrate</text>
+<path d="M175 537H255" class="cs-edge cs-n"/>
+<text x="215" y="487" class="cs-note" text-anchor="middle">NH₄ oxidizers</text>
+<text x="215" y="589" class="cs-note" text-anchor="middle">+ O₂</text>
+<path d="M405 537H485" class="cs-edge cs-n"/>
+<text x="445" y="487" class="cs-note" text-anchor="middle">NO₂ oxidizers</text>
+<text x="445" y="589" class="cs-note" text-anchor="middle">+ O₂</text>
+<rect x="730" y="505" width="315" height="64" rx="9" class="cs-guild"/>
+<text x="887.5" y="531" class="cs-label" text-anchor="middle">Facultative denitrifiers</text>
+<text x="887.5" y="554" class="cs-note" text-anchor="middle">NO₃ → NO₂ → N₂O → N₂</text>
+<path d="M635 537H730" class="cs-edge cs-n"/>
+<rect x="255" y="621" width="220" height="74" rx="9" class="cs-guild"/>
+<text x="365.0" y="647" class="cs-label" text-anchor="middle">NC10 methane oxidizers</text>
+<text x="365.0" y="670" class="cs-note" text-anchor="middle">NO₂-dependent CH₄ oxidation</text>
+<text x="365.0" y="690" class="cs-note" text-anchor="middle">→ N₂</text>
+<rect x="520" y="621" width="225" height="74" rx="9" class="cs-guild"/>
+<text x="632.5" y="647" class="cs-label" text-anchor="middle">ANME-2d methane oxidizers</text>
+<text x="632.5" y="670" class="cs-note" text-anchor="middle">NO₃-dependent CH₄ oxidation</text>
+<text x="632.5" y="690" class="cs-note" text-anchor="middle">→ NO₂</text>
+<path d="M330 569V621" class="cs-edge cs-n"/>
+<path d="M560 569V621" class="cs-edge cs-n"/>
+<text x="40" y="642" class="cs-note" text-anchor="start">NH₄ oxidizers also have</text>
+<text x="40" y="663" class="cs-note" text-anchor="start">nitrifier denitrification</text>
+<text x="40" y="684" class="cs-note" text-anchor="start">and can produce N₂O.</text>
+<text x="780" y="644" class="cs-note" text-anchor="start">NO₂ also supplies later</text>
+<text x="780" y="665" class="cs-note" text-anchor="start">denitrification steps.</text>
+<text x="780" y="691" class="cs-note" text-anchor="start">Blue arrows: N transformations / supply</text>
+<rect x="8" y="743" width="1064" height="375" rx="12" class="cs-panel"/>
+<text x="30" y="775" class="cs-title" text-anchor="start">3  Shared resources, new inputs and the biomass–organic matter feedback</text>
+<rect x="30" y="801" width="315" height="95" rx="9" class="cs-shared"/>
+<text x="187.5" y="827" class="cs-label" text-anchor="middle">Shared O₂ + mineral N / P</text>
+<text x="187.5" y="850" class="cs-note" text-anchor="middle">Microbes + plants (including moss / lichen)</text>
+<text x="187.5" y="870" class="cs-note" text-anchor="middle">Compete for finite O₂ and nutrient pools</text>
+<text x="187.5" y="890" class="cs-note" text-anchor="middle">Transport + chemistry alter supply.</text>
+<rect x="415" y="801" width="250" height="95" rx="9" class="cs-guild"/>
+<text x="540.0" y="827" class="cs-label" text-anchor="middle">Microbial live C / N / P</text>
+<text x="540.0" y="850" class="cs-note" text-anchor="middle">Reserves ↔ kinetic / structural</text>
+<text x="540.0" y="870" class="cs-note" text-anchor="middle">Uptake, maintenance and growth</text>
+<rect x="735" y="801" width="310" height="95" rx="9" class="cs-guild"/>
+<text x="890.0" y="827" class="cs-label" text-anchor="middle">Cyanobacteria + N₂ fixers</text>
+<text x="890.0" y="850" class="cs-note" text-anchor="middle">Light + CO₂ → cyanobacterial C</text>
+<text x="890.0" y="870" class="cs-note" text-anchor="middle">N₂ → fixed N in living biomass</text>
+<text x="890.0" y="890" class="cs-note" text-anchor="middle">Cyanobacteria also alter O₂ supply</text>
+<path d="M345 847H415" class="cs-edge cs-s"/>
+<path d="M735 847H665" class="cs-edge cs-c"/>
+<rect x="415" y="956" width="250" height="74" rx="9" class="cs-guild"/>
+<text x="540.0" y="982" class="cs-label" text-anchor="middle">Turnover / mortality</text>
+<text x="540.0" y="1005" class="cs-note" text-anchor="middle">Recycling → reserves</text>
+<text x="540.0" y="1025" class="cs-note" text-anchor="middle">Unrecycled C/N/P → residue / humus</text>
+<path d="M540 896V956" class="cs-edge cs-c"/>
+<rect x="30" y="956" width="315" height="74" rx="9" class="cs-pool"/>
+<text x="187.5" y="982" class="cs-label" text-anchor="middle">Organic matter + dissolved pools</text>
+<text x="187.5" y="1005" class="cs-note" text-anchor="middle">Residue / humus; DOC / DON / DOP</text>
+<text x="187.5" y="1025" class="cs-note" text-anchor="middle">Decomposition makes substrates available</text>
+<path d="M415 993H345" class="cs-edge cs-c"/>
+<path d="M187 956V924H395V873H415" class="cs-edge cs-c"/>
+<text x="187" y="1061" class="cs-note" text-anchor="middle">Feeds carbon pathways above</text>
+<text x="735" y="957" class="cs-note" text-anchor="start">Shared pools mediate interaction;</text>
+<text x="735" y="979" class="cs-note" text-anchor="start">no species-to-species interaction matrix.</text>
+<text x="735" y="1011" class="cs-note" text-anchor="start">Fixed N reaches other organisms</text>
+<text x="735" y="1033" class="cs-note" text-anchor="start">through subsequent transfers / turnover.</text>
+<text x="30" y="1094" class="cs-note" text-anchor="start">Dashed amber: shared-resource competition / uptake. Green: carbon or biomass transfers.</text>
+</g>
+</svg>
+<figcaption id="community-caption" class="legend"><strong>Implemented community connections.</strong> Boxes distinguish chemical pools from microbial guilds; repeated guilds connect the carbon and nitrogen panels. Arrows summarize substrate use, product supply and recycling, rather than balanced stoichiometry, flux magnitudes or execution order. Pathways are conditional on the active guilds and available resources. Cross-feeding can involve staged pools or same-step supply estimates. Moss and lichen use the nonvascular plant representation; the lichen box does not imply an explicit fungal–photobiont carbon-exchange model. Mortality is simplified here; the starvation-respiration redox gap is described in <a href="#issues">Improvement needs</a>.</figcaption>
+</figure>
+<p class="small">Photosynthetic connections: <a href="../f90src/Microbial_bgc/Box_Micmodel/CyanoBacteriaMod.F90">cyanobacterial fixation, organic-C use and O₂ supply</a>; <a href="../f90src/Plant_bgc/PhotoSynsMod.F90">plant photosynthesis</a>; <a href="../f90src/Plant_bgc/InitPlantMod.F90">nonvascular plant initialization</a>; <a href="../f90src/Plant_bgc/RootMod.F90">plant turnover and litter transfers</a>.</p>
 <div class="table-wrap"><table><thead><tr><th>Code family / group</th><th>Main metabolism</th><th>Community connection</th></tr></thead><tbody>
 <tr><td>Heterotrophic: aerobic bacteria; fungi</td><td>DOC/acetate use with O₂-supported respiration.</td><td>Compete for organic C, O₂ and nutrients; release CO₂ and support substrate hydrolysis.</td></tr>
 <tr><td>Heterotrophic: facultative denitrifiers</td><td>Aerobic metabolism plus NO₃ → NO₂ → N₂O → N₂ reduction.</td><td>Share DOC/acetate with other heterotrophs and oxidized N with nitrifiers, methane oxidizers, roots, and other consumers.</td></tr>
