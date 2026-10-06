@@ -1065,7 +1065,7 @@ implicit none
   !Description
   !read soil warming file
   use abortutils,      only: destroy
-  use EcosysWarmingMod, only: get_warming_fname
+  use EcosysWarmingMod, only: get_warming_fname, warming_hours_needed
   use GridMod,         only: get_col
   implicit none
   integer, intent(in) :: year
@@ -1087,6 +1087,13 @@ implicit none
   nlevs  = get_dim_len(ncid,'levsoi')
   ncol   = get_dim_len(ncid,'column')
   allocate(data(ncol,nlevs))
+
+  !hours missing from the file would leave zeros or the previous year's values in TKS_ref_vr
+  if(nsteps<warming_hours_needed(year))then
+    write(*,*)'read_soil_warming_Tref: ',trim(fname),' has ',nsteps,' hourly records, needs ', &
+      warming_hours_needed(year),' for year ',year
+    call endrun('read_soil_warming_Tref: too few hourly records in '//trim(fname),__LINE__)
+  endif
 
   !write(*,*)nsteps,nlevs,ncol
   do kk = 1,nsteps

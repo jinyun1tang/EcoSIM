@@ -42,6 +42,8 @@ module EcosysWarmingMod
   integer :: NY_w,NX_w
 
   public :: check_warming_dates
+  public :: check_warming_year
+  public :: warming_hours_needed
   public :: get_warming_fname
   public :: config_soil_warming
   public :: apply_soil_cable_warming
@@ -140,8 +142,10 @@ module EcosysWarmingMod
     return
   endif
 
-  ans=(year==warm_yearb .and. I>=warm_doyb) .or. (year==warm_yeare .and. I<=warm_doye) &
-    .or. (year>warm_yearb .and. year <warm_yeare)
+  !on or after the first day and on or before the last day; also correct when
+  !the period starts and ends in the same year
+  ans=(year>warm_yearb .or. (year==warm_yearb .and. I>=warm_doyb)) &
+    .and. (year<warm_yeare .or. (year==warm_yeare .and. I<=warm_doye))
   
   if(I==1 .and. J==1)then
     
@@ -162,6 +166,33 @@ module EcosysWarmingMod
   endif
   return
   end function check_warming_dates
+!------------------------------------------------------------------------------------------
+
+  logical function check_warming_year(year)result(ans)
+  !
+  !Description
+  !check if any day of year falls in the warming period
+  implicit none
+  integer, intent(in) :: year
+
+  ans=lsoil_warming .and. year>=warm_yearb .and. year<=warm_yeare
+  end function check_warming_year
+!------------------------------------------------------------------------------------------
+
+  integer function warming_hours_needed(year)result(nhrs)
+  !
+  !Description
+  !number of hourly reference records needed for year, counted from Jan 1:
+  !through warm_doye in the last warming year, the whole year otherwise
+  implicit none
+  integer, intent(in) :: year
+
+  if(year==warm_yeare)then
+    nhrs=24*warm_doye
+  else
+    nhrs=24*(365+iisLeap(year))
+  endif
+  end function warming_hours_needed
 !------------------------------------------------------------------------------------------
 
   subroutine config_soil_warming(warming_exp)
