@@ -934,15 +934,30 @@ implicit none
   real(r8) :: atm_ch4   !ppb
   real(r8) :: atm_n2o   !ppb
   type(file_desc_t) :: atm_ghg_nfid
-  integer :: iyear
-  real(r8) :: year,year0
+  integer :: iyear,ntime
+  real(r8) :: year0,yearN
+  character(len=512) :: msg
   INTEGER :: NY,NX,K
 
   call ncd_pio_openfile(atm_ghg_nfid, atm_ghg_in, ncd_nowrite)
 
-  iyear=1
-  call ncd_getvar(atm_ghg_nfid,'year',iyear,year0)
-  iyear=(yeari-int(year0))*12
+  iyear=0
+  if(atm_co2_fix<=0._r8 .or. atm_ch4_fix<=0._r8 .or. atm_n2o_fix<=0._r8)then
+    !time stamps are calendar_year+month/12: Jan of Y is Y+1/12, Dec of Y is Y+1
+    ntime=get_dim_len(atm_ghg_nfid,'time')
+    call ncd_getvar(atm_ghg_nfid,'year',1,year0)
+    call ncd_getvar(atm_ghg_nfid,'year',ntime,yearN)
+    if(nint((year0-int(year0))*12._r8)/=1)then
+      call endrun('GetAtmGts: first record of '//trim(atm_ghg_in)// &
+        ' is not January (expect year stamp = calendar_year+1/12)',__LINE__)
+    endif
+    iyear=(yeari-int(year0))*12
+    if(iyear<0 .or. iyear+12>ntime)then
+      write(msg,'(A,I0,A,I0,A,I0,A)')'GetAtmGts: requested year ',yeari, &
+        ' is outside the full-year coverage ',int(year0),'-',nint(yearN)-1,' of'
+      call endrun(trim(msg)//' '//trim(atm_ghg_in),__LINE__)
+    endif
+  endif
 
   if(atm_co2_fix>0._r8)then
     atm_co2_mon=atm_co2_fix
@@ -1050,7 +1065,7 @@ implicit none
   !Description
   !read soil warming file
   use abortutils,      only: destroy
-  use EcosysWarmingMod, only: get_warming_fname
+  use EcosysWarmingMod, only: get_warming_fname, warming_hours_needed
   use GridMod,         only: get_col
   implicit none
   integer, intent(in) :: year
@@ -1072,6 +1087,13 @@ implicit none
   nlevs  = get_dim_len(ncid,'levsoi')
   ncol   = get_dim_len(ncid,'column')
   allocate(data(ncol,nlevs))
+
+  !hours missing from the file would leave zeros or the previous year's values in TKS_ref_vr
+  if(nsteps<warming_hours_needed(year))then
+    write(*,*)'read_soil_warming_Tref: ',trim(fname),' has ',nsteps,' hourly records, needs ', &
+      warming_hours_needed(year),' for year ',year
+    call endrun('read_soil_warming_Tref: too few hourly records in '//trim(fname),__LINE__)
+  endif
 
   !write(*,*)nsteps,nlevs,ncol
   do kk = 1,nsteps
