@@ -3,7 +3,7 @@ module EcoSIMAPI
   use data_kind_mod,    only: yearIJ_type
   use MicBGCAPI,        only: MicrobeModel,        MicAPI_Init,              MicAPI_cleanup
   use TracerIDMod,      only: ids_NO2B,            ids_NO2,                  idg_O2
-  use EcosysWarmingMod, only: check_warming_dates, apply_soil_cable_warming, config_soil_warming
+  use EcosysWarmingMod, only: check_warming_year, apply_soil_cable_warming, config_soil_warming
   use ErosionMod,       only: erosion
   use Hour1Mod,         only: hour1
   use abortutils,       only: iulog
@@ -420,7 +420,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
 
-  if(check_warming_dates(iYearCurrent,1,1))then
+  !load the reference whenever any day of the year is warmed, not only when Jan 1 is
+  if(check_warming_year(iYearCurrent))then
     call read_soil_warming_Tref(iYearCurrent,NHW,NHE,NVN,NVS)    
   endif
   lverb0      = lverb
