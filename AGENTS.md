@@ -98,6 +98,22 @@ take precedence over repository guidance.
 
 ## Build and validation
 
+- When the agent runs inside or is linked to VSCode, build and test in the
+  environment of VSCode's integrated terminal rather than the agent's default
+  shell, which may resolve a different compiler toolchain. Before building,
+  determine that environment from the VSCode settings: workspace
+  `.vscode/settings.json` overrides the user `settings.json` (location depends
+  on the OS). Read `terminal.integrated.defaultProfile.<os>` and the matching
+  `terminal.integrated.profiles.<os>` entry for the shell and its arguments, and
+  `terminal.integrated.env.<os>` for environment variables (expand references
+  such as `${env:PATH}`). Run build and test commands through that shell with
+  those variables exported. Do not record the resolved values in the repository;
+  re-read the settings for each session.
+- Reuse a build directory whose `CMakeCache.txt` compilers match that
+  environment; do not mix toolchains in one build directory. If none matches,
+  configure a new one. Report the toolchain used along with validation results.
+  If VSCode is not involved or no terminal settings exist, use the default shell
+  and say so.
 - Run build commands from the repository root. Inspect supported options with
   `bash build_EcoSIM.sh --help`; the standard build is
   `bash build_EcoSIM.sh`. Debug/regression configuration is available through
