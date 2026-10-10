@@ -164,8 +164,18 @@ contains
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
     atm_co2_fix,first_topou,first_pft,fixWaterLevel,arg_ppm,idebug_day,idebug_year,ldo_sp_mode,iverblevel,&
     ldo_radiation_test,ldo_transpt_bubbling,plantOM4Heat,micpar_file_in,iselect_plantZ,llignification
+! --- Jing Tao ---
+! guard_floor_dying_stand is appended to this group so ONE binary serves both arms of the
+! verification, instead of needing a second build with the default flipped. It mirrors
+! lmicrobeMLdiag below, which is likewise an EcoSIMCtrlMod logical surfaced through /ecosim/.
+! DEFAULT-OFF IS PRESERVED BY THE READ ITSELF: a Fortran namelist read does not require every
+! group member to be present, so the 14,849 R3 runfiles written before this variable existed
+! simply leave it at its .false. initialiser. No existing case file needs rewriting, and a run
+! against an old runfile is bit-for-bit unchanged. To enable it, add one line to the runfile:
+!     guard_floor_dying_stand = .true.
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_fincl3,hist_yrclose, lmicrobeMLdiag,&
-    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test,lcoarseroot
+    do_budgets,ref_date,start_date,do_timing,warming_exp,fixClime,FireEvents,oscal_test,&
+      lcoarseroot,guard_floor_dying_stand
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
