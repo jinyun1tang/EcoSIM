@@ -56,6 +56,10 @@ module WatsubMod
   character(len=*), parameter :: mod_filename = &
   __FILE__
   real(r8), parameter :: tiny_wat=1.e-12_r8   !threshold water flux
+  ! ECOSIM_ZM experiment: emulate legacy ecosys natural-outlet drainage.
+  ! Set false and rebuild to recover upstream behavior. This is NOT a seepage
+  ! face implementation. Internal transport and tile drainage are unchanged.
+  logical, parameter :: zm_ecosys_outlet = .true.
   integer :: curday,curhour
   logical :: do_warming
 
@@ -977,7 +981,8 @@ module WatsubMod
                   if((DoMicPDischarg2ExtWTBL .or. DoMacPDischarg2ExtWTBL) .and. (.not.isclose(Recharg2WTBLScal,0._r8)))then
                     !discharge to external water table
                     CALL DischargeOverWaterTBL(I,J,N,N1,N2,N3,M4,M5,M6,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL,&
-                      RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,ExtWaterTable_col(N2,N1),FracLayVolBelowExtWTBL_vr(N3,N2,N1))
+                      RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,ExtWaterTable_col(N2,N1),FracLayVolBelowExtWTBL_vr(N3,N2,N1), &
+                      use_ecosys_outlet=zm_ecosys_outlet)
                   endif
 
                   if((DoMicPDischarg2Tile .or. DoMacPDischarg2Tile) .and. (.not.isclose(Recharg2WTBLScal,0._r8)))then
@@ -1676,6 +1681,35 @@ module WatsubMod
   real(r8) :: ExtWaterTableEquil
   integer :: LL
 
+  ! ECOSIM_ZM: legacy ecosys watsub.f (5283--5310) activates micropore
+  ! discharge only above its conductivity-derived wetness threshold, and
+  ! requires lower layers to meet that threshold too. Compute the equivalent
+  ! threshold from EcoSIM's OWN hydraulic table; do not change the retention
+  ! curve or its air-entry parameter used by other processes.
+  if (zm_ecosys_outlet) then
+    DoMicPDischarg2ExtWTBL = .false.
+    if (IDWaterTable_col(NY,NX).ne.0 .and. SoilDepthMidLay_vr(L,NY,NX).lt.ExtWaterTable_col(NY,NX)) then
+      if (PSISoilMatricPtmp_vr(L,NY,NX).gt.ZmOutletWetnessPotential(L,NY,NX)) then
+        DoMicPDischarg2ExtWTBL = .true.
+        if (L.lt.NL_col(NY,NX)) then
+          do LL=L+1,NL_col(NY,NX)
+            if (SoilDepthMidLay_vr(LL,NY,NX).lt.ExtWaterTable_col(NY,NX)) then
+              if (PSISoilMatricPtmp_vr(LL,NY,NX).le.ZmOutletWetnessPotential(LL,NY,NX) .or. &
+                  SoilDepthMidLay_vr(LL,NY,NX).gt.ActiveLayDepZ_col(NY,NX)) then
+                DoMicPDischarg2ExtWTBL = .false.
+                exit
+              endif
+            endif
+          enddo
+        endif
+      endif
+    endif
+    ! Macropore activation retains the upstream/legacy water-table test.
+    DoMacPDischarg2ExtWTBL=IDWaterTable_col(NY,NX).ne.0 .and. DPTHH.lt.ExtWaterTable_col(NY,NX) &
+      .and. VLWatMacP1_vr(L,NY,NX).gt.ZEROS2(NY,NX)
+    return
+  endif
+
   !     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO WATER TABLE
   !
   !     IDWaterTable=water table flag
@@ -1729,6 +1763,31 @@ module WatsubMod
     .AND. VLWatMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX)
 
   end subroutine Config4WaterTableDrain
+
+  function ZmOutletWetnessPotential(L,NY,NX) result(psi_threshold)
+    ! ECOSIM_ZM: reproduce legacy hour1.f's FSCNV=0.1 crossing of the
+    ! vertical conductivity lookup. K=1 is saturated, increasing K is drier.
+    ! Binary search is equivalent to scanning this monotonic lookup and avoids
+    ! rebuilding the hydraulic table inside every solver substep.
+    integer, intent(in) :: L,NY,NX
+    integer :: lo,hi,mid,nk
+    real(r8) :: psi_threshold,cutoff,theta_threshold
+    nk=size(HydroCond_3D,2)
+    cutoff=0.1_r8*SatHydroCondVert_vr(L,NY,NX)
+    psi_threshold=PSISE_vr(L,NY,NX)
+    if (cutoff.le.0._r8 .or. HydroCond_3D(3,nk,L,NY,NX).ge.cutoff) return
+    lo=2; hi=nk
+    do while (lo.lt.hi)
+      mid=(lo+hi)/2
+      if (HydroCond_3D(3,mid,L,NY,NX).lt.cutoff) then
+        hi=mid
+      else
+        lo=mid+1
+      endif
+    enddo
+    theta_threshold=POROS_vr(L,NY,NX)*(1._r8-real(lo-2,r8)/real(nk,r8))
+    call ComputePsiMCM(L,NY,NX,theta_threshold,psi_threshold)
+  end function ZmOutletWetnessPotential
 
 !------------------------------------------------------------------------------------------
 
@@ -2253,7 +2312,7 @@ module WatsubMod
   end subroutine SolveXgridHeatConduction
 !------------------------------------------------------------------------------------------
   subroutine DischargeOverWaterTBL(I,J,N,N1,N2,N3,M4,M5,M6,DoMicPDischarg2ExtWTBL,DoMacPDischarg2ExtWTBL,&
-    RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,TargetWaterTBL,FracLayVolBelowWTBL)
+    RechargDist2WTBL,Recharg2WTBLScal,DPTHH,XN,TargetWaterTBL,FracLayVolBelowWTBL,use_ecosys_outlet)
   !
   !Description:
   !  
@@ -2264,6 +2323,7 @@ module WatsubMod
   integer, intent(in) :: M4,M5,M6  !dest grid
   logical, intent(in) :: DoMicPDischarg2ExtWTBL
   logical, intent(in) :: DoMacPDischarg2ExtWTBL
+  logical, intent(in), optional :: use_ecosys_outlet
   real(r8), intent(in):: RechargDist2WTBL              !distance to external water table [m]
   real(r8),intent(in) :: Recharg2WTBLScal
   real(r8), intent(in):: XN                            !flow direction, <0 out of source grid
@@ -2274,9 +2334,14 @@ module WatsubMod
   character(len=*), parameter :: subname='DischargeOverWaterTBL'
   real(r8) :: FLWT,MacPoreDischarg,FLWTH,PSISWD,PSISWT,PSISWTH
   real(r8) :: watflx, heatflx
+  real(r8) :: outlet_theta,outlet_conductivity
+  integer :: outlet_k
+  logical :: legacy_outlet
   character(len=2), parameter :: direcs(2)=(/'ew','ns'/)
 
   call PrintInfo('beg '//subname)
+  legacy_outlet=.false.
+  if (present(use_ecosys_outlet)) legacy_outlet=use_ecosys_outlet
   !     MICROPORE DISCHARGE ABOVE WATER TABLE
   !
   !     DoMicPDischarg2ExtWTBL=micropore discharge flag to natural water table
@@ -2300,9 +2365,23 @@ module WatsubMod
       +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-TargetWaterTBL            &
       -AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))))
 
+    outlet_conductivity=HydroCond_3D(N,1,N3,N2,N1)
+    if (legacy_outlet) then
+      ! ECOSIM_ZM: legacy watsub.f 5819--5834 includes the saturation
+      ! potential and selects K(theta), not Ksat. Preserve MPa, m and the
+      ! upstream timestep, area and flux-accounting conventions.
+      PSISWT=AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1)+PSISE_vr(N3,N2,N1) &
+        +mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-TargetWaterTBL &
+        -AZMAX1(SoilDepthMidLay_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))))
+      outlet_theta=AMAX1(SoilWatAirDry_vr(N3,N2,N1),AMIN1(POROS_vr(N3,N2,N1), &
+        safe_adb(VLWatMicP1_vr(N3,N2,N1),VLSoilMicP_vr(N3,N2,N1))))
+      outlet_k=getMoistK(outlet_theta,POROS_vr(N3,N2,N1))
+      outlet_conductivity=HydroCond_3D(N,outlet_k,N3,N2,N1)
+    endif
+
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    !using hydraulic conductivity at saturation
-    FLWT=PSISWT*HydroCond_3D(N,1,N3,N2,N1)*AREA_3D(N,N3,N2,N1)*(1.0_r8-FracLayVolBelowWTBL)/(RechargDist2WTBL+1.0_r8) &
+    ! Upstream Ksat for tiles; ECOSIM_ZM K(theta) for natural outlets only.
+    FLWT=PSISWT*outlet_conductivity*AREA_3D(N,N3,N2,N1)*(1.0_r8-FracLayVolBelowWTBL)/(RechargDist2WTBL+1.0_r8) &
       *Recharg2WTBLScal*dts_HeatWatTP
 
     watflx                          = XN*FLWT
@@ -2342,6 +2421,11 @@ module WatsubMod
     PSISWD  = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTBLSlope_col(N2,N1))
     PSISWTH = -0.03_r8*PSISoilOsmotic_vr(N3,N2,N1)+mGravAccelerat*(DPTHH-TargetWaterTBL) &
       -mGravAccelerat*AZMAX1(DPTHH-DepzIntWTBL_col(N2,N1))
+    if (legacy_outlet) then
+      ! ECOSIM_ZM: legacy natural macropore discharge has no osmotic term.
+      ! Retain upstream distance+1 convention and macropore availability limit.
+      PSISWTH=mGravAccelerat*(DPTHH-TargetWaterTBL-AZMAX1(DPTHH-DepzIntWTBL_col(N2,N1)))
+    endif
 
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*HydroCondMacP1_vr(N3,N2,N1)*AREA_3D(N,N3,N2,N1) &

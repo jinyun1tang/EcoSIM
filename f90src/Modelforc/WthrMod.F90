@@ -366,10 +366,12 @@ module WthrMod
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
 
-        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4
-
       IF(RadLWClm(J,I).GT.0.0_r8)THEN
-        SkyLonwRad_col(NY,NX)=SkyLonwRad_col(NY,NX)+RadLWClm(J,I)
+        ! Match legacy ecosys: observed incoming longwave replaces the
+        ! sky-emissivity estimate. Adding both terms double counts longwave.
+        SkyLonwRad_col(NY,NX)=RadLWClm(J,I)
+      ELSE
+        SkyLonwRad_col(NY,NX)=EMM*stefboltz_const*TairK_col(NY,NX)**4
       ENDIF
 
 !
