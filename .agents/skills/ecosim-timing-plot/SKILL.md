@@ -12,7 +12,7 @@ description: "Visualize EcoSIM runtime-profiler output (timing/summary.csv and t
 - You need to compare process costs (`TranspNoSalt`, `WAT`, `NIT`, `PlantModel`, ...) or spot
   timesteps that are slower than the rest.
 
-Not for scientific output; for history files use the python_tools skills.
+Not for scientific output; for history files use the ecosim-agent skills.
 
 ## Inputs
 
