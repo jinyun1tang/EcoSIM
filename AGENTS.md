@@ -96,6 +96,17 @@ take precedence over repository guidance.
   when practical. Keep paired CDL/NetCDF representations consistent when changing
   an input dataset, and identify which file the model actually reads.
 
+## Site run requests
+
+- For requests to create, set up, or run an EcoSIM case for a site (for
+  example "create an ecosim run for site US-UMB"), follow the
+  `ecosim-agent` run-folder workflow
+  (`ecosim-agent/.agents/skills/ameriflux-namelist-generator/references/runfolder_workflow.md`)
+  and track progress with `ecosim-agent/.agents/skills/ecosim-site-run-tracker/`.
+  Initialize the tracker with the request text first, record the executable,
+  test run, full run, and evaluation results with its `set` command, and
+  report stage status from `ecosim-agent/result/<SITE_ID>/PROGRESS.md`.
+
 ## Build and validation
 
 - When the agent runs inside or is linked to VSCode, build and test in the
