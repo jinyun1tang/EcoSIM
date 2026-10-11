@@ -21,10 +21,10 @@ take precedence over repository guidance.
 - `input_data/`: shared model inputs and PFT parameter NetCDF/CDL files.
 - `examples/inputs/`: case-specific inputs. `examples/run_dir/`: case namelists
   and simulation working directories, including `biocrust/`.
-- `python_tools/`: a separate Git submodule for preprocessing and analysis.
+- `ecosim-agent/`: a separate Git submodule for preprocessing and analysis.
   Read its `AGENTS.md` before working there. Its canonical skills are under
-  `python_tools/.agents/skills/`; generated preprocessing outputs belong under
-  `python_tools/result/` unless the user specifies another destination.
+  `ecosim-agent/.agents/skills/`; generated preprocessing outputs belong under
+  `ecosim-agent/result/` unless the user specifies another destination.
 - `tests/` and `regression-tests/`: validation resources and regression tooling.
 - `build/` and `local/`: generated build/install products.
 - `3rd-partylibs/`: third-party dependency submodules.
@@ -63,17 +63,17 @@ take precedence over repository guidance.
   handling as needed when adding persistent state or flux variables.
 - Keep edits focused. Do not hand-edit generated build files or modify dependency
   submodules unless that is part of the requested work.
-- Treat `python_tools` changes as submodule changes, separate from root-repository
+- Treat `ecosim-agent` changes as submodule changes, separate from root-repository
   changes. Do not automatically commit, update submodule pointers, or publish work.
-- Preserve staged changes inside `python_tools`. Do not edit files with staged
+- Preserve staged changes inside `ecosim-agent`. Do not edit files with staged
   changes or alter their index entries (including staging, unstaging, or committing)
   unless the user explicitly requests updates to those staged contents.
 
 ## Scientific and input conventions
 
 - When asked to evaluate a plant-trait `.desc` file (including
-  `*.plant_trait.desc.*`), read `python_tools/AGENTS.md` and use the relevant
-  skills under `python_tools/.agents/skills/`, starting with
+  `*.plant_trait.desc.*`), read `ecosim-agent/AGENTS.md` and use the relevant
+  skills under `ecosim-agent/.agents/skills/`, starting with
   `ecosim-plant-trait-sanity-check/SKILL.md`. Treat the `.desc` file as read-only.
 - Track units explicitly: distinguish carbon mass from dry mass, per-individual
   quantities from per-area quantities, and per-area values from grid-cell totals.
