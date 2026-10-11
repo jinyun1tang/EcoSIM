@@ -7,8 +7,8 @@ Each step() runs one full simulation in an isolated episode directory:
                    -> h0-target extraction -> weighted reward
 
 All external tools are invoked as documented by their skills:
-  - python_tools/.agents/skills/ecosim-pftpar-editor  (ParamEditor.py)
-  - python_tools/.agents/skills/ecosim-h0-target-extractor/.../extract_h0_targets.py
+  - ecosim-agent/.agents/skills/ecosim-pftpar-editor  (ParamEditor.py)
+  - ecosim-agent/.agents/skills/ecosim-h0-target-extractor/.../extract_h0_targets.py
 """
 
 import json
@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-PYTHON_TOOLS = REPO_ROOT / "python_tools"
+PYTHON_TOOLS = REPO_ROOT / "ecosim-agent"
 PARAM_EDITOR_DIR = PYTHON_TOOLS / "applications" / "notebooks"
 H0_EXTRACTOR = (
     PYTHON_TOOLS
