@@ -244,7 +244,7 @@ module ncdio_pio
   integer,parameter,public :: ncd_nofill    = nf90_nofill
   integer,parameter,public :: ncd_unlimited = nf90_unlimited
   integer,parameter,public :: ncd_log       = -nf90_int
-  real(r8),parameter :: tiny_zero=1.e-14_r8
+  real(r8),parameter :: tiny_zero=1.e-16_r8
   logical :: single_column
   integer :: iulog
 !
