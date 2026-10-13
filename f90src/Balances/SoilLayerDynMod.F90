@@ -1992,9 +1992,9 @@ implicit none
     FXVOLIH                     = FHO*VLiceMacP_vr(L0,NY,NX)
     VLiceMacP_vr(L1,NY,NX)      = VLiceMacP_vr(L1,NY,NX)+FXVOLIH
     VLiceMacP_vr(L0,NY,NX)      = VLiceMacP_vr(L0,NY,NX)-FXVOLIH
-    FXVOLAH                     = FHO*VLMacP_vr(L0,NY,NX)
-    VLMacP_vr(L1,NY,NX)         = VLMacP_vr(L1,NY,NX)+FXVOLAH
-    VLMacP_vr(L0,NY,NX)         = VLMacP_vr(L0,NY,NX)-FXVOLAH
+    FXVOLAH                     = FHO*VLMacroPores_vr(L0,NY,NX)
+    VLMacroPores_vr(L1,NY,NX)         = VLMacroPores_vr(L1,NY,NX)+FXVOLAH
+    VLMacroPores_vr(L0,NY,NX)         = VLMacroPores_vr(L0,NY,NX)-FXVOLAH
   ENDIF
   end subroutine MoveFertMinerals
 

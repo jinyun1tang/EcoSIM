@@ -62,6 +62,7 @@ implicit none
   logical :: first_topou          = .false.  !only simulate first topo unit
   logical :: first_pft            = .false.  !only simulate first pft
   integer :: iErosionMode         = -1         !erosion option
+  logical :: use_ecosys_drainage = .false.
   logical :: plant_model          = .true.
   logical :: microbial_model      = .true.
   logical :: soichem_model        = .true.

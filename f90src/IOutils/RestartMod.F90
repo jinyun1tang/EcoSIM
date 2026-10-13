@@ -7922,16 +7922,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)                
-    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacroPores_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacroPores_vr,datrc_2d)      
   else
     !print*,'VLMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacroPores_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ)                    
-    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacroPores_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         

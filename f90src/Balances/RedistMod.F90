@@ -261,12 +261,12 @@ module RedistMod
     VLWatMacP_vr(L,NY,NX) = AZMAX1(VLWatMacP_vr(L,NY,NX))
     VLiceMacP_vr(L,NY,NX) = AZMAX1(VLiceMacP_vr(L,NY,NX))
     VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-    VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
+    VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
     TCS_vr(L,NY,NX)       = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
     !relative soil saturation
-    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
+    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
       VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
-    ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
+    ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
       VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)    
   ENDDO D9945
 
@@ -870,7 +870,7 @@ module RedistMod
       !update water/ice-unfilled pores
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX) &
-          +VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+          +VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
       ELSE
         VLsoiAirP_vr(L,NY,NX)=0.0_r8
       ENDIF

@@ -2195,7 +2195,7 @@ implicit none
     !
     !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
     !
-    IF(N.EQ.iVerticalDirection .AND. VLMacP_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
+    IF(N.EQ.iVerticalDirection .AND. VLMacroPores_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       D9800: DO K=1,jcplx
         do idom=idom_beg,idom_end
           DOM_Adv2MacP_flxM(idom,K)=VFLW*AZMAX1((DOM_MacP2_vr(idom,K,N3,N2,N1) &
@@ -2299,8 +2299,8 @@ implicit none
 
   call PrintInfo('beg '//subname)
 
-  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
-    .AND. VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
+  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacroPores_vr(N3,N2,N1) &
+    .AND. VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacroPores_vr(N6,N5,N4))THEN
     !------------------------------------------------------------------------------------
     !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
     !

@@ -534,13 +534,13 @@ module Hour1Mod
     ENDIF
     !     VLMicP_vr(L,NY,NX)=AMAX1(POROS_vr(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
-    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
+    !     VLMacroPores_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     !    2,VLWatMacP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     VLMicP_vr(L,NY,NX) = POROS_vr(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
-    VLMacP_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
+    VLMacroPores_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-        +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+        +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0._r8
     ENDIF
@@ -986,14 +986,14 @@ module Hour1Mod
     IF(FoundActiveLayer)exit
     !current layer
     VLiceTot=VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-    VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacP_vr(L,NY,NX)
+    VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacroPores_vr(L,NY,NX)
 
     IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
       !significant ice and pore
       D5700: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
         VLiceTotL  = VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
         VOLWTL     = VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
-        VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
+        VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacroPores_vr(LL,NY,NX)
         !defined as significant increase in ice content
         goto5701=(VLPoreTotL.GT.ZEROS2(NY,NX).AND.VLiceTotL.LT.ZERO2*VLPoreTotL)
         if(goto5701)exit
@@ -1465,7 +1465,7 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
           /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD_col(NY,NX)))
       ELSE
-        PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+        PSISoilMatricP_vr(0,NY,NX)=PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
       PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))

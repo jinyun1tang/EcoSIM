@@ -348,11 +348,11 @@ implicit none
             /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD_col(NY,NX)))
         ELSE
           ThetaWLitR         = POROS0_col(NY,NX)
-          PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
+          PSISM1_vr(0,NY,NX) = PSI_at_Sautration_vr(0,NY,NX)
         ENDIF
       ELSE
         ThetaWLitR         = POROS0_col(NY,NX)
-        PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
+        PSISM1_vr(0,NY,NX) = PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
       !vapor pressure in litter and top soil
       VapLitR   = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))

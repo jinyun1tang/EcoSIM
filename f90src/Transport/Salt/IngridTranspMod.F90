@@ -1257,7 +1257,7 @@ module IngridTranspMod
     !
     !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE IN VERTICAL FLUX
     !
-    IF(N.EQ.3.AND.VLMacP_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VLMacroPores_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       DO idsalt=idsalt_beg,idsalt_KSO4
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
           -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU_col(N2,N1),N2,N1))))
@@ -1339,8 +1339,8 @@ module IngridTranspMod
 
   call PrintInfo('beg '//subname)
   !test grid legitimacy
-  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacP_vr(N3,N2,N1) &
-    .AND.VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacP_vr(N6,N5,N4))THEN
+  IF(VLWatMacPM_vr(M,N3,N2,N1).GT.SoilWatAirDry_vr(N3,N2,N1)*VLMacroPores_vr(N3,N2,N1) &
+    .AND.VLWatMacPM_vr(M,N6,N5,N4).GT.SoilWatAirDry_vr(N6,N5,N4)*VLMacroPores_vr(N6,N5,N4))THEN
     !
     !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
     !

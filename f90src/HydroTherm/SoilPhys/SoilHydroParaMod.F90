@@ -31,8 +31,6 @@ implicit none
   ! ECOSIM_ZM: controlled legacy-ecosys hydraulic policy. These switches
   ! change constitutive properties, not water/heat accounting or boundary fluxes.
   ! Set false to recover upstream behavior. Not a universal soil calibration.
-  logical, parameter :: zm_ecosys_retention=.true.
-  logical, parameter :: zm_ecosys_airentry=.true.
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
@@ -82,7 +80,7 @@ contains
       call ComputePSIPond(L,NY,NX,THETI_vr(L,NY,NX),THETW_vr(L,NY,NX),THETW1,PSISoilMatricP_vr(L,NY,NX),TKS_vr(L,NY,NX))
 
     ELSE
-      PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)
+      PSISoilMatricP_vr(L,NY,NX)=PSI_at_Sautration_vr(L,NY,NX)
     ENDIF
     !
     !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
@@ -155,7 +153,7 @@ contains
   ENDIF
   ! ECOSIM_ZM: hour1.f uses SRP=0.67 for all mineral/organic soil branches.
   ! Rebuild K(theta) below from this same pressure curve; do not rescale fluxes.
-  if (zm_ecosys_retention) SRP_vr(L,NY,NX)=0.67_r8
+  if (use_ecosys_drainage) SRP_vr(L,NY,NX)=0.67_r8
   
   ! double check is_cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
@@ -180,7 +178,7 @@ contains
   ENDIF
 
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-    +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+    +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
 
   IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
@@ -263,7 +261,7 @@ contains
         HydroCond_3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
 
         !obtain water content at saturation
-        if (zm_ecosys_airentry) then
+        if (use_ecosys_drainage) then
           ! ECOSIM_ZM: legacy FSCNV=0.1 crossing, using preceding wetter
           ! entry for BOTH pressure and theta. Internal saturated/Green-Ampt
           ! switches and natural-outlet wetness now share the same definition.
@@ -294,12 +292,12 @@ contains
   !     PathLenMacP,MacPNumLayer,MacPRadius=path length between, number,radius of macropores
   !     CNDH=macropore hydraulic conductivity
   !VGeomLayert0_vr: geometric volume of the layer 
-  !VLMacP_vr: volume of macropores in the layer
+  !VLMacroPores_vr: volume of macropores in the layer
   !Assuming soil macropores are approximated as (cylydrical) pipes, and has layer thickness as pipe length
   !Eq.(3.3)-(3.4) from Dimitrov et al. (2010)
   
   MacPoreRadius_vr(L,NY,NX)   = 0.5E-03_r8
-  MacPoreNumbers_vr(L,NY,NX) = INT(VLMacP_vr(L,NY,NX)/(PICON*MacPoreRadius_vr(L,NY,NX)**2*VGeomLayert0_vr(L,NY,NX)))
+  MacPoreNumbers_vr(L,NY,NX) = INT(VLMacroPores_vr(L,NY,NX)/(PICON*MacPoreRadius_vr(L,NY,NX)**2*VGeomLayert0_vr(L,NY,NX)))
 
   IF(MacPoreNumbers_vr(L,NY,NX).GT.0.0_r8)THEN
     PathLenMacPore_vr(L,NY,NX)=1.0_r8/(SQRT(PICON*MacPoreNumbers_vr(L,NY,NX)))
@@ -402,9 +400,9 @@ contains
   !in a cold run, set it
     VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
     VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
     VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+    VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
     ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
     ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
     VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
@@ -447,7 +445,7 @@ contains
     HydroCond_3D(3,K,0,NY,NX) = SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
     HydroCond_3D(1,K,0,NY,NX) = 0.0_r8
     HydroCond_3D(2,K,0,NY,NX) = 0.0_r8
-    if (zm_ecosys_airentry) then
+    if (use_ecosys_drainage) then
       ! ECOSIM_ZM: apply the same conductivity-defined threshold to litter,
       ! matching legacy hour1.f. Preserve its existing retention curvature.
       if (K.gt.1) then

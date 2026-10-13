@@ -418,7 +418,7 @@ module StartsMod
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
     !     PSISoilAirEntry_vr: soil matric potential at air entry point [MPa]
-    PSISE_vr(L,NY,NX)                     = PSIPS
+    PSI_at_Sautration_vr(L,NY,NX)                     = PSIPS
     PSISoilAirEntry_vr(L,NY,NX)           = -1.5E-03_r8
     RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
     RGasTranspFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8
@@ -443,7 +443,7 @@ module StartsMod
       ENDIF
       POROSI_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
       VLMicP_vr(L,NY,NX)    = POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-      VLMacP_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
+      VLMacroPores_vr(L,NY,NX)    = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayert0_vr(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
       !
@@ -499,12 +499,12 @@ module StartsMod
         ENDIF
         VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
         VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-        VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+        VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
         VLiceMicP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLiceMacP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
+        VLiceMacP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
         ! total air-filled porosity, micropores + macropores
         VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-          +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+          +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
         VHeatCapacity_vr(L,NY,NX)=VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
           +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
         ThetaH2OZ_vr(L,NY,NX) = THETW_vr(L,NY,NX)

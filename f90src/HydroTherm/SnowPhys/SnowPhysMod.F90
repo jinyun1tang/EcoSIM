@@ -1691,7 +1691,7 @@ contains
         /PSD_vr(NUM_col(NY,NX),NY,NX))**SRP_vr(NUM_col(NY,NX),NY,NX)*LOGPSIMXD_col(NY,NX)))
     ELSE
       THETW1=POROS_vr(NUM_col(NY,NX),NY,NX)
-      PSISM1_vr(NUM_col(NY,NX),NY,NX)=PSISE_vr(NUM_col(NY,NX),NY,NX)
+      PSISM1_vr(NUM_col(NY,NX),NY,NX)=PSI_at_Sautration_vr(NUM_col(NY,NX),NY,NX)
     ENDIF
   ELSEIF(VLSoilPoreMicP_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     FCX    = FCI*FracSoiPAsIce_vr(NUM_col(NY,NX),NY,NX)
@@ -1708,11 +1708,11 @@ contains
         +(((LOGPOROS_vr(NUM_col(NY,NX),NY,NX)-LOG(FracSoiPAsWat_vr(NUM_col(NY,NX),NY,NX)))/PSDX)*LOGPSIMXD_col(NY,NX)))
     ELSE
       THETW1                      = POROS_vr(NUM_col(NY,NX),NY,NX)
-      PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSISE_vr(NUM_col(NY,NX),NY,NX)
+      PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSI_at_Sautration_vr(NUM_col(NY,NX),NY,NX)
     ENDIF
   ELSE
     THETW1                      = POROS_vr(NUM_col(NY,NX),NY,NX)
-    PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSISE_vr(NUM_col(NY,NX),NY,NX)
+    PSISM1_vr(NUM_col(NY,NX),NY,NX) = PSI_at_Sautration_vr(NUM_col(NY,NX),NY,NX)
   ENDIF
   call PrintInfo('end '//subname)
   end subroutine UpdateSoilWaterPotential
@@ -1759,11 +1759,11 @@ contains
         *LOGPSIMXD_col(NY,NX)))
     ELSE
       ThetaWLitR=POROS0_col(NY,NX)
-      PSISM1_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+      PSISM1_vr(0,NY,NX)=PSI_at_Sautration_vr(0,NY,NX)
     ENDIF
   ELSE
     ThetaWLitR         = POROS0_col(NY,NX)
-    PSISM1_vr(0,NY,NX) = PSISE_vr(0,NY,NX)
+    PSISM1_vr(0,NY,NX) = PSI_at_Sautration_vr(0,NY,NX)
   ENDIF
 
   CNVR = safe_adb(VaporDiffusivityLitR_col(NY,NX)*FracAirFilledSoilPoreM_vr(M,0,NY,NX)*POROQ*FracAirFilledSoilPoreM_vr(M,0,NY,NX),POROS_vr(0,NY,NX))
