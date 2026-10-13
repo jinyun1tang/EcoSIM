@@ -16,6 +16,7 @@ set(IOUTILS_SOURCES
     HistData/HistUpdateSoil.F90
     HistData/HistUpdatePlant.F90
     MicrobeInfoMod.F90
+    HistoryOutputPrecisionMod.F90
     HistFileMod.F90
     restUtilMod.F90
     RestartMod.F90

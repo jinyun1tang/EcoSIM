@@ -2,6 +2,8 @@ module HistFileMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ncdio_pio
+  use HistoryOutputPrecisionMod, only : history_output_environment, &
+       begin_history_output, end_history_output
   use netcdf
   use fileUtil          , only : strip_null
   use abortutils        , only : endrun,iulog
@@ -1961,6 +1963,7 @@ implicit none
     real(r8), pointer :: histo(:,:)      ! temporary
     real(r8), pointer :: hist1do(:)      ! temporary
     character(len=*),parameter :: subname = trim(mod_filename)//'::hfields_write'
+    type(history_output_environment) :: output_environment
 !-----------------------------------------------------------------------
     ! Write/define 1d topological info
 
@@ -2056,7 +2059,12 @@ implicit none
 
           ! Write history output.  Always output land and ocean runoff on xy grid.
           call PrintInfo(varname)
-          
+
+          ! EcoSIM_ZM: allow representational underflow only during float32
+          ! history writes. Restore IEEE state immediately after either rank
+          ! write; double histories, restart output and model physics are not
+          ! covered by this policy. Other arithmetic traps remain enabled.
+          call begin_history_output(output_environment, tape(t)%ncprec == ncd_float)
           if (numdims == 1) then
 !             print*,hist1do(beg1d_out:end1d_out)
              call ncd_io(flag='write', varname=varname, &
@@ -2068,6 +2076,7 @@ implicit none
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=histo, ncid=nfid(t), nt=nt)
           end if
+          call end_history_output(output_environment)
 
           ! Deallocate dynamic memory
 
