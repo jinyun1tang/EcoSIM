@@ -663,6 +663,11 @@ module RootGasMod
           !
           !     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
           !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
+          idg=idg_CO2
+          ! Keep transport forcing fixed; bound dissolution by the net gas supply.
+          ! The accepted exchange also updates the aqueous pool below.
+          RGas_DisolvSoil_flx(idg)=MIN(RGas_DisolvSoil_flx(idg), trc_gasml_loc(idg)+RGasTranspFlxPrev(idg))
+          
           DO idg=idg_beg,idg_NH3
             if(idg.eq.idg_O2)then
               ! O2 transport forcing was applied before the coupled budget solve.
