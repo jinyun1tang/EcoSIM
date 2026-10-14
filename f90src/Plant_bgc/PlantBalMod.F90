@@ -680,6 +680,7 @@ implicit none
 ! collapsed below VEGC_BAL_FLOOR_dying, which makes the RELATIVE balance test
 ! meaningless. Declared here rather than module-scope so it cannot leak between calls.
   logical :: lveg_too_small_for_relative_test
+  logical :: lbalC_abort
   associate(                                                          &
     NY                        => plt_site%NY                         ,& !input  : Y coordinate
     NX                        => plt_site%NX                         ,& !input  : X coordinate
@@ -759,7 +760,23 @@ implicit none
   else
     err_rel=1.e-10_r8
   endif
-  if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .or. len_trim(header)>3)then      
+! --- Jing Tao (2026-10-14, branch a2mc-anchor-0ffe5a06) ---
+! err_rel is normalised by total vegetation carbon, which COLLAPSES as the stand
+! dies, so a rounding-level absolute residual can read as a large relative error,
+! or (via safe_adb's own near-zero-denominator clamp) as a spuriously SMALL one --
+! either direction is unreliable below a floor on total vegetation carbon. Compute
+! the regime flag and the single abort condition HERE, before the diagnostic-write
+! gate below, so the gate and the abort test share ONE condition rather than two
+! copies that can drift apart (the previous form let the gate require
+! abs(err_rel)>1e-3 while the abort below the floor did not, which could make a
+! corrected abort unreachable).
+! Default-off: when guard_floor_dying_stand is .false. this reduces exactly to the
+! original abs(balE)>1e-6 .and. abs(err_rel)>1e-3.
+  lveg_too_small_for_relative_test = .false.
+  if(guard_floor_dying_stand) lveg_too_small_for_relative_test = &
+    (AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)) < VEGC_BAL_FLOOR_dying)
+  lbalC_abort = abs(balE(NE))>1.e-6_r8 .and. (lveg_too_small_for_relative_test .or. abs(err_rel)>1.e-3_r8)
+  if(lbalC_abort .or. len_trim(header)>3)then      
     write(888,*)iYearCurrent*1000+I+J/24.,'pft=',NZ,'balC err err_rel',balE(ielmc),err_rel,plt_distb%iDayPlanting_pft(NZ),plt_distb%iDayPlantHarvest_pft(NZ)
     write(888,*)'NY, NX=',NY,NX,header
     write(888,*)'endc, begc        =',TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ),TotEndVegE_pft(NE,NZ)-TotBegVegE_pft(NE,NZ)
@@ -782,19 +799,7 @@ implicit none
     write(888,*)'surf literfall C  =',SurfLitrfallElms_pft(NE,NZ)       
     write(888,*)('-',K=1,100)         
     !if(I/=plt_distb%iDayPlantHarvest_pft(NZ) .and. I/=plt_distb%iDayPlanting_pft(NZ)) &  
-! --- Jing Tao ---
-! err_rel above is normalised by total vegetation carbon, which COLLAPSES as the
-! stand dies, so a rounding-level absolute residual becomes a "large" relative error
-! and aborts a run that has merely gone extinct. Skip the RELATIVE test below a floor
-! on total vegetation carbon; the ABSOLUTE test (>1.e-6) still applies, and the
-! diagnostic dump above is still written, so nothing is hidden -- the run simply
-! continues and the stand is recorded as dead rather than as a crash.
-! Default-off: when the switch is .false. this is .false. and the abort is unchanged.
-    lveg_too_small_for_relative_test = .false.
-    if(guard_floor_dying_stand) lveg_too_small_for_relative_test = &
-      (AMAX1(TotEndVegE_pft(NE,NZ),TotBegVegE_pft(NE,NZ)) < VEGC_BAL_FLOOR_dying)
-    if(abs(balE(NE))>1.e-6_r8 .and. abs(err_rel)>1.e-3_r8 .and. .not.lveg_too_small_for_relative_test)call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)                    
-    
+    if(lbalC_abort)call endrun('C balance error test failure in '//trim(mod_filename)//' at line',__LINE__)                    
   endif
 
   NE=ielmn
