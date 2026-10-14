@@ -263,6 +263,11 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SetPars(this)
+! --- Jing Tao --- imported at SUBROUTINE scope, not module scope, so MicBGCPars does not acquire a
+!  module-wide dependency on NitroPars for one array. NitroPars does not use MicBGCPars, so there
+!  is no cycle. Boot order makes this safe: initNitroPars (which sets/reads SPOSC_in) runs from
+!  InitModules -> initNitro -> MicBGCFGMod.F90:61, BEFORE readi -> MicPar%SetPars assigns it here.
+  use NitroPars, only : SPOSC_in
 
   implicit none
   class(MicParType) :: this
@@ -326,11 +331,17 @@ contains
   !microbial traits
   DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
 
-  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
-    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
-    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
-    ,0.05_r8,0.0_r8,0.0_r8,0.0_r8 &
-    ,0.05_r8,0.0167_r8,0.0_r8,0.0_r8/),shape(sposc))
+! --- Jing Tao --- SPOSC (solid-SOM specific decomposition rate, h-1) is now sourced from NitroPars::SPOSC_in
+!  instead of the literal that used to sit here. SPOSC_in defaults to those exact same 20 values in
+!  initNitroPars and is overwritten ONLY if the MicrobePars.nc actually carries an SPOSC variable, so
+!  with any pre-existing input file this line reproduces the previous behaviour bit-for-bit.
+!  The x1.5 litter boost below is deliberately KEPT and still applied AFTER the copy: the .nc (like the
+!  old literal) holds BASE, pre-boost rates. Moving the boost into the .nc, or dropping it, would either
+!  double-boost the litter complexes or silently slow them by a third.
+!  Rationale for making this tunable at all: it is the first-order control on the hydrolysis flux
+!  (MicBGCFGMod.F90:1442, this file's sole consumer), and its siblings SPORC/SPOHC/SPOMC were already
+!  .nc inputs.
+  SPOSC = SPOSC_in
 
   SPOSC(:,1:this%NumOfLitrCmplxs)=SPOSC(:,1:this%NumOfLitrCmplxs)*1.5_r8
 

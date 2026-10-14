@@ -8,6 +8,9 @@ module NitroPars
   use netcdf
   use ncdio_pio  
   use EcoSimConst
+! --- Jing Tao --- needed for the SPOSC_in carrier below, which is dimensioned (jskenc,jcplxc)
+!          = (4 kinetic components, 5 organo-microbial complexes), matching micpar%SPOSC.
+  use EcoSIMConfig, only : jskenc, jcplxc
   implicit none
   public
   character(len=*), private, parameter :: mod_filename = &
@@ -118,6 +121,19 @@ module NitroPars
   real(r8) :: EFIRE(2,21:22)  !partition coefficient for N loss as NH3 and P loss as PO4 during combustion, [g gC-1]
   real(r8) :: CyanoInocC      !inoculation cyanobacteria biomass [gC m-2]
   real(r8) :: CyanoInoc_depth !inocoluation depth of cyanobacteria, [m]
+! --- Jing Tao --- NitroPars-side carrier for the SOLID-SOM specific decomposition rate, promoted from a
+!          hardcoded literal in MicBGCPars::SetPars to an optional MicrobePars.nc input.
+!          Units h-1. Shape (jskenc,jcplxc) = (4 kinetic components: protein/carbohydrate/
+!          cellulose/lignin) x (5 complexes: woody-litr/fine-litr/manure/POM/humus).
+!          Named SPOSC_in, NOT SPOSC, because MicBGCPars::SetPars already aliases
+!          SPOSC => this%SPOSC in an associate block and the names would clash.
+!          Holds the BASE (pre-boost) rates: SetPars applies the x1.5 litter boost AFTER
+!          copying this in, exactly as it did to the hardcoded values.
+!          Why promote it: SPOSC is the first-order control on the solid-SOM hydrolysis flux
+!          (MicBGCFGMod.F90:1442, Fs linear in SPOSC up to a 0.5 cap), while its sibling rate
+!          constants SPORC/SPOHC/SPOMC above are ALREADY .nc inputs -- an undocumented split
+!          that forced calibration to compensate through pool size instead (6x CORGC in R2).
+  real(r8) :: SPOSC_in(jskenc,jcplxc)
   contains
 
   subroutine initNitroPars
@@ -131,6 +147,24 @@ module NitroPars
   OAKI = 12._r8
   CyanoInoc_depth = 1.e-3_r8   ![1mm]
   CyanoInocC = 1.e-2_r8        ![gC m-2]
+! --- Jing Tao --- SPOSC_in default, set UNCONDITIONALLY -- deliberately BEFORE the .not.ReadPars() branch
+!  below, not inside it. The other parameters only need a default when the whole read FAILS, but
+!  SPOSC is a NEW variable that no existing MicrobePars.nc carries: a file can be read SUCCESSFULLY
+!  and still not contain SPOSC. Setting it inside the else-branch would leave it uninitialised in
+!  exactly the common case (an old .nc reads fine, SPOSC absent), which is a garbage decomposition
+!  rate rather than a fallback. Setting it here is what makes the promotion default-off.
+!
+!  These 20 values are the BASE (pre-boost) rates copied verbatim from the literal they replace in
+!  MicBGCPars::SetPars; the x1.5 litter-complex boost still happens there, after the copy. Column-
+!  major, so each row of 4 below is one complex K over the 4 kinetic components M:
+!    K=1 woody-litr, K=2 fine-litr, K=3 manure, K=4 POM, K=5 humus
+!    M=1 protein,    M=2 carbohydrate, M=3 cellulose, M=4 lignin        [h-1]
+  SPOSC_in = reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8     &
+    ,0.05_r8,0.0_r8,0.0_r8,0.0_r8 &
+    ,0.05_r8,0.0167_r8,0.0_r8,0.0_r8/),shape(SPOSC_in))
+
   if(.not.ReadPars())then
     DCKI          = 2.5_r8
     RCCX          = 0.833_r8
@@ -237,6 +271,9 @@ module NitroPars
   implicit none
   logical :: ans
   type(file_desc_t) :: ncfid
+! --- Jing Tao --- descriptor + presence flag for the guarded optional SPOSC read below.
+  type(Var_desc_t)  :: vardesc_SPOSC
+  logical           :: readv_SPOSC
 
   ans =.false.
 
@@ -316,6 +353,15 @@ module NitroPars
   call ncd_getvar(ncfid,'RMOM',RMOM)
   call ncd_getvar(ncfid,'SPORC',SPORC)
   call ncd_getvar(ncfid,'SPOMC',SPOMC)
+
+! --- Jing Tao --- SPOSC is read only IF PRESENT -- this must not be a bare ncd_getvar like the lines above.
+!  ncd_getvar -> check_ret -> endrun ABORTS the run when a variable is missing (ncdio_pio.F90:418-422),
+!  and every MicrobePars.nc written before this change lacks SPOSC. A bare read would therefore turn
+!  every existing input file into a hard crash. check_var only sets a flag, so this leaves the
+!  initNitroPars default in place when the variable is absent and the run is bit-identical to before.
+!  print_err=.false. keeps a normal old-format file from logging a spurious error.
+  call check_var(ncfid,'SPOSC',vardesc_SPOSC,readv_SPOSC,print_err=.false.)
+  if(readv_SPOSC) call ncd_getvar(ncfid,'SPOSC',SPOSC_in)
   call ncd_getvar(ncfid,'VMX2AMONC10',VMX2AMONC10)
   call ncd_getvar(ncfid,'VMX3AMO2D',VMX3AMO2D)
 
