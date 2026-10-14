@@ -873,6 +873,7 @@ implicit none
     DO II=1,366
       DO JJ=1,24
         SWRad_hrly(JJ,II)=SWRad_hrly(JJ,II)*3600.e-6_r8  !convert from W/m2 to MJ/m^2/hour
+        RadLWClm(JJ,II)=RadLWClm(JJ,II)*3600.e-6_r8       !convert from W/m2 to MJ/m^2/hour
         WINDH(JJ,II)=WINDH(JJ,II)*3600._r8        !convert from m/s to m/hour
         RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
       enddo

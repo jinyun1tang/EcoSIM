@@ -21,10 +21,10 @@ take precedence over repository guidance.
 - `input_data/`: shared model inputs and PFT parameter NetCDF/CDL files.
 - `examples/inputs/`: case-specific inputs. `examples/run_dir/`: case namelists
   and simulation working directories, including `biocrust/`.
-- `python_tools/`: a separate Git submodule for preprocessing and analysis.
+- `ecosim-agent/`: a separate Git submodule for preprocessing and analysis.
   Read its `AGENTS.md` before working there. Its canonical skills are under
-  `python_tools/.agents/skills/`; generated preprocessing outputs belong under
-  `python_tools/result/` unless the user specifies another destination.
+  `ecosim-agent/.agents/skills/`; generated preprocessing outputs belong under
+  `ecosim-agent/result/` unless the user specifies another destination.
 - `tests/` and `regression-tests/`: validation resources and regression tooling.
 - `build/` and `local/`: generated build/install products.
 - `3rd-partylibs/`: third-party dependency submodules.
@@ -63,17 +63,17 @@ take precedence over repository guidance.
   handling as needed when adding persistent state or flux variables.
 - Keep edits focused. Do not hand-edit generated build files or modify dependency
   submodules unless that is part of the requested work.
-- Treat `python_tools` changes as submodule changes, separate from root-repository
+- Treat `ecosim-agent` changes as submodule changes, separate from root-repository
   changes. Do not automatically commit, update submodule pointers, or publish work.
-- Preserve staged changes inside `python_tools`. Do not edit files with staged
+- Preserve staged changes inside `ecosim-agent`. Do not edit files with staged
   changes or alter their index entries (including staging, unstaging, or committing)
   unless the user explicitly requests updates to those staged contents.
 
 ## Scientific and input conventions
 
 - When asked to evaluate a plant-trait `.desc` file (including
-  `*.plant_trait.desc.*`), read `python_tools/AGENTS.md` and use the relevant
-  skills under `python_tools/.agents/skills/`, starting with
+  `*.plant_trait.desc.*`), read `ecosim-agent/AGENTS.md` and use the relevant
+  skills under `ecosim-agent/.agents/skills/`, starting with
   `ecosim-plant-trait-sanity-check/SKILL.md`. Treat the `.desc` file as read-only.
 - Track units explicitly: distinguish carbon mass from dry mass, per-individual
   quantities from per-area quantities, and per-area values from grid-cell totals.
@@ -96,8 +96,35 @@ take precedence over repository guidance.
   when practical. Keep paired CDL/NetCDF representations consistent when changing
   an input dataset, and identify which file the model actually reads.
 
+## Site run requests
+
+- For requests to create, set up, or run an EcoSIM case for a site (for
+  example "create an ecosim run for site US-UMB"), follow the
+  `ecosim-agent` run-folder workflow
+  (`ecosim-agent/.agents/skills/ameriflux-namelist-generator/references/runfolder_workflow.md`)
+  and track progress with `ecosim-agent/.agents/skills/ecosim-site-run-tracker/`.
+  Initialize the tracker with the request text first, record the executable,
+  test run, full run, and evaluation results with its `set` command, and
+  report stage status from `ecosim-agent/result/<SITE_ID>/PROGRESS.md`.
+
 ## Build and validation
 
+- When the agent runs inside or is linked to VSCode, build and test in the
+  environment of VSCode's integrated terminal rather than the agent's default
+  shell, which may resolve a different compiler toolchain. Before building,
+  determine that environment from the VSCode settings: workspace
+  `.vscode/settings.json` overrides the user `settings.json` (location depends
+  on the OS). Read `terminal.integrated.defaultProfile.<os>` and the matching
+  `terminal.integrated.profiles.<os>` entry for the shell and its arguments, and
+  `terminal.integrated.env.<os>` for environment variables (expand references
+  such as `${env:PATH}`). Run build and test commands through that shell with
+  those variables exported. Do not record the resolved values in the repository;
+  re-read the settings for each session.
+- Reuse a build directory whose `CMakeCache.txt` compilers match that
+  environment; do not mix toolchains in one build directory. If none matches,
+  configure a new one. Report the toolchain used along with validation results.
+  If VSCode is not involved or no terminal settings exist, use the default shell
+  and say so.
 - Run build commands from the repository root. Inspect supported options with
   `bash build_EcoSIM.sh --help`; the standard build is
   `bash build_EcoSIM.sh`. Debug/regression configuration is available through

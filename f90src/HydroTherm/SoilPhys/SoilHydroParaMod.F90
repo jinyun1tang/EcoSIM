@@ -28,6 +28,11 @@ implicit none
   __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8   !threshold for  C concentration in organic soil 	gC Mg-1
   real(r8), parameter :: tiny_val=1.e-6_r8   !minimum value 
+  ! ECOSIM_ZM: controlled legacy-ecosys hydraulic policy. These switches
+  ! change constitutive properties, not water/heat accounting or boundary fluxes.
+  ! Set false to recover upstream behavior. Not a universal soil calibration.
+  logical, parameter :: zm_ecosys_retention=.true.
+  logical, parameter :: zm_ecosys_airentry=.true.
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
@@ -148,6 +153,9 @@ contains
   ELSE
     SRP_vr(L,NY,NX)=1.00_r8
   ENDIF
+  ! ECOSIM_ZM: hour1.f uses SRP=0.67 for all mineral/organic soil branches.
+  ! Rebuild K(theta) below from this same pressure curve; do not rescale fluxes.
+  if (zm_ecosys_retention) SRP_vr(L,NY,NX)=0.67_r8
   
   ! double check is_cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
@@ -255,12 +263,24 @@ contains
         HydroCond_3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
 
         !obtain water content at saturation
-        IF(K.GT.1 .AND. PSISK(K).LT.PSISoilAirEntry_vr(L,NY,NX))then
-          if(PSISK(K-1).GE.PSISoilAirEntry_vr(L,NY,NX))THEN
-            !moisture at air-entry saturation
-            ThetaSat_vr(L,NY,NX)=H2OSOIK(K)
+        if (zm_ecosys_airentry) then
+          ! ECOSIM_ZM: legacy FSCNV=0.1 crossing, using preceding wetter
+          ! entry for BOTH pressure and theta. Internal saturated/Green-Ampt
+          ! switches and natural-outlet wetness now share the same definition.
+          if (K.gt.1) then
+            if (HydroCond_3D(3,K,L,NY,NX).lt.0.1_r8*SatHydroCondVert_vr(L,NY,NX) .and. &
+                HydroCond_3D(3,K-1,L,NY,NX).ge.0.1_r8*SatHydroCondVert_vr(L,NY,NX)) then
+              PSISoilAirEntry_vr(L,NY,NX)=PSISK(K-1)
+              ThetaSat_vr(L,NY,NX)=H2OSOIK(K-1)
+            endif
           endif
-        ENDIF
+        else
+          IF(K.GT.1 .AND. PSISK(K).LT.PSISoilAirEntry_vr(L,NY,NX))then
+            if(PSISK(K-1).GE.PSISoilAirEntry_vr(L,NY,NX))THEN
+              ThetaSat_vr(L,NY,NX)=H2OSOIK(K)
+            endif
+          ENDIF
+        endif
       ELSE
         !horizontal
         HydroCond_3D(N,K,L,NY,NX)=SatHydroCondHrzn_vr(L,NY,NX)*YK*SUM1/SUM2
@@ -427,12 +447,23 @@ contains
     HydroCond_3D(3,K,0,NY,NX) = SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
     HydroCond_3D(1,K,0,NY,NX) = 0.0_r8
     HydroCond_3D(2,K,0,NY,NX) = 0.0_r8
-    IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry_vr(0,NY,NX)))THEN
-      IF(PSISK(K-1).GE.PSISoilAirEntry_vr(0,NY,NX))THEN
-        !moisture at air-entry saturation
-        ThetaSat_vr(0,NY,NX)=H2OSOIK(K)
+    if (zm_ecosys_airentry) then
+      ! ECOSIM_ZM: apply the same conductivity-defined threshold to litter,
+      ! matching legacy hour1.f. Preserve its existing retention curvature.
+      if (K.gt.1) then
+        if (HydroCond_3D(3,K,0,NY,NX).lt.0.1_r8*SatHydroCondVert_vr(0,NY,NX) .and. &
+            HydroCond_3D(3,K-1,0,NY,NX).ge.0.1_r8*SatHydroCondVert_vr(0,NY,NX)) then
+          PSISoilAirEntry_vr(0,NY,NX)=PSISK(K-1)
+          ThetaSat_vr(0,NY,NX)=H2OSOIK(K-1)
+        endif
+      endif
+    else
+      IF(K.GT.1.AND.(PSISK(K).LT.PSISoilAirEntry_vr(0,NY,NX)))THEN
+        IF(PSISK(K-1).GE.PSISoilAirEntry_vr(0,NY,NX))THEN
+          ThetaSat_vr(0,NY,NX)=H2OSOIK(K)
+        ENDIF
       ENDIF
-    ENDIF
+    endif
   ENDDO D1235
   end subroutine LitterHydroproperty
 
