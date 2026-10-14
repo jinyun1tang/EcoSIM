@@ -1647,6 +1647,7 @@ module WatsubMod
   !     DLYR=layer thickness
   !     DoMacPDischarg2Tile=macropore discharge flag to artificial water table
   !
+  if(LMacPoreOff)return
   DoMacPDischarg2Tile=IDWaterTable_col(NY,NX).GE.3 .AND.              & !title drainage is on
     Surf2MacPDepz.LT.TileWaterTable_col(NY,NX)       & !layer above tile
     .AND. VLWatMacP1_vr(L,NY,NX).GT.ZEROS2(NY,NX)  !has water in macropore   
@@ -1708,7 +1709,8 @@ module WatsubMod
       .and. VLWatMacP1_vr(L,NY,NX).gt.ZEROS2(NY,NX)
     return
   endif
-
+  
+  if(LMacPoreOff)return
   !     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO WATER TABLE
   !
   !     IDWaterTable=water table flag
