@@ -61,6 +61,11 @@ take precedence over repository guidance.
 - Follow nearby Fortran conventions, precision kinds, array ordering, and module
   interfaces. Update allocation, initialization, API mapping, history, and restart
   handling as needed when adding persistent state or flux variables.
+- In Fortran executable statements, use aliases declared in an `associate` block
+  instead of direct derived-type component references such as
+  `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
+  block or introduce one when needed; component references belong in the
+  association declarations.
 - Keep edits focused. Do not hand-edit generated build files or modify dependency
   submodules unless that is part of the requested work.
 - Treat `ecosim-agent` changes as submodule changes, separate from root-repository

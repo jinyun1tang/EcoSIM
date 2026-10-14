@@ -2186,11 +2186,13 @@ implicit none
   logical  :: FoundRootTipLayer
   logical  :: LDoneTip
 
-  real(r8) :: RCO2flxt
+  real(r8) :: RCO2flxt,OldRootDepth
 
   associate(                                                                        &
     MaxNumRootLays                   => plt_site%MaxNumRootLays                    ,& !input  :maximum root layer number,[-]  
     CumSoilThickness_vr              => plt_site%CumSoilThickness_vr               ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]    
+    Root1stDepz_raxes               => plt_morph%Root1stDepz_raxes               ,& !input  :primary-root axis depth, [m]
+    NRoot1stTipLay_raxes             => plt_morph%NRoot1stTipLay_raxes             ,& !input  :primary-root tip layer
     RootAge_rpvr                     => plt_morph%RootAge_rpvr                     ,& !inoput :root age,[h]    
     flag2ndGrowth_pvr                => plt_morph%flag2ndGrowth_pvr                ,& !input  :flag for secondary growth of primary roots, [-]    
     Root1stLenPP_rpvr                => plt_morph%Root1stLenPP_rpvr                ,& !input  :primary root axis length in soil layer per plant, [m d-2]        
@@ -2211,13 +2213,20 @@ implicit none
     if(FoundRootTipLayer .and. Root1stSinkTip(NR).GT.0._r8)THEN
       Root1stTipUpdateFlag(NR) = .true.
       LDoneTip                 = .true.
+      OldRootDepth=Root1stDepz_raxes(NR,NZ)
       call StructuralRootElongation(yearIJ,N,NR,L,Lnext,NZ,VMXCSpec,Root1stSinkTip,RootSinkC_vr,&
         fRootGrowPSISense,TFN6_vr,fdLext1st,RespElongWatSens,DMRespEff,CNRTW,CPRTW,&
         litrflxt,RCO2flxt)
+      if(Root1stDepz_raxes(NR,NZ).LT.OldRootDepth)then
+        !L still identifies the old tip layer, even after geometry moves upward.
+        call PrimeRootsWithdraw(L,NR,NZ,N,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr)
+        FoundRootAxesTip(N,NR)=.true.
+      endif
     endif    
       !
       !  
-    if(flag2ndGrowth_pvr(L,NR,NZ) .and. Root1stLenPP_rpvr(L,NR,NZ).GT.0._r8)then
+    if(L.LE.NRoot1stTipLay_raxes(NR,NZ) .and. &
+       flag2ndGrowth_pvr(L,NR,NZ) .and. Root1stLenPP_rpvr(L,NR,NZ).GT.0._r8)then
       call StructuralRootThickening(yearIJ,N,NR,L,NZ,VMXCSpec,RootSinkC_vr,Root1stSink_pvr, &
         fRootGrowPSISense,TFN6_vr,litrflxt,RCO2flxt,LDoneTip)
     endif
@@ -3107,6 +3116,7 @@ implicit none
   real(r8), intent(out) :: litrflxt(NumPlantChemElms)
   real(r8), intent(out) :: RCO2flxt
   real(r8) :: Root1stExtenzPP
+  logical :: RootRetreated
   real(r8) :: Frac2Senes1
   real(r8) :: GRTWTM  
   real(r8) :: TFRCO2,FRCO2  
@@ -3179,6 +3189,7 @@ implicit none
 !    ENDDO
 !    write(490,*)L,NR,yearIJ%I*1000+yearIJ%J/24.,'beftip',dmass0(ielmn),litrflxt(ielmn)
 
+    RootRetreated=.false.
     LDoneTip=.false.
     if(FoundRootTipLayer .and. Root1stSinkTip(NR).GT.0._r8)THEN
       !reached last root layer
@@ -3186,6 +3197,7 @@ implicit none
       LDoneTip                 = .true.
       call Grow1stRootElongZoneLayL(yearIJ,N,NR,L,Lnext,NZ,VMXCSpec,Root1stSinkTip,RootSinkC_vr,&
         fRootGrowPSISense,TFN6_vr,fdLext1st,RespElongWatSens,DMRespEff,CNRTW,CPRTW,litrflxt,RCO2flxt,Root1stExtenzPP)
+      RootRetreated=Root1stExtenzPP.LT.0._r8
 
 !      dmass=0._r8
 !      DO L1=max(1,L-1),Lnext
@@ -3230,7 +3242,8 @@ implicit none
 !    write(490,*)L,NR,yearIJ%I*1000+yearIJ%J/24.,'2nd',dmass(ielmn)-dmass0(ielmn)+litrflxt(ielmn), dmass(ielmn),dmass0(ielmn),litrflxt(ielmn)
     !
     !consider root withraw at root tip
-    IF(L.EQ.NRoot1stTipLay_raxes(NR,NZ))THEN
+    IF(RootRetreated)THEN
+      !Use the old tip layer L; the extension helper has updated the tip index.
       call PrimeRootsWithdraw(L,NR,NZ,N,RootSinkC_vr,Root1stSink_pvr,Root2ndSink_pvr)
     ENDIF
 
@@ -3264,7 +3277,7 @@ implicit none
     ENDIF
 
     NRoot1stTipLay_raxes(NR,NZ) = MIN(NRoot1stTipLay_raxes(NR,NZ),MaxNumRootLays)
-    FoundRootAxesTip(N,NR)      = (L.EQ.NRoot1stTipLay_raxes(NR,NZ))
+    FoundRootAxesTip(N,NR)      = RootRetreated .OR. (L.EQ.NRoot1stTipLay_raxes(NR,NZ))
 
     !    dmass=0._r8
     !    DO L1=max(1,L-1),Lnext
@@ -3718,6 +3731,7 @@ implicit none
   CHARACTER(LEN=*), parameter :: subname='CRootsLive2DeadTransformation'
   real(r8) :: RL2DZ
   associate(                                                                &
+    RootMyco1stElm_raxs         => plt_biom%RootMyco1stElm_raxs          ,& !inout :axis primary-root structural elements, [g d-2]
     RootMyco1stStrutElms_rpvr    => plt_biom%RootMyco1stStrutElms_rpvr     ,& !input  :root layer element primary axes, [g d-2]
     Root1stActStructElms_rpvr    => plt_biom%Root1stActStructElms_rpvr     ,& !inoput :root layer active zone element in primary axes, [g d-2]
     Root1stLigStructElms_rpvr    => plt_biom%Root1stLigStructElms_rpvr     ,& !inoput :root layer lignified zone element in primary axes, [g d-2]    
@@ -3734,7 +3748,7 @@ implicit none
   Root1stActStructElms_rpvr(ielmc,L,NR,NZ) = AZMAX1(Root1stActStructElms_rpvr(ielmc,L,NR,NZ)-Act2DeadElms(ielmc))
   Root1stLigStructElms_rpvr(ielmc,L,NR,NZ) = Root1stLigStructElms_rpvr(ielmc,L,NR,NZ)+Act2DeadElms(ielmc)
   
-  !translocation of N from dead to nonstructural 
+  !translocation of N/P from dead to nonstructural
   DO NE=2,NumPlantChemElms
     Act2DeadElms1 = AMIN1(Act2DeadElms(ielmc)*rECLiveCRoot_pft(NE,NZ),Root1stActStructElms_rpvr(NE,L,NR,NZ),&
                     RootMyco1stStrutElms_rpvr(NE,L,NR,NZ))
@@ -3745,6 +3759,7 @@ implicit none
     Root1stLigStructElms_rpvr(NE,L,NR,NZ)    = AZMAX1(Root1stLigStructElms_rpvr(NE,L,NR,NZ)+Act2DeadElms2)
 
     RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)    = AZMAX1(RootMyco1stStrutElms_rpvr(NE,L,NR,NZ)-Act2DeadElms(NE))
+    RootMyco1stElm_raxs(NE,NR,NZ)          = RootMyco1stElm_raxs(NE,NR,NZ)-Act2DeadElms(NE)
     RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ) = RootMycoNonstElms_rpvr(NE,ipltroot,L,NZ)+Act2DeadElms(NE)
   ENDDO
 
@@ -4619,6 +4634,8 @@ implicit none
   !     Root1stLenPP_rpvr=primary root length per plant
   !
   Root1stDepz_raxes(NR,NZ) = Root1stDepz_raxes(NR,NZ)+Root1stExtenzPP
+  if(Root1stExtenzPP.LT.0._r8) &
+    Root1stDepz_raxes(NR,NZ)=MAX(SeedDepth_pft(NZ),Root1stDepz_raxes(NR,NZ))
   
   DO NE=1,NumPlantChemElms
     RootMyco1stElm_raxs(NE,NR,NZ)         = RootMyco1stElm_raxs(NE,NR,NZ)+RootNetGrowthElms(NE)
@@ -4661,6 +4678,9 @@ implicit none
     PSIRootTurg_vr(N,Lnext,NZ)   = PSIRootTurg_vr(N,L,NZ)
     NRoot1stTipLay_raxes(NR,NZ)  = MIN(MAX(NGTopRootLayer_pft(NZ),Lnext),MaxNumRootLays)
   ENDIF
+  !Retreat geometry is determined by depth, not a negative increment in one layer.
+  !The caller then reconciles pools using L, the old tip layer.
+  if(Root1stExtenzPP.LT.0._r8)call UpdateRetreatedRootGeometry(L,NR,NZ)
   call PrintInfo('end '//subname)
   end associate
   end subroutine PrimeRootsExtension
@@ -4702,6 +4722,10 @@ implicit none
     k_woody_comp                   => pltpar%k_woody_comp                        ,& !input  :woody litter complex id
     RootAge_rpvr                   => plt_morph%RootAge_rpvr                     ,& !inoput :root age,[h]
     RootMyco1stStrutElms_rpvr      => plt_biom%RootMyco1stStrutElms_rpvr         ,& !inoput :root layer element primary axes, [g d-2]
+    RootMyco1stElm_raxs           => plt_biom%RootMyco1stElm_raxs               ,& !inout :axis primary structural C/N/P
+    RootMediumStructElms_rpvr     => plt_biom%RootMediumStructElms_rpvr         ,& !inout :medium-root C/N/P
+    RootMediumLength_rpvr         => plt_morph%RootMediumLength_rpvr            ,& !inout :medium-root length
+    RootMediumXNum_rpvr           => plt_morph%RootMediumXNum_rpvr              ,& !inout :medium-root axes
     Root1stActStructElms_rpvr      => plt_biom%Root1stActStructElms_rpvr         ,& !inoput :root layer active zone element in primary axes, [g d-2]
     RootMyco2ndStrutElms_rpvr      => plt_biom%RootMyco2ndStrutElms_rpvr         ,& !inoput :root layer element secondary axes, [g d-2]
     RootMycoNonstElms_rpvr         => plt_biom%RootMycoNonstElms_rpvr            ,& !inoput :root layer nonstructural element, [g d-2]
@@ -4738,8 +4762,7 @@ implicit none
   D5115: DO LL=L,NGTopRootLayer_pft(NZ)+1,-1
     !
     !test root presence in layer LL-1, or root axes above seeding depth
-    RootDepzChk=Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.CumSoilThickness_vr(LL-1) &
-      .OR. Root1stAxesTipDepz2Surf_pft(NR,NZ).LT.SeedDepth_pft(NZ)
+    RootDepzChk=Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(LL-1)
     !  
     !EXIT if LL-1 is not active soil or has root, no withdraw
     !
@@ -4751,22 +4774,31 @@ implicit none
       FracRootSinkL=1.0_r8
     ENDIF
 
+    FracRootSinkL=MAX(0._r8,MIN(1._r8,FracRootSinkL))
+
     DO NE=1,NumPlantChemElms
       Root1stActStructElms_rpvr(NE,LL-1,NR,NZ) = Root1stActStructElms_rpvr(NE,LL-1,NR,NZ)+Root1stActStructElms_rpvr(NE,LL,NR,NZ)
-      RootMyco1stStrutElms_rpvr(NE,LL-1,NR,NZ) = Root1stActStructElms_rpvr(NE,LL-1,NR,NZ)
+      RootMyco1stStrutElms_rpvr(NE,LL-1,NR,NZ) = Root1stActStructElms_rpvr(NE,LL-1,NR,NZ) &
+        +Root1stLigStructElms_rpvr(NE,LL-1,NR,NZ)
       Root1stActStructElms_rpvr(NE,LL,NR,NZ)   = 0._r8
       RootMyco1stStrutElms_rpvr(NE,LL,NR,NZ)   = 0._r8
 
       !add lignified coarse root to litter
       if(Root1stLigStructElms_rpvr(NE,LL,NR,NZ).GT.0._r8)then
         DO M=1,jsken
-          LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,L,NZ)+PlantElmAllocMat4Litr(NE,icwood,M,NZ)*Root1stLigStructElms_rpvr(NE,LL,NR,NZ)
+          LitrfallElms_pvr(NE,M,k_woody_comp,LL,NZ) = LitrfallElms_pvr(NE,M,k_woody_comp,LL,NZ)+PlantElmAllocMat4Litr(NE,icwood,M,NZ)*Root1stLigStructElms_rpvr(NE,LL,NR,NZ)
         ENDDO
+        RootMyco1stElm_raxs(NE,NR,NZ)=RootMyco1stElm_raxs(NE,NR,NZ)-Root1stLigStructElms_rpvr(NE,LL,NR,NZ)
         Root1stLigStructElms_rpvr(NE,LL,NR,NZ)=0._r8
       endif
+      RootMediumStructElms_rpvr(NE,LL-1,NR,NZ)=RootMediumStructElms_rpvr(NE,LL-1,NR,NZ) &
+        +RootMediumStructElms_rpvr(NE,LL,NR,NZ)
+      RootMediumStructElms_rpvr(NE,LL,NR,NZ)=0._r8
     ENDDO
-    Root1stLenPP_rpvr(LL-1,NR,NZ)=Root1stLenPP_rpvr(LL-1,NR,NZ)+Root1stLenPP_rpvr(LL,NR,NZ)
-    Root1stLenPP_rpvr(LL,NR,NZ)  =0._r8
+    RootMediumLength_rpvr(LL-1,NR,NZ)=RootMediumLength_rpvr(LL-1,NR,NZ)+RootMediumLength_rpvr(LL,NR,NZ)
+    RootMediumLength_rpvr(LL,NR,NZ)=0._r8
+    RootMediumXNum_rpvr(LL-1,NR,NZ)=RootMediumXNum_rpvr(LL-1,NR,NZ)+RootMediumXNum_rpvr(LL,NR,NZ)
+    RootMediumXNum_rpvr(LL,NR,NZ)=0._r8
 
     D5110: DO NN=1,Myco_pft(NZ)
       
@@ -4817,16 +4849,8 @@ implicit none
     !     CumSoilThickness_vr=depth from soil surface to layer bottom
     !     SeedDepth_pft=seeding depth
     !
-    Root1stXNumL_pvr(LL,NZ)     = Root1stXNumL_pvr(LL,NZ)-Num1stAxesPerStructRootXPOP_pft(NZ) 
+    Root1stXNumL_pvr(LL,NZ)     = MAX(0._r8,Root1stXNumL_pvr(LL,NZ)-Num1stAxesPerStructRootXPOP_pft(NZ))
 
-    IF(LL-1.GT.NGTopRootLayer_pft(NZ))THEN
-      !layer LL-1 is below the root tip layer
-      Root1stLenPP_rpvr(LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness_vr(LL-1)-Root1stDepz_raxes(NR,NZ))
-    ELSE
-      !layer LL-1 is above root tip layer
-      Root1stLenPP_rpvr(LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness_vr(LL-1)-Root1stDepz_raxes(NR,NZ)) &
-        -(SeedDepth_pft(NZ)-CumSoilThickness_vr(LL-2))
-    ENDIF
     !
     !     WITHDRAW C,N,P FROM ROOT NODULES IN LEGUMES
     !
@@ -4848,7 +4872,6 @@ implicit none
         RootNodulNonstElms_rpvr(NE,LL-1,NZ) = RootNodulNonstElms_rpvr(NE,LL-1,NZ)+XFRE
       ENDDO
     ENDIF
-    NRoot1stTipLay_raxes(NR,NZ) = MAX(NGTopRootLayer_pft(NZ),LL-1)
     RootAge_rpvr(LL-1,NR,NZ)    = 0._r8
   ENDDO D5115
   call PrintInfo('end '//subname)
@@ -5366,6 +5389,7 @@ implicit none
     NK                         => plt_site%NK                           ,& !input  :current soil root bottom layer number, [-]        
     HypocotHeight_pft          => plt_morph%HypocotHeight_pft           ,& !input  :cotyledon height, [m]
     MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft        ,& !input  :maximum soil layer number for all root axes,[-]  
+    NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft               ,& !input  :layer at planting depth
     SeedDepth_pft              => plt_morph%SeedDepth_pft               ,& !input  :seeding depth, [m]
     NRoot1stTipLay_raxes       => plt_morph%NRoot1stTipLay_raxes        ,& !input  :maximum soil layer number for root axes, [-]
     NumStructuralRootAxes_pft  => plt_morph%NumStructuralRootAxes_pft    & !input  :number of structural root axes,[-]
@@ -5375,7 +5399,7 @@ implicit none
   RootEffDepz_vr    = 0._r8
   DO NR  = 1, NumStructuralRootAxes_pft(NZ)
     DO L=1,NK
-      IF(L.GT.1 .AND. Root1stDepz_raxes(NR,NZ).LT.CumSoilThickness_vr(L-1))CYCLE
+      IF(L.GT.NGTopRootLayer_pft(NZ) .AND. Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L-1))CYCLE
       IF(Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L))then
         !a patch to ensure proper tip growth 
         MaxSoilLays4Root_pft(NZ)    = MAX(MaxSoilLays4Root_pft(NZ),L)
@@ -5388,6 +5412,45 @@ implicit none
   ENDDO
   end associate
   end subroutine GetInLayerRootDepth
+
+!----------------------------------------------------------------------------------------------------
+  subroutine UpdateRetreatedRootGeometry(OldTipLayer,NR,NZ)
+  !Rebuild primary geometry from actual depth in the column coordinate system.
+  implicit none
+  integer, intent(in) :: OldTipLayer,NR,NZ
+  integer :: LL,TipLayer
+  real(r8) :: Depth,SeedDepth
+
+  associate( &
+    Root1stDepz_raxes             => plt_morph%Root1stDepz_raxes             ,& !input :primary-root axis depth, [m]
+    SeedDepth_pft                 => plt_morph%SeedDepth_pft                 ,& !input :planting depth, [m]
+    NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft            ,& !input :layer at planting depth
+    CumSoilThickness_vr           => plt_site%CumSoilThickness_vr           ,& !input :depth to layer bottom, [m]
+    DLYR3                         => plt_site%DLYR3                         ,& !input :layer thickness, [m]
+    SoilBulkDensity_vr            => plt_soilchem%SoilBulkDensity_vr            ,& !input :soil bulk density, [Mg m-3]
+    ZERO                          => plt_site%ZERO                          ,& !input :numerical zero threshold
+    Root1stLenPP_rpvr             => plt_morph%Root1stLenPP_rpvr             ,& !inout :primary-root length per axis in layer, [m]
+    Root1stLenLoc_rpvr            => plt_morph%Root1stLenLoc_rpvr            ,& !inout :local primary-root depth in layer, [m]
+    NRoot1stTipLay_raxes          => plt_morph%NRoot1stTipLay_raxes          ,& !inout :primary-root tip layer
+    Root1stAxesTipDepz2Surf_pft   => plt_morph%Root1stAxesTipDepz2Surf_pft    & !inout :primary-root tip depth relative to column surface, [m]
+  )
+
+  Depth=Root1stDepz_raxes(NR,NZ)
+  SeedDepth=SeedDepth_pft(NZ)
+  TipLayer=NGTopRootLayer_pft(NZ)
+  DO LL=NGTopRootLayer_pft(NZ),OldTipLayer
+    Root1stLenPP_rpvr(LL,NR,NZ)=MAX(0._r8,MIN(Depth,CumSoilThickness_vr(LL)) &
+      -MAX(SeedDepth,CumSoilThickness_vr(LL-1)))
+    Root1stLenLoc_rpvr(LL,NR,NZ)=MAX(0._r8, &
+      MIN(DLYR3(LL),Depth-CumSoilThickness_vr(LL-1)))
+    if(Depth.GT.CumSoilThickness_vr(LL-1))TipLayer=LL
+  ENDDO
+  NRoot1stTipLay_raxes(NR,NZ)=TipLayer
+  Root1stAxesTipDepz2Surf_pft(NR,NZ)=Depth
+  if(SoilBulkDensity_vr(TipLayer).GT.ZERO) &
+    Root1stAxesTipDepz2Surf_pft(NR,NZ)=Depth-CumSoilThickness_vr(0)
+  end associate
+  end subroutine UpdateRetreatedRootGeometry
 !----------------------------------------------------------------------------------------------------
   pure function func_cyto(cyto_conc,enh_cyto_pft)result(fctyok)
   implicit none
