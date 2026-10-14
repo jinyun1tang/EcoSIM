@@ -84,7 +84,7 @@ module readsmod
 !
 ! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
-  use ReadManagementMod, only : ReadManagementFiles,ReadFire
+  use ReadManagementMod, only : ReadSoilManagementForYear,ReadFire
   use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: yearc   !current model year
@@ -239,7 +239,9 @@ module readsmod
   endif
 
   IF(trim(soil_mgmt_in).NE.'NO')THEN
-    call ReadManagementFiles(yeari)
+    ! Soil events may follow the simulation calendar while climate still
+    ! cycles yeari. Fire, PFT scheduling, weather and GHG routing are unchanged.
+    call ReadSoilManagementForYear(yearc,yeari)
   ENDIF
   IMNG=1
 

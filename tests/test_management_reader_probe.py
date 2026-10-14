@@ -15,6 +15,7 @@ PRELUDE = """
 module EcoSIMCtrlMod
   character(len=256) :: soil_mgmt_in='management.nc'
   logical :: Lirri_auto=.false.
+  logical :: soil_mgmt_use_model_year=.false.
 end module
 module probe_reader
   use netcdf
@@ -127,6 +128,28 @@ program management_probe
 end program
 """
 
+CALENDAR_EPILOGUE = """
+end module
+program calendar_probe
+  use probe_reader
+  implicit none
+  soil_mgmt_in='calendar.nc'
+  ! Legacy mode deliberately reuses 2024 events in model year 2023.
+  call ReadSoilManagementForYear(2023,2024)
+  if(seen(1,1)/='fert01')error stop 'legacy default changed'
+  seen=''
+  soil_mgmt_use_model_year=.true.
+  call ReadSoilManagementForYear(2023,2024)
+  if(any(seen/=''))error stop 'transient event leaked into spinup'
+  call ReadSoilManagementForYear(2024,2024)
+  if(seen(1,1)/='fert01'.or.seen(1,2)/='fert02')error stop 'intended events missing'
+  seen=''
+  call ReadSoilManagementForYear(2025,2024)
+  if(any(seen/=''))error stop 'transient event repeated with recycled climate'
+  print *, 'PASS: model-year schedule isolated from recycled weather'
+end program
+"""
+
 AUTO_PRELUDE = """
 program auto_solutes_probe
   use iso_fortran_env,only: r8=>real64
@@ -164,6 +187,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     source = (root / "f90src/IOutils/ReadManagementMod.F90").read_text()
     routine = re.search(r"(?is)  subroutine ReadManagementFiles\(yeari\).*?end subroutine ReadManagementFiles", source)[0]
+    selector = re.search(r"(?is)  subroutine ReadSoilManagementForYear\(.*?end subroutine ReadSoilManagementForYear", source)[0]
     with tempfile.TemporaryDirectory(prefix="ecosim-management-probe-") as directory:
         work = Path(directory)
         (work / "reader.F90").write_text(PRELUDE + routine + EPILOGUE)
@@ -186,6 +210,28 @@ def main():
             passed = (result.returncode != 0 and "management forcing year not present" in result.stdout
                       if mode == "missing" else result.returncode == 0 and "PASS:" in result.stdout)
             checks[mode] = {"pass": passed, "returncode": result.returncode}
+        # Read the actual NetCDF year coordinate while exercising the actual
+        # dispatcher. Stubbed consumers observe routing, not process response.
+        with Dataset(work / "management.nc") as original, Dataset(work / "calendar.nc", "w") as ds:
+            for name, dim in original.dimensions.items():
+                ds.createDimension(name, 3 if name == "year" else len(dim))
+            ds.createVariable("year", "i4", ("year",))[:] = [2023, 2024, 2025]
+            for name, var in original.variables.items():
+                if name == "year":
+                    continue
+                target = ds.createVariable(name, var.dtype, var.dimensions)
+                if name in ("fertf", "irrigf", "tillf"):
+                    target[:] = np.array([[list("NO".ljust(10))] * 2] * 3, dtype="S1")
+                    target[1] = var[0]
+                else:
+                    target[:] = var[:]
+        (work / "calendar.F90").write_text(PRELUDE + selector + "\n" + routine + CALENDAR_EPILOGUE)
+        calendar_exe = work / "calendar_probe"
+        subprocess.run([args.fc, "-O0", "-g", "-fcheck=all", "-ffree-line-length-none", *flags("--fflags"),
+                        "calendar.F90", *flags("--flibs"), "-o", str(calendar_exe)], cwd=work, check=True)
+        result = subprocess.run([str(calendar_exe)], cwd=work, capture_output=True, text=True, check=False)
+        checks["model_year_with_recycled_weather"] = {"pass": result.returncode == 0 and "PASS:" in result.stdout,
+                                                     "returncode": result.returncode}
         # Confirm the same spatial-index correction covers both fire tapes.
         fire = re.search(r"(?is)  subroutine ReadFire\(.*?end subroutine ReadFire", source)[0]
         checks["fire_indices"] = {"pass": len(re.findall(r"start\s*=\s*\(/1,ntopo/\)", fire)) == 2}
