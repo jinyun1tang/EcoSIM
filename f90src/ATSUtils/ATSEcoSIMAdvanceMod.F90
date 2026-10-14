@@ -36,6 +36,8 @@ module ATSEcoSIMAdvanceMod
   use EcoSIMHistMod
   !use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
+  use EcosimBGCFluxType,  only: Eco_NetRad_col, Eco_Heat_Latent_col, &
+    Eco_Heat_Sens_col, Eco_Heat_GrndSurf_col
 
 
 implicit none
@@ -125,10 +127,30 @@ implicit none
   !NK_col(NX,1) = 14
 
   do NY=1, NYS
-    !ET variable set in SetHourlyDiagnostics unclear if a clone is
-    !needed as with SetHourlyAccumulators
-    QVegET_col(NY,NX) = 0._r8
+    !Hourly reset of the canopy column totals. extracts (ExtractCanopyFluxes)
+    !rebuilds these every hour by adding the per-PFT values to them. Standalone
+    !EcoSIM zeroes them every hour in SetHourlyDiagnostics (Hour1Mod.F90),
+    !which the ATS coupling (prescribed phenology) does not call; without this
+    !block they become running totals. This block replaces that missing reset,
+    !at the same point of the hour (before the canopy radiation and the plant
+    !model). SnowOnCanopy_col is read by the canopy radiation (effective LAI);
+    !the others are diagnostics or outputs. The per-PFT state (e.g.
+    !SnowOnCanopy_pft, WatHeldOnCanopy_pft) is not reset.
+    QVegET_col(NY,NX)            = 0._r8
+    CanopyBiomWater_col(NY,NX)   = 0._r8
+    WatHeldOnCanopy_col(NY,NX)   = 0._r8
+    SnowOnCanopy_col(NY,NX)      = 0._r8
+    VapXAir2Canopy_col(NY,NX)    = 0._r8
+    Eco_NetRad_col(NY,NX)        = 0._r8
+    Eco_Heat_Latent_col(NY,NX)   = 0._r8
+    Eco_Heat_Sens_col(NY,NX)     = 0._r8
+    Eco_Heat_GrndSurf_col(NY,NX) = 0._r8
+    CanopyHeatStor_col(NY,NX)    = 0._r8
+    HeatFlx2Canopy_col(NY,NX)    = 0._r8
+    !outputs summed over PFTs at the end of the advance; zeroed so they hold
+    !this hour's value (a_EvapCan was previously never reset, a running total)
     a_Transpiration(NY) = 0._r8
+    a_EvapCan(NY)       = 0._r8
     call SetHourlyAccumulatorsATS(NY,NX)
     NK_col(NY,NX) = a_NL(NY)
     Myco_pft(1,NY,NX) = 1
@@ -294,8 +316,8 @@ implicit none
     !Fill in column-wise values needed for prescribed phenology
     !CanopyHeight_col(NY,NX) = 17.0
     !CanopyHeightLive_pft(1,NY,NX) = 17.0
-    tlai_day_pft(1,NY,NX) = a_LAI(NY)
-    tsai_day_pft(1,NY,NX) = a_SAI(NY)
+    !tlai_day_pft(1,NY,NX) = a_LAI(NY)
+    !tsai_day_pft(1,NY,NX) = a_SAI(NY)
     !irootType_col(NY,NX) = a_PFT(NY,1)
     !if(ldo_sp_mode) call PlantCanopyRadsModel(I,J,NY,NX,0.0_r8)
     !Fill number of plants from npfts
@@ -318,8 +340,8 @@ implicit none
         if (a_PFT(NZ,NY) .GT. 0.0) then
             call root_canopy_mapping(a_PFT(NZ,NY), irootType_col(NY,NX), CanopyHeightLive_pft(NZ,NY,NX))
             CanopyHeight_col(NY,NX) = CanopyHeightLive_pft(NZ,NY,NX)
-            tlai_day_pft(NZ,NY,NX) = a_LAI(NY)/num_pfts
-            tsai_day_pft(NZ,NY,NX) = a_SAI(NY)/num_pfts
+            tlai_day_pft(NZ,NY,NX) = a_LAI(NZ,NY)
+            tsai_day_pft(NZ,NY,NX) = a_SAI(NZ,NY)
             SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
             !iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
             TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
@@ -457,16 +479,13 @@ implicit none
     dTexp = surf_e_source(NY)/heat_capacity
     Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 
     
-    surf_w_source(NY) = Qinflx2Soil_col(NY,1)
+    !per grid cell [m3 d-2 h-1] to per area [m h-1]; ATS converts h-1 to s-1
+    surf_w_source(NY) = Qinflx2Soil_col(NY,1) / column_area(NY)
     surf_snow_depth(NY) = SnowDepth_col(NY,1)
     !Now update subsurface flux from roots
     LWRadCanGPrev_col(NY,NX) = LWRadCanG_col(NY,NX)
     TLEX_col(NY,NX)             = Air_Heat_Latent_store_col(NY,NX)
     TSHX_col(NY,NX)             = Air_Heat_Sens_store_col(NY,NX)
-    a_LWCan(NY) = LWRadCanGPrev_col(NY,NX)
-    a_CLHF(NY) = TLEX_col(NY,NX) !Boundary latent heat flux
-    a_CSHF(NY) = TSHX_col(NY,NX) !boundary sensible heat flux
-    a_CanopyWat(NY) = WatHeldOnCanopy_col(NY,NX) !water held on canopy surface
     a_ET(NY) = QVegET_col(NY,NX) !canopy evapotranspiration
 
     !Now that the heat carryover variables are set to the coupler versions

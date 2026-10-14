@@ -3,7 +3,7 @@ module ATSCPLMod
   use SharedDataMod
   use ATSEcoSIMInitMod
   use ATSEcoSIMAdvanceMod
-  use BGCContainers_module
+  use EcoContainers_module
   use c_f_interface_module, only : c_f_string_ptr
   implicit none
 
@@ -14,302 +14,270 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
-  ! Function to check for NaN in an array
-  !function is_nan(x) result(mask)
-  !  real(r8), intent(in) :: x(:)
-  !  logical, dimension(size(x)) :: mask
-  !  integer :: i
-
-    !allocate(mask(size(x)))
-  !  do i = 1, size(x)
-  !    mask(i) = (x(i) /= x(i))  ! NaN is the only value that is not equal to itself
-  !  end do
-  !end function is_nan
-
-
-  subroutine ATS2EcoSIMData(ncol, state, props, sizes)
+  subroutine ATS2EcoSIMData(env, feedback, sizes, config)
+  ! ATS -> EcoSIM. Called at setup (with config) and at every advance
+  ! (without config, which is copied only once).
   implicit none
+  type (EcoEnvironment), intent(in) :: env
+  type (EcoFeedback), intent(in) :: feedback
+  type (EcoSizes), intent(in) :: sizes
+  type (EcoConfig), intent(in), optional :: config
 
-  ! BGC coupler variables
-  type (BGCState), intent(in) :: state
-  type (BGCProperties), intent(in) :: props
-  type (BGCSizes), intent(out) :: sizes
-
-  ! Ecosim variables
-  real(r8), pointer :: data(:), nested_ptr(:)
-  real(r8), pointer :: data2D(:,:)
-  real(r8), pointer :: data3D(:,:,:)
-  real(r8), pointer :: temp, temp_deref, double_deref
-  real(r8) :: real_deref
-  type(c_ptr), pointer :: cptr_temp, ptr1
-  real(r8), target :: target_val
-  real(r8), pointer :: ptr(:,:)
-  integer :: ncol, nvar, size_col, num_cols, size_col_pad, num_components
-  integer :: j1,j2,j3,i,j
-  integer :: test_rows, test_columns
-  real(r8) :: temp_eq, double_eq
-  type(c_ptr) :: data_ptr
-  character(len=512) :: f_string_buffer
-
-  !call SetBGCSizes(sizes)
-
-  size_col = sizes%ncells_per_col_
-  num_cols = props%shortwave_radiation%size
-  num_components = state%mole_fraction%procs
-  num_pfts = sizes%num_pfts
-  
-  size_col_pad = size_col+30
-  
-  call c_f_string_ptr(props%pft_file, f_string_buffer)
-  ecosim_pft_file_path = trim(f_string_buffer)
-
-  data_ptr = state%mole_fraction%data
-  call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
-  !a_MFrac=data3D(:,:,:)
-  
-  data_ptr = state%temperature%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_TEMP=data2D(:,:)
-
-  data_ptr = props%depth%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_CumDepz2LayBottom_vr = data2D(:,:)
-
-  data_ptr = props%dz%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_dz = data2D(:,:)
-
-  data_ptr = props%volume%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_Volume = data2D(:,:)
-
-  data_ptr = state%water_content%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_WC = data2D(:,:)
-
-  call c_f_pointer(props%column_area%data, data, (/num_cols/))
-  column_area = data(:)
-
-  data_ptr = state%temperature%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_TEMP = data2D(:,:)
-
-  data_ptr = state%bulk_density%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_BKDSI = data2D(:,:)
-
-  data_ptr = state%liquid_density%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_LDENS = data2D(:,:)
-
-  data_ptr = state%rock_density%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_RDENS = data2D(:,:)
-
-  data_ptr = state%matric_pressure%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_MATP = data2D(:,:)
-
-  data_ptr = state%porosity%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_PORO = data2D(:,:)
-
-  data_ptr = props%liquid_saturation%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_LSAT = data2D(:,:)
-
-  data_ptr = state%hydraulic_conductivity%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_HCOND = data2D(:,:)
-
-  data_ptr = props%rooting_depth_fraction%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_FC = data2D(:,:)
-
-  data_ptr = state%subsurface_water_source%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_SSWS = data2D(:,:)
-  
-  data_ptr = state%subsurface_energy_source%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_SSES = data2D(:,:)
-
-  call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
-  swrad = data(:)
-
-  call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
-  sunrad = data(:)
-
-  call c_f_pointer(props%air_temperature%data, data, (/num_cols/))
-  tairc = data(:)
-
-  call c_f_pointer(props%vapor_pressure_air%data, data, (/num_cols/))
-  vpair = data(:)
-
-  call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
-  uwind = data(:)
-
-  !call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-  !p_rain = data(:)
-
-  !call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
-  !p_snow = data(:)
-
-  call c_f_pointer(props%aspect%data, data, (/num_cols/))
-  a_ASP = data(:)
-
-  call c_f_pointer(props%LAI%data, data, (/num_cols/))
-  a_LAI = data(:)
-
-  call c_f_pointer(props%SAI%data, data, (/num_cols/))
-  a_SAI = data(:)
-
-  call c_f_pointer(props%vegetation_type%data, data, (/num_cols/))
-  a_VEG = data(:)
-
-  call c_f_pointer(props%snow_albedo%data, data, (/num_cols/))
-  a_SALB = data(:)
- 
-  !This dataset must be flipped due to there only being num_cols x num_pfts values
-  !Even though the technical size of the dataset is num_cols x n_cells 
-  !call c_f_pointer(props%plant_functional_type%data, data2D, [num_cols, size_col])
-  
-  !need to test flipping back due to the new dataset creation on ATS side
-  call c_f_pointer(props%plant_functional_type%data, data2D, [size_col,num_cols])
-  a_PFT = data2D(:,:)
-  
-  data_ptr = state%canopy_snow%data
-  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
-  a_CanSnow=data2D(:,:)
-
-  atm_n2 = props%atm_n2
-  atm_o2 = props%atm_o2
-  atm_co2 = props%atm_co2
-  atm_ch4 = props%atm_ch4
-  atm_n2o = props%atm_n2o
-  atm_h2 = props%atm_h2
-  atm_nh3 = props%atm_nh3
-  heat_capacity = props%heat_capacity
-  pressure_at_field_capacity = props%field_capacity
-  pressure_at_wilting_point = props%wilting_point
-  p_bool = props%p_bool
-  a_bool = props%a_bool
-  pheno_bool = props%pheno_bool
-  current_day = props%current_day
-  current_year = props%current_year
-
-  if(p_bool)THEN
-    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-    p_total = data(:)
-  else
-    call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-    p_rain = data(:)
-
-    call c_f_pointer(props%precipitation_snow%data, data, (/num_cols/))
-    p_snow = data(:)
-  endif
-
-  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
-  surf_w_source = data(:)
-
-  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
-  surf_e_source = data(:)
-
-  call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
-  surf_snow_depth = data(:)
-
-  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
-  a_LWCan = data(:)
-
-  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
-  a_CLHF = data(:)
-
-  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
-  a_CSHF = data(:)
-
-  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
-  a_CanopyWat = data(:)
+  if (present(config)) call CopyConfigFromATS(config)
+  call CopyEnvironmentFromATS(env, sizes)
+  call CopyFeedbackFromATS(feedback, sizes)
 
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
-  subroutine EcoSIM2ATSData(ncol, state, sizes)
+  subroutine EcoSIM2ATSData(feedback, sizes)
+  ! EcoSIM -> ATS, after every advance
   implicit none
-  type (BGCState), intent(in) :: state
-  type (BGCSizes), intent(out) :: sizes
+  type (EcoFeedback), intent(in) :: feedback
+  type (EcoSizes), intent(in) :: sizes
+
+  call CopyFeedbackToATS(feedback, sizes)
+
+  end subroutine EcoSIM2ATSData
+!------------------------------------------------------------------------------------------
+
+  subroutine CopyConfigFromATS(config)
+  ! run parameters and flags, once at setup; kept in SharedDataMod variables
+  implicit none
+  type (EcoConfig), intent(in) :: config
+  character(len=512) :: f_string_buffer
+
+  call c_f_string_ptr(config%pft_file, f_string_buffer)
+  ecosim_pft_file_path = trim(f_string_buffer)
+
+  heat_capacity = config%heat_capacity
+  pressure_at_field_capacity = config%field_capacity
+  pressure_at_wilting_point = config%wilting_point
+  p_bool = config%p_bool
+  a_bool = config%a_bool
+  pheno_bool = config%pheno_bool
+
+  end subroutine CopyConfigFromATS
+!------------------------------------------------------------------------------------------
+
+  subroutine CopyEnvironmentFromATS(env, sizes)
+  ! soil state and properties, geometry, forcing, vegetation, clock;
+  ! at setup and every advance
+  implicit none
+  type (EcoEnvironment), intent(in) :: env
+  type (EcoSizes), intent(in) :: sizes
 
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
-  integer :: num_cols, ncol, nvar, size_col, size_procs
-  integer :: j1,j2,j3, i
-
-  !call SetBGCSizes(sizes)
+  real(r8), pointer :: data3D(:,:,:)
+  integer :: size_col, num_cols, num_components
+  type(c_ptr) :: data_ptr
 
   size_col = sizes%ncells_per_col_
-  size_procs = state%porosity%cols
+  num_cols = env%shortwave_radiation%size
+  num_components = env%mole_fraction%components
+  num_pfts = sizes%num_pfts
+
+  data_ptr = env%mole_fraction%data
+  call c_f_pointer(data_ptr, data3D, [size_col, num_cols, num_components])
+  !a_MFrac=data3D(:,:,:)
+
+  data_ptr = env%temperature%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_TEMP=data2D(:,:)
+
+  data_ptr = env%depth%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_CumDepz2LayBottom_vr = data2D(:,:)
+
+  data_ptr = env%dz%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_dz = data2D(:,:)
+
+  data_ptr = env%volume%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_Volume = data2D(:,:)
+
+  data_ptr = env%water_content%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_WC = data2D(:,:)
+
+  call c_f_pointer(env%column_area%data, data, (/num_cols/))
+  column_area = data(:)
+
+  data_ptr = env%bulk_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_BKDSI = data2D(:,:)
+
+  data_ptr = env%liquid_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_LDENS = data2D(:,:)
+
+  data_ptr = env%rock_density%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_RDENS = data2D(:,:)
+
+  data_ptr = env%matric_pressure%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_MATP = data2D(:,:)
+
+  data_ptr = env%porosity%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_PORO = data2D(:,:)
+
+  data_ptr = env%liquid_saturation%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_LSAT = data2D(:,:)
+
+  data_ptr = env%hydraulic_conductivity%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_HCOND = data2D(:,:)
+
+  data_ptr = env%rooting_depth_fraction%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_FC = data2D(:,:)
+
+  call c_f_pointer(env%shortwave_radiation%data, data, (/num_cols/))
+  swrad = data(:)
+
+  call c_f_pointer(env%longwave_radiation%data, data, (/num_cols/))
+  sunrad = data(:)
+
+  call c_f_pointer(env%air_temperature%data, data, (/num_cols/))
+  tairc = data(:)
+
+  call c_f_pointer(env%vapor_pressure_air%data, data, (/num_cols/))
+  vpair = data(:)
+
+  call c_f_pointer(env%wind_speed%data, data, (/num_cols/))
+  uwind = data(:)
+
+  call c_f_pointer(env%aspect%data, data, (/num_cols/))
+  a_ASP = data(:)
+
+  !call c_f_pointer(env%LAI%data, data, (/num_cols/))
+  !a_LAI = data(:)
+
+  call c_f_pointer(env%LAI%data, data2D, [size_col,num_cols])
+  a_LAI = data2D(:,:)
+
+  !call c_f_pointer(env%SAI%data, data, (/num_cols/))
+  !a_SAI = data(:)
+
+  call c_f_pointer(env%SAI%data, data2D, [size_col,num_cols])
+  a_SAI = data2D(:,:)
+
+  call c_f_pointer(env%vegetation_type%data, data, (/num_cols/))
+  a_VEG = data(:)
+
+  call c_f_pointer(env%snow_albedo%data, data, (/num_cols/))
+  a_SALB = data(:)
+
+  ! PFT index of each column, in the first num_pfts entries of the column
+  call c_f_pointer(env%plant_functional_type%data, data2D, [size_col,num_cols])
+  a_PFT = data2D(:,:)
+
+  atm_n2 = env%atm_n2
+  atm_o2 = env%atm_o2
+  atm_co2 = env%atm_co2
+  atm_ch4 = env%atm_ch4
+  atm_n2o = env%atm_n2o
+  atm_h2 = env%atm_h2
+  atm_nh3 = env%atm_nh3
+  current_day = env%current_day
+  current_year = env%current_year
+
+  ! p_bool was set from the config at setup
+  if(p_bool)THEN
+    call c_f_pointer(env%precipitation%data, data, (/num_cols/))
+    p_total = data(:)
+  else
+    call c_f_pointer(env%precipitation%data, data, (/num_cols/))
+    p_rain = data(:)
+
+    call c_f_pointer(env%precipitation_snow%data, data, (/num_cols/))
+    p_snow = data(:)
+  endif
+
+  end subroutine CopyEnvironmentFromATS
+!------------------------------------------------------------------------------------------
+
+  subroutine CopyFeedbackFromATS(feedback, sizes)
+  ! snow depth is EcoSIM's snow state, kept by ATS between advances. The
+  ! sources are recomputed by EcoSIM before use; they are copied so that the
+  ! SharedDataMod arrays are allocated (allocation on assignment).
+  implicit none
+  type (EcoFeedback), intent(in) :: feedback
+  type (EcoSizes), intent(in) :: sizes
+
+  real(r8), pointer :: data(:)
+  real(r8), pointer :: data2D(:,:)
+  integer :: size_col, num_cols
+
+  size_col = sizes%ncells_per_col_
+  num_cols = feedback%snow_depth%size
+
+  call c_f_pointer(feedback%subsurface_water_source%data, data2D, [size_col, num_cols])
+  a_SSWS = data2D(:,:)
+
+  call c_f_pointer(feedback%subsurface_energy_source%data, data2D, [size_col, num_cols])
+  a_SSES = data2D(:,:)
+
+  call c_f_pointer(feedback%surface_water_source%data, data, (/num_cols/))
+  surf_w_source = data(:)
+
+  call c_f_pointer(feedback%surface_energy_source%data, data, (/num_cols/))
+  surf_e_source = data(:)
+
+  call c_f_pointer(feedback%snow_depth%data, data, (/num_cols/))
+  surf_snow_depth = data(:)
+
+  call c_f_pointer(feedback%canopy_snow%data, data2D, [sizes%num_pfts, num_cols])
+  a_CanSnow = data2D(:,:)
+
+  end subroutine CopyFeedbackFromATS
+!------------------------------------------------------------------------------------------
+
+  subroutine CopyFeedbackToATS(feedback, sizes)
+  ! sources and snow depth computed by this advance. The container is
+  ! intent(in): only the arrays it points to are written.
+  implicit none
+  type (EcoFeedback), intent(in) :: feedback
+  type (EcoSizes), intent(in) :: sizes
+
+  real(r8), pointer :: data(:)
+  real(r8), pointer :: data2D(:,:)
+  integer :: size_col, num_cols
+
+  size_col = sizes%ncells_per_col_
   num_cols = sizes%num_columns
 
-  call c_f_pointer(state%subsurface_water_source%data, data2D, [(/size_col/),(/num_cols/)])
-  data2D(:,:)=a_SSWS
+  call c_f_pointer(feedback%subsurface_water_source%data, data2D, [size_col, num_cols])
+  data2D(:,:) = a_SSWS
 
-  call c_f_pointer(state%subsurface_energy_source%data, data2D, [(/size_col/),(/num_cols/)])
-  data2D(:,:)=a_SSES
+  call c_f_pointer(feedback%subsurface_energy_source%data, data2D, [size_col, num_cols])
+  data2D(:,:) = a_SSES
 
-  !call c_f_pointer(state%snow_temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  !data2D(:,:)=a_TS
-
-  call c_f_pointer(state%canopy_longwave_radiation%data, data, (/num_cols/))
-  data(:) = a_LWCan
-
-  call c_f_pointer(state%boundary_latent_heat_flux%data, data, (/num_cols/))
-  data(:) = a_CLHF
-
-  call c_f_pointer(state%boundary_sensible_heat_flux%data, data, (/num_cols/))
-  data(:) = a_CSHF
-
-  call c_f_pointer(state%canopy_surface_water%data, data, (/num_cols/))
-  data(:) = a_CanopyWat
-
-  call c_f_pointer(state%transpiration%data, data, (/num_cols/))
-  data(:) = a_Transpiration
-
-  call c_f_pointer(state%evaporation_canopy%data, data, (/num_cols/))
-  data(:) = a_EvapCan
-
-  call c_f_pointer(state%evaporation_bare_ground%data, data, (/num_cols/))
-  data(:) = a_EvapGrnd
-
-  call c_f_pointer(state%evaporation_litter%data, data, (/num_cols/))
-  data(:) = a_EvapLitr
-
-  call c_f_pointer(state%evaporation_snow%data, data, (/num_cols/))
-  data(:) = a_EvapSnow
-
-  call c_f_pointer(state%sublimation_snow%data, data, (/num_cols/))
-  data(:) = a_Sublim
-
-  call c_f_pointer(state%surface_water_source%data, data, (/num_cols/))
+  call c_f_pointer(feedback%surface_water_source%data, data, (/num_cols/))
   data(:) = surf_w_source
 
-  call c_f_pointer(state%surface_energy_source%data, data, (/num_cols/))
+  call c_f_pointer(feedback%surface_energy_source%data, data, (/num_cols/))
   data(:) = surf_e_source
 
-  !write(*,*) "surf_e_source (ATSCPL): ", surf_e_source
-
-  call c_f_pointer(state%snow_depth%data, data, (/num_cols/))
+  call c_f_pointer(feedback%snow_depth%data, data, (/num_cols/))
   data(:) = surf_snow_depth
 
-  call c_f_pointer(state%canopy_snow%data, data2D, [size_col, num_cols])
+  call c_f_pointer(feedback%canopy_snow%data, data2D, [sizes%num_pfts, num_cols])
   data2D(:,:) = a_CanSnow
-  
-  end subroutine EcoSIM2ATSData
+
+  end subroutine CopyFeedbackToATS
 
 !------------------------------------------------------------------------------------------
 
   subroutine Run_EcoSIM_one_step(sizes)
   implicit none
 
-  type (BGCSizes), intent(in) :: sizes
+  type (EcoSizes), intent(in) :: sizes
 
   !copy data from compuler to EcoSIM
 
@@ -324,7 +292,7 @@ contains
   !initialize ecosim
   implicit none
 
-  type (BGCSizes), intent(in) :: sizes
+  type (EcoSizes), intent(in) :: sizes
   integer :: size_col, num_cols
 
   size_col = sizes%ncells_per_col_
@@ -340,7 +308,7 @@ contains
   implicit none
 
   integer :: K, vec_size
-  type (BGCSizes), intent(in) :: sizes
+  type (EcoSizes), intent(in) :: sizes
   integer :: size_col, num_cols
 
   size_col = sizes%ncells_per_col_
@@ -353,20 +321,20 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SetBGCSizes(sizes)
+  subroutine SetEcoSizes(sizes)
 
-    use BGCContainers_module, only : BGCSizes
+    use EcoContainers_module, only : EcoSizes
 
     implicit none
 
-    type (BGCSizes), intent(out) :: sizes
+    type (EcoSizes), intent(out) :: sizes
 
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
     sizes%num_columns = 1
 
-    write(*,*) "(SetBGCSizes f): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
-  end subroutine SetBGCSizes
+    write(*,*) "(SetEcoSizes f): N_cells, N_cols ", sizes%ncells_per_col_, sizes%num_columns
+  end subroutine SetEcoSizes
 
 !-----------------------------------------------------------------------------------------
 end module ATSCPLMod
