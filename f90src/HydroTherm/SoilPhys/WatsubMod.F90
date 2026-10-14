@@ -954,10 +954,9 @@ module WatsubMod
 
               !  NO runoff
               lZeroRunoff=.not.XGridRunoffFlag_2DH(NN,N,N2,N1)   &              !Runoff flag is off
-                .OR. isclose(RechargSurf,0._r8)                  &              !Allowed runoff rate is zero
-                .OR. ABS(SurfRunoffPotentM_col(M,N2,N1)).LT.ZEROS(N2,N1)        !Runoff from infiltration partition is inisignificant
+                .OR. isclose(RechargSurf,0._r8)                                 !Allowed runoff rate is zero
 
-               !do runoff
+              !do runoff
               IF(.not.LZeroRunoff)then
                 call XBoundSurfaceRunoffM(I,J,M,N,NN,N1,N2,M4,M5,RechargSurf,XN)
               ENDIF

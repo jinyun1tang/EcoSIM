@@ -1729,103 +1729,136 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine AggregateSurfRunoffFluxM(I,J,M,NHW,NHE,NVN,NVS)
-
-
   implicit none
   integer, intent(in) :: I,J,M,NHW,NHE,NVN,NVS
   character(len=*), parameter :: subname='AggregateSurfRunoffFluxM'
-  integer :: N1,N2   !source grid, with which the lateral exchange is computed
-  integer :: N,NN,N4,N5,N4B,N5B
-  integer :: NY,NX
-  real(r8) :: VLWatLitR,VLicelitR
-  real(r8) :: Heatflxlitr
+  integer :: NX,NY,N,Side
+  integer :: FaceNN(2,2),FaceNY(2,2),FaceNX(2,2)
+  real(r8) :: OutwardSign(2,2)
 
-
-  !  begin_execution
   call PrintInfo('beg '//subname)
-  DO  NX=NHW,NHE
-    DO  NY=NVN,NVS
-      cumWatFlx2LitRByRunoff_col(NY,NX)      = 0.0_r8
-      cumHeatFlx2LitRByRunoff_col(NY,NX)     = 0.0_r8
 
-      N1=NX;N2=NY
-      DO  N=1,2  !sweep across two horizontal directions
-        IF(N.EQ.iWestEastDirection)THEN
-          !exchange in the x direction, west-east
-          N4  = NX+1;N5  = NY   !front
-          N4B = NX-1;N5B = NY   !behind
-        ELSEIF(N.EQ.iNorthSouthDirection)THEN
-          !exchange in the y direction, north-south
-          N4  = NX;N5  = NY+1    !front
-          N4B = NX;N5B = NY-1    !behind
-        ENDIF
+  !TODO: consider adaptive substeps for converging flows into depressions.
+  !The donor limit preserves water/heat accounting and liquid positivity, but
+  !does not prevent collective water-level overshoot from multiple donors.
+  !Finalize every donor's outgoing faces before any receiving cell is credited.
+  call LimitSurfaceRunoffM(M,NHW,NHE,NVN,NVS)
 
-        !jump over the grid (N2,N1), front (N5,N4), behind (N5B,N4B)
-        DO  NN=1,2
-          !coming in
-          cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)+WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-          cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)+HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      cumWatFlx2LitRByRunoff_col(NY,NX)=0._r8
+      cumHeatFlx2LitRByRunoff_col(NY,NX)=0._r8
+      call GetSurfaceRunoffFaces(NX,NY,NHW,NHE,NVN,NVS,FaceNN,FaceNY,FaceNX,OutwardSign)
 
-          VLWatLitR=VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff_col(N2,N1)
-          if(VLWatLitR<0._r8)then
-            VLWatLitR                            = VLWatLitR-tiny_wat
-            Heatflxlitr                          = safe_adb(VLWatLitR,WatFlx2LitRByRunoff_2DH(N,NN,N2,N1))*HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)
-            WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)  = WatFlx2LitRByRunoff_2DH(N,NN,N2,N1)-VLWatLitR
-            HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1) = HeatFlx2LitRByRunoff_2DH(N,NN,N2,N1)-Heatflxlitr
-            cumWatFlx2LitRByRunoff_col(N2,N1)    = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
-            cumHeatFlx2LitRByRunoff_col(N2,N1)   = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
-          endif
+      DO N=1,2
+        !Internal inflows are stored in this cell's receiving slots.
+        !External inflows use the boundary face and are included below instead.
+        if((N.EQ.iWestEastDirection .and. NX.LT.NHE) .or. &
+           (N.EQ.iNorthSouthDirection .and. NY.LT.NVS))then
+          cumWatFlx2LitRByRunoff_col(NY,NX)=cumWatFlx2LitRByRunoff_col(NY,NX) &
+            +WatFlx2LitRByRunoff_2DH(N,iFront,NY,NX)
+          cumHeatFlx2LitRByRunoff_col(NY,NX)=cumHeatFlx2LitRByRunoff_col(NY,NX) &
+            +HeatFlx2LitRByRunoff_2DH(N,iFront,NY,NX)
+        endif
+        if((N.EQ.iWestEastDirection .and. NX.GT.NHW) .or. &
+           (N.EQ.iNorthSouthDirection .and. NY.GT.NVN))then
+          cumWatFlx2LitRByRunoff_col(NY,NX)=cumWatFlx2LitRByRunoff_col(NY,NX) &
+            +WatFlx2LitRByRunoff_2DH(N,iBehind,NY,NX)
+          cumHeatFlx2LitRByRunoff_col(NY,NX)=cumHeatFlx2LitRByRunoff_col(NY,NX) &
+            +HeatFlx2LitRByRunoff_2DH(N,iBehind,NY,NX)
+        endif
 
-          ! grid (N2,N1) is behind grid (N5,N4), NN=iBehind for internal grid
-          !this includes outgoing boundary fluxes
-          IF(IFLBM_2DH(M,N,NN,N5,N4).EQ.0)THEN
-            !there is outflow in east or south
-            cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-            cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-
-            VLWatLitR=VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff_col(N2,N1)
-            !negative value correction
-            if(VLWatLitR<0._r8)then
-              VLWatLitR                            = VLWatLitR-tiny_wat
-              Heatflxlitr                          = safe_adb(VLWatLitR,WatFlx2LitRByRunoff_2DH(N,NN,N5,N4))*HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)
-              WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)  = WatFlx2LitRByRunoff_2DH(N,NN,N5,N4)+VLWatLitR
-              HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4) = HeatFlx2LitRByRunoff_2DH(N,NN,N5,N4)+Heatflxlitr
-              cumWatFlx2LitRByRunoff_col(N2,N1)    = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
-              cumHeatFlx2LitRByRunoff_col(N2,N1)   = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
-              !for internal grid
-              if(NN.EQ.iBehind)then
-                XGridSurfRunoff_2DH(N,2,N5,N4)       = XGridSurfRunoff_2DH(N,2,N5,N4)+VLWatLitR
-                HeatXGridBySurfRunoff_2DH(N,2,N5,N4) = HeatXGridBySurfRunoff_2DH(N,2,N5,N4)+Heatflxlitr
-              endif
-            endif
-          ENDIF
-
-          !internal grid
-          IF(N4B.GT.0 .AND. N5B.GT.0 .AND. NN.EQ.iFront)THEN
-            !there is outflow in west and north
-            cumWatFlx2LitRByRunoff_col(N2,N1)  = cumWatFlx2LitRByRunoff_col(N2,N1)-WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-            cumHeatFlx2LitRByRunoff_col(N2,N1) = cumHeatFlx2LitRByRunoff_col(N2,N1)-HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-
-            VLWatLitR=VLWatMicP1_vr(0,NY,NX)+cumWatFlx2LitRByRunoff_col(N2,N1)
-            if(VLWatLitR<0._r8)then
-              VLWatLitR                              = VLWatLitR-tiny_wat
-              Heatflxlitr                            = safe_adb(VLWatLitR,WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B))*HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)
-              WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)  = WatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)+VLWatLitR
-              HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B) = HeatFlx2LitRByRunoff_2DH(N,NN,N5B,N4B)+Heatflxlitr
-              cumWatFlx2LitRByRunoff_col(N2,N1)      = cumWatFlx2LitRByRunoff_col(N2,N1)-VLWatLitR
-              cumHeatFlx2LitRByRunoff_col(N2,N1)     = cumHeatFlx2LitRByRunoff_col(N2,N1)-Heatflxlitr
-              XGridSurfRunoff_2DH(N,1,N5B,N4B)       = XGridSurfRunoff_2DH(N,1,N5B,N4B)+VLWatLitR
-              HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B) = HeatXGridBySurfRunoff_2DH(N,1,N5B,N4B)+Heatflxlitr
-            endif
-          ENDIF
+        DO Side=iFront,iBehind
+          cumWatFlx2LitRByRunoff_col(NY,NX)=cumWatFlx2LitRByRunoff_col(NY,NX) &
+            -OutwardSign(N,Side)*WatFlx2LitRByRunoff_2DH(N,FaceNN(N,Side),FaceNY(N,Side),FaceNX(N,Side))
+          cumHeatFlx2LitRByRunoff_col(NY,NX)=cumHeatFlx2LitRByRunoff_col(NY,NX) &
+            -OutwardSign(N,Side)*HeatFlx2LitRByRunoff_2DH(N,FaceNN(N,Side),FaceNY(N,Side),FaceNX(N,Side))
         ENDDO
       ENDDO
 
-      TXGridSurfRunoff_2DH(N2,N1)       = TXGridSurfRunoff_2DH(N2,N1)+cumWatFlx2LitRByRunoff_col(N2,N1)
-      THeatXGridBySurfRunoff_2DH(N2,N1) = THeatXGridBySurfRunoff_2DH(N2,N1)+cumHeatFlx2LitRByRunoff_col(N2,N1)
-
+      TXGridSurfRunoff_2DH(NY,NX)=TXGridSurfRunoff_2DH(NY,NX)+cumWatFlx2LitRByRunoff_col(NY,NX)
+      THeatXGridBySurfRunoff_2DH(NY,NX)=THeatXGridBySurfRunoff_2DH(NY,NX)+cumHeatFlx2LitRByRunoff_col(NY,NX)
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine AggregateSurfRunoffFluxM
+
+!------------------------------------------------------------------------------------------
+  subroutine LimitSurfaceRunoffM(M,NHW,NHE,NVN,NVS)
+  !Project all outgoing runoff faces onto each donor's beginning-of-pass liquid.
+  !Do not credit concurrent inflow: limiting must be independent of cell order.
+  implicit none
+  integer, intent(in) :: M,NHW,NHE,NVN,NVS
+  integer :: NX,NY,N,Side,NN,FY,FX
+  integer :: FaceNN(2,2),FaceNY(2,2),FaceNX(2,2)
+  real(r8) :: OutwardSign(2,2),ProposedOutflow,AvailableWater,RunoffScale
+  real(r8) :: OldWater,OldHeat,AcceptedWater,AcceptedHeat
+
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      call GetSurfaceRunoffFaces(NX,NY,NHW,NHE,NVN,NVS,FaceNN,FaceNY,FaceNX,OutwardSign)
+      ProposedOutflow=0._r8
+      DO N=1,2
+        DO Side=iFront,iBehind
+          ProposedOutflow=ProposedOutflow+MAX(0._r8,OutwardSign(N,Side) &
+            *WatFlx2LitRByRunoff_2DH(N,FaceNN(N,Side),FaceNY(N,Side),FaceNX(N,Side)))
+        ENDDO
+      ENDDO
+
+      AvailableWater=MAX(0._r8,VLWatMicP1_vr(0,NY,NX)-tiny_wat)
+      if(ProposedOutflow.LE.AvailableWater)cycle
+      RunoffScale=AvailableWater/ProposedOutflow
+      DO N=1,2
+        DO Side=iFront,iBehind
+          NN=FaceNN(N,Side);FY=FaceNY(N,Side);FX=FaceNX(N,Side)
+          OldWater=WatFlx2LitRByRunoff_2DH(N,NN,FY,FX)
+          if(OutwardSign(N,Side)*OldWater.LE.0._r8)cycle
+          OldHeat=HeatFlx2LitRByRunoff_2DH(N,NN,FY,FX)
+          AcceptedWater=OldWater*RunoffScale
+          AcceptedHeat=OldHeat*RunoffScale
+          WatFlx2LitRByRunoff_2DH(N,NN,FY,FX)=AcceptedWater
+          HeatFlx2LitRByRunoff_2DH(N,NN,FY,FX)=AcceptedHeat
+          QflxSurfRunoffM_2DH(M,N,NN,FY,FX)=AcceptedWater
+          !Only replace this substep's contribution; retain earlier substeps.
+          XGridSurfRunoff_2DH(N,NN,FY,FX)=XGridSurfRunoff_2DH(N,NN,FY,FX)+AcceptedWater-OldWater
+          HeatXGridBySurfRunoff_2DH(N,NN,FY,FX)=HeatXGridBySurfRunoff_2DH(N,NN,FY,FX)+AcceptedHeat-OldHeat
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine LimitSurfaceRunoffM
+
+!------------------------------------------------------------------------------------------
+  subroutine GetSurfaceRunoffFaces(NX,NY,NHW,NHE,NVN,NVS,FaceNN,FaceNY,FaceNX,OutwardSign)
+  !Return this donor's E/S (iFront) and W/N (iBehind) face slots.
+  !Internal transfers are positive in receiving slots. Boundary W/N outflows
+  !are negative in the donor slot; boundary E/S outflows are positive outside.
+  implicit none
+  integer, intent(in) :: NX,NY,NHW,NHE,NVN,NVS
+  integer, intent(out) :: FaceNN(2,2),FaceNY(2,2),FaceNX(2,2)
+  real(r8), intent(out) :: OutwardSign(2,2)
+  integer :: N,Position,FirstCell,LastCell
+
+  DO N=1,2
+    FaceNY(N,:)=NY;FaceNX(N,:)=NX
+    if(N.EQ.iWestEastDirection)then
+      Position=NX;FirstCell=NHW;LastCell=NHE
+      FaceNX(N,iFront)=NX+1
+      FaceNX(N,iBehind)=NX-1
+    else
+      Position=NY;FirstCell=NVN;LastCell=NVS
+      FaceNY(N,iFront)=NY+1
+      FaceNY(N,iBehind)=NY-1
+    endif
+    FaceNN(N,iFront)=iBehind
+    FaceNN(N,iBehind)=iFront
+    OutwardSign(N,:)=1._r8
+    if(Position.EQ.LastCell)FaceNN(N,iFront)=iFront
+    if(Position.EQ.FirstCell)then
+      FaceNN(N,iBehind)=iBehind
+      FaceNY(N,iBehind)=NY;FaceNX(N,iBehind)=NX
+      OutwardSign(N,iBehind)=-1._r8
+    endif
+  ENDDO
+  end subroutine GetSurfaceRunoffFaces
 end module SurfPhysMod
