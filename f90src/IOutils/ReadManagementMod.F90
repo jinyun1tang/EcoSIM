@@ -199,18 +199,19 @@ implicit none
         DIRRA(1,NY,NX) = DIRRX    !depth
         DIRRA(2,NY,NX) = WDPTHI   !width
         D220: DO I = 1, 366
-          PHQ(IDY,NY,NX)                                    = PHQX
-          NH4_irrig_mole_conc(IDY,NY,NX)                    = CN4QX/14.0_r8
-          NO3_irrig_mole_conc(IDY,NY,NX)                    = CNOQX/14.0_r8
-          H2PO4_irrig_mole_conc(IDY,NY,NX)                  = CPOQX/31.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Al,IDY,NY,NX)  = CALQX/27.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Fe,IDY,NY,NX)  = CFEQX/55.8_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Ca,IDY,NY,NX)  = CCAQX/40.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Mg,IDY,NY,NX)  = CMGQX/24.3_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Na,IDY,NY,NX)  = CNAQX/23.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_K,IDY,NY,NX)   = CKAQX/39.1_r8
-          trcsalt_irrig_mole_conc_col(idsalt_SO4,IDY,NY,NX) = CSOQX/32.0_r8
-          trcsalt_irrig_mole_conc_col(idsalt_Cl,IDY,NY,NX)  = CCLQX/35.5_r8
+          ! EcoSIM_ZM: initialize every day, not uninitialized scheduled IDY.
+          PHQ(I,NY,NX)                                    = PHQX
+          NH4_irrig_mole_conc(I,NY,NX)                    = CN4QX/14.0_r8
+          NO3_irrig_mole_conc(I,NY,NX)                    = CNOQX/14.0_r8
+          H2PO4_irrig_mole_conc(I,NY,NX)                  = CPOQX/31.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Al,I,NY,NX)  = CALQX/27.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Fe,I,NY,NX)  = CFEQX/55.8_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Ca,I,NY,NX)  = CCAQX/40.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Mg,I,NY,NX)  = CMGQX/24.3_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Na,I,NY,NX)  = CNAQX/23.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_K,I,NY,NX)   = CKAQX/39.1_r8
+          trcsalt_irrig_mole_conc_col(idsalt_SO4,I,NY,NX) = CSOQX/32.0_r8
+          trcsalt_irrig_mole_conc_col(idsalt_Cl,I,NY,NX)  = CCLQX/35.5_r8
         ENDDO D220
       ENDDO D7960
     ENDDO D7965
@@ -438,15 +439,22 @@ implicit none
     call ncd_pio_closefile(soilmgmt_nfid)
     return
   endif
-  iyear=1
-  DO while(.true.)
+  ! EcoSIM_ZM: stop at the declared year count rather than reading beyond
+  ! the coordinate when a forcing year is absent from management input.
+  DO iyear=1,nyears
     call ncd_getvar(soilmgmt_nfid,'year',iyear,year)
     if(year==yeari)exit
-    iyear=iyear+1
   ENDDO
+  if(iyear>nyears)then
+    call ncd_pio_closefile(soilmgmt_nfid)
+    call endrun('management forcing year not present: '//trim(int2str(yeari)), __LINE__)
+  endif
 
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
-  if(ntopou==0)return
+  if(ntopou==0)then
+    call ncd_pio_closefile(soilmgmt_nfid)
+    return
+  endif
   if(first_topou)ntopou=1  
   DO NTOPO=1,ntopou
     call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
@@ -464,8 +472,9 @@ implicit none
       call endrun('fail to find fertf in '//trim(mod_filename), __LINE__)
     endif
 
+    ! EcoSIM_ZM: route the schedule for this unit, not the final unit count.
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf, &
-      start = (/1,ntopou,iyear/),count = (/len(fertf),1/)), &
+      start = (/1,ntopo,iyear/),count = (/len(fertf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     !!!!
     call check_var(soilmgmt_nfid, 'tillf', vardesc, readvar)
@@ -474,7 +483,7 @@ implicit none
     endif
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf, &
-      start = (/1,ntopou,iyear/),count = (/len(tillf),1/)), &
+      start = (/1,ntopo,iyear/),count = (/len(tillf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     !!!!
     call check_var(soilmgmt_nfid, 'irrigf', vardesc, readvar)
@@ -483,7 +492,7 @@ implicit none
     endif
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf, &
-      start = (/1,ntopou,iyear/),count = (/len(irrigf),1/)), &
+      start = (/1,ntopo,iyear/),count = (/len(irrigf),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 !
 !   READ TILLAGE INPUT FILE
@@ -554,7 +563,7 @@ implicit none
     endif
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
-      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      start = (/1,ntopo/),count = (/len(firef),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2,'nfire')
   ENDDO  
@@ -580,7 +589,7 @@ implicit none
     endif
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, firef, &
-      start = (/1,ntopou/),count = (/len(firef),1/)), &
+      start = (/1,ntopo/),count = (/len(firef),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     
     call ReadPlantFireMgmt(yearc,pftinfo_nfid,firef,NH1,NH2,NV1,NV2)
