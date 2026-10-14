@@ -3051,20 +3051,9 @@ module PlantBranchMod
   IF(SeasonalNonstElms_pft(ielmc,NZ).GT.ZERO4Groth_pft(NZ))THEN
     IF(iPlantPhenolPattern_pft(NZ).EQ.iplt_perennial)THEN
       CPOOLT=AMAX1(ZERO4Groth_pft(NZ),SeasonalNonstElms_pft(ielmc,NZ)+TotalRootNonstElms(ielmc))
-! --- Jing Tao ---
-! Same shape as the shoot block above, and floored -- but only at ZERO4Groth_pft, which is
-! ZERO*PlantPopuLive_pft (StartqMod.F90:86, InitPlantMod.F90:125, PlantDisturbsMod.F90:309)
-! and therefore collapses to 0 as the stand's population goes to 0. When it does, this floor
-! floors at zero and the same divide-by-zero is reachable here.
-! Not observed in the R3 failures -- the shoot block above faults first -- so this is
-! prophylactic, and identical in form and in cost to the fix above.
       DO NE=2,NumPlantChemElms
-        if(CPOOLT>0._r8)then
-          NonstGradt=(SeasonalNonstElms_pft(NE,NZ)*TotalRootNonstElms(ielmc)-&
-            TotalRootNonstElms(NE)*SeasonalNonstElms_pft(ielmc,NZ))/CPOOLT            
-        else
-          NonstGradt=0._r8
-        endif
+        NonstGradt=(SeasonalNonstElms_pft(NE,NZ)*TotalRootNonstElms(ielmc)-&
+          TotalRootNonstElms(NE)*SeasonalNonstElms_pft(ielmc,NZ))/CPOOLT            
         NonstElm2RootMyco(NE)=AZMAX1(FRSV(iPlantTurnoverPattern_pft(NZ))*NonstGradt)
       ENDDO
     ELSE
