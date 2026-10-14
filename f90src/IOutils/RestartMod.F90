@@ -5006,6 +5006,9 @@ implicit none
   integer :: litter_band_varid
   type(var_desc_t) :: litter_band_vardesc
   logical :: has_litter_band_demand
+  integer :: gas_residual_varid
+  type(Var_desc_t) :: gas_residual_vardesc
+  logical :: has_gas_residual
   integer :: ndoms
   ncols = bounds%ncols
   npfts = bounds%npfts
@@ -5612,8 +5615,33 @@ implicit none
        fill_value=spval)    
   endif  
 
+  ! EcoSIM_ZM: retain the cumulative gas-transport diagnostic through restart.
+  ! This is a bookkeeping counter, not a gas pool or a new physical source.
+  ! Older checkpoints cannot reconstruct it; preserve their legacy zero start
+  ! and warn, rather than inventing cumulative history from current pools.
   if(flag=='read')then
-    datpr1 => datrc_1d        
+    call ncd_inqvid(ncid,'Gas_Prod_TP_cumRes_col',gas_residual_varid,gas_residual_vardesc, &
+      readvar=has_gas_residual)
+    if(has_gas_residual)then
+      datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)
+      call restartvar(ncid, flag, varname='Gas_Prod_TP_cumRes_col', dim1name='column', &
+        dim2name='gastrcs',long_name='Cumulative gas production/transport residual', &
+        units='g d-2',interpinic_flag='skip',data=datpr2,missing_value=spval,fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,Gas_Prod_TP_cumRes_col,datrc_2d)
+    else
+      Gas_Prod_TP_cumRes_col=0._r8
+      write(iulog,*) 'Legacy checkpoint: cumulative gas transport residual starts at zero'
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,Gas_Prod_TP_cumRes_col,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:trc_confs%NGasTracers)
+    call restartvar(ncid, flag, varname='Gas_Prod_TP_cumRes_col', dim1name='column', &
+      dim2name='gastrcs',long_name='Cumulative gas production/transport residual', &
+      units='g d-2',interpinic_flag='skip',data=datpr2,missing_value=spval,fill_value=spval)
+  endif
+
+  if(flag=='read')then
+    datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='Hydroloss_NH4_cumflx_col', dim1name='column',&
        long_name='cumulative NH4 loss via hydrological pathway', units='gN d-2', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
