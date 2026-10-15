@@ -47,7 +47,7 @@ hist_fincl1='CH4_cumerr_col','Hygrogen_methanogenC_vr','Acetic_methanogenC_vr',
   'Decomp_OStress_vr','RDecompC_SOM_vr','Aerobic_HetrBacterC_vr','Aerobic_HetrFungiC_vr',
   'MicrobAct_folialitr_cplx_vr','MicrobAct_pom_cplx_vr','MicrobAct_humus_cplx_vr','RootC_2nd_pvr',
   'HydrolCSOM_folialitr_cplx_vr','HydrolCSOM_pom_cplx_vr','HydrolCSOM_humus_cplx_vr',
-  'CH4_DIF_FLX_col','GasXSurfConduct_col','CH4w_conc_vr','WTR_TBL_col','FermOXYI_vr'
+  'CH4_DIF_FLX_col','GasXSurfConduct_col','CH4w_conc_vr','WTBLi_col','FermOXYI_vr'
   'SOC_folialitr_cplx_vr','SOC_pom_cplx_vr','SOC_humus_cplx_vr','rIceFLP_vr',
   'dCAN_GPP_CLIM_pft','dCAN_GPP_eLIM_pft','ThetaW_litr_col','PSI_LITR_col','ThetaI_litr_col',
   'MicroBiomE_litr','RCH4ProdHg_litr_col','RCH4ProdAcet_litr_col','RUB_ACTVN_pft',
