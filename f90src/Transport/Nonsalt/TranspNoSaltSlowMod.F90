@@ -2759,7 +2759,7 @@ implicit none
         IF(THETW1.GT.SoilWatAirDry_vr(N3,N2,N1)     & ! has significant water 
           .AND. .not.iFalseEbu)THEN                 ! ebullition is allowed
 
-          dPond=AZMAX1(CumDepz2LayBottom_vr(N3,N2,N1)-DepzIntWTBL_col(N2,N1))*10._r8
+          dPond=AZMAX1(CumDepz2LayBottom_vr(N3,N2,N1)-WaterTableDepZi_col(N2,N1))*10._r8
 
           do idg=idg_beg,idg_NH3
             GasMassSolubility(idg) =MolecularWeight(idg)*GasSolbility_vr(idg,N3,N2,N1)  !conver into carbon g /mol

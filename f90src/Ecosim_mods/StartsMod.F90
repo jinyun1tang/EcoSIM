@@ -227,10 +227,10 @@ module StartsMod
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !      ALTZG=minimum surface elevation in landscape
   !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table
-  !     WaterTBLSlope_col=slope of natural water table relative to landscape surface
+  !     WaterTableSlope_col=slope of natural water table relative to landscape surface
   !     in geography, slope =rise/run
   !     ExtWaterTablet0_col,DTBLD=depth of natural,artificial water table adjusted for elevn
-  !     DepzIntWTBL_col=depth to internal water table
+  !     WaterTableDepZi_col=depth to internal water table
   !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
   !     XDPTH_3D=x-section area/distance in solute flux calculations (m2/m)
   !     DISP=dispersivity parameter in solute flux calculations (m2 h-1)
@@ -254,22 +254,22 @@ module StartsMod
   ! altz: topographic altitude
   ! ALT: grid altitude
   ! DTBLI: external water table depth, before applying the altitude correction
-  ! WaterTBLSlope_col: slope of water table relative to surface slope
+  ! WaterTableSlope_col: slope of water table relative to surface slope
   ! ExtWaterTablet0_col: external water table depth
   ! WtblDepzTile_col: depth of artificial water table
-  ! DepzIntWTBL_col: internal water table depth
+  ! WaterTableDepZi_col: internal water table depth
   ! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ_col(NY,NX)=ALTZG
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
-        DTBLD_col(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX))
+        DTBLD_col(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX)))
       ELSE
         ExtWaterTablet0_col(NY,NX) = 0.0_r8
         DTBLD_col(NY,NX)           = 0.0_r8
       ENDIF
-      DepzIntWTBL_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
+      WaterTableDepZi_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
     ENDDO
   ENDDO
 
@@ -418,7 +418,7 @@ module StartsMod
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
     !     PSISoilAirEntry_vr: soil matric potential at air entry point [MPa]
-    PSI_at_Sautration_vr(L,NY,NX)                     = PSIPS
+    PSI_at_Sautration_vr(L,NY,NX)         = PSIPS
     PSISoilAirEntry_vr(L,NY,NX)           = -1.5E-03_r8
     RGasTranspFlxPrev_vr(idg_O2,L,NY,NX)  = 0.0_r8
     RGasTranspFlxPrev_vr(idg_CO2,L,NY,NX) = 0.0_r8

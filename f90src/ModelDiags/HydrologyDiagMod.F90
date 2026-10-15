@@ -50,7 +50,7 @@ module HydrologyDiagMod
 !     DPTH,ExtWaterTable=depth of soil layer midpoint, water table
 !     PSIEquil=water potential in hydraulic equilibrium with layer below
 !     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
-!     DepzIntWTBL_col=water table depth
+!     WaterTableDepZi_col=water table depth
 !
     IF(VLSoilMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
@@ -95,9 +95,9 @@ module HydrologyDiagMod
 
             IF(THETWM.GT.THETW1)THEN
               THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
-              DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)     !internal water depth depth relative to current layer upper depth
+              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)     !internal water depth depth relative to current layer upper depth
             ELSE
-              DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)                     !set to upper edge of current layer
+              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)                     !set to upper edge of current layer
             ENDIF
           ELSEIF(L.GT.NU_col(NY,NX))THEN
             !not bottom layer, and not topsoil layer, partially saturated
@@ -107,12 +107,12 @@ module HydrologyDiagMod
               *PSD_vr(L-1,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
             IF(THETWM.GT.THETW1)THEN
               THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
-              DepzIntWTBL_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
+              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
             ELSE
-              DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
+              WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
             ENDIF
           ELSE
-            DepzIntWTBL_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+            WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
           ENDIF
         ENDIF
       ENDIF      

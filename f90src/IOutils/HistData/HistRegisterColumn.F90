@@ -868,7 +868,7 @@ contains
     long_name='active layer depth',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_WTR_TBL_col(beg_col:end_col)
-  call hist_addfld1d(fname='WTR_TBL_col',units='m',avgflag='A',&
+  call hist_addfld1d(fname='WTBLi_col',units='m',avgflag='A',&
     long_name='internal water table depth (<0 below soil surface)',&
     ptr_col=data1d_ptr)
 

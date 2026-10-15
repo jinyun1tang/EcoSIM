@@ -323,7 +323,7 @@ module readiMod
       FlowDirIndicator_col(NY,NX) = grid_mode
       NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
       WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
-      WaterTBLSlope_col(NY,NX)    = DTBLGG
+      WaterTableSlope_col(NY,NX)    = DTBLGG
 
       RechargNorthSurf_col(NY,NX) = RCHQNG
       RechargEastSurf_col(NY,NX)  = RCHQEG

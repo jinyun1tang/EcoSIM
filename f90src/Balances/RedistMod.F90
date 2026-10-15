@@ -284,9 +284,6 @@ module RedistMod
   character(len=*), parameter :: subname='ModifyExWTBLByDisturbance'
 !     begin_execution
 !     SolarNoonHour_col=hour of solar noon from weather file
-!     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-!     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
-!     CumDepz2LayBottom_vr(NU=soil surface elevation
 !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
 !     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
 !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
@@ -297,12 +294,15 @@ module RedistMod
 !     QDischarg2WTBL_col=hourly water loss through lateral and lower boundaries
 !
   call PrintInfo('beg '//subname)
+! iSoilDisturbType_col=soil disturbance type 1-10:mixing fraction = code/10, tillage 1; 
+!  11-20: mixing fraction = (code−10)/10, tillage 2, exempts first pft; 21=litter removal,22=fire,23-24=drainage
+
   !external water table from input file
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     !natural water table depth from input file
     NatWtblDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     !
-    ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX))
+    ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX))
     ExtWaterTable_col(NY,NX)   = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
@@ -311,13 +311,13 @@ module RedistMod
     ! drainage in on
     DCORPW=DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
 
-    IF(IDWaterTable_col(NY,NX).EQ.1)THEN  !stationary
+    IF(IDWaterTable_col(NY,NX).EQ.1)THEN  !from stationary to tile
       IDWaterTable_col(NY,NX)=3
-    ELSEIF(IDWaterTable_col(NY,NX).EQ.2)THEN  !mobile
+    ELSEIF(IDWaterTable_col(NY,NX).EQ.2)THEN  !from mobile to tile
       IDWaterTable_col(NY,NX)=4
     ENDIF
     WtblDepzTile_col(NY,NX)   = DCORPW
-    DTBLD_col(NY,NX)          = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTBLSlope_col(NY,NX)))
+    DTBLD_col(NY,NX)          = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX)))
     TileWaterTable_col(NY,NX) = DTBLD_col(NY,NX)
   ENDIF
 !
