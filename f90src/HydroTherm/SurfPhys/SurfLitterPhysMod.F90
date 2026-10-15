@@ -328,7 +328,6 @@ implicit none
       dLWRaddTKR2  = -4._r8*LWRadLitR2/TKR1
       Radnet2LitR2 = Radt2LitR-LWRadLitR2      
       dLWRaddTKS2 = -4._r8*LWEmscefSoil_col(NY,NX)*TKS1**3/real(NPR,kind=r8)
-
       !
       IF(VWatLitRHoldCapcity_col(NY,NX).GT.ZEROS2(NY,NX))THEN
         ThetaWLitR=AMIN1(VWatLitRHoldCapcity_col(NY,NX),VWatLitr2)/VLitR_col(NY,NX)
@@ -354,6 +353,7 @@ implicit none
         ThetaWLitR         = POROS0_col(NY,NX)
         PSISM1_vr(0,NY,NX) = PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
+      !
       !vapor pressure in litter and top soil
       VapLitR   = vapsat(TKR1)*EXP(18.0_r8*PSISM1_vr(0,NY,NX)/(RGASC*TKR1))
       VaporSoi1 = vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGASC*TKS1))    !vapor pressure in soil, ton H2O/m3

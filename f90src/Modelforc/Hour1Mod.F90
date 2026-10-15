@@ -1467,8 +1467,8 @@ module Hour1Mod
       ELSE
         PSISoilMatricP_vr(0,NY,NX)=PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
-      PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSISoilOsmotic_vr(0,NY,NX)          = 0._r8
+      PSIGrav_vr(0,NY,NX)                 = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
