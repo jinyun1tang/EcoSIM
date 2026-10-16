@@ -25,7 +25,7 @@ add_ecosim_library(util ${ECOSIM_UTIL_SOURCES})
 #add_library(util OBJECT ${ECOSIM_UTIL_SOURCES})    
 #install(TARGETS util OBJECTS DESTINATION lib)
 
-target_include_directories(util PUBLIC ${CMAKE_BINARY_DIR}/f90src/utils)
+target_include_directories(util PUBLIC ${CMAKE_BINARY_DIR}/f90src/Utils)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};util PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};util)
