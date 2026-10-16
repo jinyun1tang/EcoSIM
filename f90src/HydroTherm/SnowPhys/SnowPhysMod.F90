@@ -510,6 +510,7 @@ contains
   real(r8) :: SnoFall,Rainfall,IceFall,HeatSnofall2Snow,SnowVolume
   real(r8), parameter :: mscal=1._r8-1.e-8_r8,tinyw=1.e-14_r8,tinyw0=1.e-16_r8
   real(r8), parameter :: mscal1=1.0001_r8
+  real(r8), parameter :: Kirchhoff_cf=1._r8+TFICE*(cpw-cps)/LtHeatIceMelt
   real(r8) :: tinyw1
   !     begin_execution
   !     HEAT AND VAPOR FLUXES BETWEEN SNOWPACK AND ATMOSPHERE
@@ -649,7 +650,7 @@ contains
         IF((TKApp.LT.TFice .AND. VOLW0X.GT.ZERO*VcumSnoDWI_col(NY,NX)) &
           .OR.(TKApp.GT.TFice .AND. VOLI0X+VOLS0X.GT.ZERO*VcumSnoDWI_col(NY,NX)))THEN
           !freeze-thaw condition met
-          TFLX1=VLHeatCapSnowMX*(TFice-TKApp)/2.7185_r8*dts_wat
+          TFLX1=VLHeatCapSnowMX*(TFice-TKApp)/Kirchhoff_cf*dts_wat
 
           IF(TFLX1.LT.0.0_r8)THEN
             TotSnowLMass=VOLS0X+VOLI0X*DENSICE
