@@ -1408,9 +1408,9 @@ module WatsubMod
             if(do_warming)then
               if(is_warming_layerL(L,NY,NX))then     
                 tk1l                   = TKSoil1_vr(L,NY,NX)
-                dHeat                  = (TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP
+                dHeat                  = (TKS_ref_vr(it,L,NY,NX)-tk1l)*VHeatCapacity1_vr(L,NY,NX)
                 HeatSource_vr(L,NY,NX) = HeatSource_vr(L,NY,NX)+dHeat
-                TKSoil1_vr(L,NY,NX)    = tk1l+dHeat/(VHeatCapacity1_vr(L,NY,NX)*dts_HeatWatTP)
+                TKSoil1_vr(L,NY,NX)    = tk1l+dHeat/(VHeatCapacity1_vr(L,NY,NX))
               endif
             endif
             
