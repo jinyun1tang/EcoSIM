@@ -1,9 +1,8 @@
 # NOTE: this is the old CMake file for compiling with a UNIX Makefile
-# Minimum CMake version, determined by hdf5.
-cmake_minimum_required (VERSION 3.10)
+# Fortran submodule dependency scanning requires CMake 3.12.
+cmake_minimum_required (VERSION 3.12)
 
 # We declare the project here.
-message(STATUS "JDM: >>>>>> Initate the project, first thing it checks is compilers")
 project (ecosim LANGUAGES NONE)
 
 # Version numbers.
@@ -104,6 +103,7 @@ message("-- Fortran compiler is ${CMAKE_Fortran_COMPILER} (${CMAKE_Fortran_COMPI
 
 # Calling the custom macro to setup the compilers - not clear if this overrides flags we already set
 set_up_compilers()
+include(build_timing)
 
 if (BGC)
   set (ECOSIM_BGC 1)

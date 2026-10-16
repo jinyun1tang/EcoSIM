@@ -218,8 +218,8 @@ implicit none
   implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
-  integer :: jcplx,ndbiomcp,nlbiomcp
-  integer :: NumMicbFunGrupsPerCmplx,jsken,NumHetetr1MicCmplx,NumMicrobAutoTrophCmplx
+  integer :: jcplx,ndbiomcp,nlbiomcp,NumMicbAFunGrupsPerCmplx
+  integer :: NumMicbHFunGrupsPerCmplx,jsken,NumHetetr1MicCmplx,NumMicrobAutoTrophCmplx
   integer :: NumLiveHeterBioms,NumLiveAutoBioms
   integer :: NumPlantChemElms
   type(file_desc_t) :: ncf
@@ -235,7 +235,8 @@ implicit none
   NumPlantChemElms=get_dim_len(ncf,'element')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
-  NumMicbFunGrupsPerCmplx    =get_dim_len(ncf,'NumMicbFunGrupsPerCmplx')
+  NumMicbAFunGrupsPerCmplx    =get_dim_len(ncf,'NumMicbAFunGrupsPerCmplx')
+  NumMicbHFunGrupsPerCmplx    =get_dim_len(ncf,'NumMicbHFunGrupsPerCmplx')
   allocate(forc%mBiomeHeter(NumPlantChemElms,NumLiveHeterBioms,1:jcplx))
   allocate(forc%DOM(idom_beg:idom_end,1:jcplx))
   allocate(forc%SolidOM(1:NumPlantChemElms,jsken,1:jcplx))

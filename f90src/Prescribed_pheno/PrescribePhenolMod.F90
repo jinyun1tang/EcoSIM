@@ -6,7 +6,9 @@ module PrescribePhenolMod
   use ElmIDMod
   use GridDataType
   use RootDataType
-  use PlantAPIData
+  use PlantAPICommonData
+  use PlantSiteAPIData, only : plt_site
+  use PlantMorphologyAPIData, only : plt_morph
   use ClimForcDataType
   use PlantTraitDataType
   use PlantMgmtDataType

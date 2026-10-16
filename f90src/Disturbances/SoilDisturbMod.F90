@@ -6,6 +6,7 @@ module SoilDisturbMod
   use minimathmod, only : safe_adb
   use EcoSiMParDataMod, only : micpar
   use MiniFuncMod,    only: gOC_to_m3_OM
+  use EcoSIMConfig,  only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx  
   use DebugToolMod
   use MicrobialDataType  
   use NitroPars
@@ -68,7 +69,8 @@ module SoilDisturbMod
   )
 
   call PrintInfo('beg '//subname)
-  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. (iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr .OR. iSoilDisturbType_col(I,NY,NX).EQ.itill_fire))THEN
+  IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. &
+    (iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr .OR. iSoilDisturbType_col(I,NY,NX).EQ.itill_fire))THEN
     IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_fire)THEN
       !fire
       iResetSoilProf_col(NY,NX) = itrue
@@ -120,7 +122,7 @@ module SoilDisturbMod
             !
             !     REMOVE heterotrophic MICROBIAL BIOMASS
             !
-            D2960: DO N=1,NumMicbFunGrupsPerCmplx
+            D2960: DO N=1,NumMicbHFunGrupsPerCmplx
               DO NGL=JGniH(N),JGnfH(N)
                 DO M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
@@ -156,7 +158,7 @@ module SoilDisturbMod
         !
         !     REMOVE autotrophic MICROBIAL BIOMASS
         !
-        DO  N=1,NumMicbFunGrupsPerCmplx
+        DO  N=1,NumMicbAFunGrupsPerCmplx
           DO NGL=JGniA(N),JGnfA(N)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)

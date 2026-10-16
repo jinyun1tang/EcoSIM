@@ -26,8 +26,10 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RootH2PO4DmndBand_pvr(:,:,:,:,:)               !root uptake of H2PO4 band, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH1PO4DmndSoil_pvr(:,:,:,:,:)               !HPO4 demand in non-band by each root population, [g d-2 h-1]
   real(r8),target,allocatable ::  RootH1PO4DmndBand_pvr(:,:,:,:,:)               !HPO4 demand in band by each root population, [g d-2 h-1]
-  real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)              !element translocated from leaf during senescence, [g d-2 h-1]
-  real(r8),target,allocatable ::  PetolShethChemElmRemobFlx_brch(:,:,:,:,:)         !element translocated from sheath during senescence, [g d-2 h-1]
+  real(r8),target,allocatable ::  LeafElmntRemobFlx_brch(:,:,:,:,:)              !cached remobilizable leaf element mass, [g d-2]
+  real(r8),target,allocatable :: LeafSenescInitialElms_brch(:,:,:,:,:) !initial senescing leaf C/N/P mass; -1 means unset, [g d-2]
+  real(r8),target,allocatable ::  PetolShethChemElmRemobFlx_brch(:,:,:,:,:)         !cached remobilizable sheath element mass, [g d-2]
+  real(r8),target,allocatable :: PetolSenescInitialElms_brch(:,:,:,:,:) !initial senescing sheath/petiole C/N/P mass; -1 means unset, [g d-2]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                         !total gross CO2 fixation, [g d-2 h-1]
   real(r8),target,allocatable ::  GrossCO2Fix_CumYr_pft(:,:,:)                   !cumulative total gross CO2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  LitrfallElms_pft(:,:,:,:)                  !total plant element LitrFall , [g d-2 ]
@@ -38,6 +40,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  LitrfalStrutElms_CumYr_pft(:,:,:,:)            !plant element LitrFall, [g d-2 h-1]
   real(r8),target,allocatable ::  LitrfallElms_pvr(:,:,:,:,:,:,:)            !plant LitrFall element, [g d-2 h-1]
   real(r8),target,allocatable ::  NetPrimProduct_pft(:,:,:)                      !Hourly net primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable :: PTSHTR_pft(:,:,:)                               !root-shoot coupling conductance, [h-1]
   real(r8),target,allocatable ::  cumNPP_pft(:,:,:)                              !cumulative net primary productivity, [g d-2]
   real(r8),target,allocatable ::  ETCanopy_CumYr_pft(:,:,:)                      !total transpiration  <0 into atmosphere, [m d-2]
   real(r8),target,allocatable ::  CanopyRespC_CumYr_pft(:,:,:)                   !total autotrophic respiration, [g d-2 ]
@@ -183,7 +186,9 @@ module PlantDataRateType
   allocate(RootH1PO4DmndSoil_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndSoil_pvr=0._r8
   allocate(RootH1PO4DmndBand_pvr(jroots,JZ,JP,JY,JX));RootH1PO4DmndBand_pvr=0._r8
   allocate(LeafElmntRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafElmntRemobFlx_brch=0._r8
+  allocate(LeafSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); LeafSenescInitialElms_brch=-1._r8
   allocate(PetolShethChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolShethChemElmRemobFlx_brch=0._r8
+  allocate(PetolSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolSenescInitialElms_brch=-1._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
   allocate(GrossCO2Fix_CumYr_pft(JP,JY,JX)); GrossCO2Fix_CumYr_pft=0._r8
   allocate(LitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_CumYr_pft=0._r8
@@ -195,6 +200,7 @@ module PlantDataRateType
   allocate(LitrfallElms_pvr(NumPlantChemElms,jsken,1:NumOfPlantLitrCmplxs,0:JZ,JP,JY,JX));LitrfallElms_pvr=0._r8
   allocate(NetPrimProduct_pft(JP,JY,JX));     NetPrimProduct_pft=0._r8
   allocate(cumNPP_pft(JP,JY,JX)); cumNPP_pft=0._r8
+  allocate(PTSHTR_pft(JP,JY,JX)); PTSHTR_pft=0._r8
   allocate(ETCanopy_CumYr_pft(JP,JY,JX));    ETCanopy_CumYr_pft=0._r8
   allocate(CanopyRespC_CumYr_pft(JP,JY,JX));    CanopyRespC_CumYr_pft=0._r8
   allocate(EcoHavstElmnt_CumYr_pft(NumPlantChemElms,JP,JY,JX));    EcoHavstElmnt_CumYr_pft=0._r8
@@ -299,6 +305,7 @@ module PlantDataRateType
   subroutine DestructPlantRates
   use abortutils, only : destroy
   implicit none
+  call destroy(PTSHTR_pft)
   call destroy(TotBegVegE_pft)
   call destroy(TotEndVegE_pft)
   call destroy(trcs_deadroot2soil_vr)
@@ -326,7 +333,9 @@ module PlantDataRateType
   call destroy(RootH1PO4DmndSoil_pvr)
   call destroy(RootH1PO4DmndBand_pvr)
   call destroy(LeafElmntRemobFlx_brch)
+  call destroy(LeafSenescInitialElms_brch)
   call destroy(PetolShethChemElmRemobFlx_brch)
+  call destroy(PetolSenescInitialElms_brch)
   call destroy(GrossCO2Fix_pft)
   call destroy(GrossCO2Fix_CumYr_pft)
   call destroy(LitrfalStrutElms_CumYr_pft)

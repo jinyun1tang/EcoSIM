@@ -3,6 +3,7 @@ module ATSEcoSIMAdvanceMod
   !Description
 
   use data_kind_mod, only : r8 => DAT_KIND_R8, yearIJ_type
+  use StartqMod,     only : InitPlantPhenoMorphoBio, InitDimensionsandUptake
   use SoilWaterDataType
   use SoilHeatDataType
   use SharedDataMod
@@ -34,6 +35,7 @@ module ATSEcoSIMAdvanceMod
   use FlagDataType
   use ATSUtilsMod
   use EcoSIMHistMod
+  use PlantTraitsTransferMod
   !use PlantAPIData
   use EcoSIMCtrlMod,      only: ldo_sp_mode
   use EcosimBGCFluxType,  only: Eco_NetRad_col, Eco_Heat_Latent_col, &
@@ -60,7 +62,7 @@ implicit none
   use PlantMod
   use WthrMod
   use PlantInfoMod
-  use InitPlantMod
+  !use InitPlantMod
   !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
@@ -329,6 +331,8 @@ implicit none
       NP_col(NY,NX) = num_pfts
     endif
     
+    !if(ldo_sp_mode) call startq(NHW,NHE,NVN,NVS,1,num_pfts)
+
     do i=1,5
       a_VEG_test(i) = 1
     enddo
@@ -351,6 +355,12 @@ implicit none
             DATAPI(NZ,NY,NX) = a_PFT(NZ,NY)
             call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
             
+            call InitDimensionsandUptake(NZ,NY,NX)
+
+            call InitPlantPhenoMorphoBio(NZ,NY,NX)
+
+            call SendPlantTraits(NY,NX,NZ)
+
             !Set cuticle resistances scaled from pft trait file
             H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
             CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
@@ -371,7 +381,6 @@ implicit none
       enddo
     endif
   ENDDO
-
   
   !Run precribe phenology interpolation which sets necessary variables
   !To do the phenology

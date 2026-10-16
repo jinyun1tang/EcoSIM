@@ -7,6 +7,7 @@
   use SurfLitterDataType, only: XTillCorp_col
   use abortutils,         only: iulog
   use DebugToolMod,       only: PrintInfo
+  use DepositionMod,     only : ApplyBioAerosol
   use CanopyRadDataType
   use EcosimConst  
   use EcoSIMCtrlMod
@@ -72,6 +73,8 @@
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       SolarNoonHour_col(NY,NX) = SolarNoonHourYM_col(NY,NX)+ eot
+
+      call ApplyBioAerosol(I,12,NY,NX)
     ENDDO
   ENDDO    
 
@@ -243,7 +246,7 @@
       ENDIF
       !fraction of material not mixed
       XTillCorp_col(NY,NX)=1.0_r8-CORP
-!     WRITE(*,2227)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XTillCorp_col(NY,NX)
+!      WRITE(990,*)'TILL',I,iSoilDisturbType_col(I,NY,NX),CORP,XTillCorp_col(NY,NX)
 !2227  FORMAT(A8,2I4,12E12.4)
 !
 !     AUTOMATIC IRRIGATION IF SELECTED

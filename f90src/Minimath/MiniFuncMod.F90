@@ -7,6 +7,7 @@ implicit none
 
   character(len=*),private, parameter :: mod_filename = &
   __FILE__
+  
   contains
 !------------------------------------------------------------------------------------------
 
@@ -25,6 +26,20 @@ implicit none
     ans=AMAX1(ppmc,EXP(-13.833_r8-0.857_r8*LOG(-PSISM)))
   endif
   end function FilmThickness
+!------------------------------------------------------------------------------------------
+  pure function Harmonicmean_safe(a,b)result(hm)
+  implicit none
+  real(r8), intent(in) :: a,b
+  real(r8) :: hm
+  real(r8) :: tiny_val
+  tiny_val = TINY(1.0_r8)
+
+  IF (a <= tiny_val .OR. b <= tiny_val) THEN
+    hm = 0.0_r8
+  ELSE  
+    hm = 2.0_r8 * MIN(a,b) / (1.0_r8 + MIN(a,b) / MAX(a,b))  
+  endif
+  end function Harmonicmean_safe
 !------------------------------------------------------------------------------------------
 
 

@@ -172,6 +172,26 @@ module readiMod
 
 !------------------------------------------------------------------------------------------
 
+  subroutine read_aerosol_vars(loc,varname,var_val)
+  implicit none
+  integer, intent(in) :: loc
+  character(len=*), intent(in) :: varname
+  real(r8), intent(out) :: var_val
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+
+  call check_var(grid_nfid, varname, vardesc, readvar)
+  if(readvar)then
+    !Read the optional bioaerosol carbon fraction.
+    call ncd_getvar(grid_nfid,varname,loc,var_val)
+  else
+    var_val=0._r8
+  endif
+
+  end subroutine read_aerosol_vars
+
+!------------------------------------------------------------------------------------------
+
   subroutine readsiteNC(NHW,NHE,NVN,NVS)
 
   implicit none
@@ -184,6 +204,7 @@ module readiMod
   integer :: IETYPG
   integer :: ierr,jj,loc
   integer :: iWaterTabelMode
+  real(r8) :: fMoss,fLich,fLiveMB,fDeadMB,fDeadNMB,fDOM
 !
 ! READ SITE DATA
 !
@@ -233,6 +254,13 @@ module readiMod
   call ncd_getvar(grid_nfid,'DHI',loc,DHI(1:NHE))
   call ncd_getvar(grid_nfid,'DVI',loc,DVI(1:NVS))
 
+  call read_aerosol_vars(loc,'fAeroDOM',fDOM)
+  call read_aerosol_vars(loc,'fAeroDeadMB',fDeadMB)
+  call read_aerosol_vars(loc,'fAeroLiveMB',fLiveMB)
+  call read_aerosol_vars(loc,'fAeroMoss',fMoss)
+  call read_aerosol_vars(loc,'fAeroLich',fLich)
+  call read_aerosol_vars(loc,'fAeroDeadNMB',fDeadNMB)
+
   if(lverb)then
     write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
@@ -271,6 +299,14 @@ module readiMod
   
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
+      !Partition bioaerosol carbon among organic matter and live biomass.
+      f_aerosol_DOM_col(NY,NX)     = fDOM     !dissolved organic matter
+      f_aerosol_DeadMB_col(NY,NX)  = fDeadMB  !dead microbial biomass
+      f_aerosol_DeadNMB_col(NY,NX) = fDeadNMB !dead nonmicrobial biomass
+      f_aerosol_LiveMB_col(NY,NX)  = fLiveMB  !live microbial biomass
+      f_aerosol_MossB_col(NY,NX)   = fMoss    !live moss
+      f_aerosol_LichB_col(NY,NX)   = fLich    !live lichen
+
       ALAT_col(NY,NX)             = ALATG
       PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
       ALTI_col(NY,NX)             = ALTIG
@@ -338,6 +374,9 @@ module readiMod
   integer :: NM(JY,JX),ntp,ntopus
   real(r8) :: dat1(1:JZ)
   real(r8) :: corrector,OrgVolFrac
+  real(r8) :: fAeroScalar
+  logical :: readvar_scalar
+  type(Var_desc_t) :: vardesc
 ! begin_execution
   associate(                            &
   k_woody_comp => micpar%k_woody_comp , &
@@ -357,6 +396,8 @@ module readiMod
 
   ntopus=get_dim_len(grid_nfid, 'ntopou')
   if(first_topou)ntopus=1
+  call check_var(grid_nfid, 'fAeroScalar', vardesc, readvar_scalar)
+  fAeroScalar=0._r8
   DO ntp=1,ntopus
     call ncd_getvar(grid_nfid, 'NH1', ntp, NH1)
     call ncd_getvar(grid_nfid, 'NV1', ntp, NV1)
@@ -365,6 +406,11 @@ module readiMod
     call ncd_getvar(grid_nfid, 'ASPX', ntp,ASPX) !clockwise degrees from north
     call ncd_getvar(grid_nfid, 'SL0', ntp,SL0)
     call ncd_getvar(grid_nfid, 'DPTHSX', ntp,initSnowDepth)
+    
+    if(readvar_scalar)then
+      !Read the optional bioaerosol carbon fraction.
+      call ncd_getvar(grid_nfid,'fAeroScalar',ntp,fAeroScalar)      
+    endif
 
 !
 ! OPEN AND READ SOIL FILE
@@ -375,6 +421,7 @@ module readiMod
 !
 !     SURFACE SLOPES AND ASPECTS
 !
+        fAeroScalar_col(NY,NX)=fAeroScalar
         ASP_col(NY,NX)       = ASPX
         SL_col(NY,NX)        = SL0
         SnowDepth_col(NY,NX) = initSnowDepth
@@ -408,11 +455,13 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NL1'   ,ntp,NL1)
     call ncd_getvar(grid_nfid, 'NL2'   ,ntp,NL2)
     call ncd_getvar(grid_nfid, 'ISOILR',ntp,ISOILR_col(NV1,NH1))
-    
+
     NU_col(NV1,NH1) = NUI_col(NV1,NH1)    
     NK_col(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+1
-    NM(NV1,NH1) = MaxNumRootLays_col(NV1,NH1)+NL1
+    NM(NV1,NH1)     = MaxNumRootLays_col(NV1,NH1)+NL1
     
+    
+
 !  the extra soil layer below root zone cannot be greater than what is allowed
     NL2=min0(JZ-NM(NV1,NH1),NL2)
     NLI_col(NV1,NH1) = NM(NV1,NH1)+NL2
@@ -616,9 +665,9 @@ module readiMod
         if(lverb)then
           CALL Disp_topo_charc(NY,NX,NU_col(NY,NX),NM(NY,NX))
         endif
-!        RSC_vr(k_fine_comp,0,NY,NX)     = AMAX1(ppmc,RSC_vr(k_fine_comp,0,NY,NX))
-!        RSN_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_comp,0,NY,NX))
-!        RSP_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_comp,0,NY,NX))
+        RSC_vr(k_fine_comp,0,NY,NX)     = AMAX1(1.00E-06_r8,RSC_vr(k_fine_comp,0,NY,NX))
+        RSN_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.04E-06_r8,RSN_vr(k_fine_comp,0,NY,NX))
+        RSP_vr(k_fine_comp,0,NY,NX)     = AMAX1(0.004E-06_r8,RSP_vr(k_fine_comp,0,NY,NX))
 
         SatHydroCondVert_vr(0,NY,NX) = 10.0_r8*0.098_r8
         !
@@ -735,8 +784,8 @@ module readiMod
           SatHydroCondHrzn_vr(L,NY,NX) = 0.098_r8*SatHydroCondHrzn_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
           CCLAY_vr(L,NY,NX)            = AZMAX1(1.0E+03_r8-(CSAND_vr(L,NY,NX)+CSILT_vr(L,NY,NX)))
           !convert from Kg to g C (C is input as kgC/Mg soil, N and P are input as g/Mg soil)
-          CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8
-          COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NY,NX)*1.0E+03_r8   !convert from kg C to g C
+          CSoilOrgM_vr(ielmc,L,NY,NX)  = CSoilOrgM_vr(ielmc,L,NY,NX)*1.0E+03_r8  !from kg C to g C
+          COMLitrC_vr(L,NY,NX)         = COMLitrC_vr(L,NY,NX)*1.0E+03_r8         !from kg C to g C
           CORGCI_vr(L,NY,NX)           = CSoilOrgM_vr(ielmc,L,NY,NX)
           SoilFracAsMacPt0_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)
           ! soil texture is reported based on mass basis soley for mineral component of the soil

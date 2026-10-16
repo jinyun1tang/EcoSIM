@@ -213,19 +213,19 @@ contains
       SnowMassErr_test = SnowMassBeg_col(NY,NX)-SnowMassEnd_col(NY,NX)+Prec2Snow_col(NY,NX)-QSnowH2Oloss_col(NY,NX)
 
       canopyH2Oerr_test=CanopyWaterMassBeg_col(NY,NX)-CanopyWaterMassEnd_col(NY,NX)+RainIntceptByCanopy_col(NY,NX) &
-        +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)+SnowIntceptByCanopy_col(NY,NX)
+        +QVegET_col(NY,NX)-TPlantRootH2OUptake_col(NY,NX)-QCanopyWatLoss2Dist_col(NY,NX)+SnowIntceptByCanopy_col(NY,NX)
 
       if(fixWaterLevel)then
         WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)
       else      
         WaterErr_test = WaterErr_col(NY,NX)-WatMass_col(NY,NX)+PrecAtm_col(NY,NX)+Irrigation_col(NY,NX)+QLaterFlow2Cell_col(NY,NX) &
           +RainLitr_col(NY,NX)+VapXAir2GSurf_col(NY,NX)+QVegET_col(NY,NX)+QRunSurf_col(NY,NX) &
-          -QDrain_col(NY,NX)-QDischarg2WTBL_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWat2Dist_col(NY,NX)
+          -QDrain_col(NY,NX)-QDischarg2WTBL_col(NY,NX)+TPlantRootH2OUptake_col(NY,NX)-QCanopyWatLoss2Dist_col(NY,NX)
       endif
       HeatErr_test = HeatErr_col(NY,NX)-HeatStore_col(NY,NX)+THeatRootRelease_col(NY,NX) &
         +HeatSource_col(NY,NX)+Eco_NetRad_col(NY,NX)+Eco_Heat_Latent_col(NY,NX)+Eco_Heat_Sens_col(NY,NX)&
         +PrecHeat_col(NY,NX)+THeatSoiThaw_col(NY,NX)+THeatSnowThaw_col(NY,NX)+HeatRunSurf_col(NY,NX) &
-        -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-HeatCanopy2Dist_col(NY,NX)
+        -HeatDrain_col(NY,NX)-HeatDischar_col(NY,NX)-CanopyHeatLoss2Dist_col(NY,NX)
 
       if(abs(WaterErr_test)>err_h2o .and. etimer%get_nstep()>1)then
         if(iVerbLevel==1 .or. abs(SoilWatErr_test)>err_h2o)then
@@ -287,6 +287,9 @@ contains
       !Turn off the tracer mass conservation check momentarily, due to complication of 
       !grid change. It will be turned on when a safe strategy will be figured out later.
       
+      Hydroloss_NH4_cumflx_col(NY,NX)=Hydroloss_NH4_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NH4,NY,NX)++trcnuts_hydrloss_flx_col(ids_NH4B,NY,NX)
+      Hydroloss_NO3_cumflx_col(NY,NX)=Hydroloss_NO3_cumflx_col(NY,NX)+trcnuts_hydrloss_flx_col(ids_NO3,NY,NX)++trcnuts_hydrloss_flx_col(ids_NO3B,NY,NX)
+
       DO idg=idg_beg,idg_NH3        
         
         tracer_mass_err = trcg_TotalMass_beg_col(idg,NY,NX) -trcg_TotalMass_col(idg,NY,NX) &
@@ -306,9 +309,9 @@ contains
           tracer_rootmass_err=tracer_rootmass_err+trcs_Soil2plant_uptake_col(idg_NH3B,NY,NX)
         endif
 
-        if(idg==idg_O2)then
+        if(idg.eq.idg_O2)then
           tracer_rootmass_err = tracer_rootmass_err-RootO2_TotSink_col(NY,NX)
-        elseif(idg==idg_CO2)then
+        elseif(idg.eq.idg_CO2)then
           tracer_rootmass_err = tracer_rootmass_err+RootCO2Ar2Root_col(NY,NX)
         endif
 
@@ -331,11 +334,11 @@ contains
             write(111,*)'surf all emis    =',SurfGasEmiss_all_flx_col(idg,NY,NX)          
             write(111,*)'surf emis        =',SurfGasEmiss_flx_col(idg,NY,NX), SurfGasEmiss_all_flx_col(idg,NY,NX) -SurfGasEmiss_flx_col(idg,NY,NX)                      
             write(111,*)'GasHydroloss     =',GasHydroLoss_flx_col(idg,NY,NX)
-            if(idg==idg_N2)then
+            if(idg.eq.idg_N2)then
               write(111,*)'RGasNetProd,rNfix,mup=',RGasNetProd_col(idg,NY,NX),RootN2Fix_col(NY,NX),trcs_RMicbUptake_col(idg,NY,NX)
-            elseif(idg==idg_CO2)then
+            elseif(idg.eq.idg_CO2)then
               write(111,*)'RGasNetProd     =',RGasNetProd_col(idg,NY,NX),-RootCO2AutorPrev_col(NY,NX)  
-            elseif(idg==idg_NH3)then
+            elseif(idg.eq.idg_NH3)then
               write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX)
             else
               write(111,*)'RGasNetProd,micup =',RGasNetProd_col(idg,NY,NX),trcs_RMicbUptake_col(idg,NY,NX)

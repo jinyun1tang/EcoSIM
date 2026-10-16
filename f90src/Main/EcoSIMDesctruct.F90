@@ -53,6 +53,7 @@ module EcoSIMDesctruct
   use PlantTraitTableMod  , only : DestructPlantTraitTable
   use MicBGCAPI           , only : MicAPI_cleanup  
   use RadiationDataMod    , only : DestroyRadiationData
+  use MLDataDiagType      , only : DestructMLDataType
   implicit none
 
   call MicAPI_cleanup
@@ -132,6 +133,8 @@ module EcoSIMDesctruct
   call destructSoilWarming()
 
   call DestructNumericAux()
+  
+  call DestructMLDataType
   
   call DestroyRadiationData
   call CleanUpTracerIDs

@@ -8,9 +8,10 @@ module RedistMod
   use MiniFuncMod,       only: gOC_to_m3_OM
   use TracerPropMod,     only: MolecularWeight
   use BalancesMod,       only: SummarizeTracers
+  use EcoSIMConfig, only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use DebugToolMod
-  use LateralTranspMod
-  use SoilBGCNLayMod  
+  use LateralTranspMod 
+  use MicrobialDiagMod
   use ElmIDMod
   use EcosimConst
   use FlagDataType
@@ -208,9 +209,8 @@ module RedistMod
 
   DO idg=idg_beg,idg_NH3
     SurfGasEmiss_all_flx_col(idg,NY,NX) = SurfGasEmiss_all_flx_col(idg,NY,NX)     &
-      + TRootGasLossDisturb_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)
-
-    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmiss_all_flx_col(idg,NY,NX)
+      + TRootGasLossDisturb_col(idg,NY,NX)+trcg_air2root_flx_col(idg,NY,NX)    
+!    SurfGas_lnd(idg)  = SurfGas_lnd(idg)+SurfGasEmiss_all_flx_col(idg,NY,NX)
   ENDDO
 
   Eco_NetRad_col(NY,NX)        = Eco_NetRad_col(NY,NX)+HeatByRad2Surf_col(NY,NX)
@@ -222,6 +222,7 @@ module RedistMod
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
+  
   Eco_NPP_CumYr_col(NY,NX)         = Eco_GPP_CumYr_col(NY,NX)+Eco_AutoR_CumYr_col(NY,NX)
   Eco_NBP_CumYr_col(NY,NX)         = Eco_NBP_CumYr_col(NY,NX)+Eco_NEE_col(NY,NX) &
     +SurfGasEmiss_all_flx_col(idg_CH4,NY,NX) +Txchem_CO2_col(NY,NX) &
@@ -262,6 +263,7 @@ module RedistMod
     VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
     VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacP_vr(L,NY,NX)
     TCS_vr(L,NY,NX)       = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
+    !relative soil saturation
     ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
       VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
     ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacP_vr(L,NY,NX), &
@@ -610,7 +612,7 @@ module RedistMod
 !
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
-      DO  NO=1,NumMicbFunGrupsPerCmplx
+      DO  NO=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(NO),JGnfH(NO)
           DO  M=1,nlbiomcp
             MID=micpar%get_micb_id(M,NGL)
@@ -624,7 +626,7 @@ module RedistMod
       enddo
     ENDDO D9280
 
-    DO  NO=1,NumMicbFunGrupsPerCmplx
+    DO  NO=1,NumMicbAFunGrupsPerCmplx
       DO NGL=JGniA(NO),JGnfA(NO)
         DO  M=1,nlbiomcp
           MID=micpar%get_micb_id(M,NGL)
@@ -872,7 +874,7 @@ module RedistMod
       ELSE
         VLsoiAirP_vr(L,NY,NX)=0.0_r8
       ENDIF
-
+      ENGY                = VHeatCapacity_vr(L,NY,NX)*TKS_vr(L,NY,NX)
       TVHeatCapacity      = TVHeatCapacity+VHeatCapacity_vr(L,NY,NX)
       TVHeatCapacitySoilM = TVHeatCapacitySoilM+VHeatCapSolidSoil_vr(L,NY,NX)
       TVOLW               = TVOLW+VLWatMicP_vr(L,NY,NX)
@@ -1340,10 +1342,10 @@ module RedistMod
       HRAINR                       = (RAINR*cpw+gOC_to_m3_OM(dOM)*cpo)*TairK_col(NY,NX)
       WatFLo2LitR_col(NY,NX)       = WatFLo2LitR_col(NY,NX)+RAINR
 
-      VLWatMicP_vr(0,NY,NX)        = VLWatMicP_vr(0,NY,NX)+RAINR
-      QCanopyWat2Dist_col(NY,NX)   = QCanopyWat2Dist_col(NY,NX)+RAINR
-      CanopyBiomWater_col(NY,NX)         = CanopyBiomWater_col(NY,NX)-RAINR
-      HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
+      VLWatMicP_vr(0,NY,NX)          = VLWatMicP_vr(0,NY,NX)+RAINR
+      QCanopyWatLoss2Dist_col(NY,NX) = QCanopyWatLoss2Dist_col(NY,NX)+RAINR
+      CanopyBiomWater_col(NY,NX)     = CanopyBiomWater_col(NY,NX)-RAINR
+      HeatFLoByWat2LitR_col(NY,NX)   = HeatFLoByWat2LitR_col(NY,NX)+HRAINR
 
       dWat                         = dWat + RAINR
       dHeat                        = dHeat + HRAINR
@@ -1352,7 +1354,8 @@ module RedistMod
       PrecHeat_col(NY,NX)          = PrecHeat_col(NY,NX) + HRAINR
       RainLitr_col(NY,NX)          = RainLitr_col(NY,NX)+RAINR
     enddo
-    call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK)
+    
+    !if(OSCMK.GT.0._r8)call MicrobeByLitterFall(I,J,K,NY,NX,OSCMK,OME_in)
   ENDDO
 
   call SumSurfMicBGCFluxes(I,J,NY,NX)
@@ -1401,7 +1404,7 @@ module RedistMod
 !
   DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
-      DO  N=1,NumMicbFunGrupsPerCmplx
+      DO  N=1,NumMicbHFunGrupsPerCmplx
         DO NGL=JGniH(N),JGnfH(N)
           !litter layer
           REcoO2DmndResp_vr(0,NY,NX)            = REcoO2DmndResp_vr(0,NY,NX)+RO2DmndHetert_vr(NGL,K,0,NY,NX)
@@ -1416,15 +1419,19 @@ module RedistMod
           RAcetateEcoDmndK_vr(K,0,NY,NX)        = RAcetateEcoDmndK_vr(K,0,NY,NX)+RAcetateUptkHeter_vr(NGL,K,0,NY,NX)
           !top soil
           REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNH4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)+RNH4DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNO3DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)+RNO3DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH2PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH2PO4DmndLitrBandHeter_col(NGL,K,NY,NX)
           REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH1PO4DmndLitrHeter_col(NGL,K,NY,NX)
+          REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH1PO4DmndLitrBandHeter_col(NGL,K,NY,NX)
         ENDDO
       ENDDO
     ENDIF
   ENDDO
 
-  DO  N=1,NumMicbFunGrupsPerCmplx
+  DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       !litter layer
       RCH4EcoDmnd_vr(0,NY,NX)               = RCH4EcoDmnd_vr(0,NY,NX)+RCH4MetaDmndAutor_vr(NGL,0,NY,NX)
@@ -1438,9 +1445,13 @@ module RedistMod
       REcoH1PO4DmndSoil_vr(0,NY,NX)         = REcoH1PO4DmndSoil_vr(0,NY,NX)+RH1PO4UptkSoilAutor_vr(NGL,0,NY,NX)
       !top soil layer
       REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNH4UptkLitrAutor_col(NGL,NY,NX)
+      REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNH4DmndBand_vr(NU_col(NY,NX),NY,NX)+RNH4UptkLitrBandAutor_col(NGL,NY,NX)
       REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndSoil_vr(NU_col(NY,NX),NY,NX)+RNO3UptkLitrAutor_col(NGL,NY,NX)
+      REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)   = REcoNO3DmndBand_vr(NU_col(NY,NX),NY,NX)+RNO3UptkLitrBandAutor_col(NGL,NY,NX)
       REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH2PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH2PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH2PO4UptkLitrBandAutor_col(NGL,NY,NX)
       REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndSoil_vr(NU_col(NY,NX),NY,NX)+RH1PO4UptkLitrAutor_col(NGL,NY,NX)
+      REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX) = REcoH1PO4DmndBand_vr(NU_col(NY,NX),NY,NX)+RH1PO4UptkLitrBandAutor_col(NGL,NY,NX)
     ENDDO
   ENDDO
 

@@ -339,7 +339,9 @@ implicit none
           ENDDO
         ENDDO
       ENDDO
-
+      do ids=ids_nuts_beg,ids_nuts_end
+        trcnuts_hydrloss_flx_col(ids,NY,NX)=trcnuts_hydrloss_flx_col(ids,NY,NX)+trcs_hydrloss_slow_flx_col(idg,NY,NX)
+      enddo
       DO idg=idg_beg,idg_NH3
         GasDiff2Surf_flx_col(idg,NY,NX)       = GasDiff2Surf_flx_col(idg,NY,NX)+AtmGasDiff2Surf_slow_flx_col(idg,NY,NX)
         GasHydroLoss_flx_col(idg,NY,NX)       = GasHydroLoss_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg,NY,NX)
