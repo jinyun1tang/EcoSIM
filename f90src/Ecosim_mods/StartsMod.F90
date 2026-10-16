@@ -636,7 +636,7 @@ module StartsMod
       GroundSurfaceAzimuth_col(NY,NX)       = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfaceAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfaceAzimuth_col(NY,NX)))
-      SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4~0.01o
+      SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,TAN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4~0.01o
       SLOPE_col(iWestEastDirection,NY,NX)   = -AZERO(SLOPE_col(0,NY,NX)*COS(GroundSurfaceAzimuth_col(NY,NX)))   !elevation increases from west to east, if west facing
       SLOPE_col(iNorthSouthDirection,NY,NX) = AZERO(SLOPE_col(0,NY,NX)*SIN(GroundSurfaceAzimuth_col(NY,NX)))    !elevation increases from north to south, if north facing
 
@@ -678,13 +678,14 @@ module StartsMod
       ENDIF
 
 !    Compute radiation geometry with sine, independently of the tangent used for SLOPE_col.
-      SineGrndSlope_col(NY,NX)   = SLOPE_col(0,NY,NX)    !preserve the radiation minimum slope
+      SineGrndSlope_col(NY,NX)   = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))    !preserve the radiation minimum slope
       CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2)
       D240: DO N=1,NumOfSkyAzimuthSects
         DGAZI                 = COS(GroundSurfaceAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
         OMEGA2Ground(N,NY,NX) = AZMAX1(AMIN1(1.0_r8,CosineGrndSlope_col(NY,NX)*YSIN(N)+ &
           SineGrndSlope_col(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
+
 !     compute ground surface elevation
 !     DH, length in e-w direction
       IF(NX.EQ.NHW)THEN
@@ -712,11 +713,11 @@ module StartsMod
             +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +SurfElevation_col(NY-1,NX) &
             +0.5_r8*DV_col(NY-1,NX)*SLOPE_col(iNorthSouthDirection,NY-1,NX) &
-            +0.5_r8*DV_col(NY,N)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0
+            +0.5_r8*DV_col(NY,N)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0_r8
         ENDIF
       ENDIF
 
-      IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
+      IF(NX.EQ.NHW .AND. NY.EQ.NVN)THEN
         !(west,north) corner, anchor point
         SurfElevLandscapeMax=SurfElevation_col(NY,NX)
       ELSE
@@ -1063,7 +1064,7 @@ module StartsMod
       !     SurfElevLandscapeMin=minimum surface elevation in landscape
       !CDPTH: depth to bottom of soil layer
       SurfElevation_col(NY,NX)=SurfElevation_col(NY,NX)-SurfElevLandscapeMax
-      IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
+      IF(NX.EQ.NHW .AND. NY.EQ.NVN)THEN
         SurfElevLandscapeMin=SurfElevation_col(NY,NX)
       ELSE
         SurfElevLandscapeMin=MIN(SurfElevLandscapeMin,SurfElevation_col(NY,NX))
