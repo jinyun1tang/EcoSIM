@@ -1621,7 +1621,8 @@ implicit none
     -solute_adv_Lit2Soil_flxM(idg_NH3B)-trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
 
   trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX) &
-    +solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
+    +trcn_AquaADV_Snow2Band_flxM(idg_NH3B,NY,NX) &
+    +solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)
 
   Gas_litr2Soil_flxM_col(idg_NH3B,NY,NX)= solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
 
@@ -3651,8 +3652,8 @@ implicit none
           lflux=.true. .or. .not.isclose(flux,0._r8)
           if(lflux .and. dpscal(idn)>tiny_p)then          
             flux=flux*dpscal(idn)             
-            call get_flux_scalar(trcn_solsml2_snvr(idn,L,NY,NX),flux,trcn_solsml2_snvr(idn,L,NY,NX),pscal(idn))
-            if(lfupdate)trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml2_snvr(idn,L,NY,NX)
+            call get_flux_scalar(trcn_solsml2_snvr(idn,L,NY,NX),flux,trcn_solsml_snvr(idn,L,NY,NX),pscal(idn))
+            if(lfupdate)trcn_solsml2_snvr(idn,L,NY,NX)=trcn_solsml_snvr(idn,L,NY,NX)
           endif  
         ENDDO
       ENDDO
