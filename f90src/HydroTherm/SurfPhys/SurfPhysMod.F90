@@ -150,7 +150,7 @@ contains
       !     CumDepz2LayBottom_vr(NUM_col(NY,NX)-1),=depth of ground surface
       !     EnergyImpact4Erosion_col=cumulative rainfall energy impact on soil surface
       !
-      Altitude_col(NY,NX)        = SurfElevation_col(NY,NX)-CumDepz2LayBottom_vr(NUM_col(NY,NX)-1,NY,NX)
+      Altitude_col(NY,NX)             = SurfElevation_col(NY,NX)-CumDepz2LayBottom_vr(NUM_col(NY,NX)-1,NY,NX)
       EnergyImpact4Erosion_col(NY,NX) = EnergyImpact4Erosion_col(NY,NX)*(1.0_r8-FEnergyImpact4Erosion_col)
 
       call StageSnowModel(I,J,NY,NX)
