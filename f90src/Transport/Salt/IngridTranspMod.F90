@@ -557,7 +557,11 @@ module IngridTranspMod
         IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
         ELSE
-          VFLWW=1.0_r8
+          ! Intentional numerical redistribution for negligible liquid:
+          ! transfer a small tracer fraction even when water flow is zero.
+          ! This is not water-driven advection; its cumulative effect
+          ! depends on the number of transport substeps.
+          VFLWW=1.e-8_r8
         ENDIF
 
         DO idsalt=idsalt_beg,idsalt_end

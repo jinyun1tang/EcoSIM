@@ -1832,7 +1832,7 @@ implicit none
               ENDDO
 
               DO idn=ids_nut_beg,ids_nuts_end
-                trcn_SnowDrift_flxM_2DH(idn,N,iBehind,N5,N4) = VFLW*AZMAX1(trcn_solsml2_snvr(idn,1,N5,N4))
+                trcn_SnowDrift_flxM_2DH(idn,N,iBehind,N5,N4) = VFLW*AZMAX1(trcn_solsml2_snvr(idn,1,N2,N1))
               ENDDO
             ENDIF  
             !check legitimate behind grid  
@@ -1894,9 +1894,12 @@ implicit none
             !some flowout
             IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
               VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
-              !no water is layer L, all water is gone to L2
             ELSE          
-              VFLWW=1.0_r8
+              ! Intentional numerical redistribution for negligible liquid:
+              ! transfer a small tracer fraction even when water flow is zero.
+              ! This is not water-driven advection; its cumulative effect
+              ! depends on the number of transport substeps.
+              VFLWW=1.e-8_r8
             ENDIF
             !flux from layer L into layer L2
             DO idg=idg_beg,idg_NH3
