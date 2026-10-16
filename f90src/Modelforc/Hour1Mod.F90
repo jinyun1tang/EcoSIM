@@ -13,7 +13,7 @@ module Hour1Mod
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
-  use HydrologyDiagMod , only: DiagWaterTBLDepz
+  use HydrologyDiagMod , only: DiagWaterTableDepZi
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -175,7 +175,7 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call DiagWaterTBLDepz(I,J,NY,NX)
+      call DiagWaterTableDepZi(I,J,NY,NX)
 
       call GetChemicalConcsInSoil(I,J,NY,NX)
 

@@ -15,43 +15,34 @@ module HydrologyDiagMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  public :: DiagWaterTBLDepz
+  public :: DiagWaterTableDepZi
 
   contains
 !------------------------------------------------------------------------------------------
 
-  subroutine DiagWaterTBLDepz(I,J,NY,NX)
+  subroutine DiagWaterTableDepZi(I,J,NY,NX)
   !
   !Description:
   !Diagnose water table depth in the soil column
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  real(r8) :: THETPZ_vr(JZ)  !air-filled porosity in layer
-  real(r8) :: PSIEquil       !equilibrium matric potential
+  real(r8) :: THETAirP_vr(JZ)  !air-filled porosity in layer
+  real(r8) :: PSIEquil         !hydrostatic equilibrium matric potential [MPa]
   real(r8) :: THETW1
   real(r8) :: THETWM
   real(r8) :: THETPX
-  real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)  
-  real(r8) :: THETWP  
+  real(r8), parameter :: THETPW =1.e-3_r8   !maximum air-filled porosity for saturation (m3 m-3)
   integer :: LL,L
   logical :: FoundWaterTable
-  character(len=*), parameter :: subname='DiagWaterTBLDepz'
+  character(len=*), parameter :: subname='DiagWaterTableDepZi'
 
 !     begin_execution
   call PrintInfo('beg '//subname)
-  THETPW          = 0.01_r8
-  THETWP          = 1.0_r8-THETPW
-  FoundWaterTable = .false.
 
-  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
-!     IDWaterTable=water table flag from site file
-!     THETPZ,THETPW=current,minimum air-filled, porosity for water table
-!     DPTH,ExtWaterTable=depth of soil layer midpoint, water table
-!     PSIEquil=water potential in hydraulic equilibrium with layer below
-!     THETW1,THETWP=water content at PSIEquil,minimum SWC for water table
-!     WaterTableDepZi_col=water table depth
-!
+  ! Refresh all active layers before searching, including layers below the
+  ! diagnosed table. Air porosity counts both liquid and ice pore occupancy.
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
     IF(VLSoilMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
       THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
       THETI_vr(L,NY,NX)    = 0._r8
@@ -62,62 +53,59 @@ module HydrologyDiagMod
       ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
     ENDIF
 
-    THETPZ_vr(L)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
+    THETAirP_vr(L)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
+  ENDDO
 
-    IF(IDWaterTable_col(NY,NX).NE.0)THEN
-      IF(FoundWaterTable)exit
-      
-      IF(THETPZ_vr(L).LT.THETPW &         !layer is saturated
-        .OR. L.EQ.NL_col(NY,NX))THEN      !bottom layer
-        FoundWaterTable=.true.
-        IF(SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN   !current middle depth is above external water table
-          D5705: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
-            IF(THETPZ_vr(LL).GE.THETPW .AND. LL.NE.NL_col(NY,NX))THEN !it is an unsaturated inner layer
-              !air-filled pore greater minimum, i.e. not saturated
-              FoundWaterTable=.false.
-              exit
-            ELSE IF(SoilDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))THEN  !
-              !current layer is lower than external water table
-              exit
-            ENDIF
-          END DO D5705
-        ENDIF
+  IF(IDWaterTable_col(NY,NX).NE.0)THEN
+    ! If no connected saturated zone is found, estimate a below-profile table
+    ! from bottom-layer pressure, assuming psi=0 at the table and hydrostatic
+    ! equilibrium. This is a diagnostic estimate, not a water transfer.
+    L=NL_col(NY,NX)
+    WaterTableDepZi_col(NY,NX)=AMAX1(CumDepz2LayBottom_vr(L,NY,NX), &
+      SoilDepthMidLay_vr(L,NY,NX)-PSISoilMatricP_vr(L,NY,NX)/mGravAccelerat)
 
-        !THETPW=saturation criterion for water table identification
-        IF(FoundWaterTable)THEN
-          IF(THETPZ_vr(L).GE.THETPW .AND. L.NE.NL_col(NY,NX))THEN !saturated and inside the hydrologically active zone
-            !not bottom layer, saturated
-            !PSIeqv in saturated layer
-            PSIEquil = PSISoilMatricP_vr(L+1,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L+1,NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
-            THETWM   = THETWP*POROS_vr(L,NY,NX)          !threshold air-filled volume
-            THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-              *PSD_vr(L,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L,NY,NX)))
-
-            IF(THETWM.GT.THETW1)THEN
-              THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L,NY,NX))/(THETWM-THETW1)))
-              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*(1.0_r8-THETPX)     !internal water depth depth relative to current layer upper depth
-            ELSE
-              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)                     !set to upper edge of current layer
-            ENDIF
-          ELSEIF(L.GT.NU_col(NY,NX))THEN
-            !not bottom layer, and not topsoil layer, partially saturated
-            PSIEquil = PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(L-1,NY,NX))
-            THETWM   = THETWP*POROS_vr(L-1,NY,NX)
-            THETW1   = AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
-              *PSD_vr(L-1,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(L-1,NY,NX)))
-            IF(THETWM.GT.THETW1)THEN
-              THETPX                 = AMIN1(1.0_r8,AZMAX1((THETWM-THETW_vr(L-1,NY,NX))/(THETWM-THETW1)))
-              WaterTableDepZi_col(NY,NX) = CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)*(1.0_r8-THETPX)
-            ELSE
-              WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(L-1,NY,NX)-DLYR_3D(3,L-1,NY,NX)
-            ENDIF
-          ELSE
-            WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+    DO L=NU_col(NY,NX),NL_col(NY,NX)
+      IF(THETAirP_vr(L).GT.THETPW)cycle
+      FoundWaterTable=.true.
+      IF(SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN
+        ! Reject a perched candidate separated from the external table (or
+        ! profile bottom) by an unsaturated layer, including a dry bottom.
+        DO LL=L+1,NL_col(NY,NX)
+          IF(THETAirP_vr(LL).GT.THETPW)THEN
+            FoundWaterTable=.false.
+            exit
           ENDIF
+          IF(SoilDepthMidLay_vr(LL,NY,NX).GE.ExtWaterTable_col(NY,NX))exit
+        ENDDO
+      ENDIF
+      IF(.not.FoundWaterTable)cycle
+
+      IF(L.GT.NU_col(NY,NX))THEN
+        ! Interpolate in the layer immediately above the accepted saturated
+        ! layer. Use the same absolute air tolerance as the detection test;
+        ! ice occupies pores but is not part of the liquid-water threshold.
+        LL=L-1
+        PSIEquil=PSISoilMatricP_vr(L,NY,NX)-mGravAccelerat* &
+          (SoilDepthMidLay_vr(L,NY,NX)-SoilDepthMidLay_vr(LL,NY,NX))
+        THETWM=AZMAX1(POROS_vr(LL,NY,NX)-THETI_vr(LL,NY,NX)-THETPW)
+        IF(PSIEquil.GE.-EXP(LOGPSIAtSat(NY,NX)))THEN
+          THETW1=THETWM
+        ELSE
+          THETW1=AMIN1(THETWM,EXP((LOGPSIAtSat(NY,NX)-LOG(-PSIEquil)) &
+            *PSD_vr(LL,NY,NX)/LOGPSIMXD_col(NY,NX)+LOGPOROS_vr(LL,NY,NX)))
         ENDIF
-      ENDIF      
-    ENDIF
-  END DO
+        THETPX=0._r8
+        IF(THETWM.GT.THETW1)THEN
+          THETPX=AMIN1(1._r8,AZMAX1((THETWM-THETW_vr(LL,NY,NX))/(THETWM-THETW1)))
+        ENDIF
+        WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(LL,NY,NX) &
+          -DLYR_3D(3,LL,NY,NX)*(1._r8-THETPX)
+      ELSE
+        WaterTableDepZi_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
+      ENDIF
+      exit
+    ENDDO
+  ENDIF
   call PrintInfo('end '//subname)
-  end subroutine DiagWaterTBLDepz
+  end subroutine DiagWaterTableDepZi
 end module HydrologyDiagMod  
