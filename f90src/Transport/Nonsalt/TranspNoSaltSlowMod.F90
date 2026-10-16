@@ -1199,6 +1199,8 @@ implicit none
   real(r8) :: trcs_Dif_Litr2Soil_flxM(ids_beg:ids_end)
   real(r8) :: DOM_Adv_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)
   real(r8) :: DOM_Difus_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8) :: solute_adv_Lit2MacP_flxM(ids_beg:ids_end)
+  real(r8) :: DOM_Adv_Litr2MacP_flxM(idom_beg:idom_end,1:jcplx)
 
 
   call PrintInfo('beg '//subname)
@@ -1211,7 +1213,8 @@ implicit none
       !
       call AtmosSoilExchangeM(I,J,M,NY,NX,trcs_cl_soil)
       !
-      call Lit2SoilTracerAdvectM(I,J,M,NY,NX,FLWRM1,solute_adv_Lit2Soil_flxM,DOM_Adv_Litr2Soil_flxM)
+      call Lit2SoilTracerAdvectM(I,J,M,NY,NX,FLWRM1,solute_adv_Lit2Soil_flxM,DOM_Adv_Litr2Soil_flxM,&
+        solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
       !
       call LitterSoilTracerDiffusionM(I,J,M,NY,NX,FLWRM1,trcs_cl_litr,trcs_cl_soil,&
         trcs_Dif_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM)
@@ -1219,7 +1222,7 @@ implicit none
       !-----------------------------------------------------------------        
       !
       call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
-        DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM)     
+        DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
     ENDDO
   ENDDO
 
@@ -1382,7 +1385,8 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Lit2SoilTracerAdvectM(I,J,M,NY,NX,FLWRM1,solute_adv_Lit2Soil_flxM,DOM_Adv_Litr2Soil_flxM)
+  subroutine Lit2SoilTracerAdvectM(I,J,M,NY,NX,FLWRM1,solute_adv_Lit2Soil_flxM,DOM_Adv_Litr2Soil_flxM,&
+    solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
   !
   ! Description:
   ! Litter and top soil tracer exchange by (upstream) advection
@@ -1393,23 +1397,27 @@ implicit none
   real(r8),intent(out) :: solute_adv_Lit2Soil_flxM(ids_beg:ids_end)
   real(r8),intent(out) :: FLWRM1    !water flow from litter to soil at iteration M
   real(r8),intent(out) :: DOM_Adv_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)
+  real(r8),intent(out) :: solute_adv_Lit2MacP_flxM(ids_beg:ids_end)
+  real(r8),intent(out) :: DOM_Adv_Litr2MacP_flxM(idom_beg:idom_end,1:jcplx)
 
   character(len=*), parameter :: subname='Lit2SoilTracerAdvectM'
-  REAL(R8) :: VFLW
+  REAL(R8) :: VFLW,FracMic,FracMac,GasFracMic
   integer :: K,idn,idom,idg,idn1,ids
 
   call PrintInfo('beg '//subname)
 
   FLWRM1=WatFLoLitr2SoilM_col(M,NY,NX)
+  solute_adv_Lit2Soil_flxM=0._r8; DOM_Adv_Litr2Soil_flxM=0._r8
+  solute_adv_Lit2MacP_flxM=0._r8; DOM_Adv_Litr2MacP_flxM=0._r8
+  call LitterInfiltrationFractions(FLWRM1,WatFLoLitr2MacPM_col(M,NY,NX),SurfRunoffPotentM_col(M,NY,NX),&
+    VLWatMicPM_vr(M,0,NY,NX),ZEROS2(NY,NX),VFLWX,FracMic,FracMac)
 !
 !
   !water flow out of litter to soil
   IF(FLWRM1.GT.0.0_r8)THEN
-    IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX)))
-    ELSE
-      VFLW=VFLWX
-    ENDIF
+    VFLW=FracMic
+    GasFracMic=0._r8
+    IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))GasFracMic=MIN(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX))
 
     DO  K=1,micpar%NumOfLitrCmplxs
       DO idom=idom_beg,idom_end
@@ -1419,7 +1427,7 @@ implicit none
 
     !all volatiles
     DO idg=idg_beg,idg_end
-      solute_adv_Lit2Soil_flxM(idg)=VFLW*AZMAX1(trcs_solml2_vr(idg,0,NY,NX))
+      solute_adv_Lit2Soil_flxM(idg)=GasFracMic*AZMAX1(trcs_solml2_vr(idg,0,NY,NX))
     enddo
 
     !from NH4 to H2PO4
@@ -1433,10 +1441,10 @@ implicit none
       solute_adv_Lit2Soil_flxM(idn1)=VFLW*AZMAX1(trcs_solml2_vr(idn+ids_NH4,0,NY,NX))*trcs_VLN_vr(idn1,NU_col(NY,NX),NY,NX)
     ENDDO
 
-    solute_adv_Lit2Soil_flxM(idg_NH3B)=VFLW*AZMAX1(trcs_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU_col(NY,NX),NY,NX)
+    solute_adv_Lit2Soil_flxM(idg_NH3B)=GasFracMic*AZMAX1(trcs_solml2_vr(idg_NH3,0,NY,NX))*trcs_VLN_vr(idg_NH3B,NU_col(NY,NX),NY,NX)
 
     ! flow from soil to litter
-  ELSE
+  ELSEIF(FLWRM1.LT.0._r8)THEN
     IF(VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX)))
     ELSE
@@ -1452,6 +1460,20 @@ implicit none
       solute_adv_Lit2Soil_flxM(ids)=VFLW*AZMAX1(trcs_solml2_vr(ids,NU_col(NY,NX),NY,NX))
     ENDDO
   ENDIF
+  ! Macropore infiltration draws from litter micropore solution. Keep gas
+  ! coupling on its existing path; transport DOM and nonvolatile nutrients.
+  associate(NumLitr => micpar%NumOfLitrCmplxs)
+  DO K=1,NumLitr
+    DO idom=idom_beg,idom_end
+      DOM_Adv_Litr2MacP_flxM(idom,K)=FracMac*AZMAX1(DOM_MicP2_vr(idom,K,0,NY,NX))
+    ENDDO
+  ENDDO
+  end associate
+  DO idn=0,ids_nuts
+    ids=ids_NH4+idn; idn1=ids_NH4B+idn
+    solute_adv_Lit2MacP_flxM(ids)=FracMac*AZMAX1(trcs_solml2_vr(ids,0,NY,NX))*trcs_VLN_vr(ids,NU_col(NY,NX),NY,NX)
+    solute_adv_Lit2MacP_flxM(idn1)=FracMac*AZMAX1(trcs_solml2_vr(ids,0,NY,NX))*trcs_VLN_vr(idn1,NU_col(NY,NX),NY,NX)
+  ENDDO
   call PrintInfo('end '//subname)
   end subroutine Lit2SoilTracerAdvectM
 !------------------------------------------------------------------------------------------
@@ -1548,7 +1570,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
-    DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM)
+    DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
   !
   !Description:
   !
@@ -1559,6 +1581,8 @@ implicit none
   real(r8), intent(in) :: solute_adv_Lit2Soil_flxM(ids_beg:ids_end)             !advection flux
   real(r8), intent(in) :: DOM_Adv_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)     !diffusion advection flux
   real(r8), intent(in) :: DOM_Difus_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)   !DOM diffusion flux
+  real(r8), intent(in) :: solute_adv_Lit2MacP_flxM(ids_beg:ids_end)
+  real(r8), intent(in) :: DOM_Adv_Litr2MacP_flxM(idom_beg:idom_end,1:jcplx)
   character(len=*), parameter :: subname ='SurfLayerNetTracerFluxM'   
   integer :: K,idg,idom,ids,ids1,ids2
   real(r8):: dom_flx,NutLitr2Soil
@@ -1611,6 +1635,23 @@ implicit none
     trcs_MicpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX) = trcs_Precip2MicpM_col(ids2,NY,NX)+trcn_AquaADV_Snow2Band_flxM(ids2,NY,NX)+NutLitr2Soil
   enddo
 
+  ! Paired litter debit / topsoil macropore credit. The soil flux gatherer
+  ! consumes this top boundary just like the other macropore faces.
+  associate(NumLitr => micpar%NumOfLitrCmplxs)
+  DO K=1,NumLitr
+    DO idom=idom_beg,idom_end
+      DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)=DOM_MicpTranspFlxM_3D(idom,K,3,0,NY,NX)-DOM_Adv_Litr2MacP_flxM(idom,K)
+      DOM_MacpTranspFlxM_3D(idom,K,3,NU_col(NY,NX),NY,NX)=DOM_MacpTranspFlxM_3D(idom,K,3,NU_col(NY,NX),NY,NX)+DOM_Adv_Litr2MacP_flxM(idom,K)
+    ENDDO
+  ENDDO
+  end associate
+  DO ids=0,ids_nuts
+    ids1=ids_NH4+ids; ids2=ids_NH4B+ids
+    trcs_MicpTranspFlxM_3D(ids1,3,0,NY,NX)=trcs_MicpTranspFlxM_3D(ids1,3,0,NY,NX) &
+      -solute_adv_Lit2MacP_flxM(ids1)-solute_adv_Lit2MacP_flxM(ids2)
+    trcs_MacpTranspFlxM_3D(ids1,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids1,3,NU_col(NY,NX),NY,NX)+solute_adv_Lit2MacP_flxM(ids1)
+    trcs_MacpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX)+solute_adv_Lit2MacP_flxM(ids2)
+  ENDDO
   call PrintInfo('end '//subname)
   end subroutine SurfLayerNetTracerFluxM
 

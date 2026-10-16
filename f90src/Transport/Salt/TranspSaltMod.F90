@@ -62,6 +62,7 @@ module TranspSaltMod
 !
 !     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 !
+  VFLWX=1._r8/NPH
   D30: DO M=1,NPH
    !
     pscal=1._r8;dpscal=1._r8

@@ -55,17 +55,18 @@ module IngridTranspMod
   integer :: NY,NX
   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
+  real(r8) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
   
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
       call SnowSaltTranptM(M,NY,NX)
 
-      call SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx)
+      call SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx,trcSalt_Adv2MacP_flx)
 
       call Litr2SoilDifusTransptM(M,NY,NX,trcSalt_flx_diffusM)
 
-      call LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM)
+      call LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
 
       !
       !     MACROPORE TO MICROPORE TRANSFER
@@ -92,22 +93,22 @@ module IngridTranspMod
   end subroutine SurfaceSaltFluxM
 !------------------------------------------------------------------------------------------
 
-  subroutine SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx)
+  subroutine SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx,trcSalt_Adv2MacP_flx)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8),intent(out) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)  
+  real(r8),intent(out) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
   integer :: ids,idsalt
-  real(r8) :: FLWRM1,VFLW
+  real(r8) :: FLWRM1,VFLW,FracMic,FracMac
 
   FLWRM1=WatFLoLitr2SoilM_col(M,NY,NX)
+  trcSalt_Adv2MicP_flx=0._r8; trcSalt_Adv2MacP_flx=0._r8
+  call LitterInfiltrationFractions(FLWRM1,WatFLoLitr2MacPM_col(M,NY,NX),SurfRunoffPotentM_col(M,NY,NX),&
+    VLWatMicPM_vr(M,0,NY,NX),ZEROS2(NY,NX),VFLWX,FracMic,FracMac)
 !
   IF(FLWRM1.GT.0.0_r8)THEN
     !litter 2 soil
-    IF(VLWatMicPM_vr(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VLWatMicPM_vr(M,0,NY,NX)))
-    ELSE
-      VFLW=VFLWX
-    ENDIF
+    VFLW=FracMic
     DO idsalt=idsalt_beg,idsalt_KSO4
       trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))
     ENDDO
@@ -115,10 +116,10 @@ module IngridTranspMod
     DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
       ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B  
       trcSalt_Adv2MicP_flx(idsalt) = VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)
-      trcSalt_Adv2MicP_flx(ids)    = VFLW*AZMAX1(trcSalt_solml2_vr(ids,0,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)
+      trcSalt_Adv2MicP_flx(ids)    = VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)
     ENDDO
    !soil advection to litter
-  ELSE
+  ELSEIF(FLWRM1.LT.0._r8)THEN
     IF(VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VLWatMicPM_vr(M,NU_col(NY,NX),NY,NX)))
     ELSE
@@ -130,6 +131,14 @@ module IngridTranspMod
     ENDDO  
   ENDIF
 
+  DO idsalt=idsalt_beg,idsalt_KSO4
+    trcSalt_Adv2MacP_flx(idsalt)=FracMac*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))
+  ENDDO
+  DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
+    ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
+    trcSalt_Adv2MacP_flx(idsalt)=FracMac*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)
+    trcSalt_Adv2MacP_flx(ids)=FracMac*AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)
+  ENDDO
   end subroutine SoilLitrSaltAdvExchange
 !------------------------------------------------------------------------------------------
 
@@ -720,7 +729,7 @@ module IngridTranspMod
   end subroutine Litr2SoilDifusTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM)
+  subroutine LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
 !
 !     Description:
 !
@@ -728,7 +737,8 @@ module IngridTranspMod
   integer, intent(in) :: NY,NX
   real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
-  integer :: idsalt
+  real(r8), intent(in) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
+  integer :: idsalt,ids
 
   !     begin_execution
   !
@@ -743,6 +753,19 @@ module IngridTranspMod
       +trcSalt_AquaADV_Snow2Soil_flxM(idsalt,NY,NX)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffusM(idsalt)
   ENDDO
 
+  DO idsalt=idsalt_beg,idsalt_end
+    trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)=trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)-trcSalt_Adv2MacP_flx(idsalt)
+  ENDDO
+  DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
+    ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
+    ! Litter has no separate nutrient band. Both soil destinations draw
+    ! from (or return to) the same unbanded litter phosphate species.
+    trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)=trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX) &
+      -trcSalt_Adv2MicP_flx(ids)-trcSalt_flx_diffusM(ids)-trcSalt_Adv2MacP_flx(ids)
+  ENDDO
+  DO idsalt=idsalt_beg,idsaltb_end
+    trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)=trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)+trcSalt_Adv2MacP_flx(idsalt)
+  ENDDO
   end subroutine LitrSoilAdvDifusTransptM
 !------------------------------------------------------------------------------------------
 

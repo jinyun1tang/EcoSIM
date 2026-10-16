@@ -319,6 +319,7 @@ module TranspNoSaltMod
 ! NPG=NPG=NPH*NPT,number of cycles per hour for gas flux calculations, 
 ! dt_GasCyc=1.0_r8/NPT, number of cycles for gas flux calculations for 1 iteration in NPH,
 
+  VFLWX=1._r8/NPH
   DO M=1,NPH
     
     !transport without reaction rates, update trcs_solml2_vr

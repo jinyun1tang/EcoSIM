@@ -831,6 +831,7 @@ contains
   ! Budget accepted surface fluxes before either infiltration pathway. Keep
   ! micropore exchange first; macropores receive only remaining mobile liquid.
   WatFLoLitr2SoilM_col(M,NY,NX)=0._r8
+  WatFLoLitr2MacPM_col(M,NY,NX)=0._r8
   AvailableLitRWater=AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX))
   VLWatLitR=AvailableLitRWater
   AvailableSoilWater=AZMAX1(VLWatMicP1_vr(NUM_col(NY,NX),NY,NX) &
@@ -944,6 +945,7 @@ contains
     -WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX))
   IF(AvailableMacPSpace.GT.0._r8 .AND. MobileLitRWater.GT.0._r8)THEN
     WatFlowLitR2MacP=AMIN1(MobileLitRWater*dts_wat,AvailableLitRWater,AvailableMacPSpace)
+    WatFLoLitr2MacPM_col(M,NY,NX)=WatFlowLitR2MacP
     HeatFlowLitR2MacP                      = WatFlowLitR2MacP*cpw*TKSoil1_vr(0,NY,NX)*HeatAdv_scal
     WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)+WatFlowLitR2MacP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlowLitR2MacP
