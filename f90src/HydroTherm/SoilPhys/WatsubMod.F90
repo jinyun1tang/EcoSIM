@@ -1619,7 +1619,7 @@ module WatsubMod
 
   IF(IDWaterTable_col(NY,NX).GE.3 .AND. &
     SoilDepthMidLay_vr(L,NY,NX).LT.TileWaterTable_col(NY,NX))THEN !above tile
-    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTableSlope_col(NY,NX))
+    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
     PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)
     !calc equilibrium tile water potential using hydrostatic equilbrium
     TileEquilPotential=mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-TileWaterTable_col(NY,NX))-PSISWD
@@ -1732,7 +1732,7 @@ module WatsubMod
   ! layer 
   IF(IDWaterTable_col(NY,NX).NE.0 .AND. SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN !layer above external water table        
 
-    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTableSlope_col(NY,NX))
+    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
     PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)
 
     !assuming zero suction pressure at water table z_w
@@ -2364,7 +2364,7 @@ module WatsubMod
   !     XN,RCHG*=direction indicator,boundary flag
   !     SLOPE=sin(lateral slope)
   !     DLYR=layer width
-  !     WaterTableSlope_col=slope of water table relative to surface slope
+  !     WaterTable2GroundSlope_col=slope of water table relative to surface slope
   !     PSISWT=water potential driving micropore discharge
   !     PSISoilMatricPtmp_vr,PSISO=matric,osmotic water potential
   !     DPTH,ExtWaterTable=depth to layer midpoint,natural water table
@@ -2375,7 +2375,7 @@ module WatsubMod
   !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
   !
   IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN        
-    PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTableSlope_col(N2,N1))
+    PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTable2GroundSlope_col(N2,N1))
     
     if (use_ecosys_drainage) then
       ! ECOSIM_ZM: legacy watsub.f 5819--5834 includes the saturation
@@ -2421,7 +2421,7 @@ module WatsubMod
   !     XN,RCHG*=direction indicator,boundary flag
   !     SLOPE=sin(lateral slope)
   !     DLYR=layer width
-  !     WaterTableSlope_col=water table slope
+  !     WaterTable2GroundSlope_col=water table slope
   !     PSISWTH=water potential driving macropore discharge
   !     PSISO=osmotic water potential
   !     ExtWaterTable=natural water table
@@ -2435,7 +2435,7 @@ module WatsubMod
   !
   IF(DoMacPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)) .AND. VLMacroPores1_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     
-    PSISWD  = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTableSlope_col(N2,N1))    
+    PSISWD  = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTable2GroundSlope_col(N2,N1))    
     
     PSISWTH = mGravAccelerat*(AMIN1(Surf2MacPDepz,WaterTableDepZi_col(N2,N1))-TargetWaterTBL)
 
@@ -2497,7 +2497,7 @@ module WatsubMod
     .AND. VLairMicP_vr(N3,N2,N1).GT.0.0_r8                                         & !grid is unsaturated
     .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN                                !water exchange with watertable enabled
     
-    PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTableSlope_col(N2,N1))
+    PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTable2GroundSlope_col(N2,N1))
     PSISUT = AZMAX1(-PSISoilMatricPtmp_vr(N3,N2,N1) + &
       mGravAccelerat*(SoilDepthMidLay_vr(N3,N2,N1)-ExtWaterTable_col(N2,N1)))
 
@@ -2539,7 +2539,7 @@ module WatsubMod
     .AND. AirfMacP.GT.ZEROS2(N2,N1)                                & !macropore has air-filled fraction
     .AND. (.not.isclose(Recharg2WTBLScal,0.0_r8)))THEN               !recharge is on
 
-    PSISWD  = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTableSlope_col(N2,N1))
+    PSISWD  = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTable2GroundSlope_col(N2,N1))
     PSISUTH = mGravAccelerat*(Surf2MacPDepz-ExtWaterTable_col(N2,N1))
 
     !outflow/drainage

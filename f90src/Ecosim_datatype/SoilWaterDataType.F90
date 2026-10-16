@@ -30,14 +30,14 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VLWatMacPM_vr(:,:,:,:)                    !soil macropore water content, [m3 d-2]
   real(r8),target,allocatable ::  VLsoiAirPM_vr(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILMM_vr(:,:,:,:)                         !soil water film thickness , [m]
-  real(r8),target,allocatable ::  WaterTableSlope_col(:,:)                    !slope of water table relative to surface slope, [-]
-  real(r8),target,allocatable ::  WtblDepzTile_col(:,:)                     !depth of artificial water table
+  real(r8),target,allocatable ::  WaterTable2GroundSlope_col(:,:)                    !slope of water table relative to surface slope, [-]
+  real(r8),target,allocatable ::  TileWaterTableDepz_col(:,:)                     !depth of artificial water table
   real(r8),target,allocatable ::  TileWaterTable_col(:,:)                   !artificial water table depth, [m]
-  real(r8),target,allocatable ::  DTBLD_col(:,:)                                !depth of artificial water table adjusted for elevation,[m]
+  real(r8),target,allocatable ::  TileWaterTableLocDepz_col(:,:)                                !depth of artificial water table adjusted for elevation,[m]
   real(r8),target,allocatable ::  WaterTableDepZi_col(:,:)                      !internal water table depth, [m]
-  real(r8),target,allocatable ::  ExtWaterTablet0_col(:,:)                  !initial external water table depth, elevation corrected ,[m]
+  real(r8),target,allocatable ::  ExtWaterTableLocDepz_col(:,:)                  !initial external water table depth, elevation corrected ,[m]
   real(r8),target,allocatable ::  ExtWaterTable_col(:,:)                    !current external water table depth, elevation corrected (>0 lower than soil surface), [m]
-  real(r8),target,allocatable ::  NatWtblDepz_col(:,:)                      !external water table depth, [m]
+  real(r8),target,allocatable ::  NaturalWaterTableDepz_col(:,:)                      !external water table depth, [m]
   real(r8),target,allocatable ::  EnergyImpact4Erosion_colM(:,:,:)              !total energy impact for erosion
   real(r8),target,allocatable ::  XVLMobileWaterLitRM(:,:,:)                !excess water+ice, [m3 d-2]
   real(r8),target,allocatable ::  XVLMobileWatMicPM(:,:,:)                  !excess water,[m3 d-2]
@@ -167,14 +167,14 @@ module SoilWaterDataType
   allocate(VLWatMacPM_vr(60,JZ,JY,JX));VLWatMacPM_vr=0._r8
   allocate(VLsoiAirPM_vr(60,0:JZ,JY,JX));VLsoiAirPM_vr=0._r8
   allocate(FILMM_vr(60,0:JZ,JY,JX));FILMM_vr=0._r8
-  allocate(WaterTableSlope_col(JY,JX));       WaterTableSlope_col=0._r8
-  allocate(WtblDepzTile_col(JY,JX));      WtblDepzTile_col=0._r8
+  allocate(WaterTable2GroundSlope_col(JY,JX));       WaterTable2GroundSlope_col=0._r8
+  allocate(TileWaterTableDepz_col(JY,JX));      TileWaterTableDepz_col=0._r8
   allocate(TileWaterTable_col(JY,JX));       TileWaterTable_col=0._r8
-  allocate(DTBLD_col(JY,JX));       DTBLD_col=0._r8
+  allocate(TileWaterTableLocDepz_col(JY,JX));       TileWaterTableLocDepz_col=0._r8
   allocate(WaterTableDepZi_col(JY,JX));       WaterTableDepZi_col=0._r8
-  allocate(ExtWaterTablet0_col(JY,JX));       ExtWaterTablet0_col=0._r8
+  allocate(ExtWaterTableLocDepz_col(JY,JX));       ExtWaterTableLocDepz_col=0._r8
   allocate(ExtWaterTable_col(JY,JX));       ExtWaterTable_col=0._r8
-  allocate(NatWtblDepz_col(JY,JX));       NatWtblDepz_col=0._r8
+  allocate(NaturalWaterTableDepz_col(JY,JX));       NaturalWaterTableDepz_col=0._r8
   allocate(EnergyImpact4Erosion_colM(60,JY,JX));   EnergyImpact4Erosion_colM=0._r8
   allocate(XVLMobileWaterLitRM(60,JY,JX));   XVLMobileWaterLitRM=0._r8
   allocate(XVLMobileWatMicPM(60,JY,JX));   XVLMobileWatMicPM=0._r8
@@ -277,14 +277,14 @@ module SoilWaterDataType
   call destroy(VLWatMacPM_vr)
   call destroy(VLsoiAirPM_vr)
   call destroy(FILMM_vr)
-  call destroy(WaterTableSlope_col)
-  call destroy(WtblDepzTile_col)
+  call destroy(WaterTable2GroundSlope_col)
+  call destroy(TileWaterTableDepz_col)
   call destroy(TileWaterTable_col)
-  call destroy(DTBLD_col)
+  call destroy(TileWaterTableLocDepz_col)
   call destroy(WaterTableDepZi_col)
-  call destroy(ExtWaterTablet0_col)
+  call destroy(ExtWaterTableLocDepz_col)
   call destroy(ExtWaterTable_col)
-  call destroy(NatWtblDepz_col)
+  call destroy(NaturalWaterTableDepz_col)
   call destroy(EnergyImpact4Erosion_colM)
   call destroy(XVLMobileWaterLitRM)
   call destroy(XVLMobileWatMicPM)

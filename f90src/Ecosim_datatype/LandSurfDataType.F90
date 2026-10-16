@@ -14,17 +14,17 @@ module LandSurfDataType
   real(r8),target,allocatable ::  RoughnessLength_col(:,:)                   !Canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                  !Soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesureHeight_col(:,:)              !Wind speed measurement height, [m]
-  real(r8),target,allocatable ::  ALT_col(:,:)                           !Altitude of grid cell, [m]
+  real(r8),target,allocatable ::  SurfElevation_col(:,:)                           !Altitude of grid cell, [m]
   real(r8),target,allocatable ::  RawIsoTSurf2CanopyHScal_col(:,:)       !scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
   real(r8),target,allocatable ::  RawIsoTAtm2CanopySinkZ_col(:,:)        !isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
   real(r8),target,allocatable ::  RawTAtm2CanopySinkZ_col(:,:)           !aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
   real(r8),target,allocatable ::  RawCanopyH2SinkZ_col(:,:)              !isothermal aerodynamic resistance bewtween canopy height and zero sink height, [h m-1]
   real(r8),target,allocatable ::  RIB_col(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
-  real(r8),target,allocatable ::  ALTI_col(:,:)                          !Altitude of landscape, [m]
+  real(r8),target,allocatable ::  AltitudeLandscape_col(:,:)                          !Altitude of landscape, [m]
   real(r8),target,allocatable ::  SineGrndSlope_col(:,:)                 !Sine of slope, [-]
   real(r8),target,allocatable ::  CosineGrndSlope_col(:,:)               !Cosine of slope, [-]
   real(r8),target,allocatable ::  GroundSurfaceAzimuth_col(:,:)             !Azimuth of slope, [-]
-  real(r8),target,allocatable ::  ALTZ_col(:,:)                          !Altitude, [m]
+  real(r8),target,allocatable ::  RefSurfElevation_col(:,:)                          !Altitude, [m]
   real(r8),target,allocatable ::  SL_col(:,:)                            !Slope, [degree]
   real(r8),target,allocatable ::  ASP_col(:,:)                           !Aspect , [degree]
   real(r8),target,allocatable ::  VPQ_col(:,:)                           ! air pressure at canopy sink height
@@ -43,14 +43,14 @@ contains
   allocate(RoughnessLength_col(JY,JX));          RoughnessLength_col=0._r8
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
   allocate(WindMesureHeight_col(JY,JX));          WindMesureHeight_col=0._r8
-  allocate(ALT_col(JY,JX));         ALT_col=0._r8
+  allocate(SurfElevation_col(JY,JX));         SurfElevation_col=0._r8
   allocate(RawIsoTAtm2CanopySinkZ_col(JY,JX));         RawIsoTAtm2CanopySinkZ_col=0._r8
   allocate(RIB_col(JY,JX));         RIB_col=0._r8
-  allocate(ALTI_col(JY,JX));        ALTI_col=0._r8
+  allocate(AltitudeLandscape_col(JY,JX));        AltitudeLandscape_col=0._r8
   allocate(SineGrndSlope_col(JY,JX));        SineGrndSlope_col=0._r8
   allocate(CosineGrndSlope_col(JY,JX));        CosineGrndSlope_col=0._r8
   allocate(GroundSurfaceAzimuth_col(JY,JX));        GroundSurfaceAzimuth_col=0._r8
-  allocate(ALTZ_col(JY,JX));        ALTZ_col=0._r8
+  allocate(RefSurfElevation_col(JY,JX));        RefSurfElevation_col=0._r8
   allocate(SL_col(JY,JX));          SL_col=0._r8
   allocate(ASP_col(JY,JX));         ASP_col=0._r8
   allocate(VPQ_col(JY,JX));         VPQ_col=0._r8  
@@ -68,14 +68,14 @@ contains
   call destroy(RoughnessLength_col)
   call destroy(SoiSurfRoughness)
   call destroy(WindMesureHeight_col)
-  call destroy(ALT_col)
+  call destroy(SurfElevation_col)
   call destroy(RawIsoTAtm2CanopySinkZ_col)
   call destroy(RIB_col)
-  call destroy(ALTI_col)
+  call destroy(AltitudeLandscape_col)
   call destroy(SineGrndSlope_col)
   call destroy(CosineGrndSlope_col)
   call destroy(GroundSurfaceAzimuth_col)
-  call destroy(ALTZ_col)
+  call destroy(RefSurfElevation_col)
   call destroy(SL_col)
   call destroy(ASP_col)
   call destroy(RawCanopyH2SinkZ_col)

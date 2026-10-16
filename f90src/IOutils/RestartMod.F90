@@ -6377,10 +6377,10 @@ implicit none
        long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTableLocDepz_col,datrc_1d) 
   else
     !print*,'ExtWaterTablet0_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTableLocDepz_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='ExtWaterTablet0_col', dim1name='column',&
        long_name='initial external water table depth', units='m', &
@@ -6394,10 +6394,10 @@ implicit none
        long_name='depth of artificial water table adjusted for elevation', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTableLocDepz_col,datrc_1d) 
   else
     !print*,'DTBLD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD_col,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTableLocDepz_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DTBLD', dim1name='column',&
        long_name='depth of artificial water table adjusted for elevation', units='m', &

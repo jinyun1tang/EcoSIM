@@ -284,8 +284,8 @@ module RedistMod
   character(len=*), parameter :: subname='ModifyExWTBLByDisturbance'
 !     begin_execution
 !     SolarNoonHour_col=hour of solar noon from weather file
-!     DTBLI,WtblDepzTile_col=depth of natural,artificial water table from readi.f
-!     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
+!     DTBLI,TileWaterTableDepz_col=depth of natural,artificial water table from readi.f
+!     ExtWaterTable,ExtWaterTableLocDepz_col=current,initial natural water table depth
 !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
 !     IDWaterTable=water table flag from readi.f
 !        :0=none
@@ -300,10 +300,10 @@ module RedistMod
   !external water table from input file
   IF(J.EQ.INT(SolarNoonHour_col(NY,NX)) .AND. iSoilDisturbType_col(I,NY,NX).EQ.23)THEN
     !natural water table depth from input file
-    NatWtblDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    NaturalWaterTableDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     !
-    ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX))
-    ExtWaterTable_col(NY,NX)   = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+    ExtWaterTable_col(NY,NX)   = ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
   !external water table from input file
@@ -316,9 +316,9 @@ module RedistMod
     ELSEIF(IDWaterTable_col(NY,NX).EQ.2)THEN  !from mobile to tile
       IDWaterTable_col(NY,NX)=4
     ENDIF
-    WtblDepzTile_col(NY,NX)   = DCORPW
-    DTBLD_col(NY,NX)          = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX)))
-    TileWaterTable_col(NY,NX) = DTBLD_col(NY,NX)
+    TileWaterTableDepz_col(NY,NX)   = DCORPW
+    TileWaterTableLocDepz_col(NY,NX)          = AZMAX1(TileWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
+    TileWaterTable_col(NY,NX) = TileWaterTableLocDepz_col(NY,NX)
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
@@ -329,15 +329,15 @@ module RedistMod
 !
   IF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
 
-    ExtWaterTable_col(NY,NX) = ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX) = ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     ExtWaterTable_col(NY,NX) = ExtWaterTable_col(NY,NX)-QDischarg2WTBL_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
-      -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTablet0_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))
+      -0.00167_r8*(ExtWaterTable_col(NY,NX)-ExtWaterTableLocDepz_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX))
   ENDIF
 
   !update mobile tile water table depth due to drainage
   IF(IDWaterTable_col(NY,NX).EQ.4)THEN
     TileWaterTable_col(NY,NX)=TileWaterTable_col(NY,NX)-QDischarg2WTBL_col(NY,NX)/AREA_3D(3,NU_col(NY,NX),NY,NX) &
-      -0.00167_r8*(TileWaterTable_col(NY,NX)-DTBLD_col(NY,NX))
+      -0.00167_r8*(TileWaterTable_col(NY,NX)-TileWaterTableLocDepz_col(NY,NX))
   ENDIF
   call PrintInfo('end '//subname)
   end subroutine ModifyExWTBLByDisturbance

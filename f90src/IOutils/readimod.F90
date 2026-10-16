@@ -308,8 +308,8 @@ module readiMod
       f_aerosol_LichB_col(NY,NX)   = fLich    !live lichen
 
       ALAT_col(NY,NX)             = ALATG
-      PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-ALT_col(NY,NX)/hpresc)
-      ALTI_col(NY,NX)             = ALTIG
+      PBOT_col(NY,NX)             = PBOT_col(NY,NX)*exp(-SurfElevation_col(NY,NX)/hpresc)
+      AltitudeLandscape_col(NY,NX)             = ALTIG
       ATCAI_col(NY,NX)            = ATCAG
       IDWaterTable_col(NY,NX)     = iWaterTabelMode
       OXYE_col(NY,NX)             = ao2_ppm
@@ -321,9 +321,9 @@ module readiMod
       ZNH3E_col(NY,NX)            = anh3_ppm
       KoppenClimZone_col(NY,NX)   = IETYPG
       FlowDirIndicator_col(NY,NX) = grid_mode
-      NatWtblDepz_col(NY,NX)      = WTBLDepz_nat
-      WtblDepzTile_col(NY,NX)     = WTBLDepz_tile
-      WaterTableSlope_col(NY,NX)    = DTBLGG
+      NaturalWaterTableDepz_col(NY,NX)      = WTBLDepz_nat
+      TileWaterTableDepz_col(NY,NX)     = WTBLDepz_tile
+      WaterTable2GroundSlope_col(NY,NX)    = DTBLGG
 
       RechargNorthSurf_col(NY,NX) = RCHQNG
       RechargEastSurf_col(NY,NX)  = RCHQEG

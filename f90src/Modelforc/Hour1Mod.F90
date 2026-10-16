@@ -591,7 +591,7 @@ module Hour1Mod
 !     SOIL SURFACE WATER STORAGE CAPACITY
 !
 !     IDWaterTable=water table flag from site file
-!     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
+!     ExtWaterTable,ExtWaterTableLocDepz_col=current,initial natural water table depth
 !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
 !     SoilSurfRoughness_col,ZW=soil,water surface roughness
 !     VLWatHeldCapSurf_col=soil surface water retention capacity
@@ -601,14 +601,14 @@ module Hour1Mod
 !
   !Stationary water table
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
+    ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
   !Mobile water table
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
-    TileWaterTable_col(NY,NX)=DTBLD_col(NY,NX)
+    TileWaterTable_col(NY,NX)=TileWaterTableLocDepz_col(NY,NX)
   ENDIF
   !
   !surface roughness parameterization can be better
@@ -1468,7 +1468,7 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
       PSISoilOsmotic_vr(0,NY,NX)          = 0._r8
-      PSIGrav_vr(0,NY,NX)                 = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSIGrav_vr(0,NY,NX)                 = mGravAccelerat*(SurfElevation_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS

@@ -195,9 +195,9 @@ module WthrMod
           -DayLensCurr_col(NY,NX)/2.0_r8))*PICON /(3.0_r8+DayLensCurr_col(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK_col(NY,NX))) &
-      VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
+      VPS(NY,NX)     = vapsat0(TairK_col(ny,nx))*EXP(-AltitudeLandscape_col(NY,NX)/7272.0_r8)
       VPK_col(NY,NX) = AMIN1(VPS(NY,NX),VPK_col(NY,NX))
-      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-ALT_col(NY,NX)/hpresc)
+      PBOT_col(NY,NX)=1.01325E+02_r8*exp(-SurfElevation_col(NY,NX)/hpresc)
 !
       !     UA=wind speed
 !
@@ -251,7 +251,7 @@ module WthrMod
       TairK_col(NY,NX) = units%Celcius2Kelvin(TCA_col(NY,NX))
 
       !elevation corrected saturated air vapor pressure, KPa
-      VPS(NY,NX)              = vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
+      VPS(NY,NX)              = vapsat0(TairK_col(ny,nx))*EXP(-AltitudeLandscape_col(NY,NX)/7272.0_r8)
       VPK_col(NY,NX)          = AMIN1(DWPTH(J,I),VPS(NY,NX))
       WindSpeedAtm_col(NY,NX) = AMAX1(3600.0_r8,WINDH(J,I))
       PBOT_col(NY,NX)         = PBOT_hrly(J,I)
@@ -496,7 +496,7 @@ module WthrMod
         IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK_col(NY,NX))) &
-          vps(ny,ny)=vapsat0(TairK_col(ny,nx))*EXP(-ALTI_col(NY,NX)/7272.0)
+          vps(ny,ny)=vapsat0(TairK_col(ny,nx))*EXP(-AltitudeLandscape_col(NY,NX)/7272.0)
           VPK_col(NY,NX)=VPK_col(NY,NX)*VPS(NY,NX)/VPX
         ENDIF
       ENDIF

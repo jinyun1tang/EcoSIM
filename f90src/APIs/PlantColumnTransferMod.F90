@@ -177,7 +177,7 @@ contains
   plt_ew%BulkFactor4Snow_col          =BulkFactor4Snow_col(NY,NX)
   plt_morph%LeafStalkAreaAll_col         = LeafStalkAreaAll_col(NY,NX)
   plt_morph%CanopyLeafArea_col        = CanopyLeafArea_col(NY,NX)
-  plt_site%ALT                        = ALT_col(NY,NX)
+  plt_site%ALT                        = SurfElevation_col(NY,NX)
   plt_site%CCO2EI_gperm3                     = CCO2EI_gperm3_col(NY,NX)
   plt_site%CO2EI                      = CO2EI_col(NY,NX)
   plt_bgcr%NetCO2Flx2Canopy_col       = NetCO2Flx2Canopy_col(NY,NX)

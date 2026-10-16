@@ -78,8 +78,8 @@ module StartsMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
   character(len=*), parameter :: subname='starts'
   integer :: NY,NX,L,idg
-  REAL(R8) :: ALTY
-  real(r8) :: ALTZG
+  REAL(R8) :: SurfElevLandscapeMax
+  real(r8) :: SurfElevLandscapeMin
   real(r8) :: tPBOT,XWS
   real(r8) :: LandScape1stSoiLayDepth
   real(r8) :: YSIN(NumOfSkyAzimuthSects)
@@ -96,7 +96,7 @@ module StartsMod
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,SurfElevLandscapeMax)
   !
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
@@ -104,7 +104,7 @@ module StartsMod
   call InitAccumulators()
 
 ! this assumes the whole landscape is a grid
-  ALTZG                   = 0.0_r8
+  SurfElevLandscapeMin                   = 0.0_r8
   LandScape1stSoiLayDepth = 0.0_r8
 
   DO  NX=NHW,NHE
@@ -114,13 +114,13 @@ module StartsMod
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
       !     ALT=surface elevation relative to maximum
-      !     ALTZG=minimum surface elevation in landscape
+      !     SurfElevLandscapeMin=minimum surface elevation in landscape
       !CDPTH: depth to bottom of soil layer
-      ALT_col(NY,NX)=ALT_col(NY,NX)-ALTY
+      SurfElevation_col(NY,NX)=SurfElevation_col(NY,NX)-SurfElevLandscapeMax
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-        ALTZG=ALT_col(NY,NX)
+        SurfElevLandscapeMin=SurfElevation_col(NY,NX)
       ELSE
-        ALTZG=MIN(ALTZG,ALT_col(NY,NX))
+        SurfElevLandscapeMin=MIN(SurfElevLandscapeMin,SurfElevation_col(NY,NX))
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)) !topsoil layer depth
@@ -206,7 +206,7 @@ module StartsMod
   tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
   
-  call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
+  call InitSoilVars(NHW,NHE,NVN,NVS,SurfElevLandscapeMin,LandScape1stSoiLayDepth)
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -222,14 +222,14 @@ module StartsMod
   RETURN
   END subroutine starts
 !------------------------------------------------------------------------------------------
-  subroutine InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
+  subroutine InitSoilVars(NHW,NHE,NVN,NVS,SurfElevLandscapeMin,LandScape1stSoiLayDepth)
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
-  !      ALTZG=minimum surface elevation in landscape
-  !     DTBLI,WtblDepzTile_col=depth of natural,artificial water table
-  !     WaterTableSlope_col=slope of natural water table relative to landscape surface
+  !      SurfElevLandscapeMin=minimum surface elevation in landscape
+  !     DTBLI,TileWaterTableDepz_col=depth of natural,artificial water table
+  !     WaterTable2GroundSlope_col=slope of natural water table relative to landscape surface
   !     in geography, slope =rise/run
-  !     ExtWaterTablet0_col,DTBLD=depth of natural,artificial water table adjusted for elevn
+  !     ExtWaterTableLocDepz_col,DTBLD=depth of natural,artificial water table adjusted for elevn
   !     WaterTableDepZi_col=depth to internal water table
   !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
   !     XDPTH_3D=x-section area/distance in solute flux calculations (m2/m)
@@ -237,7 +237,7 @@ module StartsMod
   !
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(in) :: ALTZG,LandScape1stSoiLayDepth
+  real(r8),intent(in) :: SurfElevLandscapeMin,LandScape1stSoiLayDepth
   integer :: NY,NX,L,N
   integer :: N1,N2,N3,N4,N5,N6
   character(len=*), parameter :: subname='InitSoilVars'
@@ -254,22 +254,22 @@ module StartsMod
   ! altz: topographic altitude
   ! ALT: grid altitude
   ! DTBLI: external water table depth, before applying the altitude correction
-  ! WaterTableSlope_col: slope of water table relative to surface slope
-  ! ExtWaterTablet0_col: external water table depth
-  ! WtblDepzTile_col: depth of artificial water table
+  ! WaterTable2GroundSlope_col: slope of water table relative to surface slope
+  ! ExtWaterTableLocDepz_col: external water table depth
+  ! TileWaterTableDepz_col: depth of artificial water table
   ! WaterTableDepZi_col: internal water table depth
   ! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      ALTZ_col(NY,NX)=ALTZG
+      RefSurfElevation_col(NY,NX)=SurfElevLandscapeMin
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTablet0_col(NY,NX) = NatWtblDepz_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX))
-        DTBLD_col(NY,NX)           = AZMAX1(WtblDepzTile_col(NY,NX)-(ALTZ_col(NY,NX)-ALT_col(NY,NX))*(1.0_r8-WaterTableSlope_col(NY,NX)))
+        ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+        TileWaterTableLocDepz_col(NY,NX)           = AZMAX1(TileWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
       ELSE
-        ExtWaterTablet0_col(NY,NX) = 0.0_r8
-        DTBLD_col(NY,NX)           = 0.0_r8
+        ExtWaterTableLocDepz_col(NY,NX) = 0.0_r8
+        TileWaterTableLocDepz_col(NY,NX)           = 0.0_r8
       ENDIF
-      WaterTableDepZi_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
+      WaterTableDepZi_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
     ENDDO
   ENDDO
 
@@ -600,13 +600,13 @@ module StartsMod
   end subroutine initFertArrays
 
 !------------------------------------------------------------------------------------------
-  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
+  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,SurfElevLandscapeMax)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8),intent(in) :: YSIN(NumOfSkyAzimuthSects)
   real(r8),intent(in) :: YCOS(NumOfSkyAzimuthSects)
   real(r8),intent(in) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
-  REAL(R8),INTENT(OUT):: ALTY
+  REAL(R8),INTENT(OUT):: SurfElevLandscapeMax
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI,GridArea
   real(r8) :: SineGrndSurfAzimuth_col(JY,JX),CosineGrndSurfAzimuth_col(JY,JX)  !diagnostic
@@ -617,10 +617,10 @@ module StartsMod
 ! OMEGA2Ground=incident sky angle at ground surface
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
-! ALTY=maximum surface elevation in landscape
+! SurfElevLandscapeMax=maximum surface elevation in landscape
 ! XGridRunoffFlag_2DH=runoff boundary flags:0=not possible,1=possible
 ! ASP_col=geometric aspect angle in degree
-  ALTY=0.0_r8
+  SurfElevLandscapeMax=0.0_r8
   write(*,1112)'NY','NX','east','west','south','north','altitude','Dist(m):E-W','Dist(m):N-S',&
    'Geom-ASP(o)','SLOPE_col(o)','slope0','slope-east','slope-north','SineGrndSlope_col','CosineGrndSlope_col','SineGrndSurfAzimuth_col'
 
@@ -688,10 +688,10 @@ module StartsMod
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
           !(west, north) corner
-          ALT_col(NY,NX)=0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)+0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
+          SurfElevation_col(NY,NX)=0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)+0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
           !west boundary
-          ALT_col(NY,NX)=ALT_col(NY-1,NX) &
+          SurfElevation_col(NY,NX)=SurfElevation_col(NY-1,NX) &
             +1.0_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +0.5_r8*DV_col(NY-1,NX)*(SLOPE_col(iNorthSouthDirection,NY-1,NX)) &
             +0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
@@ -699,16 +699,16 @@ module StartsMod
       ELSE
         IF(NY.EQ.NVN)THEN
           !north boundary
-          ALT_col(NY,NX)=ALT_col(NY,NX-1) &
+          SurfElevation_col(NY,NX)=SurfElevation_col(NY,NX-1) &
             +0.5_r8*DH_col(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
             +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +0.5_r8*DV_col(NY,NX-1)*SLOPE_col(iNorthSouthDirection,NY,NX-1) &
             +0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
-          ALT_col(NY,NX)=(ALT_col(NY,NX-1) &
+          SurfElevation_col(NY,NX)=(SurfElevation_col(NY,NX-1) &
             +0.5_r8*DH_col(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
             +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
-            +ALT_col(NY-1,NX) &
+            +SurfElevation_col(NY-1,NX) &
             +0.5_r8*DV_col(NY-1,NX)*SLOPE_col(iNorthSouthDirection,NY-1,NX) &
             +0.5_r8*DV_col(NY,N)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0
         ENDIF
@@ -716,12 +716,12 @@ module StartsMod
 
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
         !(west,north) corner
-        ALTY=ALT_col(NY,NX)
+        SurfElevLandscapeMax=SurfElevation_col(NY,NX)
       ELSE
-        ALTY=MAX(ALTY,ALT_col(NY,NX))
+        SurfElevLandscapeMax=MAX(SurfElevLandscapeMax,SurfElevation_col(NY,NX))
       ENDIF
       WRITE(*,1111)NY,NX,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
-        ,ALT_col(NY,NX),DH_col(NY,NX),DV_col(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
+        ,SurfElevation_col(NY,NX),DH_col(NY,NX),DV_col(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
         ,SLOPE_col(0,NY,NX),SLOPE_col(iWestEastDirection,NY,NX),SLOPE_col(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)
 1111  FORMAT(2I4,4L6,20E12.4)
@@ -1019,8 +1019,8 @@ module StartsMod
   use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   integer,intent(in) :: NHW,NHE,NVN,NVS
-  REAL(R8) :: ALTY
-  real(r8) :: ALTZG
+  REAL(R8) :: SurfElevLandscapeMax
+  real(r8) :: SurfElevLandscapeMin
   real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
@@ -1043,13 +1043,13 @@ module StartsMod
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
   !  CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,ALTY)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,SurfElevLandscapeMax)
 
   call InitAccumulators()
 
   !For whatever reason this sets a temerature, so I need to reset it:
   ATKS_col = 242.0
-  ALTZG=0.0_r8
+  SurfElevLandscapeMin=0.0_r8
   LandScape1stSoiLayDepth=0.0_r8   !pay attention to how it is set for many-grid simulations
 
   DO  NX=NHW,NHE
@@ -1058,13 +1058,13 @@ module StartsMod
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
       !     ALT=surface elevation relative to maximum
-      !     ALTZG=minimum surface elevation in landscape
+      !     SurfElevLandscapeMin=minimum surface elevation in landscape
       !CDPTH: depth to bottom of soil layer
-      ALT_col(NY,NX)=ALT_col(NY,NX)-ALTY
+      SurfElevation_col(NY,NX)=SurfElevation_col(NY,NX)-SurfElevLandscapeMax
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-        ALTZG=ALT_col(NY,NX)
+        SurfElevLandscapeMin=SurfElevation_col(NY,NX)
       ELSE
-        ALTZG=MIN(ALTZG,ALT_col(NY,NX))
+        SurfElevLandscapeMin=MIN(SurfElevLandscapeMin,SurfElevation_col(NY,NX))
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)) !topsoil layer depth
@@ -1152,7 +1152,7 @@ module StartsMod
   CanopyStemAareZ_col(1:NumCanopyLayers,:,:) = 0.0_r8
   tCanLeafC_clyr(1:NumCanopyLayers,:,:)        = 0.0_r8
 !
-  call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,LandScape1stSoiLayDepth)
+  call InitSoilVars(NHW,NHE,NVN,NVS,SurfElevLandscapeMin,LandScape1stSoiLayDepth)
 
  !do NY=1,NYS
  !   DO L=NU_col(NY,NX),NL_col(NY,NX)

@@ -88,7 +88,7 @@ contains
     !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
     !
     PSISoilOsmotic_vr(L,NY,NX)          = -RGASC*TKS_vr(L,NY,NX)*SolutesIonConc_vr(L,NY,NX)*1.E-6_r8  !MPa
-    PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(ALT_col(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
+    PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(SurfElevation_col(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
     ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
     !
     !     SoilBulkModulus4RootPent_vr=bulk modulus of the undisturbed soil [MPa]
@@ -367,9 +367,9 @@ contains
     !first time step at the beginning year
     !THW=initial soil water content
     !DPTH=depth to middle of soil layer [m]
-    !ExtWaterTablet0_col=external water table depth, [m]
+    !ExtWaterTableLocDepz_col=external water table depth, [m]
 
-    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTableLocDepz_col(NY,NX))THEN
       !below the water table, thus it is saturated
       THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
     ELSEIF(isclose(THW_vr(L,NY,NX),1._r8))THEN
@@ -385,7 +385,7 @@ contains
       THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)      
     ENDIF
 
-    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
+    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTableLocDepz_col(NY,NX))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
     ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
       THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
