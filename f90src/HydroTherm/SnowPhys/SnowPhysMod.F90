@@ -620,7 +620,10 @@ contains
         NetHeat2LayL = 0.0_r8
       ENDIF
 
-      VOLW0X                        = VOLW0X+NetWat2LayL
+      ! Phase change uses the material remaining after all accepted transfers.
+      VOLS0X = VOLS0X+NetSno2LayL
+      VOLW0X = VOLW0X+NetWat2LayL
+      VOLI0X = VOLI0X+NetIce2LayL
       SnoXfer2SnoLay_snvr(L,NY,NX)  = SnoXfer2SnoLay_snvr(L,NY,NX)+SnoX2SnoLay_snvr(L,NY,NX)
       WatXfer2SnoLay_snvr(L,NY,NX)  = WatXfer2SnoLay_snvr(L,NY,NX)+WatX2SnoLay_snvr(L,NY,NX)
       IceXfer2SnoLay_snvr(L,NY,NX)  = IceXfer2SnoLay_snvr(L,NY,NX)+IceX2SnoLay_snvr(L,NY,NX)
@@ -710,9 +713,9 @@ contains
       vdry                       = VLDrySnoWE0M_snvr(L,NY,NX)
       vwat                       = VLWatSnow0M_snvr(L,NY,NX)
       vice                       = VLIceSnow0M_snvr(L,NY,NX)
-      VLDrySnoWE0M_snvr(L,NY,NX) = AZMAX1d(VLDrySnoWE0M_snvr(L,NY,NX)+NetSno2LayL-SnowThawMass,tinyw0)
-      VLWatSnow0M_snvr(L,NY,NX)  = AZMAX1d(VLWatSnow0M_snvr(L,NY,NX)+NetWat2LayL+SnowThawMass+IceThawMass,tinyw0)
-      VLIceSnow0M_snvr(L,NY,NX)  = AZMAX1d(VLIceSnow0M_snvr(L,NY,NX)+NetIce2LayL-IceThawMass/DENSICE,tinyw0)
+      VLDrySnoWE0M_snvr(L,NY,NX) = AZMAX1d(VOLS0X-SnowThawMass,tinyw0)
+      VLWatSnow0M_snvr(L,NY,NX)  = AZMAX1d(VOLW0X+SnowThawMass+IceThawMass,tinyw0)
+      VLIceSnow0M_snvr(L,NY,NX)  = AZMAX1d(VOLI0X-IceThawMass/DENSICE,tinyw0)
 
       cphwat                        = cpw*VLWatSnow0M_snvr(L,NY,NX)
       tNetWat2LayL                  = tNetWat2LayL+NetWat2LayL
