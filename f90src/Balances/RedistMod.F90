@@ -302,8 +302,9 @@ module RedistMod
     !natural water table depth from input file
     NaturalWaterTableDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     !
-    ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
-    !add litter layer correction
+    ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)+ &
+      (SurfElevation_col(NY,NX)-RefSurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+    !add litter layer correction  
     ExtWaterTable_col(NY,NX)   = ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
@@ -317,9 +318,10 @@ module RedistMod
     ELSEIF(IDWaterTable_col(NY,NX).EQ.2)THEN  !from mobile to tile
       IDWaterTable_col(NY,NX)=4
     ENDIF
-    TileWaterTableDepz_col(NY,NX)   = DCORPW
-    TileWaterTableLocDepz_col(NY,NX)          = AZMAX1(TileWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
-    TileWaterTable_col(NY,NX) = TileWaterTableLocDepz_col(NY,NX)
+    TileWaterTableDepz_col(NY,NX)    = DCORPW
+    TileWaterTableLocDepz_col(NY,NX) = AZMAX1(TileWaterTableDepz_col(NY,NX)+&
+      (SurfElevation_col(NY,NX)-RefSurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
+    TileWaterTable_col(NY,NX)        = TileWaterTableLocDepz_col(NY,NX)
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE

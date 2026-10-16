@@ -1619,8 +1619,9 @@ module WatsubMod
 
   IF(IDWaterTable_col(NY,NX).GE.3 .AND. &
     SoilDepthMidLay_vr(L,NY,NX).LT.TileWaterTable_col(NY,NX))THEN !above tile
-    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
-    PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)
+
+    PSISWDC = XN*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+    PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)*0.5_r8
     !calc equilibrium tile water potential using hydrostatic equilbrium
     TileEquilPotential=mGravAccelerat*(SoilDepthMidLay_vr(L,NY,NX)-TileWaterTable_col(NY,NX))-PSISWD
 
@@ -1630,7 +1631,7 @@ module WatsubMod
 
       IF(L.LT.NL_col(NY,NX))THEN
         D9568: DO  LL=L+1,NL_col(NY,NX)
-          PSISWD = PSISWDC*DLYR_3D(N,LL,NY,NX)
+          PSISWD = PSISWDC*DLYR_3D(N,LL,NY,NX)*0.5_r8
           TileWaterTableX=TileWaterTable_col(NY,NX)+(PSI_at_Sautration_vr(LL,NY,NX)+PSISWD)/mGravAccelerat
           IF(SoilDepthMidLay_vr(LL,NY,NX).LT.TileWaterTableX)THEN !above tile
             IF((PSISM1_vr(LL,NY,NX).LE.mGravAccelerat*(SoilDepthMidLay_vr(LL,NY,NX)-TileWaterTableX) &
@@ -1684,7 +1685,7 @@ module WatsubMod
 
   character(len=*), parameter :: subname='Config4XWaterTableDrain' 
   real(r8) :: ExtWaterTableEquil
-  real(r8) :: PSISWDC,PSISWD !pressure drop due to elevation change (following the slope) [MPa]
+  real(r8) :: PSISWDC,PSISWD !pressure drop due to elevation change (following the slope) [MPa] 
   real(r8) :: WaterTableXEquilPotential ![MPa]
   integer :: LL
 
@@ -1733,8 +1734,8 @@ module WatsubMod
   ! layer 
   IF(IDWaterTable_col(NY,NX).NE.0 .AND. SoilDepthMidLay_vr(L,NY,NX).LT.ExtWaterTable_col(NY,NX))THEN !layer above external water table        
 
-    PSISWDC = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
-    PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)
+    PSISWDC = XN*mGravAccelerat*SLOPE_col(N,NY,NX)*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+    PSISWD  = PSISWDC*DLYR_3D(N,L,NY,NX)*0.5_r8
 
     !assuming zero suction pressure at water table z_w
     !psi_ei-g*z_i=-g*z_w, psi_ei=g(z_i-z_w), or, z_i=z_w+psi_{ei}/g
@@ -1744,7 +1745,7 @@ module WatsubMod
     if(PSISM1_vr(L,NY,NX).GT.WaterTableXEquilPotential)then
       DoMicPDischarg2ExtWTBL=.true.
       D9565: DO LL=L+1,NL_col(NY,NX)
-        PSISWD = PSISWDC*DLYR_3D(N,LL,NY,NX)      
+        PSISWD = PSISWDC*DLYR_3D(N,LL,NY,NX)*0.5_r8      
         !water level difference        
         ExtWaterTableEquil=ExtWaterTable_col(NY,NX)+(PSI_at_Sautration_vr(LL,NY,NX)+PSISWD)/mGravAccelerat  
 
@@ -2348,7 +2349,7 @@ module WatsubMod
 
   character(len=*), parameter :: subname='DischargeOverWaterTable'
   real(r8) :: FLWT,MacPoreDischarg,FLWTH
-  real(r8) :: PSISWD            !pressure head drop from the grid to the external
+  real(r8) :: PSISWD            !pressure head drop from the grid to the external 
                                 !water table due to elevation change along the slope [MPa]
   real(r8) :: PSISWT,PSISWTH
   real(r8) :: watflx, heatflx
@@ -2395,8 +2396,7 @@ module WatsubMod
       !psi-g(z_i-zw), pressure gradient, assuming zero suction pressure at the external water table
       PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1) + &
         mGravAccelerat*(AMIN1(SoilDepthMidLay_vr(N3,N2,N1),WaterTableDepZi_col(N2,N1))-TargetWaterTBL))   
-        
-      !set conductivity at saturation value
+      !set conductivity at saturation value  
       outlet_conductivity=HydroCond_3D(N,1,N3,N2,N1)
     endif
 
@@ -2445,7 +2445,7 @@ module WatsubMod
     PSISWTH = mGravAccelerat*(AMIN1(Surf2MacPDepz,WaterTableDepZi_col(N2,N1))-TargetWaterTBL)
 
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-    
+
     FLWTH=PSISWTH*HydroCondMacP1_vr(N3,N2,N1)*AREA_3D(N,N3,N2,N1) &
       *(1.0_r8-FracLayVolBelowWTBL)/(RechargDist2WTBL+1.0_r8)*Recharg2WTBLScal*dts_HeatWatTP
 

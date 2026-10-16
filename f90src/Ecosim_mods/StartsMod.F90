@@ -263,11 +263,13 @@ module StartsMod
     DO  NY=NVN,NVS
       RefSurfElevation_col(NY,NX)=SurfElevLandscapeMin
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.0.0_r8)THEN
-        ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
-        TileWaterTableLocDepz_col(NY,NX)           = AZMAX1(TileWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
+        ExtWaterTableLocDepz_col(NY,NX)  = NaturalWaterTableDepz_col(NY,NX)+ &
+          (SurfElevation_col(NY,NX)-RefSurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+        TileWaterTableLocDepz_col(NY,NX) = AZMAX1(TileWaterTableDepz_col(NY,NX)+ &
+          (SurfElevation_col(NY,NX)-RefSurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX)))
       ELSE
-        ExtWaterTableLocDepz_col(NY,NX) = 0.0_r8
-        TileWaterTableLocDepz_col(NY,NX)           = 0.0_r8
+        ExtWaterTableLocDepz_col(NY,NX)  = 0.0_r8
+        TileWaterTableLocDepz_col(NY,NX) = 0.0_r8
       ENDIF
       WaterTableDepZi_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
     ENDDO
