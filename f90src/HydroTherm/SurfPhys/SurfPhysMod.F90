@@ -1672,8 +1672,6 @@ contains
 
       call UpdateLitterPhaseChangeM(I,J,M,NY,NX)
 
-      if(snowRedist_model)call SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
-
       call AccumWaterVaporHeatFluxesM(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatSensAir2Snow,&
         Radnet2Snow,VapXAir2TopLay)
 
@@ -1687,6 +1685,21 @@ contains
       dHGrnddTKsoi1(NY,NX)=-4._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3-CdSoiHSens_col(NY,NX)
     ENDDO D9890
   ENDDO D9895
+
+  ! Clear this substep's snow faces, including unused boundary slots, before
+  ! constructing accepted transfers from the common post-local donor state.
+  IF(snowRedist_model)THEN
+    DrySnoFlxByRedistM_2DH(M,:,:,:,:)=0._r8
+    WatSnoFlxByRedistM_2DH(M,:,:,:,:)=0._r8
+    IceSnoFlxByRedistM_2DH(M,:,:,:,:)=0._r8
+    HeatSnoFlxByRedistM_2DH(M,:,:,:,:)=0._r8
+    IFLBSM_2DH(M,:,:,:,:)=-1
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        call SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
+      ENDDO
+    ENDDO
+  ENDIF
 
   ! All donors and receivers now share the same post-local-process state.
   ! Potential and face construction only read that state; the donor limiter
