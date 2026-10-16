@@ -606,7 +606,7 @@ module StartsMod
   real(r8),intent(in) :: YSIN(NumOfSkyAzimuthSects)
   real(r8),intent(in) :: YCOS(NumOfSkyAzimuthSects)
   real(r8),intent(in) :: SkyAzimuthAngle(NumOfSkyAzimuthSects)
-  REAL(R8),INTENT(OUT):: SurfElevLandscapeMax
+  REAL(R8),INTENT(OUT):: SurfElevLandscapeMax  !peak elevation of the landscape [m]
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI,GridArea
   real(r8) :: SineGrndSurfAzimuth_col(JY,JX),CosineGrndSurfAzimuth_col(JY,JX)  !diagnostic
@@ -615,7 +615,7 @@ module StartsMod
 ! GroundSurfaceAzimuth_col=ground surface azimuth, aspect in radians
 ! SineGrndSlope_col,CosineGrndSlope_col=sine,cosine of ground surface
 ! OMEGA2Ground=incident sky angle at ground surface
-! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
+! SLOPE=tangent of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
 ! SurfElevLandscapeMax=maximum surface elevation in landscape
 ! XGridRunoffFlag_2DH=runoff boundary flags:0=not possible,1=possible
@@ -634,7 +634,7 @@ module StartsMod
       GroundSurfaceAzimuth_col(NY,NX)       = ASP_col(NY,NX)*RadianPerDegree   !radian
       SineGrndSurfAzimuth_col(NY,NX)        = ABS(SIN(GroundSurfaceAzimuth_col(NY,NX)))
       CosineGrndSurfAzimuth_col(NY,NX)      = ABS(COS(GroundSurfaceAzimuth_col(NY,NX)))
-      SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4
+      SLOPE_col(0,NY,NX)                    = AMAX1(1.745E-04_r8,SIN(SL_col(NY,NX)*RadianPerDegree))  !minimum slope is 1.745E-4~0.01o
       SLOPE_col(iWestEastDirection,NY,NX)   = -AZERO(SLOPE_col(0,NY,NX)*COS(GroundSurfaceAzimuth_col(NY,NX)))   !elevation increases from west to east, if west facing
       SLOPE_col(iNorthSouthDirection,NY,NX) = AZERO(SLOPE_col(0,NY,NX)*SIN(GroundSurfaceAzimuth_col(NY,NX)))    !elevation increases from north to south, if north facing
 
@@ -675,8 +675,8 @@ module StartsMod
         FSLOPE_2DH(iNorthSouthDirection,NY,NX) = 0.5_r8
       ENDIF
 
-!    compute incident sky angle at ground surface
-      SineGrndSlope_col(NY,NX)   = SLOPE_col(0,NY,NX)    !this is exact
+!    Compute radiation geometry with sine, independently of the tangent used for SLOPE_col.
+      SineGrndSlope_col(NY,NX)   = SLOPE_col(0,NY,NX)    !preserve the radiation minimum slope
       CosineGrndSlope_col(NY,NX) = SQRT(1.0_r8-SineGrndSlope_col(NY,NX)**2)
       D240: DO N=1,NumOfSkyAzimuthSects
         DGAZI                 = COS(GroundSurfaceAzimuth_col(NY,NX)-SkyAzimuthAngle(N))
@@ -687,7 +687,7 @@ module StartsMod
 !     DH, length in e-w direction
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
-          !(west, north) corner
+          !(west, north) corner as the anchor point
           SurfElevation_col(NY,NX)=0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)+0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
           !west boundary
@@ -715,7 +715,7 @@ module StartsMod
       ENDIF
 
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-        !(west,north) corner
+        !(west,north) corner, anchor point
         SurfElevLandscapeMax=SurfElevation_col(NY,NX)
       ELSE
         SurfElevLandscapeMax=MAX(SurfElevLandscapeMax,SurfElevation_col(NY,NX))
@@ -1019,7 +1019,7 @@ module StartsMod
   use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   integer,intent(in) :: NHW,NHE,NVN,NVS
-  REAL(R8) :: SurfElevLandscapeMax
+  REAL(R8) :: SurfElevLandscapeMax ![m], peak altitude of the landscape
   real(r8) :: SurfElevLandscapeMin
   real(r8) :: tPBOT
   integer :: NY,NX,NM

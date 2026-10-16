@@ -303,6 +303,7 @@ module RedistMod
     NaturalWaterTableDepz_col(NY,NX)     = DepzCorp_col(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     !
     ExtWaterTableLocDepz_col(NY,NX) = NaturalWaterTableDepz_col(NY,NX)-(RefSurfElevation_col(NY,NX)-SurfElevation_col(NY,NX))*(1.0_r8-WaterTable2GroundSlope_col(NY,NX))
+    !add litter layer correction
     ExtWaterTable_col(NY,NX)   = ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 

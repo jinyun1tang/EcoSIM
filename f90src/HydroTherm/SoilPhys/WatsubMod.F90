@@ -1683,7 +1683,8 @@ module WatsubMod
   logical , intent(out):: DoMacPDischarg2ExtWTBL       !true to do water discharge from macropore to external water table
 
   character(len=*), parameter :: subname='Config4XWaterTableDrain' 
-  real(r8) :: ExtWaterTableEquil,PSISWD,PSISWDC
+  real(r8) :: ExtWaterTableEquil
+  real(r8) :: PSISWDC,PSISWD !pressure drop due to elevation change (following the slope) [MPa]
   real(r8) :: WaterTableXEquilPotential ![MPa]
   integer :: LL
 
@@ -2347,7 +2348,8 @@ module WatsubMod
 
   character(len=*), parameter :: subname='DischargeOverWaterTable'
   real(r8) :: FLWT,MacPoreDischarg,FLWTH
-  real(r8) :: PSISWD            !pressure head drop from the grid to the external water table due to slope [MPa]
+  real(r8) :: PSISWD            !pressure head drop from the grid to the external
+                                !water table due to elevation change along the slope [MPa]
   real(r8) :: PSISWT,PSISWTH
   real(r8) :: watflx, heatflx
   real(r8) :: outlet_theta,outlet_conductivity
@@ -2362,7 +2364,7 @@ module WatsubMod
   !     DoMicPDischarg2ExtWTBL=micropore discharge flag to natural water table
   !     PSISWD=water potential drop from water table slope
   !     XN,RCHG*=direction indicator,boundary flag
-  !     SLOPE=sin(lateral slope)
+  !     SLOPE=tan(lateral slope), projected onto the grid direction
   !     DLYR=layer width
   !     WaterTable2GroundSlope_col=slope of water table relative to surface slope
   !     PSISWT=water potential driving micropore discharge
@@ -2375,6 +2377,7 @@ module WatsubMod
   !     FracLayVolBelowExtWTBL_vr=fraction of layer below natural water table
   !
   IF(DoMicPDischarg2ExtWTBL .AND. (.not.isclose(Recharg2WTBLScal,0._r8)))THEN        
+    !pressure drop due to the change of disturbance following the slope
     PSISWD = XN*0.5_r8*mGravAccelerat*SLOPE_col(N,N2,N1)*DLYR_3D(N,N3,N2,N1)*(1.0_r8-WaterTable2GroundSlope_col(N2,N1))
     
     if (use_ecosys_drainage) then
@@ -2389,9 +2392,11 @@ module WatsubMod
       outlet_k            = getMoistK(outlet_theta,POROS_vr(N3,N2,N1))
       outlet_conductivity = HydroCond_3D(N,outlet_k,N3,N2,N1)
     else
+      !psi-g(z_i-zw), pressure gradient, assuming zero suction pressure at the external water table
       PSISWT = AZMIN1(-PSISoilMatricPtmp_vr(N3,N2,N1) + &
         mGravAccelerat*(AMIN1(SoilDepthMidLay_vr(N3,N2,N1),WaterTableDepZi_col(N2,N1))-TargetWaterTBL))   
         
+      !set conductivity at saturation value
       outlet_conductivity=HydroCond_3D(N,1,N3,N2,N1)
     endif
 
@@ -2419,7 +2424,7 @@ module WatsubMod
   !     DoMacPDischarg2ExtWTBL=macropore discharge flag to natural water table
   !     PSISWD=water potential from water table slope
   !     XN,RCHG*=direction indicator,boundary flag
-  !     SLOPE=sin(lateral slope)
+  !     SLOPE=tan(lateral slope), projected onto the grid direction
   !     DLYR=layer width
   !     WaterTable2GroundSlope_col=water table slope
   !     PSISWTH=water potential driving macropore discharge

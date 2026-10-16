@@ -581,29 +581,30 @@ module Hour1Mod
   real(r8) :: ThetaWLitR
   real(r8) :: VOLIRZ,VWatLitrZ
   real(r8) :: XVOLW0,XVOLI0
-!     begin_execution
-!
-!     FCR=litter water content at -0.01 MPa
-!     THETY=litter hygroscopic water content
-!
+  !     begin_execution
+  !
+  !     FCR=litter water content at -0.01 MPa
+  !     THETY=litter hygroscopic water content
+  !
   CSoilOrgM_vr(ielmc,0,NY,NX)=orgcden
-!
-!     SOIL SURFACE WATER STORAGE CAPACITY
-!
-!     IDWaterTable=water table flag from site file
-!     ExtWaterTable,ExtWaterTableLocDepz_col=current,initial natural water table depth
-!     TileWaterTable_col,DTBLD=current,initial artificial water table depth
-!     SoilSurfRoughness_col,ZW=soil,water surface roughness
-!     VLWatHeldCapSurf_col=soil surface water retention capacity
-!     VWatStoreCapSurf_col=VLWatHeldCapSurf_col accounting for above-ground water table
-!     EHUM=fraction of microbial decompn product allocated to surface humus
-!     EPOC=fraction of SOC decomposition product allocated to surface POC
-!
-  !Stationary water table
+  !
+  !     SOIL SURFACE WATER STORAGE CAPACITY
+  !
+  !     IDWaterTable=water table flag from site file
+  !     ExtWaterTable,ExtWaterTableLocDepz_col=current,initial natural water table depth
+  !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
+  !     SoilSurfRoughness_col,ZW=soil,water surface roughness
+  !     VLWatHeldCapSurf_col=soil surface water retention capacity
+  !     VWatStoreCapSurf_col=VLWatHeldCapSurf_col accounting for above-ground water table
+  !     EHUM=fraction of microbial decompn product allocated to surface humus
+  !     EPOC=fraction of SOC decomposition product allocated to surface POC
+  !
+  !double check the water table defined below
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
     ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
-  !Mobile water table
+    !Mobile water table
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
+    !add litter layer correction
     ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
@@ -617,7 +618,7 @@ module Hour1Mod
   ELSE
     SoilSurfRoughness_col(NY,NX)=ZW
   ENDIF
-  !
+  !what is the reference?
   VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughness_col(NY,NX)+&
     3.10_r8*SoilSurfRoughness_col(NY,NX)**2._r8 &
     -0.012_r8*SoilSurfRoughness_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX)

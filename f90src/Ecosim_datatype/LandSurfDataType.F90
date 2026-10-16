@@ -14,7 +14,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  RoughnessLength_col(:,:)                   !Canopy surface roughness height, [m]
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                  !Soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesureHeight_col(:,:)              !Wind speed measurement height, [m]
-  real(r8),target,allocatable ::  SurfElevation_col(:,:)                           !Altitude of grid cell, [m]
+  real(r8),target,allocatable ::  SurfElevation_col(:,:)                 !Reference surface elevation of grid cell, [m]
   real(r8),target,allocatable ::  RawIsoTSurf2CanopyHScal_col(:,:)       !scalar for isothermal aerodynamic resistance between zero-sink height and ground surface, [h m-1]
   real(r8),target,allocatable ::  RawIsoTAtm2CanopySinkZ_col(:,:)        !isothermal aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
   real(r8),target,allocatable ::  RawTAtm2CanopySinkZ_col(:,:)           !aerodynamic resistance between zero-sink height and wind ref height in atmosphere, [h m-1]
