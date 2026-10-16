@@ -650,7 +650,7 @@ contains
   call SoilSRFEnerbyBalanceM(M,I,J,NY,NX,PSISV1,LWRadGrnd_col,ResistanceLitRLay,TopLayWatVol,&
     VapXAir2TopLay,HeatFluxAir2Soi)
   !
-  call SurfLitREnergyBalanceM(I,J,M,NY,NX,PSISV1,Prec2LitR2,RainHeat2LitR2,CumSnowWatFlow2LitR,&
+  call SurfLitREnergyBalanceM(I,J,M,NY,NX,PSISV1,TopLayWatVol,Prec2LitR2,RainHeat2LitR2,CumSnowWatFlow2LitR,&
     CumSnoHeatFlow2LitR,CumWatFlx2SoiMicP,CumWatFlx2SoiMacP,cumSnoHeatFlow2Soil,&
     HeatSensLitR2Soi1,HeatSensVapLitR2Soi1,EvapLitR2Soi1,VapXAir2LitR,HeatFluxAir2LitR)
   !
@@ -797,6 +797,8 @@ contains
   real(r8) :: PSIST0,HeatFlxLitR2Soi,FLQZ,DarcyFlxLitR2Soil
   real(r8) :: WatDarcyFloLitR2SoiMicP,FLQ2,CNDR,DarcyCondLitR2Soil
   real(r8) :: HeatFlowLitR2MacP,WatFlowLitR2MacP
+  real(r8) :: AvailableLitRWater,AvailableSoilWater,AvailableMicPSpace,AvailableMacPSpace
+  real(r8) :: MobileLitRWater,TotalLitRWaterIce
   real(r8) :: CND1
   integer :: K0,K1
   real(r8) :: TKRt,VHCapLitR,ENGYR,VLWatLitR,deltaT,TMX
@@ -825,9 +827,15 @@ contains
 !
   call PrintInfo('beg '//subname)
   HeatSoil2LitrM_col(NY,NX) = 0._r8
-  !check litter temperature
-  VLWatLitR=AMIN1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX),VLWatMicP1_vr(0,NY,NX))
-  if(VLWatLitR.LE.ZERO)return
+  ! Budget accepted surface fluxes before either infiltration pathway. Keep
+  ! micropore exchange first; macropores receive only remaining mobile liquid.
+  WatFLoLitr2SoilM_col(M,NY,NX)=0._r8
+  AvailableLitRWater=AZMAX1(VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX))
+  VLWatLitR=AvailableLitRWater
+  AvailableSoilWater=AZMAX1(VLWatMicP1_vr(NUM_col(NY,NX),NY,NX) &
+    +WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX))
+  AvailableMicPSpace=AZMAX1(VLairMicP1_vr(NUM_col(NY,NX),NY,NX) &
+    -WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX))
 
   IF(SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX).GT.ZERO)THEN
     !top layer is soil
@@ -847,8 +855,8 @@ contains
     K1   = getMoistK(THETW1,POROS_vr(NUM_col(NY,NX),NY,NX))
     CNDR = HydroCond_3D(3,K0,0,NY,NX)
     CND1 = HydroCond_3D(3,K1,NUM_col(NY,NX),NY,NX)*RainEkReducedKsat
-    if(ats_cpl_mode)then
-      DarcyCondLitR2Soil = 0.0
+    if(ats_cpl_mode .or. CNDR.LE.0._r8 .or. CND1.LE.0._r8)then
+      DarcyCondLitR2Soil = 0._r8
     else
       DarcyCondLitR2Soil = 2.0_r8*CNDR*CND1/(CNDR*DLYR_3D(3,NUM_col(NY,NX),NY,NX)+CND1*DLYRR_COL(NY,NX))
     endif
@@ -866,8 +874,8 @@ contains
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
-      WatDarcyFloLitR2SoiMicP = AZMAX1(AMIN1(FLQZ,VLWatLitR*dts_wat,VLairMicP1_vr(NUM_col(NY,NX),NY,NX)))
-      FLQ2                    = AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatLitR*dts_wat,VLairMicP1_vr(NUM_col(NY,NX),NY,NX)))
+      WatDarcyFloLitR2SoiMicP = AZMAX1(AMIN1(FLQZ,VLWatLitR*dts_wat,AvailableMicPSpace))
+      FLQ2                    = AZMAX1(AMIN1(DarcyFlxLitR2Soil,VLWatLitR*dts_wat,AvailableMicPSpace))
     ELSE
       !from soil to liter
       IF(THETW1.GT.ThetaSat_vr(NUM_col(NY,NX),NY,NX))THEN
@@ -876,16 +884,19 @@ contains
       ELSE
         FLQZ=DarcyFlxLitR2Soil
       ENDIF
-      WatDarcyFloLitR2SoiMicP = AZMIN1(AMAX1(FLQZ,-VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
-      FLQ2                    = AZMIN1(AMAX1(DarcyFlxLitR2Soil,-VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,-VLairMicP1_vr(0,NY,NX)))
+      WatDarcyFloLitR2SoiMicP = AZMIN1(AMAX1(FLQZ,-AvailableSoilWater*dts_wat,-VLairMicP1_vr(0,NY,NX)))
+      FLQ2                    = AZMIN1(AMAX1(DarcyFlxLitR2Soil,-AvailableSoilWater*dts_wat,-VLairMicP1_vr(0,NY,NX)))
     ENDIF
 
     !top soil layer has negative air volume
     IF(VLairMicP_vr(NUM_col(NY,NX),NY,NX).LT.0.0_r8)THEN
-      WatDarcyFloLitR2SoiMicP = WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,VLairMicP_vr(NUM_col(NY,NX),NY,NX)))
-      FLQ2                    = FLQ2+AZMIN1(AMAX1(-VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)*dts_wat,VLairMicP_vr(NUM_col(NY,NX),NY,NX)))
+      WatDarcyFloLitR2SoiMicP = WatDarcyFloLitR2SoiMicP+AZMIN1(AMAX1(-AvailableSoilWater*dts_wat,VLairMicP_vr(NUM_col(NY,NX),NY,NX)))
+      FLQ2                    = FLQ2+AZMIN1(AMAX1(-AvailableSoilWater*dts_wat,VLairMicP_vr(NUM_col(NY,NX),NY,NX)))
     ENDIF
 
+    ! The oversaturation correction above shares the same donor budget.
+    WatDarcyFloLitR2SoiMicP=AMAX1(-AvailableSoilWater, &
+      AMIN1(AvailableLitRWater,WatDarcyFloLitR2SoiMicP))
     IF(WatDarcyFloLitR2SoiMicP.GT.0.0_r8)THEN
       !litter layer to soil
       HeatFlxLitR2Soi=cpw*TKSoil1_vr(0,NY,NX)*WatDarcyFloLitR2SoiMicP*HeatAdv_scal
@@ -900,12 +911,17 @@ contains
     !soil to litter
   ELSE
     !top layer is water
-    WatDarcyFloLitR2SoiMicP                    = XVLMobileWatMicP(NY,NX)*dts_wat
+    TotalLitRWaterIce=AvailableLitRWater+VLiceMicP1_vr(0,NY,NX)
+    MobileLitRWater=0._r8
+    IF(TotalLitRWaterIce.GT.ZEROS(NY,NX))MobileLitRWater=AvailableLitRWater &
+      *AZMAX1(1._r8-VWatLitRHoldCapcity_col(NY,NX)/TotalLitRWaterIce)
+    WatDarcyFloLitR2SoiMicP=AMIN1(AvailableLitRWater,MobileLitRWater*dts_wat)
     HeatFlxLitR2Soi                            = cpw*TKSoil1_vr(0,NY,NX)*WatDarcyFloLitR2SoiMicP*HeatAdv_scal
     WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Micpt_3D(3,NUM_col(NY,NX),NY,NX)+WatDarcyFloLitR2SoiMicP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlxLitR2Soi
   ENDIF
 
+  AvailableLitRWater=AZMAX1(AvailableLitRWater-WatDarcyFloLitR2SoiMicP)
   WatFLo2LitrM_col(NY,NX)       = WatFLo2LitrM_col(NY,NX)-WatDarcyFloLitR2SoiMicP
   HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)-HeatFlxLitR2Soi
   WatFLoLitr2SoilM_col(M,NY,NX) = WatDarcyFloLitR2SoiMicP
@@ -919,8 +935,14 @@ contains
 !     WaterFlow2Micpt_3D,HFLWL=micropore water,heat flux
 !     WatFLow2LitR,HFLWRL=total litter water,heat flux
 !
-  IF(VLairMacP1_vr(NUM_col(NY,NX),NY,NX).GT.0.0_r8 .AND. XVLMobileWatMicP(NY,NX).GT.0.0_r8)THEN
-    WatFlowLitR2MacP                       = AMIN1(XVLMobileWatMicP(NY,NX)*dts_wat,VLairMacP1_vr(NUM_col(NY,NX),NY,NX))
+  TotalLitRWaterIce=AvailableLitRWater+VLiceMicP1_vr(0,NY,NX)
+  MobileLitRWater=0._r8
+  IF(TotalLitRWaterIce.GT.ZEROS(NY,NX))MobileLitRWater=AvailableLitRWater &
+    *AZMAX1(1._r8-VWatLitRHoldCapcity_col(NY,NX)/TotalLitRWaterIce)
+  AvailableMacPSpace=AZMAX1(VLairMacP1_vr(NUM_col(NY,NX),NY,NX) &
+    -WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX))
+  IF(AvailableMacPSpace.GT.0._r8 .AND. MobileLitRWater.GT.0._r8)THEN
+    WatFlowLitR2MacP=AMIN1(MobileLitRWater*dts_wat,AvailableLitRWater,AvailableMacPSpace)
     HeatFlowLitR2MacP                      = WatFlowLitR2MacP*cpw*TKSoil1_vr(0,NY,NX)*HeatAdv_scal
     WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX) = WaterFlow2Macpt_3D(3,NUM_col(NY,NX),NY,NX)+WatFlowLitR2MacP
     HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)  = HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)+HeatFlowLitR2MacP
@@ -935,20 +957,16 @@ contains
   end subroutine SurfLitrSoilWaterExchangeM
 !------------------------------------------------------------------------------------------
 
-  subroutine InfilSRFRoffPartitionM(I,J,M,NY,NX)
+  subroutine UpdateLitterPhaseChangeM(I,J,M,NY,NX)
   !
-  !Partition surface water into infiltration and runoff
+  !Calculate litter phase-change fluxes and water-film thicknesses
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NY,NX
-  character(len=*), parameter :: subname='InfilSRFRoffPartitionM'
-  integer :: N1,N2
+  character(len=*), parameter :: subname='UpdateLitterPhaseChangeM'
   real(r8) :: LitrIceHeatFlxFrezPt,TK1X,ENGYR,VLWatMicP1X,VLHeatCapacityX
-  real(r8) :: TFREEZ,TFLX,VWatExcess
+  real(r8) :: TFREEZ,TFLX
 
-  real(r8) :: WatExcessDetph
-  real(r8) :: Q   !flux of mobile water (>0)
-  real(r8) :: HydraulicRadius,CrossSectVelocity
 
   !     begin_execution
   !
@@ -1009,6 +1027,20 @@ contains
     FILMM_vr(M,0,NY,NX)=1.0E-03_r8
   ENDIF
   FILMM_vr(M,NUM_col(NY,NX),NY,NX)=FilmThickness(PSISM1_vr(NUM_col(NY,NX),NY,NX),is_top_layer=.true.)
+  call PrintInfo('end '//subname)
+  end subroutine UpdateLitterPhaseChangeM
+!------------------------------------------------------------------------------------------
+
+  subroutine CalcSurfaceRunoffPotentialM(I,J,M,NY,NX)
+  !Calculate runoff potential from the locally updated, pre-runoff state.
+  implicit none
+  integer, intent(in) :: I,J,M,NY,NX
+  character(len=*), parameter :: subname='CalcSurfaceRunoffPotentialM'
+  integer :: N1,N2
+  real(r8) :: VWatExcess,WatExcessDetph,Q,VLWatMicP1X
+  real(r8) :: HydraulicRadius,CrossSectVelocity
+
+  call PrintInfo('beg '//subname)
   !
   !     OVERLAND FLOW WHEN WATER STORAGE CAPACITY
   !     OF THE SOIL SURFACE PLUS MACROPORES IS EXCEEDED
@@ -1030,7 +1062,7 @@ contains
     HydraulicRadius                 = WatExcessDetph/2.828_r8
     CrossSectVelocity               = GaucklerManningVelocity(HydraulicRadius,SLOPE_col(0,N2,N1))/SoiSurfRoughness(N2,N1)     ![1/s]
     Q                               = CrossSectVelocity*WatExcessDetph*AREA_3D(3,NUM_col(N2,N1),N2,N1)*secsphour*dts_HeatWatTP  ![kg/h/d2]
-    VLWatMicP1X                     = AZMAX1(VLWatMicP1_vr(0,N2,N1)+LitrIceFlxThaw_col(N2,N1))
+    VLWatMicP1X                     = AZMAX1(VLWatMicP1_vr(0,N2,N1))
     RunoffVelocityM_col(M,N2,N1)    = CrossSectVelocity
     SurfRunoffPotentM_col(M,N2,N1) = AMIN1(Q,VWatExcess*dts_wat,VLWatMicP1X*dts_wat) &
       *XVLMobileWatMicP(N2,N1)/XVLMobileWaterLitR_col(N2,N1)                             !>0
@@ -1039,7 +1071,7 @@ contains
     SurfRunoffPotentM_col(M,N2,N1) = 0.0_r8
   ENDIF
   call PrintInfo('end '//subname)
-  end subroutine InfilSRFRoffPartitionM
+  end subroutine CalcSurfaceRunoffPotentialM
 !------------------------------------------------------------------------------------------
 
   subroutine AccumWaterVaporHeatFluxesM(I,J,M,NY,NX,LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatSensAir2Snow,&
@@ -1052,7 +1084,7 @@ contains
   real(r8), intent(in) :: VapXAir2TopLay
 
   character(len=*), parameter :: subname='AccumWaterVaporHeatFluxesM'
-  real(r8) :: VLWatLitR, dHeatLitR
+  real(r8) :: VLWatLitR,WaterRoundoffTol
 
   ! begin_execution
   ! HOURLY-ACCUMULATED WATER, VAPOR AND HEAT FLUXES THROUGH
@@ -1063,13 +1095,13 @@ contains
 
   VLWatLitR=VLWatMicP1_vr(0,NY,NX)+WatFLo2LitrM_col(NY,NX)+LitrIceFlxThaw_col(NY,NX)
 
-  !the following line introduces extra H2O into the system
-  if(VLWatLitR<0._r8)then
-    dHeatLitR                     = cpw*(-VLWatLitR+tiny_wat)*TKSoil1_vr(0,NY,NX)
-    WatFLo2LitrM_col(NY,NX)       = WatFLo2LitrM_col(NY,NX)-VLWatLitR+tiny_wat
-    !do not add heat flow to avoid over heating, as it is included in the heat capacity
-    ! HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)+dHeatLitR
-  endif
+  ! A material deficit is a flux-budget error; never create water to hide it.
+  WaterRoundoffTol=MAX(tiny_wat,100._r8*EPSILON(1._r8)*MAX( &
+    ABS(VLWatMicP1_vr(0,NY,NX)),ABS(WatFLo2LitrM_col(NY,NX)),ABS(LitrIceFlxThaw_col(NY,NX))))
+  IF(VLWatLitR.LT.-WaterRoundoffTol)THEN
+    write(*,*)subname,': negative litter liquid at I,J,M,NY,NX=',I,J,M,NY,NX,VLWatLitR
+    call endrun(trim(mod_filename)//' at line',__LINE__)
+  ENDIF
 
   TLitrIceFlxThaw_col(NY,NX)                   = TLitrIceFlxThaw_col(NY,NX)+LitrIceFlxThaw_col(NY,NX)
   TLitrIceHeatFlxFrez_col(NY,NX)               = TLitrIceHeatFlxFrez_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)
@@ -1624,6 +1656,8 @@ contains
   WatFlx2LitRByRunoff_2DH(:,:,:,:)  = 0._r8
   HeatFlx2LitRByRunoff_2DH(:,:,:,:) = 0._r8
 
+  ! Finish every cell's local exchanges before reading neighboring water
+  ! levels or temperatures. No runoff is applied during this first pass.
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
 
@@ -1633,10 +1667,7 @@ contains
 
       call SurfLitrSoilWaterExchangeM(I,J,M,NY,NX,RainEkReducedKsat(NY,NX))
 
-      call InfilSRFRoffPartitionM(I,J,M,NY,NX)
-
-      !Do inner grid exchange
-      if(.not.ATS_cpl_mode)call XGridsSurfRunoffM(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
+      call UpdateLitterPhaseChangeM(I,J,M,NY,NX)
 
       if(snowRedist_model)call SnowRedistributionM(M,NY,NX,NHE,NHW,NVS,NVN)
 
@@ -1653,6 +1684,16 @@ contains
       dHGrnddTKsoi1(NY,NX)=-4._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3-CdSoiHSens_col(NY,NX)
     ENDDO D9890
   ENDDO D9895
+
+  ! All donors and receivers now share the same post-local-process state.
+  ! Potential and face construction only read that state; the donor limiter
+  ! and simultaneous runoff update are performed later in WatsubMod.
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      call CalcSurfaceRunoffPotentialM(I,J,M,NY,NX)
+      if(.not.ATS_cpl_mode)call XGridsSurfRunoffM(I,J,M,NY,NX,NHE,NHW,NVS,NVN)
+    ENDDO
+  ENDDO
 
   call PrintInfo('end '//subname)
   end subroutine RunSurfacePhysModelM
