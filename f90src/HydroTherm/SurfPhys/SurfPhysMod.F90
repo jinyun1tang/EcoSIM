@@ -170,6 +170,7 @@ contains
       ! The prior-hour weighted derivative was consumed above. Build this
       ! hour's unweighted conductance sum from the actual exchange substeps.
       SurfSensHeatConduct_col(NY,NX)=0._r8
+      SurfLatHeatVapDeriv_col(NY,NX)=0._r8
 
     ENDDO D9990
   ENDDO D9995
@@ -269,6 +270,11 @@ contains
   character(len=*), parameter :: subname='SetCanopyProperty'
   real(r8), parameter :: SpecHeatCapAir=1.25E-03_r8    !heat capacity of 1m3 air, [MJ/(m3 K)]
   real(r8) :: RI,RAGX,AirHeatArea,CanopyAirHeatDenom
+  real(r8) :: LatHeatArea,CanopyAirVapDenom
+  real(r8) :: SensHeatDeriv,LatHeatDeriv
+  ! Compile-time slope multiplier: 0 disables stabilization, 1 uses the
+  ! full frozen-state estimate; values between 0 and 1 weaken the damping.
+  real(r8), parameter :: cfeedback=1._r8
 
   !TLEX_col=total latent heat flux x boundary layer resistance, [MJ m-1]
   !TSHX_col=total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -276,15 +282,32 @@ contains
   !TKQ=temperature in canopy air, Kelvin
   call PrintInfo('beg '//subname)
   !
-  VPQ_col(NY,NX) = VPA_col(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA_3D(3,NUM_col(NY,NX),NY,NX))
-  AirHeatArea=SpecHeatCapAir*AREA_3D(3,NUM_col(NY,NX),NY,NX)
-  CanopyAirHeatDenom=AirHeatArea+dSensHeatdTKQ_col(NY,NX)
-  if(dSensHeatdTKQ_col(NY,NX)/=0._r8 .and. TKQHeatRef_col(NY,NX)>0._r8 .and. &
-    abs(CanopyAirHeatDenom)>1.e-12_r8*AirHeatArea)then
+  LatHeatArea              = EvapLHTC*AREA_3D(3,NUM_col(NY,NX),NY,NX)
+  ! Keep restart-persisted derivatives unscaled; tune only this prediction.
+  LatHeatDeriv            = cfeedback*dLatHeatdVPQ_col(NY,NX)
+  SensHeatDeriv           = cfeedback*dSensHeatdTKQ_col(NY,NX)
+  CanopyAirVapDenom        = 1._r8+LatHeatDeriv/LatHeatArea
+
+  if(LatHeatDeriv/=0._r8 .and. VPQLatHeatRef_col(NY,NX)>=0._r8 .and. &
+    abs(CanopyAirVapDenom)>1.e-2_r8)then
+    ! S_L(q) ~= TLEX + K_V*(q-qref), paired from the same completed hour.
+    ! This scalar predictor freezes thermal cross-responses; no saturation
+    ! clipping or change to accepted water/energy transfers is introduced.
+    VPQ_col(NY,NX)=(VPA_col(NY,NX) &
+      -(TLEX_col(NY,NX)-LatHeatDeriv*VPQLatHeatRef_col(NY,NX))/LatHeatArea) &
+      /CanopyAirVapDenom
+  else
+    VPQ_col(NY,NX)=VPA_col(NY,NX)-TLEX_col(NY,NX)/LatHeatArea
+  endif
+
+  AirHeatArea        = SpecHeatCapAir*AREA_3D(3,NUM_col(NY,NX),NY,NX)
+  CanopyAirHeatDenom = 1._r8+SensHeatDeriv/AirHeatArea
+  if(SensHeatDeriv/=0._r8 .and. TKQHeatRef_col(NY,NX)>0._r8 .and. &
+    abs(CanopyAirHeatDenom)>1.e-2_r8)then
     ! S_H(Tq) ~= TSHX + K_H*(Tq-Tref), with TSHX/K_H/Tref from
-    ! the same completed hour. The increment form avoids K_H*Tref.
-    TKQ_col(NY,NX)=TKQHeatRef_col(NY,NX) &
-      +(AirHeatArea*(TairK_col(NY,NX)-TKQHeatRef_col(NY,NX))-TSHX_col(NY,NX)) &
+    ! the same completed hour: x_new = (x_a-(F-D*x_old)/C)/(1+D/C).
+    TKQ_col(NY,NX)=(TairK_col(NY,NX) &
+      -(TSHX_col(NY,NX)-SensHeatDeriv*TKQHeatRef_col(NY,NX))/AirHeatArea) &
       /CanopyAirHeatDenom
   else
     ! No completed-hour estimate, zero conductance, or singular denominator.
@@ -602,6 +625,11 @@ contains
   !evaporation, no more than what is available, g H2O
   if(TopLayWatVol<1.0e-30) TopLayWatVol=0.0
   VapXAir2TopLay=AMAX1(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1),-AZMAX1(TopLayWatVol*dts_wat))
+  ! Freeze water availability: a donor-limited evaporation branch has zero
+  ! local derivative. CdSoiEvap already includes area and substep duration.
+  if(CdSoiEvap*(VPQ_col(NY,NX)-VaporSoi1)>-AZMAX1(TopLayWatVol*dts_wat))then
+    SurfLatHeatVapDeriv_col(NY,NX)=SurfLatHeatVapDeriv_col(NY,NX)+EvapLHTC*CdSoiEvap
+  endif
   !VapXAir2TopLay=0.0
 
   !latent heat > 0 into soil/ground

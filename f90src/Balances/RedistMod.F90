@@ -4,7 +4,7 @@ module RedistMod
   use minimathmod,       only: safe_adb, AZMAX1, AZERO, fixEXConsumpFlux, fixnegmass, isclose
   use EcoSiMParDataMod,  only: micpar
   use SurfLitterPhysMod, only: UpdateLitRPhys
-  use HydroThermData,    only: SurfSensHeatConduct_col
+  use HydroThermData,    only: SurfSensHeatConduct_col, SurfLatHeatVapDeriv_col
   use InitSOMBGCMOD,     only: MicrobeByLitterFall
   use MiniFuncMod,       only: gOC_to_m3_OM
   use TracerPropMod,     only: MolecularWeight
@@ -158,19 +158,21 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateCanopyAirHeatDerivative(NY,NX)
-  ! Frozen-state resistance estimate: each active exchange contributed
-  ! c_air*A_exchange*dt/r_a to the hourly sum. Surface temperatures and
-  ! resistances are held fixed when differentiating with respect to Tq.
+  subroutine UpdateCanopyAirDerivatives(NY,NX)
+  ! Save frozen-state resistance derivatives and matching hourly references.
+  ! Surface temperatures and resistances are held fixed; latent derivatives
+  ! respect the local water-donor limits of each accepted exchange branch.
   implicit none
   integer, intent(in) :: NY,NX
 
-  ! Match the resistance weight used for the accepted hourly surface heat.
-  ! Plant sensible heat uses ambient TairK, so it has no direct Tq derivative;
-  ! its full contribution remains in Air_Heat_Sens_store_col.
+  ! Match the resistance weight used for accepted hourly surface heat.
+  ! Plants use ambient TairK/VPA, so they have no direct Tq/VPQ derivatives;
+  ! their full fluxes remain in the sensible and latent heat stores.
   dSensHeatdTKQ_col(NY,NX)=RawTAtm2CanopySinkZ_col(NY,NX)*SurfSensHeatConduct_col(NY,NX)
   TKQHeatRef_col(NY,NX)=TKQ_col(NY,NX)
-  end subroutine UpdateCanopyAirHeatDerivative
+  dLatHeatdVPQ_col(NY,NX)=RawTAtm2CanopySinkZ_col(NY,NX)*SurfLatHeatVapDeriv_col(NY,NX)
+  VPQLatHeatRef_col(NY,NX)=VPQ_col(NY,NX)
+  end subroutine UpdateCanopyAirDerivatives
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateOutputVars(I,J,NY,NX,Txchem_CO2_col)
@@ -236,7 +238,7 @@ module RedistMod
 
   Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
-  call UpdateCanopyAirHeatDerivative(NY,NX)
+  call UpdateCanopyAirDerivatives(NY,NX)
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   

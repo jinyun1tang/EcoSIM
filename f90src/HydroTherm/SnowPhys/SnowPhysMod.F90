@@ -887,6 +887,13 @@ contains
   !then the loss is from dry snow
   EvapSublimation2   = AMAX1(EVAPX2,-AZMAX1(VLDrySnoWE0M_snvr(1,NY,NX)*dts_sno))
   LatentHeatAir2Sno2 = EVAPW2*EvapLHTC+EvapSublimation2*SublmHTC
+  ! Differentiate the sequential liquid/snow donor limits at fixed stores.
+  ! Match the latent-energy ledger, including the sublimation latent heat.
+  if(MaxVapXAir2Sno>-AZMAX1(VLWatSnow0M_snvr(1,NY,NX)*dts_sno))then
+    SurfLatHeatVapDeriv_col(NY,NX)=SurfLatHeatVapDeriv_col(NY,NX)+EvapLHTC*CdSnoEvap
+  elseif(MaxVapXAir2Sno-EVAPW2>-AZMAX1(VLDrySnoWE0M_snvr(1,NY,NX)*dts_sno))then
+    SurfLatHeatVapDeriv_col(NY,NX)=SurfLatHeatVapDeriv_col(NY,NX)+SublmHTC*CdSnoEvap
+  endif
 
   IF(MaxVapXAir2Sno.LT.0.0_r8)THEN
     !snow is losing water/heat

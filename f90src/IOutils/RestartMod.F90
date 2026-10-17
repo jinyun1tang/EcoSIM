@@ -5011,7 +5011,7 @@ implicit none
   logical :: has_gas_residual
   integer :: ndoms, feedback_varid
   type(var_desc_t) :: feedback_vardesc
-  logical :: has_heat_deriv, has_heat_ref
+  logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -6589,6 +6589,38 @@ implicit none
     datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='TKQHeatRef_col', dim1name='column',&
       long_name='Canopy air temperature used for the last completed hour', units='K',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+  endif
+
+  ! Preserve the paired hourly feedback history. Legacy restarts start with
+  ! zero derivative and build a fresh resistance estimate after one hour.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'dLatHeatdVPQ_col',feedback_varid,feedback_vardesc,readvar=has_vap_deriv)
+    call ncd_inqvid(ncid,'VPQLatHeatRef_col',feedback_varid,feedback_vardesc,readvar=has_vap_ref)
+    dLatHeatdVPQ_col=0._r8
+    VPQLatHeatRef_col=-1._r8
+    if(has_vap_deriv .and. has_vap_ref)then
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='dLatHeatdVPQ_col', dim1name='column',&
+        long_name='Resistance estimate of weighted latent-energy derivative', units='MJ m2 ton-1',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,dLatHeatdVPQ_col,datrc_1d)
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='VPQLatHeatRef_col', dim1name='column',&
+        long_name='Canopy vapor concentration used for the last completed hour', units='ton m-3',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,VPQLatHeatRef_col,datrc_1d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,dLatHeatdVPQ_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='dLatHeatdVPQ_col', dim1name='column',&
+      long_name='Resistance estimate of weighted latent-energy derivative', units='MJ m2 ton-1',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VPQLatHeatRef_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='VPQLatHeatRef_col', dim1name='column',&
+      long_name='Canopy vapor concentration used for the last completed hour', units='ton m-3',&
       interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
   endif
 

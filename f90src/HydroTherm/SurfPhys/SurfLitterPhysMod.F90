@@ -380,6 +380,11 @@ implicit none
       !     VAPOR FLUX AT RESIDUE SURFACE against atmosphere
       !
       EvapAtm2LitR2         = AMAX1(-AZMAX1(VWatLitr2)*dts_wat,CdLitREvap*(VPQ_col(NY,NX)-VapLitR)) ![ton H2O]
+      ! Accumulate only the active atmospheric exchange branch; the inactive
+      ! litter branch contributes zero. Area and inner timestep are in Cd.
+      if(CdLitREvap*(VPQ_col(NY,NX)-VapLitR)>-AZMAX1(VWatLitr2)*dts_wat)then
+        SurfLatHeatVapDeriv_col(NY,NX)=SurfLatHeatVapDeriv_col(NY,NX)+EvapLHTC*CdLitREvap
+      endif
       LatentHeatAir2LitR2   = EvapAtm2LitR2*EvapLHTC          !latent energy flux, MJ/ton H2O * ton H2O = MJ
       HeatSensEvapAir2LitR2 = EvapAtm2LitR2*cpw*TKR1          !mass energy flux due to move of liquid water
       !
