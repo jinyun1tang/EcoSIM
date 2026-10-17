@@ -603,7 +603,7 @@ implicit none
   real(r8) :: VOLIRZ,ENGYR,VLHeatCapLitRPre
   real(r8) :: TK0Prev,TVWatIceLitR,VWatLitrZ
   real(r8) :: VLWatMicP10,VLiceMicP10,VLWatLitR,VLicelitR
-  real(r8) :: deltaT,TMX
+  real(r8) :: deltaT,TMX,dLWRaddTKR,RadHeatCorrection,SensHeatCorrection,NetHeatCorrection
 
   ! SURFACE RESIDUE WATER AND TEMPERATURE
   !
@@ -656,10 +656,34 @@ implicit none
   VHeatCapacity1_vr(0,NY,NX)             = cpo*m3OM_col(NY,NX)+cpw*VLWatMicP1_vr(0,NY,NX)+cpi*VLiceMicP1_vr(0,NY,NX)  !update heat capacity
 
   IF(VHeatCapacity1_vr(0,NY,NX).GT.VHeatCapLitRMin_col(NY,NX) .and. FracSurfByLitR_col(NY,NX)>1.e-3_r8)THEN
-    ! Reconstruct from accepted substep heat and phase change without a
-    ! second atmospheric derivative correction (all energies are in MJ).
-    TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX)) &
-      /VHeatCapacity1_vr(0,NY,NX)
+    ! Retain the historical full-step stabilizer in addition to the inner
+    ! litter solve. The extra 1/dts_HeatWatTP strengthens longwave damping;
+    ! it is numerical stabilization, not another physical radiation Jacobian.
+    ! Removing this amplification destabilizes the Blodgett nolig case.
+    dLWRaddTKR = -4._r8*LWEmscefLitR_col(NY,NX)*TK0Prev**3/dts_HeatWatTP
+    TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX) &
+      +(-dLWRaddTKR+CdLitRHSens_col(NY,NX))*TK0Prev) &
+      /(VHeatCapacity1_vr(0,NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX)))
+    if(abs(TKSoil1_vr(0,NY,NX)-TK0Prev)>10._r8)then
+      dLWRaddTKR = -2._r8*LWEmscefLitR_col(NY,NX)*(TK0Prev**3+TKSoil1_vr(0,NY,NX)**3)/dts_HeatWatTP
+      TKSoil1_vr(0,NY,NX) = (ENGYR+HeatFLoByWat2LitRM_col(NY,NX)+LitrIceHeatFlxFrez_col(NY,NX) &
+        +(-dLWRaddTKR+CdLitRHSens_col(NY,NX))*TK0Prev) &
+        /(VHeatCapacity1_vr(0,NY,NX)+(-dLWRaddTKR+CdLitRHSens_col(NY,NX)))
+    endif
+
+    ! Record exactly the heat implied by the final stabilized solve [MJ/cell].
+    ! AccumWaterVaporHeatFluxesM has already accumulated the uncorrected heat,
+    ! so both the current-step and hourly litter stores need this correction.
+    deltaT = TKSoil1_vr(0,NY,NX)-TK0Prev
+    RadHeatCorrection = dLWRaddTKR*deltaT
+    SensHeatCorrection = -CdLitRHSens_col(NY,NX)*deltaT
+    NetHeatCorrection = RadHeatCorrection+SensHeatCorrection
+    HeatFLoByWat2LitRM_col(NY,NX) = HeatFLoByWat2LitRM_col(NY,NX)+NetHeatCorrection
+    HeatFLoByWat2LitR_col(NY,NX) = HeatFLoByWat2LitR_col(NY,NX)+NetHeatCorrection
+    HeatByRad2Surf_col(NY,NX) = HeatByRad2Surf_col(NY,NX)+RadHeatCorrection
+    HeatSensAir2Surf_col(NY,NX) = HeatSensAir2Surf_col(NY,NX)+SensHeatCorrection
+    HeatNet2Surf_col(NY,NX) = HeatNet2Surf_col(NY,NX)+NetHeatCorrection
+    LWRadBySurf_col(NY,NX) = LWRadBySurf_col(NY,NX)-RadHeatCorrection
 
     if(TKSoil1_vr(0,NY,NX)<200._r8 .or. (TKSoil1_vr(0,NY,NX)>373._r8 .and. VHeatCapacity1_vr(0,NY,NX)>2._r8*VHeatCapLitRMin_col(NY,NX)) )then
       write(*,*)'IJ, weird litter temp UpdateLitRBe4RunoffM=',I*1000+J,M,NY,NX

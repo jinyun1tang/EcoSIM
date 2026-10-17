@@ -1781,7 +1781,7 @@ contains
   character(len=*), parameter :: subname = 'SurfaceEnergyModelM'
   integer :: N1,N2,L
   real(r8):: PrecNet2SoiMicP,PrecNet2SoiMacP,RainPrecHeatAir2LitR
-  real(r8) :: Prec2LitR2,RainHeat2LitR2
+  real(r8) :: Prec2LitR2,RainHeat2LitR2,SnowRadHeatCorrection
 
   call PrintInfo('beg '//subname)
 
@@ -1795,7 +1795,9 @@ contains
     HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,VapXAir2TopLay,HeatFluxAir2Soi1)
 
   !update snow pack before doing snow redistribution to avoid negative mass values
-  call UpdateSnowPack1M(I,J,M,NY,NX)
+  call UpdateSnowPack1M(I,J,M,NY,NX,SnowRadHeatCorrection)
+  ! Include the outer snow stabilizer before surface heat is accumulated.
+  Radnet2Snow=Radnet2Snow+SnowRadHeatCorrection
 
   call PrintInfo('end '//subname)
   end subroutine SurfaceEnergyModelM

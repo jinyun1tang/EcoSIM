@@ -977,18 +977,19 @@ contains
   end subroutine PrepIterSnowLayerM
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateSnowPack1M(I,J,M,NY,NX)
+  subroutine UpdateSnowPack1M(I,J,M,NY,NX,RadHeatCorrection)
 
   ! This is called in the surface energy model
   ! till one less than the last iteration
   !
   implicit NONE
   integer, intent(in) :: I,J,M,NY,NX
+  real(r8), intent(out) :: RadHeatCorrection !additional net radiation into snow [MJ/cell/step]
 
   integer :: L
   real(r8) :: ENGY0,vdry,vwat,vice
   real(r8) :: dHPhaseChange,VLDrySnoWEtmp
-  real(r8) :: TKX,tENGY,dENGY
+  real(r8) :: TKX,tENGY,dENGY,LongwaveStabilizer
   real(r8), parameter :: tinyw_val=1.e-12_r8
   logical :: ActiveSnow_test
 !
@@ -1001,6 +1002,8 @@ contains
 !     CumHeat2SnowLay=total snowpack conductive+convective heat flux
 !     PhaseChangeHeatL=snowpack latent heat flux from freeze-thaw
 !
+
+  RadHeatCorrection=0._r8
 
   !the use of tinyw_val may introduce extra snow mass unphysically
   D9780: DO L=1,JS
@@ -1016,9 +1019,21 @@ contains
 
     ActiveSnow_test = VLSnowHeatCapM_snvr(M+1,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8
     IF(ActiveSnow_test)THEN
-      ! Radiation was integrated by the snow substeps; preserve accepted energy.
-      TKSnow0_snvr(L,NY,NX) = (ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX)) &
-        /VLSnowHeatCapM_snvr(M+1,L,NY,NX)
+      ! Retain the historical outer longwave stabilizer as additional damping
+      ! of the full-step reconstruction; the inner snow solve is also implicit.
+      LongwaveStabilizer=0._r8
+      if(L==1)LongwaveStabilizer=4._r8*LWEmscefSnow_col(NY,NX)*TKX**3
+      TKSnow0_snvr(L,NY,NX) = (ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX) &
+        +LongwaveStabilizer*TKX)/(VLSnowHeatCapM_snvr(M+1,L,NY,NX)+LongwaveStabilizer)
+      if(L==1)then
+        ! Net incoming correction is negative for warming [MJ/cell]. Return it
+        ! before the caller accumulates Radnet2Snow; outgoing LW is stored here.
+        RadHeatCorrection=-LongwaveStabilizer*(TKSnow0_snvr(L,NY,NX)-TKX)
+        CumHeat2SnowLM_snvr(L,NY,NX)=CumHeat2SnowLM_snvr(L,NY,NX)+RadHeatCorrection
+        HeatXfer2SnoLay_snvr(L,NY,NX)=HeatXfer2SnoLay_snvr(L,NY,NX)+RadHeatCorrection
+        tEnGYM_snvr(L,NY,NX)=tEnGYM_snvr(L,NY,NX)+RadHeatCorrection
+        LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)-RadHeatCorrection
+      endif
       
       !no active snow, reset top layer snow  temperature to air temperature, (it introduces energy error though)
     ELSEIF(L.EQ.1)THEN
