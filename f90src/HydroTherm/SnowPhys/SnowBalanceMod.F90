@@ -560,6 +560,7 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
+  real(r8) :: DrySnowWE,DrySnowVol
 
   integer :: IFLGLS,idn,idg,idsalt
   integer, parameter :: inochange=0
@@ -644,6 +645,13 @@ implicit none
 !
 !     TARGET SNOW LAYER
 !         volume/mass
+          ! Relayering preserves dry-snow bulk volume; compression is separate.
+          DrySnowWE = VLDrySnoWE_snvr(L1,NY,NX)+FX*VLDrySnoWE_snvr(L0,NY,NX)
+          DrySnowVol = VLDrySnoWE_snvr(L1,NY,NX)/SnoDens_snvr(L1,NY,NX) &
+            +FX*VLDrySnoWE_snvr(L0,NY,NX)/SnoDens_snvr(L0,NY,NX)
+          if(DrySnowVol>0._r8)then
+            SnoDens_snvr(L1,NY,NX)=DrySnowWE/DrySnowVol
+          endif
           VLDrySnoWE_snvr(L1,NY,NX)   = VLDrySnoWE_snvr(L1,NY,NX)+FX*VLDrySnoWE_snvr(L0,NY,NX)
           VLWatSnow_snvr(L1,NY,NX)    = VLWatSnow_snvr(L1,NY,NX)+FX*VLWatSnow_snvr(L0,NY,NX)
           VLIceSnow_snvr(L1,NY,NX)    = VLIceSnow_snvr(L1,NY,NX)+FX*VLIceSnow_snvr(L0,NY,NX)
@@ -808,6 +816,8 @@ implicit none
       nsnol_col(NY,NX)=nsnol_col(NY,NX)+1
     endif
   ENDDO
+  VcumSnoDWI_col(NY,NX) = sum(VLSnoDWIprev_snvr(1:JS,NY,NX))
+  SnowDepth_col(NY,NX)  = sum(SnowThickL_snvr(1:JS,NY,NX))
 !  if(I==19 .and. I>=10)write(115,*)I*1000+J,'nsnol_beg_col',nsnol_beg_col,nsnol_col(NY,NX),trcs_solml_vr(idg_O2,0,NY,NX),&
 !    trcg_solsml_snvr(idg_O2,1,NY,NX)
   if(nsnol_beg_col>0 .and. nsnol_col(NY,NX)==0)then
