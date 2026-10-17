@@ -1697,14 +1697,14 @@ contains
   SensHeatCorrection=NetHeatCorrection-RadHeatCorrection
 
   ! Correct both the accepted surface face and its cell/hourly accumulators.
-  HeatFlow2Soili_3D(3,L,NY,NX)=HeatFlow2Soili_3D(3,L,NY,NX)+NetHeatCorrection
-  HeatFlow2Soil_3D(3,L,NY,NX)=HeatFlow2Soil_3D(3,L,NY,NX)+NetHeatCorrection
-  HeatFlx2Grnd_col(NY,NX)=HeatFlx2Grnd_col(NY,NX)+NetHeatCorrection
-  HeatByRad2Surf_col(NY,NX)=HeatByRad2Surf_col(NY,NX)+RadHeatCorrection
-  HeatSensAir2Surf_col(NY,NX)=HeatSensAir2Surf_col(NY,NX)+SensHeatCorrection
-  HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+NetHeatCorrection
-  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)-RadHeatCorrection
-  LWRadGrnd_col(NY,NX)=LWRadGrnd_col(NY,NX)-RadHeatCorrection
+  HeatFlow2Soili_3D(3,L,NY,NX) = HeatFlow2Soili_3D(3,L,NY,NX)+NetHeatCorrection
+  HeatFlow2Soil_3D(3,L,NY,NX)  = HeatFlow2Soil_3D(3,L,NY,NX)+NetHeatCorrection
+  HeatFlx2Grnd_col(NY,NX)      = HeatFlx2Grnd_col(NY,NX)+NetHeatCorrection
+  HeatByRad2Surf_col(NY,NX)    = HeatByRad2Surf_col(NY,NX)+RadHeatCorrection
+  HeatSensAir2Surf_col(NY,NX)  = HeatSensAir2Surf_col(NY,NX)+SensHeatCorrection
+  HeatNet2Surf_col(NY,NX)      = HeatNet2Surf_col(NY,NX)+NetHeatCorrection
+  LWRadBySurf_col(NY,NX)       = LWRadBySurf_col(NY,NX)-RadHeatCorrection
+  LWRadGrnd_col(NY,NX)         = LWRadGrnd_col(NY,NX)-RadHeatCorrection
   end subroutine CorrectSoilSurfaceHeatM
 
 !------------------------------------------------------------------------------------------
