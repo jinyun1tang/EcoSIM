@@ -45,6 +45,7 @@ implicit none
 
   !surface model
   public :: StageSurfacePhysModel
+  public :: CorrectSoilSurfaceHeatM
   public :: RunSurfacePhysModelM
   public :: AggregateSurfRunoffFluxM
   public :: SetHourlyAccumulatorsATS
@@ -1633,6 +1634,36 @@ contains
   call PrintInfo('end '//subname)
   end subroutine SumAftEnergyBalanceM
 !------------------------------------------------------------------------------------------
+  subroutine CorrectSoilSurfaceHeatM(NY,NX,TKPrev,TKNew,dHeatdTK,NetHeatCorrection)
+  ! Record the boundary exchange accepted by the implicit topsoil solve.
+  implicit none
+  integer, intent(in) :: NY,NX             !horizontal grid indices
+  real(r8), intent(in) :: TKPrev,TKNew     !soil temperature before/after solve [K]
+  real(r8), intent(in) :: dHeatdTK         !derivative of step-integrated net boundary heat [MJ/K]
+  real(r8), intent(out) :: NetHeatCorrection !accepted change to soil net heat [MJ/grid cell]
+  real(r8) :: DeltaT,RadHeatCorrection,SensHeatCorrection
+  integer :: L
+
+  NetHeatCorrection=0._r8
+  if(dHeatdTK==0._r8)return
+  L=NUM_col(NY,NX)
+  DeltaT=TKNew-TKPrev
+  NetHeatCorrection=dHeatdTK*DeltaT
+  RadHeatCorrection=-4._r8*LWEmscefSoil_col(NY,NX)*TKPrev**3*DeltaT
+  SensHeatCorrection=NetHeatCorrection-RadHeatCorrection
+
+  ! Correct both the accepted surface face and its cell/hourly accumulators.
+  HeatFlow2Soili_3D(3,L,NY,NX)=HeatFlow2Soili_3D(3,L,NY,NX)+NetHeatCorrection
+  HeatFlow2Soil_3D(3,L,NY,NX)=HeatFlow2Soil_3D(3,L,NY,NX)+NetHeatCorrection
+  HeatFlx2Grnd_col(NY,NX)=HeatFlx2Grnd_col(NY,NX)+NetHeatCorrection
+  HeatByRad2Surf_col(NY,NX)=HeatByRad2Surf_col(NY,NX)+RadHeatCorrection
+  HeatSensAir2Surf_col(NY,NX)=HeatSensAir2Surf_col(NY,NX)+SensHeatCorrection
+  HeatNet2Surf_col(NY,NX)=HeatNet2Surf_col(NY,NX)+NetHeatCorrection
+  LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)-RadHeatCorrection
+  LWRadGrnd_col(NY,NX)=LWRadGrnd_col(NY,NX)-RadHeatCorrection
+  end subroutine CorrectSoilSurfaceHeatM
+
+!------------------------------------------------------------------------------------------
   subroutine RunSurfacePhysModelM(I,J,M,NHE,NHW,NVS,NVN,ResistanceLitRLay,RainEkReducedKsat,&
     TopLayWatVol_col,HeatFluxAir2Soi,dHGrnddTKsoi1,Qinfl2MicP,HeatInfl2Soil,Qinfl2MacP)
   !
@@ -1644,11 +1675,18 @@ contains
   real(r8), dimension(:,:),intent(inout) :: ResistanceLitRLay(JY,JX)
   REAL(R8), dimension(:,:),INTENT(OUT) :: RainEkReducedKsat
   real(r8), dimension(:,:),intent(inout) :: TopLayWatVol_col(JY,JX)
+  
+  ! Atmospheric heat predictor for soil conduction [MJ/grid cell/step];
+  ! the soil temperature solve subsequently accepts its implicit correction.
   real(r8), dimension(:,:),intent(out) :: HeatFluxAir2Soi(JY,JX)
+
+  ! Derivative of net soil radiation+sensible heat integrated over this step
+  ! [MJ/K], evaluated at the current topsoil temperature; normally negative.
+  ! UpdateSoilMoistTempM accepts its flux correction after solving temperature.
   real(r8), dimension(:,:),intent(out) :: dHGrnddTKsoi1(JY,JX)
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)       !flow into micropore
-  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)       !flow into macropore
-  real(r8), dimension(:,:),optional,intent(out) :: HeatInfl2Soil(JY,JX)    !heat flow into soil [MJ d-2]
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MacP(JY,JX)       !water into soil macropores [m3/grid cell/step]
+  real(r8), dimension(:,:),optional,intent(out) :: Qinfl2MicP(JY,JX)       !water into soil micropores [m3/grid cell/step]
+  real(r8), dimension(:,:),optional,intent(out) :: HeatInfl2Soil(JY,JX)    !boundary heat before soil implicit correction [MJ/grid cell]
 
   character(len=*), parameter :: subname='RunSurfacePhysModelM'
   real(r8) :: LatentHeatAir2Sno,HeatSensAir2Snow,Radnet2Snow,HeatSensEvapAir2Snow,VapXAir2TopLay
@@ -1664,6 +1702,8 @@ contains
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
 
+      ! No exposed-soil sensible derivative survives a snow-covered step.
+      CdSoiHSens_col(NY,NX)=0._r8
       call SurfaceEnergyModelM(I,J,M,NX,NY,ResistanceLitRLay(NY,NX),RainEkReducedKsat(NY,NX),&
         HeatFluxAir2Soi(NY,NX),LatentHeatAir2Sno,HeatSensEvapAir2Snow,HeatSensAir2Snow,Radnet2Snow,&
         TopLayWatVol_col(NY,NX),VapXAir2TopLay)
@@ -1682,7 +1722,14 @@ contains
       if(present(HeatInfl2Soil))HeatInfl2Soil(NY,NX)=HeatFlow2Soili_3D(3,NUM_col(NY,NX),NY,NX)
       LWRadGrnd_col(NY,NX)   = LWRadBySurf_col(NY,NX)
       
-      dHGrnddTKsoi1(NY,NX)=-4._r8*LWEmscefSoil_col(NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3-CdSoiHSens_col(NY,NX)
+      dHGrnddTKsoi1(NY,NX)=0._r8
+      ! Match the exposed-soil exchange gate in AtmLandSurfExchangeM.
+      if(FracSurfSnoFree_col(NY,NX)>0._r8 .and. &
+        (SoilBulkDensity_vr(NUM_col(NY,NX),NY,NX)>ZERO .or. &
+        VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)>VHCPNX_col(NY,NX)))then
+        dHGrnddTKsoi1(NY,NX)=-4._r8*LWEmscefSoil_col(NY,NX) &
+          *TKSoil1_vr(NUM_col(NY,NX),NY,NX)**3-CdSoiHSens_col(NY,NX)
+      endif
     ENDDO D9890
   ENDDO D9895
 

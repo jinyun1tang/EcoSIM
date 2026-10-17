@@ -101,7 +101,7 @@ module WatsubMod
   real(r8) :: Qinfl2MicP_col(JY,JX)
   real(r8) :: HeatInfl2Soil(JY,JX)
   real(r8) :: Qinfl2MacP_col(JY,JX)
-  real(r8) :: dHGrnddTKsoi1(JY,JX)    !the derivate of surface heat flux (longwave radiation+sensible heat) with respect to surface temperature
+  real(r8) :: dHGrnddTKsoi1(JY,JX)    !step-integrated radiation+sensible heat derivative [MJ/K]
   real(r8) :: twatmass0(JY,JX),twatmasstM(JY,JX)
   integer  :: NUX0(JY,JX)
   logical  :: found_frozen
@@ -1260,10 +1260,12 @@ module WatsubMod
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  ! Step-integrated net surface-heat derivative [MJ/K], at the old topsoil
+  ! temperature. Its accepted correction is recorded after the implicit solve.
   real(r8), intent(in):: dHGrnddTKsoi1(JY,JX)
   character(len=*), parameter :: subname='UpdateSoilMoistTempM'
   integer :: NY,NX,L
-  real(r8) :: tk1pres,tk1l
+  real(r8) :: tk1pres,tk1l,NetSurfaceHeatCorrection
   real(r8) :: ENGY1,VLTSoiPore,VHXX
   real(r8) :: TKXX,VLWMicPre,VLHeatCapacityPre,dHeat
   integer :: it   !current model step in the simulation year
@@ -1369,7 +1371,7 @@ module WatsubMod
 
             if(dWaterPlantRoot2SoilPrev_vr(L,NY,NX)>0._r8)then              
               VHeatCapacity1_vr(L,NY,NX) = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)
-              if(L==NUM_col(NY,NX))then
+              if(L.EQ.NUM_col(NY,NX))then
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)+dHeatPlantRoot2SoilPrev_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
                   /(VHeatCapacity1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX))                 
@@ -1378,7 +1380,7 @@ module WatsubMod
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)+dHeatPlantRoot2SoilPrev_vr(L,NY,NX))/VHeatCapacity1_vr(L,NY,NX)   
               endif
             else
-              if(L==NUM_col(NY,NX))then
+              if(L.EQ.NUM_col(NY,NX))then
                 TKSoil1_vr(L,NY,NX)  = (ENGY1+THeatFlow2Soil_3DM_vr(L,NY,NX)+HeatIrrigation1_vr(L,NY,NX)&
                   +TLPhaseChangeHeat2Soi1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX)*TKSoil1_vr(L,NY,NX)) &
                   /(VHeatCapacity1_vr(L,NY,NX)-dHGrnddTKsoi1(NY,NX))                              
@@ -1389,6 +1391,14 @@ module WatsubMod
               VHeatCapacity1_vr(L,NY,NX)          = VHeatCapacity1_vr(L,NY,NX)+cpw*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
               THeatPlantRoot2SoilPrev_vr(L,NY,NX) = THeatPlantRoot2SoilPrev_vr(L,NY,NX)+ &
                 cpw*TKSoil1_vr(L,NY,NX)*dWaterPlantRoot2SoilPrev_vr(L,NY,NX)*pscal
+            endif
+
+            ! The stabilizing derivative represents real accepted boundary heat.
+            ! Record it before any separately accounted prescribed warming.
+            if(L.eq.NUM_col(NY,NX))then
+              call CorrectSoilSurfaceHeatM(NY,NX,TKXX,TKSoil1_vr(L,NY,NX), &
+                dHGrnddTKsoi1(NY,NX),NetSurfaceHeatCorrection)
+              THeatFlow2Soil_3DM_vr(L,NY,NX)=THeatFlow2Soil_3DM_vr(L,NY,NX)+NetSurfaceHeatCorrection
             endif
 
             if(TKSoil1_vr(L,NY,NX)>400._r8.or.TKSoil1_vr(L,NY,NX)<100._r8)then
