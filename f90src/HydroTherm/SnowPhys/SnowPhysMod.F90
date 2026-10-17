@@ -7,7 +7,7 @@ module SnowPhysMod
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use data_const_mod, only : spval => DAT_CONST_SPVAL
-  use abortutils,    only: endrun
+  use abortutils,    only: endrun, iulog
   use EcoSIMCtrlMod, only: fixWaterLevel, mod_snow_albedo
   use DebugToolMod,  only: PrintInfo
   use SnowDataType
@@ -64,7 +64,7 @@ contains
   real(r8) :: GridArea
   !reference snow thickness [m]
   real(r8), parameter :: cumSnowDepzRef_col(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
-  !the maximum snow layer is 1.0 m.
+  ! The maximum initial snowpack depth is 1.0 m.
   integer :: L
 
   ! begin_execution
@@ -82,6 +82,14 @@ contains
 ! TKW,TCSnow=later temperature K,oC
 ! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
 ! SnowDepth=total snow height in the column
+
+  ! Truncate before deriving any stores or summaries so initialization agrees.
+  if(SnowDepth_col(NY,NX)>cumSnowDepzRef_col(JS))then
+    write(iulog,*) 'WARNING: InitSnowLayers NY,NX=',NY,NX, &
+      ': initial snow depth (m)=',SnowDepth_col(NY,NX), &
+      ' truncated to (m)=',cumSnowDepzRef_col(JS)
+    SnowDepth_col(NY,NX)=cumSnowDepzRef_col(JS)
+  endif
 
   GridArea=DH_col(NY,NX)*DV_col(NY,NX)
   if(present(XSW))XSW=0._r8
@@ -962,7 +970,7 @@ contains
   integer :: L
   real(r8) :: ENGY0,vdry,vwat,vice
   real(r8) :: dHPhaseChange,VLDrySnoWEtmp
-  real(r8) :: TKX,tENGY,dENGY,dLWRaddTSno1
+  real(r8) :: TKX,tENGY,dENGY
   real(r8), parameter :: tinyw_val=1.e-12_r8
   logical :: ActiveSnow_test
 !
@@ -990,14 +998,9 @@ contains
 
     ActiveSnow_test = VLSnowHeatCapM_snvr(M+1,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8
     IF(ActiveSnow_test)THEN
-      !
-      if(L==1)then
-        dLWRaddTSno1          = -4._r8*LWEmscefSnow_col(NY,NX)*TKSnow0_snvr(L,NY,NX)**3
-        TKSnow0_snvr(L,NY,NX) = (ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX)-dLWRaddTSno1*TKX) &
-          /(VLSnowHeatCapM_snvr(M+1,L,NY,NX)-dLWRaddTSno1)
-      else
-        TKSnow0_snvr(L,NY,NX)=(ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX))/VLSnowHeatCapM_snvr(M+1,L,NY,NX)
-      endif
+      ! Radiation was integrated by the snow substeps; preserve accepted energy.
+      TKSnow0_snvr(L,NY,NX) = (ENGY0+CumHeat2SnowLM_snvr(L,NY,NX)+XPhaseChangeHeatLM_snvr(L,NY,NX)) &
+        /VLSnowHeatCapM_snvr(M+1,L,NY,NX)
       
       !no active snow, reset top layer snow  temperature to air temperature, (it introduces energy error though)
     ELSEIF(L.EQ.1)THEN
