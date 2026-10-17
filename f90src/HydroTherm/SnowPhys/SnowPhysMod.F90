@@ -94,6 +94,7 @@ contains
 !  VOLSWI=0.0_r8
 
   !build the snow profile, topdown
+  nsnol_col(NY,NX)=0
   D9580: DO L=1,JS
     IF(L.EQ.1)THEN
       !top snow layer
@@ -107,6 +108,7 @@ contains
 
     if(SnowThickL_snvr(L,NY,NX) .GT. ZEROS(NY,NX))then
       !there is meaningful snow
+      nsnol_col(NY,NX)=nsnol_col(NY,NX)+1
       VLDrySnoWE_snvr(L,NY,NX) = SnowThickL_snvr(L,NY,NX)*NewSnowDens_col(NY,NX)*GridArea
       VLWatSnow_snvr(L,NY,NX)  = 0.0_r8
       VLIceSnow_snvr(L,NY,NX)  = 0.0_r8
@@ -126,7 +128,6 @@ contains
       TCSnow_snvr(L,NY,NX)        = TKSnow_snvr(L,NY,NX)-Tref
       VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
     ELSE
-      nsnol_col(NY,NX)            = L-1
       VLDrySnoWE_snvr(L,NY,NX)    = 0._r8
       VLWatSnow_snvr(L,NY,NX)     = 0.0_r8
       VLIceSnow_snvr(L,NY,NX)     = 0.0_r8

@@ -747,7 +747,7 @@ implicit none
       VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
       SnoDens_snvr(L,NY,NX)       = NewSnowDens_col(NY,NX)
     endif
-    if(VLHeatCapSnow_snvr(L,NY,NX)<ZEROS(NY,NX))then
+    if(VLHeatCapSnow_snvr(L,NY,NX)<=0._r8)then
       if(L>1)then
         TKSnow_snvr(L,NY,NX)=spval
       else
@@ -757,13 +757,14 @@ implicit none
 
   ENDDO
 
-  ! Close all empty internal layers, preserving the special surface layer.
+  ! Keep occupied layers contiguous from the surface for tracer transport.
+  ! A positive store remains occupied even below the heat-solver threshold.
   ! Residual chemicals in an empty destination remain with the incoming snow.
   DO L=2,JS
-    if(VLHeatCapSnow_snvr(L,NY,NX)>=ZEROS(NY,NX))then
-      L1=2
+    if(VLHeatCapSnow_snvr(L,NY,NX)>0._r8)then
+      L1=1
       do while(L1<L)
-        if(TKSnow_snvr(L1,NY,NX)==spval)exit
+        if(VLHeatCapSnow_snvr(L1,NY,NX)<=0._r8)exit
         L1=L1+1
       enddo
       if(L1<L)then
@@ -812,7 +813,7 @@ implicit none
     else
       TCSnow_snvr(L,NY,NX)=spval
     endif
-    if(VLHeatCapSnow_snvr(L,NY,NX)>ZEROS(NY,NX))then
+    if(VLHeatCapSnow_snvr(L,NY,NX)>0._r8)then
       nsnol_col(NY,NX)=nsnol_col(NY,NX)+1
     endif
   ENDDO
@@ -820,7 +821,7 @@ implicit none
   SnowDepth_col(NY,NX)  = sum(SnowThickL_snvr(1:JS,NY,NX))
 !  if(I==19 .and. I>=10)write(115,*)I*1000+J,'nsnol_beg_col',nsnol_beg_col,nsnol_col(NY,NX),trcs_solml_vr(idg_O2,0,NY,NX),&
 !    trcg_solsml_snvr(idg_O2,1,NY,NX)
-  if(nsnol_beg_col>0 .and. nsnol_col(NY,NX)==0)then
+  if(nsnol_col(NY,NX)==0)then
     ! Include residual tracers in empty slots beyond the former active count.
     ! Add all tracers to the litter layer.
     DO L=1,JS
