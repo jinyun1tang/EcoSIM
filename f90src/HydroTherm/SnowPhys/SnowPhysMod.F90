@@ -530,6 +530,7 @@ contains
   real(r8) :: tNetWat2LayL,vwat,vdry,vice
   real(r8) :: dt_SnoHeat   !time step size for snow model iteration
   real(r8) :: cphwat,vhcp0
+  real(r8) :: LongwaveDeriv,LongwaveCorrection
   real(r8) :: SnoFallWE,Rainfall,IceFallVol,HeatSnofall2Snow
   real(r8) :: TopLaySnoVol      !sum of constituent-volume weights for empirical albedo [m3]
   real(r8), parameter :: tinyw=1.e-14_r8,tinyw0=1.e-16_r8
@@ -655,15 +656,20 @@ contains
 !
       ENGY0           = VLHeatCapSnowM1_snvr(L,NY,NX)*TKSnow1_snvr(L,NY,NX)
       VLHeatCapSnowMX = cps*VOLS0X+cpw*VOLW0X+cpi*VOLI0X
+      ! Linearized emitted longwave energy for this snow substep [MJ/K].
+      LongwaveDeriv=0._r8
+      if(L==1 .and. VLHeatCapSnowMX>VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)then
+        LongwaveDeriv=4._r8*LWEmscefSnow_col(NY,NX)*TKSnow1_snvr(L,NY,NX)**3/real(NPS,kind=r8)
+      endif
 
       IF(VLHeatCapSnowMX.GT.VLHeatCapSnowMin_col(NY,NX))THEN
         !apparent temperature before freeze-thaw
-        TKApp=(ENGY0+NetHeat2LayL)/VLHeatCapSnowMX
+        TKApp=(ENGY0+NetHeat2LayL+LongwaveDeriv*TKSnow1_snvr(L,NY,NX))/(VLHeatCapSnowMX+LongwaveDeriv)
 
         IF((TKApp.LT.TFice .AND. VOLW0X.GT.ZERO*VcumSnoDWI_col(NY,NX)) &
           .OR.(TKApp.GT.TFice .AND. VOLI0X+VOLS0X.GT.ZERO*VcumSnoDWI_col(NY,NX)))THEN
           !freeze-thaw condition met
-          TFLX1=VLHeatCapSnowMX*(TFice-TKApp)/Kirchhoff_cf*dts_wat
+          TFLX1=(VLHeatCapSnowMX+LongwaveDeriv)*(TFice-TKApp)/Kirchhoff_cf*dts_wat
 
           IF(TFLX1.LT.0.0_r8)THEN
             TotSnowLMass=VOLS0X+VOLI0X*DENSICE
@@ -711,13 +717,6 @@ contains
       !     VHCPWMM,VLHeatCapSnowMin_col=snowpack, minimum heat capacity
       !
       if(abs(NetWat2LayL)>1.e10)call endrun(trim(mod_filename)//' at line',__LINE__)
-      CumSno2SnowLM_snvr(L,NY,NX)      = CumSno2SnowLM_snvr(L,NY,NX)+NetSno2LayL
-      CumWat2SnowLM_snvr(L,NY,NX)      = CumWat2SnowLM_snvr(L,NY,NX)+NetWat2LayL
-      CumIce2SnowLM_snvr(L,NY,NX)      = CumIce2SnowLM_snvr(L,NY,NX)+NetIce2LayL
-      XSnowThawMassLM_snvr(L,NY,NX)    = XSnowThawMassLM_snvr(L,NY,NX)+SnowThawMass
-      XIceThawMassLM_snvr(L,NY,NX)     = XIceThawMassLM_snvr(L,NY,NX)+IceThawMass
-      CumHeat2SnowLM_snvr(L,NY,NX)     = CumHeat2SnowLM_snvr(L,NY,NX)+NetHeat2LayL
-      XPhaseChangeHeatLM_snvr(L,NY,NX) = XPhaseChangeHeatLM_snvr(L,NY,NX)+HeatByFrezThaw
 
       vdry                       = VLDrySnoWE0M_snvr(L,NY,NX)
       vwat                       = VLWatSnow0M_snvr(L,NY,NX)
@@ -734,12 +733,31 @@ contains
       TK1X                          = TKSnow1_snvr(L,NY,NX)
 
       IF(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
-        TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw)/VLHeatCapSnowM1_snvr(L,NY,NX)
+        TKSnow1_snvr(L,NY,NX)=(ENGY0+NetHeat2LayL+HeatByFrezThaw+LongwaveDeriv*TK1X) &
+          /(VLHeatCapSnowM1_snvr(L,NY,NX)+LongwaveDeriv)
       ELSEIF(L.EQ.1)THEN
         TKSnow1_snvr(L,NY,NX)=TairK_col(NY,NX)
       ELSE
         TKSnow1_snvr(L,NY,NX)=TKSnow1_snvr(L-1,NY,NX)
       ENDIF
+      ! Record the same implicit radiation exchange used by the temperature solve.
+      ! Positive correction is additional outgoing longwave; net heat loses it.
+      if(L==1)then
+        LongwaveCorrection=LongwaveDeriv*(TKSnow1_snvr(L,NY,NX)-TK1X)
+        NetHeat2LayL=NetHeat2LayL-LongwaveCorrection
+        HeatX2SnoLay_snvr(1,NY,NX)=HeatX2SnoLay_snvr(1,NY,NX)-LongwaveCorrection
+        HeatXfer2SnoLay_snvr(1,NY,NX)=HeatXfer2SnoLay_snvr(1,NY,NX)-LongwaveCorrection
+        LWRadBySurf_col(NY,NX)=LWRadBySurf_col(NY,NX)+LongwaveCorrection
+        Radnet2Snow=Radnet2Snow-LongwaveCorrection
+        HeatNetFlx2Snow=HeatNetFlx2Snow-LongwaveCorrection
+      endif
+      CumSno2SnowLM_snvr(L,NY,NX)      = CumSno2SnowLM_snvr(L,NY,NX)+NetSno2LayL
+      CumWat2SnowLM_snvr(L,NY,NX)      = CumWat2SnowLM_snvr(L,NY,NX)+NetWat2LayL
+      CumIce2SnowLM_snvr(L,NY,NX)      = CumIce2SnowLM_snvr(L,NY,NX)+NetIce2LayL
+      XSnowThawMassLM_snvr(L,NY,NX)    = XSnowThawMassLM_snvr(L,NY,NX)+SnowThawMass
+      XIceThawMassLM_snvr(L,NY,NX)     = XIceThawMassLM_snvr(L,NY,NX)+IceThawMass
+      CumHeat2SnowLM_snvr(L,NY,NX)     = CumHeat2SnowLM_snvr(L,NY,NX)+NetHeat2LayL
+      XPhaseChangeHeatLM_snvr(L,NY,NX) = XPhaseChangeHeatLM_snvr(L,NY,NX)+HeatByFrezThaw
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
 
       if(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 .and. &
@@ -1212,6 +1230,7 @@ contains
     VLHeatCapSnow_snvr(L,NY,NX) = cps*VLDrySnoWE_snvr(L,NY,NX)+cpw*VLWatSnow_snvr(L,NY,NX)+cpi*VLIceSnow_snvr(L,NY,NX)
     SnowThickL_snvr(L,NY,NX)    = VLSnoDWIprev_snvr(L,NY,NX)/AREA_3D(3,NUM_col(NY,NX),NY,NX)
     TKSnow_snvr(L,NY,NX)        = TKSnow0_snvr(L,NY,NX)
+    TCSnow_snvr(L,NY,NX)        = units%Kelvin2Celcius(TKSnow_snvr(L,NY,NX))
   ENDDO D60
 
   end subroutine UpdateSnowAtM
