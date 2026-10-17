@@ -518,6 +518,7 @@ implicit none
     HeatSensLitR2Soi1    = HeatSensLitR2Soi1+HeatSensLitR2Soi2
     LWRadLitR            = LWRadLitR+LWRadLitR2
     CdLitRHSens_col(NY,NX)=CdLitRHSens_col(NY,NX)+CdLitRHSens
+    SurfSensHeatConduct_col(NY,NX)=SurfSensHeatConduct_col(NY,NX)+CdLitRHSens
 
     ! This predictor receives litter heat only; soil boundary stabilization is
     ! applied once in UpdateSoilMoistTempM, with matching surface flux records.

@@ -107,6 +107,8 @@ implicit none
   real(r8),target,allocatable ::  TSHX_col(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Air_Heat_Latent_store_col(:,:)         !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  Air_Heat_Sens_store_col(:,:)           !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),target,allocatable ::  dSensHeatdTKQ_col(:,:)                 !hourly resistance estimate of weighted sensible-heat derivative [MJ m-1 K-1]
+  real(r8),target,allocatable ::  TKQHeatRef_col(:,:)                     !Tq used for last completed hour [K]; zero means no completed-hour reference
   real(r8),target,allocatable ::  SoilHeatSrcDepth_col(:,:)              !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD_col(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI_col(:,:)                         !initial mean annual air temperature, [oC]
@@ -237,6 +239,8 @@ implicit none
   allocate(TSHX_col(JY,JX));        TSHX_col=0._r8
   allocate(Air_Heat_Latent_store_col(JY,JX));        Air_Heat_Latent_store_col=0._r8
   allocate(Air_Heat_Sens_store_col(JY,JX));        Air_Heat_Sens_store_col=0._r8
+  allocate(dSensHeatdTKQ_col(JY,JX)); dSensHeatdTKQ_col=0._r8
+  allocate(TKQHeatRef_col(JY,JX));    TKQHeatRef_col=0._r8
   allocate(SoilHeatSrcDepth_col(JY,JX));      SoilHeatSrcDepth_col=0._r8
   allocate(TKSD_col(JY,JX));        TKSD_col=0._r8
   allocate(ATCAI_col(JY,JX));       ATCAI_col=0._r8
@@ -342,6 +346,8 @@ implicit none
   call destroy(TSHX_col)
   call destroy(Air_Heat_Latent_store_col)
   call destroy(Air_Heat_Sens_store_col)
+  call destroy(dSensHeatdTKQ_col)
+  call destroy(TKQHeatRef_col)
   call destroy(SoilHeatSrcDepth_col)
   call destroy(TKSD_col)
   call destroy(ATCAI_col)

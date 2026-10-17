@@ -5009,7 +5009,9 @@ implicit none
   integer :: gas_residual_varid
   type(Var_desc_t) :: gas_residual_vardesc
   logical :: has_gas_residual
-  integer :: ndoms
+  integer :: ndoms, feedback_varid
+  type(var_desc_t) :: feedback_vardesc
+  logical :: has_heat_deriv, has_heat_ref
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -6556,6 +6558,38 @@ implicit none
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)      
+  endif
+
+  ! Preserve the paired hourly feedback history. Legacy restarts start with
+  ! zero derivative and build a fresh resistance estimate after one hour.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'dSensHeatdTKQ_col',feedback_varid,feedback_vardesc,readvar=has_heat_deriv)
+    call ncd_inqvid(ncid,'TKQHeatRef_col',feedback_varid,feedback_vardesc,readvar=has_heat_ref)
+    dSensHeatdTKQ_col=0._r8
+    TKQHeatRef_col=0._r8
+    if(has_heat_deriv .and. has_heat_ref)then
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='dSensHeatdTKQ_col', dim1name='column',&
+        long_name='Resistance estimate of weighted sensible-heat derivative', units='MJ m-1 K-1',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,dSensHeatdTKQ_col,datrc_1d)
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='TKQHeatRef_col', dim1name='column',&
+        long_name='Canopy air temperature used for the last completed hour', units='K',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,TKQHeatRef_col,datrc_1d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,dSensHeatdTKQ_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='dSensHeatdTKQ_col', dim1name='column',&
+      long_name='Resistance estimate of weighted sensible-heat derivative', units='MJ m-1 K-1',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TKQHeatRef_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='TKQHeatRef_col', dim1name='column',&
+      long_name='Canopy air temperature used for the last completed hour', units='K',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
   endif
 
   if(flag=='read')then

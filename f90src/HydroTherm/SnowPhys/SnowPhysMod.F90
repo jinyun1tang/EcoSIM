@@ -908,6 +908,7 @@ contains
 !
 
   HeatSensAir2Sno2 = CdSnoHSens*(TKQ_col(NY,NX)-TKSnow1_snvr(1,NY,NX))
+  SurfSensHeatConduct_col(NY,NX)=SurfSensHeatConduct_col(NY,NX)+CdSnoHSens
   !occasionally, RadNet2Sno2 and HeatSensAir2Sno2 go to infinity
   HeatNetFlx2Sno1      = RadNet2Sno2+LatentHeatAir2Sno2+HeatSensAir2Sno2
 

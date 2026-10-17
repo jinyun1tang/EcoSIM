@@ -167,6 +167,9 @@ contains
       call Radiation2Surface(I,J,NY,NX)
 
       call SetCanopyProperty(I,J,NY,NX)
+      ! The prior-hour weighted derivative was consumed above. Build this
+      ! hour's unweighted conductance sum from the actual exchange substeps.
+      SurfSensHeatConduct_col(NY,NX)=0._r8
 
     ENDDO D9990
   ENDDO D9995
@@ -265,7 +268,7 @@ contains
   integer, intent(in) :: I,J,NY,NX
   character(len=*), parameter :: subname='SetCanopyProperty'
   real(r8), parameter :: SpecHeatCapAir=1.25E-03_r8    !heat capacity of 1m3 air, [MJ/(m3 K)]
-  real(r8) :: RI,RAGX
+  real(r8) :: RI,RAGX,AirHeatArea,CanopyAirHeatDenom
 
   !TLEX_col=total latent heat flux x boundary layer resistance, [MJ m-1]
   !TSHX_col=total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -274,7 +277,19 @@ contains
   call PrintInfo('beg '//subname)
   !
   VPQ_col(NY,NX) = VPA_col(NY,NX)-TLEX_col(NY,NX)/(EvapLHTC*AREA_3D(3,NUM_col(NY,NX),NY,NX))
-  TKQ_col(NY,NX) = TairK_col(NY,NX)-TSHX_col(NY,NX)/(SpecHeatCapAir*AREA_3D(3,NUM_col(NY,NX),NY,NX))
+  AirHeatArea=SpecHeatCapAir*AREA_3D(3,NUM_col(NY,NX),NY,NX)
+  CanopyAirHeatDenom=AirHeatArea+dSensHeatdTKQ_col(NY,NX)
+  if(dSensHeatdTKQ_col(NY,NX)/=0._r8 .and. TKQHeatRef_col(NY,NX)>0._r8 .and. &
+    abs(CanopyAirHeatDenom)>1.e-12_r8*AirHeatArea)then
+    ! S_H(Tq) ~= TSHX + K_H*(Tq-Tref), with TSHX/K_H/Tref from
+    ! the same completed hour. The increment form avoids K_H*Tref.
+    TKQ_col(NY,NX)=TKQHeatRef_col(NY,NX) &
+      +(AirHeatArea*(TairK_col(NY,NX)-TKQHeatRef_col(NY,NX))-TSHX_col(NY,NX)) &
+      /CanopyAirHeatDenom
+  else
+    ! No completed-hour estimate, zero conductance, or singular denominator.
+    TKQ_col(NY,NX)=TairK_col(NY,NX)-TSHX_col(NY,NX)/AirHeatArea
+  endif
 
   RI   = RichardsonNumber(RIB_col(NY,NX),TairK_col(NY,NX),TKQ_col(NY,NX))
   RAGX = RawIsoTAtm2CanopySinkZ_col(NY,NX)
@@ -610,6 +625,7 @@ contains
   ! HeatFluxAir2Soi=storage heat flux
   !
   HeatSensAir2Grnd = CdSoiHSens_col(NY,NX)*(TKQ_col(NY,NX)-TKSoil1_vr(NUM_col(NY,NX),NY,NX))
+  SurfSensHeatConduct_col(NY,NX)=SurfSensHeatConduct_col(NY,NX)+CdSoiHSens_col(NY,NX)
   tHeatAir2Grnd    = Radnet2Grnd+LatentHeatEvapAir2Grnd+HeatSensAir2Grnd !net energy into soil, subtracting latent heat and sensible heat
   HeatFluxAir2Soi  = tHeatAir2Grnd+HeatSensVapAir2Grnd !total heat plus convective heat > 0 to ground
   call PrintInfo('end '//subname)
