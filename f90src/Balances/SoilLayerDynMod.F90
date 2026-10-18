@@ -168,7 +168,7 @@ implicit none
             ! MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
             !
             IF(L_donor.NE.0)THEN
-              call MoveFertMinerals(L,L_donor,L_rcept,NY,NX,FX,FO)
+              call MoveFertMinerals(L,L_donor,L_rcept,NY,NX,FX,FO,FHO)
             ENDIF
 
             call MoveHeatWat(I,J,L,L_donor,L_rcept,NY,NX,FO,FX,XVOLWP,FWO)
@@ -1854,16 +1854,20 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MoveFertMinerals(L,L0,L1,NY,NX,FX,FO)
+  subroutine MoveFertMinerals(L,L0,L1,NY,NX,FX,FO,FHO)
   implicit none
   integer, intent(in) :: L,L0,L1,NY,NX
   real(r8),intent(in) :: FX,FO
-  real(r8) :: FHO,FBO
+  real(r8),intent(out) :: FHO !fraction of donor macropore water/pore volume moved; reused for solutes
+  real(r8) :: FBO
 
   real(r8) :: FXSAND,FXSILT,FXCLAY,FXROCK
   real(r8) :: FXWDNHB,FXDPNHB,FXWDNOB
   real(r8) :: FXDPNOB,FXWDPOB,FXDPPOB
   real(r8) :: FXVOLWH,FXVOLIH,FXVOLAH
+
+  ! No macropore transfer unless the active branch below assigns a fraction.
+  FHO=0._r8
 
   IF(DLYR_3D(3,L1,NY,NX).GT.ZERO.AND.DLYR_3D(3,L0,NY,NX).GT.ZERO)THEN
 !
