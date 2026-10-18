@@ -1056,7 +1056,8 @@ module IngridTranspMod
                 VFLW=VFLWX
               ENDIF
 
-              DO idsalt=idsalt_beg,idsaltb_end
+              ! Snow contains only unbanded salt species.
+              DO idsalt=idsalt_beg,idsalt_end
                 trcSalt_SnowDrift_flxM_2D(idsalt,N,iBehind,N5,N4) = VFLW*AZMAX1(trcSalt_ml2_snvr(idsalt,1,N2,N1))
               ENDDO
             ENDIF  
@@ -1067,7 +1068,7 @@ module IngridTranspMod
               ELSE
                 VFLW=VFLWX
               ENDIF
-              DO idsalt=idsalt_beg,idsaltb_end
+              DO idsalt=idsalt_beg,idsalt_end
                 trcSalt_SnowDrift_flxM_2D(idsalt,N,iFront,N5B,N4B) = VFLW*AZMAX1(trcSalt_ml2_snvr(idsalt,1,N2,N1))
               ENDDO
             ENDIF  
