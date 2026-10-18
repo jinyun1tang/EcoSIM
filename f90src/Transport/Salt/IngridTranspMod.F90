@@ -1115,6 +1115,10 @@ module IngridTranspMod
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
       VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
+      ! Intentional numerical redistribution of residual tracers in dry soil,
+      ! including when the face water flow is zero.
+      ! TODO: revisit the fallback magnitude and timestep dependence of VFLWX
+      ! when revising dry-soil transport.
       VFLW=-VFLWX
     ENDIF
     DO idsalt=idsalt_beg,idsalt_KSO4
@@ -1291,17 +1295,17 @@ module IngridTranspMod
     IF(N.EQ.3.AND.VLMacroPores_vr(N6,N5,N4).GT.VLWatMacPM_vr(M,N6,N5,N4))THEN
       DO idsalt=idsalt_beg,idsalt_KSO4
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU_col(N2,N1),N2,N1))))
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,N3,N2,N1))))
       ENDDO
 
       DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU_col(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,N3,N2,N1))))*trcs_VLN_vr(ids_H1PO4,N3,N2,N1)
       ENDDO
 
       DO idsalt=idsalt_pband_beg,idsalt_pband_end
         trcSalt_RFH(idsalt)=VFLW*AZMAX1((trcSalt_soHml2_vr(idsalt,N3,N2,N1) &
-          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,NU_col(N2,N1),N2,N1))))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
+          -AZMIN1(trcSalt_Mac2MicPore_flxM_vr(idsalt,N3,N2,N1))))*trcs_VLN_vr(ids_H1PO4B,N3,N2,N1)
       ENDDO
       !
       !     OTHERWISE

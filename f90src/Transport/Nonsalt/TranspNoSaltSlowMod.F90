@@ -2565,6 +2565,10 @@ implicit none
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
       VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
+      ! Intentional numerical redistribution of residual tracers in dry soil,
+      ! including when the face water flow is zero.
+      ! TODO: revisit the fallback magnitude and timestep dependence of VFLWX
+      ! when revising dry-soil transport.
       VFLW=-VFLWX
     ENDIF
     D9815: DO K=1,jcplx
