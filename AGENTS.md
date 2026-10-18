@@ -58,6 +58,8 @@ take precedence over repository guidance.
 - Trace callers and CMake source lists to establish the active implementation.
   Similar routines occur in initialization, process, and coupling modules; do not
   assume one is obsolete or change every copy without checking its role.
+- When multiple correct implementation options are available, choose the simpler
+  one. Prioritize clarity in code, equations, naming, and comments.
 - Follow nearby Fortran conventions, precision kinds, array ordering, and module
   interfaces. Update allocation, initialization, API mapping, history, and restart
   handling as needed when adding persistent state or flux variables.
