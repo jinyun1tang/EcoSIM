@@ -80,91 +80,95 @@ module TillageMixMod
 
   call DeriveTillageProf(NY,NX,DCORPZ,LL,FI,TI)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SoiBulkDensityt0_vr(1:JZ,NY,NX))
+  ! FI weights the tilled thickness in this column. Intensive properties
+  ! are blended as properties; actual pools below retain mass redistribution.
+  ! Conductivity/selectivity blending is an empirical arithmetic mixing rule,
+  ! not an effective-conductivity or exchange-equilibrium calculation.
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SoiBulkDensityt0_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FieldCapacity_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FieldCapacity_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,WiltPoint_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,WiltPoint_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondVert_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondVert_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondHrzn_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SatHydroCondHrzn_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SAND_vr(1:JZ,NY,NX))
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SAND_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SILT_vr(1:JZ,NY,NX))
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,SILT_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,CLAY_vr(1:JZ,NY,NX))
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,CLAY_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKC4_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCA_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCM_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCN_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
+  call MixIntensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,GKCK_vr(1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_soil_vr(ifertn_beg:ifertn_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(idg_NH3B:ids_nutb_end,1:JZ,NY,NX))
 
   if(salt_model)then
-    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
+    CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_beg:idsalt_end,0:JZ,NY,NX),XCORP0)
 
-    CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_pband_beg:idsalt_pband_end,1:JZ,NY,NX))
+    CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcSalt_solml_vr(idsalt_pband_beg:idsalt_pband_end,1:JZ,NY,NX))
   endif
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg:idsp_CaSO4,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg:idsp_CaSO4,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg_band:idsp_end,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_beg_band:idsp_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_psoi_beg:idsp_psoi_end,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcp_saltpml_vr(idsp_psoi_beg:idsp_psoi_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_Hp:idx_cation_end,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_Hp:idx_cation_end,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_CEC:idx_CEC,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_CEC:idx_CEC,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC:idx_AEC,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC:idx_AEC,1:JZ,NY,NX))
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeAutor_vr(:,:,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, DOM_MicP_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SorbedOM_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive3D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOMAct_vr(:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, mBiomeHeter_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, OMBioResdu_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,1:micpar%NumOfLitrCmplxs,0:JZ,NY,NX),XCORP0)
 
-  CALL Mix4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
+  CALL MixExtensive4D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, SolidOM_vr(:,:,micpar%NumOfLitrCmplxs+1:jcplx,1:JZ,NY,NX))
 
   !build the energy profile
   !ENGYV: water
@@ -182,19 +186,19 @@ module TillageMixMod
   HFLXD=ENGYM(0)+ENGYV(0)
 
   !mix
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMicP_vr(0:JZ,NY,NX),XCORP0)
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMicP_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMicP_vr(0:JZ,NY,NX),XCORP0)
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMicP_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYV(0:JZ),XCORP0)
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYV(0:JZ),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYM(0:JZ),XCORP0)
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,ENGYM(0:JZ),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VHeatCapSolidSoil_vr(0:JZ,NY,NX),XCORP0)
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VHeatCapSolidSoil_vr(0:JZ,NY,NX),XCORP0)
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLWatMacP_vr(1:JZ,NY,NX))
 
-  call Mix1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMacP_vr(1:JZ,NY,NX))
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,VLiceMacP_vr(1:JZ,NY,NX))
 
   !update 
   call sumLitrOMLayL(0,NY,NX,litrOM)
@@ -378,7 +382,36 @@ module TillageMixMod
   end subroutine MixSoluteMacpore
 !--------------------------------------------------------------------------------
 
-  subroutine Mix1D(xdCorp,TI,FI,NU,LL,mass1d,XCORP0)
+  subroutine MixIntensive1D(xdCorp,TI,FI,NU,LL,property1d)
+  ! Mix material properties over the tilled volume, assuming the column's
+  ! cross-sectional area is constant. A partially tilled layer retains its
+  ! unmixed portion. No surface-litter property is incorporated here.
+  implicit none
+  real(r8), intent(in) :: xdCorp       !fraction of tilled material not mixed [-]
+  real(r8), intent(in) :: TI(1:JZ)     !fraction of each layer inside the tillage zone [-]
+  real(r8), intent(in) :: FI(1:JZ)     !each layer's share of total tilled thickness [-]
+  integer, intent(in) :: NU,LL         !first and last layers in the tillage zone
+  real(r8), intent(inout) :: property1d(:) !intensive property; element 1 is soil layer 1
+  real(r8) :: MixedProperty,TotalWeight
+  integer :: L
+
+  MixedProperty=0._r8
+  TotalWeight=0._r8
+  do L=NU,LL
+    MixedProperty=MixedProperty+FI(L)*property1d(L)
+    TotalWeight=TotalWeight+FI(L)
+  enddo
+  if(TotalWeight<=0._r8)return
+  MixedProperty=MixedProperty/TotalWeight
+
+  do L=NU,LL
+    property1d(L)=property1d(L)+(1._r8-xdCorp)*TI(L)*(MixedProperty-property1d(L))
+  enddo
+  end subroutine MixIntensive1D
+
+!--------------------------------------------------------------------------------
+
+  subroutine MixExtensive1D(xdCorp,TI,FI,NU,LL,mass1d,XCORP0)
 
   implicit none
   real(r8), intent(in) :: xdCorp    !fraction of layer not mixed  
@@ -418,11 +451,11 @@ module TillageMixMod
     endif
   ENDDO D100
 
-  end subroutine Mix1D
+  end subroutine MixExtensive1D
 
 !--------------------------------------------------------------------------------
 
-  subroutine Mix2D(xdCorp,TI,FI,NU,LL,mass2d,XCORP0,name)
+  subroutine MixExtensive2D(xdCorp,TI,FI,NU,LL,mass2d,XCORP0,name)
 
   implicit none
   real(r8), intent(in) :: xdCorp    !fraction of layer not mixed  
@@ -474,11 +507,11 @@ module TillageMixMod
     enddo
   ENDDO D100
 
-  end subroutine Mix2D
+  end subroutine MixExtensive2D
 
 !--------------------------------------------------------------------------------
 
-  subroutine Mix3D(xdCorp,TI,FI,NU,LL,mass3d,XCORP0)
+  subroutine MixExtensive3D(xdCorp,TI,FI,NU,LL,mass3d,XCORP0)
 
   implicit none
   real(r8), intent(in) :: xdCorp    !fraction of layer not mixed
@@ -530,11 +563,11 @@ module TillageMixMod
     enddo
   ENDDO D100
 
-  end subroutine Mix3D
+  end subroutine MixExtensive3D
 
 !--------------------------------------------------------------------------------
 
-  subroutine Mix4D(xdCorp,TI,FI,NU,LL,mass4d,XCORP0)
+  subroutine MixExtensive4D(xdCorp,TI,FI,NU,LL,mass4d,XCORP0)
 
   implicit none
   real(r8), intent(in) :: xdCorp    !fraction of layer not mixed
@@ -590,7 +623,7 @@ module TillageMixMod
     enddo
   ENDDO D100
 
-  end subroutine Mix4D
+  end subroutine MixExtensive4D
 
 
  !--------------------------------------------------------------------------------
