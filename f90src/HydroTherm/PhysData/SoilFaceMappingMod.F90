@@ -28,8 +28,8 @@ contains
       do NY=NVN,NVS
         do N=FlowDirIndicator_col(NY,NX),2
           TX=NX;TY=NY
-          if(N==1)TX=NX+1
-          if(N==2)TY=NY+1
+          if(N==iWestEastDirection)TX=NX+1
+          if(N==iNorthSouthDirection)TY=NY+1
           if(TX>NHE.or.TY>NVS)cycle
           do L=1,NL_col(NY,NX)
             if(VLSoilPoreMicP_vr(L,NY,NX)<=ZEROS2(NY,NX))cycle
@@ -51,7 +51,7 @@ contains
 
     call PrintInfo('beg '//subname)
     if(allocated(target_layer))deallocate(target_layer)
-    
+
     call PrintInfo('end '//subname)
   end subroutine DestroySoilFaceMap
 
@@ -74,13 +74,14 @@ contains
 
     call PrintInfo('beg '//subname)
     first=L;last=L
-    if(N==3.or.(N==1.and.NX==west_edge).or.(N==2.and.NY==north_edge))then
+    if(N==iVerticalDirection .or. (N==iWestEastDirection.and.NX==west_edge) .or. &
+      (N==iNorthSouthDirection .and. NY==north_edge))then
       call PrintInfo('end '//subname)
       return
     endif
     SX=NX;SY=NY
-    if(N==1)SX=NX-1
-    if(N==2)SY=NY-1
+    if(N==iWestEastDirection)SX=NX-1
+    if(N==iNorthSouthDirection)SY=NY-1
     first=1;last=0
     do K=1,NL_col(SY,SX)
       if(target_layer(N,K,SY,SX)/=L)cycle
