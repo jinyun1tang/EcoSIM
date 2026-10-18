@@ -1780,13 +1780,14 @@ implicit none
   real(r8) :: FXG
   integer  :: idg
 !
-!     SOIL GASEOUS GASES
-! exclude NH3B, NH3
+! Gas-phase NH3 moves here; dissolved NH3 and NH3B move in MoveFertSalt.
   DO idg=idg_beg,idg_NH3
     FXG                        = FWO*trcg_gasml_vr(idg,L0,NY,NX)
     trcg_gasml_vr(idg,L1,NY,NX) = trcg_gasml_vr(idg,L1,NY,NX)+FXG
     trcg_gasml_vr(idg,L0,NY,NX) = trcg_gasml_vr(idg,L0,NY,NX)-FXG
+  ENDDO
 
+  DO idg=idg_beg,idg_NH3-1
     FXG                        = FWO*trcs_solml_vr(idg,L0,NY,NX)
     trcs_solml_vr(idg,L1,NY,NX) = trcs_solml_vr(idg,L1,NY,NX)+FXG
     trcs_solml_vr(idg,L0,NY,NX) = trcs_solml_vr(idg,L0,NY,NX)-FXG
