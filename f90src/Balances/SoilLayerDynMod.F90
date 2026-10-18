@@ -167,11 +167,12 @@ implicit none
           ELSE
             ! MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
             !
+            FHO=0._r8 ! Surface litter has no macropore transfer.
             IF(L_donor.NE.0)THEN
               call MoveFertMinerals(L,L_donor,L_rcept,NY,NX,FX,FO,FHO)
             ENDIF
 
-            call MoveHeatWat(I,J,L,L_donor,L_rcept,NY,NX,FO,FX,XVOLWP,FWO)
+            call MoveHeatWat(I,J,L,L_donor,L_rcept,NY,NX,FO,FX,XVOLWP,FHO,FWO)
             !
             !     SOIL FERTILIZER
             !
@@ -1857,13 +1858,13 @@ implicit none
   implicit none
   integer, intent(in) :: L,L0,L1,NY,NX
   real(r8),intent(in) :: FX,FO
-  real(r8),intent(out) :: FHO !fraction of donor macropore water/pore volume moved; reused for solutes
+  real(r8),intent(out) :: FHO !donor macropore fraction; used for water/ice, heat, pore volume, and solutes
   real(r8) :: FBO
 
   real(r8) :: FXSAND,FXSILT,FXCLAY,FXROCK
   real(r8) :: FXWDNHB,FXDPNHB,FXWDNOB
   real(r8) :: FXDPNOB,FXWDPOB,FXDPPOB
-  real(r8) :: FXVOLWH,FXVOLIH,FXVOLAH
+  real(r8) :: FXVOLAH
 
   ! No macropore transfer unless the active branch below assigns a fraction.
   FHO=0._r8
@@ -1980,7 +1981,7 @@ implicit none
   ROCK_vr(L1,NY,NX) = ROCK_vr(L1,NY,NX)+FXROCK
   ROCK_vr(L0,NY,NX) = ROCK_vr(L0,NY,NX)-FXROCK
 !
-!     SOIL WATER AND HEAT
+!     MACROPORE FRACTION AND PORE VOLUME (WATER/ICE AND HEAT MOVE IN MoveHeatWat)
 !
   IF(SoilFracAsMacP_vr(L1,NY,NX).GT.ZERO.AND.SoilFracAsMacP_vr(L0,NY,NX).GT.ZERO)THEN
     IF(L0.EQ.L.OR.SoilFracAsMacPt0_vr(L0,NY,NX).LE.ZERO)THEN
@@ -1989,12 +1990,6 @@ implicit none
       FHO=AMIN1(0.5_r8,FO*SoilFracAsMacPt0_vr(L1,NY,NX)/SoilFracAsMacPt0_vr(L0,NY,NX))
     ENDIF
     SoilFracAsMacP_vr(L1,NY,NX) = (1.0_r8-FO)*SoilFracAsMacP_vr(L1,NY,NX)+FO*SoilFracAsMacP_vr(L0,NY,NX)
-    FXVOLWH                     = FHO*VLWatMacP_vr(L0,NY,NX)
-    VLWatMacP_vr(L1,NY,NX)      = VLWatMacP_vr(L1,NY,NX)+FXVOLWH
-    VLWatMacP_vr(L0,NY,NX)      = VLWatMacP_vr(L0,NY,NX)-FXVOLWH
-    FXVOLIH                     = FHO*VLiceMacP_vr(L0,NY,NX)
-    VLiceMacP_vr(L1,NY,NX)      = VLiceMacP_vr(L1,NY,NX)+FXVOLIH
-    VLiceMacP_vr(L0,NY,NX)      = VLiceMacP_vr(L0,NY,NX)-FXVOLIH
     FXVOLAH                     = FHO*VLMacroPores_vr(L0,NY,NX)
     VLMacroPores_vr(L1,NY,NX)         = VLMacroPores_vr(L1,NY,NX)+FXVOLAH
     VLMacroPores_vr(L0,NY,NX)         = VLMacroPores_vr(L0,NY,NX)-FXVOLAH
@@ -2003,7 +1998,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MoveHeatWat(I,J,L,L0,L1,NY,NX,FO,FX,XVOLWP,FWO)
+  subroutine MoveHeatWat(I,J,L,L0,L1,NY,NX,FO,FX,XVOLWP,FHO,FWO)
   implicit none
   integer, intent(in) :: I,J  
   integer, intent(in) :: L,NY,NX
@@ -2011,9 +2006,10 @@ implicit none
   integer, intent(in) :: L1    !target layer
   real(r8), intent(in) :: FO
   real(r8), intent(in) :: FX
+  real(r8), intent(in) :: FHO      !donor macropore fraction from MoveFertMinerals; zero for litter
   real(r8), intent(in) :: XVOLWP
   real(r8), intent(out):: FWO      !mixing fraction of organic material
-  real(r8) :: FXVOLW
+  real(r8) :: FXVOLW,FXVOLWH,FXVOLIH,FXVHC
   real(r8) :: FXENGY,FXVOLI,FXVLSoilMicP,FXVOLWX,FXVHCM
   real(r8) :: ENGY0,ENGY1
 
@@ -2032,7 +2028,6 @@ implicit none
   IF(L0.EQ.0)THEN
     FXVOLW=FX*AZMAX1(XVOLWP+VLWatHeldCapSurf_col(NY,NX))
     Qinflx2Soil_col(NY,NX) = Qinflx2Soil_col(NY,NX)+FXVOLW
-!    if(I==312 .and. J==22)write(211,*)'mvwat',FX,FO,FXVOLW,XVOLWP,VLWatHeldCapSurf_col(NY,NX)    
   ELSE
     FXVOLW=FWO*VLWatMicP_vr(L0,NY,NX)
   ENDIF
@@ -2059,11 +2054,24 @@ implicit none
   FXVHCM                          = FWO*VHeatCapSolidSoil_vr(L0,NY,NX)
   VHeatCapSolidSoil_vr(L1,NY,NX) = VHeatCapSolidSoil_vr(L1,NY,NX)+FXVHCM
   VHeatCapSolidSoil_vr(L0,NY,NX) = VHeatCapSolidSoil_vr(L0,NY,NX)-FXVHCM
-  FXENGY                          = TKS_vr(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
+
+  ! Transfer macropore water/ice and their sensible heat before updating temperatures.
+  FXVOLWH=0._r8
+  FXVOLIH=0._r8
+  IF(L0.NE.0)THEN
+    FXVOLWH                     = FHO*VLWatMacP_vr(L0,NY,NX)
+    VLWatMacP_vr(L1,NY,NX)      = VLWatMacP_vr(L1,NY,NX)+FXVOLWH
+    VLWatMacP_vr(L0,NY,NX)      = VLWatMacP_vr(L0,NY,NX)-FXVOLWH
+    FXVOLIH                     = FHO*VLiceMacP_vr(L0,NY,NX)
+    VLiceMacP_vr(L1,NY,NX)      = VLiceMacP_vr(L1,NY,NX)+FXVOLIH
+    VLiceMacP_vr(L0,NY,NX)      = VLiceMacP_vr(L0,NY,NX)-FXVOLIH
+  ENDIF
+  FXVHC                           = FXVHCM+cpw*(FXVOLW+FXVOLWH)+cpi*(FXVOLI+FXVOLIH)
+  FXENGY                          = TKS_vr(L0,NY,NX)*FXVHC
   ENGY1                           = VHeatCapacity_vr(L1,NY,NX)*TKS_vr(L1,NY,NX)+FXENGY
   ENGY0                           = VHeatCapacity_vr(L0,NY,NX)*TKS_vr(L0,NY,NX)-FXENGY
-  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapacity_vr(L1,NY,NX)+FXVHCM+cpw*FXVOLW+cpi*FXVOLI
-  VHeatCapacity_vr(L0,NY,NX)      = VHeatCapacity_vr(L0,NY,NX)-FXVHCM-cpw*FXVOLW-cpi*FXVOLI
+  VHeatCapacity_vr(L1,NY,NX)      = VHeatCapacity_vr(L1,NY,NX)+FXVHC
+  VHeatCapacity_vr(L0,NY,NX)      = VHeatCapacity_vr(L0,NY,NX)-FXVHC
   IF(VHeatCapacity_vr(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS_vr(L1,NY,NX)=ENGY1/VHeatCapacity_vr(L1,NY,NX)
   ELSE
