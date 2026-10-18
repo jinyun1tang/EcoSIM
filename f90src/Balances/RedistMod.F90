@@ -191,14 +191,6 @@ module RedistMod
     SurfGasEmiss_all_flx_col(idg,NY,NX)=  SurfGasEmiss_flx_col(idg,NY,NX) 
   enddo
 
-!  if(I==167 .and. J==16)then
-!    write(193,*)'afggas',trcg_gasml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)
-!    write(193,*)'afgmic',trcs_solml_vr(idg_O2,0:NL_col(NY,NX),NY,NX)
-!    write(193,*)'afgmac',trcs_soHml_vr(idg_O2,1:NL_col(NY,NX),NY,NX)  
-!    idg=idg_O2
-!    write(194,*)'afgmas',sum(trcg_gasml_vr(idg,1:NL_col(NY,NX),NY,NX))+sum(trcs_solml_vr(idg,0:NL_col(NY,NX),NY,NX))+sum(trcs_soHml_vr(idg,1:NL_col(NY,NX),NY,NX))    
-!  endif
-
   IF(NU_col(NY,NX).GT.NUI_col(NY,NX))THEN  
     DO L=NUI_col(NY,NX),NU_col(NY,NX)-1
       IF(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))THEN
@@ -238,7 +230,7 @@ module RedistMod
 
   Air_Heat_Latent_store_col(NY,NX) = Air_Heat_Latent_store_col(NY,NX)+HeatEvapAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
   Air_Heat_Sens_store_col(NY,NX)   = Air_Heat_Sens_store_col(NY,NX)+HeatSensAir2Surf_col(NY,NX)*RawTAtm2CanopySinkZ_col(NY,NX) 
-  call UpdateCanopyAirDerivatives(NY,NX)
+
   Eco_NEE_col(NY,NX)               = Canopy_NEE_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   ECO_ER_col(NY,NX)                = ECO_ER_col(NY,NX)+SurfGasEmiss_all_flx_col(idg_CO2,NY,NX)
   
@@ -262,6 +254,7 @@ module RedistMod
       +RGasNetProd_col(idg,NY,NX)
   ENDDO  
 
+  call UpdateCanopyAirDerivatives(NY,NX)
 
   !     MIX ALL SOIL STATE VARIABLES AND INCORPORATE ALL SURFACE
   !     RESIDUE STATE VARIABLES WITHIN THE TILLAGE ZONE TO THE EXTENT
@@ -573,7 +566,7 @@ module RedistMod
   !========================================================================
   
   ECO_HR_CO2_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CO2,0,NY,NX)
-  ECO_HR_CH4_vr(L,NY,NX)       = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)  
+  ECO_HR_CH4_vr(0,NY,NX)       = trcs_RMicbUptake_vr(idg_CH4,0,NY,NX)
 
   call PrintInfo('end '//subname)
   end subroutine HandleSurfaceBoundary
@@ -1064,9 +1057,6 @@ module RedistMod
       +trcg_root_vr(idg_CO2,L,NY,NX)+trcg_gasml_vr(idg_CH4,L,NY,NX) &
       +trcs_solml_vr(idg_CH4,L,NY,NX)+trcg_root_vr(idg_CH4,L,NY,NX) 
 
-    TGasC_lnd=TGasC_lnd+CS
-
-    DIC_mass_col(NY,NX)=DIC_mass_col(NY,NX)+CS
     HS=trcg_gasml_vr(idg_H2,L,NY,NX)+trcs_solml_vr(idg_H2,L,NY,NX) &
       +trcg_root_vr(idg_H2,L,NY,NX)
 
@@ -1113,6 +1103,9 @@ module RedistMod
       +FertN_mole_soil_vr(ifert_N_nh3,L,NY,NX)+FertN_mole_Band_vr(ifert_N_nh4_band,L,NY,NX) &
       +FertN_mole_Band_vr(ifert_N_urea_band,L,NY,NX)+FertN_mole_Band_vr(ifert_N_nh3_band,L,NY,NX))
 
+    ! Record carbon only after including the dissolved macropore pools.
+    TGasC_lnd           = TGasC_lnd+CS
+    DIC_mass_col(NY,NX) = DIC_mass_col(NY,NX)+CS
     TSoilH2G_lnd    = TSoilH2G_lnd+HS
     TSoilO2G_lnd    = TSoilO2G_lnd+OS
     TGasN_lnd       = TGasN_lnd+ZG
@@ -1135,8 +1128,8 @@ module RedistMod
       +trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX)+trcp_saltpml_vr(idsp_AlPO4B,L,NY,NX)&
       +trcp_saltpml_vr(idsp_FePO4B,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4B,L,NY,NX)) &
       +2._r8*patomw*(trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+trcp_saltpml_vr(idsp_CaH4P2O8B,L,NY,NX)) &
-      +3._r8*patomw*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX) &
-      +patomw*(FertP_mole_band_vr(L,NY,NX)+FertP_mole_soil_vr(L,NY,NX)))
+      +3._r8*patomw*(trcp_saltpml_vr(idsp_Apatite,L,NY,NX)+trcp_saltpml_vr(idsp_ApatiteBand,L,NY,NX)) &
+      +patomw*(FertP_mole_band_vr(L,NY,NX)+FertP_mole_soil_vr(L,NY,NX))
 
     TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
     tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
