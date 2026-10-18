@@ -499,7 +499,7 @@ implicit none
 !
   IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS+POA+POB.GT.0._r8)THEN
     FDPTHF=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
-    IF(FDPTHF.LE.0._r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
+    IF(FDPTHF.LE.0._r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB+POB,0._r8))THEN
       LFDPTH=0
       frcFert2SurfLitr=1.0_r8-EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA_3D(3,0,NY,NX)))
     ELSE
@@ -608,7 +608,7 @@ implicit none
 !     DPPOB,WDPOB=depth,width of H2PO4 band
 !     VLPOB,VLPO4=soil volume in H2PO4 band,non-band
 !
-    IF((PMB.GT.0.0_r8) .OR. (trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX).GT.0._r8 .AND. iFertPO4Band_col(NY,NX).EQ.ifert_off))THEN
+    IF((PMB+POB.GT.0.0_r8) .OR. (trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX).GT.0._r8 .AND. iFertPO4Band_col(NY,NX).EQ.ifert_off))THEN
       iFertPO4Band_col(NY,NX)=ifert_on
       ROWSpacePO4_col(NY,NX)=ROWI(I,NY,NX)
       DO  L=NUI_col(NY,NX),JZ
@@ -722,8 +722,8 @@ implicit none
     Z3BX = Z3B*AREA_3D(3,LFDPTH,NY,NX)/natomw
     ZUBX = ZUB*AREA_3D(3,LFDPTH,NY,NX)/natomw
     ZOBX = ZOB*AREA_3D(3,LFDPTH,NY,NX)/natomw
-    POAX = PMA*AREA_3D(3,LFDPTH,NY,NX)/patomw
-    POBX = PMB*AREA_3D(3,LFDPTH,NY,NX)/patomw
+    POAX = POA*AREA_3D(3,LFDPTH,NY,NX)/patomw
+    POBX = POB*AREA_3D(3,LFDPTH,NY,NX)/patomw
     PMAX = PMA*AREA_3D(3,LFDPTH,NY,NX)/(2.0_r8*patomw)
     PMBX = PMB*AREA_3D(3,LFDPTH,NY,NX)/(2.0_r8*patomw)
     PHAX = PHA*AREA_3D(3,LFDPTH,NY,NX)/(3.0_r8*patomw)
@@ -733,15 +733,19 @@ implicit none
     FertN_mole_soil_vr(ifert_N_nh4,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_nh4,LFDPTH,NY,NX)+Z4AX*frcFert2SurfLitr)
     FertN_mole_soil_vr(ifert_N_urea,LFDPTH,NY,NX) = AZMAX1(FertN_mole_soil_vr(ifert_N_urea,LFDPTH,NY,NX)+ZUAX*frcFert2SurfLitr)
     FertN_mole_soil_vr(ifert_N_no3,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_no3,LFDPTH,NY,NX)+ZOAX*frcFert2SurfLitr)
-    FertP_mole_soil_vr(LFDPTH,NY,NX)              = AZMAX1(FertP_mole_soil_vr(LFDPTH,NY,NX)+POAX*frcFert2SurfLitr)
 
     ! Layer-zero applications are broadcast; banded pools exist only in soil.
     if(LFDPTH>0)then
       FertN_mole_Band_vr(ifert_N_nh4_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_nh4_band,LFDPTH,NY,NX)+Z4BX*frcFert2SurfLitr)
       FertN_mole_Band_vr(ifert_N_urea_band,LFDPTH,NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_N_urea_band,LFDPTH,NY,NX)+ZUBX*frcFert2SurfLitr)
       FertN_mole_Band_vr(ifert_N_no3_band,LFDPTH,NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_no3_band,LFDPTH,NY,NX)+ZOBX*frcFert2SurfLitr)
-      FertP_mole_band_vr(LFDPTH,NY,NX)                   = AZMAX1(FertP_mole_band_vr(LFDPTH,NY,NX) +POBX*frcFert2SurfLitr)
     endif
+
+    ! Explicit PO4 enters dissolved pools as g P; mineral P remains in precipitates.
+    trcs_solml_vr(ids_H2PO4,LFDPTH,NY,NX) = trcs_solml_vr(ids_H2PO4,LFDPTH,NY,NX) &
+      +patomw*POAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*frcFert2SurfLitr
+    trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX) = trcs_solml_vr(ids_H2PO4B,LFDPTH,NY,NX) &
+      +patomw*(POAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)+POBX)*frcFert2SurfLitr
 
     trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)    = trcp_saltpml_vr(idsp_CaH4P2O8,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,LFDPTH,NY,NX)*frcFert2SurfLitr
     trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)   = trcp_saltpml_vr(idsp_CaH4P2O8B,LFDPTH,NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,LFDPTH,NY,NX)*frcFert2SurfLitr+PMBX*frcFert2SurfLitr
@@ -753,13 +757,17 @@ implicit none
       FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_nh3,NU_col(NY,NX),NY,NX)+Z3AX)
       FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX) = AZMAX1(FertN_mole_soil_vr(ifert_N_urea,NU_col(NY,NX),NY,NX)+ZUAX*frcFert2Topsoil)
       FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)  = AZMAX1(FertN_mole_soil_vr(ifert_N_no3,NU_col(NY,NX),NY,NX)+ZOAX*frcFert2Topsoil)
-      FertP_mole_soil_vr(NU_col(NY,NX),NY,NX)              = AZMAX1(FertP_mole_soil_vr(NU_col(NY,NX),NY,NX)+POAX*frcFert2Topsoil)
 
       FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_nh4_band,NU_col(NY,NX),NY,NX)+Z4BX*frcFert2Topsoil)
       FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_nh3_band,NU_col(NY,NX),NY,NX)+Z3BX)
       FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX) = AZMAX1(FertN_mole_Band_vr(ifert_N_urea_band,NU_col(NY,NX),NY,NX)+ZUBX*frcFert2Topsoil)
       FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)  = AZMAX1(FertN_mole_Band_vr(ifert_N_no3_band,NU_col(NY,NX),NY,NX)+ZOBX*frcFert2Topsoil)
-      FertP_mole_band_vr(NU_col(NY,NX),NY,NX)                   = AZMAX1(FertP_mole_band_vr(NU_col(NY,NX),NY,NX)+POBX*frcFert2Topsoil)
+
+      ! Explicit PO4 enters dissolved pools as g P; mineral P remains in precipitates.
+      trcs_solml_vr(ids_H2PO4,NU_col(NY,NX),NY,NX) = trcs_solml_vr(ids_H2PO4,NU_col(NY,NX),NY,NX) &
+        +patomw*POAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*frcFert2Topsoil
+      trcs_solml_vr(ids_H2PO4B,NU_col(NY,NX),NY,NX) = trcs_solml_vr(ids_H2PO4B,NU_col(NY,NX),NY,NX) &
+        +patomw*(POAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)+POBX)*frcFert2Topsoil
 
       trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)    = trcp_saltpml_vr(idsp_CaH4P2O8,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4,NU_col(NY,NX),NY,NX)*frcFert2Topsoil
       trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX)   = trcp_saltpml_vr(idsp_CaH4P2O8B,NU_col(NY,NX),NY,NX)+PMAX*trcs_VLN_vr(ids_H1PO4B,NU_col(NY,NX),NY,NX)*frcFert2Topsoil+PMBX*frcFert2Topsoil
@@ -772,10 +780,10 @@ implicit none
     trcp_saltpml_vr(idsp_CaCO3,NU_col(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaCO3,NU_col(NY,NX),NY,NX)+CACX
     trcp_saltpml_vr(idsp_CaSO4,NU_col(NY,NX),NY,NX)=trcp_saltpml_vr(idsp_CaSO4,NU_col(NY,NX),NY,NX)+CASX
     TZIN                       = TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
-    TPIN                       = TPIN+2._r8*patomw*(PMAX+PMBX)+3._r8*patomw*PHAX
+    TPIN                       = TPIN+patomw*(POAX+POBX)+2._r8*patomw*(PMAX+PMBX)+3._r8*patomw*PHAX
     TIONIN                     = TIONIN+2.0_r8*(CACX+CASX)
     FertN_Flx_CumYr_col(NY,NX) = FertN_Flx_CumYr_col(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
-    FerP_Flx_CumYr_col(NY,NX)  = FerP_Flx_CumYr_col(NY,NX)+2._r8*patomw*(PMAX+PMBX)+3.0_r8*patomw*PHAX
+    FerP_Flx_CumYr_col(NY,NX)  = FerP_Flx_CumYr_col(NY,NX)+patomw*(POAX+POBX)+2._r8*patomw*(PMAX+PMBX)+3.0_r8*patomw*PHAX
   ENDIF
 
   call PrintInfo('end '//subname)  
