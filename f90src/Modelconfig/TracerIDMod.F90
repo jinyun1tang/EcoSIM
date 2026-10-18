@@ -282,7 +282,7 @@ implicit none
 
     idsalt_end  = idsalt_MgHPO4
     idsaltb_beg = idsalt_end+1
-    idsaltb_end = idsaltb_beg
+    idsaltb_end = idsalt_end
     idsalt_psoil_beg=idsalt_H0PO4;idsalt_psoil_end=idsalt_MgHPO4
 
     idsalt_nuts=idsalt_MgHPO4-idsalt_H0PO4

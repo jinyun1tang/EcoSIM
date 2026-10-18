@@ -858,7 +858,7 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsalt_KSO4
-    trcSalt_Adv2MicP_flx(idsalt_Al)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt_Al,NU_col(NY,NX),NY,NX))
+    trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,NU_col(NY,NX),NY,NX))
   ENDDO
 
   DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
