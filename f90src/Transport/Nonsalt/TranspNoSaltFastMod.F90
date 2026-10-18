@@ -1,5 +1,6 @@
 module TranspNoSaltFastMod
 
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use abortutils,    only: destroy, endrun
   use EcoSIMCtrlMod, only: iVerbLevel
@@ -601,7 +602,7 @@ implicit none
 !     by assuming volume conservation, gases and water flow in opposite direction
 !
   call PrintInfo('beg '//subname)
-  FLQW=WaterFlow2SoilMM_3D(N,N6,N5,N4)  
+  FLQW=WaterFlow2SoilMM_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
   
   !water flow into grid (N6,N5,N4), so gas out of grid
   IF(FLQW.GT.0.0_r8)THEN
@@ -615,7 +616,7 @@ implicit none
 
     DO idg=idg_beg,idg_NH3
       RGasAdv                             = VFLW*AZMAX1(trcg_gasml2_vr(idg,N6,N5,N4))
-      Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+RGasAdv
+      Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4)+RGasAdv
     ENDDO
     !water flow out of source grid, gas into grid (N6,N5,N4)  
   ELSE
@@ -626,7 +627,7 @@ implicit none
     ENDIF
     DO idg=idg_beg,idg_NH3
       RGasAdv                             = VFLW*AZMAX1(trcg_gasml2_vr(idg,N3,N2,N1))
-      Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+RGasAdv
+      Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4)+RGasAdv
     ENDDO
   ENDIF
   call PrintInfo('end '//subname)
@@ -758,13 +759,15 @@ implicit none
 
   integer, intent(in) :: N,M,N1,N2,N3,N4,N5,N6
   integer :: K,LL,idg,idom
+  integer :: first_face,last_face
   real(r8) :: flux
 !
 !     NET GAS FLUX
 !
+  call SoilFaceIncomingRange(N,N3,N2,N1,first_face,last_face)
   IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO idg=idg_beg,idg_NH3
-      flux =Gas_AdvDif_FlxMM_3D(idg,N,N3,N2,N1)-Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)
+      flux =sum(Gas_AdvDif_FlxMM_3D(idg,N,first_face:last_face,N2,N1))-Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4)
       Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)=Gas_AdvDif_FlxMM_vr(idg,N3,N2,N1)+flux
 
       if(N.NE.iVerticalDirection)then
@@ -806,7 +809,7 @@ implicit none
     !
     trc_gasc1(idg)                      = AZMAX1(trcg_gasml2_vr(idg,N3,N2,N1)/VLsoiAirPM_vr(M,N3,N2,N1))
     trc_gasc2(idg)                      = AZMAX1(trcg_gasml2_vr(idg,N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4))
-    Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,N6,N5,N4)+GasDifuscoefMM_3D*(trc_gasc1(idg)-trc_gasc2(idg))
+    Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4) = Gas_AdvDif_FlxMM_3D(idg,N,SoilFaceSlot(N,N3,N6),N5,N4)+GasDifuscoefMM_3D*(trc_gasc1(idg)-trc_gasc2(idg))
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine GasDiffusionMM
@@ -1040,6 +1043,7 @@ implicit none
               exit
             ENDIF
           ENDDO
+          if(LL>NL_col(N5,N4))cycle D120
           !
           !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
           !     WATER CONTEnsolutes AND WATER FLUXES 'WaterFlow2SoilMM_3D' FROM 'WATSUB'

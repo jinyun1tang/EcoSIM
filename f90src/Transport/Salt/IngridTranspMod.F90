@@ -1,4 +1,5 @@
 module IngridTranspMod
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : AZMAX1,AZMIN1,isclose
   use DebugToolMod
@@ -308,6 +309,7 @@ module IngridTranspMod
   integer, intent(in) :: N,N1,N2,N3,N4,N5
   integer, intent(inout) :: N6
   integer :: LL,idsalt
+  integer :: first_face,last_face
 
   !
   !     begin_execution
@@ -322,12 +324,13 @@ module IngridTranspMod
       ENDIF
     ENDDO D1200
 
+  call SoilFaceIncomingRange(N,N3,N2,N1,first_face,last_face)
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO idsalt=idsalt_beg,idsaltb_end
         trcSalt_Transp2Micp_flxM_vr(idsalt,N3,N2,N1)=trcSalt_Transp2Micp_flxM_vr(idsalt,N3,N2,N1) &
-          +trcSalt_MicpTranspFlxM_3D(idsalt,N,N3,N2,N1)-trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)
+          +sum(trcSalt_MicpTranspFlxM_3D(idsalt,N,first_face:last_face,N2,N1))-trcSalt_MicpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)
         trcSalt_Transp2Macp_flxM_vr(idsalt,N3,N2,N1)=trcSalt_Transp2Macp_flxM_vr(idsalt,N3,N2,N1) &
-          +trcSalt_MacpTranspFlxM_3D(idsalt,N,N3,N2,N1)-trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)
+          +sum(trcSalt_MacpTranspFlxM_3D(idsalt,N,first_face:last_face,N2,N1))-trcSalt_MacpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)
       ENDDO
 
     ELSE
@@ -1088,10 +1091,10 @@ module IngridTranspMod
   call PrintInfo('beg '//subname)  
 
   !flow out of grid (N3,N2,N1)
-  IF(WaterFlow2MicPM_3D(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).GT.0.0)THEN
     !
     IF(VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1110,7 +1113,7 @@ module IngridTranspMod
     !flow out of grid (N6,N5,N4)
   ELSE
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1128,7 +1131,7 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_Adv2MicP_flx(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcSalt_Adv2MicP_flx(idsalt)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine SoluteAdvMicroporeM
@@ -1209,7 +1212,7 @@ module IngridTranspMod
     DLYR2=AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL=(TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
-    DISPN=DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA_3D(N,N6,N5,N4)))
+    DISPN=DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
     DIFPO=(SoluteDifusivitytscaledM_vr(N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
 
     DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
@@ -1257,7 +1260,7 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MicpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_flx_diffusM(idsalt)
+    trcSalt_MicpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcSalt_MicpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)+trcSalt_flx_diffusM(idsalt)
   ENDDO
 
   end subroutine SoluteDifsMicroporeM
@@ -1275,10 +1278,10 @@ module IngridTranspMod
   call PrintInfo('beg '//subname)
 
   !flow out of (N3,N2,N1)
-  IF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).GT.0.0)THEN
+  IF(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).GT.0.0)THEN
     !
     IF(VLWatMacPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1319,10 +1322,10 @@ module IngridTranspMod
       ENDDO
     ENDIF
     !flow out of (N6,N5,N4)
-  ELSEIF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).LT.0.0)THEN
+  ELSEIF(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).LT.0.0)THEN
    !
     IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1347,7 +1350,7 @@ module IngridTranspMod
   ENDIF
   !
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_RFH(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcSalt_RFH(idsalt)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine SoluteAdvMacroporeM
@@ -1383,7 +1386,7 @@ module IngridTranspMod
     DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
     DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA_3D(N,N6,N5,N4)))
+    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
     DIFPO = (SoluteDifusivitytscaledM_vr(N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
 
     DIFAL=(AquaIonDifusivty2_vr(idsalt_Al,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
@@ -1431,7 +1434,7 @@ module IngridTranspMod
   ENDIF
 
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)=trcSalt_MacpTranspFlxM_3D(idsalt,N,N6,N5,N4)+trcSalt_MacPore_Diffus(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcSalt_MacpTranspFlxM_3D(idsalt,N,SoilFaceSlot(N,N3,N6),N5,N4)+trcSalt_MacPore_Diffus(idsalt)
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine SoluteDifsMacroporeM
@@ -1622,13 +1625,13 @@ module IngridTranspMod
     
               call SoluteAdvDifsMicMacporeM(M,N,N1,N2,N3,N4,N5,N6,THETW1)        
             ELSEIF(N.NE.iVerticalDirection)THEN
-              trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
-              trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+              trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,SoilFaceSlot(N,N3,N6),N5,N4)=0.0_r8
+              trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,SoilFaceSlot(N,N3,N6),N5,N4)=0.0_r8
             ENDIF
           ELSE
 
-            trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
-            trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,N6,N5,N4)=0.0_r8
+            trcSalt_MicpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,SoilFaceSlot(N,N3,N6),N5,N4)=0.0_r8
+            trcSalt_MacpTranspFlxM_3D(idsalt_beg:idsaltb_end,N,SoilFaceSlot(N,N3,N6),N5,N4)=0.0_r8
           ENDIF
         enddo
       enddo

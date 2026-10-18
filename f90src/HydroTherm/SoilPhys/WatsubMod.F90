@@ -6,6 +6,8 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange, &
+    RebuildSoilFaceMap,DestroySoilFaceMap
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
   use abortutils,        only: endrun,                      print_info
@@ -76,6 +78,7 @@ module WatsubMod
 !------------------------------------------------------------------------------------------
   subroutine DestroyWatsub
   implicit none
+  call DestroySoilFaceMap
   call DestructSurfPhysData
   end subroutine DestroyWatsub
 !------------------------------------------------------------------------------------------
@@ -323,7 +326,7 @@ module WatsubMod
   WaterFlow2MicptX_3D           = 0.0_r8
   WaterFlow2Macpt_3D            = 0.0_r8
   HeatFlow2Soili_3D             = 0.0_r8
-  WaterFlow2MacPM_3D(M,:,:,:,:) = 0.0_r8
+  WaterFlow2MicPM_3D(M,:,:,:,:) = 0.0_r8
   WaterFlow2MacPM_3D(M,:,:,:,:) = 0.0_r8
 
 
@@ -563,6 +566,7 @@ module WatsubMod
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
+  call RebuildSoilFaceMap(NHW,NHE,NVN,NVS)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       D35: DO L=NUM_col(NY,NX),NL_col(NY,NX)
@@ -618,10 +622,10 @@ module WatsubMod
           !
           IF(HydroCondMacP1_vr(N3,N2,N1).GT.ZERO .AND. HydroCondMacP1_vr(N6,N5,N4).GT.ZERO)THEN
             !when both src and dest have macro pores
-            AVCNHL_3D(N,N6,N5,N4)=2.0_r8*HydroCondMacP1_vr(N3,N2,N1)*HydroCondMacP1_vr(N6,N5,N4) &
+            AVCNHL_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)=2.0_r8*HydroCondMacP1_vr(N3,N2,N1)*HydroCondMacP1_vr(N6,N5,N4) &
               /(HydroCondMacP1_vr(N3,N2,N1)*DLYR_3D(N,N6,N5,N4)+HydroCondMacP1_vr(N6,N5,N4)*DLYR_3D(N,N3,N2,N1))
           ELSE
-            AVCNHL_3D(N,N6,N5,N4)=0.0_r8
+            AVCNHL_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)=0.0_r8
           ENDIF
         ENDDO D40
       ENDDO D35
@@ -759,12 +763,12 @@ module WatsubMod
               !     WaterFlow2MicptX_3D=total unsaturated water+vapor flux to destination
               !     HeatByWatFlowMicP=total convective heat flux from water+vapor flux          
               !flow into cell (N6,N5,N4)
-              WaterFlow2Micpt_3D(N,N6,N5,N4)  = WatDarcyFlowMicP+ConvectVapFlux
-              WaterFlow2MicptX_3D(N,N6,N5,N4) = PredDarcyFlowMax+ConvectVapFlux
-              WaterFlow2Macpt_3D(N,N6,N5,N4)  = WaterMacpFlow
-              HeatFlow2Soili_3D(N,N6,N5,N4)   = HeatByDarcyFlowMicP+HeatByConvectVapFlux+HeatByFlowMacP
-              WaterFlow2Micptl_3D(N,N6,N5,N4) = WaterFlow2Micpt_3D(N,N6,N5,N4)
-              WaterFlow2Macptl_3D(N,N6,N5,N4) = WaterFlow2Macpt_3D(N,N6,N5,N4)
+              WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)  = WatDarcyFlowMicP+ConvectVapFlux
+              WaterFlow2MicptX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) = PredDarcyFlowMax+ConvectVapFlux
+              WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)  = WaterMacpFlow
+              HeatFlow2Soili_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)   = HeatByDarcyFlowMicP+HeatByConvectVapFlux+HeatByFlowMacP
+              WaterFlow2Micptl_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) = WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+              WaterFlow2Macptl_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) = WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
               !   compute heat flux by conduction
               call SolveXgridHeatConduction(I,J,M,N,N1,N2,N3,N4,N5,N6,ConvectVapFlux,HeatByConvectVapFlux,HeatFluxAir2Soi(NY,NX))
@@ -777,14 +781,14 @@ module WatsubMod
               !     WaterFlow2MicPM_3D=water flux used for solute flux calculations in TranspNoSalt.f
               !
               if(.not.fixWaterLevel)then
-                WaterFlowSoiMicP_3D(N,N6,N5,N4)  = WaterFlowSoiMicP_3D(N,N6,N5,N4)+WaterFlow2Micpt_3D(N,N6,N5,N4)
-                WaterFlowSoiMicPX_3D(N,N6,N5,N4) = WaterFlowSoiMicPX_3D(N,N6,N5,N4)+WaterFlow2MicptX_3D(N,N6,N5,N4)
-                WaterFlowSoiMacP_3D(N,N6,N5,N4)  = WaterFlowSoiMacP_3D(N,N6,N5,N4)+WaterFlow2Macpt_3D(N,N6,N5,N4)
+                WaterFlowSoiMicP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)  = WaterFlowSoiMicP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)+WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                WaterFlowSoiMicPX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) = WaterFlowSoiMicPX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)+WaterFlow2MicptX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                WaterFlowSoiMacP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)  = WaterFlowSoiMacP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)+WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
               endif
-              HeatFlow2Soil_3D(N,N6,N5,N4)     = HeatFlow2Soil_3D(N,N6,N5,N4)+HeatFlow2Soili_3D(N,N6,N5,N4)
+              HeatFlow2Soil_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)     = HeatFlow2Soil_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)+HeatFlow2Soili_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
-              WaterFlow2MicPM_3D(M,N,N6,N5,N4) = WaterFlow2Micpt_3D(N,N6,N5,N4)
-              WaterFlow2MacPM_3D(M,N,N6,N5,N4) = WaterFlow2Macpt_3D(N,N6,N5,N4)                            
+              WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4) = WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+              WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4) = WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
               IF(N.EQ.iVerticalDirection)THEN
                 FILMM_vr(M,N6,N5,N4)=FilmThickness(PSISoilMatricPtmp_vr(N6,N5,N4))
@@ -1067,6 +1071,7 @@ module WatsubMod
   real(r8),intent(in) :: Qinfl2MacP_col(JY,JX)  
   character(len=*), parameter :: subname='Summarize3DFlowM'
   integer :: NY,NX,L,N,LL
+  integer :: first_face,last_face
   integer :: N3,N2,N1
   integer :: N6,N5,N4
   real(r8):: FINHX
@@ -1119,15 +1124,16 @@ module WatsubMod
               ENDIF
             ENDDO D12003
 
+  call SoilFaceIncomingRange(N,N3,N2,N1,first_face,last_face)
             !compute the net flux 
             IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
               if(.not.fixWaterLevel)then
-                WatNetFlow2MicP_3DM_vr(N3,N2,N1)   = WatNetFlow2MicP_3DM_vr(N3,N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)
-                WatNetFlow2MicptX_3DM_vr(N3,N2,N1) = WatNetFlow2MicptX_3DM_vr(N3,N2,N1)+WaterFlow2MicptX_3D(N,N3,N2,N1)-WaterFlow2MicptX_3D(N,N6,N5,N4)
-                WatNetFlow2Macpt_3DM_vr(N3,N2,N1)  = WatNetFlow2Macpt_3DM_vr(N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)
+                WatNetFlow2MicP_3DM_vr(N3,N2,N1)   = WatNetFlow2MicP_3DM_vr(N3,N2,N1)+sum(WaterFlow2Micpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                WatNetFlow2MicptX_3DM_vr(N3,N2,N1) = WatNetFlow2MicptX_3DM_vr(N3,N2,N1)+sum(WaterFlow2MicptX_3D(N,first_face:last_face,N2,N1))-WaterFlow2MicptX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                WatNetFlow2Macpt_3DM_vr(N3,N2,N1)  = WatNetFlow2Macpt_3DM_vr(N3,N2,N1)+sum(WaterFlow2Macpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
               endif
-              THeatFlow2Soil_3DM_vr(N3,N2,N1)    = THeatFlow2Soil_3DM_vr(N3,N2,N1)+HeatFlow2Soili_3D(N,N3,N2,N1)-HeatFlow2Soili_3D(N,N6,N5,N4)
+              THeatFlow2Soil_3DM_vr(N3,N2,N1)    = THeatFlow2Soil_3DM_vr(N3,N2,N1)+sum(HeatFlow2Soili_3D(N,first_face:last_face,N2,N1))-HeatFlow2Soili_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
               if(N.NE.iVerticalDirection)then     
 
@@ -1137,18 +1143,18 @@ module WatsubMod
 
                 IF((N.EQ.iWestEastDirection .AND. NX.EQ.NHW .AND. NHW.LT.NHE) .OR. & !western boundary
                   (N.EQ.iNorthSouthDirection .AND. NY.EQ.NVN .AND. NVN.LT.NVS)) THEN !northern boundary 
-                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)
-                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4)-WaterFlow2Macpt_3D(N,N6,N5,N4)                        
+                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)-WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)-WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)-WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)-WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
                   
                 ELSEIF((N.EQ.iWestEastDirection .AND. NX.EQ.NHE .AND. NHW.LT.NHE) .OR. & !eastern boundary
                   (N.EQ.iNorthSouthDirection .AND. NY.EQ.NVS .AND. NVN.LT.NVS)) THEN !southern boundary 
-                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
-                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)+WaterFlow2Macpt_3D(N,N3,N2,N1)
+                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)+sum(WaterFlow2Micpt_3D(N,first_face:last_face,N2,N1))+sum(WaterFlow2Macpt_3D(N,first_face:last_face,N2,N1))
+                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)+sum(WaterFlow2Micpt_3D(N,first_face:last_face,N2,N1))+sum(WaterFlow2Macpt_3D(N,first_face:last_face,N2,N1))
                 ELSEIF(CHECKGRID)THEN
-                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4) &
-                    +WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)
-                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)+WaterFlow2Micpt_3D(N,N3,N2,N1)-WaterFlow2Micpt_3D(N,N6,N5,N4) &
-                    +WaterFlow2Macpt_3D(N,N3,N2,N1)-WaterFlow2Macpt_3D(N,N6,N5,N4)                 
+                  QLaterFlow2Cell_col(N2,N1)  = QLaterFlow2Cell_col(N2,N1)+sum(WaterFlow2Micpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) &
+                    +sum(WaterFlow2Macpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+                  QLaterFlow2CellM_col(N2,N1) = QLaterFlow2CellM_col(N2,N1)+sum(WaterFlow2Micpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Micpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4) &
+                    +sum(WaterFlow2Macpt_3D(N,first_face:last_face,N2,N1))-WaterFlow2Macpt_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
                   
                 ENDIF
               endif
@@ -2138,7 +2144,7 @@ module WatsubMod
     !     VOLW2,VOLP1=water,air contents of source,destination micropores
     !     HeatByFlowMacP=convective heat flux from micropore water flux
     ! from (N3,N2,N1) to (N6,N5,N4)
-    FLWHX=AVCNHL_3D(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA_3D(N,N3,N2,N1)*dts_HeatWatTP
+    FLWHX=AVCNHL_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)*(PSISH1-PSISHL)*AREA_3D(N,N3,N2,N1)*dts_HeatWatTP
     IF(N.NE.iVerticalDirection)THEN
       !horizontal direction
       IF(PSISH1.GT.PSISHL)THEN
@@ -2344,7 +2350,7 @@ module WatsubMod
     HeatCondSoi=AZMIN1(AMAX1(HFLWX,HFLWC))
   ENDIF
 
-  HeatFlow2Soili_3D(N,N6,N5,N4)=HeatFlow2Soili_3D(N,N6,N5,N4)+HeatCondSoi
+  HeatFlow2Soili_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)=HeatFlow2Soili_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)+HeatCondSoi
 
   end subroutine SolveXgridHeatConduction
 !------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 module TranspNoSaltSlowMod
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: destroy, endrun
   use TracerPropMod,    only: MolecularWeight
@@ -1124,6 +1125,7 @@ implicit none
               exit
             ENDIF
           ENDDO
+          if(LL>NL_col(N5,N4))cycle D120
           
           IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             IF(N3.GE.NUM_col(N2,N1) .AND. N6.GE.NUM_col(N5,N4))THEN
@@ -2162,7 +2164,7 @@ implicit none
     DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
     DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,N6,N5,N4)/AREA_3D(N,N6,N5,N4)))
+    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
       DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
@@ -2193,11 +2195,11 @@ implicit none
   ENDIF
   !diffusion flux into (N6,N5,N4)
   DO ids=ids_beg,ids_end
-    trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)=trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)+SDifFlx(ids)
+    trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)+SDifFlx(ids)
 
-    if(abs(trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4))>1.e20)then
+    if(abs(trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4))>1.e20)then
       write(*,*)I*1000+J,M
-      write(*,*)ids,N,N6,N5,N4,trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4),SDifFlx(ids),trcs_names(ids)   
+      write(*,*)ids,N,N6,N5,N4,trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4),SDifFlx(ids),trcs_names(ids)
       write(*,*)SDifc(ids),trcsolc1(ids),trcsolc2(ids),AMIN1(trcs_VLN_vr(ids,N3,N2,N1),trcs_VLN_vr(ids,N6,N5,N4))   
       write(*,*)trcs_solml2_vr(idg,N3,N2,N1),VLWatMicPM_vr(M,N3,N2,N1),trcs_solml2_vr(idg,N6,N5,N4),VLWatMicPM_vr(M,N6,N5,N4)
       call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -2206,7 +2208,7 @@ implicit none
 
   DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4) = DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)+DOM_Difus_Mac2Micp_flxM(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4) = DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)+DOM_Difus_Mac2Micp_flxM(idom,K)
     ENDDO  
   ENDDO
   call PrintInfo('end '//subname)
@@ -2225,7 +2227,7 @@ implicit none
   call PrintInfo('beg '//subname)
   !     WaterFlow2MacPM_3D=water flux through soil macropore from watsub.f
   !
-  IF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).GT.0.0_r8)THEN
     !
     !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
     !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -2233,7 +2235,7 @@ implicit none
     !     GRID CELL
     !
     IF(VLWatMacPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMacPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -2281,9 +2283,9 @@ implicit none
 !     OF WATER FLUX AND MACROPORE SOLUTE CONCENTRATIONS IN ADJACENT
 !     GRID CELL
 !
-  ELSEIF(WaterFlow2MacPM_3D(M,N,N6,N5,N4).LT.0.0_r8)THEN
+  ELSEIF(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).LT.0.0_r8)THEN
     IF(VLWatMacPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,N6,N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMacPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -2312,12 +2314,12 @@ implicit none
   ENDIF
 
   DO ids=ids_beg,ids_end
-    trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)= trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)+trcs_Adv2MacP_flxM(ids)
+    trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)= trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)+trcs_Adv2MacP_flxM(ids)
   ENDDO
 
   DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4) =DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)+ DOM_Adv2MacP_flxM(idom,K)
+      DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4) =DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)+ DOM_Adv2MacP_flxM(idom,K)
     ENDDO
   ENDDO      
   call PrintInfo('end '//subname)
@@ -2481,7 +2483,7 @@ implicit none
     DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
     DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,N6,N5,N4)/AREA_3D(N,N6,N5,N4)))
+    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
 
     DO idom=idom_beg,idom_end
       DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
@@ -2517,12 +2519,12 @@ implicit none
   ENDIF
 
   DO ids = ids_beg,ids_end
-    trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)=trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)+SDifHFlx(ids)
+    trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)+SDifHFlx(ids)
   ENDDO
 
   DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4) = DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)+DOM_Difus_Macp_flxM(idom,K)
+      DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4) = DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)+DOM_Difus_Macp_flxM(idom,K)
     enddo
   ENDDO
 
@@ -2543,9 +2545,9 @@ implicit none
    
   call PrintInfo('beg '//subname)
   !advection from (N3,N2,N1) to (N6,N5,N4)
-  IF(WaterFlow2MicPM_3D(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4).GT.0.0_r8)THEN
     IF(VLWatMicPM_vr(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -2561,7 +2563,7 @@ implicit none
     !advection from (N6,N5,N4) to (N3,N2,N1)
   ELSE
     IF(VLWatMicPM_vr(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/VLWatMicPM_vr(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -2576,9 +2578,9 @@ implicit none
   ENDIF
   !add advection flux
   DO ids=ids_beg,ids_end
-    trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)=trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)+trcs_Adv2MicP_flx(ids)
+    trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)=trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)+trcs_Adv2MicP_flx(ids)
 
-    if(abs(trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4))>1.e20)then
+    if(abs(trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4))>1.e20)then
       write(*,*)I*1000+J,ids,N,N6,N5,N4,trcs_Adv2MicP_flx(ids)
       write(*,*)VFLW,trcs_solml2_vr(ids,N6,N5,N4),trcs_solml2_vr(ids,N3,N2,N1),trcs_names(ids)
       write(*,*)trcs_solml_vr(ids,N6,N5,N4),trcs_solml_vr(ids,N3,N2,N1)
@@ -2588,7 +2590,7 @@ implicit none
 
   DO K=1,jcplx
     do idom=idom_beg,idom_end
-      DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4) = DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)+DOM_Adv2MicP_flx(idom,K)
+      DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4) = DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)+DOM_Adv2MicP_flx(idom,K)
     enddo
   ENDDO
   call PrintInfo('end '//subname)
@@ -3352,21 +3354,23 @@ implicit none
   integer, intent(in) :: N4,N5,N6
   character(len=*), parameter :: subname='NetTracerFlowXSoilPoresM'
   integer :: K,LL,ids,idg,idom
+  integer :: first_face,last_face
 
+  call SoilFaceIncomingRange(N,N3,N2,N1,first_face,last_face)
   call PrintInfo('beg '//subname)
   
   DO  K=1,jcplx
     do idom=idom_beg,idom_end
       DOM_Transp2Micp_flxM_vr(idom,K,N3,N2,N1)=DOM_Transp2Micp_flxM_vr(idom,K,N3,N2,N1) &
-        +DOM_MicpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4)
+        +sum(DOM_MicpTranspFlxM_3D(idom,K,N,first_face:last_face,N2,N1))-DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)
 
       DOM_Transp2Macp_flxM_vr(idom,K,N3,N2,N1)=DOM_Transp2Macp_flxM_vr(idom,K,N3,N2,N1) &
-        +DOM_MacpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
+        +sum(DOM_MacpTranspFlxM_3D(idom,K,N,first_face:last_face,N2,N1))-DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)
 
       if(N.NE.iVerticalDirection)then    
         DOM_transpFlxM_2DH(idom,K,N2,N1)=DOM_transpFlxM_2DH(idom,K,N2,N1) &
-          +DOM_MicpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MicpTranspFlxM_3D(idom,K,N,N6,N5,N4) &
-          +DOM_MacpTranspFlxM_3D(idom,K,N,N3,N2,N1)-DOM_MacpTranspFlxM_3D(idom,K,N,N6,N5,N4)
+          +sum(DOM_MicpTranspFlxM_3D(idom,K,N,first_face:last_face,N2,N1))-DOM_MicpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4) &
+          +sum(DOM_MacpTranspFlxM_3D(idom,K,N,first_face:last_face,N2,N1))-DOM_MacpTranspFlxM_3D(idom,K,N,SoilFaceSlot(N,N3,N6),N5,N4)
       endif    
     enddo
   enddo
@@ -3375,20 +3379,20 @@ implicit none
   !
   DO ids=ids_beg,ids_end
     trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1) &
-      +trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
+      +sum(trcs_MicpTranspFlxM_3D(ids,N,first_face:last_face,N2,N1))-trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)
 
     trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1)=trcs_Transp2Macp_flxM_vr(ids,N3,N2,N1) &
-      +trcs_MacpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4)
+      +sum(trcs_MacpTranspFlxM_3D(ids,N,first_face:last_face,N2,N1))-trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)
 
     if(N.NE.iVerticalDirection)then
        trcs_transpFlxM_2DH(ids,N2,N1)=trcs_transpFlxM_2DH(ids,N2,N1) &
-         +trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4) &
-         +trcs_MacpTranspFlxM_3D(ids,N,N3,N2,N1)-trcs_MacpTranspFlxM_3D(ids,N,N6,N5,N4) 
+         +sum(trcs_MicpTranspFlxM_3D(ids,N,first_face:last_face,N2,N1))-trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4) &
+         +sum(trcs_MacpTranspFlxM_3D(ids,N,first_face:last_face,N2,N1))-trcs_MacpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)
     endif
 
     if(abs(trcs_Transp2Micp_flxM_vr(ids,N3,N2,N1))>1.e20)then
       write(*,*)N,N3,N2,N1,N6,N5,N4,trcs_names(ids)
-      write(*,*)trcs_MicpTranspFlxM_3D(ids,N,N3,N2,N1),-trcs_MicpTranspFlxM_3D(ids,N,N6,N5,N4)
+      write(*,*)sum(trcs_MicpTranspFlxM_3D(ids,N,first_face:last_face,N2,N1)),-trcs_MicpTranspFlxM_3D(ids,N,SoilFaceSlot(N,N3,N6),N5,N4)
       call endrun(trim(mod_filename)//' at line',__LINE__)                
     endif  
   ENDDO

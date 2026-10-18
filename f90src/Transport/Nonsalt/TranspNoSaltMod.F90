@@ -417,6 +417,7 @@ module TranspNoSaltMod
   real(r8) :: PARGM
 
   call PrintInfo('beg '//subname)
+  WaterFlow2SoilMM_3D=(WaterFlow2MicPM_3D(M,:,:,:,:)+WaterFlow2MacPM_3D(M,:,:,:,:))*dt_GasCyc
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -438,7 +439,6 @@ module TranspNoSaltMod
       VLWatMicPXA_vr(0,NY,NX)          = natomw*VLWatMicPM_vr(M,0,NY,NX)
 
       L=NU_col(NY,NX)
-      WaterFlow2SoilMM_3D(3,L,NY,NX)     = (WaterFlow2MicPM_3D(M,3,L,NY,NX)+WaterFlow2MacPM_3D(M,3,L,NY,NX))*dt_GasCyc
       tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
 
       VLWatMicPMA_vr(L,NY,NX)          = VLWatMicPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
@@ -451,9 +451,6 @@ module TranspNoSaltMod
 
       DO L=NU_col(NY,NX)+1,NL_col(NY,NX)
         tScalReductVLsoiAirPMM_vr(L,NY,NX) = ReductVLsoiAirPM_vr(M,L,NY,NX)*dt_GasCyc
-        DO N=FlowDirIndicator_col(NY,NX),3
-          WaterFlow2SoilMM_3D(N,L,NY,NX)=(WaterFlow2MicPM_3D(M,N,L,NY,NX)+WaterFlow2MacPM_3D(M,N,L,NY,NX))*dt_GasCyc
-        ENDDO
 
         VLWatMicPMA_vr(L,NY,NX) = VLWatMicPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
         VLWatMicPMB_vr(L,NY,NX) = VLWatMicPM_vr(M,L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)

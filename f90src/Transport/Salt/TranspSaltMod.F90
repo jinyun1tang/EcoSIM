@@ -146,7 +146,9 @@ module TranspSaltMod
   real(r8) :: carbon_weight(idsalt_beg:idsaltb_end), phosphorus_weight(idsalt_beg:idsaltb_end)
   real(r8) :: surface_export, subsurface_export
   integer :: idsalt,L
+  character(len=*), parameter :: subname='SummarizeSaltBoundaryFluxesM'
 
+  call PrintInfo('beg '//subname)
   carbon_weight=0._r8
   carbon_weight([idsalt_CO3,idsalt_HCO3,idsalt_CaCO3,idsalt_CaHCO3, &
     idsalt_MgCO3,idsalt_MgHCO3,idsalt_NaCO3])=catomw
@@ -177,6 +179,7 @@ module TranspSaltMod
     HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)+phosphorus_weight(idsalt)*surface_export
     HydroSubsDIPFlx_col(NY,NX)=HydroSubsDIPFlx_col(NY,NX)+phosphorus_weight(idsalt)*subsurface_export
   enddo
+  call PrintInfo('end '//subname)
   end subroutine SummarizeSaltBoundaryFluxesM
 !------------------------------------------------------------------------------------------
 
@@ -438,6 +441,11 @@ module TranspSaltMod
 
   integer :: NY,NX
   integer :: L, idsalt
+
+  ! A face may disappear after relayering. Clear all owner slots, including
+  ! those above the destination's active surface or without a valid target.
+  trcSalt_MicpTranspFlxM_3D=0._r8
+  trcSalt_MacpTranspFlxM_3D=0._r8
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS

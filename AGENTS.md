@@ -61,6 +61,12 @@ take precedence over repository guidance.
 - Follow nearby Fortran conventions, precision kinds, array ordering, and module
   interfaces. Update allocation, initialization, API mapping, history, and restart
   handling as needed when adding persistent state or flux variables.
+- New Fortran procedures should declare
+  `character(len=*), parameter :: subname='procedure_name'`, using the actual
+  procedure name as the string value. Include `call PrintInfo('beg '//subname)`
+  at entry and `call PrintInfo('end '//subname)` at normal exit. Separate
+  procedures with the following comment line:
+  `!------------------------------------------------------------------------------------------`
 - In Fortran executable statements, use aliases declared in an `associate` block
   instead of direct derived-type component references such as
   `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
