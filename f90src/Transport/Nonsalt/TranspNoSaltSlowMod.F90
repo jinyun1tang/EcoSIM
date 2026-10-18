@@ -51,6 +51,7 @@ implicit none
   real(r8) :: pscal1_dom(idom_beg:idom_end),dpscal_dom(idom_beg:idom_end)
   real(r8) :: dpscal_max
   integer :: ids,idom,iterm
+  integer :: band_snow_donor_col(JY,JX) ! snow donor for the surface band-transfer pass
   
   call PrintInfo('beg '//subname)
 
@@ -60,6 +61,11 @@ implicit none
   iterm=0; dpscal_max=1._r8
 
   call StageSlowTranspIterationM(I,J,M,NHE,NHW,NVS,NVN)
+
+  ! Accept ID-changing surface transfers once, before independent soil transport.
+  call ZeroFluxesM(I,J,M,NHE,NHW,NVS,NVN)
+  call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
+  call SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
 
   DO while(dpscal_max>1.e-2_r8 .and. iterm<3)
     iterm=iterm+1
@@ -484,6 +490,7 @@ implicit none
     call UpdateSurfTracerM(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal1,pscal1_dom)
 
     call UpdateSubSurfTracerM(I,J,M,NHW,NHE,NVN,NVS,dpscal,dpscal_dom,pscal1,pscal1_dom)
+
 
   else
     DOM_mass3_col=0._r8
@@ -1186,11 +1193,13 @@ implicit none
   end subroutine GatherTranspFluxM
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN)
+  subroutine SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M
   integer, intent(in) :: NHE,NHW,NVS,NVN
+  ! Present only in the once-per-substep ID-changing surface-transfer pass.
+  integer, optional, intent(in) :: band_snow_donor_col(JY,JX)
   character(len=*), parameter :: subname='SurfaceSoluteFluxM'
 
   integer  :: NY,NX,K
@@ -1223,18 +1232,104 @@ implicit none
 
       !-----------------------------------------------------------------        
       !
-      call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
-        DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
+      if(present(band_snow_donor_col))then
+        call AcceptSurfaceBandTransfersM(NY,NX,band_snow_donor_col(NY,NX), &
+          solute_adv_Lit2Soil_flxM+trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM)
+      else
+        ! These transfers were already accepted; do not replay them in retries.
+        solute_adv_Lit2Soil_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
+        trcs_Dif_Litr2Soil_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
+        solute_adv_Lit2MacP_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
+        call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
+          DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
+      endif
     ENDDO
   ENDDO
 
-  call TracerFlowThruSurRofM(I,J,M,NHE,NHW,NVS,NVN)
-
-  CALL TracerFlowThruSnowRedist(I,J,M,NHE,NHW,NVS,NVN)
+  if(.not.present(band_snow_donor_col))then
+    call TracerFlowThruSurRofM(I,J,M,NHE,NHW,NVS,NVN)
+    call TracerFlowThruSnowRedist(I,J,M,NHE,NHW,NVS,NVN)
+  endif
 
   call PrintInfo('end '//subname)
   end subroutine SurfaceSoluteFluxM
 
+!------------------------------------------------------------------------------------------
+
+  subroutine AcceptSurfaceBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp)
+  ! Accept only transfers that change IDs between litter/snow and banded soil.
+  ! All other transport uses the existing independent per-tracer retry solver.
+  implicit none
+  integer, intent(in) :: NY,NX,LS ! LS=0 means no bottom snow donor
+  real(r8), intent(in) :: litter_to_micp(ids_beg:ids_end) ! signed litter-to-band proposal
+  real(r8), intent(in) :: litter_to_macp(ids_beg:ids_end) ! nonnegative litter-to-band proposal
+  character(len=*), parameter :: subname='AcceptSurfaceBandTransfersM'
+  integer :: ids,idsband,L
+  real(r8) :: litter_mass,soil_mass,snow_mass,outflow,scale
+  real(r8) :: micp_flux,macp_flux,snow_flux,soil_gain
+
+  call PrintInfo('beg '//subname)
+  L=NU_col(NY,NX)
+  DO idsband=ids_nutb_beg,ids_nutb_end
+    if(idsband==idg_NH3B)then
+      ids=idg_NH3
+    else
+      ids=idsband-ids_NH4B+ids_NH4
+    endif
+    litter_mass=AZMAX1(trcs_solml2_vr(ids,0,NY,NX))
+    soil_mass=AZMAX1(trcs_solml2_vr(idsband,L,NY,NX))
+    ! Both litter destinations draw on the same donor snapshot. Incoming
+    ! soil/snow transfers are not reused to fund outgoing transfers here.
+    outflow=AZMAX1(litter_to_micp(idsband))+litter_to_macp(idsband)
+    scale=1._r8
+    if(outflow>0._r8)scale=MIN(1._r8,litter_mass/outflow)
+    if(litter_to_micp(idsband)>=0._r8)then
+      micp_flux=MIN(litter_mass,litter_to_micp(idsband)*scale)
+    else
+      micp_flux=-MIN(soil_mass,-litter_to_micp(idsband))
+    endif
+    macp_flux=MIN(litter_to_macp(idsband)*scale,AZMAX1(litter_mass-AZMAX1(micp_flux)))
+
+    snow_flux=0._r8
+    if(LS>0)then
+      if(ids==idg_NH3)then
+        snow_mass=AZMAX1(trcg_solsml2_snvr(ids,LS,NY,NX))
+      else
+        snow_mass=AZMAX1(trcn_solsml2_snvr(ids,LS,NY,NX))
+      endif
+      snow_flux=MIN(snow_mass,AZMAX1(trcn_AquaADV_Snow2Band_flxM(idsband,NY,NX)))
+      if(ids==idg_NH3)then
+        trcg_solsml2_snvr(ids,LS,NY,NX)=snow_mass-snow_flux
+        trcg_solsml_snvr(ids,LS,NY,NX)=trcg_solsml2_snvr(ids,LS,NY,NX)
+      else
+        trcn_solsml2_snvr(ids,LS,NY,NX)=snow_mass-snow_flux
+        trcn_solsml_snvr(ids,LS,NY,NX)=trcn_solsml2_snvr(ids,LS,NY,NX)
+      endif
+    endif
+
+    trcs_solml2_vr(ids,0,NY,NX)=litter_mass-micp_flux-macp_flux
+    trcs_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux
+    trcs_soHml2_vr(idsband,L,NY,NX)=trcs_soHml2_vr(idsband,L,NY,NX)+macp_flux
+    trcs_solml_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)
+    trcs_solml_vr(idsband,L,NY,NX)=trcs_solml2_vr(idsband,L,NY,NX)
+    trcs_soHml_vr(idsband,L,NY,NX)=trcs_soHml2_vr(idsband,L,NY,NX)
+
+    ! Record the accepted internal transfers once, outside ordinary retries.
+    soil_gain=micp_flux+macp_flux+snow_flux
+    trcs_netflow2soil_slow_flx_col(idsband,NY,NX)=trcs_netflow2soil_slow_flx_col(idsband,NY,NX)+soil_gain
+    trcn_AquaADV_Snow2Band_flx(idsband,NY,NX)=trcn_AquaADV_Snow2Band_flx(idsband,NY,NX)+snow_flux
+    if(ids==idg_NH3)then
+      trcs_NetFlow2Litr_slow_flx_col(ids,NY,NX)=trcs_NetFlow2Litr_slow_flx_col(ids,NY,NX)-micp_flux
+      Gas_litr2Soil_slow_flx_col(ids,NY,NX)=Gas_litr2Soil_slow_flx_col(ids,NY,NX)+micp_flux
+      Gas_Snowloss_slow_flx_col(ids,NY,NX)=Gas_Snowloss_slow_flx_col(ids,NY,NX)+snow_flux
+      Gas_Snowloss_flx_col(ids,NY,NX)=Gas_Snowloss_flx_col(ids,NY,NX)+snow_flux
+      trc_topsoil_flx_col(ids,NY,NX)=trc_topsoil_flx_col(ids,NY,NX)+soil_gain
+      TranspNetSoil_flx_col(ids,NY,NX)=TranspNetSoil_flx_col(ids,NY,NX)+soil_gain
+      TranspNetSoil_flx2_col(ids,NY,NX)=TranspNetSoil_flx2_col(ids,NY,NX)+soil_gain
+    endif
+  ENDDO
+  call PrintInfo('end '//subname)
+  end subroutine AcceptSurfaceBandTransfersM
 !------------------------------------------------------------------------------------------
 
   subroutine AtmosLitterExchangeM(I,J,M,NY,NX,trcs_cl_litr)
@@ -1863,7 +1958,7 @@ implicit none
   ENDDO  
   end subroutine TracerFlowThruSnowRedist
 ! ----------------------------------------------------------------------
-  subroutine SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN)
+  subroutine SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
   !
   !Description
   !Vertical drainage of solute in and out of snow.
@@ -1871,6 +1966,8 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NHE,NHW,NVS,NVN
+  ! Bottom snow donor for the separate ID-changing transfer pass.
+  integer, optional, intent(out) :: band_snow_donor_col(JY,JX)
   integer :: NY, NX
 
   character(len=*), parameter :: subname='SnowSoluteVertDrainM'
@@ -1882,6 +1979,7 @@ implicit none
   integer  :: idg,idn
 !
   call PrintInfo('beg '//subname)
+  if(present(band_snow_donor_col))band_snow_donor_col=0
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -1966,6 +2064,7 @@ implicit none
               trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B,NY,NX) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
               trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B,NY,NX) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
               
+              if(present(band_snow_donor_col))band_snow_donor_col(NY,NX)=L
               LCHKBOTML = .true.
             ENDIF
           ENDIF
@@ -1973,6 +2072,10 @@ implicit none
       ENDDO
     ENDDO
   ENDDO
+  ! Snow-to-band transfer is applied only in the separate surface pass.
+  if(.not.present(band_snow_donor_col))then
+    trcn_AquaADV_Snow2Band_flxM(:,NVN:NVS,NHW:NHE)=0._r8
+  endif
   call PrintInfo('end '//subname)
   end subroutine SnowSoluteVertDrainM
 

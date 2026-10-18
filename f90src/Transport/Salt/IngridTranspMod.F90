@@ -21,6 +21,7 @@ module IngridTranspMod
 
   real(r8), PARAMETER :: XFRS=0.05_r8
   public :: GetSaltTranspFlxM
+  public :: SurfaceSaltFluxM
   public :: SaltFall2Snowpack
   contains
 
@@ -48,24 +49,42 @@ module IngridTranspMod
   end subroutine GetSaltTranspFlxM
 
 !------------------------------------------------------------------------------------------
-  subroutine SurfaceSaltFluxM(M,NHW,NHE,NVN,NVS)
+  subroutine SurfaceSaltFluxM(M,NHW,NHE,NVN,NVS,band_transfer_only)
 
   implicit none
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
+  ! True only for the once-per-substep litter/snow-to-band transfer pass.
+  logical, optional, intent(in) :: band_transfer_only
 
-  integer :: NY,NX
+  integer :: NY,NX,LS
+  logical :: band_pass
   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
   
+  band_pass=.false.
+  if(present(band_transfer_only))band_pass=band_transfer_only
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      call SnowSaltTranptM(M,NY,NX)
+      if(band_pass)then
+        call SnowSaltTranptM(M,NY,NX,LS)
+      else
+        call SnowSaltTranptM(M,NY,NX)
+      endif
 
       call SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx,trcSalt_Adv2MacP_flx)
 
       call Litr2SoilDifusTransptM(M,NY,NX,trcSalt_flx_diffusM)
+
+      if(band_pass)then
+        call AcceptSurfaceSaltBandTransfersM(NY,NX,LS,trcSalt_Adv2MicP_flx+trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
+        cycle
+      endif
+      ! These ID-changing transfers have already been accepted locally.
+      trcSalt_Adv2MicP_flx(idsalt_pband_beg:idsalt_pband_end)=0._r8
+      trcSalt_flx_diffusM(idsalt_pband_beg:idsalt_pband_end)=0._r8
+      trcSalt_Adv2MacP_flx(idsalt_pband_beg:idsalt_pband_end)=0._r8
 
       call LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
 
@@ -92,6 +111,56 @@ module IngridTranspMod
     ENDDO
   ENDDO
   end subroutine SurfaceSaltFluxM
+!------------------------------------------------------------------------------------------
+
+  subroutine AcceptSurfaceSaltBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp)
+  ! Accept ID-changing phosphate transfers without coupling ordinary soil pools.
+  implicit none
+  integer, intent(in) :: NY,NX,LS ! LS=0 means no bottom snow donor
+  real(r8), intent(in) :: litter_to_micp(idsalt_beg:idsaltb_end) ! signed litter-to-band proposal [mol d-2]
+  real(r8), intent(in) :: litter_to_macp(idsalt_beg:idsaltb_end) ! nonnegative litter-to-band proposal [mol d-2]
+  character(len=*), parameter :: subname='AcceptSurfaceSaltBandTransfersM'
+  integer :: idsalt,idsband,L
+  real(r8) :: litter_mass,soil_mass,snow_mass,outflow,scale
+  real(r8) :: micp_flux,macp_flux,snow_flux
+
+  call PrintInfo('beg '//subname)
+  L=NU_col(NY,NX)
+  DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
+    idsband=idsalt-idsalt_psoil_beg+idsalt_pband_beg
+    litter_mass=AZMAX1(trcSalt_solml2_vr(idsalt,0,NY,NX))
+    soil_mass=AZMAX1(trcSalt_solml2_vr(idsband,L,NY,NX))
+    ! Share the litter donor snapshot between its two outgoing destinations.
+    ! Incoming soil/snow transfers do not fund outgoing transfers in this pass.
+    outflow=AZMAX1(litter_to_micp(idsband))+litter_to_macp(idsband)
+    scale=1._r8
+    if(outflow>0._r8)scale=MIN(1._r8,litter_mass/outflow)
+    if(litter_to_micp(idsband)>=0._r8)then
+      micp_flux=MIN(litter_mass,litter_to_micp(idsband)*scale)
+    else
+      micp_flux=-MIN(soil_mass,-litter_to_micp(idsband))
+    endif
+    macp_flux=MIN(litter_to_macp(idsband)*scale,AZMAX1(litter_mass-AZMAX1(micp_flux)))
+
+    snow_flux=0._r8
+    if(LS>0)then
+      snow_mass=AZMAX1(trcSalt_ml2_snvr(idsalt,LS,NY,NX))
+      snow_flux=MIN(snow_mass,AZMAX1(trcSalt_AquaADV_Snow2Soil_flxM(idsband,NY,NX)))
+      trcSalt_ml2_snvr(idsalt,LS,NY,NX)=snow_mass-snow_flux
+      trcSalt_ml_snvr(idsalt,LS,NY,NX)=trcSalt_ml2_snvr(idsalt,LS,NY,NX)
+    endif
+
+    trcSalt_solml2_vr(idsalt,0,NY,NX)=litter_mass-micp_flux-macp_flux
+    trcSalt_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux
+    trcSalt_soHml2_vr(idsband,L,NY,NX)=trcSalt_soHml2_vr(idsband,L,NY,NX)+macp_flux
+    trcSalt_solml_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX)
+    trcSalt_solml_vr(idsband,L,NY,NX)=trcSalt_solml2_vr(idsband,L,NY,NX)
+    trcSalt_soHml_vr(idsband,L,NY,NX)=trcSalt_soHml2_vr(idsband,L,NY,NX)
+    ! Accumulate this accepted snow transfer once, outside ordinary retries.
+    trcSalt_AquaADV_Snow2Soil_flx(idsband,NY,NX)=trcSalt_AquaADV_Snow2Soil_flx(idsband,NY,NX)+snow_flux
+  ENDDO
+  call PrintInfo('end '//subname)
+  end subroutine AcceptSurfaceSaltBandTransfersM
 !------------------------------------------------------------------------------------------
 
   subroutine SoilLitrSaltAdvExchange(M,NY,NX,trcSalt_Adv2MicP_flx,trcSalt_Adv2MacP_flx)
@@ -534,12 +603,14 @@ module IngridTranspMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SnowSaltTranptM(M,NY,NX)
+  subroutine SnowSaltTranptM(M,NY,NX,band_snow_donor)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: M,NY,NX
+  ! Present in the surface band pass; returns zero if there is no snow donor.
+  integer, optional, intent(out) :: band_snow_donor
 
   character(len=*), parameter :: subname='SnowSaltTranptM'
   integer :: L,L2,idsalt,ids
@@ -550,6 +621,7 @@ module IngridTranspMod
 !     begin_execution
 !
   call PrintInfo('beg '//subname)
+  if(present(band_snow_donor))band_snow_donor=0
   ! Reset column discharge once; inactive layers must preserve bottom-layer fluxes.
   trcSalt_AquaADV_Snow2Litr_flxM(idsalt_beg:idsalt_end,NY,NX)=0._r8
   trcSalt_AquaADV_Snow2Soil_flxM(idsalt_beg:idsaltb_end,NY,NX)=0._r8
@@ -612,11 +684,16 @@ module IngridTranspMod
             !band
             trcSalt_AquaADV_Snow2Soil_flxM(ids,NY,NX) = trcSalt_ml2_snvr(idsalt,L,NY,NX)*VFLWPOB
           ENDDO
+          if(present(band_snow_donor))band_snow_donor=L
           ICHKL=.true.
         ENDIF
       ENDIF
     ENDIF
   ENDDO
+  ! Snow-to-band transfer belongs only to the separate surface pass.
+  if(.not.present(band_snow_donor))then
+    trcSalt_AquaADV_Snow2Soil_flxM(idsalt_pband_beg:idsalt_pband_end,NY,NX)=0._r8
+  endif
   call PrintInfo('end '//subname)
   end subroutine SnowSaltTranptM
 

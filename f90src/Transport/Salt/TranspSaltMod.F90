@@ -76,6 +76,10 @@ module TranspSaltMod
     iteration=0
     stalled_iterations=0
 
+    ! Apply ID-changing surface transfers once before independent soil retries.
+    call ZeroFluxArraysM(NHW,NHE,NVN,NVS)
+    call SurfaceSaltFluxM(M,NHW,NHE,NVN,NVS,band_transfer_only=.true.)
+
     do while(dpscal_max>1.e-2_r8)
       iteration=iteration+1
       if(iteration>max_salt_iterations)then
@@ -388,7 +392,7 @@ module TranspSaltMod
   real(r8), optional, intent(out):: pscal(idsalt_beg:idsaltb_end)
 
   character(len=*), parameter :: subname='UpdateSaltTranspM'
-  integer :: L,idsalt,idsband,NY,NX
+  integer :: L,idsalt,NY,NX
   real(r8) :: pscal1(idsalt_beg:idsaltb_end)
   real(r8) :: flux
   !
@@ -440,15 +444,6 @@ module TranspSaltMod
       ENDDO D9685
     ENDDO D9690
   ENDDO D9695
-  ! Snow/litter phosphate is unbanded even when routed to banded soil.
-  ! Share acceptance for each corresponding pair so both transfer endpoints
-  ! and their ledgers use the same fraction. Equal initial dpscal values then
-  ! remain equal through every accepted replay and remaining-fraction retry.
-  DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-    idsband=idsalt-idsalt_psoil_beg+idsalt_pband_beg
-    pscal1(idsalt)=AMIN1(pscal1(idsalt),pscal1(idsband))
-    pscal1(idsband)=pscal1(idsalt)
-  ENDDO
   if(present(pscal))pscal=pscal1
   call PrintInfo('end '//subname)
   end subroutine UpdateSaltTranspM
