@@ -215,7 +215,11 @@ module TillageMixMod
 
   VLitR_col(NY,NX)          = VLitR_col(NY,NX)*XCORP0
   VGeomLayer_vr(0,NY,NX)    = VGeomLayer_vr(0,NY,NX)*XCORP0
-  TKS_vr(0,NY,NX)           = (ENGYM(0)+ENGYV(0))/VHeatCapacity_vr(0,NY,NX)
+
+  ! Empty litter has no stored energy; retain its previous temperature.
+  IF(VHeatCapacity_vr(0,NY,NX).GT.0._r8)THEN
+    TKS_vr(0,NY,NX) = (ENGYM(0)+ENGYV(0))/VHeatCapacity_vr(0,NY,NX)
+  ENDIF
   HFLXD                     = HFLXD-ENGYM(0)-ENGYV(0)
   DO  L=NU_col(NY,NX),LL
     IF(DLYR_3D(3,L,NY,NX).GT.ZERO)THEN
