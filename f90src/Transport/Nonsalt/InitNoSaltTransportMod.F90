@@ -79,6 +79,7 @@ module InitNoSaltTransportMod
       trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
       trcg_Precip2LitrM_col(idg_beg:idg_NH3,NY,NX)=0._r8
+      trcn_Precip2LitrM_col(ids_nut_beg:ids_nuts_end,NY,NX)=0._r8
       trcs_Precip2MicpM_col(ids_beg:ids_end,NY,NX)=0._r8
 
       RO2AquaSourcePrev_vr(:,NY,NX)                    = 0._r8
@@ -545,21 +546,21 @@ module InitNoSaltTransportMod
       +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
   ENDDO
 
-  trcg_Precip2LitrM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
 
   trcg_Precip2LitrM_col(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw
 
-  trcg_Precip2LitrM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
 
-  trcg_Precip2LitrM_col(ids_NO2,NY,NX)=0.0_r8
+  trcn_Precip2LitrM_col(ids_NO2,NY,NX)=0.0_r8
 
-  trcg_Precip2LitrM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
+  trcn_Precip2LitrM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
 
-  trcg_Precip2LitrM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
 
   trcs_Precip2MicpM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
