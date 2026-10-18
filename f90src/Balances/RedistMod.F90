@@ -772,9 +772,7 @@ module RedistMod
   real(r8) :: SSS,PSS
   INTEGER :: idsalt
 
-  DO idsalt=idsalt_beg,idsalt_end
-    trcSalt_solml_vr(idsalt,0,NY,NX)=trcSalt_solml_vr(idsalt,0,NY,NX)+trcSalt_TransptMicP_3D(idsalt,3,0,NY,NX)
-  ENDDO
+  ! Dissolved litter salt transport is already committed by TranspSalt.
 
   PSS=patomw*(trcSalt_solml_vr(idsalt_H0PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,0,NY,NX)&
     +trcSalt_solml_vr(idsalt_FeHPO4,0,NY,NX) &
@@ -1161,13 +1159,9 @@ module RedistMod
   real(r8) :: ECNO,ECSO,ECCL
   real(r8) :: PSS,SSS,SSH,SSF,SSX,SST,SSP
 
-  DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_solml_vr(idsalt,L,NY,NX)=trcSalt_solml_vr(idsalt,L,NY,NX)+trcSalt_RGeoChem_flx_vr(idsalt,L,NY,NX) &
-      +trcSalt_Flo2MicP_vr(idsalt,L,NY,NX)+trcSalt_Irrig_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flx_vr(idsalt,L,NY,NX)
-
-    trcSalt_soHml_vr(idsalt,L,NY,NX)=trcSalt_soHml_vr(idsalt,L,NY,NX)+trcSalt_Flo2MacP_vr(idsalt,L,NY,NX) &
-      -trcSalt_Mac2MicPore_flx_vr(idsalt,L,NY,NX)
-  ENDDO
+  ! TranspSalt already commits accepted dissolved transport, pore exchange,
+  ! irrigation and reaction increments. Apply only the separate sorbed and
+  ! precipitated-pool updates here, including their dissolved counterparts.
   trcSalt_solml_vr(idsalt_AlOH2,L,NY,NX)=trcSalt_solml_vr(idsalt_AlOH2,L,NY,NX)-TRChem_AlO2H2_sorbed_soil_vr(L,NY,NX)
   trcSalt_solml_vr(idsalt_FeOH2,L,NY,NX)=trcSalt_solml_vr(idsalt_FeOH2,L,NY,NX)-TRChem_FeO2H2_sorbed_soil_vr(L,NY,NX)
 

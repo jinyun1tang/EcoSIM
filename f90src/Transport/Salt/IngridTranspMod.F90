@@ -1549,12 +1549,7 @@ module IngridTranspMod
     trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)=trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)+trcSalt_Difus_Mac2Micp_flxM(idsalt)
   ENDDO
 
-  !
-  !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
-  !
-  DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_Mac2MicPore_flx_vr(idsalt,N6,N5,N4)=trcSalt_Mac2MicPore_flx_vr(idsalt,N6,N5,N4)+trcSalt_Mac2MicPore_flxM_vr(idsalt,N6,N5,N4)
-  ENDDO
+  ! Hourly exchange is accumulated after acceptance in AccumSaltFluxesM.
 
   end subroutine SaltAdvDifuXMicMacporesM
 !----------------------------------------------------------------------

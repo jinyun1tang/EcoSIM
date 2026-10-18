@@ -122,7 +122,7 @@ module TranspSaltMod
   real(r8), intent(in):: pscal(idsalt_beg:idsaltb_end)
 
   real(r8) :: ppscal(idsalt_beg:idsaltb_end)
-  integer  :: idsalt,NY,NX
+  integer  :: idsalt,NY,NX,L
   character(len=*), parameter :: subname='AccumSaltFluxesM'
 
   call PrintInfo('beg '//subname)
@@ -147,6 +147,14 @@ module TranspSaltMod
       ENDDO
 
       call SummarizeSaltBoundaryFluxesM(NY,NX,ppscal)
+
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        IF(VLSoilPoreMicP_vr(L,NY,NX)<=ZEROS2(NY,NX))cycle
+        DO idsalt=idsalt_beg,idsaltb_end
+          trcSalt_Mac2MicPore_flx_vr(idsalt,L,NY,NX)=trcSalt_Mac2MicPore_flx_vr(idsalt,L,NY,NX) &
+            +ppscal(idsalt)*trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
+        ENDDO
+      ENDDO
 
     ENDDO
   ENDDO  
@@ -398,7 +406,7 @@ module TranspSaltMod
   real(r8), optional, intent(out):: pscal(idsalt_beg:idsaltb_end)
 
   character(len=*), parameter :: subname='UpdateSaltTranspM'
-  integer :: L,idsalt,NY,NX
+  integer :: L,idsalt,idsband,NY,NX
   real(r8) :: pscal1(idsalt_beg:idsaltb_end)
   real(r8) :: flux
   !
@@ -449,7 +457,16 @@ module TranspSaltMod
         ENDIF
       ENDDO D9685
     ENDDO D9690
-  ENDDO D9695  
+  ENDDO D9695
+  ! Snow/litter phosphate is unbanded even when routed to banded soil.
+  ! Share acceptance for each corresponding pair so both transfer endpoints
+  ! and their ledgers use the same fraction. Equal initial dpscal values then
+  ! remain equal through every accepted replay and remaining-fraction retry.
+  DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
+    idsband=idsalt-idsalt_psoil_beg+idsalt_pband_beg
+    pscal1(idsalt)=AMIN1(pscal1(idsalt),pscal1(idsband))
+    pscal1(idsband)=pscal1(idsalt)
+  ENDDO
   if(present(pscal))pscal=pscal1
   call PrintInfo('end '//subname)
   end subroutine UpdateSaltTranspM
@@ -482,8 +499,9 @@ module TranspSaltMod
 !
 !     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
 !
+      ! Include banded phosphate so retries start with no previous net flux.
       D9885: DO L=NU_col(NY,NX),NL_col(NY,NX)
-        DO idsalt=idsalt_beg,idsalt_end      
+        DO idsalt=idsalt_beg,idsaltb_end
           trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)=0.0_r8
           trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)=0.0_r8
         enddo
