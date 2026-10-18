@@ -3,6 +3,7 @@ module TranspSaltMod
 ! Description:
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use abortutils,      only: endrun,iulog
   use EcosimConst,      only: catomw, patomw
   use minimathmod  
   use DebugToolMod
@@ -51,14 +52,18 @@ module TranspSaltMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NX,NY,L,M,ids
+  integer, parameter :: max_salt_iterations=100
+  integer :: iteration,stalled_iterations(idsalt_beg:idsaltb_end)
+  character(len=*), parameter :: subname='TranspSalt'
   real(r8)  :: dpscal(idsalt_beg:idsaltb_end)
   real(r8)  :: pscal(idsalt_beg:idsaltb_end)
-  real(r8) :: dpscal_max
+  real(r8) :: dpscal_max,remaining
 
 !     execution begins here
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !
+  call PrintInfo('beg '//subname)
   call InitSaltTransportModel(I,NHW,NHE,NVN,NVS)
 !
 !     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
@@ -68,8 +73,15 @@ module TranspSaltMod
    !
     pscal=1._r8;dpscal=1._r8
     dpscal_max=1._r8
+    iteration=0
+    stalled_iterations=0
 
     do while(dpscal_max>1.e-2_r8)
+      iteration=iteration+1
+      if(iteration>max_salt_iterations)then
+        write(iulog,*)subname,': retry limit at I,J,M,remaining=',I,J,M,dpscal_max
+        call endrun(trim(mod_filename)//' at line',__LINE__)
+      endif
       call ZeroFluxArraysM(NHW,NHE,NVN,NVS)
 
       call GetSaltTranspFlxM(I,M,NHW,NHE,NVN,NVS)
@@ -82,13 +94,23 @@ module TranspSaltMod
 
       dpscal_max=0._r8
       DO ids=idsalt_beg,idsaltb_end
-        dpscal(ids)=dpscal(ids)*(1._r8-pscal(ids))
+        remaining=dpscal(ids)*(1._r8-pscal(ids))
+        if(dpscal(ids)>1.e-2_r8.and.remaining>=dpscal(ids))then
+          stalled_iterations(ids)=stalled_iterations(ids)+1
+        else
+          stalled_iterations(ids)=0
+        endif
+        if(stalled_iterations(ids)>=3)then
+          write(iulog,*)subname,': no accepted flux at I,J,M,tracer,remaining=',I,J,M,ids,remaining
+          call endrun(trim(mod_filename)//' at line',__LINE__)
+        endif
+        dpscal(ids)=remaining
         dpscal_max=AMAX1(dpscal_max,dpscal(ids))
       enddo
 
     enddo
   ENDDO D30
-  RETURN
+  call PrintInfo('end '//subname)
 
   END subroutine TranspSalt
 !------------------------------------------------------------------------------------------
@@ -99,19 +121,15 @@ module TranspSaltMod
   real(r8), intent(in) :: dpscal(idsalt_beg:idsaltb_end)
   real(r8), intent(in):: pscal(idsalt_beg:idsaltb_end)
 
-  real(r8) :: pscal_max
   real(r8) :: ppscal(idsalt_beg:idsaltb_end)
-  integer  :: idsalt,NY,NX,ids
+  integer  :: idsalt,NY,NX
+  character(len=*), parameter :: subname='AccumSaltFluxesM'
 
-  pscal_max=0._r8
-  DO ids=idsalt_beg,idsaltb_end
-    ppscal(ids) = dpscal(ids)*pscal(ids)
-    pscal_max=AMAX1(pscal(ids),pscal_max)
-  ENDDO
-
-  if(pscal_max<0.999_r8)then
-    call UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,ppscal)
-  endif
+  call PrintInfo('beg '//subname)
+  ppscal=dpscal*pscal
+  ! Replay every pool from the immutable staged baseline with the same
+  ! accepted fraction used by the ledgers, even if only one tracer is limited.
+  call UpdateSaltTranspM(M,NHW,NHE,NVN,NVS,ppscal)
 
   DO NX=NHW,NHE
     DO NY=NVN,NVS     
@@ -134,6 +152,7 @@ module TranspSaltMod
   ENDDO  
 
   
+  call PrintInfo('end '//subname)
   end subroutine AccumSaltFluxesM
 !------------------------------------------------------------------------------------------
 
@@ -387,28 +406,31 @@ module TranspSaltMod
   !
   call PrintInfo('beg '//subname)
 
-  pscal1=1.001_r8
+  ! *2 arrays are the immutable baseline; primary arrays hold trial results.
+  ! Accumulate a common per-tracer donor limit across all pools and cells.
+  ! The local array also makes replay without optional pscal safe.
+  pscal1=1._r8
   D9695: DO NX=NHW,NHE
     D9690: DO NY=NVN,NVS
       !snow
       DO idsalt=idsalt_beg,idsalt_end
         flux=trcSalt_SnowDrift_flxM_col(idsalt,NY,NX)+trcSalt_Aqua_flxM_snvr(idsalt,1,NY,NX)
         flux=flux*dpscal(idsalt)
-        call get_flux_scalar(trcSalt_ml2_snvr(idsalt,1,NY,NX),flux,trcSalt_ml_snvr(idsalt,1,NY,NX),pscal(idsalt))
+        call get_flux_scalar(trcSalt_ml2_snvr(idsalt,1,NY,NX),flux,trcSalt_ml_snvr(idsalt,1,NY,NX),pscal1(idsalt))
       ENDDO
 
       D9670: DO L=2,JS
         DO idsalt=idsalt_beg,idsalt_end
           flux=trcSalt_Aqua_flxM_snvr(idsalt,L,NY,NX)
           flux=flux*dpscal(idsalt)
-          call get_flux_scalar(trcSalt_ml2_snvr(idsalt,L,NY,NX),flux,trcSalt_ml_snvr(idsalt,L,NY,NX),pscal(idsalt))
+          call get_flux_scalar(trcSalt_ml2_snvr(idsalt,L,NY,NX),flux,trcSalt_ml_snvr(idsalt,L,NY,NX),pscal1(idsalt))
         ENDDO
       ENDDO D9670
       !litter
       DO idsalt=idsalt_beg,idsalt_end        
         flux=trcSalt_FloXSurRof_flxM_col(idsalt,NY,NX)+trcSalt_MicpTranspFlxM_3D(idsalt,3,0,NY,NX)
         flux=flux*dpscal(idsalt)
-        call get_flux_scalar(trcSalt_solml2_vr(idsalt,0,NY,NX),flux,trcSalt_solml_vr(idsalt,0,NY,NX),pscal(idsalt))
+        call get_flux_scalar(trcSalt_solml2_vr(idsalt,0,NY,NX),flux,trcSalt_solml_vr(idsalt,0,NY,NX),pscal1(idsalt))
       ENDDO
 
       D9685: DO L=NU_col(NY,NX),NL_col(NY,NX)
@@ -417,11 +439,11 @@ module TranspSaltMod
             flux=trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX)+trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX) &
               +trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)-trcSalt_RGeoChem_flxM_vr(idsalt,L,NY,NX)
             flux=flux*dpscal(idsalt)
-            call get_flux_scalar(trcSalt_solml2_vr(idsalt,L,NY,NX),flux,trcSalt_solml2_vr(idsalt,L,NY,NX),pscal(idsalt))
+            call get_flux_scalar(trcSalt_solml2_vr(idsalt,L,NY,NX),flux,trcSalt_solml_vr(idsalt,L,NY,NX),pscal1(idsalt))
 
             flux=trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)-trcSalt_Mac2MicPore_flxM_vr(idsalt,L,NY,NX)
             flux=flux*dpscal(idsalt)
-            call get_flux_scalar(trcSalt_soHml2_vr(idsalt,L,NY,NX),flux,trcSalt_soHml_vr(idsalt,L,NY,NX),pscal(idsalt))
+            call get_flux_scalar(trcSalt_soHml2_vr(idsalt,L,NY,NX),flux,trcSalt_soHml_vr(idsalt,L,NY,NX),pscal1(idsalt))
             
           ENDDO
         ENDIF

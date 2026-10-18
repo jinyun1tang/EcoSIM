@@ -3,6 +3,7 @@ module SoilFaceMappingMod
   ! The owner is the west/north cell; a negative flux reverses the actual donor.
   ! Vertical and external boundary faces retain their original layer indices.
   use GridConsts, only: JZ,JY,JX
+  use ElmIDMod, only: iWestEastDirection,iNorthSouthDirection,iVerticalDirection
   use GridDataType, only: NL_col,FlowDirIndicator_col
   use SoilPropertyDataType, only: VLSoilPoreMicP_vr
   use EcoSIMCtrlDataType, only: ZEROS2
