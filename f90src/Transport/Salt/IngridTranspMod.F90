@@ -1508,7 +1508,7 @@ module IngridTranspMod
     ENDDO
 
     DO idsalt=idsalt_pband_beg,idsalt_pband_end
-      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4,N6,N5,N4)
+      trcSalt_Adv2MicP_flx(idsalt)=VFLW*AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4))*trcs_VLN_vr(ids_H1PO4B,N6,N5,N4)
     ENDDO
     !
     !     NO MACROPORE TO MICROPORE TRANSFER
