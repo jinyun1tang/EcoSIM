@@ -41,6 +41,7 @@ module TillageMixMod
   integer :: K,N,M,L,LL,NGL,NTS
   real(r8) :: TDOMH(idom_beg:idom_end,0:micpar%NumOfLitrCmplxs)
   real(r8) :: FracTillCorp,CORP0,XCORP0,DCORPZ
+  real(r8) :: FracMacPoreMixed,TransferredDOM
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
   real(r8) :: TZNFNG,TZNFN2
   real(r8) :: TNFNIH,TZNFNI
@@ -145,6 +146,9 @@ module TillageMixMod
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_NH4:idx_NH4,0:JZ,NY,NX),XCORP0)
 
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_AEC+1:idx_anion_soil_end,0:JZ,NY,NX),XCORP0)
+
+  ! Band-bound anions have no surface-litter pool.
+  CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcx_solml_vr(idx_anion_soil_end+1:idx_end,1:JZ,NY,NX))
 
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL, trcg_gasml_vr(idg_beg:idg_NH3,1:JZ,NY,NX))
 
@@ -309,23 +313,15 @@ module TillageMixMod
       
 !     SoilFracAsMacP_vr(L,NY,NX)=XTillCorp_col(NY,NX)*SoilFracAsMacP_vr(L,NY,NX)
 
-      if(salt_model)then
-        DO NTSA=idsalt_beg,idsalt_end
-          trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+FracTillCorp*trcSalt_soHml_vr(NTSA,L,NY,NX)
-        ENDDO
-      endif
-
-      ! solute
-      DO NTS=ids_beg,ids_end
-        trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+FracTillCorp*trcs_soHml_vr(NTS,L,NY,NX)
-      ENDDO
-
-      call MixSoluteMacpore(L,NY,NX)
+      ! Only the tilled, mixed portion of this layer changes pore domains.
+      FracMacPoreMixed=TI1*FracTillCorp
+      call MixSoluteMacpore(L,NY,NX,FracMacPoreMixed)
 
       DO  K=1,jcplx
         DO idom=idom_beg,idom_end
-          DOM_MicP_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)+FracTillCorp*DOM_MacP_vr(idom,K,L,NY,NX)              
-          DOM_MacP_vr(idom,K,L,NY,NX)=XTillCorp_col(NY,NX)*DOM_MacP_vr(idom,K,L,NY,NX)
+          TransferredDOM=FracMacPoreMixed*DOM_MacP_vr(idom,K,L,NY,NX)
+          DOM_MicP_vr(idom,K,L,NY,NX)=DOM_MicP_vr(idom,K,L,NY,NX)+TransferredDOM
+          DOM_MacP_vr(idom,K,L,NY,NX)=DOM_MacP_vr(idom,K,L,NY,NX)-TransferredDOM
         ENDDO  
       ENDDO
 !
@@ -370,21 +366,26 @@ module TillageMixMod
 
 !--------------------------------------------------------------------------------
 
-  subroutine MixSoluteMacpore(L,NY,NX)
+  subroutine MixSoluteMacpore(L,NY,NX,FracMacPoreMixed)
   !
-  !mix solutes in macropores
-  !assuming macropores do not change
+  ! Transfer macropore solutes to micropores in the tilled, mixed fraction.
   implicit none
   integer, intent(in) :: L,NY,NX
+  real(r8), intent(in) :: FracMacPoreMixed !fraction of the whole layer affected [-]
+  real(r8) :: TransferredSolute
   integer :: NTS,NTSA
 
   DO NTS=ids_beg,ids_end
-    trcs_soHml_vr(NTS,L,NY,NX)=XTillCorp_col(NY,NX)*trcs_soHml_vr(NTS,L,NY,NX)
+    TransferredSolute=FracMacPoreMixed*trcs_soHml_vr(NTS,L,NY,NX)
+    trcs_solml_vr(NTS,L,NY,NX)=trcs_solml_vr(NTS,L,NY,NX)+TransferredSolute
+    trcs_soHml_vr(NTS,L,NY,NX)=trcs_soHml_vr(NTS,L,NY,NX)-TransferredSolute
   ENDDO
 
   if(salt_model)then
     DO NTSA=idsalt_beg,idsalt_end
-      trcSalt_soHml_vr(ntsa,L,NY,NX)=XTillCorp_col(NY,NX)*trcSalt_soHml_vr(ntsa,L,NY,NX)
+      TransferredSolute=FracMacPoreMixed*trcSalt_soHml_vr(NTSA,L,NY,NX)
+      trcSalt_solml_vr(NTSA,L,NY,NX)=trcSalt_solml_vr(NTSA,L,NY,NX)+TransferredSolute
+      trcSalt_soHml_vr(NTSA,L,NY,NX)=trcSalt_soHml_vr(NTSA,L,NY,NX)-TransferredSolute
     ENDDO
   endif
   end subroutine MixSoluteMacpore
