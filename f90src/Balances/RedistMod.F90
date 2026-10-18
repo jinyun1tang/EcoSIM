@@ -752,7 +752,8 @@ module RedistMod
   POX = patomw*(trcx_solml_vr(idx_HPO4,0,NY,NX)+trcx_solml_vr(idx_H2PO4,0,NY,NX))
   POP = patomw*(trcp_saltpml_vr(idsp_AlPO4,0,NY,NX)+trcp_saltpml_vr(idsp_FePO4,0,NY,NX) &
     +trcp_saltpml_vr(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_saltpml_vr(idsp_CaH4P2O8,0,NY,NX) &
-    +3._r8*patomw*trcp_saltpml_vr(idsp_Apatite,0,NY,NX)
+    +3._r8*patomw*trcp_saltpml_vr(idsp_Apatite,0,NY,NX) &
+    +patomw*FertP_mole_soil_vr(0,NY,NX)
   TDisolPi_lnd      = TDisolPi_lnd+POS+POX+POP
   tHxPO4_col(NY,NX) = tHxPO4_col(NY,NX)+POX
   tXPO4_col(NY,NX)  = tXPO4_col(NY,NX)+POP

@@ -114,6 +114,10 @@ module TillageMixMod
 
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertN_mole_Band_vr(ifertnb_beg:ifertnb_end,1:JZ,NY,NX))
 
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertP_mole_soil_vr(0:JZ,NY,NX),XCORP0)
+
+  call MixExtensive1D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,FertP_mole_band_vr(1:JZ,NY,NX))
+
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_beg:idg_NH3,0:JZ,NY,NX),XCORP0)
 
   CALL MixExtensive2D(XTillCorp_col(NY,NX),TI,FI,NU_col(NY,NX),LL,trcs_solml_vr(ids_nut_beg:ids_nuts_end,0:JZ,NY,NX),XCORP0)

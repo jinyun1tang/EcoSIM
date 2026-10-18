@@ -5012,6 +5012,7 @@ implicit none
   integer :: ndoms, feedback_varid
   type(var_desc_t) :: feedback_vardesc
   logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
+  logical :: has_fertP_soil,has_fertP_band
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -9358,6 +9359,44 @@ implicit none
       dim3name='levsoi',long_name='fertilizer application', units='g d-2', interpinic_flag='skip',&
       data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
+
+  ! Legacy restart files have no fertilizer-P fields; missing pools start at zero.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'FertP_mole_soil_vr',feedback_varid,feedback_vardesc,readvar=has_fertP_soil)
+    FertP_mole_soil_vr=0._r8
+    if(has_fertP_soil)then
+      datpr2 => datrc_2d(1:ncols,1:JZ+1)
+      call restartvar(ncid, flag, varname='FertP_mole_soil_vr', dim1name='column',dim2name='levsoi1',&
+        long_name='Broadcast fertilizer P including surface litter', units='mol P d-2', interpinic_flag='skip',&
+        data=datpr2, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_soil_vr,datrc_2d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_soil_vr,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)
+    call restartvar(ncid, flag, varname='FertP_mole_soil_vr', dim1name='column',dim2name='levsoi1',&
+      long_name='Broadcast fertilizer P including surface litter', units='mol P d-2', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)
+  endif
+
+  ! Legacy restart files have no fertilizer-P fields; missing pools start at zero.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'FertP_mole_band_vr',feedback_varid,feedback_vardesc,readvar=has_fertP_band)
+    FertP_mole_band_vr=0._r8
+    if(has_fertP_band)then
+      datpr2 => datrc_2d(1:ncols,1:JZ)
+      call restartvar(ncid, flag, varname='FertP_mole_band_vr', dim1name='column',dim2name='levsoi',&
+        long_name='Banded fertilizer P in soil', units='mol P d-2', interpinic_flag='skip',&
+        data=datpr2, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_band_vr,datrc_2d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_band_vr,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:JZ)
+    call restartvar(ncid, flag, varname='FertP_mole_band_vr', dim1name='column',dim2name='levsoi',&
+      long_name='Banded fertilizer P in soil', units='mol P d-2', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)
+  endif
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    
