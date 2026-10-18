@@ -146,6 +146,7 @@ module RedistMod
       call SnowpackLayering(I,J,NY,NX)
 
       call UpdateSoilGrids(I,J,NY,NX,DORGC,DVLiceMicP_vr(:,NY,NX))
+      if(iResetSoilProf_col(NY,NX).NE.ifalse)call RefreshOrganicMatterSummaries(NY,NX)
 
       call UpdateOutputVars(I,J,NY,NX,Txchem_CO2_col)
 
@@ -262,6 +263,7 @@ module RedistMod
   !     TILLAGE FILE
 
   call ApplyTillageMixing(I,J,NY,NX)
+  if(iResetSoilProf_col(NY,NX).NE.ifalse)call RefreshOrganicMatterSummaries(NY,NX)
 
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
@@ -1316,6 +1318,47 @@ module RedistMod
   ENDDO
   TSEDSO=TSEDSO+(litrOM_vr(ielmc,L,NY,NX)+HumOM(ielmc))*ppmc
   end subroutine SumOMStates
+
+!------------------------------------------------------------------------------------------
+
+  subroutine RefreshOrganicMatterSummaries(NY,NX)
+  ! Rebuild derived states after relayering/tillage without replaying process
+  ! fluxes or changing heat storage. Replace this column's landscape contribution.
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+  real(r8) :: OldLitter(NumPlantChemElms),OldHumus(NumPlantChemElms)
+  real(r8) :: Microbes(NumPlantChemElms),Humus(NumPlantChemElms)
+
+  OldLitter=tLitrOM_col(:,NY,NX)
+  OldHumus=tHumOM_col(:,NY,NX)
+  tSoilOrgM_col(:,NY,NX)=0._r8
+  tLitrOM_col(:,NY,NX)=0._r8
+  tHumOM_col(:,NY,NX)=0._r8
+  tMicBiome_col(:,NY,NX)=0._r8
+  SoilOrgM_vr(:,:,NY,NX)=0._r8
+  litrOM_vr(:,:,NY,NX)=0._r8
+  OMLitrC_vr(:,NY,NX)=0._r8
+
+  do L=0,NL_col(NY,NX)
+    if(L>0 .and. L<NU_col(NY,NX))cycle
+    call sumORGMLayL(L,NY,NX,SoilOrgM_vr(:,L,NY,NX), &
+      info='RefreshOrganicMatterSummaries',clip_small_pools=.false.)
+    call sumLitrOMLayL(L,NY,NX,litrOM_vr(:,L,NY,NX))
+    OMLitrC_vr(L,NY,NX)=litrOM_vr(ielmc,L,NY,NX)
+    call sumMicBiomLayL(L,NY,NX,Microbes)
+    tSoilOrgM_col(:,NY,NX)=tSoilOrgM_col(:,NY,NX)+SoilOrgM_vr(:,L,NY,NX)
+    tLitrOM_col(:,NY,NX)=tLitrOM_col(:,NY,NX)+litrOM_vr(:,L,NY,NX)
+    tMicBiome_col(:,NY,NX)=tMicBiome_col(:,NY,NX)+Microbes
+    if(L>0)then
+      call sumHumOMLayL(L,NY,NX,Humus)
+      tHumOM_col(:,NY,NX)=tHumOM_col(:,NY,NX)+Humus
+    endif
+  enddo
+  call sumSurfOMCK(NY,NX,SurfLitterC_col(:,NY,NX),RC0ff_col(NY,NX))
+  LitRMStoreLndscap=LitRMStoreLndscap+(tLitrOM_col(:,NY,NX)-OldLitter)
+  POMHumStoreLndscap=POMHumStoreLndscap+(tHumOM_col(:,NY,NX)-OldHumus)
+  end subroutine RefreshOrganicMatterSummaries
 
 !------------------------------------------------------------------------------------------
 

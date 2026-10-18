@@ -41,7 +41,7 @@ module MicrobialDiagMod
 
   contains
 !------------------------------------------------------------------------------------------
-  subroutine sumORGMLayL(L,NY,NX,ORGM,conly,info)
+  subroutine sumORGMLayL(L,NY,NX,ORGM,conly,info,clip_small_pools)
   !
   !sum up organic matter in layer L
   !including live microbial biomass, microbial residue, sorbed dom+acetate, and solid SOM
@@ -52,6 +52,8 @@ module MicrobialDiagMod
   logical, optional, intent(in) :: conly
   character(len=*), optional, intent(in) :: info
   integer :: K,N,NGL,M,MID,NE,jcplx1,nelms,idom
+  logical, optional, intent(in) :: clip_small_pools !default preserves the existing tiny-pool cleanup
+  logical :: do_clip_small_pools
   logical :: conly_loc
   real(r8) :: orgm0(1:NumPlantChemElms)
 
@@ -60,6 +62,9 @@ module MicrobialDiagMod
   else
     conly_loc=.false.
   endif
+
+  do_clip_small_pools=.true.
+  if(present(clip_small_pools))do_clip_small_pools=clip_small_pools
 
   ORGM=0._r8
   !sumup heterotrophic microbes
@@ -113,11 +118,14 @@ module MicrobialDiagMod
     ENDDO
 
     !add dom
-    DO idom=idom_beg,idom_end
-      if(abs(DOM_MicP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MicP_vr(idom,K,L,NY,NX)=0._r8    
-      if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
-      if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
-    ENDDO  
+    if(do_clip_small_pools)then
+      DO idom=idom_beg,idom_end
+        if(abs(DOM_MicP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MicP_vr(idom,K,L,NY,NX)=0._r8
+        if(abs(SorbedOM_vr(idom,K,L,NY,NX))<1.e-12_r8)SorbedOM_vr(idom,K,L,NY,NX)=0._r8
+        if(abs(DOM_MacP_vr(idom,K,L,NY,NX))<1.e-12_r8)DOM_MacP_vr(idom,K,L,NY,NX)=0._r8
+      ENDDO
+    endif
+
 
     DO NE=1,nelms      
       ORGM(NE)=ORGM(NE)+DOM_MicP_vr(NE,K,L,NY,NX)+DOM_MacP_vr(NE,K,L,NY,NX)+SorbedOM_vr(NE,K,L,NY,NX)
@@ -231,8 +239,8 @@ module MicrobialDiagMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
-      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(idom,K,L,NY,NX)
+      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(idom,K,L,NY,NX)
     ENDDO
 
     !add dom
@@ -306,8 +314,8 @@ module MicrobialDiagMod
 
     !add dom
     DO idom=idom_beg,idom_end
-      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(NE,K,L,NY,NX)
-      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(NE,K,L,NY,NX)
+      DOM_micp(idom) = DOM_micp(idom) + DOM_MicP_vr(idom,K,L,NY,NX)
+      DOM_macp(idom) = DOM_macp(idom) + DOM_MacP_vr(idom,K,L,NY,NX)
     ENDDO
     DO NE=1,NumPlantChemElms
       ORGM(NE)=ORGM(NE)+SorbedOM_vr(NE,K,L,NY,NX)
