@@ -67,6 +67,8 @@ take precedence over repository guidance.
   at entry and `call PrintInfo('end '//subname)` at normal exit. Separate
   procedures with the following comment line:
   `!------------------------------------------------------------------------------------------`
+- When a diagnostic `write` statement is needed before calling `endrun`, write
+  to `iulog` rather than the default output unit `*` (use `write(iulog,*)`).
 - In Fortran executable statements, use aliases declared in an `associate` block
   instead of direct derived-type component references such as
   `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
