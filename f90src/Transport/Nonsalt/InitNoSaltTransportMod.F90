@@ -102,8 +102,8 @@ module InitNoSaltTransportMod
     DO  NY=NVN,NVS
 
         IF(nsnol_col(NY,NX) > 0 .and. (SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snowfall
-          (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. &   !rainfall and significant snowpack
-          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)))THEN !rainfall with snowpack
+          ((RainFalPrec_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) .AND. &
+          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)))THEN !rain/irrigation with snowpack
 
           call TracerFall2Snowpack(I,J,NY,NX)
 

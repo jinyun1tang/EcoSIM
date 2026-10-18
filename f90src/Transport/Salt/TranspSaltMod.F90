@@ -362,7 +362,8 @@ module TranspSaltMod
       !
       call ZeroAtmosSoluteFlux(NY,NX)      
 
-      IF(SnoFalPrec_col(NY,NX).GT.0.0.OR.(RainFalPrec_col(NY,NX).GT.0.0 &
+      IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. ((RainFalPrec_col(NY,NX).GT.0.0_r8 &
+        .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
         .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
 
         ! there is snowpack

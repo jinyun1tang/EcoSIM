@@ -1517,7 +1517,8 @@ contains
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
   !there is precipitation, there is significant snow layer
-  IF(SnowPrecThrufall_col(NY,NX).GT.0.0_r8 .OR. (RainFalPrec_col(NY,NX).GT.0.0_r8 &
+  IF(SnowPrecThrufall_col(NY,NX).GT.0.0_r8 .OR. ((RainFalPrec_col(NY,NX).GT.0.0_r8 &
+    .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
     .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
     Rain2LitRSurf_col(NY,NX)  = 0.0_r8
     Irrig2LitRSurf_col(NY,NX) = 0.0_r8
