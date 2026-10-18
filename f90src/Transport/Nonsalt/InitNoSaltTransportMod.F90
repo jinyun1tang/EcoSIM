@@ -101,29 +101,13 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-        IF(nsnol_col(NY,NX) > 0 .and. (SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snowfall
-          ((RainFalPrec_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) .AND. &
-          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)))THEN !rain/irrigation with snowpack
-
-          call TracerFall2Snowpack(I,J,NY,NX)
-
-          !
-          !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
-          !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
-          !     ENTERED IN WEATHER AND IRRIGATION FILES
-          !
-        ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) & !Irrigation or rainfall
-          .AND. (nsnol_col(NY,NX)==0 .or. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX)))THEN     !no snowpack
-          !
-          !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
-          !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
-          !
-          call TracerFall2Grnd(I,J,NY,NX)
-
-          !
-          !     NO SOLUTE FLUXES FROM ATMOSPHERE
-          !
-        ENDIF
+      ! Ground formation clears top-snow inputs first; snow formation then
+      ! adds its independent recipient share when snow layers are present.
+      call TracerFall2Grnd(I,J,NY,NX)
+      if(nsnol_col(NY,NX)>0)call TracerFall2Snowpack(I,J,NY,NX)
+      NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+(Rain2SnowSurf_col(NY,NX) &
+        +Rain2LitRSurf_col(NY,NX)+Rain2SoilSurf_col(NY,NX)) &
+        *(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
@@ -525,19 +509,18 @@ module InitNoSaltTransportMod
   integer :: idg
 
   DO idg=idg_beg,idg_NH3
-    trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)*dts_HeatWatTP
+    trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=(Rain2SnowSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+      +Irrig2SnowSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)*dts_HeatWatTP
   ENDDO
-  NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+Rain2SoilSurf_col(NY,NX)*(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
 
-  trcn_AquaAdv_flxM_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_NO3,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_H1PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_NH4,1,NY,NX)   = (Rain2SnowSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_NO3,1,NY,NX)   = (Rain2SnowSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_H1PO4,1,NY,NX) = (Rain2SnowSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_H2PO4,1,NY,NX) = (Rain2SnowSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
 
   !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
   !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT

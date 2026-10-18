@@ -362,29 +362,10 @@ module TranspSaltMod
       !
       call ZeroAtmosSoluteFlux(NY,NX)      
 
-      IF(SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR. ((RainFalPrec_col(NY,NX).GT.0.0_r8 &
-        .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
-        .AND.VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
-
-        ! there is snowpack
-        call SaltFall2Snowpack(I,NY,NX)
-        !
-        !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
-        !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
-        !     ENTERED IN WEATHER AND IRRIGATION FILES
-        !
-      ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) & !there is significant precipiation
-        .AND. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN     !there is no significant snowpack
-        
-        call AtmosSoluteFluxToTopsoil(I,NY,NX)
-        !
-        !     NO SOLUTE FLUXES FROM ATMOSPHERE
-        !
-      ENDIF
-      !
-      !     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
-      !     ENTERED IN SITE FILE
-      !
+      ! Partial snow cover receives snow and exposed-ground deposition together.
+      call AtmosSoluteFluxToTopsoil(I,NY,NX)
+      call SaltFall2Snowpack(I,NY,NX)
+      ! Stage soil sources independently of surface precipitation.
       call GetSubHourFlux(I,NY,NX)
 
     ENDDO D9990

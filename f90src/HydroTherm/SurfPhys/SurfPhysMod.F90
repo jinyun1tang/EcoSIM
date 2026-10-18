@@ -1446,7 +1446,7 @@ contains
   real(r8) :: SnoFall,PrecHeat2Sno
   real(r8) :: RainThrufall2SoiMicP,RainThrufall2SoiMacP,Rain2Snow
   real(r8) :: RainThrufall2LitR,RainThrufall2Soil,RainHeat2LitR,RainHeat2Soil
-  real(r8) :: Rain2ExposedSurf
+  real(r8) :: Rain2ExposedSurf,RainFrac,IrrigFrac
   real(r8), parameter :: m2mm=1.e3_r8
 
   call PrintInfo('beg '//subname)
@@ -1508,38 +1508,25 @@ contains
   Rain2ExposedSurf_col(NY,NX) = Rain2ExposedSurf
   PrecHeat_col(NY,NX)         = PrecHeat_col(NY,NX)+(PrecHeat2Sno+RainHeat2Soil)*dts_HeatWatTP
 !
-!     PRECIP ON SNOW ARRAYS EXPORTED TO TranspNoSalt.F, TranspSalt.F
-!     FOR SOLUTE FLUX CALCULATIONS
+!     RECIPIENT WATER RATES EXPORTED TO SALT AND NON-SALT DEPOSITION
 !
-!     SnoFalPrec,RainFalPrec_col,PrecAtm_col,PRECI=snow,rain,snow+rain,irrigation
-!     VHCPW,VLHeatCapSnowMin_col=current, minimum snowpack heat capacities
-!     Rain2LitRSurf_col,Irrig2LitRSurf_col=water flux to surface litter from rain,irrigation
-!     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
+!     Rain2SnowSurf_col includes snowfall water equivalent and liquid rain.
+!     Snow/litter/soil exports are rates; deposition applies dts_HeatWatTP once.
 !
-  !there is precipitation, there is significant snow layer
-  IF(SnowPrecThrufall_col(NY,NX).GT.0.0_r8 .OR. ((RainFalPrec_col(NY,NX).GT.0.0_r8 &
-    .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND. VLHeatCapSnow_snvr(1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)))THEN
-    Rain2LitRSurf_col(NY,NX)  = 0.0_r8
-    Irrig2LitRSurf_col(NY,NX) = 0.0_r8
-    Rain2SoilSurf_col(NY,NX)  = PrecAtm_col(NY,NX)
-    Irrig2SoilSurf_col(NY,NX) = IrrigSurface_col(NY,NX)
-
-  !there is insignificant snow layer and precipiation
-  ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) &
-    .AND. VLHeatCapSnow_snvr(1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX))THEN
-    Rain2LitRSurf_col(NY,NX)  = RainThrufall2LitR*PrecAtm_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
-    Irrig2LitRSurf_col(NY,NX) = RainThrufall2LitR*IrrigSurface_col(NY,NX)/(PrecAtm_col(NY,NX)+IrrigSurface_col(NY,NX))
-    Rain2SoilSurf_col(NY,NX)  = PrecAtm_col(NY,NX)-Rain2LitRSurf_col(NY,NX)
-    Irrig2SoilSurf_col(NY,NX) = IrrigSurface_col(NY,NX)-Irrig2LitRSurf_col(NY,NX)
-  !no precipiation
-  ELSE
-    !no precipitation
-    Rain2LitRSurf_col(NY,NX)  = 0.0_r8
-    Irrig2LitRSurf_col(NY,NX) = 0.0_r8
-    Rain2SoilSurf_col(NY,NX)  = 0.0_r8
-    Irrig2SoilSurf_col(NY,NX) = 0.0_r8
+  ! Export the same recipient split used by the water calculation. Liquid
+  ! throughfall carries the rain/irrigation mixture; snowfall goes to snow.
+  RainFrac=0._r8
+  IrrigFrac=0._r8
+  IF(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)>0._r8)THEN
+    RainFrac=RainFalPrec_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
+    IrrigFrac=IrrigSurface_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
   ENDIF
+  Rain2SnowSurf_col(NY,NX)=SnoFall+Rain2Snow*RainFrac
+  Irrig2SnowSurf_col(NY,NX)=Rain2Snow*IrrigFrac
+  Rain2LitRSurf_col(NY,NX)=RainThrufall2LitR*RainFrac
+  Irrig2LitRSurf_col(NY,NX)=RainThrufall2LitR*IrrigFrac
+  Rain2SoilSurf_col(NY,NX)=RainThrufall2Soil*RainFrac
+  Irrig2SoilSurf_col(NY,NX)=RainThrufall2Soil*IrrigFrac
   !
   !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS
   !     AMONG ATMOSPHERE, SNOWPACK, RESIDUE AND SOIL SURFACES

@@ -23,6 +23,8 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  CondGasXSnowM_col(:,:,:)               !area upscaled soil surface boundary layer conductance, [m d-2]
   real(r8),target,allocatable ::  Rain2SoilSurf_col(:,:)                 !precipitation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  Irrig2SoilSurf_col(:,:)                !irrifation flux into soil surface , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Rain2SnowSurf_col(:,:)                 !rain plus snowfall water equivalent to snow [m3 d-2 h-1]
+  real(r8),target,allocatable ::  Irrig2SnowSurf_col(:,:)                !surface irrigation to snow [m3 d-2 h-1]
   real(r8),target,allocatable ::  LakeSurfFlowMicP_col(:,:)              !lake surface water flux,[m3 d-2 h-1]
   real(r8),target,allocatable ::  LakeSurfFlowMicPX_col(:,:)             !lake surface water flux,[m3 d-2 h-1]
   real(r8),target,allocatable ::  LakeSurfFlowMacP_col(:,:)              !lake surface water flux,[m3 d-2 h-1]
@@ -49,6 +51,8 @@ contains
   allocate(CondGasXSnowM_col(60,JY,JX));     CondGasXSnowM_col                                   = 0._r8
   allocate(Rain2SoilSurf_col(JY,JX));       Rain2SoilSurf_col          = 0._r8
   allocate(Irrig2SoilSurf_col(JY,JX));       Irrig2SoilSurf_col                = 0._r8
+  allocate(Rain2SnowSurf_col(JY,JX));        Rain2SnowSurf_col=0._r8
+  allocate(Irrig2SnowSurf_col(JY,JX));       Irrig2SnowSurf_col=0._r8
   allocate(LakeSurfFlowMicP_col(JY,JX));       LakeSurfFlowMicP_col    = 0._r8
   allocate(LakeSurfFlowMicPX_col(JY,JX));      LakeSurfFlowMicPX_col           = 0._r8
   allocate(LakeSurfFlowMacP_col(JY,JX));      LakeSurfFlowMacP_col     = 0._r8
@@ -75,6 +79,8 @@ contains
   call destroy(CondGasXSnowM_col)
   call destroy(Rain2SoilSurf_col)
   call destroy(Irrig2SoilSurf_col)
+  call destroy(Rain2SnowSurf_col)
+  call destroy(Irrig2SnowSurf_col)
   call destroy(LakeSurfFlowMicP_col)
   call destroy(LakeSurfFlowMicPX_col)
   call destroy(LakeSurfFlowMacP_col)

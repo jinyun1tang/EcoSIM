@@ -1648,8 +1648,8 @@ module IngridTranspMod
 
   if(salt_model)then
     DO idsalt=idsalt_beg,idsalt_end
-      trcSalt_AquaAdv_flxM_snvr(idsalt,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
-        +Irrig2SoilSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*dts_HeatWatTP
+      trcSalt_AquaAdv_flxM_snvr(idsalt,1,NY,NX) = (Rain2SnowSurf_col(NY,NX)*trcsalt_rain_mole_conc_col(idsalt,NY,NX) &
+        +Irrig2SnowSurf_col(NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX))*dts_HeatWatTP
     ENDDO
   endif
 
