@@ -697,10 +697,10 @@ module IngridTranspMod
     trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,NU_col(NY,NX),NY,NX)*TORTL+DISPN)*AREA_3D(3,NU_col(NY,NX),NY,NX)
 
     DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,NU_col(NY,NX),NY,NX)*TORTL+DISPN)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
+    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CaCO3,idsalt_CaHCO3,idsalt_CaSO4/))=DIFCA
 
     DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,NU_col(NY,NX),NY,NX)*TORTL+DISPN)*AREA_3D(3,NU_col(NY,NX),NY,NX)
-    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
+    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_MgSO4/))=DIFMG
 
     DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,NU_col(NY,NX),NY,NX)*TORTL+DISPN)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
@@ -1190,14 +1190,14 @@ module IngridTranspMod
 
     IF(VLWPA2.GT.ZEROS(N5,N4))THEN
       DO idsalt=idsalt_psoil_beg,idsalt_psoil_end
-        trcSalt_conc_dest(idsalt)=AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
+        trcSalt_conc_dest(idsalt)=AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4)/VLWPA2)
       ENDDO
     ELSE
       trcSalt_conc_dest(idsalt_psoil_beg:idsalt_psoil_end)=0.0_r8
     ENDIF
     IF(VLWPB2.GT.ZEROS(N5,N4))THEN
       DO idsalt=idsalt_pband_beg,idsalt_pband_end
-        trcSalt_conc_dest(idsalt)=AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4)/VLWatMicPM_vr(M,N6,N5,N4))
+        trcSalt_conc_dest(idsalt)=AZMAX1(trcSalt_solml2_vr(idsalt,N6,N5,N4)/VLWPB2)
       ENDDO
     ELSE
       DO idsalt=0,idsalt_nuts
@@ -1224,10 +1224,10 @@ module IngridTranspMod
     trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
 
     DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
-    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
+    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CaCO3,idsalt_CaHCO3,idsalt_CaSO4/))=DIFCA
 
     DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
-    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
+    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_MgSO4/))=DIFMG
 
     DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
@@ -1398,10 +1398,10 @@ module IngridTranspMod
     trcSaltDiffConductance(idsalt_Hp)=(AquaIonDifusivty2_vr(idsalt_Hp,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
 
     DIFCA=(AquaIonDifusivty2_vr(idsalt_Ca,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
-    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CO3,idsalt_HCO3,idsalt_CaSO4/))=DIFCA
+    trcSaltDiffConductance((/idsalt_Ca,idsalt_CaOH,idsalt_CaCO3,idsalt_CaHCO3,idsalt_CaSO4/))=DIFCA
 
     DIFMG=(AquaIonDifusivty2_vr(idsalt_Mg,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
-    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_SO4/))=DIFMG
+    trcSaltDiffConductance((/idsalt_Mg,idsalt_MgOH2,idsalt_MgCO3,idsalt_MgHCO3,idsalt_MgSO4/))=DIFMG
 
     DIFNA=(AquaIonDifusivty2_vr(idsalt_Na,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
     trcSaltDiffConductance((/idsalt_Na,idsalt_NaCO3,idsalt_NaSO4/))=DIFNA
