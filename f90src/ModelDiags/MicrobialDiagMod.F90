@@ -205,7 +205,7 @@ module MicrobialDiagMod
   BiomDead = 0._r8
   OMSolid  = 0._r8
   OMSorb   = 0._r8
-  !add autotrophic microbes
+  ! Attribute complex-independent autotrophic biomass to litter only.
   DO  N=1,NumMicbAFunGrupsPerCmplx
     DO NGL=JGniA(N),JGnfA(N)
       DO  M=1,nlbiomcp
@@ -269,7 +269,7 @@ module MicrobialDiagMod
 
   subroutine sumHumOMLayL(L,NY,NX,ORGM)
   !
-  !sum up litter OM in layer L
+  !sum up humus OM in layer L; autotrophic biomass is included in litter
   implicit none
   integer, intent(in) :: L, NY,NX
   real(r8), intent(out) :: ORGM(1:NumPlantChemElms)
@@ -280,18 +280,6 @@ module MicrobialDiagMod
   ORGM=0._r8
   DOM_micp=0._r8
   DOM_macp=0._r8
-
-  !add autotrophic microbes
-  DO  N=1,NumMicbAFunGrupsPerCmplx
-    DO NGL=JGniA(N),JGnfA(N)
-      DO  M=1,nlbiomcp
-        MID=micpar%get_micb_id(M,NGL)
-        DO NE=1,NumPlantChemElms
-          ORGM(NE)=ORGM(NE)+mBiomeAutor_vr(NE,MID,L,NY,NX)
-        ENDDO
-      enddo
-    enddo
-  enddo
 
   DO  K=micpar%NumOfLitrCmplxs+1,jcplx
    !sumup heterotrophic microbes
