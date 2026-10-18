@@ -3,6 +3,7 @@ module TranspSaltMod
 ! Description:
 !
   use data_kind_mod,    only: r8 => DAT_KIND_R8
+  use EcosimConst,      only: catomw, patomw
   use minimathmod  
   use DebugToolMod
   use SOMDataType
@@ -127,11 +128,56 @@ module TranspSaltMod
           *trcSalt_AquaADV_Snow2Soil_flxM(idsalt,NY,NX)
       ENDDO
 
+      call SummarizeSaltBoundaryFluxesM(NY,NX,ppscal)
+
     ENDDO
   ENDDO  
 
   
   end subroutine AccumSaltFluxesM
+!------------------------------------------------------------------------------------------
+
+  subroutine SummarizeSaltBoundaryFluxesM(NY,NX,ppscal)
+  ! Add accepted salt transport as elemental C/P exports, in grams.
+  ! Internal snow/litter/soil and micro/macropore transfers are excluded.
+  implicit none
+  integer, intent(in) :: NY,NX
+  real(r8), intent(in) :: ppscal(idsalt_beg:idsaltb_end)
+  real(r8) :: carbon_weight(idsalt_beg:idsaltb_end), phosphorus_weight(idsalt_beg:idsaltb_end)
+  real(r8) :: surface_export, subsurface_export
+  integer :: idsalt,L
+
+  carbon_weight=0._r8
+  carbon_weight([idsalt_CO3,idsalt_HCO3,idsalt_CaCO3,idsalt_CaHCO3, &
+    idsalt_MgCO3,idsalt_MgHCO3,idsalt_NaCO3])=catomw
+  phosphorus_weight=0._r8
+  phosphorus_weight(idsalt_psoil_beg:idsalt_psoil_end)=patomw
+  phosphorus_weight(idsalt_pband_beg:idsalt_pband_end)=patomw
+  phosphorus_weight([idsalt_CaH4P2O8,idsalt_CaH4P2O8B])=2._r8*patomw
+
+  do idsalt=idsalt_beg,idsaltb_end
+    if(carbon_weight(idsalt)==0._r8.and.phosphorus_weight(idsalt)==0._r8)cycle
+    surface_export=0._r8
+    if(idsalt<=idsalt_end)surface_export=-ppscal(idsalt)*(trcSalt_FloXSurRof_flxM_col(idsalt,NY,NX) &
+      +trcSalt_SnowDrift_flxM_col(idsalt,NY,NX))
+    ! Summed soil transport is top influx plus lateral/bottom net gain.
+    ! Removing top influx excludes deposition and internal infiltration.
+    L=NU_col(NY,NX)
+    subsurface_export=trcSalt_MicpTranspFlxM_3D(idsalt,3,L,NY,NX) &
+      +trcSalt_MacpTranspFlxM_3D(idsalt,3,L,NY,NX)
+    do L=NU_col(NY,NX),NL_col(NY,NX)
+      if(VLSoilPoreMicP_vr(L,NY,NX)<=ZEROS2(NY,NX))cycle
+      subsurface_export=subsurface_export-trcSalt_Transp2Micp_flxM_vr(idsalt,L,NY,NX) &
+        -trcSalt_Transp2Macp_flxM_vr(idsalt,L,NY,NX)
+    enddo
+    subsurface_export=subsurface_export*ppscal(idsalt)
+    HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX)+carbon_weight(idsalt)*surface_export
+    HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX)+carbon_weight(idsalt)*subsurface_export
+    ! Each accepted fraction is accumulated once; the surface P total is annual.
+    HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)+phosphorus_weight(idsalt)*surface_export
+    HydroSubsDIPFlx_col(NY,NX)=HydroSubsDIPFlx_col(NY,NX)+phosphorus_weight(idsalt)*subsurface_export
+  enddo
+  end subroutine SummarizeSaltBoundaryFluxesM
 !------------------------------------------------------------------------------------------
 
   subroutine ZeroAtmosSoluteFlux(NY,NX)

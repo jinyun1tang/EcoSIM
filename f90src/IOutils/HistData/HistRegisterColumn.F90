@@ -285,19 +285,19 @@ contains
 
   data1d_ptr => this%h1D_SUR_DIC_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIC_FLX_col',units='gC/m2/hr',avgflag='A',&
-    long_name='total surface DIC flux',ptr_col=data1d_ptr)
+    long_name='surface carbon export (CO2, CH4 and carbonate species)',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUR_DIN_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIN_FLX_col',units='gN/m2',avgflag='I',&
-    long_name='cumulative total surface DIN flux',ptr_col=data1d_ptr)
+    long_name='annual cumulative surface NH3/NH4/NO2/NO3 export',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUR_DIP_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIP_FLX_col',units='gP/m2',avgflag='I',&
-    long_name='Cumulative surface DIP flux',ptr_col=data1d_ptr,default='inactive')
+    long_name='annual cumulative surface phosphate export',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_SUB_DIC_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUB_DIC_FLX_col',units='gC/m2/hr',avgflag='A',&
-    long_name='total subsurface DIC flux',ptr_col=data1d_ptr)
+    long_name='subsurface carbon export (CO2, CH4, carbonate and boundary gas transport)',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUB_DIN_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUB_DIN_FLX_col',units='gN/m2/hr',avgflag='A',&

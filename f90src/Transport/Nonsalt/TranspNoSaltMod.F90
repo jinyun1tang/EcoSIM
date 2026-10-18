@@ -353,9 +353,41 @@ module TranspNoSaltMod
   implicit none
   integer, intent(in) :: I,J,NHE,NHW,NVS,NVN
   integer :: NY,NX,K
+  integer :: n, nitrogen_ids(6), phosphorus_ids(4)
+  real(r8) :: surface_n, surface_p
+
+  nitrogen_ids=[ids_NH4,ids_NO3,ids_NO2,ids_NH4B,ids_NO3B,ids_NO2B]
+  phosphorus_ids=[ids_H1PO4,ids_H2PO4,ids_H1PO4B,ids_H2PO4B]
   
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
+      ! Accepted transport ledgers are signed gains; these inorganic
+      ! diagnostics are signed exports (positive out, negative in).
+      ! Preserve the legacy carbon grouping: CO2 + CH4, including lateral
+      ! and bottom gas-phase transport in the subsurface total.
+      HydroSufDICFlx_col(NY,NX)=HydroSufDICFlx_col(NY,NX) &
+        -GasHydroSurfLoss_flx_col(idg_CO2,NY,NX)-GasHydroSurfLoss_flx_col(idg_CH4,NY,NX)
+      HydroSubsDICFlx_col(NY,NX)=HydroSubsDICFlx_col(NY,NX) &
+        -GasHydroSubsLoss_flx_col(idg_CO2,NY,NX)-GasHydroSubsLoss_flx_col(idg_CH4,NY,NX)
+
+      ! DIN excludes N2/N2O. The NH3 subsurface ledger already includes
+      ! NH3B and fast gas transport; do not add those contributions twice.
+      surface_n=-GasHydroSurfLoss_flx_col(idg_NH3,NY,NX)
+      HydroSubsDINFlx_col(NY,NX)=HydroSubsDINFlx_col(NY,NX)-GasHydroSubsLoss_flx_col(idg_NH3,NY,NX)
+      do n=1,size(nitrogen_ids)
+        HydroSubsDINFlx_col(NY,NX)=HydroSubsDINFlx_col(NY,NX)-trcnuts_hydrloss_flx_col(nitrogen_ids(n),NY,NX)
+        if(n<=3)surface_n=surface_n-trcn_SurfRunoff_flx_col(nitrogen_ids(n),NY,NX) &
+          -trcn_SnowDrift_flx_col(nitrogen_ids(n),NY,NX)
+      enddo
+      surface_p=0._r8
+      do n=1,size(phosphorus_ids)
+        HydroSubsDIPFlx_col(NY,NX)=HydroSubsDIPFlx_col(NY,NX)-trcnuts_hydrloss_flx_col(phosphorus_ids(n),NY,NX)
+        if(n<=2)surface_p=surface_p-trcn_SurfRunoff_flx_col(phosphorus_ids(n),NY,NX) &
+          -trcn_SnowDrift_flx_col(phosphorus_ids(n),NY,NX)
+      enddo
+      ! Add this hour only; these two fields retain their annual resets.
+      HydroSufDINFlx_CumYr_col(NY,NX)=HydroSufDINFlx_CumYr_col(NY,NX)+surface_n
+      HydroSufDIPFlx_CumYr_col(NY,NX)=HydroSufDIPFlx_CumYr_col(NY,NX)+surface_p
       DO K=1,jcplx
         HydroSufDONFlx_col(NY,NX) = HydroSufDONFlx_col(NY,NX)+DOM_SurfRunoff_flx_col(idom_don,K,NY,NX)
         HydroSufDOPFlx_col(NY,NX) = HydroSufDOPFlx_col(NY,NX)+DOM_SurfRunoff_flx_col(idom_dop,K,NY,NX)

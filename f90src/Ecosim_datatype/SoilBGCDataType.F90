@@ -67,12 +67,15 @@ implicit none
   real(r8),target,allocatable ::  tXPO4_col(:,:)                     !total soil precipited P, [g d-2]
   real(r8),target,allocatable ::  RootResp_CumYr_col(:,:)            !total soil autotrophic respiration, [g d-2]
   real(r8),target,allocatable ::  SedmErossLoss_CumYr_col(:,:)       !total sediment subsurface flux, [Mg d-2]
-  real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)            !total surface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)           !total subsurface DIC flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDINFlx_CumYr_col(:,:)      !total surface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)           !total subsurface DIN flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSufDIPFlx_CumYr_col(:,:)      !total surface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)           !total subsurface DIP flux, [g d-2]
+  ! Inorganic export diagnostics: positive out, negative in; grid-cell totals.
+  ! Legacy DIC groups CO2 + CH4 + carbonate species; subsurface also includes
+  ! lateral/bottom gas transport. Geochemical conversion is recorded separately.
+  real(r8),target,allocatable ::  HydroSufDICFlx_col(:,:)            !hourly carbon export, [gC h-1]
+  real(r8),target,allocatable ::  HydroSubsDICFlx_col(:,:)           !hourly carbon export, [gC h-1]
+  real(r8),target,allocatable ::  HydroSufDINFlx_CumYr_col(:,:)      !annual NH3/NH4/NO2/NO3 export, [gN]
+  real(r8),target,allocatable ::  HydroSubsDINFlx_col(:,:)           !hourly NH3/NH4/NO2/NO3 export, [gN h-1]
+  real(r8),target,allocatable ::  HydroSufDIPFlx_CumYr_col(:,:)      !annual phosphate export, [gP]
+  real(r8),target,allocatable ::  HydroSubsDIPFlx_col(:,:)           !hourly phosphate export, [gP h-1]
   real(r8),target,allocatable ::  StandingDeadStrutElms_col(:,:,:)   !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN_col(:,:)                    !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN_col(:,:)                    !total P drainage below root zone, [g d-2]

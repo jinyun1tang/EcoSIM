@@ -1012,7 +1012,8 @@ module RedistMod
     TOMOU_lnds(ielmc) = TOMOU_lnds(ielmc)+COB
 
     RootResp_CumYr_col(NY,NX)  = RootResp_CumYr_col(NY,NX)-RootCO2Emis2Root_vr(L,NY,NX)+trcs_Soil2plant_uptake_vr(idg_CO2,L,NY,NX)
-    HydroSubsDICFlx_col(NY,NX) = HydroSubsDICFlx_col(NY,NX)-catomw*Txchem_CO2_vr(L,NY,NX)
+    ! Geochemical conversion is included once through Txchem_CO2_col in
+    ! NBP; keep it separate from the transported carbon export diagnostic.
     Txchem_CO2_col(NY,NX)      = Txchem_CO2_col(NY,NX)+catomw*Txchem_CO2_vr(L,NY,NX)
 
     OOB    = trcs_RMicbUptake_vr(idg_O2,L,NY,NX)+RUptkRootO2_vr(L,NY,NX)+trcs_Soil2plant_uptake_vr(idg_O2,L,NY,NX)
