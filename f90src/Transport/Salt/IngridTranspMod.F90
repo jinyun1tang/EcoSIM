@@ -550,6 +550,9 @@ module IngridTranspMod
 !     begin_execution
 !
   call PrintInfo('beg '//subname)
+  ! Reset column discharge once; inactive layers must preserve bottom-layer fluxes.
+  trcSalt_AquaADV_Snow2Litr_flxM(idsalt_beg:idsalt_end,NY,NX)=0._r8
+  trcSalt_AquaADV_Snow2Soil_flxM(idsalt_beg:idsaltb_end,NY,NX)=0._r8
   ICHKL=.false.
   DO L=1,JS
     !
@@ -612,9 +615,6 @@ module IngridTranspMod
           ICHKL=.true.
         ENDIF
       ENDIF
-    ELSE
-      trcSalt_AquaADV_Snow2Litr_flxM(idsalt_beg:idsalt_end,NY,NX)  = 0.0_r8
-      trcSalt_AquaADV_Snow2Soil_flxM(idsalt_beg:idsaltb_end,NY,NX) = 0.0_r8
     ENDIF
   ENDDO
   call PrintInfo('end '//subname)
