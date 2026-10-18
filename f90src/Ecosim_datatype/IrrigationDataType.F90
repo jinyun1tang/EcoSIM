@@ -74,7 +74,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  SurfIrrig_IonStrenth_col(:,:)     !surface irrigation ion strength, [g m-3]
   real(r8),target,allocatable ::  trcg_irrig_mole_conc_col(:,:,:)   !surface irrigation  volatile concentration, [mol m-3]
   real(r8),target,allocatable ::  trcn_irrig_vr(:,:,:,:)            !subsurface irrigation  nutrient concentration, [g m-3]
-  real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)         !subsurface irrigation  chemical concentration, [g m-3]
+  real(r8),target,allocatable ::  trcSalt_Irrig_vr(:,:,:,:)         !prescribed external-water salt concentration, unbanded [mol m-3]
   real(r8),target,allocatable ::  FWatIrrigate2MicP_vr(:,:,:)       !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HeatIrrigation_vr(:,:,:)          !convective heat due to underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_Irrig_flx_vr(:,:,:,:)            !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
@@ -173,6 +173,7 @@ module IrrigationDataType
   call destroy(trcsalt_irrig_mole_conc_col)
   call destroy(trcs_irrig_flx_col)
   call destroy(trcn_irrig_vr)
+  call destroy(trcSalt_Irrig_vr)
   call destroy(trcs_Irrig_flx_vr)
   call destroy(PHQ)
   call destroy(NH4_irrig_mole_conc)

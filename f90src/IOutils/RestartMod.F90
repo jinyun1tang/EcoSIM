@@ -5013,6 +5013,9 @@ implicit none
   type(var_desc_t) :: feedback_vardesc
   logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
   logical :: has_fertP_soil,has_fertP_band
+  integer :: salt_boundary_varid
+  type(var_desc_t) :: salt_boundary_vardesc
+  logical :: has_salt_boundary_conc
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -8174,6 +8177,26 @@ implicit none
 
 
   IF(salt_model)THEN
+
+    ! Preserve prescribed boundary chemistry independently of irrigation fluxes.
+    ! The shared salt dimension includes band entries; unused entries are zero.
+    if(flag=='read')then
+      call ncd_inqvid(ncid,'trcSalt_Irrig_vr',salt_boundary_varid,salt_boundary_vardesc, &
+        readvar=has_salt_boundary_conc)
+      if(.not.has_salt_boundary_conc)then
+        write(iulog,*)'Salt restart lacks trcSalt_Irrig_vr boundary concentrations; regenerate the salt restart.'
+        call endrun(trim(mod_filename)//' at line',__LINE__)
+      endif
+    endif
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ)
+    if(flag=='write')then
+      datpr3=0._r8
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_Irrig_vr,datrc_3d)
+    endif
+    call restartvar(ncid, flag, varname='trcSalt_Irrig_vr', dim1name='column',dim2name='satracers', &
+      dim3name='levsoi',long_name='prescribed external-water salt concentration, unbanded',units='mol m-3', &
+      interpinic_flag='skip',data=datpr3,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_Irrig_vr,datrc_3d)
 
     if(flag=='read')then
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ+1)           

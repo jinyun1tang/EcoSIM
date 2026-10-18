@@ -778,7 +778,7 @@ module RedistMod
     +trcSalt_solml_vr(idsalt_FeHPO4,0,NY,NX) &
     +trcSalt_solml_vr(idsalt_FeH2PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4,0,NY,NX)&
     +trcSalt_solml_vr(idsalt_CaHPO4,0,NY,NX) &
-    +trcSalt_solml_vr(idsalt_CaH4P2O8,0,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,0,NY,NX))
+    +2._r8*trcSalt_solml_vr(idsalt_CaH4P2O8,0,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,0,NY,NX))
   TDisolPi_lnd=TDisolPi_lnd+PSS
   SSS=0._r8
   do idsalt=idsalt_beg,idsalt_end
@@ -1185,6 +1185,9 @@ module RedistMod
   DO idsalt=idsalt_psoil_beg,idsalt_pband_end
     PSS=PSS+trcSalt_solml_vr(idsalt,L,NY,NX)+trcSalt_soHml_vr(idsalt,L,NY,NX)
   ENDDO
+  ! CaH4P2O8 contains a second P atom in both pore pools and both bands.
+  PSS=PSS+trcSalt_solml_vr(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_soHml_vr(idsalt_CaH4P2O8,L,NY,NX) &
+    +trcSalt_solml_vr(idsalt_CaH4P2O8B,L,NY,NX)+trcSalt_soHml_vr(idsalt_CaH4P2O8B,L,NY,NX)
   PSS=PSS*patomw  
 
   TDisolPi_lnd=TDisolPi_lnd+PSS
@@ -1193,7 +1196,7 @@ module RedistMod
   SSH=0._r8
   DO idsalt=idsalt_beg,idsaltb_end
     SSS=SSS+trcSalt_solml_vr(idsalt,L,NY,NX)*trcSaltIonNumber(idsalt)
-    SSH=SSH+trcSalt_soHml_vr(idsalt_Al,L,NY,NX)*trcSaltIonNumber(idsalt)
+    SSH=SSH+trcSalt_soHml_vr(idsalt,L,NY,NX)*trcSaltIonNumber(idsalt)
   ENDDO
 
  

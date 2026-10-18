@@ -271,7 +271,7 @@ module TranspSaltMod
   implicit none
   integer, intent(in) :: I,NY,NX
   integer :: L,idsalt,ids
-  real(r8) :: FLWU
+  real(r8) :: IrrigWater
 
 
 !     begin_execution
@@ -288,22 +288,19 @@ module TranspSaltMod
     ! SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
     ! placeholder: salt uptake by plant roots can be applied here. 
     !
-    FLWU=TWaterPlantRoot2Soil_vr(L,NY,NX)*dts_HeatWatTP
+    ! Keep trcSalt_Irrig_vr as the prescribed boundary concentration.
+    ! Irrigation mass inputs belong only in the transport-substep flux array.
+    IrrigWater=FWatIrrigate2MicP_vr(L,NY,NX)*dts_HeatWatTP
+    trcSalt_Irrig_flxM_vr(:,L,NY,NX)=0._r8
 
     DO idsalt=idsalt_beg,idsalt_KSO4
-      trcSalt_Irrig_vr(idsalt,L,NY,NX)=FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
+      trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)=IrrigWater*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)
     ENDDO
 
     DO idsalt=idsalt_H0PO4,idsalt_MgHPO4
       ids=idsalt-idsalt_H0PO4+idsalt_H0PO4B
-      trcSalt_Irrig_vr(idsalt,L,NY,NX) = FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
-      trcSalt_Irrig_vr(ids,L,NY,NX)    = FWatIrrigate2MicP_vr(L,NY,NX)*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
-    ENDDO
-    !
-    !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
-    !
-    DO idsalt=idsalt_beg,idsaltb_end
-      trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)=trcSalt_Irrig_vr(idsalt,L,NY,NX)*dts_HeatWatTP
+      trcSalt_Irrig_flxM_vr(idsalt,L,NY,NX)=IrrigWater*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
+      trcSalt_Irrig_flxM_vr(ids,L,NY,NX)=IrrigWater*trcsalt_irrig_mole_conc_col(idsalt,I,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)
     ENDDO
     !
     !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
