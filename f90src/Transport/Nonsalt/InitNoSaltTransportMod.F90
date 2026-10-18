@@ -71,7 +71,9 @@ module InitNoSaltTransportMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+      ! Reset hourly atmospheric inputs before selecting current deposition.
       trcg_AquaAdv_flxM_snvr(:,1,NY,NX)=0._r8
+      trcn_AquaAdv_flxM_snvr(:,1,NY,NX)=0._r8
 
       trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)          = 0.0_r8
       trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8

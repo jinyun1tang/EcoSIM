@@ -218,6 +218,9 @@ module TranspSaltMod
   integer, intent(in) :: NY,NX
   integer :: idsalt
 
+  ! Reset hourly atmospheric input before selecting current deposition.
+  trcSalt_AquaAdv_flxM_snvr(:,1,NY,NX)=0._r8
+
   trcSalt_Precip2LitrM(:,NY,NX) = 0._r8
 
   trcSalt_Precip2MicpM(:,NY,NX) = 0._r8
