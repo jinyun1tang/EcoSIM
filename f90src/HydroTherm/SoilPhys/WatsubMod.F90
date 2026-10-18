@@ -554,7 +554,7 @@ module WatsubMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: N,N1,N2,N3,N4,N5,N6
-  integer :: NY,NX,L
+  integer :: NY,NX,L,LL
 !     begin_execution
 !
 !     INITIALIZE SOIL HYDRAULIC PARAMETERS IN LOCAL ARRAYS
@@ -569,6 +569,7 @@ module WatsubMod
         dWaterPlantRoot2SoilPrev_vr(L,NY,NX)=TWaterPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP
         dHeatPlantRoot2SoilPrev_vr(L,NY,NX) =THeatPlantRoot2SoilPrev_vr(L,NY,NX)*dts_HeatWatTP
         THeatPlantRoot2SoilPrev_vr(L,NY,NX)=0._r8
+        if(VLSoilPoreMicP_vr(L,NY,NX).LE.ZEROS2(NY,NX))cycle D35
         D40: DO N=FlowDirIndicator_col(NY,NX),3
           N1=NX;N2=NY;N3=L
 ! in the EW direction
@@ -599,6 +600,14 @@ module WatsubMod
               N6=L+1
             ENDIF
           ENDIF
+          ! Match the destination layer used by Subsurface3DInternalFlowM.
+          do LL=N6,NL_col(N5,N4)
+            if(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))then
+              N6=LL
+              exit
+            endif
+          enddo
+          if(LL>NL_col(N5,N4))cycle D40
           !
           !     MACROPORE CONDUCTIVITY FROM 'HOUR1' AND GRAVITATIONAL
           !     GRADIENT USED TO CALCULATE MACROPORE FLOW FOR USE BELOW
@@ -696,12 +705,14 @@ module WatsubMod
           !
           !'SKIP NON-EXISTENT DESTINATION SOIL LAYERS'
           ! identified by soil volume
-          D1100: DO LL=N6,NL_col(NY,NX)
+          D1100: DO LL=N6,NL_col(N5,N4)
             IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
               N6=LL
               exit
             ENDIF
           ENDDO D1100
+          ! No internal face exists without an active destination layer.
+          if(LL>NL_col(N5,N4))cycle D4320
 
           ! source grid at surface, make a copy of the destination layer number
           IF(N3.EQ.NU_col(N2,N1))N6X(N2,N1)=N6

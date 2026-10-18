@@ -391,12 +391,13 @@ implicit none
   call PrintInfo('beg '//subname)
   N6=N60
   IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
-    !locate the vertical layer for the dest grid
+    ! Use the destination column, as in the flux producer. If no active
+    ! layer is found, retain N60 for external/ghost boundary-face fluxes.
     D1200: DO LL=N60,NL_col(N5,N4)
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
-      IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
         N6=LL
         exit
       ENDIF

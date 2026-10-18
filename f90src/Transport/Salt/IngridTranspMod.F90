@@ -313,9 +313,10 @@ module IngridTranspMod
   !     begin_execution
   !
   IF(FlowDirIndicator_col(N2,N1).NE.3 .OR. N.EQ.iVerticalDirection)THEN
-    !adjust N6 for lateral transport
-    D1200: DO LL=N6,NL_col(N2,N1)
-      IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+    ! Match the destination mask used by the face producer. Keep the
+    ! supplied index when no active layer exists (external/ghost face).
+    D1200: DO LL=N6,NL_col(N5,N4)
+      IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
         N6=LL
         exit
       ENDIF
@@ -1607,6 +1608,8 @@ module IngridTranspMod
               exit
             ENDIF
           enddo
+          ! Internal transport requires an active destination layer.
+          if(LL>NL_col(N5,N4))cycle
           !
           !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
           !     WATER CONTENTS AND WATER FLUXES 'FLQM' FROM 'WATSUB'
