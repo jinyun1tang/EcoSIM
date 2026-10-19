@@ -328,7 +328,7 @@ module StarteMod
     CN2U                           = solutevar%N2O_aque_mole_conc
     trcn_irrig_vr(ids_NH4,L,NY,NX)    = solutevar%NH4_1p_aque_mole_conc*natomw
     trcn_irrig_vr(idg_NH3,L,NY,NX)    = solutevar%NH3_aque_mole_conc*natomw
-    trcn_irrig_vr(ids_NO3,L,NY,NX)    = solutevar%CNOX*natomw
+    trcn_irrig_vr(ids_NO3,L,NY,NX)    = solutevar%CNOZ*natomw
     trcn_irrig_vr(ids_NH4B,L,NY,NX)   = trcn_irrig_vr(ids_NH4,L,NY,NX)
     trcn_irrig_vr(idg_NH3B,L,NY,NX)   = trcn_irrig_vr(idg_NH3,L,NY,NX)
     trcn_irrig_vr(ids_NO3B,L,NY,NX)   = trcn_irrig_vr(ids_NO3,L,NY,NX)
@@ -382,15 +382,7 @@ module StarteMod
     endif
 !
 !   INITIAL STATE VARIABLES FOR GAS IN SOIL
-!   CCO2EI_gperm3 is set to the first year, because AtmGasCgperm3_col(idg_CO2,x)
-!   varies year by year, while other tracer gases are fixed year by year,
-!   this is not quite right for CH4, and N2O. However, the current implementation
-!   make sure the inexact restart run works. When exact restart is used, trcg_gasml_vr
-!   and trcs_solml_vr will be read from restart file, so that the following inconsistent
-!   use between CO2 and other gas tracers can be avoided.
-!   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trcg_gasml_vr(idg_CO2,L,NY,NX) = CCO2EI_gperm3_col(NY,NX)*VLsoiAirP_vr(L,NY,NX)
     DO idg=idg_beg,idg_NH3
       trcg_gasml_vr(idg,L,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*VLsoiAirP_vr(L,NY,NX)
     ENDDO
@@ -398,17 +390,14 @@ module StarteMod
 !   ExtWaterTableLocDepz_col: external water table depth
     IF(CumDepz2LayBottom_vr(L-1,NY,NX).LT.ExtWaterTableLocDepz_col(NY,NX))THEN
       ! above water table
-      trcs_solml_vr(idg_O2,L,NY,NX)=AtmGasCgperm3_col(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA_col(NY,NX)) &
-        /(EXP(GasSechenovConst(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
+      DO idg=idg_beg,idg_NH3-1
+        trcs_solml_vr(idg,L,NY,NX)=AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg, ATCA_col(NY,NX)) &
+          /(EXP(GasSechenovConst(idg)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
+      ENDDO
     ELSE
       !below water table
-      trcs_solml_vr(idg_O2,L,NY,NX)=0._r8
+      trcs_solml_vr(idg_beg:idg_NH3-1,L,NY,NX)=0._r8
     ENDIF
-    
-    DO idg=idg_beg,idg_NH3-1  
-      trcs_solml_vr(idg,L,NY,NX)=AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg, ATCA_col(NY,NX)) &
-        /(EXP(GasSechenovConst(idg)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP_vr(L,NY,NX)
-    ENDDO  
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
