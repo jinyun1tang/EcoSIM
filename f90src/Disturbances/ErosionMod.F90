@@ -457,6 +457,46 @@ module ErosionMod
   end subroutine XBoundSedTranspM
 !------------------------------------------------------------------------------------------
 
+  subroutine CalcErosionMaterialDenom(NY,NX,NHW,NHE,NVN,NVS,MaterialDenom)
+  implicit none
+  integer, intent(in) :: NY,NX,NHW,NHE,NVN,NVS
+  real(r8), intent(out) :: MaterialDenom
+  character(len=*), parameter :: subname='CalcErosionMaterialDenom'
+  real(r8) :: OutgoingSediment
+
+  call PrintInfo('beg '//subname)
+  ! Sum this donor's hourly outgoing sediment magnitudes across all faces.
+  ! Internal transfers use receiving slots; external W/N exports are negative
+  ! in the donor slot. Incoming sediment does not offset the material budget.
+  OutgoingSediment=0._r8
+  if(NX<NHE)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iWestEastDirection,iBehind,NY,NX+1))
+  elseif(.not.column_mode)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iWestEastDirection,iFront,NY,NX+1))
+  endif
+  if(NX>NHW)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iWestEastDirection,iFront,NY,NX-1))
+  elseif(.not.column_mode)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(-cumSed_Eros_2D(iWestEastDirection,iBehind,NY,NX))
+  endif
+  if(NY<NVS)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iNorthSouthDirection,iBehind,NY+1,NX))
+  elseif(.not.column_mode)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iNorthSouthDirection,iFront,NY+1,NX))
+  endif
+  if(NY>NVN)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(cumSed_Eros_2D(iNorthSouthDirection,iFront,NY-1,NX))
+  elseif(.not.column_mode)then
+    OutgoingSediment=OutgoingSediment+AZMAX1(-cumSed_Eros_2D(iNorthSouthDirection,iBehind,NY,NX))
+  endif
+  ! A common denominator keeps the sum of exported material fractions <= 1,
+  ! preserving each face's sign and relative share. Protect empty soil too.
+  ! This limits soil-pool withdrawals; it does not track suspended composition
+  ! or alter the separately accepted suspended-sediment transport ledger.
+  MaterialDenom=max(ZERO,SoilMicPMassLayerMX(NY,NX),OutgoingSediment)
+  call PrintInfo('end '//subname)
+  end subroutine CalcErosionMaterialDenom
+!------------------------------------------------------------------------------------------
   subroutine LateralXGridSedmentFlux(NHW, NHE,NVN,NVS)
   implicit none
 
@@ -466,11 +506,12 @@ module ErosionMod
   integer :: NGL,NTX,NTP,NE,idom
   integer :: K,NN,N,NO,M,NY,NX
   integer :: N1,N2,N4,N5,N4B,N5B
-  real(r8) :: FSEDER
+  real(r8) :: FSEDER,MaterialDenom
 
   call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+        call CalcErosionMaterialDenom(NY,NX,NHW,NHE,NVN,NVS,MaterialDenom)
         N1=NX
         N2=NY
         DO  N=1,2
@@ -503,7 +544,7 @@ module ErosionMod
 !     SOIL MINERALS
 !
             IF(NN.EQ.iFront)THEN
-              FSEDER = AMIN1(1.0,cumSed_Eros_2D(N,iBehind,N5,N4)/SoilMicPMassLayerMX(N2,N1))
+              FSEDER = cumSed_Eros_2D(N,iBehind,N5,N4)/MaterialDenom
 
               XSand_Eros_2D(N,iBehind,N5,N4) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
               XSilt_Eros_2D(N,iBehind,N5,N4) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
@@ -587,7 +628,7 @@ module ErosionMod
             ENDIF
             IF(NN.EQ.iBehind)THEN
               IF(N4B.GT.0.AND.N5B.GT.0)THEN
-                FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,iFront,N5B,N4B)/SoilMicPMassLayerMX(N2,N1))
+                FSEDER=cumSed_Eros_2D(N,iFront,N5B,N4B)/MaterialDenom
                 XSand_Eros_2D(N,iFront,N5B,N4B) = FSEDER*SAND_vr(NU_col(N2,N1),N2,N1)
                 XSilt_Eros_2D(N,iFront,N5B,N4B) = FSEDER*SILT_vr(NU_col(N2,N1),N2,N1)
                 XClay_Eros_2D(N,iFront,N5B,N4B) = FSEDER*CLAY_vr(NU_col(N2,N1),N2,N1)
@@ -751,7 +792,7 @@ module ErosionMod
 
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  real(r8) :: RCHQF,FSEDER
+  real(r8) :: RCHQF,FSEDER,MaterialDenom
   integer :: NGL
   integer :: NY,NX,NE,idom
   integer :: N,NN,K,NO,M,NTX,NTP
@@ -763,6 +804,7 @@ module ErosionMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
+        call CalcErosionMaterialDenom(NY,NX,NHW,NHE,NVN,NVS,MaterialDenom)
         N1=NX
         N2=NY
         D8980: DO  N=1,2
@@ -893,7 +935,7 @@ module ErosionMod
 !     CALCULATE FRACTION OF SURACE MATERIAL ERODED
 !
             ELSE
-              FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,NN,M5,M4)/SoilMicPMassLayerMX(N2,N1))
+              FSEDER=cumSed_Eros_2D(N,NN,M5,M4)/MaterialDenom
 !
 !     SOIL MINERALS
 !
