@@ -693,27 +693,24 @@ module StartsMod
           !(west, north) corner as the anchor point
           SurfElevation_col(NY,NX)=0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)+0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ELSE
-          !west boundary
+          !west boundary: integrate the north-south slope between cell centers
           SurfElevation_col(NY,NX)=SurfElevation_col(NY-1,NX) &
-            +1.0_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +0.5_r8*DV_col(NY-1,NX)*(SLOPE_col(iNorthSouthDirection,NY-1,NX)) &
             +0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
         ENDIF
       ELSE
         IF(NY.EQ.NVN)THEN
-          !north boundary
+          !north boundary: integrate the east-west slope between cell centers
           SurfElevation_col(NY,NX)=SurfElevation_col(NY,NX-1) &
             +0.5_r8*DH_col(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
-            +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
-            +0.5_r8*DV_col(NY,NX-1)*SLOPE_col(iNorthSouthDirection,NY,NX-1) &
-            +0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX)
+            +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX)
         ELSE
           SurfElevation_col(NY,NX)=(SurfElevation_col(NY,NX-1) &
             +0.5_r8*DH_col(NY,NX-1)*SLOPE_col(iWestEastDirection,NY,NX-1) &
             +0.5_r8*DH_col(NY,NX)*SLOPE_col(iWestEastDirection,NY,NX) &
             +SurfElevation_col(NY-1,NX) &
             +0.5_r8*DV_col(NY-1,NX)*SLOPE_col(iNorthSouthDirection,NY-1,NX) &
-            +0.5_r8*DV_col(NY,N)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0_r8
+            +0.5_r8*DV_col(NY,NX)*SLOPE_col(iNorthSouthDirection,NY,NX))/2.0_r8
         ENDIF
       ENDIF
 
@@ -723,7 +720,7 @@ module StartsMod
       ELSE
         SurfElevLandscapeMax=MAX(SurfElevLandscapeMax,SurfElevation_col(NY,NX))
       ENDIF
-      WRITE(*,1111)NY,NX,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
+      WRITE(iulog,1111)NY,NX,((XGridRunoffFlag_2DH(NN,N,NY,NX),NN=1,2),N=1,2) &
         ,SurfElevation_col(NY,NX),DH_col(NY,NX),DV_col(NY,NX),ASP_col(NY,NX),SL_col(NY,NX) &
         ,SLOPE_col(0,NY,NX),SLOPE_col(iWestEastDirection,NY,NX),SLOPE_col(iNorthSouthDirection,NY,NX) &
         ,SineGrndSlope_col(NY,NX),CosineGrndSurfAzimuth_col(NY,NX),SineGrndSurfAzimuth_col(NY,NX)

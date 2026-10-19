@@ -74,7 +74,7 @@ module StarteMod
             BulkSoilMass=0._r8
 
             !maure applied at the soil surface
-            IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
+            IF(K.EQ.micpar%k_manure.AND.L.EQ.NU_col(NY,NX))THEN
               !   INITIALIZE IRRIGATION WATER
               solutevar%CN4Z = NH4_irrig_mole_conc(I,NY,NX)
               solutevar%CNOZ = NO3_irrig_mole_conc(I,NY,NX)
@@ -94,7 +94,7 @@ module StarteMod
               solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1)THEN
+                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.NU_col(NY,NX))THEN
                   !     INITIALIZE RAINFALL, top layer
                   solutevar%H_1p_aque_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
@@ -111,7 +111,7 @@ module StarteMod
                     solutevar%CSOZ = trcsalt_rain_mole_conc_col(idsalt_SO4,NY,NX)
                     solutevar%CCLZ = trcsalt_rain_mole_conc_col(idsalt_Cl,NY,NX)
                   endif
-!               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart()).AND.is_first_year)THEN
+                ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart()).AND.is_first_year)THEN
 !
 !     INITIALIZE SOIL WATER
 
@@ -202,7 +202,7 @@ module StarteMod
     iprotein  => micpar%iprotein,  &
     k_manure  => micpar%k_manure   &
   )
-  IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.1.AND.I.EQ.1)THEN
+  IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.NU_col(NY,NX).AND.I.EQ.1)THEN
     !litter pool, top soil layer
     trcg_rain_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aque_mole_conc
     trcg_rain_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aque_mole_conc
@@ -260,7 +260,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
-  ELSEIF(K.EQ.micpar%k_manure .AND. L.EQ.1)THEN
+  ELSEIF(K.EQ.micpar%k_manure .AND. L.EQ.NU_col(NY,NX))THEN
   ! manure, top layer
     trcg_irrig_mole_conc_col(idg_CO2,NY,NX) = solutevar%H2CO3_aque_mole_conc
     trcg_irrig_mole_conc_col(idg_CH4,NY,NX) = solutevar%CH4_aque_mole_conc
