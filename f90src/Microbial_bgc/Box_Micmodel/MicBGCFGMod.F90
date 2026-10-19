@@ -3262,7 +3262,7 @@ module MicBGCMod
   endif
   RMetabDOCUptkHeter(NGL,K)  = PrimaryDOCUptake+CGOMD
   RMetabAcetUptkHeter(NGL,K) = PrimaryAcetUptake+AGOMD
-  CGOXC                           = RMetabDOCUptkHeter(NGL,K)+RMetabAcetUptkHeter(NGL,K)
+  CGOXC                      = RMetabDOCUptkHeter(NGL,K)+RMetabAcetUptkHeter(NGL,K)
 
   !obtain organic nutrient uptake
   DOMUptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))
