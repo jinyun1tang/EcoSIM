@@ -647,7 +647,7 @@ module EcosysWarmingMod
   !
   !Description
   !check if day I is within the specified warming dates
-  use PlantDataRateType, only: GrossCO2Fix_pft  
+  use PlantDataRateType, only: GPP_PrevDay_col
 
   implicit none
   integer, intent(in) :: I,NY,NX
@@ -660,8 +660,9 @@ module EcosysWarmingMod
     !over two years
     ans=I>=seas_doyb+leap_cor(1) .or. I<=seas_doye+leap_cor(2)
   else
-    !floating growing season, using gpp to check
-    ans = igrowth==0 .or. (igrowth==1 .and. MAXVAL(GrossCO2Fix_pft(:,NY,NX))>0._r8)      
+    ! Yesterday's completed daily GPP keeps the seasonal gate fixed overnight.
+    ! Cold/legacy starts remain inactive until a complete day is available.
+    ans = igrowth==0 .or. (igrowth==1 .and. GPP_PrevDay_col(NY,NX)>0._r8)
   endif
   end function check_warming_season
 end module EcosysWarmingMod

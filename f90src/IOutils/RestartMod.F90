@@ -5013,6 +5013,7 @@ implicit none
   type(var_desc_t) :: feedback_vardesc
   logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
   logical :: has_fertP_soil,has_fertP_band
+  logical :: has_gpp_day_sum,has_gpp_prev_day,has_gpp_day_hours
   integer :: salt_boundary_varid
   type(var_desc_t) :: salt_boundary_vardesc
   logical :: has_salt_boundary_conc
@@ -6478,6 +6479,40 @@ implicit none
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
+
+  ! These three fields form one daily clock. Legacy checkpoints cannot
+  ! reconstruct yesterday or a partial day's missing hours, so start all at zero.
+  has_gpp_day_sum=.true.;has_gpp_prev_day=.true.;has_gpp_day_hours=.true.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'GPP_DaySum_col',feedback_varid,feedback_vardesc,readvar=has_gpp_day_sum)
+    call ncd_inqvid(ncid,'GPP_PrevDay_col',feedback_varid,feedback_vardesc,readvar=has_gpp_prev_day)
+    call ncd_inqvid(ncid,'GPP_DayHours_col',feedback_varid,feedback_vardesc,readvar=has_gpp_day_hours)
+    GPP_DaySum_col=0._r8
+    GPP_PrevDay_col=0._r8
+    GPP_DayHours_col=0
+  endif
+  if(has_gpp_day_sum .and. has_gpp_prev_day .and. has_gpp_day_hours)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DaySum_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='GPP_DaySum_col', dim1name='column',&
+      long_name='Accumulated GPP for the current day', units='g C d-2', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DaySum_col,datrc_1d)
+
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_PrevDay_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='GPP_PrevDay_col', dim1name='column',&
+      long_name='GPP for the previous completed day', units='g C d-2', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_PrevDay_col,datrc_1d)
+
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DayHours_col,datic_1d)
+    dat1pr => datic_1d
+    call restartvar(ncid, flag, varname='GPP_DayHours_col', dim1name='column',&
+      long_name='Hours accumulated in the current daily GPP sum', units='hours', interpinic_flag='skip',&
+      data=dat1pr, missing_value=ispval, fill_value=ispval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DayHours_col,datic_1d)
+  endif
 
   if(flag=='read')then
     datpr1 => datrc_1d            

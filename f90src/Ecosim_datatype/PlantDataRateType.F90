@@ -31,6 +31,9 @@ module PlantDataRateType
   real(r8),target,allocatable ::  PetolShethChemElmRemobFlx_brch(:,:,:,:,:)         !cached remobilizable sheath element mass, [g d-2]
   real(r8),target,allocatable :: PetolSenescInitialElms_brch(:,:,:,:,:) !initial senescing sheath/petiole C/N/P mass; -1 means unset, [g d-2]
   real(r8),target,allocatable ::  GrossCO2Fix_pft(:,:,:)                         !total gross CO2 fixation, [g d-2 h-1]
+  real(r8),target,allocatable :: GPP_DaySum_col(:,:) !current day's accumulated GPP, [g C d-2]
+  real(r8),target,allocatable :: GPP_PrevDay_col(:,:) !previous completed day's GPP; zero until available, [g C d-2]
+  integer,target,allocatable :: GPP_DayHours_col(:,:) !hours accumulated; partial startup days are not promoted, [-]
   real(r8),target,allocatable ::  GrossCO2Fix_CumYr_pft(:,:,:)                   !cumulative total gross CO2 fixation, [g d-2 ]
   real(r8),target,allocatable ::  LitrfallElms_pft(:,:,:,:)                  !total plant element LitrFall , [g d-2 ]
   real(r8),target,allocatable ::  PlantN2Fix_CumYr_pft(:,:,:)                    !total plant N2 fixation, [g d-2 ]
@@ -190,6 +193,9 @@ module PlantDataRateType
   allocate(PetolShethChemElmRemobFlx_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolShethChemElmRemobFlx_brch=0._r8
   allocate(PetolSenescInitialElms_brch(NumPlantChemElms,MaxNumBranches,JP,JY,JX)); PetolSenescInitialElms_brch=-1._r8
   allocate(GrossCO2Fix_pft(JP,JY,JX));    GrossCO2Fix_pft=0._r8
+  allocate(GPP_DaySum_col(JY,JX)); GPP_DaySum_col=0._r8
+  allocate(GPP_PrevDay_col(JY,JX)); GPP_PrevDay_col=0._r8
+  allocate(GPP_DayHours_col(JY,JX)); GPP_DayHours_col=0
   allocate(GrossCO2Fix_CumYr_pft(JP,JY,JX)); GrossCO2Fix_CumYr_pft=0._r8
   allocate(LitrfalStrutElms_CumYr_pft(NumPlantChemElms,JP,JY,JX));    LitrfalStrutElms_CumYr_pft=0._r8
   allocate(PlantN2Fix_CumYr_pft(JP,JY,JX));   PlantN2Fix_CumYr_pft=0._r8
@@ -337,6 +343,9 @@ module PlantDataRateType
   call destroy(PetolShethChemElmRemobFlx_brch)
   call destroy(PetolSenescInitialElms_brch)
   call destroy(GrossCO2Fix_pft)
+  call destroy(GPP_DaySum_col)
+  call destroy(GPP_PrevDay_col)
+  call destroy(GPP_DayHours_col)
   call destroy(GrossCO2Fix_CumYr_pft)
   call destroy(LitrfalStrutElms_CumYr_pft)
   call destroy(PlantN2Fix_CumYr_pft)

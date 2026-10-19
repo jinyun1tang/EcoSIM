@@ -9,7 +9,7 @@ module EcoSIMAPI
   use abortutils,       only: iulog
   use RedistMod,         only: redist
   use GeochemAPI,        only: soluteModel
-  use PlantMod,          only: PlantModel
+  use PlantMod,          only: PlantModel, UpdateDailyGPP
   use TranspNoSaltMod,   only: TranspNoSalt
   use TranspSaltMod,     only: TranspSalt
   use WatsubMod,         only: watsub
@@ -73,6 +73,9 @@ contains
     call PlantModel(yearIJ,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('PlantModel',t1)    
   endif
+
+  call UpdateDailyGPP(yearIJ%J,NHW,NHE,NVN,NVS, &
+    plant_model .and. .not.ldo_radiation_test .and. .not.ldo_sp_mode)
 
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
