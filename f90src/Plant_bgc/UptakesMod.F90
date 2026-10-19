@@ -463,7 +463,6 @@ module UptakesMod
     Root2ndRadius_rpvr         => plt_morph%Root2ndRadius_rpvr       ,& !input  :root layer diameter secondary axes, [m]    
     Root2ndMaxRadius1_pft      => plt_morph%Root2ndMaxRadius1_pft    ,& !input  :root diameter secondary axes, [m]
     Root1stRadius_pvr          => plt_morph%Root1stRadius_pvr        ,& !input  :root layer diameter primary axes, [m]    
-    Root1stMaxRadius_pft       => plt_morph%Root1stMaxRadius_pft      ,& !output :maximum radius of primary roots, [m]
     Root2ndMaxRadius_pft       => plt_morph%Root2ndMaxRadius_pft     ,& !input  :maximum radius of secondary roots, [m]
     RootLenDensPerPlant_pvr    => plt_morph%RootLenDensPerPlant_pvr  ,& !input  :root layer length density, [m m-3]
     RootAbsorbLenPerPlant_pvr  => plt_morph%RootAbsorbLenPerPlant_pvr,& !input  :total absorptive root length per plant in layer, [m p-1]
@@ -482,14 +481,14 @@ module UptakesMod
     ENDDO
     if(ats_cpl_mode)then
         !the following number should be revised
-        !Root2ndAxialResist_pft(N,NZ) = 500.0_r8
-        !RootRadialResist_pft(N,NZ) = 400000.0_r8
+        Root2ndAxialResist_pft(N,NZ) = 500.0_r8
+        RootRadialResist_pft(N,NZ) = 400000.0_r8
         DO N=1,Myco_pft(NZ)
             !test vals
-            !Root2ndMaxRadius_pft(N,NZ) = 0.0002_r8
+            Root2ndMaxRadius_pft(N,NZ) = 0.0002_r8
             DO L=NU,MaxSoilLays4Root_pft(NZ)
-                Root2ndradius_rpvr(N,L,NZ) = Root2ndMaxRadius_pft(N,NZ)
-                Root1stRadius_pvr(N,L,NZ) = Root1stMaxRadius_pft(N,NZ)
+                Root2ndradius_rpvr(N,L,NZ) = 0.0002_r8
+                Root1stRadius_pvr(N,L,NZ) = 0.001_r8
             ENDDO
         ENDDO
     endif
@@ -1301,13 +1300,7 @@ module UptakesMod
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
         FRAD1 = AZMAX1(CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._r8)
-        write(*,*) "FRAD1: ", FRAD1
-        write(*,*) "  CRootLumenArea_pvr: ", CRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
         FRADM = AZMAX1(MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._R8)
-        write(*,*) "FRADM: ", FRADM
-        write(*,*) "  MRootLumenArea_pvr: ", MRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
@@ -1315,24 +1308,12 @@ module UptakesMod
         endif
         StalkAxialResist            = AZMAX1(StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ)))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
-        write(*,*) "Root1stAxialResist_rvr: ", Root1stAxialResist_rvr(N,L)
-        write(*,*) "  StalkAxialResist: ", StalkAxialResist
-        write(*,*) "  RootSingleVesselRstaxial_pft: ", RootSingleVesselRstaxial_pft(NZ)
-        write(*,*) "  CumSoilThickMidL_vr: ", CumSoilThickMidL_vr(L)
-        write(*,*) "  FRAD1: ", FRAD1
-
         if(FRADM.GT.0._r8)then
           RootMediumAxialResist_rvr(N,L)=0.5_r8*RootSingleVesselRstaxial_pft(NZ)*RootMediumLength_pvr(L,NZ)/FRADM
         ELSE
           RootMediumAxialResist_rvr(N,L)=0._r8
         endif
         Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
-        write(*,*) "Root2ndAxialResist_rvr: ", Root2ndAxialResist_rvr(N,L)
-        write(*,*) "  Root2ndAxialResist_pft: ", Root2ndAxialResist_pft(N,NZ)
-        write(*,*) "  Root2ndEffLen4uptk_rpvr: ", Root2ndEffLen4uptk_rpvr(N,L,NZ)
-        write(*,*) "  FRAD2: ", FRAD2
-        write(*,*) "  Root2ndXNumL_rpvr: ", Root2ndXNumL_rpvr(N,L,NZ)
-
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !

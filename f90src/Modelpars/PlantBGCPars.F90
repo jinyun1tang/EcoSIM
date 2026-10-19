@@ -189,7 +189,7 @@ module PlantBGCPars
   character(len=*), parameter :: subname='InitVegPars'
 
   call PrintInfo('beg '//subname)
-  if (len_trim(pft_file_in) == 0)then
+  if (len_trim(pft_file_in) == 0 .or. (ats_cpl_mode .and. plant_model))then
     write(*,*) "Setting PFTs to one"
     npfts_tab  = 1
   else

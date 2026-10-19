@@ -14,7 +14,6 @@ Module SharedDataMod
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
   real(r8) :: heat_capacity, pressure_at_field_capacity, pressure_at_wilting_point
-  real(r8), allocatable :: a_MFrac(:,:,:)   !molecular fraction
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
@@ -33,12 +32,11 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
   real(r8), allocatable :: a_PORO(:,:)    !Porosity
   real(r8), allocatable :: a_MATP(:,:)    !Matric Pressure
-  
 !  real(r8), allocatable ::a_CORGR(:,:)   !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)       !Aspect
   real(r8), allocatable :: a_ALT(:)       !Altitude
-  real(r8), allocatable :: a_LAI(:,:)       !Leaf Area Index
-  real(r8), allocatable :: a_SAI(:,:)       !Stem Area Index
+  real(r8), allocatable :: a_LAI(:)       !Leaf Area Index
+  real(r8), allocatable :: a_SAI(:)       !Stem Area Index
   real(r8), allocatable :: a_VEG(:)       !Vegetation type
   real(r8), allocatable :: a_SALB(:)      !Snow Albedo
   real(r8), allocatable :: a_ATKA(:)
@@ -53,14 +51,17 @@ Module SharedDataMod
   real(r8), allocatable :: a_SSWS(:,:)    !subsurface water source
   real(r8), allocatable :: a_AREA3(:,:)
   real(r8), allocatable :: a_AREA3_pad(:,:)
+  real(r8), allocatable :: a_LWCan(:)         !canopy longwave radiation
+  real(r8), allocatable :: a_CLHF(:)         !Boundary latent heat flux
+  real(r8), allocatable :: a_CSHF(:)         !boundary sensible heat flux
+  real(r8), allocatable :: a_CanopyWat(:)    !water held on canopy surface
   real(r8), allocatable :: a_ET(:)           !canopy evapotranspiration
-  ! outputs sent to ATS through ATSStateRegistryMod (hence target)
-  real(r8), allocatable, target :: a_Transpiration(:)!canopy transpiration
-  real(r8), allocatable, target :: a_EvapCan(:)      !canopy evaporation
-  real(r8), allocatable, target :: a_EvapGrnd(:)     !bare ground evaporation
-  real(r8), allocatable, target :: a_EvapLitr(:)     !litter evaporation
-  real(r8), allocatable, target :: a_EvapSnow(:)     !water evaporation from snow
-  real(r8), allocatable, target :: a_Sublim(:)       !water sublimation from snow
+  real(r8), allocatable :: a_Transpiration(:)!canopy transpiration
+  real(r8), allocatable :: a_EvapCan(:)      !canopy evaporation
+  real(r8), allocatable :: a_EvapGrnd(:)     !bare ground evaporation
+  real(r8), allocatable :: a_EvapLitr(:)     !litter evaporation
+  real(r8), allocatable :: a_EvapSnow(:)     !water evaporation from snow
+  real(r8), allocatable :: a_Sublim(:)       !water sublimation from snow
   real(r8), allocatable :: a_TS(:,:)         !snow temperature (LS,L dimensions)
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
@@ -74,19 +75,14 @@ Module SharedDataMod
   real(r8), allocatable :: surf_e_source(:) !surface energy source
   real(r8), allocatable :: surf_w_source(:) !surface water source
   real(r8), allocatable :: surf_snow_depth(:) !snow depth source
-  real(r8), allocatable :: a_CanSnow(:,:)    !canopy snow per PFT (num_pfts x num_columns)
   !real(r8), allocatable :: a_AREA3(:)
-  integer, allocatable :: a_NU(:)        !upper soil layer index
-  integer, allocatable :: a_NL(:)        !lower soil layer index
-  integer, allocatable :: a_NJ(:)
-  integer, allocatable :: a_MaxNumRootLays_col(:)
-  integer, allocatable :: a_VEG_test(:)
-  integer, allocatable :: a_PFT(:,:)
+  integer,  allocatable :: a_NU(:)        !upper soil layer index
+  integer,  allocatable :: a_NL(:)        !lower soil layer index
+  integer,  allocatable :: a_NJ(:)
+  integer,  allocatable :: a_MaxNumRootLays_col(:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
-  integer :: num_pfts
   logical :: p_bool, a_bool, pheno_bool
-  character(len=512), public :: ecosim_pft_file_path = ""
   contains
 
   subroutine InitSharedData(ncells_per_col_,ncol)
@@ -170,7 +166,6 @@ Module SharedDataMod
     !Set these to zero to prevent truncation errors in the summations later
     a_Transpiration=0.0
     a_EvapCan=0.0
-    num_pfts=5
 
   end subroutine InitSharedData
 
