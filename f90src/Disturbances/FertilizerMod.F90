@@ -40,7 +40,10 @@ implicit none
   integer :: NX,NY
   real(r8) :: OFC(2),OFN(2),OFP(2)
   integer :: LFDPTH = 0
+  character(len=*), parameter :: subname='ApplyFertilizerAtNoon'
 !     begin_execution
+
+  call PrintInfo('beg '//subname)
 
   D8990: DO NX=NHW,NHE
     D8995: DO NY=NVN,NVS
@@ -61,6 +64,7 @@ implicit none
 
     ENDDO D8995
   ENDDO D8990
+  call PrintInfo('end '//subname)
   end subroutine ApplyFertilizerAtNoon
 !------------------------------------------------------------------------------------------
 
@@ -69,8 +73,10 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NY,NX
   integer, intent(in) :: LFDPTH
+  character(len=*), parameter :: subname='ApplyUreaNitrifierInhibitor'
   integer :: L
 !     begin_execution
+  call PrintInfo('beg '//subname)
 !
 !     IYTYP=fertilizer release type from fertilizer input file
 !     FERT=fertilizer type from fertilizer input file
@@ -115,6 +121,7 @@ implicit none
       ENDIF
     ENDDO D9965
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine ApplyUreaNitrifierInhibitor
 !------------------------------------------------------------------------------------------
 
@@ -123,6 +130,7 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer, intent(inout) :: LFDPTH
   real(r8), intent(in) :: OFC(2),OFN(2),OFP(2)
+  character(len=*), parameter :: subname='ApplyManure'
   real(r8) :: CNOF(4),CPOF(4)
   real(r8) :: CORGCX
   real(r8) :: CNOFT
@@ -135,10 +143,12 @@ implicit none
   real(r8) :: OQC1,OQN1,OQP1
   real(r8) :: OSC1,OSN1,OSP1
   REAL(R8) :: RNT,RPT
-  integer  :: L,K,M,N,NN,NGL,MID
+  integer  :: L,K,M,N,NN,NGL,amendment
   integer :: numGuildsH,numGuildsA
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
+  call PrintInfo('beg '//subname)
+
   associate(                           &
     k_fine_comp => micpar%k_fine_comp, &
     k_manure    => micpar%k_manure   , &
@@ -150,7 +160,9 @@ implicit none
     OMCF        => micpar%OMCF      , &
     OMCA        => micpar%OMCA      , &
     rNCOMC_ave  => micpar%rNCOMC_ave, &
-    rPCOMC_ave  => micpar%rPCOMC_ave  &
+    rPCOMC_ave  => micpar%rPCOMC_ave, &
+    CNOFC       => micpar%CNOFC     , &
+    CPOFC       => micpar%CPOFC       &
   )
 !     LFDPTH=layer number
 !
@@ -284,10 +296,17 @@ implicit none
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
 
-    D2965: DO K=1,2
-      OSCI=OFC(K)*AREA_3D(3,LFDPTH,NY,NX)
-      OSNI=OFN(K)*AREA_3D(3,LFDPTH,NY,NX)
-      OSPI=OFP(K)*AREA_3D(3,LFDPTH,NY,NX)
+    D2965: DO amendment=1,2
+      ! Input slots are plant residue and animal manure; their destination
+      ! complexes are fine litter and manure, respectively.
+      IF(amendment==1)THEN
+        K=k_fine_comp
+      ELSE
+        K=k_manure
+      ENDIF
+      OSCI=OFC(amendment)*AREA_3D(3,LFDPTH,NY,NX)
+      OSNI=OFN(amendment)*AREA_3D(3,LFDPTH,NY,NX)
+      OSPI=OFP(amendment)*AREA_3D(3,LFDPTH,NY,NX)
       IF(VLSoilMicPMass_vr(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
         CORGCX=OSCI/VLSoilMicPMass_vr(LFDPTH,NY,NX)
       ELSE
@@ -312,13 +331,14 @@ implicit none
           OMN1=AZMAX1(AMIN1(OMC1*rNCOMC_ave(M,N,K),OSNI-OSNX))
           OMP1=AZMAX1(AMIN1(OMC1*rPCOMC_ave(M,N,K),OSPI-OSPX))
           DO NGL=JGniH(N),JGnfH(N)
-            MID=micpar%get_micb_id(M,NGL)
-            OMC1g=OMC1/numGuildsH
-            OMN1g=OMN1/numGuildsH
-            OMP1g=OMP1/numGuildsH
-            mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
-            mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
-            mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
+            associate(MID => micpar%get_micb_id(M,NGL))
+              OMC1g=OMC1/numGuildsH
+              OMN1g=OMN1/numGuildsH
+              OMP1g=OMP1/numGuildsH
+              mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
+              mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
+              mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
+            end associate
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
@@ -327,13 +347,14 @@ implicit none
             numGuildsA=JGnfA(NN)-JGniA(NN)+1
             if(numGuildsA<=0)cycle D2962
             DO NGL=JGniA(NN),JGnfA(NN)
-              MID=micpar%get_micb_id(M,NGL)
-              OMC1g=OMC1/numGuildsA
-              OMN1g=OMN1/numGuildsA
-              OMP1g=OMP1/numGuildsA
-              mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)+OMC1g*OMCA(NN)
-              mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)+OMN1g*OMCA(NN)
-              mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)+OMP1g*OMCA(NN)
+              associate(MID => micpar%get_micb_id(M,NGL))
+                OMC1g=OMC1/numGuildsA
+                OMN1g=OMN1/numGuildsA
+                OMP1g=OMP1/numGuildsA
+                mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)+OMC1g*OMCA(NN)
+                mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)+OMN1g*OMCA(NN)
+                mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)+OMP1g*OMCA(NN)
+              end associate
             ENDDO
             OSCX=OSCX+OMC1*OMCA(NN)
             OSNX=OSNX+OMN1*OMCA(NN)
@@ -370,14 +391,14 @@ implicit none
         RNT=0._r8
         RPT=0._r8
         D965: DO M=1,jsken
-          RNT=RNT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
-          RPT=RPT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
+          RNT=RNT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
+          RPT=RPT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
         ENDDO D965
         FRNT=(OSNI-OSNX)/RNT
         FRPT=(OSPI-OSPX)/RPT
         D970: DO M=1,jsken
-          CNOF(M)=micpar%CNOFC(M,K)*FRNT
-          CPOF(M)=micpar%CPOFC(M,K)*FRPT
+          CNOF(M)=CNOFC(M,K)*FRNT
+          CPOF(M)=CPOFC(M,K)*FRPT
           CNOFT=CNOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOF(M)
           CPOFT=CPOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOF(M)
         ENDDO D970
@@ -402,9 +423,9 @@ implicit none
         SolidOM_vr(ielmc,M,K,LFDPTH,NY,NX)=SolidOM_vr(ielmc,M,K,LFDPTH,NY,NX)+OSC1
         SolidOM_vr(ielmn,M,K,LFDPTH,NY,NX)=SolidOM_vr(ielmn,M,K,LFDPTH,NY,NX)+OSN1
         SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)=SolidOM_vr(ielmp,M,K,LFDPTH,NY,NX)+OSP1
-        SolidOMAct_vr(M,K,LFDPTH,NY,NX)=SolidOMAct_vr(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
+        SolidOMAct_vr(M,K,LFDPTH,NY,NX)=SolidOMAct_vr(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)
         IF(LFDPTH.EQ.0)THEN
-          VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(micpar%k_fine_comp)
+          VGeomLayer_vr(LFDPTH,NY,NX)=VGeomLayer_vr(LFDPTH,NY,NX)+OSC1*ppmc/BulkDensLitR(k_fine_comp)
         ENDIF
       ENDDO D2970
       tAmendOrgC_lnd              = tAmendOrgC_lnd+OSCI
@@ -419,6 +440,7 @@ implicit none
     ENDDO D2965
   ENDIF
   end associate
+  call PrintInfo('end '//subname)
   end subroutine ApplyManure
 !------------------------------------------------------------------------------------------
 
