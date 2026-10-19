@@ -140,6 +140,10 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+    if(NS<0 .or. NS>JP)then
+      write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
+      call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
+    endif
     ! Topographic units may span several cells; validate against grid dimensions.
     if(NH1<1 .or. NH2>JX .or. NH1>NH2 .or. &
        NV1<1 .or. NV2>JY .or. NV1>NV2)then
@@ -277,6 +281,10 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+    if(NS<0 .or. NS>JP)then
+      write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
+      call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
+    endif
 
     call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
     if(.not. readvar)then
@@ -286,6 +294,14 @@ implicit none
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
       start = (/1,NTOPO,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
       '::at line '//trim(int2str(__LINE__)))
+
+    do NZ=1,NS
+      if(pft_nmgnt(NZ)<0 .or. pft_nmgnt(NZ)>size(pft_mgmtinfo,1))then
+        write(iulog,*)'Invalid event count in '//subname,': topo unit=',NTOPO, &
+          ' PFT=',NZ,' nmgnts=',pft_nmgnt(NZ),' capacity=',size(pft_mgmtinfo,1)
+        call endrun('Plant management event count exceeds the supported range in '//subname,__LINE__)
+      endif
+    enddo
 
     if(any(pft_nmgnt(1:NS)>0))then
       call check_var(pftinfo_nfid, 'pft_mgmt', vardesc, readvar)
@@ -1583,6 +1599,10 @@ implicit none
         call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
         call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+        if(NS<0 .or. NS>JP)then
+          write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
+          call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
+        endif
 
         NN=1
         ! Topographic units may span several cells; validate against grid dimensions.

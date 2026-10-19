@@ -317,6 +317,7 @@ implicit none
 
   subroutine ReadFertlizerFile(soilmgmt_nfid,FertFile,NH1,NH2,NV1,NV2)
 
+  use abortutils, only : iulog
   implicit none
   character(len=*), intent(in) :: FertFile
   integer,intent(in) :: NH1,NH2,NV1,NV2
@@ -335,6 +336,7 @@ implicit none
   type(Var_desc_t) :: vardesc
   character(len=128) :: fertf(12)
   integer :: nfert
+  integer :: FirstRecord(366)
 
   nfert=get_dim_len(soilmgmt_nfid,'nfert')
   if(nfert==0)return
@@ -362,6 +364,7 @@ implicit none
   call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf(1:nfert)),&
       trim(mod_filename))
 
+  FirstRecord=0
   do kk=1,nfert
     if(len_trim(fertf(kk))==0)exit
     !all nutrients are in g/m2
@@ -391,6 +394,18 @@ implicit none
     else
       IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
     endif
+
+    ! One combined amendment record is applied at noon for each day.
+    if(IDY<1 .or. IDY>size(FirstRecord))then
+      write(iulog,*)'Invalid fertilizer day in ',trim(FertFile),': record=',kk,' day=',IDY
+      call endrun('Fertilizer day is outside the daily schedule',__LINE__)
+    endif
+    if(FirstRecord(IDY)/=0)then
+      write(iulog,*)'Duplicate fertilizer day in ',trim(FertFile),': day=',IDY, &
+        ' records=',FirstRecord(IDY),kk
+      call endrun('Combine same-day fertilizer and amendment inputs into one record',__LINE__)
+    endif
+    FirstRecord(IDY)=kk
 
     D8985: DO NX=NH1,NH2
       D8980: DO NY=NV1,NV2
