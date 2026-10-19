@@ -605,7 +605,7 @@ module EcosysWarmingMod
   !
   !Description
   !Apply infrared warming
-  use ClimForcDataType,  only: TairK_col,SineSunInclinationAngle_col
+  use ClimForcDataType,  only: TairK_col,TCA_col,SineSunInclinationAngle_col
   use GridDataType,      only: AREA_3D, NU_col
   use PlantDataRateType, only: GrossCO2Fix_pft
   implicit none
@@ -624,7 +624,8 @@ module EcosysWarmingMod
 
         season_chk=check_warming_season(I,NY,NX)
         if(daytime_chk .and. season_chk)then
-          TairK_col(NY,NX)=TairK_col(NY,NX)+warm_dTK          
+          TairK_col(NY,NX)=TairK_col(NY,NX)+warm_dTK
+          TCA_col(NY,NX)=TairK_col(NY,NX)-TC2K
         endif  
       endif
     ENDDO

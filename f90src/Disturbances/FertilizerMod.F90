@@ -2,7 +2,7 @@ module FertilizerMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use EcoSIMCtrlMod, only: lverb
   use DebugToolMod,  only: PrintInfo
-  use abortutils,    only: iulog
+  use abortutils,    only: iulog,endrun
   use EcoSIMConfig,  only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx
   use SurfLitterDataType
   use EcoSimSumDataType
@@ -39,7 +39,8 @@ implicit none
 
   integer :: NX,NY
   real(r8) :: OFC(2),OFN(2),OFP(2)
-  integer :: LFDPTH = 0
+  integer :: LFDPTH
+  logical :: UreaLayers(0:JZ),NitrifierLayers(0:JZ)
   character(len=*), parameter :: subname='ApplyFertilizerAtNoon'
 !     begin_execution
 
@@ -49,7 +50,7 @@ implicit none
     D8995: DO NY=NVN,NVS
       IF(J.EQ.INT(SolarNoonHour_col(NY,NX)))THEN
 
-        call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
+        call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP,UreaLayers,NitrifierLayers)
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
 !
@@ -58,7 +59,7 @@ implicit none
 !
 !     FERTILIZER UREA, NITRIFICATION INHIBITORS
         if(lverb)write(iulog,*)'ApplyUreaNitrifierInhibitor'
-        call ApplyUreaNitrifierInhibitor(I,J,NY,NX,LFDPTH)
+        call ApplyUreaNitrifierInhibitor(I,J,NY,NX,UreaLayers,NitrifierLayers)
 
       ENDIF
 
@@ -68,11 +69,11 @@ implicit none
   end subroutine ApplyFertilizerAtNoon
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyUreaNitrifierInhibitor(I,J,NY,NX,LFDPTH)
+  subroutine ApplyUreaNitrifierInhibitor(I,J,NY,NX,UreaLayers,NitrifierLayers)
 
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  integer, intent(in) :: LFDPTH
+  logical, intent(in) :: UreaLayers(0:JZ),NitrifierLayers(0:JZ)
   character(len=*), parameter :: subname='ApplyUreaNitrifierInhibitor'
   integer :: L
 !     begin_execution
@@ -97,9 +98,11 @@ implicit none
       iUreaHydInhibitorType_col(NY,NX)=2
     ENDIF
 
+    ! Activity is intensive: initialize each receiving layer at full activity.
+    ! The masks retain mineral placement even if manure changes LFDPTH.
     !urea inhibitor is on
     D9964: DO L=0,NL_col(NY,NX)
-      IF(L.EQ.LFDPTH)THEN
+      IF(UreaLayers(L))THEN
         ZNHU0_vr(L,NY,NX)=1.0_r8  !inital inhibitor activity
         ZNHUI_vr(L,NY,NX)=1.0_r8  !current inhibitor activity
       ELSE
@@ -112,7 +115,7 @@ implicit none
   IF(IYTYP(iamendtyp_fert,I,NY,NX).EQ.3 .OR. IYTYP(iamendtyp_fert,I,NY,NX).EQ.4)THEN
     !nitrification inhibitor is on
     D9965: DO L=0,NL_col(NY,NX)
-      IF(L.EQ.LFDPTH)THEN
+      IF(NitrifierLayers(L))THEN
         ZNFN0_vr(L,NY,NX)=1.0_r8  !initial inhibitor activity
         ZNFNI_vr(L,NY,NX)=1.0_r8  !current inhibitor activity
       ELSE
@@ -444,11 +447,13 @@ implicit none
   end subroutine ApplyManure
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
+  subroutine ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP,UreaLayers,NitrifierLayers)
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(out) :: OFC(2),OFN(2),OFP(2)
   integer, intent(out) :: LFDPTH
+  logical, intent(out) :: UreaLayers(0:JZ),NitrifierLayers(0:JZ)
+  logical :: HasMineralFertilizer
 
   character(len=*), parameter :: subname='ApplyMineralFertilizer'
   real(r8) :: frcFert2Topsoil
@@ -527,22 +532,47 @@ implicit none
 !     LFDPTH=layer number
 !     frcFert2SurfLitr=fraction of fertilizer applied to surface litter
 !
-  IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS+POA+POB.GT.0._r8)THEN
+  HasMineralFertilizer=Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS+POA+POB.GT.0._r8
+  LFDPTH=0
+  UreaLayers=.false.;NitrifierLayers=.false.
+  ! Inhibitor-only records also need a placement determined from FDPTH.
+  IF(HasMineralFertilizer .OR. IYTYP(iamendtyp_fert,I,NY,NX)==3 &
+    .OR. IYTYP(iamendtyp_fert,I,NY,NX)==4)THEN
     FDPTHF=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
     IF(FDPTHF.LE.0._r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB+POB,0._r8))THEN
       LFDPTH=0
       frcFert2SurfLitr=1.0_r8-EXP(-0.8E-02_r8*(SoilOrgM_vr(ielmc,0,NY,NX)/AREA_3D(3,0,NY,NX)))
     ELSE
-      D65: DO L=NUI_col(NY,NX),JZ
+      LFDPTH=-1
+      D65: DO L=NUI_col(NY,NX),NL_col(NY,NX)
         IF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHF)THEN
           LFDPTH=L
           frcFert2SurfLitr=1.0_r8
           exit
         ENDIF
       ENDDO D65
+      if(LFDPTH<0)call endrun('Fertilizer/inhibitor depth exceeds the soil profile in '//mod_filename,__LINE__)
     ENDIF
 
     frcFert2Topsoil=1.0_r8-frcFert2SurfLitr
+    ! Record actual N destinations before any organic amendment changes LFDPTH.
+    UreaLayers(LFDPTH)=(ZUA+ZUB)*frcFert2SurfLitr>0._r8
+    NitrifierLayers(LFDPTH)=(Z4A+ZUA+ZOA+Z4B+ZUB+ZOB)*frcFert2SurfLitr>0._r8
+    if(LFDPTH==0)then
+      UreaLayers(NU_col(NY,NX))=(ZUA+ZUB)*frcFert2Topsoil>0._r8
+      ! Ammonia fertilizer bypasses litter and enters topsoil directly.
+      NitrifierLayers(NU_col(NY,NX))=(Z4A+ZUA+ZOA+Z4B+ZUB+ZOB)*frcFert2Topsoil+Z3A+Z3B>0._r8
+    else
+      NitrifierLayers(LFDPTH)=NitrifierLayers(LFDPTH) .or. (Z3A+Z3B>0._r8)
+    endif
+    if(.not.any(NitrifierLayers))then
+      ! Without an N carrier, place the inhibitor using the application split.
+      NitrifierLayers(LFDPTH)=frcFert2SurfLitr>0._r8
+      if(LFDPTH==0)NitrifierLayers(NU_col(NY,NX))=frcFert2Topsoil>0._r8
+    endif
+  ENDIF
+
+  IF(HasMineralFertilizer)THEN
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
