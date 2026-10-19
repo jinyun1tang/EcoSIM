@@ -140,7 +140,13 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-    if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
+    ! Topographic units may span several cells; validate against grid dimensions.
+    if(NH1<1 .or. NH2>JX .or. NH1>NH2 .or. &
+       NV1<1 .or. NV2>JY .or. NV1>NV2)then
+      write(iulog,*)'Invalid bounds in '//subname,': topo unit=',NTOPO, &
+        ' NH1,NH2,NV1,NV2=',NH1,NH2,NV1,NV2,' JX,JY=',JX,JY
+      call endrun('Invalid topographic-unit bounds in '//subname,__LINE__)
+    endif
     !planting information
     call check_var(pftinfo_nfid, 'pft_pltinfo', vardesc, readvar)
     if(.not. readvar)then
@@ -291,7 +297,13 @@ implicit none
         start = (/1,1,1,NTOPO,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
         trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
     endif
-    if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
+    ! Topographic units may span several cells; validate against grid dimensions.
+    if(NH1<1 .or. NH2>JX .or. NH1>NH2 .or. &
+       NV1<1 .or. NV2>JY .or. NV1>NV2)then
+      write(iulog,*)'Invalid bounds in '//subname,': topo unit=',NTOPO, &
+        ' NH1,NH2,NV1,NV2=',NH1,NH2,NV1,NV2,' JX,JY=',JX,JY
+      call endrun('Invalid topographic-unit bounds in '//subname,__LINE__)
+    endif
 
     DO NX=NH1,NH2
       DO NY=NV1,NV2
@@ -1573,7 +1585,13 @@ implicit none
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
 
         NN=1
-        if(any((/NH1, NV1,NH2,NV2/)<=0) .or. any((/NH1, NV1,NH2,NV2/)>ntopou))exit
+        ! Topographic units may span several cells; validate against grid dimensions.
+        if(NH1<1 .or. NH2>JX .or. NH1>NH2 .or. &
+           NV1<1 .or. NV2>JY .or. NV1>NV2)then
+          write(iulog,*)'Invalid bounds in '//subname,': topo unit=',NTOPO, &
+            ' NH1,NH2,NV1,NV2=',NH1,NH2,NV1,NV2,' JX,JY=',JX,JY
+          call endrun('Invalid topographic-unit bounds in '//subname,__LINE__)
+        endif
         D4995: DO NX=NH1,NH2
           D4990: DO NY=NV1,NV2
             NP0_col(NY,NX)=NS

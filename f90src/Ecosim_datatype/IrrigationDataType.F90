@@ -18,7 +18,7 @@ module IrrigationDataType
   ! Annual management forcing, reread from inputs on startup and restart.
   logical, allocatable :: Lirri_auto_col(:,:)                         !automatic irrigation enabled by management, [-]
   integer ,target,allocatable ::  IIRRA(:,:,:)                       !start and end dates of automated irrigation, [-]
-  real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
+  real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application depth, [m h-1]
   real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
   real(r8),target,allocatable ::  IrrigSubsurf_col(:,:)              !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  IrrigSurface_col(:,:)              !surface irrigation, [m3 d-2 h-1]

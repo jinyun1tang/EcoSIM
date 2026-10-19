@@ -298,8 +298,8 @@
 !     iIrrigOpt_col=flag for irrigation criterion,0=SWC,1=canopy water potential
 !     FIRRA_col=depletion of SWC from CIRRA_col to WP(iIrrigOpt_col=0),or minimum canopy
 !     water potential(iIrrigOpt_col=1), to trigger irrigation
-!     RR=total irrigation requirement
-!     RRIG=hourly irrigation amount applied in wthr.f
+!     RR=total irrigation requirement [m3 per cell]
+!     RRIG=hourly irrigation depth [m h-1]; WthrMod multiplies by cell area
 !
       IF(Lirri_auto_col(NY,NX) .and. decide_irrigation)THEN
       !automated irrigation
@@ -325,7 +325,8 @@
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
-                RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
+                RRIG(J,I,NY,NX)=RR/(AREA_3D(3,NU_col(NY,NX),NY,NX) &
+                  *(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1))
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
               WRITE(iulog,2222)'auto',iYearCurrent,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
