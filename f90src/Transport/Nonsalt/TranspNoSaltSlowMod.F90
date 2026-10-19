@@ -1529,6 +1529,9 @@ implicit none
     DO idg=idg_beg,idg_end
       solute_adv_Lit2Soil_flxM(idg)=GasFracMic*AZMAX1(trcs_solml2_vr(idg,0,NY,NX))
     enddo
+    ! Partition the shared litter NH3 solution between non-band and band soil.
+    solute_adv_Lit2Soil_flxM(idg_NH3)=solute_adv_Lit2Soil_flxM(idg_NH3) &
+      *trcs_VLN_vr(idg_NH3,NU_col(NY,NX),NY,NX)
 
     !from NH4 to H2PO4
     DO idn=ids_nut_beg,ids_nuts_end
