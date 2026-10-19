@@ -326,6 +326,12 @@ module SoilDisturbMod
           OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(idg_NH3,L,NY,NX) &
             +trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO2,L,NY,NX))
           OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4,L,NY,NX))
+          ! Record the elemental mass exported from the molar pools below.
+          OMelm(ielmn)=OMelm(ielmn)+DCORPC*natomw*(trcx_solml_vr(idx_NH4,L,NY,NX) &
+            +SUM(FertN_mole_soil_vr(ifertn_beg:ifertn_end,L,NY,NX)))
+          OMelm(ielmp)=OMelm(ielmp)+DCORPC*patomw*(trcp_saltpml_vr(idsp_AlPO4,L,NY,NX) &
+            +trcp_saltpml_vr(idsp_FePO4,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX) &
+            +2._r8*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+3._r8*trcp_saltpml_vr(idsp_Apatite,L,NY,NX))
           
           DCORPC1=1.0_r8-DCORPC
 

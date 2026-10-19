@@ -549,6 +549,9 @@ module EcosysWarmingMod
   logical :: daytime_chk
   logical :: season_chk
   
+  ! Recompute eligibility each hour; an inactive cable must not force the
+  ! unmodified control temperature after a daytime or seasonal warming period.
+  warm_LL(NVN:NVS,NHW:NHE)=0
   DO NX=NHW,NHE
     DO NY=NVN,NVS
       if(warm_type(NY,NX)==2 .or.warm_type(NY,NX)>20)then

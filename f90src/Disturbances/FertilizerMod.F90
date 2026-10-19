@@ -136,7 +136,7 @@ implicit none
   real(r8) :: OSC1,OSN1,OSP1
   REAL(R8) :: RNT,RPT
   integer  :: L,K,M,N,NN,NGL,MID
-  real(r8) :: tglds
+  integer :: numGuildsH,numGuildsA
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
   associate(                           &
@@ -145,7 +145,12 @@ implicit none
     ilignin     => micpar%ilignin    , &
     icellulos   => micpar%icellulos  , &
     icarbhyro   => micpar%icarbhyro  , &
-    iprotein    => micpar%iprotein     &
+    iprotein    => micpar%iprotein   , &
+    OMCI        => micpar%OMCI      , &
+    OMCF        => micpar%OMCF      , &
+    OMCA        => micpar%OMCA      , &
+    rNCOMC_ave  => micpar%rNCOMC_ave, &
+    rPCOMC_ave  => micpar%rPCOMC_ave  &
   )
 !     LFDPTH=layer number
 !
@@ -299,16 +304,18 @@ implicit none
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
       D2960: DO N=1,NumMicbHFunGrupsPerCmplx
-        tglds=JGnfH(N)-JGnfH(N)+1
+        numGuildsH=JGnfH(N)-JGniH(N)+1
+        ! Unrepresented groups leave their amendment share in the remainder.
+        if(numGuildsH<=0)cycle D2960
         D2961: DO M=1,nlbiomcp
-          OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
-          OMN1=AZMAX1(AMIN1(OMC1*micpar%rNCOMC_ave(M,N,K),OSNI-OSNX))
-          OMP1=AZMAX1(AMIN1(OMC1*micpar%rPCOMC_ave(M,N,K),OSPI-OSPX))
+          OMC1=AZMAX1(AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
+          OMN1=AZMAX1(AMIN1(OMC1*rNCOMC_ave(M,N,K),OSNI-OSNX))
+          OMP1=AZMAX1(AMIN1(OMC1*rPCOMC_ave(M,N,K),OSPI-OSPX))
           DO NGL=JGniH(N),JGnfH(N)
             MID=micpar%get_micb_id(M,NGL)
-            OMC1g=OMC1/tglds
-            OMN1g=OMN1/tglds
-            OMP1g=OMP1/tglds
+            OMC1g=OMC1/numGuildsH
+            OMN1g=OMN1/numGuildsH
+            OMP1g=OMP1/numGuildsH
             mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmc,MID,K,LFDPTH,NY,NX)+OMC1g
             mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmn,MID,K,LFDPTH,NY,NX)+OMN1g
             mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)=mBiomeHeter_vr(ielmp,MID,K,LFDPTH,NY,NX)+OMP1g
@@ -317,19 +324,20 @@ implicit none
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
           D2962: DO NN=1,NumMicbAFunGrupsPerCmplx
-            tglds=JGnfA(N)-JGniA(N)+1
+            numGuildsA=JGnfA(NN)-JGniA(NN)+1
+            if(numGuildsA<=0)cycle D2962
             DO NGL=JGniA(NN),JGnfA(NN)
               MID=micpar%get_micb_id(M,NGL)
-              OMC1g=OMC1/tglds
-              OMN1g=OMN1/tglds
-              OMP1g=OMP1/tglds
-              mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMC1g=OMC1/numGuildsA
+              OMN1g=OMN1/numGuildsA
+              OMP1g=OMP1/numGuildsA
+              mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmc,MID,LFDPTH,NY,NX)+OMC1g*OMCA(NN)
+              mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmn,MID,LFDPTH,NY,NX)+OMN1g*OMCA(NN)
+              mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)=mBiomeAutor_vr(ielmp,MID,LFDPTH,NY,NX)+OMP1g*OMCA(NN)
             ENDDO
-            OSCX=OSCX+OMC1*micpar%OMCA(NN)
-            OSNX=OSNX+OMN1*micpar%OMCA(NN)
-            OSPX=OSPX+OMP1*micpar%OMCA(NN)
+            OSCX=OSCX+OMC1*OMCA(NN)
+            OSNX=OSNX+OMN1*OMCA(NN)
+            OSPX=OSPX+OMP1*OMCA(NN)
           ENDDO D2962
         ENDDO D2961
       ENDDO D2960
