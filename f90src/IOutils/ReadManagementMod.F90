@@ -29,6 +29,7 @@ implicit none
   __FILE__
 
   public :: ReadManagementFiles
+  public :: ReadSoilManagementForYear
   public :: ReadFire
   contains
 
@@ -407,6 +408,19 @@ implicit none
   end subroutine ReadFertlizerFile
 
 !------------------------------------------------------------------------------------------
+
+  subroutine ReadSoilManagementForYear(simulation_year,forcing_year)
+  ! Select only the schedule coordinate. Event doses, units and processes
+  ! remain in the existing reader; missing years still stop explicitly.
+  use EcoSIMCtrlMod, only : soil_mgmt_use_model_year
+  implicit none
+  integer, intent(in) :: simulation_year,forcing_year
+  if(soil_mgmt_use_model_year)then
+    call ReadManagementFiles(simulation_year)
+  else
+    call ReadManagementFiles(forcing_year)
+  endif
+  end subroutine ReadSoilManagementForYear
 
   subroutine ReadManagementFiles(yeari)
   !

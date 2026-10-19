@@ -6,6 +6,7 @@ module PlantAPI4Uptake
   use EcoSiMParDataMod,           only: micpar, pltpar
   use SoilPhysDataType,           only: SurfAlbedo_col
   use MiniMathMod,                only: AZMAX1
+  use EcoSIMCtrlMod,              only: ats_cpl_mode
   use PlantSiteAPIData,           only: plt_site
   use PlantPhotosynthesisAPIData, only: plt_photo
   use PlantRadiationAPIData,      only: plt_rad
@@ -86,6 +87,8 @@ implicit none
   plt_site%ZEROS2                  = ZEROS2(NY,NX)                     !numerical threshold
   plt_ew%Air_Heat_Sens_store_col   = Air_Heat_Sens_store_col(NY,NX)    !initialized to zero,  but is needed iterately to update heat source for surface energy balance calculation?
   plt_ew%Air_Heat_Latent_store_col = Air_Heat_Latent_store_col(NY,NX)  !initialized to zero,  but is needed iteratively for surface energy calculation
+  plt_ew%EMS_modify_scalar_col     = EMS_modify_scalar_col(NY,NX)             !scaling factor for longwave radiation, should be 1 in the coupling, but needs to be in the API
+  !plt_ew%ZERO4PlantDisplace_col    = ZERO4PlantDisplace_col(NY,NX)    
   plt_ew%ZeroPlaneDisplacem_col    = ZeroPlaneDisplacem_col(NY,NX)     !numerical threshold
   plt_rad%Eco_NetRad_col           = Eco_NetRad_col(NY,NX)             !net ecosystem radiation, updated through model iterations, reset to zero in hour1.F90
   plt_ew%Eco_Heat_Sens_col         = Eco_Heat_Sens_col(NY,NX)          !whole ecosystem sensible heat, updated iteratively, reset to zero in hour1.F90
@@ -126,10 +129,19 @@ implicit none
     plt_ew%fSnowCanopy_pft(NZ)              =fSnowCanopy_pft(NZ,NY,NX)   
     Myco_pft(NZ,NY,NX)=1
     plt_ew%DeltaTKC_pft(NZ)                 = DeltaTKC_pft(NZ,NY,NX)
-    if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
-      IsPlantActive_pft(NZ,NY,NX)=iTrue
+    
+    if(ats_cpl_mode)then
+      if(DATAPI(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
+          IsPlantActive_pft(NZ,NY,NX)=iTrue
+        else
+          IsPlantActive_pft(NZ,NY,NX)=iFalse
+      endif
     else
-      IsPlantActive_pft(NZ,NY,NX)=iFalse
+      if(LeafStalkAreaAct_pft(NZ,NY,NX).GT.ZERO4LeafVar_pft(NZ,NY,NX))then
+        IsPlantActive_pft(NZ,NY,NX)=iTrue
+      else
+        IsPlantActive_pft(NZ,NY,NX)=iFalse
+      endif
     endif
     plt_morph%StalkAxialResist_pft(NZ)         = StalkAxialResist_pft(NZ,NY,NX)
     plt_morph%RootSingleVesselRstaxial_pft(NZ) = RootSingleVesselRstaxial_pft(NZ,NY,NX)
@@ -170,14 +182,15 @@ implicit none
       plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)
       plt_morph%RootFineFrac2Med_rpvr(:,L,NZ) = RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)
       plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
-      plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)  
+      plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndRadius_rpvr(N,L,NZ) = Root2ndRadius_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root2ndEffLen4uptk_rpvr(N,L,NZ) = Root2ndEffLen4uptk_rpvr(N,L,NZ,NY,NX)
-        plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)        
+        plt_morph%RootLenDensPerPlant_pvr(N,L,NZ) = RootLenDensPerPlant_pvr(N,L,NZ,NY,NX)
         plt_morph%RootTotLenPerPlant_pvr(N,L,NZ)     = RootTotLenPerPlant_pvr(N,L,NZ,NY,NX)
+        plt_morph%RootAbsorbLenPerPlant_pvr(N,L,NZ)=RootAbsorbLenPerPlant_pvr(N,L,NZ,NY,NX)
       ENDDO
     ENDDO
     !variables updated from surface energy calculation
