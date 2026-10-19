@@ -166,16 +166,20 @@ implicit none
 !     LFDPTH=layer number
 !
   IF(OFC(1)+OFC(2).GT.0._r8)THEN
-    DO  L=0,JZ
-      FDPTHM=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
-      IF(FDPTHM.LE.0._r8)THEN
-        LFDPTH=0
-        exit
-      ELSEIF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHM)THEN
-        LFDPTH=L
-        exit
-      ENDIF
-    ENDDO
+    FDPTHM=FDPTH(I,NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    IF(FDPTHM.LE.0._r8)THEN
+      LFDPTH=0
+    ELSE
+      ! Organic-only records also require a destination in the active profile.
+      LFDPTH=-1
+      DO L=NU_col(NY,NX),NL_col(NY,NX)
+        IF(CumDepz2LayBottom_vr(L,NY,NX).GE.FDPTHM)THEN
+          LFDPTH=L
+          exit
+        ENDIF
+      ENDDO
+      if(LFDPTH<0)call endrun('Organic amendment depth exceeds the soil profile in '//mod_filename,__LINE__)
+    ENDIF
 !
 !     ALLOCATION OF PLANT RESIDUE APPLICATION TO
 !     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
