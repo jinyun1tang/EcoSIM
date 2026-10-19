@@ -103,6 +103,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine ReadIrrigationFile(soilmgmt_nfid,FileIrrig,NH1,NH2,NV1,NV2)
+  use abortutils, only : iulog
 
   implicit none
   character(len=*), intent(in) :: FileIrrig
@@ -117,6 +118,7 @@ implicit none
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
   real(r8) :: CMGQX,CNAQX,CSOQX
   real(r8) :: CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX
+  real(r8) :: IrrigProperties(13),ExistingProperties(13)
   integer :: kk
   logical :: readvar
   type(Var_desc_t) :: vardesc
@@ -255,11 +257,39 @@ implicit none
       else
         IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
       endif
+      if(JST<1 .or. JEN>24 .or. JST>JEN .or. RR<0._r8)then
+        write(iulog,*)'Invalid scheduled irrigation in ',trim(FileIrrig), &
+          ': record=',kk,' day=',IDY,' start,end hours=',JST,JEN,' amount [mm]=',RR
+        call endrun('Scheduled irrigation requires 1<=start<=end<=24 and a nonnegative amount',__LINE__)
+      endif
+      ! A zero-water record must not replace another event's daily properties.
+      if(RR==0._r8)cycle
+      ! Chemistry and application depth are daily fields; all pulses must agree.
+      IrrigProperties=(/PHQX,CN4QX/14._r8,CNOQX/14._r8,CPOQX/31._r8, &
+        CALQX/27._r8,CFEQX/55.8_r8,CCAQX/40._r8,CMGQX/24.3_r8, &
+        CNAQX/23._r8,CKAQX/39.1_r8,CSOQX/32._r8,CCLQX/35.5_r8,WDPTHI/)
       RRH=RR/(JEN-(JST-1))
       D8965: DO NX=NH1,NH2
         D8960: DO NY=NV1,NV2
+          if(any(RRIG(:,IDY,NY,NX)>0._r8))then
+            ExistingProperties=(/PHQ(IDY,NY,NX),NH4_irrig_mole_conc(IDY,NY,NX), &
+              NO3_irrig_mole_conc(IDY,NY,NX),H2PO4_irrig_mole_conc(IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Al,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Fe,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Ca,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Mg,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Na,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_K,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_SO4,IDY,NY,NX), &
+              trcsalt_irrig_mole_conc_col(idsalt_Cl,IDY,NY,NX),WDPTH(IDY,NY,NX)/)
+            if(any(IrrigProperties/=ExistingProperties))then
+              write(iulog,*)'Conflicting scheduled irrigation in ',trim(FileIrrig), &
+                ': record=',kk,' day=',IDY,' NY,NX=',NY,NX
+              call endrun('Same-day irrigation requires identical chemistry and application depth',__LINE__)
+            endif
+          endif
           D2535: DO J=1,24
-            IF(J.GE.JST.AND.J.LE.JEN)RRIG(J,IDY,NY,NX)=RRH/1000.0_r8
+            IF(J.GE.JST.AND.J.LE.JEN)RRIG(J,IDY,NY,NX)=RRIG(J,IDY,NY,NX)+RRH/1000.0_r8
           ENDDO D2535
 !
 !           TRANSFER INPUTS TO MODEL ARRAYS
