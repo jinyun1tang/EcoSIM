@@ -58,6 +58,7 @@ module IngridTranspMod
 
   integer :: NY,NX,LS
   logical :: band_pass
+  real(r8) :: snow_soil_water,snow_mac_frac
   real(r8) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
@@ -77,8 +78,13 @@ module IngridTranspMod
 
       call Litr2SoilDifusTransptM(M,NY,NX,trcSalt_flx_diffusM)
 
+      ! Split accepted soil-directed snow solutes with the liquid-water flow.
+      ! Zero flow retains the existing micropore numerical fallback.
+      snow_soil_water=WatFlowSno2MicPM_col(M,NY,NX)+WatFlowSno2MacPM_col(M,NY,NX)
+      snow_mac_frac=0._r8
+      if(snow_soil_water>0._r8)snow_mac_frac=WatFlowSno2MacPM_col(M,NY,NX)/snow_soil_water
       if(band_pass)then
-        call AcceptSurfaceSaltBandTransfersM(NY,NX,LS,trcSalt_Adv2MicP_flx+trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
+        call AcceptSurfaceSaltBandTransfersM(NY,NX,LS,trcSalt_Adv2MicP_flx+trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx,snow_mac_frac)
         cycle
       endif
       ! These ID-changing transfers have already been accepted locally.
@@ -86,7 +92,7 @@ module IngridTranspMod
       trcSalt_flx_diffusM(idsalt_pband_beg:idsalt_pband_end)=0._r8
       trcSalt_Adv2MacP_flx(idsalt_pband_beg:idsalt_pband_end)=0._r8
 
-      call LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
+      call LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx,snow_mac_frac)
 
       !
       !     MACROPORE TO MICROPORE TRANSFER
@@ -113,10 +119,11 @@ module IngridTranspMod
   end subroutine SurfaceSaltFluxM
 !------------------------------------------------------------------------------------------
 
-  subroutine AcceptSurfaceSaltBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp)
+  subroutine AcceptSurfaceSaltBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp,snow_mac_frac)
   ! Accept ID-changing phosphate transfers without coupling ordinary soil pools.
   implicit none
   integer, intent(in) :: NY,NX,LS ! LS=0 means no bottom snow donor
+  real(r8), intent(in) :: snow_mac_frac ! fraction of soil-directed snow liquid entering macropores
   real(r8), intent(in) :: litter_to_micp(idsalt_beg:idsaltb_end) ! signed litter-to-band proposal [mol d-2]
   real(r8), intent(in) :: litter_to_macp(idsalt_beg:idsaltb_end) ! nonnegative litter-to-band proposal [mol d-2]
   character(len=*), parameter :: subname='AcceptSurfaceSaltBandTransfersM'
@@ -151,8 +158,8 @@ module IngridTranspMod
     endif
 
     trcSalt_solml2_vr(idsalt,0,NY,NX)=litter_mass-micp_flux-macp_flux
-    trcSalt_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux
-    trcSalt_soHml2_vr(idsband,L,NY,NX)=trcSalt_soHml2_vr(idsband,L,NY,NX)+macp_flux
+    trcSalt_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux*(1._r8-snow_mac_frac)
+    trcSalt_soHml2_vr(idsband,L,NY,NX)=trcSalt_soHml2_vr(idsband,L,NY,NX)+macp_flux+snow_flux*snow_mac_frac
     trcSalt_solml_vr(idsalt,0,NY,NX)=trcSalt_solml2_vr(idsalt,0,NY,NX)
     trcSalt_solml_vr(idsband,L,NY,NX)=trcSalt_solml2_vr(idsband,L,NY,NX)
     trcSalt_soHml_vr(idsband,L,NY,NX)=trcSalt_soHml2_vr(idsband,L,NY,NX)
@@ -814,12 +821,13 @@ module IngridTranspMod
   end subroutine Litr2SoilDifusTransptM
 !------------------------------------------------------------------------------------------
 
-  subroutine LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx)
+  subroutine LitrSoilAdvDifusTransptM(NY,NX,trcSalt_Adv2MicP_flx,trcSalt_flx_diffusM,trcSalt_Adv2MacP_flx,snow_mac_frac)
 !
 !     Description:
 !
   implicit none
   integer, intent(in) :: NY,NX
+  real(r8), intent(in) :: snow_mac_frac ! fraction of soil-directed snow liquid entering macropores
   real(r8), intent(in) :: trcSalt_Adv2MicP_flx(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSalt_flx_diffusM(idsalt_beg:idsaltb_end)
   real(r8), intent(in) :: trcSalt_Adv2MacP_flx(idsalt_beg:idsaltb_end)
@@ -835,7 +843,7 @@ module IngridTranspMod
 
   DO idsalt=idsalt_beg,idsaltb_end
     trcSalt_MicpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)=trcSalt_Precip2MicpM(idsalt,NY,NX) &
-      +trcSalt_AquaADV_Snow2Soil_flxM(idsalt,NY,NX)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffusM(idsalt)
+      +trcSalt_AquaADV_Snow2Soil_flxM(idsalt,NY,NX)*(1._r8-snow_mac_frac)+trcSalt_Adv2MicP_flx(idsalt)+trcSalt_flx_diffusM(idsalt)
   ENDDO
 
   DO idsalt=idsalt_beg,idsalt_end
@@ -849,7 +857,8 @@ module IngridTranspMod
       -trcSalt_Adv2MicP_flx(ids)-trcSalt_flx_diffusM(ids)-trcSalt_Adv2MacP_flx(ids)
   ENDDO
   DO idsalt=idsalt_beg,idsaltb_end
-    trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)=trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)+trcSalt_Adv2MacP_flx(idsalt)
+    trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)=trcSalt_MacpTranspFlxM_3D(idsalt,3,NU_col(NY,NX),NY,NX)+trcSalt_Adv2MacP_flx(idsalt) &
+      +trcSalt_AquaADV_Snow2Soil_flxM(idsalt,NY,NX)*snow_mac_frac
   ENDDO
   end subroutine LitrSoilAdvDifusTransptM
 !------------------------------------------------------------------------------------------

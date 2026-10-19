@@ -1203,7 +1203,7 @@ implicit none
   character(len=*), parameter :: subname='SurfaceSoluteFluxM'
 
   integer  :: NY,NX,K
-  real(r8) :: FLWRM1
+  real(r8) :: FLWRM1,snow_soil_water,snow_mac_frac
   real(r8) :: trcs_cl_litr(ids_beg:ids_end)
   real(r8) :: trcs_cl_soil(ids_beg:ids_end)
   real(r8) :: solute_adv_Lit2Soil_flxM(ids_beg:ids_end)
@@ -1230,18 +1230,23 @@ implicit none
       call LitterSoilTracerDiffusionM(I,J,M,NY,NX,FLWRM1,trcs_cl_litr,trcs_cl_soil,&
         trcs_Dif_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM)
 
+      ! Keep total snow discharge for donor accounting; split soil credits
+      ! with the liquid-water destinations. Zero flow retains the old fallback.
+      snow_soil_water=WatFlowSno2MicPM_col(M,NY,NX)+WatFlowSno2MacPM_col(M,NY,NX)
+      snow_mac_frac=0._r8
+      if(snow_soil_water>0._r8)snow_mac_frac=WatFlowSno2MacPM_col(M,NY,NX)/snow_soil_water
       !-----------------------------------------------------------------        
       !
       if(present(band_snow_donor_col))then
         call AcceptSurfaceBandTransfersM(NY,NX,band_snow_donor_col(NY,NX), &
-          solute_adv_Lit2Soil_flxM+trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM)
+          solute_adv_Lit2Soil_flxM+trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,snow_mac_frac)
       else
         ! These transfers were already accepted; do not replay them in retries.
         solute_adv_Lit2Soil_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
         trcs_Dif_Litr2Soil_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
         solute_adv_Lit2MacP_flxM(ids_nutb_beg:ids_nutb_end)=0._r8
         call SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
-          DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
+          DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM,snow_mac_frac)
       endif
     ENDDO
   ENDDO
@@ -1256,11 +1261,12 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine AcceptSurfaceBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp)
+  subroutine AcceptSurfaceBandTransfersM(NY,NX,LS,litter_to_micp,litter_to_macp,snow_mac_frac)
   ! Accept only transfers that change IDs between litter/snow and banded soil.
   ! All other transport uses the existing independent per-tracer retry solver.
   implicit none
   integer, intent(in) :: NY,NX,LS ! LS=0 means no bottom snow donor
+  real(r8), intent(in) :: snow_mac_frac ! fraction of soil-directed snow liquid entering macropores
   real(r8), intent(in) :: litter_to_micp(ids_beg:ids_end) ! signed litter-to-band proposal
   real(r8), intent(in) :: litter_to_macp(ids_beg:ids_end) ! nonnegative litter-to-band proposal
   character(len=*), parameter :: subname='AcceptSurfaceBandTransfersM'
@@ -1308,8 +1314,8 @@ implicit none
     endif
 
     trcs_solml2_vr(ids,0,NY,NX)=litter_mass-micp_flux-macp_flux
-    trcs_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux
-    trcs_soHml2_vr(idsband,L,NY,NX)=trcs_soHml2_vr(idsband,L,NY,NX)+macp_flux
+    trcs_solml2_vr(idsband,L,NY,NX)=soil_mass+micp_flux+snow_flux*(1._r8-snow_mac_frac)
+    trcs_soHml2_vr(idsband,L,NY,NX)=trcs_soHml2_vr(idsband,L,NY,NX)+macp_flux+snow_flux*snow_mac_frac
     trcs_solml_vr(ids,0,NY,NX)=trcs_solml2_vr(ids,0,NY,NX)
     trcs_solml_vr(idsband,L,NY,NX)=trcs_solml2_vr(idsband,L,NY,NX)
     trcs_soHml_vr(idsband,L,NY,NX)=trcs_soHml2_vr(idsband,L,NY,NX)
@@ -1673,13 +1679,14 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine SurfLayerNetTracerFluxM(I,J,M,NY,NX,trcs_Dif_Litr2Soil_flxM,solute_adv_Lit2Soil_flxM,&
-    DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM)
+    DOM_Adv_Litr2Soil_flxM,DOM_Difus_Litr2Soil_flxM,solute_adv_Lit2MacP_flxM,DOM_Adv_Litr2MacP_flxM,snow_mac_frac)
   !
   !Description:
   !
   implicit none
   integer, intent(in) :: I,J,M
   integer, intent(in) :: NY, NX
+  real(r8), intent(in) :: snow_mac_frac ! fraction of soil-directed snow liquid entering macropores
   real(r8), intent(in) :: trcs_Dif_Litr2Soil_flxM(ids_beg:ids_end)              !diffusion flux
   real(r8), intent(in) :: solute_adv_Lit2Soil_flxM(ids_beg:ids_end)             !advection flux
   real(r8), intent(in) :: DOM_Adv_Litr2Soil_flxM(idom_beg:idom_end,1:jcplx)     !diffusion advection flux
@@ -1707,7 +1714,7 @@ implicit none
     trcs_MicpTranspFlxM_3D(idg,3,0,NY,NX)=trcg_Precip2LitrM_col(idg,NY,NX)+trcg_AquaADV_Snow2Litr_flxM(idg,NY,NX) &
       -Gas_litr2Soil_flxM_col(idg,NY,NX)
 
-    trcs_MicpTranspFlxM_3D(idg,3,NU_col(NY,NX),NY,NX)=trcs_Precip2MicpM_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX) &
+    trcs_MicpTranspFlxM_3D(idg,3,NU_col(NY,NX),NY,NX)=trcs_Precip2MicpM_col(idg,NY,NX)+trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)*(1._r8-snow_mac_frac) &
       +Gas_litr2Soil_flxM_col(idg,NY,NX)
   ENDDO
   !from NH4 to H2PO4
@@ -1715,7 +1722,7 @@ implicit none
     trcs_MicpTranspFlxM_3D(ids,3,0,NY,NX)=trcn_Precip2LitrM_col(ids,NY,NX)+trcn_AquaADV_Snow2Litr_flxM(ids,NY,NX) &
       -solute_adv_Lit2Soil_flxM(ids)-trcs_Dif_Litr2Soil_flxM(ids)
 
-    trcs_MicpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX)=trcs_Precip2MicpM_col(ids,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(ids,NY,NX) &
+    trcs_MicpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX)=trcs_Precip2MicpM_col(ids,NY,NX)+trcn_AquaADV_Snow2Soil_flxM(ids,NY,NX)*(1._r8-snow_mac_frac) &
       +solute_adv_Lit2Soil_flxM(ids)+trcs_Dif_Litr2Soil_flxM(ids)
   enddo
 
@@ -1724,7 +1731,7 @@ implicit none
     -solute_adv_Lit2Soil_flxM(idg_NH3B)-trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
 
   trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX)   = trcs_MicpTranspFlxM_3D(idg_NH3B,3,NU_col(NY,NX),NY,NX) &
-    +trcn_AquaADV_Snow2Band_flxM(idg_NH3B,NY,NX) &
+    +trcn_AquaADV_Snow2Band_flxM(idg_NH3B,NY,NX)*(1._r8-snow_mac_frac) &
     +solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)
 
   Gas_litr2Soil_flxM_col(idg_NH3B,NY,NX)= solute_adv_Lit2Soil_flxM(idg_NH3B)+trcs_Dif_Litr2Soil_flxM(idg_NH3B)  
@@ -1736,7 +1743,7 @@ implicit none
     ids2=ids+ids_NH4B  
     NutLitr2Soil=solute_adv_Lit2Soil_flxM(ids2)+trcs_Dif_Litr2Soil_flxM(ids2)
     trcs_MicpTranspFlxM_3D(ids1,3,0,NY,NX)             = trcs_MicpTranspFlxM_3D(ids1,3,0,NY,NX)-NutLitr2Soil
-    trcs_MicpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX) = trcs_Precip2MicpM_col(ids2,NY,NX)+trcn_AquaADV_Snow2Band_flxM(ids2,NY,NX)+NutLitr2Soil
+    trcs_MicpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX) = trcs_Precip2MicpM_col(ids2,NY,NX)+trcn_AquaADV_Snow2Band_flxM(ids2,NY,NX)*(1._r8-snow_mac_frac)+NutLitr2Soil
   enddo
 
   ! Paired litter debit / topsoil macropore credit. The soil flux gatherer
@@ -1755,6 +1762,19 @@ implicit none
       -solute_adv_Lit2MacP_flxM(ids1)-solute_adv_Lit2MacP_flxM(ids2)
     trcs_MacpTranspFlxM_3D(ids1,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids1,3,NU_col(NY,NX),NY,NX)+solute_adv_Lit2MacP_flxM(ids1)
     trcs_MacpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids2,3,NU_col(NY,NX),NY,NX)+solute_adv_Lit2MacP_flxM(ids2)
+  ENDDO
+  ! The total snow flux remains unchanged for the donor and hourly ledgers.
+  DO idg=idg_beg,idg_NH3
+    trcs_MacpTranspFlxM_3D(idg,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(idg,3,NU_col(NY,NX),NY,NX) &
+      +trcg_AquaADV_Snow2Soil_flxM(idg,NY,NX)*snow_mac_frac
+  ENDDO
+  DO ids=ids_nut_beg,ids_nuts_end
+    trcs_MacpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX) &
+      +trcn_AquaADV_Snow2Soil_flxM(ids,NY,NX)*snow_mac_frac
+  ENDDO
+  DO ids=ids_nutb_beg,ids_nutb_end
+    trcs_MacpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX)=trcs_MacpTranspFlxM_3D(ids,3,NU_col(NY,NX),NY,NX) &
+      +trcn_AquaADV_Snow2Band_flxM(ids,NY,NX)*snow_mac_frac
   ENDDO
   call PrintInfo('end '//subname)
   end subroutine SurfLayerNetTracerFluxM
