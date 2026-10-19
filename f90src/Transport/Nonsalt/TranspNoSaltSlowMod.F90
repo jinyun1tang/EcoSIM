@@ -51,7 +51,7 @@ implicit none
   real(r8) :: pscal1_dom(idom_beg:idom_end),dpscal_dom(idom_beg:idom_end)
   real(r8) :: dpscal_max
   integer :: ids,idom,iterm
-  integer :: band_snow_donor_col(JY,JX) ! snow donor for the surface band-transfer pass
+  integer :: snow_donor_col(JY,JX) ! selected snow discharge donor; zero means none
   
   call PrintInfo('beg '//subname)
 
@@ -64,8 +64,8 @@ implicit none
 
   ! Accept ID-changing surface transfers once, before independent soil transport.
   call ZeroFluxesM(I,J,M,NHE,NHW,NVS,NVN)
-  call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
-  call SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
+  call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,snow_donor_col,band_transfer_only=.true.)
+  call SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN,snow_donor_col)
 
   DO while(dpscal_max>1.e-2_r8 .and. iterm<3)
     iterm=iterm+1
@@ -73,11 +73,11 @@ implicit none
 !    write(555,*)'============================'
     call ZeroFluxesM(I,J,M,NHE,NHW,NVS,NVN)  
 
-    call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN)
+    call SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,snow_donor_col)
 
     call SurfaceSoluteFluxM(I,J,M,NHE,NHW,NVS,NVN)
 
-    call TracerXBoundariesM(I,J,M,NHW,NHE,NVN,NVS)
+    call TracerXBoundariesM(I,J,M,NHW,NHE,NVN,NVS,snow_donor_col)
 
     call TracerXInterGridsM(I,J,M,NHE,NHW,NVS,NVN)
 
@@ -1984,7 +1984,7 @@ implicit none
   ENDDO  
   end subroutine TracerFlowThruSnowRedist
 ! ----------------------------------------------------------------------
-  subroutine SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,band_snow_donor_col)
+  subroutine SnowSoluteVertDrainM(I,J,M,NHE,NHW,NVS,NVN,snow_donor_col,band_transfer_only)
   !
   !Description
   !Vertical drainage of solute in and out of snow.
@@ -1992,8 +1992,11 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NHE,NHW,NVS,NVN
-  ! Bottom snow donor for the separate ID-changing transfer pass.
-  integer, optional, intent(out) :: band_snow_donor_col(JY,JX)
+  ! Discharge donor within the fixed hourly layer range; zero means none.
+  integer, intent(out) :: snow_donor_col(JY,JX)
+  ! True only in the once-per-substep ID-changing surface transfer pass.
+  logical, optional, intent(in) :: band_transfer_only
+  logical :: band_pass
   integer :: NY, NX
 
   character(len=*), parameter :: subname='SnowSoluteVertDrainM'
@@ -2005,7 +2008,9 @@ implicit none
   integer  :: idg,idn
 !
   call PrintInfo('beg '//subname)
-  if(present(band_snow_donor_col))band_snow_donor_col=0
+  snow_donor_col=0
+  band_pass=.false.
+  if(present(band_transfer_only))band_pass=band_transfer_only
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -2017,7 +2022,7 @@ implicit none
           !next layer index
           L2=MIN(JS,L+1)
           !L is an inner layer, because L2 is well defined
-          IF(L.LT.JS .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+          IF(L.LT.nsnol_col(NY,NX) .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
             !some flowout
             IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
               VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
@@ -2090,7 +2095,7 @@ implicit none
               trcn_AquaADV_Snow2Band_flxM(ids_H1PO4B,NY,NX) = trcn_solsml2_snvr(ids_H1PO4,L,NY,NX)*VFLWPOB
               trcn_AquaADV_Snow2Band_flxM(ids_H2PO4B,NY,NX) = trcn_solsml2_snvr(ids_H2PO4,L,NY,NX)*VFLWPOB
               
-              if(present(band_snow_donor_col))band_snow_donor_col(NY,NX)=L
+              snow_donor_col(NY,NX)=L
               LCHKBOTML = .true.
             ENDIF
           ENDIF
@@ -2099,7 +2104,7 @@ implicit none
     ENDDO
   ENDDO
   ! Snow-to-band transfer is applied only in the separate surface pass.
-  if(.not.present(band_snow_donor_col))then
+  if(.not.band_pass)then
     trcn_AquaADV_Snow2Band_flxM(:,NVN:NVS,NHW:NHE)=0._r8
   endif
   call PrintInfo('end '//subname)
@@ -3125,63 +3130,51 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerFluxThruSnowZM(I,J,M,N1,N2)
-  !
-  !tracer flux from snow to litter and soil
+  subroutine TracerFluxThruSnowZM(I,J,M,N1,N2,snow_donor)
+  ! Assemble the recorded snow transfers on the fixed hourly layer structure.
+  ! The proposal routine selects the discharge donor; do not reclassify layers
+  ! here using a different capacity threshold or substep snapshot.
   implicit none
-  integer, intent(in) :: I,J
-  integer, intent(in) :: M,N1,N2
-
+  integer, intent(in) :: I,J,M,N1,N2
+  integer, intent(in) :: snow_donor ! zero means no discharge proposal
   character(len=*), parameter :: subname='TracerFluxThruSnowZM'
-  integer :: LS,LS2
-  integer :: idg,idn
+  integer :: LS,idg,idn
 
   call PrintInfo('beg '//subname)
 
-  DO  LS=1,nsnol_col(N2,N1)
+  DO LS=1,nsnol_col(N2,N1)
+    DO idg=idg_beg,idg_NH3
+      trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
+        +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)
+      if(LS<nsnol_col(N2,N1))then
+        trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
+          -trcg_AquaAdv_flxM_snvr(idg,LS+1,N2,N1)
+      endif
+    ENDDO
+    DO idn=ids_nut_beg,ids_nuts_end
+      trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
+        +trcn_AquaAdv_flxM_snvr(idn,LS,N2,N1)
+      if(LS<nsnol_col(N2,N1))then
+        trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
+          -trcn_AquaAdv_flxM_snvr(idn,LS+1,N2,N1)
+      endif
+    ENDDO
 
-    IF(VLSnowHeatCapM_snvr(1,1,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
-      LS2=MIN(JS,LS+1)
-
-      ! NEXT LAYER IS IN THE SNOWPACK   
-      IF(LS.LT.nsnol_col(N2,N1) .AND. VLSnowHeatCapM_snvr(M,LS2,N2,N1).GT.VLHeatCapSnowMin_col(N2,N1)*1.e-4_r8)THEN
-
-        DO idg=idg_beg,idg_NH3
-          trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
-            +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)-trcg_AquaAdv_flxM_snvr(idg,LS2,N2,N1)
-        ENDDO
-
-        DO idn=ids_nut_beg,ids_nuts_end
-          trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
-            +trcn_AquaAdv_flxM_snvr(idn,LS,N2,N1)-trcn_AquaAdv_flxM_snvr(idn,LS2,N2,N1)
-        ENDDO
-
-        ! NEXT LAYER IS THE LITTER AND SOIL SURFACE
-      ELSE
-
-        ! exclude NH3 and NH3B
-        DO idg=idg_beg,idg_NH3
-          trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
-            +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)   &
-            -trcg_AquaADV_Snow2Litr_flxM(idg,N2,N1) &
-            -trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
-
-        ENDDO
-
-        trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
-          -trcn_AquaADV_Snow2Band_flxM(idg_NH3B,N2,N1)
-
-        !from NH4 to H2PO4
-        DO idn=0,ids_nuts
-          trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1) &
-            +trcn_AquaAdv_flxM_snvr(ids_NH4+idn,LS,N2,N1)   &
-            -trcn_AquaADV_Snow2Litr_flxM(ids_NH4+idn,N2,N1) &
-            -trcn_AquaADV_Snow2Soil_flxM(ids_NH4+idn,N2,N1) &
-            -trcn_AquaADV_Snow2Band_flxM(ids_NH4B+idn,N2,N1)
-        ENDDO
-      ENDIF
-    ENDIF
-  enddo
+    if(LS==snow_donor)then
+      DO idg=idg_beg,idg_NH3
+        trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
+          -trcg_AquaADV_Snow2Litr_flxM(idg,N2,N1)-trcg_AquaADV_Snow2Soil_flxM(idg,N2,N1)
+      ENDDO
+      trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg_NH3,LS,N2,N1) &
+        -trcn_AquaADV_Snow2Band_flxM(idg_NH3B,N2,N1)
+      DO idn=0,ids_nuts
+        trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(ids_NH4+idn,LS,N2,N1) &
+          -trcn_AquaADV_Snow2Litr_flxM(ids_NH4+idn,N2,N1) &
+          -trcn_AquaADV_Snow2Soil_flxM(ids_NH4+idn,N2,N1) &
+          -trcn_AquaADV_Snow2Band_flxM(ids_NH4B+idn,N2,N1)
+      ENDDO
+    endif
+  ENDDO
   call PrintInfo('end '//subname)
   end subroutine TracerFluxThruSnowZM
 ! ----------------------------------------------------------------------
@@ -3344,7 +3337,7 @@ implicit none
   end subroutine XSurfBoundaryTracerRunoffXYM
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerXBoundariesM(I,J,M,NHW,NHE,NVN,NVS)
+  subroutine TracerXBoundariesM(I,J,M,NHW,NHE,NVN,NVS,snow_donor_col)
   !
   !Description:
   !Do transport across the boundaries, upper surface, subsurface lateral,
@@ -3354,6 +3347,7 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NHW, NHE, NVN, NVS
 
+  integer, intent(in) :: snow_donor_col(JY,JX) ! discharge donors selected during proposal formation
   character(len=*), parameter :: subname='TracerXBoundariesM'
   integer :: NY,NX,L
   integer :: NN,N
@@ -3430,7 +3424,7 @@ implicit none
               !
             ELSEIF(N.EQ.iVerticalDirection)THEN
               ! vertical direction
-              call TracerFluxThruSnowZM(I,J,M,N1,N2)
+              call TracerFluxThruSnowZM(I,J,M,N1,N2,snow_donor_col(N2,N1))
             ENDIF
           ENDIF
 
