@@ -1515,18 +1515,18 @@ contains
 !
   ! Export the same recipient split used by the water calculation. Liquid
   ! throughfall carries the rain/irrigation mixture; snowfall goes to snow.
-  RainFrac=0._r8
-  IrrigFrac=0._r8
+  RainFrac  = 0._r8
+  IrrigFrac = 0._r8
   IF(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX)>0._r8)THEN
-    RainFrac=RainFalPrec_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
-    IrrigFrac=IrrigSurface_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
+    RainFrac  = RainFalPrec_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
+    IrrigFrac = IrrigSurface_col(NY,NX)/(RainFalPrec_col(NY,NX)+IrrigSurface_col(NY,NX))
   ENDIF
-  Rain2SnowSurf_col(NY,NX)=SnoFall+Rain2Snow*RainFrac
-  Irrig2SnowSurf_col(NY,NX)=Rain2Snow*IrrigFrac
-  Rain2LitRSurf_col(NY,NX)=RainThrufall2LitR*RainFrac
-  Irrig2LitRSurf_col(NY,NX)=RainThrufall2LitR*IrrigFrac
-  Rain2SoilSurf_col(NY,NX)=RainThrufall2Soil*RainFrac
-  Irrig2SoilSurf_col(NY,NX)=RainThrufall2Soil*IrrigFrac
+  Rain2SnowSurf_col(NY,NX)  = SnoFall+Rain2Snow*RainFrac
+  Irrig2SnowSurf_col(NY,NX) = Rain2Snow*IrrigFrac
+  Rain2LitRSurf_col(NY,NX)  = RainThrufall2LitR*RainFrac
+  Irrig2LitRSurf_col(NY,NX) = RainThrufall2LitR*IrrigFrac
+  Rain2SoilSurf_col(NY,NX)  = RainThrufall2Soil*RainFrac
+  Irrig2SoilSurf_col(NY,NX) = RainThrufall2Soil*IrrigFrac
   !
   !     GATHER PRECIPITATION AND MELTWATER FLUXES AND THEIR HEATS
   !     AMONG ATMOSPHERE, SNOWPACK, RESIDUE AND SOIL SURFACES
