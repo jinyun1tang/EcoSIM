@@ -1335,7 +1335,7 @@ implicit none
   subroutine AtmosLitterExchangeM(I,J,M,NY,NX,trcs_cl_litr)
   implicit none
   integer, intent(in) :: I,J,NY,NX,M
-  real(r8),intent(out) :: trcs_cl_litr(ids_beg:ids_end)
+  real(r8),intent(out) :: trcs_cl_litr(ids_beg:ids_end) !tracer concentration
 
   character(len=*), parameter :: subname = 'AtmosLitterExchangeM'
   integer :: K,ids,idg,idom
@@ -1358,6 +1358,9 @@ implicit none
     DO ids=ids_beg,ids_end
       trcs_cl_litr(ids)=(trcs_solml2_vr(ids,0,NY,NX)-0._r8*trcs_solml_drib_vr(ids,0,NY,NX))/VLWatMicPM_vr(M,0,NY,NX)
     ENDDO
+    ! Both soil destinations draw from the same unbanded litter solution.
+    trcs_cl_litr(idg_NH3B)=trcs_cl_litr(idg_NH3)
+    trcs_cl_litr(ids_NH4B:ids_H2PO4B)=trcs_cl_litr(ids_NH4:ids_H2PO4)
 !
 !     PARR=boundary layer conductance above litter surface from watsub.f
 !
