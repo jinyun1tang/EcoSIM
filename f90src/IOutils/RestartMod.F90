@@ -10671,7 +10671,7 @@ implicit none
   character(len=256) :: filename  ! local file name
   character(len=256) :: fnamer    ! restart file name
   integer :: nio
-  integer :: ii,year,mon,day,tod,iostat
+  integer :: ii,year,mon,day,tod,iostat,hh,mm,ss
   nio = getavu()
   filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
   
@@ -10701,6 +10701,10 @@ implicit none
   read(fnamer(ii+1:),'(I2)')day
   ii=ii+3
   read(fnamer(ii+1:),'(I6)')tod
-  write(curr_date,'(I4.4,I2.2,I2.2,I6.6)')year,mon,day,tod
+  ! Restart filenames use seconds since midnight; the driver matches HHMMSS.
+  hh=tod/3600
+  mm=mod(tod,3600)/60
+  ss=mod(tod,60)
+  write(curr_date,'(I4.4,5I2.2)')year,mon,day,hh,mm,ss
   end subroutine get_restart_date
 end module restartMod
