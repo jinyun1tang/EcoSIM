@@ -137,6 +137,10 @@ implicit none
 !       AUTOMATED IRRIGATION
 !
 !       DST,DEN=start,end dates,hours DDMMHHHH
+!       TODO: Verify this input format; DDMMHHHH may be a documentation typo.
+!       The final four digits are used both as a year in isLeap(IDY3) and
+!       as a time in IHRS/IHRE. Check the intended input convention before
+!       revising the parsing or leap-year calculation for either endpoint.
 !       iIrrigOptX=flag for irrigation criterion,0=SWC,1=canopy water potl
 !       FIRRX=depletion of SWC from CIRRX to WP(iIrrigOpt_col=0),or minimum canopy
 !       water potential(iIrrigOpt_col=1), to trigger irrigation
