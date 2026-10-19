@@ -147,22 +147,13 @@ module EcosysWarmingMod
   ans=(year>warm_yearb .or. (year==warm_yearb .and. I>=warm_doyb)) &
     .and. (year<warm_yeare .or. (year==warm_yeare .and. I<=warm_doye))
   
-  if(I==1 .and. J==1)then
-    
-    leap_cor=0
-    if(seas_doyb>59)then
-      leap_cor(1)=iisleap(year)
-    endif
-
-    if(seas_doyb<seas_doye)then
-      !within a year
-      leap_cor(2)=leap_cor(1)
-    else
-      !over two years
-      if(seas_doye>59)then
-        leap_cor(2)=iisleap(year+1)
-      endif      
-    endif
+  ! Seasonal endpoints are stored as non-leap-year ordinal days. Each is
+  ! compared against the current year's I, including cross-year seasons.
+  ! Refresh on every call so a midyear start/restart needs no January setup.
+  leap_cor=0
+  if(igrowth==2 .or. igrowth==3)then
+    if(seas_doyb>59)leap_cor(1)=iisleap(year)
+    if(seas_doye>59)leap_cor(2)=iisleap(year)
   endif
   return
   end function check_warming_dates
@@ -494,12 +485,9 @@ module EcosysWarmingMod
   ans=.true.  
   write(fname,'(A)')trim(fname_warming_Tref)
   
-  do jj = 1, 256
-    if(fname(jj:jj+3)=='xxxx')then
-      write(fname(jj:jj+3),'(I4)')year      
-      exit
-    endif
-  enddo
+  ! Substitute a year template when present; literal filenames remain valid.
+  jj=index(fname,'xxxx')
+  if(jj>0)write(fname(jj:jj+3),'(I4)')year
   
   end function get_warming_fname
 
