@@ -134,12 +134,8 @@ implicit none
   integer, intent(inout) :: LFDPTH
   real(r8), intent(in) :: OFC(2),OFN(2),OFP(2)
   character(len=*), parameter :: subname='ApplyManure'
-  real(r8) :: CNOF(4),CPOF(4)
   real(r8) :: CORGCX
-  real(r8) :: CNOFT
-  real(r8) :: CPOFT
   real(r8) :: FDPTHM
-  real(r8) :: FRNT,FRPT
   REAL(R8) :: OSCI,OSNI,OSPI
   REAL(R8) :: OSCX,OSNX,OSPX
   REAL(R8) :: OMC1,OMN1,OMP1
@@ -148,7 +144,7 @@ implicit none
   REAL(R8) :: RNT,RPT
   integer  :: L,K,M,N,NN,NGL,amendment
   integer :: numGuildsH,numGuildsA
-  real(r8) :: OMC1g,OMN1g,OMP1g
+  real(r8) :: OMC1g,OMN1g,OMP1g,MicrobialShareFactor
 !     begin_execution
   call PrintInfo('beg '//subname)
 
@@ -299,6 +295,12 @@ implicit none
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
 
+    ! Reserve the represented autotroph shares together with each heterotroph
+    ! allocation, before debiting the common amendment C/N/P donor budgets.
+    MicrobialShareFactor=1._r8
+    DO NN=1,NumMicbAFunGrupsPerCmplx
+      if(JGnfA(NN)>=JGniA(NN))MicrobialShareFactor=MicrobialShareFactor+OMCA(NN)
+    ENDDO
     D2965: DO amendment=1,2
       ! Input slots are plant residue and animal manure; their destination
       ! complexes are fine litter and manure, respectively.
@@ -330,9 +332,9 @@ implicit none
         ! Unrepresented groups leave their amendment share in the remainder.
         if(numGuildsH<=0)cycle D2960
         D2961: DO M=1,nlbiomcp
-          OMC1=AZMAX1(AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
-          OMN1=AZMAX1(AMIN1(OMC1*rNCOMC_ave(M,N,K),OSNI-OSNX))
-          OMP1=AZMAX1(AMIN1(OMC1*rPCOMC_ave(M,N,K),OSPI-OSPX))
+          OMC1=AZMAX1(AMIN1(OSCI*OMCI(M,K)*OMCF(N),(OSCI-OSCX)/MicrobialShareFactor))
+          OMN1=AZMAX1(AMIN1(OMC1*rNCOMC_ave(M,N,K),(OSNI-OSNX)/MicrobialShareFactor))
+          OMP1=AZMAX1(AMIN1(OMC1*rPCOMC_ave(M,N,K),(OSPI-OSPX)/MicrobialShareFactor))
           DO NGL=JGniH(N),JGnfH(N)
             associate(MID => micpar%get_micb_id(M,NGL))
               OMC1g=OMC1/numGuildsH
@@ -370,9 +372,9 @@ implicit none
 !
 !     OQC,OQN,OQP=DOC,DON,DOP in litter
 !
-      OQC1=AMIN1(0.1_r8*OSCX,OSCI-OSCX)
-      OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
-      OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
+      OQC1=AZMAX1(AMIN1(0.1_r8*OSCX,OSCI-OSCX))
+      OQN1=AZMAX1(AMIN1(0.1_r8*OSNX,OSNI-OSNX))
+      OQP1=AZMAX1(AMIN1(0.1_r8*OSPX,OSPI-OSPX))
 
       DOM_MicP_vr(idom_doc,K,LFDPTH,NY,NX)=DOM_MicP_vr(idom_doc,K,LFDPTH,NY,NX)+OQC1
       DOM_MicP_vr(idom_don,K,LFDPTH,NY,NX)=DOM_MicP_vr(idom_don,K,LFDPTH,NY,NX)+OQN1
@@ -388,38 +390,24 @@ implicit none
       OSCX=OSCX+OQC1
       OSNX=OSNX+OQN1
       OSPX=OSPX+OQP1
-      CNOFT=0._r8
-      CPOFT=0._r8
-      IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
-        RNT=0._r8
-        RPT=0._r8
-        D965: DO M=1,jsken
-          RNT=RNT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
-          RPT=RPT+(OSCI-OSCX)*CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
-        ENDDO D965
-        FRNT=(OSNI-OSNX)/RNT
-        FRPT=(OSPI-OSPX)/RPT
-        D970: DO M=1,jsken
-          CNOF(M)=CNOFC(M,K)*FRNT
-          CPOF(M)=CPOFC(M,K)*FRPT
-          CNOFT=CNOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOF(M)
-          CPOFT=CPOFT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOF(M)
-        ENDDO D970
-      ELSE
-        D975: DO M=1,jsken
-          CNOF(M)=0._r8
-          CPOF(M)=0._r8
-        ENDDO D975
-      ENDIF
+      ! Normalize component weights independently of remaining carbon or
+      ! nutrient mass. This is the same relative weighting without dividing
+      ! by a remainder that can be zero after microbial/DOM allocation.
+      RNT=0._r8
+      RPT=0._r8
+      DO M=1,jsken
+        RNT=RNT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
+        RPT=RPT+CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
+      ENDDO
       D2970: DO M=1,jsken
-        OSC1=CFOSC_vr(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
-        IF(CNOFT.GT.ZERO)THEN
-          OSN1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
+        OSC1=CFOSC_vr(M,K,LFDPTH,NY,NX)*AZMAX1(OSCI-OSCX)
+        IF(RNT.GT.ZERO)THEN
+          OSN1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CNOFC(M,K)/RNT*AZMAX1(OSNI-OSNX)
         ELSE
           OSN1=0._r8
         ENDIF
-        IF(CPOFT.GT.ZERO)THEN
-          OSP1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
+        IF(RPT.GT.ZERO)THEN
+          OSP1=CFOSC_vr(M,K,LFDPTH,NY,NX)*CPOFC(M,K)/RPT*AZMAX1(OSPI-OSPX)
         ELSE
           OSP1=0._r8
         ENDIF
@@ -437,8 +425,15 @@ implicit none
       AmendC_CumYr_flx_col(NY,NX) = AmendC_CumYr_flx_col(NY,NX)+OSCI
       FertN_Flx_CumYr_col(NY,NX)  = FertN_Flx_CumYr_col(NY,NX)+OSNI
       FerP_Flx_CumYr_col(NY,NX)    = FerP_Flx_CumYr_col(NY,NX)+OSPI
-      IF(IYTYP(iAmendtyp_Manure,I,NY,NX).LT.3)THEN
+      IF(amendment==1)THEN
+        ! Plant residue is external regardless of the animal-manure flag.
         Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX)+OSCI
+      ELSE
+        !manure
+        ! Grazing can merge internal returns into FERT and change its type.
+        ! Preserve the independently read external share for application-day NBP.
+        Eco_NBP_CumYr_col(NY,NX)=Eco_NBP_CumYr_col(NY,NX) &
+          +ExternalManureC_col(I,NY,NX)*AREA_3D(3,LFDPTH,NY,NX)
       ENDIF
     ENDDO D2965
   ENDIF

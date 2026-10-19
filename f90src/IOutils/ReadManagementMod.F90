@@ -386,6 +386,9 @@ implicit none
         FERT(ifert_plant_resN,IDY,NY,NX)  = PlantResN
         FERT(ifert_plant_resP,IDY,NY,NX)  = PlantResP
         FERT(ifert_plant_manuC,IDY,NY,NX) = ManureC
+        ! Retain input provenance even if grazing later merges manure returns.
+        ExternalManureC_col(IDY,NY,NX)=0._r8
+        if(IR2<imanure_grazing)ExternalManureC_col(IDY,NY,NX)=ManureC
         FERT(ifert_plant_manuN,IDY,NY,NX) = ManureN
         FERT(ifert_plant_manuP,IDY,NY,NX) = ManureP
         FERT(ifert_PO4_soil,IDY,NY,NX)    = PO4Soil

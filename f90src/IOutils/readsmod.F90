@@ -198,6 +198,7 @@ module readsmod
         D35: DO N=1,3
           IYTYP(N,I,NY,NX)=0
         ENDDO D35
+        ExternalManureC_col(I,NY,NX)=0._r8
         FDPTH(I,NY,NX)=0.0_r8
       ENDDO D40
       D125: DO I=1,366
