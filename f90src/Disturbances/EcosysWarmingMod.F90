@@ -307,6 +307,10 @@ module EcosysWarmingMod
   DO KK=1,num_found
     select case(trim(variables(kk)))
     case ('power')
+      ! IR power is parsed but currently cannot be applied consistently through
+      ! the model's energy coupling. Warming uses the prescribed dT instead;
+      ! power alone does not define the treatment. TODO: implement a consistent
+      ! IR energy-input pathway before using warm_IR_power to drive warming.
       if(extract_number_and_unit(values(kk), warm_IR_power, unit_out))then
         if(trim(unit_out)=='Wm-2')then
           !convert from W m-2 to MJ/m2/hr

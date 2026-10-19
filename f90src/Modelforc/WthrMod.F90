@@ -81,6 +81,10 @@ module WthrMod
   !     ITYPE=weather data type:1=daily,2=hourly
   !
 
+  ! Restore neutral modifiers for every forcing path before applying this
+  ! hour's eligible OTC treatment, including after its season or dates end.
+  EMS_Modify_Scalar_col(NVN:NVS,NHW:NHE)=1._r8
+  srad_scalar_col(NVN:NVS,NHW:NHE)=1._r8
   ITYPE=IWTHR
 
   !
@@ -263,8 +267,6 @@ module WthrMod
         PrecAsRain_col(NY,NX) = 0.0_r8
         PrecAsSnow_col(NY,NX) = RAINH(J,I)
       ENDIF
-      EMS_Modify_Scalar_col(NY,NX) = 1._r8        
-      srad_scalar_col(NY,NX)= 1._r8
     enddo
   enddo
 
