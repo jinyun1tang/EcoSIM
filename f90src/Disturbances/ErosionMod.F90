@@ -1,6 +1,7 @@
 module ErosionMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : isclose,AZMAX1
+  use DebugToolMod, only : PrintInfo
   use EcoSIMConfig, only : nlbiomcp => NumLiveMicrbCompts
   use EcoSIMConfig, only : ndbiomcp=> NumDeadMicrbCompts
   use EcoSIMConfig, only : jcplx1=> jcplxcm1, NumMicbAFunGrupsPerCmplx, NumMicbHFunGrupsPerCmplx,jcplx=>jcplxc
@@ -48,6 +49,9 @@ module ErosionMod
 
   implicit none
 
+  character(len=*), parameter :: subname='InitErosion'
+
+  call PrintInfo('beg '//subname)
   allocate(SedErosionM(2,2,JV,JH))
   allocate(TERSED_col(JY,JX))
   allocate(RDTSED_col(JY,JX))
@@ -56,6 +60,7 @@ module ErosionMod
   allocate(FracVol4Erosion(JY,JX))
   allocate(BaseErosionRate(JY,JX))
 
+  call PrintInfo('end '//subname)
   end subroutine InitErosion
 !------------------------------------------------------------------------------------------
 
@@ -64,7 +69,9 @@ module ErosionMod
 !     THIS SUBROUTINE CALCULATES DETACHMENT AND OVERLAND TRANSPORT
 !     OF SURFACE SEDIMENT FROM PRECIPITATION IN WEATHER FILE AND
 !     FROM RUNOFF IN 'WATSUB'
-      implicit none
+  implicit none
+
+  character(len=*), parameter :: subname='erosion'
 
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -72,6 +79,7 @@ module ErosionMod
 
 !     execution begins here
 !
+  call PrintInfo('beg '//subname)
   IF(iErosionMode.EQ.ieros_frzthaweros.OR.iErosionMode.EQ.ieros_frzthawsomeros)THEN
     DO M=1,NPH
       call SedimentDetachmentM(M,NHW,NHE,NVN,NVS)
@@ -87,8 +95,9 @@ module ErosionMod
   !
     if(.not.column_mode)call XBoundErosionFlux(NHW,NHE,NVN,NVS)
   ENDIF
+  call PrintInfo('end '//subname)
   END subroutine erosion
-!---------------------------------------------------------------------------------------------------
+!------------------------------------------------------------------------------------------
 
   subroutine SedimentDetachmentM(M,NHW,NHE,NVN,NVS)
 !     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
@@ -97,12 +106,15 @@ module ErosionMod
 !
   implicit none
 
+  character(len=*), parameter :: subname='SedimentDetachmentM'
+
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
   real(r8) :: DETW,SEDX,CSEDD,CSEDX
   real(r8) :: DEPI,DETI,SoilDetachRate,STPR
   integer :: NY,NX
 
 
+  call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -177,15 +189,19 @@ module ErosionMod
     ENDDO
   ENDDO
 
+  call PrintInfo('end '//subname)
   end subroutine SedimentDetachmentM
 !------------------------------------------------------------------------------------------
   subroutine OverLandFlowSedTransp(M,NY,NX,NHW,NHE,NVN,NVS)
 
   implicit none
+
+  character(len=*), parameter :: subname='OverLandFlowSedTransp'
   integer, intent(in) :: M,NY,NX,NHW,NHE,NVN,NVS
   integer :: N1,N2,N,NN,N4,N5,N4B,N5B
   real(r8) :: SEDX,CSEDE,FERM
 
+  call PrintInfo('beg '//subname)
   N1=NX
   N2=NY
 !     SEDX=SED_col(N2,N1)
@@ -229,9 +245,6 @@ module ErosionMod
           IF(NN.EQ.iFront)THEN  !            
             FERM                      = QflxSurfRunoffM_2DH(M,N,iBehind,N5,N4)/SurfRunoffPotentM_col(M,N2,N1)
             SedErosionM(N,iBehind,N5,N4)    = BaseErosionRate(N2,N1)*FERM
-            cumSed_Eros_2D(N,iBehind,N5,N4) = cumSed_Eros_2D(N,iBehind,N5,N4)+SedErosionM(N,iBehind,N5,N4)
-          ELSE
-            SedErosionM(N,iBehind,N5,N4)=0._r8
           ENDIF
 
           IF(NN.EQ.iBehind)THEN
@@ -239,20 +252,13 @@ module ErosionMod
               !well-defined dest grid
               FERM                             = QflxSurfRunoffM_2DH(M,N,iFront,N5B,N4B)/SurfRunoffPotentM_col(M,N2,N1)
               SedErosionM(N,iFront,N5B,N4B)    = BaseErosionRate(N2,N1)*FERM
-              cumSed_Eros_2D(N,iFront,N5B,N4B) = cumSed_Eros_2D(N,iFront,N5B,N4B)+SedErosionM(N,iFront,N5B,N4B)
-            ELSE
-              SedErosionM(N,iFront,N5B,N4B)=0._r8
             ENDIF
-          ENDIF
-        ELSE
-          SedErosionM(N,iBehind,N5,N4)=0._r8
-          IF(N4B.GT.0.AND.N5B.GT.0)THEN
-            SedErosionM(N,iFront,N5B,N4B)=0._r8
           ENDIF
         ENDIF
       ENDDO
     ENDDO
   ENDIF
+  call PrintInfo('end '//subname)
   end subroutine OverLandFlowSedTransp
 !------------------------------------------------------------------------------------------
   subroutine SedimentTransportM(M,NHW,NHE,NVN,NVS)
@@ -264,9 +270,18 @@ module ErosionMod
 
   integer, intent(in) :: M,NHW,NHE,NVN,NVS
 
-  real(r8) :: CSEDE,SEDX
-  integer :: NGL
-  integer :: N1,N2,NY,NX
+  character(len=*), parameter :: subname='SedimentTransportM'
+  real(r8) :: CSEDE,SEDX,AvailableSediment,ProposedOutflow,SedimentScale,AcceptedOutflow
+  real(r8) :: OutwardSign(2,2)
+  integer :: N1,N2,NY,NX,N,Side,FY,FX,NN
+  integer :: FaceNN(2,2),FaceNY(2,2),FaceNX(2,2)
+  logical :: InternalFace(2,2)
+
+  call PrintInfo('beg '//subname)
+  ! Reset instantaneous faces once, including quiet cells and halo slots.
+  ! Keep all donor states unchanged until every face has been finalized.
+  SedErosionM=0._r8
+  TERSED_col(NVN:NVS,NHW:NHE)=0._r8
 !
 !     BOUNDARY SEDIMENT FLUXES
 !
@@ -288,18 +303,77 @@ module ErosionMod
       ENDIF
 !
       if(.not. column_mode)call XBoundSedTranspM(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
-!
-!     UPDATE STATE VARIABLES FOR SEDIMENT TRANSPORT
-!
-      SED_col(NY,NX)=SED_col(NY,NX)+TERSED_col(NY,NX)+RDTSED_col(NY,NX)
-
     ENDDO
   ENDDO
+
+  ! Accept all outward faces against one donor snapshot. Incoming sediment
+  ! does not fund outgoing transport within this explicit substep.
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO N=1,2
+        FaceNY(N,:)=NY;FaceNX(N,:)=NX
+        if(N==iWestEastDirection)then
+          FaceNX(N,iFront)=NX+1;FaceNX(N,iBehind)=NX-1
+          InternalFace(N,iFront)=NX<NHE
+          InternalFace(N,iBehind)=NX>NHW
+        else
+          FaceNY(N,iFront)=NY+1;FaceNY(N,iBehind)=NY-1
+          InternalFace(N,iFront)=NY<NVS
+          InternalFace(N,iBehind)=NY>NVN
+        endif
+        ! Internal outflows are positive in receiving slots. External E/S
+        ! outflows are positive outside; external W/N outflows are negative
+        ! in this donor's slot, matching the water and material flux ledgers.
+        FaceNN(N,iFront)=iBehind;FaceNN(N,iBehind)=iFront
+        OutwardSign(N,:)=1._r8
+        if(.not.InternalFace(N,iFront))FaceNN(N,iFront)=iFront
+        if(.not.InternalFace(N,iBehind))then
+          FaceNN(N,iBehind)=iBehind
+          FaceNY(N,iBehind)=NY;FaceNX(N,iBehind)=NX
+          OutwardSign(N,iBehind)=-1._r8
+        endif
+      ENDDO
+
+      ProposedOutflow=0._r8
+      DO N=1,2
+        DO Side=iFront,iBehind
+          ProposedOutflow=ProposedOutflow+AZMAX1(OutwardSign(N,Side) &
+            *SedErosionM(N,FaceNN(N,Side),FaceNY(N,Side),FaceNX(N,Side)))
+        ENDDO
+      ENDDO
+      AvailableSediment=AZMAX1(SED_col(NY,NX)+RDTSED_col(NY,NX))
+      SedimentScale=1._r8
+      if(ProposedOutflow>AvailableSediment)SedimentScale=AvailableSediment/ProposedOutflow
+      DO N=1,2
+        DO Side=iFront,iBehind
+          NN=FaceNN(N,Side);FY=FaceNY(N,Side);FX=FaceNX(N,Side)
+          AcceptedOutflow=AZMAX1(OutwardSign(N,Side)*SedErosionM(N,NN,FY,FX))*SedimentScale
+          SedErosionM(N,NN,FY,FX)=OutwardSign(N,Side)*AcceptedOutflow
+          TERSED_col(NY,NX)=TERSED_col(NY,NX)-AcceptedOutflow
+          if(InternalFace(N,Side))then
+            ! Credit the identical accepted transfer to its receiving cell.
+            TERSED_col(FY,FX)=TERSED_col(FY,FX)+AcceptedOutflow
+          endif
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+
+  ! Only accepted faces enter the hourly sediment and material-transfer ledger.
+  cumSed_Eros_2D=cumSed_Eros_2D+SedErosionM
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      SED_col(NY,NX)=SED_col(NY,NX)+RDTSED_col(NY,NX)+TERSED_col(NY,NX)
+    ENDDO
+  ENDDO
+  call PrintInfo('end '//subname)
   end subroutine SedimentTransportM
 !------------------------------------------------------------------------------------------
   subroutine XBoundSedTranspM(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
 
   implicit none
+
+  character(len=*), parameter :: subname='XBoundSedTranspM'
   integer, intent(in) :: M,N1,N2,NY,NX,NHW,NHE,NVN,NVS
 !     LOCATE EXTERNAL BOUNDARIES
 !
@@ -307,6 +381,7 @@ module ErosionMod
   integer :: M1,M2,M4,M5
   real(r8) :: RCHQF,FERM,XN
 
+  call PrintInfo('beg '//subname)
   D9580: DO  N=1,2
     D9575: DO  NN=1,2
       IF(N.EQ.iWestEastDirection)THEN
@@ -368,7 +443,6 @@ module ErosionMod
             .OR. (NN.EQ.iBehind .AND. QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             FERM                       = QflxSurfRunoffM_2DH(M,N,NN,M5,M4)/SurfRunoffPotentM_col(M,N2,N1)
             SedErosionM(N,NN,M5,M4)    = BaseErosionRate(N2,N1)*FERM
-            cumSed_Eros_2D(N,NN,M5,M4) = cumSed_Eros_2D(N,NN,M5,M4)+SedErosionM(N,NN,M5,M4)
           ELSEIF((NN.EQ.iBehind.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
             .OR.(NN.EQ.iFront.AND.QflxSurfRunoffM_2DH(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
             SedErosionM(N,NN,M5,M4)=0._r8
@@ -378,33 +452,23 @@ module ErosionMod
         ENDIF
       ENDIF
     ENDDO D9575
-!
-!     TOTAL SEDIMENT FLUXES
-!
-    D1202: DO  NN=1,2
-      TERSED_col(N2,N1)=TERSED_col(N2,N1)+SedErosionM(N,NN,N2,N1)
-      !legitimate front grid
-      IF(IFLBM_2DH(M,N,NN,N5,N4).EQ.0)THEN
-        TERSED_col(N2,N1)=TERSED_col(N2,N1)-SedErosionM(N,NN,N5,N4)
-      ENDIF
-      !legtimate behind grid
-      IF(N4B.GT.0.AND.N5B.GT.0 .AND. NN.EQ.iFront)THEN
-        TERSED_col(N2,N1)=TERSED_col(N2,N1)-SedErosionM(N,NN,N5B,N4B)
-      ENDIF
-    ENDDO D1202
   ENDDO D9580
+  call PrintInfo('end '//subname)
   end subroutine XBoundSedTranspM
 !------------------------------------------------------------------------------------------
 
   subroutine LateralXGridSedmentFlux(NHW, NHE,NVN,NVS)
   implicit none
+
+  character(len=*), parameter :: subname='LateralXGridSedmentFlux'
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NGL,NTX,NTP,NE,idom
   integer :: K,NN,N,NO,M,NY,NX
-  integer :: N1,N2,N4,N5,N4B,N5B,MID
+  integer :: N1,N2,N4,N5,N4B,N5B
   real(r8) :: FSEDER
 
+  call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
         N1=NX
@@ -482,10 +546,11 @@ module ErosionMod
                 DO NO=1,NumMicbHFunGrupsPerCmplx
                   DO NGL=JGniH(NO),JGnfH(NO)
                     DO M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElms
-                        OMEERhetr_2D(NE,MID,K,N,iBehind,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
-                      ENDDO
+                      associate(MID => micpar%get_micb_id(M,NGL))
+                        DO NE=1,NumPlantChemElms
+                          OMEERhetr_2D(NE,MID,K,N,iBehind,N5,N4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
+                        ENDDO
+                      end associate
                     ENDDO
                   ENDDO
                 ENDDO
@@ -494,10 +559,11 @@ module ErosionMod
               DO NO=1,NumMicbAFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
-                    MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElms
-                      OMEERauto_2D(NE,MID,N,iBehind,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
-                    ENDDO
+                    associate(MID => micpar%get_micb_id(M,NGL))
+                      DO NE=1,NumPlantChemElms
+                        OMEERauto_2D(NE,MID,N,iBehind,N5,N4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
+                      ENDDO
+                    end associate
                   ENDDO
                 ENDDO
               ENDDO
@@ -516,74 +582,6 @@ module ErosionMod
                     SolidOM_Eros_2D(NE,M,K,N,iBehind,N5,N4)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                   ENDDO
                   SolidOMAct_Eros_2D(M,K,N,iBehind,N5,N4)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
-                ENDDO
-              ENDDO
-            ELSE
-              XSand_Eros_2D(N,iBehind,N5,N4)=0._r8
-              XSilt_Eros_2D(N,iBehind,N5,N4)=0._r8
-              XClay_Eros_2D(N,iBehind,N5,N4)=0._r8
-!
-!     FERTILIZER POOLS
-!
-              XNH4Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XNH3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XUreaSoil_Eros_molN_2D(N,iBehind,N5,N4) = 0._r8
-              XNO3Soil_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XPO4Soil_Eros_molP_2D(N,iBehind,N5,N4)  = 0._r8
-              XNH4Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XNH3Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XUreaBand_Eros_molN_2D(N,iBehind,N5,N4) = 0._r8
-              XNO3Band_Eros_molN_2D(N,iBehind,N5,N4)  = 0._r8
-              XPO4Band_Eros_molP_2D(N,iBehind,N5,N4)  = 0._r8
-!
-!     EXCHANGEABLE CATIONS AND ANIONS
-!
-              trcx_Eros_mol_2D(idx_beg:idx_end,N,iBehind,N5,N4)=0._r8
-!
-!     PRECIPITATES
-!
-              trcp_Eros_mol_2D(idsp_beg:idsp_end,N,iBehind,N5,N4)=0._r8
-!
-!     ORGANIC MATTER
-!
-              DO  K=1,jcplx
-                DO  NO=1,NumMicbHFunGrupsPerCmplx
-                  DO NGL=JGniH(NO),JGnfH(NO)
-                    DO  M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElms
-                        OMEERhetr_2D(NE,MID,K,N,iBehind,N5,N4)=0._r8
-                      ENDDO
-                    enddo
-                  ENDDO
-                enddo
-              ENDDO
-
-              DO  NO=1,NumMicbAFunGrupsPerCmplx
-                DO NGL=JGniA(NO),JGnfA(NO)
-                  DO  M=1,nlbiomcp
-                    MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElms                    
-                      OMEERauto_2D(NE,MID,N,iBehind,N5,N4)=0._r8
-                    ENDDO
-                  enddo
-                ENDDO
-              enddo
-
-              DO  K=1,jcplx
-                DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElms
-                    OMBioResdu_Eros_2D(NE,M,K,N,iBehind,N5,N4)=0._r8
-                  ENDDO
-                ENDDO
-                DO idom=idom_beg,idom_end
-                  SorbedOM_Eros_2D(idom,K,N,iBehind,N5,N4)=0._r8
-                ENDDO
-                DO  M=1,jsken
-                  SolidOMAct_Eros_2D(M,K,N,iBehind,N5,N4)=0._r8       
-                  DO NE=1,NumPlantChemElms         
-                    SolidOM_Eros_2D(NE,M,K,N,iBehind,N5,N4)=0._r8
-                  ENDDO
                 ENDDO
               ENDDO
             ENDIF
@@ -629,10 +627,11 @@ module ErosionMod
                   DO  NO=1,NumMicbHFunGrupsPerCmplx
                     DO NGL=JGniH(NO),JGnfH(NO)
                       DO  M=1,nlbiomcp
-                        MID=micpar%get_micb_id(M,NGL)      
-                        DO NE=1,NumPlantChemElms                                                 
-                          OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
-                        ENDDO
+                        associate(MID => micpar%get_micb_id(M,NGL))
+                          DO NE=1,NumPlantChemElms
+                            OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
+                          ENDDO
+                        end associate
                       enddo
                     enddo
                   ENDDO
@@ -640,17 +639,18 @@ module ErosionMod
                 DO  NO=1,NumMicbAFunGrupsPerCmplx
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElms         
-                        OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
-                      ENDDO
+                      associate(MID => micpar%get_micb_id(M,NGL))
+                        DO NE=1,NumPlantChemElms
+                          OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
+                        ENDDO
+                      end associate
                     enddo
                   enddo
                 ENDDO
 
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
-                    DO NE=1,NumPlantChemElms   
+                    DO NE=1,NumPlantChemElms
                       OMBioResdu_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
@@ -659,7 +659,7 @@ module ErosionMod
                   ENDDO
                   DO  M=1,jsken
                     SolidOMAct_Eros_2D(M,K,N,iFront,N5B,N4B)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
-                    DO NE=1,NumPlantChemElms                      
+                    DO NE=1,NumPlantChemElms
                       SolidOM_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                     ENDDO  
                   ENDDO
@@ -696,10 +696,11 @@ module ErosionMod
                   DO  NO=1,NumMicbHFunGrupsPerCmplx
                     DO NGL=JGniH(NO),JGnfH(NO)
                       DO  M=1,nlbiomcp
-                        MID=micpar%get_micb_id(M,NGL)
-                        DO NE=1,NumPlantChemElms  
-                          OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=0._r8
-                        ENDDO  
+                        associate(MID => micpar%get_micb_id(M,NGL))
+                          DO NE=1,NumPlantChemElms
+                            OMEERhetr_2D(NE,MID,K,N,iFront,N5B,N4B)=0._r8
+                          ENDDO
+                        end associate
                       enddo
                     ENDDO
                   enddo
@@ -708,17 +709,18 @@ module ErosionMod
                 DO  NO=1,NumMicbAFunGrupsPerCmplx
                   DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElms                        
-                        OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=0._r8
-                      ENDDO  
+                      associate(MID => micpar%get_micb_id(M,NGL))
+                        DO NE=1,NumPlantChemElms
+                          OMEERauto_2D(NE,MID,N,iFront,N5B,N4B)=0._r8
+                        ENDDO
+                      end associate
                     enddo
                   ENDDO
                 enddo
 
                 DO  K=1,jcplx
                   DO  M=1,ndbiomcp
-                    DO NE=1,NumPlantChemElms                    
+                    DO NE=1,NumPlantChemElms
                       OMBioResdu_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
@@ -727,7 +729,7 @@ module ErosionMod
                   ENDDO
                   DO  M=1,jsken
                     SolidOMAct_Eros_2D(M,K,N,iFront,N5B,N4B)=0._r8
-                    DO NE=1,NumPlantChemElms       
+                    DO NE=1,NumPlantChemElms
                       SolidOM_Eros_2D(NE,M,K,N,iFront,N5B,N4B)=0._r8
                     ENDDO  
                   ENDDO
@@ -738,11 +740,14 @@ module ErosionMod
         ENDDO
     ENDDO
   ENDDO
+  call PrintInfo('end '//subname)
   end subroutine LateralXGridSedmentFlux
-!----------------------------------------------------------------------------------------------
+!------------------------------------------------------------------------------------------
 
   subroutine XBoundErosionFlux(NHW,NHE,NVN,NVS)
   implicit none
+
+  character(len=*), parameter :: subname='XBoundErosionFlux'
 
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -751,9 +756,10 @@ module ErosionMod
   integer :: NY,NX,NE,idom
   integer :: N,NN,K,NO,M,NTX,NTP
   integer :: N1,N2,N4,N5
-  integer :: M1,M2,M4,M5,MID
+  integer :: M1,M2,M4,M5
   real(r8) :: XN
 
+  call PrintInfo('beg '//subname)
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       IF(SoilBulkDensity_vr(NU_col(NY,NX),NY,NX).GT.ZERO)THEN
@@ -847,10 +853,11 @@ module ErosionMod
                 DO  NO=1,NumMicbHFunGrupsPerCmplx
                   DO NGL=JGniH(NO),JGnfH(NO)
                     DO  M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)
-                      DO NE=1,NumPlantChemElms
-                        OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=0._r8
-                      ENDDO
+                      associate(MID => micpar%get_micb_id(M,NGL))
+                        DO NE=1,NumPlantChemElms
+                          OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=0._r8
+                        ENDDO
+                      end associate
                     enddo
                   ENDDO
                 enddo
@@ -858,16 +865,17 @@ module ErosionMod
               DO  NO=1,NumMicbAFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
-                    MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElms       
-                      OMEERauto_2D(NE,MID,N,NN,M5,M4)=0._r8
-                    ENDDO  
+                    associate(MID => micpar%get_micb_id(M,NGL))
+                      DO NE=1,NumPlantChemElms
+                        OMEERauto_2D(NE,MID,N,NN,M5,M4)=0._r8
+                      ENDDO
+                    end associate
                   enddo
                 ENDDO
               enddo
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElms                       
+                  DO NE=1,NumPlantChemElms
                     OMBioResdu_Eros_2D(NE,M,K,N,NN,M5,M4)=0._r8
                   ENDDO  
                 ENDDO
@@ -876,7 +884,7 @@ module ErosionMod
                 ENDDO
                 DO  M=1,jsken
                   SolidOMAct_Eros_2D(M,K,N,NN,M5,M4)=0._r8
-                  DO NE=1,NumPlantChemElms                       
+                  DO NE=1,NumPlantChemElms
                     SolidOM_Eros_2D(NE,M,K,N,NN,M5,M4)=0._r8
                   ENDDO
                 ENDDO
@@ -885,7 +893,7 @@ module ErosionMod
 !     CALCULATE FRACTION OF SURACE MATERIAL ERODED
 !
             ELSE
-              FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,NN,N5,N4)/SoilMicPMassLayerMX(N2,N1))
+              FSEDER=AMIN1(1.0_r8,cumSed_Eros_2D(N,NN,M5,M4)/SoilMicPMassLayerMX(N2,N1))
 !
 !     SOIL MINERALS
 !
@@ -925,10 +933,11 @@ module ErosionMod
                 DO NO=1,NumMicbHFunGrupsPerCmplx
                   DO NGL=JGniH(NO),JGnfH(NO)
                     DO M=1,nlbiomcp
-                      MID=micpar%get_micb_id(M,NGL)                    
-                      DO NE=1,NumPlantChemElms                       
-                        OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
-                      ENDDO
+                      associate(MID => micpar%get_micb_id(M,NGL))
+                        DO NE=1,NumPlantChemElms
+                          OMEERhetr_2D(NE,MID,K,N,NN,M5,M4)=FSEDER*mBiomeHeter_vr(NE,MID,K,NU_col(N2,N1),N2,N1)
+                        ENDDO
+                      end associate
                     ENDDO
                   ENDDO
                 ENDDO
@@ -936,17 +945,18 @@ module ErosionMod
               DO NO=1,NumMicbAFunGrupsPerCmplx
                 DO NGL=JGniA(NO),JGnfH(NO)
                   DO M=1,nlbiomcp
-                    MID=micpar%get_micb_id(M,NGL)
-                    DO NE=1,NumPlantChemElms                       
-                      OMEERauto_2D(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
-                    ENDDO
+                    associate(MID => micpar%get_micb_id(M,NGL))
+                      DO NE=1,NumPlantChemElms
+                        OMEERauto_2D(NE,MID,N,NN,M5,M4)=FSEDER*mBiomeAutor_vr(NE,MID,NU_col(N2,N1),N2,N1)
+                      ENDDO
+                    end associate
                   ENDDO
                 ENDDO
               ENDDO
 
               DO  K=1,jcplx
                 DO  M=1,ndbiomcp
-                  DO NE=1,NumPlantChemElms                       
+                  DO NE=1,NumPlantChemElms
                     OMBioResdu_Eros_2D(NE,M,K,N,NN,M5,M4)=FSEDER*OMBioResdu_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                   ENDDO  
                 ENDDO
@@ -955,7 +965,7 @@ module ErosionMod
                 ENDDO
                 DO  M=1,jsken
                   SolidOMAct_Eros_2D(M,K,N,NN,M5,M4)=FSEDER*SolidOMAct_vr(M,K,NU_col(N2,N1),N2,N1)
-                  DO NE=1,NumPlantChemElms                       
+                  DO NE=1,NumPlantChemElms
                     SolidOM_Eros_2D(NE,M,K,N,NN,M5,M4)=FSEDER*SolidOM_vr(NE,M,K,NU_col(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
@@ -967,6 +977,7 @@ module ErosionMod
     ENDDO
   ENDDO
 
+  call PrintInfo('end '//subname)
   end subroutine XBoundErosionFlux
 
 !------------------------------------------------------------------------------------------
@@ -975,6 +986,9 @@ module ErosionMod
 
   implicit none
 
+  character(len=*), parameter :: subname='DestructErosion'
+
+  call PrintInfo('beg '//subname)
   call destroy(SedErosionM)
   call destroy(TERSED_col)
   call destroy(RDTSED_col)
@@ -983,5 +997,6 @@ module ErosionMod
   call destroy(FracVol4Erosion)
   call destroy(BaseErosionRate)
 
+  call PrintInfo('end '//subname)
   end subroutine DestructErosion
   end module ErosionMod
