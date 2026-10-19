@@ -121,6 +121,7 @@ implicit none
   integer :: nirrig
 
   nirrig=get_dim_len(soilmgmt_nfid,'nirri')
+  if(nirrig==0)return
 
   if(nirrig>24)then
     call endrun("not enough size for array irrigf in "//trim(mod_filename), __LINE__)
@@ -193,6 +194,7 @@ implicit none
 !
     D7965: DO NX=NH1,NH2
       D7960: DO NY=NV1,NV2
+        Lirri_auto_col(NY,NX) = .true.
         iIrrigOpt_col(NY,NX) = iIrrigOptX
         IIRRA(1,NY,NX)       = IDYS
         IIRRA(2,NY,NX)       = IDYE
@@ -223,10 +225,10 @@ implicit none
 !
 !    print*,'   SCHEDULED IRRIGATION'
 !
-    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf),&
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1:nirrig)),&
       trim(mod_filename))
 
-    do kk=1,24
+    do kk=1,nirrig
       if(len_trim(irrigf(kk))==0)exit
 !
 !     DY,RR,JST,JEN=date DDMMYYYY,amount (mm),start and end hours
@@ -302,6 +304,7 @@ implicit none
   integer :: nfert
 
   nfert=get_dim_len(soilmgmt_nfid,'nfert')
+  if(nfert==0)return
   if(nfert>12)then
     call endrun('Not enough size for array fertf in '//trim(mod_filename), __LINE__)
   endif
@@ -323,10 +326,10 @@ implicit none
     call endrun('fail to find fertilizer '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
   endif
 
-  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf),&
+  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf(1:nfert)),&
       trim(mod_filename))
 
-  do kk=1,12
+  do kk=1,nfert
     if(len_trim(fertf(kk))==0)exit
     !all nutrients are in g/m2
     READ(fertf(kk),*)DDMMYYYY,NH4Soil,NH3Soil,UreaSoil,NO3Soil,NH4Band,NH3Band,UreaBand,NO3Band &
@@ -420,7 +423,7 @@ implicit none
   !DESCRIPTION
   !read in management information for soil: tillage
   !fertilizer and irrigation
-  use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
+  use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: yeari
   character(len=*), parameter :: subname='ReadManagementFiles'
@@ -439,6 +442,8 @@ implicit none
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
   call PrintInfo('beg '//subname)
+  ! Reset annual irrigation modes so absent selections cannot retain old settings.
+  Lirri_auto_col=.false.
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
   nyears=get_dim_len(soilmgmt_nfid, 'year')
   if(nyears==0)then
@@ -518,8 +523,8 @@ implicit none
 !
 !   READ IRRIGATION INPUT FILE
 !
+    Lirri_auto_col(NV1:NV2,NH1:NH2)=.false.
     IF(trim(irrigf).NE.'NO')THEN
-      Lirri_auto=irrigf(1:4)=='auto'
       if(lverb)print*,'ReadIrrigationFile'
       call ReadIrrigationFile(soilmgmt_nfid,irrigf,NH1,NH2,NV1,NV2)
     ENDIF

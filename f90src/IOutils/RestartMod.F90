@@ -4980,7 +4980,6 @@ implicit none
 
   subroutine restartnc_daily_irrigation(ncid,flag)
   ! Retain the already-decided day's schedule for exact intraday continuation.
-  use EcoSIMCtrlMod, only: Lirri_auto
   use DebugToolMod, only: PrintInfo
   implicit none
   type(file_desc_t), intent(inout) :: ncid
@@ -5005,7 +5004,7 @@ implicit none
       call ncd_inqvid(ncid,'RRIG_day',varid,vardesc,readvar=has_schedule)
       call ncd_inqvid(ncid,'WDPTH_day',varid,vardesc,readvar=has_depth)
       transfer_schedule=has_schedule .and. has_depth
-      if(.not.transfer_schedule .and. Lirri_auto)then
+      if(.not.transfer_schedule .and. any(Lirri_auto_col(NVN:NVS,NHW:NHE)))then
         call endrun('Intraday automatic-irrigation restart lacks RRIG_day/WDPTH_day; use a midnight checkpoint',__LINE__)
       endif
       ! Older prescribed-irrigation runs retain the schedule reread from inputs.

@@ -184,6 +184,7 @@ module readsmod
 !
   D9980: DO NX=NHW,NHE
     D9985: DO NY=NVN,NVS
+      Lirri_auto_col(NY,NX) = .false.
       ROWSpaceNH4_col(NY,NX) = 0.0_r8
       ROWSpaceNO3Band_col(NY,NX) = 0.0_r8
       ROWSpacePO4_col(NY,NX) = 0.0_r8

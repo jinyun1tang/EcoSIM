@@ -15,6 +15,8 @@ module IrrigationDataType
   real(r8) :: COXU                                                   !subsurface irrigation  O2 concentration,	[g m-3]
   real(r8) :: CNNU                                                   !subsurface irrigation  N2 concentration,	[g m-3]
   real(r8) :: CN2U                                                   !subsurface irrigation  N2O concentration	[g m-3]
+  ! Annual management forcing, reread from inputs on startup and restart.
+  logical, allocatable :: Lirri_auto_col(:,:)                         !automatic irrigation enabled by management, [-]
   integer ,target,allocatable ::  IIRRA(:,:,:)                       !start and end dates of automated irrigation, [-]
   real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
   real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
@@ -148,6 +150,7 @@ module IrrigationDataType
   allocate(RRIG(24,366,JY,JX)); RRIG=0._r8
   allocate(WDPTH(366,JY,JX));   WDPTH=0._r8
 
+  allocate(Lirri_auto_col(JY,JX)); Lirri_auto_col=.false.
   allocate(IIRRA(4,JY,JX));     IIRRA=0
   allocate(IrrigSubsurf_col(JY,JX));       IrrigSubsurf_col=0._r8
   allocate(IrrigSurface_col(JY,JX));       IrrigSurface_col=0._r8
@@ -224,6 +227,7 @@ module IrrigationDataType
   call destroy(CSTRQ)
   call destroy(RRIG)
   call destroy(WDPTH)
+  call destroy(Lirri_auto_col)
   call destroy(IIRRA)
   call destroy(IrrigSubsurf_col)
   call destroy(IrrigSurface_col)

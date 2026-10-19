@@ -105,7 +105,6 @@ implicit none
   logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid
   type(ecosim_time_type) :: etimer
-  logical :: Lirri_auto=.false.
 
   logical :: fixClime =.false.    !If true, do fixed climate forcing
   character(len=8) :: diag_opt ='nsteps'

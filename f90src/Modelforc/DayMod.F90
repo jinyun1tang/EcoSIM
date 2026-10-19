@@ -301,7 +301,7 @@
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
-      IF(Lirri_auto .and. decide_irrigation)THEN
+      IF(Lirri_auto_col(NY,NX) .and. decide_irrigation)THEN
       !automated irrigation
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
           TFZ    = 0._r8
