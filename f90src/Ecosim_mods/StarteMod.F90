@@ -63,8 +63,8 @@ module StarteMod
       solutevar%CCO2M = CCO2EI_gperm3_col(NY,NX)/catomw
       solutevar%CCH4M = AtmGasCgperm3_col(idg_CH4,NY,NX)/catomw
       solutevar%COXYM = AtmGasCgperm3_col(idg_O2,NY,NX)/32.0_r8
-      solutevar%CZ2GM = AtmGasCgperm3_col(idg_N2,NY,NX)/natomw
-      solutevar%CZ2OM = AtmGasCgperm3_col(idg_N2O,NY,NX)/natomw
+      solutevar%CZ2GM = AtmGasCgperm3_col(idg_N2,NY,NX)/MolecularWeight(idg_N2)
+      solutevar%CZ2OM = AtmGasCgperm3_col(idg_N2O,NY,NX)/MolecularWeight(idg_N2O)
       solutevar%ATCA  = ATCA_col(NY,NX)
       solutevar%ZEROS = ZEROS(NY,NX)
 
@@ -141,7 +141,12 @@ module StarteMod
                   solutevar%CCACOX               = CCACO_vr(L,NY,NX)
                   solutevar%CCASOX               = CCASO_vr(L,NY,NX)
                   solutevar%H_1p_aque_mole_conc  = 10.0_r8**(-(PH_vr(L,NY,NX)-3.0_r8))
-                  solutevar%CNOZ                 = CNO3_vr(L,NY,NX)
+                  ! Convert nitrate from mol/Mg soil to mol/m3 water for chemistry.
+                  IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+                    solutevar%CNOZ = CNO3_vr(L,NY,NX)*BulkSoilMass/VLWatMicP_vr(L,NY,NX)
+                  ELSE
+                    solutevar%CNOZ = 0._r8
+                  ENDIF
                   solutevar%CPOZ                 = CPO4_vr(L,NY,NX)
                   solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
                   solutevar%CN4Z                 = solutevar%CN4X
@@ -176,7 +181,7 @@ module StarteMod
 
             call InitSoluteModel(K,BulkSoilMass,solutevar)
 
-            call InitSoluteConcs(K,I,L,NY,NX,solutevar)
+            call InitSoluteConcs(K,I,L,NY,NX,BulkSoilMass,solutevar)
           ENDDO D2000
         enddo
       ENDDO
@@ -189,10 +194,11 @@ module StarteMod
   END subroutine starte
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSoluteConcs(K,I,L,NY,NX,solutevar)
+  subroutine InitSoluteConcs(K,I,L,NY,NX,BulkSoilMass,solutevar)
 
   implicit none
   integer, intent(in) :: K, I, L, NY, NX
+  real(r8), intent(in) :: BulkSoilMass
   type(solutedtype), intent(in) :: solutevar
   integer :: nsalts,ids,idg
 !
@@ -405,8 +411,10 @@ module StarteMod
     trcs_solml_vr(ids_NH4B,L,NY,NX) = trcn_irrig_vr(ids_NH4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
     trcs_solml_vr(idg_NH3,L,NY,NX)  = trcn_irrig_vr(idg_NH3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4,L,NY,NX)
     trcs_solml_vr(idg_NH3B,L,NY,NX) = trcn_irrig_vr(idg_NH3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NH4B,L,NY,NX)
-    trcs_solml_vr(ids_NO3,L,NY,NX)  = trcn_irrig_vr(ids_NO3,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3,L,NY,NX)
-    trcs_solml_vr(ids_NO3B,L,NY,NX) = trcn_irrig_vr(ids_NO3B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_NO3B,L,NY,NX)
+    ! Preserve the prescribed soil nitrate inventory, including in dry layers.
+    ! Dry layers start with zero aqueous boundary concentration.
+    trcs_solml_vr(ids_NO3,L,NY,NX)  = CNO3_vr(L,NY,NX)*BulkSoilMass*natomw*trcs_VLN_vr(ids_NO3,L,NY,NX)
+    trcs_solml_vr(ids_NO3B,L,NY,NX) = CNO3_vr(L,NY,NX)*BulkSoilMass*natomw*trcs_VLN_vr(ids_NO3B,L,NY,NX)
 
     trcs_solml_vr(ids_H2PO4,L,NY,NX)  = trcn_irrig_vr(ids_H2PO4,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4,L,NY,NX)
     trcs_solml_vr(ids_H2PO4B,L,NY,NX) = trcn_irrig_vr(ids_H2PO4B,L,NY,NX)*VLWatMicP_vr(L,NY,NX)*trcs_VLN_vr(ids_H1PO4B,L,NY,NX)

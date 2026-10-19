@@ -297,7 +297,7 @@ module Hour1Mod
       AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
       AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
       AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
+      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-03_r8*tmp  !gAr/m3
       AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
       AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
       AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
@@ -1045,7 +1045,7 @@ module Hour1Mod
   trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
   trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
   trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
-  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
+  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-03_r8*tmp  !gAr/m3
 
   ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8

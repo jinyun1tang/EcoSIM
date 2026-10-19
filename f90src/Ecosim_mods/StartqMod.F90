@@ -497,7 +497,8 @@ module StartqMod
       exit
     endif
   ENDDO
-  PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
+  ! Preserve the revised planting depth relative to the soil surface.
+  PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)-SoilSurfDepZ_col(NY,NX)
 
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !find the seeding layer, i.e. the first root layer
