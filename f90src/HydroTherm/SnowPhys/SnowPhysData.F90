@@ -55,6 +55,13 @@ module SnowPhysData
   real(r8),allocatable ::  WatSnoFlxByRedistM_2DH(:,:,:,:,:)       !water snow due to redistribution at iteration M [m3 d-2]
   real(r8),allocatable ::  IceSnoFlxByRedistM_2DH(:,:,:,:,:)       !Ice snow due to redistribution at iteration M [m3 d-2]
   real(r8),allocatable ::  HeatSnoFlxByRedistM_2DH(:,:,:,:,:)      !Heat snow due to redistribution at iteration M [m3 d-2]
+  
+  real(r8),allocatable :: HeatFlowSno2SoiByWat_col(:,:)
+  real(r8),allocatable :: HAltFlowSno2SoiByWat_col(:,:)
+  real(r8),allocatable :: HeatConvFlxSno2Soi_col(:,:)
+  real(r8),allocatable :: HeatCndFlxSno2Soi_col(:,:)
+  real(r8),allocatable :: HeatConvFlxLitr2Soi_col(:,:)
+  real(r8),allocatable :: HeatCndFlxLitr2Soi_col(:,:)
 
   public :: InitSnowPhysData
   public :: DestructSnowPhysData
@@ -114,6 +121,14 @@ module SnowPhysData
   allocate(SnowThickL0_snvr(JS,JY,JX));   SnowThickL0_snvr=0._r8
   allocate(XSnowThawMassL_snvr(JS,JY,JX));   XSnowThawMassL_snvr=0._r8
   allocate(XIceThawMassL_snvr(JS,JY,JX));   XIceThawMassL_snvr=0._r8  
+  
+  allocate(HeatFlowSno2SoiByWat_col(JY,JX))
+  allocate(HAltFlowSno2SoiByWat_col(JY,JX))
+  allocate(HeatConvFlxSno2Soi_col(JY,JX))
+  allocate(HeatCndFlxSno2Soi_col(JY,JX))
+  allocate(HeatConvFlxLitr2Soi_col(JY,JX))
+  allocate(HeatCndFlxLitr2Soi_col(JY,JX))
+  
   end subroutine  InitSnowPhysData
 !----------------------------------------------------------------------  
   subroutine DestructSnowPhysData
@@ -167,5 +182,13 @@ module SnowPhysData
   call destroy(cumHeatFlx2LitRByRunoff_col)
   call destroy(TDrysnoByRedist_col)
   call destroy(XIceThawMassL_snvr)  
+  
+  call destroy(HeatFlowSno2SoiByWat_col)
+  call destroy(HAltFlowSno2SoiByWat_col)
+  call destroy(HeatConvFlxSno2Soi_col)
+  call destroy(HeatCndFlxSno2Soi_col)
+  call destroy(HeatConvFlxLitr2Soi_col)
+  call destroy(HeatCndFlxLitr2Soi_col)
+  
   end subroutine DestructSnowPhysData
 end module SnowPhysData
