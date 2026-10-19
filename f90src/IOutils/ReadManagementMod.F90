@@ -33,7 +33,7 @@ implicit none
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2,dimtill)
+  subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2,dimtill,EventYear)
   !
   !read soil tillage information. It also includes events due to fire and drainage
   implicit none
@@ -41,6 +41,7 @@ implicit none
   integer, intent(in) :: NH1,NH2,NV1,NV2
   type(file_desc_t), intent(in) :: soilmgmt_nfid
   character(len=*), intent(in) :: dimtill
+  integer, optional, intent(in) :: EventYear !configured fire year; otherwise use the record year
   integer :: NY,NX
   integer  :: IPLOW,IDY
   real(r8) :: DPLOW,DY
@@ -74,6 +75,8 @@ implicit none
   do while(len_trim(tillf(kk)).GT.0)
 
     read(tillf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
+    ! Fire records may contain placeholder years; use the configured event calendar.
+    if(present(EventYear))IDY3=EventYear
     LPY=0
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
@@ -592,7 +595,7 @@ implicit none
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, firef, &
       start = (/1,ntopo/),count = (/len(firef),1/)), &
       trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
-    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2,'nfire')
+    call ReadTillageFile(soilmgmt_nfid,firef,NH1,NH2,NV1,NV2,'nfire',EventYear=yearc)
   ENDDO  
   call ncd_pio_closefile(soilmgmt_nfid)
 
@@ -665,7 +668,8 @@ implicit none
             ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
         !"17050000,2,0,0.06,0.0,0.9,0.3,0.0,0.1,0.9,0.9,0.0,0.5               
         LPY=0
-        if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+        ! FireEvents determines the execution year, regardless of the record year.
+        if(isLeap(yearc) .and. IMO.GT.2)LPY=1
         !obtain the ordinal day
         IF(IMO.EQ.1)then
           IDY=IDX
