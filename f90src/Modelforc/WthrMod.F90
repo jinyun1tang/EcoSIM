@@ -104,29 +104,23 @@ module WthrMod
     call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   ENDIF
 
+  ! Current geometry controls day/night eligibility; radiation below must
+  ! use the eligible treatment's transmission and atmospheric temperature.
+  call UpdateSolarGeometry(I,J,NHW,NHE,NVN,NVS,RADN_col)
+
   if(check_warming_dates(iYearCurrent,I,J))then    
-    !do this before radiation calculation
     call apply_OTC_warming(I,J,NHW,NHE,NVN,NVS)
     call apply_IR_warming(I,J,NHW,NHE,NVN,NVS) 
   endif  
 
   call CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
 !
-
 !  IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
 !    !perturb climate data
 !    call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col,VPS)
 !  ENDIF
 !
   mon=etimer%get_curr_mon()
-  !DO NX=NHW,NHE
-  !  DO NY=NVN,NVS
-  !    CO2EI_col(NY,NX)=atm_co2_mon(mon)
-  !    CH4E_col(NY,NX) =atm_ch4_mon(mon)*1.e-3_r8  !ppb to ppm
-  !    Z2OE_col(NY,NX) =atm_n2o_mon(mon)*1.e-3_r8  !ppb to ppm
-  !    CO2E_col(NY,NX)=CO2EI_col(NY,NX)   !used in photosynthesis, soil CO2 transport
-  !  ENDDO
-  !ENDDO
 
   call SummaryClimateForc(I,J,NHW,NHE,NVN,NVS,PRECUI_col,PrecAsRain_col,PRECII_col,PrecAsSnow_col)
   call PrintInfo('end '//subname)
@@ -273,36 +267,19 @@ module WthrMod
   end subroutine HourlyWeather
 !------------------------------------------------------------------------------------------
 
-  subroutine CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
-!
-  !     Description:
-!
+  subroutine UpdateSolarGeometry(I,J,NHW,NHE,NVN,NVS,RADN_col)
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-  real(r8), intent(inout) :: RADN_col(JY,JX)   !Incident shortwave radiation at surface horizontal plane, [MJ/hr/m2]
-  real(r8), intent(out) :: PRECUI_col(JY,JX)
-  real(r8), intent(out) :: PRECII_col(JY,JX)
+  real(r8), intent(inout) :: RADN_col(JY,JX) !Incident horizontal shortwave; cleared when geometry excludes sunlight
+  character(len=*), parameter :: subname='UpdateSolarGeometry'
   integer :: NY,NX
-  real(r8) :: AZI  !solar azimuth contribution
-  REAL(R8) :: DEC  !solar declination contribution
-  real(r8) :: DECLIN
-  real(r8) :: RADX    !solar constant at horizontal surface
-  real(r8), PARAMETER :: PICON12=PICON/12._r8
-  !     begin_execution
-  !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
-  !     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
-  !     TEMPERATURE AND CLOUDINESS
-  !
+  real(r8) :: AZI,DEC,DECLIN
+  real(r8), parameter :: PICON12=PICON/12._r8
 
+  call PrintInfo('beg '//subname)
   DECLIN=get_sun_declin(I)
   DO NX=NHW,NHE
-    DO  NY=NVN,NVS
-!
-!     IF OUTDOORS
-!
-!     SineSunInclinationAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
-!     
-!     IETYP: koppen climate zone
+    DO NY=NVN,NVS
       IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT_col(NY,NX)*RadianPerDegree)*SIN(DECLIN*RadianPerDegree)
         DEC=COS(ALAT_col(NY,NX)*RadianPerDegree)*COS(DECLIN*RadianPerDegree)
@@ -319,7 +296,46 @@ module WthrMod
         !IF(SineSunInclinationAngle_col(NY,NX).GT.0.0_r8 .AND. SineSunInclinationAngle_col(NY,NX).LT.TWILGT)SineSunInclinationAngle_col(NY,NX)=TWILGT
         IF(RADN_col(NY,NX).LE.0.0_r8)SineSunInclinationAngle_col(NY,NX)=0.0_r8
         IF(SineSunInclinationAngle_col(NY,NX).LE.-TWILGT)RADN_col(NY,NX)=0.0_r8
-        
+
+      ELSE
+        IF(RADN_col(NY,NX).LE.0.0_r8)THEN
+          SineSunInclinationAngle_col(NY,NX)=0.0_r8
+        ELSE
+          SineSunInclinationAngle_col(NY,NX)=1.0_r8
+        ENDIF
+        SineSunInclAnglNxtHour_col(NY,NX)=1.0_r8
+      ENDIF
+    ENDDO
+  ENDDO
+  call PrintInfo('end '//subname)
+  end subroutine UpdateSolarGeometry
+!------------------------------------------------------------------------------------------
+  subroutine CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN_col,PRECUI_col,PRECII_col)
+!
+  !     Description:
+!
+  implicit none
+  integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+  real(r8), intent(inout) :: RADN_col(JY,JX)   !Incident shortwave radiation at surface horizontal plane, [MJ/hr/m2]
+  real(r8), intent(out) :: PRECUI_col(JY,JX)
+  real(r8), intent(out) :: PRECII_col(JY,JX)
+  integer :: NY,NX
+  real(r8) :: RADX    !solar constant at horizontal surface
+  !     begin_execution
+  !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
+  !     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
+  !     TEMPERATURE AND CLOUDINESS
+  !
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+!
+!     IF OUTDOORS
+!
+!     SineSunInclinationAngle_col,SineSunInclAnglNxtHour_col=sine solar angle of current,next hour
+!     
+!     IETYP: koppen climate zone
+      IF(KoppenClimZone_col(NY,NX).GE.-1)THEN
         RADX            = SolConst*AZMAX1(SineSunInclinationAngle_col(NY,NX))
         RADN_col(NY,NX) = AMIN1(RADX,RADN_col(NY,NX))
         !
@@ -352,12 +368,6 @@ module WthrMod
         !     IF PHYTOTRON
         !
       ELSE
-        IF(RADN_col(NY,NX).LE.0.0_r8)THEN
-          SineSunInclinationAngle_col(NY,NX)=0.0_r8
-        ELSE
-          SineSunInclinationAngle_col(NY,NX)=1.0_r8
-        ENDIF
-        SineSunInclAnglNxtHour_col(NY,NX)=1.0_r8
         CLD=0.0_r8
         EMM=0.96
       ENDIF

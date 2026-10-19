@@ -426,7 +426,8 @@ module EcosysWarmingMod
   call PrintInfo('beg '//subname)
   igrowth=0  !default all year
   wind_otc       = 0.4_r8 !default to 0.4 m/s
-  ems_reduct_otc = 0.07 !default reduce 7%
+  ems_reduct_otc = 0.07_r8 !default reduce 7%
+  taus_otc       = 1._r8 !neutral solar transmission unless specified
   DO KK             = 1, num_found
     select case(trim(variables(kk)))
     case ('beg_time')
@@ -439,13 +440,9 @@ module EcosysWarmingMod
       endif
     case ('taus') 
       !solar transmissivity
-      if(extract_number_and_unit(values(kk), taus_otc, unit_out))then
-        if(trim(unit_out)=='%')taus_otc=taus_otc*0.01_r8
-      endif 
+      call ParseOTCFraction(values(kk),'taus',taus_otc)
     case ('EMSReduct')        
-      if(extract_number_and_unit(values(kk), ems_reduct_otc, unit_out))then
-        if(trim(unit_out)=='%')ems_reduct_otc=ems_reduct_otc*0.01_r8
-      endif    
+      call ParseOTCFraction(values(kk),'EMSReduct',ems_reduct_otc)
     case ('season')
       if(trim(values(kk))=='growth')then
         !growing season only
@@ -469,6 +466,42 @@ module EcosysWarmingMod
   call PrintInfo('end '//subname)
   end subroutine set_open_top_chamber
 
+!------------------------------------------------------------------------------------------
+  subroutine ParseOTCFraction(value,name,fraction)
+  use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+  implicit none
+  character(len=*), intent(in) :: value,name
+  real(r8), intent(out) :: fraction
+  character(len=*), parameter :: subname='ParseOTCFraction'
+  character(len=len(value)) :: numeric
+  integer :: n,ios
+  logical :: isPercent
+  real(r8) :: parsed
+
+  call PrintInfo('beg '//subname)
+  ! OTC scalars accept a unitless fraction or a trailing percent sign.
+  ! Keep the unit-requiring parser's contract unchanged for other settings.
+  numeric=adjustl(value)
+  n=len_trim(numeric)
+  isPercent=.false.
+  if(n>0)then
+    isPercent=numeric(n:n)=='%'
+    if(isPercent)numeric(n:n)=' '
+  endif
+  ios=1
+  ! Reject extra tokens, unsupported units and null list-directed values.
+  if(len_trim(numeric)>0)then
+    if(verify(trim(numeric),'0123456789.+-eEdD')==0)read(numeric,*,iostat=ios)parsed
+  endif
+  if(ios/=0)call endrun('Invalid OTC '//name//' fraction: '//trim(value)//' in '//mod_filename,__LINE__)
+  if(.not.ieee_is_finite(parsed)) &
+    call endrun('Nonfinite OTC '//name//' fraction in '//mod_filename,__LINE__)
+  if(isPercent)parsed=parsed*0.01_r8
+  if(parsed<0._r8 .or. parsed>1._r8) &
+    call endrun('OTC '//name//' fraction must be in [0,1] in '//mod_filename,__LINE__)
+  fraction=parsed
+  call PrintInfo('end '//subname)
+  end subroutine ParseOTCFraction
 !------------------------------------------------------------------------------------------
   logical function get_warming_fname(year,fname)result(ans)
   !
