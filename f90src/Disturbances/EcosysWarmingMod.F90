@@ -333,7 +333,7 @@ module EcosysWarmingMod
         !growing season only
         igrowth=1
       elseif(Extract_dates2doy(values(kk),seas_doyb,seas_doye))then
-        if(seas_doyb<seas_doye)then
+        if(seas_doyb<=seas_doye)then
           igrowth=2
         else
           igrowth=3
@@ -398,7 +398,7 @@ module EcosysWarmingMod
         !growing season only
         igrowth=1
       elseif(Extract_dates2doy(values(kk),seas_doyb,seas_doye))then
-        if(seas_doyb<seas_doye)then
+        if(seas_doyb<=seas_doye)then
           igrowth=2
         else
           igrowth=3
@@ -448,7 +448,7 @@ module EcosysWarmingMod
         !growing season only
         igrowth=1
       elseif(Extract_dates2doy(values(kk),seas_doyb,seas_doye))then
-        if(seas_doyb<seas_doye)then
+        if(seas_doyb<=seas_doye)then
           igrowth=2
         else
           igrowth=3
