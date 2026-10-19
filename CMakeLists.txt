@@ -2,9 +2,6 @@
 # Fortran submodule dependency scanning requires CMake 3.12.
 cmake_minimum_required (VERSION 3.12)
 
-# We declare the project here.
-project (ecosim LANGUAGES NONE)
-
 # Version numbers.
 set (ECOSIM_MAJOR_VERSION 0)
 set (ECOSIM_MINOR_VERSION 1)
@@ -42,18 +39,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 #option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
 #option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local CACHE PATH "" FORCE)
+if (NOT CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 endif()
 
-## JDM: Not sure why we need this at all - is it used in running tests?
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
+
 # set the number of cores to something reasonable so we don't over
 # subscribe a laptop or exceed hpc login node restrictions. could
 # switch to something more sophisticated like polymec if necessary.
 set(NUMBER_OF_CORES 4)
 math(EXPR NUM_BUILD_THREADS "${NUMBER_OF_CORES} + 1")
 
-# This includes some custom macros - but does not call them
 include(set_up_platform)
 include(set_up_compilers)
 
@@ -89,19 +86,19 @@ if (NOT CMAKE_Fortran_FLAGS)
   set(CMAKE_Fortran_FLAGS $ENV{FCFLAGS})
 endif()
 
-# Calling the platform setup macro
 set_up_platform()
-
-# Enabling the languages for the project
 enable_language(C)
 enable_language(CXX)
 enable_language(Fortran)
+
+
+# We declare the project here.
+project (ecosim)
 
 message("-- C compiler is ${CMAKE_C_COMPILER} (${CMAKE_C_COMPILER_ID})")
 message("-- CXX compiler is ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
 message("-- Fortran compiler is ${CMAKE_Fortran_COMPILER} (${CMAKE_Fortran_COMPILER_ID})")
 
-# Calling the custom macro to setup the compilers - not clear if this overrides flags we already set
 set_up_compilers()
 include(build_timing)
 
@@ -116,7 +113,6 @@ if (ECOSIM)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DECOSIM")
 endif()
 
-# JDM: Isn't this covered by the specialized macro we already called?
 # Figure out the system type.
 set(ECOSIM_HAVE_BOOL 1) # All reasonable C99 compilers have this now.
 if (APPLE EQUAL 1)
@@ -136,7 +132,6 @@ else ()
   endif ()
 endif ()
 
-# JDM: We are overriding things that are already provided, probably should wrap this?
 # Here we make sure CMake-installed binaries use the correct runpath, and
 # that the path is not stripped during installation.
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_BINARY_DIR}/lib")
@@ -147,7 +142,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 #set(ECOSIM_LIBRARIES "")
 #set(ECOSIM_TPLS m)
 
-# JDM: We should provide these for Amanzi-ATS builds, but in general, yes - it's a pain but you should find them
 if (${NEED_LAPACK})
   # NEED_LAPACK is set by set_up_platform()
   include(FindBLAS)
@@ -163,11 +157,10 @@ if (${NEED_LAPACK})
   set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};${LAPACK_LIBRARIES};${BLAS_LIBRARIES})
 endif()
 
-set(ECOSIM_NEED_PFUNIT FALSE)
-set(ECOSIM_NEED_PETSC FALSE)
-set(ECOSIM_INCLUDE_DIRS "" CACHE STRING "Include directory of EcoSIM" FORCE)
+set(ECOSIM_NEED_PFUNIT 0)
+set(ECOSIM_NEED_PETSC 0)
+set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
 
-# JDM: Do we need this?
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Templates/ecosim.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake"
@@ -178,35 +171,32 @@ configure_file(
 # adding in ATS tpl support:
 
 if(ATS_ECOSIM)
-  message(STATUS "AG: >>>>>> ATS_ECOSIM is set")
+  message(STATUS "ATS_ECOSIM is set")
   #set(ATS_ECOSIM TRUE)
 else()
-  message(STATUS "AG: >>>>>> ATS_ECOSIM NOT set")
+  message(STATUS "ATS_ECOSIM NOT set")
 endif()
 
 if (ATS_ECOSIM)
-    message(STATUS "JDM: >>>>>> Using TPLs provided by Amanzi-ATS build")
-    message(STATUS "JDM: >>>>>> TPL include and libraries definitions ... ")
-    message(STATUS "JDM: >>>>>> HDF5")
-    message(STATUS "JDM: >>>>>>   TPLS_HDF5_INCLUDE_DIRS = ${TPLS_HDF5_INCLUDE_DIRS}")
-    message(STATUS "JDM: >>>>>>   TPLS_HDF5_LIBRARIES    = ${TPLS_HDF5_LIBRARIES}")
-    message(STATUS "JDM: >>>>>> NETCDF")
-    message(STATUS "JDM: >>>>>>   TPLS_NETCDF_INCLUDE_DIRS = ${TPLS_NETCDF_INCLUDE_DIRS}")
-    message(STATUS "JDM: >>>>>>   TPLS_NETCDF_LIBRARIES    = ${TPLS_NETCDF_LIBRARIES}")
-    message(STATUS "JDM: >>>>>> NETCDF_FORTRAN")
-    message(STATUS "JDM: >>>>>>   TPLS_NETCDF_FORTRAN_INCLUDE_DIRS = ${TPLS_NETCDF_FORTRAN_INCLUDE_DIRS}")
-    message(STATUS "JDM: >>>>>>   TPLS_NETCDF_FORTRAN_LIBRARIES    = ${TPLS_NETCDF_FORTRAN_LIBRARIES}")
-    message(STATUS "JDM: >>>>>>>>>>>")
- 
+    message(STATUS "Compiling ATS:")
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
+    set(NETCDF_FFLAGS "-I${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_FLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdff -lnetcdf -lnetcdf -lhdf5")
+    set(Z_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    set(Z_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")
+    set(HDF5_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    set(HDF5_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib")    
     set(ECOSIM_HAVE_NETCDF TRUE)
+    set(NETCDF_LIBRARY "-L${TPL_INSTALL_PREFIX}/lib/libnetcdf${LIB_SUFFIX}")
+    set(NETCDF_CFLAGS "-I${TPL_INSTALL_PREFIX}/include")
+    set(NETCDF_CLIBS "-L${TPL_INSTALL_PREFIX}/lib -lnetcdf")
     #Needed to share with ATS (probably an easier way to do this)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${NETCDF_CFLAGS} -fPIC")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${NETCDF_FFLAGS} -fPIC -g -O0 -fbacktrace -fbounds-check")
 
     #What were these even for? are they neccesary?
-    #include_directories("${TPL_INSTALL_PREFIX}/include")
-    include_directories(${TPLS_NETCDF_FORTRAN_INCLUDE_DIRS} ${TPLS_NETCDF_INCLUDE_DIRS} ${TPLS_HDF5_INCLUDE_DIRS})
+    include_directories("${TPL_INSTALL_PREFIX}/include")
     #link_directories("/global2/agraus/code/ats_dev_dir/amanzi_tpls-install-master-Debug/lib")
 
     # Check for math library (libm)
@@ -239,7 +229,7 @@ if (ATS_ECOSIM)
         set(ECOSIM_TPLS "${ECOSIM_TPLS} ${CURL_LIBRARY}")
     endif()
 
-    set(ECOSIM_TPLS "${TPLS_NETCDF_FORTRAN_LIBRARIES}")
+    set(ECOSIM_TPLS "${NETCDF_FLIBS} ${NETCDF_CLIBS} ${Z_LIBRARY} ${HDF5_LIBRARY} -lhdf5_hl -ldl -lz -lcurl -lhdf5 -lnetcdf -lnetcdff")
     
 else()
     add_subdirectory(3rd-partylibs)
@@ -267,9 +257,8 @@ link_directories("${PROJECT_BINARY_DIR}/lib")
 #list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
 #include_directories(${ECOSIM_INCLUDE_DIRS})
 
-# set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
+set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local)
 
-# JDM: I think this could some much earlier in the file.
 enable_testing()
 
 # Source code itself.

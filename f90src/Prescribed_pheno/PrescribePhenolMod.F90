@@ -208,12 +208,12 @@ implicit none
   !REAL(R8) :: tmp_rootl(1:JZ)
   !==========================================
 
-  !irootType=1
+  irootType=1
   PerPlantRootC_vr = 0.0_r8
   PerPlantRootLen_vr = 0.0_r8
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      !NP_col(NY,NX)=1
+      NP_col(NY,NX)=1
       DO NZ=1,NP_col(NY,NX)
         !FOR test only
         tlai_mon_pft(:,NZ,NY,NX)       = LAI
@@ -252,25 +252,18 @@ implicit none
     DO NY=NVN,NVS
       !==========================================
       !temporary set TEST values, assuming trees
-      !NZ=1
-      !PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
+      NZ=1
+      PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
       !==========================================
 
       CanopyLeafArea_col(NY,NX) = 0._r8
       StemArea_col(NY,NX)       = 0._r8
-      !CanopyHeight_col(NY,NX)   = 0.0_r8
+      CanopyHeight_col(NY,NX)   = 0.0_r8
 
       DO NZ=1,NP_col(NY,NX)
-        if(.not.ats_cpl_mode)then
-          tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
-          tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
-          CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
-        endif
-        
-        PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
-        !tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
-        !tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
-        !CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
+        tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
+        tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
+        CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
         CanopyLeafArea_col(NY,NX)  = CanopyLeafArea_col(NY,NX)+tlai_day_pft(NZ,NY,NX)
         StemArea_col(NY,NX)        = StemArea_col(NY,NX)+tsai_day_pft(NZ,NY,NX)
         CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeightLive_pft(NZ,NY,NX))
@@ -305,7 +298,7 @@ implicit none
       !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
       !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
       if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr,PerPlantRootLen_vr)
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr,PerPlantRootC_vr,PerPlantRootLen_vr)
       endif
       !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
       !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
@@ -315,7 +308,6 @@ implicit none
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopuLive_pft(NZ,NY,NX)
-          RootAbsorbLenPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)
 
           !the following two are fillers, which will be updated later
           Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8
