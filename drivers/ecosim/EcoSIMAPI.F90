@@ -349,7 +349,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
   use data_kind_mod,   only: r8 => DAT_KIND_R8
-  use DayMod,          only: day
+  use DayMod,          only: day, CompleteDailySetup
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts,InitControlParms
@@ -386,6 +386,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   character(len=14) :: ymdhs
   logical :: rstwr, lnyr
   logical :: lverb0
+  logical :: DeferDailySetup
 
 ! begin_execution
 !
@@ -479,7 +480,10 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !
     
     if(do_timing)call start_timer(t1)
-    CALL DAY(I,NHW,NHE,NVN,NVS)
+    associate(RestartPending => frectyp%lskip_loop)
+      DeferDailySetup=RestartPending .and. (is_restart() .or. is_branch())
+    end associate
+    CALL DAY(I,NHW,NHE,NVN,NVS,DeferStateChanges=DeferDailySetup)
     if(do_timing)call end_timer('DAY',t1)
     
     if(do_timing)call start_timer(t1)
@@ -497,6 +501,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
           if(do_timing)call start_timer(t1)
           call restFile(flag='read')
           if(do_timing)call end_timer('RestartRead',t1)
+          call CompleteDailySetup(I,J,NHW,NHE,NVN,NVS)
           if (j==1)then
             if(do_timing)call start_timer(t1)
             call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)

@@ -79,8 +79,8 @@ implicit none
   if (flag=='read')then
     call restFile_getfile(fnamer,path)
     call restFile_read( bounds, fnamer)
-    ! DAY resets daily accumulators before the checkpoint is read. At midnight
-    ! the saved sum belongs to yesterday; intraday restarts must retain it.
+    ! At midnight the saved daily storage sum belongs to yesterday.
+    ! Intraday restarts must retain it; daily setup resumes after this read.
     call etimer%get_curr_date(yr,mon,day,tod)
     if(plant_model.and.tod==0)then
       SeasonalNonstCDayAve_pft(:,bounds%NVN:bounds%NVS,bounds%NHW:bounds%NHE)=0._r8
@@ -4973,8 +4973,65 @@ implicit none
   call restartnc_plant(ncid,flag)
 
   call restartnc_soil(ncid,flag)
+  call restartnc_daily_irrigation(ncid,flag)
 
   end subroutine restartnc
+!------------------------------------------------------------------------------------------
+
+  subroutine restartnc_daily_irrigation(ncid,flag)
+  ! Retain the already-decided day's schedule for exact intraday continuation.
+  use EcoSIMCtrlMod, only: Lirri_auto
+  use DebugToolMod, only: PrintInfo
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag
+  character(len=*), parameter :: subname='restartnc_daily_irrigation'
+  real(r8), target :: hourly_irrigation(bounds%begc:bounds%endc,24)
+  real(r8), target :: irrigation_depth(bounds%begc:bounds%endc)
+  real(r8), pointer :: hourly_data(:,:),depth_data(:)
+  type(var_desc_t) :: vardesc
+  integer :: varid,yr,mon,dom,tod,schedule_day
+  logical :: has_schedule,has_depth,transfer_schedule
+
+  call PrintInfo('beg '//subname)
+  associate(NHW => bounds%NHW,NHE => bounds%NHE,NVN => bounds%NVN,NVS => bounds%NVS)
+  schedule_day=etimer%get_curr_doy()
+  transfer_schedule=.true.
+  if(flag=='read')then
+    call etimer%get_curr_date(yr,mon,dom,tod)
+    ! At midnight the new day is decided after loading, using restored water.
+    transfer_schedule=tod/=0
+    if(transfer_schedule)then
+      call ncd_inqvid(ncid,'RRIG_day',varid,vardesc,readvar=has_schedule)
+      call ncd_inqvid(ncid,'WDPTH_day',varid,vardesc,readvar=has_depth)
+      transfer_schedule=has_schedule .and. has_depth
+      if(.not.transfer_schedule .and. Lirri_auto)then
+        call endrun('Intraday automatic-irrigation restart lacks RRIG_day/WDPTH_day; use a midnight checkpoint',__LINE__)
+      endif
+      ! Older prescribed-irrigation runs retain the schedule reread from inputs.
+    endif
+  endif
+  if(transfer_schedule)then
+    if(flag=='write')then
+      call cpcol(flag,NHW,NHE,NVN,NVS,RRIG(:,schedule_day,:,:),hourly_irrigation)
+      call cpcol(flag,NHW,NHE,NVN,NVS,WDPTH(schedule_day,:,:),irrigation_depth)
+    endif
+    hourly_data => hourly_irrigation
+    call restartvar(ncid,flag,varname='RRIG_day',dim1name='column',dim2name='hour',&
+      long_name='Hourly irrigation schedule for the checkpoint day',units='m h-1',interpinic_flag='skip',&
+      data=hourly_data,missing_value=spval,fill_value=spval)
+    depth_data => irrigation_depth
+    call restartvar(ncid,flag,varname='WDPTH_day',dim1name='column',&
+      long_name='Irrigation application depth for the checkpoint day',units='m',interpinic_flag='skip',&
+      data=depth_data,missing_value=spval,fill_value=spval)
+    if(flag=='read')then
+      call cpcol(flag,NHW,NHE,NVN,NVS,RRIG(:,schedule_day,:,:),hourly_irrigation)
+      call cpcol(flag,NHW,NHE,NVN,NVS,WDPTH(schedule_day,:,:),irrigation_depth)
+    endif
+  endif
+  end associate
+  call PrintInfo('end '//subname)
+  end subroutine restartnc_daily_irrigation
 !------------------------------------------------------------------------------------------
 
   SUBROUTINE restartnc_soil(ncid,flag)
@@ -10553,6 +10610,7 @@ implicit none
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
   
   ! "level" dimensions
+  call ncd_defdim(ncid,'hour',24,dimid)
   call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',MaxNumRootAxes,dimid)
   call ncd_defdim(ncid,'nodes',MaxNodesPerBranch,dimid)
