@@ -537,13 +537,14 @@ implicit none
 
   subroutine ReadFire(yearc,fire_event_entry,NHW,NHE,NVN,NVS)
   use EcoSIMCtrlMod, only : soil_mgmt_in  
+  use abortutils, only : iulog
   implicit none
   integer, intent(in) :: yearc
   character(len=21), intent(in) :: fire_event_entry
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(file_desc_t) :: soilmgmt_nfid
   character(len=10) :: firef
-  integer :: ntopou,ntopo,pair_end
+  integer :: ntopou,ntopou_plant,ntopo,pair_end
   logical :: readvar
   type(Var_desc_t) :: vardesc
   type(file_desc_t) :: pftinfo_nfid
@@ -551,9 +552,23 @@ implicit none
   integer :: NH1,NH2,NV1,NV2
 
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
+  call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
 
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
-  if(ntopou==0)return
+  ntopou_plant=get_dim_len(pftinfo_nfid, 'ntopou')
+  ! Both management files must describe the same number of topographic units.
+  ! Check the full dimensions before first_topou restricts either fire loop.
+  if(ntopou/=ntopou_plant)then
+    write(iulog,*)'ReadFire: ntopou=',ntopou,' in soil file ',trim(soil_mgmt_in)
+    write(iulog,*)'ReadFire: ntopou=',ntopou_plant,' in plant file ',trim(pft_mgmt_in)
+    call endrun('ReadFire requires matching ntopou in soil and plant management files',__LINE__)
+  endif
+
+  if(ntopou==0)then
+    call ncd_pio_closefile(soilmgmt_nfid)
+    call ncd_pio_closefile(pftinfo_nfid)
+    return
+  endif
   if(first_topou)ntopou=1  
   !
   !fire disturbance to soil  
@@ -582,8 +597,6 @@ implicit none
   call ncd_pio_closefile(soilmgmt_nfid)
 
   !fire disturbance to plants    
-  call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
-
   DO NTOPO=1,ntopou
     call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
     call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
