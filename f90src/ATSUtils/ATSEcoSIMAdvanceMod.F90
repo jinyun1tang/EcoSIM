@@ -223,8 +223,8 @@ implicit none
       VHeatCapacity1_vr(L,NY,NX)   = heat_capacity
       SoilFracAsMicP_vr(L,NY,NX)   = 1.0 !This is percentage of Soil void that is micropores (100% for now)
       !Convert Matric Pressure from ATS [Pa] to EcoSIM [MPa]
-      PSISM1_vr(L,NY,NX)           = a_MATP(L,NY)/1.0e6
-      ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = -1.0*PSISM1_vr(L,NY,NX) !needed for root uptake
+      PSISM1_vr(L,NY,NX)           = -1.0*a_MATP(L,NY)/1.0e6
+      ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = PSISM1_vr(L,NY,NX) !needed for root uptake
       POROS_vr(L,NY,NX)            = a_PORO(L,NY)
       !AREA3(L,NY,NX)              = a_AREA3(L,NY)
       VLTSoiPore = VLSoilMicP_vr(L,NY,NX)
@@ -347,6 +347,7 @@ implicit none
             tlai_day_pft(NZ,NY,NX) = a_LAI(NZ,NY)
             tsai_day_pft(NZ,NY,NX) = a_SAI(NZ,NY)
             SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
+            SnowOnCanopy_col(NY,NX)    = SnowOnCanopy_col(NY,NX) + a_CanSnow(NZ,NY)
             !iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
             TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
         
@@ -385,7 +386,7 @@ implicit none
   !Run precribe phenology interpolation which sets necessary variables
   !To do the phenology
   if(ldo_sp_mode) call PrescribePhenologyInterp(I, NHW, NHE, NVN, NVS)
-  
+
   !PlantCanopyRadsModel processes the input radiation
   ! into radiation to ground and to canopy
   do NY=1,NYS

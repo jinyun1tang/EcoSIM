@@ -128,6 +128,7 @@ implicit none
   DO NZ=1,NP_col(NY,NX)
     plt_site%PlantPopuDead_pft(NZ)          = PlantPopuDead_pft(NZ,NY,NX)
     plt_morph%StemSpecVolume_pft(NZ)        = StemSpecVolume_pft(NZ,NY,NX)
+    plt_ew%SnowOnCanopy_pft(NZ)             = SnowOnCanopy_pft(NZ,NY,NX)
     plt_ew%fSnowCanopy_pft(NZ)              = fSnowCanopy_pft(NZ,NY,NX)
     plt_ew%BulkFactor4Snow_pft(NZ)          = BulkFactor4Snow_pft(NZ,NY,NX)
     plt_pheno%iPlant2ndGrothPattern_pft(NZ) = iPlant2ndGrothPattern_pft(NZ,NY,NX)

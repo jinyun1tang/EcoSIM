@@ -1301,13 +1301,7 @@ module UptakesMod
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
         FRAD1 = AZMAX1(CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._r8)
-        write(*,*) "FRAD1: ", FRAD1
-        write(*,*) "  CRootLumenArea_pvr: ", CRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
         FRADM = AZMAX1(MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._R8)
-        write(*,*) "FRADM: ", FRADM
-        write(*,*) "  MRootLumenArea_pvr: ", MRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
@@ -1315,11 +1309,6 @@ module UptakesMod
         endif
         StalkAxialResist            = AZMAX1(StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ)))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
-        write(*,*) "Root1stAxialResist_rvr: ", Root1stAxialResist_rvr(N,L)
-        write(*,*) "  StalkAxialResist: ", StalkAxialResist
-        write(*,*) "  RootSingleVesselRstaxial_pft: ", RootSingleVesselRstaxial_pft(NZ)
-        write(*,*) "  CumSoilThickMidL_vr: ", CumSoilThickMidL_vr(L)
-        write(*,*) "  FRAD1: ", FRAD1
 
         if(FRADM.GT.0._r8)then
           RootMediumAxialResist_rvr(N,L)=0.5_r8*RootSingleVesselRstaxial_pft(NZ)*RootMediumLength_pvr(L,NZ)/FRADM
@@ -1327,11 +1316,6 @@ module UptakesMod
           RootMediumAxialResist_rvr(N,L)=0._r8
         endif
         Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
-        write(*,*) "Root2ndAxialResist_rvr: ", Root2ndAxialResist_rvr(N,L)
-        write(*,*) "  Root2ndAxialResist_pft: ", Root2ndAxialResist_pft(N,NZ)
-        write(*,*) "  Root2ndEffLen4uptk_rpvr: ", Root2ndEffLen4uptk_rpvr(N,L,NZ)
-        write(*,*) "  FRAD2: ", FRAD2
-        write(*,*) "  Root2ndXNumL_rpvr: ", Root2ndXNumL_rpvr(N,L,NZ)
 
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
