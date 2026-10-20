@@ -1188,8 +1188,10 @@ module SoluteMod
 !
     DP                     = DPH2P
     S0                     = H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc+DP
-    S1                     = AZMAX1(S0**2-4.0*(H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_aque_mole_conc))
-    H2PO4_e_to_HPO4_2e_flx = TSL*(S0-SQRT(S1))
+    ! Keep small positive discriminants: concentration cutoffs do not apply to squares.
+    ! Use a sum of nonnegative terms and 4*(B*C-K*A)/(S0+sqrt(D)) to avoid cancellation.
+    S1                     = MAX(0._r8,(H1PO4_2e_aque_mole_conc-H_1p_aque_mole_conc)**2+2._r8*DP*(H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc)+DP**2+4._r8*DP*H2PO4_1e_aque_mole_conc)
+    H2PO4_e_to_HPO4_2e_flx = TSL*(4._r8*((H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_aque_mole_conc)/(S0+SQRT(S1))))
 !
 !     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS
 !     AND CATION CONCENTRATIONS

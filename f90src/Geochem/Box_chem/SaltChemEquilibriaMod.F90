@@ -898,8 +898,10 @@ module SaltChemEquilibriaMod
     P2     = AMAX1(ZERO,P2)
     SPX    = SP*R1**NR1
     S0     = P1+P2
-    S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    RPCACX = AMAX1(-Precp_CaCO3_conc,TPDX*(S0-SQRT(S1)))  !negative flux, suction of CO2
+    ! Keep small positive discriminants: concentration cutoffs do not apply to squares.
+    ! Mineral D=(P1-P2)**2+4*SPX; rationalize S0-sqrt(D) to retain small fluxes.
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    RPCACX = AMAX1(-Precp_CaCO3_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))  !negative flux, suction of CO2
 
     IF(isclose(PX,CO3_2e_activity))THEN
       RHCAC3=RPCACX
@@ -917,8 +919,8 @@ module SaltChemEquilibriaMod
     P2     = AMAX1(ZERO,P2)
     SPX    = SPCAS
     S0     = P1+P2
-    S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    RPCASO = AMAX1(-Precp_CaSO4_conc,TPDX*(S0-SQRT(S1)))
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    RPCASO = AMAX1(-Precp_CaSO4_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
 !     IF((M/10)*10.EQ.M)THEN
 !     WRITE(*,1112)'CALC',I,J,L,M,Precp_CaSO4_conc,CO3_2e_activity,HCO3_e_activity,H2CO3_activity,H_1p_aque_mole_conc
 !    2,OH_1e_aque_mole_conc,R1,P1,P2,P3,SP,Z,TX,RPCACX,RHCAC3,RHCACH,RHCACO
@@ -1067,8 +1069,8 @@ module SaltChemEquilibriaMod
     P3     = AMAX1(ZERO,P3)
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
-    S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
@@ -1182,8 +1184,8 @@ module SaltChemEquilibriaMod
     P3     = AMAX1(ZERO,P3)
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
-    S1     = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
@@ -1239,8 +1241,8 @@ module SaltChemEquilibriaMod
     P2     = AMAX1(ZERO,P2)
     SPX    = SP*R1**NR1
     S0     = P1+P2
-    S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
@@ -1744,8 +1746,8 @@ module SaltChemEquilibriaMod
     P3                         = AMAX1(ZERO,P3)
     SPX                        = SP*R1**NR1/P3**NP3
     S0                         = P1+P2
-    S1                         = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissolB_flx = AMAX1(-PrecpB_AlPO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1                         = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_AlPO4_dissolB_flx = AMAX1(-PrecpB_AlPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_band_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0B1=H2PO4_1e_AlPO4_dissolB_flx
@@ -1851,8 +1853,8 @@ module SaltChemEquilibriaMod
     P3     = AMAX1(ZERO,P3)
     SPX    = SP*R1**NR1/P3**NP3
     S0     = P1+P2
-    S1     = AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissolB_flx=AMAX1(-PrecpB_FePO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_FePO4_dissolB_flx=AMAX1(-PrecpB_FePO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_band_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0B1=H2PO4_1e_FePO4_dissolB_flx
@@ -1900,8 +1902,8 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissolB_flx=AMAX1(-PrecpB_CaHPO4_mole_conc,TPDX*(S0-SQRT(S1)))
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_CaHPO4_dissolB_flx=AMAX1(-PrecpB_CaHPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PX,H1PO4_2e_band_activity))THEN
       RPCDB1=H2PO4_1e_CaHPO4_dissolB_flx
     ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
@@ -2196,16 +2198,16 @@ module SaltChemEquilibriaMod
 !     RXALO2,RXFLO2=Al(OH2)2+,FeOH2+ adsorption
 ! COOH <-> COO(-) + H(+)
   S0     = H_1p_activity+XCOO+DPCOH
-  S1     = AZMAX1(S0**2-4.0_r8*(H_1p_activity*XCOO-DPCOH*XHC1))
-  RXHC   = TADCX*(S0-SQRT(S1))
+  S1     = MAX(0._r8,(H_1p_activity-XCOO)**2+2._r8*DPCOH*(H_1p_activity+XCOO)+DPCOH**2+4._r8*DPCOH*XHC1)
+  RXHC   = TADCX*(4._r8*((H_1p_activity*XCOO-DPCOH*XHC1)/(S0+SQRT(S1))))
 
   S0     = AlO2H2_1p_activity+XCOO+DPALO
-  S1     = AZMAX1(S0**2-4.0_r8*(AlO2H2_1p_activity*XCOO-DPALO*XAlO2H2_conc))
-  RXALO2 = TADAX*(S0-SQRT(S1))
+  S1     = MAX(0._r8,(AlO2H2_1p_activity-XCOO)**2+2._r8*DPALO*(AlO2H2_1p_activity+XCOO)+DPALO**2+4._r8*DPALO*XAlO2H2_conc)
+  RXALO2 = TADAX*(4._r8*((AlO2H2_1p_activity*XCOO-DPALO*XAlO2H2_conc)/(S0+SQRT(S1))))
   
   S0     = FeO2H2_p_activity+XCOO+DPFEO
-  S1     = AZMAX1(S0**2-4.0_r8*(FeO2H2_p_activity*XCOO-DPFEO*XFeO2H2_conc))
-  RXFEO2 = TADAX*(S0-SQRT(S1))
+  S1     = MAX(0._r8,(FeO2H2_p_activity-XCOO)**2+2._r8*DPFEO*(FeO2H2_p_activity+XCOO)+DPFEO**2+4._r8*DPFEO*XFeO2H2_conc)
+  RXFEO2 = TADAX*(4._r8*((FeO2H2_p_activity*XCOO-DPFEO*XFeO2H2_conc)/(S0+SQRT(S1))))
 
 !
 !     RNH4,RNHB-NH4-NH3+H dissociation in non-band,band
@@ -2228,14 +2230,14 @@ module SaltChemEquilibriaMod
 ! H2CO3 <-> HCO3(-) + H(+)
 
   S0    = H_1p_activity+HCO3_e_activity+DPCO2
-  S1    = AZMAX1(S0**2-4.0_r8*(H_1p_activity*HCO3_e_activity-DPCO2*H2CO3_activity))
-  RCO2Q = TSLX*(S0-SQRT(S1))
+  S1    = MAX(0._r8,(H_1p_activity-HCO3_e_activity)**2+2._r8*DPCO2*(H_1p_activity+HCO3_e_activity)+DPCO2**2+4._r8*DPCO2*H2CO3_activity)
+  RCO2Q = TSLX*(4._r8*((H_1p_activity*HCO3_e_activity-DPCO2*H2CO3_activity)/(S0+SQRT(S1))))
 !
 !     RHCO3=HCO3-CO3+H dissociation, > 0 for increasing HCO3
 ! HCO3(-) <-> CO3(--)+H(+)
   S0    = H_1p_activity+CO3_2e_activity+DPHCO
-  S1    = AZMAX1(S0**2_r8-4.0_r8*(H_1p_activity*CO3_2e_activity-DPHCO*HCO3_e_activity))
-  RHCO3 = TSLX*(S0-SQRT(S1))
+  S1    = MAX(0._r8,(H_1p_activity-CO3_2e_activity)**2+2._r8*DPHCO*(H_1p_activity+CO3_2e_activity)+DPHCO**2+4._r8*DPHCO*HCO3_e_activity)
+  RHCO3 = TSLX*(4._r8*((H_1p_activity*CO3_2e_activity-DPHCO*HCO3_e_activity)/(S0+SQRT(S1))))
 !
 !     RALO1=ALOH(++) <-> AL(+++)+OH(-) dissociation
 !
@@ -2256,8 +2258,8 @@ module SaltChemEquilibriaMod
 !     RALS=ALSO4 <-> AL+SO4 dissociation
 ! AlSO4(+) <-> Al(3+) + SO4(2-)
   S0=Al_3p_activity+SO4_2e_activity+DPALS
-  S1=AZMAX1(S0**2-4.0_r8*(Al_3p_activity*SO4_2e_activity-DPALS*AlSO4_1p_activity))
-  RALS=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Al_3p_activity-SO4_2e_activity)**2+2._r8*DPALS*(Al_3p_activity+SO4_2e_activity)+DPALS**2+4._r8*DPALS*AlSO4_1p_activity)
+  RALS=TSLX*(4._r8*((Al_3p_activity*SO4_2e_activity-DPALS*AlSO4_1p_activity)/(S0+SQRT(S1))))
 !
 !     RFEO1=FEOH <-> FE+OH dissociation
 ! Fe(OH)(++) <-> Fe(+++)+OH(-)
@@ -2278,8 +2280,8 @@ module SaltChemEquilibriaMod
 !     RFES <-> FE+SO4 dissociation
 ! FeSO4(+) <-> Fe(+++)+SO4(--)
   S0=Fe_3p_activity+SO4_2e_activity+DPFES
-  S1=AZMAX1(S0**2-4.0_r8*(Fe_3p_activity*SO4_2e_activity-DPFES*FeSO4_1p_activity))
-  RFES=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Fe_3p_activity-SO4_2e_activity)**2+2._r8*DPFES*(Fe_3p_activity+SO4_2e_activity)+DPFES**2+4._r8*DPFES*FeSO4_1p_activity)
+  RFES=TSLX*(4._r8*((Fe_3p_activity*SO4_2e_activity-DPFES*FeSO4_1p_activity)/(S0+SQRT(S1))))
 !
 !     RCAO=CAOH <-> CA+OH dissociation
 ! Ca(OH)(+) <-> Ca(++)+OH(-)
@@ -2288,20 +2290,20 @@ module SaltChemEquilibriaMod
 !     RCAC=CACO3 <-> CA+CO3 dissociation
 ! CaCO3 <-> Ca(++)+CO3(--)
   S0=Ca_2p_activity+CO3_2e_activity+DPCAC
-  S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*CO3_2e_activity-DPCAC*CaCO3_activity))
-  RCAC=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-CO3_2e_activity)**2+2._r8*DPCAC*(Ca_2p_activity+CO3_2e_activity)+DPCAC**2+4._r8*DPCAC*CaCO3_activity)
+  RCAC=TSLX*(4._r8*((Ca_2p_activity*CO3_2e_activity-DPCAC*CaCO3_activity)/(S0+SQRT(S1))))
 !
 !     RCAH=CAHCO3<->CA+HCO3 dissociation
 ! CaHCO3(+) <-> Ca(++) + HCO3(-)
   S0=Ca_2p_activity+HCO3_e_activity+DPCAH
-  S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*HCO3_e_activity-DPCAH*CaHCO3_1p_activity))
-  RCAH=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-HCO3_e_activity)**2+2._r8*DPCAH*(Ca_2p_activity+HCO3_e_activity)+DPCAH**2+4._r8*DPCAH*CaHCO3_1p_activity)
+  RCAH=TSLX*(4._r8*((Ca_2p_activity*HCO3_e_activity-DPCAH*CaHCO3_1p_activity)/(S0+SQRT(S1))))
 !
 !     RCAS=CASO4<->CA+SO4 dissociation
 ! CaSO4 <-> Ca(++) + SO4(--)
   S0=Ca_2p_activity+SO4_2e_activity+DPCAS
-  S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*SO4_2e_activity-DPCAS*CaSO4_activity))
-  RCAS=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-SO4_2e_activity)**2+2._r8*DPCAS*(Ca_2p_activity+SO4_2e_activity)+DPCAS**2+4._r8*DPCAS*CaSO4_activity)
+  RCAS=TSLX*(4._r8*((Ca_2p_activity*SO4_2e_activity-DPCAS*CaSO4_activity)/(S0+SQRT(S1))))
 !
 !     RMGO=MGOH<->MG+OH dissociation
 ! MgOH(+) <-> Mg(++)+OH(-)
@@ -2310,38 +2312,38 @@ module SaltChemEquilibriaMod
 !     RMGC=MGCO3<->MG+CO3 dissociation
 ! MgCO3 <-> Mg(++)+CO3(--)
   S0=Mg_2p_activity+CO3_2e_activity+DPMGC
-  S1=AZMAX1(S0**2-4.0_r8*(Mg_2p_activity*CO3_2e_activity-DPMGC*AMGC1))
-  RMGC=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-CO3_2e_activity)**2+2._r8*DPMGC*(Mg_2p_activity+CO3_2e_activity)+DPMGC**2+4._r8*DPMGC*AMGC1)
+  RMGC=TSLX*(4._r8*((Mg_2p_activity*CO3_2e_activity-DPMGC*AMGC1)/(S0+SQRT(S1))))
 !
 !     RMGH=MGHCO3<->MG+HCO3 dissociation
 ! MgHCO3(+) <-> Mg(++) + HCO3(-)
   S0=Mg_2p_activity+HCO3_e_activity+DPMGH
-  S1=AZMAX1(S0**2-4.0_r8*(Mg_2p_activity*HCO3_e_activity-DPMGH*MgHCO3_1p_activity))
-  RMGH=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-HCO3_e_activity)**2+2._r8*DPMGH*(Mg_2p_activity+HCO3_e_activity)+DPMGH**2+4._r8*DPMGH*MgHCO3_1p_activity)
+  RMGH=TSLX*(4._r8*((Mg_2p_activity*HCO3_e_activity-DPMGH*MgHCO3_1p_activity)/(S0+SQRT(S1))))
 !
 !     RMGS=MGSO4<->MG+SO4 dissociation
 ! MgSO4 <-> Mg(++) + SO4(--)
   S0=Mg_2p_activity+SO4_2e_activity+DPMGS
-  S1=AZMAX1(S0**2-4.0_r8*(Mg_2p_activity*SO4_2e_activity-DPMGS*MgSO4_activity))
-  RMGS=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-SO4_2e_activity)**2+2._r8*DPMGS*(Mg_2p_activity+SO4_2e_activity)+DPMGS**2+4._r8*DPMGS*MgSO4_activity)
+  RMGS=TSLX*(4._r8*((Mg_2p_activity*SO4_2e_activity-DPMGS*MgSO4_activity)/(S0+SQRT(S1))))
 !
 !     RNAC=NACO3<->NA+CO3 dissociation
 ! NaCO3(-) <-> Na(+) +CO3(--)
   S0=Na_1p_activity+CO3_2e_activity+DPNAC
-  S1=AZMAX1(S0**2-4.0_r8*(Na_1p_activity*CO3_2e_activity-DPNAC*NaCO3_1e_activity))
-  RNAC=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Na_1p_activity-CO3_2e_activity)**2+2._r8*DPNAC*(Na_1p_activity+CO3_2e_activity)+DPNAC**2+4._r8*DPNAC*NaCO3_1e_activity)
+  RNAC=TSLX*(4._r8*((Na_1p_activity*CO3_2e_activity-DPNAC*NaCO3_1e_activity)/(S0+SQRT(S1))))
 !
 !     RNAS=NASO4<->NA+SO4 dissociation
 ! NaSO4(-) <-> Na(+)+SO4(--)
   S0=Na_1p_activity+SO4_2e_activity+DPNAS
-  S1=AZMAX1(S0**2_r8-4.0_r8*(Na_1p_activity*SO4_2e_activity-DPNAS*NaSO4_1e_activity))
-  RNAS=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Na_1p_activity-SO4_2e_activity)**2+2._r8*DPNAS*(Na_1p_activity+SO4_2e_activity)+DPNAS**2+4._r8*DPNAS*NaSO4_1e_activity)
+  RNAS=TSLX*(4._r8*((Na_1p_activity*SO4_2e_activity-DPNAS*NaSO4_1e_activity)/(S0+SQRT(S1))))
 !
 !     RKAS=KSO4<->K+SO4 dissociation, RKAS>0 for increasing KSO4
 ! KSO4(-) <-> K(+)+SO4(--)
   S0=K_1p_activity+SO4_2e_activity+DPKAS
-  S1=AZMAX1(S0**2_r8-4.0_r8*(K_1p_activity*SO4_2e_activity-DPKAS*AKAS1))
-  RKAS=TSLX*(S0-SQRT(S1))
+  S1=MAX(0._r8,(K_1p_activity-SO4_2e_activity)**2+2._r8*DPKAS*(K_1p_activity+SO4_2e_activity)+DPKAS**2+4._r8*DPKAS*AKAS1)
+  RKAS=TSLX*(4._r8*((K_1p_activity*SO4_2e_activity-DPKAS*AKAS1)/(S0+SQRT(S1))))
 !
 !     PHOSPHORUS IN NON-BAND SOIL ZONE
 !
@@ -2362,39 +2364,39 @@ module SaltChemEquilibriaMod
 !     RF1P=FEHPO4 <-> FE+HPO4 dissociation in non-band
 ! FeHPO4(+) <-> Fe(+++)+HPO4(--)
     S0=Fe_3p_activity+H1PO4_2e_activity+DPF1P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Fe_3p_activity*H1PO4_2e_activity-DPF1P*FeHPO4_p_activity))
-    RF1P=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Fe_3p_activity-H1PO4_2e_activity)**2+2._r8*DPF1P*(Fe_3p_activity+H1PO4_2e_activity)+DPF1P**2+4._r8*DPF1P*FeHPO4_p_activity)
+    RF1P=TSLX*(4._r8*((Fe_3p_activity*H1PO4_2e_activity-DPF1P*FeHPO4_p_activity)/(S0+SQRT(S1))))
 !
 !     RF2P=FEH2PO4 <-> FE+H2PO4 dissociation in non-band
 ! FeH2PO4(++) <-> Fe(+++)+H2PO4(-)
     S0=Fe_3p_activity+H2PO4_1e_activity+DPF2P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Fe_3p_activity*H2PO4_1e_activity-DPF2P*FeH2PO4_2p_activity))
-    RF2P=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Fe_3p_activity-H2PO4_1e_activity)**2+2._r8*DPF2P*(Fe_3p_activity+H2PO4_1e_activity)+DPF2P**2+4._r8*DPF2P*FeH2PO4_2p_activity)
+    RF2P=TSLX*(4._r8*((Fe_3p_activity*H2PO4_1e_activity-DPF2P*FeH2PO4_2p_activity)/(S0+SQRT(S1))))
 !
 !     RC0P=CAPO4 <-> CA+PO4 dissociation in non-band
 ! CaPO4(-) <-> Ca(++)+PO4(---)
     S0=Ca_2p_activity+H0PO4_3e_activity+DPC0P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Ca_2p_activity*H0PO4_3e_activity-DPC0P*CaPO4_1e_activity))
-    RC0P=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H0PO4_3e_activity)**2+2._r8*DPC0P*(Ca_2p_activity+H0PO4_3e_activity)+DPC0P**2+4._r8*DPC0P*CaPO4_1e_activity)
+    RC0P=TSLX*(4._r8*((Ca_2p_activity*H0PO4_3e_activity-DPC0P*CaPO4_1e_activity)/(S0+SQRT(S1))))
 !
 !     RC1P=CAHPO4-CA+HPO4 dissociation in non-band
 ! CaHPO4 <-> Ca(++)+HPO4(--)
 
     S0=Ca_2p_activity+H1PO4_2e_activity+DPC1P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity))
-    RC1P=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H1PO4_2e_activity)**2+2._r8*DPC1P*(Ca_2p_activity+H1PO4_2e_activity)+DPC1P**2+4._r8*DPC1P*CaHPO4_activity)
+    RC1P=TSLX*(4._r8*((Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)/(S0+SQRT(S1))))
 !
 !     RC2P=CaH2PO4(+)-Ca+H2PO4 dissociation in non-band
 ! CaH2PO4(+) <-> Ca(++)+H2PO4(-); CaH4P2O8 is the legacy dissolved variable name.
     S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity))
-    RC2P=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H2PO4_1e_activity)**2+2._r8*DPC2P*(Ca_2p_activity+H2PO4_1e_activity)+DPC2P**2+4._r8*DPC2P*CaH4P2O8_1p_activity)
+    RC2P=TSLX*(4._r8*((Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity)/(S0+SQRT(S1))))
 !
 !     RM1P=MGHPO4-MG+HPO4 dissociation in non-band
 ! MgHPO4 <-> Mg(++)+HPO4(--)
     S0   = Mg_2p_activity+H1PO4_2e_activity+DPM1P
-    S1   = AZMAX1(S0**2_r8-4.0_r8*(Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity))
-    RM1P = TSLX*(S0-SQRT(S1))
+    S1   = MAX(0._r8,(Mg_2p_activity-H1PO4_2e_activity)**2+2._r8*DPM1P*(Mg_2p_activity+H1PO4_2e_activity)+DPM1P**2+4._r8*DPM1P*MgHPO4_activity)
+    RM1P = TSLX*(4._r8*((Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity)/(S0+SQRT(S1))))
   ELSE
     RH1P=0._r8
     H2PO4_e_to_HPO4_2e_flx=0._r8
@@ -2426,38 +2428,38 @@ module SaltChemEquilibriaMod
 !     RF1B=FEHPO4-FE+HPO4 dissociation in band
 ! FeHPO4(+) <-> Fe(+++)+HPO4(--)
     S0=Fe_3p_activity+H1PO4_2e_band_activity+DPF1P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Fe_3p_activity*H1PO4_2e_band_activity-DPF1P*FeHPO4_1p_band_activity))
-    RF1B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Fe_3p_activity-H1PO4_2e_band_activity)**2+2._r8*DPF1P*(Fe_3p_activity+H1PO4_2e_band_activity)+DPF1P**2+4._r8*DPF1P*FeHPO4_1p_band_activity)
+    RF1B=TSLX*(4._r8*((Fe_3p_activity*H1PO4_2e_band_activity-DPF1P*FeHPO4_1p_band_activity)/(S0+SQRT(S1))))
 !
 !     RF2B=FEH2PO4-FE+H2PO4 dissociation in band
 ! FeH2PO4(+) <-> Fe(+++)+H2PO4(-)
     S0=Fe_3p_activity+H2PO4_1e_band_activity+DPF2P
-    S1=AZMAX1(S0**2_r8-4.0_r8*(Fe_3p_activity*H2PO4_1e_band_activity-DPF2P*FeH2PO4_2p_band_activity))
-    RF2B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Fe_3p_activity-H2PO4_1e_band_activity)**2+2._r8*DPF2P*(Fe_3p_activity+H2PO4_1e_band_activity)+DPF2P**2+4._r8*DPF2P*FeH2PO4_2p_band_activity)
+    RF2B=TSLX*(4._r8*((Fe_3p_activity*H2PO4_1e_band_activity-DPF2P*FeH2PO4_2p_band_activity)/(S0+SQRT(S1))))
 !
 !     RC0B=CAPO4-CA+PO4 dissociation in band
 ! CaPO4(-) <-> Ca(++)+PO4(---)
     S0=Ca_2p_activity+H0PO4_3e_band_activity+DPC0P
-    S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*H0PO4_3e_band_activity-DPC0P*CaPO4_1e_band_activity))
-    RC0B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H0PO4_3e_band_activity)**2+2._r8*DPC0P*(Ca_2p_activity+H0PO4_3e_band_activity)+DPC0P**2+4._r8*DPC0P*CaPO4_1e_band_activity)
+    RC0B=TSLX*(4._r8*((Ca_2p_activity*H0PO4_3e_band_activity-DPC0P*CaPO4_1e_band_activity)/(S0+SQRT(S1))))
 !
 !     RC1B=CAHPO4-CA+HPO4 dissociation in band
 ! CaHPO4 <-> Ca(++)+HPO4(--)
     S0=Ca_2p_activity+H1PO4_2e_band_activity+DPC1P
-    S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*H1PO4_2e_band_activity-DPC1P*CaHPO4_band_activity))
-    RC1B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H1PO4_2e_band_activity)**2+2._r8*DPC1P*(Ca_2p_activity+H1PO4_2e_band_activity)+DPC1P**2+4._r8*DPC1P*CaHPO4_band_activity)
+    RC1B=TSLX*(4._r8*((Ca_2p_activity*H1PO4_2e_band_activity-DPC1P*CaHPO4_band_activity)/(S0+SQRT(S1))))
 !
 !     RC2B=CaH2PO4(+)-Ca+H2PO4 dissociation in band
 ! CaH2PO4(+) <-> Ca(++)+H2PO4(-); the two-P solid Ca(H2PO4)2 is a separate pool.
     S0=Ca_2p_activity+H2PO4_1e_band_activity+DPC2P
-    S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*H2PO4_1e_band_activity-DPC2P*CaH4P2O8_1p_band_activity))
-    RC2B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Ca_2p_activity-H2PO4_1e_band_activity)**2+2._r8*DPC2P*(Ca_2p_activity+H2PO4_1e_band_activity)+DPC2P**2+4._r8*DPC2P*CaH4P2O8_1p_band_activity)
+    RC2B=TSLX*(4._r8*((Ca_2p_activity*H2PO4_1e_band_activity-DPC2P*CaH4P2O8_1p_band_activity)/(S0+SQRT(S1))))
 !
 !     RM1B=MGHPO4-MG+HPO4 dissociation in band
 ! MgHPO4 <-> Mg(++)+HPO4(--)
     S0=Mg_2p_activity+H1PO4_2e_band_activity+DPM1P
-    S1=AZMAX1(S0**2-4.0_r8*(Mg_2p_activity*H1PO4_2e_band_activity-DPM1P*MgHPO4_band_activity))
-    RM1B=TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(Mg_2p_activity-H1PO4_2e_band_activity)**2+2._r8*DPM1P*(Mg_2p_activity+H1PO4_2e_band_activity)+DPM1P**2+4._r8*DPM1P*MgHPO4_band_activity)
+    RM1B=TSLX*(4._r8*((Mg_2p_activity*H1PO4_2e_band_activity-DPM1P*MgHPO4_band_activity)/(S0+SQRT(S1))))
   ELSE
     RH1B=0._r8
     RH2B=0._r8

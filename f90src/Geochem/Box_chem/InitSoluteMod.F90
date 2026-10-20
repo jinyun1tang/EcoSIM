@@ -932,8 +932,10 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
-    RPCACX=AMAX1(-Precp_CaCO3_conc,TPD*(S0-SQRT(S1)))
+    ! Keep small positive discriminants: concentration cutoffs do not apply to squares.
+    ! Mineral D=(P1-P2)**2+4*SPX; rationalize S0-sqrt(D) to retain small fluxes.
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    RPCACX=AMAX1(-Precp_CaCO3_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PX,CO3_2e_activity))THEN
       RHCAC3=RPCACX
     ELSEIF(isclose(PX,HCO3_e_activity))THEN
@@ -950,8 +952,8 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SPCAS
     S0=P1+P2
-    S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
-    RPCASO=AMAX1(-Precp_CaSO4_conc,TPD*(S0-SQRT(S1)))
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    RPCASO=AMAX1(-Precp_CaSO4_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN NON-BAND SOIL ZONE
 !
@@ -1035,8 +1037,8 @@ module InitSoluteMod
     P3=AMAX1(ZERO,P3)
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
-    S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
-    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPD*(S0-SQRT(S1)))
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Al_3p_activity))THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
@@ -1142,8 +1144,8 @@ module InitSoluteMod
     P3=AMAX1(ZERO,P3)
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
-    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPD*(S0-SQRT(S1)))
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PY,H1PO4_2e_activity))THEN
       IF(isclose(PX,Fe_3p_activity))THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
@@ -1191,8 +1193,8 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPD*(S0-SQRT(S1)))
+    S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
+    H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
     IF(isclose(PX,H1PO4_2e_activity))THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
     ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
@@ -1731,14 +1733,14 @@ module InitSoluteMod
 !     NH4 <-> NH3
 !
   S0=H_1p_aque_mole_conc+NH3_aque_mole_conc+DPN4
-  S1=AZMAX1(S0**2-4.0*(H_1p_aque_mole_conc*NH3_aque_mole_conc-DPN4*NH4_1p_aque_mole_conc))
-  RNH4=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H_1p_aque_mole_conc-NH3_aque_mole_conc)**2+2._r8*DPN4*(H_1p_aque_mole_conc+NH3_aque_mole_conc)+DPN4**2+4._r8*DPN4*NH4_1p_aque_mole_conc)
+  RNH4=TSL*(4._r8*((H_1p_aque_mole_conc*NH3_aque_mole_conc-DPN4*NH4_1p_aque_mole_conc)/(S0+SQRT(S1))))
 !
 !     H2PO4 <-> HPO4
 !
   S0=H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc+DPH2P
-  S1=AZMAX1(S0**2-4.0*(H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DPH2P*H2PO4_1e_aque_mole_conc))
-  H2PO4_e_to_HPO4_2e_flx=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H1PO4_2e_aque_mole_conc-H_1p_aque_mole_conc)**2+2._r8*DPH2P*(H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc)+DPH2P**2+4._r8*DPH2P*H2PO4_1e_aque_mole_conc)
+  H2PO4_e_to_HPO4_2e_flx=TSL*(4._r8*((H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DPH2P*H2PO4_1e_aque_mole_conc)/(S0+SQRT(S1))))
 !
 !     ION FLUXES
 !
