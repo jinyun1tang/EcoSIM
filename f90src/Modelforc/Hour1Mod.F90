@@ -13,7 +13,7 @@ module Hour1Mod
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
-  use HydrologyDiagMod , only: DiagWaterTableDepZi
+  use HydrologyDiagMod , only: DiagWaterTableDepZi, DiagActiveLayerDepth
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -962,58 +962,6 @@ module Hour1Mod
   ENDDO
   
   end subroutine UpdateTotalSOC
-!------------------------------------------------------------------------------------------
-
-  subroutine DiagActiveLayerDepth(NY,NX)
-
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  real(r8) :: VLiceTot,VLPoreTot,VLiceTotL,VOLWTL,VLPoreTotL
-  integer :: LL,L
-  logical :: FoundActiveLayer
-  logical :: goto5701
-
-!     begin_execution
-  FoundActiveLayer = .false.
-  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
-!
-!     VOLI,VOLIH=ice volume in micropores,macropores
-!     VOLW,VOLWH=water volume in micropores,macropores
-!     VOLA,VOLAH=total volume in micropores,macropores
-!     ActiveLayDepZ_col=active layer depth
-!     CDPTH,DLYR=depth to bottom,thickness of soil layer
-!
-    IF(FoundActiveLayer)exit
-    !current layer
-    VLiceTot=VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-    VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacroPores_vr(L,NY,NX)
-
-    IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
-      !significant ice and pore
-      D5700: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
-        VLiceTotL  = VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
-        VOLWTL     = VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
-        VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacroPores_vr(LL,NY,NX)
-        !defined as significant increase in ice content
-        goto5701=(VLPoreTotL.GT.ZEROS2(NY,NX).AND.VLiceTotL.LT.ZERO2*VLPoreTotL)
-        if(goto5701)exit
-      ENDDO D5700
-
-      if(.not. goto5701)then
-        IF(VLPoreTot.GT.ZEROS2(NY,NX))THEN
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
-        ELSE
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
-        ENDIF
-        FoundActiveLayer=.true.
-      else
-        !not active layer
-        ActiveLayDepZ_col(NY,NX)=9999.0_r8
-      endif
-    ENDIF
-  ENDDO
-  end subroutine DiagActiveLayerDepth
 !------------------------------------------------------------------------------------------
 
   subroutine SetTracerPropertyInLiterAir(NY,NX)
