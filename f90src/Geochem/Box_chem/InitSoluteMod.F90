@@ -373,7 +373,7 @@ module InitSoluteMod
   real(r8), intent(in) :: BulkSoilMass
   integer :: MM
   real(r8) :: XNAQ,XPT,XN4Q,XMGQ,XKAQ,XHYQ,XFEQ
-  real(r8) :: XHP,XCECQ,XTLQ,XALQ,XCAX,SPH2P
+  real(r8) :: XHP,XCECQ,XTLQ,XALQ,XCAX
   real(r8) :: XCAQ,XOH,SPH1P,FX,FXH2,FXP1,FSTR2
   real(r8) :: FHPA,FXH1,FXP2,FHP1,FHP3,FHCO
   real(r8) :: FCO3,CX1,CX2,CSTRZ,FHP2,CCO2Y
@@ -572,7 +572,6 @@ module InitSoluteMod
     XOH=XAEC/BulkSoilMass
     SPOH2=SXOH2/A1
     SPOH1=SXOH1/A1
-    SPH2P=SXH2P*DPH2O/A1
     SPH1P=SXH1P*DPH2O*A1/A2
     FXH2=1.0_r8/(1.0_r8+SPOH2/H_1p_aque_mole_conc+SPOH2*SPOH1/H_1p_aque_mole_conc**2)
     FXH1=FXH2*SPOH2/H_1p_aque_mole_conc
@@ -1348,7 +1347,10 @@ module InitSoluteMod
       RXOH1=TAD*(XOH_mole_conc*H_1p_activity-SXOH1*XROH1_mole_conc)/(XOH_mole_conc+SPOH1)*VLWatMicPBK
       ! Intended ligand exchange: R-OH2(+) + H2PO4(-) <=> R-H2PO4 + H2O.
       ! Positive flux binds dissolved H2PO4 to a protonated surface site.
-      SPH2P=SXH2P*DPH2O
+      ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+      ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+      ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+      SPH2P = SXH2P*DPH2O/SXOH2
       H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_mole_conc*H2PO4_1e_activity-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
       ! R-OH + H2PO4(-) <=> R-H2PO4 + OH(-); positive flux binds phosphate.
       H2PO4_to_XH2PO4_ROH_flx=TAD*(XROH1_mole_conc*H2PO4_1e_activity-SXH2P*XH2PO4_mole_conc*OH_1e_activity) &
@@ -1864,7 +1866,10 @@ module InitSoluteMod
     IF(XAEC.GT.ZEROS)THEN
       ! Intended ligand exchange: R-OH2(+) + H2PO4(-) <=> R-H2PO4 + H2O.
       ! Positive flux binds dissolved H2PO4 to a protonated surface site.
-      SPH2P=SXH2P*DPH2O
+      ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+      ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+      ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+      SPH2P = SXH2P*DPH2O/SXOH2
       H2PO4_1e_to_XH2PO4_ROH2_flx=TAD*(XROH2_mole_conc*H2PO4_1e_aque_mole_conc-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
 
       ! R-OH + H2PO4(-) <=> R-H2PO4 + OH(-); positive flux binds phosphate.

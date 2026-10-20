@@ -2014,7 +2014,10 @@ module SaltChemEquilibriaMod
 !     SPH2P,SXH2P=equilibrium constant for H2PO4 exchange with R-OH2,R-OH
 !     H2PO4_1e_to_XH2PO4_ROH2_flx,H2PO4_to_XH2PO4_ROH_flx=H2PO4 exchange with R-OH2,R-OH in non-band
 !
-    SPH2P=SXH2P*DPH2O
+    ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+    ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+    ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+    SPH2P = SXH2P*DPH2O/SXOH2
     H2PO4_1e_to_XH2PO4_ROH2_flx = TADAX*(XROH2_mole_conc*H2PO4_1e_activity-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
     H2PO4_to_XH2PO4_ROH_flx     = TADAX*(XROH1_mole_conc*H2PO4_1e_activity-SXH2P*XH2PO4_mole_conc*OH_1e_activity)/(XROH1_mole_conc+SXH2P)*VLWatMicPBK
 !
@@ -2061,7 +2064,10 @@ module SaltChemEquilibriaMod
 !     SPH2P,SXH2P=equilibrium constant for H2PO4 exchange with R-OH2,R-OH
 !     H2PO4_1e_to_XH2PO4_ROH2_Bflx,H2PO4_to_XH2PO4_ROH_Bflx=H2PO4 exchange with R-OH2,R-OH in band
 !
-    SPH2P=SXH2P*DPH2O
+    ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+    ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+    ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+    SPH2P = SXH2P*DPH2O/SXOH2
     H2PO4_1e_to_XH2PO4_ROH2_Bflx=TADAX*(XROH2_band_mole_conc*H2PO4_1e_band_activity-SPH2P*XH2PO4_band_mole_conc)/(XROH2_band_mole_conc+SPH2P)*VLWatMicPBK
     H2PO4_to_XH2PO4_ROH_Bflx=TADAX*(XROH_band_mole_conc*H2PO4_1e_band_activity-SXH2P*XH2PO4_band_mole_conc*OH_1e_activity)/(XROH_band_mole_conc+SXH2P)*VLWatMicPBK
 !

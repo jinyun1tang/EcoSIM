@@ -389,7 +389,10 @@ module ChemEquilibriaMod
 !     [X-OH2(+)][H2PO4(-)]/[X-H2PO4]=K, SPH2P
 !     X-H2PO4+OH(-) <-> X-OH+H2PO4(-)
 !     [X-OH][H2PO4(-)]/([X-H2PO4][OH(-)])=K,SXH2P
-      SPH2P                       = SXH2P*DPH2O
+      ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+      ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+      ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+      SPH2P = SXH2P*DPH2O/SXOH2
       H2PO4_1e_to_XH2PO4_ROH2_flx = TADA*(XROH2_mole_conc*H2PO4_1e_aque_mole_conc-SPH2P*XH2PO4_mole_conc)/(XROH2_mole_conc+SPH2P)*VLWatMicPBK
       H2PO4_to_XH2PO4_ROH_flx     = TADA*(XROH1_mole_conc*H2PO4_1e_aque_mole_conc-SXH2P*OH_1e_aque_mole_conc*XH2PO4_mole_conc)/(XROH1_mole_conc+SXH2P)*VLWatMicPBK
 !------------------------------------------
@@ -510,7 +513,10 @@ module ChemEquilibriaMod
 !   H2PO4_1e_band_mole_conc: H2PO4(-)
 !   XH2PO4_band_mole_conc: R-H2PO4
 !   XROH2_band_mole_conc: R-OH2
-      SPH2P                        = SXH2P*DPH2O
+      ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
+      ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
+      ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
+      SPH2P = SXH2P*DPH2O/SXOH2
       H2PO4_1e_to_XH2PO4_ROH2_Bflx = TADA*(XROH2_band_mole_conc*H2PO4_1e_band_mole_conc-SPH2P*XH2PO4_band_mole_conc)/(XROH2_band_mole_conc+SPH2P)*VLWatMicPBK
       H2PO4_to_XH2PO4_ROH_Bflx     = TADA*(XROH_band_mole_conc*H2PO4_1e_band_mole_conc-SXH2P*XH2PO4_band_mole_conc*OH_1e_aque_mole_conc)/(XROH_band_mole_conc+SXH2P)*VLWatMicPBK
 !
@@ -671,11 +677,9 @@ module ChemEquilibriaMod
 !
   IF(VLWatMicPNH.GT.ZEROS2)THEN
     RNH4 = (H_1p_aque_mole_conc*NH3_aque_mole_conc-DPN4*NH4_1p_aque_mole_conc)/(DPN4+H_1p_aque_mole_conc)
-    if(RNH4>0._r8)then
-      RNH4=AMIN1(RNH4,H_1p_aque_mole_conc,NH3_aque_mole_conc)
-    else
-      RNH4 = AMAX1(RNH4,-NH4_1p_aque_mole_conc)
-    ENDIF
+    ! Prescribed pH supplies H(+); only NH3 and NH4 are finite N donors.
+    ! Match the band limiter and retain equal, opposite NH3/NH4 transfers.
+    RNH4 = AMAX1(AMIN1(RNH4,NH3_aque_mole_conc),-NH4_1p_aque_mole_conc)
 
   ELSE
     RNH4=0._r8
