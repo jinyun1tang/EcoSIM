@@ -1,7 +1,7 @@
 module TranspNoSaltSlowMod
   use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange,GetSoilFaceGeometry
   use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use abortutils,       only: destroy, endrun
+  use abortutils,       only: destroy, endrun, iulog
   use TracerPropMod,    only: MolecularWeight
   use EcoSIMCtrlMod,    only: iVerbLevel
   use EcoSiMParDataMod, only: micpar
@@ -2980,7 +2980,7 @@ implicit none
 
               trcs_solml2_vr(idg,N3,N2,N1)=trcs_solml2_vr(idg,N3,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)
               if(trcs_solml2_vr(idg,N3,N2,N1)<0._r8)then
-                write(134,*)(I*1000+J)*100+M,trcs_names(idg),N3,trcs_solml2_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                write(iulog,*)(I*1000+J)*100+M,trcs_names(idg),N3,trcs_solml2_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                 call endrun(trim(mod_filename)//' at line',__LINE__)
               endif
 
@@ -2996,14 +2996,14 @@ implicit none
                 if(idg/=idg_NH3B)then
                   trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                   if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
-                    write(*,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                    stop
+                    write(iulog,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
                   endif
                 else
                   trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_Ebu_flxM_vr(idg,N3,N2,N1)    
                   if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
-                    write(*,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                    stop
+                    write(iulog,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
                   endif             
                 endif                
               endif              
@@ -3012,6 +3012,12 @@ implicit none
             RCH4PhysexchPrev_vr(N3,N2,N1)  = RCH4PhysexchPrev_vr(N3,N2,N1)+trcg_Ebu_flxM_vr(idg_CH4,N3,N2,N1)
           ENDIF
         ELSE
+          ! Modeling approximation: a dry layer encountered in the upward scan
+          ! suppresses ebullition in all layers above it. Its gas-filled pores
+          ! can accommodate gas via the separate dissolution/diffusion pathways,
+          ! potentially delaying efflux; this flag itself transfers no upper-layer gas.
+          ! TODO: Revisit whether those pathways justify suppressing local bubble
+          ! formation in a supersaturated wet layer above a dry layer.
           iFalseEbu=.true.
           DO idg=idg_beg,idg_end
             !add to the gas phase, which will then go through gaseous transport, triggering bubbling
@@ -3019,14 +3025,14 @@ implicit none
               if(idg/=idg_NH3B)then
                 trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
                 if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
-                  write(*,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                  stop
+                  write(iulog,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  call endrun(trim(mod_filename)//' at line',__LINE__)
                 endif
               else
                 trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
                 if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
-                  write(*,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
-                  stop
+                  write(iulog,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  call endrun(trim(mod_filename)//' at line',__LINE__)
                 endif             
               endif
               trcg_ebu_flx_col(idg,N2,N1)=0._r8
