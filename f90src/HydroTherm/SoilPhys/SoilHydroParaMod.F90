@@ -355,6 +355,7 @@ contains
   implicit none
   integer, intent(in) :: L,NY,NX
   logical :: SaturateBelowWaterTable
+  real(r8) :: WaterRelSaturation,IceRelSaturation
   character(len=*), parameter :: subname='SetColdRunSoilStates'
 
   call PrintInfo('beg '//subname)
@@ -391,12 +392,22 @@ contains
     THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
   ENDIF
 
+  ! THETW/THETI are volumes per unit micropore-domain soil volume. Macropore
+  ! volume is already pore space, so initialize it with relative saturation.
+  ! Give water priority and limit ice to the remaining macropore space.
+  WaterRelSaturation=0._r8
+  IceRelSaturation=0._r8
+  IF(POROS_vr(L,NY,NX).GT.ZERO)THEN
+    WaterRelSaturation=AZMAX1(AMIN1(1._r8,THETW_vr(L,NY,NX)/POROS_vr(L,NY,NX)))
+    IceRelSaturation=AZMAX1(AMIN1(1._r8-WaterRelSaturation,THETI_vr(L,NY,NX)/POROS_vr(L,NY,NX)))
+  ENDIF
+
   ! Initialize water/ice volumes and their contribution to heat capacity.
   VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
   VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
-  VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
+  VLWatMacP_vr(L,NY,NX)     = WaterRelSaturation*VLMacroPores_vr(L,NY,NX)
   VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-  VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
+  VLiceMacP_vr(L,NY,NX)     = IceRelSaturation*VLMacroPores_vr(L,NY,NX)
   ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
   ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
   VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
