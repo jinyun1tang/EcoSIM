@@ -841,12 +841,19 @@ module StartsMod
 
       DLYR_3D(3,L,NY,NX)           = DLYRI_3D(3,L,NY,NX)
       SoilDepthMidLay_vr(L,NY,NX)  = 0.5_r8*(CumDepz2LayBottom_vr(L,NY,NX)+CumDepz2LayBottom_vr(L-1,NY,NX))
-      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)+DLYR_3D(3,NU_col(NY,NX),NY,NX)
+      ! Use the input upper boundary; the active top-layer thickness may not yet
+      ! be calculated while visiting reserved layers above NU_col.
+      CumSoilThickness_vr(L,NY,NX) = CumDepz2LayBottom_vr(L,NY,NX) &
+        -CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
       CumSoilThickness_vr(L,NY,NX) = real_truncate(CumSoilThickness_vr(L,NY,NX),1.e-6_r8)
       !identify the first soil layer
       IF(SoiBulkDensityt0_vr(L,NY,NX).LE.ZERO)SoilSurfDepZ_col(NY,NX)=CumSoilThickness_vr(L,NY,NX)
       
-      CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
+      IF(L.EQ.NU_col(NY,NX))THEN
+        CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*CumSoilThickness_vr(L,NY,NX)
+      ELSE
+        CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
+      ENDIF
       VGeomLayer_vr(L,NY,NX)       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)     ![m3]
       VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)  !volume of soil occupied by micropores
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)
