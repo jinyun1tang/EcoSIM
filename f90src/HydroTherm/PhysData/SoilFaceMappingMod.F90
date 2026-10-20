@@ -2,9 +2,10 @@ module SoilFaceMappingMod
   ! Horizontal face storage uses the owner's layer and the destination column.
   ! The owner is the west/north cell; a negative flux reverses the actual donor.
   ! Vertical and external boundary faces retain their original layer indices.
+  use data_kind_mod, only: r8 => DAT_KIND_R8
   use GridConsts, only: JZ,JY,JX
   use ElmIDMod, only: iWestEastDirection,iNorthSouthDirection,iVerticalDirection
-  use GridDataType, only: NL_col,FlowDirIndicator_col
+  use GridDataType, only: NL_col,FlowDirIndicator_col,DLYR_3D,AREA_3D
   use SoilPropertyDataType, only: VLSoilPoreMicP_vr
   use EcoSIMCtrlDataType, only: ZEROS2
   use DebugToolMod, only: PrintInfo
@@ -12,6 +13,7 @@ module SoilFaceMappingMod
   private
   integer, allocatable :: target_layer(:,:,:,:)
   integer :: west_edge,north_edge
+  public :: GetSoilFaceGeometry
   public :: RebuildSoilFaceMap,DestroySoilFaceMap,SoilFaceSlot,SoilFaceIncomingRange
 contains
 !------------------------------------------------------------------------------------------
@@ -91,5 +93,28 @@ contains
     enddo
     call PrintInfo('end '//subname)
   end subroutine SoilFaceIncomingRange
+!------------------------------------------------------------------------------------------
+  subroutine GetSoilFaceGeometry(N,N1,N2,N3,N4,N5,N6,FaceArea,AreaOverDistance,Dispersivity)
+    ! Use current dimensions of the actual layer pair. The face owner supplies
+    ! the area, matching the convention used by water and heat transport.
+    integer, intent(in) :: N,N1,N2,N3,N4,N5,N6
+    real(r8), intent(out) :: FaceArea          ![m2]
+    real(r8), intent(out) :: AreaOverDistance  ![m]
+    real(r8), intent(out) :: Dispersivity      ![m]
+    real(r8) :: Distance
+    character(len=*), parameter :: subname='GetSoilFaceGeometry'
+
+    call PrintInfo('beg '//subname)
+    FaceArea=AREA_3D(N,N3,N2,N1)
+    Distance=0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
+    AreaOverDistance=0._r8
+    Dispersivity=0._r8
+    if(Distance>0._r8)then
+      AreaOverDistance=FaceArea/Distance
+      Dispersivity=0.20_r8*Distance**1.07_r8
+    endif
+    call PrintInfo('end '//subname)
+  end subroutine GetSoilFaceGeometry
+
 !------------------------------------------------------------------------------------------
 end module SoilFaceMappingMod

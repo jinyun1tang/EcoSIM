@@ -1266,7 +1266,7 @@ contains
   implicit none
   integer, intent(in) :: M,NY,NX,NHE,NHW,NVS,NVN
   character(len=*), parameter :: subname='SnowRedistributionM'
-  integer :: N,NN,N4,N5,FaceSide,Step,FaceX,FaceY
+  integer :: N,NN,N4,N5,FaceSide,Step
   real(r8) :: Fraction(2,2),SnowDepthGradH,QSX,DonorScale,FaceDistance
 
   call PrintInfo('beg '//subname)
@@ -1282,13 +1282,12 @@ contains
         N5=NY+Step
       ENDIF
       IF(N4.LT.NHW .OR. N4.GT.NHE .OR. N5.LT.NVN .OR. N5.GT.NVS)CYCLE
-      ! DIST_3D is stored at the eastern/southern face index. A backward
-      ! transfer uses the current cell's face, not the backward cell's face.
-      FaceX=N4; FaceY=N5
-      IF(NN.EQ.iBehind)THEN
-        FaceX=NX; FaceY=NY
+      ! Horizontal center distance is independent of soil-layer numbering.
+      IF(N.EQ.iWestEastDirection)THEN
+        FaceDistance=0.5_r8*(DH_col(NY,NX)+DH_col(N5,N4))
+      ELSE
+        FaceDistance=0.5_r8*(DV_col(NY,NX)+DV_col(N5,N4))
       ENDIF
-      FaceDistance=DIST_3D(N,NU_col(FaceY,FaceX),FaceY,FaceX)
       ! Retain the snow-depth gradient formulation, using the actual neighbor
       ! in both directions. Donor states have completed local physics.
       SnowDepthGradH=(Altitude_col(NY,NX)+SnowDepth_col(NY,NX) &

@@ -232,15 +232,11 @@ module StartsMod
   !     in geography, slope =rise/run
   !     ExtWaterTableLocDepz_col,DTBLD=depth of natural,artificial water table adjusted for elevn
   !     WaterTableDepZi_col=depth to internal water table
-  !     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
-  !     XDPTH_3D=x-section area/distance in solute flux calculations (m2/m)
-  !     DISP=dispersivity parameter in solute flux calculations (m2 h-1)
   !
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8),intent(in) :: SurfElevLandscapeMin,LandScape1stSoiLayDepth
-  integer :: NY,NX,L,N
-  integer :: N1,N2,N3,N4,N5,N6
+  integer :: NY,NX
   character(len=*), parameter :: subname='InitSoilVars'
 
   ! begin_execution
@@ -273,50 +269,6 @@ module StartsMod
         TileWaterTableLocDepz_col(NY,NX) = 0.0_r8
       ENDIF
       WaterTableDepZi_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
-    ENDDO
-  ENDDO
-
-  DO  NX=NHW,NHE
-    DO  NY=NVN,NVS
-      DO L=1,NL_col(NY,NX)
-        N1 = NX;N2 = NY;N3 = L
-        DO N=FlowDirIndicator_col(N2,N1),3
-          IF(N.EQ.iWestEastDirection)THEN
-            ! in direction x, west-east
-            IF(NX.EQ.NHE)THEN
-              cycle
-            ELSE
-              N4=NX+1;N5=NY;N6=L
-            ENDIF
-          ELSEIF(N.EQ.iNorthSouthDirection)THEN
-            ! in direction y, north-south
-            IF(NY.EQ.NVS)THEN
-              cycle
-            ELSE
-              N4=NX;N5=NY+1;N6=L
-            ENDIF
-          ELSEIF(N.EQ.iVerticalDirection)THEN
-            ! in vertical, up-down
-            IF(L.EQ.NL_col(NY,NX))THEN
-              cycle
-            ELSE
-              N4=NX;N5=NY;N6=L+1
-            ENDIF
-          ENDIF
-          !distance between the center of grids (N3,N2,N1) and (N6,N5,N4)
-          DIST_3D(N,N6,N5,N4)  = 0.5_r8*(DLYR_3D(N,N3,N2,N1)+DLYR_3D(N,N6,N5,N4))
-          !
-          XDPTH_3D(N,N6,N5,N4) = AREA_3D(N,N3,N2,N1)/DIST_3D(N,N6,N5,N4)
-          !1.07 is a scaling parameter for dispersion calculation, reference?
-          DISP_3D(N,N6,N5,N4)=0.20_r8*DIST_3D(N,N6,N5,N4)**1.07_r8
-        ENDDO
-
-        IF(L.EQ.NU_col(NY,NX))THEN
-          DIST_3D(3,N3,N2,N1)  = 0.5_r8*DLYR_3D(3,N3,N2,N1)
-          XDPTH_3D(3,N3,N2,N1) = AREA_3D(3,N3,N2,N1)/DIST_3D(3,N3,N2,N1)
-          DISP_3D(3,N3,N2,N1)  = 0.20_r8*DIST_3D(3,N3,N2,N1)**1.07_r8
-        ENDIF
-      ENDDO
     ENDDO
   ENDDO
 

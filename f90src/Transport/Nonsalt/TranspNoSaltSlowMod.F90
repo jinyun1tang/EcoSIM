@@ -1,5 +1,5 @@
 module TranspNoSaltSlowMod
-  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange,GetSoilFaceGeometry
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: destroy, endrun
   use TracerPropMod,    only: MolecularWeight
@@ -1639,7 +1639,7 @@ implicit none
     TORT0 = TortMicPM_vr(M,0,NY,NX)/DLYR0*FracSurfByLitR_col(NY,NX)
     DLYR1 = AMAX1(ZERO2,DLYR_3D(3,NU_col(NY,NX),NY,NX))
     TORT1 = TortMicPM_vr(M,NU_col(NY,NX),NY,NX)/DLYR1
-    DISPN = DISP_3D(3,NU_col(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA_3D(3,NU_col(NY,NX),NY,NX)))
+    DISPN = (0.20_r8*(0.5_r8*DLYR1)**1.07_r8)*AMIN1(VFLWX,ABS(FLWRM1/AREA_3D(3,NU_col(NY,NX),NY,NX)))
 
     DO idom=idom_beg,idom_end
       DIFDOM0      = (DOM_diffusivitytscaledM_vr(idom,0,NY,NX)*TORT0+DISPN)
@@ -2145,6 +2145,7 @@ implicit none
   integer , intent(in) :: I,J,M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: DOM_Difus_Mac2Micp_flxM(idom_beg:idom_end,1:jcplx)
 
+  real(r8) :: FaceArea,AreaOverDistance,Dispersivity
   character(len=*), parameter :: subname='MicroporeSoluteDiffusionM'
   real(r8) :: THETW1_vr(JZ,JY,JX)  !soil saturation   
   real(r8) :: VLWatMicPOA,VLWatMicPOB,VLWatMicPPA,VLWatMicPPB
@@ -2298,14 +2299,15 @@ implicit none
     DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
     DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMicPM_vr(M,N3,N2,N1)*DLYR1+TortMicPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
+    call GetSoilFaceGeometry(N,N1,N2,N3,N4,N5,N6,FaceArea,AreaOverDistance,Dispersivity)
+    DISPN = Dispersivity*AMIN1(VFLWX,ABS(WaterFlow2MicPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/FaceArea))
 
     DO idom=idom_beg,idom_end
-      DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
+      DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*AreaOverDistance
     ENDDO
 
     DO ids=ids_beg,ids_end
-      SDifc(ids)=(SoluteDifusivitytscaledM_vr(ids,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
+      SDifc(ids)=(SoluteDifusivitytscaledM_vr(ids,N6,N5,N4)*TORTL+DISPN)*AreaOverDistance
     ENDDO
     !
     D9805: DO K=1,jcplx
@@ -2464,6 +2466,7 @@ implicit none
   implicit none
   integer , intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
+  real(r8) :: FaceArea,AreaOverDistance,Dispersivity
   character(len=*), parameter :: subname='MacroporeSoluteDispersionM'
   real(r8) :: DOM_Difus_Macp_flxM(idom_beg:idom_end,1:jcplx)
   real(r8) :: VOLH2A,VOLH2B,VOLH3A,VOLH3B,VOLH4A,VOLH4B
@@ -2617,14 +2620,15 @@ implicit none
     DLYR1 = AMAX1(ZERO2,DLYR_3D(N,N3,N2,N1))
     DLYR2 = AMAX1(ZERO2,DLYR_3D(N,N6,N5,N4))
     TORTL = (TortMacPM_vr(M,N3,N2,N1)*DLYR1+TortMacPM_vr(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN = DISP_3D(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/AREA_3D(N,N6,N5,N4)))
+    call GetSoilFaceGeometry(N,N1,N2,N3,N4,N5,N6,FaceArea,AreaOverDistance,Dispersivity)
+    DISPN = Dispersivity*AMIN1(VFLWX,ABS(WaterFlow2MacPM_3D(M,N,SoilFaceSlot(N,N3,N6),N5,N4)/FaceArea))
 
     DO idom=idom_beg,idom_end
-      DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
+      DOMDifc(idom)=(DOM_diffusivitytscaledM_vr(idom,N6,N5,N4)*TORTL+DISPN)*AreaOverDistance
     ENDDO
 
     DO ids=ids_beg,ids_end
-      SDifc(ids)=(SoluteDifusivitytscaledM_vr(ids,N6,N5,N4)*TORTL+DISPN)*XDPTH_3D(N,N6,N5,N4)
+      SDifc(ids)=(SoluteDifusivitytscaledM_vr(ids,N6,N5,N4)*TORTL+DISPN)*AreaOverDistance
     ENDDO
     !
     !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
