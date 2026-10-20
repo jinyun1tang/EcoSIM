@@ -122,7 +122,7 @@ implicit none
   integer :: NTOPO,NY,NX,NZ,lstr
   type(Var_desc_t) :: vardesc
   character(len=128) :: pft_pltinfo(JP),tstr,date_str
-  integer :: LPY,IDX,IMO,IYR,IDY,ierr
+  integer :: IYR,IDY,ierr
 
   call PrintInfo('beg '//subname)
   DO NX=NHW,NHE
@@ -140,12 +140,19 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-    ! Nonpositive bounds mark the end of populated topographic-unit records.
+    !
+    ! Legacy plant files may reserve more ntopou slots than they populate.
+    ! Nonpositive bounds (including NetCDF fill values) end the populated records;
+    ! exit before validating NZ or reading planting/management data for unused slots.
+    ! Keep this sentinel exit when changing validation. Populated units may span
+    ! multiple cells, so their bounds are checked against JX/JY, not ntopou.
+    !
     if(any((/NH1,NV1,NH2,NV2/)<=0))exit
     if(NS<0 .or. NS>JP)then
       write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
       call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
     endif
+    !
     ! Topographic units may span several cells; validate against grid dimensions.
     if(NH1<1 .or. NH2>JX .or. NH1>NH2 .or. &
        NV1<1 .or. NV2>JY .or. NV1>NV2)then
@@ -172,6 +179,7 @@ implicit none
             cycle
           endif
 
+          date_str=''
           select case(count_delimited_items(tstr, ' '))
           case(3)
             lstr=3
@@ -183,27 +191,13 @@ implicit none
             lstr=0
             ierr=1
           end select
-          if(ierr==0)then
-            if(len_trim(date_str)==8.and.verify(trim(date_str),'0123456789')==0)then
-              read(date_str,'(I2,I2,I4)',iostat=ierr)IDX,IMO,IYR
-            else
-              ierr=1
-            endif
-          endif
           if(ierr/=0)then
             write(iulog,*)'lstr=',lstr
             call endrun('Invalid planting record (expected DDMMYYYY population depth [maximum population]): '// &
               trim(tstr)//' in '//subname,__LINE__)
           endif
           PlantinDepz_pft(NZ,NY,NX)=AZMAX1(PlantinDepz_pft(NZ,NY,NX),1.e-6_r8)
-          LPY=0
-          if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-          !obtain the ordinal day
-          IF(IMO.EQ.1)then
-            IDY=IDX
-          else
-            IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
-          endif
+          call ParsePlantEventDate(date_str,yearc,NTOPO,NZ,IDY,IYR)
 
           IF(IDY.GT.0.AND.IYR.GT.0)THEN
             IF(iselect_plantZ==-1 .OR. (iselect_plantZ>0 .and. NZ==iselect_plantZ))THEN
@@ -221,6 +215,41 @@ implicit none
   ENDDO  
   CALL PrintInfo('end '//subname)
   end subroutine readplantinginfo
+
+!------------------------------------------------------------------------------------------
+  subroutine ParsePlantEventDate(date_str,yearc,NTOPO,NZ,IDY,IYR)
+  ! Validate DDMMYYYY before computing any calendar or daily-array index.
+  implicit none
+  character(len=*), intent(in) :: date_str
+  integer, intent(in) :: yearc,NTOPO,NZ
+  integer, intent(out) :: IDY,IYR
+  character(len=*), parameter :: subname='ParsePlantEventDate'
+  integer :: IDX,IMO,ierr
+  integer :: MonthDays(12)
+  logical :: valid_date
+
+  call PrintInfo('beg '//subname)
+  MonthDays=(/31,28,31,30,31,30,31,31,30,31,30,31/)
+  ! Events are applied in yearc, including recurring management with year 0000.
+  ! Preserve the input year for the caller's planting/harvest selection rules.
+  if(isLeap(yearc))MonthDays(2)=29
+  valid_date=len_trim(date_str)==8.and.verify(trim(date_str),'0123456789')==0
+  if(valid_date)then
+    read(date_str,'(I2,I2,I4)',iostat=ierr)IDX,IMO,IYR
+    valid_date=ierr==0
+  endif
+
+  if(valid_date)valid_date=IMO>=1.and.IMO<=12
+  ! Do not index MonthDays until the month has been validated.
+  if(valid_date)valid_date=IDX>=1.and.IDX<=MonthDays(IMO)
+  if(.not.valid_date)then
+    write(iulog,*)'Invalid plant event date: topo unit=',NTOPO,' PFT=',NZ, &
+      ' date=',trim(date_str),' simulation year=',yearc
+    call endrun('Expected a valid DDMMYYYY date in '//subname,__LINE__)
+  endif
+  IDY=sum(MonthDays(1:IMO-1))+IDX
+  call PrintInfo('end '//subname)
+  end subroutine ParsePlantEventDate
 
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMgmnt(NHW,NHE,NVN,NVS)
@@ -263,15 +292,15 @@ implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   character(len=*), parameter :: subname='ReadPlantMgmtinfo'
   logical  :: readvar
-  real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
+  real(r8) :: ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
   real(r8) :: ECUT24,HCUT,PCUT
   integer  :: pft_nmgnt(JP)
   integer  :: NH1,NV1,NH2,NV2,NS
   type(Var_desc_t) :: vardesc
   integer :: NTOPO,NY,NX,NZ
-  character(len=128) :: pft_pltinfo(JP),tstr  
+  character(len=128) :: pft_pltinfo(JP),tstr,date_str
   character(len=128) :: pft_mgmtinfo(24,JP)
-  integer :: LPY,IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS
+  integer :: IYR,IDY,ICUT,IDYE,IDYG,JCUT,IDYS,ierr
   integer :: M,NN,N,nn1
 
   call PrintInfo('beg '//subname)
@@ -283,7 +312,11 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-    ! Nonpositive bounds mark the end of populated topographic-unit records.
+    ! Legacy plant files may reserve more ntopou slots than they populate.
+    ! Nonpositive bounds (including NetCDF fill values) end the populated records;
+    ! exit before validating NZ or reading planting/management data for unused slots.
+    ! Keep this sentinel exit when changing validation. Populated units may span
+    ! multiple cells, so their bounds are checked against JX/JY, not ntopou.
     if(any((/NH1,NV1,NH2,NV2/)<=0))exit
     if(NS<0 .or. NS>JP)then
       write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
@@ -333,20 +366,15 @@ implicit none
             DO nn1=1,pft_nmgnt(NZ)
               if(len_trim(pft_mgmtinfo(NN1,NZ))==0)cycle
               tstr=trim(pft_mgmtinfo(NN1,NZ))
-              !read day/month/year when management occurs
-              read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-              
-              READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+              date_str=''
+              read(tstr,*,iostat=ierr)date_str,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13, &
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
-              !"17050000,2,0,0.06,0.0,0.9,0.3,0.0,0.1,0.9,0.9,0.0,0.5       
-              LPY=0
-              if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-              !obtain the ordinal day
-              IF(IMO.EQ.1)then
-                IDY=IDX
-              else
-                IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+              if(ierr/=0)then
+                write(iulog,*)'Invalid plant management record: topo unit=',NTOPO,' PFT=',NZ, &
+                  ' record=',trim(tstr)
+                call endrun('Invalid management record in '//subname,__LINE__)
               endif
+              call ParsePlantEventDate(date_str,yearc,NTOPO,NZ,IDY,IYR)
 
               IF(IDY.GT.0 .AND. JCUT.EQ.1)THEN
                 iDayPlantHarvest_pft(NZ,NY,NX)=IDY
@@ -436,6 +464,7 @@ implicit none
 
   call PrintInfo('beg '//subname)
   pft_changed_loc=.false.
+  if(present(pft_changed))pft_changed=.false.
   if (len_trim(pft_mgmt_in)==0)return
   
   call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
@@ -444,6 +473,14 @@ implicit none
 
   call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
     trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
+
+  if(pft_dflag==-1)then
+    ! ReadPlantInfoNC has already disabled plants. No year, topographic-unit,
+    ! planting, or management records are required for the no-plant flag.
+    call ncd_pio_closefile(pftinfo_nfid)
+    call PrintInfo('end '//subname)
+    return
+  endif
 
   !obtain the number of topographic units
   ntopou=get_dim_len(pftinfo_nfid, 'ntopou')    
@@ -475,7 +512,11 @@ implicit none
     call readplantmgmtinfo(pftinfo_nfid,ntopou,iyear,yearc,NHW,NHE,NVN,NVS)
   else
     pft_changed_loc=.true.
+
     !transient pft data (flexible inputs)
+    ! Intentionally use the simulation year for flexible planting/management,
+    ! while ReadPlantInfoNC selects species using the forcing year. The two
+    ! record years may differ when climate forcing is cycled.
     iyear=1
     DO while(.true.)
       call ncd_getvar(pftinfo_nfid,'year',iyear,year)
@@ -1588,6 +1629,9 @@ implicit none
         iyear=1
       else
         iyear=1
+        ! Species intentionally follow the forcing year in all transient modes.
+        ! Flexible planting/management separately follow the simulation year;
+        ! do not make these year selections identical when forcing is cycled.
         DO while(.true.)
           call ncd_getvar(pftinfo_nfid,'year',iyear,year)
           if(year==yeari)exit
@@ -1603,7 +1647,11 @@ implicit none
         call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
         call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
-        ! Nonpositive bounds mark the end of populated topographic-unit records.
+        ! Legacy plant files may reserve more ntopou slots than they populate.
+        ! Nonpositive bounds (including NetCDF fill values) end the populated records;
+        ! exit before validating NZ or reading planting/management data for unused slots.
+        ! Keep this sentinel exit when changing validation. Populated units may span
+        ! multiple cells, so their bounds are checked against JX/JY, not ntopou.
         if(any((/NH1,NV1,NH2,NV2/)<=0))exit
         if(NS<0 .or. NS>JP)then
           write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
