@@ -362,7 +362,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use ForcWriterMod,   only: do_bgcforc_write,   WriteBBGCForc
   use HistDataType,    only: hist_ecosim
   use HistFileMod,     only: hist_update_hbuf,   hist_htapes_wrapup
-  use ClimReadMod,     only: read_soil_warming_Tref
+  use ClimReadMod,     only: read_soil_warming_Tref, ReadAtmosComposition
   use EcoSIMCtrlMod
   use GridConsts
   use EcoSIMCtrlDataType
@@ -411,6 +411,11 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   if(do_timing)call start_timer(t1)
   call InitControlParms
   if(do_timing)call end_timer('InitControlParms',t1)
+
+  ! Read annual atmospheric mixing ratios before STARTS converts them to mass concentrations.
+  if(do_timing)call start_timer(t1)
+  call ReadAtmosComposition(iYearCurrent,NHW,NHE,NVN,NVS)
+  if(do_timing)call end_timer('ReadAtmosComposition',t1)
 
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     

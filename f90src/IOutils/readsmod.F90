@@ -251,7 +251,6 @@ module readsmod
   ENDIF
   IMNG=1
 
-  call GetAtmGts(yearc,NHW,NHE,NVN,NVS)
   call PrintInfo('end '//subname)
   
   RETURN
