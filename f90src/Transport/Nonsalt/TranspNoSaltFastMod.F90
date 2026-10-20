@@ -790,14 +790,19 @@ implicit none
   real(r8) :: CNDC2   !conductance in destination grid
   real(r8) :: DFLG2   !air-filled porosity effect on gaseous diffusivity in source
   real(r8) :: DFLGL   !air-filled porosity effect on gaseous diffusivity in destination
+  real(r8) :: FaceArea
   integer :: idg
   real(r8):: GasDifuscoefMM_3D
 
   call PrintInfo('beg '//subname)
 
-  DFLG2=2.0_r8*POROQ*AZMAX1(FracAirFilledSoilPoreM_vr(M,N3,N2,N1))**2/POROS_vr(N3,N2,N1)*AREA_3D(N,N3,N2,N1)/DLYR_3D(N,N3,N2,N1)
+  ! The traversal fixes (N3,N2,N1) as the face owner, independently of the
+  ! flux sign. Use its area on both sides, matching water/solute transport.
+  ! This ownership convention does not calculate unequal layers' geometric overlap.
+  FaceArea=AREA_3D(N,N3,N2,N1)
+  DFLG2=2.0_r8*POROQ*AZMAX1(FracAirFilledSoilPoreM_vr(M,N3,N2,N1))**2/POROS_vr(N3,N2,N1)*FaceArea/DLYR_3D(N,N3,N2,N1)
 
-  DFLGL=2.0_r8*POROQ*AZMAX1(FracAirFilledSoilPoreM_vr(M,N6,N5,N4))**2/POROS_vr(N6,N5,N4)*AREA_3D(N,N6,N5,N4)/DLYR_3D(N,N6,N5,N4)
+  DFLGL=2.0_r8*POROQ*AZMAX1(FracAirFilledSoilPoreM_vr(M,N6,N5,N4))**2/POROS_vr(N6,N5,N4)*FaceArea/DLYR_3D(N,N6,N5,N4)
   !
   DO idg=idg_beg,idg_NH3
     !     GASOUS CONDUCTANCES
