@@ -15,10 +15,36 @@ module HydrologyDiagMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
   __FILE__
 
+  public :: UpdateSoilWaterContents
   public :: DiagWaterTableDepZi
   public :: DiagActiveLayerDepth
 
   contains
+!------------------------------------------------------------------------------------------
+
+  subroutine UpdateSoilWaterContents(NY,NX)
+  ! Update diagnostic water, ice and air contents without changing inventories.
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+  character(len=*), parameter :: subname='UpdateSoilWaterContents'
+
+  call PrintInfo('beg '//subname)
+  ! Refresh fractions from current inventories before hydraulic pressures are computed.
+  DO L=NU_col(NY,NX),NL_col(NY,NX)
+    IF(VLSoilMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
+      THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
+      THETI_vr(L,NY,NX)    = 0._r8
+      ThetaAir_vr(L,NY,NX) = 0._r8
+    ELSE
+      THETW_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      THETI_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
+      ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
+    ENDIF
+
+  ENDDO
+  call PrintInfo('end '//subname)
+  end subroutine UpdateSoilWaterContents
 !------------------------------------------------------------------------------------------
 
   subroutine DiagWaterTableDepZi(I,J,NY,NX)
@@ -41,19 +67,9 @@ module HydrologyDiagMod
 !     begin_execution
   call PrintInfo('beg '//subname)
 
-  ! Refresh all active layers before searching, including layers below the
-  ! diagnosed table. Air porosity counts both liquid and ice pore occupancy.
+  ! Call after UpdateSoilWaterContents and GetSoilHydraulicVars so fractions
+  ! and matric pressures describe the same current soil state.
   DO L=NU_col(NY,NX),NL_col(NY,NX)
-    IF(VLSoilMicP_vr(L,NY,NX).LE.ZEROS(NY,NX))THEN
-      THETW_vr(L,NY,NX)    = POROS_vr(L,NY,NX)
-      THETI_vr(L,NY,NX)    = 0._r8
-      ThetaAir_vr(L,NY,NX) = 0._r8
-    ELSE
-      THETW_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLWatMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      THETI_vr(L,NY,NX)    = AZMAX1(AMIN1(POROS_vr(L,NY,NX),VLiceMicP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX)))
-      ThetaAir_vr(L,NY,NX) = AZMAX1(VLsoiAirP_vr(L,NY,NX)/VLSoilMicP_vr(L,NY,NX))
-    ENDIF
-
     THETAirP_vr(L)=AZMAX1(POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)-THETI_vr(L,NY,NX))
   ENDDO
 

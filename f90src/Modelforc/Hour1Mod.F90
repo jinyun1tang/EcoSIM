@@ -13,7 +13,7 @@ module Hour1Mod
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
-  use HydrologyDiagMod , only: DiagWaterTableDepZi, DiagActiveLayerDepth
+  use HydrologyDiagMod , only: UpdateSoilWaterContents, DiagWaterTableDepZi, DiagActiveLayerDepth
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -175,7 +175,7 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call DiagWaterTableDepZi(I,J,NY,NX)
+      call UpdateSoilWaterContents(NY,NX)
 
       call GetChemicalConcsInSoil(I,J,NY,NX)
 
@@ -186,6 +186,9 @@ module Hour1Mod
       call CalGasSolubility(NY,NX)
 
       call GetSoilHydraulicVars(I,J,NY,NX)
+
+      ! Diagnose the water table using current water/ice fractions and pressures.
+      call DiagWaterTableDepZi(I,J,NY,NX)
 
 !     CALCULATE ACTIVE LAYER DEPTH
       call DiagActiveLayerDepth(NY,NX)
