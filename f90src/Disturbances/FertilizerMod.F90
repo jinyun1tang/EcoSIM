@@ -84,6 +84,14 @@ implicit none
 !     iUreaHydInhibitorType_col=urea hydrolysis inhibitor type (1=no,2=yes)
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
+!     Inhibitors are dimensionless activity factors with a maximum of 1,
+!     not concentrations or conserved masses. Resetting receiving layers
+!     to 1 and other layers to 0 for each treatment is an intentional
+!     compromise; overlapping applications are not accumulated.
+!     TODO: Revisit treatment overlap across dates and depths, including
+!     the column-wide urea-inhibitor type, if a more detailed representation
+!     is introduced. Preserving old activity would also require an explicit
+!     assumption about how successive treatments interact.
 ! urea application
   IF(FERT(ifert_N_urea,I,NY,NX).GT.0._r8 .OR. FERT(ifert_N_urea_band,I,NY,NX).GT.0._r8)THEN  
     IF(IYTYP(iamendtyp_fert,I,NY,NX).EQ.0)THEN
