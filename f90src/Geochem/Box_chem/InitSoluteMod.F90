@@ -1250,9 +1250,11 @@ module InitSoluteMod
         /(XROH1_mole_conc+SXH2P*OH_1e_activity)*VLWatMicPBK
 !
 !     HPO4 EXCHANGE
+!     Intended ligand exchange: R-OH + HPO4(2-) <=> R-HPO4(-) + OH(-).
+!     Positive flux removes dissolved HPO4 and adds adsorbed R-HPO4.
 !
       SPH1P=SXH1P*DPH2O/DPH2P
-      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_mole_conc*H2PO4_1e_activity-SPH1P*XHPO4_mole_conc)/(XROH1_mole_conc+SPH1P)*VLWatMicPBK
+      H1PO4_to_XHPO4_ROH_flx=TAD*(XROH1_mole_conc*H1PO4_2e_activity-SPH1P*XHPO4_mole_conc)/(XROH1_mole_conc+SPH1P)*VLWatMicPBK
       XOH_mole_conc=XOH_mole_conc-RXOH1
       XROH1_mole_conc=XROH1_mole_conc+RXOH1-RXOH2-H2PO4_to_XH2PO4_ROH_flx-H1PO4_to_XHPO4_ROH_flx
       XROH2_mole_conc=XROH2_mole_conc+RXOH2-H2PO4_1e_to_XH2PO4_ROH2_flx
