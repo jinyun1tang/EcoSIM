@@ -275,13 +275,20 @@ module RedistMod
     VLWatMacP_vr(L,NY,NX) = AZMAX1(VLWatMacP_vr(L,NY,NX))
     VLiceMacP_vr(L,NY,NX) = AZMAX1(VLiceMacP_vr(L,NY,NX))
     VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-    VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
+    VOLTX_vr(L,NY,NX)     = POROS_vr(L,NY,NX)*VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
     TCS_vr(L,NY,NX)       = units%Kelvin2Celcius(TKS_vr(L,NY,NX))
-    !relative soil saturation
-    ThetaH2OZ_vr(L,NY,NX) = AMIN1(safe_adb(VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX),VLWatMacP_vr(L,NY,NX)),&
-      VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
-    ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
-      VLiceMacP_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)    
+    ! Relative saturation uses actual micropore plus macropore space.
+    IF(VOLTX_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      ThetaH2OZ_vr(L,NY,NX) = AZMAX1(AMIN1(1._r8, &
+        (VLWatMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
+        VLWatMacP_vr(L,NY,NX)))/VOLTX_vr(L,NY,NX)))
+      ThetaICEZ_vr(L,NY,NX) = AZMAX1(AMIN1(1._r8, &
+        (VLiceMicP_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
+        VLiceMacP_vr(L,NY,NX)))/VOLTX_vr(L,NY,NX)))
+    ELSE
+      ThetaH2OZ_vr(L,NY,NX)=0._r8
+      ThetaICEZ_vr(L,NY,NX)=0._r8
+    ENDIF
   ENDDO D9945
 
   call PrintInfo('end '//subname)

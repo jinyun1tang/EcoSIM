@@ -408,8 +408,17 @@ contains
   VLWatMacP_vr(L,NY,NX)     = WaterRelSaturation*VLMacroPores_vr(L,NY,NX)
   VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
   VLiceMacP_vr(L,NY,NX)     = IceRelSaturation*VLMacroPores_vr(L,NY,NX)
-  ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
-  ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
+  ! Match the relative pore occupancies reported after hourly redistribution.
+  VOLTX_vr(L,NY,NX)=POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)+VLMacroPores_vr(L,NY,NX)
+  IF(VOLTX_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    ThetaH2OZ_vr(L,NY,NX)=AZMAX1(AMIN1(1._r8, &
+      (VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))/VOLTX_vr(L,NY,NX)))
+    ThetaICEZ_vr(L,NY,NX)=AZMAX1(AMIN1(1._r8, &
+      (VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))/VOLTX_vr(L,NY,NX)))
+  ELSE
+    ThetaH2OZ_vr(L,NY,NX)=0._r8
+    ThetaICEZ_vr(L,NY,NX)=0._r8
+  ENDIF
   VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
     +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &

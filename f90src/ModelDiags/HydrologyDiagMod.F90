@@ -213,9 +213,16 @@ module HydrologyDiagMod
       found_frozen=.false.
       DO L=NUM_col(NY,NX),NL_col(NY,NX)
         VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-        VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
-        ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP1_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
-          VLiceMacP1_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)
+        ! Macropore volume is already pore space; porosity applies only to the
+        ! micropore-domain soil volume.
+        VOLTX_vr(L,NY,NX) = POROS_vr(L,NY,NX)*VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
+        IF(VOLTX_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          ThetaICEZ_vr(L,NY,NX) = AZMAX1(AMIN1(1._r8, &
+            (VLiceMicP1_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
+            VLiceMacP1_vr(L,NY,NX)))/VOLTX_vr(L,NY,NX)))
+        ELSE
+          ThetaICEZ_vr(L,NY,NX)=0._r8
+        ENDIF
         if(ThetaICEZ_vr(L,NY,NX)>0.9_r8 .and. .not. found_frozen)then
           found_frozen=.true.
           NLF_col(NY,NX)=L
