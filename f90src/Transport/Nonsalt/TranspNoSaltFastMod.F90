@@ -552,6 +552,7 @@ implicit none
   integer, intent(in) :: N4,N5,N6
   character(len=*), parameter :: subname='GasDissolutionMM'
   integer :: idg
+  real(r8) :: NH3GasMassZone
 !
 !
   call PrintInfo('beg '//subname)
@@ -567,15 +568,21 @@ implicit none
       enddo    
 
       IF(VLsoiAirPMA_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXA_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+        ! Both dissolved zones exchange with one gas pool. Allocate its mass by
+        ! zone air volume so the zone-specific equation uses the common gas concentration.
+        NH3GasMassZone=AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4)) &
+          *VLsoiAirPMA_vr(N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4)
         RGas_Disol_FlxMM_vr(idg_NH3,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
-         (AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
+         (NH3GasMassZone*trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4) &
           -(trcs_solml2_vr(idg_NH3,N6,N5,N4)-0._r8*trcs_solml_drib_vr(idg_NH3,N6,N5,N4))*VLsoiAirPMA_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3,N6,N5,N4)+VLsoiAirPMA_vr(N6,N5,N4))
       ENDIF
 
       IF(VLsoiAirPMB_vr(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VLWatMicPXB_vr(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+        NH3GasMassZone=AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4)) &
+          *VLsoiAirPMB_vr(N6,N5,N4)/VLsoiAirPM_vr(M,N6,N5,N4)
         RGas_Disol_FlxMM_vr(idg_NH3B,N6,N5,N4)=DiffusivitySolutEffM_vr(M,N6,N5,N4)* &
-          (AZMAX1(trcg_gasml2_vr(idg_NH3,N6,N5,N4))*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
+          (NH3GasMassZone*trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4) &
           -(trcs_solml2_vr(idg_NH3B,N6,N5,N4)-0._r8*trcs_solml_drib_vr(idg_NH3B,N6,N5,N4))*VLsoiAirPMB_vr(N6,N5,N4)) &
           /(trcg_VLWatMicP_vr(idg_NH3B,N6,N5,N4)+VLsoiAirPMB_vr(N6,N5,N4))
       ENDIF

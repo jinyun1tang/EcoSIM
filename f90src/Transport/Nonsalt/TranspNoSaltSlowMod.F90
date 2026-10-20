@@ -2925,6 +2925,7 @@ implicit none
 
   character(len=*), parameter :: subname='BubbleEffluxM'  
   real(r8) :: THETW1
+  real(r8) :: BubbleEffluxStep(idg_beg:idg_end) !negative gas mass routed in this substep
   real(r8) :: GasMassSolubility(idg_beg:idg_end)
   real(r8) :: trcg_VOLG(idg_beg:idg_end)   !gas concentation corresponding to each volatile [mol d-2]
   integer  :: idg
@@ -2939,6 +2940,7 @@ implicit none
   DO N1=NHW,NHE
     DO N2=NVN,NVS
       iFalseEbu = .false.
+      BubbleEffluxStep=0._r8
       trcg_Ebu_flxM_vr(idg_beg:idg_end,NUM_col(N2,N1):NL_col(N2,N1),N2,N1)=0.0_r8      
 
       DO N3=NLF_col(N2,N1),NUM_col(N2,N1),-1  !sweep upward assuming bubbles go upward
@@ -2985,11 +2987,11 @@ implicit none
               endif
 
               if(N3==NUM_col(N2,N1) .or. dPond>0._r8)then !surface layer or below water table
-                !accumulate bubbling flux
+                ! Accumulate current-substep bubbles pending upward routing.
                 if(idg==idg_NH3B)then
-                  trcg_ebu_flx_col(idg_NH3,N2,N1) = trcg_ebu_flx_col(idg_NH3,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)
+                  BubbleEffluxStep(idg_NH3) = BubbleEffluxStep(idg_NH3)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                 else
-                  trcg_ebu_flx_col(idg,N2,N1) = trcg_ebu_flx_col(idg,N2,N1)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)                
+                  BubbleEffluxStep(idg) = BubbleEffluxStep(idg)+trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                 endif
               else
                 !add to the gas phase, which will then go through gaseous transport, triggering bubbling
@@ -3019,27 +3021,33 @@ implicit none
           ! TODO: Revisit whether those pathways justify suppressing local bubble
           ! formation in a supersaturated wet layer above a dry layer.
           iFalseEbu=.true.
+          ! Intercept only bubbles routed in this substep; earlier emissions
+          ! have already left the column and remain in the hourly diagnostic.
           DO idg=idg_beg,idg_end
             !add to the gas phase, which will then go through gaseous transport, triggering bubbling
-            if(trcg_ebu_flx_col(idg,N2,N1)<0._r8)then
+            if(BubbleEffluxStep(idg)<0._r8)then
               if(idg/=idg_NH3B)then
-                trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
+                trcg_gasml2_vr(idg,N3,N2,N1)=trcg_gasml2_vr(idg,N3,N2,N1)-BubbleEffluxStep(idg)
                 if(AZERO(trcg_gasml2_vr(idg,N3,N2,N1))<0._r8)then
                   write(iulog,*)I*1000+J,N3,trcs_names(idg),trcg_gasml2_vr(idg,N3,N2,N1),trcg_gasml_vr(idg,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                   call endrun(trim(mod_filename)//' at line',__LINE__)
                 endif
               else
-                trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-trcg_ebu_flx_col(idg,N2,N1)
+                trcg_gasml2_vr(idg_NH3,N3,N2,N1)=trcg_gasml2_vr(idg_NH3,N3,N2,N1)-BubbleEffluxStep(idg)
                 if(AZERO(trcg_gasml2_vr(idg_NH3,N3,N2,N1))<0._r8)then
                   write(iulog,*)I*1000+J,M,N3,trcg_gasml2_vr(idg_NH3,N3,N2,N1),trcg_gasml_vr(idg_NH3,N3,N2,N1),trcg_Ebu_flxM_vr(idg,N3,N2,N1)
                   call endrun(trim(mod_filename)//' at line',__LINE__)
                 endif             
               endif
-              trcg_ebu_flx_col(idg,N2,N1)=0._r8
+              BubbleEffluxStep(idg)=0._r8
             endif 
           ENDDO      
         ENDIF
-      ENDDO  
+      ENDDO
+      ! Only bubbles surviving the current upward scan contribute to emissions.
+      ! Band NH3 was merged into the shared NH3 gas tracer above.
+      trcg_ebu_flx_col(idg_beg:idg_NH3,N2,N1)=trcg_ebu_flx_col(idg_beg:idg_NH3,N2,N1) &
+        +BubbleEffluxStep(idg_beg:idg_NH3)
     ENDDO
   ENDDO  
   
