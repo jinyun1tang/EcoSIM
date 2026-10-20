@@ -509,6 +509,47 @@ module SoluteMod
 
 !------------------------------------------------------------------------------------------
 
+  subroutine UpdateFertilizerBandDepth(L,NY,NX,DepthChange,BandDepth,BandThickness,BandWidth)
+  ! Update band geometry in meters; this routine does not move or remove nutrient mass.
+  implicit none
+  integer, intent(in) :: L,NY,NX
+  real(r8), intent(in) :: DepthChange
+  real(r8), intent(inout) :: BandDepth,BandThickness(:),BandWidth(:)
+  character(len=*), parameter :: subname='UpdateFertilizerBandDepth'
+  real(r8) :: MinChange,MaxChange,AppliedChange,Excess
+
+  call PrintInfo('beg '//subname)
+  !
+  ! The redistribution stencil reaches only one adjacent layer. Limit movement
+  ! to its available thickness/capacity so large steps cannot overfill or empty
+  ! that neighbor. NU:NL are active soil bounds; indices outside them are not
+  ! destinations for band geometry, even when allocated in the arrays.
+  MinChange=-BandThickness(L)
+  if(L>NU_col(NY,NX))MinChange=MinChange-BandThickness(L-1)
+  MaxChange=DLYR_3D(3,L,NY,NX)-BandThickness(L)
+  if(L<NL_col(NY,NX))MaxChange=MaxChange &
+    +AMAX1(0._r8,DLYR_3D(3,L+1,NY,NX)-BandThickness(L+1))
+  AppliedChange=AMAX1(MinChange,AMIN1(MaxChange,DepthChange))
+  !
+  ! Use the same limited change for total depth and layer thickness.
+  BandDepth        = BandDepth+AppliedChange
+  BandThickness(L) = BandThickness(L)+AppliedChange
+  if(BandThickness(L)>DLYR_3D(3,L,NY,NX))then
+    Excess=BandThickness(L)-DLYR_3D(3,L,NY,NX)
+    if(L<NL_col(NY,NX))then
+      BandThickness(L+1) = BandThickness(L+1)+Excess
+      BandWidth(L+1)     = BandWidth(L)
+    endif
+    BandThickness(L)=DLYR_3D(3,L,NY,NX)
+  elseif(BandThickness(L)<=0._r8)then
+    if(L>NU_col(NY,NX))BandThickness(L-1)=BandThickness(L-1)+BandThickness(L)
+    BandThickness(L) = 0._r8
+    BandWidth(L)     = 0._r8
+  endif
+  call PrintInfo('end '//subname)
+  end subroutine UpdateFertilizerBandDepth
+
+!------------------------------------------------------------------------------------------
   subroutine UpdateNH3FertilizerBandinfo(L,NY,NX,FLWD)
   implicit none
   integer, intent(in) :: L,NY,NX
@@ -541,18 +582,9 @@ module SoluteMod
 !     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
 !
       IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthNH4_col(NY,NX))THEN
-        DPFLW                        = FLWD+DWNH4
-        BandDepthNH4_col(NY,NX)      = BandDepthNH4_col(NY,NX)+DPFLW
-        BandThicknessNH4_vr(L,NY,NX) = BandThicknessNH4_vr(L,NY,NX)+DPFLW
-        IF(BandThicknessNH4_vr(L,NY,NX).GT.DLYR_3D(3,L,NY,NX))THEN
-          BandThicknessNH4_vr(L+1,NY,NX) = BandThicknessNH4_vr(L+1,NY,NX)+(BandThicknessNH4_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX))
-          BandWidthNH4_vr(L+1,NY,NX)     = BandWidthNH4_vr(L,NY,NX)
-          BandThicknessNH4_vr(L,NY,NX)   = DLYR_3D(3,L,NY,NX)
-        ELSEIF(BandThicknessNH4_vr(L,NY,NX).LT.0.0)THEN
-          IF(L>1)BandThicknessNH4_vr(L-1,NY,NX) = BandThicknessNH4_vr(L-1,NY,NX)+BandThicknessNH4_vr(L,NY,NX)
-          BandThicknessNH4_vr(L,NY,NX)   = 0._r8
-          BandWidthNH4_vr(L,NY,NX)       = 0._r8
-        ENDIF
+        DPFLW=FLWD+DWNH4
+        call UpdateFertilizerBandDepth(L,NY,NX,DPFLW,BandDepthNH4_col(NY,NX), &
+          BandThicknessNH4_vr(:,NY,NX),BandWidthNH4_vr(:,NY,NX))
       ENDIF
 !
 !     FRACTION OF SOIL LAYER OCCUPIED BY NH4 BAND
@@ -645,19 +677,9 @@ module SoluteMod
 !     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
 !
       IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthPO4_col(NY,NX))THEN
-        DPFLW                        = FLWD+DWPO4
-        BandDepthPO4_col(NY,NX)      = BandDepthPO4_col(NY,NX)+DPFLW
-        BandThicknessPO4_vr(L,NY,NX) = BandThicknessPO4_vr(L,NY,NX)+DPFLW
-        IF(BandThicknessPO4_vr(L,NY,NX).GT.DLYR_3D(3,L,NY,NX))THEN
-          BandThicknessPO4_vr(L+1,NY,NX) = BandThicknessPO4_vr(L+1,NY,NX)+(BandThicknessPO4_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX))
-          BandWidthPO4_vr(L+1,NY,NX)     = BandWidthPO4_vr(L,NY,NX)
-          BandThicknessPO4_vr(L,NY,NX)   = DLYR_3D(3,L,NY,NX)
-        ELSEIF(BandThicknessPO4_vr(L,NY,NX).LT.0.0_r8)THEN
-          !make sure it is not touching the litter layer
-          if(L/=1)BandThicknessPO4_vr(L-1,NY,NX)=BandThicknessPO4_vr(L-1,NY,NX)+BandThicknessPO4_vr(L,NY,NX)
-          BandThicknessPO4_vr(L,NY,NX) = 0._r8
-          BandWidthPO4_vr(L,NY,NX)     = 0._r8
-        ENDIF
+        DPFLW=FLWD+DWPO4
+        call UpdateFertilizerBandDepth(L,NY,NX,DPFLW,BandDepthPO4_col(NY,NX), &
+          BandThicknessPO4_vr(:,NY,NX),BandWidthPO4_vr(:,NY,NX))
       ENDIF
 !
 !     FRACTION OF SOIL LAYER OCCUPIED BY PO4 BAND
@@ -874,18 +896,9 @@ module SoluteMod
 !     BandDepthNO3_col,DPNOB=total,layer NO3 fertilizer band depth
 !
       IF(CumDepz2LayBottom_vr(L,NY,NX).GE.BandDepthNO3_col(NY,NX))THEN
-        DPFLW                        = FLWD+DWNO3
-        BandDepthNO3_col(NY,NX)      = BandDepthNO3_col(NY,NX)+DPFLW
-        BandThicknessNO3_vr(L,NY,NX) = BandThicknessNO3_vr(L,NY,NX)+DPFLW
-        IF(BandThicknessNO3_vr(L,NY,NX).GT.DLYR_3D(3,L,NY,NX))THEN
-          BandThicknessNO3_vr(L+1,NY,NX) = BandThicknessNO3_vr(L+1,NY,NX)+(BandThicknessNO3_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX))
-          BandWidthNO3_vr(L+1,NY,NX)     = BandWidthNO3_vr(L,NY,NX)
-          BandThicknessNO3_vr(L,NY,NX)   = DLYR_3D(3,L,NY,NX)
-        ELSEIF(BandThicknessNO3_vr(L,NY,NX).LT.0.0)THEN
-          BandThicknessNO3_vr(L-1,NY,NX) = BandThicknessNO3_vr(L-1,NY,NX)+BandThicknessNO3_vr(L,NY,NX)
-          BandThicknessNO3_vr(L,NY,NX)   = 0._r8
-          BandWidthNO3_vr(L,NY,NX)       = 0._r8
-        ENDIF
+        DPFLW=FLWD+DWNO3
+        call UpdateFertilizerBandDepth(L,NY,NX,DPFLW,BandDepthNO3_col(NY,NX), &
+          BandThicknessNO3_vr(:,NY,NX),BandWidthNO3_vr(:,NY,NX))
       ENDIF
 !
 !     FRACTION OF SOIL LAYER OCCUPIED BY NO3 BAND
