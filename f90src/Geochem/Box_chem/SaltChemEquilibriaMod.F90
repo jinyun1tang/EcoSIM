@@ -1301,10 +1301,11 @@ module SaltChemEquilibriaMod
     P2                           = H2PO4_1e_activity
     P1                           = AMAX1(ZERO,P1)
     P2                           = AMAX1(ZERO,P2)
-    SPX                          = SPCAM
-    S0                           = P1+P2
-    S1                           = AZMAX1(S0**2-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaH4P2O8_dissol_flx = AMAX1(-Precp_CaH4P2O8_mole_conc,TPDX*(S0-SQRT(S1)))
+    ! Ca(H2PO4)2(s) <-> Ca(2+)+2H2PO4(-): K=a_Ca*a_H2PO4**2.
+    ! Relax phosphate toward equilibrium at the current calcium activity.
+    ! Positive flux precipitates one formula unit; transfers use one Ca and two P.
+    SPX                          = SQRT(SPCAM/P1)
+    H2PO4_1e_CaH4P2O8_dissol_flx = AMAX1(-Precp_CaH4P2O8_mole_conc,TPDX*(P2-SPX))
   ELSE
     H2PO4_1e_AlPO4_dissol_flx    = 0._r8
     H2PO4_1e_FePO4_dissol_flx    = 0._r8
@@ -1940,10 +1941,10 @@ module SaltChemEquilibriaMod
     P2=H2PO4_1e_band_activity
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
-    SPX=SPCAM
-    S0=P1+P2
-    S1=AZMAX1(S0**2._r8-4.0_r8*(P1*P2-SPX))
-    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_mole_conc,TPDX*(S0-SQRT(S1)))
+    ! Ca(H2PO4)2(s) <-> Ca(2+)+2H2PO4(-): K=a_Ca*a_H2PO4**2.
+    ! Use the same fixed-calcium relaxation and formula-unit flux as non-band soil.
+    SPX=SQRT(SPCAM/P1)
+    H2PO4_1e_CaH4P2O8_dissolB_flx=AMAX1(-PrecpB_CaH4P2O8_mole_conc,TPDX*(P2-SPX))
   ELSE
     H2PO4_1e_AlPO4_dissolB_flx=0._r8
     H2PO4_1e_FePO4_dissolB_flx=0._r8
