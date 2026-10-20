@@ -412,6 +412,9 @@ module InitSoluteMod
     A2=1.0_r8
     A3=1.0_r8
   ENDIF
+  ! Keep prescribed [H(+)], but enforce a_H*a_OH=DPH2O in salt chemistry.
+  ! Both monovalent activity coefficients are A1; no-salt inputs are unchanged.
+  IF(salt_model) OH_1e_aque_mole_conc=DPH2O/(A1*A1*H_1p_aque_mole_conc)
   ! Hydroxide reaction constants use a_OH = gamma_OH*[OH], including each power.
   OH_activity=OH_1e_aque_mole_conc*A1
 !
@@ -805,6 +808,8 @@ module InitSoluteMod
 !
 !     PRECIPITATION-DISSOLUTION EQUILIBRIA
 !
+  ! Refresh water dissociation after each ionic-strength/activity update.
+  OH_1e_aque_mole_conc=DPH2O/(A1*A1*H_1p_aque_mole_conc)
   H_1p_activity        = H_1p_aque_mole_conc*A1
   OH_1e_activity       = OH_1e_aque_mole_conc*A1
   Al_3p_activity       = Al_3p_aque_mole_conc*A3

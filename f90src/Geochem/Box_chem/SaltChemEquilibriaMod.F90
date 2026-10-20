@@ -24,6 +24,8 @@ module SaltChemEquilibriaMod
   real(r8) :: RFE1,RFE2,RFE3,RFE4,RF1P,RF2P
   real(r8) :: RHB0,RHB3,RHB2,RHCO,RHCO3,RHB1,RHHY,RXH0
   real(r8) :: RHOH,RHP0,RHP1,RHP2,RHP3,RHY,RKA,RKAS
+  ! Scratch targets/correction refreshed by IonStrengthActivity each iteration.
+  real(r8) :: OH_1e_equil_conc,RHOH_equil
   real(r8) :: RM1B,RH1B,RM1P,RMG
   real(r8) :: RMGC,RMGH,RMGS,RH3B
   real(r8) :: XHY1,XAl_conc,XFe_conc
@@ -1494,7 +1496,8 @@ module SaltChemEquilibriaMod
   NH3_aque_mole_conc         = AMAX1(ZERO,NH3_aque_mole_conc)
   NH3_aqu_band_mole_conc     = AMAX1(ZERO,NH3_aqu_band_mole_conc)
   H_1p_aque_mole_conc        = AMAX1(ZERO,10.0_r8**(-(PH-3.0)))
-  OH_1e_aque_mole_conc       = AMAX1(ZERO,DPH2O/H_1p_aque_mole_conc)
+  ! Retain incoming OH(-) until its activity correction can enter the flux ledger.
+  OH_1e_aque_mole_conc       = AMAX1(ZERO,OH_1e_aque_mole_conc)
   CO3_2e_aque_mole_conc      = AMAX1(ZERO,CO3_2e_aque_mole_conc)
   Al_3p_aque_mole_conc       = AMAX1(ZERO,Al_3p_aque_mole_conc)
   Fe_3p_aque_mole_conc       = AMAX1(ZERO,Fe_3p_aque_mole_conc)
@@ -1600,6 +1603,11 @@ module SaltChemEquilibriaMod
 !     SPX=equilibrium product concentration
 !     R*X=precipitation-dissolution rate
 !
+  ! Prescribed [H(+)] is unchanged; impose a_H*a_OH=DPH2O using A1 for both.
+  ! Record the initial correction separately from the subsequent reaction fluxes.
+  OH_1e_equil_conc=DPH2O/(A1*A1*H_1p_aque_mole_conc)
+  RHOH_equil=OH_1e_equil_conc-OH_1e_aque_mole_conc
+  OH_1e_aque_mole_conc=OH_1e_equil_conc
   H_1p_activity             = H_1p_aque_mole_conc*A1
   OH_1e_activity            = OH_1e_aque_mole_conc*A1
   Al_3p_activity            = Al_3p_aque_mole_conc*A3
@@ -2643,11 +2651,15 @@ module SaltChemEquilibriaMod
 !     RHHY,RHOH=H2O-H+OH equilibration
 !  
   CHY2_conc  = 10.0_r8**(-PH)*1.0E+03
-  COH2_conc  = DPH2O/CHY2_conc
+  ! Reuse the activity-consistent target held fixed for this reaction iteration.
+  COH2_conc  = OH_1e_equil_conc
   RHHY       = CHY2_conc-H_1p_aque_mole_conc
   RHOH       = COH2_conc-OH_1e_aque_mole_conc
   H_1p_aque_mole_conc  = H_1p_aque_mole_conc+RHHY
   OH_1e_aque_mole_conc = OH_1e_aque_mole_conc+RHOH
+  ! Include the pre-reaction correction once in the accumulated OH(-) ledger.
+  ! Add it after updating the state, where it has already been applied above.
+  RHOH=RHOH+RHOH_equil
 
 !
 !     UPDATE EXCHANGEABLE ION CONCENTRATIONS IN CURRENT
