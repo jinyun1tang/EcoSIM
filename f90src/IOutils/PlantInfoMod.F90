@@ -174,11 +174,12 @@ implicit none
       DO NY=NV1,NV2
         DO NZ=1,MIN(NS,NP_col(NY,NX))
           if(PlantPopuLive_pft(NZ,NY,NX).GT.1.e-2_r8)cycle          
-          tstr=string_compaction(pft_pltinfo(NZ))
-          if (tstr .EQ. "") then
+          tstr=pft_pltinfo(NZ)
+          if (string_compaction(tstr) .EQ. "") then
             cycle
           endif
 
+          call CheckPlantRecordFields(tstr,3,4,NTOPO,NZ)
           date_str=''
           select case(count_delimited_items(tstr, ' '))
           case(3)
@@ -215,6 +216,44 @@ implicit none
   ENDDO  
   CALL PrintInfo('end '//subname)
   end subroutine readplantinginfo
+
+!------------------------------------------------------------------------------------------
+  subroutine CheckPlantRecordFields(record,MinFields,MaxFields,NTOPO,NZ)
+  ! Require explicit values before list-directed reads can retain old values.
+  implicit none
+  character(len=*), intent(inout) :: record
+  integer, intent(in) :: MinFields,MaxFields,NTOPO,NZ
+  character(len=*), parameter :: subname='CheckPlantRecordFields'
+  character(len=len(record)) :: normalized
+  integer :: i,first,nfields
+  logical :: valid_record
+
+  call PrintInfo('beg '//subname)
+  normalized=string_compaction(record)
+  do i=1,len(normalized)
+    if(normalized(i:i)==achar(9))normalized(i:i)=' '
+  enddo
+  ! Slash terminates a read successfully; asterisk permits repeated/null values.
+  valid_record=index(record,'/')==0.and.index(record,'*')==0
+  first=1
+  do i=1,len_trim(record)
+    if(record(i:i)==',')then
+      ! Check comma fields before normalization hides empty fields as whitespace.
+      if(len_trim(normalized(first:i-1))==0)valid_record=.false.
+      first=i+1
+    endif
+  enddo
+  if(len_trim(normalized(first:))==0)valid_record=.false.
+  nfields=count_delimited_items(normalized,' ')
+  if(nfields<MinFields.or.nfields>MaxFields)valid_record=.false.
+  if(.not.valid_record)then
+    write(iulog,*)'Invalid plant record fields: topo unit=',NTOPO,' PFT=',NZ, &
+      ' expected fields=',MinFields,MaxFields,' record=',trim(record)
+    call endrun('Plant records require explicit values for every field in '//subname,__LINE__)
+  endif
+  record=normalized
+  call PrintInfo('end '//subname)
+  end subroutine CheckPlantRecordFields
 
 !------------------------------------------------------------------------------------------
   subroutine ParsePlantEventDate(date_str,yearc,NTOPO,NZ,IDY,IYR)
@@ -364,8 +403,9 @@ implicit none
           if(pft_nmgnt(NZ)>0)then
             NN=0
             DO nn1=1,pft_nmgnt(NZ)
-              if(len_trim(pft_mgmtinfo(NN1,NZ))==0)cycle
+              if(string_compaction(pft_mgmtinfo(NN1,NZ))=='')cycle
               tstr=trim(pft_mgmtinfo(NN1,NZ))
+              call CheckPlantRecordFields(tstr,13,13,NTOPO,NZ)
               date_str=''
               read(tstr,*,iostat=ierr)date_str,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13, &
                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
