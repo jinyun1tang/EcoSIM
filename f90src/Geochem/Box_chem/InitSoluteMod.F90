@@ -379,6 +379,8 @@ module InitSoluteMod
   real(r8) :: FCO3,CX1,CX2,CSTRZ,FHP2,CCO2Y
   real(r8) :: CION2,A3,anion_1e_aque_mole_conc,anion_2e_aque_mole_conc,anion_3e_conc,cation_1p_aque_mole_conc,cation_2p_aque_mole_conc,cation_3p_aque_mole_conc
   real(r8) :: CCO2X,CCO2Z,CN,CSTR2,FHP0,FXH0,R,Z
+  real(r8) :: OH_activity
+  real(r8) :: AdsorpEquilTerm,XPTDiscriminant,XPTDenom
 !
 !     INITIALIZE SOLUTE EQUILIBRIA
 !
@@ -410,6 +412,8 @@ module InitSoluteMod
     A2=1.0_r8
     A3=1.0_r8
   ENDIF
+  ! Hydroxide reaction constants use a_OH = gamma_OH*[OH], including each power.
+  OH_activity=OH_1e_aque_mole_conc*A1
 !
 !     INITIALIZE GASES
 !
@@ -456,15 +460,15 @@ module InitSoluteMod
   ENDIF
   ! Al(OH)3(s) <=> Al(3+) + 3OH(-): initialize the free ion subject to its mineral solubility cap.
   IF(Al_mole_conc.LE.0.0_r8)THEN
-    Al_3p_aque_mole_conc=AMIN1(CALMX,SPALO/(OH_1e_aque_mole_conc**3*A3))
+    Al_3p_aque_mole_conc=AMIN1(CALMX,SPALO/(OH_activity**3*A3))
   ELSE
-    Al_3p_aque_mole_conc=AMIN1(Al_mole_conc,SPALO/(OH_1e_aque_mole_conc**3*A3))
+    Al_3p_aque_mole_conc=AMIN1(Al_mole_conc,SPALO/(OH_activity**3*A3))
   ENDIF
   ! Fe(OH)3(s) <=> Fe(3+) + 3OH(-): initialize the free ion subject to its mineral solubility cap.
   IF(CFEZ.LE.0.0_r8)THEN
-    Fe_3p_aque_mole_conc=AMIN1(CFEMX,SPFEO/(OH_1e_aque_mole_conc**3*A3))
+    Fe_3p_aque_mole_conc=AMIN1(CFEMX,SPFEO/(OH_activity**3*A3))
   ELSE
-    Fe_3p_aque_mole_conc=AMIN1(CFEZ,SPFEO/(OH_1e_aque_mole_conc**3*A3))
+    Fe_3p_aque_mole_conc=AMIN1(CFEZ,SPFEO/(OH_activity**3*A3))
   ENDIF
   ! CaCO3(s) <=> Ca(2+) + CO3(2-): initialize the free ion subject to its mineral solubility cap.
   IF(CCAZ.LE.0.0_r8)THEN
@@ -479,33 +483,33 @@ module InitSoluteMod
   Cl_e_conc              = CCLZ
 
   ! Al(3+) + OH(-) <=> AlOH(2+): initialize the hydrolysis product.
-  AlOH_2p_aque_mole_conc = Al_3p_aque_mole_conc*OH_1e_aque_mole_conc*A3/(DPAL1*A2)
+  AlOH_2p_aque_mole_conc = Al_3p_aque_mole_conc*OH_activity*A3/(DPAL1*A2)
 
   ! AlOH(2+) + OH(-) <=> Al(OH)2(+): initialize the hydrolysis product.
-  AlO2H2_1p_aque_mole_conc         = Al_3p_aque_mole_conc*OH_1e_aque_mole_conc**2*A3/(DPAL1*DPAL2*A1)
+  AlO2H2_1p_aque_mole_conc         = Al_3p_aque_mole_conc*OH_activity**2*A3/(DPAL1*DPAL2*A1)
   
   ! Al(OH)2(+) + OH(-) <=> Al(OH)3(aq): initialize the hydrolysis product.
-  AlO3H3_conc            = Al_3p_aque_mole_conc*OH_1e_aque_mole_conc**3*A3/(DPAL1*DPAL2*DPAL3*A0)
+  AlO3H3_conc            = Al_3p_aque_mole_conc*OH_activity**3*A3/(DPAL1*DPAL2*DPAL3*A0)
   
   ! Al(OH)3(aq) + OH(-) <=> Al(OH)4(-): initialize the hydrolysis product.
-  AlO4H4_1e_aque_mole_conc         = Al_3p_aque_mole_conc*OH_1e_aque_mole_conc**4*A3/(DPAL1*DPAL2*DPAL3*DPAL4*A1)
+  AlO4H4_1e_aque_mole_conc         = Al_3p_aque_mole_conc*OH_activity**4*A3/(DPAL1*DPAL2*DPAL3*DPAL4*A1)
   AlSO4_1p_aque_mole_conc          = 0._r8
   
   ! Fe(3+) + OH(-) <=> FeOH(2+): initialize the hydrolysis product.
-  FeOH_2p_aque_mole_conc = Fe_3p_aque_mole_conc*OH_1e_aque_mole_conc*A3/(DPFE1*A2)
+  FeOH_2p_aque_mole_conc = Fe_3p_aque_mole_conc*OH_activity*A3/(DPFE1*A2)
   
   ! FeOH(2+) + OH(-) <=> Fe(OH)2(+): initialize the hydrolysis product.
-  FeO2H2_p_conc          = Fe_3p_aque_mole_conc*OH_1e_aque_mole_conc**2*A3/(DPFE1*DPFE2*A1)
+  FeO2H2_p_conc          = Fe_3p_aque_mole_conc*OH_activity**2*A3/(DPFE1*DPFE2*A1)
   
   ! Fe(OH)2(+) + OH(-) <=> Fe(OH)3(aq): initialize the hydrolysis product.
-  FeO3H3_conc            = Fe_3p_aque_mole_conc*OH_1e_aque_mole_conc**3*A3/(DPFE1*DPFE2*DPFE3*A0)
+  FeO3H3_conc            = Fe_3p_aque_mole_conc*OH_activity**3*A3/(DPFE1*DPFE2*DPFE3*A0)
   
   ! Fe(OH)3(aq) + OH(-) <=> Fe(OH)4(-): initialize the hydrolysis product.
-  FeO4H4_1e_aque_mole_conc         = Fe_3p_aque_mole_conc*OH_1e_aque_mole_conc**4*A3/(DPFE1*DPFE2*DPFE3*DPFE4*A1)
+  FeO4H4_1e_aque_mole_conc         = Fe_3p_aque_mole_conc*OH_activity**4*A3/(DPFE1*DPFE2*DPFE3*DPFE4*A1)
   FeSO4_1p_aque_mole_conc          = 0._r8
   
   ! Ca(2+) + OH(-) <=> CaOH(+): initialize the aqueous complex.
-  CaO2H2_conc            = Ca_2p_aque_mole_conc*OH_1e_aque_mole_conc*A2/(DPCAO*A1)
+  CaO2H2_conc            = Ca_2p_aque_mole_conc*OH_activity*A2/(DPCAO*A1)
   
   ! Ca(2+) + CO3(2-) <=> CaCO3(aq): initialize the aqueous complex.
   CaCO3_conc=Ca_2p_aque_mole_conc*CO3_2e_aque_mole_conc*A2**2/(DPCAC*A0)
@@ -515,7 +519,7 @@ module InitSoluteMod
   CaSO4_conc=0._r8
   
   ! Mg(2+) + OH(-) <=> MgOH(+): initialize the aqueous complex.
-  MgOH_1p_aque_mole_conc=Mg_2p_aque_mole_conc*OH_1e_aque_mole_conc*A2/(DPMGO*A1)
+  MgOH_1p_aque_mole_conc=Mg_2p_aque_mole_conc*OH_activity*A2/(DPMGO*A1)
   
   ! Mg(2+) + CO3(2-) <=> MgCO3(aq): initialize the aqueous complex.
   MgCO3_conc=Mg_2p_aque_mole_conc*CO3_2e_aque_mole_conc*A2**2/(DPMGC*A0)
@@ -537,17 +541,28 @@ module InitSoluteMod
 !
 !     INITIALIZE PHOSPHORUS EQUILIBRIA AMONG SOLUBLE, ADSORBED
 !     AND PRECIPITATED FORMS
-! NOT POM complex
   ! Phosphate acid equilibria: H3PO4 <=> H(+) + H2PO4(-),
   ! H2PO4(-) <=> H(+) + HPO4(2-), and HPO4(2-) <=> H(+) + PO4(3-).
-  ! Partition total dissolved P among these four forms at prescribed pH.
-  IF(K.NE.micpar%k_POM)THEN
-    H3PO4_conc=CPOZ/(1.0_r8+DPH3P*A0/(H_1p_aque_mole_conc*A1)+DPH3P*DPH2P*A0 &
+  ! Salt mode represents all four forms. No-salt mode represents only H2PO4
+  ! and HPO4, so normalize their fractions to retain all dissolved P.
+  IF(salt_model)THEN
+    FHP3=1.0_r8/(1.0_r8+DPH3P*A0/(H_1p_aque_mole_conc*A1)+DPH3P*DPH2P*A0 &
       /(H_1p_aque_mole_conc**2*A2)+DPH3P*DPH2P*DPH1P*A0/(H_1p_aque_mole_conc**3*A3))
-    H2PO4_1e_aque_mole_conc=H3PO4_conc*DPH3P*A0/(H_1p_aque_mole_conc*A1)
-    H1PO4_2e_aque_mole_conc=H3PO4_conc*DPH3P*DPH2P*A0/(H_1p_aque_mole_conc**2*A2)
-    H0PO4_3e_conc=H3PO4_conc*DPH3P*DPH2P*DPH1P*A0/(H_1p_aque_mole_conc**3*A3)
-! POM complex
+    FHP2=FHP3*DPH3P*A0/(H_1p_aque_mole_conc*A1)
+    FHP1=FHP3*DPH3P*DPH2P*A0/(H_1p_aque_mole_conc**2*A2)
+    FHP0=FHP3*DPH3P*DPH2P*DPH1P*A0/(H_1p_aque_mole_conc**3*A3)
+  ELSE
+    FHP3=0._r8
+    FHP2=H_1p_aque_mole_conc/(H_1p_aque_mole_conc+DPH2P)
+    FHP1=DPH2P/(H_1p_aque_mole_conc+DPH2P)
+    FHP0=0._r8
+  ENDIF
+  IF(K.NE.micpar%k_POM)THEN
+    ! Boundary water: distribute the supplied P among represented dissolved forms.
+    H3PO4_conc=CPOZ*FHP3
+    H2PO4_1e_aque_mole_conc=CPOZ*FHP2
+    H1PO4_2e_aque_mole_conc=CPOZ*FHP1
+    H0PO4_3e_conc=CPOZ*FHP0
   ELSE
     ! Solve the same phosphate acid equilibria together with surface-site protonation:
     ! R-OH2(+) <=> R-OH + H(+); R-OH <=> R-O(-) + H(+).
@@ -555,11 +570,6 @@ module InitSoluteMod
     ! and R-OH + HPO4(2-) <=> R-HPO4(-) + OH(-).
     XHP=CPOZ
     XOH=XAEC/BulkSoilMass
-    FHP3=1.0_r8/(1.0_r8+DPH3P*A0/(H_1p_aque_mole_conc*A1)+DPH3P*DPH2P*A0 &
-      /(H_1p_aque_mole_conc**2*A2)+DPH3P*DPH2P*DPH1P*A0/(H_1p_aque_mole_conc**3*A3))
-    FHP2=FHP3*DPH3P*A0/(H_1p_aque_mole_conc*A1)
-    FHP1=FHP3*DPH3P*DPH2P*A0/(H_1p_aque_mole_conc**2*A2)
-    FHP0=FHP3*DPH3P*DPH2P*DPH1P*A0/(H_1p_aque_mole_conc**3*A3)
     SPOH2=SXOH2/A1
     SPOH1=SXOH1/A1
     SPH2P=SXH2P*DPH2O/A1
@@ -572,10 +582,16 @@ module InitSoluteMod
     FHPA=FHP2*A1
     ! Coupled phosphate adsorption above: solve total occupied sites XPT,
     ! then distribute free sites and sorbed phosphate among their protonation states.
-    XPT=(XOH+XHP+SXH2P*FXP2*OH_1e_aque_mole_conc/(FXH1*FHPA)-SQRT(XOH**2*FXH1**2 &
-      *FHPA**2-2.0*XOH*FXH1**2*XHP*FHPA**2+FXH1**2*XHP**2*FHPA**2 &
-      +2.0*XOH*FXH1*FHPA*SXH2P*FXP2*OH_1e_aque_mole_conc+2.0*FXH1*XHP*FHPA*SXH2P &
-      *FXP2*OH_1e_aque_mole_conc+SXH2P**2*FXP2**2*OH_1e_aque_mole_conc**2)/(FXH1*FHPA))/2.0_r8
+    ! Rationalize the smaller root of (XOH-XPT)*(XHP-XPT)=AdsorpEquilTerm*XPT.
+    ! This retains tiny P inputs and gives exactly zero adsorption when XHP=0.
+    AdsorpEquilTerm=SXH2P*FXP2*OH_1e_aque_mole_conc/(FXH1*FHPA)
+    XPTDiscriminant=(XOH-XHP)**2+2._r8*AdsorpEquilTerm*(XOH+XHP)+AdsorpEquilTerm**2
+    XPTDenom=XOH+XHP+AdsorpEquilTerm+SQRT(MAX(0._r8,XPTDiscriminant))
+    IF(XPTDenom.GT.0._r8)THEN
+      XPT=2._r8*(XOH/XPTDenom)*XHP
+    ELSE
+      XPT=0._r8
+    ENDIF
     XROH2_mole_conc=(XOH-XPT)*FXH2
     XROH1_mole_conc=(XOH-XPT)*FXH1
     XOH_mole_conc=(XOH-XPT)*FXH0
@@ -811,7 +827,7 @@ module InitSoluteMod
   H1PO4_2e_activity    = H1PO4_2e_aque_mole_conc*A2
   H2PO4_1e_activity    = H2PO4_1e_aque_mole_conc*A1
   H3PO4_activity       = H3PO4_conc*A0
-  FeHPO4_p_activity    = FeHPO4_p_conc*A2
+  FeHPO4_p_activity    = FeHPO4_p_conc*A1
   FeH2PO4_2p_activity  = FeH2PO4_2p_aque_mole_conc*A2
   CaPO4_1e_activity    = CaPO4_1e_con*A1
   CaHPO4_activity      = CaHPO4_conc*A0
@@ -828,7 +844,7 @@ module InitSoluteMod
   AMGX                 = Mg_2p_activity**0.500_r8
   AlSO4_1p_activity    = AlSO4_1p_aque_mole_conc*A1
   FeSO4_1p_activity    = FeSO4_1p_aque_mole_conc*A1
-  CaO2H2_activity      = CaO2H2_conc*A0
+  CaO2H2_activity      = CaO2H2_conc*A1
   CaCO3_activity       = CaCO3_conc*A0
   CaSO4_activity       = CaSO4_conc*A0
   CaHCO3_1p_activity   = CaHCO3_1p_aque_mole_conc*A1

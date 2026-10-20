@@ -35,7 +35,7 @@ module SoluteParMod
   real(r8), PARAMETER :: DPFE3=1.8E-05_r8                !equilibrium constant for Fe(OH)3(aq)=Fe(OH)2(+)+OH(-),[mol m^-3]
   real(r8), PARAMETER :: DPFE4=1.2E-05_r8                !equilibrium constant for Fe(OH)4(-)=Fe(OH)3(aq)+OH(-),[mol m^-^3]
   real(r8), PARAMETER :: DPFES=7.1E-02_r8                !equilibrium constant for Fe(SO4)(+)=Fe(3+)+SO4(2-),[mol m^-3]
-  real(r8), PARAMETER :: DPCAO=12.5_r8                   !equilibrium constant for Ca(OH)(-)=Ca(2+)+OH(-),[mol m^-3]
+  real(r8), PARAMETER :: DPCAO=12.5_r8                   !equilibrium constant for CaOH(+)=Ca(2+)+OH(-),[mol m^-3]
   real(r8), PARAMETER :: DPCAC=4.2E-02_r8                !equilibrium constant for CaCO3(aq)=Ca(2+)+CO3(2-),[mol m^-3]
   real(r8), PARAMETER :: DPCAH=13.5_r8                   !equilibrium constant for CaHCO3(+)=Ca(2+)+HCO3(-),[mol m^-3]
   real(r8), PARAMETER :: DPCAS=1.2_r8                    !equilibrium constant for CaSO4=Ca(2+)+SO4(2-),[mol m^-3]
