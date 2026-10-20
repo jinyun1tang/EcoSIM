@@ -7,6 +7,7 @@ module StartsMod
   use abortutils,       only: padr,   print_info, check_bool
   use minimathMod,      only: isclose,  AZMAX1,   AZMIN1, real_truncate, AZERO
   use EcoSiMParDataMod, only: micpar
+  use SoilHydroParaMod, only: SetColdRunSoilStates
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
@@ -475,43 +476,9 @@ module StartsMod
       !
       !     INITIAL SOIL WATER AND ICE CONTENTS
       ! the use of POROS in defining relative saturation is not very appropriate.
-      IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set)THEN
-        ! field capacity and wilting point are read from input
-        IF(THW_vr(L,NY,NX).GT.1.0_r8)THEN
-          THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)            !m3 pore /m3 soil
-        ELSEIF(isclose(THW_vr(L,NY,NX),1.0_r8))THEN
-          THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)    !relative saturation at wilting point
-        ELSEIF(isclose(THW_vr(L,NY,NX),0.0_r8))THEN
-          THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)        !relative saturation at wilting point
-        ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
-          THETW_vr(L,NY,NX)=0.0_r8
-        ELSE
-          THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)
-        ENDIF
-        IF(THI_vr(L,NY,NX).GT.1.0_r8)THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-        ELSEIF(isclose(THI_vr(L,NY,NX),1.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-        ELSEIF(isclose(THI_vr(L,NY,NX),0.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-        ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
-          THETI_vr(L,NY,NX)=0.0_r8
-        ELSE
-          THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
-        ENDIF
-        VLWatMicP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLWatMicPX_vr(L,NY,NX) = VLWatMicP_vr(L,NY,NX)
-        VLWatMacP_vr(L,NY,NX)  = THETW_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
-        VLiceMicP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-        VLiceMacP_vr(L,NY,NX)  = THETI_vr(L,NY,NX)*VLMacroPores_vr(L,NY,NX)
-        ! total air-filled porosity, micropores + macropores
-        VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-          +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
-        VHeatCapacity_vr(L,NY,NX)=VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX) &
-          +VLWatMacP_vr(L,NY,NX))+cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
-        ThetaH2OZ_vr(L,NY,NX) = THETW_vr(L,NY,NX)
-        ThetaICEZ_vr(L,NY,NX) = THETI_vr(L,NY,NX)
-      ENDIF
+      ! Resolve supplied or estimated FC/WP and initialize all pore volumes
+      ! before STARTE uses them to construct chemical inventories.
+      call SetColdRunSoilStates(L,NY,NX)
       XS=XS+VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)+(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))*DENSICE
       HBAmin_vr(L,NY,NX) = 7._r8 * CSAND_vr(L,NY,NX)+3._r8*CCLAY_vr(L,NY,NX)+4.5_r8*CSILT_vr(L,NY,NX)
       !
