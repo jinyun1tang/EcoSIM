@@ -80,7 +80,7 @@ module readsmod
 
 !------------------------------------------------------------------------------------------
 
-  SUBROUTINE ReadClimSoilForcing(yearc,yeari,NHW,NHE,NVN,NVS)
+  SUBROUTINE ReadClimSoilForcing(yearc,yeari,NHW,NHE,NVN,NVS,RefreshRainChem)
 !
 ! THIS SUBROUTINE read ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
@@ -90,6 +90,7 @@ module readsmod
   integer, intent(in) :: yearc   !current model year
   integer, intent(in) :: yeari   !current data year
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  logical, intent(out) :: RefreshRainChem !raw rainfall chemistry was reloaded
 
   character(len=*), parameter :: subname='ReadClimSoilForcing'
   CHARACTER(len=1) :: TTYPE
@@ -103,6 +104,7 @@ module readsmod
 
 ! begin_execution
   call PrintInfo('beg '//subname)
+  RefreshRainChem=.false.
 
   ICLM=0
   call ReadClimateCorrections(yeari)
@@ -169,13 +171,17 @@ module readsmod
   if(fixClime)then
     !set constatnt climate forcing
     call SetConstClimeForcing()
+    RefreshRainChem=.true.
   else
     IF(is_first_year)THEN
       L=1
     ELSE
       L=2
     ENDIF
-    if(yearhi/=yeari)call ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS)
+    if(yearhi/=yeari)then
+      call ReadClimateForc(yearc,yeari,L,NHW,NHE,NVN,NVS)
+      RefreshRainChem=.true.
+    endif
   endif
   yearhi=yeari
 

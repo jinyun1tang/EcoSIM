@@ -387,6 +387,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   logical :: rstwr, lnyr
   logical :: lverb0
   logical :: DeferDailySetup
+  logical :: RefreshRainChem
 
 ! begin_execution
 !
@@ -430,7 +431,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   endif
 
   if(do_timing)call start_timer(t1)
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS,RefreshRainChem)
   if(do_timing)call end_timer('ReadClimSoilForcing',t1)
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
@@ -442,14 +443,12 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     if(do_timing)call end_timer('STARTQ',t1)
   ENDIF
 
-  if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
-    ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
-    ! This is done done every year, because tracer concentrations
-    ! in rainfall vary every year. In a more reasonable way, e.g.,
-    ! when coupled to atmospheric chemistry code, it should be done by
-    ! hour
+  if(soichem_model)then
+    ! Refresh irrigation chemistry after annual management reading; process
+    ! rainfall only when its raw inputs were reloaded. Soil initialization
+    ! remains restricted to the first cold-start year within STARTE.
     if(do_timing)call start_timer(t1)
-    CALL STARTE(NHW,NHE,NVN,NVS)
+    CALL STARTE(NHW,NHE,NVN,NVS,RefreshRainChem)
     if(do_timing)call end_timer('STARTE',t1)
   endif
 

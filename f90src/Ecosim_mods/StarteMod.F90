@@ -36,16 +36,17 @@ module StarteMod
   public :: starte
   contains
 
-  SUBROUTINE starte(NHW,NHE,NVN,NVS)
+  SUBROUTINE starte(NHW,NHE,NVN,NVS,RefreshRainChem)
 !
 ! DESCRIPTION:
 !     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
-! The top layer are initialized every year to accomadate changes in
-! boundary conditions (irrigation, rainfall, manure application) every year
-! other layers are done only in the first year.
+! Irrigation chemistry is refreshed after annual management reading.
+! Rainfall chemistry is refreshed only when raw rainfall inputs were reloaded.
+! Soil, litter and snow state initialization is limited to the first cold-start year.
 
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
+  logical, intent(in) :: RefreshRainChem !process rainfall only after raw inputs are reloaded
   character(len=*), parameter :: subname='starte'
   type(solutedtype)  :: solutevar
   REAL(R8) :: BulkSoilMass
@@ -73,6 +74,30 @@ module StarteMod
           D2000: DO K=micpar%k_fine_comp,micpar%k_POM
             BulkSoilMass=0._r8
 
+            ! Unspecified boundary ions must not retain values from a previous solve.
+            ! The soil branch below supplies its own ion inputs.
+            if(.not.salt_model)then
+              associate(                       &
+                Al_conc => solutevar%Al_mole_conc, &
+                Fe_conc => solutevar%CFEZ,      &
+                Ca_conc => solutevar%CCAZ,      &
+                Mg_conc => solutevar%CMGZ,      &
+                Na_conc => solutevar%CNAZ,      &
+                K_conc  => solutevar%CKAZ,      &
+                SO4_conc => solutevar%CSOZ,     &
+                Cl_conc => solutevar%CCLZ       &
+              )
+                Al_conc=0._r8
+                Fe_conc=0._r8
+                Ca_conc=0._r8
+                Mg_conc=0._r8
+                Na_conc=0._r8
+                K_conc=0._r8
+                SO4_conc=0._r8
+                Cl_conc=0._r8
+              end associate
+            endif
+
             !maure applied at the soil surface
             IF(K.EQ.micpar%k_manure.AND.L.EQ.NU_col(NY,NX))THEN
               !   INITIALIZE IRRIGATION WATER
@@ -94,7 +119,7 @@ module StarteMod
               solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.NU_col(NY,NX))THEN
+                IF(K.EQ.micpar%k_fine_comp.AND.L.EQ.NU_col(NY,NX).AND.RefreshRainChem)THEN
                   !     INITIALIZE RAINFALL, top layer
                   solutevar%H_1p_aque_mole_conc  = 10.0_r8**(-(pH_rain_col(NY,NX)-3.0_r8))
                   solutevar%OH_1e_aque_mole_conc = DPH2O/solutevar%H_1p_aque_mole_conc
