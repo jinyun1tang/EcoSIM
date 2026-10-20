@@ -389,6 +389,7 @@ module ChemEquilibriaMod
 !     [X-OH2(+)][H2PO4(-)]/[X-H2PO4]=K, SPH2P
 !     X-H2PO4+OH(-) <-> X-OH+H2PO4(-)
 !     [X-OH][H2PO4(-)]/([X-H2PO4][OH(-)])=K,SXH2P
+
       ! R-H2PO4 + H2O <=> R-OH2(+) + H2PO4(-).
       ! Combine neutral-site exchange (SXH2P), water dissociation (DPH2O),
       ! and R-OH2(+) <=> R-OH + H(+) (SXOH2) to close the equilibrium cycle.
@@ -424,10 +425,12 @@ module ChemEquilibriaMod
 !    corresponding to
 !  (AB) <-> A+B,  (A+x)(B+x)/((AB)-x)=K
 !  X represents flux from H2PO4(-) dissolution
+    ! Rationalize the smaller root to retain small phosphate transfers;
+    ! TSL retains the existing relaxation and root factor 1/2.
     DP                     = DPH2P
     S0                     = H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc+DP
-    S1                     = AMAX1(0._r8,S0**2-4.0_r8*(H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_aque_mole_conc))
-    H2PO4_e_to_HPO4_2e_flx = TSL*(S0-SQRT(S1))
+    S1=MAX(0._r8,(H1PO4_2e_aque_mole_conc-H_1p_aque_mole_conc)**2+2._r8*DP*(H1PO4_2e_aque_mole_conc+H_1p_aque_mole_conc)+DP**2+4._r8*DP*H2PO4_1e_aque_mole_conc)
+    H2PO4_e_to_HPO4_2e_flx=TSL*(4._r8*((H1PO4_2e_aque_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_aque_mole_conc)/(S0+SQRT(S1))))
   ELSE
     H2PO4_1e_AlPO4_dissol_flx    = 0._r8
     H2PO4_1e_FePO4_dissol_flx    = 0._r8
@@ -541,10 +544,11 @@ module ChemEquilibriaMod
 !     S1=eqilibriunm concentration in band
 !     RH2B=H2PO4-H+HPO4 dissociation in band
 !
+    ! Use the same cancellation-resistant root in the fertilizer band.
     DP   = DPH2P
     S0   = H1PO4_2e_band_mole_conc+H_1p_aque_mole_conc+DP
-    S1   = AMAX1(0._r8,S0**2._r8-4.0_r8*(H1PO4_2e_band_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_band_mole_conc))
-    RH2B = TSLX*(S0-SQRT(S1))
+    S1=MAX(0._r8,(H1PO4_2e_band_mole_conc-H_1p_aque_mole_conc)**2+2._r8*DP*(H1PO4_2e_band_mole_conc+H_1p_aque_mole_conc)+DP**2+4._r8*DP*H2PO4_1e_band_mole_conc)
+    RH2B=TSLX*(4._r8*((H1PO4_2e_band_mole_conc*H_1p_aque_mole_conc-DP*H2PO4_1e_band_mole_conc)/(S0+SQRT(S1))))
   ELSE
     H2PO4_1e_AlPO4_dissolB_flx    = 0._r8
     H2PO4_1e_FePO4_dissolB_flx    = 0._r8

@@ -1,7 +1,6 @@
 module SaltChemEquilibriaMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod,        only: isclose
   use SoluteChemDataType, only: chem_var_type, solute_flx_type
   use minimathmod,        only: AZMAX1
   use DebugToolMod
@@ -747,36 +746,38 @@ module SaltChemEquilibriaMod
 !
 !     ALUMINUM HYDROXIDE (GIBBSITE)
 !
+    ! PX/PY copy an AMAX1 operand, so exact equality identifies the selected
+    ! species even at trace activity; the first exact tie keeps precedence.
     PX=AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
-    IF(isclose(PX,Al_3p_activity))THEN
+    IF(PX.EQ.Al_3p_activity)THEN
       R1  = H_1p_activity
       P1  = Al_3p_activity
       P2  = OH_1e_activity
       NR1 = 3
       NP2 = 0
       SP  = SHALO
-    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+    ELSEIF(PX.EQ.AlOH_2p_activity)THEN
       R1  = H_1p_activity
       P1  = AlOH_2p_activity
       P2  = OH_1e_activity
       NR1 = 2
       NP2 = 0
       SP  = SHAL1
-    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+    ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
       R1  = H_1p_activity
       P1  = AlO2H2_1p_activity
       P2  = OH_1e_activity
       NR1 = 1
       NP2 = 0
       SP  = SHAL2
-    ELSEIF(isclose(PX,AlO3H3_activity))THEN
+    ELSEIF(PX.EQ.AlO3H3_activity)THEN
       R1  = H_1p_activity
       P1  = AlO3H3_activity
       P2  = OH_1e_activity
       NR1 = 0
       NP2 = 0
       SP  = SPAL3
-    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
       R1  = OH_1e_activity
       P1  = AlO4H4_1e_activity
       P2  = H_1p_activity
@@ -794,50 +795,50 @@ module SaltChemEquilibriaMod
 !     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPALOX=AMAX1(-Precp_AlO3H3_conc,TPDX*(P1-SPX))
-    IF(isclose(PX,Al_3p_activity))THEN
+    IF(PX.EQ.Al_3p_activity)THEN
       RHAL1=RPALOX
-    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+    ELSEIF(PX.EQ.AlOH_2p_activity)THEN
       RHALO1=RPALOX
-    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+    ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
       RHALO2=RPALOX
-    ELSEIF(isclose(PX,AlO3H3_activity))THEN
+    ELSEIF(PX.EQ.AlO3H3_activity)THEN
       RHALO3=RPALOX
-    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
       RHALO4=RPALOX
     ENDIF
 !
 !     IRON HYDROXIDE
 !
     PX=AMAX1(Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity)
-    IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PX.EQ.Fe_3p_activity)THEN
       R1  = H_1p_activity
       P1  = Fe_3p_activity
       P2  = OH_1e_activity
       NR1 = 3
       NP2 = 0
       SP  = SHFEO
-    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+    ELSEIF(PX.EQ.FeOH_2p_activity)THEN
       R1  = H_1p_activity
       P1  = FeOH_2p_activity
       P2  = OH_1e_activity
       NR1 = 2
       NP2 = 0
       SP  = SHFE1
-    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+    ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
       R1  = H_1p_activity
       P1  = FeO2H2_p_activity
       P2  = OH_1e_activity
       NR1 = 1
       NP2 = 0
       SP  = SHFE2
-    ELSEIF(isclose(PX,FeO3H3_activity))THEN
+    ELSEIF(PX.EQ.FeO3H3_activity)THEN
       R1  = H_1p_activity
       P1  = FeO3H3_activity
       P2  = OH_1e_activity
       NR1 = 0
       NP2 = 0
       SP  = SPFE3
-    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
       R1  = OH_1e_activity
       P1  = FeO4H4_1e_activity
       P2  = H_1p_activity
@@ -855,15 +856,15 @@ module SaltChemEquilibriaMod
     P2     = AMAX1(ZERO,P2)
     SPX    = SP*R1**NR1/P2**NP2
     RPFEOX = AMAX1(-Precp_FeO3H3_conc,TPDX*(P1-SPX))
-    IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PX.EQ.Fe_3p_activity)THEN
       RHFE1=RPFEOX
-    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+    ELSEIF(PX.EQ.FeOH_2p_activity)THEN
       RHFEO1=RPFEOX
-    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+    ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
       RHFEO2=RPFEOX
-    ELSEIF(isclose(PX,FeO3H3_activity))THEN
+    ELSEIF(PX.EQ.FeO3H3_activity)THEN
       RHFEO3=RPFEOX
-    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
       RHFEO4=RPFEOX
     ENDIF
 !     IF(I.EQ.180.AND.J.EQ.12)THEN
@@ -877,15 +878,15 @@ module SaltChemEquilibriaMod
     PX = AMAX1(CO3_2e_activity,HCO3_e_activity,H2CO3_activity)
     R1 = H_1p_activity
     P1 = Ca_2p_activity
-    IF(isclose(PX,CO3_2e_activity))THEN
+    IF(PX.EQ.CO3_2e_activity)THEN
       P2  = CO3_2e_activity
       NR1 = 0
       SP  = SPCAC
-    ELSEIF(isclose(PX,HCO3_e_activity))THEN
+    ELSEIF(PX.EQ.HCO3_e_activity)THEN
       P2  = HCO3_e_activity
       NR1 = 1
       SP  = SHCAC1
-    ELSEIF(isclose(PX,H2CO3_activity))THEN
+    ELSEIF(PX.EQ.H2CO3_activity)THEN
       P2  = H2CO3_activity
       NR1 = 2
       SP  = SHCAC2
@@ -903,11 +904,11 @@ module SaltChemEquilibriaMod
     S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     RPCACX = AMAX1(-Precp_CaCO3_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))  !negative flux, suction of CO2
 
-    IF(isclose(PX,CO3_2e_activity))THEN
+    IF(PX.EQ.CO3_2e_activity)THEN
       RHCAC3=RPCACX
-    ELSEIF(isclose(PX,HCO3_e_activity))THEN
+    ELSEIF(PX.EQ.HCO3_e_activity)THEN
       RHCACH=RPCACX
-    ELSEIF(isclose(PX,H2CO3_activity))THEN
+    ELSEIF(PX.EQ.H2CO3_activity)THEN
       RHCACO=RPCACX
     ENDIF
 !
@@ -992,33 +993,35 @@ module SaltChemEquilibriaMod
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
+    ! PX/PY copy an AMAX1 operand, so exact equality identifies the selected
+    ! species even at trace activity; the first exact tie keeps precedence.
     PX=AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
     PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P3=H_1p_activity
-    IF(isclose(PY,H1PO4_2e_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1=Al_3p_activity
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1=AlOH_2p_activity
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1=AlO2H2_1p_activity
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1=AlO3H3_activity
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1=AlO4H4_1e_activity
         NR1=0
         NP3=3
@@ -1026,27 +1029,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=H2PO4_1e_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1=Al_3p_activity
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1=AlOH_2p_activity
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1=AlO2H2_1p_activity
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1=AlO3H3_activity
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1=AlO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1071,28 +1074,28 @@ module SaltChemEquilibriaMod
     S0     = P1+P2
     S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_activity))THEN
-      IF(isclose(PX,Al_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4P1=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4P2=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ENDIF
@@ -1111,29 +1114,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P3=H_1p_activity
-    IF(isclose(PY,H1PO4_2e_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=3
@@ -1141,27 +1144,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=H2PO4_1e_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1186,28 +1189,28 @@ module SaltChemEquilibriaMod
     S0     = P1+P2
     S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_activity))THEN
-      IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4P1=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4P2=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ENDIF
@@ -1225,11 +1228,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
       NR1=0
       SP=SPCAD
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       P2=H2PO4_1e_activity
       NR1=1
       SP=SHCAD2
@@ -1243,9 +1246,9 @@ module SaltChemEquilibriaMod
     S0     = P1+P2
     S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       RHCAD2=H2PO4_1e_CaHPO4_dissol_flx
     ENDIF
 !     IF((M/10)*10.EQ.M)THEN
@@ -1259,11 +1262,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
       NR1=4
       SP=SHCAH1
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       P2=H2PO4_1e_activity
       NR1=7
       SP=SHCAH2
@@ -1275,9 +1278,9 @@ module SaltChemEquilibriaMod
     P2     = AMAX1(ZERO,P2)
     SPX    = (SP*R1**NR1/P1**5)**0.333_r8
     H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_mole_conc,TPDX*(P2-SPX))
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       RHCAH2=H2PO4_1e_apatite_dissol_flx
     ENDIF
 !     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
@@ -1669,33 +1672,35 @@ module SaltChemEquilibriaMod
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
+    ! PX/PY copy an AMAX1 operand, so exact equality identifies the selected
+    ! species even at trace activity; the first exact tie keeps precedence.
     PX = AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
     PY = AMAX1(H1PO4_2e_band_activity,H2PO4_1e_band_activity)
     R1 = H_1p_activity
     P3 = H_1p_activity
-    IF(isclose(PY,H1PO4_2e_band_activity))THEN
+    IF(PY.EQ.H1PO4_2e_band_activity)THEN
       P2=H1PO4_2e_band_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1  = Al_3p_activity
         NR1 = 1
         NP3 = 0
         SP  = SHA0P1
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1  = AlOH_2p_activity
         NR1 = 0
         NP3 = 0
         SP  = SPA1P1
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1  = AlO2H2_1p_activity
         NR1 = 0
         NP3 = 1
         SP  = SHA2P1
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1  = AlO3H3_activity
         NR1 = 0
         NP3 = 2
         SP  = SHA3P1
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1  = AlO4H4_1e_activity
         NR1 = 0
         NP3 = 3
@@ -1703,27 +1708,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=H2PO4_1e_band_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1  = Al_3p_activity
         NR1 = 2
         NP3 = 0
         SP  = SHA0P2
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1=AlOH_2p_activity
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1=AlO2H2_1p_activity
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1=AlO3H3_activity
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1=AlO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1748,28 +1753,28 @@ module SaltChemEquilibriaMod
     S0                         = P1+P2
     S1                         = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_AlPO4_dissolB_flx = AMAX1(-PrecpB_AlPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_band_activity))THEN
-      IF(isclose(PX,Al_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_band_activity)THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0B1=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1B1=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2B1=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3B1=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4B1=H2PO4_1e_AlPO4_dissolB_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0B2=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1B2=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2B2=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3B2=H2PO4_1e_AlPO4_dissolB_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4B2=H2PO4_1e_AlPO4_dissolB_flx
       ENDIF
     ENDIF
@@ -1780,29 +1785,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(H1PO4_2e_band_activity,H2PO4_1e_band_activity)
     R1=H_1p_activity
     P3=H_1p_activity
-    IF(isclose(PY,H1PO4_2e_band_activity))THEN
+    IF(PY.EQ.H1PO4_2e_band_activity)THEN
       P2=H1PO4_2e_band_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=3
@@ -1810,27 +1815,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=H2PO4_1e_band_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1855,28 +1860,28 @@ module SaltChemEquilibriaMod
     S0     = P1+P2
     S1     = MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_FePO4_dissolB_flx=AMAX1(-PrecpB_FePO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_band_activity))THEN
-      IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_band_activity)THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0B1=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1B1=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2B1=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3B1=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4B1=H2PO4_1e_FePO4_dissolB_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0B2=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1B2=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2B2=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3B2=H2PO4_1e_FePO4_dissolB_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4B2=H2PO4_1e_FePO4_dissolB_flx
       ENDIF
     ENDIF
@@ -1886,11 +1891,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(H1PO4_2e_band_activity,H2PO4_1e_band_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_band_activity))THEN
+    IF(PX.EQ.H1PO4_2e_band_activity)THEN
       P2=H1PO4_2e_band_activity
       NR1=0
       SP=SPCAD
-    ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_band_activity)THEN
       P2=H2PO4_1e_band_activity
       NR1=1
       SP=SHCAD2
@@ -1904,9 +1909,9 @@ module SaltChemEquilibriaMod
     S0=P1+P2
     S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_CaHPO4_dissolB_flx=AMAX1(-PrecpB_CaHPO4_mole_conc,TPDX*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PX,H1PO4_2e_band_activity))THEN
+    IF(PX.EQ.H1PO4_2e_band_activity)THEN
       RPCDB1=H2PO4_1e_CaHPO4_dissolB_flx
-    ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_band_activity)THEN
       RHCDB2=H2PO4_1e_CaHPO4_dissolB_flx
     ENDIF
 !
@@ -1915,11 +1920,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(H1PO4_2e_band_activity,H2PO4_1e_band_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_band_activity))THEN
+    IF(PX.EQ.H1PO4_2e_band_activity)THEN
       P2=H1PO4_2e_band_activity
       NR1=4
       SP=SHCAH1
-    ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_band_activity)THEN
       P2=H2PO4_1e_band_activity
       NR1=7
       SP=SHCAH2
@@ -1931,9 +1936,9 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5._r8)**0.333_r8
     H2PO4_1e_apatite_dissolB_flx=AMAX1(-PrecpB_Ca5P3O12O3H3_mole_conc,TPDX*(P2-SPX))
-    IF(isclose(PX,H1PO4_2e_band_activity))THEN
+    IF(PX.EQ.H1PO4_2e_band_activity)THEN
       RHCHB1=H2PO4_1e_apatite_dissolB_flx
-    ELSEIF(isclose(PX,H2PO4_1e_band_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_band_activity)THEN
       RHCHB2=H2PO4_1e_apatite_dissolB_flx
     ENDIF
 !

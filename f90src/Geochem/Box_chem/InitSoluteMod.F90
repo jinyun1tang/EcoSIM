@@ -1,6 +1,6 @@
 module InitSoluteMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : isclose,AZMAX1
+  use minimathmod, only : AZMAX1
   use SoluteChemDataType, only : solutedtype
   use AqueChemDatatype, only : trcSaltIonNumber
   use ChemTracerParsMod
@@ -861,36 +861,38 @@ module InitSoluteMod
 !     The dominant dissolved metal hydrolysis form selects an equivalent pH-dependent reaction.
 !     Positive mineral flux precipitates the solid; negative flux dissolves it.
   IF(K.EQ.micpar%k_POM)THEN
+    ! PX/PY copy an AMAX1 operand, so exact equality identifies the selected
+    ! species even at trace activity; the first exact tie keeps precedence.
     PX=AMAX1(Al_3p_activity,AlOH_2p_activity,AlO2H2_1p_activity,AlO3H3_activity,AlO4H4_1e_activity)
-    IF(isclose(PX,Al_3p_activity))THEN
+    IF(PX.EQ.Al_3p_activity)THEN
       R1=H_1p_activity
       P1=Al_3p_activity
       P2=OH_1e_activity
       NR1=3
       NP2=0
       SP=SHALO
-    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+    ELSEIF(PX.EQ.AlOH_2p_activity)THEN
       R1=H_1p_activity
       P1=AlOH_2p_activity
       P2=OH_1e_activity
       NR1=2
       NP2=0
       SP=SHAL1
-    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+    ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
       R1=H_1p_activity
       P1=AlO2H2_1p_activity
       P2=OH_1e_activity
       NR1=1
       NP2=0
       SP=SHAL2
-    ELSEIF(isclose(PX,AlO3H3_activity))THEN
+    ELSEIF(PX.EQ.AlO3H3_activity)THEN
       R1=H_1p_activity
       P1=AlO3H3_activity
       P2=OH_1e_activity
       NR1=0
       NP2=0
       SP=SPAL3
-    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
       R1=OH_1e_activity
       P1=AlO4H4_1e_activity
       P2=H_1p_activity
@@ -908,15 +910,15 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPALOX=AMAX1(-Precp_AlO3H3_conc,TPD*(P1-SPX))
-    IF(isclose(PX,Al_3p_activity))THEN
+    IF(PX.EQ.Al_3p_activity)THEN
       RHAL1=RPALOX
-    ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+    ELSEIF(PX.EQ.AlOH_2p_activity)THEN
       RHALO1=RPALOX
-    ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+    ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
       RHALO2=RPALOX
-    ELSEIF(isclose(PX,AlO3H3_activity))THEN
+    ELSEIF(PX.EQ.AlO3H3_activity)THEN
       RHALO3=RPALOX
-    ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
       RHALO4=RPALOX
     ENDIF
 !
@@ -926,35 +928,35 @@ module InitSoluteMod
 !     The dominant dissolved metal hydrolysis form selects an equivalent pH-dependent reaction.
 !     Positive mineral flux precipitates the solid; negative flux dissolves it.
     PX=AMAX1(Fe_3p_activity,FeOH_2p_activity,FeO2H2_p_activity,FeO3H3_activity,FeO4H4_1e_activity)
-    IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PX.EQ.Fe_3p_activity)THEN
       R1=H_1p_activity
       P1=Fe_3p_activity
       P2=OH_1e_activity
       NR1=3
       NP2=0
       SP=SHFEO
-    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+    ELSEIF(PX.EQ.FeOH_2p_activity)THEN
       R1=H_1p_activity
       P1=FeOH_2p_activity
       P2=OH_1e_activity
       NR1=2
       NP2=0
       SP=SHFE1
-    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+    ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
       R1=H_1p_activity
       P1=FeO2H2_p_activity
       P2=OH_1e_activity
       NR1=1
       NP2=0
       SP=SHFE2
-    ELSEIF(isclose(PX,FeO3H3_activity))THEN
+    ELSEIF(PX.EQ.FeO3H3_activity)THEN
       R1=H_1p_activity
       P1=FeO3H3_activity
       P2=OH_1e_activity
       NR1=0
       NP2=0
       SP=SPFE3
-    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
       R1=OH_1e_activity
       P1=FeO4H4_1e_activity
       P2=H_1p_activity
@@ -972,15 +974,15 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPFEOX=AMAX1(-Precp_FeO3H3_conc,TPD*(P1-SPX))
-    IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PX.EQ.Fe_3p_activity)THEN
       RHFE1=RPFEOX
-    ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+    ELSEIF(PX.EQ.FeOH_2p_activity)THEN
       RHFEO1=RPFEOX
-    ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+    ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
       RHFEO2=RPFEOX
-    ELSEIF(isclose(PX,FeO3H3_activity))THEN
+    ELSEIF(PX.EQ.FeO3H3_activity)THEN
       RHFEO3=RPFEOX
-    ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+    ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
       RHFEO4=RPFEOX
     ENDIF
 !
@@ -992,15 +994,15 @@ module InitSoluteMod
     PX=AMAX1(CO3_2e_activity,HCO3_e_activity,H2CO3_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,CO3_2e_activity))THEN
+    IF(PX.EQ.CO3_2e_activity)THEN
       P2=CO3_2e_activity
       NR1=0
       SP=SPCAC
-    ELSEIF(isclose(PX,HCO3_e_activity))THEN
+    ELSEIF(PX.EQ.HCO3_e_activity)THEN
       P2=HCO3_e_activity
       NR1=1
       SP=SHCAC1
-    ELSEIF(isclose(PX,H2CO3_activity))THEN
+    ELSEIF(PX.EQ.H2CO3_activity)THEN
       P2=H2CO3_activity
       NR1=2
       SP=SHCAC2
@@ -1017,11 +1019,11 @@ module InitSoluteMod
     ! Mineral D=(P1-P2)**2+4*SPX; rationalize S0-sqrt(D) to retain small fluxes.
     S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     RPCACX=AMAX1(-Precp_CaCO3_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PX,CO3_2e_activity))THEN
+    IF(PX.EQ.CO3_2e_activity)THEN
       RHCAC3=RPCACX
-    ELSEIF(isclose(PX,HCO3_e_activity))THEN
+    ELSEIF(PX.EQ.HCO3_e_activity)THEN
       RHCACH=RPCACX
-    ELSEIF(isclose(PX,H2CO3_activity))THEN
+    ELSEIF(PX.EQ.H2CO3_activity)THEN
       RHCACO=RPCACX
     ENDIF
 !
@@ -1051,29 +1053,29 @@ module InitSoluteMod
     PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P3=H_1p_activity
-    IF(isclose(PY,H1PO4_2e_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1=Al_3p_activity
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1=AlOH_2p_activity
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1=AlO2H2_1p_activity
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1=AlO3H3_activity
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1=AlO4H4_1e_activity
         NR1=0
         NP3=3
@@ -1081,27 +1083,27 @@ module InitSoluteMod
       ENDIF
     ELSE
       P2=H2PO4_1e_activity
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         P1=Al_3p_activity
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         P1=AlOH_2p_activity
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         P1=AlO2H2_1p_activity
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         P1=AlO3H3_activity
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         P1=AlO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1126,28 +1128,28 @@ module InitSoluteMod
     S0=P1+P2
     S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_AlPO4_dissol_flx=AMAX1(-Precp_AlPO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_activity))THEN
-      IF(isclose(PX,Al_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3P1=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4P1=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Al_3p_activity))THEN
+      IF(PX.EQ.Al_3p_activity)THEN
         RHA0P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlOH_2p_activity))THEN
+      ELSEIF(PX.EQ.AlOH_2p_activity)THEN
         RHA1P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO2H2_1p_activity))THEN
+      ELSEIF(PX.EQ.AlO2H2_1p_activity)THEN
         RHA2P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO3H3_activity))THEN
+      ELSEIF(PX.EQ.AlO3H3_activity)THEN
         RHA3P2=H2PO4_1e_AlPO4_dissol_flx
-      ELSEIF(isclose(PX,AlO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.AlO4H4_1e_activity)THEN
         RHA4P2=H2PO4_1e_AlPO4_dissol_flx
       ENDIF
     ENDIF
@@ -1162,29 +1164,29 @@ module InitSoluteMod
     PY=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P3=H_1p_activity
-    IF(isclose(PY,H1PO4_2e_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=3
@@ -1192,27 +1194,27 @@ module InitSoluteMod
       ENDIF
     ELSE
       P2=H2PO4_1e_activity
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         P1=Fe_3p_activity
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         P1=FeOH_2p_activity
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         P1=FeO2H2_p_activity
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         P1=FeO3H3_activity
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         P1=FeO4H4_1e_activity
         NR1=0
         NP3=2
@@ -1237,28 +1239,28 @@ module InitSoluteMod
     S0=P1+P2
     S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_FePO4_dissol_flx=AMAX1(-Precp_FePO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PY,H1PO4_2e_activity))THEN
-      IF(isclose(PX,Fe_3p_activity))THEN
+    IF(PY.EQ.H1PO4_2e_activity)THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3P1=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4P1=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ELSE
-      IF(isclose(PX,Fe_3p_activity))THEN
+      IF(PX.EQ.Fe_3p_activity)THEN
         RHF0P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeOH_2p_activity))THEN
+      ELSEIF(PX.EQ.FeOH_2p_activity)THEN
         RHF1P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO2H2_p_activity))THEN
+      ELSEIF(PX.EQ.FeO2H2_p_activity)THEN
         RHF2P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO3H3_activity))THEN
+      ELSEIF(PX.EQ.FeO3H3_activity)THEN
         RHF3P2=H2PO4_1e_FePO4_dissol_flx
-      ELSEIF(isclose(PX,FeO4H4_1e_activity))THEN
+      ELSEIF(PX.EQ.FeO4H4_1e_activity)THEN
         RHF4P2=H2PO4_1e_FePO4_dissol_flx
       ENDIF
     ENDIF
@@ -1271,11 +1273,11 @@ module InitSoluteMod
     PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
       NR1=0
       SP=SPCAD
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       P2=H2PO4_1e_activity
       NR1=1
       SP=SHCAD2
@@ -1289,9 +1291,9 @@ module InitSoluteMod
     S0=P1+P2
     S1=MAX(0._r8,(P1-P2)**2+4._r8*SPX)
     H2PO4_1e_CaHPO4_dissol_flx=AMAX1(-Precp_CaHPO4_mole_conc,TPD*(4._r8*((P1*P2-SPX)/(S0+SQRT(S1)))))
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       RPCAD1=H2PO4_1e_CaHPO4_dissol_flx
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       RHCAD2=H2PO4_1e_CaHPO4_dissol_flx
     ENDIF
 !
@@ -1303,11 +1305,11 @@ module InitSoluteMod
     PX=AMAX1(H1PO4_2e_activity,H2PO4_1e_activity)
     R1=H_1p_activity
     P1=Ca_2p_activity
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       P2=H1PO4_2e_activity
       NR1=4
       SP=SHCAH1
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       P2=H2PO4_1e_activity
       NR1=7
       SP=SHCAH2
@@ -1319,9 +1321,9 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5_r8)**0.333_r8
     H2PO4_1e_apatite_dissol_flx=AMAX1(-Precp_Ca5P3O12O3H3_mole_conc,TPD*(P2-SPX))
-    IF(isclose(PX,H1PO4_2e_activity))THEN
+    IF(PX.EQ.H1PO4_2e_activity)THEN
       RHCAH1=H2PO4_1e_apatite_dissol_flx
-    ELSEIF(isclose(PX,H2PO4_1e_activity))THEN
+    ELSEIF(PX.EQ.H2PO4_1e_activity)THEN
       RHCAH2=H2PO4_1e_apatite_dissol_flx
     ENDIF
     Precp_AlO3H3_conc            = Precp_AlO3H3_conc+RPALOX
@@ -1534,162 +1536,166 @@ module InitSoluteMod
 !
 !     ION SPECIATION
 !
+  ! Rationalize S0-sqrt(S1) as 4*(A*B-K*C)/(S0+sqrt(S1)) to retain
+  ! small reaction transfers. Preserve TSL, which includes the root factor 1/2.
   ! NH4(+) <=> NH3(aq) + H(+); positive RNH4 forms NH4(+).
   S0=H_1p_activity+NH3_activity+DPN4
-  S1=S0**2_r8-4.0_r8*(H_1p_activity*NH3_activity-DPN4*NH4_1p_activity)
-  RNH4=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H_1p_activity-NH3_activity)**2+2._r8*DPN4*(H_1p_activity+NH3_activity)+DPN4**2+4._r8*DPN4*NH4_1p_activity)
+  RNH4=TSL*(4._r8*((H_1p_activity*NH3_activity-DPN4*NH4_1p_activity)/(S0+SQRT(S1))))
 
   ! AlOH(2+) <=> Al(3+) + OH(-); positive RALO1 forms AlOH(2+).
   S0=Al_3p_activity+OH_1e_activity+DPAL1
-  S1=S0**2_r8-4.0_r8*(Al_3p_activity*OH_1e_activity-DPAL1*AlOH_2p_activity)
-  RALO1=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Al_3p_activity-OH_1e_activity)**2+2._r8*DPAL1*(Al_3p_activity+OH_1e_activity)+DPAL1**2+4._r8*DPAL1*AlOH_2p_activity)
+  RALO1=TSL*(4._r8*((Al_3p_activity*OH_1e_activity-DPAL1*AlOH_2p_activity)/(S0+SQRT(S1))))
 
   ! Al(OH)2(+) <=> AlOH(2+) + OH(-); positive RALO2 forms Al(OH)2(+).
   S0=AlOH_2p_activity+OH_1e_activity+DPAL2
-  S1=S0**2_r8-4.0_r8*(AlOH_2p_activity*OH_1e_activity-DPAL2*AlO2H2_1p_activity)
-  RALO2=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(AlOH_2p_activity-OH_1e_activity)**2+2._r8*DPAL2*(AlOH_2p_activity+OH_1e_activity)+DPAL2**2+4._r8*DPAL2*AlO2H2_1p_activity)
+  RALO2=TSL*(4._r8*((AlOH_2p_activity*OH_1e_activity-DPAL2*AlO2H2_1p_activity)/(S0+SQRT(S1))))
 
   ! Al(OH)3(aq) <=> Al(OH)2(+) + OH(-); positive RALO3 forms Al(OH)3(aq).
+  ! Retain the existing concentration-based S0 for this reaction; its
+  ! activity-based product is unchanged by the rationalization below.
   S0=AlO2H2_1p_aque_mole_conc+OH_1e_aque_mole_conc+DPAL3
-  S1=S0**2-4.0*(AlO2H2_1p_activity*OH_1e_activity-DPAL3*AlO3H3_activity)
-  RALO3=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,S0**2-4._r8*(AlO2H2_1p_activity*OH_1e_activity-DPAL3*AlO3H3_activity))
+  RALO3=TSL*(4._r8*((AlO2H2_1p_activity*OH_1e_activity-DPAL3*AlO3H3_activity)/(S0+SQRT(S1))))
 
   ! Al(OH)4(-) <=> Al(OH)3(aq) + OH(-); positive RALO4 forms Al(OH)4(-).
   S0=AlO3H3_activity+OH_1e_activity+DPAL4
-  S1=S0**2-4.0*(AlO3H3_activity*OH_1e_activity-DPAL4*AlO4H4_1e_activity)
-  RALO4=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(AlO3H3_activity-OH_1e_activity)**2+2._r8*DPAL4*(AlO3H3_activity+OH_1e_activity)+DPAL4**2+4._r8*DPAL4*AlO4H4_1e_activity)
+  RALO4=TSL*(4._r8*((AlO3H3_activity*OH_1e_activity-DPAL4*AlO4H4_1e_activity)/(S0+SQRT(S1))))
 
   ! AlSO4(+) <=> Al(3+) + SO4(2-); positive RALS forms AlSO4(+).
   S0=Al_3p_activity+SO4_2e_activity+DPALS
-  S1=S0**2-4.0*(Al_3p_activity*SO4_2e_activity-DPALS*AlSO4_1p_activity)
-  RALS=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Al_3p_activity-SO4_2e_activity)**2+2._r8*DPALS*(Al_3p_activity+SO4_2e_activity)+DPALS**2+4._r8*DPALS*AlSO4_1p_activity)
+  RALS=TSL*(4._r8*((Al_3p_activity*SO4_2e_activity-DPALS*AlSO4_1p_activity)/(S0+SQRT(S1))))
 
   ! FeOH(2+) <=> Fe(3+) + OH(-); positive RFEO1 forms FeOH(2+).
   S0=Fe_3p_activity+OH_1e_activity+DPFE1
-  S1=S0**2-4.0*(Fe_3p_activity*OH_1e_activity-DPFE1*FeOH_2p_activity)
-  RFEO1=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Fe_3p_activity-OH_1e_activity)**2+2._r8*DPFE1*(Fe_3p_activity+OH_1e_activity)+DPFE1**2+4._r8*DPFE1*FeOH_2p_activity)
+  RFEO1=TSL*(4._r8*((Fe_3p_activity*OH_1e_activity-DPFE1*FeOH_2p_activity)/(S0+SQRT(S1))))
 
   ! Fe(OH)2(+) <=> FeOH(2+) + OH(-); positive RFEO2 forms Fe(OH)2(+).
   S0=FeOH_2p_activity+OH_1e_activity+DPFE2
-  S1=S0**2-4.0*(FeOH_2p_activity*OH_1e_activity-DPFE2*FeO2H2_p_activity)
-  RFEO2=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(FeOH_2p_activity-OH_1e_activity)**2+2._r8*DPFE2*(FeOH_2p_activity+OH_1e_activity)+DPFE2**2+4._r8*DPFE2*FeO2H2_p_activity)
+  RFEO2=TSL*(4._r8*((FeOH_2p_activity*OH_1e_activity-DPFE2*FeO2H2_p_activity)/(S0+SQRT(S1))))
 
   ! Fe(OH)3(aq) <=> Fe(OH)2(+) + OH(-); positive RFEO3 forms Fe(OH)3(aq).
   S0=FeO2H2_p_activity+OH_1e_activity+DPFE3
-  S1=S0**2-4.0*(FeO2H2_p_activity*OH_1e_activity-DPFE3*FeO3H3_activity)
-  RFEO3=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(FeO2H2_p_activity-OH_1e_activity)**2+2._r8*DPFE3*(FeO2H2_p_activity+OH_1e_activity)+DPFE3**2+4._r8*DPFE3*FeO3H3_activity)
+  RFEO3=TSL*(4._r8*((FeO2H2_p_activity*OH_1e_activity-DPFE3*FeO3H3_activity)/(S0+SQRT(S1))))
 
   ! Fe(OH)4(-) <=> Fe(OH)3(aq) + OH(-); positive RFEO4 forms Fe(OH)4(-).
   S0=FeO3H3_activity+OH_1e_activity+DPFE4
-  S1=S0**2-4.0*(FeO3H3_activity*OH_1e_activity-DPFE4*FeO4H4_1e_activity)
-  RFEO4=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(FeO3H3_activity-OH_1e_activity)**2+2._r8*DPFE4*(FeO3H3_activity+OH_1e_activity)+DPFE4**2+4._r8*DPFE4*FeO4H4_1e_activity)
+  RFEO4=TSL*(4._r8*((FeO3H3_activity*OH_1e_activity-DPFE4*FeO4H4_1e_activity)/(S0+SQRT(S1))))
 
   ! FeSO4(+) <=> Fe(3+) + SO4(2-); positive RFES forms FeSO4(+).
   S0=Fe_3p_activity+SO4_2e_activity+DPFES
-  S1=S0**2-4.0*(Fe_3p_activity*SO4_2e_activity-DPFES*FeSO4_1p_activity)
-  RFES=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Fe_3p_activity-SO4_2e_activity)**2+2._r8*DPFES*(Fe_3p_activity+SO4_2e_activity)+DPFES**2+4._r8*DPFES*FeSO4_1p_activity)
+  RFES=TSL*(4._r8*((Fe_3p_activity*SO4_2e_activity-DPFES*FeSO4_1p_activity)/(S0+SQRT(S1))))
 
   ! CaOH(+) <=> Ca(2+) + OH(-); positive RCAO forms CaOH(+).
   S0=Ca_2p_activity+OH_1e_activity+DPCAO
-  S1=S0**2-4.0*(Ca_2p_activity*OH_1e_activity-DPCAO*CaO2H2_activity)
-  RCAO=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-OH_1e_activity)**2+2._r8*DPCAO*(Ca_2p_activity+OH_1e_activity)+DPCAO**2+4._r8*DPCAO*CaO2H2_activity)
+  RCAO=TSL*(4._r8*((Ca_2p_activity*OH_1e_activity-DPCAO*CaO2H2_activity)/(S0+SQRT(S1))))
 
   ! CaCO3(aq) <=> Ca(2+) + CO3(2-); positive RCAC forms CaCO3(aq).
   S0=Ca_2p_activity+CO3_2e_activity+DPCAC
-  S1=S0**2-4.0*(Ca_2p_activity*CO3_2e_activity-DPCAC*CaCO3_activity)
-  RCAC=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-CO3_2e_activity)**2+2._r8*DPCAC*(Ca_2p_activity+CO3_2e_activity)+DPCAC**2+4._r8*DPCAC*CaCO3_activity)
+  RCAC=TSL*(4._r8*((Ca_2p_activity*CO3_2e_activity-DPCAC*CaCO3_activity)/(S0+SQRT(S1))))
 
   ! CaHCO3(+) <=> Ca(2+) + HCO3(-); positive RCAH forms CaHCO3(+).
   S0=Ca_2p_activity+HCO3_e_activity+DPCAH
-  S1=S0**2-4.0*(Ca_2p_activity*HCO3_e_activity-DPCAH*CaHCO3_1p_activity)
-  RCAH=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-HCO3_e_activity)**2+2._r8*DPCAH*(Ca_2p_activity+HCO3_e_activity)+DPCAH**2+4._r8*DPCAH*CaHCO3_1p_activity)
+  RCAH=TSL*(4._r8*((Ca_2p_activity*HCO3_e_activity-DPCAH*CaHCO3_1p_activity)/(S0+SQRT(S1))))
 
   ! CaSO4(aq) <=> Ca(2+) + SO4(2-); positive RCAS forms CaSO4(aq).
   S0=Ca_2p_activity+SO4_2e_activity+DPCAS
-  S1=S0**2-4.0*(Ca_2p_activity*SO4_2e_activity-DPCAS*CaSO4_activity)
-  RCAS=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-SO4_2e_activity)**2+2._r8*DPCAS*(Ca_2p_activity+SO4_2e_activity)+DPCAS**2+4._r8*DPCAS*CaSO4_activity)
+  RCAS=TSL*(4._r8*((Ca_2p_activity*SO4_2e_activity-DPCAS*CaSO4_activity)/(S0+SQRT(S1))))
 
   ! MgOH(+) <=> Mg(2+) + OH(-); positive RMGO forms MgOH(+).
   S0=Mg_2p_activity+OH_1e_activity+DPMGO
-  S1=S0**2-4.0*(Mg_2p_activity*OH_1e_activity-DPMGO*MgOH_1p_activity)
-  RMGO=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-OH_1e_activity)**2+2._r8*DPMGO*(Mg_2p_activity+OH_1e_activity)+DPMGO**2+4._r8*DPMGO*MgOH_1p_activity)
+  RMGO=TSL*(4._r8*((Mg_2p_activity*OH_1e_activity-DPMGO*MgOH_1p_activity)/(S0+SQRT(S1))))
 
   ! MgCO3(aq) <=> Mg(2+) + CO3(2-); positive RMGC forms MgCO3(aq).
   S0=Mg_2p_activity+CO3_2e_activity+DPMGC
-  S1=S0**2-4.0*(Mg_2p_activity*CO3_2e_activity-DPMGC*MgCO3_activity)
-  RMGC=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-CO3_2e_activity)**2+2._r8*DPMGC*(Mg_2p_activity+CO3_2e_activity)+DPMGC**2+4._r8*DPMGC*MgCO3_activity)
+  RMGC=TSL*(4._r8*((Mg_2p_activity*CO3_2e_activity-DPMGC*MgCO3_activity)/(S0+SQRT(S1))))
 
   ! MgHCO3(+) <=> Mg(2+) + HCO3(-); positive RMGH forms MgHCO3(+).
   S0=Mg_2p_activity+HCO3_e_activity+DPMGH
-  S1=S0**2-4.0*(Mg_2p_activity*HCO3_e_activity-DPMGH*MgHCO3_1p_activity)
-  RMGH=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-HCO3_e_activity)**2+2._r8*DPMGH*(Mg_2p_activity+HCO3_e_activity)+DPMGH**2+4._r8*DPMGH*MgHCO3_1p_activity)
+  RMGH=TSL*(4._r8*((Mg_2p_activity*HCO3_e_activity-DPMGH*MgHCO3_1p_activity)/(S0+SQRT(S1))))
 
   ! MgSO4(aq) <=> Mg(2+) + SO4(2-); positive RMGS forms MgSO4(aq).
   S0=Mg_2p_activity+SO4_2e_activity+DPMGS
-  S1=S0**2-4.0*(Mg_2p_activity*SO4_2e_activity-DPMGS*MgSO4_activity)
-  RMGS=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-SO4_2e_activity)**2+2._r8*DPMGS*(Mg_2p_activity+SO4_2e_activity)+DPMGS**2+4._r8*DPMGS*MgSO4_activity)
+  RMGS=TSL*(4._r8*((Mg_2p_activity*SO4_2e_activity-DPMGS*MgSO4_activity)/(S0+SQRT(S1))))
 
   ! NaCO3(-) <=> Na(+) + CO3(2-); positive RNAC forms NaCO3(-).
   S0=Na_1p_activity+CO3_2e_activity+DPNAC
-  S1=S0**2-4.0*(Na_1p_activity*CO3_2e_activity-DPNAC*NaCO3_1e_activity)
-  RNAC=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Na_1p_activity-CO3_2e_activity)**2+2._r8*DPNAC*(Na_1p_activity+CO3_2e_activity)+DPNAC**2+4._r8*DPNAC*NaCO3_1e_activity)
+  RNAC=TSL*(4._r8*((Na_1p_activity*CO3_2e_activity-DPNAC*NaCO3_1e_activity)/(S0+SQRT(S1))))
 
   ! NaSO4(-) <=> Na(+) + SO4(2-); positive RNAS forms NaSO4(-).
   S0=Na_1p_activity+SO4_2e_activity+DPNAS
-  S1=S0**2-4.0*(Na_1p_activity*SO4_2e_activity-DPNAS*NaSO4_1e_activity)
-  RNAS=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Na_1p_activity-SO4_2e_activity)**2+2._r8*DPNAS*(Na_1p_activity+SO4_2e_activity)+DPNAS**2+4._r8*DPNAS*NaSO4_1e_activity)
+  RNAS=TSL*(4._r8*((Na_1p_activity*SO4_2e_activity-DPNAS*NaSO4_1e_activity)/(S0+SQRT(S1))))
 
   ! KSO4(-) <=> K(+) + SO4(2-); positive RKAS forms KSO4(-).
   S0=K_1p_activity+SO4_2e_activity+DPKAS
-  S1=S0**2-4.0*(K_1p_activity*SO4_2e_activity-DPKAS*KSO4_1e_activity)
-  RKAS=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(K_1p_activity-SO4_2e_activity)**2+2._r8*DPKAS*(K_1p_activity+SO4_2e_activity)+DPKAS**2+4._r8*DPKAS*KSO4_1e_activity)
+  RKAS=TSL*(4._r8*((K_1p_activity*SO4_2e_activity-DPKAS*KSO4_1e_activity)/(S0+SQRT(S1))))
 
   ! HPO4(2-) <=> PO4(3-) + H(+); positive RH1P forms HPO4(2-).
   S0=H0PO4_3e_activity+H_1p_activity+DPH1P
-  S1=S0**2-4.0*(H0PO4_3e_activity*H_1p_activity-DPH1P*H1PO4_2e_activity)
-  RH1P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H0PO4_3e_activity-H_1p_activity)**2+2._r8*DPH1P*(H0PO4_3e_activity+H_1p_activity)+DPH1P**2+4._r8*DPH1P*H1PO4_2e_activity)
+  RH1P=TSL*(4._r8*((H0PO4_3e_activity*H_1p_activity-DPH1P*H1PO4_2e_activity)/(S0+SQRT(S1))))
 
   ! H2PO4(-) <=> HPO4(2-) + H(+); positive H2PO4_e_to_HPO4_2e_flx forms H2PO4(-).
   S0=H1PO4_2e_activity+H_1p_activity+DPH2P
-  S1=S0**2-4.0*(H1PO4_2e_activity*H_1p_activity-DPH2P*H2PO4_1e_activity)
-  H2PO4_e_to_HPO4_2e_flx=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H1PO4_2e_activity-H_1p_activity)**2+2._r8*DPH2P*(H1PO4_2e_activity+H_1p_activity)+DPH2P**2+4._r8*DPH2P*H2PO4_1e_activity)
+  H2PO4_e_to_HPO4_2e_flx=TSL*(4._r8*((H1PO4_2e_activity*H_1p_activity-DPH2P*H2PO4_1e_activity)/(S0+SQRT(S1))))
 
   ! H3PO4 <=> H2PO4(-) + H(+); positive RH3P forms H3PO4.
   S0=H2PO4_1e_activity+H_1p_activity+DPH3P
-  S1=S0**2-4.0*(H2PO4_1e_activity*H_1p_activity-DPH3P*H3PO4_activity)
-  RH3P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(H2PO4_1e_activity-H_1p_activity)**2+2._r8*DPH3P*(H2PO4_1e_activity+H_1p_activity)+DPH3P**2+4._r8*DPH3P*H3PO4_activity)
+  RH3P=TSL*(4._r8*((H2PO4_1e_activity*H_1p_activity-DPH3P*H3PO4_activity)/(S0+SQRT(S1))))
 
   ! FeHPO4(+) <=> Fe(3+) + HPO4(2-); positive RF1P forms FeHPO4(+).
   S0=Fe_3p_activity+H1PO4_2e_activity+DPF1P
-  S1=S0**2-4.0*(Fe_3p_activity*H1PO4_2e_activity-DPF1P*FeHPO4_p_activity)
-  RF1P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Fe_3p_activity-H1PO4_2e_activity)**2+2._r8*DPF1P*(Fe_3p_activity+H1PO4_2e_activity)+DPF1P**2+4._r8*DPF1P*FeHPO4_p_activity)
+  RF1P=TSL*(4._r8*((Fe_3p_activity*H1PO4_2e_activity-DPF1P*FeHPO4_p_activity)/(S0+SQRT(S1))))
 
   ! FeH2PO4(2+) <=> Fe(3+) + H2PO4(-); positive RF2P forms FeH2PO4(2+).
   S0=Fe_3p_activity+H2PO4_1e_activity+DPF2P
-  S1=S0**2-4.0*(Fe_3p_activity*H2PO4_1e_activity-DPF2P*FeH2PO4_2p_activity)
-  RF2P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Fe_3p_activity-H2PO4_1e_activity)**2+2._r8*DPF2P*(Fe_3p_activity+H2PO4_1e_activity)+DPF2P**2+4._r8*DPF2P*FeH2PO4_2p_activity)
+  RF2P=TSL*(4._r8*((Fe_3p_activity*H2PO4_1e_activity-DPF2P*FeH2PO4_2p_activity)/(S0+SQRT(S1))))
 
   ! CaPO4(-) <=> Ca(2+) + PO4(3-); positive RC0P forms CaPO4(-).
   S0=Ca_2p_activity+H0PO4_3e_activity+DPC0P
-  S1=S0**2-4.0*(Ca_2p_activity*H0PO4_3e_activity-DPC0P*CaPO4_1e_activity)
-  RC0P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-H0PO4_3e_activity)**2+2._r8*DPC0P*(Ca_2p_activity+H0PO4_3e_activity)+DPC0P**2+4._r8*DPC0P*CaPO4_1e_activity)
+  RC0P=TSL*(4._r8*((Ca_2p_activity*H0PO4_3e_activity-DPC0P*CaPO4_1e_activity)/(S0+SQRT(S1))))
 
   ! CaHPO4(aq) <=> Ca(2+) + HPO4(2-); positive RC1P forms CaHPO4(aq).
   S0=Ca_2p_activity+H1PO4_2e_activity+DPC1P
-  S1=S0**2-4.0*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)
-  RC1P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-H1PO4_2e_activity)**2+2._r8*DPC1P*(Ca_2p_activity+H1PO4_2e_activity)+DPC1P**2+4._r8*DPC1P*CaHPO4_activity)
+  RC1P=TSL*(4._r8*((Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)/(S0+SQRT(S1))))
 
   ! Legacy dissolved CaH4P2O8 variables represent the one-P CaH2PO4(+) complex:
   ! CaH2PO4(+) <-> Ca(2+) + H2PO4(-), distinct from solid Ca(H2PO4)2.
   ! Positive RC2P forms the dissolved one-P complex CaH2PO4(+).
   S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
-  S1=S0**2-4.0*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity)
-  RC2P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Ca_2p_activity-H2PO4_1e_activity)**2+2._r8*DPC2P*(Ca_2p_activity+H2PO4_1e_activity)+DPC2P**2+4._r8*DPC2P*CaH4P2O8_1p_activity)
+  RC2P=TSL*(4._r8*((Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity)/(S0+SQRT(S1))))
 
   ! MgHPO4(aq) <=> Mg(2+) + HPO4(2-); positive RM1P forms MgHPO4(aq).
   S0=Mg_2p_activity+H1PO4_2e_activity+DPM1P
-  S1=S0**2-4.0*(Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity)
-  RM1P=TSL*(S0-SQRT(S1))
+  S1=MAX(0._r8,(Mg_2p_activity-H1PO4_2e_activity)**2+2._r8*DPM1P*(Mg_2p_activity+H1PO4_2e_activity)+DPM1P**2+4._r8*DPM1P*MgHPO4_activity)
+  RM1P=TSL*(4._r8*((Mg_2p_activity*H1PO4_2e_activity-DPM1P*MgHPO4_activity)/(S0+SQRT(S1))))
 !
 !     TOTAL ION FLUX FOR EACH ION SPECIES
 !
