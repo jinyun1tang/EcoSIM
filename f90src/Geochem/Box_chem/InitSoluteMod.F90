@@ -1486,6 +1486,8 @@ module InitSoluteMod
   S0=Ca_2p_activity+H1PO4_2e_activity+DPC1P
   S1=S0**2-4.0*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity)
   RC1P=TSL*(S0-SQRT(S1))
+  ! Legacy dissolved CaH4P2O8 variables represent the one-P CaH2PO4(+) complex:
+  ! CaH2PO4(+) <-> Ca(2+) + H2PO4(-), distinct from solid Ca(H2PO4)2.
   S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
   S1=S0**2-4.0*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity)
   RC2P=TSL*(S0-SQRT(S1))

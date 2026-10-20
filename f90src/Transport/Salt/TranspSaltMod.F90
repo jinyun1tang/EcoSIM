@@ -184,9 +184,9 @@ module TranspSaltMod
   carbon_weight([idsalt_CO3,idsalt_HCO3,idsalt_CaCO3,idsalt_CaHCO3, &
     idsalt_MgCO3,idsalt_MgHCO3,idsalt_NaCO3])=catomw
   phosphorus_weight=0._r8
+  ! Dissolved CaH4P2O8 IDs are legacy names for CaH2PO4(+), with one P atom.
   phosphorus_weight(idsalt_psoil_beg:idsalt_psoil_end)=patomw
   phosphorus_weight(idsalt_pband_beg:idsalt_pband_end)=patomw
-  phosphorus_weight([idsalt_CaH4P2O8,idsalt_CaH4P2O8B])=2._r8*patomw
 
   do idsalt=idsalt_beg,idsaltb_end
     if(carbon_weight(idsalt)==0._r8.and.phosphorus_weight(idsalt)==0._r8)cycle

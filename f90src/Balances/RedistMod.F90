@@ -781,11 +781,12 @@ module RedistMod
 
   ! Dissolved litter salt transport is already committed by TranspSalt.
 
+  ! The legacy dissolved CaH4P2O8 tracer is CaH2PO4(+), with one P atom.
   PSS=patomw*(trcSalt_solml_vr(idsalt_H0PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_H3PO4,0,NY,NX)&
     +trcSalt_solml_vr(idsalt_FeHPO4,0,NY,NX) &
     +trcSalt_solml_vr(idsalt_FeH2PO4,0,NY,NX)+trcSalt_solml_vr(idsalt_CaPO4,0,NY,NX)&
     +trcSalt_solml_vr(idsalt_CaHPO4,0,NY,NX) &
-    +2._r8*trcSalt_solml_vr(idsalt_CaH4P2O8,0,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,0,NY,NX))
+    +trcSalt_solml_vr(idsalt_CaH4P2O8,0,NY,NX)+trcSalt_solml_vr(idsalt_MgHPO4,0,NY,NX))
   TDisolPi_lnd=TDisolPi_lnd+PSS
   SSS=0._r8
   do idsalt=idsalt_beg,idsalt_end
@@ -1192,9 +1193,8 @@ module RedistMod
   DO idsalt=idsalt_psoil_beg,idsalt_pband_end
     PSS=PSS+trcSalt_solml_vr(idsalt,L,NY,NX)+trcSalt_soHml_vr(idsalt,L,NY,NX)
   ENDDO
-  ! CaH4P2O8 contains a second P atom in both pore pools and both bands.
-  PSS=PSS+trcSalt_solml_vr(idsalt_CaH4P2O8,L,NY,NX)+trcSalt_soHml_vr(idsalt_CaH4P2O8,L,NY,NX) &
-    +trcSalt_solml_vr(idsalt_CaH4P2O8B,L,NY,NX)+trcSalt_soHml_vr(idsalt_CaH4P2O8B,L,NY,NX)
+  ! Every dissolved P species above contains one P atom. The legacy CaH4P2O8
+  ! IDs represent CaH2PO4(+), unlike the separate two-P solid Ca(H2PO4)2 pools.
   PSS=PSS*patomw  
 
   TDisolPi_lnd=TDisolPi_lnd+PSS

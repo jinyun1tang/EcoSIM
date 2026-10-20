@@ -2383,8 +2383,8 @@ module SaltChemEquilibriaMod
     S1=AZMAX1(S0**2_r8-4.0_r8*(Ca_2p_activity*H1PO4_2e_activity-DPC1P*CaHPO4_activity))
     RC1P=TSLX*(S0-SQRT(S1))
 !
-!     RC2P=CaH4P2O8-CA+H2PO4 dissociation in non-band
-! CaH4P2O8(+) <-> Ca(++)+H2PO4(-)
+!     RC2P=CaH2PO4(+)-Ca+H2PO4 dissociation in non-band
+! CaH2PO4(+) <-> Ca(++)+H2PO4(-); CaH4P2O8 is the legacy dissolved variable name.
     S0=Ca_2p_activity+H2PO4_1e_activity+DPC2P
     S1=AZMAX1(S0**2_r8-4.0_r8*(Ca_2p_activity*H2PO4_1e_activity-DPC2P*CaH4P2O8_1p_activity))
     RC2P=TSLX*(S0-SQRT(S1))
@@ -2446,8 +2446,8 @@ module SaltChemEquilibriaMod
     S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*H1PO4_2e_band_activity-DPC1P*CaHPO4_band_activity))
     RC1B=TSLX*(S0-SQRT(S1))
 !
-!     RC2B=CaH4P2O8-CA+H2PO4 dissociation in band
-! CaH4P2O8(+) <-> Ca(++)+H2PO4(-)
+!     RC2B=CaH2PO4(+)-Ca+H2PO4 dissociation in band
+! CaH2PO4(+) <-> Ca(++)+H2PO4(-); the two-P solid Ca(H2PO4)2 is a separate pool.
     S0=Ca_2p_activity+H2PO4_1e_band_activity+DPC2P
     S1=AZMAX1(S0**2-4.0_r8*(Ca_2p_activity*H2PO4_1e_band_activity-DPC2P*CaH4P2O8_1p_band_activity))
     RC2B=TSLX*(S0-SQRT(S1))
