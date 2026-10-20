@@ -1,4 +1,5 @@
 module StarteMod
+  use AtmosCompositionMod, only: UpdateAtmosGasMassConcentrations
   use data_kind_mod,      only: r8 => DAT_KIND_R8
   use SoluteChemDataType, only: solutedtype
   use EcoSiMParDataMod,   only: micpar
@@ -59,6 +60,8 @@ module StarteMod
   !     FROM WEATHER, IRRIGATION AND SOIL FILES IN 'READS'
   !
   call PrintInfo('beg '//subname)
+  ! Annual forcing reads change mixing ratios even when STARTS is skipped.
+  call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS)
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
       solutevar%CCO2M = CCO2EI_gperm3_col(NY,NX)/catomw

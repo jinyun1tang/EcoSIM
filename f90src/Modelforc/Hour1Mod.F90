@@ -1,4 +1,5 @@
 module Hour1Mod
+  use AtmosCompositionMod, only: UpdateAtmosGasMassConcentrations
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
   use minimathmod,       only: isclose, AZMAX1, AZMIN1,Viscosity_H2O
@@ -280,7 +281,6 @@ module Hour1Mod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NX, NY, idg
-  real(r8) :: tPBOT,tmp
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
@@ -288,23 +288,9 @@ module Hour1Mod
 !
 !
 ! SurfIrrig_IonStrenth_col: surface irrigation ion strength, [g m-3]
+  call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
-      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
-      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
-
-      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
-      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-03_r8*tmp  !gAr/m3
-      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
-      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
-      AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
-
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
            /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))

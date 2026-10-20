@@ -6,6 +6,7 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
+  use HydrologyDiagMod, only: DiagFrozenBoundary
   use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange, &
     RebuildSoilFaceMap,DestroySoilFaceMap
   use data_kind_mod,     only: r8 => DAT_KIND_R8
@@ -107,8 +108,6 @@ module WatsubMod
   real(r8) :: dHGrnddTKsoi1(JY,JX)    !step-integrated radiation+sensible heat derivative [MJ/K]
   real(r8) :: twatmass0(JY,JX),twatmasstM(JY,JX)
   integer  :: NUX0(JY,JX)
-  logical  :: found_frozen
-  real(r8) :: VLSoilPoreMicPX
 !  real(r8) :: dtime
 ! begin_execution
 
@@ -169,43 +168,9 @@ module WatsubMod
     call ExitMassBalanceM(I,J,M,NHW,NHE,NVN,NVS,twatmass0,NUX0,twatmasstM)
 
   ENDDO D3320
-  call PrintInfo('end watsub')
 
-  !diagnose surface ice
-  DO NX=NHW,NHE
-    DO  NY=NVN,NVS
+  call DiagFrozenBoundary(NHW,NHE,NVN,NVS)
 
-      found_frozen=.false.
-      DO L=NUM_col(NY,NX),NL_col(NY,NX)
-        VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
-        VOLTX_vr(L,NY,NX)     = VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
-        ThetaICEZ_vr(L,NY,NX) = AMIN1(safe_adb(VLiceMicP1_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
-          VLiceMacP1_vr(L,NY,NX)),VOLTX_vr(L,NY,NX))/POROS_vr(L,NY,NX),1._r8)   
-        if(ThetaICEZ_vr(L,NY,NX)>0.9_r8 .and. .not. found_frozen)then
-          found_frozen=.true.
-          NLF_col(NY,NX)=L
-        endif
-        !micropore water change due to freeze-thaw:=final-initial
-        DVLiceMicP_vr(L,NY,NX)       = VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
-
-        TKS_vr(L,NY,NX)        = TKSoil1_vr(L,NY,NX)
-        VLWatMicP_vr(L,NY,NX)  = VLWatMicP1_vr(L,NY,NX)
-        VLWatMicPX_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)
-        VLiceMicP_vr(L,NY,NX)  = VLiceMicP1_vr(L,NY,NX)
-        VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
-        VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
-      ENDDO  
-
-      DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
-        DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-      ENDDO
-      !PAR radiation to Soil surface
-      RadPAR2Soil_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
-      !PAR radiation to litter surface
-      RadPAR2LitR_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)
-      
-    ENDDO  
-  ENDDO
   call PrintInfo('end '//subname)
   END subroutine watsub
 

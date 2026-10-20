@@ -341,10 +341,10 @@ module readiMod
       RechargRateWestWTBL_col(NY,NX)  = RCHGWUG      
       RechargBottom_col(NY,NX) = RCHGDG
 
-      DH_col(NY,NX)                = DHI(NX)
-      DV_col(NY,NX)                = DVI(NY)
-      CO2E_col(NY,NX)          = CO2EI_col(NY,NX)
-      H2GE_col(NY,NX)          = ah2_ppm
+      DH_col(NY,NX)   = DHI(NX)
+      DV_col(NY,NX)   = DVI(NY)
+      CO2E_col(NY,NX) = CO2EI_col(NY,NX)
+      H2GE_col(NY,NX) = ah2_ppm
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !

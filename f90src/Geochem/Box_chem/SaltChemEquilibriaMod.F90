@@ -2150,6 +2150,11 @@ module SaltChemEquilibriaMod
 !
 !     RX*=ion adsorption
 !
+    ! TODO: Desorption below can overdraw exchangeable donors for small targets.
+    ! NH4 above has a donor limit, but reactions sharing aqueous donors are not
+    ! limited jointly. Retain these equations pending a geochemistry solver that
+    ! handles all reactions concurrently, preserves nonnegative pools, and
+    ! conserves elemental totals (also applies to initialization chemistry).
     RXHY=TADCX*AMIN1((XHYQ-XHY1)*H_1p_activity/XHYQ,H_1p_aque_mole_conc)
     RXAL=TADCX*AMIN1((XALQ-XAl_conc)*AALX/XALQ,Al_3p_aque_mole_conc)
     RXFE=TADCX*AMIN1((XFEQ-XFe_conc)*AFEX/XFEQ,Fe_3p_aque_mole_conc)

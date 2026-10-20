@@ -1301,6 +1301,11 @@ module InitSoluteMod
       XMGQ=FX*XMGQ/2.0_r8
       XNAQ=FX*XNAQ
       XKAQ=FX*XKAQ
+      ! TODO: Desorption below can overdraw exchangeable donors when equilibrium
+      ! targets are small. Other reactions also compete for aqueous donors, so
+      ! independent reaction limits do not guarantee nonnegative shared pools.
+      ! Retain these equations pending replacement with a geochemistry solver
+      ! that handles all reactions concurrently and conserves elemental totals.
       RXN4=TAD*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_activity/XN4Q,NH4_1p_aque_mole_conc)
       RXHY=TAD*AMIN1((XHYQ-XHY1)*H_1p_activity/XHYQ,H_1p_aque_mole_conc)
       RXAL=TAD*AMIN1((XALQ-XAl_conc)*AALX/XALQ,Al_3p_aque_mole_conc)
@@ -1702,6 +1707,9 @@ module InitSoluteMod
         FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
+      ! TODO: NH4 desorption can overdraw its exchangeable donor for small XN4Q.
+      ! Retain pending the concurrent geochemistry solver noted in the salt
+      ! initialization exchange block; shared aqueous donors need joint treatment.
       RXN4=TSL*AMIN1((XN4Q-XNH4_mole_conc)*NH4_1p_aque_mole_conc/XN4Q,NH4_1p_aque_mole_conc)
       XNH4_mole_conc=XNH4_mole_conc+RXN4
     ELSE

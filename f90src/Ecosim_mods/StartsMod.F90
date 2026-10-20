@@ -1,4 +1,5 @@
 module StartsMod
+  use AtmosCompositionMod, only: UpdateAtmosGasMassConcentrations
 !!
 ! Description:
 ! code to initalize soil variables
@@ -81,7 +82,7 @@ module StartsMod
   integer :: NY,NX,L,idg
   REAL(R8) :: SurfElevLandscapeMax
   real(r8) :: SurfElevLandscapeMin
-  real(r8) :: tPBOT,XWS
+  real(r8) :: XWS
   real(r8) :: LandScape1stSoiLayDepth
   real(r8) :: YSIN(NumOfSkyAzimuthSects)
   real(r8) :: YCOS(NumOfSkyAzimuthSects)
@@ -103,6 +104,7 @@ module StartsMod
   !     OF EACH GRID CELL
   !
   call InitAccumulators()
+  call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS)
 
 ! this assumes the whole landscape is a grid
   SurfElevLandscapeMin                   = 0.0_r8
@@ -125,25 +127,6 @@ module StartsMod
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)) !topsoil layer depth
-!
-!     INITIALIZE ATMOSPHERE VARIABLES
-!
-!     C*E=atmospheric concentration (g m-3)
-!     *E=atmospheric concentration from readi.f (umol mol-1)
-!     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
-!
-      tPBOT                             = PBOT_col(NY,NX)/1.01325E+02_r8
-      CCO2EI_gperm3_col(NY,NX)          = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_CO2,NY,NX)  = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_CH4,NY,NX)  = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_O2,NY,NX)   = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_N2,NY,NX)   = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_N2O,NY,NX)  = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_NH3,NY,NX)  = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_H2,NY,NX)   = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_AR,NY,NX)   = ARGE_col(NY,NX)*1.78E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
-
       DO idg=idg_beg,idg_NH3
         trcs_solcoef_col(idg,NY,NX)= AMAX1(AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,ATCA_col(NY,NX))*1.e-2_r8,1.e-10_r8)
       ENDDO  
@@ -317,7 +300,7 @@ module StartsMod
 !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
 !
   call PrintInfo('beg '//subname)
-  TORGC=0.0_r8
+  TORGC=0.0_r8;TORGL=0._r8
   D1190: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !     CORGCZ=CSoilOrgM_vr(ielmc,L,NY,NX)
     !     CORGRZ=CORGR(L,NY,NX)
@@ -821,7 +804,7 @@ module StartsMod
       VGeomLayert0_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)
       VLSoilMicPMass_vr(L,NY,NX) = gC2MgOM*SoilOrgM_vr(ielmc,L,NY,NX)  !mass of soil layer, Mg/d2
       !thickness of litter layer 
-      !write(*,*) "AREA_3D(3,L,NY,NX) = ", AREA_3D(3,L,NY,NX)
+
       DLYRI_3D(3,L,NY,NX) = VLSoilPoreMicP_vr(L,NY,NX)/AREA_3D(3,L,NY,NX)
       DLYR_3D(3,L,NY,NX)  = DLYRI_3D(3,L,NY,NX)
     ELSE
@@ -949,7 +932,6 @@ module StartsMod
   integer,intent(in) :: NHW,NHE,NVN,NVS
   REAL(R8) :: SurfElevLandscapeMax ![m], peak altitude of the landscape
   real(r8) :: SurfElevLandscapeMin
-  real(r8) :: tPBOT
   integer :: NY,NX,NM
   real(r8) :: LandScape1stSoiLayDepth
   real(r8) :: YSIN(NumOfSkyAzimuthSects)
@@ -974,6 +956,7 @@ module StartsMod
   call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,SkyAzimuthAngle,SurfElevLandscapeMax)
 
   call InitAccumulators()
+  call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS,PressureRatio=1._r8)
 
   !For whatever reason this sets a temerature, so I need to reset it:
   ATKS_col = 242.0
@@ -996,24 +979,6 @@ module StartsMod
       ENDIF
       !
       LandScape1stSoiLayDepth=AMAX1(LandScape1stSoiLayDepth,CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)) !topsoil layer depth
-!
-!     INITIALIZE ATMOSPHERE VARIABLES
-!
-!     C*E=atmospheric concentration (g m-3)
-!     *E=atmospheric concentration from readi.f (umol mol-1)
-!     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
-!     TairKClimMean_col=mean annual air temperature (K)
-!     tPBOT = # atmosphere
-      tPBOT=1._r8   
-      CCO2EI_gperm3_col(NY,NX)         = CO2EI_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*Tref/TairKClimMean_col(NY,NX)*tPBOT
-      AtmGasCgperm3_col(idg_NH3B,NY,NX)= AtmGasCgperm3_col(idg_NH3,NY,NX) 
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
