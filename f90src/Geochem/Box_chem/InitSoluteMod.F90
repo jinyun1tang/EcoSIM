@@ -445,17 +445,17 @@ module InitSoluteMod
     NH4_1p_aque_mole_conc=ZERO
     NH3_aque_mole_conc=ZERO
   ENDIF
-  IF(Al_mole_conc.LT.0.0_r8)THEN
+  IF(Al_mole_conc.LE.0.0_r8)THEN
     Al_3p_aque_mole_conc=AMIN1(CALMX,SPALO/(OH_1e_aque_mole_conc**3*A3))
   ELSE
     Al_3p_aque_mole_conc=AMIN1(Al_mole_conc,SPALO/(OH_1e_aque_mole_conc**3*A3))
   ENDIF
-  IF(CFEZ.LT.0.0_r8)THEN
+  IF(CFEZ.LE.0.0_r8)THEN
     Fe_3p_aque_mole_conc=AMIN1(CFEMX,SPFEO/(OH_1e_aque_mole_conc**3*A3))
   ELSE
     Fe_3p_aque_mole_conc=AMIN1(CFEZ,SPFEO/(OH_1e_aque_mole_conc**3*A3))
   ENDIF
-  IF(CCAZ.LT.0.0_r8)THEN
+  IF(CCAZ.LE.0.0_r8)THEN
     Ca_2p_aque_mole_conc=AMIN1(CCAMX,SPCAC/(CO3_2e_aque_mole_conc*A2**2))
   ELSE
     Ca_2p_aque_mole_conc=AMIN1(CCAZ,SPCAC/(CO3_2e_aque_mole_conc*A2**2))
