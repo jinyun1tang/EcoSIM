@@ -295,7 +295,7 @@ module StartsMod
   REAL(R8),INTENT(IN) :: LandScape1stSoiLayDepth
   character(len=*), parameter :: subname='InitSoilProfile'
   integer  :: L,M,K,N,KK,NN
-  real(r8) :: VORGCM          !volume of conslidated organic matter [cm3]
+  real(r8) :: CORGCM          !organic-matter mass fraction [Mg OM/Mg soil]
   real(r8) :: HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
   REAL(R8) :: PTDS  !particle density [g cm-3]=[Mg m-3]
@@ -360,7 +360,7 @@ module StartsMod
       TORGLL=TORGL(L)
     endif
 
-    call InitSOMProfile(L,NY,NX,HCX,TORGLL,LandScape1stSoiLayDepth,VORGCM,FCX)
+    call InitSOMProfile(L,NY,NX,HCX,TORGLL,LandScape1stSoiLayDepth,FCX)
     !
     !     LAYER WATER, ICE, AIR CONTENTS
     !
@@ -383,11 +383,9 @@ module StartsMod
 
     IF(L.GT.0)THEN
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
-        !it is a soil layer
-        !compute particle density,
-        !particle density of solid OM is about 1.20~1.4 g/cm3, while 
-        !particle density for minearl soil is about 2.66 g/cm3~Mg/m3, 1 m^3=1.e6 cm^3
-        PTDS              = ppmc*(DensitySolidOM*VORGCM+DensitySolidMineral*(1.0E+06_r8-VORGCM)) ![Mg m-3]
+        ! Use the organic-matter mass fraction and density mixture from Hour1Mod.
+        CORGCM            = AZMAX1(AMIN1(1.0_r8,gC2MgOM*CSoilOrgM_vr(ielmc,L,NY,NX)))
+        PTDS              = DensitySolidOM*CORGCM+DensitySolidMineral*(1.0_r8-CORGCM)
         VSolidSoil        = SoilBulkDensity_vr(L,NY,NX)/PTDS      ! volume of soil as solid [Mg m-3]/[Mg m-3]
         POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-VSolidSoil)             ! volume of pores in one unit soil
       ELSE
@@ -415,7 +413,7 @@ module StartsMod
       IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density [Mg m-3]
         ! soil volumetric heat capacity, [SoilBulkDensity_vr]=[Mg soil m-3]
-        VORGC = VORGCM*VSolidSoil*1.e-6                            ![m3 OM m-3 soil]
+        VORGC = CORGCM*VSolidSoil                                 ![m3 OM m-3 soil], same convention as Hour1Mod
         VMINL = (CSILT_vr(L,NY,NX)+CCLAY_vr(L,NY,NX))*VSolidSoil   ![m3 mineral m-3 soil]
         VSAND = CSAND_vr(L,NY,NX)*VSolidSoil                       ![m3 sand m-3 soil]
         VHeatCapMineralSoil_vr(L,NY,NX)=((cpmins*VMINL+cpsand*VSAND) &
