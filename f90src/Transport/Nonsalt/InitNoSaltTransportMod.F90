@@ -391,8 +391,10 @@ module InitNoSaltTransportMod
           RBGCSinkGasMM_vr(idg,L,NY,NX) = RBGCSinkGasMM_vr(idg,L,NY,NX)+trcs_solml_drib_vr(idg,L,NY,NX)*dts_gas
         enddo
 
+        ! Direct root respiration is independent of chemistry; dead-root CO2 is staged above.
+        RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)*dts_gas
         if(TProd_CO2_geochem_soil_vr(L,NY,NX)>0._r8)then
-          RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+(TProd_CO2_geochem_soil_vr(L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX))*dts_gas
+          RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)*dts_gas
         else
           RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)*dts_gas
         endif
@@ -411,8 +413,10 @@ module InitNoSaltTransportMod
           RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = -trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)*dts_HeatWatTP        
         endif
 
+        ! Dead-root NH3 enters the non-band dissolved pool once, regardless of chemistry.
+        RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX) = trcs_deadroot2soil_vr(idg_NH3,L,NY,NX)*dts_HeatWatTP
         if(TRProd_chem_sol_NH3_soil_vr(L,NY,NX)>0._r8)then
-          RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX)  = (TRProd_chem_sol_NH3_soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+          RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX) = RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX)+TRProd_chem_sol_NH3_soil_vr(L,NY,NX)*dts_HeatWatTP
         else
           RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = -TRProd_chem_sol_NH3_soil_vr(L,NY,NX)*dts_HeatWatTP
         endif

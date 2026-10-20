@@ -140,6 +140,8 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+    ! Nonpositive bounds mark the end of populated topographic-unit records.
+    if(any((/NH1,NV1,NH2,NV2/)<=0))exit
     if(NS<0 .or. NS>JP)then
       write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
       call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
@@ -281,6 +283,8 @@ implicit none
     call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
     call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
     call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+    ! Nonpositive bounds mark the end of populated topographic-unit records.
+    if(any((/NH1,NV1,NH2,NV2/)<=0))exit
     if(NS<0 .or. NS>JP)then
       write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
       call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
@@ -1599,6 +1603,8 @@ implicit none
         call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
         call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+        ! Nonpositive bounds mark the end of populated topographic-unit records.
+        if(any((/NH1,NV1,NH2,NV2/)<=0))exit
         if(NS<0 .or. NS>JP)then
           write(iulog,*)'Invalid PFT count in '//subname,': topo unit=',NTOPO,' NZ=',NS,' capacity=',JP
           call endrun('PFT count must be between zero and JP in '//subname,__LINE__)
