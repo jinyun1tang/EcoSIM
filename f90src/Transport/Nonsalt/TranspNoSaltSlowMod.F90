@@ -226,7 +226,7 @@ implicit none
       ENDDO
 
       DO idg=idg_beg,idg_NH3
-        DO L=1,nsnol_col(NY,NX)
+        DO L=1,JS
           trcg_mass_snow_begs(idg,NY,NX)=trcg_mass_snow_begs(idg,NY,NX)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
@@ -311,7 +311,7 @@ implicit none
       ENDDO
 
       DO idg=idg_beg,idg_NH3
-        DO L=1,nsnol_col(NY,NX)
+        DO L=1,JS
           trcg_mass_snow_now(idg)=trcg_mass_snow_now(idg)+trcg_solsml2_snvr(idg,L,NY,NX)
         ENDDO
 
@@ -395,7 +395,7 @@ implicit none
             write(201,*)'dep2sno    =',Gas_WetDepo2Snow_slow_flx_col(idg,NY,NX)
             write(201,*)'snowloss   =',-Gas_Snowloss_slow_flx_col(idg,NY,NX)
             write(201,*)'snowdrift  =',trcg_SnowDrift_flx_col(idg,NY,NX)
-            write(201,*)'snow mass  =',trcg_solsml2_snvr(idg,1:nsnol_col(NY,NX),NY,NX)
+            write(201,*)'snow mass  =',trcg_solsml2_snvr(idg,1:JS,NY,NX)
             if(idg==idg_NH3)then
               write(201,*)'netpro      =',trcs_NetProd_slow_flxM_col(idg,NY,NX)+trcs_NetProd_slow_flxM_col(idg_NH3B,NY,NX)
               write(201,*)'hydloss     =',trcs_hydrloss_slow_flx_col(idg,NY,NX)+trcs_hydrloss_slow_flx_col(idg_NH3B,NY,NX)
@@ -1992,7 +1992,7 @@ implicit none
   implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: M,NHE,NHW,NVS,NVN
-  ! Discharge donor within the fixed hourly layer range; zero means none.
+  ! Discharge donor within the fixed snow slots; zero means none.
   integer, intent(out) :: snow_donor_col(JY,JX)
   ! True only in the once-per-substep ID-changing surface transfer pass.
   logical, optional, intent(in) :: band_transfer_only
@@ -2016,13 +2016,15 @@ implicit none
     DO  NY=NVN,NVS
 
       LCHKBOTML=.false.
-      DO  L=1,nsnol_col(NY,NX)
+      ! Hydrology can create snow in slot 1 before nsnol_col is updated.
+      ! Scan fixed slots; substep heat capacity determines drainage donors.
+      DO  L=1,JS
         !check having meaningful snow mass
         IF(VLSnowHeatCapM_snvr(M,L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)THEN
           !next layer index
           L2=MIN(JS,L+1)
           !L is an inner layer, because L2 is well defined
-          IF(L.LT.nsnol_col(NY,NX) .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
+          IF(L.LT.JS .AND. VLSnowHeatCapM_snvr(M,L2,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX))THEN
             !some flowout
             IF(VLWatSnow_snvr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
               VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM_snvr(M,L2,NY,NX)/VLWatSnow_snvr(L,NY,NX)))
@@ -3149,7 +3151,8 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine TracerFluxThruSnowZM(I,J,M,N1,N2,snow_donor)
-  ! Assemble the recorded snow transfers on the fixed hourly layer structure.
+  ! Assemble recorded transfers on all fixed snow slots, including new snow.
+  ! Top-slot deposition is accepted even when its initial heat capacity is zero.
   ! The proposal routine selects the discharge donor; do not reclassify layers
   ! here using a different capacity threshold or substep snapshot.
   implicit none
@@ -3160,11 +3163,11 @@ implicit none
 
   call PrintInfo('beg '//subname)
 
-  DO LS=1,nsnol_col(N2,N1)
+  DO LS=1,JS
     DO idg=idg_beg,idg_NH3
       trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
         +trcg_AquaAdv_flxM_snvr(idg,LS,N2,N1)
-      if(LS<nsnol_col(N2,N1))then
+      if(LS<JS)then
         trcg_Aqua_flxM_snvr(idg,LS,N2,N1)=trcg_Aqua_flxM_snvr(idg,LS,N2,N1) &
           -trcg_AquaAdv_flxM_snvr(idg,LS+1,N2,N1)
       endif
@@ -3172,7 +3175,7 @@ implicit none
     DO idn=ids_nut_beg,ids_nuts_end
       trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
         +trcn_AquaAdv_flxM_snvr(idn,LS,N2,N1)
-      if(LS<nsnol_col(N2,N1))then
+      if(LS<JS)then
         trcn_Aqua_flxM_snvr(idn,LS,N2,N1)=trcn_Aqua_flxM_snvr(idn,LS,N2,N1) &
           -trcn_AquaAdv_flxM_snvr(idn,LS+1,N2,N1)
       endif
@@ -3777,7 +3780,7 @@ implicit none
         endif
       ENDDO
 
-      DO  L=2,nsnol_col(NY,NX)
+      DO  L=2,JS
         DO idg=idg_beg,idg_NH3
           flux=trcg_Aqua_flxM_snvr(idg,L,NY,NX)        
           lflux=.true. .or. .not.isclose(flux,0._r8)

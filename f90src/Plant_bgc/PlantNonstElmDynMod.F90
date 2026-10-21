@@ -435,7 +435,7 @@ module PlantNonstElmDynMod
   !     ECO_ER_col=ecosystem respiration
   !     Eco_AutoR_CumYr_col=total autotrophic respiration
   !
-  ! Rebuild protein after all growth and withdrawal, from the same surviving
+  ! Rebuild protein of fine radius roots after all growth and withdrawal, from the same surviving
   ! tissue and layer routing as active carbon. Protein is a derived diagnostic.
   RootProteinC_pvr(:,:,NZ) = 0._r8
   D5445: DO N=1,Myco_pft(NZ)
@@ -462,7 +462,7 @@ module PlantNonstElmDynMod
     DO L=MaxSoilLays4Root_pft(NZ),NU,-1
       PrimaryRootProteinC = MIN(rProteinC2RootN_pft(NZ)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)), &
                                 rProteinC2RootP_pft(NZ)*AZMAX1(Root1stActStructElms_rpvr(ielmp,L,NR,NZ)))
-      !primary roots are not coarse
+      !primary roots are fine in radius
       if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
         L1=NRoot1stTipLay_raxes(NR,NZ)  
         RootMycoActiveBiomC_pvr(ipltroot,L1,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)

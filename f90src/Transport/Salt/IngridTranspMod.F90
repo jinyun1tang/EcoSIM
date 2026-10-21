@@ -604,6 +604,13 @@ module IngridTranspMod
             -trcSalt_AquaADV_Snow2Soil_flxM(idsalt_H0PO4B+idsalt,NY,NX)
         ENDDO
       ENDIF
+    ELSEIF(LS.EQ.1)THEN
+      ! First snowfall has no initial snow heat capacity. Accept its staged
+      ! deposition once; donor-dependent discharge remains in the branch above.
+      DO idsalt=idsalt_beg,idsalt_end
+        trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX)=trcSalt_Aqua_flxM_snvr(idsalt,LS,NY,NX) &
+          +trcSalt_AquaAdv_flxM_snvr(idsalt,LS,NY,NX)
+      ENDDO
     ENDIF
   ENDDO D1205
   end subroutine AccumSaltTranspInSnowM

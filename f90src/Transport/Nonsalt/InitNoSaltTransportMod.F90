@@ -102,10 +102,10 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-      ! Ground formation clears top-snow inputs first; snow formation then
-      ! adds its independent recipient share when snow layers are present.
+      ! Ground formation clears top-snow inputs first. Stage the snow share
+      ! even on first snowfall: nsnol_col is updated later by SnowpackLayering.
       call TracerFall2Grnd(I,J,NY,NX)
-      if(nsnol_col(NY,NX)>0)call TracerFall2Snowpack(I,J,NY,NX)
+      call TracerFall2Snowpack(I,J,NY,NX)
       NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+(Rain2SnowSurf_col(NY,NX) &
         +Rain2LitRSurf_col(NY,NX)+Rain2SoilSurf_col(NY,NX)) &
         *(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
@@ -313,18 +313,14 @@ module InitNoSaltTransportMod
       DO idg=idg_beg,idg_NH3      
         trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
       ENDDO
-      !volatile and nutrient tracers in snow
+      ! Preserve all transport slots, including newly forming snow whose
+      ! layer count is still zero. SnowpackLayering handles empty-slot residue.
       DO L=1,JS
-        if(L<=nsnol_col(NY,NX))then
-          DO idg=idg_beg,idg_NH3
-            trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
-          ENDDO  
-          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)   =trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
-        else          
-          trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0._r8
-          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
-        endif
-      enddo
+        DO idg=idg_beg,idg_NH3
+          trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
+        ENDDO
+        trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)=trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
+      ENDDO
       !gas tracers in soil column       
       DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
