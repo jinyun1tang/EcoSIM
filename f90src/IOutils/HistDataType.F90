@@ -42,9 +42,11 @@ module HistDataType
   real(r8), pointer :: h1d_RAeroCH4Oxi30cm_col(:)
   real(r8), pointer :: h1d_RCH4ProdAcet30cm_col(:)
   real(r8), pointer :: h1d_RCH4ProdHG30cm_col(:)
+  real(r8), pointer :: h1d_RCH4ProdAcet_col(:)
+  real(r8), pointer :: h1d_RCH4ProdHG_col(:)
+  real(r8), pointer :: h1D_RCH4Oxi_col(:)
   real(r8), pointer :: h1d_RFerment30cm_col(:)
   real(r8), pointer :: h1d_RCO2Ht30cm_col(:)
-
   real(r8),pointer   :: h1D_cumFIRE_CO2_col(:)    
   real(r8),pointer   :: h1D_cumFIRE_CH4_col(:)    
   real(r8),pointer   :: h1D_cNH4_LITR_col(:)    

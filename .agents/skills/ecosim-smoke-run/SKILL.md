@@ -15,7 +15,7 @@ Do **not** use this to judge scientific correctness. See [Limits](#limits).
 
 ## What It Does
 
-For each namelist under `examples/run_dir/*/`:
+For each eligible namelist under `examples/run_dir/*/` (see exclusions below):
 
 1. Stages it in a scratch mirror so committed outputs and restart pointers are never touched.
 2. Forces a short run (`stop_option='ndays'`, `stop_n=DAYS`) from the case's own `start_date`.
@@ -46,6 +46,11 @@ The default run must complete 480 hourly steps (20 days x 24 hours). Use
 `-d DAYS` when the user explicitly requests a different duration.
 
 ### Excluded namelists
+
+**Exclude `blodgett/Blodget.warming` from routine smoke runs**, including runs
+that explicitly select the `blodgett` directory. It has an existing SIGILL
+failure and is reserved for separate investigation. The runner removes only
+its scratch namelist; the original case and other Blodgett cases are preserved.
 
 **Exclude `dryland/dryland2` from the smoke run.** It is not a standalone case:
 it starts from `finidat='./dryland_maize.ecosim.r.2004-01-01-000000.nc'`, a

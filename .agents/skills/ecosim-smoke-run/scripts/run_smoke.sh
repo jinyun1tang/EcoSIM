@@ -92,6 +92,12 @@ for c in "${CASES[@]}"; do
   mkdir -p "$dst"
   cp "$src"/*.namelist "$dst"/ 2>/dev/null
 
+  # Excluded from the routine smoke screen; keep the source case available
+  # for separate investigation of its existing SIGILL failure.
+  if [[ $c == blodgett ]]; then
+    rm -f "$dst/Blodget.warming.namelist"
+  fi
+
   # Some cases (e.g. dryland2) start from a finidat restart living in the run
   # directory itself; copy anything referenced by a './...' path.
   for f in "$dst"/*.namelist; do

@@ -96,8 +96,9 @@ module TranspNoSaltMod
         trcs_mass_litr_beg(idg,NY,NX)=trcs_solml_vr(idg,0,NY,NX)
         trcs_mass_snow_beg(idg,NY,NX)=0._r8
         trcs_mass_soil_beg(idg,NY,NX)=0._r8
-        
-        DO L=1,nsnol_col(NY,NX)
+
+        ! First-snow tracer mass exists before SnowpackLayering updates nsnol.
+        DO L=1,JS
           trcs_mass_snow_beg(idg,NY,NX)=trcs_mass_snow_beg(idg,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO
         
@@ -166,7 +167,7 @@ module TranspNoSaltMod
 
         mass_litr = trcs_solml_vr(idg,0,NY,NX)
         mass_snow = 0._r8
-        DO L=1,nsnol_col(NY,NX)
+        DO L=1,JS
           mass_snow=mass_snow+trcg_solsml_snvr(idg,L,NY,NX)
         ENDDO        
 
@@ -210,7 +211,7 @@ module TranspNoSaltMod
             write(121,*)'mass sno,litr,soil       =',mass_snow,mass_litr,mass_soil
             write(121,*)'Delta mass sno, litr,soil=',mass_snow-trcs_mass_snow_beg(idg,NY,NX),mass_litr-trcs_mass_litr_beg(idg,NY,NX), &
               mass_soil-trcs_mass_soil_beg(idg,NY,NX)
-            write(121,*)'mass snow                =',trcg_solsml_snvr(idg,1:nsnol_col(NY,NX),NY,NX)  
+            write(121,*)'mass snow                =',trcg_solsml_snvr(idg,1:JS,NY,NX)
             write(121,*)'------------------------------------------------------------------------------'            
             write(121,*)'dif to litr              =',AtmGasDiff2Litr_flx_col(idg,NY,NX)
             write(121,*)'wet dep to litr.         =',Gas_WetDepo2Litr_col(idg,NY,NX)

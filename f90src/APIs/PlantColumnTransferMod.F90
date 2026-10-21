@@ -143,6 +143,17 @@ contains
     RootO2_TotSink_vr(L,NY,NX)                    = plt_bgcr%RootO2_TotSink_vr(L)
     trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L,NY,NX) =plt_rbgc%trcs_Soil2plant_uptake_vr(ids_beg:ids_end,L)
 
+    associate(RootSoilCO2Debt_vr => plt_rbgc%RootSoilCO2Debt_vr)
+      ! Materialize the predictor loan with equal aqueous mass and debt.
+      ! Adding debt alone would charge fixed transport/root uptake twice.
+      ! The pair leaves soil CO2 mass minus debt unchanged; normal transport
+      ! stages this obligation once and SubstrateDribbling repays/carries it.
+      ! The persistent dribble pool already participates in balances/restarts.
+      trcs_solml_vr(idg_CO2,L,NY,NX)=trcs_solml_vr(idg_CO2,L,NY,NX)+RootSoilCO2Debt_vr(L)
+      trcs_solml_drib_vr(idg_CO2,L,NY,NX)=trcs_solml_drib_vr(idg_CO2,L,NY,NX)+RootSoilCO2Debt_vr(L)
+      RootSoilCO2Debt_vr(L)=0._r8
+    end associate
+
     DO  K=1,jcplx
       tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L,NY,NX)=plt_bgcr%tRootMycoExud2Soil_vr(1:NumPlantChemElms,K,L)
     ENDDO

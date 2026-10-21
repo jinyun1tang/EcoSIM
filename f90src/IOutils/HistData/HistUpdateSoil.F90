@@ -8,7 +8,7 @@ submodule (HistDataType) HistUpdateSoil
   use EcoSiMParDataMod, only: micpar
   use EcoSIMCtrlMod, only: plant_model
   use MicrobialDataType, only: FermOXYI_vr, tRespGrossHeter_vr, tRespGrossHeterUlm_vr
-  use GridDataType, only: AREA_3D, CumDepz2LayBottom_vr, DLYR_3D, NU_col
+  use GridDataType, only: AREA_3D, CumDepz2LayBottom_vr, DLYR_3D, NU_col, NL_col
   use PlantDataRateType, only: idg_Ar, idg_CH4, idg_CO2, idg_H2, idg_N2, idg_N2O, idg_NH3, idg_O2, &
     idom_acetate, idom_beg, idom_doc, idom_don, idom_dop, idom_end, ids_H1PO4, ids_H1PO4B, ids_H2PO4, &
     ids_H2PO4B, ids_NH4, ids_NH4B, ids_NO2, ids_NO2B, ids_NO3, ids_NO3B, idx_H2PO4, idx_H2PO4B, idx_HPO4, &
@@ -42,6 +42,17 @@ contains
     real(r8) :: DVOLL
     real(r8) :: SOMC(jcplx)
     integer :: jj
+
+
+    ! Layer 0 is litter. Sum only active soil layers, excluding unused slots,
+    ! and convert cell-total C rates to rates per ground area exactly once.
+    this%h1D_RCH4ProdAcet_col(ncol)=(RCH4ProdAcetcl_vr(0,NY,NX) &
+      +SUM(RCH4ProdAcetcl_vr(NU_col(NY,NX):NL_col(NY,NX),NY,NX)))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+    this%h1D_RCH4ProdHG_col(ncol)=(RCH4ProdHydrog_vr(0,NY,NX) &
+      +SUM(RCH4ProdHydrog_vr(NU_col(NY,NX):NL_col(NY,NX),NY,NX)))/AREA_3D(3,NU_col(NY,NX),NY,NX)
+    this%h1D_RCH4Oxi_col(ncol)=(RCH4Oxi_aero_vr(0,NY,NX)+RCH4Oxi_anmo_vr(0,NY,NX) &
+      +SUM(RCH4Oxi_aero_vr(NU_col(NY,NX):NL_col(NY,NX),NY,NX)) &
+      +SUM(RCH4Oxi_anmo_vr(NU_col(NY,NX):NL_col(NY,NX),NY,NX)))/AREA_3D(3,NU_col(NY,NX),NY,NX)
 
       DO L=1,JZ
         call SumSolidOML(ielmc,L,NY,NX,SOMC)
