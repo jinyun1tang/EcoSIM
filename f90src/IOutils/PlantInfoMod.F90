@@ -818,6 +818,11 @@ implicit none
   RCS_pft(NZ,NY,NX)           = RCS_tab(loc)
   CuticleResist_pft(NZ,NY,NX) = CuticleResist_tab(loc)
 
+  if(ats_cpl_mode)then
+    irootType_pft(NZ,NY,NX)       = irootType_tab(loc)
+    CanopyHeightLive_pft(NZ,NY,NX) = CanopyHeightLive_tab(loc)
+  endif
+
   LeafBiomGrowthYld_pft(NZ,NY,NX)    = LeafBiomGrowthYld_tab(loc)
   PetolShethBiomGrowthYld_pft(NZ,NY,NX) = PetolShethBiomGrowthYld_tab(loc)
   StalkBiomGrowthYld_pft(NZ,NY,NX)   = StalkBiomGrowthYld_tab(loc)
@@ -1848,6 +1853,10 @@ implicit none
   call ncd_getvar(pft_nfid, 'CPGR', rPCGrain_tab)
   call ncd_getvar(pft_nfid, 'CPRT', rPCRootr_tab)
   call ncd_getvar(pft_nfid, 'CPND', rPCNoduler_tab)
+  if(ats_cpl_mode)then
+    call ncd_getvar(pft_nfid, 'IROOTJK', irootType_tab)
+    call ncd_getvar(pft_nfid, 'CANHT', CanopyHeightLive_tab)
+  endif
   call ncd_pio_closefile(pft_nfid)
   call PrintInfo('end '//subname)
   end Subroutine ReadPlantTraitTable

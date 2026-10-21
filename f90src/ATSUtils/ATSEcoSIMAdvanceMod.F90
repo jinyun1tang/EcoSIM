@@ -342,13 +342,13 @@ implicit none
     if (ldo_sp_mode) then
       DO NZ=1,num_pfts
         if (a_PFT(NZ,NY) .GT. 0.0) then
-            call root_canopy_mapping(a_PFT(NZ,NY), irootType_col(NY,NX), CanopyHeightLive_pft(NZ,NY,NX))
-            CanopyHeight_col(NY,NX) = CanopyHeightLive_pft(NZ,NY,NX)
-            tlai_day_pft(NZ,NY,NX) = a_LAI(NZ,NY)
-            tsai_day_pft(NZ,NY,NX) = a_SAI(NZ,NY)
+            tlai_day_pft(NZ,NY,NX) = a_LAI(NZ,NY)*AREA_3D(3, NU_col(NY,NX), NY, NX)
+            tsai_day_pft(NZ,NY,NX) = a_SAI(NZ,NY)*AREA_3D(3, NU_col(NY,NX), NY, NX)
             SnowOnCanopy_pft(NZ,NY,NX) = a_CanSnow(NZ,NY)
             SnowOnCanopy_col(NY,NX)    = SnowOnCanopy_col(NY,NX) + a_CanSnow(NZ,NY)
-            !iPlantRootProfile_pft(NZ,NY,NX) = 3 !plant type for holding capacity
+
+            irootType_col(NY,NX) = irootType_pft(NZ,NY,NX)
+            CanopyHeight_col(NY,NX) = CanopyHeightLive_pft(NZ,NY,NX)
             TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
         
             !Load the PFT array from ATS and fill the plant traits 
@@ -378,6 +378,14 @@ implicit none
             PSICanopy_pft(NZ,NY,NX)         = -2.0_r8
             PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
             PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+        else
+            !Empty PFT slot (zeros are packed at the end of a_PFT). NP_col still
+            !includes it, so mark it inactive (DATAPI=0) with no canopy or roots
+            DATAPI(NZ,NY,NX)               = 0
+            tlai_day_pft(NZ,NY,NX)         = 0._r8
+            tsai_day_pft(NZ,NY,NX)         = 0._r8
+            irootType_pft(NZ,NY,NX)        = 0
+            CanopyHeightLive_pft(NZ,NY,NX) = 0._r8
         endif
       enddo
     endif
@@ -482,9 +490,13 @@ implicit none
     !write(*,*) "dts_HeatWatTP: ", dts_HeatWatTP
     !surf_e_source(NY) = (HeatFlx2Grnd_col(NY,1)-HeatFlowSno2SoiByWat_col(NY,1)) / (column_area(NY))
     !surf_e_source(NY) = MIN(HeatFlx2Grnd_col(NY,1) / (column_area(NY)), surf_e_max)
-    flux_per_area = HeatFlx2Grnd_col(NY,1) / column_area(NY)
-    surf_e_source(NY) = SIGN(MIN(ABS(flux_per_area), surf_e_max), flux_per_area)
-
+    !EcoSIM advects heat with water as cpw*T*Q (T in K, zero at 0 K) while ATS
+    !internal energy is zero at TFice (IEM reference temperature, must match the
+    !ATS input). Shift the energy of the exported water Qinflx2Soil_col to the
+    !ATS reference, otherwise each m3 of infiltration adds ~cpw*273 MJ of heat.
+    flux_per_area = (HeatFlx2Grnd_col(NY,1) - cpw*TFice*Qinflx2Soil_col(NY,1)) / column_area(NY)
+    !surf_e_source(NY) = SIGN(MIN(ABS(flux_per_area), surf_e_max), flux_per_area)
+    surf_e_source(NY) = flux_per_area
     
     dTexp = surf_e_source(NY)/heat_capacity
     Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 
@@ -530,43 +542,5 @@ implicit none
   
   !end associate
   end subroutine RunEcoSIMSurfaceBalance
-  
-  subroutine root_canopy_mapping(plant_id, root_id, canopy_height)
-      implicit none
-  
-      ! Arguments
-      integer, intent(in)  :: plant_id
-      integer, intent(out) :: root_id
-      real(r8), intent(out) :: canopy_height
-      integer :: canopy_id
-  
-      !Needleleaf Evergreen
-      if (plant_id .EQ. 19.0_r8) then
-          root_id = 1
-          canopy_id = 5
-          canopy_height = 30.0_r8
-      else if (plant_id .EQ. 22.0_r8) then
-          root_id = 1
-          canopy_id = 4
-          canopy_height = 17.0_r8
-      else if (plant_id .EQ. 23.0_r8) then
-          root_id = 5
-          canopy_id = 4
-          canopy_height = 17.0_r8
-      else if (plant_id .EQ. 68.0_r8) then
-          root_id = 3
-          canopy_id = 3
-          canopy_height = 2.0_r8
-      else if (plant_id .EQ. 77.0_r8) then
-          root_id = 6
-          canopy_id = 2
-          canopy_height = 1.0_r8
-      else
-          root_id = 1
-          canopy_id = 1
-          canopy_height = 17.0_r8
-      end if
-  
-  end subroutine root_canopy_mapping
 
 end module ATSEcoSIMAdvanceMod
