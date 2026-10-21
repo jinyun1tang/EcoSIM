@@ -165,6 +165,8 @@ contains
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,continue_run,restart_out,lsoilCompaction,LMacPoreOff,use_ecosys_drainage,&
+    clm_hour_file_in,clm_day_file_in,soil_mgmt_in,soil_mgmt_use_model_year,forc_periods,NCYC_LITR,NCYC_SNOW,&
+    NPXS,NPYS,continue_run,restart_out,lsoilCompaction,LMacPoreOff,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
     snowRedist_model,disp_planttrait,iErosionMode,grid_mode,atm_ch4_fix,atm_n2o_fix,&
@@ -250,6 +252,7 @@ contains
   clm_hour_file_in   = ''
   clm_day_file_in    = ''
   soil_mgmt_in       = 'NO'
+  soil_mgmt_use_model_year = .false. ! legacy default; opt in for dated schedules
   atm_ghg_in         = ''
   aco2_ppm           = 280._r8
   ach4_ppm           = 1.144_r8
@@ -673,6 +676,7 @@ end subroutine regressiontest
     write(nu_cfg,*)'salt_model=',salt_model
     write(nu_cfg,*)'erosion_model=',erosion_model_status(iErosionMode)
     write(nu_cfg,*)'grid_mode=',GridConectionMode(grid_mode)
+    write(nu_cfg,*)'soil_mgmt_use_model_year=',soil_mgmt_use_model_year
     call relavu(nu_cfg)
   endif
   end subroutine write_modelconfig

@@ -29,6 +29,8 @@ module StartqMod
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
   public :: startq
+  public :: InitDimensionsandUptake
+  public :: InitPlantPhenoMorphoBio
   contains
 
   SUBROUTINE startq(NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q)

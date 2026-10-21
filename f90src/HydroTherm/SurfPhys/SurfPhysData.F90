@@ -36,6 +36,18 @@ implicit none
   real(r8),allocatable :: TEvapXAir2Toplay_col(:,:)
   real(r8),allocatable :: TEvapXAir2LitR_col(:,:)
   real(r8),allocatable :: TEvapXAir2Snow_col(:,:)
+  
+  !real(r8),allocatable :: HeatFlowSno2SoiByWat_col(:,:)
+  !real(r8),allocatable :: HeatConvFlxSno2Soi_col(:,:)
+  !real(r8),allocatable :: HeatCndFlxSno2Soi_col(:,:)
+  !real(r8),allocatable :: HeatConvFlxLitr2Soi_col(:,:)
+  !real(r8),allocatable :: HeatCndFlxLitr2Soi_col(:,:)
+
+  real(r8),allocatable :: HeatSensAir2Grnd_col(:,:)
+  real(r8),allocatable :: Radnet2Grnd_col(:,:)
+  real(r8),allocatable :: LatentHeatEvapAir2Grnd_col(:,:)
+  real(r8),allocatable :: HeatSensVapAir2Grnd_col(:,:)
+  
   real(r8),allocatable :: CdLitRHSens_col(:,:)            !conductance of sensible heat [MJ/K]
   real(r8),allocatable :: watflw(:,:)
   real(r8),allocatable :: waticefl(:,:)
@@ -84,9 +96,13 @@ implicit none
   allocate(TEvapXAir2Toplay_col(JY,JX)); TEvapXAir2Toplay_col   = 0._r8
   allocate(TEvapXAir2LitR_col(JY,JX)); TEvapXAir2LitR_col       = 0._r8
   allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
-  allocate(HeatSnow2LitrM_col(JY,JX)); HeatSnow2LitrM_col=0._r8
-  allocate(HeatAir2LitrM_col(JY,JX)); HeatAir2LitrM_col=0._r8
-  allocate(CdSoiHSens_col(JY,JX)); CdSoiHSens_col=0._r8
+  allocate(HeatSensAir2Grnd_col(JY,JX));    HeatSensAir2Grnd_col=0._r8
+  allocate(Radnet2Grnd_col(JY,JX));         Radnet2Grnd_col=0._r8
+  allocate(LatentHeatEvapAir2Grnd_col(JY,JX)); LatentHeatEvapAir2Grnd_col=0._r8
+  allocate(HeatSensVapAir2Grnd_col(JY,JX)); HeatSensVapAir2Grnd_col=0._r8
+  allocate(HeatSnow2LitrM_col(JY,JX));     HeatSnow2LitrM_col=0._r8
+  allocate(HeatAir2LitrM_col(JY,JX));      HeatAir2LitrM_col=0._r8
+  allocate(CdSoiHSens_col(JY,JX));         CdSoiHSens_col=0._r8
   end subroutine InitSurfPhysData  
 !------------------------------------------------------------------------------------------  
 
@@ -129,6 +145,10 @@ implicit none
   call destroy(Rain2LitR1_col)
   call destroy(FracAsExposedSoil_col)
 !  call destroy(HCNDLitr_col)  
+  call destroy(HeatSensAir2Grnd_col)
+  call destroy(Radnet2Grnd_col)
+  call destroy(LatentHeatEvapAir2Grnd_col)
+  call destroy(HeatSensVapAir2Grnd_col)
   end subroutine DestructSurfPhysData
 
 end module SurfPhysData
