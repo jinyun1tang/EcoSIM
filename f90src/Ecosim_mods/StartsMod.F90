@@ -137,7 +137,7 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      TempOffset_col(NY,NX)=fOFFSET(ATCS_col(NY,NX))
+      TempOffset_col(NY,NX)=f_microbe_TOffset(ATCS_col(NY,NX))
 
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
@@ -985,7 +985,7 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      TempOffset_col(NY,NX)=fOFFSET(ATCS_col(NY,NX))
+      TempOffset_col(NY,NX)=f_microbe_TOffset(ATCS_col(NY,NX))
 
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS

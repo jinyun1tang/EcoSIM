@@ -18,6 +18,7 @@ module HistDataType
   real(r8), pointer :: h1d_AcetMGC60cm_col(:)
   real(r8), pointer :: h1d_H2MGC60cm_col(:)
   real(r8), pointer :: h1d_FermC60cm_col(:)
+  real(r8), pointer :: h1D_Fermtation_col(:)
   real(r8), pointer :: h1d_AeroMOC60cm_col(:)
   real(r8), pointer :: h1d_AeroHRFungC60cm_col(:)
   real(r8), pointer :: h1d_AeroHRBactC60cm_col(:)

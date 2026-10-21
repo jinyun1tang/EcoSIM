@@ -412,7 +412,7 @@ module MicBGCMod
 !     222500,232500 high temp inactivation for growth,maintenance
 !     TSensGrowth,TSensMaintR=temperature function for growth,maintenance respiration
 ! the offset could be micobial guild/group specific
-  TKSO=real_truncate(TKS+TempOffset,1.e-3_r8)
+  TKSO=TKS+TempOffset
 
   call MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
 

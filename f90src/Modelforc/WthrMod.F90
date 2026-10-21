@@ -4,7 +4,7 @@ module WthrMod
   ! code to process the weather forcing
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use MiniMathMod,       only: safe_adb, vapsat0, isclose
-  use MiniFuncMod,       only: get_sun_declin
+  use MiniFuncMod,       only: get_sun_declin,f_microbe_TOffset
   use EcoSIMCtrlMod,     only: etimer, frectyp,fixClime, ats_cpl_mode
   use PlantMgmtDataType, only: NP_col
   use MiniMathMod,       only: AZMAX1
@@ -483,7 +483,7 @@ module WthrMod
           DTS                   = 0.5_r8*DTA
           ATCA_col(NY,NX)       = ATCAI_col(NY,NX)+DTA
           ATCS_col(NY,NX)       = ATCAI_col(NY,NX)+DTS
-          TempOffset_col(NY,NX) = 0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS_col(NY,NX))))
+          TempOffset_col(NY,NX) = f_microbe_TOffset(ATCS_col(NY,NX))
           DO NZ=1,NP_col(NY,NX)
             rPlantThermoAdaptZone_pft(NZ,NY,NX)=PlantInitThermoAdaptZone_pft(NZ,NY,NX)+0.30_r8/2.667_r8*DTA
             TempOffset_pft(NZ,NY,NX)=2.667*(2.5-rPlantThermoAdaptZone_pft(NZ,NY,NX))
