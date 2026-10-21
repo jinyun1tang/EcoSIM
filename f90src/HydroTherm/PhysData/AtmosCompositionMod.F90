@@ -1,8 +1,7 @@
 module AtmosCompositionMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
-  use ClimForcDataType, only: PBOT_col,TairKClimMean_col,CCO2EI_gperm3_col,AtmGasCgperm3_col, &
-    CO2EI_col,CO2E_col,CH4E_col,OXYE_col,Z2GE_col,Z2OE_col,ARGE_col,ZNH3E_col,H2GE_col
-  use TracerIDMod, only: idg_CO2,idg_CH4,idg_O2,idg_N2,idg_N2O,idg_AR,idg_NH3,idg_H2,idg_NH3B
+  use ClimForcDataType
+  use TracerIDMod
   use EcosimConst, only: Tref
   use DebugToolMod, only: PrintInfo
   implicit none
@@ -28,6 +27,7 @@ contains
         else
           tPBOT=PBOT_col(NY,NX)/1.01325E+02_r8
         endif
+
         tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
         CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
 

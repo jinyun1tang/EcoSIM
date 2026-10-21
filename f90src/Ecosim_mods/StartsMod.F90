@@ -104,6 +104,7 @@ module StartsMod
   !     OF EACH GRID CELL
   !
   call InitAccumulators()
+
   call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS)
 
 ! this assumes the whole landscape is a grid

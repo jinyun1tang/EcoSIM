@@ -14,6 +14,7 @@ module RestartMod
   use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy,iulog
+  use UnitMod           , only : units
   use HistFileMod       , only : hist_restart_ncd  
   use NumericalAuxMod
   use EcoSIMCtrlDataType  
@@ -5068,6 +5069,9 @@ implicit none
   integer :: ndoms, feedback_varid
   type(var_desc_t) :: feedback_vardesc
   logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
+  integer :: clim_mean_varid
+  type(var_desc_t) :: clim_mean_vardesc
+  logical :: has_clim_mean_temp
   logical :: has_fertP_soil,has_fertP_band
   logical :: has_gpp_day_sum,has_gpp_prev_day,has_gpp_day_hours
   integer :: salt_boundary_varid
@@ -6653,6 +6657,26 @@ implicit none
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)      
+  endif
+
+  ! Preserve the climatological temperature used for atmospheric gas densities.
+  ! Legacy checkpoints predate this field; recover the same site-input mean
+  ! used by STARTS instead of retaining an uninitialized Kelvin temperature.
+  has_clim_mean_temp=.true.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'TairKClimMean_col',clim_mean_varid,clim_mean_vardesc,readvar=has_clim_mean_temp)
+    if(.not.has_clim_mean_temp)then
+      TairKClimMean_col(NVN:NVS,NHW:NHE)=units%Celcius2Kelvin(ATCAI_col(NVN:NVS,NHW:NHE))
+    endif
+
+  endif
+  if(has_clim_mean_temp)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TairKClimMean_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='TairKClimMean_col', dim1name='column',&
+      long_name='Mean annual air temperature', units='K', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,TairKClimMean_col,datrc_1d)
   endif
 
   ! Preserve the paired hourly feedback history. Legacy restarts start with

@@ -311,6 +311,7 @@ module readiMod
       AltitudeLandscape_col(NY,NX)     = ALTIG
       PBOT_col(NY,NX)                  = PBOT_col(NY,NX)*exp(-AltitudeLandscape_col(NY,NX)/hpresc)
       ATCAI_col(NY,NX)                 = ATCAG
+      TairKClimMean_col(NY,NX)         = ATCAG+273.15_r8
       IDWaterTable_col(NY,NX)          = iWaterTabelMode
       OXYE_col(NY,NX)                  = ao2_ppm
       Z2GE_col(NY,NX)                  = an2_ppm
