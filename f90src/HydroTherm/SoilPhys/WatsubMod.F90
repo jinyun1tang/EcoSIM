@@ -6,7 +6,6 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
-  use HydrologyDiagMod, only: DiagFrozenBoundary
   use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange, &
     RebuildSoilFaceMap,DestroySoilFaceMap
   use data_kind_mod,     only: r8 => DAT_KIND_R8
@@ -65,6 +64,7 @@ module WatsubMod
 
   public :: watsub,InitWatsub
   public :: DestroyWatsub
+  public :: ExitSoilHydroUpdate
   contains
 !------------------------------------------------------------------------------------------
   subroutine InitWatsub
@@ -169,10 +169,70 @@ module WatsubMod
 
   ENDDO D3320
 
-  call DiagFrozenBoundary(NHW,NHE,NVN,NVS)
+  call ExitSoilHydroUpdate(NHW,NHE,NVN,NVS)
 
   call PrintInfo('end '//subname)
   END subroutine watsub
+!------------------------------------------------------------------------------------------
+
+  subroutine ExitSoilHydroUpdate(NHW,NHE,NVN,NVS)
+  ! Diagnose the frozen boundary from the final hydrology solution, then commit
+  ! water, ice and temperature states and update surface PAR for later processes.
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NX,NY,L
+  logical :: found_frozen
+  real(r8) :: VLSoilPoreMicPX
+  character(len=*), parameter :: subname='ExitSoilHydroUpdate'
+
+  call PrintInfo('beg '//subname)
+  !diagnose surface ice
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+
+      ! Without a frozen barrier, ebullition must scan upward from the current
+      ! bottom layer. Reset here to avoid zero at startup or a stale thawed barrier.
+      NLF_col(NY,NX)=NL_col(NY,NX)
+      found_frozen=.false.
+      DO L=NUM_col(NY,NX),NL_col(NY,NX)
+        VLSoilPoreMicPX       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+        ! Macropore volume is already pore space; porosity applies only to the
+        ! micropore-domain soil volume.
+        VOLTX_vr(L,NY,NX) = POROS_vr(L,NY,NX)*VLSoilPoreMicPX+VLMacroPores_vr(L,NY,NX)
+        IF(VOLTX_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          ThetaICEZ_vr(L,NY,NX) = AZMAX1(AMIN1(1._r8, &
+            (VLiceMicP1_vr(L,NY,NX)+AMIN1(VLMacroPores_vr(L,NY,NX), &
+            VLiceMacP1_vr(L,NY,NX)))/VOLTX_vr(L,NY,NX)))
+        ELSE
+          ThetaICEZ_vr(L,NY,NX)=0._r8
+        ENDIF
+        if(ThetaICEZ_vr(L,NY,NX)>0.9_r8 .and. .not. found_frozen)then
+          found_frozen=.true.
+          NLF_col(NY,NX)=L
+        endif
+        !micropore water change due to freeze-thaw:=final-initial
+        DVLiceMicP_vr(L,NY,NX)       = VLiceMicP1_vr(L,NY,NX)+VLiceMacP1_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX)
+
+        TKS_vr(L,NY,NX)        = TKSoil1_vr(L,NY,NX)
+        VLWatMicP_vr(L,NY,NX)  = VLWatMicP1_vr(L,NY,NX)
+        VLWatMicPX_vr(L,NY,NX) = VLWatMicPX1_vr(L,NY,NX)
+        VLiceMicP_vr(L,NY,NX)  = VLiceMicP1_vr(L,NY,NX)
+        VLWatMacP_vr(L,NY,NX)  = VLWatMacP1_vr(L,NY,NX)
+        VLiceMacP_vr(L,NY,NX)  = VLiceMacP1_vr(L,NY,NX)
+      ENDDO
+
+      DO L=NU_col(NY,NX),NUM_col(NY,NX)-1
+        DVLiceMicP_vr(L,NY,NX) = VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
+      ENDDO
+      !PAR radiation to Soil surface
+      RadPAR2Soil_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfBareSoil_col(NY,NX)
+      !PAR radiation to litter surface
+      RadPAR2LitR_col(NY,NX) = RadPARGrnd_col(NY,NX)*FracSurfSnoFree_col(NY,NX)*FracSurfByLitR_col(NY,NX)
+
+    ENDDO
+  ENDDO
+  call PrintInfo('end '//subname)
+  end subroutine ExitSoilHydroUpdate
 
 !------------------------------------------------------------------------------------------  
 
