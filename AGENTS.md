@@ -75,7 +75,10 @@ take precedence over repository guidance.
   instead of direct derived-type component references such as
   `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
   block or introduce one when needed; component references belong in the
-  association declarations.
+  association declarations. Exception: when adding history-output variables,
+  avoid `associate` aliases and use direct history components such as
+  `this%h1D_variable_col` in allocation, registration, and update code, following
+  the surrounding history-output conventions.
 - Keep edits focused. Do not hand-edit generated build files or modify dependency
   submodules unless that is part of the requested work.
 - Treat `ecosim-agent` changes as submodule changes, separate from root-repository
