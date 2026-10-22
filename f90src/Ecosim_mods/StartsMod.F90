@@ -139,7 +139,6 @@ module StartsMod
 !     ATCS=mean annual soil temperature (OC)
 !
       TempOffset_col(NY,NX)=f_microbe_TOffset(ATCS_col(NY,NX))
-
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
