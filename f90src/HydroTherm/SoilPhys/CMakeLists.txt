@@ -8,6 +8,7 @@ include(add_ecosim_library)
 add_ecosim_library(SoilPhys ${SOILPHYS_SOURCES})
 
 target_include_directories(SoilPhys  PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/ModelDiags/
   ${CMAKE_BINARY_DIR}/f90src/Utils/
   ${CMAKE_BINARY_DIR}/f90src/Minimath/
   ${CMAKE_BINARY_DIR}/f90src/Mesh/

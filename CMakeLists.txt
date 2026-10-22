@@ -42,8 +42,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 #option(TPL_NETCDF_LIBRARIES "List of absolute paths to netcdf link libraries [].")
 #option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directories [].")
 
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/local CACHE PATH "" FORCE)
+# LANGUAGES NONE may leave the install prefix unset until languages are enabled
+# below. Also replace /usr/local cached by older configurations, so repeated
+# build_EcoSIM.sh runs install locally. Preserve other custom install prefixes.
+if (NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT
+    OR CMAKE_INSTALL_PREFIX STREQUAL "" OR CMAKE_INSTALL_PREFIX STREQUAL "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "${PROJECT_BINARY_DIR}/local" CACHE PATH "EcoSIM installation directory" FORCE)
 endif()
 
 ## JDM: Not sure why we need this at all - is it used in running tests?

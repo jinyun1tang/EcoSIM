@@ -560,6 +560,7 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
+  real(r8) :: DrySnowWE,DrySnowVol
 
   integer :: IFLGLS,idn,idg,idsalt
   integer, parameter :: inochange=0
@@ -644,6 +645,13 @@ implicit none
 !
 !     TARGET SNOW LAYER
 !         volume/mass
+          ! Relayering preserves dry-snow bulk volume; compression is separate.
+          DrySnowWE = VLDrySnoWE_snvr(L1,NY,NX)+FX*VLDrySnoWE_snvr(L0,NY,NX)
+          DrySnowVol = VLDrySnoWE_snvr(L1,NY,NX)/SnoDens_snvr(L1,NY,NX) &
+            +FX*VLDrySnoWE_snvr(L0,NY,NX)/SnoDens_snvr(L0,NY,NX)
+          if(DrySnowVol>0._r8)then
+            SnoDens_snvr(L1,NY,NX)=DrySnowWE/DrySnowVol
+          endif
           VLDrySnoWE_snvr(L1,NY,NX)   = VLDrySnoWE_snvr(L1,NY,NX)+FX*VLDrySnoWE_snvr(L0,NY,NX)
           VLWatSnow_snvr(L1,NY,NX)    = VLWatSnow_snvr(L1,NY,NX)+FX*VLWatSnow_snvr(L0,NY,NX)
           VLIceSnow_snvr(L1,NY,NX)    = VLIceSnow_snvr(L1,NY,NX)+FX*VLIceSnow_snvr(L0,NY,NX)
@@ -739,7 +747,7 @@ implicit none
       VLHeatCapSnow_snvr(L,NY,NX) = 0._r8
       SnoDens_snvr(L,NY,NX)       = NewSnowDens_col(NY,NX)
     endif
-    if(VLHeatCapSnow_snvr(L,NY,NX)<ZEROS(NY,NX))then
+    if(VLHeatCapSnow_snvr(L,NY,NX)<=0._r8)then
       if(L>1)then
         TKSnow_snvr(L,NY,NX)=spval
       else
@@ -747,15 +755,25 @@ implicit none
       endif
     endif
 
-    !move up to handel loss of surface layer, this should rarely occur, but round off error may trigger it
-    if(L>1 .and. VLHeatCapSnow_snvr(L,NY,NX)>=ZEROS(NY,NX))then
-      if (TKSnow_snvr(L-1,NY,NX)==spval)then
-        VLDrySnoWE_snvr(L-1,NY,NX)    = VLDrySnoWE_snvr(L,NY,NX)
-        VLWatSnow_snvr(L-1,NY,NX)     = VLWatSnow_snvr(L,NY,NX)
-        VLIceSnow_snvr(L-1,NY,NX)     = VLIceSnow_snvr(L,NY,NX)
-        VLHeatCapSnow_snvr(L-1,NY,NX) = VLHeatCapSnow_snvr(L,NY,NX)
-        TKSnow_snvr(L-1,NY,NX)        = TKSnow_snvr(L,NY,NX)
-        SnoDens_snvr(L-1,NY,NX)       = SnoDens_snvr(L,NY,NX)
+  ENDDO
+
+  ! Keep occupied layers contiguous from the surface for tracer transport.
+  ! A positive store remains occupied even below the heat-solver threshold.
+  ! Residual chemicals in an empty destination remain with the incoming snow.
+  DO L=2,JS
+    if(VLHeatCapSnow_snvr(L,NY,NX)>0._r8)then
+      L1=1
+      do while(L1<L)
+        if(VLHeatCapSnow_snvr(L1,NY,NX)<=0._r8)exit
+        L1=L1+1
+      enddo
+      if(L1<L)then
+        VLDrySnoWE_snvr(L1,NY,NX)    = VLDrySnoWE_snvr(L,NY,NX)
+        VLWatSnow_snvr(L1,NY,NX)     = VLWatSnow_snvr(L,NY,NX)
+        VLIceSnow_snvr(L1,NY,NX)     = VLIceSnow_snvr(L,NY,NX)
+        VLHeatCapSnow_snvr(L1,NY,NX) = VLHeatCapSnow_snvr(L,NY,NX)
+        TKSnow_snvr(L1,NY,NX)        = TKSnow_snvr(L,NY,NX)
+        SnoDens_snvr(L1,NY,NX)       = SnoDens_snvr(L,NY,NX)
 
         VLDrySnoWE_snvr(L,NY,NX)    = 0._r8
         VLWatSnow_snvr(L,NY,NX)     = 0._r8
@@ -765,28 +783,48 @@ implicit none
         SnoDens_snvr(L,NY,NX)       = NewSnowDens_col(NY,NX)
 
         DO idg=idg_beg,idg_NH3
-          trcg_solsml_snvr(idg,L-1,NY,NX) = trcg_solsml_snvr(idg,L,NY,NX)
+          trcg_solsml_snvr(idg,L1,NY,NX) = trcg_solsml_snvr(idg,L1,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)
           trcg_solsml_snvr(idg,L,NY,NX)   = 0._r8
         ENDDO
         DO idn=ids_nut_beg,ids_nuts_end
-          trcn_solsml_snvr(idn,L-1,NY,NX) = trcn_solsml_snvr(idn,L,NY,NX)
+          trcn_solsml_snvr(idn,L1,NY,NX) = trcn_solsml_snvr(idn,L1,NY,NX)+trcn_solsml_snvr(idn,L,NY,NX)
           trcn_solsml_snvr(idn,L,NY,NX)   = 0._r8
         ENDDO
 
         IF(salt_model)THEN
           DO idsalt=idsalt_beg,idsalt_end
-            trcSalt_ml_snvr(idsalt,L-1,NY,NX) = trcSalt_ml_snvr(idsalt,L,NY,NX)
+            trcSalt_ml_snvr(idsalt,L1,NY,NX) = trcSalt_ml_snvr(idsalt,L1,NY,NX)+trcSalt_ml_snvr(idsalt,L,NY,NX)
             trcSalt_ml_snvr(idsalt,L,NY,NX)   = 0._r8
           ENDDO
         ENDIF
       endif
     endif
   ENDDO
+
+  ! Rebuild geometry and diagnostics from the final layer order.
+  nsnol_col(NY,NX)=0
+  DO L=1,JS
+    VLSnoDWIprev_snvr(L,NY,NX) = VLDrySnoWE_snvr(L,NY,NX)/SnoDens_snvr(L,NY,NX) &
+      +VLWatSnow_snvr(L,NY,NX)+VLIceSnow_snvr(L,NY,NX)
+    SnowThickL_snvr(L,NY,NX) = VLSnoDWIprev_snvr(L,NY,NX)/AREA_3D(3,L,NY,NX)
+    cumSnowDepz_col(L,NY,NX) = cumSnowDepz_col(L-1,NY,NX)+SnowThickL_snvr(L,NY,NX)
+    if(TKSnow_snvr(L,NY,NX)/=spval)then
+      TCSnow_snvr(L,NY,NX)=units%Kelvin2Celcius(TKSnow_snvr(L,NY,NX))
+    else
+      TCSnow_snvr(L,NY,NX)=spval
+    endif
+    if(VLHeatCapSnow_snvr(L,NY,NX)>0._r8)then
+      nsnol_col(NY,NX)=nsnol_col(NY,NX)+1
+    endif
+  ENDDO
+  VcumSnoDWI_col(NY,NX) = sum(VLSnoDWIprev_snvr(1:JS,NY,NX))
+  SnowDepth_col(NY,NX)  = sum(SnowThickL_snvr(1:JS,NY,NX))
 !  if(I==19 .and. I>=10)write(115,*)I*1000+J,'nsnol_beg_col',nsnol_beg_col,nsnol_col(NY,NX),trcs_solml_vr(idg_O2,0,NY,NX),&
 !    trcg_solsml_snvr(idg_O2,1,NY,NX)
-  if(nsnol_beg_col>0 .and. nsnol_col(NY,NX)==0)then
-    !add all tracers to litter layer
-    DO L=1,nsnol_beg_col
+  if(nsnol_col(NY,NX)==0)then
+    ! Include residual tracers in empty slots beyond the former active count.
+    ! Add all tracers to the litter layer.
+    DO L=1,JS
       DO idg=idg_beg,idg_NH3
         if(trcg_solsml_snvr(idg,L,NY,NX)>0._r8)then
           trcs_solml_vr(idg,0,NY,NX)       = trcs_solml_vr(idg,0,NY,NX)+trcg_solsml_snvr(idg,L,NY,NX)

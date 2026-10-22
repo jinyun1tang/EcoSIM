@@ -50,6 +50,11 @@ contains
     allocate(this%h1d_RCO2Ht30cm_col(beg_col:end_col)); this%h1d_RCO2Ht30cm_col(:)=spval
   endif
 
+  ! Whole-column methane rates are available independently of ML diagnostics.
+  allocate(this%h1d_RCH4ProdAcet_col(beg_col:end_col),source=spval)
+  allocate(this%h1d_RCH4ProdHG_col(beg_col:end_col),source=spval)
+  allocate(this%h1D_RCH4Oxi_col(beg_col:end_col),source=spval)
+
   allocate(this%h1D_cumFIRE_CO2_col(beg_col:end_col)) ;this%h1D_cumFIRE_CO2_col(:)=spval
   allocate(this%h1D_cumFIRE_CH4_col(beg_col:end_col)) ;this%h1D_cumFIRE_CH4_col(:)=spval
   allocate(this%h1D_cNH4_LITR_col(beg_col:end_col)) ;this%h1D_cNH4_LITR_col(:)=spval

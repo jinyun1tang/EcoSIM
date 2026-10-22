@@ -13,6 +13,7 @@ module ClimReadMod
   use EcoSIMCtrlMod
   use EcoSIMConfig
   use UnitMod, only : units
+  use DebugToolMod, only : PrintInfo
 implicit none
   private
 
@@ -43,7 +44,7 @@ implicit none
   end type atm_forc_type
   public :: ReadClim
   public :: ReadClimNC    !read climate data
-  public :: GetAtmGts
+  public :: ReadAtmosComposition
   public :: get_clm_years
   public :: read_soil_warming_Tref
   contains
@@ -921,9 +922,9 @@ implicit none
   end subroutine reshape1
 
 
-!----------------------------------------------------------------------
+!------------------------------------------------------------------------------------------
 
-  subroutine GetAtmGts(yeari,NHW,NHE,NVN,NVS)
+  subroutine ReadAtmosComposition(yeari,NHW,NHE,NVN,NVS)
   !
   !DESCRIPTION
   !read in atmospheric concentrations for CO2, CH4, and N2O
@@ -939,6 +940,9 @@ implicit none
   real(r8) :: year0,yearN
   character(len=512) :: msg
   INTEGER :: NY,NX,K
+  character(len=*), parameter :: subname='ReadAtmosComposition'
+
+  call PrintInfo('beg '//subname)
 
   call ncd_pio_openfile(atm_ghg_nfid, atm_ghg_in, ncd_nowrite)
 
@@ -949,12 +953,12 @@ implicit none
     call ncd_getvar(atm_ghg_nfid,'year',1,year0)
     call ncd_getvar(atm_ghg_nfid,'year',ntime,yearN)
     if(nint((year0-int(year0))*12._r8)/=1)then
-      call endrun('GetAtmGts: first record of '//trim(atm_ghg_in)// &
+      call endrun(subname//': first record of '//trim(atm_ghg_in)// &
         ' is not January (expect year stamp = calendar_year+1/12)',__LINE__)
     endif
     iyear=(yeari-int(year0))*12
     if(iyear<0 .or. iyear+12>ntime)then
-      write(msg,'(A,I0,A,I0,A,I0,A)')'GetAtmGts: requested year ',yeari, &
+      write(msg,'(A,I0,A,I0,A,I0,A)')subname//': requested year ',yeari, &
         ' is outside the full-year coverage ',int(year0),'-',nint(yearN)-1,' of'
       call endrun(trim(msg)//' '//trim(atm_ghg_in),__LINE__)
     endif
@@ -992,10 +996,11 @@ implicit none
       Z2OE_col(NY,NX) =atm_n2o_mon(1)*1.e-3_r8  !ppb to ppm
     ENDDO
   ENDDO
-  end subroutine GetAtmGts
+  call PrintInfo('end '//subname)
+  end subroutine ReadAtmosComposition
 
 
-!-----------------------------------------------------------------------
+!------------------------------------------------------------------------------------------
   subroutine get_clm_years()
   !Description  
   !obtain the forcing year

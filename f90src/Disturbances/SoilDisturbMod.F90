@@ -6,6 +6,8 @@ module SoilDisturbMod
   use minimathmod, only : safe_adb
   use EcoSiMParDataMod, only : micpar
   use MiniFuncMod,    only: gOC_to_m3_OM
+  use EcoSIMCtrlMod,  only: plantOM4Heat
+  use RootDataType,   only: RootMycoMassElm_vr
   use EcoSIMConfig,  only : NumMicbAFunGrupsPerCmplx,NumMicbHFunGrupsPerCmplx  
   use DebugToolMod
   use MicrobialDataType  
@@ -52,7 +54,7 @@ module SoilDisturbMod
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
-  real(r8) :: HFLXD
+  real(r8) :: HFLXD,rootC
   real(r8) :: ONX
   REAL(R8) :: OPX,OCA,OAH
   real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
@@ -326,6 +328,12 @@ module SoilDisturbMod
           OMelm(ielmn)=OMelm(ielmn)+DCORPC*(trcs_solml_vr(ids_NH4,L,NY,NX)+trcs_solml_vr(idg_NH3,L,NY,NX) &
             +trcs_solml_vr(ids_NO3,L,NY,NX)+trcs_solml_vr(ids_NO2,L,NY,NX))
           OMelm(ielmp)=OMelm(ielmp)+DCORPC*(trcs_solml_vr(ids_H1PO4,L,NY,NX)+trcs_solml_vr(ids_H2PO4,L,NY,NX))
+          ! Record the elemental mass exported from the molar pools below.
+          OMelm(ielmn)=OMelm(ielmn)+DCORPC*natomw*(trcx_solml_vr(idx_NH4,L,NY,NX) &
+            +SUM(FertN_mole_soil_vr(ifertn_beg:ifertn_end,L,NY,NX)))
+          OMelm(ielmp)=OMelm(ielmp)+DCORPC*patomw*(trcp_saltpml_vr(idsp_AlPO4,L,NY,NX) &
+            +trcp_saltpml_vr(idsp_FePO4,L,NY,NX)+trcp_saltpml_vr(idsp_CaHPO4,L,NY,NX) &
+            +2._r8*trcp_saltpml_vr(idsp_CaH4P2O8,L,NY,NX)+3._r8*trcp_saltpml_vr(idsp_Apatite,L,NY,NX))
           
           DCORPC1=1.0_r8-DCORPC
 
@@ -346,16 +354,23 @@ module SoilDisturbMod
         ENDIF
         SoilOrgM_vr(1:NumPlantChemElms,L,NY,NX)=dOMelm(1:NumPlantChemElms)
         
-        IF(L.EQ.0)THEN
-          HFLXD        = 4.19E-06_r8*(ORGCX_vr(L,NY,NX)-SoilOrgM_vr(ielmc,L,NY,NX))*TKS_vr(L,NY,NX)
-          HeatOut_lnds = HeatOut_lnds+HFLXD
-        ENDIF
+        ! Export sensible heat with the actual organic C withdrawn by this
+        ! event, using the same capacity law as the remaining organic matter.
+        ! ORGCX is an earlier hourly snapshot and includes other C changes.
+        ! This accounts for carried sensible heat, not combustion heat release.
+        HFLXD        = cpo*gOC_to_m3_OM(OMelm(ielmc))*TKS_vr(L,NY,NX)
+        HeatOut_lnds = HeatOut_lnds+HFLXD
         IF(L.EQ.0)then
           VHeatCapacity_vr(0,NY,NX)=cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)+cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,L,NY,NX))
         else
           VHeatCapSolidSoil_vr(L,NY,NX) = VHeatCapMineralSoil_vr(L,NY,NX)+cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,L,NY,NX))
-          VHeatCapacity_vr(L,NY,NX)     = VHeatCapMineralSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
+          VHeatCapacity_vr(L,NY,NX)     = VHeatCapSolidSoil_vr(L,NY,NX)+cpw*(VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX)) &
             +cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
+          ! Roots are separate from the soil organic pools removed above.
+          if(plantOM4Heat .and. VHeatCapacity_vr(L,NY,NX)>0._r8)then
+            rootC=sum(RootMycoMassElm_vr(ielmc,:,L,NY,NX))
+            VHeatCapacity_vr(L,NY,NX)=VHeatCapacity_vr(L,NY,NX)+cpo*gOC_to_m3_OM(rootC)
+          endif
         endif    
 
         IF(iSoilDisturbType_col(I,NY,NX).EQ.itill_rmlitr)THEN

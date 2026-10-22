@@ -14,6 +14,7 @@ target_include_directories(Salt  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/DebugTools/  
   ${CMAKE_BINARY_DIR}/f90src/Ecosim_datatype/
   ${CMAKE_BINARY_DIR}/f90src/IOutils/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/  
   ${CMAKE_BINARY_DIR}/f90src/APIs/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/

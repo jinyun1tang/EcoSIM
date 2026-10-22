@@ -141,14 +141,16 @@ implicit none
   endif
   end function fDiffusivitySolutEff
 !------------------------------------------------------------------------------------------
-  pure function fOFFSET(atcs)result(ans)
+  pure function f_microbe_TOffset(atcs)result(ans)
+  !
+  !computing the temeprature offset for microbial activity
   implicit none
   real(r8), intent(in) :: atcs   !mean annual soil temperature, [oC]
   real(r8) :: ans
 
   ans=0.333_r8*(12.5_r8-AMAX1(0.0_r8,AMIN1(25.0_r8,ATCS)))
 
-  end function fOFFSET
+  end function f_microbe_TOffset
 
 !------------------------------------------------------------------------------------------
   function GetDayLength(ALAT,I,DECLIN)result(DYL)

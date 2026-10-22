@@ -301,20 +301,32 @@ contains
   call hist_addfld1d(fname='NO3redux_litr_col',units='gN/m2/h',avgflag='A',&
     long_name='Denitrifier NO3(-) to NO2(-) reduction rate in litter layer',ptr_col=data1d_ptr)
 
+  data1d_ptr => this%h1D_RCH4ProdAcet_col(beg_col:end_col)
+  call hist_addfld1d(fname='CH4Prod_Acet_col',units='gC/m2/h',avgflag='A',&
+    long_name='Acetoclastic CH4 production integrated over soil and surface litter',ptr_col=data1d_ptr)
+
+  data1d_ptr => this%h1D_RCH4ProdHG_col(beg_col:end_col)
+  call hist_addfld1d(fname='CH4Prod_HG_col',units='gC/m2/h',avgflag='A',&
+    long_name='Hydrogenotrophic CH4 production integrated over soil and surface litter',ptr_col=data1d_ptr)
+
+  data1d_ptr => this%h1D_RCH4Oxi_col(beg_col:end_col)
+  call hist_addfld1d(fname='CH4Oxi_col',units='gC/m2/h',avgflag='A',&
+    long_name='Aerobic plus anaerobic CH4 oxidation integrated over soil and surface litter',ptr_col=data1d_ptr)
+
   data1d_ptr => this%h1D_RCH4Oxi_aero_col(beg_col:end_col)
-  call hist_addfld1d(fname='RCH4Oxi_aero_col',units='gC/m2/h',avgflag='A',&
+  call hist_addfld1d(fname='CH4Oxi_aero_col',units='gC/m2/h',avgflag='A',&
     long_name='Aerobic CH4 oxidation integrated over all layers',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_RCH4Oxi_anmo_col(beg_col:end_col)
-  call hist_addfld1d(fname='RCH4Oxi_anmo_col',units='gC/m2/h',avgflag='A',&
+  call hist_addfld1d(fname='CH4Oxi_anmo_col',units='gC/m2/h',avgflag='A',&
     long_name='Anaerobic CH4 oxidation integrated over all layers',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_RCH4ProdHydrog_litr_col(beg_col:end_col)
-  call hist_addfld1d(fname='RCH4ProdHg_litr_col',units='gC/m2/h',avgflag='A',&
+  call hist_addfld1d(fname='CH4Prod_HG_litr_col',units='gC/m2/h',avgflag='A',&
     long_name='Hydrogenotrophic CH4 produciton in litter layer',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_RCH4ProdAcetcl_litr_col(beg_col:end_col)
-  call hist_addfld1d(fname='RCH4ProdAcet_litr_col',units='gC/m2/h',avgflag='A',&
+  call hist_addfld1d(fname='CH4Prod_Acet_litr_col',units='gC/m2/h',avgflag='A',&
     long_name='Acetoclastic CH4 produciton in litter layer',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_tDOP_soil_col(beg_col:end_col)

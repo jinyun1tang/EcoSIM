@@ -226,7 +226,7 @@ implicit none
     call ncd_putvar(ncf,'PSIMD',LOGPSIMND_col(NY,NX))
     call ncd_putvar(ncf,'PSIMS',LOGPSIAtSat(NY,NX))
     call ncd_putvar(ncf,'PSISD',LOGPSIMXD_col(NY,NX))
-    call ncd_putvar(ncf,'PSISE',PSISE_vr(L,NY,NX))
+    call ncd_putvar(ncf,'PSISE',PSI_at_Sautration_vr(L,NY,NX))
     call ncd_putvar(ncf,'DLYR3',DLYR_3D(3,L,NY,NX))
     call ncd_putvar(ncf,'CEC',CEC_vr(L,NY,NX))
     call ncd_putvar(ncf,'XCEC',trcx_solml_vr(idx_CEC,L,NY,NX))

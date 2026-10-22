@@ -598,7 +598,7 @@ module UptakesMod
   )
   call PrintInfo('beg '//subname)
 
-    WRITE(*,9999)iYearCurrent,yearIJ%I,yearIJ%J,NZ
+    WRITE(iulog,9999)iYearCurrent,yearIJ%I,yearIJ%J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
 
     IF(DIFF.GT.0.5_r8)THEN
@@ -1220,7 +1220,7 @@ module UptakesMod
     MRootLumenArea_pvr          => plt_morph%MRootLumenArea_pvr              ,& !input  :medium roots lumen area, [m2]
     VLWatMicPM_vr               => plt_site%VLWatMicPM_vr                    ,& !input  :soil micropore water content, [m3 d-2]
     ZERO                        => plt_site%ZERO                             ,& !input  :threshold zero for numerical stability, [-]
-    RootFineFrac2Med_rpvr        => plt_morph%RootFineFrac2Med_rpvr            ,& !fine-axis-count-weighted medium-root routing by category, [-]
+    RootFineFrac2Med_rpvr       => plt_morph%RootFineFrac2Med_rpvr           ,& !fine-axis-count-weighted medium-root routing by category, [-]
     ZERO4Groth_pft              => plt_biom%ZERO4Groth_pft                   ,& !input  :threshold zero for plang growth calculation, [-]
     ZEROS2                      => plt_site%ZEROS2                           ,& !input  :threshold zero for numerical stability,[-]
     CdH2ORootxSoil_pft          => plt_ew%CdH2ORootxSoil_pft                 ,& !output :total root and soil conductance for plant root water uptake, [mH2O h-1 d-2 MPa-1]
@@ -1301,13 +1301,9 @@ module UptakesMod
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
         FRAD1 = AZMAX1(CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._r8)
-        write(*,*) "FRAD1: ", FRAD1
-        write(*,*) "  CRootLumenArea_pvr: ", CRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
+
         FRADM = AZMAX1(MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._R8)
-        write(*,*) "FRADM: ", FRADM
-        write(*,*) "  MRootLumenArea_pvr: ", MRootLumenArea_pvr(L,NZ)
-        write(*,*) "  RootSingleVesselArea_pft: ", RootSingleVesselArea_pft(NZ)
+
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
@@ -1315,11 +1311,6 @@ module UptakesMod
         endif
         StalkAxialResist            = AZMAX1(StalkAxialResist_pft(NZ)*CanopyHeight4WatUptake_pft(NZ)/(FRADW*Root1stXNumL_pvr(L,NZ)))
         Root1stAxialResist_rvr(N,L) = StalkAxialResist+RootSingleVesselRstaxial_pft(NZ)*CumSoilThickMidL_vr(L)/FRAD1
-        write(*,*) "Root1stAxialResist_rvr: ", Root1stAxialResist_rvr(N,L)
-        write(*,*) "  StalkAxialResist: ", StalkAxialResist
-        write(*,*) "  RootSingleVesselRstaxial_pft: ", RootSingleVesselRstaxial_pft(NZ)
-        write(*,*) "  CumSoilThickMidL_vr: ", CumSoilThickMidL_vr(L)
-        write(*,*) "  FRAD1: ", FRAD1
 
         if(FRADM.GT.0._r8)then
           RootMediumAxialResist_rvr(N,L)=0.5_r8*RootSingleVesselRstaxial_pft(NZ)*RootMediumLength_pvr(L,NZ)/FRADM
@@ -1327,12 +1318,6 @@ module UptakesMod
           RootMediumAxialResist_rvr(N,L)=0._r8
         endif
         Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
-        write(*,*) "Root2ndAxialResist_rvr: ", Root2ndAxialResist_rvr(N,L)
-        write(*,*) "  Root2ndAxialResist_pft: ", Root2ndAxialResist_pft(N,NZ)
-        write(*,*) "  Root2ndEffLen4uptk_rpvr: ", Root2ndEffLen4uptk_rpvr(N,L,NZ)
-        write(*,*) "  FRAD2: ", FRAD2
-        write(*,*) "  Root2ndXNumL_rpvr: ", Root2ndXNumL_rpvr(N,L,NZ)
-
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !
@@ -1500,7 +1485,7 @@ module UptakesMod
   integer :: N,L
   associate(                                                          &
     OrganOsmoPsi0pt_pft       => plt_ew%OrganOsmoPsi0pt_pft          ,& !input  :Organ osmotic potential when canopy water potential = 0 MPa, [MPa]
-    MaxSoilLays4Root_pft          => plt_morph%MaxSoilLays4Root_pft          ,& !input  :maximum soil layer number for all root axes,[-]
+    MaxSoilLays4Root_pft      => plt_morph%MaxSoilLays4Root_pft      ,& !input  :maximum soil layer number for all root axes,[-]
     Myco_pft                  => plt_morph%Myco_pft                  ,& !input  :mycorrhizal type (no or yes),[-]
     NU                        => plt_site%NU                         ,& !input  :current soil surface layer number, [-]
     PSICanopy_pft             => plt_ew%PSICanopy_pft                ,& !input  :canopy total water potential, [Mpa]

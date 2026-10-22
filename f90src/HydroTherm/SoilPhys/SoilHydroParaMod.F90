@@ -31,8 +31,6 @@ implicit none
   ! ECOSIM_ZM: controlled legacy-ecosys hydraulic policy. These switches
   ! change constitutive properties, not water/heat accounting or boundary fluxes.
   ! Set false to recover upstream behavior. Not a universal soil calibration.
-  logical, parameter :: zm_ecosys_retention=.true.
-  logical, parameter :: zm_ecosys_airentry=.true.
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
@@ -82,7 +80,7 @@ contains
       call ComputePSIPond(L,NY,NX,THETI_vr(L,NY,NX),THETW_vr(L,NY,NX),THETW1,PSISoilMatricP_vr(L,NY,NX),TKS_vr(L,NY,NX))
 
     ELSE
-      PSISoilMatricP_vr(L,NY,NX)=PSISE_vr(L,NY,NX)
+      PSISoilMatricP_vr(L,NY,NX)=PSI_at_Sautration_vr(L,NY,NX)
     ENDIF
     !
     !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
@@ -90,7 +88,7 @@ contains
     !     PSISM,PSISO,PSIGrav_vr,PSIST=matric,osmotic,gravimetric,total water potential
     !
     PSISoilOsmotic_vr(L,NY,NX)          = -RGASC*TKS_vr(L,NY,NX)*SolutesIonConc_vr(L,NY,NX)*1.E-6_r8  !MPa
-    PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(ALT_col(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
+    PSIGrav_vr(L,NY,NX)                 = mGravAccelerat*(SurfElevation_col(NY,NX)-SoilDepthMidLay_vr(L,NY,NX))
     ElvAdjstedSoilH2OPSIMPa_vr(L,NY,NX) = AZMIN1(PSISoilMatricP_vr(L,NY,NX)+PSISoilOsmotic_vr(L,NY,NX)+PSIGrav_vr(L,NY,NX))
     !
     !     SoilBulkModulus4RootPent_vr=bulk modulus of the undisturbed soil [MPa]
@@ -155,32 +153,21 @@ contains
   ENDIF
   ! ECOSIM_ZM: hour1.f uses SRP=0.67 for all mineral/organic soil branches.
   ! Rebuild K(theta) below from this same pressure curve; do not rescale fluxes.
-  if (zm_ecosys_retention) SRP_vr(L,NY,NX)=0.67_r8
+  if (use_ecosys_drainage) SRP_vr(L,NY,NX)=0.67_r8
   
   ! double check is_cold_run() setup
   LOGPOROS_vr(L,NY,NX)=LOG(POROS_vr(L,NY,NX))
 
-  IF((ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_set .AND. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_set) .OR. (.not.is_cold_run()))THEN
-    ! read from check point file or if soil properties are set with soil file    
-
-    LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
-    LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-    PSD_vr(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-    FCD_vr(L,NY,NX)            = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
-  ELSE
-    !
-    !     DEFAULT SOIL HYDROLOGIC PPTYS (FIELD CAPACITY, WILTING POINT)
-    !     IF ACTUAL VALUES WERE NOT INPUT TO THE SOIL FILE
-    !
-    !     THW,THI=initial soil water,ice content from soil file
-    !
-    IF(is_cold_run())THEN
-      call SetColdRunSoilStates(I,J,L,NY,NX)
-    ENDIF
-  ENDIF
+  ! Cold-start volumes were initialized in STARTS before chemistry. Refresh
+  ! estimated hydraulic limits here without resetting water, ice or heat capacity.
+  if(is_cold_run())call EstimateSoilWaterLimits(L,NY,NX)
+  LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
+  LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
+  PSD_vr(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
+  FCD_vr(L,NY,NX)            = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
 
   VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-    +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+    +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
 
   IF(VGeomLayer_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !ratio of total air-filled pore to micropore
@@ -263,7 +250,7 @@ contains
         HydroCond_3D(N,K,L,NY,NX)=SatHydroCondVert_vr(L,NY,NX)*YK*SUM1/SUM2
 
         !obtain water content at saturation
-        if (zm_ecosys_airentry) then
+        if (use_ecosys_drainage) then
           ! ECOSIM_ZM: legacy FSCNV=0.1 crossing, using preceding wetter
           ! entry for BOTH pressure and theta. Internal saturated/Green-Ampt
           ! switches and natural-outlet wetness now share the same definition.
@@ -294,12 +281,12 @@ contains
   !     PathLenMacP,MacPNumLayer,MacPRadius=path length between, number,radius of macropores
   !     CNDH=macropore hydraulic conductivity
   !VGeomLayert0_vr: geometric volume of the layer 
-  !VLMacP_vr: volume of macropores in the layer
+  !VLMacroPores_vr: volume of macropores in the layer
   !Assuming soil macropores are approximated as (cylydrical) pipes, and has layer thickness as pipe length
   !Eq.(3.3)-(3.4) from Dimitrov et al. (2010)
   
   MacPoreRadius_vr(L,NY,NX)   = 0.5E-03_r8
-  MacPoreNumbers_vr(L,NY,NX) = INT(VLMacP_vr(L,NY,NX)/(PICON*MacPoreRadius_vr(L,NY,NX)**2*VGeomLayert0_vr(L,NY,NX)))
+  MacPoreNumbers_vr(L,NY,NX) = INT(VLMacroPores_vr(L,NY,NX)/(PICON*MacPoreRadius_vr(L,NY,NX)**2*VGeomLayert0_vr(L,NY,NX)))
 
   IF(MacPoreNumbers_vr(L,NY,NX).GT.0.0_r8)THEN
     PathLenMacPore_vr(L,NY,NX)=1.0_r8/(SQRT(PICON*MacPoreNumbers_vr(L,NY,NX)))
@@ -315,12 +302,13 @@ contains
   end subroutine SoilHydroProperty
 
 !------------------------------------------------------------------------------------------
-  subroutine SetColdRunSoilStates(I,J,L,NY,NX)
+  subroutine EstimateSoilWaterLimits(L,NY,NX)
+  ! Estimate both FC and WP when either was unspecified; retain the input flags.
   implicit none
-  integer, intent(in) :: I,J,L,NY,NX
-  character(len=*), parameter :: subname='SetColdRunSoilStates'
+  integer, intent(in) :: L,NY,NX
+  character(len=*), parameter :: subname='EstimateSoilWaterLimits'
 
-  ! restart is defined as simulation starting from a previous run
+  call PrintInfo('beg '//subname)
   IF(ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset)THEN
     !when either field capacity or wilting point is not provided, both are recomputed 
     !for consistency.
@@ -357,59 +345,85 @@ contains
     WiltPoint_vr(L,NY,NX) = AMIN1(0.75_r8*FieldCapacity_vr(L,NY,NX),WiltPoint_vr(L,NY,NX))
   ENDIF
   
-  LOGFldCapacity_vr(L,NY,NX) = LOG(FieldCapacity_vr(L,NY,NX))
-  LOGWiltPoint_vr(L,NY,NX)   = LOG(WiltPoint_vr(L,NY,NX))
-  PSD_vr(L,NY,NX)            = LOGPOROS_vr(L,NY,NX)-LOGFldCapacity_vr(L,NY,NX)
-  FCD_vr(L,NY,NX)            = LOGFldCapacity_vr(L,NY,NX)-LOGWiltPoint_vr(L,NY,NX)
+  call PrintInfo('end '//subname)
+  end subroutine EstimateSoilWaterLimits
+!------------------------------------------------------------------------------------------
 
-!   IBEGIN:   start date of model run
+  subroutine SetColdRunSoilStates(L,NY,NX)
+  ! Initialize volumes before chemistry. Supplied FC/WP retain the prescribed
+  ! THW/THI interpretation; estimated limits retain the water-table saturation rule.
+  implicit none
+  integer, intent(in) :: L,NY,NX
+  logical :: SaturateBelowWaterTable
+  real(r8) :: WaterRelSaturation,IceRelSaturation
+  character(len=*), parameter :: subname='SetColdRunSoilStates'
 
-    !IDATA(9): start year of model run
-  IF(I.EQ.IBEGIN .AND. J.EQ.1 .AND. is_first_year)THEN
-    !first time step at the beginning year
-    !THW=initial soil water content
-    !DPTH=depth to middle of soil layer [m]
-    !ExtWaterTablet0_col=external water table depth, [m]
+  call PrintInfo('beg '//subname)
+  SaturateBelowWaterTable = (ISOIL_vr(isoi_fc,L,NY,NX).EQ.isoi_unset .OR. &
+    ISOIL_vr(isoi_wp,L,NY,NX).EQ.isoi_unset) .AND. &
+    SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTableLocDepz_col(NY,NX)
+  call EstimateSoilWaterLimits(L,NY,NX)
 
-    IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
-      !below the water table, thus it is saturated
-      THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
-    ELSEIF(isclose(THW_vr(L,NY,NX),1._r8))THEN
-      !at field capacity
-      THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)
-    ELSEIF(isclose(THW_vr(L,NY,NX),0._r8))THEN
-      !at wilting point
-      THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)
-    ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
-      !CO2CompenPoint_nodeetely dry
-      THETW_vr(L,NY,NX)=0.0_r8
-    ELSE
-      THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)      
-    ENDIF
-
-    IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SoilDepthMidLay_vr(L,NY,NX).GE.ExtWaterTablet0_col(NY,NX))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-    ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-    ELSEIF(isclose(THI_vr(L,NY,NX),0._r8))THEN
-      THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
-    ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
-      THETI_vr(L,NY,NX)=0.0_r8
-    ELSE
-      THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
-    ENDIF
-
-  !in a cold run, set it
-    VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
-    VLWatMacP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
-    VLiceMacP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLMacP_vr(L,NY,NX)
-    ThetaH2OZ_vr(L,NY,NX)     = THETW_vr(L,NY,NX)
-    ThetaICEZ_vr(L,NY,NX)     = THETI_vr(L,NY,NX)
-    VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
-      +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
+  IF(THW_vr(L,NY,NX).GT.1.0_r8 .OR. SaturateBelowWaterTable)THEN
+    !below the water table, thus it is saturated
+    THETW_vr(L,NY,NX)=POROS_vr(L,NY,NX)
+  ELSEIF(isclose(THW_vr(L,NY,NX),1._r8))THEN
+    !at field capacity
+    THETW_vr(L,NY,NX)=FieldCapacity_vr(L,NY,NX)
+  ELSEIF(isclose(THW_vr(L,NY,NX),0._r8))THEN
+    !at wilting point
+    THETW_vr(L,NY,NX)=WiltPoint_vr(L,NY,NX)
+  ELSEIF(THW_vr(L,NY,NX).LT.0.0_r8)THEN
+    !completely dry
+    THETW_vr(L,NY,NX)=0.0_r8
+  ELSE
+    THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)
   ENDIF
+
+  IF(THI_vr(L,NY,NX).GT.1.0_r8.OR.SaturateBelowWaterTable)THEN
+    THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
+  ELSEIF(isclose(THI_vr(L,NY,NX),1._r8))THEN
+    THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
+  ELSEIF(isclose(THI_vr(L,NY,NX),0._r8))THEN
+    THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
+  ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
+    THETI_vr(L,NY,NX)=0.0_r8
+  ELSE
+    THETI_vr(L,NY,NX)=THI_vr(L,NY,NX)
+  ENDIF
+
+  ! THETW/THETI are volumes per unit micropore-domain soil volume. Macropore
+  ! volume is already pore space, so initialize it with relative saturation.
+  ! Give water priority and limit ice to the remaining macropore space.
+  WaterRelSaturation=0._r8
+  IceRelSaturation=0._r8
+  IF(POROS_vr(L,NY,NX).GT.ZERO)THEN
+    WaterRelSaturation=AZMAX1(AMIN1(1._r8,THETW_vr(L,NY,NX)/POROS_vr(L,NY,NX)))
+    IceRelSaturation=AZMAX1(AMIN1(1._r8-WaterRelSaturation,THETI_vr(L,NY,NX)/POROS_vr(L,NY,NX)))
+  ENDIF
+
+  ! Initialize water/ice volumes and their contribution to heat capacity.
+  VLWatMicP_vr(L,NY,NX)     = THETW_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+  VLWatMicPX_vr(L,NY,NX)    = VLWatMicP_vr(L,NY,NX)
+  VLWatMacP_vr(L,NY,NX)     = WaterRelSaturation*VLMacroPores_vr(L,NY,NX)
+  VLiceMicP_vr(L,NY,NX)     = THETI_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)
+  VLiceMacP_vr(L,NY,NX)     = IceRelSaturation*VLMacroPores_vr(L,NY,NX)
+  ! Match the relative pore occupancies reported after hourly redistribution.
+  VOLTX_vr(L,NY,NX)=POROS_vr(L,NY,NX)*VLSoilPoreMicP_vr(L,NY,NX)+VLMacroPores_vr(L,NY,NX)
+  IF(VOLTX_vr(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    ThetaH2OZ_vr(L,NY,NX)=AZMAX1(AMIN1(1._r8, &
+      (VLWatMicP_vr(L,NY,NX)+VLWatMacP_vr(L,NY,NX))/VOLTX_vr(L,NY,NX)))
+    ThetaICEZ_vr(L,NY,NX)=AZMAX1(AMIN1(1._r8, &
+      (VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))/VOLTX_vr(L,NY,NX)))
+  ELSE
+    ThetaH2OZ_vr(L,NY,NX)=0._r8
+    ThetaICEZ_vr(L,NY,NX)=0._r8
+  ENDIF
+  VHeatCapacity_vr(L,NY,NX) = VHeatCapSolidSoil_vr(L,NY,NX)+Cpw*(VLWatMicP_vr(L,NY,NX) &
+    +VLWatMacP_vr(L,NY,NX))+Cpi*(VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
+  VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
+    +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+  call PrintInfo('end '//subname)
   end subroutine SetColdRunSoilStates
 !------------------------------------------------------------------------------------------
   subroutine LitterHydroproperty(NY,NX)
@@ -447,7 +461,7 @@ contains
     HydroCond_3D(3,K,0,NY,NX) = SatHydroCondVert_vr(0,NY,NX)*YK*SUM1/SUM2
     HydroCond_3D(1,K,0,NY,NX) = 0.0_r8
     HydroCond_3D(2,K,0,NY,NX) = 0.0_r8
-    if (zm_ecosys_airentry) then
+    if (use_ecosys_drainage) then
       ! ECOSIM_ZM: apply the same conductivity-defined threshold to litter,
       ! matching legacy hour1.f. Preserve its existing retention curvature.
       if (K.gt.1) then
