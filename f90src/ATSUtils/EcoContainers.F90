@@ -177,6 +177,7 @@ module EcoContainers_module
      type (EcoVectorDouble) :: slope
      type (EcoVectorDouble) :: vegetation_type
      type (EcoVectorDouble) :: snow_albedo
+     type (EcoVectorDouble) :: surface_temperature
      ! atmosphere composition
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2

@@ -86,6 +86,10 @@ contains
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP=data2D(:,:)
 
+  data_ptr = env%thermal_conductivity%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_TCOND=data2D(:,:)
+
   data_ptr = env%depth%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_CumDepz2LayBottom_vr = data2D(:,:)
@@ -172,6 +176,9 @@ contains
 
   call c_f_pointer(env%snow_albedo%data, data, (/num_cols/))
   a_SALB = data(:)
+
+  call c_f_pointer(env%surface_temperature%data, data, (/num_cols/))
+  a_TSURF = data(:)
 
   ! PFT index of each column, in the first num_pfts entries of the column
   call c_f_pointer(env%plant_functional_type%data, data2D, [size_col,num_cols])

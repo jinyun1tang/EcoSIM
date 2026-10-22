@@ -41,6 +41,8 @@ Module SharedDataMod
   real(r8), allocatable :: a_SAI(:,:)       !Stem Area Index
   real(r8), allocatable :: a_VEG(:)       !Vegetation type
   real(r8), allocatable :: a_SALB(:)      !Snow Albedo
+  real(r8), allocatable :: a_TSURF(:)     !ATS surface temperature [K]
+  real(r8), allocatable :: a_TCOND(:,:)   !ATS thermal conductivity [MW m-1 K-1]
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
   real(r8), allocatable :: a_WC_rev(:,:)  !Soil water content testing

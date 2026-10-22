@@ -85,10 +85,19 @@ implicit none
   real(r8) :: PrecAsSnow(JY,JX)
   real(r8) :: VLTSoiPore
   real(r8) :: VPS(JY,JX)
-  real(r8) :: EMM
+  real(r8) :: EMM, CLD
+  real(r8) :: SkyLWEst  !EcoSIM estimate of incoming longwave [MJ m-2 h-1]
+  !surface skin temperature, solved each substep
+  integer  :: L0                 !top soil layer
+  real(r8) :: kTop               !thermal conductivity of the top cell [MJ m-1 h-1 K-1]
+  real(r8) :: Told, Tnew, Heff, Gs
+  real(r8) :: GcondTop(JY)       !conductance skin to top cell centre [MJ h-1 K-1]
+  real(r8) :: TbelowTop(JY)      !ATS top cell temperature [K]
+  real(r8) :: TsurfStart(JY)     !skin temperature at the start of the hour [K]
   real(r8) :: dTexp, Tfinal
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
   real(r8), PARAMETER :: surf_e_max=0.1_r8
+  real(r8), PARAMETER :: evap_sat_floor=0.3_r8  !top-cell liquid saturation below which soil evaporation stops [-]
   real(r8) :: Qinfl2MicPM(JY,JX)
   real(r8) :: Hinfl2SoilM(JY,JX)
   real(r8) :: VLWat_test(JZ,JY,JX)
@@ -200,8 +209,19 @@ implicit none
     !call InitSnowLayers(NY,NX) 
     
     !EMM = 2.445 !There is a more elaborate calcuation of sky emissivity but I don't think we'll need that yet
-    EMM = 0.684
-    SkyLonwRad_col(NY,NX) = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8
+    !EMM = 0.684
+    !Incoming longwave: use the ATS value (sunrad, [W m-2]) when present, as
+    !standalone EcoSIM does for longwave from the weather file. Otherwise
+    !estimate it as in WthrMod; cloudiness is unknown here, so CLD = 0.2 (clear)
+    CLD = 0.2_r8
+    EMM = 0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK_col(NY,NX)/TairK_col(NY,NX))**0.131_r8)
+    EMM = EMM*(1.0_r8+0.242_r8*CLD**0.583_r8)
+    SkyLWEst = EMM*stefboltz_const*TairK_col(NY,NX)**4._r8   ![MJ m-2 h-1]
+    if(sunrad(NY) > 0._r8)then
+      SkyLonwRad_col(NY,NX) = sunrad(NY)*0.0036_r8   !W m-2 to MJ m-2 h-1
+    else
+      SkyLonwRad_col(NY,NX) = SkyLWEst
+    endif
     LWRadSky_col(NY,NX) = SkyLonwRad_col(NY,NX)*AREA_3D(3,NU_col(NY,NX),NY,NX)
     TCA_col(NY,NX) = units%Kelvin2Celcius(TairK_col(NY,NX))
     !SineSunInclinationAngle_col(NY,NX) = 1.0_r8
@@ -263,7 +283,11 @@ implicit none
       LOGPSIMXD_col(NY,NX)          = LOGPSIFLD_col(NY,NX)-LOGPSIAtSat(NY,NX)
 
       !Top layer water volume:
-      TopLayWatVol_col(NY,NX) = VLWatMicP1_vr(NU_col(NY,NX),NY,NX)
+      !Only the top-cell water above evap_sat_floor can evaporate within the
+      !hour, so the hourly sink sent to ATS cannot dry the cell into the steep,
+      !near-residual end of its retention curve
+      TopLayWatVol_col(NY,NX) = VLWatMicP1_vr(NU_col(NY,NX),NY,NX) &
+        *AZMAX1(1._r8-evap_sat_floor/AMAX1(a_LSAT(NU_col(NY,NX),NY),1.e-6_r8))
 
       !Adapting from SoilHydroParaMod.F90 for the no organic matter in soil case
       !THETF=AMIN1(POROS_vr(L,NY,NX),EXP((LOGPSIAtSat(NY,NX)-LOG(0.033_r8)) &
@@ -287,6 +311,16 @@ implicit none
         FracAirFilledSoilPore_vr(L,NY,NX)=0.0_r8
       ENDIF
     ENDDO
+
+    !The surface energy balance (longwave emission, sensible heat, soil vapor
+    !pressure, snow-soil conduction) reads the top soil layer temperature. Use
+    !the ATS surface temperature there instead of the top subsurface cell
+    !temperature, which can be much deeper than the surface and does not see the
+    !cooling or warming applied to the surface by surf_e_source.
+    if(a_TSURF(NY) > 0._r8)then
+      TKSoil1_vr(NU_col(NY,NX),NY,NX) = a_TSURF(NY)
+      TKS_vr(NU_col(NY,NX),NY,NX)     = a_TSURF(NY)
+    endif
 
     !Setting the snow, if passed as total precipitation do full temp calc, else
     !Just set snow and rain to their given values
@@ -442,8 +476,23 @@ implicit none
     Radnet2Grnd_col(NY,NX)=0.0_r8
     LatentHeatEvapAir2Grnd_col(NY,NX)=0.0_r8
     HeatSensVapAir2Grnd_col(NY,NX)=0.0_r8
+
+    !EcoSIM owns the surface skin temperature (TKSoil1_vr of the top layer):
+    !it has no heat capacity and is solved each substep so that the surface
+    !fluxes balance conduction into the ATS top cell, as ATS's own surface
+    !energy balance does. ATS receives that conducted heat, which is bounded by
+    !the soil conductance. The ATS surface temperature is only the first guess.
+    L0   = NU_col(NY,NX)
+    kTop = a_TCOND(L0,NY)*3600._r8                     !MW m-1 K-1 to MJ m-1 h-1 K-1
+    if(kTop <= 0._r8) kTop = 0.0036_r8                 !1 W m-1 K-1 if ATS sends none
+    !skin to top cell centre, matching ATS's top face discretization. Use the
+    !ATS cell thickness: DLYR_3D is derived from ATS centroid depths treated as
+    !layer-bottom depths, which makes the top layer half the ATS cell
+    GcondTop(NY)   = AREA_3D(3,L0,NY,NX)*kTop/(0.5_r8*a_dz(L0,NY))
+    TbelowTop(NY)  = a_TEMP(L0,NY)
+    TsurfStart(NY) = TKSoil1_vr(L0,NY,NX)
   enddo
-  
+
   !Runs the main subcycling for the surface energy and water balance in
   !addition to snow.
   !
@@ -464,15 +513,31 @@ implicit none
 
     !sum fluxes over iterations in each column
     do NY=1, NYS
-      HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX)+HeatInfl2Soil(NY,NX)
       Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP_col(NY,NX)
+
+      !Solve the skin energy balance: surface fluxes, linearized about Told with
+      !dLWRaddTKsoi1 [MJ K-1 per substep], equal conduction to the top cell:
+      !  F(Told) + dH*(Tnew-Told) = Gs*(Tnew-Tbelow)
+      !Heat carried by infiltrating water is taken relative to the skin.
+      L0   = NU_col(NY,NX)
+      Told = TKSoil1_vr(L0,NY,NX)
+      Heff = HeatInfl2Soil(NY,NX)-cpw*Told*Qinfl2MicP_col(NY,NX)
+      Gs   = GcondTop(NY)*dts_HeatWatTP
+      Tnew = (Heff-dLWRaddTKsoi1(NY,NX)*Told+Gs*TbelowTop(NY)) &
+        /(Gs-dLWRaddTKsoi1(NY,NX))
+      TKSoil1_vr(L0,NY,NX) = Tnew
+
+      !Export the conducted heat plus the heat carried by infiltrating water at
+      !the skin temperature (the TFice shift is applied at the export below)
+      HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX) &
+        +Gs*(Tnew-TbelowTop(NY))+cpw*Tnew*Qinfl2MicP_col(NY,NX)
     enddo
 
     !also update state variables for iteration M
     call UpdateSurfaceAtM(I,J,M,NHW,NHE,NVN,NVS)
 
   ENDDO
-  
+
   !Does final update of the snow masses after the surface model is run
   do NY=1,NYS
     call SnowMassUpdate(I,J,NY,NX,Qinfl2MicPM(NY,NX),Hinfl2SoilM(NY,NX))

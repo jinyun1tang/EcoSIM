@@ -1863,7 +1863,8 @@ contains
   character(len=*), parameter :: subname='SnowTopSoilExch'
 
   call PrintInfo('beg '//subname)
-  call UpdateSoilWaterPotential(NY,NX)
+  !in ATS mode keep the ATS matric potential (see SoilSRFEnerbyBalanceM)
+  if(.not.ats_cpl_mode)call UpdateSoilWaterPotential(NY,NX)
   !micropore pressure, excluding gravitational pressure
   PSISV1=PSISM1_vr(NUM_col(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM_col(NY,NX),NY,NX)
 !
