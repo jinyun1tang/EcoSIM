@@ -73,7 +73,7 @@ implicit none
       THETA1,PSISoilMatric,TKSoil1_vr(N3,N2,N1))
   ELSE
     THETA1        = POROS_vr(N3,N2,N1)
-    PSISoilMatric = PSISE_vr(N3,N2,N1)
+    PSISoilMatric = PSI_at_Sautration_vr(N3,N2,N1)
   ENDIF
   if(present(THETA1S))THETA1S=THETA1
 
@@ -120,7 +120,7 @@ implicit none
     PSI=-EXP(LOGPSIAtSat(NY,NX)+(LOGPOROS_vr(L,NY,NX)-LOG(ThetafW))*LOGPSIMXD_col(NY,NX)/PSDX)
   ELSE
     ThetaW = POROS_vr(L,NY,NX)
-    PSI    = PSISE_vr(L,NY,NX)
+    PSI    = PSI_at_Sautration_vr(L,NY,NX)
   ENDIF
   call PrintInfo('end '//subname)
   end subroutine ComputePSIPond
@@ -282,7 +282,7 @@ implicit none
   ELSE
     !saturated
     THETWL = POROS_vr(N6,N5,N4)
-    PSISM1 = PSISE_vr(N6,N5,N4)
+    PSISM1 = PSI_at_Sautration_vr(N6,N5,N4)
   ENDIF
   call PrintInfo('end '//subname)
   END subroutine ComputePsiMCM

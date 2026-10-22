@@ -181,7 +181,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  SeasonalNonstElms_pft(:,:,:,:)             !plant stored nonstructural chemical element, [g d-2]
   real(r8),target,allocatable ::  SeasonalNonstCDayAve_pft(:,:,:)            !daily average seasonal storage C for annual plant death check, [g d-2]
   real(r8),target,allocatable ::  SeedPlantedElm_pft(:,:,:,:)              !plant stored nonstructural chemical elements at planting, [g d-2]
-  REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)            !landscape average canopy shoot C, [g d-2]
+  REAL(R8),target,allocatable ::  AvgCanopyBiomC2Graze_pft(:,:,:)            !section mean shoot C density times local cell area, [g d-2]
   real(r8),target,allocatable :: CO2FixCL_pft(:,:,:)                         !CO2-limited carboxylation rate, [gC d2 h-1]
   real(r8),target,allocatable :: CO2FixLL_pft(:,:,:)                         !Light-limited carboxylation rate,[gC d2 h-1]
   real(r8),target,allocatable :: CanopyMassC_pft(:,:,:)                      !Canopy biomass, [gC d-2]

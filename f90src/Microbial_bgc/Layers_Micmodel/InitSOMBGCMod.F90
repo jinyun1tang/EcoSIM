@@ -590,14 +590,13 @@ module InitSOMBGCMOD
   end associate
   end subroutine InitManureKinetiComponent
 !------------------------------------------------------------------------------------------
-  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,VORGCM)
+  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX)
   implicit none
   integer, intent(in)  :: L, NY, NX
   real(r8), intent(in) :: HCX
   real(r8), intent(in) :: TORGL
   real(r8), intent(in) :: LandScape1stSoiLayDepth
   real(r8), intent(out):: FCX
-  real(r8), intent(out):: VORGCM      !volume of consolidated organic matter [cm3]=mass/density
   real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
@@ -629,12 +628,12 @@ module InitSOMBGCMOD
       !     DRYLAND SOIL
       !
       !     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
-      !     DPTH,ExtWaterTablet0_col=depth to layer midpoint,external water table(m)
+      !     DPTH,ExtWaterTableLocDepz_col=depth to layer midpoint,external water table(m)
       !     FC0=partitioning to less resistant component at DPTH=0
       !     FCX=reduction in FC0 at DPTH
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
-      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoilDepthMidLay_vr(L,NY,NX).LE.ExtWaterTablet0_col(NY,NX) &
+      IF(CSoilOrgM_vr(ielmc,L,NY,NX).LE.FORGC .OR. SoilDepthMidLay_vr(L,NY,NX).LE.ExtWaterTableLocDepz_col(NY,NX) &
         +CumDepz2LayBottom_vr(NU_col(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
@@ -691,10 +690,7 @@ module InitSOMBGCMOD
   IF(L.GT.0)THEN
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       !assume 0.55 of organic matter is carbon
-      VORGCM=AMIN1(orgcden,(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus))/DensitySolidOM)/OMCMassFrac      
       SolidOMPercent_vr(L,NY,NX)=(CORGCX(k_fine_comp)+CORGCX(k_manure)+CORGCX(k_POM)+CORGCX(k_humus))*1.e-4_r8/OMCMassFrac ![g Mg-1] -> [g /100g-1]
-    else
-      VORGCM=0._r8
     endif
   endif
   end associate
@@ -702,14 +698,13 @@ module InitSOMBGCMOD
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,VORGCM,FCX)
+  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX)
 
   implicit none
   integer,  intent(in)  :: L,NY,NX
   real(r8), intent(in)  :: HCX
   real(r8), intent(in)  :: TORGL
   real(r8), intent(in)  :: LandScape1stSoiLayDepth
-  real(r8), intent(out) :: VORGCM !volume of consolidated organic matter [cm3]
   real(r8), intent(out) :: FCX
 
   call PrintInfo('beg InitSOMProfile')
@@ -723,7 +718,7 @@ module InitSOMBGCMOD
   call InitManureKinetiComponent(L,NY,NX)
   !
   !     POM
-  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,VORGCM)
+  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX)
   
   call PrintInfo('end InitSOMProfile')
   end subroutine InitSOMProfile

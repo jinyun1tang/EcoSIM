@@ -340,6 +340,11 @@ module NutUptakeMod
   character(len=*), parameter :: subname='ZeroNutrientUptake'
   !     begin_execution
   call PrintInfo('end '//subname)
+  associate(RootSoilCO2Debt_vr => plt_rbgc%RootSoilCO2Debt_vr)
+    ! Transient API output; persistent debt is owned by trcs_solml_drib_vr
+    ! after the paired column handoff, not carried again in the root API.
+    RootSoilCO2Debt_vr=0._r8
+  end associate
   plt_rbgc%RootCO2Ar2RootX_rpvr       = 0._r8
   plt_rbgc%RootCO2Ar2Soil_pvr         = 0._r8
   plt_bgcr%RootO2_TotSink_pvr         = 0._r8

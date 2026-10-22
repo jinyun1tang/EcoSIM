@@ -221,6 +221,8 @@ implicit none
     TNH3ErosBand_molN_col(NY,NX)     = 0.0_r8
     TNUreaErosBand_molN_col(NY,NX)   = 0.0_r8
     TNO3ErosBand_molN_col(NY,NX)     = 0.0_r8
+    TPO4Erosed_molP_col(NY,NX)      = 0._r8
+    TPO4ErosBand_molP_col(NY,NX)    = 0._r8
 
     trcx_TER_col(idx_beg:idx_end,NY,NX)   = 0.0_r8
     trcp_TER_col(idsp_beg:idsp_end,NY,NX) = 0.0_r8

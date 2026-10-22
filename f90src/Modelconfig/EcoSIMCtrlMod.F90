@@ -62,6 +62,7 @@ implicit none
   logical :: first_topou          = .false.  !only simulate first topo unit
   logical :: first_pft            = .false.  !only simulate first pft
   integer :: iErosionMode         = -1         !erosion option
+  logical :: use_ecosys_drainage = .false.
   logical :: plant_model          = .true.
   logical :: microbial_model      = .true.
   logical :: soichem_model        = .true.
@@ -97,6 +98,9 @@ implicit none
   character(len=300) :: clm_hour_file_in =''    !file for hourly climate forcing
   character(len=300) :: clm_day_file_in  =''    !file for daily climate forcing
   character(len=300) :: soil_mgmt_in            !file for soil management information
+  ! Opt in to dated soil schedules independent of recycled weather years.
+  ! False preserves legacy forcing-year routing; no management is synthesized.
+  logical :: soil_mgmt_use_model_year = .false.
   character(len=300) :: clm_factor_in           !file for climate change factors
   character(len=300) :: atm_ghg_in              !file for atmospheric GHG concentrations
   character(len=300) :: micpar_file_in=''       !file of microbial parameters 
@@ -104,7 +108,6 @@ implicit none
   logical :: do_budgets = .false.
   type(file_desc_t)  :: pft_nfid
   type(ecosim_time_type) :: etimer
-  logical :: Lirri_auto=.false.
 
   logical :: fixClime =.false.    !If true, do fixed climate forcing
   character(len=8) :: diag_opt ='nsteps'

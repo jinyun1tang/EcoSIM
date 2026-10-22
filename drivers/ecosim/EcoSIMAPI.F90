@@ -9,7 +9,7 @@ module EcoSIMAPI
   use abortutils,       only: iulog
   use RedistMod,         only: redist
   use GeochemAPI,        only: soluteModel
-  use PlantMod,          only: PlantModel
+  use PlantMod,          only: PlantModel, UpdateDailyGPP
   use TranspNoSaltMod,   only: TranspNoSalt
   use TranspSaltMod,     only: TranspSalt
   use WatsubMod,         only: watsub
@@ -73,6 +73,9 @@ contains
     call PlantModel(yearIJ,NHW,NHE,NVN,NVS)
     if(do_timing)call end_timer('PlantModel',t1)    
   endif
+
+  call UpdateDailyGPP(yearIJ%J,NHW,NHE,NVN,NVS, &
+    plant_model .and. .not.ldo_radiation_test .and. .not.ldo_sp_mode)
 
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -161,6 +164,8 @@ contains
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_hour_file_in,clm_day_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
+    NPXS,NPYS,continue_run,restart_out,lsoilCompaction,LMacPoreOff,use_ecosys_drainage,&
+    clm_hour_file_in,clm_day_file_in,soil_mgmt_in,soil_mgmt_use_model_year,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,continue_run,restart_out,lsoilCompaction,LMacPoreOff,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,ach4_ppm,anh3_ppm,&
@@ -230,6 +235,7 @@ contains
   do_doy               = 0
   do_layer             = 1
   LMacPoreOff          = .false.
+  use_ecosys_drainage  = .false.
   salt_model           = .false.
   laddband             = .false.
   do_regression_test   = .false.
@@ -246,6 +252,7 @@ contains
   clm_hour_file_in   = ''
   clm_day_file_in    = ''
   soil_mgmt_in       = 'NO'
+  soil_mgmt_use_model_year = .false. ! legacy default; opt in for dated schedules
   atm_ghg_in         = ''
   aco2_ppm           = 280._r8
   ach4_ppm           = 1.144_r8
@@ -345,7 +352,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
   use data_kind_mod,   only: r8 => DAT_KIND_R8
-  use DayMod,          only: day
+  use DayMod,          only: day, CompleteDailySetup
   use StarteMod,       only: starte
   use StartqMod,       only: startq
   use StartsMod,       only: starts,InitControlParms
@@ -358,7 +365,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   use ForcWriterMod,   only: do_bgcforc_write,   WriteBBGCForc
   use HistDataType,    only: hist_ecosim
   use HistFileMod,     only: hist_update_hbuf,   hist_htapes_wrapup
-  use ClimReadMod,     only: read_soil_warming_Tref
+  use ClimReadMod,     only: read_soil_warming_Tref, ReadAtmosComposition
   use EcoSIMCtrlMod
   use GridConsts
   use EcoSIMCtrlDataType
@@ -382,6 +389,8 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   character(len=14) :: ymdhs
   logical :: rstwr, lnyr
   logical :: lverb0
+  logical :: DeferDailySetup
+  logical :: RefreshRainChem
 
 ! begin_execution
 !
@@ -406,6 +415,11 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   call InitControlParms
   if(do_timing)call end_timer('InitControlParms',t1)
 
+  ! Read annual atmospheric mixing ratios before STARTS converts them to mass concentrations.
+  if(do_timing)call start_timer(t1)
+  call ReadAtmosComposition(iYearCurrent,NHW,NHE,NVN,NVS)
+  if(do_timing)call end_timer('ReadAtmosComposition',t1)
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
     
     if(do_timing)call start_timer(t1)
@@ -425,7 +439,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
   endif
 
   if(do_timing)call start_timer(t1)
-  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS)
+  CALL ReadClimSoilForcing(frectyp%yearcur,frectyp%yearclm,NHW,NHE,NVN,NVS,RefreshRainChem)
   if(do_timing)call end_timer('ReadClimSoilForcing',t1)
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
@@ -437,14 +451,12 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     if(do_timing)call end_timer('STARTQ',t1)
   ENDIF
 
-  if(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. soichem_model)then
-    ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
-    ! This is done done every year, because tracer concentrations
-    ! in rainfall vary every year. In a more reasonable way, e.g.,
-    ! when coupled to atmospheric chemistry code, it should be done by
-    ! hour
+  if(soichem_model)then
+    ! Refresh irrigation chemistry after annual management reading; process
+    ! rainfall only when its raw inputs were reloaded. Soil initialization
+    ! remains restricted to the first cold-start year within STARTE.
     if(do_timing)call start_timer(t1)
-    CALL STARTE(NHW,NHE,NVN,NVS)
+    CALL STARTE(NHW,NHE,NVN,NVS,RefreshRainChem)
     if(do_timing)call end_timer('STARTE',t1)
   endif
 
@@ -475,7 +487,10 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
     !
     
     if(do_timing)call start_timer(t1)
-    CALL DAY(I,NHW,NHE,NVN,NVS)
+    associate(RestartPending => frectyp%lskip_loop)
+      DeferDailySetup=RestartPending .and. (is_restart() .or. is_branch())
+    end associate
+    CALL DAY(I,NHW,NHE,NVN,NVS,DeferStateChanges=DeferDailySetup)
     if(do_timing)call end_timer('DAY',t1)
     
     if(do_timing)call start_timer(t1)
@@ -493,6 +508,7 @@ subroutine AdvanceModelOneYear(NHW,NHE,NVN,NVS,nlend)
           if(do_timing)call start_timer(t1)
           call restFile(flag='read')
           if(do_timing)call end_timer('RestartRead',t1)
+          call CompleteDailySetup(I,J,NHW,NHE,NVN,NVS)
           if (j==1)then
             if(do_timing)call start_timer(t1)
             call SetAnnualAccumlators(I, NHW, NHE, NVN, NVS)
@@ -660,6 +676,7 @@ end subroutine regressiontest
     write(nu_cfg,*)'salt_model=',salt_model
     write(nu_cfg,*)'erosion_model=',erosion_model_status(iErosionMode)
     write(nu_cfg,*)'grid_mode=',GridConectionMode(grid_mode)
+    write(nu_cfg,*)'soil_mgmt_use_model_year=',soil_mgmt_use_model_year
     call relavu(nu_cfg)
   endif
   end subroutine write_modelconfig

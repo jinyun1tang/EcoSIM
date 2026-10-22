@@ -1,4 +1,5 @@
 module Hour1Mod
+  use AtmosCompositionMod, only: UpdateAtmosGasMassConcentrations
   use data_kind_mod,     only: r8 => DAT_KIND_R8
   use data_const_mod,    only: GravAcceleration=>DAT_CONST_G
   use minimathmod,       only: isclose, AZMAX1, AZMIN1,Viscosity_H2O
@@ -13,7 +14,7 @@ module Hour1Mod
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
-  use HydrologyDiagMod , only: DiagWaterTBLDepz
+  use HydrologyDiagMod , only: UpdateSoilWaterContents, DiagWaterTableDepZi, DiagActiveLayerDepth
   use CanopyHydroMod
   use NumericalAuxMod
   use DebugToolMod
@@ -175,7 +176,7 @@ module Hour1Mod
 
       call ZeroHourlyArrays(NY,NX)
 
-      call DiagWaterTBLDepz(I,J,NY,NX)
+      call UpdateSoilWaterContents(NY,NX)
 
       call GetChemicalConcsInSoil(I,J,NY,NX)
 
@@ -186,6 +187,9 @@ module Hour1Mod
       call CalGasSolubility(NY,NX)
 
       call GetSoilHydraulicVars(I,J,NY,NX)
+
+      ! Diagnose the water table using current water/ice fractions and pressures.
+      call DiagWaterTableDepZi(I,J,NY,NX)
 
 !     CALCULATE ACTIVE LAYER DEPTH
       call DiagActiveLayerDepth(NY,NX)
@@ -277,7 +281,6 @@ module Hour1Mod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NX, NY, idg
-  real(r8) :: tPBOT,tmp
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
@@ -285,23 +288,9 @@ module Hour1Mod
 !
 !
 ! SurfIrrig_IonStrenth_col: surface irrigation ion strength, [g m-3]
+  call UpdateAtmosGasMassConcentrations(NHW,NHE,NVN,NVS)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      !obtain the mass density using the ideal gas law, taking TREF as reference tempeature
-      tPBOT                        = PBOT_col(NY,NX)/1.01325E+02_r8
-      tmp                          = Tref/TairKClimMean_col(NY,NX)*tPBOT
-      CCO2EI_gperm3_col(NY,NX)                = CO2EI_col(NY,NX)*5.36E-04_r8*tmp
-
-      AtmGasCgperm3_col(idg_CO2,NY,NX) = CO2E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3_col(idg_CH4,NY,NX) = CH4E_col(NY,NX)*5.36E-04_r8*tmp  !gC/m3
-      AtmGasCgperm3_col(idg_O2,NY,NX)  = OXYE_col(NY,NX)*1.43E-03_r8*tmp  !gO/m3
-      AtmGasCgperm3_col(idg_N2,NY,NX)  = Z2GE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_N2O,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp  !gN/m3
-      AtmGasCgperm3_col(idg_AR,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
-      AtmGasCgperm3_col(idg_NH3,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp !gN/m3
-      AtmGasCgperm3_col(idg_H2,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp  !gH/m3
-      AtmGasCgperm3_col(idg_NH3B,NY,NX) = AtmGasCgperm3_col(idg_NH3,NY,NX)
-
       DO idg=idg_beg,idg_NH3
         trcg_rain_mole_conc_col(idg,NY,NX) = AtmGasCgperm3_col(idg,NY,NX)*gas_solubility(idg,TCA_col(NY,NX)) &
            /(EXP(GasSechenovConst(idg)*SurfIrrig_IonStrenth_col(NY,NX))*MolecularWeight(idg))
@@ -534,13 +523,13 @@ module Hour1Mod
     ENDIF
     !     VLMicP_vr(L,NY,NX)=AMAX1(POROS_vr(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
     !    2,VLWatMicP_vr(L,NY,NX)+VLiceMicP_vr(L,NY,NX))
-    !     VLMacP_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
+    !     VLMacroPores_vr(L,NY,NX)=AMAX1(SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     !    2,VLWatMacP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX))
     VLMicP_vr(L,NY,NX) = POROS_vr(L,NY,NX)*VLSoilMicP_vr(L,NY,NX)
-    VLMacP_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
+    VLMacroPores_vr(L,NY,NX) = SoilFracAsMacP_vr(L,NY,NX)*VGeomLayer_vr(L,NY,NX)
     IF(SoilBulkDensity_vr(L,NY,NX).GT.ZERO)THEN
       VLsoiAirP_vr(L,NY,NX)=AZMAX1(VLMicP_vr(L,NY,NX)-VLWatMicP_vr(L,NY,NX)-VLiceMicP_vr(L,NY,NX)) &
-        +AZMAX1(VLMacP_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
+        +AZMAX1(VLMacroPores_vr(L,NY,NX)-VLWatMacP_vr(L,NY,NX)-VLiceMacP_vr(L,NY,NX))
     ELSE
       VLsoiAirP_vr(L,NY,NX)=0._r8
     ENDIF
@@ -581,34 +570,35 @@ module Hour1Mod
   real(r8) :: ThetaWLitR
   real(r8) :: VOLIRZ,VWatLitrZ
   real(r8) :: XVOLW0,XVOLI0
-!     begin_execution
-!
-!     FCR=litter water content at -0.01 MPa
-!     THETY=litter hygroscopic water content
-!
+  !     begin_execution
+  !
+  !     FCR=litter water content at -0.01 MPa
+  !     THETY=litter hygroscopic water content
+  !
   CSoilOrgM_vr(ielmc,0,NY,NX)=orgcden
-!
-!     SOIL SURFACE WATER STORAGE CAPACITY
-!
-!     IDWaterTable=water table flag from site file
-!     ExtWaterTable,ExtWaterTablet0_col=current,initial natural water table depth
-!     TileWaterTable_col,DTBLD=current,initial artificial water table depth
-!     SoilSurfRoughness_col,ZW=soil,water surface roughness
-!     VLWatHeldCapSurf_col=soil surface water retention capacity
-!     VWatStoreCapSurf_col=VLWatHeldCapSurf_col accounting for above-ground water table
-!     EHUM=fraction of microbial decompn product allocated to surface humus
-!     EPOC=fraction of SOC decomposition product allocated to surface POC
-!
-  !Stationary water table
+  !
+  !     SOIL SURFACE WATER STORAGE CAPACITY
+  !
+  !     IDWaterTable=water table flag from site file
+  !     ExtWaterTable,ExtWaterTableLocDepz_col=current,initial natural water table depth
+  !     TileWaterTable_col,DTBLD=current,initial artificial water table depth
+  !     SoilSurfRoughness_col,ZW=soil,water surface roughness
+  !     VLWatHeldCapSurf_col=soil surface water retention capacity
+  !     VWatStoreCapSurf_col=VLWatHeldCapSurf_col accounting for above-ground water table
+  !     EHUM=fraction of microbial decompn product allocated to surface humus
+  !     EPOC=fraction of SOC decomposition product allocated to surface POC
+  !
+  !double check the water table defined below
   IF(IDWaterTable_col(NY,NX).LE.1 .OR. IDWaterTable_col(NY,NX).EQ.3)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)
-  !Mobile water table
+    ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)
+    !Mobile water table
   ELSEIF(IDWaterTable_col(NY,NX).EQ.2 .OR. IDWaterTable_col(NY,NX).EQ.4)THEN
-    ExtWaterTable_col(NY,NX)=ExtWaterTablet0_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
+    !add litter layer correction
+    ExtWaterTable_col(NY,NX)=ExtWaterTableLocDepz_col(NY,NX)+CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(IDWaterTable_col(NY,NX).EQ.3.OR.IDWaterTable_col(NY,NX).EQ.4)THEN
-    TileWaterTable_col(NY,NX)=DTBLD_col(NY,NX)
+    TileWaterTable_col(NY,NX)=TileWaterTableLocDepz_col(NY,NX)
   ENDIF
   !
   !surface roughness parameterization can be better
@@ -617,7 +607,7 @@ module Hour1Mod
   ELSE
     SoilSurfRoughness_col(NY,NX)=ZW
   ENDIF
-  !
+  !what is the reference?
   VLWatHeldCapSurf_col(NY,NX)=AMAX1(0.001_r8,0.112_r8*SoilSurfRoughness_col(NY,NX)+&
     3.10_r8*SoilSurfRoughness_col(NY,NX)**2._r8 &
     -0.012_r8*SoilSurfRoughness_col(NY,NX)*SLOPE_col(0,NY,NX))*AREA_3D(3,NU_col(NY,NX),NY,NX)
@@ -963,58 +953,6 @@ module Hour1Mod
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
-  subroutine DiagActiveLayerDepth(NY,NX)
-
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  real(r8) :: VLiceTot,VLPoreTot,VLiceTotL,VOLWTL,VLPoreTotL
-  integer :: LL,L
-  logical :: FoundActiveLayer
-  logical :: goto5701
-
-!     begin_execution
-  FoundActiveLayer = .false.
-  DO L=NUI_col(NY,NX),NLI_col(NY,NX)
-!
-!     VOLI,VOLIH=ice volume in micropores,macropores
-!     VOLW,VOLWH=water volume in micropores,macropores
-!     VOLA,VOLAH=total volume in micropores,macropores
-!     ActiveLayDepZ_col=active layer depth
-!     CDPTH,DLYR=depth to bottom,thickness of soil layer
-!
-    IF(FoundActiveLayer)exit
-    !current layer
-    VLiceTot=VLiceMicP_vr(L,NY,NX)+VLiceMacP_vr(L,NY,NX)
-    VLPoreTot=VLMicP_vr(L,NY,NX)+VLMacP_vr(L,NY,NX)
-
-    IF(VLPoreTot.GT.ZEROS2(NY,NX).AND.VLiceTot.GT.0.01*VLPoreTot)THEN
-      !significant ice and pore
-      D5700: DO LL=MIN(L+1,NL_col(NY,NX)),NL_col(NY,NX)
-        VLiceTotL  = VLiceMicP_vr(LL,NY,NX)+VLiceMacP_vr(LL,NY,NX)
-        VOLWTL     = VLWatMicP_vr(LL,NY,NX)+VLWatMacP_vr(LL,NY,NX)
-        VLPoreTotL = VLMicP_vr(LL,NY,NX)+VLMacP_vr(LL,NY,NX)
-        !defined as significant increase in ice content
-        goto5701=(VLPoreTotL.GT.ZEROS2(NY,NX).AND.VLiceTotL.LT.ZERO2*VLPoreTotL)
-        if(goto5701)exit
-      ENDDO D5700
-
-      if(.not. goto5701)then
-        IF(VLPoreTot.GT.ZEROS2(NY,NX))THEN
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)*AMIN1(1.0_r8,VLiceTot/VLPoreTot)
-        ELSE
-          ActiveLayDepZ_col(NY,NX)=CumDepz2LayBottom_vr(L,NY,NX)-DLYR_3D(3,L,NY,NX)
-        ENDIF
-        FoundActiveLayer=.true.
-      else
-        !not active layer
-        ActiveLayDepZ_col(NY,NX)=9999.0_r8
-      endif
-    ENDIF
-  ENDDO
-  end subroutine DiagActiveLayerDepth
-!------------------------------------------------------------------------------------------
-
   subroutine SetTracerPropertyInLiterAir(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
@@ -1044,7 +982,7 @@ module Hour1Mod
   trcg_gascl_vr(idg_N2O,0,NY,NX) = Z2OE_col(NY,NX)*1.25E-03_r8*tmp
   trcg_gascl_vr(idg_NH3,0,NY,NX) = ZNH3E_col(NY,NX)*6.25E-04_r8*tmp
   trcg_gascl_vr(idg_H2,0,NY,NX)  = H2GE_col(NY,NX)*8.92E-05_r8*tmp
-  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-02_r8*tmp  !gAr/m3
+  trcg_gascl_vr(idg_AR,0,NY,NX)  = ARGE_col(NY,NX)*1.78E-03_r8*tmp  !gAr/m3
 
   ! initialize all band nutrients to zero
   trc_solcl_vr(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0._r8
@@ -1465,10 +1403,10 @@ module Hour1Mod
         PSISoilMatricP_vr(0,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS_vr(0,NY,NX)-LOG(ThetaWLitR)) &
           /PSD_vr(0,NY,NX))**SRP_vr(0,NY,NX)*LOGPSIMXD_col(NY,NX)))
       ELSE
-        PSISoilMatricP_vr(0,NY,NX)=PSISE_vr(0,NY,NX)
+        PSISoilMatricP_vr(0,NY,NX)=PSI_at_Sautration_vr(0,NY,NX)
       ENDIF
-      PSISoilOsmotic_vr(0,NY,NX)     = 0._r8
-      PSIGrav_vr(0,NY,NX)            = mGravAccelerat*(ALT_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
+      PSISoilOsmotic_vr(0,NY,NX)          = 0._r8
+      PSIGrav_vr(0,NY,NX)                 = mGravAccelerat*(SurfElevation_col(NY,NX)-CumDepz2LayBottom_vr(NU_col(NY,NX)-1,NY,NX)+0.5_r8*DLYR_3D(3,0,NY,NX))
       ElvAdjstedSoilH2OPSIMPa_vr(0,NY,NX) = AZMIN1(PSISoilMatricP_vr(0,NY,NX)+PSISoilOsmotic_vr(0,NY,NX)+PSIGrav_vr(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS

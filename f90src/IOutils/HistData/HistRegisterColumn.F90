@@ -73,19 +73,19 @@ contains
       long_name='0-30 cm mean aerobic CH4 oxidation rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCH4ProdAcet30cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCH4ProdAcet30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CH4Prod_Acet30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-30 cm mean acetoclastic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCH4ProdHG30cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCH4ProdHG30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CH4Prod_HG30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-30 cm mean hydrogenotrohpic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RFerment30cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RFerment30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='Ferment_30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-30 cm mean fermentation rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCO2Ht30cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCO2Ht30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CO2Ht_30cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-30 cm mean CO2 respiration rate',ptr_col=data1d_ptr,default='inactive')
 !----------------------------------------------------------------------------------------------------
     data1d_ptr => this%h1d_TEMP60cm_col(beg_col:end_col)
@@ -145,19 +145,19 @@ contains
       long_name='0-60 cm mean aerobic CH4 oxidation rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCH4ProdAcet60cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCH4ProdAcet60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CH4Prod_Acet60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-60 cm mean acetoclastic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCH4ProdHG60cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCH4ProdHG60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CH4Prod_HG60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-60 cm mean hydrogenotrohpic CH4 produciton rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RFerment60cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RFerment60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='Ferment_60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-60 cm mean fermentation rate',ptr_col=data1d_ptr,default='inactive')
 
     data1d_ptr => this%h1d_RCO2Ht60cm_col(beg_col:end_col)
-    call hist_addfld1d(fname='RCO2Ht60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
+    call hist_addfld1d(fname='CO2Ht_60cm_col',units='gC h-1 m-3 soil',avgflag='A',&
       long_name='0-60 cm mean CO2 respiration rate',ptr_col=data1d_ptr,default='inactive')
   endif
 
@@ -285,19 +285,19 @@ contains
 
   data1d_ptr => this%h1D_SUR_DIC_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIC_FLX_col',units='gC/m2/hr',avgflag='A',&
-    long_name='total surface DIC flux',ptr_col=data1d_ptr)
+    long_name='surface carbon export (CO2, CH4 and carbonate species)',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUR_DIN_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIN_FLX_col',units='gN/m2',avgflag='I',&
-    long_name='cumulative total surface DIN flux',ptr_col=data1d_ptr)
+    long_name='annual cumulative surface NH3/NH4/NO2/NO3 export',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUR_DIP_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUR_DIP_FLX_col',units='gP/m2',avgflag='I',&
-    long_name='Cumulative surface DIP flux',ptr_col=data1d_ptr,default='inactive')
+    long_name='annual cumulative surface phosphate export',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_SUB_DIC_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUB_DIC_FLX_col',units='gC/m2/hr',avgflag='A',&
-    long_name='total subsurface DIC flux',ptr_col=data1d_ptr)
+    long_name='subsurface carbon export (CO2, CH4, carbonate and boundary gas transport)',ptr_col=data1d_ptr)
 
   data1d_ptr => this%h1D_SUB_DIN_FLX_col(beg_col:end_col)
   call hist_addfld1d(fname='SUB_DIN_FLX_col',units='gN/m2/hr',avgflag='A',&
@@ -868,7 +868,7 @@ contains
     long_name='active layer depth',ptr_col=data1d_ptr,default='inactive')
 
   data1d_ptr => this%h1D_WTR_TBL_col(beg_col:end_col)
-  call hist_addfld1d(fname='WTR_TBL_col',units='m',avgflag='A',&
+  call hist_addfld1d(fname='WTBLi_col',units='m',avgflag='A',&
     long_name='internal water table depth (<0 below soil surface)',&
     ptr_col=data1d_ptr)
 

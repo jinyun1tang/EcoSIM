@@ -29,6 +29,8 @@ module StartqMod
   character(len=*),private, parameter :: mod_filename =&
    __FILE__
   public :: startq
+  public :: InitDimensionsandUptake
+  public :: InitPlantPhenoMorphoBio
   contains
 
   SUBROUTINE startq(NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q)
@@ -497,7 +499,8 @@ module StartqMod
       exit
     endif
   ENDDO
-  PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)
+  ! Preserve the revised planting depth relative to the soil surface.
+  PlantinDepz_pft(NZ,NY,NX)=SeedDepth_pft(NZ,NY,NX)-SoilSurfDepZ_col(NY,NX)
 
   D9795: DO L=NU_col(NY,NX),NL_col(NY,NX)
     !find the seeding layer, i.e. the first root layer

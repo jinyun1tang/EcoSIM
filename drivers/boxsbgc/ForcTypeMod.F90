@@ -306,7 +306,7 @@ implicit none
   call ncd_getvar(ncf,'ATKA', forc%ATKA)
   call ncd_pio_closefile(ncf)
 
-  forc%TempOffset=fOFFSET(forc%ATCS)
+  forc%TempOffset=f_microbe_TOffset(forc%ATCS)
   forc%VLNOB=0._r8
   forc%VLNO3=1._r8
   forc%VLNHB=0._r8

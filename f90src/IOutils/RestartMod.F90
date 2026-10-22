@@ -14,6 +14,7 @@ module RestartMod
   use EcoSIMCtrlMod     , only : etimer,do_budgets,plant_model
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy,iulog
+  use UnitMod           , only : units
   use HistFileMod       , only : hist_restart_ncd  
   use NumericalAuxMod
   use EcoSIMCtrlDataType  
@@ -79,8 +80,8 @@ implicit none
   if (flag=='read')then
     call restFile_getfile(fnamer,path)
     call restFile_read( bounds, fnamer)
-    ! DAY resets daily accumulators before the checkpoint is read. At midnight
-    ! the saved sum belongs to yesterday; intraday restarts must retain it.
+    ! At midnight the saved daily storage sum belongs to yesterday.
+    ! Intraday restarts must retain it; daily setup resumes after this read.
     call etimer%get_curr_date(yr,mon,day,tod)
     if(plant_model.and.tod==0)then
       SeasonalNonstCDayAve_pft(:,bounds%NVN:bounds%NVS,bounds%NHW:bounds%NHE)=0._r8
@@ -4973,8 +4974,64 @@ implicit none
   call restartnc_plant(ncid,flag)
 
   call restartnc_soil(ncid,flag)
+  call restartnc_daily_irrigation(ncid,flag)
 
   end subroutine restartnc
+!------------------------------------------------------------------------------------------
+
+  subroutine restartnc_daily_irrigation(ncid,flag)
+  ! Retain the already-decided day's schedule for exact intraday continuation.
+  use DebugToolMod, only: PrintInfo
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag
+  character(len=*), parameter :: subname='restartnc_daily_irrigation'
+  real(r8), target :: hourly_irrigation(bounds%begc:bounds%endc,24)
+  real(r8), target :: irrigation_depth(bounds%begc:bounds%endc)
+  real(r8), pointer :: hourly_data(:,:),depth_data(:)
+  type(var_desc_t) :: vardesc
+  integer :: varid,yr,mon,dom,tod,schedule_day
+  logical :: has_schedule,has_depth,transfer_schedule
+
+  call PrintInfo('beg '//subname)
+  associate(NHW => bounds%NHW,NHE => bounds%NHE,NVN => bounds%NVN,NVS => bounds%NVS)
+  schedule_day=etimer%get_curr_doy()
+  transfer_schedule=.true.
+  if(flag=='read')then
+    call etimer%get_curr_date(yr,mon,dom,tod)
+    ! At midnight the new day is decided after loading, using restored water.
+    transfer_schedule=tod/=0
+    if(transfer_schedule)then
+      call ncd_inqvid(ncid,'RRIG_day',varid,vardesc,readvar=has_schedule)
+      call ncd_inqvid(ncid,'WDPTH_day',varid,vardesc,readvar=has_depth)
+      transfer_schedule=has_schedule .and. has_depth
+      if(.not.transfer_schedule .and. any(Lirri_auto_col(NVN:NVS,NHW:NHE)))then
+        call endrun('Intraday automatic-irrigation restart lacks RRIG_day/WDPTH_day; use a midnight checkpoint',__LINE__)
+      endif
+      ! Older prescribed-irrigation runs retain the schedule reread from inputs.
+    endif
+  endif
+  if(transfer_schedule)then
+    if(flag=='write')then
+      call cpcol(flag,NHW,NHE,NVN,NVS,RRIG(:,schedule_day,:,:),hourly_irrigation)
+      call cpcol(flag,NHW,NHE,NVN,NVS,WDPTH(schedule_day,:,:),irrigation_depth)
+    endif
+    hourly_data => hourly_irrigation
+    call restartvar(ncid,flag,varname='RRIG_day',dim1name='column',dim2name='hour',&
+      long_name='Hourly irrigation schedule for the checkpoint day',units='m h-1',interpinic_flag='skip',&
+      data=hourly_data,missing_value=spval,fill_value=spval)
+    depth_data => irrigation_depth
+    call restartvar(ncid,flag,varname='WDPTH_day',dim1name='column',&
+      long_name='Irrigation application depth for the checkpoint day',units='m',interpinic_flag='skip',&
+      data=depth_data,missing_value=spval,fill_value=spval)
+    if(flag=='read')then
+      call cpcol(flag,NHW,NHE,NVN,NVS,RRIG(:,schedule_day,:,:),hourly_irrigation)
+      call cpcol(flag,NHW,NHE,NVN,NVS,WDPTH(schedule_day,:,:),irrigation_depth)
+    endif
+  endif
+  end associate
+  call PrintInfo('end '//subname)
+  end subroutine restartnc_daily_irrigation
 !------------------------------------------------------------------------------------------
 
   SUBROUTINE restartnc_soil(ncid,flag)
@@ -5009,7 +5066,17 @@ implicit none
   integer :: gas_residual_varid
   type(Var_desc_t) :: gas_residual_vardesc
   logical :: has_gas_residual
-  integer :: ndoms
+  integer :: ndoms, feedback_varid
+  type(var_desc_t) :: feedback_vardesc
+  logical :: has_heat_deriv, has_heat_ref, has_vap_deriv, has_vap_ref
+  integer :: clim_mean_varid
+  type(var_desc_t) :: clim_mean_vardesc
+  logical :: has_clim_mean_temp
+  logical :: has_fertP_soil,has_fertP_band
+  logical :: has_gpp_day_sum,has_gpp_prev_day,has_gpp_day_hours
+  integer :: salt_boundary_varid
+  type(var_desc_t) :: salt_boundary_vardesc
+  logical :: has_salt_boundary_conc
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -6373,16 +6440,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='ExtWaterTablet0_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='ExtWaterTableLocDepz_col', dim1name='column',&
        long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTableLocDepz_col,datrc_1d) 
   else
-    !print*,'ExtWaterTablet0_col'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0_col,datrc_1d)   
+    !print*,'ExtWaterTableLocDepz_col'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTableLocDepz_col,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='ExtWaterTablet0_col', dim1name='column',&
+    call restartvar(ncid, flag, varname='ExtWaterTableLocDepz_col', dim1name='column',&
        long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
@@ -6394,10 +6461,10 @@ implicit none
        long_name='depth of artificial water table adjusted for elevation', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD_col,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTableLocDepz_col,datrc_1d) 
   else
     !print*,'DTBLD'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLD_col,datrc_1d)   
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TileWaterTableLocDepz_col,datrc_1d)   
     datpr1 => datrc_1d              
     call restartvar(ncid, flag, varname='DTBLD', dim1name='column',&
        long_name='depth of artificial water table adjusted for elevation', units='m', &
@@ -6472,6 +6539,40 @@ implicit none
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
+
+  ! These three fields form one daily clock. Legacy checkpoints cannot
+  ! reconstruct yesterday or a partial day's missing hours, so start all at zero.
+  has_gpp_day_sum=.true.;has_gpp_prev_day=.true.;has_gpp_day_hours=.true.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'GPP_DaySum_col',feedback_varid,feedback_vardesc,readvar=has_gpp_day_sum)
+    call ncd_inqvid(ncid,'GPP_PrevDay_col',feedback_varid,feedback_vardesc,readvar=has_gpp_prev_day)
+    call ncd_inqvid(ncid,'GPP_DayHours_col',feedback_varid,feedback_vardesc,readvar=has_gpp_day_hours)
+    GPP_DaySum_col=0._r8
+    GPP_PrevDay_col=0._r8
+    GPP_DayHours_col=0
+  endif
+  if(has_gpp_day_sum .and. has_gpp_prev_day .and. has_gpp_day_hours)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DaySum_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='GPP_DaySum_col', dim1name='column',&
+      long_name='Accumulated GPP for the current day', units='g C d-2', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DaySum_col,datrc_1d)
+
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_PrevDay_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='GPP_PrevDay_col', dim1name='column',&
+      long_name='GPP for the previous completed day', units='g C d-2', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_PrevDay_col,datrc_1d)
+
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DayHours_col,datic_1d)
+    dat1pr => datic_1d
+    call restartvar(ncid, flag, varname='GPP_DayHours_col', dim1name='column',&
+      long_name='Hours accumulated in the current daily GPP sum', units='hours', interpinic_flag='skip',&
+      data=dat1pr, missing_value=ispval, fill_value=ispval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,GPP_DayHours_col,datic_1d)
+  endif
 
   if(flag=='read')then
     datpr1 => datrc_1d            
@@ -6556,6 +6657,90 @@ implicit none
        long_name='total sensible heat flux x boundary layer resistance', units='MJ m-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)      
+  endif
+
+  ! Preserve the climatological temperature used for atmospheric gas densities.
+  ! Legacy checkpoints predate this field; recover the same site-input mean
+  ! used by STARTS instead of retaining an uninitialized Kelvin temperature.
+  has_clim_mean_temp=.true.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'TairKClimMean_col',clim_mean_varid,clim_mean_vardesc,readvar=has_clim_mean_temp)
+    if(.not.has_clim_mean_temp)then
+      TairKClimMean_col(NVN:NVS,NHW:NHE)=units%Celcius2Kelvin(ATCAI_col(NVN:NVS,NHW:NHE))
+    endif
+
+  endif
+  if(has_clim_mean_temp)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TairKClimMean_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='TairKClimMean_col', dim1name='column',&
+      long_name='Mean annual air temperature', units='K', interpinic_flag='skip',&
+      data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,TairKClimMean_col,datrc_1d)
+  endif
+
+  ! Preserve the paired hourly feedback history. Legacy restarts start with
+  ! zero derivative and build a fresh resistance estimate after one hour.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'dSensHeatdTKQ_col',feedback_varid,feedback_vardesc,readvar=has_heat_deriv)
+    call ncd_inqvid(ncid,'TKQHeatRef_col',feedback_varid,feedback_vardesc,readvar=has_heat_ref)
+    dSensHeatdTKQ_col=0._r8
+    TKQHeatRef_col=0._r8
+    if(has_heat_deriv .and. has_heat_ref)then
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='dSensHeatdTKQ_col', dim1name='column',&
+        long_name='Resistance estimate of weighted sensible-heat derivative', units='MJ m-1 K-1',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,dSensHeatdTKQ_col,datrc_1d)
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='TKQHeatRef_col', dim1name='column',&
+        long_name='Canopy air temperature used for the last completed hour', units='K',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,TKQHeatRef_col,datrc_1d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,dSensHeatdTKQ_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='dSensHeatdTKQ_col', dim1name='column',&
+      long_name='Resistance estimate of weighted sensible-heat derivative', units='MJ m-1 K-1',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,TKQHeatRef_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='TKQHeatRef_col', dim1name='column',&
+      long_name='Canopy air temperature used for the last completed hour', units='K',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+  endif
+
+  ! Preserve the paired hourly feedback history. Legacy restarts start with
+  ! zero derivative and build a fresh resistance estimate after one hour.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'dLatHeatdVPQ_col',feedback_varid,feedback_vardesc,readvar=has_vap_deriv)
+    call ncd_inqvid(ncid,'VPQLatHeatRef_col',feedback_varid,feedback_vardesc,readvar=has_vap_ref)
+    dLatHeatdVPQ_col=0._r8
+    VPQLatHeatRef_col=-1._r8
+    if(has_vap_deriv .and. has_vap_ref)then
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='dLatHeatdVPQ_col', dim1name='column',&
+        long_name='Resistance estimate of weighted latent-energy derivative', units='MJ m2 ton-1',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,dLatHeatdVPQ_col,datrc_1d)
+      datpr1 => datrc_1d
+      call restartvar(ncid, flag, varname='VPQLatHeatRef_col', dim1name='column',&
+        long_name='Canopy vapor concentration used for the last completed hour', units='ton m-3',&
+        interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,VPQLatHeatRef_col,datrc_1d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,dLatHeatdVPQ_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='dLatHeatdVPQ_col', dim1name='column',&
+      long_name='Resistance estimate of weighted latent-energy derivative', units='MJ m2 ton-1',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VPQLatHeatRef_col,datrc_1d)
+    datpr1 => datrc_1d
+    call restartvar(ncid, flag, varname='VPQLatHeatRef_col', dim1name='column',&
+      long_name='Canopy vapor concentration used for the last completed hour', units='ton m-3',&
+      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
   endif
 
   if(flag=='read')then
@@ -7922,16 +8107,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)                
-    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacroPores_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,VLMacroPores_vr,datrc_2d)      
   else
     !print*,'VLMacP'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacP_vr,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,VLMacroPores_vr,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JZ)                    
-    call restartvar(ncid, flag, varname='VLMacP_vr', dim1name='column',dim2name='levsoi',&
+    call restartvar(ncid, flag, varname='VLMacroPores_vr', dim1name='column',dim2name='levsoi',&
        long_name='total volume in macropores', units='m3 d-2', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
@@ -8107,6 +8292,26 @@ implicit none
 
 
   IF(salt_model)THEN
+
+    ! Preserve prescribed boundary chemistry independently of irrigation fluxes.
+    ! The shared salt dimension includes band entries; unused entries are zero.
+    if(flag=='read')then
+      call ncd_inqvid(ncid,'trcSalt_Irrig_vr',salt_boundary_varid,salt_boundary_vardesc, &
+        readvar=has_salt_boundary_conc)
+      if(.not.has_salt_boundary_conc)then
+        write(iulog,*)'Salt restart lacks trcSalt_Irrig_vr boundary concentrations; regenerate the salt restart.'
+        call endrun(trim(mod_filename)//' at line',__LINE__)
+      endif
+    endif
+    datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ)
+    if(flag=='write')then
+      datpr3=0._r8
+      call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_Irrig_vr,datrc_3d)
+    endif
+    call restartvar(ncid, flag, varname='trcSalt_Irrig_vr', dim1name='column',dim2name='satracers', &
+      dim3name='levsoi',long_name='prescribed external-water salt concentration, unbanded',units='mol m-3', &
+      interpinic_flag='skip',data=datpr3,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,trcSalt_Irrig_vr,datrc_3d)
 
     if(flag=='read')then
       datpr3 => datrc_3d(1:ncols,1:trc_confs%NSaltTracers,1:JZ+1)           
@@ -9293,6 +9498,44 @@ implicit none
       data=datpr3, missing_value=spval, fill_value=spval)   
   endif  
 
+  ! Legacy restart files have no fertilizer-P fields; missing pools start at zero.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'FertP_mole_soil_vr',feedback_varid,feedback_vardesc,readvar=has_fertP_soil)
+    FertP_mole_soil_vr=0._r8
+    if(has_fertP_soil)then
+      datpr2 => datrc_2d(1:ncols,1:JZ+1)
+      call restartvar(ncid, flag, varname='FertP_mole_soil_vr', dim1name='column',dim2name='levsoi1',&
+        long_name='Broadcast fertilizer P including surface litter', units='mol P d-2', interpinic_flag='skip',&
+        data=datpr2, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_soil_vr,datrc_2d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_soil_vr,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:JZ+1)
+    call restartvar(ncid, flag, varname='FertP_mole_soil_vr', dim1name='column',dim2name='levsoi1',&
+      long_name='Broadcast fertilizer P including surface litter', units='mol P d-2', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)
+  endif
+
+  ! Legacy restart files have no fertilizer-P fields; missing pools start at zero.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'FertP_mole_band_vr',feedback_varid,feedback_vardesc,readvar=has_fertP_band)
+    FertP_mole_band_vr=0._r8
+    if(has_fertP_band)then
+      datpr2 => datrc_2d(1:ncols,1:JZ)
+      call restartvar(ncid, flag, varname='FertP_mole_band_vr', dim1name='column',dim2name='levsoi',&
+        long_name='Banded fertilizer P in soil', units='mol P d-2', interpinic_flag='skip',&
+        data=datpr2, missing_value=spval, fill_value=spval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_band_vr,datrc_2d)
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,FertP_mole_band_vr,datrc_2d)
+    datpr2 => datrc_2d(1:ncols,1:JZ)
+    call restartvar(ncid, flag, varname='FertP_mole_band_vr', dim1name='column',dim2name='levsoi',&
+      long_name='Banded fertilizer P in soil', units='mol P d-2', interpinic_flag='skip',&
+      data=datpr2, missing_value=spval, fill_value=spval)
+  endif
+
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='WDNHB', dim1name='column', &
@@ -10390,6 +10633,7 @@ implicit none
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
   
   ! "level" dimensions
+  call ncd_defdim(ncid,'hour',24,dimid)
   call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',MaxNumRootAxes,dimid)
   call ncd_defdim(ncid,'nodes',MaxNodesPerBranch,dimid)
@@ -10508,7 +10752,7 @@ implicit none
   character(len=256) :: filename  ! local file name
   character(len=256) :: fnamer    ! restart file name
   integer :: nio
-  integer :: ii,year,mon,day,tod,iostat
+  integer :: ii,year,mon,day,tod,iostat,hh,mm,ss
   nio = getavu()
   filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
   
@@ -10538,6 +10782,10 @@ implicit none
   read(fnamer(ii+1:),'(I2)')day
   ii=ii+3
   read(fnamer(ii+1:),'(I6)')tod
-  write(curr_date,'(I4.4,I2.2,I2.2,I6.6)')year,mon,day,tod
+  ! Restart filenames use seconds since midnight; the driver matches HHMMSS.
+  hh=tod/3600
+  mm=mod(tod,3600)/60
+  ss=mod(tod,60)
+  write(curr_date,'(I4.4,5I2.2)')year,mon,day,hh,mm,ss
   end subroutine get_restart_date
 end module restartMod

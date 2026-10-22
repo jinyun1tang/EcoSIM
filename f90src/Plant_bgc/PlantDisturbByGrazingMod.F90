@@ -227,7 +227,7 @@ contains
     AvgCanopyBiomC2Graze_pft    => plt_biom%AvgCanopyBiomC2Graze_pft     &
   )
   !
-  !     AvgCanopyBiomC2Graze_pft=average biomass in landscape grazing section
+  !     AvgCanopyBiomC2Graze_pft=section mean shoot C density times local cell area
   !     HVST=iHarvstType_pft=0-2:>0=cutting height,<0=fraction of LAI removed
   !          iHarvstType_pft=3:reduction of clumping factor
   !          iHarvstType_pft=4 or 6:animal or insect biomass(g LM m-2),iHarvstType_pft=5:fire
@@ -238,6 +238,7 @@ contains
   !     CCPOLP=nonstructural C concentration in canopy
   !     CanopyNoduleNonstCConc_pft=nonstructural C concentration in canopy nodules
   ! 24. has unit of hour, 0.45 is biomass C fraction
+  ! Both shoot C and its section mean are scaled to this cell area.
   IF(AvgCanopyBiomC2Graze_pft(NZ).GT.ZERO4Groth_pft(NZ))THEN
     TotPhytomassRemoved=CanopyCutProxy_pft(NZ)*THIN_pft(NZ)*0.45_r8/24.0_r8 &
       *AREA3(NU)*ShootElms_pft(ielmc,NZ)/AvgCanopyBiomC2Graze_pft(NZ)

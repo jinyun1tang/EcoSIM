@@ -8,7 +8,7 @@ implicit none
   __FILE__
 
   real(r8),target,allocatable :: PAR_RAD_vr(:,:,:)                             !vertically-resolved PAR radiation,  [umol photon m-2 s-1]
-  real(r8),target,allocatable ::  SLOPE_col(:,:,:)                             !slope	in four directions, [o]
+  real(r8),target,allocatable ::  SLOPE_col(:,:,:)                             !tan(slope angle): 0=magnitude, 1=EW, 2=NS; 3=-1 vertical, [-]
   real(r8),target,allocatable ::  SoilSurfDepZ_col(:,:)                        !depth of soil surface, [m]
   real(r8),target,allocatable ::  FieldCapacity_vr(:,:,:)                      !water contents at field capacity,[m3 d-2]
   real(r8),target,allocatable ::  WiltPoint_vr(:,:,:)                          !water contents at wilting point,[m3 d-2]

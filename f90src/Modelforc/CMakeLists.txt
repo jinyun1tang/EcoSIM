@@ -22,6 +22,7 @@ target_include_directories(modelforc  PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/ATSUtils/
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/CanopyPhys
   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData
   ${CMAKE_BINARY_DIR}/f90src/APIData/
   ${CMAKE_BINARY_DIR}/f90src/APIs/
   ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/

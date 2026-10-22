@@ -360,6 +360,7 @@ module PlantNonstElmDynMod
   real(r8) :: RootDepzMean,PSIOsmo,PSITurg
   real(r8) :: Leff_phol
   real(r8) :: CPOLT(JZ1),CCPOLT,DTransptTube,AreaTranspt
+  real(r8) :: PrimaryRootProteinC
   associate(                                                                   &
     CanopyHeight4WatUptake_pft    => plt_morph%CanopyHeight4WatUptake_pft     ,& !input  :canopy height, [m]  
     iPlantRootProfile_pft         => plt_pheno%iPlantRootProfile_pft          ,& !input  :plant growth type (vascular, non-vascular),[-]  
@@ -409,6 +410,9 @@ module PlantNonstElmDynMod
     fRootTube_rpvr                => plt_morph%fRootTube_rpvr                 ,& !input  :fraction of root for transport,[-]
     NGTopRootLayer_pft            => plt_morph%NGTopRootLayer_pft             ,& !input  :soil layer at planting depth, [-]    
     RootMycoActiveBiomC_pvr       => plt_biom%RootMycoActiveBiomC_pvr         ,& !inoput :root layer structural C, [gC d-2]
+    RootProteinC_pvr              => plt_biom%RootProteinC_pvr                ,& !output :protein C supported by surviving active root tissue, [gC d-2]
+    rProteinC2RootN_pft           => plt_allom%rProteinC2RootN_pft            ,& !input  :protein C to root N ratio, [gC gN-1]
+    rProteinC2RootP_pft           => plt_allom%rProteinC2RootP_pft            ,& !input  :protein C to root P ratio, [gC gP-1]
     PopuRootMycoC_pvr             => plt_biom%PopuRootMycoC_pvr               ,& !inoput :root layer C, [gC d-2]
     RootMycoNonstElms_rpvr        => plt_biom%RootMycoNonstElms_rpvr          ,& !inoput :root layer nonstructural element, [g d-2]
     CanopyNonstElms_brch          => plt_biom%CanopyNonstElms_brch            ,& !inoput :branch nonstructural element, [g d-2]
@@ -431,12 +435,18 @@ module PlantNonstElmDynMod
   !     ECO_ER_col=ecosystem respiration
   !     Eco_AutoR_CumYr_col=total autotrophic respiration
   !
+  ! Rebuild protein of fine radius roots after all growth and withdrawal, from the same surviving
+  ! tissue and layer routing as active carbon. Protein is a derived diagnostic.
+  RootProteinC_pvr(:,:,NZ) = 0._r8
   D5445: DO N=1,Myco_pft(NZ)
     D5450: DO L=NU,MaxSoilLays4Root_pft(NZ)
       RootMycoActiveBiomC_pvr(N,L,NZ) = 0._r8
       PopuRootMycoC_pvr(N,L,NZ)       = 0._r8
       D5460: DO NR=1,NumStructuralRootAxes_pft(NZ)
         RootMycoActiveBiomC_pvr(N,L,NZ) = RootMycoActiveBiomC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)
+        RootProteinC_pvr(N,L,NZ) = RootProteinC_pvr(N,L,NZ) &
+          +MIN(rProteinC2RootN_pft(NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(ielmn,N,L,NR,NZ)), &
+               rProteinC2RootP_pft(NZ)*AZMAX1(RootMyco2ndStrutElms_rpvr(ielmp,N,L,NR,NZ)))
         PopuRootMycoC_pvr(N,L,NZ)       = PopuRootMycoC_pvr(N,L,NZ)+RootMyco2ndStrutElms_rpvr(ielmc,N,L,NR,NZ)           
       ENDDO D5460
       ECO_ER_col          = ECO_ER_col+RootCO2Autor_pvr(N,L,NZ)
@@ -450,10 +460,13 @@ module PlantNonstElmDynMod
   DO  NR=1,NumStructuralRootAxes_pft(NZ) 
     found_coarse=.false.
     DO L=MaxSoilLays4Root_pft(NZ),NU,-1
-      !primary roots are not coarse
+      PrimaryRootProteinC = MIN(rProteinC2RootN_pft(NZ)*AZMAX1(Root1stActStructElms_rpvr(ielmn,L,NR,NZ)), &
+                                rProteinC2RootP_pft(NZ)*AZMAX1(Root1stActStructElms_rpvr(ielmp,L,NR,NZ)))
+      !primary roots are fine in radius
       if(Root1stRadius_rpvr(L,NR,NZ)<2.e-3_r8 .and. .not.found_coarse)then
         L1=NRoot1stTipLay_raxes(NR,NZ)  
         RootMycoActiveBiomC_pvr(ipltroot,L1,NZ) = RootMycoActiveBiomC_pvr(ipltroot,L1,NZ)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
+        RootProteinC_pvr(ipltroot,L1,NZ)        = RootProteinC_pvr(ipltroot,L1,NZ)+PrimaryRootProteinC
         ROOTACTBIOMS_vr(L1)                     = ROOTACTBIOMS_vr(L1)+Root1stActStructElms_rpvr(ielmc,L,NR,NZ)
       else
         !coarse roots enhancement

@@ -1,17 +1,18 @@
 program EcoATSTest
   use ATSCPLMod
-  use BGCContainers_module
+  use EcoContainers_module
   use SharedDataMod
   use GridDataType
   use RootDataType
-  use EcoSIMCtrlMod, only: etimer
+  use EcoSIMCtrlMod
+  
   !use ecosim_Time_Mod  , only : ecosim_time_type
   implicit none
 
   ! Declare variables
-  type (BGCState) :: state
-  type (BGCProperties) :: props
-  type (BGCSizes) :: sizes
+  type (EcoEnvironment) :: env
+  type (EcoFeedback) :: feedback
+  type (EcoSizes) :: sizes
   integer :: NY, NX, L, ii
   integer :: ncells_per_col_, ncol
   !real, dimension(6) :: rain_array
@@ -29,6 +30,9 @@ program EcoATSTest
   sizes%num_columns = 1
   a_bool = .false.
   pheno_bool = .true.
+  !Set pft file manually
+  pft_file_in = '../../../../input_data/ecosim_pftpar_20260303.nc'
+  
   call Init_ATSEcoSIM_driver()
 
   call Init_EcoSIM(sizes)
@@ -49,17 +53,17 @@ end program EcoATSTest
 ! ----------------------------------------------------------------------------
 
 subroutine Init_ATSEcoSIM_driver()
-  use BGCContainers_module
+  use EcoContainers_module
   use SharedDataMod
   use GridDataType
   use CanopyDataType
   implicit none
 
   ! Declare variables
-  type (BGCState) :: state
-  type (BGCProperties) :: props
-  type (BGCSizes) :: sizes
-  integer :: NY, NX, L
+  type (EcoEnvironment) :: env
+  type (EcoFeedback) :: feedback
+  type (EcoSizes) :: sizes
+  integer :: NY, NX, L, NZ
   integer :: ncells_per_col_, ncol
   integer :: kmo,dofmon,ndaysmon
   real(r8) :: dist_step, dist_tot
@@ -71,6 +75,7 @@ subroutine Init_ATSEcoSIM_driver()
   ncol = 1
   dist_step = 1.0
   dist_tot = 1.0 !IC or first layer is zero
+  num_pfts = 5
 
   ! Initialize sizes structure
   sizes%num_components = 1
@@ -113,8 +118,8 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
-  allocate(a_LAI(1:ncells_per_col_))
-  allocate(a_SAI(1:ncells_per_col_))
+  allocate(a_LAI(1:ncells_per_col_,ncol))
+  allocate(a_SAI(1:ncells_per_col_,ncol))
   allocate(column_area(ncol))
 
   !subsurface vars
@@ -129,14 +134,10 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(a_LSAT(ncells_per_col_, ncol))
   allocate(a_SSWS(ncells_per_col_,ncol))
   allocate(a_rdens(ncells_per_col_,ncol))
-
+  
   !Pheno vars
   !allocate(LAI_col(ncells_per_col_,ncol))
-  allocate(a_VEG(ncol))
-  allocate(a_lwcan(ncol))
-  allocate(a_clhf(ncol))
-  allocate(a_cshf(ncol))
-  allocate(a_canopywat(ncol))
+  allocate(a_VEG(num_pfts))
 
   do NY=1,NYS
     do L=1,ncells_per_col_
@@ -173,8 +174,11 @@ subroutine Init_ATSEcoSIM_driver()
     vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
 
-    a_LAI(NY) = 0.2
-    a_SAI(NY) = 0.05
+    a_LAI(NY,1) = 0.2
+    a_SAI(NY,1) = 0.05
+    do NZ=1,num_pfts
+      a_VEG(NZ) = 1
+    enddo
 
   enddo
 

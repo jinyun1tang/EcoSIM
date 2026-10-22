@@ -1,7 +1,7 @@
 module RootGasMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use minimathmod,   only: safe_adb, vapsat, AZMAX1, AZMIN1
-  use minimathmod,   only: fixEXConsumpFlux,isclose, symmetric_flux_limiter
+  use minimathmod,   only: fixEXConsumpFlux,isclose, symmetric_flux_limiter, SubstrateDribbling
   use EcoSIMCtrlMod, only : lcoarseroot
   use DebugToolMod
   use EcosimConst
@@ -75,6 +75,7 @@ module RootGasMod
   real(r8) :: RGasTranspFlxPrev(idg_beg:idg_NH3)       !diagnosed increment gas flux
   real(r8) :: ROXYLX                         !prescribed dissolved O2 removal per substep (negative for supply)
   real(r8) :: O2AqueousForcing,O2GasForcing   !accepted forcing for the current substep
+  real(r8) :: SoilCO2Debt                     !unfunded aqueous CO2 withdrawal in the local predictor, [gC d-2]
   real(r8) :: O2PhaseExchangeRate            !soil gas-water relaxation coefficient
   real(r8) :: O2SoilUptakeRequested          !soil uptake before the donor-budget limit
   real(r8) :: RGas_DisolvSoil_flx(idg_beg:idg_end)     !gas dissolution into aqueous concentration in soil
@@ -110,6 +111,7 @@ module RootGasMod
   
 !     begin_execution
   associate(                                                                 &
+    RootSoilCO2Debt_vr           => plt_rbgc%RootSoilCO2Debt_vr            ,& !output :residual predictor debt for paired soil mass/debt handoff, [gC d-2]
     RootStrutElms_pft            => plt_biom%RootStrutElms_pft              ,& !input  :plant root structural element mass, [g d-2]
     ZERO4Groth_pft               => plt_biom%ZERO4Groth_pft                 ,& !input  :threshold zero for plang growth calculation, [-]
     PlantPopuLive_pft            => plt_site%PlantPopuLive_pft              ,& !input  :plant population, [d-2]
@@ -144,7 +146,7 @@ module RootGasMod
     RootAbsorbLenPerPlant_pvr    => plt_morph%RootAbsorbLenPerPlant_pvr     ,& !input  :root layer length per plant, [m p-1]
     Root2ndXNumL_rpvr            => plt_morph%Root2ndXNumL_rpvr             ,& !input  :root layer number axes, [d-2]
     Root2ndLen_rpvr              => plt_morph%Root2ndLen_rpvr               ,& !input  :population fine-root length per structural axis, [m]
-    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr       ,& !input  :fine-root structural C/N/P per axis, [g]
+    RootMyco2ndStrutElms_rpvr    => plt_biom%RootMyco2ndStrutElms_rpvr      ,& !input  :fine-root structural C/N/P per axis, [g]
     NumStructuralRootAxes_pft    => plt_morph%NumStructuralRootAxes_pft     ,& !input  :number of active structural-root groups, [-]
     Root2ndRadius_rpvr           => plt_morph%Root2ndRadius_rpvr            ,& !input  :root layer diameter secondary axes, [m]
     RootRaidus_rpft              => plt_morph%RootRaidus_rpft               ,& !input  :root internal radius, [m]
@@ -154,7 +156,7 @@ module RootGasMod
     NGTopRootLayer_pft           => plt_morph%NGTopRootLayer_pft            ,& !input  :soil layer at planting depth, [-]
     RootMediumXNum_pvr           => plt_morph%RootMediumXNum_pvr            ,& !inoput :Number of medium size root axes in layer, [d-2]    
     Root1stTransptArea_pvr       => plt_morph%Root1stTransptArea_pvr        ,& !input  :transport area by 1st order root, [-] 
-    RootFineFrac2Med_rpvr         => plt_morph%RootFineFrac2Med_rpvr          ,& !fine-axis-count-weighted medium-root routing by category, [-]
+    RootFineFrac2Med_rpvr        => plt_morph%RootFineFrac2Med_rpvr         ,& !fine-axis-count-weighted medium-root routing by category, [-]
     RootMedTransptArea_pvr       => plt_morph%RootMedTransptArea_pvr        ,& !input  :transport area by medisum size roots, [-]
     MainBranchNum_pft            => plt_morph%MainBranchNum_pft             ,& !input  :number of main branch,[-]
     RootMediumLength_pvr         => plt_morph%RootMediumLength_pvr          ,& !input  :within layer mean length for medium size root axes, [m d-2]              
@@ -174,6 +176,7 @@ module RootGasMod
   )
   
   call PrintInfo('beg '//subname)
+  SoilCO2Debt=0._r8
 
   chkActiveUptk=RootRespPotent_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. RootVH2O_pvr(N,L,NZ).GT.ZERO4Groth_pft(NZ) .AND. FOXYX.GT.ZERO4Uptk_pft(NZ)
 !  if(N.eq.1)write(9340,*)I*1000+J/24.,L,chkActiveUptk,RootStrutElms_pft(ielmc,NZ),FracSoiLayByPrimRoot_pvr(L,NZ)
@@ -663,6 +666,11 @@ module RootGasMod
           !
           !     UPDATE GASEOUS, AQUEOUS GAS CONTENTS AND CONCENTRATIONS
           !     FROM GASEOUS-AQUEOUS EXCHANGE, SOIL GAS TRANSFERS
+          idg=idg_CO2
+          ! Keep transport forcing fixed; bound dissolution by the net gas supply.
+          ! The accepted exchange also updates the aqueous pool below.
+          RGas_DisolvSoil_flx(idg)=MIN(RGas_DisolvSoil_flx(idg), trc_gasml_loc(idg)+RGasTranspFlxPrev(idg))
+          
           DO idg=idg_beg,idg_NH3
             if(idg.eq.idg_O2)then
               ! O2 transport forcing was applied before the coupled budget solve.
@@ -676,7 +684,16 @@ module RootGasMod
 
           !aqueous concentrations in soil
           DO idg=idg_beg,idg_end
-            trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RSoilSolute2Roots(idg)
+            if(idg.eq.idg_CO2)then
+              ! Fixed transport can force outgassing beyond dissolved supply.
+              ! Carry that aqueous deficit through all M/MX substeps; subsequent
+              ! dissolution or root release repays it before restoring free CO2.
+              ! Aqueous mass minus debt retains the signed predictor budget.
+              call SubstrateDribbling(RSoilSolute2Roots(idg)-RGas_DisolvSoil_flx(idg), &
+                SoilCO2Debt,trc_solml_loc(idg))
+            else
+              trc_solml_loc(idg)=trc_solml_loc(idg)+RGas_DisolvSoil_flx(idg)-RSoilSolute2Roots(idg)
+            endif
           enddo
           !
           !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE'
@@ -706,6 +723,10 @@ module RootGasMod
         RootCO2Ar2Soil_pvr(L,NZ)       = RootCO2Ar2Soil_pvr(L,NZ)+RootCO2Prod_tscaled*NPT
       ENDIF
     ENDDO D99
+
+    ! Export only outstanding debt, not every transient deficit. Each root/PFT
+    ! owns a separate soil share; the column handoff sums those final debts.
+    RootSoilCO2Debt_vr(L)=RootSoilCO2Debt_vr(L)+SoilCO2Debt
 
     DO idg=idg_beg,idg_NH3
       trcg_rootml_pvr(idg,N,L,NZ) = trcg_rootml_loc(idg)
