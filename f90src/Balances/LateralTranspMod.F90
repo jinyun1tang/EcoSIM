@@ -3,7 +3,7 @@ module LateralTranspMod
   USE abortutils,       only: endrun
   use EcoSiMParDataMod, only: micpar
   use minimathmod,      only: AZMAX1,safe_adb
-  use EcoSIMConfig,     only: jcplx => jcplxc, NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx
+  use EcoSIMConfig,     only: jcplx => jcplxc, NumMicbHFunGrupsPerCmplx,NumMicbAFunGrupsPerCmplx
   use EcoSIMConfig,     only: nlbiomcp=>NumLiveMicrbCompts
   use TracerPropMod,    only: MolecularWeight
   use ClimForcDataType, only: PBOT_col
@@ -189,7 +189,7 @@ implicit none
         ENDDO
 
         DO  K=1,jcplx
-          DO NO=1,NumMicbFunGrupsPerCmplx
+          DO NO=1,NumMicbHFunGrupsPerCmplx
             DO NGL=JGniH(NO),JGnfH(NO)
               DO M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)
@@ -201,7 +201,7 @@ implicit none
           enddo
         ENDDO
 
-        DO NO=1,NumMicbFunGrupsPerCmplx
+        DO NO=1,NumMicbAFunGrupsPerCmplx
           DO NGL=JGniA(NO),JGnfA(NO)
             DO M=1,nlbiomcp
               MID=micpar%get_micb_id(M,NGL)
@@ -255,7 +255,7 @@ implicit none
           ENDDO
 
           DO  K=1,jcplx
-            DO  NO=1,NumMicbFunGrupsPerCmplx
+            DO  NO=1,NumMicbHFunGrupsPerCmplx
               DO NGL=JGniH(NO),JGnfH(NO)
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)
@@ -267,7 +267,7 @@ implicit none
             enddo
           ENDDO
 
-          DO  NO=1,NumMicbFunGrupsPerCmplx
+          DO  NO=1,NumMicbAFunGrupsPerCmplx
             DO  M=1,nlbiomcp
               DO NGL=JGniA(NO),JGnfA(NO)
                 MID=micpar%get_micb_id(M,NGL)   
@@ -323,7 +323,7 @@ implicit none
           ENDDO
 
           D8380: DO K=1,jcplx
-            DO  NO=1,NumMicbFunGrupsPerCmplx
+            DO  NO=1,NumMicbHFunGrupsPerCmplx
               DO NGL=JGniH(NO),JGnfH(NO)
                 DO  M=1,nlbiomcp
                   MID=micpar%get_micb_id(M,NGL)    
@@ -335,7 +335,7 @@ implicit none
             enddo
           ENDDO D8380
 
-          DO  NO=1,NumMicbFunGrupsPerCmplx
+          DO  NO=1,NumMicbAFunGrupsPerCmplx
             DO NGL=JGniA(NO),JGnfA(NO)
               DO  M=1,nlbiomcp
                 MID=micpar%get_micb_id(M,NGL)      

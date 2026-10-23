@@ -51,7 +51,10 @@ implicit none
   real(r8),allocatable :: CdLitRHSens_col(:,:)            !conductance of sensible heat [MJ/K]
   real(r8),allocatable :: watflw(:,:)
   real(r8),allocatable :: waticefl(:,:)
-
+  real(r8),allocatable :: CdSoiHSens_col(:,:)     ! scaled conductance for sensible heat [MJ/K]
+  real(r8),allocatable :: HeatSnow2LitrM_col(:,:) !heat flux from snow to litter [MJ/d-2]
+  real(r8),allocatable :: HeatAir2LitrM_col(:,:)  !heat flux from air to litter [MJ/d-2]
+  real(r8),allocatable :: HeatSoil2LitrM_col(:,:) !heat flux from soil to litter [MJ/d-2]
   public :: InitSurfPhysData,DestructSurfPhysData
 
   contains
@@ -60,6 +63,7 @@ implicit none
   subroutine InitSurfPhysData  
   implicit none
 
+  allocate(HeatSoil2LitrM_col(JY,JX)); HeatSoil2LitrM_col=0._r8
   allocate(watflw(JY, JX))
   allocate(waticefl(JY,JX))
   allocate(m3OM_col(JY,JX))
@@ -92,13 +96,13 @@ implicit none
   allocate(TEvapXAir2Toplay_col(JY,JX)); TEvapXAir2Toplay_col   = 0._r8
   allocate(TEvapXAir2LitR_col(JY,JX)); TEvapXAir2LitR_col       = 0._r8
   allocate(TEvapXAir2Snow_col(JY,JX)); TEvapXAir2Snow_col       = 0._r8
-!        allocate(HCNDLitr_col(JY,JX));       HCNDLitr_col    = 0._r8
-
-  allocate(HeatSensAir2Grnd_col(JY,JX))
-  allocate(Radnet2Grnd_col(JY,JX))
-  allocate(LatentHeatEvapAir2Grnd_col(JY,JX))
-  allocate(HeatSensVapAir2Grnd_col(JY,JX))
-
+  allocate(HeatSensAir2Grnd_col(JY,JX));    HeatSensAir2Grnd_col=0._r8
+  allocate(Radnet2Grnd_col(JY,JX));         Radnet2Grnd_col=0._r8
+  allocate(LatentHeatEvapAir2Grnd_col(JY,JX)); LatentHeatEvapAir2Grnd_col=0._r8
+  allocate(HeatSensVapAir2Grnd_col(JY,JX)); HeatSensVapAir2Grnd_col=0._r8
+  allocate(HeatSnow2LitrM_col(JY,JX));     HeatSnow2LitrM_col=0._r8
+  allocate(HeatAir2LitrM_col(JY,JX));      HeatAir2LitrM_col=0._r8
+  allocate(CdSoiHSens_col(JY,JX));         CdSoiHSens_col=0._r8
   end subroutine InitSurfPhysData  
 !------------------------------------------------------------------------------------------  
 
@@ -106,6 +110,10 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
+  call destroy(HeatSoil2LitrM_col)
+  call destroy(HeatAir2LitrM_col)
+  call destroy(HeatSnow2LitrM_col)
+  call destroy(CdSoiHSens_col)
   call destroy(CdLitRHSens_col)
   call destroy(m3OM_col)
   call destroy(TEvapXAir2Toplay_col)

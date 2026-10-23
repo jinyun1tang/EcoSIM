@@ -65,9 +65,9 @@ contains
   use ChemTranspDataType, only : H2OVapDifsc_snvr
   use SoilWaterDataType,  only : VLWatMicP_vr, VLiceMicP_vr
   use SoilHeatDataType,   only : TKS_vr, VHeatCapacity_vr
-  use CanopyDataType,     only : WatHeldOnCanopy_pft, SnowOnCanopy_pft, &
+  use CanopyDataType,     only : WatHeldOnCanopy_pft, &
     LWRadCanGPrev_col, WatHeldOnCanopy_col, PSICanopy_pft, TKC_pft, TKCanopy_pft, &
-    ENGYX_pft, DeltaTKC_pft, CanopyBiomWater_pft
+    ENGYX_pft, DeltaTKC_pft, CanopyBiomWater_pft, Transpiration_pft
   use ClimForcDataType,   only : TLEX_col, TSHX_col
   use SharedDataMod,      only : a_Transpiration, a_EvapCan, a_EvapGrnd, a_EvapLitr, &
     a_EvapSnow, a_Sublim, a_PlantInit
@@ -115,8 +115,8 @@ contains
     'surface litter (soil layer 0) heat capacity', VHeatCapacity_vr, 0, 1)
   call add3('canopy_water_pft', 'WatHeldOnCanopy_pft', 'm3 d-2', kRolePrivate, &
     'water held on the canopy per PFT', WatHeldOnCanopy_pft, 1, npft)
-  call add3('canopy_snow', 'SnowOnCanopy_pft', 'm3 d-2', kRolePrivate, &
-    'snow water equivalent held on the canopy per PFT', SnowOnCanopy_pft, 1, npft)
+  ! canopy snow (SnowOnCanopy_pft) is exchanged with ATS through
+  ! feedback%canopy_snow (a_CanSnow), so it is not registered here
   ! Prescribed phenology plant water and energy state, carried between hours
   ! (set at the first advance by InitPrescribedPlantState; the flag keeps a
   ! restarted run from initializing it again)
@@ -150,6 +150,8 @@ contains
   ! terms use EcoSIM's air -> surface sign: <0 = water leaving to the air.
   call add1('transpiration', 'a_Transpiration', 'm3 d-2 h-1', kRoleOutput, &
     'transpiration summed over PFTs; <0 = water to air', a_Transpiration)
+  call add3('transpiration_pft', 'Transpiration_pft', 'm3 d-2 h-1', kRoleOutput, &
+    'transpiration of individual PFTs; <0 = water to air', Transpiration_pft, 1, npft)
   call add1('evaporation_canopy', 'a_EvapCan', 'm2 d-2 h-1', kRoleOutput, &
     'canopy evaporation summed over PFTs, this hour; <0 = water to air', a_EvapCan)
   call add1('evaporation_ground', 'a_EvapGrnd', 'unannotated', kRoleOutput, &

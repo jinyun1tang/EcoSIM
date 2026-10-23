@@ -5,12 +5,14 @@ module StartsMod
 
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   use abortutils,       only: padr,   print_info, check_bool
-  use minimathMod,      only: isclose,AZMAX1, AZMIN1,real_truncate,AZERO
+  use minimathMod,      only: isclose,  AZMAX1,   AZMIN1, real_truncate, AZERO
   use EcoSiMParDataMod, only: micpar
   use SnowPhysMod,      only: InitSnowLayers
   use InitSOMBGCMod,    only: InitSOMConsts, InitSOMProfile, InitSOMVars
   use InitVegBGC,       only: InitIrradianceGeometry
   use TracerPropMod,    only: gas_solubility
+  use MicrobialDiagMod, only: sumSurfOMCK
+  use UnitMod,          only: units
   use DebugToolMod
   use EcosimConst
   use TracerIDMod
@@ -45,8 +47,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
-  use SoilBGCNLayMod, only : sumSurfOMCK
-  use UnitMod, only : units
+
   implicit none
 
   private
@@ -66,6 +67,7 @@ module StartsMod
   public :: starts
   public :: set_ecosim_solver
   public :: startsim
+  public :: InitControlParms
   contains
 
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
@@ -87,8 +89,8 @@ module StartsMod
 ! begin_execution
 
   call PrintInfo('beg '//subname)
-  !  Initialize controlling parameters
-  call InitControlParms
+  
+  call InitControlParms  
   !
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)
@@ -347,7 +349,7 @@ module StartsMod
   real(r8) :: TORGL(JZ)
   real(r8) :: VMINL
   real(r8) :: VORGC,XS
-  real(r8) :: VSolidSoil !volume of solid soil in one m3 volume
+  real(r8) :: VSolidSoil !volume of solid soil in one m3 volume, including mineral and organic particles
 ! begin_execution
 ! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 ! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
@@ -431,8 +433,8 @@ module StartsMod
         !particle density of solid OM is about 1.20~1.4 g/cm3, while 
         !particle density for minearl soil is about 2.66 g/cm3~Mg/m3, 1 m^3=1.e6 cm^3
         PTDS              = ppmc*(DensitySolidOM*VORGCM+DensitySolidMineral*(1.0E+06_r8-VORGCM)) ![Mg m-3]
-        VSolidSoil        = SoilBulkDensity_vr(L,NY,NX)/PTDS      ! [Mg m-3]/[Mg m-3]
-        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-VSolidSoil)        
+        VSolidSoil        = SoilBulkDensity_vr(L,NY,NX)/PTDS      ! volume of soil as solid [Mg m-3]/[Mg m-3]
+        POROS_vr(L,NY,NX) = AZMAX1(1.0_r8-VSolidSoil)             ! volume of pores in one unit soil
       ELSE
         !for ponding water
         VSolidSoil        = 0._r8
@@ -485,11 +487,11 @@ module StartsMod
           THETW_vr(L,NY,NX)=THW_vr(L,NY,NX)
         ENDIF
         IF(THI_vr(L,NY,NX).GT.1.0_r8)THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(POROS_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(isclose(THI_vr(L,NY,NX),1.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(isclose(THI_vr(L,NY,NX),0.0_r8))THEN
-          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THW_vr(L,NY,NX)))
+          THETI_vr(L,NY,NX)=AZMAX1(AMIN1(WiltPoint_vr(L,NY,NX),POROS_vr(L,NY,NX)-THETW_vr(L,NY,NX)))
         ELSEIF(THI_vr(L,NY,NX).LT.0.0_r8)THEN
           THETI_vr(L,NY,NX)=0.0_r8
         ELSE
@@ -513,7 +515,7 @@ module StartsMod
       !
       HBAconst_vr(L,NY,NX)=AMAX1(HBAmin_vr(L,NY,NX)*exp(-0.035_r8*SolidOMPercent_vr(L,NY,NX)),0.5_r8)
       
-    ELSEIF(L==0)THEN 
+    ELSEIF(L.eq.0)THEN 
     
       IF(VLitR_col(NY,NX).GT.ZEROS(NY,NX))THEN
         VHeatCapacity_vr(0,NY,NX)=cpo*gOC_to_m3_OM(SoilOrgM_vr(ielmc,0,NY,NX))+cpw*VLWatMicP_vr(0,NY,NX)+cpi*VLiceMicP_vr(0,NY,NX)
@@ -742,38 +744,9 @@ module StartsMod
   BulkDensLitR=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
   call InitSOMConsts
-  !     NDIM=1
-  !     IF(NHE.GT.NHW)NDIM=NDIM+1
-  !     IF(NVS.GT.NVN)NDIM=NDIM+1
-  !     XDIM=1.0/NDIM
+
   ZERO  = 1.0E-16_r8
   ZERO2 = 1.0E-08_r8
-  TAREA = 0.0_r8  !land scape area
-  !
-  !     INITIALIZE MASS BALANCE CHECKS
-  !
-  CRAIN_lnd           = 0.0_r8
-  HEATIN_lnd          = 0.0_r8
-  SurfGas_lnd(idg_CO2)     = 0.0_r8
-  SurfGas_lnd(idg_O2)      = 0.0_r8
-  SurfGas_lnd(idg_H2)      = 0.0_r8
-  TZIN                = 0.0_r8
-  SurfGas_lnd(idg_N2)      = 0.0_r8
-  TPIN                = 0.0_r8
-  tAmendOrgC_lnd      = 0.0_r8
-  TORGN               = 0.0_r8
-  TORGP               = 0.0_r8
-  QH2OLoss_lnds       = 0.0_r8
-  CEVAP               = 0.0_r8
-  CRUN                = 0.0_r8
-  HeatOut_lnds        = 0.0_r8
-  OXYGOU              = 0.0_r8
-  H2GOU               = 0.0_r8
-  TSedmErossLoss_lnds = 0.0_r8
-  TOMOU_lnds(:)       = 0.0_r8
-  Litrfall_lnds(:)    = 0.0_r8
-  TIONIN              = 0.0_r8
-  TIONOU              = 0.0_r8
   end subroutine InitControlParms
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators()
@@ -920,6 +893,7 @@ module StartsMod
       ENDDO
       !volume of litter layer
       VLitR_col(NY,NX)           = VLitR0*ppmc*AREA_3D(3,L,NY,NX)
+      
       VGeomLayer_vr(L,NY,NX)     = VLitR_col(NY,NX)
       VLSoilPoreMicP_vr(L,NY,NX) = VGeomLayer_vr(L,NY,NX)
       VLSoilMicP_vr(L,NY,NX)     = VLSoilPoreMicP_vr(L,NY,NX)
@@ -953,7 +927,7 @@ module StartsMod
       
       CumSoilThickMidL_vr(L,NY,NX) = 0.5_r8*(CumSoilThickness_vr(L,NY,NX)+CumSoilThickness_vr(L-1,NY,NX))
       VGeomLayer_vr(L,NY,NX)       = AREA_3D(3,L,NY,NX)*DLYR_3D(3,L,NY,NX)     ![m3]
-      VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)
+      VLSoilPoreMicP_vr(L,NY,NX)   = VGeomLayer_vr(L,NY,NX)*FracSoiAsMicP_vr(L,NY,NX)  !volume of soil occupied by micropores
       VLSoilMicP_vr(L,NY,NX)       = VLSoilPoreMicP_vr(L,NY,NX)
       VGeomLayert0_vr(L,NY,NX)     = VGeomLayer_vr(L,NY,NX)
 !     bulk density is defined only for soil with micropores
@@ -1008,7 +982,38 @@ module StartsMod
   end subroutine set_ecosim_solver
 
 !------------------------------------------------------------------------------------------
+  subroutine InitLandScapeVars
+  implicit none
+  TAREA = 0.0_r8  !land scape area
+  !
+  !     INITIALIZE MASS BALANCE CHECKS
+  !
+  CRAIN_lnd           = 0.0_r8
+  HEATIN_lnd          = 0.0_r8
+  SurfGas_lnd(idg_CO2)     = 0.0_r8
+  SurfGas_lnd(idg_O2)      = 0.0_r8
+  SurfGas_lnd(idg_H2)      = 0.0_r8
+  TZIN                = 0.0_r8
+  SurfGas_lnd(idg_N2)      = 0.0_r8
+  TPIN                = 0.0_r8
+  tAmendOrgC_lnd      = 0.0_r8
+  TORGN               = 0.0_r8
+  TORGP               = 0.0_r8
+  QH2OLoss_lnds       = 0.0_r8
+  CEVAP               = 0.0_r8
+  CRUN                = 0.0_r8
+  HeatOut_lnds        = 0.0_r8
+  OXYGOU              = 0.0_r8
+  H2GOU               = 0.0_r8
+  TSedmErossLoss_lnds = 0.0_r8
+  TOMOU_lnds(:)       = 0.0_r8
+  Litrfall_lnds(:)    = 0.0_r8
+  TIONIN              = 0.0_r8
+  TIONOU              = 0.0_r8
 
+  end subroutine InitLandScapeVars  
+
+!------------------------------------------------------------------------------------------
   subroutine startsim(NHW,NHE,NVN,NVS)
   use SoilHydroParaMod, only : ComputeSoilHydroPars
   use SoilPhysParaMod, only : SetDeepSoil
@@ -1031,8 +1036,8 @@ module StartsMod
       call SetDeepSoil(NY,NX,NM,JZ)
     enddo
   enddo
-  !  Initialize controlling parameters
-  call InitControlParms
+
+  call InitLandScapeVars
 
   !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
   call InitIrradianceGeometry(YSIN,YCOS,SkyAzimuthAngle)

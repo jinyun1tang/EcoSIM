@@ -118,8 +118,8 @@ subroutine Init_ATSEcoSIM_driver()
   allocate(surf_e_source(1:ncells_per_col_))
   allocate(surf_w_source(1:ncells_per_col_))
   allocate(surf_snow_depth(1:ncells_per_col_))
-  allocate(a_LAI(1:ncells_per_col_))
-  allocate(a_SAI(1:ncells_per_col_))
+  allocate(a_LAI(1:ncells_per_col_,ncol))
+  allocate(a_SAI(1:ncells_per_col_,ncol))
   allocate(column_area(ncol))
 
   !subsurface vars
@@ -174,8 +174,8 @@ subroutine Init_ATSEcoSIM_driver()
     vpair(NY) = 3.9167352020740509E-002*1.0e3
     uwind(NY) = 1.1
 
-    a_LAI(NY) = 0.2
-    a_SAI(NY) = 0.05
+    a_LAI(NY,1) = 0.2
+    a_SAI(NY,1) = 0.05
     do NZ=1,num_pfts
       a_VEG(NZ) = 1
     enddo

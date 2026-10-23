@@ -2,11 +2,19 @@ module PlantAPI4Uptake
 !
 ! interface to integrate the plant model
 ! for prescribed phenology
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
-  use MiniMathMod,      only: AZMAX1
-  use EcoSIMCtrlMod,    only: ats_cpl_mode
+  use data_kind_mod,              only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,           only: micpar, pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col
+  use MiniMathMod,                only: AZMAX1
+  use EcoSIMCtrlMod,              only: ats_cpl_mode
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantSoilChemistryAPIData,  only: plt_soilchem
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
   use NumericalAuxMod
   use EcoSIMSolverPar
   use EcoSIMHistMod
@@ -33,7 +41,7 @@ module PlantAPI4Uptake
   use FertilizerDataType
   use SoilBGCDataType
   use PlantMgmtDataType
-  use PlantAPIData
+  use PlantAPICommonData
 implicit none
 
   private
@@ -56,7 +64,7 @@ implicit none
   plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column
   plt_site%ZERO                    = ZERO                              !numerical threshold
   plt_site%ZERO2                   = ZERO2                             !numerical threshold
-  plt_morph%LeafStalkAreaAll_col      = LeafStalkAreaAll_col(NY,NX)          !leaf+stalk area,  set as phenology input
+  plt_morph%LeafStalkAreaAll_col   = LeafStalkAreaAll_col(NY,NX)          !leaf+stalk area,  set as phenology input
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_morph%CanopyLeafArea_col     = CanopyLeafArea_col(NY,NX)         !canopy leaf area, set as phenolgoy input
   plt_site%NL                      = NL_col(NY,NX)                     !lower node number of the total vertical number of soil layers used for water uptake
@@ -86,7 +94,7 @@ implicit none
   plt_ew%Eco_Heat_Sens_col         = Eco_Heat_Sens_col(NY,NX)          !whole ecosystem sensible heat, updated iteratively, reset to zero in hour1.F90
   plt_ew%Eco_Heat_Latent_col       = Eco_Heat_Latent_col(NY,NX)        !whole ecosystem latent heat, updated iterately, reset to zero in hour1.F90
   plt_ew%Eco_Heat_GrndSurf_col     = Eco_Heat_GrndSurf_col(NY,NX)      !heat to ground surface, updated iterately, reset to zero in hour1.F90
-  plt_ew%CanopyBiomWater_col             = CanopyBiomWater_col(NY,NX)              !canopy water content, updated iterately
+  plt_ew%CanopyBiomWater_col       = CanopyBiomWater_col(NY,NX)              !canopy water content, updated iterately
   plt_ew%WatHeldOnCanopy_col       = WatHeldOnCanopy_col(NY,NX)        !water held on canopy, updated iterately
   plt_ew%SnowOnCanopy_col          = SnowOnCanopy_col(NY,NX)
   plt_ew%QVegET_col                = QVegET_col(NY,NX)                 !canopy evapotranspiration, reset to zero in hour1.F90
@@ -135,9 +143,12 @@ implicit none
         IsPlantActive_pft(NZ,NY,NX)=iFalse
       endif
     endif
-    plt_ew%ETCanopy_CumYr_pft(NZ)      = ETCanopy_CumYr_pft(NZ,NY,NX)
-    plt_ew%ENGYX_pft(NZ)               = ENGYX_pft(NZ,NY,NX)
-    plt_morph%NGTopRootLayer_pft(NZ)  = 1
+    plt_morph%StalkAxialResist_pft(NZ)         = StalkAxialResist_pft(NZ,NY,NX)
+    plt_morph%RootSingleVesselRstaxial_pft(NZ) = RootSingleVesselRstaxial_pft(NZ,NY,NX)
+    plt_morph%RootSingleVesselArea_pft(NZ)     = RootSingleVesselArea_pft(NZ,NY,NX)
+    plt_ew%ETCanopy_CumYr_pft(NZ)              = ETCanopy_CumYr_pft(NZ,NY,NX)
+    plt_ew%ENGYX_pft(NZ)                       = ENGYX_pft(NZ,NY,NX)
+    plt_morph%NGTopRootLayer_pft(NZ)        = 1
     plt_morph%LeafStalkAreaAct_pft(NZ)      = LeafStalkAreaAct_pft(NZ,NY,NX)      !pft leaf+stalk area
     plt_morph%HypocotHeight_pft(NZ)         = HypocotHeight_pft(NZ,NY,NX)      !(approximately) plant height
     plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)      !number of branches, can be set to one for simplicity
@@ -146,7 +157,7 @@ implicit none
     plt_morph%CanopyHeightDead_pft(NZ)      = CanopyHeightDead_pft(NZ,NY,NX)
     plt_morph%CanopyStemSurfArea_pft(NZ)    = CanopyStemSurfArea_pft(NZ,NY,NX)     !canopy stem area, set as prescribed input
     plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)     !canopy leaf area, set as prescribed input
-    plt_morph%MaxSoiL4Root_pft(NZ)          = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
+    plt_morph%MaxSoilLays4Root_pft(NZ)      = NK_col(NY,NX)                     !can be derived from root type, set to maximum for simplicity
     plt_morph%Myco_pft(NZ)                  = Myco_pft(NZ,NY,NX)                !no mycorrhizae
     plt_biom%CanopyLeafSheathC_pft(NZ)      = CanopyLeafSheathC_pft(NZ,NY,NX)    !need to convert from leaf area
     plt_biom%CanopySapwoodC_pft(NZ)         = CanopySapwoodC_pft(NZ,NY,NX)        !need to convert from stem area
@@ -159,7 +170,7 @@ implicit none
     DO N=1,Myco_pft(NZ,NY,NX)
       plt_morph%Root1stMaxRadius_pft(N,NZ) = Root1stMaxRadius_pft(N,NZ,NY,NX)
       plt_morph%Root2ndMaxRadius_pft(N,NZ) = Root2ndMaxRadius_pft(N,NZ,NY,NX)
-      plt_morph%RootAxialResist_pft(N,NZ)  = RootAxialResist_pft(N,NZ,NY,NX)
+      plt_morph%Root2ndAxialResist_pft(N,NZ)  = Root2ndAxialResist_pft(N,NZ,NY,NX)
       plt_morph%RootPorosity_pft(N,NZ)     = RootPorosity_pft(N,NZ,NY,NX)
       plt_morph%RootRadialResist_pft(N,NZ) = RootRadialResist_pft(N,NZ,NY,NX)
       plt_morph%Root1stMaxRadius1_pft(N,NZ) = Root1stMaxRadius1_pft(N,NZ,NY,NX)
@@ -167,7 +178,11 @@ implicit none
     ENDDO
 
     DO L=1,NK_col(NY,NX)
-      plt_morph%Root1stXNumL_pvr(L,NZ)  = Root1stXNumL_pvr(L,NZ,NY,NX)
+      plt_morph%Root1stXNumL_pvr(L,NZ)     = Root1stXNumL_pvr(L,NZ,NY,NX)
+      plt_morph%CRootLumenArea_pvr(L,NZ)   = CRootLumenArea_pvr(L,NZ,NY,NX)
+      plt_morph%RootFineFrac2Med_rpvr(:,L,NZ) = RootFineFrac2Med_rpvr(:,L,NZ,NY,NX)
+      plt_morph%RootMediumLength_pvr(L,NZ) = RootMediumLength_pvr(L,NZ,NY,NX)
+      plt_morph%MRootLumenArea_pvr(L,NZ)   = MRootLumenArea_pvr(L,NZ,NY,NX)
       DO N=1,Myco_pft(NZ,NY,NX)
         plt_morph%Root2ndXNumL_rpvr(N,L,NZ)   = Root2ndXNumL_rpvr(N,L,NZ,NY,NX)
         plt_morph%Root1stRadius_pvr(N,L,NZ) = Root1stRadius_pvr(N,L,NZ,NY,NX)
@@ -207,22 +222,23 @@ implicit none
       ENDDO
     ENDDO
     !variables updated iteratively
-    plt_ew%CanopyBiomWater_pft(NZ)          = CanopyBiomWater_pft(NZ,NY,NX)    !canopy biom water, updated iteratively
-    plt_ew%TKC_pft(NZ)                      = TKC_pft(NZ,NY,NX)                !canopy temeprature updated iteratively
-    plt_ew%TKCanopy_pft(NZ)                 = TKCanopy_pft(NZ,NY,NX)           !canopy temperature updated iteratively
-    plt_photo%RawCanopy2Atm_pft(NZ)      = RawCanopy2Atm_pft(NZ,NY,NX)
+    plt_ew%CanopyBiomWater_pft(NZ)         = CanopyBiomWater_pft(NZ,NY,NX)    !canopy biom water,    updated iteratively
+    plt_ew%TKC_pft(NZ)                     = TKC_pft(NZ,NY,NX)                !canopy temeprature updated iteratively
+    plt_ew%TKCanopy_pft(NZ)                = TKCanopy_pft(NZ,NY,NX)           !canopy temperature updated iteratively
+    plt_photo%RawCanopy2Atm_pft(NZ)        = RawCanopy2Atm_pft(NZ,NY,NX)
     plt_ew%SnowOnCanopy_pft(NZ)            = SnowOnCanopy_pft(NZ,NY,NX)
-    plt_ew%WatHeldOnCanopy_pft(NZ)          = WatHeldOnCanopy_pft(NZ,NY,NX)     !water held by canopy surface
-    plt_rad%FracPARads2Canopy_pft(NZ)       = FracPARads2Canopy_pft(NZ,NY,NX)
-    plt_ew%HeatXAir2PCan_pft(NZ)            = HeatXAir2PCan_pft(NZ,NY,NX)
-    plt_rad%RadPARCanopyAbsorption_pft(NZ)          = RadPARCanopyAbsorption_pft(NZ,NY,NX)      !computed from surface energy module
-    plt_rad%RadSWCanopyAbsorption_pft(NZ)           = RadSWCanopyAbsorption_pft(NZ,NY,NX)       !computed from surface energy module
-    plt_ew%RainIntcptByCanopy_pft(NZ)       = RainIntcptByCanopy_pft(NZ,NY,NX)  !computed from hour1,           rainfall partition
-    plt_ew%SnowIntcptByCanopy_pft(NZ)       = SnowIntcptByCanopy_pft(NZ,NY,NX)
-    plt_pheno%IsPlantActive_pft(NZ)         = IsPlantActive_pft(NZ,NY,NX)       !lai >0,                        active
-    plt_ew%PSICanopy_pft(NZ)                = PSICanopy_pft(NZ,NY,NX)
-    plt_pheno%TempOffset_pft(NZ)            = TempOffset_pft(NZ,NY,NX)             !set based on read in pft parameter
-    plt_ew%OrganOsmoPsi0pt_pft(NZ)            = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
+    plt_ew%WatHeldOnCanopy_pft(NZ)         = WatHeldOnCanopy_pft(NZ,NY,NX)     !water held by canopy surface
+    plt_rad%FracPARads2Canopy_pft(NZ)      = FracPARads2Canopy_pft(NZ,NY,NX)
+    plt_rad%FracPARads2LiveCanopy_pft(NZ)  = FracPARads2LiveCanopy_pft(NZ,NY,NX)
+    plt_ew%HeatXAir2PCan_pft(NZ)           = HeatXAir2PCan_pft(NZ,NY,NX)
+    plt_rad%RadPARCanopyAbsorption_pft(NZ) = RadPARCanopyAbsorption_pft(NZ,NY,NX)      !computed from surface energy module
+    plt_rad%RadSWCanopyAbsorption_pft(NZ)  = RadSWCanopyAbsorption_pft(NZ,NY,NX)       !computed from surface energy module
+    plt_ew%RainIntcptByCanopy_pft(NZ)      = RainIntcptByCanopy_pft(NZ,NY,NX)  !computed from hour1, rainfall partition
+    plt_ew%SnowIntcptByCanopy_pft(NZ)      = SnowIntcptByCanopy_pft(NZ,NY,NX)
+    plt_pheno%IsPlantActive_pft(NZ)        = IsPlantActive_pft(NZ,NY,NX)       !lai >0,              active
+    plt_ew%PSICanopy_pft(NZ)               = PSICanopy_pft(NZ,NY,NX)
+    plt_pheno%TempOffset_pft(NZ)           = TempOffset_pft(NZ,NY,NX)             !set based on read in pft parameter
+    plt_ew%OrganOsmoPsi0pt_pft(NZ)         = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
 
   ENDDO
   end subroutine PlantUptakeAPISend
@@ -249,6 +265,7 @@ implicit none
   HeatFlx2Canopy_col(NY,NX)        = plt_ew%HeatFlx2Canopy_col
   LWRadCanG_col(NY,NX)             = plt_ew%LWRadCanG
   DO NZ=1,NP0_col(NY,NX)
+    CdH2ORootxSoil_pft(NZ,NY,NX)     = plt_ew%CdH2ORootxSoil_pft(NZ)
     ENGYX_pft(NZ,NY,NX)              = plt_ew%ENGYX_pft(NZ)
     ETCanopy_CumYr_pft(NZ,NY,NX)     = plt_ew%ETCanopy_CumYr_pft(NZ)
     DeltaTKC_pft(NZ,NY,NX)           = plt_ew%DeltaTKC_pft(NZ)

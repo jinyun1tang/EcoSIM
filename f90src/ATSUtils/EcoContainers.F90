@@ -162,6 +162,8 @@ module EcoContainers_module
      type (EcoMatrixDouble) :: plant_wilting_factor
      type (EcoMatrixDouble) :: rooting_depth_fraction
      type (EcoMatrixDouble) :: plant_functional_type
+     type (EcoMatrixDouble) :: LAI
+     type (EcoMatrixDouble) :: SAI
      type (EcoTensorDouble) :: mole_fraction
      ! per column: num_columns
      type (EcoVectorDouble) :: column_area
@@ -175,10 +177,9 @@ module EcoContainers_module
      type (EcoVectorDouble) :: elevation
      type (EcoVectorDouble) :: aspect
      type (EcoVectorDouble) :: slope
-     type (EcoVectorDouble) :: LAI
-     type (EcoVectorDouble) :: SAI
      type (EcoVectorDouble) :: vegetation_type
      type (EcoVectorDouble) :: snow_albedo
+     type (EcoVectorDouble) :: surface_temperature
      ! atmosphere composition
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
@@ -194,7 +195,7 @@ module EcoContainers_module
   end type EcoEnvironment
 
   ! --------------------------------------------------------------------------
-  ! EcoSIM -> ATS, every advance (snow_depth is also sent in)
+  ! EcoSIM -> ATS, every advance (snow_depth and canopy_snow are also sent in)
   ! --------------------------------------------------------------------------
   type, public, bind(c) :: EcoFeedback
      type (EcoMatrixDouble) :: subsurface_water_source
@@ -202,6 +203,7 @@ module EcoContainers_module
      type (EcoVectorDouble) :: surface_water_source
      type (EcoVectorDouble) :: surface_energy_source
      type (EcoVectorDouble) :: snow_depth
+     type (EcoMatrixDouble) :: canopy_snow
   end type EcoFeedback
 
   ! --------------------------------------------------------------------------

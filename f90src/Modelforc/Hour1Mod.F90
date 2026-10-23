@@ -7,9 +7,9 @@ module Hour1Mod
   use FertilizerMod,     only: ApplyFertilizerAtNoon
   use EcoSIMConfig,      only: jcplx=>jcplxc, nlbiomcp=>NumLiveMicrbCompts
   use EcoSIMConfig,      only: ndbiomcp=>NumDeadMicrbCompts, jsken=>jskenc
-  use EcoSIMConfig,      only: NumMicbFunGrupsPerCmplx=>NumMicbFunGrupsPerCmplx, do_instequil
+  use EcoSIMConfig,      only: do_instequil
   use EcoSiMParDataMod,  only: micpar, pltpar
-  use SoilBGCNLayMod,    only: sumORGMLayL
+  use MicrobialDiagMod,  only: sumORGMLayL
   use PlantMgmtDataType, only: NP_col
   use BalancesMod,       only: SummarizeTracerMass, BegCheckBalances
   use EcosimConst,       only: mGravAccelerat
@@ -337,8 +337,8 @@ module Hour1Mod
 !     WATER,SNOW,SOLUTE RUNOFF
 !
       QLaterFlow2Cell_col(NY,NX)    = 0._r8
-      QCanopyWat2Dist_col(NY,NX)     = 0._r8
-      HeatCanopy2Dist_col(NY,NX)     = 0._r8
+      QCanopyWatLoss2Dist_col(NY,NX)     = 0._r8
+      CanopyHeatLoss2Dist_col(NY,NX)     = 0._r8
       HydroSufDOCFlx_col(NY,NX)      = 0._r8
       HydroSufDONFlx_col(NY,NX)      = 0._r8
       HydroSufDOPFlx_col(NY,NX)      = 0._r8
@@ -350,7 +350,7 @@ module Hour1Mod
       HydroSubsDOPFlx_col(NY,NX)     = 0._r8
       HydroSubsDIPFlx_col(NY,NX)     = 0._r8
       SurfRunoffPotentM_col(:,NY,NX) = 0._r8
-
+      trcnuts_hydrloss_flx_col(:,NY,NX)=0._r8
       DOM_FloXSurRunoff_2DH(idom_beg:idom_end,1:jcplx,1:2,1:2,NY,NX) = 0._r8
       trcg_FloXSurRunoff_2D(idg_beg:idg_NH3,1:2,1:2,NY,NX)           = 0._r8
       trcn_FloXSurRunoff_2D(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)  = 0._r8
@@ -1534,7 +1534,7 @@ module Hour1Mod
 
     IF(VLWatMicP_vr(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO idg=idg_beg,idg_NH3
-        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)
+        trc_solcl_vr(idg,L,NY,NX)=AZMAX1(trcs_solml_vr(idg,L,NY,NX)-trcs_solml_drib_vr(idg,L,NY,NX))/VLWatMicP_vr(L,NY,NX)        
       ENDDO
     ELSE
       trc_solcl_vr(idg_beg:idg_NH3,L,NY,NX)=0._r8
@@ -1548,6 +1548,7 @@ module Hour1Mod
       CSoilOrgM_vr(ielmc,L,NY,NX)=0._r8
     ENDIF
   ENDDO
+  !write(9134,*)I*1000+J/24.,trc_solcl_vr(idg_O2,1:2,NY,NX),trcs_solml_vr(idg_O2,1:2,NY,NX),trcs_solml_drib_vr(idg_O2,1:2,NY,NX)  
   call PrintInfo('end '//subname)
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------

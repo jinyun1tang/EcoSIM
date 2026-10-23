@@ -661,7 +661,7 @@ contains
       IF(VLHeatCapSnowMX.GT.VLHeatCapSnowMin_col(NY,NX))THEN
         !apparent temperature before freeze-thaw
         TKApp=(ENGY0+NetHeat2LayL)/VLHeatCapSnowMX
-!        if(NY==1 .and. NX==6 .and. L==1)print*,MM,'Tkapp',TKApp,VOLW0X,ZERO*VcumSnoDWI_col(NY,NX)
+
         IF((TKApp.LT.TFice .AND. VOLW0X.GT.ZERO*VcumSnoDWI_col(NY,NX)) &
           .OR.(TKApp.GT.TFice .AND. VOLI0X+VOLS0X.GT.ZERO*VcumSnoDWI_col(NY,NX)))THEN
           !freeze-thaw condition met
@@ -700,18 +700,18 @@ contains
         SnowThawMass   = 0.0_r8
         IceThawMass    = 0.0_r8
       ENDIF
-!
-!     INTERNAL SNOWPACK SNOW, WATER, ICE, TEMPERATURE
-!
-!     VLDrySnoWE0M,VOLW0M,VOLI0M=snow water eqv,water,ice volume
-!     NetSno2LayL,NetWat2LayL,NetIce2LayL=net snow,water,ice transfer
-!     NetHeat2LayL=conductive+convective heat from snow,water,ice transfer
-!     SnowThawMass,IceThawMass=freeze-thaw changes in water,ice
-!     HeatByFrezThaw=source-limited latent heat flux from freeze-thaw
-!     DENSICE=ice density
-!     TKSnow1,TairK=snowpack,air temperature
-!     VHCPWMM,VLHeatCapSnowMin_col=snowpack, minimum heat capacity
-!
+      !
+      !     INTERNAL SNOWPACK SNOW, WATER, ICE, TEMPERATURE
+      !
+      !     VLDrySnoWE0M,VOLW0M,VOLI0M=snow water eqv,water,ice volume
+      !     NetSno2LayL,NetWat2LayL,NetIce2LayL=net snow,water,ice transfer
+      !     NetHeat2LayL=conductive+convective heat from snow,water,ice transfer
+      !     SnowThawMass,IceThawMass=freeze-thaw changes in water,ice
+      !     HeatByFrezThaw=source-limited latent heat flux from freeze-thaw
+      !     DENSICE=ice density
+      !     TKSnow1,TairK=snowpack,air temperature
+      !     VHCPWMM,VLHeatCapSnowMin_col=snowpack, minimum heat capacity
+      !
       if(abs(NetWat2LayL)>1.e10)call endrun(trim(mod_filename)//' at line',__LINE__)
       CumSno2SnowLM_snvr(L,NY,NX)      = CumSno2SnowLM_snvr(L,NY,NX)+NetSno2LayL
       CumWat2SnowLM_snvr(L,NY,NX)      = CumWat2SnowLM_snvr(L,NY,NX)+NetWat2LayL
@@ -743,7 +743,7 @@ contains
         TKSnow1_snvr(L,NY,NX)=TKSnow1_snvr(L-1,NY,NX)
       ENDIF
       tEnGYM_snvr(L,NY,NX)=ENGY0+NetHeat2LayL+HeatByFrezThaw
-!      if(I>=108 .and. L==1)write(*,*)'solvewm',M,TKSnow1_snvr(L,NY,NX),TK1X
+
       if(VLHeatCapSnowM1_snvr(L,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8 .and. &
         (TK1X/=spval .and. abs(TK1X-TKSnow1_snvr(L,NY,NX))>20._r8 .or. TKSnow1_snvr(L,NY,NX)<200._r8))then
         write(*,*)'dh, TK1X, TKSnow1',I+J/24.,M,L,TK1X,TKSnow1_snvr(L,NY,NX)
@@ -1166,27 +1166,42 @@ contains
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else
-      if(.not. fixWaterLevel .and. .not. ats_cpl_mode)then
-        VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
-        VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-        ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
-        VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
-          +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
-        VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
-          +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)
-        VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)
+      if(.not. fixWaterLevel)then
+        !in ATS mode the soil state is owned by ATS, so only the fluxes below are kept
+        if(.not. ats_cpl_mode)then
+          VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
+          VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+          ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+          VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
+            +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
+          VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
+            +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)
+          VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)
+
+          ! topsoil layer is there
+          IF(VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+            tk1pres                      = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+            TKSoil1_vr(NUM_col(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
+          ELSE
+            TKSoil1_vr(NUM_col(NY,NX),NY,NX) = TairK_col(NY,NX)
+          ENDIF
+        else
+          !ATS receives the residual as liquid water through Qinflx2Soil_col and its
+          !energy through HeatFlx2Grnd_col. The export subtracts cpw*TFice per unit of
+          !Qinflx2Soil_col (ATS energy reference), so add that back here and send the
+          !residual's energy relative to TFice, including the latent heat needed to
+          !melt its ice and dry snow, which ATS cannot see.
+          HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX) &
+            +cpw*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWW &
+            +cpi*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWI &
+            +cps*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWS &
+            -LtHeatIceMelt*(FLWI*DENSICE+FLWS) &
+            +cpw*TFice*(FLWW+FLWI*DENSICE+FLWS)
+        endif
 
         QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
         QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
         QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
-
-        ! topsoil layer is there
-        IF(VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-          tk1pres                      = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
-          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
-        ELSE
-          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = TairK_col(NY,NX)
-        ENDIF
 
         Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
         QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
@@ -1848,7 +1863,8 @@ contains
   character(len=*), parameter :: subname='SnowTopSoilExch'
 
   call PrintInfo('beg '//subname)
-  call UpdateSoilWaterPotential(NY,NX)
+  !in ATS mode keep the ATS matric potential (see SoilSRFEnerbyBalanceM)
+  if(.not.ats_cpl_mode)call UpdateSoilWaterPotential(NY,NX)
   !micropore pressure, excluding gravitational pressure
   PSISV1=PSISM1_vr(NUM_col(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM_col(NY,NX),NY,NX)
 !

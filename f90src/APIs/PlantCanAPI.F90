@@ -1,11 +1,19 @@
 module PlantCanAPI
 
 ! interface to integrate the plant model
-  use data_kind_mod,    only: r8 => DAT_KIND_R8
-  use EcoSiMParDataMod, only: micpar, pltpar
-  use SoilPhysDataType, only: SurfAlbedo_col
-  use MiniMathMod,      only: AZMAX1
-  use EcoSIMCtrlMod,    only: ldo_sp_mode
+  use data_kind_mod,              only: r8 => DAT_KIND_R8
+  use EcoSiMParDataMod,           only: micpar, pltpar
+  use SoilPhysDataType,           only: SurfAlbedo_col
+  use MiniMathMod,                only: AZMAX1
+  use EcoSIMCtrlMod,              only: ldo_sp_mode
+  use PlantSiteAPIData,           only: plt_site
+  use PlantPhotosynthesisAPIData, only: plt_photo
+  use PlantRadiationAPIData,      only: plt_rad
+  use PlantMorphologyAPIData,     only: plt_morph
+  use PlantPhenologyAPIData,      only: plt_pheno
+  use PlantSoilChemistryAPIData,  only: plt_soilchem
+  use PlantBiomassAPIData,        only: plt_biom
+  use PlantEnergyWaterAPIData,    only: plt_ew
   use EcoSIMSolverPar
   use EcoSIMHistMod
   use SnowDataType
@@ -31,7 +39,8 @@ module PlantCanAPI
   use FertilizerDataType
   use SoilBGCDataType
   use PlantMgmtDataType
-  use PlantAPIData
+  use PlantAPICommonData
+
 implicit none
 
   private
@@ -92,7 +101,7 @@ implicit none
     plt_soilchem%VLSoilMicP_vr(L)     = VLSoilMicP_vr(L,NY,NX)
     plt_soilchem%VLWatMicP_vr(L)      = VLWatMicP_vr(L,NY,NX)
   ENDDO
-  
+
   plt_ew%SnowOnCanopy_col          = SnowOnCanopy_col(NY,NX)
   plt_ew%fSnowCanopy_col           = fSnowCanopy_col(NY,NX)
   plt_rad%SineSunInclinationAngle_col     = SineSunInclinationAngle_col(NY,NX)
@@ -105,6 +114,7 @@ implicit none
   plt_rad%RadPARDiffus_col         = RadPARDiffus_col(NY,NX)
   plt_rad%RadSWDirect_col          = RadSWDirect_col(NY,NX)
   plt_rad%RadDirectPAR_col         = RadDirectPAR_col(NY,NX)
+  plt_rad%RadPARGrnd_col           = RadPARGrnd_col(NY,NX)
   plt_site%SoilSurfRoughness_col = SoilSurfRoughness_col(NY,NX)
   plt_ew%VcumWatSnow_col           = VcumWatSnow_col(NY,NX)
   plt_ew%VcumIceSnow_col           = VcumIceSnow_col(NY,NX)
@@ -116,21 +126,24 @@ implicit none
   plt_ew%BulkFactor4Snow_col       = BulkFactor4Snow_col(NY,NX)
   plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
   DO NZ=1,NP_col(NY,NX)
-    plt_ew%fSnowCanopy_pft(NZ) = fSnowCanopy_pft(NZ,NY,NX)
-    plt_ew%BulkFactor4Snow_pft(NZ) = BulkFactor4Snow_pft(NZ,NY,NX)
+    plt_site%PlantPopuDead_pft(NZ)          = PlantPopuDead_pft(NZ,NY,NX)
+    plt_morph%StemSpecVolume_pft(NZ)        = StemSpecVolume_pft(NZ,NY,NX)
+    plt_ew%SnowOnCanopy_pft(NZ)             = SnowOnCanopy_pft(NZ,NY,NX)
+    plt_ew%fSnowCanopy_pft(NZ)              = fSnowCanopy_pft(NZ,NY,NX)
+    plt_ew%BulkFactor4Snow_pft(NZ)          = BulkFactor4Snow_pft(NZ,NY,NX)
     plt_pheno%iPlant2ndGrothPattern_pft(NZ) = iPlant2ndGrothPattern_pft(NZ,NY,NX)
-    plt_morph%CanopyLeafArea_pft(NZ)   = CanopyLeafArea_pft(NZ,NY,NX)
-    plt_morph%CanopyHeightDead_pft(NZ) = CanopyHeightDead_pft(NZ,NY,NX)
-    plt_morph%CanopyHeightLive_pft(NZ)     = CanopyHeightLive_pft(NZ,NY,NX)    
-    plt_morph%ClumpFactorNow_pft(NZ)   = ClumpFactorNow_pft(NZ,NY,NX)
-    plt_rad%LeafSWabsorptivity_pft(NZ)     = LeafSWabsorptivity_pft(NZ,NY,NX)
-    plt_rad%LeafPARabsorptivity_pft(NZ)    = LeafPARabsorptivity_pft(NZ,NY,NX)
-    plt_rad%RadSWLeafTransmitance_pft(NZ)  = RadSWLeafTransmitance_pft(NZ,NY,NX)
-    plt_rad%RadSWLeafAlbedo_pft(NZ)    = RadSWLeafAlbedo_pft(NZ,NY,NX)
-    plt_rad%RadPARLeafTransmitance_pft(NZ) = RadPARLeafTransmitance_pft(NZ,NY,NX)
-    plt_rad%RadPARLeafAlbedo_pft(NZ)    = RadPARLeafAlbedo_pft(NZ,NY,NX)
-    plt_morph%NumOfBranches_pft(NZ)    = NumOfBranches_pft(NZ,NY,NX)
-    plt_morph%ClumpFactor_pft(NZ)      = ClumpFactor_pft(NZ,NY,NX)
+    plt_morph%CanopyLeafArea_pft(NZ)        = CanopyLeafArea_pft(NZ,NY,NX)
+    plt_morph%CanopyHeightDead_pft(NZ)      = CanopyHeightDead_pft(NZ,NY,NX)
+    plt_morph%CanopyHeightLive_pft(NZ)      = CanopyHeightLive_pft(NZ,NY,NX)
+    plt_morph%ClumpFactorNow_pft(NZ)        = ClumpFactorNow_pft(NZ,NY,NX)
+    plt_rad%LeafSWabsorptivity_pft(NZ)      = LeafSWabsorptivity_pft(NZ,NY,NX)
+    plt_rad%LeafPARabsorptivity_pft(NZ)     = LeafPARabsorptivity_pft(NZ,NY,NX)
+    plt_rad%RadSWLeafTransmitance_pft(NZ)   = RadSWLeafTransmitance_pft(NZ,NY,NX)
+    plt_rad%RadSWLeafAlbedo_pft(NZ)         = RadSWLeafAlbedo_pft(NZ,NY,NX)
+    plt_rad%RadPARLeafTransmitance_pft(NZ)  = RadPARLeafTransmitance_pft(NZ,NY,NX)
+    plt_rad%RadPARLeafAlbedo_pft(NZ)        = RadPARLeafAlbedo_pft(NZ,NY,NX)
+    plt_morph%NumOfBranches_pft(NZ)         = NumOfBranches_pft(NZ,NY,NX)
+    plt_morph%ClumpFactor_pft(NZ)           = ClumpFactor_pft(NZ,NY,NX)
 
     DO  L=1,NumCanopyLayers
       plt_morph%CanopyStemSurfAreaZ_pft(L,NZ) = CanopyStemSurfAreaZ_pft(L,NZ,NY,NX)
@@ -202,6 +215,7 @@ implicit none
   RadDirectPAR_col(NY,NX)    = plt_rad%RadDirectPAR_col
   RadPARDiffus_col(NY,NX)    = plt_rad%RadPARDiffus_col
   RadSWGrnd_col(NY,NX)       = plt_rad%RadSWGrnd_col
+  RadPARGrnd_col(NY,NX)      = plt_rad%RadPARGrnd_col
   FracSWRad2Grnd_col(NY,NX)  = plt_rad%FracSWRad2Grnd_col
   RadSWSolarBeam_col(NY,NX)  = plt_rad%RadSWSolarBeam_col
   RadPARSolarBeam_col(NY,NX) = plt_rad%RadPARSolarBeam_col
@@ -226,6 +240,7 @@ implicit none
     RadPARCanopyAbsorption_pft(NZ,NY,NX) = plt_rad%RadPARCanopyAbsorption_pft(NZ)
     ClumpFactorNow_pft(NZ,NY,NX)         = plt_morph%ClumpFactorNow_pft(NZ)
     FracPARads2Canopy_pft(NZ,NY,NX)      = plt_rad%FracPARads2Canopy_pft(NZ)
+    FracPARads2LiveCanopy_pft(NZ,NY,NX)  = plt_rad%FracPARads2LiveCanopy_pft(NZ)
     StomatalStress_pft(NZ,NY,NX)         = plt_biom%StomatalStress_pft(NZ)
     Eco_RadSW_col(NY,NX)                 = Eco_RadSW_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
     RadSW_Canopy_col(NY,NX)         = RadSW_Canopy_col(NY,NX)+RadSWCanopyAbsorption_pft(NZ,NY,NX)
