@@ -1033,9 +1033,17 @@ module UptakesMod
         cumPRootH2OUptake     = scal*CumWaterPlant2Soil+CumWaterSoil2Plant
         CumPlantHeatLoss2Soil = scal*CumHeatPlant2Soil+CumHeatSoil2Plant        
       else
-        !neglible water release to soil
-        cumPRootH2OUptake     = CumWaterSoil2Plant
-        CumPlantHeatLoss2Soil = CumHeatSoil2Plant        
+        if(ldo_sp_mode)then
+          !prescribed phenology: no release to the soil, so the plant receives
+          !what it takes from the soil and the per-layer uptake
+          !(RPlantRootH2OUptk_pvr, the soil sink) and the plant agree
+          cumPRootH2OUptake     = CumWaterSoil2Plant
+          CumPlantHeatLoss2Soil = CumHeatSoil2Plant
+        else
+          !full plant model unchanged (same inconsistency, not yet reviewed)
+          cumPRootH2OUptake     = 0._r8
+          CumPlantHeatLoss2Soil = 0._r8
+        endif
       endif
       !
       !     TEST TRANSPIRATION - ROOT WATER UPTAKE VS. CHANGE IN CANOPY

@@ -126,6 +126,8 @@ module EcoContainers_module
      real (c_double) :: heat_capacity
      real (c_double) :: field_capacity
      real (c_double) :: wilting_point
+     real (c_double) :: latitude
+     real (c_double) :: solar_noon
      logical (c_bool) :: p_bool
      logical (c_bool) :: a_bool
      logical (c_bool) :: pheno_bool
@@ -189,6 +191,7 @@ module EcoContainers_module
      ! clock
      integer (c_int) :: current_day
      integer (c_int) :: current_year
+     integer (c_int) :: current_hour
   end type EcoEnvironment
 
   ! --------------------------------------------------------------------------

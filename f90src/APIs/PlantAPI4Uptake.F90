@@ -278,6 +278,9 @@ implicit none
     RadNet2Canopy_pft(NZ,NY,NX)      = plt_rad%RadNet2Canopy_pft(NZ)
     TKCanopy_pft(NZ,NY,NX)           = plt_ew%TKCanopy_pft(NZ)
     PSICanopy_pft(NZ,NY,NX)          = plt_ew%PSICanopy_pft(NZ)
+    !plant tissue water is carried between steps (as PlantAPIRecv does for the
+    !full plant model); ROOTUPTAKES updates it by transpiration - root uptake
+    CanopyBiomWater_pft(NZ,NY,NX)    = plt_ew%CanopyBiomWater_pft(NZ)
     WatHeldOnCanopy_pft(NZ,NY,NX)    = plt_ew%WatHeldOnCanopy_pft(NZ)
     SnowOnCanopy_pft(NZ,NY,NX)       = plt_ew%SnowOnCanopy_pft(NZ)
     PSICanopyOsmo_pft(NZ,NY,NX)      = plt_ew%PSICanopyOsmo_pft(NZ)

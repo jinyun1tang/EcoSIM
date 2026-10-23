@@ -53,6 +53,8 @@ contains
   heat_capacity = config%heat_capacity
   pressure_at_field_capacity = config%field_capacity
   pressure_at_wilting_point = config%wilting_point
+  site_latitude = config%latitude
+  site_solar_noon = config%solar_noon
   p_bool = config%p_bool
   a_bool = config%a_bool
   pheno_bool = config%pheno_bool
@@ -193,6 +195,7 @@ contains
   atm_nh3 = env%atm_nh3
   current_day = env%current_day
   current_year = env%current_year
+  current_hour = env%current_hour
 
   ! p_bool was set from the config at setup
   if(p_bool)THEN

@@ -62,14 +62,14 @@ implicit none
   use PlantMod
   use WthrMod
   use PlantInfoMod
-  !use InitPlantMod
+  !InitPlantMod is not used: its InitPlantPhenoMorphoBio(NZ) would hide the
+  !column versions from StartqMod (module level) called in the PFT loop
+  use MiniFuncMod, only : GetDayLength
   !use InitEcoSIM
   implicit none
   integer, intent(in) :: NYS  !Number of columns?
 
   integer :: NY,NX,NZ,L,NHW,NHE,NVN,NVS, I, J, M, heat_vec_size, NPH_Test, LS, npfts, NP
-  integer :: nu_plt
-  logical :: pft_changed
   real(r8) :: Wat_next
   real(r8) :: YSIN(NumOfSkyAzimuthSects),YCOS(NumOfSkyAzimuthSects),SkyAzimuthAngle(NumOfSkyAzimuthSects)
   real(r8) :: ResistanceLitRLay(JY,JX)
@@ -114,7 +114,11 @@ implicit none
   allocate(a_VEG_test(5))
   
   NHW=1;NHE=1;NVN=1;NVS=NYS
-  I=1;J=1
+  !clock from ATS: day of year I (1-365) and hour J (1-24); EcoSIM's hour J
+  !covers [J-1, J) h, here the hour starting at this call. The sun position
+  !(PrepHourlyWeather) and the plant model use them; they were fixed at I=1,
+  !J=1 (sun always below the horizon, no shortwave) before.
+  I=current_day+1;J=current_hour+1
   NPH_Test=1
   NX=1
   npfts=1
@@ -125,12 +129,9 @@ implicit none
   !what Day/Month is it?
   call ComputeDatefromATS(current_day, current_year, current_month, day_of_month, total_days_in_month)
   write(*,*) "(ATSEcoSIMAdvance) month: ", current_month, " day: ", day_of_month, " of ", total_days_in_month
-  !I = current_day+1
-  !J = 12
-
   yearIJ%year=current_year
-  yearIJ%J=12
-  yearIJ%I=current_day+1
+  yearIJ%J=J
+  yearIJ%I=I
 
   call SetMeshATS(NHW,NVN,NHE,NVS)
   !call InitModules()
@@ -190,8 +191,10 @@ implicit none
     !convert VPA from ATS units (Pa) to EcoSIM (MPa)
     !VPA(NY,NX) = vpair(NY)/1.0e6_r8
 
-    SolarNoonHour_col(NY,NX) = 12.0_r8
-    ALAT_col(NY,NX)       = 40.0_r8
+    !site from ATS (PK parameters "solar noon [h]", "latitude [degrees]")
+    SolarNoonHour_col(NY,NX) = site_solar_noon
+    ALAT_col(NY,NX)       = site_latitude
+    DayLensCurr_col(NY,NX) = GetDayLength(ALAT_col(NY,NX),I)   !day length [h] (DayMod in standalone)
     !VPS(NY,NX)              = vapsat0(TairK_col(NY,NX))*EXP(-ALTI_col(NY,NX)/7272.0_r8)
     VPK_col(NY,NX)          = vpair(NY)/1.0e3 !vapor pressure in kPa
     !VPK_col(NY,NX)          = AMIN1(VPK_col(NY,NX),VPS(NY,NX))
@@ -372,7 +375,11 @@ implicit none
     enddo
     a_VEG_test(1) = a_VEG(1)
     
-    !loop over npfts and fill snow on canopy variables
+    !prescribed phenology. Every hour: the canopy structure prescribed by ATS
+    !and the plant traits (parameters only). The plant water/energy state
+    !(canopy water potential, canopy temperatures, canopy heat storage, plant
+    !water) is initialized once, at the first advance, and then carried from
+    !hour to hour as in standalone EcoSIM; it is no longer reset every hour.
     if (ldo_sp_mode) then
       DO NZ=1,num_pfts
         if (a_PFT(NZ,NY) .GT. 0.0) then
@@ -383,13 +390,11 @@ implicit none
 
             irootType_col(NY,NX) = irootType_pft(NZ,NY,NX)
             CanopyHeight_col(NY,NX) = CanopyHeightLive_pft(NZ,NY,NX)
-            TKCanopy_pft(NZ,NY,NX) = TairK_col(NY,NX)
-        
-            !Load the PFT array from ATS and fill the plant traits 
+            !Load the PFT array from ATS and fill the plant traits
             ! based on that mapping
             DATAPI(NZ,NY,NX) = a_PFT(NZ,NY)
-            call ReadPlantProperties(nu_plt,NZ,NY,NX,pft_changed)
-            
+            call ReadPlantProperties(0,NZ,NY,NX,.false.)
+
             call InitDimensionsandUptake(NZ,NY,NX)
 
             call InitPlantPhenoMorphoBio(NZ,NY,NX)
@@ -399,19 +404,9 @@ implicit none
             !Set cuticle resistances scaled from pft trait file
             H2OCuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)/3600.0_r8
             CO2CuticleResist_pft(NZ,NY,NX) = CuticleResist_pft(NZ,NY,NX)*1.56_r8
-            
-            ATCA_col(NY,NX)                 = 6.0_r8
-            ENGYX_pft(NZ,NY,NX)             = 0._r8
-            DeltaTKC_pft(NZ,NY,NX)          = 0._r8
-            TdegCCanopy_pft(NZ,NY,NX)       = ATCA_col(NY,NX)
-            TKC_pft(NZ,NY,NX)               = units%Celcius2Kelvin(TdegCCanopy_pft(NZ,NY,NX))
-            TCGroth_pft(NZ,NY,NX)           = TdegCCanopy_pft(NZ,NY,NX)
-            TKGroth_pft(NZ,NY,NX)           = units%Celcius2Kelvin(TCGroth_pft(NZ,NY,NX))
-            fTCanopyGroth_pft(NZ,NY,NX)     = 1.0_r8
-            !PSICanopy_pft(NZ,NY,NX)         = -1.0E-03_r8
-            PSICanopy_pft(NZ,NY,NX)         = -2.0_r8
-            PSICanopyOsmo_pft(NZ,NY,NX)     = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
-            PSICanopyTurg_pft(NZ,NY,NX)     = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+            ATCA_col(NY,NX)                = 6.0_r8
+
+            if (a_PlantInit(NY,1) .LT. 0.5_r8) call InitPrescribedPlantState(NZ,NY,NX)
         else
             !Empty PFT slot (zeros are packed at the end of a_PFT). NP_col still
             !includes it, so mark it inactive (DATAPI=0) with no canopy or roots
@@ -422,6 +417,7 @@ implicit none
             CanopyHeightLive_pft(NZ,NY,NX) = 0._r8
         endif
       enddo
+      a_PlantInit(NY,1) = 1.0_r8
     endif
   ENDDO
   
@@ -465,6 +461,8 @@ implicit none
     HeatInfl2Soil(NY,NX)=0.0_r8
     Qinflx2Soil_col(NY,NX)=0.0_r8
     HeatFlx2Grnd_col(NY,NX)=0.0_r8
+    a_EvapSnow(NY)=0.0_r8
+    a_Sublim(NY)=0.0_r8
     
     HeatFlowSno2SoiByWat_col(NY,NX)=0.0_r8
     HeatConvFlxSno2Soi_col(NY,NX)=0.0_r8
@@ -514,6 +512,10 @@ implicit none
     !sum fluxes over iterations in each column
     do NY=1, NYS
       Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP_col(NY,NX)
+      !EVAPW_col/EVAPS_col are reset at every substep (InitSnowAccumsM), so
+      !add them over the substeps to get the hourly snow evaporation/sublimation
+      a_EvapSnow(NY)          = a_EvapSnow(NY)+EVAPW_col(NY,NX)
+      a_Sublim(NY)            = a_Sublim(NY)+EVAPS_col(NY,NX)
 
       !Solve the skin energy balance: surface fluxes, linearized about Told with
       !dLWRaddTKsoi1 [MJ K-1 per substep], equal conduction to the top cell:
@@ -560,7 +562,8 @@ implicit none
     !ATS input). Shift the energy of the exported water Qinflx2Soil_col to the
     !ATS reference, otherwise each m3 of infiltration adds ~cpw*273 MJ of heat.
     flux_per_area = (HeatFlx2Grnd_col(NY,1) - cpw*TFice*Qinflx2Soil_col(NY,1)) / column_area(NY)
-    !surf_e_source(NY) = SIGN(MIN(ABS(flux_per_area), surf_e_max), flux_per_area)
+    !No cap (surf_e_max): the skin energy balance above bounds the exported
+    !heat by the soil conductance, which the cap was standing in for
     surf_e_source(NY) = flux_per_area
     
     dTexp = surf_e_source(NY)/heat_capacity
@@ -591,8 +594,7 @@ implicit none
 
     a_EvapGrnd(NY) = TEvapXAir2Toplay_col(NY,NX) !bare ground evaporation
     a_EvapLitr(NY) = TEvapXAir2LitR_col(NY,NX) !litter evaporation
-    a_EvapSnow(NY) = EVAPW_col(NY,NX) !water evapoartion from snow
-    a_Sublim(NY) = EVAPS_col(NY,NX) !water sublimation from snow
+    !a_EvapSnow, a_Sublim: added over the substeps in the M loop above
     !DO LS=1,JS
     !  a_TS(LS,L) = TKSnow1_snvr(LS,NY,NX)
     !ENDDO
@@ -607,5 +609,36 @@ implicit none
   
   !end associate
   end subroutine RunEcoSIMSurfaceBalance
+
+!------------------------------------------------------------------------------------------
+  subroutine InitPrescribedPlantState(NZ,NY,NX)
+  !
+  !Description
+  !Prescribed phenology: initial plant water and energy state of PFT NZ,
+  !set at the first advance (when ATS's air temperature is available) and
+  !then carried between hours and checkpointed (see ATSStateRegistryMod), as
+  !in standalone EcoSIM (StartqMod).
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  !canopy energy state: canopy at air temperature, no stored heat
+  ENGYX_pft(NZ,NY,NX)         = 0._r8
+  DeltaTKC_pft(NZ,NY,NX)      = 0._r8
+  TKC_pft(NZ,NY,NX)           = TairK_col(NY,NX)
+  TKCanopy_pft(NZ,NY,NX)      = TairK_col(NY,NX)
+  TdegCCanopy_pft(NZ,NY,NX)   = units%Kelvin2Celcius(TKC_pft(NZ,NY,NX))
+  TCGroth_pft(NZ,NY,NX)       = TdegCCanopy_pft(NZ,NY,NX)
+  TKGroth_pft(NZ,NY,NX)       = TKC_pft(NZ,NY,NX)
+  fTCanopyGroth_pft(NZ,NY,NX) = 1.0_r8
+
+  !canopy water potential: standalone initial value (StartqMod.F90)
+  PSICanopy_pft(NZ,NY,NX)     = -1.0E-03_r8
+  PSICanopyOsmo_pft(NZ,NY,NX) = OrganOsmoPsi0pt_pft(NZ,NY,NX)+PSICanopy_pft(NZ,NY,NX)
+  PSICanopyTurg_pft(NZ,NY,NX) = AZMAX1(PSICanopy_pft(NZ,NY,NX)-PSICanopyOsmo_pft(NZ,NY,NX))
+
+  !plant tissue water: unset, PrescribePhenologyInterp starts it in equilibrium
+  !with the leaf carbon
+  CanopyBiomWater_pft(NZ,NY,NX) = 0._r8
+  end subroutine InitPrescribedPlantState
 
 end module ATSEcoSIMAdvanceMod

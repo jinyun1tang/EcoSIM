@@ -13,6 +13,7 @@ set(APIDATA_SOURCES
   PlantRootBGCAPIData.F90
   PlantAPICommonData.F90
   PlantAPIData.F90
+  PlantMathFuncMod.F90
 )
 
 #include_directories(${CMAKE_BINARY_DIR}/f90src/Utils/)
@@ -21,8 +22,10 @@ set(APIDATA_SOURCES
 include(add_ecosim_library)
 add_ecosim_library(APIData ${APIDATA_SOURCES})
 
-target_include_directories(APIData PRIVATE 
+target_include_directories(APIData PRIVATE
   ${CMAKE_BINARY_DIR}/f90src/Utils/
+  ${CMAKE_BINARY_DIR}/f90src/Minimath/
+  ${CMAKE_BINARY_DIR}/f90src/DebugTools/
   ${CMAKE_BINARY_DIR}/f90src/Modelconfig/
   ${CMAKE_BINARY_DIR}/f90src/Modelpars/
   ${CMAKE_BINARY_DIR})
