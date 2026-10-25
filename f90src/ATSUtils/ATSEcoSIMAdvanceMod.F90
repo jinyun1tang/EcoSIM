@@ -87,13 +87,6 @@ implicit none
   real(r8) :: VPS(JY,JX)
   real(r8) :: EMM, CLD
   real(r8) :: SkyLWEst  !EcoSIM estimate of incoming longwave [MJ m-2 h-1]
-  !surface skin temperature, solved each substep
-  integer  :: L0                 !top soil layer
-  real(r8) :: kTop               !thermal conductivity of the top cell [MJ m-1 h-1 K-1]
-  real(r8) :: Told, Tnew, Heff, Gs
-  real(r8) :: GcondTop(JY)       !conductance skin to top cell centre [MJ h-1 K-1]
-  real(r8) :: TbelowTop(JY)      !ATS top cell temperature [K]
-  real(r8) :: TsurfStart(JY)     !skin temperature at the start of the hour [K]
   real(r8) :: dTexp, Tfinal
   real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
   real(r8), PARAMETER :: surf_e_max=0.1_r8
@@ -173,6 +166,16 @@ implicit none
   enddo
   write(*,*) "(ATS-EcoSIM Advance) Day: ", current_day, " Year: ", current_year
 
+  !Weather from ATS: PrepHourlyWeather takes the IWTHR=-999 branch and starts
+  !from the ATS incident shortwave of each column, which CalcRadiation splits into
+  !direct/diffuse with the sun position (and the canopy model then between canopy
+  !and ground). IWTHR is otherwise unset in ATS mode, which selected the
+  !hourly-file branch (no data, zero shortwave) and overwrote the ATS value.
+  IWTHR = -999
+  do NY=1,NYS
+    RadSWATS_col(NY,NX) = swrad(NY)*0.0036_r8   !W m-2 to MJ m-2 h-1
+  enddo
+
   call PrepHourlyWeather(I,J,NHW,NHE,NVN,NVS)
   do NY=1,NYS
     NU_col(NY,NX)               = a_NU(NY)
@@ -203,7 +206,6 @@ implicit none
     WindSpeedAtm_col(NY,NX) = uwind(NY)*3600.0_r8
     !converting radiation units from ATS (W m^-2) to EcoSIM (MJ m^-2 h^-1)
     RadSWGrnd_col(NY,NX) = swrad(NY)*0.0036_r8
-    RMAX = swrad(NY)*0.0036_r8
     
     !Set snow and initialize snow layers
     SnowAlbedo_col(NY,NX) = a_SALB(NY)
@@ -474,21 +476,6 @@ implicit none
     Radnet2Grnd_col(NY,NX)=0.0_r8
     LatentHeatEvapAir2Grnd_col(NY,NX)=0.0_r8
     HeatSensVapAir2Grnd_col(NY,NX)=0.0_r8
-
-    !EcoSIM owns the surface skin temperature (TKSoil1_vr of the top layer):
-    !it has no heat capacity and is solved each substep so that the surface
-    !fluxes balance conduction into the ATS top cell, as ATS's own surface
-    !energy balance does. ATS receives that conducted heat, which is bounded by
-    !the soil conductance. The ATS surface temperature is only the first guess.
-    L0   = NU_col(NY,NX)
-    kTop = a_TCOND(L0,NY)*3600._r8                     !MW m-1 K-1 to MJ m-1 h-1 K-1
-    if(kTop <= 0._r8) kTop = 0.0036_r8                 !1 W m-1 K-1 if ATS sends none
-    !skin to top cell centre, matching ATS's top face discretization. Use the
-    !ATS cell thickness: DLYR_3D is derived from ATS centroid depths treated as
-    !layer-bottom depths, which makes the top layer half the ATS cell
-    GcondTop(NY)   = AREA_3D(3,L0,NY,NX)*kTop/(0.5_r8*a_dz(L0,NY))
-    TbelowTop(NY)  = a_TEMP(L0,NY)
-    TsurfStart(NY) = TKSoil1_vr(L0,NY,NX)
   enddo
 
   !Runs the main subcycling for the surface energy and water balance in
@@ -511,28 +498,12 @@ implicit none
 
     !sum fluxes over iterations in each column
     do NY=1, NYS
+      HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX)+HeatInfl2Soil(NY,NX)
       Qinflx2Soil_col(NY,NX)  = Qinflx2Soil_col(NY,NX)+Qinfl2MicP_col(NY,NX)
       !EVAPW_col/EVAPS_col are reset at every substep (InitSnowAccumsM), so
       !add them over the substeps to get the hourly snow evaporation/sublimation
       a_EvapSnow(NY)          = a_EvapSnow(NY)+EVAPW_col(NY,NX)
       a_Sublim(NY)            = a_Sublim(NY)+EVAPS_col(NY,NX)
-
-      !Solve the skin energy balance: surface fluxes, linearized about Told with
-      !dLWRaddTKsoi1 [MJ K-1 per substep], equal conduction to the top cell:
-      !  F(Told) + dH*(Tnew-Told) = Gs*(Tnew-Tbelow)
-      !Heat carried by infiltrating water is taken relative to the skin.
-      L0   = NU_col(NY,NX)
-      Told = TKSoil1_vr(L0,NY,NX)
-      Heff = HeatInfl2Soil(NY,NX)-cpw*Told*Qinfl2MicP_col(NY,NX)
-      Gs   = GcondTop(NY)*dts_HeatWatTP
-      Tnew = (Heff-dLWRaddTKsoi1(NY,NX)*Told+Gs*TbelowTop(NY)) &
-        /(Gs-dLWRaddTKsoi1(NY,NX))
-      TKSoil1_vr(L0,NY,NX) = Tnew
-
-      !Export the conducted heat plus the heat carried by infiltrating water at
-      !the skin temperature (the TFice shift is applied at the export below)
-      HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX) &
-        +Gs*(Tnew-TbelowTop(NY))+cpw*Tnew*Qinfl2MicP_col(NY,NX)
     enddo
 
     !also update state variables for iteration M
@@ -562,9 +533,10 @@ implicit none
     !ATS input). Shift the energy of the exported water Qinflx2Soil_col to the
     !ATS reference, otherwise each m3 of infiltration adds ~cpw*273 MJ of heat.
     flux_per_area = (HeatFlx2Grnd_col(NY,1) - cpw*TFice*Qinflx2Soil_col(NY,1)) / column_area(NY)
-    !No cap (surf_e_max): the skin energy balance above bounds the exported
-    !heat by the soil conductance, which the cap was standing in for
-    surf_e_source(NY) = flux_per_area
+    !Uncapped export:
+    !surf_e_source(NY) = flux_per_area
+    !Cap the magnitude at surf_e_max [MJ m-2 h-1], keeping the sign
+    surf_e_source(NY) = SIGN(MIN(ABS(flux_per_area), surf_e_max), flux_per_area)
     
     dTexp = surf_e_source(NY)/heat_capacity
     Tfinal = TKsoil1_vr(1,NY,NX) + dTexp 

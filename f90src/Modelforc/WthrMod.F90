@@ -94,8 +94,11 @@ module WthrMod
     !     AND PRECIPITATION FROM HOURLY WEATHER ARRAYS LOADED IN 'READS'
     !
   else if (IWTHR.EQ.-999)then
-    write(*,*) "ATS weather:"
-    RADN_col = RMAX
+    !ATS coupling: per-column incident shortwave from ATS. Precipitation is set
+    !by the ATS driver after this call, so it is zeroed here.
+    RADN_col       = RadSWATS_col
+    PrecAsRain_col = 0._r8
+    PrecAsSnow_col = 0._r8
   ELSE
     call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN_col,PrecAsRain_col,PrecAsSnow_col,VPS)
   ENDIF
