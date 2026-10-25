@@ -9,7 +9,7 @@ implicit none
   CHARACTER(LEN=*),private,PARAMETER :: MOD_FILENAME=&
   __FILE__
 
-  real(r8), PARAMETER :: VFLWX=0.5_r8
+  real(r8) :: VFLWX=0.5_r8
   real(r8),allocatable ::  AquaIonDifusivty2_vr(:,:,:,:)                      !aqueous diffusivity of ions [m2/hr]
   real(r8),allocatable ::  trcSalt_FloXSurRof_flxM_2DH(:,:,:,:,:)             !2D flow of salt through surface runoff at iteration M [mol d-2]
   real(r8),allocatable ::  trcSalt_SnowDrift_flxM_2D(:,:,:,:,:)               !salt flux through snow drift at iteration M [mol d-2]

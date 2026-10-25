@@ -32,7 +32,7 @@ implicit none
   real(r8),allocatable :: TWaterPlantRoot2SoilXM_col(:,:)
   real(r8),allocatable ::  HydroCondMacP1_vr(:,:,:)                 !
   real(r8),allocatable ::  VLMicP1_vr(:,:,:)                        !
-  real(r8),allocatable ::  VLMacP1_vr(:,:,:)                        !
+  real(r8),allocatable ::  VLMacroPores1_vr(:,:,:)                        !
 
   real(r8),allocatable ::  WatFlow2TopSoiMicP_col(:,:)              !
   real(r8),allocatable ::  WatFlow2TopSoiMicPX_col(:,:)             !
@@ -81,7 +81,7 @@ contains
   allocate(dHeatPlantRoot2SoilPrev_vr(JZ,JY,JX)); dHeatPlantRoot2SoilPrev_vr=0._r8
   allocate(HydroCondMacP1_vr(JZ,JY,JX));    HydroCondMacP1_vr=0._r8
   allocate(VLMicP1_vr(0:JZ,JY,JX));  VLMicP1_vr=0._r8
-  allocate(VLMacP1_vr(JZ,JY,JX));   VLMacP1_vr=0._r8
+  allocate(VLMacroPores1_vr(JZ,JY,JX));   VLMacroPores1_vr=0._r8
 
   allocate(WatFlow2TopSoiMicP_col(JY,JX));       WatFlow2TopSoiMicP_col=0._r8
   allocate(WatFlow2TopSoiMicPX_col(JY,JX));      WatFlow2TopSoiMicPX_col=0._r8
@@ -122,7 +122,7 @@ contains
   call destroy(FIceThawedMacP_vr)
   call destroy(HydroCondMacP1_vr)
   call destroy(VLMicP1_vr)
-  call destroy(VLMacP1_vr)
+  call destroy(VLMacroPores1_vr)
   call destroy(WatFlow2TopSoiMicP_col)
   call destroy(WatFlow2TopSoiMicPX_col)
   call destroy(WatFlow2TopSoiMacP_col)

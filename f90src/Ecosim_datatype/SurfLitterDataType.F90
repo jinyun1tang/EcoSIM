@@ -13,6 +13,7 @@ module SurfLitterDataType
   integer  ,target,allocatable ::   iLitrType_col(:,:,:)              !surface litter type:1 = plant, 2 = manure,[-]
   real(r8) ,target,allocatable ::   XTillCorp_col(:,:)                !factor for surface litter incorporation and soil mixing
   real(r8) ,target,allocatable ::   WatFLoLitr2SoilM_col(:,:,:)        !water transfer between soil surface and surface litter, [g d-2 t-1]
+  real(r8) ,target,allocatable ::   WatFLoLitr2MacPM_col(:,:,:)        !accepted litter-to-macropore water volume per soil substep, [m3 d-2]
   real(r8) ,target,allocatable ::   WatFlowSno2LitRM_col(:,:,:)       !meltwater flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   FracSurfByLitR_col(:,:)           !fraction of soil surface covered by surface litter, [-]
   real(r8) ,target,allocatable ::   HeatFLoByWat2LitR_col(:,:)        !net heat transfer to surface litter, [MJ d-2 t-1]
@@ -56,6 +57,7 @@ module SurfLitterDataType
   allocate(iLitrType_col(2,JY,JX));      iLitrType_col=0
   allocate(XTillCorp_col(JY,JX));        XTillCorp_col=0._r8
   allocate(WatFLoLitr2SoilM_col(60,JY,JX));     WatFLoLitr2SoilM_col=0._r8
+  allocate(WatFLoLitr2MacPM_col(60,JY,JX));     WatFLoLitr2MacPM_col=0._r8
   allocate(WatFlowSno2LitRM_col(60,JY,JX));     WatFlowSno2LitRM_col=0._r8
   allocate(FracSurfByLitR_col(JY,JX));         FracSurfByLitR_col=0._r8
   allocate(HeatFLoByWat2LitR_col(JY,JX));        HeatFLoByWat2LitR_col=0._r8
@@ -85,6 +87,7 @@ module SurfLitterDataType
   call destroy(iLitrType_col)
   call destroy(XTillCorp_col)
   call destroy(WatFLoLitr2SoilM_col)
+  call destroy(WatFLoLitr2MacPM_col)
   call destroy(WatFlowSno2LitRM_col)
   call destroy(FracSurfByLitR_col)
   call destroy(HeatFLoByWat2LitR_col)
@@ -101,5 +104,23 @@ module SurfLitterDataType
   call destroy(RC0ff_col)
 
   end subroutine DestructSurfLitter
+
+!----------------------------------------------------------------------
+  pure subroutine LitterInfiltrationFractions(WaterMic,WaterMac,WaterRunoff,WaterDonor,WaterTol,MaxFraction,FracMic,FracMac)
+  ! Share a litter tracer donor between infiltration routes. Reserve the
+  ! existing runoff proposal's capped fraction; do not count incoming runon.
+  real(r8), intent(in) :: WaterMic,WaterMac,WaterRunoff,WaterDonor,WaterTol,MaxFraction
+  real(r8), intent(out) :: FracMic,FracMac
+  real(r8) :: TotalWater,Fraction,RunoffFraction,Limit
+
+  FracMic=0._r8; FracMac=0._r8
+  TotalWater=MAX(0._r8,WaterMic)+MAX(0._r8,WaterMac)
+  IF(WaterDonor.LE.WaterTol .OR. TotalWater.LE.0._r8)RETURN
+  Limit=MIN(1._r8,MAX(0._r8,MaxFraction))
+  RunoffFraction=MIN(Limit,MAX(0._r8,WaterRunoff)/WaterDonor)
+  Fraction=MIN(Limit,TotalWater/WaterDonor,1._r8-RunoffFraction)
+  FracMic=Fraction*MAX(0._r8,WaterMic)/TotalWater
+  FracMac=Fraction*MAX(0._r8,WaterMac)/TotalWater
+  end subroutine LitterInfiltrationFractions
 
 end module SurfLitterDataType

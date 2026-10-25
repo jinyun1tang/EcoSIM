@@ -1,4 +1,5 @@
 module LateralTranspMod
+  use SoilFaceMappingMod, only: SoilFaceSlot,SoilFaceIncomingRange
   use data_kind_mod,    only: r8 => DAT_KIND_R8
   USE abortutils,       only: endrun
   use EcoSiMParDataMod, only: micpar
@@ -380,6 +381,7 @@ implicit none
   integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(in) :: N60        !vertical layer 
   integer :: N6
+  integer :: first_face,last_face
   character(len=*), parameter :: subname='FlowXGrids'
   integer :: LL,K,idsalt,ids,idg,idom
   real(r8) :: TK_loc
@@ -391,31 +393,33 @@ implicit none
   call PrintInfo('beg '//subname)
   N6=N60
   IF(FlowDirIndicator_col(N2,N1).NE.iVerticalDirection .OR. N.EQ.iVerticalDirection)THEN
-    !locate the vertical layer for the dest grid
+    ! Use the destination column, as in the flux producer. If no active
+    ! layer is found, retain N60 for external/ghost boundary-face fluxes.
     D1200: DO LL=N60,NL_col(N5,N4)
       !modify the dest grid vertical location if needed
       !by matching the vertical layer number between source and dest, if N/=3
       !if N==3, skip insignificant layers
-      IF(VLSoilPoreMicP_vr(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP_vr(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
 
+  call SoilFaceIncomingRange(N,N3,N2,N1,first_face,last_face)
     IF(VLSoilPoreMicP_vr(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       !vertical direction transport, source is at soil surface
       IF(N3.EQ.NU_col(N2,N1) .AND. N.EQ.iVerticalDirection)THEN              
-        TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-LakeSurfFlowMicP_col(N5,N4)
-        TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX_3D(N,N3,N2,N1)-LakeSurfFlowMicPX_col(N5,N4)
-        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-LakeSurfFlowMacP_col(N5,N4)
-        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-LakeSurfHeatFlux_col(N5,N4)
+        TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+sum(WaterFlowSoiMicP_3D(N,first_face:last_face,N2,N1))-LakeSurfFlowMicP_col(N5,N4)
+        TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+sum(WaterFlowSoiMicPX_3D(N,first_face:last_face,N2,N1))-LakeSurfFlowMicPX_col(N5,N4)
+        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+sum(WaterFlowSoiMacP_3D(N,first_face:last_face,N2,N1))-LakeSurfFlowMacP_col(N5,N4)
+        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+sum(HeatFlow2Soil_3D(N,first_face:last_face,N2,N1))-LakeSurfHeatFlux_col(N5,N4)
 
         !not vertical direction or source grid is not at surface
       ELSE
-        TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+WaterFlowSoiMicP_3D(N,N3,N2,N1)-WaterFlowSoiMicP_3D(N,N6,N5,N4)
-        TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+WaterFlowSoiMicPX_3D(N,N3,N2,N1)-WaterFlowSoiMicPX_3D(N,N6,N5,N4)
-        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+WaterFlowSoiMacP_3D(N,N3,N2,N1)-WaterFlowSoiMacP_3D(N,N6,N5,N4)
-        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+HeatFlow2Soil_3D(N,N3,N2,N1)-HeatFlow2Soil_3D(N,N6,N5,N4)
+        TWatFlowCellMicP_vr(N3,N2,N1)  = TWatFlowCellMicP_vr(N3,N2,N1)+sum(WaterFlowSoiMicP_3D(N,first_face:last_face,N2,N1))-WaterFlowSoiMicP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+        TWatFlowCellMicPX_vr(N3,N2,N1) = TWatFlowCellMicPX_vr(N3,N2,N1)+sum(WaterFlowSoiMicPX_3D(N,first_face:last_face,N2,N1))-WaterFlowSoiMicPX_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+        TWatFlowCellMacP_vr(N3,N2,N1)  = TWatFlowCellMacP_vr(N3,N2,N1)+sum(WaterFlowSoiMacP_3D(N,first_face:last_face,N2,N1))-WaterFlowSoiMacP_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
+        THeatFlowCellSoil_vr(N3,N2,N1) = THeatFlowCellSoil_vr(N3,N2,N1)+sum(HeatFlow2Soil_3D(N,first_face:last_face,N2,N1))-HeatFlow2Soil_3D(N,SoilFaceSlot(N,N3,N6),N5,N4)
 
       ENDIF
       !

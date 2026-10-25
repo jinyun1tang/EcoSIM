@@ -412,7 +412,7 @@ module MicBGCMod
 !     222500,232500 high temp inactivation for growth,maintenance
 !     TSensGrowth,TSensMaintR=temperature function for growth,maintenance respiration
 ! the offset could be micobial guild/group specific
-  TKSO=real_truncate(TKS+TempOffset,1.e-3_r8)
+  TKSO=TKS+TempOffset
 
   call MicrobPhysTempFun(TKSO, TSensGrowth, TSensMaintR)
 
@@ -3262,7 +3262,7 @@ module MicBGCMod
   endif
   RMetabDOCUptkHeter(NGL,K)  = PrimaryDOCUptake+CGOMD
   RMetabAcetUptkHeter(NGL,K) = PrimaryAcetUptake+AGOMD
-  CGOXC                           = RMetabDOCUptkHeter(NGL,K)+RMetabAcetUptkHeter(NGL,K)
+  CGOXC                      = RMetabDOCUptkHeter(NGL,K)+RMetabAcetUptkHeter(NGL,K)
 
   !obtain organic nutrient uptake
   DOMUptk4GrothHeter(ielmn,NGL,K)=AZMAX1(AMIN1(DOM(idom_don,K)*FracHeterBiomOfActK(NGL,K),CGOXC*rCNDOM(K)/FCN(NGL,K)))

@@ -58,9 +58,27 @@ take precedence over repository guidance.
 - Trace callers and CMake source lists to establish the active implementation.
   Similar routines occur in initialization, process, and coupling modules; do not
   assume one is obsolete or change every copy without checking its role.
+- When multiple correct implementation options are available, choose the simpler
+  one. Prioritize clarity in code, equations, naming, and comments.
 - Follow nearby Fortran conventions, precision kinds, array ordering, and module
   interfaces. Update allocation, initialization, API mapping, history, and restart
   handling as needed when adding persistent state or flux variables.
+- New Fortran procedures should declare
+  `character(len=*), parameter :: subname='procedure_name'`, using the actual
+  procedure name as the string value. Include `call PrintInfo('beg '//subname)`
+  at entry and `call PrintInfo('end '//subname)` at normal exit. Separate
+  procedures with the following comment line:
+  `!------------------------------------------------------------------------------------------`
+- When a diagnostic `write` statement is needed before calling `endrun`, write
+  to `iulog` rather than the default output unit `*` (use `write(iulog,*)`).
+- In Fortran executable statements, use aliases declared in an `associate` block
+  instead of direct derived-type component references such as
+  `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
+  block or introduce one when needed; component references belong in the
+  association declarations. Exception: when adding history-output variables,
+  avoid `associate` aliases and use direct history components such as
+  `this%h1D_variable_col` in allocation, registration, and update code, following
+  the surrounding history-output conventions.
 - Keep edits focused. Do not hand-edit generated build files or modify dependency
   submodules unless that is part of the requested work.
 - Treat `ecosim-agent` changes as submodule changes, separate from root-repository

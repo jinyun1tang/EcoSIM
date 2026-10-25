@@ -7,6 +7,7 @@ module PlantRootBGCAPIData
 
   type, public :: plant_rootbgc_type
   real(r8), pointer :: canopy_growth_pft(:)              => null()  !canopy structural C growth rate,                                [gC d-2 h-1]
+  real(r8), pointer :: RootSoilCO2Debt_vr(:)             => null()  !pending local soil CO2 debt, paired with mass on handoff, [gC d-2]
   real(r8), pointer :: TRootGasLossDisturb_col(:)        => null()  !total root gas content,                                         [g d-2]
   real(r8), pointer :: trcs_Soil2plant_uptake_vr(:,:)    => null()  !total root-soil solute flux non-band,                           [g d-2 h-1]
   real(r8), pointer :: trcs_Soil2plant_uptake_pvr(:,:,:) => null()  !plant root-soil solute flux non-band,                           [g d-2 h-1]
@@ -112,6 +113,7 @@ contains
   allocate(this%trcg_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcg_rootml_pvr=spval
   allocate(this%trcs_rootml_pvr(idg_beg:idg_NH3,jroots,JZ1,JP1));this%trcs_rootml_pvr=spval
   allocate(this%RootAtmGasConductance_rpvr(idg_beg:idg_NH3,jroots,JZ1,JP1)); this%RootAtmGasConductance_rpvr=0._r8
+  allocate(this%RootSoilCO2Debt_vr(0:JZ1));this%RootSoilCO2Debt_vr=0._r8
   allocate(this%TRootGasLossDisturb_col(idg_beg:idg_NH3));this%TRootGasLossDisturb_col=spval
   allocate(this%REcoUptkSoilO2M_vr(60,0:JZ1)); this%REcoUptkSoilO2M_vr=spval
   allocate(this%Soil2RootMycoExudE_pvr(NumPlantChemElms,jroots,1:jcplx,0:JZ1,JP1));this%Soil2RootMycoExudE_pvr=spval
@@ -294,5 +296,9 @@ contains
 !  if(allocated(CMinNH4Root_pft))deallocate(CMinNH4Root_pft)
 !  if(allocated(VmaxNH4Root_pft))deallocate(VmaxNH4Root_pft)
 !  if(allocated(KmNH4Root_pft))deallocate(KmNH4Root_pft)
+  if(associated(this%RootSoilCO2Debt_vr))then
+    deallocate(this%RootSoilCO2Debt_vr)
+    nullify(this%RootSoilCO2Debt_vr)
+  endif
   end subroutine plt_rootbgc_destroy
 end module PlantRootBGCAPIData

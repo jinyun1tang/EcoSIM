@@ -29,11 +29,15 @@ implicit none
 contains
 
   function getvarllen()result(nvars)
+  use MicBGCMod, only : initNitro1Layer
   implicit none
   integer :: nvars
   integer :: nmicbguilds
 
   call micpar%Init()
+  ! Load microbial defaults and optional input before SetPars copies SPOSC_in.
+  ! Initialize once here so the box driver uses the same order as EcoSIM.
+  call initNitro1Layer
   call micpar%SetPars()
 
   call Initboxbgc(nvars)
@@ -43,7 +47,6 @@ contains
   subroutine initmodel(nvars, ystates0l, forc, err_status)
 !
 ! set initial conditions for the boxsbgc
-  use MicBGCMod, only : initNitro1Layer
   implicit none
   integer, intent(in) :: nvars
   type(forc_type), intent(in) :: forc
@@ -51,7 +54,6 @@ contains
   type(model_status_type), intent(out) :: err_status
 
   call err_status%reset()
-  call initNitro1Layer
 
 
   associate(                                                   &

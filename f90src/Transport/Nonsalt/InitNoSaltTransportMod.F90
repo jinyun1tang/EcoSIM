@@ -71,12 +71,15 @@ module InitNoSaltTransportMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+      ! Reset hourly atmospheric inputs before selecting current deposition.
       trcg_AquaAdv_flxM_snvr(:,1,NY,NX)=0._r8
+      trcn_AquaAdv_flxM_snvr(:,1,NY,NX)=0._r8
 
       trcg_AquaAdv_flx_snvr(idg_beg:idg_NH3,1,NY,NX)          = 0.0_r8
       trcn_AquaAdv_flx_snvr(ids_nut_beg:ids_nuts_end,1,NY,NX) = 0.0_r8
 
       trcg_Precip2LitrM_col(idg_beg:idg_NH3,NY,NX)=0._r8
+      trcn_Precip2LitrM_col(ids_nut_beg:ids_nuts_end,NY,NX)=0._r8
       trcs_Precip2MicpM_col(ids_beg:ids_end,NY,NX)=0._r8
 
       RO2AquaSourcePrev_vr(:,NY,NX)                    = 0._r8
@@ -99,29 +102,13 @@ module InitNoSaltTransportMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
-        IF(nsnol_col(NY,NX) > 0 .and. (SnoFalPrec_col(NY,NX).GT.0.0_r8 .OR.   &   !snowfall
-          (RainFalPrec_col(NY,NX).GT.0.0_r8 .AND. &   !rainfall and significant snowpack
-          VLSnowHeatCapM_snvr(1,1,NY,NX).GT.VLHeatCapSnowMin_col(NY,NX)*1.e-4_r8)))THEN !rainfall with snowpack
-
-          call TracerFall2Snowpack(I,J,NY,NX)
-
-          !
-          !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
-          !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
-          !     ENTERED IN WEATHER AND IRRIGATION FILES
-          !
-        ELSEIF((PrecAtm_col(NY,NX).GT.0.0_r8 .OR. IrrigSurface_col(NY,NX).GT.0.0_r8) & !Irrigation or rainfall
-          .AND. (nsnol_col(NY,NX)==0 .or. VLSnowHeatCapM_snvr(1,1,NY,NX).LE.VLHeatCapSnowMin_col(NY,NX)))THEN     !no snowpack
-          !
-          !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
-          !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
-          !
-          call TracerFall2Grnd(I,J,NY,NX)
-
-          !
-          !     NO SOLUTE FLUXES FROM ATMOSPHERE
-          !
-        ENDIF
+      ! Ground formation clears top-snow inputs first. Stage the snow share
+      ! even on first snowfall: nsnol_col is updated later by SnowpackLayering.
+      call TracerFall2Grnd(I,J,NY,NX)
+      call TracerFall2Snowpack(I,J,NY,NX)
+      NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+(Rain2SnowSurf_col(NY,NX) &
+        +Rain2LitRSurf_col(NY,NX)+Rain2SoilSurf_col(NY,NX)) &
+        *(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
     ENDDO
   ENDDO
   call PrintInfo('end '//subname)
@@ -326,18 +313,14 @@ module InitNoSaltTransportMod
       DO idg=idg_beg,idg_NH3      
         trcs_solml_vr(idg,0,NY,NX)=AZERO(trcs_solml2_vr(idg,0,NY,NX))
       ENDDO
-      !volatile and nutrient tracers in snow
+      ! Preserve all transport slots, including newly forming snow whose
+      ! layer count is still zero. SnowpackLayering handles empty-slot residue.
       DO L=1,JS
-        if(L<=nsnol_col(NY,NX))then
-          DO idg=idg_beg,idg_NH3
-            trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
-          ENDDO  
-          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)   =trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
-        else          
-          trcg_solsml_snvr(idg_beg:idg_NH3,L,NY,NX)          = 0._r8
-          trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = 0._r8
-        endif
-      enddo
+        DO idg=idg_beg,idg_NH3
+          trcg_solsml_snvr(idg,L,NY,NX)=trcg_solsml2_snvr(idg,L,NY,NX)
+        ENDDO
+        trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)=trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
+      ENDDO
       !gas tracers in soil column       
       DO L=NU_col(NY,NX),NL_col(NY,NX)
         DO idg=idg_beg,idg_NH3
@@ -404,8 +387,10 @@ module InitNoSaltTransportMod
           RBGCSinkGasMM_vr(idg,L,NY,NX) = RBGCSinkGasMM_vr(idg,L,NY,NX)+trcs_solml_drib_vr(idg,L,NY,NX)*dts_gas
         enddo
 
+        ! Direct root respiration is independent of chemistry; dead-root CO2 is staged above.
+        RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX)*dts_gas
         if(TProd_CO2_geochem_soil_vr(L,NY,NX)>0._r8)then
-          RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+(TProd_CO2_geochem_soil_vr(L,NY,NX)+RootCO2Ar2Soil_vr(L,NY,NX))*dts_gas
+          RBGCSrceGasMM_vr(idg_CO2,L,NY,NX) = RBGCSrceGasMM_vr(idg_CO2,L,NY,NX)+TProd_CO2_geochem_soil_vr(L,NY,NX)*dts_gas
         else
           RBGCSinkGasMM_vr(idg_CO2,L,NY,NX) = RBGCSinkGasMM_vr(idg_CO2,L,NY,NX)-TProd_CO2_geochem_soil_vr(L,NY,NX)*dts_gas
         endif
@@ -424,8 +409,10 @@ module InitNoSaltTransportMod
           RBGCSinkSoluteM_vr(idg_NH3B,L,NY,NX) = -trcn_RProdChem_band_soil_vr(idg_NH3B,L,NY,NX)*dts_HeatWatTP        
         endif
 
+        ! Dead-root NH3 enters the non-band dissolved pool once, regardless of chemistry.
+        RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX) = trcs_deadroot2soil_vr(idg_NH3,L,NY,NX)*dts_HeatWatTP
         if(TRProd_chem_sol_NH3_soil_vr(L,NY,NX)>0._r8)then
-          RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX)  = (TRProd_chem_sol_NH3_soil_vr(L,NY,NX)+trcs_deadroot2soil_vr(idg_NH3,L,NY,NX))*dts_HeatWatTP
+          RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX) = RBGCSrcSoluteM_vr(idg_NH3,L,NY,NX)+TRProd_chem_sol_NH3_soil_vr(L,NY,NX)*dts_HeatWatTP
         else
           RBGCSinkSoluteM_vr(idg_NH3,L,NY,NX)  = -TRProd_chem_sol_NH3_soil_vr(L,NY,NX)*dts_HeatWatTP
         endif
@@ -523,19 +510,18 @@ module InitNoSaltTransportMod
   integer :: idg
 
   DO idg=idg_beg,idg_NH3
-    trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=(Rain2SoilSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
-      +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)*dts_HeatWatTP
+    trcg_AquaAdv_flxM_snvr(idg,1,NY,NX)=(Rain2SnowSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg,NY,NX) &
+      +Irrig2SnowSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)*dts_HeatWatTP
   ENDDO
-  NWetDep_col(NY,NX)=NWetDep_col(NY,NX)+Rain2SoilSurf_col(NY,NX)*(NH4_rain_mole_conc(NY,NX)+NO3_rain_mole_conc(NY,NX))*natomw
 
-  trcn_AquaAdv_flxM_snvr(ids_NH4,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_NO3,1,NY,NX)   = (Rain2SoilSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_H1PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
-  trcn_AquaAdv_flxM_snvr(ids_H2PO4,1,NY,NX) = (Rain2SoilSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
-    +Irrig2SoilSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_NH4,1,NY,NX)   = (Rain2SnowSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_NO3,1,NY,NX)   = (Rain2SnowSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_H1PO4,1,NY,NX) = (Rain2SnowSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
+  trcn_AquaAdv_flxM_snvr(ids_H2PO4,1,NY,NX) = (Rain2SnowSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+    +Irrig2SnowSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw*dts_HeatWatTP
 
   !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
   !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT
@@ -560,21 +546,21 @@ module InitNoSaltTransportMod
       +Irrig2SoilSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg,NY,NX))*MolecularWeight(idg)
   ENDDO
 
-  trcg_Precip2LitrM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NH4_irrig_mole_conc(I,NY,NX))*natomw
 
   trcg_Precip2LitrM_col(idg_NH3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*trcg_rain_mole_conc_col(idg_NH3,NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*trcg_irrig_mole_conc_col(idg_NH3,NY,NX))*natomw
 
-  trcg_Precip2LitrM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_NO3,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*NO3_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*NO3_irrig_mole_conc(I,NY,NX))*natomw
 
-  trcg_Precip2LitrM_col(ids_NO2,NY,NX)=0.0_r8
+  trcn_Precip2LitrM_col(ids_NO2,NY,NX)=0.0_r8
 
-  trcg_Precip2LitrM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
+  trcn_Precip2LitrM_col(ids_H1PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*HPO4_rain_mole_conc_col(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*HPO4_irrig_mole_conc(I,NY,NX))*patomw
 
-  trcg_Precip2LitrM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
+  trcn_Precip2LitrM_col(ids_H2PO4,NY,NX)=dts_HeatWatTP*(Rain2LitRSurf_col(NY,NX)*H2PO4_rain_mole_conc(NY,NX) &
     +Irrig2LitRSurf_col(NY,NX)*H2PO4_irrig_mole_conc(I,NY,NX))*patomw
 
   trcs_Precip2MicpM_col(ids_NH4,NY,NX)=dts_HeatWatTP*(Rain2SoilSurf_col(NY,NX)*NH4_rain_mole_conc(NY,NX) &

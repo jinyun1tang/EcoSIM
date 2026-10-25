@@ -73,7 +73,7 @@ implicit none
   plt_site%NP                      = NP_col(NY,NX)                     !total number of plants in the column, set to NP0_col for simplicity
   plt_site%NU                      = NU_col(NY,NX)                     !top soil layer indices
   plt_site%NK                      = NK_col(NY,NX)                     !total layers with roots,  can be set to NL_col
-  plt_site%ALT                     = ALT_col(NY,NX)                    !column altitude [m]
+  plt_site%ALT                     = SurfElevation_col(NY,NX)                    !column altitude [m]
   plt_ew%TKSnow                    = TKSnow_snvr(1,NY,NX)              !surface snow temperature
   plt_ew%SnowDepth                 = SnowDepth_col(NY,NX)              !total snow depth
   plt_ew%RawIsoTAtm2CanopySinkZ_col   = RawIsoTAtm2CanopySinkZ_col(NY,NX)    !aboveground canopy resistance,  computed in the radiation code

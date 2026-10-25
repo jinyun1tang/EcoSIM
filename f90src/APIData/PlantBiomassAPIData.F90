@@ -61,7 +61,7 @@ module PlantBiomassAPIData
   real(r8), pointer :: SeasonalNonstElms_pft(:,:)           => null()    !plant stored nonstructural element at current step, [g d-2]
   real(r8), pointer :: SeasonalNonstElmsbeg_pft(:,:)        => null()    !plant stored nonstructural element at prev step,    [g d-2]
   real(r8), pointer :: CanopyLeafSheathC_pft(:)              => null()    !canopy leaf + sheath C,                             [g d-2]
-  real(r8), pointer :: AvgCanopyBiomC2Graze_pft(:)          => null()    !landscape average canopy shoot C,                   [g d-2]
+  real(r8), pointer :: AvgCanopyBiomC2Graze_pft(:)          => null()    !section mean shoot C density times local cell area, [g d-2]
   real(r8), pointer :: StandDeadStrutElms_pft(:,:)          => null()    !standing dead element,                              [g d-2]
   real(r8), pointer :: CanopyNonstElms_brch(:,:,:)          => null()    !branch nonstructural element,                       [g d-2]
   real(r8), pointer :: C4PhotoShootNonstC_brch(:,:)         => null()    !branch shoot nonstrucal elelment,                   [g d-2]
