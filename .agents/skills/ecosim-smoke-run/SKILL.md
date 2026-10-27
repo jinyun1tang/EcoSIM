@@ -39,6 +39,9 @@ Then run the smoke test from the repository root:
 .agents/skills/ecosim-smoke-run/scripts/run_smoke.sh biocrust dryland   # subset
 ```
 
+The runner prefers the executable under `drivers/ecosim/` over installed copies
+and resolves the build directory before changing into scratch case directories.
+
 Options: `-d DAYS` (default 20), `-b BUILD_DIR` (default: newest under `build/`),
 `-o WORKDIR` (default: a `mktemp -d`), `-t CPU_SECS` per-case cap (default 1800).
 
@@ -57,19 +60,9 @@ it starts from `finidat='./dryland_maize.ecosim.r.2004-01-01-000000.nc'`, a
 restart produced by running `dryland` itself out to 2004, and that file is not
 tracked in the repository. Its result says nothing about the build either way.
 
-The script selects *case directories*, not individual namelists, and both
-namelists live in `dryland/`, so a case-name argument cannot skip it. To
-exclude it, stage into an explicit workdir and delete the namelist after the
-mirror is built, or drop `dryland` from the case list entirely:
-
-```bash
-.agents/skills/ecosim-smoke-run/scripts/run_smoke.sh \
-  DaLake Fen FireCA Pond RiceUSTWT SatePhenol bare_soil biocrust \
-  blodgett climeConst jupyter_notebook lake radiation_test
-```
-
-If you do run the full set, treat a `dryland/dryland2` FAIL row as expected
-noise, not as a build regression.
+The runner automatically excludes both namelists in its scratch mirror, including
+when their directories are explicitly selected. It prints the exclusion reasons.
+Original namelists and local restart files are preserved.
 
 Exit status is 0 only if every case completed its days *and* the output scan is
 clean. The script prints a `CASE / RC / NSTEP / RESULT` table, then the scan.
