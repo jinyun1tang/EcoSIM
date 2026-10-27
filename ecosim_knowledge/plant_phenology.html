@@ -198,7 +198,7 @@
 <h3>Prescribed phenology is a different execution mode</h3>
 <p>With <code>ldo_sp_mode</code>, <code>PlantModel</code> takes a prescribed-structure/uptake path instead of the prognostic phenology-and-growth sequence described above. <code>PrescribePhenologyInterp</code> interpolates monthly leaf and stem area and sets canopy/root structure.</p>
 <div class="note gold"><strong>Current implementation limitation:</strong> that interpolation routine contains fixed single-PFT monthly values, canopy height and population. Its non-ATS calendar fallback is January 1 with a 31-day month. Treat this as an implementation requiring case-specific inspection, not a general claim that arbitrary supplied monthly phenology is already honored in every driver.</div>
-<p class="source">Source: <a href="../f90src/APIs/PlantMod.F90">PlantModel</a>; <a href="../f90src/Prescribed_pheno/PrescribePhenolMod.F90">PrescribePhenologyInterp</a>.</p>
+<p class="source">Source: <a href="../f90src/APIs/PlantMod.F90">PlantModel</a>; <a href="../f90src/Plant_bgc/PrescribePhenolMod.F90">PrescribePhenologyInterp</a>.</p>
 </section>
 
 <section id="sources">
@@ -214,7 +214,7 @@
 <tr><td><a href="../f90src/IOutils/PlantInfoMod.F90">PlantInfoMod.F90</a> · <a href="../f90src/Ecosim_mods/StartqMod.F90">StartqMod.F90</a></td><td>Input-derived branch requirements and thermal acclimation.</td></tr>
 <tr><td><a href="../f90src/Plant_bgc/PlantNonstElmDynMod.F90">PlantNonstElmDynMod.F90</a></td><td>Nonstructural C/N/P and seasonal storage transfers.</td></tr>
 <tr><td><a href="../f90src/Plant_bgc/LitterFallMod.F90">LitterFallMod.F90</a> · <a href="../f90src/Plant_bgc/PlantDisturbsMod.F90">PlantDisturbsMod.F90</a></td><td>Death, litter transfer and failed-establishment handling.</td></tr>
-<tr><td><a href="../f90src/Prescribed_pheno/PrescribePhenolMod.F90">PrescribePhenolMod.F90</a></td><td>Alternative prescribed canopy structure.</td></tr>
+<tr><td><a href="../f90src/Plant_bgc/PrescribePhenolMod.F90">PrescribePhenolMod.F90</a></td><td>Alternative prescribed canopy structure.</td></tr>
 </tbody></table></div>
 <p>Related explanations: <a href="root_categories.html">root categories and structural scales</a> · <a href="root_gas_transport.html">root gas transport and oxygen limitation</a> · <a href="cytokinin.html">cytokinin representation</a> · <a href="canopy_water_potential.html">canopy water potential</a>.</p>
 </section>

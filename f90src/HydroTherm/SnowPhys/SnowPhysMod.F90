@@ -1225,27 +1225,42 @@ contains
       WatFLo2LitR_col(NY,NX)     = WatFLo2LitR_col(NY,NX) + FLWW+FLWI*DENSICE+FLWS
     !pond
     else
-      if(.not. fixWaterLevel .and. .not. ats_cpl_mode)then
-        VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
-        VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
-        ENGY1                                    = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
-        VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
-          +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
-        VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
-          +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)
-        VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)
+      if(.not. fixWaterLevel)then
+        !in ATS mode the soil state is owned by ATS, so only the fluxes below are kept
+        if(.not. ats_cpl_mode)then
+          VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWW
+          VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)      = VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)+FLWI+FLWS/DENSICE
+          ENGY1                                = VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)*TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+          VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX) = VHeatCapSolidSoil_vr(NUM_col(NY,NX),NY,NX) &
+            +cpw*VLWatMicP1_vr(NUM_col(NY,NX),NY,NX)+cpi*VLiceMicP1_vr(NUM_col(NY,NX),NY,NX)
+          VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)=cpw*VLWatMacP1_vr(NUM_col(NY,NX),NY,NX) &
+            +cpi*VLiceMacP1_vr(NUM_col(NY,NX),NY,NX)
+          VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX) = VLHeatCapacityA_vr(NUM_col(NY,NX),NY,NX)+VLHeatCapacityB_vr(NUM_col(NY,NX),NY,NX)
+
+          ! topsoil layer is there
+          IF(VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+            tk1pres                      = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
+            TKSoil1_vr(NUM_col(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
+          ELSE
+            TKSoil1_vr(NUM_col(NY,NX),NY,NX) = TairK_col(NY,NX)
+          ENDIF
+        else
+          !ATS receives the residual as liquid water through Qinflx2Soil_col and its
+          !energy through HeatFlx2Grnd_col. The export subtracts cpw*TFice per unit of
+          !Qinflx2Soil_col (ATS energy reference), so add that back here and send the
+          !residual's energy relative to TFice, including the latent heat needed to
+          !melt its ice and dry snow, which ATS cannot see.
+          HeatFlx2Grnd_col(NY,NX) = HeatFlx2Grnd_col(NY,NX) &
+            +cpw*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWW &
+            +cpi*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWI &
+            +cps*(TKSnow0_snvr(1,NY,NX)-TFice)*FLWS &
+            -LtHeatIceMelt*(FLWI*DENSICE+FLWS) &
+            +cpw*TFice*(FLWW+FLWI*DENSICE+FLWS)
+        endif
 
         QSnoWatXfer2Soil_col(NY,NX) = QSnoWatXfer2Soil_col(NY,NX)+FLWW
         QSnoIceXfer2Soil_col(NY,NX) = QSnoIceXfer2Soil_col(NY,NX)+FLWI+FLWS/DENSICE
         QSnoHeatXfer2Soil_col(NY,NX)= QSnoHeatXfer2Soil_col(NY,NX)+HFLWS
-
-        ! topsoil layer is there
-        IF(VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-          tk1pres                      = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
-          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = (ENGY1+HFLWS)/VHeatCapacity1_vr(NUM_col(NY,NX),NY,NX)
-        ELSE
-          TKSoil1_vr(NUM_col(NY,NX),NY,NX) = TairK_col(NY,NX)
-        ENDIF
 
         Qinflx2Soil_col(NY,NX)   = Qinflx2Soil_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
         QSnowH2Oloss_col(NY,NX)  = QSnowH2Oloss_col(NY,NX)+FLWW+FLWI*DENSICE+FLWS
@@ -1887,7 +1902,8 @@ contains
   character(len=*), parameter :: subname='SnowTopSoilExch'
 
   call PrintInfo('beg '//subname)
-  call UpdateSoilWaterPotential(NY,NX)
+  !in ATS mode keep the ATS matric potential (see SoilSRFEnerbyBalanceM)
+  if(.not.ats_cpl_mode)call UpdateSoilWaterPotential(NY,NX)
   !micropore pressure, excluding gravitational pressure
   PSISV1=PSISM1_vr(NUM_col(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM_col(NY,NX),NY,NX)
 !

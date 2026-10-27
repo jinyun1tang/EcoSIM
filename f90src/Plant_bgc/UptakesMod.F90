@@ -1033,9 +1033,17 @@ module UptakesMod
         cumPRootH2OUptake     = scal*CumWaterPlant2Soil+CumWaterSoil2Plant
         CumPlantHeatLoss2Soil = scal*CumHeatPlant2Soil+CumHeatSoil2Plant        
       else
-        !neglible water release to soil
-        cumPRootH2OUptake     = CumWaterSoil2Plant
-        CumPlantHeatLoss2Soil = CumHeatSoil2Plant        
+        if(ldo_sp_mode)then
+          !prescribed phenology: no release to the soil, so the plant receives
+          !what it takes from the soil and the per-layer uptake
+          !(RPlantRootH2OUptk_pvr, the soil sink) and the plant agree
+          cumPRootH2OUptake     = CumWaterSoil2Plant
+          CumPlantHeatLoss2Soil = CumHeatSoil2Plant
+        else
+          !full plant model unchanged (same inconsistency, not yet reviewed)
+          cumPRootH2OUptake     = 0._r8
+          CumPlantHeatLoss2Soil = 0._r8
+        endif
       endif
       !
       !     TEST TRANSPIRATION - ROOT WATER UPTAKE VS. CHANGE IN CANOPY
@@ -1301,9 +1309,7 @@ module UptakesMod
         ! apply the Poiseuille relationship (Aguirrezabal et al., 1993, Grant, 1998)
 
         FRAD1 = AZMAX1(CRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._r8)
-
         FRADM = AZMAX1(MRootLumenArea_pvr(L,NZ)/RootSingleVesselArea_pft(NZ),1._R8)
-
         if(N.eq.ipltroot)then
           FRAD2                       = (Root2ndRadius_rpvr(N,L,NZ)/Root2ndMaxRadius_pft(N,NZ))**2
         else
@@ -1318,6 +1324,8 @@ module UptakesMod
           RootMediumAxialResist_rvr(N,L)=0._r8
         endif
         Root2ndAxialResist_rvr(N,L) = Root2ndAxialResist_pft(N,NZ)*Root2ndEffLen4uptk_rpvr(N,L,NZ)/(FRAD2*Root2ndXNumL_rpvr(N,L,NZ))
+
+
         !
         !     TOTAL ROOT RESISTANCE = SOIL + RADIAL + AXIAL
         !

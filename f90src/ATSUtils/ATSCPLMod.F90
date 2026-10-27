@@ -53,6 +53,8 @@ contains
   heat_capacity = config%heat_capacity
   pressure_at_field_capacity = config%field_capacity
   pressure_at_wilting_point = config%wilting_point
+  site_latitude = config%latitude
+  site_solar_noon = config%solar_noon
   p_bool = config%p_bool
   a_bool = config%a_bool
   pheno_bool = config%pheno_bool
@@ -85,6 +87,10 @@ contains
   data_ptr = env%temperature%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
   a_TEMP=data2D(:,:)
+
+  data_ptr = env%thermal_conductivity%data
+  call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
+  a_TCOND=data2D(:,:)
 
   data_ptr = env%depth%data
   call c_f_pointer(data_ptr, data2D, [size_col, num_cols])
@@ -173,6 +179,9 @@ contains
   call c_f_pointer(env%snow_albedo%data, data, (/num_cols/))
   a_SALB = data(:)
 
+  call c_f_pointer(env%surface_temperature%data, data, (/num_cols/))
+  a_TSURF = data(:)
+
   ! PFT index of each column, in the first num_pfts entries of the column
   call c_f_pointer(env%plant_functional_type%data, data2D, [size_col,num_cols])
   a_PFT = data2D(:,:)
@@ -186,6 +195,7 @@ contains
   atm_nh3 = env%atm_nh3
   current_day = env%current_day
   current_year = env%current_year
+  current_hour = env%current_hour
 
   ! p_bool was set from the config at setup
   if(p_bool)THEN

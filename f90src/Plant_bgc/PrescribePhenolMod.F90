@@ -1,8 +1,10 @@
 module PrescribePhenolMod
   use data_kind_mod, only: r8 => DAT_KIND_R8
   use EcoSimConst,   only: PICON2h
+  use minimathmod,   only: AZMAX1
   use EcoSIMCtrlMod, only: etimer, ats_cpl_mode
   use EcoSIMCtrlDataType, only : ZEROS, current_month, day_of_month, total_days_in_month
+  use EcoSIMHistMod, only : DATAPI
   use ElmIDMod
   use GridDataType
   use RootDataType
@@ -14,6 +16,8 @@ module PrescribePhenolMod
   use PlantMgmtDataType
   use CanopyDataType
   use CanopyRadDataType
+  use PlantMathFuncMod, only: get_FDM, is_plant_woody_vascular
+  use EcoSimConst,   only: ppmc
 implicit none
 
   !pft information from CLM4.5
@@ -192,10 +196,14 @@ implicit none
   integer :: months(2)
   integer :: kmo,dofmon,ndaysmon,NY,NX,NZ,L,irootType
   real(r8) :: timwt(2)
+  real(r8) :: RootCPerPlant    !prescribed fine root C per plant, [gC]
+  real(r8) :: NumPrimRootAxes  !primary root axes of the PFT, [d-2]
+  real(r8) :: RootCBelow       !root C per plant at or below the current layer, [gC]
   real(r8) :: ZL1(0:NumCanopyLayers)
   real(r8) :: AreaInterval,AreaL
   real(r8) :: ARX  !interval canopy area: leaf+stem
   real(r8) :: DZL  !canopy interval height
+  real(r8) :: PlantPopCol  !default plant population of the column root type, unused [1/m2]
   !==========================================
   !example inputs
   real(r8) :: lai(12)=(/1.1852, 1.1821, 1.1554, 1.2433, 1.2922, 1.3341, 1.2296, 1.4118, 1.4343, 1.3941, 1.2721, 1.2218/)
@@ -267,7 +275,12 @@ implicit none
           CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
         endif
         
-        PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
+        !empty ATS PFT slot: no plants, so it stays inactive in the uptake model
+        if(ats_cpl_mode .and. DATAPI(NZ,NY,NX).EQ.0)then
+          PlantPopuLive_pft(NZ,NY,NX)=0._r8
+        else
+          PlantPopuLive_pft(NZ,NY,NX)=0.6_r8
+        endif
         !tlai_day_pft(NZ,NY,NX)     = timwt(1)*tlai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tlai_mon_pft(months(2),NZ,NY,NX)
         !tsai_day_pft(NZ,NY,NX)     = timwt(1)*tsai_mon_pft(months(1),NZ,NY,NX)+timwt(2)*tsai_mon_pft(months(2),NZ,NY,NX)
         !CanopyHeightLive_pft(NZ,NY,NX) = timwt(1)*height_top_mon_pft(months(1),NZ,NY,NX)+timwt(2)*height_top_mon_pft(months(2),NZ,NY,NX)
@@ -276,6 +289,28 @@ implicit none
         CanopyHeight_col(NY,NX)    = AMAX1(CanopyHeight_col(NY,NX),CanopyHeightLive_pft(NZ,NY,NX))
         CanopyLeafAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tlai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
         CanopyStemSurfAreaZ_pft(1:NumCanopyLayers,NZ,NY,NX)=tsai_day_pft(NZ,NY,NX)/real(NumCanopyLayers,kind=r8)
+        !per-PFT leaf and stem areas, and the canopy carbon they imply. The carbon
+        !sets the plant water storage capacity in ROOTUPTAKES (CanopyMassC4H2OStorage)
+        !  leaf + sheath C = leaf area / specific leaf area SLA1 [m2 gC-1]
+        !  sapwood C = stem area x sapwood thickness (2.5 mm, as assumed in
+        !             UptakesMod) / specific stalk volume [m3 gC-1]
+        CanopyLeafArea_pft(NZ,NY,NX)     = tlai_day_pft(NZ,NY,NX)
+        CanopyStemSurfArea_pft(NZ,NY,NX) = tsai_day_pft(NZ,NY,NX)
+        if(SLA1_pft(NZ,NY,NX).GT.0._r8)then
+          CanopyLeafSheathC_pft(NZ,NY,NX) = CanopyLeafArea_pft(NZ,NY,NX)/SLA1_pft(NZ,NY,NX)
+        else
+          CanopyLeafSheathC_pft(NZ,NY,NX) = 0._r8
+        endif
+        if(StemSpecVolume_pft(NZ,NY,NX).GT.0._r8)then
+          CanopySapwoodC_pft(NZ,NY,NX) = CanopyStemSurfArea_pft(NZ,NY,NX)*2.5E-03_r8/StemSpecVolume_pft(NZ,NY,NX)
+        else
+          CanopySapwoodC_pft(NZ,NY,NX) = 0._r8
+        endif
+        !plant tissue water not yet set: start it in equilibrium with the leaf
+        !carbon and the canopy water potential, as StartqMod does for the full model
+        if(CanopyBiomWater_pft(NZ,NY,NX).LE.0._r8 .and. CanopyLeafSheathC_pft(NZ,NY,NX).GT.0._r8)then
+          CanopyBiomWater_pft(NZ,NY,NX) = ppmc*CanopyLeafSheathC_pft(NZ,NY,NX)/get_FDM(PSICanopy_pft(NZ,NY,NX))
+        endif
       ENDDO
 
       !set vertical desitribution of LAI and
@@ -305,20 +340,56 @@ implicit none
       !tmp_rootc = PerPlantRootC_vr(1:NL_col(NY,NX))
       !tmp_rootl = PerPlantRootLen_vr(1:NL_col(NY,NX))
       if(irootType_col(NY,NX).GT.0.0)then
-        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr,PerPlantRootLen_vr)
+        call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr,PerPlantRootLen_vr,PlantPopCol)
       endif
       !PerPlantRootC_vr(1:NL_col(NY,NX)) = tmp_rootc(1:NL_col(NY,NX))
       !PerPlantRootLen_vr(1:NL_col(NY,NX)) = tmp_rootl(1:NL_col(NY,NX))
       !call SetRootProfileZ(irootType_col(NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr(1:NL_col(NY,NX)),PerPlantRootLen_vr(1:NL_col(NY,NX)))
       DO NZ=1,NP_col(NY,NX)
+        !empty ATS PFT slot: zero its roots rather than inheriting the
+        !profile left in PerPlantRoot*_vr by the previous slot
+        if(ats_cpl_mode .and. DATAPI(NZ,NY,NX).EQ.0)then
+          DO L=NU_col(NY,NX),NL_col(NY,NX)
+            RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)    = 0._r8
+            RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX)   = 0._r8
+            PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)         = 0._r8
+            RootAbsorbLenPerPlant_pvr(ipltroot,L,NZ,NY,NX) = 0._r8
+          ENDDO
+          cycle
+        endif
+
+        !root profile of this PFT's root type (overrides the column profile)
+        if(irootType_pft(NZ,NY,NX).GT.0)then
+          call SetRootProfileZ(irootType_pft(NZ,NY,NX),NL_col(NY,NX),CumDepz2LayBottom_vr(1:NL_col(NY,NX),NY,NX),PerPlantRootC_vr,PerPlantRootLen_vr,PlantPopuLive_pft(NZ,NY,NX))
+        endif
+
+        !number of primary root axes, by the pipe-model allometry of the full plant
+        !model (GrosubsMod): max(1, root C per plant**b) x population. Each layer
+        !gets the axes that reach it: the total scaled by the share of root C at
+        !or below the layer.
+        RootCPerPlant = sum(PerPlantRootC_vr(NU_col(NY,NX):NL_col(NY,NX)))
+        IF(iPlantPhenolPattern_pft(NZ,NY,NX).EQ.iplt_annual)THEN
+          NumPrimRootAxes = AMAX1(1.0_r8,RootCPerPlant**0.833_r8)*PlantPopuLive_pft(NZ,NY,NX)
+        elseif(is_plant_woody_vascular(iPlantRootProfile_pft(NZ,NY,NX),iPlant2ndGrothPattern_pft(NZ,NY,NX)))then
+          NumPrimRootAxes = AMAX1(1.0_r8,RootCPerPlant**0.7143_r8)*PlantPopuLive_pft(NZ,NY,NX)
+        else
+          NumPrimRootAxes = AMAX1(1.0_r8,RootCPerPlant**1.053_r8)*PlantPopuLive_pft(NZ,NY,NX)
+        endif
+        RootCBelow = RootCPerPlant
         DO L=NU_col(NY,NX),NL_col(NY,NX)
           RootTotLenPerPlant_pvr(ipltroot,L,NZ,NY,NX)     = PerPlantRootLen_vr(L)
           RootLenDensPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)/DLYR_3D(3,L,NY,NX)
           PopuRootMycoC_pvr(ipltroot,L,NZ,NY,NX)       = PerPlantRootC_vr(L)*PlantPopuLive_pft(NZ,NY,NX)
           RootAbsorbLenPerPlant_pvr(ipltroot,L,NZ,NY,NX) = PerPlantRootLen_vr(L)
 
-          !the following two are fillers, which will be updated later
-          Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8
+          !primary axes reaching layer L (was a filler of 2)
+          if(RootCPerPlant.GT.0._r8)then
+            Root1stXNumL_pvr(L,NZ,NY,NX) = AMAX1(1.0_r8,NumPrimRootAxes*RootCBelow/RootCPerPlant)
+          else
+            Root1stXNumL_pvr(L,NZ,NY,NX) = 2._r8
+          endif
+          RootCBelow = AZMAX1(RootCBelow-PerPlantRootC_vr(L))
+          !the following is a filler, which will be updated later
           Root2ndXNumL_rpvr(ipltroot,L,NZ,NY,NX) = 1.e5_r8
         ENDDO
       ENDDO
@@ -327,7 +398,7 @@ implicit none
 
   end subroutine PrescribePhenologyInterp
 !------------------------------------------------------------------------------------------
-  subroutine SetRootProfileZ(irootType,NL,tmp_cdepthz,tmp_rootc,tmp_rootl)
+  subroutine SetRootProfileZ(irootType,NL,tmp_cdepthz,tmp_rootc,tmp_rootl,PlantPop)
   !
   !Description:
   !Reference: Jackson et al. (1997), A global budget for fine root biomass, surface area, and nutrient contents, PNAS.
@@ -350,13 +421,17 @@ implicit none
   real(r8),intent(in) :: tmp_cdepthz(JZ)        !cumulative depth [m]
   real(r8),intent(out) :: tmp_rootc(JZ)   !fine root C in each layer [gC m-2]
   real(r8),intent(out) :: tmp_rootl(JZ)    !root length in each layer [gC m-2]
+  real(r8),intent(out) :: PlantPop        !default plant population [1/m2]
   real(r8), parameter :: beta(10)=real((/0.943,0.970,0.950,0.980,0.967,0.943,0.982,0.972,0.972,0.909/),kind=r8)
-  real(r8), parameter :: totfrootC(10)=(/0.6,0.27,0.52,0.82,0.78,1.51,0.57,0.57,0.99,0.96/)*0.488_r8 !total fine root C
+  !total fine root C [gC m-2]: Jackson et al. live+dead fine root biomass [kg m-2] x 0.488 gC/g x 1000 g/kg
+  real(r8), parameter :: totfrootC(10)=(/0.6,0.27,0.52,0.82,0.78,1.51,0.57,0.57,0.99,0.96/)*0.488_r8*1.e3_r8
   real(r8), parameter :: frootLen(10)=(/2.6,4.0,8.4,6.1,5.4,112.,3.5,4.1,60.4,7.4/)*1.e3_r8  !total fine root length
   real(r8), parameter :: PltPopDef(10)=(/0.6,1.,1.0,0.6,0.6,40.,0.6,0.6,40.,40./) !default plant population [1/m2]
   integer :: L
   real(r8) :: CumRootFrac_vr(JZ)  !Cumfraction of root in soil layers
   real(r8) :: RootFrac_vr(JZ)     !fraction of root in soil layers
+
+  PlantPop = PltPopDef(irootType)
 
   CumRootFrac_vr(1)=1._r8-beta(irootType)**(tmp_cdepthz(1)*100._r8)
   RootFrac_vr(1)=CumRootFrac_vr(1)

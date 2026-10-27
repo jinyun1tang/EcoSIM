@@ -511,6 +511,7 @@ contains
   real(r8) :: RAa            ! [h/m]
   real(r8) :: VaporSoi1      ! soil vapor pressure [ton water/m3]
   real(r8) :: CdSoiEvap      ! scaled conductance for evaporation   [m^3]
+  real(r8) :: RSoilEvap      ! soil surface resistance to evaporation [h/m]
   real(r8) :: tRadIncid      !total incoming radiation to soil or liter surface, short + long [MJ]
   real(r8) :: RI,WPLX,WPX,FracLitrPoreAsAir
   real(r8) :: VLWatGrnd,VLIceGrnd,VaporTortuosityLitr
@@ -544,7 +545,12 @@ contains
 
   call PrintInfo('beg '//subname)
 
-  call CalcSoilWatPotential(NY,NX,NX,NY,NUM_col(NY,NX),PSISM1_vr(NUM_col(NY,NX),NY,NX),THETA1S)
+  !In ATS mode PSISM1_vr already holds the ATS matric potential; recomputing
+  !it from EcoSIM's own water content and retention curve hides surface drying
+  !from the soil vapor pressure and keeps evaporation at the potential rate
+  if(.not.ats_cpl_mode)then
+    call CalcSoilWatPotential(NY,NX,NX,NY,NUM_col(NY,NX),PSISM1_vr(NUM_col(NY,NX),NY,NX),THETA1S)
+  endif
 
   PSISV1=PSISM1_vr(NUM_col(NY,NX),NY,NX)+PSISoilOsmotic_vr(NUM_col(NY,NX),NY,NX)
 !
@@ -621,7 +627,16 @@ contains
   ! VAP=latent heat of evaporation
   ! HeatSensVapAir2Grnd=convective heat of evaporation flux
   !
-  CdSoiEvap             = AScaledCdWOverSoil_col(NY,NX)/(RAa+RZ)
+  if(ats_cpl_mode)then
+    !A coarse ATS top cell cannot resolve the dry surface crust that limits
+    !bare-soil evaporation, so use a surface resistance from its liquid
+    !saturation (THETW_vr = a_LSAT): r = exp(8.206-4.255*s) [s m-1] (Sellers et
+    !al., 1992, SiB2). It is about RZ when saturated and ~1500 s m-1 at s=0.2.
+    RSoilEvap = AMAX1(RZ, EXP(8.206_r8-4.255_r8*AMIN1(1._r8,AZMAX1(THETW_vr(NUM_col(NY,NX),NY,NX))))/3600._r8)
+  else
+    RSoilEvap = RZ
+  endif
+  CdSoiEvap             = AScaledCdWOverSoil_col(NY,NX)/(RAa+RSoilEvap)
   CdSoiHSens_col(NY,NX) = AScaledCdHOverSoil_col(NY,NX)/RAa
   TKX1                  = TKSoil1_vr(NUM_col(NY,NX),NY,NX)
   VaporSoi1             = vapsat(TKX1)*EXP(18.0_r8*PSISV1/(RGASC*TKX1))

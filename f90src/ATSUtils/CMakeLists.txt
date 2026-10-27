@@ -30,7 +30,6 @@ target_include_directories(ATSUtils_mods  PRIVATE
    ${CMAKE_BINARY_DIR}/f90src/HydroTherm/CanopyPhys/
    ${CMAKE_BINARY_DIR}/f90src/APIData/
    ${CMAKE_BINARY_DIR}/f90src/Ecosim_mods/
-   ${CMAKE_BINARY_DIR}/f90src/Prescribed_pheno/
    ${CMAKE_BINARY_DIR}/f90src/Plant_bgc/
    ${CMAKE_BINARY_DIR}/f90src/APIs/
 )
