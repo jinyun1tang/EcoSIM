@@ -901,11 +901,8 @@ module StartsMod
   !
   CRAIN_lnd           = 0.0_r8
   HEATIN_lnd          = 0.0_r8
-  SurfGas_lnd(idg_CO2)     = 0.0_r8
-  SurfGas_lnd(idg_O2)      = 0.0_r8
-  SurfGas_lnd(idg_H2)      = 0.0_r8
+  SurfGas_lnd(:)      = 0.0_r8
   TZIN                = 0.0_r8
-  SurfGas_lnd(idg_N2)      = 0.0_r8
   TPIN                = 0.0_r8
   tAmendOrgC_lnd      = 0.0_r8
   TORGN               = 0.0_r8
