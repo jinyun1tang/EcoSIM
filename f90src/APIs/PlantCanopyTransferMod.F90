@@ -260,6 +260,9 @@ contains
       plt_morph%IndRootSegTip_raxes(NR,NZ)   = IndRootSegTip_raxes(NR,NZ,NY,NX)
     ENDDO
     DO NB=1,pltpar%MaxNumBranches
+      ! Inactive branches retain their saved counter until phenology updates it.
+      plt_morph%KLeafNumber_brch(NB,NZ) = KLeafNumber_brch(NB,NZ,NY,NX)
+      plt_photo%RubiscoActivity_brch(NB,NZ) = RubiscoActivity_brch(NB,NZ,NY,NX)
       DO K=1,MaxNodesPerBranch
         DO  L=1,NumCanopyLayers
           DO N=1,NumLeafInclinationClasses

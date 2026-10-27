@@ -71,11 +71,14 @@ take precedence over repository guidance.
   `!------------------------------------------------------------------------------------------`
 - When a diagnostic `write` statement is needed before calling `endrun`, write
   to `iulog` rather than the default output unit `*` (use `write(iulog,*)`).
-- In Fortran executable statements, use aliases declared in an `associate` block
-  instead of direct derived-type component references such as
-  `plt_morph%Root1stDepz_raxes(NR,NZ)`. Add aliases to an existing `associate`
-  block or introduce one when needed; component references belong in the
-  association declarations. Exception: when adding history-output variables,
+- Use `associate` blocks only when creating a new subroutine or modifying a
+  subroutine that already contains an `associate` block. In those subroutines,
+  use aliases for derived-type components in executable statements, adding
+  aliases to the existing block or introducing a block in the new subroutine
+  as needed. When modifying an existing subroutine without an `associate`
+  block, keep direct derived-type component references such as
+  `plt_morph%Root1stDepz_raxes(NR,NZ)`; do not introduce an `associate` block.
+  Exception: when adding history-output variables,
   avoid `associate` aliases and use direct history components such as
   `this%h1D_variable_col` in allocation, registration, and update code, following
   the surrounding history-output conventions.
@@ -163,6 +166,12 @@ take precedence over repository guidance.
   simulated days in a scratch mirror and checks exit status, steps completed,
   and output for NaN/Inf. A pass means the model ran and produced finite
   numbers; it is not evidence of scientific correctness.
+- To test restart reproducibility, use the `ecosim-restart-test` skill
+  (`.agents/skills/ecosim-restart-test/`, also exposed at `.claude/skills/`
+  and `.codex/skills/`). It compares 10-day uninterrupted example runs with
+  five-day runs followed by five-day continuations in scratch directories,
+  requiring exact checkpoint/history equality and finite valid values.
+  Report failed cases; do not relax tolerances or update baselines to pass.
 - Inspect `regression-tests/Makefile` before running its targets. It provides
   `mtest` and `rtest`; verify the executable path and required data first. Do not
   update regression baselines merely to make a changed result pass.
