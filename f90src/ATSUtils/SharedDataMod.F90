@@ -41,6 +41,8 @@ Module SharedDataMod
   real(r8), allocatable :: a_SAI(:,:)       !Stem Area Index
   real(r8), allocatable :: a_VEG(:)       !Vegetation type
   real(r8), allocatable :: a_SALB(:)      !Snow Albedo
+  real(r8), allocatable :: a_TSURF(:)     !ATS surface temperature [K]
+  real(r8), allocatable :: a_TCOND(:,:)   !ATS thermal conductivity [MW m-1 K-1]
   real(r8), allocatable :: a_ATKA(:)
   real(r8), allocatable :: a_WC(:,:)      !Soil water content
   real(r8), allocatable :: a_WC_rev(:,:)  !Soil water content testing
@@ -61,6 +63,7 @@ Module SharedDataMod
   real(r8), allocatable, target :: a_EvapLitr(:)     !litter evaporation
   real(r8), allocatable, target :: a_EvapSnow(:)     !water evaporation from snow
   real(r8), allocatable, target :: a_Sublim(:)       !water sublimation from snow
+  real(r8), allocatable, target :: a_PlantInit(:,:)  !prescribed phenology: 1 once the plant state of the column is initialized, else 0
   real(r8), allocatable :: a_TS(:,:)         !snow temperature (LS,L dimensions)
   real(r8), allocatable :: tairc(:)       !air temperature oC
   real(r8), allocatable :: uwind(:)       !wind speed, m/s
@@ -84,6 +87,9 @@ Module SharedDataMod
   integer, allocatable :: a_PFT(:,:)
   integer :: NYS, I !total number of columns
   integer :: current_day, current_year
+  integer :: current_hour = 0              !hour of the day [0-23] starting at the call (from ATS)
+  real(r8) :: site_latitude = 40._r8       !site latitude [degrees] (from ATS)
+  real(r8) :: site_solar_noon = 12._r8     !hour of solar noon [h] (from ATS)
   integer :: num_pfts
   logical :: p_bool, a_bool, pheno_bool
   character(len=512), public :: ecosim_pft_file_path = ""
@@ -122,6 +128,7 @@ Module SharedDataMod
     allocate(a_EvapLitr(ncol))
     allocate(a_EvapSnow(ncol))
     allocate(a_Sublim(ncol))
+    allocate(a_PlantInit(ncol,1)); a_PlantInit=0._r8
     allocate(a_NU(ncol))
     allocate(a_NL(ncol))
     !allocate(a_ASP(ncells_per_col_))

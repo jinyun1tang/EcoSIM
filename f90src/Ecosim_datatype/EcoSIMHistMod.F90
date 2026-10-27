@@ -32,7 +32,7 @@ module EcoSIMHistMod
   implicit none
 
   allocate(DATAP(JP,JY,JX))
-  allocate(datapi(jp,jy,jx))
+  allocate(datapi(jp,jy,jx)); datapi=0
   allocate(DATAM(JP,JY,JX))
   allocate(DATAZ(JP,JY,JX))
   allocate(OUTFILS(10,JY,JX))

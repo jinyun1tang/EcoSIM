@@ -53,6 +53,7 @@ implicit none
   real(r8),target,allocatable ::  srad_scalar_col(:,:)     !solar radiation scalar due to open top chamber
   real(r8),target,allocatable ::  EMS_Modify_Scalar_col(:,:)      !emissivity scalar due to open top chamber
   real(r8),target,allocatable ::  Eco_RadSW_col(:,:)       !shortwave radiation absorbed by the ecosystem [MJ/h]
+  real(r8),target,allocatable ::  RadSWATS_col(:,:)        !incident shortwave radiation from ATS (IWTHR=-999), [MJ m-2 h-1]
   real(r8),target,allocatable ::  TKS_ref_vr(:,:,:,:)      !reference tempeature profile from control run to warming experiment [K]
   real(r8),target,allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
   real(r8),target,allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
@@ -184,6 +185,7 @@ implicit none
   allocate(srad_scalar_col(JY,JX));srad_scalar_col=1._r8
   allocate(trcs_solcoef_col(idg_beg:idg_NH3,JY,JX)); trcs_solcoef_col=0._r8
   allocate(Eco_RadSW_col(JY,JX)); Eco_RadSW_col=0._r8
+  allocate(RadSWATS_col(JY,JX));  RadSWATS_col=0._r8
   allocate(GDD_col(JY,JX)); GDD_col=0._r8
   allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
   allocate(TDTPN(12,JY,JX));    TDTPN=0._r8
@@ -330,6 +332,7 @@ implicit none
   call destroy(AtmGmms_col)
   call destroy(TKS_ref_vr)
   call destroy(Eco_RadSW_col)
+  call destroy(RadSWATS_col)
   call destroy(OXYE_col)
   call destroy(Z2OE_col)
   call destroy(Z2GE_col)
