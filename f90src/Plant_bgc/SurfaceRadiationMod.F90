@@ -56,6 +56,7 @@ module SurfaceRadiationMod
   real(r8) :: StemAreaZsecLive_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)
   real(r8) :: SurfAreaZsecDead_lpft(NumLeafInclinationClasses1,NumCanopyLayers1,JP1)
   call PrintInfo('beg '//subname)
+
   iyrc=etimer%get_curr_yearAD()
 
   if(ldo_sp_mode)then
@@ -1846,6 +1847,9 @@ module SurfaceRadiationMod
   character(len=*), parameter :: subname='subroutine AngularDistributeRadiation'
 
   associate(                                                              &
+    CanopyHeightZ_col          => plt_morph%CanopyHeightZ_col         ,&
+    SnowDepth                  => plt_ew%SnowDepth                     ,&
+    ZERO                       => plt_site%ZERO                       ,&
     NP                           => plt_site%NP                          ,& !input  :current number of plant species,[-]  
     LeafPARabsorptivity_pft      => plt_rad%LeafPARabsorptivity_pft      ,& !input  :canopy PAR absorptivity,[-]
     LeafSWabsorptivity_pft       => plt_rad%LeafSWabsorptivity_pft       ,& !input  :canopy shortwave absorptivity, [-]  
@@ -1912,7 +1916,13 @@ module SurfaceRadiationMod
 
         DO L=1,NumCanopyLayers1
           RadDifPARAbsorption_zsec(N,M,L,NZ) = 0.0_r8
-          RadTotPARAbsorption_zsec(N,M,L,NZ) = RadDirPAR2Leaf_zsec(N,M,NZ)*LeafPARabsorptivityL_pft(L,NZ)
+          ! Optical properties are defined only above the snow surface.
+          ! Buried layers must not reuse an earlier column/hour's coefficients.
+          if(CanopyHeightZ_col(L-1).GE.SnowDepth-ZERO)then
+            RadTotPARAbsorption_zsec(N,M,L,NZ) = RadDirPAR2Leaf_zsec(N,M,NZ)*LeafPARabsorptivityL_pft(L,NZ)
+          else
+            RadTotPARAbsorption_zsec(N,M,L,NZ) = 0._r8
+          endif
         enddo
       enddo
     enddo

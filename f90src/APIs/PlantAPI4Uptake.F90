@@ -60,7 +60,6 @@ implicit none
   integer :: M,L,NZ,N,NB,K
 
   !sent variables also modified
-  plt_site%NumActivePlants         = NumActivePlants_col(NY,NX)        !number of active plants in the column
   plt_site%PlantPopu_col           = PlantPopu_col(NY,NX)              !total plant population in the column
   plt_site%ZERO                    = ZERO                              !numerical threshold
   plt_site%ZERO2                   = ZERO2                             !numerical threshold
@@ -241,6 +240,10 @@ implicit none
     plt_ew%OrganOsmoPsi0pt_pft(NZ)         = OrganOsmoPsi0pt_pft(NZ,NY,NX)          !read in pft parameter
 
   ENDDO
+  ! HOUR1 clears the count. Prescribed phenology sets activity here instead
+  ! of running PhenologyUpdate; keep restart filtering consistent with it.
+  NumActivePlants_col(NY,NX) = sum(IsPlantActive_pft(1:NP0_col(NY,NX),NY,NX))
+  plt_site%NumActivePlants = NumActivePlants_col(NY,NX)
   end subroutine PlantUptakeAPISend
 !------------------------------------------------------------------------------------------
 

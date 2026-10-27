@@ -265,11 +265,12 @@ contains
     SpecificLeafArea_pft(NZ,NY,NX)             = plt_biom%SpecificLeafArea_pft(NZ)
     Root1stTipSinkWeight_pft(NZ,NY,NX)         = plt_morph%Root1stTipSinkWeight_pft(NZ)
   end subroutine ReceivePlantState
-
+!----------------------------------------------------------------------------------------------------
   subroutine SendPlantState(I,NY,NX,NZ)
   use EcoSIMConfig, only : jsken=>jskenc,jcplx=>jcplxc
   integer, intent(in) :: I,NY,NX,NZ
 
+    plt_biom%StomatalStress_pft(NZ) = StomatalStress_pft(NZ,NY,NX)
     plt_biom%RootNoduleElms_pft(1:NumPlantChemElms,NZ)             = RootNoduleElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%ShootNoduleElms_pft(1:NumPlantChemElms,NZ)            = ShootNoduleElms_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_biom%RootElms_pft(1:NumPlantChemElms,NZ)                   = RootElms_pft(1:NumPlantChemElms,NZ,NY,NX)

@@ -244,9 +244,10 @@ module InitNoSaltTransportMod
         trcn_solsml2_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX) = trcn_solsml_snvr(ids_nut_beg:ids_nuts_end,L,NY,NX)
       enddo
 
-      ! exclude banded nutrient
-      DO idg=idg_beg,idg_end
-        trcs_solml2_vr(idg,0,NY,NX)=AZERO(trcs_solml_vr(idg,0,NY,NX))
+      ! Accepted surface transfers run before the iterative state copy. Stage
+      ! nutrients too, rather than reusing the preceding hour's workspace.
+      DO ids=ids_beg,ids_end
+        trcs_solml2_vr(ids,0,NY,NX)=AZERO(trcs_solml_vr(ids,0,NY,NX))
       ENDDO
 
     !reset DOM to value before the iteration

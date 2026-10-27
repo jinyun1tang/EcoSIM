@@ -92,7 +92,8 @@ implicit none
     plt_rad%TAU_DirectSunLit(L)      = TAU_DirectSunLit(L,NY,NX)
   ENDDO
   DO L=1,NumCanopyLayers+1
-    plt_rad%TAU_DirectSunLit(L)      = TAU_DirectSunLit(L,NY,NX)  
+    plt_rad%TAU_DirectSunLit(L) = TAU_DirectSunLit(L,NY,NX)
+    plt_rad%TAU_DirectSunSha(L) = TAU_DirectSunSha(L,NY,NX)
   ENDDO  
 
   DO L=0,NL_col(NY,NX)
@@ -127,6 +128,14 @@ implicit none
   plt_site%POROS1                  = POROS_vr(NU_col(NY,NX),NY,NX)
   DO NZ=1,NP_col(NY,NX)
     plt_site%PlantPopuDead_pft(NZ)          = PlantPopuDead_pft(NZ,NY,NX)
+    ! Radiation runs before PlantModel refreshes the shared plant API state.
+    ! Refill biomass, snow and leaf-angle inputs for this column and restart.
+    plt_biom%StandDeadStrutElms_pft(1:NumPlantChemElms,NZ) = StandDeadStrutElms_pft(1:NumPlantChemElms,NZ,NY,NX)
+    plt_photo%LeafAreaSunlit_pft(NZ)       = LeafAreaSunlit_pft(NZ,NY,NX)
+    plt_biom%StomatalStress_pft(NZ)        = StomatalStress_pft(NZ,NY,NX)
+    plt_biom%ZERO4Groth_pft(NZ)            = ZERO4Groth_pft(NZ,NY,NX)
+    plt_ew%SnowOnCanopy_pft(NZ)            = SnowOnCanopy_pft(NZ,NY,NX)
+    plt_morph%LeafAngleClass_pft(:,NZ)     = LeafAngleClass_pft(:,NZ,NY,NX)
     plt_morph%StemSpecVolume_pft(NZ)        = StemSpecVolume_pft(NZ,NY,NX)
     plt_ew%fSnowCanopy_pft(NZ)              = fSnowCanopy_pft(NZ,NY,NX)
     plt_ew%BulkFactor4Snow_pft(NZ)          = BulkFactor4Snow_pft(NZ,NY,NX)
