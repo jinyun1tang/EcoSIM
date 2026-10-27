@@ -15,6 +15,7 @@ module RestartMod
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use abortutils        , only : endrun,destroy,iulog
   use UnitMod           , only : units
+  use DebugToolMod      , only : PrintInfo
   use HistFileMod       , only : hist_restart_ncd  
   use NumericalAuxMod
   use EcoSIMCtrlDataType  
@@ -134,9 +135,27 @@ implicit none
   logical :: has_senesc_snapshot
   type(var_desc_t) :: single_grain_vardesc
   logical :: has_single_grain
+  integer :: dead_height_varid
+  type(var_desc_t) :: dead_height_vardesc
+  logical :: has_dead_height
+  logical :: retained_inactive_canopy
+  integer :: canopy_state_schema
   character(len=64) :: single_grain_varname
 
 ! execution begins here
+  ! Legacy files masked these values in dormant/dead PFTs. New files retain
+  ! the thermal/water state and the response used for standing-dead turnover.
+  retained_inactive_canopy=.true.
+  canopy_state_schema=1
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'retained_inactive_canopy_state',dead_height_varid,dead_height_vardesc, &
+      readvar=retained_inactive_canopy)
+  endif
+  if(flag/='read' .or. retained_inactive_canopy)then
+    call restartvar(ncid,flag,varname='retained_inactive_canopy_state', &
+      long_name='inactive canopy water, temperature and turnover response retained',units='none', &
+      interpinic_flag='skip',data=canopy_state_schema)
+  endif
   NHW = bounds%NHW;NVN = bounds%NVN
   NHE = bounds%NHE;NVS = bounds%NVS
   ncols = bounds%ncols
@@ -199,9 +218,9 @@ implicit none
     call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
        long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
        data=datpr1, missing_value=spval, fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,RootCO2Autor_col,datrc_1d)
   else     
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RoughnessLength_col,datrc_1d)
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RootCO2Autor_col,datrc_1d)
     datpr1 => datrc_1d
     call restartvar(ncid, flag, varname='RootCO2Autor_col', dim1name='column',&
        long_name='Root autotrophic respiraiton', units='gC d-2 h-1', interpinic_flag='skip', &
@@ -929,11 +948,14 @@ implicit none
     call restartvar(ncid, flag, varname='TKC_pft', dim1name='pft',&
      long_name='canopy temperature', units='K', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,TKC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,TKC_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,TKC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'TKC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,TKC_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,TKC_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='TKC_pft', dim1name='pft',&
      long_name='canopy temperature', units='K', &
@@ -978,12 +1000,15 @@ implicit none
     call restartvar(ncid, flag, varname='fTCanopyGroth_pft', dim1name='pft',&
      long_name='canopy temperature growth function', units='none', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)           
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,fTCanopyGroth_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,fTCanopyGroth_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,fTCanopyGroth_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'fTCanopyGroth_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,fTCanopyGroth_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,fTCanopyGroth_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='fTCanopyGroth_pft', dim1name='pft',&
      long_name='canopy temperature growth function', units='none', &
@@ -1013,12 +1038,15 @@ implicit none
     call restartvar(ncid, flag, varname='CanopyBiomWater_pft', dim1name='pft',&
      long_name='plant canopy water content in dry matter', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyBiomWater_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyBiomWater_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyBiomWater_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'CanopyBiomWater_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyBiomWater_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyBiomWater_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='CanopyBiomWater_pft', dim1name='pft',&
      long_name='canopy water content in dry matter', units='m3 d-2', &
@@ -1030,12 +1058,15 @@ implicit none
     call restartvar(ncid, flag, varname='PSICanopy_pft', dim1name='pft',&
      long_name='canopy total water potential', units='MPa', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)      
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopy_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'PSICanP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopy_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PSICanopy_pft', dim1name='pft',&
      long_name='canopy total water potential', units='MPa', &
@@ -1047,12 +1078,15 @@ implicit none
     call restartvar(ncid, flag, varname='PSICanopyOsmo_pft', dim1name='pft',&
      long_name='plant canopy osmotic water potential', units='MPa', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)          
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyOsmo_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyOsmo_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyOsmo_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'PSICanopyOsmo_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyOsmo_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyOsmo_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PSICanopyOsmo_pft', dim1name='pft',&
      long_name='plant canopy osmotic water potential', units='MPa', &
@@ -1065,12 +1099,15 @@ implicit none
     call restartvar(ncid, flag, varname='PSICanopyTurg_pft', dim1name='pft',&
      long_name='plant canopy turgor water potential', units='MPa', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)          
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyTurg_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyTurg_pft,datrp_1d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyTurg_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'PSICanopyTurg_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyTurg_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PSICanopyTurg_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='PSICanopyTurg_pft', dim1name='pft',&
      long_name='plant canopy turgor water potential', units='MPa', &
@@ -1497,12 +1534,20 @@ implicit none
     call restartvar(ncid, flag, varname='StandDeadStrutElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='standing dead element', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)  
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StandDeadStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StandDeadStrutElms_pft,datrp_2d)
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        DO NZ=1,NP_col(NY,NX)
+          if(any(StandDeadStrutElms_pft(:,NZ,NY,NX)==spval))then
+            StandDeadStrutElms_pft(:,NZ,NY,NX)=sum(StandDeadCompKElms_pft(:,:,NZ,NY,NX),dim=2)
+            write(iulog,*) 'Restart omitted inactive standing dead pool; reconstructed from components'
+          endif
+        ENDDO
+      ENDDO
+    ENDDO
   else
     !print*,'StandDeadStrutElms_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StandDeadStrutElms_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,StandDeadStrutElms_pft,datrp_2d)
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='StandDeadStrutElms_pft', dim1name='pft',dim2name='elmnts',&
      long_name='standing dead element', units='g d-2', &
@@ -1526,16 +1571,37 @@ implicit none
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
   endif
 
+  ! Dead canopy height carries the maximum of earlier live/dead heights.
+  ! It cannot be reconstructed from current live height after mortality.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'CanopyHeightDead_pft',dead_height_varid,dead_height_vardesc, &
+      readvar=has_dead_height)
+    if(has_dead_height)then
+      datpr1 => datrp_1d
+      call restartvar(ncid, flag, varname='CanopyHeightDead_pft', dim1name='pft', &
+        long_name='standing dead canopy height', units='m', interpinic_flag='skip', &
+        data=datpr1, missing_value=spval, fill_value=spval)
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyHeightDead_pft,datrp_1d)
+    else
+      write(iulog,*) 'Restart lacks CanopyHeightDead_pft; exact continuation is not guaranteed'
+    endif
+  else
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,CanopyHeightDead_pft,datrp_1d)
+    datpr1 => datrp_1d
+    call restartvar(ncid, flag, varname='CanopyHeightDead_pft', dim1name='pft', &
+      long_name='standing dead canopy height', units='m', interpinic_flag='skip', &
+      data=datpr1, missing_value=spval, fill_value=spval)
+  endif
+
   if(flag=='read')then
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='SnowOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held snow content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d)
+    where(SnowOnCanopy_pft==spval)SnowOnCanopy_pft=0._r8
   else
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,SnowOnCanopy_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='SnowOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held snow content', units='m3 d-2', &
@@ -1547,12 +1613,11 @@ implicit none
     call restartvar(ncid, flag, varname='WatHeldOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)            
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,WatHeldOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,WatHeldOnCanopy_pft,datrp_1d)
+    where(WatHeldOnCanopy_pft==spval)WatHeldOnCanopy_pft=0._r8
   else
     !print*,'WatHeldOnCanopy_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,WatHeldOnCanopy_pft,datrp_1d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)  
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,WatHeldOnCanopy_pft,datrp_1d)
     datpr1 => datrp_1d
     call restartvar(ncid, flag, varname='WatHeldOnCanopy_pft', dim1name='pft',&
      long_name='plant canopy held water content', units='m3 d-2', &
@@ -2411,12 +2476,15 @@ implicit none
     call restartvar(ncid, flag, varname='PlantElmBalCum_pft', dim1name='pft',dim2name='elmnts',&
      long_name='Cumulative plant element conservation error', units='g d-2', &
      interpinic_flag='skip', data=datpr2, missing_value=spval, fill_value=spval)
-    call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantElmBalCum_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)   
+    if(retained_inactive_canopy)then
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantElmBalCum_pft,datrp_2d)
+    else
+      call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantElmBalCum_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
+      IsPlantActive_pft=IsPlantActive_pft)
+    endif
   else
     !print*,'RootElms_pft'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantElmBalCum_pft,datrp_2d,NumActivePlants=NumActivePlants_col,&
-      IsPlantActive_pft=IsPlantActive_pft)     
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,PlantElmBalCum_pft,datrp_2d)
     datpr2 => datrp_2d(1:npfts,1:NumPlantChemElms)
     call restartvar(ncid, flag, varname='PlantElmBalCum_pft', dim1name='pft',dim2name='elmnts',&
      long_name='Cumulative plant element conservation error', units='g d-2', &
@@ -4962,7 +5030,47 @@ implicit none
   call destroy(datrp_5d)  
   call destroy(datip_3d)
 
+  ! Preserve geometry established at planting and cached branch activity.
+  call restart_plant_profile(ncid,flag,'Root1stMaxRadius_pft',Root1stMaxRadius_pft,'m')
+  call restart_plant_profile(ncid,flag,'Root2ndMaxRadius_pft',Root2ndMaxRadius_pft,'m')
+  call restart_plant_profile(ncid,flag,'RubiscoActivity_brch',RubiscoActivity_brch,'none','nbranches')
+  call restart_plant_profile(ncid,flag,'Root1stSpecLen_pft',Root1stSpecLen_pft,'m gC-1')
   END SUBROUTINE restartnc_plant
+!------------------------------------------------------------------------------------------
+  subroutine restart_plant_profile(ncid,flag,name,values,units,dimension_name)
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag,name,units
+  real(r8), intent(inout) :: values(:,:,:,:)
+  character(len=*), optional, intent(in) :: dimension_name
+  character(len=16) :: second_dimension
+  character(len=*), parameter :: subname='restart_plant_profile'
+  real(r8), target :: buffer(bounds%begp:bounds%endp,size(values,1))
+  real(r8), pointer :: data(:,:)
+  type(var_desc_t) :: vardesc
+  integer :: varid
+  logical :: present_cache
+
+  associate(NHW => bounds%NHW, NHE => bounds%NHE, NVN => bounds%NVN, NVS => bounds%NVS)
+  call PrintInfo('beg '//subname)
+  second_dimension='rootyps'
+  if(present(dimension_name))second_dimension=dimension_name
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,name,varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,values,buffer)
+    data=>buffer
+    call restartvar(ncid,flag,varname=name,dim1name='pft',dim2name=trim(second_dimension), &
+      long_name='persistent plant property: '//name,units=units,interpinic_flag='skip', &
+      data=data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,values,buffer)
+  else
+    write(iulog,*) 'Restart lacks ',name,'; exact continuation is not guaranteed'
+  endif
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine restart_plant_profile
+
 
 !------------------------------------------------------------------------------------------
 
@@ -4974,9 +5082,282 @@ implicit none
   call restartnc_plant(ncid,flag)
 
   call restartnc_soil(ncid,flag)
+  call restartnc_soil_caches(ncid,flag)
+  call restartnc_accumulators(ncid,flag)
   call restartnc_daily_irrigation(ncid,flag)
 
   end subroutine restartnc
+!------------------------------------------------------------------------------------------
+  subroutine restartnc_accumulators(ncid,flag)
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag
+  character(len=*), parameter :: subname='restartnc_accumulators'
+  logical :: complete
+
+  call PrintInfo('beg '//subname)
+  call restart_column_memory(ncid,flag,'SnowOnCanopy_col',SnowOnCanopy_col,'m3')
+  call restart_column_memory(ncid,flag,'fSnowCanopy_col',fSnowCanopy_col,'none')
+  call restart_column_memory(ncid,flag,'BulkFactor4Snow_col',BulkFactor4Snow_col,'m2 ton-1')
+  call restart_column_memory(ncid,flag,'NWetDep_col',NWetDep_col,'gN')
+  call restart_column_memory(ncid,flag,'CumDryDepoOM_col',CumDryDepoOM_col,'gC')
+  call restart_column_memory(ncid,flag,'GDD_col',GDD_col,'degC day')
+  call restart_column_memory(ncid,flag,'TRAD_col',TRAD_col,'MJ m-2 h-1')
+  call restart_column_memory(ncid,flag,'EvapoTransp_col',EvapoTransp_col,'m3')
+  call restart_column_memory(ncid,flag,'QDrain_cum_col',QDrain_cum_col,'m3')
+  ! Radiation and snow unloading consume these before the current plant step.
+  call restart_pft_memory(ncid,flag,'fSnowCanopy_pft',fSnowCanopy_pft,'none')
+  call restart_pft_memory(ncid,flag,'BulkFactor4Snow_pft',BulkFactor4Snow_pft,'m2 ton-1')
+  call restart_pft_memory(ncid,flag,'LeafAreaSunlit_pft',LeafAreaSunlit_pft,'m2')
+  call restart_pft_memory(ncid,flag,'StomatalStress_pft',StomatalStress_pft,'none')
+  call restart_pft_memory(ncid,flag,'TKCanopy_pft',TKCanopy_pft,'K')
+  call restart_pft_memory(ncid,flag,'GrossRespC_CumYr_pft',GrossRespC_CumYr_pft,'gC')
+  call restart_pft_memory(ncid,flag,'RootUptk_Nmin_cumYr_pft',RootUptk_Nmin_cumYr_pft,'gN')
+  call restart_pft_memory(ncid,flag,'RootUptk_Pmin_cumYr_pft',RootUptk_Pmin_cumYr_pft,'gP')
+  complete=.true.
+  call restart_soil_profile_cache(ncid,flag,'trcg_mass_cumerr_col',trcg_mass_cumerr_col, &
+    'cumulative gas tracer balance error','g tracer',complete,dimension_name='gastrcs')
+  if(flag=='read' .and. .not.complete) &
+    write(iulog,*) 'Restart lacks accumulated gas balance errors; history continuation is not exact'
+  call PrintInfo('end '//subname)
+  end subroutine restartnc_accumulators
+!------------------------------------------------------------------------------------------
+  subroutine restart_column_memory(ncid,flag,name,values,units)
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag,name,units
+  real(r8), intent(inout) :: values(:,:)
+  character(len=*), parameter :: subname='restart_column_memory'
+  real(r8), target :: buffer(bounds%begc:bounds%endc)
+  real(r8), pointer :: data(:)
+  type(var_desc_t) :: vardesc
+  integer :: varid
+  logical :: present_value
+
+  associate(NHW => bounds%NHW, NHE => bounds%NHE, NVN => bounds%NVN, NVS => bounds%NVS)
+  call PrintInfo('beg '//subname)
+  present_value=.true.
+  if(flag=='read')call ncd_inqvid(ncid,name,varid,vardesc,readvar=present_value)
+  if(present_value)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,values,buffer)
+    data=>buffer
+    call restartvar(ncid,flag,varname=name,dim1name='column', &
+      long_name='persistent column memory: '//name,units=units,interpinic_flag='skip', &
+      data=data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,values,buffer)
+  else
+    write(iulog,*) 'Restart lacks ',name,'; retaining initialization; exact continuation is not guaranteed'
+  endif
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine restart_column_memory
+!------------------------------------------------------------------------------------------
+  subroutine restart_pft_memory(ncid,flag,name,values,units)
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag,name,units
+  real(r8), intent(inout) :: values(:,:,:)
+  character(len=*), parameter :: subname='restart_pft_memory'
+  real(r8), target :: buffer(bounds%begp:bounds%endp)
+  real(r8), pointer :: data(:)
+  type(var_desc_t) :: vardesc
+  integer :: varid
+  logical :: present_value
+
+  associate(NHW => bounds%NHW, NHE => bounds%NHE, NVN => bounds%NVN, NVS => bounds%NVS)
+  call PrintInfo('beg '//subname)
+  present_value=.true.
+  if(flag=='read')call ncd_inqvid(ncid,name,varid,vardesc,readvar=present_value)
+  if(present_value)then
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,values,buffer)
+    data=>buffer
+    call restartvar(ncid,flag,varname=name,dim1name='pft', &
+      long_name='persistent plant memory: '//name,units=units,interpinic_flag='skip', &
+      data=data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cppft(flag,NHW,NHE,NVN,NVS,NP_col,values,buffer)
+  else
+    write(iulog,*) 'Restart lacks ',name,'; retaining initialization; exact continuation is not guaranteed'
+  endif
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine restart_pft_memory
+!------------------------------------------------------------------------------------------
+  subroutine restartnc_soil_caches(ncid,flag)
+  ! These coefficients are updated only after disturbances. Re-running that
+  ! update changes geometry; leaving them at allocation defaults is unsafe.
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag
+  character(len=*), parameter :: subname='restartnc_soil_caches'
+  logical :: complete,present_cache
+  integer :: varid,L
+  type(var_desc_t) :: vardesc
+  real(r8), target :: conductivity(bounds%begc:bounds%endc,3,100,JZ+1)
+  real(r8), target :: root_mass(bounds%begc:bounds%endc,NumPlantChemElms,jroots,JZ)
+  real(r8), target :: irrigation_nutrients(bounds%begc:bounds%endc,size(trcn_irrig_vr,1),JZ)
+  real(r8), pointer :: irrigation_data(:,:,:)
+  real(r8), pointer :: conductivity_data(:,:,:,:)
+  integer, target :: pore_numbers(bounds%begc:bounds%endc,JZ)
+  integer, pointer :: pore_number_data(:,:)
+
+  associate(NHW => bounds%NHW, NHE => bounds%NHE, NVN => bounds%NVN, NVS => bounds%NVS)
+  call PrintInfo('beg '//subname)
+  complete=.true.
+  ! Pending litter-property updates use the previous geometry before HOUR1
+  ! rebuilds it. Other columns retain their geometry until a disturbance.
+  call restart_soil_profile_cache(ncid,flag,'VGeomLayer_vr',VGeomLayer_vr, &
+    'soil and surface litter geometric volume','m3',complete)
+  call restart_soil_profile_cache(ncid,flag,'SoilDepthMidLay_vr',SoilDepthMidLay_vr, &
+    'depth to soil layer midpoint','m',complete)
+  call restart_soil_profile_cache(ncid,flag,'CumSoilThickMidL_vr',CumSoilThickMidL_vr, &
+    'soil layer midpoint depth from grid cell surface','m',complete)
+  call restart_soil_profile_cache(ncid,flag,'LOGPOROS_vr',LOGPOROS_vr, &
+    'log soil porosity','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'LOGFldCapacity_vr',LOGFldCapacity_vr, &
+    'log water content at field capacity','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'LOGWiltPoint_vr',LOGWiltPoint_vr, &
+    'log water content at wilting point','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'PSD_vr',PSD_vr, &
+    'log porosity to field-capacity ratio','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'FCD_vr',FCD_vr, &
+    'log field-capacity to wilting-point ratio','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'SRP_vr',SRP_vr, &
+    'water retention curve shape','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'CSAND_vr',CSAND_vr, &
+    'soil sand mass fraction','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'CSILT_vr',CSILT_vr, &
+    'soil silt mass fraction','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'CCLAY_vr',CCLAY_vr, &
+    'soil clay mass fraction','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'EHUM_vr',EHUM_vr, &
+    'microbial residue humification fraction','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'EPOC_vr',EPOC_vr, &
+    'litter partition coefficient','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'NumerSolidThermCond_vr',NumerSolidThermCond_vr, &
+    'solid thermal conductivity numerator','MJ m-1 h-1 K-1',complete)
+  call restart_soil_profile_cache(ncid,flag,'DenomSolidThermCond_vr',DenomSolidThermCond_vr, &
+    'solid thermal conductivity denominator','none',complete)
+  call restart_soil_profile_cache(ncid,flag,'ThetaSat_vr',ThetaSat_vr, &
+    'water content at conductivity threshold','m3 m-3',complete)
+  call restart_soil_profile_cache(ncid,flag,'PathLenMacPore_vr',PathLenMacPore_vr, &
+    'distance between macropores','m',complete)
+  call restart_soil_profile_cache(ncid,flag,'MacPoreRadius_vr',MacPoreRadius_vr, &
+    'macropore radius','m',complete)
+  call restart_soil_profile_cache(ncid,flag,'HydroCondMacP_vr',HydroCondMacP_vr, &
+    'macropore hydraulic conductivity','m h-1',complete)
+
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,'HydroCond_3D',varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,HydroCond_3D,conductivity)
+    conductivity_data=>conductivity
+    call restartvar(ncid,flag,varname='HydroCond_3D',dim1name='column',dim2name='sdim', &
+      dim3name='moisture_class',dim4name='levsoi1',long_name='micropore hydraulic conductivity table', &
+      units='m h-1',interpinic_flag='skip',data=conductivity_data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,HydroCond_3D,conductivity)
+  else
+    complete=.false.
+  endif
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,'MacPoreNumbers_vr',varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')then
+      do L=1,JZ
+        call cpcol(flag,NHW,NHE,NVN,NVS,MacPoreNumbers_vr(L,:,:),pore_numbers(:,L))
+      enddo
+    endif
+    pore_number_data=>pore_numbers
+    call restartvar(ncid,flag,varname='MacPoreNumbers_vr',dim1name='column',dim2name='levsoi', &
+      long_name='macropore number per cross-sectional area',units='m-2',interpinic_flag='skip', &
+      data=pore_number_data,missing_value=ispval,fill_value=ispval)
+    if(flag=='read')then
+      do L=1,JZ
+        call cpcol(flag,NHW,NHE,NVN,NVS,MacPoreNumbers_vr(L,:,:),pore_numbers(:,L))
+      enddo
+    endif
+  else
+    complete=.false.
+  endif
+  if(flag=='read' .and. .not.complete)then
+    ! Legacy files did not save these coefficients. Retain the old recovery
+    ! path, but do not describe that recovery as an exact restart.
+    iResetSoilProf_col(NVN:NVS,NHW:NHE)=itrue
+    write(iulog,*) 'Restart lacks soil property caches; rebuilding properties, exact continuation is not guaranteed'
+  endif
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,'trcn_irrig_vr',varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,trcn_irrig_vr,irrigation_nutrients)
+    irrigation_data=>irrigation_nutrients
+    call restartvar(ncid,flag,varname='trcn_irrig_vr',dim1name='column',dim2name='nonband_nutrients', &
+      dim3name='levsoi',long_name='nutrient concentration at subsurface inflow boundary',units='g m-3', &
+      interpinic_flag='skip',data=irrigation_data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,trcn_irrig_vr,irrigation_nutrients)
+  else
+    write(iulog,*) 'Restart lacks subsurface nutrient boundary; exact continuation is not guaranteed'
+  endif
+  ! This aggregate is consumed by hydrology before plant pools are refreshed.
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,'RootMycoMassElm_vr',varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,RootMycoMassElm_vr,root_mass)
+    conductivity_data=>root_mass
+    call restartvar(ncid,flag,varname='RootMycoMassElm_vr',dim1name='column',dim2name='elmnts', &
+      dim3name='rootyps',dim4name='levsoi',long_name='root and mycorrhizal element mass by layer', &
+      units='g',interpinic_flag='skip',data=conductivity_data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,RootMycoMassElm_vr,root_mass)
+  else
+    write(iulog,*) 'Restart lacks root biomass aggregate; exact continuation is not guaranteed'
+  endif
+  complete=.true.
+  ! HOUR1 stages the completed-hour heat flux for hydrology before resetting it.
+  ! The matching water flux TWaterPlantRoot2Soil_vr is already saved above.
+  call restart_soil_profile_cache(ncid,flag,'THeatLossRoot2Soil_vr',THeatLossRoot2Soil_vr, &
+    'previous-hour root heat uptake','MJ h-1',complete)
+  call restart_soil_profile_cache(ncid,flag,'RCH4EcoDmnd_vr',RCH4EcoDmnd_vr, &
+    'completed-hour ecosystem methane demand','gC h-1',complete)
+  if(flag=='read' .and. .not.complete) &
+    write(iulog,*) 'Restart lacks completed-hour root heat or methane demand; exact continuation is not guaranteed'
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine restartnc_soil_caches
+
+!------------------------------------------------------------------------------------------
+  subroutine restart_soil_profile_cache(ncid,flag,name,values,long_name,units,complete,dimension_name)
+  implicit none
+  type(file_desc_t), intent(inout) :: ncid
+  character(len=*), intent(in) :: flag,name,long_name,units
+  real(r8), intent(inout) :: values(:,:,:)
+  logical, intent(inout) :: complete
+  character(len=*), optional, intent(in) :: dimension_name
+  character(len=*), parameter :: subname='restart_soil_profile_cache'
+  real(r8), target :: buffer(bounds%begc:bounds%endc,size(values,1))
+  real(r8), pointer :: data(:,:)
+  type(var_desc_t) :: vardesc
+  integer :: varid
+  logical :: present_cache
+  character(len=8) :: level_dim
+
+  associate(NHW => bounds%NHW, NHE => bounds%NHE, NVN => bounds%NVN, NVS => bounds%NVS)
+  call PrintInfo('beg '//subname)
+  level_dim='levsoi'
+  if(size(values,1)==JZ+1)level_dim='levsoi1'
+  if(present(dimension_name))level_dim=dimension_name
+  present_cache=.true.
+  if(flag=='read')call ncd_inqvid(ncid,name,varid,vardesc,readvar=present_cache)
+  if(present_cache)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,values,buffer)
+    data=>buffer
+    call restartvar(ncid,flag,varname=name,dim1name='column',dim2name=trim(level_dim), &
+      long_name=long_name,units=units,interpinic_flag='skip',data=data,missing_value=spval,fill_value=spval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,values,buffer)
+  else
+    complete=.false.
+  endif
+  call PrintInfo('end '//subname)
+  end associate
+  end subroutine restart_soil_profile_cache
+
 !------------------------------------------------------------------------------------------
 
   subroutine restartnc_daily_irrigation(ncid,flag)
@@ -5077,6 +5458,8 @@ implicit none
   integer :: salt_boundary_varid
   type(var_desc_t) :: salt_boundary_vardesc
   logical :: has_salt_boundary_conc
+  logical :: has_reset_soil_profile
+  logical :: has_snow_layers
   ncols = bounds%ncols
   npfts = bounds%npfts
 
@@ -5096,6 +5479,28 @@ implicit none
 
   NHW = bounds%NHW;NVN = bounds%NVN
   NHE = bounds%NHE;NVS = bounds%NVS
+
+  ! Preserve pending geometry updates: replaying one after loading changes
+  ! litter density/porosity even when no new disturbance has occurred.
+  if(flag=='read')then
+    call ncd_inqvid(ncid,'iResetSoilProf_col',feedback_varid,feedback_vardesc, &
+      readvar=has_reset_soil_profile)
+    if(has_reset_soil_profile)then
+      dat1pr => datic_1d
+      call restartvar(ncid, flag, varname='iResetSoilProf_col', dim1name='column', &
+        long_name='pending soil profile geometry update', units='none', &
+        interpinic_flag='skip',data=dat1pr,missing_value=ispval,fill_value=ispval)
+      call cpcol(flag,NHW,NHE,NVN,NVS,iResetSoilProf_col,datic_1d)
+    else
+      write(iulog,*) 'Restart lacks iResetSoilProf_col; exact continuation is not guaranteed'
+    endif
+  else
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,iResetSoilProf_col,datic_1d)
+    dat1pr => datic_1d
+    call restartvar(ncid, flag, varname='iResetSoilProf_col', dim1name='column', &
+      long_name='pending soil profile geometry update', units='none', &
+      interpinic_flag='skip',data=dat1pr,missing_value=ispval,fill_value=ispval)
+  endif
 
   call restartvar(ncid, flag, varname='CRAIN_lnd', &
        long_name='total precipitation', units='m3 d-2', &
@@ -7048,6 +7453,27 @@ implicit none
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  
+
+  ! The initial gas balance is summed before snow physics runs. Preserve its
+  ! layer count so restored snow tracers are included in that first sum.
+  has_snow_layers=.true.
+  if(flag=='read')call ncd_inqvid(ncid,'nsnol_col',feedback_varid,feedback_vardesc,readvar=has_snow_layers)
+  if(has_snow_layers)then
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,nsnol_col,datic_1d)
+    dat1pr=>datic_1d
+    call restartvar(ncid,flag,varname='nsnol_col',dim1name='column', &
+      long_name='number of active snow layers',units='none',interpinic_flag='skip', &
+      data=dat1pr,missing_value=ispval,fill_value=ispval)
+    if(flag=='read')call cpcol(flag,NHW,NHE,NVN,NVS,nsnol_col,datic_1d)
+  else
+    ! Match the completed-hour SnowBalance count without advancing physics.
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        nsnol_col(NY,NX)=count(VLHeatCapSnow_snvr(1:JS,NY,NX)>0._r8)
+      ENDDO
+    ENDDO
+    write(iulog,*) 'Restart lacks nsnol_col; reconstructed from restored snow heat capacity'
+  endif
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JS)        
@@ -9642,7 +10068,7 @@ implicit none
       data=datpr2, missing_value=spval, fill_value=spval)   
     call cpcol(flag,NHW,NHE,NVN,NVS,CCL_vr,datrc_2d)
   else
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CSO4_vr,datrc_2d)  
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CCL_vr,datrc_2d)
     datpr2 => datrc_2d(1:ncols,1:JZ)    
     call restartvar(ncid, flag, varname='CCL', dim1name='column', &
       dim2name='levsoi',long_name='soil Cl content', units='mg Cl kg-1', interpinic_flag='skip',&
@@ -10645,6 +11071,8 @@ implicit none
   call ncd_defdim(ncid,'nlbiomcp',nlbiomcp,dimid)
   call ncd_defdim(ncid,'nlivehetermicb',NumLiveHeterBioms,dimid)
   call ncd_defdim(ncid,'nliveautomicb',NumLiveAutoBioms,dimid)
+  call ncd_defdim(ncid, 'nonband_nutrients', size(trcn_irrig_vr,1), dimid)
+  call ncd_defdim(ncid, 'moisture_class', 100, dimid)
   call ncd_defdim(ncid, 'levsoi', JZ, dimid)
   call ncd_defdim(ncid, 'levsoi1', JZ+1, dimid)
   call ncd_defdim(ncid, 'levsno',  JS,dimid)
