@@ -103,15 +103,12 @@ module Hour1Mod
 !     execution begins here
   call PrintInfo('beg '//subname)
   !
-  if(lverb)write(*,*)'ResetLndscapeAccumlators'
   call ResetLndscapeAccumlators()
 
-  if(lverb)write(*,*)'SetAtmsTracerConc'
   call SetAtmsTracerConc(I,J,NHW,NHE,NVN,NVS)
 !
 !     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
 !
-  if(lverb)write(*,*)'ResetFluxArrays'
   call ResetFluxArrays(I,NHW,NHE,NVN,NVS)
 !
 !     IF SALT FLAG SET
@@ -258,13 +255,16 @@ module Hour1Mod
 !     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
 !
   implicit none
-  WatMassStore_lnd     = 0._r8
-  HeatStore_lnd        = 0._r8
-  TSoilO2G_lnd         = 0._r8
-  TSoilH2G_lnd         = 0._r8
-  TSEDSO               = 0._r8
-  LitRMStoreLndscap(:) = 0._r8
+  character(len=*), parameter :: subname='ResetLndscapeAccumlators'
 
+  call PrintInfo('beg '//subname)
+  WatMassStore_lnd  = 0._r8
+  HeatStore_lnd     = 0._r8
+  TSoilO2G_lnd      = 0._r8
+  TSoilH2G_lnd      = 0._r8
+  TSEDSO            = 0._r8
+  LitRMStoreLndscap = 0._r8
+  SurfGas_lnd       = 0._r8
   POMHumStoreLndscap(:)        = 0._r8
   TGasC_lnd                    = 0._r8
   TGasN_lnd                    = 0._r8
@@ -273,6 +273,7 @@ module Hour1Mod
   TDisolPi_lnd                 = 0._r8
   TION                         = 0._r8
   PlantElemntStoreLandscape(:) = 0._r8
+  call PrintInfo('end '//subname)
   end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
