@@ -5,6 +5,7 @@ A biogeochemical modeling library spins off the ecosys model.
 # Pull requests (for contributors & collaborators)
 
 Before submitting your PR:
+- make sure smoke-run-test and restart-run-test are passed (via coding agent).
 - Search for existing PRs to prevent duplicating efforts
 - Rebase your change with main branch & Test your changes:
 -Create separate PRs for each feature or fix:
