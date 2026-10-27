@@ -43,10 +43,11 @@ if [[ -z $BUILD_DIR ]]; then
   BUILD_DIR=$(ls -dt "$ROOT"/build/*/ 2>/dev/null | head -1)
 fi
 [[ -n $BUILD_DIR ]] || { echo "ERROR: no build/ configuration found. Run: bash build_EcoSIM.sh" >&2; exit 2; }
-BUILD_DIR=${BUILD_DIR%/}
+BUILD_DIR=$(cd "$BUILD_DIR" && pwd) || exit 2
 
 EXE=""
-for cand in "$BUILD_DIR/local/bin/ecosim.f90.x" "$BUILD_DIR/bin/ecosim.f90.x"; do
+for cand in "$BUILD_DIR/drivers/ecosim/ecosim.f90.x" \
+            "$BUILD_DIR/local/bin/ecosim.f90.x" "$BUILD_DIR/bin/ecosim.f90.x"; do
   [[ -x $cand ]] && { EXE=$cand; break; }
 done
 [[ -n $EXE ]] || { echo "ERROR: ecosim.f90.x not found under $BUILD_DIR" >&2; exit 2; }
@@ -96,6 +97,11 @@ for c in "${CASES[@]}"; do
   # for separate investigation of its existing SIGILL failure.
   if [[ $c == blodgett ]]; then
     rm -f "$dst/Blodget.warming.namelist"
+    echo "SKIP blodgett/Blodget.warming: existing SIGILL failure"
+  fi
+  if [[ $c == dryland ]]; then
+    rm -f "$dst/dryland2.namelist"
+    echo "SKIP dryland/dryland2: requires a locally generated 2004 checkpoint"
   fi
 
   # Some cases (e.g. dryland2) start from a finidat restart living in the run
