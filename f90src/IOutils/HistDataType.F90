@@ -292,7 +292,7 @@ module HistDataType
   real(r8),pointer   :: h1D_cTNC_ptc(:)        
   real(r8),pointer   :: h1D_cTNN_ptc(:)       
   real(r8),pointer   :: h1D_cTNP_ptc(:)    
-  real(r8),pointer   :: h1D_CanNonstBConc_ptc(:)      
+  real(r8),pointer   :: h1D_CanopyNonstOMConc_ptc(:)
   real(r8),pointer   :: h1D_STOML_RSC_CO2_ptc(:)
   real(r8),pointer   :: h1D_STOML_Min_RSC_CO2_ptc(:)
   real(r8),pointer   :: h1D_Km_CO2_carboxy_ptc(:)

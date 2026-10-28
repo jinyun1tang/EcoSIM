@@ -113,7 +113,7 @@ contains
   this%h1D_cTNC_ptc(nptc)          = 0._r8
   this%h1D_cTNN_ptc(nptc)          = 0._r8
   this%h1D_cTNP_ptc(nptc)          = 0._r8
-  this%h1D_CanNonstBconc_ptc(nptc) = 0._r8
+  this%h1D_CanopyNonstOMConc_ptc(nptc) = 0._r8
   this%h1D_STOML_RSC_CO2_ptc(nptc) = 0._r8
   this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=0._r8
   this%h1D_Km_CO2_carboxy_ptc(nptc)= 0._r8
