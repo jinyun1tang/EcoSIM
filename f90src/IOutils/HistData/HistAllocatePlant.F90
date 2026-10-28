@@ -27,7 +27,7 @@ contains
   allocate(this%h1D_cTNC_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNC_ptc(:)=spval
   allocate(this%h1D_cTNN_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNN_ptc(:)=spval
   allocate(this%h1D_cTNP_ptc(beg_ptc:end_ptc))            ;this%h1D_cTNP_ptc(:)=spval
-  allocate(this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)) ;this%h1D_CanNonstBConc_ptc(:)=spval
+  allocate(this%h1D_CanopyNonstOMConc_ptc(beg_ptc:end_ptc)) ;this%h1D_CanopyNonstOMConc_ptc(:)=spval
   allocate(this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc))   ;this%h1D_STOML_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_STOML_Min_RSC_CO2_ptc(beg_ptc:end_ptc));this%h1D_STOML_Min_RSC_CO2_ptc(:)=spval
   allocate(this%h1D_Km_CO2_carboxy_ptc(beg_ptc:end_ptc)); this%h1D_Km_CO2_carboxy_ptc(:)=spval

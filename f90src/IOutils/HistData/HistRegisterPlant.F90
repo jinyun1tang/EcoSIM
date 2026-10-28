@@ -85,9 +85,9 @@ contains
   call hist_addfld1d(fname='PTSHTR_pft',units='h-1',avgflag='A',&
     long_name='Root-shoot C coupling rate',ptr_patch=data1d_ptr)
 
-  data1d_ptr => this%h1D_CanNonstBConc_ptc(beg_ptc:end_ptc)
-  call hist_addfld1d(fname='CanNonstBConc_pft',units='g',avgflag='A',&
-    long_name='Canopy nonstructural biomass concentration',ptr_patch=data1d_ptr,&
+  data1d_ptr => this%h1D_CanopyNonstOMConc_ptc(beg_ptc:end_ptc)
+  call hist_addfld1d(fname='CanopyNonstOMConc_pft',units='g/gC',avgflag='A',&
+    long_name='Canopy nonstructural C+N+P concentration per unit leaf/sheath carbon',ptr_patch=data1d_ptr,&
     default='inactive')
 
   data1d_ptr => this%h1D_STOML_RSC_CO2_ptc(beg_ptc:end_ptc)

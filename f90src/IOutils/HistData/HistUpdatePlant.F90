@@ -159,7 +159,7 @@ contains
         this%h1D_cTNC_ptc(nptc)          = CanopyNonstElmConc_pft(ielmc,NZ,NY,NX)
         this%h1D_cTNN_ptc(nptc)          = CanopyNonstElmConc_pft(ielmn,NZ,NY,NX)
         this%h1D_cTNP_ptc(nptc)          = CanopyNonstElmConc_pft(ielmp,NZ,NY,NX)
-        this%h1D_CanNonstBconc_ptc(nptc) = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX))
+        this%h1D_CanopyNonstOMConc_ptc(nptc) = sum(CanopyNonstElmConc_pft(1:NumPlantChemElms,NZ,NY,NX))
         this%h1D_STOML_RSC_CO2_ptc(nptc) = CanPStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_STOML_Min_RSC_CO2_ptc(nptc)=CanopyMinStomaResistH2O_pft(NZ,NY,NX)*1.56_r8*secs1hour
         this%h1D_Km_CO2_carboxy_ptc(nptc)= Km4RubiscoCarboxy_pft(NZ,NY,NX)

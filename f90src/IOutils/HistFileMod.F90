@@ -2058,7 +2058,7 @@ implicit none
           call PrintInfo(varname)
           
           if (numdims == 1) then
-!             print*,hist1do(beg1d_out:end1d_out)
+!             print*,varname,hist1do(beg1d_out:end1d_out)
              call ncd_io(flag='write', varname=varname, &
                   dim1name=type1d_out, data=hist1do, ncid=nfid(t), nt=nt)
           else
