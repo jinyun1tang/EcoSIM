@@ -1,4 +1,6 @@
 module UptakesMod
+  use, intrinsic :: ieee_arithmetic, only : ieee_is_finite
+  use abortutils, only : endrun
   use data_kind_mod , only : r8 => DAT_KIND_R8,yearIJ_type
   use data_const_mod, only: GravAcceleration=>DAT_CONST_G
   use StomatesMod,    only: StomatalDynamics, PhotosynsDiag
@@ -84,6 +86,7 @@ module UptakesMod
   real(r8) :: CumPlantHeatLoss2Soil,RawAtm2CanopySinkZ_pft
   real(r8) :: FDMP
   logical  :: HydroActivePlant
+  logical  :: HydraulicPathAvailable
   logical  :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
 !     begin_execution
   associate(                                                        &
@@ -154,8 +157,17 @@ module UptakesMod
       !     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
       !     TRANSPIRATION - ROOT WATER UPTAKE = CHANGE IN CANOPY WATER CONTENT
       !     [SpecStalkVolume]=[m3/gC], assuming mean sapwood thicknees is 2.5 mm.
-      CanopyMassC4H2OStorage = AZMAX1(CanopyLeafSheathC_pft(NZ)+AMIN1(CanopySapwoodC_pft(NZ),&
-        2.5e-3_r8*CanopyStemSurfArea_pft(NZ)/StemSpecVolume_pft(NZ)))
+      CanopyMassC4H2OStorage = CanopyLeafSheathC_pft(NZ)+AMIN1(CanopySapwoodC_pft(NZ),&
+        2.5e-3_r8*CanopyStemSurfArea_pft(NZ)/StemSpecVolume_pft(NZ))
+      ! A negative reservoir cannot be repaired by changing pressure. Reject it
+      ! before exchanging water; silently clipping it would create water.
+      if (.not.ieee_is_finite(CanopyBiomWater_pft(NZ)) .or. CanopyBiomWater_pft(NZ)<0._r8 &
+          .or. .not.ieee_is_finite(CanopyMassC4H2OStorage)) then
+        write(iulog,*)subname,': invalid canopy hydraulic storage; year/day/hour/PFT, water, storage C: ', &
+          yearIJ%year,yearIJ%I,yearIJ%J,NZ,CanopyBiomWater_pft(NZ),CanopyMassC4H2OStorage
+        call endrun('Invalid canopy hydraulic storage; use a valid checkpoint or an accounted water correction',__LINE__)
+      endif
+      CanopyMassC4H2OStorage=MAX(0._r8,CanopyMassC4H2OStorage)
       VHeatCapCanopyPrev_pft = cpo*gOC_to_m3_OM(CanopyMassC4H2OStorage)+cpw*(WatHeldOnCanopy_pft(NZ)+CanopyBiomWater_pft(NZ)) &
         +cps*SnowOnCanopy_pft(NZ)
 
@@ -164,8 +176,7 @@ module UptakesMod
       else
         HydroActivePlant=(iPlantCalendar_brch(ipltcal_Emerge,MainBranchNum_pft(NZ),NZ).NE.0)             &  !plant emerged
           .AND.(LeafStalkAreaAct_pft(NZ).GT.ZERO4LeafVar_pft(NZ).AND.FracPARads2Canopy_pft(NZ).GT.0.0_r8)   &  !active canopy
-          .AND.(Root1stDepz_raxes(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))                     &  !active root
-          .and. CanopyMassC4H2OStorage.GT.0._r8
+          .AND.(Root1stDepz_raxes(1,NZ).GT.SeedDepth_pft(NZ)+CumSoilThickness_vr(0))                        !active root
       endif
       !add snow coverage check 
 
@@ -173,11 +184,29 @@ module UptakesMod
       
         call CalcPlantHydroResistance(yearIJ,NZ,RadialMeanLen_rvr,FineRootRadius_rvr,RootEffLen4Absorption_pvr,&
           SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,CdH2ORootxSoil,PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
+
+        ! Second-stage eligibility: biological activity alone does not imply
+        ! a connected hydraulic reservoir. Zero water is allowed to refill;
+        ! small positive conductance and storage C retain their physical scale.
+        if (.not.ieee_is_finite(CdH2ORootxSoil) .or. CdH2ORootxSoil<0._r8) then
+          write(iulog,*)subname,': invalid root conductance; day/hour/PFT, conductance: ', &
+            yearIJ%I,yearIJ%J,NZ,CdH2ORootxSoil
+          call endrun('Invalid soil-canopy hydraulic conductance',__LINE__)
+        endif
+
+        HydraulicPathAvailable=CanopyMassC4H2OStorage>0._r8 .and. &
+          CdH2ORootxSoil>0._r8 .and. any(SoiLayerHasRoot_rvr)
+        if (.not.HydraulicPathAvailable) SoiLayerHasRoot_rvr=.false.
         !
         !       INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
         !       BALANCE THAT DON'T NEED TO BE RECALCULATED DURING CONVERGENCE
         !
-        PSICanopy_pft(NZ)      = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
+        if (HydraulicPathAvailable) then
+          PSICanopy_pft(NZ) = AMIN1(-ppmc,0.667_r8*PSICanopy_pft(NZ))
+        else
+          !canopy evaporation/condensation can still occur with standing dead
+          PSICanopy_pft(NZ) = TotalSoilPSIMPa_vr(NU)
+        endif
         PrecpHeatbyCanopy      = (RainIntcptByCanopy_pft(NZ)*cpw+SnowIntcptByCanopy_pft(NZ)*cps)*TairK
         !
         IF(LeafStalkAreaAll_col.GT.ZEROS)THEN
@@ -198,13 +227,18 @@ module UptakesMod
           TotalSoilPSIMPa_vr,CdHeatCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,&
           HeatEvapSens,FDMP,SoilRootResist4H2O_pvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,&
           WatAvail4Uptake_vr,TKCX,CdH2ORootxSoil,VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,&
-          PSIGravCanopyHeight,SoiLayerHasRoot_rvr)
+          PSIGravCanopyHeight,SoiLayerHasRoot_rvr,HydraulicPathAvailable)
         !
         !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
         !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
         !
-        IF(NN.GE.MaxIterNum)THEN          
-          call HandlingDivergence(yearIJ,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP,cumPRootH2OUptake,HeatEvapSens)
+        ! Reject stalled solves and exchanges that would overdraw the reservoir.
+        if (.not.ieee_is_finite(DIFF)) DIFF=1._r8
+        if (.not.ieee_is_finite(Transpiration_pft(NZ)-cumPRootH2OUptake)) DIFF=1._r8
+        if (CanopyBiomWater_pft(NZ)+Transpiration_pft(NZ)-cumPRootH2OUptake<0._r8) DIFF=MAX(1._r8,DIFF)
+        IF(NN.GE.MaxIterNum .or. DIFF.GE.DIFFY)THEN
+          call HandlingDivergence(yearIJ,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP,cumPRootH2OUptake,HeatEvapSens, &
+            CumPlantHeatLoss2Soil)
         endif
 
         call UpdatePlantWaterVars(NZ,CdHeatCanopyAir,CanopyMassC4H2OStorage,TotalSoilPSIMPa_vr,SoilResist4H2O_rvr,SoilRootResist4H2O_pvr,&
@@ -548,7 +582,8 @@ module UptakesMod
   end subroutine UpdateRootProperty
 
 !----------------------------------------------------------------------------------------------------
-  subroutine HandlingDivergence(yearIJ,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP,cumPRootH2OUptake,HeatEvapSens)
+  subroutine HandlingDivergence(yearIJ,NZ,TotalSoilPSIMPa_vr,DIFF,FDMP,cumPRootH2OUptake,HeatEvapSens, &
+    CumPlantHeatLoss2Soil)
 
   implicit none
   type(yearIJ_type), intent(in) :: yearIJ
@@ -557,6 +592,7 @@ module UptakesMod
   real(r8) , intent(in) :: DIFF   !divergence check
   real(r8), intent(inout):: FDMP
   real(r8), intent(inout) :: cumPRootH2OUptake,HeatEvapSens
+  real(r8), intent(inout) :: CumPlantHeatLoss2Soil
   character(len=*), parameter :: subname='HandlingDivergence'
   real(r8) :: APSILT
   real(r8) :: CCPOLT
@@ -601,8 +637,9 @@ module UptakesMod
     WRITE(iulog,9999)iYearCurrent,yearIJ%I,yearIJ%J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
 
-    IF(DIFF.GT.0.5_r8)THEN
+    IF(DIFF.GE.DIFFY)THEN
       cumPRootH2OUptake=0._r8;HeatEvapSens=0._r8
+      CumPlantHeatLoss2Soil=0._r8
       plt_rad%RadNet2Canopy_pft(NZ)       = 0.0_r8
       plt_ew%CanopyEvapTransLHeat_pft(NZ) = 0.0_r8
       plt_ew%HeatXAir2PCan_pft(NZ)        = 0.0_r8
@@ -655,7 +692,7 @@ module UptakesMod
   function CanopyEnergyH2OIter_func(I,J,NZ,FracGridPFTCovered,CanopyMassC4H2OStorage,TotalSoilPSIMPa_vr,  &
     CdHeatCanopyAir,DIFF,cumPRootH2OUptake,CumPlantHeatLoss2Soil,HeatEvapSens,FDMP,                       &
     SoilRootResist4H2O_pvr,FracPRoot4Uptake_pvr,AirMicPore4Fill_vr,WatAvail4Uptake_vr,TKCX,CdH2ORootxSoil,&
-    VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr) result(NN)
+    VHeatCapCanopyPrev_pft,PrecpHeatbyCanopy,PSIGravCanopyHeight,SoiLayerHasRoot_rvr,HydraulicPathAvailable) result(NN)
   !
   !Description:
   !The relationship between plant root water uptake and canopy water storage is approximated using the water tower concept. That is
@@ -678,6 +715,7 @@ module UptakesMod
   real(r8) , intent(in) :: PrecpHeatbyCanopy         !heat added to canopy by precipitation [MJ]
   real(r8) , intent(in) :: PSIGravCanopyHeight       !Graviational water potential at effective canopy height [MPa]
   logical  , intent(in) :: SoiLayerHasRoot_rvr(pltpar%jroots,JZ1)
+  logical  , intent(in) :: HydraulicPathAvailable
   real(r8) , intent(out):: CdHeatCanopyAir           !area-scaled conductance for canopy-air sensible heat flux
   real(r8) , intent(out):: DIFF
   real(r8) , intent(out):: cumPRootH2OUptake         !total root water uptake from soil  (<0 addition to canopy)
@@ -799,6 +837,11 @@ module UptakesMod
   DPSI_old              = 0._r8
   cumPRootH2OUptake     = 0.0_r8
   CumPlantHeatLoss2Soil = 0._r8
+  if (.not.HydraulicPathAvailable) then
+    RPlantRootH2OUptk_pvr(:,:,NZ)=0._r8
+    RootH2OUptkStress_pvr(:,:,NZ)=0._r8
+  endif
+  DIFF=1._r8
   VHCPYZ                = VHCPYM*AREA3(NU)
   D4000: DO NN=1,MaxIterNum
     !
@@ -898,6 +941,7 @@ module UptakesMod
     !CanopyEvapTransLHeat_pft:latent heat flux, negative means into atmosphere
     !
     Transpiration_pft(NZ)        = EX*RawCanopy2Atm_pft(NZ)/(RawCanopy2Atm_pft(NZ)+CanPStomaResistH2O_pft(NZ))
+    if (.not.HydraulicPathAvailable) Transpiration_pft(NZ)=0._r8
     CanopyEvapTransLHeat_pft(NZ) = (Transpiration_pft(NZ)+VapXAir2CanopyLiq_pft(NZ))*EvapLHTC+SnoSub2AirCanopy_pft(NZ)*SublmHTC
     HeatEvapSens                 = HeatEvapSens + Transpiration_pft(NZ)*cpw*TKC1
     !
@@ -955,6 +999,15 @@ module UptakesMod
       !cooling or no change
       IC=0
     ENDIF
+    ! A disconnected canopy still exchanges heat and intercepted water with
+    ! the atmosphere. Its biomass reservoir and root fluxes remain unchanged.
+    if (.not.HydraulicPathAvailable) then
+      if (ABS(TKCY-TKC1)<0.05_r8) then
+        DIFF=0._r8
+        exit D4000
+      endif
+      cycle D4000
+    endif
     !
     !     IF CONVERGENCE CRITERION IS MET OR ON EVERY TENTH ITERATION,
     !     PROCEED TO WATER BALANCE
@@ -1077,7 +1130,7 @@ module UptakesMod
       ENDIF
 
       !the relative difference is small enough'
-      IF(DIFF.LT.5.0E-03_r8)THEN
+      IF(DIFF.LT.DIFFY)THEN
         IF(LIterationExit)EXIT
         LIterationExit=.true.
         CALL StomatalDynamics(I,J,NZ)
@@ -1123,13 +1176,14 @@ module UptakesMod
       !     DPSI=change in PSICanopy_pft for next convergence cycle, MPa = [Cd] * m H2O d-2, [Cd]= MPa d2/m
       !     1.0E-03=acceptance criterion for DPSI
       !
-      DPSI=AMIN1(AMIN1(RSSZ,RSSU)*DIFFW,ABS(PSICanopy_pft(NZ)))
+      DPSI=MAX(-ABS(PSICanopy_pft(NZ)), &
+        MIN(MIN(RSSZ,RSSU)*DIFFW,ABS(PSICanopy_pft(NZ))))
       !
       !     IF CONVERGENCE CRITERION IS MET THEN FINISH,
       !     OTHERWISE START NEXT ITERATION WITH CANOPY WATER POTENTIAL
       !     TRANSPIRATION, UPTAKE AND WATER CONTENT FROM CURRENT ITERATION
       !
-      IF((NN.GE.30 .AND. ABS(DPSI).LT.1.0E-03_r8) .OR. NN.GE.MaxIterNum)then
+      IF((NN.GE.30 .AND. ABS(DPSI).LT.1.0E-03_r8 .and. DIFF.LT.DIFFY) .OR. NN.GE.MaxIterNum)then
         IF(LIterationExit)EXIT
         LIterationExit=.true.
         CALL StomatalDynamics(I,J,NZ)
@@ -1348,7 +1402,9 @@ module UptakesMod
       ENDIF
     enddo
   ENDDO D3880
-  CdH2ORootxSoil = AZMAX1(CdH2ORootxSoil_pft(NZ))
+  ! Conductance is PFT-size dependent; the generic AZMAX1 cutoff (1e-12)
+  ! can erase a valid small plant's connection while layer uptake remains on.
+  CdH2ORootxSoil = CdH2ORootxSoil_pft(NZ)
   call PrintInfo('end '//subname)
   end associate
   end subroutine CalcPlantHydroResistance
