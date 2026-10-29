@@ -172,6 +172,10 @@ take precedence over repository guidance.
   five-day runs followed by five-day continuations in scratch directories,
   requiring exact checkpoint/history equality and finite valid values.
   Report failed cases; do not relax tolerances or update baselines to pass.
+- To run from an existing checkpoint of a long simulation (branch with new
+  history fields or changed inputs, or continue the parent case), use the
+  `ecosim-restart-run` skill (`.agents/skills/ecosim-restart-run/`, also
+  exposed at `.claude/skills/` and `.codex/skills/`).
 - Inspect `regression-tests/Makefile` before running its targets. It provides
   `mtest` and `rtest`; verify the executable path and required data first. Do not
   update regression baselines merely to make a changed result pass.
