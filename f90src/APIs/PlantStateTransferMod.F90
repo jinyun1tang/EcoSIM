@@ -354,7 +354,9 @@ contains
     plt_morph%BranchNumber_pft(NZ)    = BranchNumber_pft(NZ,NY,NX)
     plt_morph%NGTopRootLayer_pft(NZ)  = NGTopRootLayer_pft(NZ,NY,NX)
     plt_pheno%doInitPlant_pft(NZ)     = doInitPlant_pft(NZ,NY,NX)
-    plt_morph%NMaxRootBotLayer_pft(NZ) = NMaxRootBotLayer_pft(NZ,NY,NX)
+    ! Legacy checkpoints can include the extra soil layer below the rooting domain.
+    ! Restrict process bounds without changing the stored C/N/P pools in that layer.
+    plt_morph%NMaxRootBotLayer_pft(NZ) = MIN(NMaxRootBotLayer_pft(NZ,NY,NX),plt_site%MaxNumRootLays)
     plt_morph%NumStructuralRootAxes_pft(NZ)     = NumStructuralRootAxes_pft(NZ,NY,NX)
     plt_morph%MainBranchNum_pft(NZ)   = MainBranchNum_pft(NZ,NY,NX)
     plt_morph%NumOfBranches_pft(NZ)   = NumOfBranches_pft(NZ,NY,NX)
@@ -389,7 +391,7 @@ contains
     plt_morph%HypocotHeight_pft(NZ)                          = HypocotHeight_pft(NZ,NY,NX)
     plt_rbgc%PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ) = PlantRootSoilElmNetX_pft(1:NumPlantChemElms,NZ,NY,NX)
     plt_morph%CanopyHeight4WatUptake_pft(NZ)                       = CanopyHeight4WatUptake_pft(NZ,NY,NX)
-    plt_morph%MaxSoilLays4Root_pft(NZ)                           = MaxSoilLays4Root_pft(NZ,NY,NX)
+    plt_morph%MaxSoilLays4Root_pft(NZ) = MIN(MaxSoilLays4Root_pft(NZ,NY,NX),plt_site%MaxNumRootLays)
     plt_photo%RawCanopy2Atm_pft(NZ)                       = RawCanopy2Atm_pft(NZ,NY,NX)
     plt_photo%CanPStomaResistH2O_pft(NZ)                     = CanPStomaResistH2O_pft(NZ,NY,NX)
     plt_ew%TKC_pft(NZ)                                           = TKC_pft(NZ,NY,NX)
