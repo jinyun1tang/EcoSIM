@@ -405,6 +405,11 @@ implicit none
     NU                     => plt_site%NU                     ,& !input  :current soil surface layer number, [-]
     MaxSoilLays4Root_pft   => plt_morph%MaxSoilLays4Root_pft  ,& !input  :maximum soil layer number for all root axes,[-]
     MaxNumRootLays         => plt_site%MaxNumRootLays         ,& !input  :maximum root layer number,[-]
+    Root1stActStruct_pvr   => plt_biom%Root1stActStruct_pvr   ,& !output :derived primary active root element mass
+    Root1stLigStruct_pvr   => plt_biom%Root1stLigStruct_pvr   ,& !output :derived primary lignified root element mass
+    RootMedStruct_pvr      => plt_biom%RootMedStruct_pvr      ,& !output :derived medium root element mass
+    RootSinkWeight_pvr     => plt_morph%RootSinkWeight_pvr    ,& !output :root-layer sink weighting
+    RootAtmGasConductance_rpvr => plt_rbgc%RootAtmGasConductance_rpvr ,& !output :root-atmosphere gas conductance
     RootCO2Autor_pvr       => plt_rbgc%RootCO2Autor_pvr       ,& !input  :root respiration constrained by O2, [g d-2 h-1]
     CO2NetFix_pft          => plt_bgcr%CO2NetFix_pft          ,& !output :canopy net CO2 exchange, [gC d-2 h-1]
     RCanMaintDef_CO2_pft   => plt_bgcr%RCanMaintDef_CO2_pft   ,& !output :canopy maintenance respiraiton deficit as CO2, [gC d-2]    
@@ -453,6 +458,14 @@ implicit none
   plt_rbgc%trcs_Soil2plant_uptake_vr=0._r8
 
   D9980: DO NZ=1,NP
+    ! Excluded layers can retain legacy mass, but have no active root diagnostics.
+    ! Clear shared working arrays so neither another column nor a restart leaves
+    ! stale values in history. The underlying structural and reserve pools are kept.
+    Root1stActStruct_pvr(:,MaxNumRootLays+1:,NZ) = 0._r8
+    Root1stLigStruct_pvr(:,MaxNumRootLays+1:,NZ) = 0._r8
+    RootMedStruct_pvr(:,MaxNumRootLays+1:,NZ) = 0._r8
+    RootSinkWeight_pvr(MaxNumRootLays+1:,NZ) = 0._r8
+    RootAtmGasConductance_rpvr(:,:,MaxNumRootLays+1:,NZ) = 0._r8
     CO2Intra_pft(NZ) = 0._R8
     CO2IntraScal_pft(NZ) = 0._R8
     plt_rbgc%NH3Dep2Can_brch(:,NZ) = 0._R8  

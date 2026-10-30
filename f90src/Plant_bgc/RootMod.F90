@@ -225,7 +225,9 @@ implicit none
   ! Production is a current-hour rate; skipped growth must not reuse the previous rate.
   plt_rbgc%RootMRProdCytok_rpvr(:,:,NZ) = 0._r8
   D5010: DO N=1,Myco_pft(NZ)
-    D5000: DO L=NU,MaxNumRootLays+1
+    ! Growth and reserve transfers must use the same layers as SumRootBiome.
+    ! The additional lower soil layer is not part of the root mass balance.
+    D5000: DO L=NU,MaxNumRootLays
 
       call SumRootBiome(yearIJ,NZ,masst_inital)
       call SumRootAR(NZ);call SumLitfallBlg(NZ)
@@ -285,7 +287,7 @@ implicit none
   !Withdrawal in layer L can also remove roots/mycorrhizae in the already processed
   !layer L-1. All categories and layers must be consistent before cytokinin transport.
   DO N=1,Myco_pft(NZ)
-    DO L=NU,MaxNumRootLays+1
+    DO L=NU,MaxNumRootLays
       IF(VLSoilPoreMicP_vr(L).GT.ZEROS2)THEN
         call DiagRootGeometry(yearIJ%I,yearIJ%J,N,L,NZ)
       ENDIF
@@ -5386,7 +5388,7 @@ implicit none
     Root1stDepz_raxes          => plt_morph%Root1stDepz_raxes           ,& !input  :root layer depth, [m]
     CumSoilThickness_vr        => plt_site%CumSoilThickness_vr          ,& !input  :depth to bottom of soil layer from surface of grid cell, [m]
     DLYR3                      => plt_site%DLYR3                        ,& !input  :vertical thickness of soil layer, [m]
-    NK                         => plt_site%NK                           ,& !input  :current soil root bottom layer number, [-]        
+    MaxNumRootLays             => plt_site%MaxNumRootLays               ,& !input  :lowest layer included in root mass accounting
     HypocotHeight_pft          => plt_morph%HypocotHeight_pft           ,& !input  :cotyledon height, [m]
     MaxSoilLays4Root_pft       => plt_morph%MaxSoilLays4Root_pft        ,& !input  :maximum soil layer number for all root axes,[-]  
     NGTopRootLayer_pft         => plt_morph%NGTopRootLayer_pft               ,& !input  :layer at planting depth
@@ -5397,11 +5399,14 @@ implicit none
 
   Root1stLocDepz_vr = 0._r8
   RootEffDepz_vr    = 0._r8
+  ! Root depth may extend beyond the bottom of the permitted rooting domain.
+  ! Keep its tip in the last root layer; NK includes an extra soil layer whose
+  ! reserves are excluded from SumRootBiome and must not supply the shoot.
+  MaxSoilLays4Root_pft(NZ) = MIN(MaxSoilLays4Root_pft(NZ),MaxNumRootLays)
   DO NR  = 1, NumStructuralRootAxes_pft(NZ)
-    DO L=1,NK
+    DO L=1,MaxNumRootLays
       IF(L.GT.NGTopRootLayer_pft(NZ) .AND. Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L-1))CYCLE
-      IF(Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L))then
-        !a patch to ensure proper tip growth 
+      IF(Root1stDepz_raxes(NR,NZ).LE.CumSoilThickness_vr(L) .OR. L.EQ.MaxNumRootLays)then
         MaxSoilLays4Root_pft(NZ)    = MAX(MaxSoilLays4Root_pft(NZ),L)
         NRoot1stTipLay_raxes(NR,NZ) = L
       endif
